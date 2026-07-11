@@ -1,0 +1,65 @@
+task_builder_plan:
+  agent: "dev_lead"
+  title: "Planear Arquitetura e Estrutura"
+  description: "Analisar a diretiva '{prompt_text}' e criar a arquitetura de software, definindo quais os ficheiros e scripts a serem criados na sandbox. Fala sempre em português de Portugal."
+  expected_output: "Um plano de arquitetura e estrutura de ficheiros estruturado em Markdown."
+
+task_builder_code:
+  agent: "coder"
+  title: "Implementar Ficheiros e Lógica"
+  description: "Com base no plano do dev_lead, escrever os ficheiros e scripts necessários na sandbox (ex: index.html, styles.css, app.js ou scripts python). Deves retornar os códigos completos no formato markdown. Fala sempre em português de Portugal."
+  expected_output: "Os blocos de código completos gerados na sandbox."
+
+task_builder_test:
+  agent: "tester"
+  title: "Auditar e Testar Código"
+  description: "Inspecionar os ficheiros gerados e garantir que o código funciona perfeitamente, sem erros de sintaxe ou imagens partidas. Fala sempre em português de Portugal."
+  expected_output: "Um relatório de testes estruturado em Markdown."
+
+task_operator_setup:
+  agent: "sys_admin"
+  title: "Planear Operações de Ficheiros"
+  description: "Planear as alterações de ficheiros, cópias de segurança ou comandos de sistema necessários para cumprir o objetivo '{prompt_text}'. Fala sempre em português de Portugal."
+  expected_output: "Um plano operacional detalhado em Markdown."
+
+task_operator_execute:
+  agent: "ops_specialist"
+  title: "Executar Comandos e Configurações"
+  description: "Executar ou gerar os comandos e scripts necessários para gerir a infraestrutura, contentores Docker ou processos locais. Fala sempre em português de Portugal."
+  expected_output: "Relatório de execução de infraestrutura e comandos efetuados em Markdown."
+
+task_creator_concept:
+  agent: "designer"
+  title: "Esboçar Ideia Visual"
+  description: "Planear a estética visual, layout e paleta de cores para o conteúdo ou produto '{prompt_text}'. Fala sempre em português de Portugal."
+  expected_output: "Um guia de estilo e conceito visual em Markdown."
+
+task_creator_copy:
+  agent: "copywriter"
+  title: "Redigir Textos Persuasivos"
+  description: "Redigir o texto completo do ebook, landing page ou campanha com base no conceito estético definido, utilizando tom de voz profissional. Fala sempre em português de Portugal."
+  expected_output: "Conteúdo textual completo escrito em Markdown."
+
+task_growth_niche:
+  agent: "market_analyst"
+  title: "Análise de Nichos Rentáveis"
+  description: "Pesquisar o mercado para '{prompt_text}' e encontrar os nichos com maior viabilidade financeira e menor concorrência. Fala sempre em português de Portugal."
+  expected_output: "Um relatório de análise de viabilidade de nicho em Markdown."
+
+task_growth_strategy:
+  agent: "growth_lead"
+  title: "Delinear Estratégia de SEO e Vendas"
+  description: "Com base no nicho selecionado, estruturar um plano de vendas completo com palavras-chave recomendadas para SEO e canais de monetização. Fala sempre em português de Portugal."
+  expected_output: "Um plano estratégico de marketing e monetização detalhado em Markdown."
+
+task_research_query:
+  agent: "researcher"
+  title: "Investigar e Compilar Dados"
+  description: "Pesquisar e compilar as informações essenciais para resolver a diretiva '{prompt_text}'. Fala sempre em português de Portugal."
+  expected_output: "Um relatório consolidado de pesquisa em Markdown."
+
+task_research_archive:
+  agent: "knowledge_manager"
+  title: "Estruturar e Arquivar no Obsidian"
+  description: "Escrever e organizar a informação recolhida em notas estruturadas dentro do Obsidian Vault. Fala sempre em português de Portugal."
+  expected_output: "Relatório de arquivamento detalhando as notas criadas/modificadas no Obsidian."

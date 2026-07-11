@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #030407;
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom glow effects */
+.text-shadow-glow {
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5), 0 0 20px rgba(6, 182, 212, 0.2);
+}
+
+.core-glow {
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.15), inset 0 0 20px rgba(168, 85, 247, 0.1);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.3);
+}
+
+/* Hologram animations classes */
+.hologram-wrapper.online {
+  filter: drop-shadow(0 0 15px rgba(6, 182, 212, 0.4));
+}
+
+.hologram-wrapper.processing {
+  filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.6));
+  animation: pulse-rapid 1.2s ease-in-out infinite alternate;
+}
+
+.hologram-wrapper.listening {
+  filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.6));
+  animation: pulse-rapid 1s ease-in-out infinite alternate;
+}
+
+.hologram-wrapper.transcribing {
+  filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.5));
+  animation: pulse-rapid 0.8s ease-in-out infinite alternate;
+}
+
+.hologram-wrapper.offline {
+  filter: grayscale(1) opacity(0.3);
+}
+
+@keyframes pulse-rapid {
+  0% {
+    transform: scale(0.97);
+  }
+  100% {
+    transform: scale(1.03);
+  }
+}
+
+/* Kanban custom styles */
+.card-pm {
+  border-left: 3px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.03);
+}
+.card-designer {
+  border-left: 3px solid #ec4899;
+  background: rgba(236, 72, 153, 0.03);
+}
+.card-developer {
+  border-left: 3px solid #a855f7;
+  background: rgba(168, 85, 247, 0.03);
+}
+.card-qa {
+  border-left: 3px solid #10b981;
+  background: rgba(16, 185, 129, 0.03);
+}

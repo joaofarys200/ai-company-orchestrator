@@ -1,0 +1,65 @@
+# Secrets and local env
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node/Electron
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+frontend/dist/
+dist/
+build/
+
+# Local data, memory and generated state
+database.db
+*.db
+*.sqlite
+*.sqlite3
+chroma_db/
+obsidian_vault/
+sandbox_dir/
+.jarvis_backups/
+.jarvis_plan.json
+symbols_index.json
+workspace/.jarvis/
+workspace/projects/*
+!workspace/projects/task-app/
+!workspace/projects/task-app/**
+config/loop_metrics.json
+config/session_memory.json
+
+# Personal documents
+CV -*
+
+# Logs and temporary files
+logs/
+*.log
+*.tmp
+*.temp
+.cache/
+scratch/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
