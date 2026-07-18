@@ -1,0 +1,9 @@
+# AirLLM is pinned because this experiment validates its documented 3.0.1
+# AutoModel.from_pretrained contract and fails closed for other versions.
+airllm==3.0.1
+
+# Required by the documented 4bit/8bit compression modes. AirLLM itself
+# already declares compatible Torch and Transformers dependencies.
+bitsandbytes
+python-dotenv
+
