@@ -138,8 +138,9 @@ PROJECT_PLAN_SCHEMA: dict[str, Any] = {
         "rationale": {"type": "string", "required": False, "default": ""},
     },
 }
-FOCAL_CORRECTION_PROTOCOL = "project_builder_focal_correction_v1"
-FOCAL_CORRECTION_RESPONSE_KEYS = {"plan_updates", "replacements", "correction_manifest"}
+FOCAL_CORRECTION_PROTOCOL = "project_builder_focal_correction_v2"
+FOCAL_CORRECTION_SCHEMA_VERSION = "project_builder_focal_correction_schema_v2"
+FOCAL_CORRECTION_RESPONSE_KEYS = {"plan_updates", "replacements"}
 FOCAL_PLAN_UPDATE_FIELDS_BY_ERROR: dict[str, set[str]] = {
     "MISSING_REQUESTED_COMPONENTS": {"components"},
     "MISSING_COMPONENT_MAPPING": {"component_files"},
@@ -294,6 +295,21 @@ class PlanAttemptRecord:
     base_prompt_length: int = 0
     correction_prompt_length: int = 0
     effective_prompt_length: int = 0
+    structured_output_enabled: bool = False
+    correction_schema_sha256: str = ""
+    correction_schema_length: int = 0
+    correction_schema_version: str = ""
+    streaming_enabled: bool = True
+
+
+@dataclass(frozen=True)
+class _OllamaGenerationContract:
+    response_format: str | dict[str, Any]
+    structured_output_enabled: bool = False
+    correction_schema_sha256: str = ""
+    correction_schema_length: int = 0
+    correction_schema_version: str = ""
+    streaming_enabled: bool = True
 
 
 class _PlanAttemptFailure(Exception):
@@ -516,6 +532,12 @@ class CorrectionEffectivenessResult:
     manifest_verified: bool = False
     revalidation: dict[str, Any] = field(default_factory=dict)
     rejection_reason: str = ""
+    model_manifest_accepted: bool = False
+    derived_changed_plan_fields: list[str] = field(default_factory=list)
+    derived_changed_files: list[str] = field(default_factory=list)
+    unchanged_replacements: list[str] = field(default_factory=list)
+    error_resolution_statuses: dict[str, str] = field(default_factory=dict)
+    revalidation_executed: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -537,6 +559,13 @@ class CorrectionEffectivenessResult:
             "manifest_verified": self.manifest_verified,
             "revalidation": deepcopy(self.revalidation),
             "rejection_reason": self.rejection_reason,
+            "focal_protocol_version": self.protocol,
+            "model_manifest_accepted": self.model_manifest_accepted,
+            "derived_changed_plan_fields": list(self.derived_changed_plan_fields),
+            "derived_changed_files": list(self.derived_changed_files),
+            "unchanged_replacements": list(self.unchanged_replacements),
+            "error_resolution_statuses": dict(self.error_resolution_statuses),
+            "revalidation_executed": self.revalidation_executed,
         }
 
 
@@ -3413,6 +3442,119 @@ def _is_focal_correction_prompt(correction: str | None) -> bool:
     return isinstance(payload, dict) and payload.get("protocol") == FOCAL_CORRECTION_PROTOCOL
 
 
+def _project_plan_field_json_schema(field_name: str) -> dict[str, Any]:
+    spec = PROJECT_PLAN_SCHEMA["properties"].get(field_name) or {}
+    field_type = spec.get("type")
+    if field_type == "string":
+        schema: dict[str, Any] = {"type": "string"}
+    elif field_type == "array[string]":
+        schema = {"type": "array", "items": {"type": "string"}}
+    elif field_type == "object[array[string]]":
+        schema = {
+            "type": "object",
+            "additionalProperties": {"type": "array", "items": {"type": "string"}},
+        }
+    elif field_type == "object":
+        schema = {"type": "object"}
+    else:
+        schema = {}
+    allowed_items = spec.get("allowed_items")
+    if field_type == "array[string]" and allowed_items:
+        schema["items"]["enum"] = list(allowed_items)
+    return schema
+
+
+def _focal_correction_response_schema(correction: str | dict[str, Any]) -> dict[str, Any]:
+    payload = json.loads(correction) if isinstance(correction, str) else deepcopy(correction)
+    if not isinstance(payload, dict) or payload.get("protocol") != FOCAL_CORRECTION_PROTOCOL:
+        raise ValueError("A correcao nao usa o protocolo focal suportado.")
+
+    allowed_plan_updates = sorted({
+        str(field_name)
+        for field_name in payload.get("allowed_plan_updates") or []
+        if str(field_name) in PROJECT_PLAN_SCHEMA["properties"]
+    })
+    allowed_replacements = sorted({
+        str(path) for path in payload.get("allowed_replacements") or [] if str(path)
+    })
+    plan_update_context = payload.get("plan_update_context") or {}
+
+    plan_update_properties: dict[str, Any] = {}
+    for field_name in allowed_plan_updates:
+        field_schema = _project_plan_field_json_schema(field_name)
+        if field_name == "components":
+            expected = (plan_update_context.get("components") or {}).get(
+                "expected_final_complete_value"
+            )
+            if isinstance(expected, list) and all(isinstance(item, str) for item in expected):
+                field_schema = {"const": list(expected)}
+        plan_update_properties[field_name] = field_schema
+
+    replacement_item: dict[str, Any] = {
+        "type": "object",
+        "required": ["path", "content"],
+        "additionalProperties": False,
+        "properties": {
+            "path": {"type": "string"},
+            "content": {"type": "string", "minLength": 1},
+        },
+    }
+    replacements_schema: dict[str, Any] = {
+        "type": "array",
+        "items": replacement_item,
+    }
+    if allowed_replacements:
+        replacement_item["properties"]["path"]["enum"] = allowed_replacements
+    else:
+        replacements_schema["maxItems"] = 0
+
+    return {
+        "type": "object",
+        "required": ["plan_updates", "replacements"],
+        "additionalProperties": False,
+        "properties": {
+            "plan_updates": {
+                "type": "object",
+                "properties": plan_update_properties,
+                "additionalProperties": False,
+            },
+            "replacements": replacements_schema,
+        },
+    }
+
+
+def _ollama_generation_contract(correction: str | None) -> _OllamaGenerationContract:
+    if not _is_focal_correction_prompt(correction):
+        return _OllamaGenerationContract(response_format="json")
+    schema = _focal_correction_response_schema(str(correction))
+    encoded = json.dumps(
+        schema,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return _OllamaGenerationContract(
+        response_format=schema,
+        structured_output_enabled=True,
+        correction_schema_sha256=hashlib.sha256(encoded).hexdigest(),
+        correction_schema_length=len(encoded),
+        correction_schema_version=FOCAL_CORRECTION_SCHEMA_VERSION,
+        streaming_enabled=True,
+    )
+
+
+def _is_structured_output_rejection(response_body: str) -> bool:
+    normalized = response_body.casefold()
+    structured_markers = ("json schema", "json_schema", "structured output", "format")
+    rejection_markers = (
+        "unsupported", "not supported", "does not support", "unknown", "not implemented",
+    )
+    return (
+        any(marker in normalized for marker in structured_markers)
+        and any(marker in normalized for marker in rejection_markers)
+    )
+
+
 def _ollama_messages(prompt: str, correction: str | None, compact: bool) -> list[dict[str, str]]:
     if _is_focal_correction_prompt(correction):
         return [
@@ -3529,8 +3671,21 @@ class OllamaPlanRequester:
                 "max_output_tokens": self.max_output_tokens,
                 "context_tokens": self.num_ctx,
                 "keep_alive": self.keep_alive,
-                "stream": True,
+                "stream": latest.streaming_enabled if latest else True,
                 "json_format": True,
+                "structured_output_enabled": (
+                    latest.structured_output_enabled if latest else False
+                ),
+                "correction_schema_sha256": (
+                    latest.correction_schema_sha256 if latest else ""
+                ),
+                "correction_schema_length": (
+                    latest.correction_schema_length if latest else 0
+                ),
+                "correction_schema_version": (
+                    latest.correction_schema_version if latest else ""
+                ),
+                "streaming_enabled": latest.streaming_enabled if latest else True,
             },
             "first_error": self.first_error,
             "final_error": self.final_error,
@@ -3709,14 +3864,15 @@ class OllamaPlanRequester:
         correction: str | None,
         attempt: int,
         readiness: dict[str, Any],
+        generation_contract: _OllamaGenerationContract,
     ) -> str:
         compact = attempt > 1
         messages = _ollama_messages(prompt, correction, compact)
         payload = {
             "model": self.model,
             "messages": messages,
-            "stream": True,
-            "format": "json",
+            "stream": generation_contract.streaming_enabled,
+            "format": generation_contract.response_format,
             "think": False,
             "keep_alive": self.keep_alive,
             "options": {
@@ -3735,6 +3891,17 @@ class OllamaPlanRequester:
             async with self._client(self.timeout_config.to_httpx()) as client:
                 async with client.stream("POST", "/api/chat", json=payload) as response:
                     if response.status_code >= 400:
+                        response_body = (await response.aread()).decode("utf-8", errors="replace")
+                        if (
+                            generation_contract.structured_output_enabled
+                            and _is_structured_output_rejection(response_body)
+                        ):
+                            raise _PlanAttemptFailure(
+                                "CORRECTION_STRUCTURED_OUTPUT_UNSUPPORTED",
+                                "O provider rejeitou structured output com JSON Schema.",
+                                retryable=False,
+                                error_type="StructuredOutputUnsupported",
+                            )
                         raise _PlanAttemptFailure(
                             "PLAN_HTTP_ERROR",
                             f"Ollama planning devolveu HTTP {response.status_code}.",
@@ -3840,10 +4007,17 @@ class OllamaPlanRequester:
             effective_prompt_length = _ollama_message_length(
                 _ollama_messages(prompt, correction, attempt > 1)
             )
+            generation_contract = _ollama_generation_contract(correction)
             started = time.monotonic()
             try:
                 readiness = await self._readiness(attempt)
-                result = await self._generate(prompt, correction, attempt, readiness)
+                result = await self._generate(
+                    prompt,
+                    correction,
+                    attempt,
+                    readiness,
+                    generation_contract,
+                )
             except _PlanAttemptFailure as failure:
                 duration = time.monotonic() - started
                 can_retry = (
@@ -3865,6 +4039,11 @@ class OllamaPlanRequester:
                     base_prompt_length=base_prompt_length,
                     correction_prompt_length=correction_prompt_length,
                     effective_prompt_length=effective_prompt_length,
+                    structured_output_enabled=generation_contract.structured_output_enabled,
+                    correction_schema_sha256=generation_contract.correction_schema_sha256,
+                    correction_schema_length=generation_contract.correction_schema_length,
+                    correction_schema_version=generation_contract.correction_schema_version,
+                    streaming_enabled=generation_contract.streaming_enabled,
                 )
                 self.attempts.append(record)
                 error_data = {
@@ -3891,6 +4070,11 @@ class OllamaPlanRequester:
                         "category": failure.category,
                         "retry_reason": retry_reason,
                         "partial_response": failure.partial_response,
+                        "structured_output_enabled": generation_contract.structured_output_enabled,
+                        "correction_schema_sha256": generation_contract.correction_schema_sha256,
+                        "correction_schema_length": generation_contract.correction_schema_length,
+                        "correction_schema_version": generation_contract.correction_schema_version,
+                        "streaming_enabled": generation_contract.streaming_enabled,
                     }, ensure_ascii=True),
                 )
                 if can_retry:
@@ -3914,6 +4098,11 @@ class OllamaPlanRequester:
                 base_prompt_length=base_prompt_length,
                 correction_prompt_length=correction_prompt_length,
                 effective_prompt_length=effective_prompt_length,
+                structured_output_enabled=generation_contract.structured_output_enabled,
+                correction_schema_sha256=generation_contract.correction_schema_sha256,
+                correction_schema_length=generation_contract.correction_schema_length,
+                correction_schema_version=generation_contract.correction_schema_version,
+                streaming_enabled=generation_contract.streaming_enabled,
             ))
             self.final_error = None
             logger.info(
@@ -3929,6 +4118,11 @@ class OllamaPlanRequester:
                     "correction_prompt_length": correction_prompt_length,
                     "effective_prompt_length": effective_prompt_length,
                     "response_length": response_length,
+                    "structured_output_enabled": generation_contract.structured_output_enabled,
+                    "correction_schema_sha256": generation_contract.correction_schema_sha256,
+                    "correction_schema_length": generation_contract.correction_schema_length,
+                    "correction_schema_version": generation_contract.correction_schema_version,
+                    "streaming_enabled": generation_contract.streaming_enabled,
                 }, ensure_ascii=True),
             )
             return result
@@ -4049,6 +4243,7 @@ def _with_validation_history(
     if _is_focal_correction_prompt(correction):
         correction_payload = json.loads(str(correction))
         result["focal_correction_protocol"] = correction_payload.get("protocol")
+        result["focal_protocol_version"] = correction_payload.get("protocol")
         result["correction_error_count"] = len(correction_payload.get("errors") or [])
         result["correction_files_sent_count"] = len(correction_payload.get("affected_files") or {})
     if history:
@@ -4081,6 +4276,24 @@ def _with_validation_history(
             )
             result["correction_rejection_reason"] = str(
                 effectiveness.get("rejection_reason") or ""
+            )
+            result["model_manifest_accepted"] = bool(
+                effectiveness.get("model_manifest_accepted", False)
+            )
+            result["derived_changed_plan_fields"] = list(
+                effectiveness.get("derived_changed_plan_fields") or []
+            )
+            result["derived_changed_files"] = list(
+                effectiveness.get("derived_changed_files") or []
+            )
+            result["unchanged_replacements"] = list(
+                effectiveness.get("unchanged_replacements") or []
+            )
+            result["error_resolution_statuses"] = dict(
+                effectiveness.get("error_resolution_statuses") or {}
+            )
+            result["correction_revalidation_executed"] = bool(
+                effectiveness.get("revalidation_executed", False)
             )
     return result
 
@@ -4522,8 +4735,7 @@ def _strict_focal_path(value: Any) -> str:
 
 def _strict_focal_correction_envelope(
     raw: str | dict[str, Any],
-    failure: _PlanValidationFailure,
-) -> tuple[dict[str, Any], list[dict[str, str]], list[dict[str, Any]], list[PlanValidationIssue]]:
+) -> tuple[dict[str, Any], list[dict[str, str]], list[PlanValidationIssue]]:
     errors: list[PlanValidationIssue] = []
     try:
         if isinstance(raw, dict):
@@ -4539,7 +4751,7 @@ def _strict_focal_correction_envelope(
             actual=type(exc).__name__,
             suggestion="Responde apenas com JSON sintaticamente valido.",
         ))
-        return {}, [], [], errors
+        return {}, [], errors
     if not isinstance(payload, dict):
         errors.append(_correction_contract_issue(
             "CORRECTION_RESPONSE_SCHEMA_INVALID",
@@ -4547,9 +4759,9 @@ def _strict_focal_correction_envelope(
             field_path="$",
             expected="object",
             actual=type(payload).__name__,
-            suggestion="Usa plan_updates, replacements e correction_manifest.",
+            suggestion="Usa apenas plan_updates e replacements.",
         ))
-        return {}, [], [], errors
+        return {}, [], errors
 
     payload_keys = set(payload)
     unknown = sorted(payload_keys - FOCAL_CORRECTION_RESPONSE_KEYS)
@@ -4561,7 +4773,7 @@ def _strict_focal_correction_envelope(
             "CORRECTION_FULL_PLAN_FORBIDDEN",
             "A resposta tentou devolver um plano completo em vez de uma correcao focal.",
             field_path="$",
-            expected="plan_updates, replacements and correction_manifest only",
+            expected="plan_updates and replacements only",
             actual=f"keys={sorted(payload_keys)}",
             suggestion="Devolve apenas os campos e ficheiros realmente alterados.",
         ))
@@ -4581,7 +4793,7 @@ def _strict_focal_correction_envelope(
             field_path="$",
             expected=f"keys={sorted(FOCAL_CORRECTION_RESPONSE_KEYS)}",
             actual=f"missing={missing}",
-            suggestion="Inclui plan_updates, replacements e correction_manifest.",
+            suggestion="Inclui plan_updates e replacements.",
         ))
 
     plan_updates = payload.get("plan_updates")
@@ -4634,14 +4846,14 @@ def _strict_focal_correction_envelope(
             ))
             continue
         content = item.get("content")
-        if not isinstance(content, str):
+        if not isinstance(content, str) or not content:
             errors.append(_correction_contract_issue(
                 "CORRECTION_REPLACEMENT_INVALID",
-                f"{field_path}.content deve ser uma string integral.",
+                f"{field_path}.content deve ser uma string integral nao vazia.",
                 field_path=f"{field_path}.content",
                 file=path,
-                expected="string",
-                actual=type(content).__name__,
+                expected="non-empty string",
+                actual="empty string" if content == "" else type(content).__name__,
                 suggestion="Devolve o conteudo completo do ficheiro.",
             ))
             continue
@@ -4659,91 +4871,67 @@ def _strict_focal_correction_envelope(
         seen_paths.add(path)
         replacements.append({"path": path, "content": content})
 
-    manifest_raw = payload.get("correction_manifest")
+    return deepcopy(plan_updates), replacements, _deduplicate_issues(errors)
+
+
+def _focal_error_resolution_statuses(
+    first_failure: _PlanValidationFailure,
+    revalidation_errors: list[PlanValidationIssue] | None = None,
+    *,
+    semantic_evaluated: bool,
+) -> dict[str, str]:
+    original_codes = list(dict.fromkeys(issue.code for issue in first_failure.errors))
+    if not semantic_evaluated:
+        return {code: "NOT_EVALUATED" for code in original_codes}
+    remaining_codes = {issue.code for issue in revalidation_errors or []}
+    return {
+        code: "UNRESOLVED" if code in remaining_codes else "RESOLVED"
+        for code in original_codes
+    }
+
+
+def _derived_focal_manifest(
+    first_failure: _PlanValidationFailure,
+    scope_by_error: dict[str, dict[str, list[str]]],
+    original_plan: dict[str, Any],
+    candidate: dict[str, Any],
+    hashes_before: dict[str, str],
+    hashes_after: dict[str, str],
+    changed_plan_fields: list[str],
+    changed_files: list[str],
+    resolution_statuses: dict[str, str],
+) -> list[dict[str, Any]]:
+    changed_plan = set(changed_plan_fields)
+    changed_paths = set(changed_files)
     manifest: list[dict[str, Any]] = []
-    known_codes = {issue.code for issue in failure.errors}
-    if not isinstance(manifest_raw, list):
-        errors.append(_correction_contract_issue(
-            "CORRECTION_MANIFEST_INVALID",
-            "correction_manifest deve ser uma lista.",
-            expected="array",
-            actual=type(manifest_raw).__name__,
-            suggestion="Inclui uma entrada para cada error_code recebido.",
-        ))
-        manifest_raw = []
-    for index, item in enumerate(manifest_raw):
-        field_path = f"correction_manifest[{index}]"
-        if not isinstance(item, dict) or set(item) != {"error_code", "changed_artifacts", "resolution"}:
-            errors.append(_correction_contract_issue(
-                "CORRECTION_MANIFEST_INVALID",
-                f"{field_path} nao cumpre o schema focal.",
-                field_path=field_path,
-                expected="error_code, changed_artifacts and resolution only",
-                actual=_summarize_offending(item),
-                suggestion="Preenche exatamente os tres campos obrigatorios.",
-            ))
-            continue
-        code = item.get("error_code")
-        changed = item.get("changed_artifacts")
-        resolution = item.get("resolution")
-        if not isinstance(code, str) or not code.strip() or code.strip() not in known_codes:
-            errors.append(_correction_contract_issue(
-                "CORRECTION_UNKNOWN_ERROR_CODE",
-                f"O manifesto referencia um error_code desconhecido: {code}.",
-                field_path=f"{field_path}.error_code",
-                expected=f"one of {sorted(known_codes)}",
-                actual=str(code or ""),
-                suggestion="Usa apenas error_code recebidos na prompt focal.",
-            ))
-            continue
-        if (
-            not isinstance(changed, list) or not changed
-            or not all(isinstance(value, str) and value.strip() for value in changed)
-            or not isinstance(resolution, str) or not resolution.strip()
-        ):
-            errors.append(_correction_contract_issue(
-                "CORRECTION_MANIFEST_INVALID",
-                f"{field_path} deve declarar artefactos alterados e uma resolucao factual.",
-                field_path=field_path,
-                expected="non-empty changed_artifacts and resolution",
-                actual=_summarize_offending(item),
-                suggestion="Declara apenas alteracoes reais realizadas por esta correcao.",
-            ))
-            continue
-        normalized_artifacts: list[str] = []
-        artifact_invalid = False
-        for artifact in changed:
-            if artifact in PROJECT_PLAN_SCHEMA["properties"] and artifact != "files":
-                normalized_artifacts.append(artifact)
-                continue
-            try:
-                normalized_artifacts.append(_strict_focal_path(artifact))
-            except ProjectBuilderError as exc:
-                artifact_invalid = True
-                errors.append(_correction_contract_issue(
-                    "CORRECTION_MANIFEST_INVALID",
-                    str(exc),
-                    field_path=f"{field_path}.changed_artifacts",
-                    actual=str(artifact),
-                    suggestion="Declara apenas paths ou campos de plano permitidos.",
-                ))
-        if artifact_invalid:
-            continue
-        if len(normalized_artifacts) != len(set(normalized_artifacts)):
-            errors.append(_correction_contract_issue(
-                "CORRECTION_DUPLICATE_ARTIFACT",
-                f"{field_path} declara o mesmo artefacto mais do que uma vez.",
-                field_path=f"{field_path}.changed_artifacts",
-                actual=str(normalized_artifacts),
-                suggestion="Declara cada artefacto exatamente uma vez.",
-            ))
-            continue
+    for code in dict.fromkeys(issue.code for issue in first_failure.errors):
+        scope = scope_by_error.get(code) or {"plan_updates": [], "replacements": []}
+        scoped_plan_fields = sorted(changed_plan.intersection(scope.get("plan_updates") or []))
+        scoped_files = sorted(changed_paths.intersection(scope.get("replacements") or []))
+        evidence: dict[str, Any] = {}
+        if scoped_plan_fields:
+            evidence["plan_fields"] = {
+                field_name: {
+                    "before": deepcopy(original_plan.get(field_name)),
+                    "after": deepcopy(candidate.get(field_name)),
+                }
+                for field_name in scoped_plan_fields
+            }
+        if scoped_files:
+            evidence["file_hashes"] = {
+                path: {
+                    "hash_before": hashes_before.get(path, ""),
+                    "hash_after": hashes_after.get(path, ""),
+                }
+                for path in scoped_files
+            }
         manifest.append({
-            "error_code": code.strip(),
-            "changed_artifacts": normalized_artifacts,
-            "resolution": resolution.strip(),
+            "error_code": code,
+            "changed_artifacts": scoped_plan_fields + scoped_files,
+            "resolution_status": resolution_statuses.get(code, "NOT_EVALUATED"),
+            "evidence": evidence,
         })
-    return deepcopy(plan_updates), replacements, manifest, _deduplicate_issues(errors)
+    return manifest
 
 
 def _focal_failure(
@@ -4786,9 +4974,13 @@ def _validated_focal_correction_response(
     original_plan_hash = _plan_hash(original_plan) if original_plan else ""
     before_source = _safe_correction_source(original_plan)
     scope_by_error, allowed_plan_updates, allowed_replacements = _focal_correction_scope(first_failure)
-    plan_updates, replacements, manifest, errors = _strict_focal_correction_envelope(
-        raw, first_failure
+    plan_updates, replacements, errors = _strict_focal_correction_envelope(raw)
+    resolution_statuses = _focal_error_resolution_statuses(
+        first_failure,
+        semantic_evaluated=False,
     )
+    manifest: list[dict[str, Any]] = []
+    unchanged_replacements: list[str] = []
     effectiveness = CorrectionEffectivenessResult(
         valid=False,
         protocol=FOCAL_CORRECTION_PROTOCOL,
@@ -4799,7 +4991,9 @@ def _validated_focal_correction_response(
         hashes_before=before_source.hashes(),
         hashes_after=before_source.hashes(),
         error_artifact_mappings=deepcopy(first_failure.error_artifact_mappings),
-        correction_manifest=deepcopy(manifest),
+        correction_manifest=[],
+        model_manifest_accepted=False,
+        error_resolution_statuses=resolution_statuses,
         revalidation={
             "structural": "NOT_RUN",
             "semantic": "NOT_RUN",
@@ -4867,6 +5061,7 @@ def _validated_focal_correction_response(
                 suggestion="Nao cries, removas ou renomeies ficheiros nesta correcao.",
             ))
         elif hashlib.sha256(content.encode("utf-8")).hexdigest() == original_file.content_hash:
+            unchanged_replacements.append(path)
             errors.append(_correction_contract_issue(
                 "CORRECTION_DECLARED_FILE_UNCHANGED",
                 f"O replacement de {path} e identico ao conteudo original.",
@@ -4879,6 +5074,19 @@ def _validated_focal_correction_response(
 
     errors = _deduplicate_issues(errors)
     if errors:
+        effectiveness.unchanged_replacements = sorted(unchanged_replacements)
+        manifest = _derived_focal_manifest(
+            first_failure,
+            scope_by_error,
+            original_plan,
+            original_plan,
+            before_source.hashes(),
+            before_source.hashes(),
+            [],
+            [],
+            resolution_statuses,
+        )
+        effectiveness.correction_manifest = deepcopy(manifest)
         effectiveness.rejection_reason = errors[0].code
         raise _focal_failure(
             first_failure, raw_response_length, errors, effectiveness, manifest
@@ -4905,85 +5113,45 @@ def _validated_focal_correction_response(
     actual_changes = set(changed_files) | set(changed_plan_fields)
     effectiveness.hashes_after = after_hashes
     effectiveness.changed_artifacts = sorted(actual_changes)
+    effectiveness.derived_changed_plan_fields = changed_plan_fields
+    effectiveness.derived_changed_files = changed_files
+    effectiveness.unchanged_replacements = sorted(unchanged_replacements)
     effectiveness.replacements_applied = len(changed_files)
     effectiveness.unchanged_affected_artifacts = sorted(
         set(allowed_replacements) - set(changed_files)
     )
+    manifest = _derived_focal_manifest(
+        first_failure,
+        scope_by_error,
+        original_plan,
+        candidate,
+        before_hashes,
+        after_hashes,
+        changed_plan_fields,
+        changed_files,
+        resolution_statuses,
+    )
+    effectiveness.correction_manifest = deepcopy(manifest)
 
-    expected_codes = {issue.code for issue in first_failure.errors}
-    manifest_codes = [item["error_code"] for item in manifest]
-    if len(manifest_codes) != len(set(manifest_codes)):
-        errors.append(_correction_contract_issue(
-            "CORRECTION_DUPLICATE_ERROR_CODE",
-            "O manifesto declara o mesmo error_code mais do que uma vez.",
-            expected="one manifest entry per error code",
-            actual=str(manifest_codes),
-            suggestion="Consolida cada error_code numa unica entrada.",
-        ))
-    if set(manifest_codes) != expected_codes:
-        errors.append(_correction_contract_issue(
-            "CORRECTION_MANIFEST_INVALID",
-            "O manifesto nao corresponde exatamente aos erros recebidos.",
-            expected=f"error codes {sorted(expected_codes)}",
-            actual=f"error codes {sorted(set(manifest_codes))}",
-            suggestion="Inclui uma entrada por erro recebido e nenhum error_code adicional.",
-        ))
-
-    declared_artifacts: list[str] = []
-    for item in manifest:
-        code = item["error_code"]
-        scope = scope_by_error.get(code) or {"plan_updates": [], "replacements": []}
-        allowed_for_error = set(scope["plan_updates"]) | set(scope["replacements"])
-        for artifact in item["changed_artifacts"]:
-            if artifact in declared_artifacts:
-                errors.append(_correction_contract_issue(
-                    "CORRECTION_DUPLICATE_ARTIFACT",
-                    f"O artefacto {artifact} foi declarado mais do que uma vez no manifesto.",
-                    file=artifact if artifact in before_hashes else "",
-                    expected="artifact declared exactly once",
-                    actual=artifact,
-                    suggestion="Atribui cada alteracao a uma unica entrada do manifesto.",
-                ))
-            declared_artifacts.append(artifact)
-            if artifact not in allowed_for_error:
-                errors.append(_correction_contract_issue(
-                    "CORRECTION_ARTIFACT_OUT_OF_SCOPE",
-                    f"O artefacto {artifact} nao esta autorizado para {code}.",
-                    file=artifact if artifact in before_hashes else "",
-                    expected=f"one of {sorted(allowed_for_error)}",
-                    actual=artifact,
-                    suggestion="Declara a alteracao apenas no erro que a autoriza.",
-                ))
-            if artifact not in actual_changes:
-                errors.append(_correction_contract_issue(
-                    "CORRECTION_DECLARED_ARTIFACT_UNCHANGED",
-                    f"O manifesto declara {artifact}, mas nao existe alteracao real.",
-                    file=artifact if artifact in before_hashes else "",
-                    expected="observable change",
-                    actual="unchanged",
-                    suggestion="Remove declaracoes sem diff real.",
-                ))
-    undeclared = sorted(actual_changes - set(declared_artifacts))
-    if undeclared:
-        errors.append(_correction_contract_issue(
-            "CORRECTION_CHANGED_ARTIFACT_UNDECLARED",
-            f"Existem alteracoes reais ausentes do manifesto: {undeclared}.",
-            expected="every changed artifact declared exactly once",
-            actual=str(undeclared),
-            suggestion="Declara todos os replacements e plan_updates aplicados.",
-        ))
-
-    errors = _deduplicate_issues(errors)
-    if errors:
-        effectiveness.rejection_reason = errors[0].code
-        raise _focal_failure(
-            first_failure, raw_response_length, errors, effectiveness, manifest
+    if not actual_changes:
+        pending_codes = list(dict.fromkeys(issue.code for issue in first_failure.errors))
+        issue = _correction_contract_issue(
+            "CORRECTION_NO_EFFECT",
+            "A correcao focal nao alterou campos do plano nem ficheiros.",
+            field_path="$",
+            expected="at least one derived plan-field or file diff",
+            actual=f"changed_plan_fields=[]; changed_files=[]; pending_errors={pending_codes}",
+            suggestion="Devolve apenas alteracoes reais que resolvam os erros semanticos pendentes.",
         )
-    effectiveness.manifest_verified = True
+        effectiveness.rejection_reason = issue.code
+        raise _focal_failure(
+            first_failure, raw_response_length, [issue], effectiveness, manifest
+        )
 
     try:
         processed = _validated_raw_project_plan(candidate, prompt)
     except _PlanValidationFailure as failure:
+        effectiveness.revalidation_executed = True
         effectiveness.errors = list(failure.errors)
         if failure.category == "PLAN_SCHEMA_INVALID":
             effectiveness.revalidation["structural"] = "FAILED"
@@ -4998,6 +5166,24 @@ def _validated_focal_correction_response(
         effectiveness.revalidation["category"] = failure.category
         effectiveness.revalidation["errors"] = [item.to_dict() for item in failure.errors]
         effectiveness.rejection_reason = failure.errors[0].code if failure.errors else failure.category
+        resolution_statuses = _focal_error_resolution_statuses(
+            first_failure,
+            failure.errors,
+            semantic_evaluated=failure.category != "PLAN_SCHEMA_INVALID",
+        )
+        manifest = _derived_focal_manifest(
+            first_failure,
+            scope_by_error,
+            original_plan,
+            candidate,
+            before_hashes,
+            after_hashes,
+            changed_plan_fields,
+            changed_files,
+            resolution_statuses,
+        )
+        effectiveness.error_resolution_statuses = resolution_statuses
+        effectiveness.correction_manifest = deepcopy(manifest)
         failure.parsed_plan = deepcopy(original_plan)
         failure.virtual_files = before_source.metadata()
         failure.error_artifact_mappings = deepcopy(first_failure.error_artifact_mappings)
@@ -5019,6 +5205,7 @@ def _validated_focal_correction_response(
             "semantic": "NOT_RUN",
             "integrity": "NOT_RUN",
         })
+        effectiveness.revalidation_executed = True
         effectiveness.rejection_reason = issue.code
         raise _focal_failure(
             first_failure, raw_response_length, [issue], effectiveness, manifest
@@ -5037,6 +5224,25 @@ def _validated_focal_correction_response(
         )
 
     effectiveness.valid = True
+    effectiveness.revalidation_executed = True
+    resolution_statuses = _focal_error_resolution_statuses(
+        first_failure,
+        semantic_evaluated=True,
+    )
+    manifest = _derived_focal_manifest(
+        first_failure,
+        scope_by_error,
+        original_plan,
+        candidate,
+        before_hashes,
+        after_hashes,
+        changed_plan_fields,
+        changed_files,
+        resolution_statuses,
+    )
+    effectiveness.error_resolution_statuses = resolution_statuses
+    effectiveness.correction_manifest = deepcopy(manifest)
+    effectiveness.manifest_verified = True
     effectiveness.revalidation = {
         "structural": "PASSED",
         "semantic": "PASSED",
@@ -5123,7 +5329,7 @@ def _legacy_structured_plan_correction(
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 
-def _focal_structured_plan_correction(failure: _PlanValidationFailure) -> str:
+def _focal_structured_plan_correction(failure: _PlanValidationFailure, prompt: str) -> str:
     source = _safe_correction_source(failure.parsed_plan)
     scope_by_error, allowed_plan_updates, allowed_replacements = _focal_correction_scope(failure)
     mappings_by_code: dict[str, list[dict[str, Any]]] = {}
@@ -5169,6 +5375,47 @@ def _focal_structured_plan_correction(failure: _PlanValidationFailure) -> str:
         for path in allowed_replacements
         if source.get(path) is not None
     }
+    original_components = list((failure.parsed_plan or {}).get("components") or [])
+    requested_components = _requested_components(prompt)
+    missing_components = [
+        component for component in requested_components
+        if component not in original_components
+    ]
+    expected_components = original_components + missing_components
+    plan_update_context: dict[str, Any] = {}
+    if "components" in allowed_plan_updates:
+        plan_update_context["components"] = {
+            "original_complete_value": original_components,
+            "missing_requested_components": missing_components,
+            "expected_final_complete_value": expected_components,
+        }
+
+    test_entrypoint_contracts: list[dict[str, Any]] = []
+    for mapping in failure.error_artifact_mappings:
+        if mapping.get("code") != "TEST_DOES_NOT_EXERCISE_ENTRYPOINT":
+            continue
+        evidence = mapping.get("evidence") or {}
+        test_file = str(evidence.get("test_artifact") or "tests/run-tests.js")
+        backend_entrypoint = str(evidence.get("backend_entrypoint") or "backend/server.js")
+        test_entrypoint_contracts.append({
+            "test_file": test_file,
+            "backend_entrypoint": backend_entrypoint,
+            "mandatory_postconditions": [
+                f"{test_file} must import, start or execute {backend_entrypoint}.",
+                f"{test_file} must make a real request to /health.",
+                "The real backend process must always be terminated at the end of the test.",
+            ],
+            "forbidden": [
+                f"Creating http.createServer inside {test_file} is forbidden.",
+                "Keeping the previous synthetic server is forbidden.",
+                "Do not claim that importing or starting the backend is impractical.",
+            ],
+            "precedence": "The required postconditions override model preferences or objections.",
+            "failure_condition": (
+                f"A response that keeps http.createServer in {test_file} has not corrected the error."
+            ),
+        })
+
     payload: dict[str, Any] = {
         "protocol": FOCAL_CORRECTION_PROTOCOL,
         "instruction": (
@@ -5177,23 +5424,55 @@ def _focal_structured_plan_correction(failure: _PlanValidationFailure) -> str:
         ),
         "response_schema": {
             "plan_updates": {
-                "description": "only plan fields actually changed",
+                "description": "only plan fields actually changed, each containing its complete final value",
                 "allowed_fields": allowed_plan_updates,
+                "value_semantics": "complete final values only; never append, add, patch or delta operations",
             },
             "replacements": [{
                 "path": "one existing path from allowed_replacements",
                 "content": "complete corrected file content",
             }],
-            "correction_manifest": [{
-                "error_code": "one error_code received below",
-                "changed_artifacts": ["changed plan field or replacement path"],
-                "resolution": "brief factual resolution",
-            }],
         },
+        "model_generated_manifest_forbidden": True,
         "errors": errors_payload,
         "allowed_plan_updates": allowed_plan_updates,
+        "plan_update_context": plan_update_context,
+        "plan_update_semantics": {
+            "mandatory_rule": (
+                "plan_updates não usa operações append, add, patch ou delta. "
+                "Cada campo contém o seu valor final completo."
+            ),
+            "mandatory_components_example": {
+                "Original": ["frontend", "backend", "persistence", "tests"],
+                "Inválido": ["preview"],
+                "Válido": ["frontend", "backend", "persistence", "tests", "preview"],
+            },
+        },
         "allowed_replacements": allowed_replacements,
+        "replacement_allowlist_semantics": {
+            "mandatory_rule": (
+                "The files in allowed_replacements are an allowlist, not a list of mandatory changes."
+            ),
+            "rules": [
+                "Return only files whose final content is actually different from the original content.",
+                "Before including a replacement, silently compare it byte for byte with the original content.",
+                "If the content is identical byte for byte, omit the replacement.",
+                "An error may be resolved by changing only a subset of its allowed files.",
+            ],
+            "mandatory_subset_example": {
+                "allowed_replacements": ["tests/run-tests.js", "backend/server.js"],
+                "condition": "Only tests/run-tests.js needs to change.",
+                "valid_response_fragment": {
+                    "replacements": [{
+                        "path": "tests/run-tests.js",
+                        "content": "<complete corrected content of tests/run-tests.js>",
+                    }],
+                },
+                "must_be_omitted": ["backend/server.js"],
+            },
+        },
         "affected_files": affected_files,
+        "test_entrypoint_contracts": test_entrypoint_contracts,
         "requirements": [
             "Do not regenerate or return the complete project plan.",
             "Do not return files whose content is unchanged.",
@@ -5201,26 +5480,40 @@ def _focal_structured_plan_correction(failure: _PlanValidationFailure) -> str:
             "Return the complete content of every replaced file, never a partial patch.",
             "Treat every required_postcondition as mandatory; do not discuss or bypass it.",
             "Do not change artifacts outside the per-error allowlists.",
-            "Do not declare changes that did not occur.",
+            "Do not return correction_manifest, changed_artifacts or any field outside response_schema.",
+            "Every plan_updates field must contain its complete final value, never an append/add/patch/delta.",
+            "Allowed replacement files are optional candidates; return only the changed subset.",
             "Return exactly one valid JSON object without markdown or additional text.",
         ],
         "silent_verification_before_response": [
             "Every error is actually resolved.",
-            "Every declared artifact has a real content or value change.",
+            "Every returned plan update or replacement has a real content or value change.",
             "Every replacement path is allowed and appears exactly once.",
             "No artifact outside the requested scope changed.",
+            "Every returned file has a content hash different from its original hash.",
+            "components contains the complete final array, not only newly added components.",
             "The response is syntactically valid JSON matching response_schema.",
         ],
     }
+    for contract in test_entrypoint_contracts:
+        test_file = contract["test_file"]
+        backend_entrypoint = contract["backend_entrypoint"]
+        payload["silent_verification_before_response"].extend([
+            f"{test_file} contains an executable reference to {backend_entrypoint}.",
+            f"{test_file} does not contain http.createServer.",
+            f"{test_file} makes a real request to /health.",
+            "The backend is terminated at the end of the test, including on failure.",
+        ])
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 
 def _structured_plan_correction(
     failure: _PlanValidationFailure,
     previous_raw: str | dict[str, Any],
+    prompt: str,
 ) -> str:
     if failure.category == "PLAN_SEMANTIC_INVALID":
-        return _focal_structured_plan_correction(failure)
+        return _focal_structured_plan_correction(failure, prompt)
     return _legacy_structured_plan_correction(failure, previous_raw)
 
 
@@ -5279,7 +5572,7 @@ async def get_valid_project_plan(prompt: str, requester: PlanRequester | None = 
                     "O plano devolvido e invalido e o limite de tentativas foi atingido.",
                     diagnostics,
                 ) from first_error.cause
-        correction = _structured_plan_correction(first_error, first_raw)
+        correction = _structured_plan_correction(first_error, first_raw, prompt)
         corrected_raw = await _maybe_await_plan(
             selected_requester,
             planning_prompt,

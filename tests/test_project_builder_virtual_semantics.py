@@ -117,7 +117,7 @@ def static_analysis(plan, prompt="Cria um projeto"):
     return result
 
 
-def correction_response(original, corrected, entries):
+def correction_response(original, corrected):
     original_files = {item["path"]: item["content"] for item in original["files"]}
     replacements = [
         {"path": item["path"], "content": item["content"]}
@@ -132,15 +132,6 @@ def correction_response(original, corrected, entries):
     return {
         "plan_updates": plan_updates,
         "replacements": replacements,
-        "correction_manifest": entries,
-    }
-
-
-def manifest_entry(code, *paths):
-    return {
-        "error_code": code,
-        "changed_artifacts": list(paths),
-        "resolution": "Resolved the reported semantic postconditions.",
     }
 
 
@@ -202,12 +193,7 @@ class ProjectBuilderVirtualSemanticsTest(unittest.IsolatedAsyncioTestCase):
     async def test_j_all_first_response_errors_reach_correction_prompt(self):
         first = wp1_regression_plan(include_preview=False)
         second = wp1_regression_plan(valid=True, references_backend=True)
-        requester = FakeRequester(first, correction_response(first, second, [
-            manifest_entry("MISSING_REQUESTED_COMPONENTS", "components"),
-            manifest_entry("COMMAND_TARGET_INVALID", "package.json"),
-            manifest_entry("MISSING_IMPORT", "backend/server.js"),
-            manifest_entry("TEST_DOES_NOT_EXERCISE_ENTRYPOINT", "tests/run-tests.js"),
-        ]))
+        requester = FakeRequester(first, correction_response(first, second))
 
         await project_builder.get_valid_project_plan(
             "Cria uma app full stack com persistencia, testes e preview", requester
@@ -244,11 +230,7 @@ class ProjectBuilderVirtualSemanticsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_l_invalid_second_response_never_materializes(self):
         plan = wp1_regression_plan()
-        requester = FakeRequester(plan, correction_response(plan, plan, [
-            manifest_entry("COMMAND_TARGET_INVALID", "package.json"),
-            manifest_entry("MISSING_IMPORT", "backend/server.js"),
-            manifest_entry("TEST_DOES_NOT_EXERCISE_ENTRYPOINT", "tests/run-tests.js"),
-        ]))
+        requester = FakeRequester(plan, correction_response(plan, plan))
         result = await project_builder.build_project(
             "Cria uma app full stack com persistencia, testes e preview",
             plan_requester=requester,

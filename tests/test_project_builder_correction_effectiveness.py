@@ -28,8 +28,28 @@ def wp1_plan(*, valid_command=False, real_backend_test=False, include_preview=Tr
     check_target = "tests/run-tests.js" if valid_command else "frontend/index.html"
     test_source = (
         "import http from 'node:http';\n"
-        "import '../backend/server.js';\n"
-        "http.get('http://localhost:3001/health', () => {});\n"
+        "import { spawn } from 'node:child_process';\n"
+        "import { once } from 'node:events';\n"
+        "const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));\n"
+        "const backend = spawn(process.execPath, ['backend/server.js'], { stdio: 'ignore', windowsHide: true });\n"
+        "const health = () => new Promise((resolve, reject) => {\n"
+        "  const request = http.get('http://127.0.0.1:3001/health', (response) => {\n"
+        "    let body = '';\n"
+        "    response.on('data', (chunk) => { body += chunk; });\n"
+        "    response.on('end', () => resolve({ statusCode: response.statusCode, body }));\n"
+        "  });\n"
+        "  request.on('error', reject);\n"
+        "});\n"
+        "try {\n"
+        "  let result;\n"
+        "  for (let attempt = 0; attempt < 20; attempt += 1) {\n"
+        "    try { result = await health(); break; } catch { await delay(50); }\n"
+        "  }\n"
+        "  if (!result || result.statusCode !== 200 || result.body !== 'ok') process.exitCode = 1;\n"
+        "} finally {\n"
+        "  backend.kill();\n"
+        "  await Promise.race([once(backend, 'exit'), delay(1000)]);\n"
+        "}\n"
         if real_backend_test else
         "import http from 'node:http';\n"
         "const alternate = http.createServer();\n"
@@ -96,19 +116,10 @@ def replacement(plan, path):
     return {"path": path, "content": content(plan, path)}
 
 
-def manifest_entry(code, *artifacts, resolution="Resolved the required postconditions."):
-    return {
-        "error_code": code,
-        "changed_artifacts": list(artifacts),
-        "resolution": resolution,
-    }
-
-
-def focal_correction(*, plan_updates=None, replacements=None, manifest=None):
+def focal_correction(*, plan_updates=None, replacements=None):
     return {
         "plan_updates": deepcopy(plan_updates or {}),
         "replacements": deepcopy(replacements or []),
-        "correction_manifest": deepcopy(manifest or []),
     }
 
 
@@ -125,7 +136,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         second = wp1_plan(valid_command=True, real_backend_test=True)
         requester = FakeRequester(first, focal_correction(
             replacements=[replacement(second, "package.json")],
-            manifest=[manifest_entry("COMMAND_TARGET_INVALID", "package.json")],
         ))
 
         plan = await project_builder.get_valid_project_plan(OBJECTIVE, requester)
@@ -150,14 +160,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
                 replacement(second, "tests/run-tests.js"),
                 replacement(second, "backend/server.js"),
             ],
-            manifest=[
-                manifest_entry("COMMAND_TARGET_INVALID", "package.json"),
-                manifest_entry(
-                    "TEST_DOES_NOT_EXERCISE_ENTRYPOINT",
-                    "tests/run-tests.js",
-                    "backend/server.js",
-                ),
-            ],
         ))
 
         plan = await project_builder.get_valid_project_plan(OBJECTIVE, requester)
@@ -175,7 +177,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
             plan_updates={
                 "components": ["frontend", "backend", "persistence", "tests", "preview"],
             },
-            manifest=[manifest_entry("MISSING_REQUESTED_COMPONENTS", "components")],
         ))
 
         plan = await project_builder.get_valid_project_plan(OBJECTIVE, requester)
@@ -184,6 +185,18 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         effectiveness = plan.planning_diagnostics["correction_effectiveness"]
         self.assertEqual(effectiveness["plan_update_fields"], ["components"])
         self.assertEqual(effectiveness["replacements_received"], 0)
+
+    async def test_c2_components_delta_only_is_rejected(self):
+        first = wp1_plan(valid_command=True, real_backend_test=True, include_preview=False)
+        requester = FakeRequester(first, focal_correction(
+            plan_updates={"components": ["preview"]},
+        ))
+
+        with self.assertRaises(project_builder.ProjectBuilderPlanningError) as captured:
+            await project_builder.get_valid_project_plan(OBJECTIVE, requester)
+
+        errors = captured.exception.diagnostics["final_validation"]["errors"]
+        self.assertIn("CORRECTION_PLAN_UPDATE_OUT_OF_SCOPE", {item["code"] for item in errors})
 
     async def test_d_invalid_json_is_rejected(self):
         first = wp1_plan(real_backend_test=True)
@@ -202,7 +215,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         first = wp1_plan(real_backend_test=True)
         requester = FakeRequester(first, focal_correction(
             replacements=[replacement(first, "package.json")],
-            manifest=[manifest_entry("COMMAND_TARGET_INVALID", "package.json")],
         ))
 
         with self.assertRaises(project_builder.ProjectBuilderPlanningError) as captured:
@@ -211,19 +223,24 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         codes = {item["code"] for item in captured.exception.diagnostics["final_validation"]["errors"]}
         self.assertIn("CORRECTION_DECLARED_FILE_UNCHANGED", codes)
 
-    async def test_f_changed_file_absent_from_manifest_is_rejected(self):
+    async def test_f_model_correction_manifest_is_rejected(self):
         first = wp1_plan(real_backend_test=True)
         second = wp1_plan(valid_command=True, real_backend_test=True)
-        requester = FakeRequester(first, focal_correction(
+        correction = focal_correction(
             replacements=[replacement(second, "package.json")],
-            manifest=[manifest_entry("COMMAND_TARGET_INVALID", "tests/run-tests.js")],
-        ))
+        )
+        correction["correction_manifest"] = [{
+            "error_code": "COMMAND_TARGET_INVALID",
+            "changed_artifacts": ["package.json"],
+            "resolution": "Model claim",
+        }]
+        requester = FakeRequester(first, correction)
 
         with self.assertRaises(project_builder.ProjectBuilderPlanningError) as captured:
             await project_builder.get_valid_project_plan(OBJECTIVE, requester)
 
         codes = {item["code"] for item in captured.exception.diagnostics["final_validation"]["errors"]}
-        self.assertIn("CORRECTION_CHANGED_ARTIFACT_UNDECLARED", codes)
+        self.assertIn("CORRECTION_RESPONSE_SCHEMA_INVALID", codes)
 
     async def test_g_file_outside_allowlist_is_rejected(self):
         first = wp1_plan(real_backend_test=True)
@@ -232,7 +249,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         frontend["content"] += "<!-- unrelated -->\n"
         requester = FakeRequester(first, focal_correction(
             replacements=[replacement(altered, "frontend/index.html")],
-            manifest=[manifest_entry("COMMAND_TARGET_INVALID", "frontend/index.html")],
         ))
 
         with self.assertRaises(project_builder.ProjectBuilderPlanningError) as captured:
@@ -247,7 +263,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         fixed = replacement(second, "package.json")
         requester = FakeRequester(first, focal_correction(
             replacements=[fixed, deepcopy(fixed)],
-            manifest=[manifest_entry("COMMAND_TARGET_INVALID", "package.json")],
         ))
 
         with self.assertRaises(project_builder.ProjectBuilderPlanningError) as captured:
@@ -261,7 +276,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         second = wp1_plan(valid_command=True, real_backend_test=True)
         requester = FakeRequester(first, {
             "corrected_plan": second,
-            "correction_manifest": [manifest_entry("COMMAND_TARGET_INVALID", "package.json")],
         })
 
         with self.assertRaises(project_builder.ProjectBuilderPlanningError) as captured:
@@ -278,10 +292,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
             replacements=[
                 replacement(second, "package.json"),
                 {"path": "tests/run-tests.js", "content": stale_test},
-            ],
-            manifest=[
-                manifest_entry("COMMAND_TARGET_INVALID", "package.json"),
-                manifest_entry("TEST_DOES_NOT_EXERCISE_ENTRYPOINT", "tests/run-tests.js"),
             ],
         ))
 
@@ -302,7 +312,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         broken_package["scripts"]["check"] = "node --check missing.js"
         requester = FakeRequester(first, focal_correction(
             replacements=[{"path": "package.json", "content": json.dumps(broken_package)}],
-            manifest=[manifest_entry("COMMAND_TARGET_INVALID", "package.json")],
         ))
 
         with self.assertRaises(project_builder.ProjectBuilderPlanningError) as captured:
@@ -330,7 +339,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
                         "path": "frontend/index.html",
                         "content": "<!doctype html><main>changed</main>\n",
                     }],
-                    manifest=[manifest_entry("COMMAND_TARGET_INVALID", "frontend/index.html")],
                 ),
                 OBJECTIVE,
                 first_failure,
@@ -351,11 +359,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
                 replacement(second, "package.json"),
                 replacement(second, "tests/run-tests.js"),
             ],
-            manifest=[
-                manifest_entry("MISSING_REQUESTED_COMPONENTS", "components"),
-                manifest_entry("COMMAND_TARGET_INVALID", "package.json"),
-                manifest_entry("TEST_DOES_NOT_EXERCISE_ENTRYPOINT", "tests/run-tests.js"),
-            ],
         ))
 
         plan = await project_builder.get_valid_project_plan(OBJECTIVE, requester)
@@ -373,7 +376,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
                 "path": "frontend/index.html.mjs",
                 "content": content(first, "frontend/index.html"),
             }],
-            manifest=[manifest_entry("COMMAND_TARGET_INVALID", "frontend/index.html.mjs")],
         ))
 
         with self.assertRaises(project_builder.ProjectBuilderPlanningError) as captured:
@@ -387,7 +389,6 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         synthetic = content(first, "tests/run-tests.js") + "// still an alternate server\n"
         requester = FakeRequester(first, focal_correction(
             replacements=[{"path": "tests/run-tests.js", "content": synthetic}],
-            manifest=[manifest_entry("TEST_DOES_NOT_EXERCISE_ENTRYPOINT", "tests/run-tests.js")],
         ))
 
         with self.assertRaises(project_builder.ProjectBuilderPlanningError) as captured:
@@ -400,16 +401,13 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         )
 
     async def test_p_prompt_is_focal_and_contains_only_allowlisted_files(self):
-        first = wp1_plan()
+        first = wp1_plan(include_preview=False)
         second = wp1_plan(valid_command=True, real_backend_test=True)
         requester = FakeRequester(first, focal_correction(
+            plan_updates={"components": second["components"]},
             replacements=[
                 replacement(second, "package.json"),
                 replacement(second, "tests/run-tests.js"),
-            ],
-            manifest=[
-                manifest_entry("COMMAND_TARGET_INVALID", "package.json"),
-                manifest_entry("TEST_DOES_NOT_EXERCISE_ENTRYPOINT", "tests/run-tests.js"),
             ],
         ))
 
@@ -421,6 +419,11 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         self.assertNotIn("virtual_file_system", payload)
         self.assertNotIn("corrected_plan", payload["response_schema"])
         self.assertEqual(
+            set(payload["response_schema"]),
+            {"plan_updates", "replacements"},
+        )
+        self.assertTrue(payload["model_generated_manifest_forbidden"])
+        self.assertEqual(
             set(payload["affected_files"]),
             {"package.json", "tests/run-tests.js", "backend/server.js"},
         )
@@ -428,6 +431,55 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         self.assertEqual(
             payload["affected_files"]["package.json"]["content_hash"],
             hashlib.sha256(content(first, "package.json").encode("utf-8")).hexdigest(),
+        )
+        component_context = payload["plan_update_context"]["components"]
+        self.assertEqual(
+            component_context["original_complete_value"],
+            ["frontend", "backend", "persistence", "tests"],
+        )
+        self.assertEqual(component_context["missing_requested_components"], ["preview"])
+        self.assertEqual(component_context["expected_final_complete_value"], second["components"])
+        component_example = payload["plan_update_semantics"]["mandatory_components_example"]
+        self.assertEqual(component_example["Inválido"], ["preview"])
+        self.assertEqual(component_example["Válido"], second["components"])
+        self.assertIn(
+            "plan_updates não usa operações append, add, patch ou delta",
+            payload["plan_update_semantics"]["mandatory_rule"],
+        )
+        allowlist_semantics = payload["replacement_allowlist_semantics"]
+        self.assertIn("allowlist", allowlist_semantics["mandatory_rule"])
+        self.assertIn("not a list of mandatory changes", allowlist_semantics["mandatory_rule"])
+        subset_example = allowlist_semantics["mandatory_subset_example"]
+        self.assertEqual(
+            subset_example["allowed_replacements"],
+            ["tests/run-tests.js", "backend/server.js"],
+        )
+        self.assertEqual(
+            [item["path"] for item in subset_example["valid_response_fragment"]["replacements"]],
+            ["tests/run-tests.js"],
+        )
+        self.assertEqual(subset_example["must_be_omitted"], ["backend/server.js"])
+        test_contract = payload["test_entrypoint_contracts"][0]
+        self.assertEqual(test_contract["test_file"], "tests/run-tests.js")
+        self.assertEqual(test_contract["backend_entrypoint"], "backend/server.js")
+        self.assertIn(
+            "Creating http.createServer inside tests/run-tests.js is forbidden.",
+            test_contract["forbidden"],
+        )
+        silent_checks = payload["silent_verification_before_response"]
+        self.assertIn(
+            "tests/run-tests.js contains an executable reference to backend/server.js.",
+            silent_checks,
+        )
+        self.assertIn("tests/run-tests.js does not contain http.createServer.", silent_checks)
+        self.assertIn("tests/run-tests.js makes a real request to /health.", silent_checks)
+        self.assertIn(
+            "Every returned file has a content hash different from its original hash.",
+            silent_checks,
+        )
+        self.assertIn(
+            "components contains the complete final array, not only newly added components.",
+            silent_checks,
         )
         messages = project_builder._ollama_messages(
             "BASE OBJECTIVE MUST NOT BE RESENT",
@@ -438,13 +490,35 @@ class ProjectBuilderCorrectionEffectivenessTest(unittest.IsolatedAsyncioTestCase
         self.assertNotIn("BASE OBJECTIVE MUST NOT BE RESENT", serialized_messages)
         self.assertNotIn("project_name", messages[0]["content"])
 
+    async def test_p2_allowed_unchanged_backend_is_omitted_and_real_test_is_accepted(self):
+        first = wp1_plan(valid_command=True)
+        second = wp1_plan(valid_command=True, real_backend_test=True)
+        requester = FakeRequester(first, focal_correction(
+            replacements=[replacement(second, "tests/run-tests.js")],
+        ))
+
+        plan = await project_builder.get_valid_project_plan(OBJECTIVE, requester)
+
+        payload = json.loads(requester.calls[1][1])
+        self.assertEqual(
+            set(payload["allowed_replacements"]),
+            {"tests/run-tests.js", "backend/server.js"},
+        )
+        effectiveness = plan.planning_diagnostics["correction_effectiveness"]
+        self.assertEqual(effectiveness["replacements_received"], 1)
+        self.assertEqual(effectiveness["replacements_applied"], 1)
+        self.assertEqual(effectiveness["changed_artifacts"], ["tests/run-tests.js"])
+        self.assertEqual(
+            next(item.content for item in plan.files if item.path == "backend/server.js"),
+            content(first, "backend/server.js"),
+        )
+
     async def test_q_invalid_correction_never_materializes(self):
         first = wp1_plan(real_backend_test=True)
         result = await project_builder.build_project(
             OBJECTIVE,
             plan_requester=FakeRequester(first, focal_correction(
                 replacements=[replacement(first, "package.json")],
-                manifest=[manifest_entry("COMMAND_TARGET_INVALID", "package.json")],
             )),
             projects_root_rel=TEST_ROOT_REL,
             start_preview=False,
