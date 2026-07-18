@@ -1,0 +1,11 @@
+{
+  "name": "full-stack-standalone",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "check": "node --check backend/server.js && node --check frontend/index.html",
+    "build": "echo 'Build complete'",
+    "start": "node backend/server.js"
+  }
+}

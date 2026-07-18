@@ -30,6 +30,7 @@ from backend.message_protocol import (
     normalize_ws_message,
     state_message,
     system_message,
+    validate_client_message,
 )
 
 configure_runtime_environment()
@@ -39,6 +40,9 @@ import sandbox
 import agents
 from intelligence.project_context import ProjectContextError, ProjectContextService
 from intelligence.coding_session import CodingSessionError, CodingSessionService
+from agents.mission_state import MissionStateError
+from agents.mission_executor import MissionExecutorService
+from agents.planner_engine import PersistentPlanner
 from voice_service import VoiceService
 
 voice_service = None
@@ -47,6 +51,12 @@ pending_voice_directive = None
 logger = get_logger(__name__)
 project_context_service = ProjectContextService()
 coding_session_service = CodingSessionService(project_context_service)
+mission_planner = PersistentPlanner(os.path.dirname(os.path.abspath(__file__)))
+mission_executor_service = MissionExecutorService(
+    os.path.dirname(os.path.abspath(__file__)),
+    mission_state=mission_planner.mission_state,
+    coding_service=coding_session_service,
+)
 
 VOICE_CONFIRMATION_WORDS = {
     "confirma",
@@ -655,6 +665,238 @@ async def send_project_context(websocket, project_id: str, reindex: bool = False
 async def send_latest_coding_session(websocket, project_id: str):
     session = await asyncio.to_thread(coding_session_service.latest, project_id)
     await send_ws(websocket, {"type": "coding_session", "data": session.to_dict() if session else None})
+
+
+async def send_mission_list(websocket, project_id: str):
+    missions = await asyncio.to_thread(mission_planner.list_missions, project_id)
+    await send_ws(websocket, {"type": "mission_list", "project_id": project_id, "missions": missions})
+
+
+async def dispatch_mission_operation(websocket, msg: dict, selected_project_id: str | None) -> bool:
+    operation = str(msg.get("type") or "")
+    mission_operations = {
+        "mission_list", "mission_create", "mission_get", "mission_update", "mission_set_status",
+        "work_package_create", "work_package_update", "work_package_set_status", "work_package_add_dependency",
+        "deliverable_create", "deliverable_update", "deliverable_set_status", "evidence_attach",
+        "criterion_create", "criterion_set_status", "mission_resume_snapshot",
+        "mission_execute_work_package", "mission_apply_execution", "mission_review_execution",
+        "mission_retry_execution", "mission_cancel_execution", "mission_release_stale_lock",
+    }
+    if operation not in mission_operations:
+        return False
+    project_id = str(msg.get("project_id") or selected_project_id or "").strip()
+    try:
+        snapshot = None
+        if operation == "mission_list":
+            await send_mission_list(websocket, project_id)
+            return True
+        if operation == "mission_create":
+            snapshot = await asyncio.to_thread(
+                mission_planner.create_mission,
+                project_id,
+                msg.get("title"),
+                msg.get("objective"),
+                msg.get("description", ""),
+                msg.get("current_phase", ""),
+                msg.get("metadata"),
+                msg.get("mission_id"),
+            )
+        elif operation in {"mission_get", "mission_resume_snapshot"}:
+            snapshot = await asyncio.to_thread(mission_planner.load_mission, project_id, msg.get("mission_id"))
+        elif operation == "mission_update":
+            snapshot = await asyncio.to_thread(
+                mission_planner.update_mission, project_id, msg.get("mission_id"), msg.get("expected_version"), msg.get("changes")
+            )
+        elif operation == "mission_set_status":
+            snapshot = await asyncio.to_thread(
+                mission_planner.set_mission_status,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("status"),
+                msg.get("expected_version"),
+            )
+        elif operation == "work_package_create":
+            snapshot = await asyncio.to_thread(
+                mission_planner.create_work_package,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("title"),
+                msg.get("description", ""),
+                msg.get("work_package_type", "GENERIC"),
+                msg.get("priority", 0),
+                msg.get("dependencies"),
+                msg.get("executor_kind", "MANUAL"),
+                msg.get("executor_ref", ""),
+                msg.get("metadata"),
+                msg.get("required", True),
+                msg.get("work_package_id"),
+            )
+        elif operation == "work_package_update":
+            snapshot = await asyncio.to_thread(
+                mission_planner.update_work_package,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("work_package_id"),
+                msg.get("expected_version"),
+                msg.get("changes"),
+            )
+        elif operation == "work_package_set_status":
+            snapshot = await asyncio.to_thread(
+                mission_planner.set_work_package_status,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("work_package_id"),
+                msg.get("status"),
+                msg.get("expected_version"),
+                msg.get("blocked_reason", ""),
+            )
+        elif operation == "work_package_add_dependency":
+            snapshot = await asyncio.to_thread(
+                mission_planner.add_dependency,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("work_package_id"),
+                msg.get("dependency_id"),
+                msg.get("expected_version"),
+            )
+        elif operation == "deliverable_create":
+            snapshot = await asyncio.to_thread(
+                mission_planner.create_deliverable,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("work_package_id"),
+                msg.get("name"),
+                msg.get("kind", "GENERIC"),
+                msg.get("description", ""),
+                msg.get("artifact_refs"),
+                msg.get("required", False),
+                msg.get("expected_work_package_version"),
+                msg.get("deliverable_id"),
+            )
+        elif operation == "deliverable_update":
+            snapshot = await asyncio.to_thread(
+                mission_planner.update_deliverable,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("deliverable_id"),
+                msg.get("expected_version"),
+                msg.get("changes"),
+            )
+        elif operation == "deliverable_set_status":
+            snapshot = await asyncio.to_thread(
+                mission_planner.set_deliverable_status,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("deliverable_id"),
+                msg.get("status"),
+                msg.get("expected_version"),
+            )
+        elif operation == "evidence_attach":
+            snapshot = await asyncio.to_thread(
+                mission_planner.attach_evidence,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("work_package_id"),
+                msg.get("kind"),
+                msg.get("source_ref"),
+                msg.get("description", ""),
+                msg.get("deliverable_id"),
+                msg.get("metadata"),
+                msg.get("content_hash"),
+                msg.get("evidence_id"),
+            )
+        elif operation == "criterion_create":
+            snapshot = await asyncio.to_thread(
+                mission_planner.create_criterion,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("owner_type"),
+                msg.get("owner_id"),
+                msg.get("description"),
+                msg.get("required_evidence_kinds"),
+                msg.get("required", True),
+                msg.get("criterion_id"),
+            )
+        elif operation == "criterion_set_status":
+            snapshot = await asyncio.to_thread(
+                mission_planner.set_criterion_status,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("criterion_id"),
+                msg.get("status"),
+                msg.get("expected_version"),
+                msg.get("evidence_refs"),
+                msg.get("validation_note", ""),
+            )
+        elif operation == "mission_execute_work_package":
+            snapshot = await mission_executor_service.execute_work_package(
+                project_id,
+                msg.get("mission_id"),
+                msg.get("work_package_id"),
+                msg.get("expected_mission_version"),
+                msg.get("expected_work_package_version"),
+            )
+        elif operation == "mission_apply_execution":
+            snapshot = await asyncio.to_thread(
+                mission_executor_service.apply_execution,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("execution_id"),
+                msg.get("expected_execution_version"),
+                bool(msg.get("confirmed")),
+            )
+        elif operation == "mission_review_execution":
+            snapshot = await asyncio.to_thread(
+                mission_executor_service.review_execution,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("execution_id"),
+                msg.get("decision"),
+                msg.get("review_note", ""),
+                msg.get("accepted_evidence_refs") or [],
+                msg.get("expected_execution_version"),
+                bool(msg.get("validation_failed", False)),
+            )
+        elif operation == "mission_retry_execution":
+            snapshot = await mission_executor_service.retry_execution(
+                project_id,
+                msg.get("mission_id"),
+                msg.get("execution_id"),
+                msg.get("expected_execution_version"),
+            )
+        elif operation == "mission_cancel_execution":
+            snapshot = await asyncio.to_thread(
+                mission_executor_service.cancel_execution,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("execution_id"),
+                msg.get("expected_execution_version"),
+                bool(msg.get("confirmed")),
+            )
+        elif operation == "mission_release_stale_lock":
+            snapshot = await asyncio.to_thread(
+                mission_executor_service.release_stale_lock,
+                project_id,
+                msg.get("mission_id"),
+                msg.get("execution_id"),
+                msg.get("expected_execution_version"),
+                bool(msg.get("confirmed")),
+                msg.get("minimum_age_seconds"),
+            )
+        if snapshot is not None:
+            active_mission_store = getattr(mission_planner, "mission_state", mission_planner)
+            if mission_executor_service.mission_state is active_mission_store:
+                snapshot = await asyncio.to_thread(
+                    mission_executor_service.load_snapshot,
+                    project_id,
+                    snapshot["mission"]["mission_id"],
+                )
+            await send_ws(websocket, {"type": "mission_snapshot", "data": snapshot})
+            await send_mission_list(websocket, project_id)
+        return True
+    except MissionStateError as mission_error:
+        await send_ws(websocket, system_message(str(mission_error)))
+        return True
 
 async def broadcast_state(value: str):
     global voice_service
@@ -1341,12 +1583,13 @@ async def handle_client(websocket, *args):
             try:
                 await send_project_context(websocket, selected_project_id)
                 await send_latest_coding_session(websocket, selected_project_id)
+                await send_mission_list(websocket, selected_project_id)
             except ProjectContextError as project_error:
                 log_event(logger, "project_context.initial_error", level="warning", error=str(project_error))
         
         async for message_str in websocket:
             try:
-                msg = json.loads(message_str)
+                msg = validate_client_message(json.loads(message_str))
                 if msg.get("type") == "directive":
                     prompt = msg.get("text", "").strip()
                     if not prompt:
@@ -1502,6 +1745,9 @@ async def handle_client(websocket, *args):
                         "rules": rules
                     })
 
+                elif await dispatch_mission_operation(websocket, msg, selected_project_id):
+                    pass
+
                 elif msg.get("type") == "get_planner_state":
                     plan_data = read_persistent_plan_state()
                     await send_ws(websocket, {
@@ -1522,6 +1768,7 @@ async def handle_client(websocket, *args):
                     try:
                         await send_project_context(websocket, requested_project_id)
                         await send_latest_coding_session(websocket, requested_project_id)
+                        await send_mission_list(websocket, requested_project_id)
                         selected_project_id = requested_project_id
                     except ProjectContextError as project_error:
                         await send_ws(websocket, system_message(str(project_error)))

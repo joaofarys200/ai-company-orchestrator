@@ -14,6 +14,9 @@ import {
   type KanbanCard,
   type KanbanColumn,
   type KanbanState,
+  type MissionClientOperation,
+  type MissionData,
+  type MissionSnapshot,
   type PlannerState,
   type ProjectContextData,
   type ProjectReferenceResult,
@@ -76,6 +79,11 @@ interface WebSocketContextType {
   plannerState: PlannerState | null;
   astState: AstState | null;
   getPlannerState: () => void;
+  missions: MissionData[];
+  missionSnapshot: MissionSnapshot | null;
+  getMissions: () => void;
+  openMission: (missionId: string) => void;
+  sendMissionOperation: (operation: MissionClientOperation) => void;
   getAstState: () => void;
   projects: ProjectSummary[];
   projectContext: ProjectContextData | null;
@@ -128,6 +136,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [decisions, setDecisions] = useState<EngineeringDecision[]>([]);
   const [currentNote, setCurrentNote] = useState<{ filename: string; content: string } | null>(null);
   const [plannerState, setPlannerState] = useState<PlannerState | null>(null);
+  const [missions, setMissions] = useState<MissionData[]>([]);
+  const [missionSnapshot, setMissionSnapshot] = useState<MissionSnapshot | null>(null);
   const [astState, setAstState] = useState<AstState | null>(null);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [projectContext, setProjectContext] = useState<ProjectContextData | null>(null);
@@ -452,6 +462,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           case 'planner_state':
             setPlannerState(msg.data);
             break;
+          case 'mission_list':
+            setMissions(msg.missions);
+            break;
+          case 'mission_snapshot':
+            setMissionSnapshot(msg.data);
+            break;
           case 'ast_state':
             setAstState(msg.data);
             break;
@@ -597,6 +613,24 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [sendClientMessage]);
 
+  const getMissions = useCallback(() => {
+    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id) {
+      sendClientMessage({ type: 'mission_list', project_id: projectContext.project_id });
+    }
+  }, [projectContext?.project_id, sendClientMessage]);
+
+  const openMission = useCallback((missionId: string) => {
+    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id && missionId) {
+      sendClientMessage({ type: 'mission_resume_snapshot', project_id: projectContext.project_id, mission_id: missionId });
+    }
+  }, [projectContext?.project_id, sendClientMessage]);
+
+  const sendMissionOperation = useCallback((operation: MissionClientOperation) => {
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      sendClientMessage(operation);
+    }
+  }, [sendClientMessage]);
+
   const getAstState = useCallback(() => {
     if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id) {
       sendClientMessage({ type: 'get_ast_state', project_id: projectContext.project_id });
@@ -612,6 +646,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setPreviewUrl('about:blank');
       setIsProjectRunning(false);
       setCodingSession(null);
+      setMissions([]);
+      setMissionSnapshot(null);
       sendClientMessage({ type: 'open_project', project_id: projectId });
     }
   }, [sendClientMessage]);
@@ -703,8 +739,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         deleteArchitecture,
         deleteDecision,
         plannerState,
+        missions,
+        missionSnapshot,
         astState,
         getPlannerState,
+        getMissions,
+        openMission,
+        sendMissionOperation,
         getAstState,
         projects,
         projectContext,

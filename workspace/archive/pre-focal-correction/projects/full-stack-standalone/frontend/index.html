@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Standalone App</title>
+</head>
+<body>
+    <h1>Welcome to the Standalone Full Stack App</h1>
+    <p>Status: <span id="status">Loading...</span></p>
+    <script type="module">
+        async function checkHealth() {
+            try {
+                const res = await fetch('http://localhost:3001/health');
+                if (res.ok) {
+                    document.getElementById('status').textContent = 'Healthy';
+                    document.getElementById('status').style.color = 'green';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        checkHealth();
+    </script>
+</body>
+</html>

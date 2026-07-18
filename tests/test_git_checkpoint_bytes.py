@@ -25,10 +25,10 @@ def test_git_checkpoint_preserves_exact_worktree_bytes(tmp_path: Path, original_
     root.mkdir(parents=True)
     source = root / "app.js"
     source.write_bytes(original_bytes)
-    (tmp_path / ".gitattributes").write_bytes(b"* text=auto\n")
-    subprocess.run(["git", "init", str(tmp_path)], check=True, capture_output=True)
+    (root / ".gitattributes").write_bytes(b"* text=auto\n")
+    subprocess.run(["git", "init", str(root)], check=True, capture_output=True)
     subprocess.run(
-        ["git", "-C", str(tmp_path), "config", "core.autocrlf", "true"],
+        ["git", "-C", str(root), "config", "core.autocrlf", "true"],
         check=True,
         capture_output=True,
     )

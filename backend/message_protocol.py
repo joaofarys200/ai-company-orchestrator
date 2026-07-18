@@ -13,6 +13,8 @@ from websocket_schema import (
     system_message,
     ui_message,
     ui_theme_message,
+    validate_client_message,
+    WebSocketPayloadError,
 )
 
 __all__ = [
@@ -30,4 +32,6 @@ __all__ = [
     "system_message",
     "ui_message",
     "ui_theme_message",
+    "validate_client_message",
+    "WebSocketPayloadError",
 ]

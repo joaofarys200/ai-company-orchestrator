@@ -106,6 +106,165 @@ export interface PlannerState {
   status?: string;
 }
 
+export interface MissionData {
+  mission_id: string;
+  project_id: string;
+  title: string;
+  objective: string;
+  description: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+  current_phase: string;
+  progress: number;
+  metadata: Record<string, unknown>;
+  version: number;
+}
+
+export interface MissionWorkPackage {
+  work_package_id: string;
+  mission_id: string;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+  stored_status?: string;
+  priority: number;
+  dependencies: string[];
+  acceptance_criteria: string[];
+  required_deliverables: string[];
+  executor_kind: string;
+  executor_ref: string;
+  blocked_reason: string;
+  required: boolean;
+  version: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MissionDeliverable {
+  deliverable_id: string;
+  mission_id: string;
+  work_package_id: string;
+  name: string;
+  description: string;
+  kind: string;
+  status: string;
+  artifact_refs: string[];
+  acceptance_criteria: string[];
+  evidence_refs: string[];
+  version: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MissionEvidence {
+  evidence_id: string;
+  mission_id: string;
+  work_package_id: string;
+  deliverable_id: string | null;
+  kind: string;
+  source_ref: string;
+  description: string;
+  content_hash: string | null;
+  version: number;
+  created_at: string;
+}
+
+export interface MissionCriterion {
+  criterion_id: string;
+  mission_id: string;
+  owner_type: string;
+  owner_id: string;
+  description: string;
+  status: string;
+  required_evidence_kinds: string[];
+  evidence_refs: string[];
+  validated_at: string | null;
+  validation_note: string;
+  required: boolean;
+  version: number;
+}
+
+export interface MissionExecution {
+  execution_id: string;
+  mission_id: string;
+  work_package_id: string;
+  executor_kind: string;
+  executor_ref: string;
+  status: string;
+  started_at: string | null;
+  updated_at: string;
+  completed_at: string | null;
+  attempt: number;
+  input_snapshot: Record<string, unknown>;
+  output_summary: Record<string, unknown>;
+  artifact_refs: string[];
+  evidence_refs: string[];
+  validation_refs: string[];
+  primary_error: Record<string, string> | null;
+  rollback_error: Record<string, string> | null;
+  lock_owner: string | null;
+  lock_acquired_at: string | null;
+  heartbeat_at: string | null;
+  version: number;
+  review_note: string;
+  previous_execution_id: string | null;
+}
+
+export interface MissionEvent {
+  event_id: string;
+  mission_id: string;
+  entity_type: string;
+  entity_id: string;
+  event_type: string;
+  timestamp: string;
+  previous_version: number;
+  new_version: number;
+  payload: Record<string, unknown>;
+}
+
+export interface MissionSnapshot {
+  mission: MissionData;
+  work_packages: MissionWorkPackage[];
+  deliverables: MissionDeliverable[];
+  evidence: MissionEvidence[];
+  acceptance_criteria: MissionCriterion[];
+  executions: MissionExecution[];
+  eligible_work_packages: string[];
+  recent_events: MissionEvent[];
+  resumed_at: string;
+  read_only_execution: boolean;
+  controlled_execution?: boolean;
+  autonomous_execution?: boolean;
+  executor_registry?: Record<string, { supported: boolean; executor: string | null; requires_apply_approval?: boolean }>;
+}
+
+export type MissionClientOperation =
+  | { type: 'mission_list'; project_id: string }
+  | { type: 'mission_create'; project_id: string; title: string; objective: string; description?: string; current_phase?: string; metadata?: Record<string, unknown> }
+  | { type: 'mission_get' | 'mission_resume_snapshot'; project_id: string; mission_id: string }
+  | { type: 'mission_update'; project_id: string; mission_id: string; expected_version: number; changes: Record<string, unknown> }
+  | { type: 'mission_set_status'; project_id: string; mission_id: string; expected_version: number; status: string }
+  | { type: 'work_package_create'; project_id: string; mission_id: string; title: string; description?: string; work_package_type?: string; priority?: number; required?: boolean; executor_kind?: string; executor_ref?: string }
+  | { type: 'work_package_update'; project_id: string; mission_id: string; work_package_id: string; expected_version: number; changes: Record<string, unknown> }
+  | { type: 'work_package_set_status'; project_id: string; mission_id: string; work_package_id: string; expected_version: number; status: string; blocked_reason?: string }
+  | { type: 'work_package_add_dependency'; project_id: string; mission_id: string; work_package_id: string; dependency_id: string; expected_version: number }
+  | { type: 'deliverable_create'; project_id: string; mission_id: string; work_package_id: string; name: string; description?: string; kind?: string; required?: boolean; expected_work_package_version?: number }
+  | { type: 'deliverable_update'; project_id: string; mission_id: string; deliverable_id: string; expected_version: number; changes: Record<string, unknown> }
+  | { type: 'deliverable_set_status'; project_id: string; mission_id: string; deliverable_id: string; expected_version: number; status: string }
+  | { type: 'evidence_attach'; project_id: string; mission_id: string; work_package_id: string; kind: string; source_ref: string; description?: string; deliverable_id?: string }
+  | { type: 'criterion_create'; project_id: string; mission_id: string; owner_type: string; owner_id: string; description: string; required_evidence_kinds?: string[]; required?: boolean }
+  | { type: 'criterion_set_status'; project_id: string; mission_id: string; criterion_id: string; expected_version: number; status: string; evidence_refs?: string[]; validation_note?: string }
+  | { type: 'mission_execute_work_package'; project_id: string; mission_id: string; work_package_id: string; expected_mission_version: number; expected_work_package_version: number }
+  | { type: 'mission_apply_execution'; project_id: string; mission_id: string; execution_id: string; expected_execution_version: number; confirmed: true }
+  | { type: 'mission_review_execution'; project_id: string; mission_id: string; execution_id: string; decision: 'ACCEPT' | 'REJECT'; review_note: string; accepted_evidence_refs: string[]; expected_execution_version: number; validation_failed?: boolean }
+  | { type: 'mission_retry_execution'; project_id: string; mission_id: string; execution_id: string; expected_execution_version: number }
+  | { type: 'mission_cancel_execution'; project_id: string; mission_id: string; execution_id: string; expected_execution_version: number; confirmed: true }
+  | { type: 'mission_release_stale_lock'; project_id: string; mission_id: string; execution_id: string; expected_execution_version: number; confirmed: true; minimum_age_seconds?: number };
+
 export interface AstSymbol {
   name: string;
   line?: number;
@@ -326,6 +485,17 @@ export interface PlannerStateMessage {
   data: PlannerState | null;
 }
 
+export interface MissionListMessage {
+  type: 'mission_list';
+  project_id: string;
+  missions: MissionData[];
+}
+
+export interface MissionSnapshotMessage {
+  type: 'mission_snapshot';
+  data: MissionSnapshot | null;
+}
+
 export interface AstStateMessage {
   type: 'ast_state';
   data: AstState | null;
@@ -394,6 +564,8 @@ export type ServerMessage =
   | ArchitectureMessage
   | DecisionsMessage
   | PlannerStateMessage
+  | MissionListMessage
+  | MissionSnapshotMessage
   | AstStateMessage
   | ProjectsListMessage
   | ProjectContextMessage
@@ -427,7 +599,8 @@ export type ClientMessage =
   | { type: 'create_coding_session'; project_id: string; objective: string }
   | { type: 'apply_coding_session'; project_id: string; session_id: string }
   | { type: 'rollback_coding_session'; project_id: string; session_id: string; confirmed: boolean }
-  | { type: 'get_coding_session'; project_id: string };
+  | { type: 'get_coding_session'; project_id: string }
+  | MissionClientOperation;
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -438,6 +611,10 @@ const asString = (value: unknown, fallback = ''): string => {
 };
 
 const asBoolean = (value: unknown): boolean => Boolean(value);
+
+const asNumber = (value: unknown, fallback = 0): number => {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+};
 
 const asStringArray = (value: unknown): string[] => {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
@@ -511,6 +688,143 @@ const normalizePlanner = (value: unknown): PlannerState | null => {
     goal,
     status,
     steps,
+  };
+};
+
+const normalizeMission = (value: Record<string, unknown>): MissionData => ({
+  mission_id: asString(value.mission_id),
+  project_id: asString(value.project_id),
+  title: asString(value.title),
+  objective: asString(value.objective),
+  description: asString(value.description),
+  status: asString(value.status),
+  created_at: asString(value.created_at),
+  updated_at: asString(value.updated_at),
+  started_at: typeof value.started_at === 'string' ? value.started_at : null,
+  completed_at: typeof value.completed_at === 'string' ? value.completed_at : null,
+  current_phase: asString(value.current_phase),
+  progress: asNumber(value.progress),
+  metadata: isRecord(value.metadata) ? value.metadata : {},
+  version: asNumber(value.version, 1),
+});
+
+const normalizeMissionSnapshot = (value: unknown): MissionSnapshot | null => {
+  if (!isRecord(value) || !isRecord(value.mission)) return null;
+  return {
+    mission: normalizeMission(value.mission),
+    work_packages: asRecordArray(value.work_packages).map((item) => ({
+      work_package_id: asString(item.work_package_id),
+      mission_id: asString(item.mission_id),
+      title: asString(item.title),
+      description: asString(item.description),
+      type: asString(item.type),
+      status: asString(item.status),
+      stored_status: item.stored_status ? asString(item.stored_status) : undefined,
+      priority: asNumber(item.priority),
+      dependencies: asStringArray(item.dependencies),
+      acceptance_criteria: asStringArray(item.acceptance_criteria),
+      required_deliverables: asStringArray(item.required_deliverables),
+      executor_kind: asString(item.executor_kind),
+      executor_ref: asString(item.executor_ref),
+      blocked_reason: asString(item.blocked_reason),
+      required: item.required === undefined ? true : asBoolean(item.required),
+      version: asNumber(item.version, 1),
+      created_at: asString(item.created_at),
+      updated_at: asString(item.updated_at),
+    })),
+    deliverables: asRecordArray(value.deliverables).map((item) => ({
+      deliverable_id: asString(item.deliverable_id),
+      mission_id: asString(item.mission_id),
+      work_package_id: asString(item.work_package_id),
+      name: asString(item.name),
+      description: asString(item.description),
+      kind: asString(item.kind),
+      status: asString(item.status),
+      artifact_refs: asStringArray(item.artifact_refs),
+      acceptance_criteria: asStringArray(item.acceptance_criteria),
+      evidence_refs: asStringArray(item.evidence_refs),
+      version: asNumber(item.version, 1),
+      created_at: asString(item.created_at),
+      updated_at: asString(item.updated_at),
+    })),
+    evidence: asRecordArray(value.evidence).map((item) => ({
+      evidence_id: asString(item.evidence_id),
+      mission_id: asString(item.mission_id),
+      work_package_id: asString(item.work_package_id),
+      deliverable_id: typeof item.deliverable_id === 'string' ? item.deliverable_id : null,
+      kind: asString(item.kind),
+      source_ref: asString(item.source_ref),
+      description: asString(item.description),
+      content_hash: typeof item.content_hash === 'string' ? item.content_hash : null,
+      version: asNumber(item.version, 1),
+      created_at: asString(item.created_at),
+    })),
+    acceptance_criteria: asRecordArray(value.acceptance_criteria).map((item) => ({
+      criterion_id: asString(item.criterion_id),
+      mission_id: asString(item.mission_id),
+      owner_type: asString(item.owner_type),
+      owner_id: asString(item.owner_id),
+      description: asString(item.description),
+      status: asString(item.status),
+      required_evidence_kinds: asStringArray(item.required_evidence_kinds),
+      evidence_refs: asStringArray(item.evidence_refs),
+      validated_at: typeof item.validated_at === 'string' ? item.validated_at : null,
+      validation_note: asString(item.validation_note),
+      required: item.required === undefined ? true : asBoolean(item.required),
+      version: asNumber(item.version, 1),
+    })),
+    executions: asRecordArray(value.executions).map((item) => ({
+      execution_id: asString(item.execution_id),
+      mission_id: asString(item.mission_id),
+      work_package_id: asString(item.work_package_id),
+      executor_kind: asString(item.executor_kind),
+      executor_ref: asString(item.executor_ref),
+      status: asString(item.status),
+      started_at: typeof item.started_at === 'string' ? item.started_at : null,
+      updated_at: asString(item.updated_at),
+      completed_at: typeof item.completed_at === 'string' ? item.completed_at : null,
+      attempt: asNumber(item.attempt, 1),
+      input_snapshot: isRecord(item.input_snapshot) ? item.input_snapshot : {},
+      output_summary: isRecord(item.output_summary) ? item.output_summary : {},
+      artifact_refs: asStringArray(item.artifact_refs),
+      evidence_refs: asStringArray(item.evidence_refs),
+      validation_refs: asStringArray(item.validation_refs),
+      primary_error: isRecord(item.primary_error)
+        ? Object.fromEntries(Object.entries(item.primary_error).map(([key, entry]) => [key, asString(entry)]))
+        : null,
+      rollback_error: isRecord(item.rollback_error)
+        ? Object.fromEntries(Object.entries(item.rollback_error).map(([key, entry]) => [key, asString(entry)]))
+        : null,
+      lock_owner: typeof item.lock_owner === 'string' ? item.lock_owner : null,
+      lock_acquired_at: typeof item.lock_acquired_at === 'string' ? item.lock_acquired_at : null,
+      heartbeat_at: typeof item.heartbeat_at === 'string' ? item.heartbeat_at : null,
+      version: asNumber(item.version, 1),
+      review_note: asString(item.review_note),
+      previous_execution_id: typeof item.previous_execution_id === 'string' ? item.previous_execution_id : null,
+    })),
+    eligible_work_packages: asStringArray(value.eligible_work_packages),
+    recent_events: asRecordArray(value.recent_events).map((item) => ({
+      event_id: asString(item.event_id),
+      mission_id: asString(item.mission_id),
+      entity_type: asString(item.entity_type),
+      entity_id: asString(item.entity_id),
+      event_type: asString(item.event_type),
+      timestamp: asString(item.timestamp),
+      previous_version: asNumber(item.previous_version),
+      new_version: asNumber(item.new_version),
+      payload: isRecord(item.payload) ? item.payload : {},
+    })),
+    resumed_at: asString(value.resumed_at),
+    read_only_execution: asBoolean(value.read_only_execution),
+    controlled_execution: asBoolean(value.controlled_execution),
+    autonomous_execution: asBoolean(value.autonomous_execution),
+    executor_registry: isRecord(value.executor_registry)
+      ? Object.fromEntries(Object.entries(value.executor_registry).filter(([, entry]) => isRecord(entry)).map(([key, entry]) => [key, {
+        supported: asBoolean((entry as Record<string, unknown>).supported),
+        executor: typeof (entry as Record<string, unknown>).executor === 'string' ? asString((entry as Record<string, unknown>).executor) : null,
+        requires_apply_approval: asBoolean((entry as Record<string, unknown>).requires_apply_approval),
+      }]))
+      : undefined,
   };
 };
 
@@ -725,6 +1039,10 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
       return { type, decisions: normalizeDecisions(raw.decisions) };
     case 'planner_state':
       return { type, data: normalizePlanner(raw.data) };
+    case 'mission_list':
+      return { type, project_id: asString(raw.project_id), missions: asRecordArray(raw.missions).map(normalizeMission) };
+    case 'mission_snapshot':
+      return { type, data: normalizeMissionSnapshot(raw.data) };
     case 'ast_state':
       return { type, data: normalizeAst(raw.data) };
     case 'projects_list':

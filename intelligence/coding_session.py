@@ -8,7 +8,9 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 import time
+import traceback
 import urllib.request
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -32,6 +34,53 @@ class CodingSessionError(Exception):
     pass
 
 
+def resolve_project_git_context(project_root: str) -> dict[str, Any]:
+    canonical_root = os.path.realpath(project_root)
+    context: dict[str, Any] = {
+        "is_git_repository": False,
+        "git_toplevel": None,
+        "project_relative_to_toplevel": None,
+        "checkpoint_strategy": "file_backup",
+        "reason": "git_unavailable",
+    }
+    if not shutil.which("git"):
+        return context
+    try:
+        result = subprocess.run(
+            ["git", "-C", canonical_root, "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        context["reason"] = f"git_probe_failed:{type(exc).__name__}"
+        return context
+    if result.returncode != 0 or not result.stdout.strip():
+        context["reason"] = "not_a_git_repository"
+        return context
+
+    git_toplevel = os.path.realpath(result.stdout.strip())
+    context["is_git_repository"] = True
+    context["git_toplevel"] = git_toplevel
+    try:
+        relative = os.path.relpath(canonical_root, git_toplevel).replace(os.sep, "/")
+        common = os.path.commonpath([canonical_root, git_toplevel])
+    except ValueError:
+        context["reason"] = "git_toplevel_not_ancestor"
+        return context
+    context["project_relative_to_toplevel"] = relative
+
+    same_root = os.path.normcase(canonical_root) == os.path.normcase(git_toplevel)
+    if same_root:
+        context["checkpoint_strategy"] = "git_blob"
+        context["reason"] = "project_root_is_git_toplevel"
+    elif os.path.normcase(common) == os.path.normcase(git_toplevel):
+        context["reason"] = "nested_project_uses_file_backup"
+    else:
+        context["reason"] = "git_toplevel_not_ancestor"
+    return context
+
+
 @dataclass
 class CodingSession:
     session_id: str
@@ -45,6 +94,12 @@ class CodingSession:
     checkpoint: dict[str, Any] = field(default_factory=dict)
     status: str = "PROPOSED"
     errors: list[str] = field(default_factory=list)
+    primary_error: dict[str, str] | None = None
+    rollback_error: dict[str, str] | None = None
+    checkpoint_created: bool = False
+    writes_started: bool = False
+    rollback_attempted: bool = False
+    rollback_succeeded: bool = False
     change_plan: dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
@@ -152,18 +207,27 @@ class CodingSessionService:
 
         try:
             session.checkpoint = self._create_checkpoint(session, root)
+            session.checkpoint_created = True
             self._save(session)
             for change in session.proposed_changes:
+                session.writes_started = True
                 self._apply_change(session, root, change)
             self._verify_applied_changes(root, session.proposed_changes)
         except Exception as exc:
+            session.primary_error = self._exception_details(exc)
             session.errors.append(str(exc))
-            try:
-                self._restore_checkpoint(session, root)
-                session.status = "ERROR_ROLLED_BACK"
-            except Exception as rollback_error:
-                session.errors.append(f"Rollback automatico falhou: {rollback_error}")
+            if not session.checkpoint_created or not session.writes_started:
                 session.status = "ERROR"
+            else:
+                session.rollback_attempted = True
+                try:
+                    self._restore_checkpoint(session, root)
+                    session.rollback_succeeded = True
+                    session.status = "ERROR_ROLLED_BACK"
+                except Exception as rollback_error:
+                    session.rollback_error = self._exception_details(rollback_error)
+                    session.errors.append(f"Rollback automatico falhou: {rollback_error}")
+                    session.status = "ROLLBACK_FAILED"
             session.updated_at = datetime.now(timezone.utc).isoformat()
             self._save(session)
             return session
@@ -189,7 +253,18 @@ class CodingSessionService:
         if session.status in {"ROLLED_BACK", "ERROR_ROLLED_BACK"}:
             return session
         root = self.projects.project_root(project_id)
-        self._restore_checkpoint(session, root)
+        session.rollback_attempted = True
+        try:
+            self._restore_checkpoint(session, root)
+        except Exception as exc:
+            session.rollback_error = self._exception_details(exc)
+            session.rollback_succeeded = False
+            session.errors.append(f"Rollback explicito falhou: {exc}")
+            session.status = "ROLLBACK_FAILED"
+            self._save(session)
+            raise
+        session.rollback_succeeded = True
+        session.rollback_error = None
         session.status = "ROLLED_BACK"
         session.updated_at = datetime.now(timezone.utc).isoformat()
         self.projects.index_project(project_id)
@@ -320,10 +395,13 @@ class CodingSessionService:
         return validations
 
     def _create_checkpoint(self, session: CodingSession, root: str) -> dict[str, Any]:
-        git_state = session.project_context_snapshot.get("git_state") or {}
-        use_git = bool(git_state.get("available")) and self._git_repository_valid(root)
+        git_context = resolve_project_git_context(root)
+        use_git = git_context["checkpoint_strategy"] == "git_blob"
         checkpoint = {
             "type": "git_blob" if use_git else "file_backup",
+            "strategy": git_context["checkpoint_strategy"],
+            "reason": git_context["reason"],
+            "git_context": git_context,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "files": {},
         }
@@ -377,6 +455,7 @@ class CodingSessionService:
 
     def _apply_change(self, session: CodingSession, root: str, change: dict[str, Any]) -> None:
         relative_path, absolute_path = self._safe_project_path(root, change["file"])
+        write_metadata: dict[str, Any] = {}
         if change["operation"] == "create_file":
             if self.new_file_writer:
                 result = self.new_file_writer(absolute_path, change["proposed_excerpt"])
@@ -387,6 +466,16 @@ class CodingSessionService:
                 result = agent_tools.write_file_sync(workspace_relative, change["proposed_excerpt"])
             if result.lower().startswith("erro"):
                 raise CodingSessionError(result)
+            resulting_sha256, resulting_size = self._sha256_file_bytes(absolute_path)
+            write_metadata = {
+                "physical_write_strategy": "write_file",
+                "original_size": 0,
+                "resulting_size": resulting_size,
+                "original_sha256": None,
+                "resulting_sha256": resulting_sha256,
+                "full_file_logical_rewrite": True,
+                "full_file_physical_write": True,
+            }
         elif relative_path.endswith(".py") and change["operation"] == "replace_symbol":
             from agents.patch_engine import PatchEngine
 
@@ -394,18 +483,163 @@ class CodingSessionService:
             result = patcher.apply_patch(relative_path, change["symbol"], change["proposed_excerpt"])
             if "Sucesso" not in result:
                 raise CodingSessionError(result)
+            write_metadata = {
+                "physical_write_strategy": "patch_engine",
+                "full_file_logical_rewrite": False,
+                "full_file_physical_write": None,
+            }
         else:
-            current = Path(absolute_path).read_text(encoding="utf-8")
-            updated = self._replace_once(current, change["previous_excerpt"], change["proposed_excerpt"], relative_path)
-            Path(absolute_path).write_text(updated, encoding="utf-8")
+            write_metadata = self._apply_atomic_text_patch(absolute_path, relative_path, change)
 
         current_content = Path(absolute_path).read_text(encoding="utf-8")
-        session.applied_changes.append({
+        applied_change = {
             "file": relative_path,
             "after_hash": self._content_hash(current_content),
             "unified_diff": change["unified_diff"],
-        })
+        }
+        applied_change.update(write_metadata)
+        session.applied_changes.append(applied_change)
         self._save(session)
+
+    def _apply_atomic_text_patch(
+        self,
+        absolute_path: str,
+        relative_path: str,
+        change: dict[str, Any],
+    ) -> dict[str, Any]:
+        original_bytes = Path(absolute_path).read_bytes()
+        has_utf8_bom = original_bytes.startswith(b"\xef\xbb\xbf")
+        payload = original_bytes[3:] if has_utf8_bom else original_bytes
+        try:
+            original_text = payload.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise CodingSessionError(f"Encoding UTF-8 invalido em {relative_path}.") from exc
+
+        normalized_text, boundaries = self._normalize_newlines_with_boundaries(original_text)
+        old_text = str(change["previous_excerpt"]).replace("\r\n", "\n").replace("\r", "\n")
+        new_text = str(change["proposed_excerpt"]).replace("\r\n", "\n").replace("\r", "\n")
+        occurrences = normalized_text.count(old_text)
+        if occurrences != 1:
+            raise CodingSessionError(
+                f"Patch controlado recusado em {relative_path}: trecho anterior ocorre {occurrences} vezes."
+            )
+        normalized_start = normalized_text.index(old_text)
+        normalized_end = normalized_start + len(old_text)
+        raw_start = boundaries[normalized_start]
+        raw_end = boundaries[normalized_end]
+        replaced_raw_text = original_text[raw_start:raw_end]
+        newline = self._preferred_newline(original_text, replaced_raw_text)
+        rendered_new_text = new_text.replace("\n", newline)
+        resulting_text = original_text[:raw_start] + rendered_new_text + original_text[raw_end:]
+        resulting_text = self._preserve_final_newline(original_text, resulting_text, newline)
+        resulting_payload = resulting_text.encode("utf-8")
+        resulting_bytes = (b"\xef\xbb\xbf" if has_utf8_bom else b"") + resulting_payload
+
+        normalized_result = resulting_text.replace("\r\n", "\n").replace("\r", "\n")
+        logical_scope = self._logical_edit_scope(normalized_text, normalized_result)
+        original_sha256 = hashlib.sha256(original_bytes).hexdigest()
+        resulting_sha256 = hashlib.sha256(resulting_bytes).hexdigest()
+        self._atomic_replace_bytes(absolute_path, resulting_bytes)
+        return {
+            "logical_edit_scope": logical_scope,
+            "physical_write_strategy": "atomic_full_file_replace",
+            "full_file_logical_rewrite": old_text == normalized_text,
+            "full_file_physical_write": True,
+            "original_size": len(original_bytes),
+            "resulting_size": len(resulting_bytes),
+            "original_sha256": original_sha256,
+            "resulting_sha256": resulting_sha256,
+            "changed_line_count": logical_scope["changed_line_count"],
+            "total_line_count": logical_scope["total_line_count"],
+            "logical_change_ratio": logical_scope["logical_change_ratio"],
+            "encoding": "utf-8-sig" if has_utf8_bom else "utf-8",
+            "newline": "crlf" if newline == "\r\n" else "lf",
+            "final_newline": resulting_text.endswith(("\n", "\r")),
+        }
+
+    @staticmethod
+    def _normalize_newlines_with_boundaries(text: str) -> tuple[str, list[int]]:
+        normalized: list[str] = []
+        boundaries = [0]
+        index = 0
+        while index < len(text):
+            if text.startswith("\r\n", index):
+                normalized.append("\n")
+                index += 2
+            elif text[index] == "\r":
+                normalized.append("\n")
+                index += 1
+            else:
+                normalized.append(text[index])
+                index += 1
+            boundaries.append(index)
+        return "".join(normalized), boundaries
+
+    @staticmethod
+    def _preferred_newline(text: str, replaced_text: str) -> str:
+        replaced_crlf = replaced_text.count("\r\n")
+        replaced_lf = replaced_text.count("\n") - replaced_crlf
+        if replaced_crlf and not replaced_lf:
+            return "\r\n"
+        if replaced_lf and not replaced_crlf:
+            return "\n"
+        crlf = text.count("\r\n")
+        lf = text.count("\n") - crlf
+        return "\r\n" if crlf > lf else "\n"
+
+    @staticmethod
+    def _preserve_final_newline(original: str, resulting: str, newline: str) -> str:
+        original_has_final = original.endswith(("\n", "\r"))
+        resulting_has_final = resulting.endswith(("\n", "\r"))
+        if original_has_final and not resulting_has_final:
+            return resulting + newline
+        if not original_has_final and resulting_has_final:
+            return resulting.rstrip("\r\n")
+        return resulting
+
+    @staticmethod
+    def _logical_edit_scope(original: str, resulting: str) -> dict[str, Any]:
+        original_lines = original.splitlines()
+        resulting_lines = resulting.splitlines()
+        matcher = difflib.SequenceMatcher(a=original_lines, b=resulting_lines, autojunk=False)
+        changed_line_count = 0
+        changed_region_count = 0
+        for tag, old_start, old_end, new_start, new_end in matcher.get_opcodes():
+            if tag == "equal":
+                continue
+            changed_region_count += 1
+            changed_line_count += max(old_end - old_start, new_end - new_start)
+        total_line_count = max(len(original_lines), len(resulting_lines), 1)
+        return {
+            "changed_line_count": changed_line_count,
+            "changed_region_count": changed_region_count,
+            "total_line_count": total_line_count,
+            "logical_change_ratio": changed_line_count / total_line_count,
+        }
+
+    @staticmethod
+    def _atomic_replace_bytes(path: str, content: bytes) -> None:
+        directory = os.path.dirname(path)
+        descriptor, temporary_path = tempfile.mkstemp(
+            prefix=f".{Path(path).name}.",
+            suffix=".jarvis-tmp",
+            dir=directory,
+        )
+        try:
+            original_mode = os.stat(path).st_mode
+            with os.fdopen(descriptor, "wb") as handle:
+                descriptor = -1
+                handle.write(content)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.chmod(temporary_path, original_mode)
+            os.replace(temporary_path, path)
+        except Exception:
+            if descriptor >= 0:
+                os.close(descriptor)
+            if os.path.exists(temporary_path):
+                os.remove(temporary_path)
+            raise
 
     def _run_validations(self, session: CodingSession, root: str) -> list[dict[str, Any]]:
         current_context = self.projects.open_project(session.project_id).to_dict()
@@ -651,12 +885,12 @@ class CodingSessionService:
         return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
     @staticmethod
-    def _git_repository_valid(root: str) -> bool:
-        try:
-            result = subprocess.run(["git", "-C", root, "rev-parse", "--is-inside-work-tree"], capture_output=True, text=True, timeout=5)
-            return result.returncode == 0 and result.stdout.strip() == "true"
-        except (OSError, subprocess.TimeoutExpired):
-            return False
+    def _exception_details(exc: Exception) -> dict[str, str]:
+        return {
+            "type": type(exc).__name__,
+            "message": str(exc),
+            "traceback": "".join(traceback.format_exception(type(exc), exc, exc.__traceback__)),
+        }
 
     @staticmethod
     def _limited_files(files: dict[str, str], limit: int = 60_000) -> dict[str, str]:

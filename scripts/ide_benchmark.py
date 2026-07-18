@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 import hashlib
-import inspect
 import json
 import os
 import shutil
@@ -24,7 +23,8 @@ if str(REPO_ROOT) not in sys.path:
 
 from agents.orchestrator.project_builder import build_project
 from intelligence.coding_session import CodingSessionError, CodingSessionService
-from intelligence.project_context import ProjectContextError, ProjectContextService
+from intelligence.project_context import HASH_CHUNK_BYTES, MAX_VIEW_FILE_BYTES, ProjectContextError, ProjectContextService
+from intelligence.project_intelligence import MAX_AST_FILE_BYTES
 
 
 REPORT_PATH = REPO_ROOT / "logs" / "ide_benchmark" / "benchmark_latest.json"
@@ -113,6 +113,34 @@ def record_session(metrics: dict[str, Any], session) -> None:
     metrics["final_state"] = session.status
     metrics["details"]["validation_results"] = list(session.validation_results)
     metrics["details"]["checkpoint_type"] = session.checkpoint.get("type") if session.checkpoint else None
+    metrics["details"]["checkpoint_strategy"] = session.checkpoint.get("strategy") if session.checkpoint else None
+    metrics["details"]["checkpoint_created"] = session.checkpoint_created
+    metrics["details"]["primary_error"] = session.primary_error
+    metrics["details"]["rollback_error"] = session.rollback_error
+    metrics["details"]["rollback_attempted"] = session.rollback_attempted
+    metrics["details"]["rollback_succeeded"] = session.rollback_succeeded
+
+
+def rollback_session_if_needed(
+    sessions: CodingSessionService,
+    project_id: str,
+    session,
+) -> tuple[Any, bool]:
+    if not session.checkpoint or not session.checkpoint_created:
+        return session, False
+    if session.status in {"ROLLED_BACK", "ERROR_ROLLED_BACK"} or session.rollback_succeeded:
+        return session, False
+    has_changes = bool(session.applied_changes) or session.writes_started
+    state_requires_rollback = session.status in {"SUCCEEDED", "VALIDATION_FAILED", "APPLYING", "ROLLBACK_FAILED"}
+    if not has_changes and not state_requires_rollback:
+        return session, False
+    return sessions.rollback_session(project_id, session.session_id, confirmed=True), True
+
+
+def session_primary_error_message(session) -> str:
+    if isinstance(session.primary_error, dict) and session.primary_error.get("message"):
+        return str(session.primary_error["message"])
+    return "; ".join(session.errors) if session.errors else f"estado {session.status}"
 
 
 def write_html_fixture(workspace: Path, project_id: str = "task-app") -> tuple[ProjectContextService, CodingSessionService, Path]:
@@ -275,15 +303,18 @@ def run_i005(metrics: dict[str, Any], workspace: Path) -> None:
     applied = sessions.apply_session("python-multi", session.session_id)
     record_session(metrics, applied)
     if applied.status != "SUCCEEDED":
-        restored = sessions.rollback_session("python-multi", session.session_id, confirmed=True)
-        metrics["rollback_executed"] = True
+        restored, rollback_executed = rollback_session_if_needed(sessions, "python-multi", applied)
+        record_session(metrics, restored)
+        metrics["rollback_executed"] = rollback_executed
         metrics["final_state"] = restored.status
-        require(False, f"Patch Python falhou: {applied.errors}")
+        require(False, f"Patch Python falhou: {session_primary_error_message(applied)}")
     require(any("py_compile" in command for command in metrics["commands_executed"]), "py_compile nao executado.")
     require(any("pytest" in command for command in metrics["commands_executed"]), "pytest nao executado.")
-    restored = sessions.rollback_session("python-multi", session.session_id, confirmed=True)
-    metrics["rollback_executed"] = True
+    restored, rollback_executed = rollback_session_if_needed(sessions, "python-multi", applied)
+    record_session(metrics, restored)
+    metrics["rollback_executed"] = rollback_executed
     metrics["final_state"] = restored.status
+    require(rollback_executed, "Rollback Python nao foi executado.")
     require((root / "package" / "math_utils.py").read_bytes() == before, "Rollback Python falhou.")
 
 
@@ -385,12 +416,68 @@ def run_i008(metrics: dict[str, Any], workspace: Path) -> None:
     suffix = "\n".join(f"// trailing context line {index}" for index in range(8000)) + "\n"
     (root / "app.js").write_text(prefix + target + suffix, encoding="utf-8")
     (root / "index.html").write_text("<script src=\"app.js\"></script>", encoding="utf-8")
+    huge_content = "// ast-only context\n" * ((MAX_AST_FILE_BYTES // 20) + 1000)
+    (root / "huge.js").write_text(huge_content, encoding="utf-8")
     projects = ProjectContextService(workspace_root=str(workspace))
-    projects.index_project("large-file")
+    context = projects.index_project("large-file")
+    graph = projects.load_index("large-file")
+    displayed_files = projects.read_project_files("large-file")
     sessions = CodingSessionService(projects)
     before = (root / "app.js").read_bytes()
+    before_sha256 = sha256(root / "app.js")
+    unrelated_before_sha256 = sha256(root / "index.html")
+    huge_before_sha256 = sha256(root / "huge.js")
+    app_metadata = context.ast_index["files"]["app.js"]
+    huge_metadata = context.ast_index["files"]["huge.js"]
     record_project_reads(metrics, projects, "large-file")
-    metrics["details"]["source_size_bytes"] = len(before)
+    metrics["details"].update({
+        "source_size_bytes": len(before),
+        "display_limit_bytes": MAX_VIEW_FILE_BYTES,
+        "ast_limit_bytes": MAX_AST_FILE_BYTES,
+        "transaction_limit_bytes": projects.max_transaction_file_bytes,
+        "hash_chunk_bytes": HASH_CHUNK_BYTES,
+        "display_content_available": "app.js" in displayed_files,
+        "hash_available": app_metadata["hash_available"],
+        "source_hash": app_metadata["source_hash"],
+        "ast_indexed": app_metadata["content_indexed"] and "app.js" in graph,
+        "above_ast_limit": {
+            "file": "huge.js",
+            "size_bytes": huge_metadata["size_bytes"],
+            "display_content_available": "huge.js" in displayed_files,
+            "hash_available": huge_metadata["hash_available"],
+            "source_hash": huge_metadata["source_hash"],
+            "ast_indexed": huge_metadata["content_indexed"] or "huge.js" in graph,
+        },
+        "original_sha256": before_sha256,
+        "unrelated_sha256_before": unrelated_before_sha256,
+    })
+    require(len(before) > MAX_VIEW_FILE_BYTES, "Fixture nao excede o limite de visualizacao.", "FIXTURE")
+    require("app.js" not in displayed_files, "Ficheiro grande apareceu integralmente na UI.")
+    require(app_metadata["hash_available"] and app_metadata["source_hash"] == before_sha256, "Hash transacional indisponivel.")
+    require(app_metadata["content_indexed"] and "app.js" in graph, "Ficheiro abaixo de 2 MiB nao entrou no AST.")
+    require(huge_metadata["size_bytes"] > MAX_AST_FILE_BYTES, "Fixture AST nao excede 2 MiB.", "FIXTURE")
+    require("huge.js" not in displayed_files, "Fixture acima do AST apareceu integralmente na UI.")
+    require(huge_metadata["hash_available"] and huge_metadata["source_hash"] == huge_before_sha256, "Hash da fixture acima do AST indisponivel.")
+    require(not huge_metadata["content_indexed"] and "huge.js" not in graph, "Fixture acima de 2 MiB entrou no AST.")
+
+    stale_session = sessions.create_session("large-file", "Detetar mutacao stale", [{
+        "file": "app.js",
+        "operation": "replace_symbol",
+        "symbol": "compute",
+        "new_code": "function compute(value) { return value + 2; }",
+        "reason": "Confirmar stale detection real.",
+    }])
+    with (root / "app.js").open("ab") as handle:
+        handle.write(b"// external stale mutation\r\n")
+    try:
+        sessions.apply_session("large-file", stale_session.session_id)
+    except CodingSessionError as exc:
+        metrics["details"]["stale_detection"] = {"blocked": True, "reason": str(exc)}
+    else:
+        raise BenchmarkFailure("Mutacao stale do ficheiro grande nao foi bloqueada.")
+    (root / "app.js").write_bytes(before)
+    projects.index_project("large-file")
+
     session = sessions.create_session("large-file", "Alterar compute localmente", [{
         "file": "app.js",
         "operation": "replace_symbol",
@@ -401,18 +488,44 @@ def run_i008(metrics: dict[str, Any], workspace: Path) -> None:
     applied = sessions.apply_session("large-file", session.session_id)
     record_session(metrics, applied)
     require(applied.status == "SUCCEEDED", f"Patch em ficheiro grande falhou: {applied.errors}")
+    after = (root / "app.js").read_bytes()
+    after_sha256 = sha256(root / "app.js")
+    unrelated_after_sha256 = sha256(root / "index.html")
+    expected_after = before.replace(
+        b"function compute(value) { return value + 1; }",
+        b"function compute(value) { return value + 2; }",
+        1,
+    )
+    applied_metadata = next(item for item in applied.applied_changes if item["file"] == "app.js")
     diff_lines = session.proposed_changes[0]["unified_diff"].splitlines()
-    metrics["details"]["diff_lines"] = len(diff_lines)
-    metrics["details"]["physical_write_strategy"] = "full_file" if "write_text(updated" in inspect.getsource(CodingSessionService._apply_change) else "localized"
+    metrics["details"].update({
+        "diff_lines": len(diff_lines),
+        "logical_edit_scope": applied_metadata["logical_edit_scope"],
+        "physical_write_strategy": applied_metadata["physical_write_strategy"],
+        "full_file_logical_rewrite": applied_metadata["full_file_logical_rewrite"],
+        "full_file_physical_write": applied_metadata["full_file_physical_write"],
+        "resulting_sha256": after_sha256,
+        "unrelated_sha256_after_apply": unrelated_after_sha256,
+    })
+    require(bool(applied.checkpoint), "Checkpoint do ficheiro grande nao foi criado.")
+    require(after == expected_after, "Patch alterou bytes fora do simbolo compute.")
+    require(applied_metadata["physical_write_strategy"] == "atomic_full_file_replace", "Escrita textual nao foi atomica.")
+    require(not applied_metadata["full_file_logical_rewrite"], "Patch localizado foi classificado como rewrite logico total.")
+    require(applied_metadata["changed_line_count"] <= 1, "Patch logico alterou linhas excessivas.")
+    require(applied_metadata["logical_change_ratio"] < 0.001, "Ratio logico excessivo para alteracao localizada.")
+    require(all(item["exit_code"] == 0 for item in applied.validation_results), "Validacao do ficheiro grande falhou.")
+    require(unrelated_after_sha256 == unrelated_before_sha256, "Ficheiro nao relacionado mudou durante aplicacao.")
     restored = sessions.rollback_session("large-file", session.session_id, confirmed=True)
+    record_session(metrics, restored)
     metrics["rollback_executed"] = True
     metrics["final_state"] = restored.status
-    require((root / "app.js").read_bytes() == before, "Rollback do ficheiro grande falhou.")
+    restored_sha256 = sha256(root / "app.js")
+    unrelated_restored_sha256 = sha256(root / "index.html")
+    metrics["details"]["restored_sha256"] = restored_sha256
+    metrics["details"]["unrelated_sha256_after_rollback"] = unrelated_restored_sha256
+    require((root / "app.js").read_bytes() == before and restored_sha256 == before_sha256, "Rollback do ficheiro grande falhou.")
+    require(unrelated_restored_sha256 == unrelated_before_sha256, "Ficheiro nao relacionado mudou durante rollback.")
     require(len(diff_lines) < 20, f"Diff nao permaneceu localizado: {len(diff_lines)} linhas.")
-    require(
-        metrics["details"]["physical_write_strategy"] == "localized",
-        "A edicao textual localizada ainda grava o conteudo integral com Path.write_text.",
-    )
 
 
 def run_i009(metrics: dict[str, Any], workspace: Path) -> None:

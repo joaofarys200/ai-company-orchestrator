@@ -28,6 +28,17 @@ class FakeRequester:
         return self.responses.pop(0)
 
 
+def correction_response(plan, error_code):
+    return {
+        "corrected_plan": plan,
+        "correction_manifest": [{
+            "error_code": error_code,
+            "changed_artifacts": [],
+            "resolution": "Returned a complete valid plan.",
+        }],
+    }
+
+
 class ProjectBuilderUnitTest(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         cleanup_test_projects()
@@ -56,7 +67,7 @@ class ProjectBuilderUnitTest(unittest.IsolatedAsyncioTestCase):
             "project_name": "Hello Txt",
             "stack": "text",
             "files": [{"path": "hello.txt", "content": "hello\n"}],
-            "validation_commands": ["Get-ChildItem -LiteralPath workspace/projects"],
+            "validation_commands": ["Get-ChildItem -LiteralPath ."],
             "preview_command": "",
         })
 
@@ -75,6 +86,8 @@ class ProjectBuilderUnitTest(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("obsidian_vault", result.files_created[0].lower())
         self.assertEqual(len(result.commands_executed), 1)
         self.assertTrue(result.commands_executed[0].ok)
+        self.assertEqual(result.commands_executed[0].working_directory, result.project_dir)
+        self.assertEqual(result.commands_executed[0].exit_code, 0)
 
     async def test_creates_simple_page_and_static_preview(self):
         requester = FakeRequester({
@@ -120,20 +133,24 @@ class ProjectBuilderUnitTest(unittest.IsolatedAsyncioTestCase):
 
         self.assertIn("app-de-tarefas", result.project_rel_dir)
         self.assertEqual(len(result.files_created), 2)
-        self.assertEqual(result.commands_executed, [])
+        blocked = [item for item in result.commands_executed if item.command == "npm install"]
+        self.assertEqual(len(blocked), 1)
+        self.assertFalse(blocked[0].ok)
+        self.assertEqual(blocked[0].status, "BLOCKED")
         self.assertEqual(result.commands_skipped[0].command, "npm install")
+        self.assertFalse(result.technical_success)
         self.assertFalse(result.obsidian_used)
 
     async def test_invalid_json_gets_one_correction(self):
         requester = FakeRequester(
             "not json",
-            {
+            correction_response({
                 "project_name": "Corrigido",
                 "stack": "text",
                 "files": [{"path": "ok.txt", "content": "ok"}],
                 "validation_commands": [],
                 "preview_command": "",
-            },
+            }, "INVALID_JSON"),
         )
 
         result = await project_builder.build_project(
@@ -158,7 +175,15 @@ class ProjectBuilderUnitTest(unittest.IsolatedAsyncioTestCase):
                 start_preview=False,
             )
 
-        self.assertIn("Plano JSON invalido depois de uma correcao", str(ctx.exception))
+        error = ctx.exception
+        self.assertIsInstance(error, project_builder.ProjectBuilderPlanningError)
+        self.assertEqual(error.category, "PLAN_JSON_INVALID")
+        self.assertEqual(error.diagnostics["attempt_count"], 2)
+        self.assertEqual(
+            error.diagnostics["final_validation"]["parse_status"],
+            "INVALID_JSON",
+        )
+        self.assertIn("unica correcao", error.sanitized_message)
         self.assertEqual(len(requester.calls), 2)
 
     async def test_rejects_obsidian_paths(self):
@@ -170,13 +195,18 @@ class ProjectBuilderUnitTest(unittest.IsolatedAsyncioTestCase):
             "preview_command": "",
         })
 
-        with self.assertRaises(project_builder.ProjectBuilderError):
-            await project_builder.build_project(
-                "cria hello.txt",
-                plan_requester=requester,
-                projects_root_rel=TEST_PROJECTS_ROOT,
-                start_preview=False,
-            )
+        result = await project_builder.build_project(
+            "cria hello.txt",
+            plan_requester=requester,
+            projects_root_rel=TEST_PROJECTS_ROOT,
+            start_preview=False,
+        )
+
+        first_errors = result.planning_diagnostics["validation_history"][0]["errors"]
+        self.assertIn("UNSAFE_FILE_PATH", {item["code"] for item in first_errors})
+        self.assertEqual(result.error_category, "PLAN_CORRECTION_FAILED")
+        self.assertEqual(result.files_created, [])
+        self.assertFalse(Path(ag_tools.resolve_workspace_path(TEST_PROJECTS_ROOT)).exists())
 
 
 if __name__ == "__main__":

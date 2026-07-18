@@ -48,6 +48,8 @@ SERVER_MESSAGE_TYPES = {
     "project_references",
     "semantic_results",
     "coding_session",
+    "mission_list",
+    "mission_snapshot",
     "ui",
     "ui_action",
     "ui_theme",
@@ -78,7 +80,110 @@ CLIENT_MESSAGE_TYPES = {
     "apply_coding_session",
     "rollback_coding_session",
     "get_coding_session",
+    "mission_list",
+    "mission_create",
+    "mission_get",
+    "mission_update",
+    "mission_set_status",
+    "work_package_create",
+    "work_package_update",
+    "work_package_set_status",
+    "work_package_add_dependency",
+    "deliverable_create",
+    "deliverable_update",
+    "deliverable_set_status",
+    "evidence_attach",
+    "criterion_create",
+    "criterion_set_status",
+    "mission_resume_snapshot",
+    "mission_execute_work_package",
+    "mission_apply_execution",
+    "mission_review_execution",
+    "mission_retry_execution",
+    "mission_cancel_execution",
+    "mission_release_stale_lock",
 }
+
+MISSION_CLIENT_REQUIRED_FIELDS = {
+    "mission_list": ("project_id",),
+    "mission_create": ("project_id", "title", "objective"),
+    "mission_get": ("project_id", "mission_id"),
+    "mission_update": ("project_id", "mission_id", "expected_version", "changes"),
+    "mission_set_status": ("project_id", "mission_id", "expected_version", "status"),
+    "work_package_create": ("project_id", "mission_id", "title"),
+    "work_package_update": ("project_id", "mission_id", "work_package_id", "expected_version", "changes"),
+    "work_package_set_status": ("project_id", "mission_id", "work_package_id", "expected_version", "status"),
+    "work_package_add_dependency": (
+        "project_id", "mission_id", "work_package_id", "dependency_id", "expected_version",
+    ),
+    "deliverable_create": ("project_id", "mission_id", "work_package_id", "name"),
+    "deliverable_update": ("project_id", "mission_id", "deliverable_id", "expected_version", "changes"),
+    "deliverable_set_status": ("project_id", "mission_id", "deliverable_id", "expected_version", "status"),
+    "evidence_attach": ("project_id", "mission_id", "work_package_id", "kind", "source_ref"),
+    "criterion_create": ("project_id", "mission_id", "owner_type", "owner_id", "description"),
+    "criterion_set_status": ("project_id", "mission_id", "criterion_id", "expected_version", "status"),
+    "mission_resume_snapshot": ("project_id", "mission_id"),
+    "mission_execute_work_package": (
+        "project_id", "mission_id", "work_package_id",
+        "expected_mission_version", "expected_work_package_version",
+    ),
+    "mission_apply_execution": (
+        "project_id", "mission_id", "execution_id", "expected_execution_version", "confirmed",
+    ),
+    "mission_review_execution": (
+        "project_id", "mission_id", "execution_id", "decision", "review_note",
+        "accepted_evidence_refs", "expected_execution_version",
+    ),
+    "mission_retry_execution": (
+        "project_id", "mission_id", "execution_id", "expected_execution_version",
+    ),
+    "mission_cancel_execution": (
+        "project_id", "mission_id", "execution_id", "expected_execution_version", "confirmed",
+    ),
+    "mission_release_stale_lock": (
+        "project_id", "mission_id", "execution_id", "expected_execution_version", "confirmed",
+    ),
+}
+
+
+class WebSocketPayloadError(ValueError):
+    pass
+
+
+def validate_client_message(message: Mapping[str, Any]) -> dict[str, Any]:
+    if not isinstance(message, Mapping):
+        raise WebSocketPayloadError("A mensagem WebSocket deve ser um objeto JSON.")
+    payload = dict(message)
+    message_type = _as_str(payload.get("type")).strip()
+    if message_type not in CLIENT_MESSAGE_TYPES:
+        raise WebSocketPayloadError(f"Operacao WebSocket desconhecida: {message_type or 'sem type'}.")
+    required_fields = MISSION_CLIENT_REQUIRED_FIELDS.get(message_type, ())
+    missing = [field for field in required_fields if field not in payload or payload[field] is None or payload[field] == ""]
+    if missing:
+        raise WebSocketPayloadError(f"Payload {message_type} incompleto; faltam: {', '.join(missing)}.")
+    for version_field in (
+        "expected_version",
+        "expected_mission_version",
+        "expected_work_package_version",
+        "expected_execution_version",
+    ):
+        if version_field not in required_fields:
+            continue
+        version = payload.get(version_field)
+        if isinstance(version, bool) or not isinstance(version, int) or version < 1:
+            raise WebSocketPayloadError(f"{version_field} deve ser um inteiro positivo.")
+    if message_type.endswith("_update") and not isinstance(payload.get("changes"), dict):
+        raise WebSocketPayloadError("changes deve ser um objeto JSON.")
+    if message_type in {"mission_apply_execution", "mission_cancel_execution", "mission_release_stale_lock"}:
+        if payload.get("confirmed") is not True:
+            raise WebSocketPayloadError(f"{message_type} exige confirmed=true.")
+    if message_type == "mission_review_execution":
+        decision = _as_str(payload.get("decision")).strip().upper()
+        if decision not in {"ACCEPT", "REJECT"}:
+            raise WebSocketPayloadError("decision deve ser ACCEPT ou REJECT.")
+        if not isinstance(payload.get("accepted_evidence_refs"), list):
+            raise WebSocketPayloadError("accepted_evidence_refs deve ser uma lista.")
+    return payload
 
 _logged_unknown_types: set[str] = set()
 
@@ -196,6 +301,15 @@ def normalize_ws_message(message: Mapping[str, Any]) -> dict[str, Any]:
     if message_type == "coding_session":
         return {
             "type": "coding_session",
+            "data": message.get("data") if isinstance(message.get("data"), dict) or message.get("data") is None else None,
+        }
+
+    if message_type == "mission_list":
+        return {"type": "mission_list", "project_id": _as_str(message.get("project_id")), "missions": _as_list(message.get("missions"))}
+
+    if message_type == "mission_snapshot":
+        return {
+            "type": "mission_snapshot",
             "data": message.get("data") if isinstance(message.get("data"), dict) or message.get("data") is None else None,
         }
 

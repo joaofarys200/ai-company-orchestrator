@@ -1,0 +1,5 @@
+{
+  "type": "static-server",
+  "port": 3002,
+  "path": "/frontend"
+}

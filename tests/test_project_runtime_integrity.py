@@ -133,7 +133,9 @@ def test_file_above_ast_limit_is_hashed_but_not_indexed(tmp_path):
     assert metadata["size_bytes"] > MAX_AST_FILE_BYTES
     assert metadata["content_indexed"] is False
     assert metadata["hash_available"] is True
+    assert metadata["source_hash"]
     assert "huge.js" not in graph
+    assert "huge.js" not in service.read_project_files("ast-limit")
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node indisponivel")

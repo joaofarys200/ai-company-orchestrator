@@ -27,6 +27,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useWebSocket } from '../../context/WebSocketContext';
+import { MissionPlanner } from '../planner';
 
 interface WorkspaceViewerProps {
   onClose?: () => void;
@@ -873,7 +874,8 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
 
           {activeTab === 'planner' && (
             <ViewFrame key="planner" className="grid grid-cols-1 gap-3 overflow-hidden lg:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.75fr)]">
-              <section className={`${PANEL} flex min-h-0 flex-col overflow-hidden`}>
+              <MissionPlanner />
+              <section className={`${PANEL} hidden min-h-0 flex-col overflow-hidden`} aria-hidden="true">
                 <div className="flex items-center gap-3 border-b border-white/8 px-4 py-3">
                   <Activity className="h-4 w-4 text-cyan-300" />
                   <h3 className="flex-1 text-sm font-semibold text-gray-100">Plano persistente</h3>

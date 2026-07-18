@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from intelligence.coding_session import CodingSessionError, CodingSessionService
+from intelligence.coding_session import CodingSessionError, CodingSessionService, resolve_project_git_context
 from intelligence.project_context import ProjectContextService
 
 
@@ -26,6 +26,48 @@ INVALID_ADD_TASK = """function addTask( {
   const input = document.getElementById('taskInput');
   return input.value;
 }"""
+
+
+def parse_python_module_command(command: str) -> tuple[str, list[str]]:
+    tokens = shlex.split(command, posix=os.name != "nt")
+    if os.name == "nt":
+        if len(tokens) < 4 or tokens[0] != "&":
+            raise ValueError("Nao e um comando Python PowerShell estruturado.")
+        executable = tokens[1].strip('"').replace('`"', '"')
+        arguments = [token.strip('"') for token in tokens[2:]]
+    else:
+        if len(tokens) < 3:
+            raise ValueError("Nao e um comando Python estruturado.")
+        executable = tokens[0]
+        arguments = tokens[1:]
+    if arguments[0] != "-m":
+        raise ValueError("O comando nao executa um modulo Python.")
+    return executable, arguments
+
+
+def assert_python_module_validation(
+    results: list[dict],
+    python_executable: str,
+    module: str,
+    relative_path: str,
+) -> dict:
+    matches = []
+    for result in results:
+        if result["kind"] != "syntax":
+            continue
+        try:
+            executable, arguments = parse_python_module_command(result["command"])
+        except ValueError:
+            continue
+        if arguments == ["-m", module, relative_path]:
+            matches.append((result, executable))
+
+    assert len(matches) == 1
+    result, executable = matches[0]
+    assert os.path.normcase(os.path.realpath(executable)) == os.path.normcase(os.path.realpath(python_executable))
+    assert not result["command"].lstrip().startswith("python ")
+    assert result["exit_code"] == 0
+    return result
 
 
 @pytest.fixture
@@ -160,23 +202,13 @@ def test_python_symbol_change_reuses_patch_engine_and_py_compile(tmp_path):
     applied = sessions.apply_session("python-app", session.session_id)
 
     assert applied.status == "SUCCEEDED"
-    syntax_results = [
-        item for item in applied.validation_results
-        if item["kind"] == "syntax"
-        and "-m py_compile" in item["command"]
-        and "main.py" in item["command"]
-    ]
-    assert len(syntax_results) == 1
-    syntax = syntax_results[0]
     assert context.python_executable
-    expected_launcher = (
-        f'& "{context.python_executable}"'
-        if os.name == "nt"
-        else shlex.quote(context.python_executable)
+    assert_python_module_validation(
+        applied.validation_results,
+        context.python_executable,
+        "py_compile",
+        "main.py",
     )
-    assert syntax["command"].startswith(expected_launcher + " -m py_compile")
-    assert not syntax["command"].lstrip().startswith("python ")
-    assert syntax["exit_code"] == 0
     assert "return value + 2" in (root / "main.py").read_text(encoding="utf-8")
     sessions.rollback_session("python-app", session.session_id, confirmed=True)
     assert (root / "main.py").read_text(encoding="utf-8") == original
@@ -229,7 +261,7 @@ def test_assisted_plan_receives_real_context_and_ast(task_app_service):
 @pytest.mark.skipif(shutil.which("git") is None, reason="git indisponivel")
 def test_git_repository_uses_selective_blob_checkpoint(task_app_service, tmp_path):
     _sessions, projects, root = task_app_service
-    subprocess.run(["git", "init", str(tmp_path)], check=True, capture_output=True)
+    subprocess.run(["git", "init", str(root)], check=True, capture_output=True)
     projects.index_project("task-app")
     sessions = CodingSessionService(projects)
     original = (root / "app.js").read_bytes()
@@ -247,3 +279,107 @@ def test_git_repository_uses_selective_blob_checkpoint(task_app_service, tmp_pat
     assert checkpoint_file["existed_before"] is True
     sessions.rollback_session("task-app", session.session_id, confirmed=True)
     assert (root / "app.js").read_bytes() == original
+
+
+@pytest.mark.skipif(shutil.which("git") is None, reason="git indisponivel")
+def test_nested_git_project_uses_file_backup_without_parent_blobs(task_app_service, tmp_path):
+    _sessions, projects, root = task_app_service
+    subprocess.run(["git", "init", str(tmp_path)], check=True, capture_output=True)
+    projects.index_project("task-app")
+    objects_dir = tmp_path / ".git" / "objects"
+    objects_before = sorted(path.relative_to(objects_dir) for path in objects_dir.rglob("*") if path.is_file())
+    sessions = CodingSessionService(projects)
+    session = sessions.create_session("task-app", "Checkpoint nested", proposed_change(VALID_ADD_TASK))
+
+    applied = sessions.apply_session("task-app", session.session_id)
+
+    assert applied.status == "SUCCEEDED"
+    assert applied.checkpoint["type"] == "file_backup"
+    assert applied.checkpoint["strategy"] == "file_backup"
+    assert applied.checkpoint["reason"] == "nested_project_uses_file_backup"
+    assert applied.checkpoint["git_context"]["git_toplevel"] == os.path.realpath(tmp_path)
+    objects_after = sorted(path.relative_to(objects_dir) for path in objects_dir.rglob("*") if path.is_file())
+    assert objects_after == objects_before
+    sessions.rollback_session("task-app", session.session_id, confirmed=True)
+
+
+def test_non_git_project_uses_selective_file_backup(task_app_service):
+    _sessions, projects, root = task_app_service
+    context = resolve_project_git_context(str(root))
+    sessions = CodingSessionService(projects)
+    session = sessions.create_session("task-app", "Checkpoint sem Git", proposed_change(VALID_ADD_TASK))
+
+    applied = sessions.apply_session("task-app", session.session_id)
+
+    assert context["is_git_repository"] is False
+    assert context["checkpoint_strategy"] == "file_backup"
+    assert applied.checkpoint["type"] == "file_backup"
+    assert applied.checkpoint["reason"] == "not_a_git_repository"
+    sessions.rollback_session("task-app", session.session_id, confirmed=True)
+
+
+def test_checkpoint_failure_preserves_primary_error_without_rollback(task_app_service, monkeypatch):
+    sessions, _projects, root = task_app_service
+    original = (root / "app.js").read_bytes()
+    session = sessions.create_session("task-app", "Falhar checkpoint", proposed_change(VALID_ADD_TASK))
+
+    def fail_checkpoint(_session, _root):
+        raise RuntimeError("checkpoint original failure")
+
+    monkeypatch.setattr(sessions, "_create_checkpoint", fail_checkpoint)
+    failed = sessions.apply_session("task-app", session.session_id)
+
+    assert failed.status == "ERROR"
+    assert failed.primary_error["type"] == "RuntimeError"
+    assert failed.primary_error["message"] == "checkpoint original failure"
+    assert "fail_checkpoint" in failed.primary_error["traceback"]
+    assert failed.checkpoint_created is False
+    assert failed.writes_started is False
+    assert failed.rollback_attempted is False
+    assert failed.rollback_succeeded is False
+    assert failed.rollback_error is None
+    assert (root / "app.js").read_bytes() == original
+
+
+def test_partial_write_failure_preserves_error_and_rolls_back(task_app_service, monkeypatch):
+    sessions, _projects, root = task_app_service
+    original = (root / "app.js").read_bytes()
+    session = sessions.create_session("task-app", "Falhar depois da escrita", proposed_change(VALID_ADD_TASK))
+
+    def fail_verification(_root, _changes):
+        raise RuntimeError("post-write verification failure")
+
+    monkeypatch.setattr(sessions, "_verify_applied_changes", fail_verification)
+    failed = sessions.apply_session("task-app", session.session_id)
+
+    assert failed.status == "ERROR_ROLLED_BACK"
+    assert failed.primary_error["message"] == "post-write verification failure"
+    assert failed.checkpoint_created is True
+    assert failed.writes_started is True
+    assert failed.rollback_attempted is True
+    assert failed.rollback_succeeded is True
+    assert failed.rollback_error is None
+    assert (root / "app.js").read_bytes() == original
+
+
+def test_rollback_failure_preserves_both_errors(task_app_service, monkeypatch):
+    sessions, _projects, _root = task_app_service
+    session = sessions.create_session("task-app", "Falhar rollback", proposed_change(VALID_ADD_TASK))
+
+    def fail_verification(_root, _changes):
+        raise RuntimeError("primary write failure")
+
+    def fail_rollback(_session, _root):
+        raise OSError("rollback storage failure")
+
+    monkeypatch.setattr(sessions, "_verify_applied_changes", fail_verification)
+    monkeypatch.setattr(sessions, "_restore_checkpoint", fail_rollback)
+    failed = sessions.apply_session("task-app", session.session_id)
+
+    assert failed.status == "ROLLBACK_FAILED"
+    assert failed.primary_error["type"] == "RuntimeError"
+    assert failed.primary_error["message"] == "primary write failure"
+    assert failed.rollback_error["type"] == "OSError"
+    assert failed.rollback_error["message"] == "rollback storage failure"
+    assert failed.rollback_attempted is True
+    assert failed.rollback_succeeded is False
