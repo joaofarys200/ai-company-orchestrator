@@ -145,6 +145,8 @@ FOCAL_PLAN_UPDATE_FIELDS_BY_ERROR: dict[str, set[str]] = {
     "MISSING_REQUESTED_COMPONENTS": {"components"},
     "MISSING_COMPONENT_MAPPING": {"component_files"},
     "MAPPED_FILE_NOT_FOUND": {"component_files"},
+    "DECLARED_COMPONENT_WITHOUT_ARTIFACTS": {"component_files"},
+    "PERSISTENCE_NOT_IMPLEMENTED": {"component_files"},
     "MISSING_ENTRYPOINTS": {"entrypoints"},
     "MISSING_VALIDATION_COMMANDS": {"validation_commands"},
     "MISSING_PREVIEW_IMPLEMENTATION": {"preview_command", "preview_strategy"},
@@ -1821,6 +1823,14 @@ class _JavaScriptFacts:
     warnings: list[str] = field(default_factory=list)
 
 
+FUNCTIONAL_COMPONENTS = {"frontend", "backend", "persistence", "tests"}
+FS_READ_OPERATIONS = {"readFile", "readFileSync", "createReadStream"}
+FS_WRITE_OPERATIONS = {
+    "appendFile", "appendFileSync", "createWriteStream", "truncate", "truncateSync",
+    "writeFile", "writeFileSync",
+}
+
+
 def _tree_sitter_javascript_parser():
     if TreeSitterParser is None or TreeSitterLanguage is None or tsjavascript is None:
         return None
@@ -1911,6 +1921,180 @@ def _javascript_facts(file: PlannedFile) -> _JavaScriptFacts:
 
     traverse(tree.root_node)
     return facts
+
+
+def _javascript_tree(file: PlannedFile):
+    parser = _tree_sitter_javascript_parser()
+    if parser is None:
+        return None, b""
+    source = file.content.encode("utf-8")
+    tree = parser.parse(source)
+    if tree.root_node.has_error:
+        return None, source
+    return tree, source
+
+
+def _javascript_node_text(source: bytes, node) -> str:
+    return source[node.start_byte:node.end_byte].decode("utf-8", errors="replace")
+
+
+def _javascript_descendants(node):
+    yield node
+    for child in node.children:
+        yield from _javascript_descendants(child)
+
+
+def _javascript_nonzero_literal(source: bytes, node) -> bool:
+    value = _javascript_node_text(source, node).strip()
+    if not re.fullmatch(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)", value):
+        return False
+    try:
+        return float(value) != 0
+    except ValueError:
+        return False
+
+
+def _handler_propagates_failure(handler, source: bytes) -> bool:
+    for node in _javascript_descendants(handler):
+        if node.type == "throw_statement":
+            return True
+        if node.type == "assignment_expression":
+            left = node.child_by_field_name("left")
+            right = node.child_by_field_name("right")
+            if (
+                left is not None and right is not None
+                and re.sub(r"\s+", "", _javascript_node_text(source, left)) == "process.exitCode"
+                and _javascript_nonzero_literal(source, right)
+            ):
+                return True
+        if node.type != "call_expression":
+            continue
+        function = node.child_by_field_name("function")
+        arguments = node.child_by_field_name("arguments")
+        if function is None or arguments is None:
+            continue
+        function_text = re.sub(r"\s+", "", _javascript_node_text(source, function))
+        values = list(arguments.named_children)
+        if function_text == "process.exit" and values and _javascript_nonzero_literal(source, values[0]):
+            return True
+    return False
+
+
+def _handler_logs_failure(handler, source: bytes) -> bool:
+    for node in _javascript_descendants(handler):
+        if node.type != "member_expression":
+            continue
+        value = re.sub(r"\s+", "", _javascript_node_text(source, node))
+        if value in {"console.error", "console.log"}:
+            return True
+    return False
+
+
+def _test_failure_propagation_issues(
+    file: PlannedFile,
+    *,
+    phase: str,
+) -> list[PlanValidationIssue]:
+    tree, source = _javascript_tree(file)
+    if tree is None:
+        if re.search(r"\.catch\s*\(\s*console\.(?:error|log)\s*\)", file.content):
+            return [_static_issue(
+                "TEST_FAILURE_NOT_PROPAGATED", f"files[{file.normalized_path}].content",
+                "O teste captura uma rejeicao apenas para a registar e pode terminar com exit code zero.",
+                phase=phase, file=file.normalized_path,
+                expected="catch handler that throws or sets a non-zero process exit status",
+                actual=".catch(console logger)",
+                suggestion="Propaga a falha com throw, process.exitCode nao zero ou process.exit nao zero.",
+            )]
+        return []
+
+    for node in _javascript_descendants(tree.root_node):
+        handler = None
+        actual = ""
+        if node.type == "call_expression":
+            function = node.child_by_field_name("function")
+            arguments = node.child_by_field_name("arguments")
+            if function is None or arguments is None:
+                continue
+            function_text = re.sub(r"\s+", "", _javascript_node_text(source, function))
+            if not function_text.endswith(".catch") or not arguments.named_children:
+                continue
+            handler = arguments.named_children[0]
+            actual = _javascript_node_text(source, handler).strip()
+        elif node.type == "catch_clause":
+            handler = node
+            actual = "catch handler that only logs the failure"
+        if handler is None or _handler_propagates_failure(handler, source):
+            continue
+        if not _handler_logs_failure(handler, source):
+            continue
+        return [_static_issue(
+            "TEST_FAILURE_NOT_PROPAGATED", f"files[{file.normalized_path}].content",
+            "O teste captura uma falha apenas para a registar e pode produzir falso sucesso.",
+            phase=phase, file=file.normalized_path, line=node.start_point[0] + 1,
+            expected="throw captured error or set process.exitCode/process.exit to a non-zero value",
+            actual=actual,
+            suggestion="Propaga a falha com throw, process.exitCode nao zero ou process.exit nao zero.",
+        )]
+    return []
+
+
+def _javascript_persistence_operations(file: PlannedFile) -> tuple[set[str], set[str]]:
+    facts = _javascript_facts(file)
+    fs_imported = bool({
+        value.removeprefix("node:") for value in facts.imported_modules
+    } & {"fs", "fs/promises"})
+    if not fs_imported:
+        return set(), set()
+    tree, source = _javascript_tree(file)
+    if tree is None:
+        return set(), set()
+    reads: set[str] = set()
+    writes: set[str] = set()
+    for node in _javascript_descendants(tree.root_node):
+        if node.type != "call_expression":
+            continue
+        function = node.child_by_field_name("function")
+        if function is None:
+            continue
+        call = re.sub(r"\s+", "", _javascript_node_text(source, function))
+        operation = call.rsplit(".", 1)[-1]
+        if operation in FS_READ_OPERATIONS:
+            reads.add(operation)
+        if operation in FS_WRITE_OPERATIONS:
+            writes.add(operation)
+    return reads, writes
+
+
+def _persistence_evidence(files: list[PlannedFile]) -> tuple[bool, str]:
+    fs_reads: set[str] = set()
+    fs_writes: set[str] = set()
+    fs_paths: list[str] = []
+    for file in files:
+        reads, writes = _javascript_persistence_operations(file)
+        if reads or writes:
+            fs_paths.append(file.normalized_path)
+            fs_reads.update(reads)
+            fs_writes.update(writes)
+        compact = re.sub(r"\s+", "", file.content)
+        if "localStorage.getItem(" in compact and "localStorage.setItem(" in compact:
+            return True, f"{file.normalized_path}: localStorage read/write"
+        if "indexedDB.open(" in compact and ".transaction(" in compact:
+            return True, f"{file.normalized_path}: IndexedDB"
+        lowered = file.content.lower()
+        if "sqlite3" in lowered and re.search(r"\b(select|pragma)\b", lowered) and re.search(
+            r"\b(insert|update|delete|replace|create\s+table)\b", lowered
+        ):
+            return True, f"{file.normalized_path}: SQLite read/write"
+        if re.search(r"\bopen\s*\([^\n]+[\"']r", file.content) and re.search(
+            r"\bopen\s*\([^\n]+[\"'](?:w|a|x)", file.content
+        ):
+            return True, f"{file.normalized_path}: file read/write"
+    if fs_reads and fs_writes:
+        return True, (
+            f"{sorted(set(fs_paths))}: fs reads={sorted(fs_reads)}, writes={sorted(fs_writes)}"
+        )
+    return False, "no durable read/write mechanism in mapped persistence artifacts"
 
 
 def _normalized_node_dependency(value: str) -> str:
@@ -2183,6 +2367,54 @@ def analyze_project_artifacts(
                 suggestion="Corrige entrypoints para ficheiros presentes no plano.",
             ))
 
+    declared_components = list(dict.fromkeys(components))
+    for component in declared_components:
+        if component not in FUNCTIONAL_COMPONENTS:
+            continue
+        mapped = list(component_files.get(component) or [])
+        existing = [path for path in mapped if source.exists(path)]
+        if existing:
+            continue
+        errors.append(_static_issue(
+            "DECLARED_COMPONENT_WITHOUT_ARTIFACTS", f"component_files.{component}",
+            f"O componente declarado {component} nao tem nenhum artefacto real mapeado.",
+            phase=phase, component=component,
+            expected="at least one component_files path present in the planned files",
+            actual=json.dumps(mapped, ensure_ascii=False),
+            suggestion=(
+                f"Mapeia {component} para pelo menos um ficheiro existente que implemente o componente."
+            ),
+        ))
+
+    if (
+        "persistence" in required_components
+        and ("persistence" in components or "persistence" in component_files)
+    ):
+        persistence_paths = [
+            path for path in component_files.get("persistence", []) if source.exists(path)
+        ]
+        persistence_files = [source.get(path) for path in persistence_paths]
+        persistence_files = [file for file in persistence_files if file is not None]
+        implemented, evidence = _persistence_evidence(persistence_files)
+        if not implemented:
+            backend_candidates = [
+                path for path in component_files.get("backend", []) if source.exists(path)
+            ]
+            target = next((
+                path for path in persistence_paths + backend_candidates
+                if Path(path).suffix.lower() in {".js", ".mjs", ".cjs", ".ts", ".py"}
+            ), persistence_paths[0] if persistence_paths else (backend_candidates[0] if backend_candidates else ""))
+            errors.append(_static_issue(
+                "PERSISTENCE_NOT_IMPLEMENTED", "component_files.persistence",
+                "O componente persistence nao demonstra leitura e escrita duravel; estado em memoria nao e persistencia.",
+                phase=phase, file=target, target=target, component="persistence",
+                expected="mapped artifact implementing durable read and write operations",
+                actual=evidence,
+                suggestion=(
+                    "Associa persistence a um artefacto existente que implemente leitura e escrita duravel."
+                ),
+            ))
+
     health_path = str(preview_strategy.get("healthcheck_path") or "/health")
     backend_paths = list(component_files.get("backend") or [])
     backend_contents = [
@@ -2228,6 +2460,14 @@ def analyze_project_artifacts(
                     actual="isolated alternate server",
                     suggestion="Importa ou inicia explicitamente o backend entrypoint declarado no teste.",
                 ))
+
+    if "tests" in required_components:
+        for file in source.files.values():
+            if "test" not in Path(file.normalized_path).stem.lower() and "spec" not in Path(file.normalized_path).stem.lower():
+                continue
+            if file.extension not in {".js", ".mjs", ".cjs", ".jsx", ".ts", ".tsx"}:
+                continue
+            errors.extend(_test_failure_propagation_issues(file, phase=phase))
 
     component_extensions = {
         "frontend": {".html", ".jsx", ".tsx"},
@@ -2276,7 +2516,7 @@ def _analyze_normalized_plan_artifacts(
 ) -> tuple[PlannedFileSystem, StaticAnalysisResult]:
     source = PlannedFileSystem.from_plan_data(data)
     files = [ProjectFile(path=item.normalized_path, content=item.content) for item in source.files.values()]
-    components = list(data.get("components") or []) or _infer_components(str(data.get("stack") or ""), files)
+    components = list(data.get("components") or [])
     required = list(dict.fromkeys(_requested_components(prompt) + components))
     result = analyze_project_artifacts(
         source,
@@ -2365,6 +2605,55 @@ def semantic_error_artifact_mappings(
                 "The test must not replace the declared backend with an alternate synthetic server.",
             ]
             content_dependent = True
+        elif issue.code == "TEST_FAILURE_NOT_PROPAGATED":
+            if source.exists(issue.file):
+                affected.append(issue.file)
+            evidence.update({
+                "test_artifact": issue.file,
+                "rejected_handler": issue.actual,
+                "accepted_propagation": [
+                    "throw captured error",
+                    "process.exitCode = non-zero",
+                    "process.exit(non-zero)",
+                ],
+            })
+            postconditions = [
+                "Every caught test failure must be rethrown or set a non-zero process exit status.",
+                "A console.error or console.log call alone does not propagate a test failure.",
+            ]
+            content_dependent = True
+        elif issue.code == "DECLARED_COMPONENT_WITHOUT_ARTIFACTS":
+            evidence.update({
+                "component": issue.component,
+                "received_mapping": issue.actual,
+                "expected_artifacts": issue.expected,
+            })
+            if issue.component == "persistence":
+                affected.extend(
+                    path for path in component_files.get("backend", []) if source.exists(path)
+                )
+            postconditions = [
+                f"component_files.{issue.component} must contain at least one existing planned artifact."
+            ]
+        elif issue.code == "PERSISTENCE_NOT_IMPLEMENTED":
+            affected.extend(
+                path
+                for component in ("persistence", "backend")
+                for path in component_files.get(component, [])
+                if source.exists(path)
+                and Path(path).suffix.lower() in {".js", ".mjs", ".cjs", ".jsx", ".ts", ".tsx", ".py"}
+            )
+            evidence.update({
+                "component": "persistence",
+                "persistence_artifacts": list(component_files.get("persistence") or []),
+                "durability_evidence": issue.actual,
+            })
+            postconditions = [
+                "A mapped existing artifact must implement durable read and write operations.",
+                "Module arrays, objects, Map, Set or variables alone do not satisfy persistence.",
+                "For dependency-free Node.js plans, node:fs or node:fs/promises may implement the durable storage.",
+            ]
+            content_dependent = bool(affected)
         elif issue.code == "MISSING_IMPORT":
             if source.exists(issue.file):
                 affected.append(issue.file)
@@ -2398,7 +2687,7 @@ def semantic_error_artifact_mappings(
             code=issue.code,
             message=issue.message,
             affected_artifacts=list(dict.fromkeys(affected)),
-            evidence={key: value for key, value in evidence.items() if value not in {"", None}},
+            evidence={key: value for key, value in evidence.items() if value is not None and value != ""},
             required_postconditions=list(dict.fromkeys(item for item in postconditions if item)),
             content_dependent=content_dependent,
         ))
@@ -5789,7 +6078,7 @@ def _prevalidation_errors_and_metadata(
             ))
     analysis = analyze_project_artifacts(
         source,
-        components=list(plan.components),
+        components=list(plan.component_files),
         required_components=list(validation.required_components),
         entrypoints=list(plan.entrypoints),
         component_files=deepcopy(plan.component_files),
@@ -6386,6 +6675,35 @@ def _apply_result_to_check(
         validation.failed_checks.append(check.check_id)
 
 
+TECHNICAL_GATE_DEFENSE_CODES = {
+    "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "PERSISTENCE_NOT_IMPLEMENTED",
+    "TEST_FAILURE_NOT_PROPAGATED",
+}
+
+
+def _technical_gate_defense_issues(
+    validation: ValidationPlan,
+    plan: ProjectPlan,
+    project_dir: str,
+) -> list[PlanValidationIssue]:
+    source = PlannedFileSystem.from_materialized_project(project_dir, plan)
+    analysis = analyze_project_artifacts(
+        source,
+        components=list(plan.component_files),
+        required_components=list(validation.required_components),
+        entrypoints=list(plan.entrypoints),
+        component_files=deepcopy(plan.component_files),
+        dependencies=list(plan.dependencies),
+        setup_commands=list(plan.setup_commands),
+        validation_commands=list(plan.validation_commands),
+        preview_command=plan.preview_command,
+        preview_strategy=deepcopy(plan.preview_strategy),
+        phase="TECHNICAL_VALIDATION_GATE",
+    )
+    return [issue for issue in analysis.errors if issue.code in TECHNICAL_GATE_DEFENSE_CODES]
+
+
 async def _execute_validation_plan(
     validation: ValidationPlan,
     plan: ProjectPlan,
@@ -6395,6 +6713,48 @@ async def _execute_validation_plan(
 ) -> tuple[list[CommandResult], list[SkippedCommand], bool, str]:
     executed: list[CommandResult] = []
     skipped: list[SkippedCommand] = []
+
+    defense_issues = _technical_gate_defense_issues(validation, plan, project_dir)
+    if defense_issues:
+        for issue in defense_issues:
+            value = issue.to_dict()
+            value["category"] = value.pop("code")
+            value["suggested_fix"] = value.pop("suggestion")
+            value["retryable"] = False
+            validation.static_errors.append(value)
+            if issue.component:
+                validation.missing_components.append(issue.component)
+        validation.missing_components = sorted(set(validation.missing_components))
+        validation.failed_checks.append("technical-validation-gate")
+        validation.suggested_fix = "; ".join(
+            dict.fromkeys(issue.suggestion for issue in defense_issues if issue.suggestion)
+        )
+        gate = CommandResult(
+            command="technical validation gate",
+            ok=False,
+            output=_command_output(None, "", validation.suggested_fix, False),
+            working_directory=project_dir,
+            exit_code=None,
+            stderr=validation.suggested_fix,
+            category="BUILD",
+            required=True,
+            source="ValidationPlan defense in depth",
+            status="FAILED",
+            error_category=defense_issues[0].code,
+            command_id="technical-validation-gate",
+        )
+        if journal is not None:
+            check = _new_check(
+                "technical-validation-gate",
+                "technical validation gate",
+                project_dir,
+                "BUILD",
+                "ValidationPlan defense in depth",
+            )
+            journal.transition("VALIDATING")
+            journal.command_started(check)
+            journal.command_completed(check.check_id, gate)
+        return [gate], skipped, False, ""
 
     abort_remaining = False
     setup_ids = {item.check_id for item in validation.setup_commands}

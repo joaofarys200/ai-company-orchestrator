@@ -43,6 +43,10 @@ def wp1_regression_plan(*, valid=False, references_backend=False, include_previe
     backend = (
         "import http from 'node:http';\n" if valid else ""
     ) + (
+        "import fs from 'node:fs';\n"
+        "const dataPath = new URL('./persistence/data.json', import.meta.url);\n"
+        "function loadData() { return JSON.parse(fs.readFileSync(dataPath, 'utf8')); }\n"
+        "function saveData(value) { fs.writeFileSync(dataPath, JSON.stringify(value)); }\n"
         "const server = http.createServer((req, res) => {\n"
         "  if (req.url === '/health') { res.end('ok'); return; }\n"
         "  res.end('missing');\n"
@@ -84,7 +88,7 @@ def wp1_regression_plan(*, valid=False, references_backend=False, include_previe
         "component_files": {
             "frontend": ["frontend/index.html"],
             "backend": ["backend/server.js"],
-            "persistence": ["backend/persistence/data.json"],
+            "persistence": ["backend/server.js", "backend/persistence/data.json"],
             "tests": ["tests/run-tests.js"],
             "preview": ["frontend/index.html"],
         },

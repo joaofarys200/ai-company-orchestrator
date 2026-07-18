@@ -45,7 +45,7 @@ def node_server(extra_line=""):
 
 
 def backend_plan(name, *, files=None, components=None, setup=None, validation=None):
-    return {
+    result = {
         "project_name": name,
         "stack": "Node.js backend",
         "components": components or ["backend"],
@@ -59,6 +59,12 @@ def backend_plan(name, *, files=None, components=None, setup=None, validation=No
         "preview_command": "",
         "rationale": "Validate syntax and the real backend health endpoint.",
     }
+    if "tests" in result["components"]:
+        result["component_files"]["tests"] = [
+            item["path"] for item in result["files"]
+            if "test" in Path(item["path"]).stem.lower() or "spec" in Path(item["path"]).stem.lower()
+        ]
+    return result
 
 
 @unittest.skipUnless(shutil.which("node") and shutil.which("npm"), "Node and npm are required")
@@ -281,6 +287,8 @@ class ProjectBuilderValidationPlanTest(unittest.IsolatedAsyncioTestCase):
             "const http = require('node:http');\n"
             "const fs = require('node:fs');\n"
             "const path = require('node:path');\n"
+            "const notesPath = path.join(__dirname, 'data/notes.json');\n"
+            "function saveNotes(notes) { fs.writeFileSync(notesPath, JSON.stringify(notes)); }\n"
             "function createApp() { return http.createServer((request, response) => {\n"
             "  if (request.url === '/health') { response.writeHead(200); return response.end('ok'); }\n"
             "  if (request.url === '/api/notes') {\n"
@@ -324,7 +332,7 @@ class ProjectBuilderValidationPlanTest(unittest.IsolatedAsyncioTestCase):
             "component_files": {
                 "frontend": ["index.html"],
                 "backend": ["server.js"],
-                "persistence": ["data/notes.json"],
+                "persistence": ["server.js", "data/notes.json"],
                 "tests": ["tests/test.js"],
             },
             "setup_commands": ["node --version"],
