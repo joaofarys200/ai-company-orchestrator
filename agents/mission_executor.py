@@ -19,6 +19,7 @@ from agents.mission_state import (
     utc_now,
 )
 from agents.orchestrator.project_builder import ProjectBuildResult, build_project
+from agents.orchestrator.flight_recorder import ProjectBuilderFlightRecorder, recorder_directory
 from intelligence.coding_session import CodingSession, CodingSessionService
 from intelligence.project_context import ProjectContextService
 
@@ -577,7 +578,35 @@ class MissionExecutorService:
         execution: MissionExecution,
     ) -> dict[str, Any]:
         objective = self._execution_objective(execution.input_snapshot["work_package"])
-        result = self.project_builder_runner(objective)
+        use_real_builder = self.project_builder_runner is build_project
+        recorder = None
+        if use_real_builder:
+            recorder = ProjectBuilderFlightRecorder(
+                recorder_directory(self.workspace_root),
+                project_id=project_id,
+                mission_id=execution.mission_id,
+                execution_id=execution.execution_id,
+            )
+            recorder.event(
+                "mission_execution_started",
+                phase="EXECUTION",
+                metadata={"executor_kind": execution.executor_kind},
+            )
+            recorder.event(
+                "project_builder_dispatch_started",
+                phase="EXECUTION",
+                metadata={"objective_bytes": len(objective.encode("utf-8"))},
+            )
+        if use_real_builder:
+            result = self.project_builder_runner(
+                objective,
+                flight_recorder=recorder,
+                project_id=project_id,
+                mission_id=execution.mission_id,
+                execution_id=execution.execution_id,
+            )
+        else:
+            result = self.project_builder_runner(objective)
         if asyncio.iscoroutine(result):
             result = await result
         result_data = asdict(result) if is_dataclass(result) else dict(result)
