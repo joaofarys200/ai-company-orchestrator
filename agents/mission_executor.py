@@ -580,6 +580,7 @@ class MissionExecutorService:
         objective = self._execution_objective(execution.input_snapshot["work_package"])
         use_real_builder = self.project_builder_runner is build_project
         recorder = None
+        close_status = "FAILED"
         if use_real_builder:
             recorder = ProjectBuilderFlightRecorder(
                 recorder_directory(self.workspace_root),
@@ -597,65 +598,88 @@ class MissionExecutorService:
                 phase="EXECUTION",
                 metadata={"objective_bytes": len(objective.encode("utf-8"))},
             )
-        if use_real_builder:
-            result = self.project_builder_runner(
-                objective,
-                flight_recorder=recorder,
-                project_id=project_id,
-                mission_id=execution.mission_id,
-                execution_id=execution.execution_id,
-            )
-        else:
-            result = self.project_builder_runner(objective)
-        if asyncio.iscoroutine(result):
-            result = await result
-        result_data = asdict(result) if is_dataclass(result) else dict(result)
-        commands = list(result_data.get("commands_executed") or [])
-        preview_started = bool(result_data.get("preview_started"))
-        technical_success = (bool(commands) and all(bool(item.get("ok")) for item in commands)) or preview_started
-        artifact_refs = [f"file:{path}" for path in result_data.get("files_created") or []]
-        validation_refs = [f"validation:{execution.execution_id}"] if commands or preview_started else []
-        if not technical_success:
-            return self._fail_execution(
+        try:
+            if use_real_builder:
+                result = self.project_builder_runner(
+                    objective,
+                    flight_recorder=recorder,
+                    project_id=project_id,
+                    mission_id=execution.mission_id,
+                    execution_id=execution.execution_id,
+                    finalize_flight_recorder=False,
+                )
+            else:
+                result = self.project_builder_runner(objective)
+            if asyncio.iscoroutine(result):
+                result = await result
+            result_data = asdict(result) if is_dataclass(result) else dict(result)
+            commands = list(result_data.get("commands_executed") or [])
+            preview_started = bool(result_data.get("preview_started"))
+            technical_success = (bool(commands) and all(bool(item.get("ok")) for item in commands)) or preview_started
+            artifact_refs = [f"file:{path}" for path in result_data.get("files_created") or []]
+            validation_refs = [f"validation:{execution.execution_id}"] if commands or preview_started else []
+            if not technical_success:
+                if recorder is not None:
+                    recorder.event("mission_state_update_started", phase="MISSION_STATE", metadata={"status": "VALIDATION_FAILED"})
+                outcome = self._fail_execution(
+                    project_id,
+                    execution.mission_id,
+                    execution.execution_id,
+                    MissionExecutionError("ProjectBuilder nao produziu validacao ou preview tecnico com sucesso."),
+                    validation_failed=True,
+                    output={"project_builder": result_data},
+                    artifact_refs=artifact_refs,
+                    validation_refs=validation_refs,
+                )
+                if recorder is not None:
+                    recorder.event("mission_state_update_completed", phase="MISSION_STATE", status="COMPLETED", metadata={"status": "VALIDATION_FAILED"})
+                return outcome
+            evidence_refs = self._create_builder_evidence(
                 project_id,
                 execution.mission_id,
                 execution.execution_id,
-                MissionExecutionError("ProjectBuilder nao produziu validacao ou preview tecnico com sucesso."),
-                validation_failed=True,
-                output={"project_builder": result_data},
-                artifact_refs=artifact_refs,
-                validation_refs=validation_refs,
+                result_data,
+                artifact_refs,
             )
-        evidence_refs = self._create_builder_evidence(
-            project_id,
-            execution.mission_id,
-            execution.execution_id,
-            result_data,
-            artifact_refs,
-        )
-        with self.mission_state._locked_mission(project_id, execution.mission_id):
-            current = self._load_execution(project_id, execution.mission_id, execution.execution_id)
-            if current.status == "CANCELLED":
-                return self.load_snapshot(project_id, execution.mission_id)
-            previous = current.version
-            current.executor_ref = execution.execution_id
-            current.output_summary = {
-                "phase": "TECHNICAL_SUCCESS",
-                "project_builder": result_data,
-                "validation_results": commands,
-            }
-            current.artifact_refs = artifact_refs
-            current.evidence_refs = evidence_refs
-            current.validation_refs = validation_refs
-            current.status = "WAITING_FOR_REVIEW"
-            self._heartbeat(current)
-            self._save_execution(project_id, current)
-            self.mission_state._append_event(
-                project_id, execution.mission_id, "MISSION_EXECUTION", execution.execution_id,
-                "MISSION_EXECUTION_WAITING_REVIEW", previous, current.version,
-                {"project_id": self._built_project_id(result_data), "evidence_refs": evidence_refs},
-            )
-        return self.load_snapshot(project_id, execution.mission_id)
+            if recorder is not None:
+                recorder.event("mission_state_update_started", phase="MISSION_STATE", metadata={"status": "WAITING_FOR_REVIEW"})
+            with self.mission_state._locked_mission(project_id, execution.mission_id):
+                current = self._load_execution(project_id, execution.mission_id, execution.execution_id)
+                if current.status == "CANCELLED":
+                    return self.load_snapshot(project_id, execution.mission_id)
+                previous = current.version
+                current.executor_ref = execution.execution_id
+                current.output_summary = {
+                    "phase": "TECHNICAL_SUCCESS",
+                    "project_builder": result_data,
+                    "validation_results": commands,
+                }
+                current.artifact_refs = artifact_refs
+                current.evidence_refs = evidence_refs
+                current.validation_refs = validation_refs
+                current.status = "WAITING_FOR_REVIEW"
+                self._heartbeat(current)
+                self._save_execution(project_id, current)
+                self.mission_state._append_event(
+                    project_id, execution.mission_id, "MISSION_EXECUTION", execution.execution_id,
+                    "MISSION_EXECUTION_WAITING_REVIEW", previous, current.version,
+                    {"project_id": self._built_project_id(result_data), "evidence_refs": evidence_refs},
+                )
+            if recorder is not None:
+                recorder.event("mission_state_update_completed", phase="MISSION_STATE", status="COMPLETED", metadata={"status": "WAITING_FOR_REVIEW"})
+            close_status = "WAITING_FOR_REVIEW"
+            return self.load_snapshot(project_id, execution.mission_id)
+        finally:
+            if recorder is not None:
+                recorder.close(
+                    status=close_status,
+                    final_state={
+                        "status": close_status,
+                        "project_id": project_id,
+                        "mission_id": execution.mission_id,
+                        "execution_id": execution.execution_id,
+                    },
+                )
 
     def _accept_execution(
         self,

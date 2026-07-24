@@ -7634,6 +7634,7 @@ async def build_project(
     project_id: str = "",
     mission_id: str = "",
     execution_id: str = "",
+    finalize_flight_recorder: bool = True,
 ) -> ProjectBuildResult:
     """Run the existing builder with optional persistent observability."""
     enabled = _project_builder_setting("PROJECT_BUILDER_FLIGHT_RECORDER_ENABLED", "1").lower() not in {
@@ -7696,4 +7697,8 @@ async def build_project(
             "project_rel_dir": result.project_rel_dir if result is not None else "",
             "files_created": result.files_created if result is not None else [],
         }
-        recorder.close(status="SUCCEEDED" if result is not None and result.technical_success else final_status, final_state=final_state)
+        if finalize_flight_recorder:
+            recorder.close(
+                status="SUCCEEDED" if result is not None and result.technical_success else final_status,
+                final_state=final_state,
+            )
