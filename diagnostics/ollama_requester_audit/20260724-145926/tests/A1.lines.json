@@ -1,0 +1,99 @@
+[
+  {
+    "offset": 1.7040239000925794,
+    "raw_line_base64": "eyJtb2RlbCI6InF3ZW4zLjU6OWIiLCJjcmVhdGVkX2F0IjoiMjAyNi0wNy0yNFQxNDowMzo1OC4wMDQ2NzE3WiIsIm1lc3NhZ2UiOnsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiJ7XCIifSwiZG9uZSI6ZmFsc2V9",
+    "raw_line": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-07-24T14:03:58.0046717Z\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"\"},\"done\":false}",
+    "json_valid": true,
+    "json": {
+      "model": "qwen3.5:9b",
+      "created_at": "2026-07-24T14:03:58.0046717Z",
+      "message": {
+        "role": "assistant",
+        "content": "{\""
+      },
+      "done": false
+    }
+  },
+  {
+    "offset": 1.7366351000964642,
+    "raw_line_base64": "eyJtb2RlbCI6InF3ZW4zLjU6OWIiLCJjcmVhdGVkX2F0IjoiMjAyNi0wNy0yNFQxNDowMzo1OC4wNDc4MDc0WiIsIm1lc3NhZ2UiOnsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiJvayJ9LCJkb25lIjpmYWxzZX0=",
+    "raw_line": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-07-24T14:03:58.0478074Z\",\"message\":{\"role\":\"assistant\",\"content\":\"ok\"},\"done\":false}",
+    "json_valid": true,
+    "json": {
+      "model": "qwen3.5:9b",
+      "created_at": "2026-07-24T14:03:58.0478074Z",
+      "message": {
+        "role": "assistant",
+        "content": "ok"
+      },
+      "done": false
+    }
+  },
+  {
+    "offset": 1.781585599994287,
+    "raw_line_base64": "eyJtb2RlbCI6InF3ZW4zLjU6OWIiLCJjcmVhdGVkX2F0IjoiMjAyNi0wNy0yNFQxNDowMzo1OC4wOTIzNDIzWiIsIm1lc3NhZ2UiOnsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiJcIjoifSwiZG9uZSI6ZmFsc2V9",
+    "raw_line": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-07-24T14:03:58.0923423Z\",\"message\":{\"role\":\"assistant\",\"content\":\"\\\":\"},\"done\":false}",
+    "json_valid": true,
+    "json": {
+      "model": "qwen3.5:9b",
+      "created_at": "2026-07-24T14:03:58.0923423Z",
+      "message": {
+        "role": "assistant",
+        "content": "\":"
+      },
+      "done": false
+    }
+  },
+  {
+    "offset": 1.8252455000765622,
+    "raw_line_base64": "eyJtb2RlbCI6InF3ZW4zLjU6OWIiLCJjcmVhdGVkX2F0IjoiMjAyNi0wNy0yNFQxNDowMzo1OC4xMzY0MloiLCJtZXNzYWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50IjoiIHRydWUifSwiZG9uZSI6ZmFsc2V9",
+    "raw_line": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-07-24T14:03:58.13642Z\",\"message\":{\"role\":\"assistant\",\"content\":\" true\"},\"done\":false}",
+    "json_valid": true,
+    "json": {
+      "model": "qwen3.5:9b",
+      "created_at": "2026-07-24T14:03:58.13642Z",
+      "message": {
+        "role": "assistant",
+        "content": " true"
+      },
+      "done": false
+    }
+  },
+  {
+    "offset": 1.8633633001009002,
+    "raw_line_base64": "eyJtb2RlbCI6InF3ZW4zLjU6OWIiLCJjcmVhdGVkX2F0IjoiMjAyNi0wNy0yNFQxNDowMzo1OC4xNzQyMDUzWiIsIm1lc3NhZ2UiOnsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiJ9In0sImRvbmUiOmZhbHNlfQ==",
+    "raw_line": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-07-24T14:03:58.1742053Z\",\"message\":{\"role\":\"assistant\",\"content\":\"}\"},\"done\":false}",
+    "json_valid": true,
+    "json": {
+      "model": "qwen3.5:9b",
+      "created_at": "2026-07-24T14:03:58.1742053Z",
+      "message": {
+        "role": "assistant",
+        "content": "}"
+      },
+      "done": false
+    }
+  },
+  {
+    "offset": 1.9064792999997735,
+    "raw_line_base64": "eyJtb2RlbCI6InF3ZW4zLjU6OWIiLCJjcmVhdGVkX2F0IjoiMjAyNi0wNy0yNFQxNDowMzo1OC4yMTgwNDk0WiIsIm1lc3NhZ2UiOnsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiIifSwiZG9uZSI6dHJ1ZSwiZG9uZV9yZWFzb24iOiJzdG9wIiwidG90YWxfZHVyYXRpb24iOjE3MjU4ODEzMDAsImxvYWRfZHVyYXRpb24iOjExMTM3NjkzMDAsInByb21wdF9ldmFsX2NvdW50IjoyMiwicHJvbXB0X2V2YWxfZHVyYXRpb24iOjMzMjc1MjAwMCwiZXZhbF9jb3VudCI6NiwiZXZhbF9kdXJhdGlvbiI6MjEyODQyMDAwfQ==",
+    "raw_line": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-07-24T14:03:58.2180494Z\",\"message\":{\"role\":\"assistant\",\"content\":\"\"},\"done\":true,\"done_reason\":\"stop\",\"total_duration\":1725881300,\"load_duration\":1113769300,\"prompt_eval_count\":22,\"prompt_eval_duration\":332752000,\"eval_count\":6,\"eval_duration\":212842000}",
+    "json_valid": true,
+    "json": {
+      "model": "qwen3.5:9b",
+      "created_at": "2026-07-24T14:03:58.2180494Z",
+      "message": {
+        "role": "assistant",
+        "content": ""
+      },
+      "done": true,
+      "done_reason": "stop",
+      "total_duration": 1725881300,
+      "load_duration": 1113769300,
+      "prompt_eval_count": 22,
+      "prompt_eval_duration": 332752000,
+      "eval_count": 6,
+      "eval_duration": 212842000
+    }
+  }
+]

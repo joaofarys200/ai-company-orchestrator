@@ -1,0 +1,80 @@
+{
+  "name": "B2",
+  "started_at": "2026-07-24T14:05:16.503798+00:00",
+  "duration_seconds": 45.821727,
+  "read_timeout_seconds": 300.0,
+  "stream": false,
+  "format": null,
+  "chunks": 1,
+  "bytes_received": 4226,
+  "json_objects": 1,
+  "content_bytes": 3484,
+  "time_to_headers": 45.820731,
+  "time_to_first_byte": 45.821139,
+  "time_to_first_http_chunk": 45.821145,
+  "time_to_first_json": 45.821211,
+  "time_to_first_content": 45.82122,
+  "max_chunk_interval": null,
+  "done": true,
+  "done_reason": "length",
+  "prompt_eval_count": 277,
+  "prompt_eval_duration": 264627000,
+  "eval_count": 1024,
+  "eval_duration": 44168513000,
+  "load_duration": 1138483800,
+  "total_duration": 45665717800,
+  "first_content_offset": 45.82113030005712,
+  "useful_terminated": true,
+  "events": [
+    {
+      "event": "call_started",
+      "wall_time": "2026-07-24T14:05:16.503798+00:00",
+      "monotonic_offset": 0.000347,
+      "stream": false,
+      "format": null,
+      "payload_bytes": 1464
+    },
+    {
+      "event": "headers_received",
+      "wall_time": "2026-07-24T14:06:02.323874+00:00",
+      "monotonic_offset": 45.820731,
+      "status_code": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "date": "Fri, 24 Jul 2026 14:06:02 GMT",
+        "transfer-encoding": "chunked"
+      }
+    },
+    {
+      "event": "first_byte",
+      "wall_time": "2026-07-24T14:06:02.323874+00:00",
+      "monotonic_offset": 45.821139,
+      "bytes": 4226
+    },
+    {
+      "event": "first_http_chunk",
+      "wall_time": "2026-07-24T14:06:02.324876+00:00",
+      "monotonic_offset": 45.821145,
+      "bytes": 4226
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:06:02.324876+00:00",
+      "monotonic_offset": 45.821211,
+      "index": 1
+    },
+    {
+      "event": "first_non_empty_content",
+      "wall_time": "2026-07-24T14:06:02.324876+00:00",
+      "monotonic_offset": 45.82122,
+      "characters": 3484
+    },
+    {
+      "event": "generation_done",
+      "wall_time": "2026-07-24T14:06:02.324876+00:00",
+      "monotonic_offset": 45.821225,
+      "done_reason": "length"
+    }
+  ],
+  "payload_file": "payloads\\B2.json"
+}

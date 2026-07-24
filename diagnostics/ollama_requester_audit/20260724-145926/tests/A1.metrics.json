@@ -1,0 +1,110 @@
+{
+  "name": "A1",
+  "started_at": "2026-07-24T14:03:56.312051+00:00",
+  "duration_seconds": 1.907378,
+  "read_timeout_seconds": 300.0,
+  "stream": true,
+  "format": null,
+  "chunks": 6,
+  "bytes_received": 928,
+  "json_objects": 6,
+  "content_bytes": 12,
+  "time_to_headers": 1.703871,
+  "time_to_first_byte": 1.704032,
+  "time_to_first_http_chunk": 1.704038,
+  "time_to_first_json": 1.704071,
+  "time_to_first_content": 1.704079,
+  "max_chunk_interval": 0.04495049989782274,
+  "done": true,
+  "done_reason": "stop",
+  "prompt_eval_count": 22,
+  "prompt_eval_duration": 332752000,
+  "eval_count": 6,
+  "eval_duration": 212842000,
+  "load_duration": 1113769300,
+  "total_duration": 1725881300,
+  "first_content_offset": 1.7040239000925794,
+  "useful_terminated": true,
+  "events": [
+    {
+      "event": "call_started",
+      "wall_time": "2026-07-24T14:03:56.312051+00:00",
+      "monotonic_offset": 0.000389,
+      "stream": true,
+      "format": null,
+      "payload_bytes": 238
+    },
+    {
+      "event": "headers_received",
+      "wall_time": "2026-07-24T14:03:58.014945+00:00",
+      "monotonic_offset": 1.703871,
+      "status_code": 200,
+      "headers": {
+        "content-type": "application/x-ndjson",
+        "date": "Fri, 24 Jul 2026 14:03:58 GMT",
+        "transfer-encoding": "chunked"
+      }
+    },
+    {
+      "event": "first_byte",
+      "wall_time": "2026-07-24T14:03:58.015955+00:00",
+      "monotonic_offset": 1.704032,
+      "bytes": 127
+    },
+    {
+      "event": "first_http_chunk",
+      "wall_time": "2026-07-24T14:03:58.015955+00:00",
+      "monotonic_offset": 1.704038,
+      "bytes": 127
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:03:58.015955+00:00",
+      "monotonic_offset": 1.704071,
+      "index": 1
+    },
+    {
+      "event": "first_non_empty_content",
+      "wall_time": "2026-07-24T14:03:58.015955+00:00",
+      "monotonic_offset": 1.704079,
+      "characters": 2
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:03:58.048313+00:00",
+      "monotonic_offset": 1.736729,
+      "index": 2
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:03:58.093203+00:00",
+      "monotonic_offset": 1.781632,
+      "index": 3
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:03:58.136933+00:00",
+      "monotonic_offset": 1.825295,
+      "index": 4
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:03:58.175065+00:00",
+      "monotonic_offset": 1.863403,
+      "index": 5
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:03:58.218407+00:00",
+      "monotonic_offset": 1.906535,
+      "index": 6
+    },
+    {
+      "event": "generation_done",
+      "wall_time": "2026-07-24T14:03:58.218407+00:00",
+      "monotonic_offset": 1.906545,
+      "done_reason": "stop"
+    }
+  ],
+  "payload_file": "payloads\\A1.json"
+}

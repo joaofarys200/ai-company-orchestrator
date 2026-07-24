@@ -1,0 +1,117 @@
+{
+  "captured_at": "2026-07-24T14:03:01.584975+00:00",
+  "endpoint": "http://127.0.0.1:11434",
+  "python_executable": "C:\\Users\\joaor\\Desktop\\ai-company-orchestrator\\venv\\Scripts\\python.exe",
+  "requester": {
+    "model": "qwen3.5:9b",
+    "context_tokens": 8192,
+    "max_output_tokens": 16384,
+    "timeouts": {
+      "connect": 5.0,
+      "read": 300.0,
+      "write": 15.0,
+      "pool": 5.0
+    },
+    "keep_alive": "15m"
+  },
+  "commands": [
+    {
+      "command": [
+        "C:\\Users\\joaor\\Desktop\\ai-company-orchestrator\\venv\\Scripts\\python.exe",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "Python 3.12.4\n",
+      "stderr": "",
+      "duration_seconds": 0.0275
+    },
+    {
+      "command": [
+        "C:\\Users\\joaor\\Desktop\\ai-company-orchestrator\\venv\\Scripts\\python.exe",
+        "-c",
+        "import httpx; print(httpx.__version__)"
+      ],
+      "exit_code": 0,
+      "stdout": "0.28.1\n",
+      "stderr": "",
+      "duration_seconds": 0.2314
+    },
+    {
+      "command": [
+        "ollama",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "ollama version is 0.32.1\n",
+      "stderr": "",
+      "duration_seconds": 0.0895
+    },
+    {
+      "command": [
+        "ollama",
+        "list"
+      ],
+      "exit_code": 0,
+      "stdout": "NAME              ID              SIZE      MODIFIED    \nqwen3.5:9b        6488c96fa5fa    6.6 GB    2 weeks ago    \nqwen2.5:14b       7cdf5a0187d5    9.0 GB    5 weeks ago    \nhermes3:latest    4f6b83f30b62    4.7 GB    5 weeks ago    \ngemma4:latest     c6eb396dbd59    9.6 GB    5 weeks ago    \nqwen2.5:7b        845dbda0ea48    4.7 GB    6 weeks ago    \n",
+      "stderr": "",
+      "duration_seconds": 0.1638
+    },
+    {
+      "command": [
+        "ollama",
+        "ps"
+      ],
+      "exit_code": 0,
+      "stdout": "NAME    ID    SIZE    PROCESSOR    CONTEXT    UNTIL \n",
+      "stderr": "",
+      "duration_seconds": 0.0418
+    },
+    {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "Get-Process ollama -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,CPU,WorkingSet64,StartTime,Path | ConvertTo-Json -Compress"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"Id\":10416,\"ProcessName\":\"ollama\",\"CPU\":0.859375,\"WorkingSet64\":48668672,\"StartTime\":\"\\/Date(1784901039771)\\/\",\"Path\":\"C:\\\\Users\\\\joaor\\\\AppData\\\\Local\\\\Programs\\\\Ollama\\\\ollama.exe\"}\n",
+      "stderr": "",
+      "duration_seconds": 0.2774
+    },
+    {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize,FreePhysicalMemory,LastBootUpTime | ConvertTo-Json -Compress"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Get-CimInstance : Access denied \nAt line:1 char:1\n+ Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMem ...\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : PermissionDenied: (root\\cimv2:Win32_OperatingSystem:String) [Get-CimInstance], CimExcept \n   ion\n    + FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n",
+      "duration_seconds": 0.6137
+    },
+    {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "Get-NetTCPConnection -LocalPort 11434 -ErrorAction SilentlyContinue | Select-Object LocalAddress,LocalPort,RemoteAddress,State,OwningProcess | ConvertTo-Json -Compress"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "",
+      "duration_seconds": 1.3697
+    },
+    {
+      "command": [
+        "nvidia-smi",
+        "--query-gpu=name,driver_version,memory.total,memory.used,utilization.gpu",
+        "--format=csv,noheader,nounits"
+      ],
+      "exit_code": 0,
+      "stdout": "NVIDIA GeForce RTX 5060 Laptop GPU, 581.34, 8151, 1119, 3\n",
+      "stderr": "",
+      "duration_seconds": 0.0657
+    }
+  ]
+}

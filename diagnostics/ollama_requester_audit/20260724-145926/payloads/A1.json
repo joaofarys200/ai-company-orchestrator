@@ -1,0 +1,18 @@
+{
+  "model": "qwen3.5:9b",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Responde apenas com: {\"ok\":true}"
+    }
+  ],
+  "stream": true,
+  "think": false,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0,
+    "top_p": 0.8,
+    "num_predict": 64,
+    "num_ctx": 8192
+  }
+}

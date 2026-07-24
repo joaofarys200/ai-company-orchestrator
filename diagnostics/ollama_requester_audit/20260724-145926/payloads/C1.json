@@ -1,0 +1,117 @@
+{
+  "model": "qwen3.5:9b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Return exactly one valid JSON object matching the supplied schema. No markdown or prose."
+    },
+    {
+      "role": "user",
+      "content": "Produz um plano minimo valido que cumpra exatamente o schema fornecido. Usa apenas um ficheiro de texto e um comando seguro.\nSchema:\n{\"type\":\"object\",\"additional_properties\":false,\"properties\":{\"project_name\":{\"type\":\"string\",\"required\":true,\"non_empty\":true},\"stack\":{\"type\":\"string\",\"required\":true,\"non_empty\":true},\"components\":{\"type\":\"array[string]\",\"required\":false,\"default\":[],\"allowed_items\":[\"frontend\",\"backend\",\"persistence\",\"tests\",\"preview\"]},\"files\":{\"type\":\"array[object]\",\"required\":true,\"min_items\":1,\"max_items\":40,\"item_schema\":{\"type\":\"object\",\"additional_properties\":false,\"properties\":{\"path\":{\"type\":\"string\",\"required\":true,\"non_empty\":true},\"content\":{\"type\":\"string\",\"required\":true}}}},\"dependencies\":{\"type\":\"array[string]\",\"required\":false,\"default\":[]},\"setup_commands\":{\"type\":\"array[string]\",\"required\":false,\"default\":[]},\"validation_commands\":{\"type\":\"array[string]\",\"required\":false,\"default\":[]},\"entrypoints\":{\"type\":\"array[string]\",\"required\":false,\"default\":[]},\"preview_strategy\":{\"type\":\"object\",\"required\":false,\"default\":{},\"additional_properties\":true},\"preview_command\":{\"type\":\"string\",\"required\":false,\"default\":\"\"},\"constraints\":{\"type\":\"array[string]\",\"required\":false,\"default\":[]},\"component_files\":{\"type\":\"object[array[string]]\",\"required\":false,\"default\":{}},\"rationale\":{\"type\":\"string\",\"required\":false,\"default\":\"\"}}}"
+    }
+  ],
+  "stream": true,
+  "think": false,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0,
+    "top_p": 0.8,
+    "num_predict": 1024,
+    "num_ctx": 8192
+  },
+  "format": {
+    "type": "object",
+    "additional_properties": false,
+    "properties": {
+      "project_name": {
+        "type": "string",
+        "required": true,
+        "non_empty": true
+      },
+      "stack": {
+        "type": "string",
+        "required": true,
+        "non_empty": true
+      },
+      "components": {
+        "type": "array[string]",
+        "required": false,
+        "default": [],
+        "allowed_items": [
+          "frontend",
+          "backend",
+          "persistence",
+          "tests",
+          "preview"
+        ]
+      },
+      "files": {
+        "type": "array[object]",
+        "required": true,
+        "min_items": 1,
+        "max_items": 40,
+        "item_schema": {
+          "type": "object",
+          "additional_properties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "required": true,
+              "non_empty": true
+            },
+            "content": {
+              "type": "string",
+              "required": true
+            }
+          }
+        }
+      },
+      "dependencies": {
+        "type": "array[string]",
+        "required": false,
+        "default": []
+      },
+      "setup_commands": {
+        "type": "array[string]",
+        "required": false,
+        "default": []
+      },
+      "validation_commands": {
+        "type": "array[string]",
+        "required": false,
+        "default": []
+      },
+      "entrypoints": {
+        "type": "array[string]",
+        "required": false,
+        "default": []
+      },
+      "preview_strategy": {
+        "type": "object",
+        "required": false,
+        "default": {},
+        "additional_properties": true
+      },
+      "preview_command": {
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      "constraints": {
+        "type": "array[string]",
+        "required": false,
+        "default": []
+      },
+      "component_files": {
+        "type": "object[array[string]]",
+        "required": false,
+        "default": {}
+      },
+      "rationale": {
+        "type": "string",
+        "required": false,
+        "default": ""
+      }
+    }
+  }
+}

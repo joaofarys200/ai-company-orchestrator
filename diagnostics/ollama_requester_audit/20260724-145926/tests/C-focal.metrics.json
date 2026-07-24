@@ -1,0 +1,358 @@
+{
+  "name": "C-focal",
+  "started_at": "2026-07-24T14:12:39.692580+00:00",
+  "duration_seconds": 3.264885,
+  "read_timeout_seconds": 300.0,
+  "stream": true,
+  "format": {
+    "type": "object",
+    "required": [
+      "plan_updates",
+      "replacements"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "plan_updates": {
+        "type": "object",
+        "properties": {
+          "components": {
+            "const": [
+              "frontend",
+              "backend",
+              "persistence",
+              "tests",
+              "preview"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "replacements": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "path",
+            "content"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "enum": [
+                "backend/server.js",
+                "package.json",
+                "tests/run-tests.js"
+              ]
+            },
+            "content": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  },
+  "chunks": 31,
+  "bytes_received": 4160,
+  "json_objects": 31,
+  "content_bytes": 122,
+  "time_to_headers": 1.63893,
+  "time_to_first_byte": 1.63912,
+  "time_to_first_http_chunk": 1.639127,
+  "time_to_first_json": 1.639158,
+  "time_to_first_content": 1.639163,
+  "max_chunk_interval": 0.12810720002744347,
+  "done": true,
+  "done_reason": "stop",
+  "prompt_eval_count": 170,
+  "prompt_eval_duration": 324559000,
+  "eval_count": 40,
+  "eval_duration": 1625821000,
+  "load_duration": 1118468000,
+  "total_duration": 3088334700,
+  "first_content_offset": 1.6391088999807835,
+  "useful_terminated": true,
+  "events": [
+    {
+      "event": "call_started",
+      "wall_time": "2026-07-24T14:12:39.692580+00:00",
+      "monotonic_offset": 0.001152,
+      "stream": true,
+      "format": {
+        "type": "object",
+        "required": [
+          "plan_updates",
+          "replacements"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "plan_updates": {
+            "type": "object",
+            "properties": {
+              "components": {
+                "const": [
+                  "frontend",
+                  "backend",
+                  "persistence",
+                  "tests",
+                  "preview"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "replacements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "path",
+                "content"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "enum": [
+                    "backend/server.js",
+                    "package.json",
+                    "tests/run-tests.js"
+                  ]
+                },
+                "content": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "payload_bytes": 1619
+    },
+    {
+      "event": "headers_received",
+      "wall_time": "2026-07-24T14:12:41.330037+00:00",
+      "monotonic_offset": 1.63893,
+      "status_code": 200,
+      "headers": {
+        "content-type": "application/x-ndjson",
+        "date": "Fri, 24 Jul 2026 14:12:41 GMT",
+        "transfer-encoding": "chunked"
+      }
+    },
+    {
+      "event": "first_byte",
+      "wall_time": "2026-07-24T14:12:41.330037+00:00",
+      "monotonic_offset": 1.63912,
+      "bytes": 124
+    },
+    {
+      "event": "first_http_chunk",
+      "wall_time": "2026-07-24T14:12:41.330037+00:00",
+      "monotonic_offset": 1.639127,
+      "bytes": 124
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.330037+00:00",
+      "monotonic_offset": 1.639158,
+      "index": 1
+    },
+    {
+      "event": "first_non_empty_content",
+      "wall_time": "2026-07-24T14:12:41.330037+00:00",
+      "monotonic_offset": 1.639163,
+      "characters": 1
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.452507+00:00",
+      "monotonic_offset": 1.760968,
+      "index": 2
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.489692+00:00",
+      "monotonic_offset": 1.798561,
+      "index": 3
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.526924+00:00",
+      "monotonic_offset": 1.835611,
+      "index": 4
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.565073+00:00",
+      "monotonic_offset": 1.87396,
+      "index": 5
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.604399+00:00",
+      "monotonic_offset": 1.91286,
+      "index": 6
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.721534+00:00",
+      "monotonic_offset": 2.030903,
+      "index": 7
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.761245+00:00",
+      "monotonic_offset": 2.070044,
+      "index": 8
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.801414+00:00",
+      "monotonic_offset": 2.110022,
+      "index": 9
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.839793+00:00",
+      "monotonic_offset": 2.148255,
+      "index": 10
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.906930+00:00",
+      "monotonic_offset": 2.215365,
+      "index": 11
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.946352+00:00",
+      "monotonic_offset": 2.254883,
+      "index": 12
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:41.986924+00:00",
+      "monotonic_offset": 2.29596,
+      "index": 13
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.049435+00:00",
+      "monotonic_offset": 2.358078,
+      "index": 14
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.088850+00:00",
+      "monotonic_offset": 2.397455,
+      "index": 15
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.127390+00:00",
+      "monotonic_offset": 2.436084,
+      "index": 16
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.169062+00:00",
+      "monotonic_offset": 2.477643,
+      "index": 17
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.205877+00:00",
+      "monotonic_offset": 2.51445,
+      "index": 18
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.243586+00:00",
+      "monotonic_offset": 2.552075,
+      "index": 19
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.281620+00:00",
+      "monotonic_offset": 2.590188,
+      "index": 20
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.320011+00:00",
+      "monotonic_offset": 2.628955,
+      "index": 21
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.358625+00:00",
+      "monotonic_offset": 2.667193,
+      "index": 22
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.398917+00:00",
+      "monotonic_offset": 2.707576,
+      "index": 23
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.523132+00:00",
+      "monotonic_offset": 2.831528,
+      "index": 24
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.651038+00:00",
+      "monotonic_offset": 2.959642,
+      "index": 25
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.693640+00:00",
+      "monotonic_offset": 3.002498,
+      "index": 26
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.738473+00:00",
+      "monotonic_offset": 3.047213,
+      "index": 27
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.781175+00:00",
+      "monotonic_offset": 3.090057,
+      "index": 28
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.826063+00:00",
+      "monotonic_offset": 3.13473,
+      "index": 29
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.910704+00:00",
+      "monotonic_offset": 3.219328,
+      "index": 30
+    },
+    {
+      "event": "valid_json_object",
+      "wall_time": "2026-07-24T14:12:42.954834+00:00",
+      "monotonic_offset": 3.263535,
+      "index": 31
+    },
+    {
+      "event": "generation_done",
+      "wall_time": "2026-07-24T14:12:42.954834+00:00",
+      "monotonic_offset": 3.263543,
+      "done_reason": "stop"
+    }
+  ],
+  "payload_file": "payloads\\C-focal.json"
+}

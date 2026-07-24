@@ -1,0 +1,24 @@
+[
+  {
+    "offset": 1.8689386999467388,
+    "raw_line_base64": "eyJtb2RlbCI6InF3ZW4zLjU6OWIiLCJjcmVhdGVkX2F0IjoiMjAyNi0wNy0yNFQxNDowNDowNy45NTY1NDI2WiIsIm1lc3NhZ2UiOnsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiJ7XCJva1wiOiB0cnVlfSJ9LCJkb25lIjp0cnVlLCJkb25lX3JlYXNvbiI6InN0b3AiLCJ0b3RhbF9kdXJhdGlvbiI6MTY5MTA0NTMwMCwibG9hZF9kdXJhdGlvbiI6MTE4ODg3ODYwMCwicHJvbXB0X2V2YWxfY291bnQiOjIyLCJwcm9tcHRfZXZhbF9kdXJhdGlvbiI6MjkzMzAzMDAwLCJldmFsX2NvdW50Ijo2LCJldmFsX2R1cmF0aW9uIjoyMDIwODQwMDB9",
+    "raw_line": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-07-24T14:04:07.9565426Z\",\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"ok\\\": true}\"},\"done\":true,\"done_reason\":\"stop\",\"total_duration\":1691045300,\"load_duration\":1188878600,\"prompt_eval_count\":22,\"prompt_eval_duration\":293303000,\"eval_count\":6,\"eval_duration\":202084000}",
+    "json_valid": true,
+    "json": {
+      "model": "qwen3.5:9b",
+      "created_at": "2026-07-24T14:04:07.9565426Z",
+      "message": {
+        "role": "assistant",
+        "content": "{\"ok\": true}"
+      },
+      "done": true,
+      "done_reason": "stop",
+      "total_duration": 1691045300,
+      "load_duration": 1188878600,
+      "prompt_eval_count": 22,
+      "prompt_eval_duration": 293303000,
+      "eval_count": 6,
+      "eval_duration": 202084000
+    }
+  }
+]

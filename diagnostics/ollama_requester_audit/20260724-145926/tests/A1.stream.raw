@@ -1,0 +1,6 @@
+{"model":"qwen3.5:9b","created_at":"2026-07-24T14:03:58.0046717Z","message":{"role":"assistant","content":"{\""},"done":false}
+{"model":"qwen3.5:9b","created_at":"2026-07-24T14:03:58.0478074Z","message":{"role":"assistant","content":"ok"},"done":false}
+{"model":"qwen3.5:9b","created_at":"2026-07-24T14:03:58.0923423Z","message":{"role":"assistant","content":"\":"},"done":false}
+{"model":"qwen3.5:9b","created_at":"2026-07-24T14:03:58.13642Z","message":{"role":"assistant","content":" true"},"done":false}
+{"model":"qwen3.5:9b","created_at":"2026-07-24T14:03:58.1742053Z","message":{"role":"assistant","content":"}"},"done":false}
+{"model":"qwen3.5:9b","created_at":"2026-07-24T14:03:58.2180494Z","message":{"role":"assistant","content":""},"done":true,"done_reason":"stop","total_duration":1725881300,"load_duration":1113769300,"prompt_eval_count":22,"prompt_eval_duration":332752000,"eval_count":6,"eval_duration":212842000}

@@ -1,0 +1,22 @@
+{
+  "prompt_characters": 583,
+  "prompt_bytes": 583,
+  "message_bytes": 2578,
+  "payload_bytes": 3016,
+  "estimated_prompt_tokens_chars_div_4": 146,
+  "real_token_count": null,
+  "token_count_note": "No local tokenizer was invoked; probe response metrics may expose prompt_eval_count.",
+  "schema_stats": {
+    "properties": 15,
+    "enums": 0,
+    "arrays": 0,
+    "description_characters": 0,
+    "max_depth": 6,
+    "bytes": 1243
+  },
+  "first_call_ollama_format": "json",
+  "structured_json_schema_sent_on_first_call": false,
+  "model": "qwen3.5:9b",
+  "num_ctx": 8192,
+  "num_predict": 16384
+}

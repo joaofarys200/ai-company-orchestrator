@@ -1,0 +1,92 @@
+{
+  "started_at": "2026-07-24T14:08:08.954305+00:00",
+  "requester": "agents.orchestrator.project_builder.OllamaPlanRequester",
+  "prompt_file": "wp1_prompt.txt",
+  "status": "SUCCEEDED",
+  "raw_response_characters": 2639,
+  "raw_response_bytes": 2644,
+  "raw_response": "{\n  \"project_name\": \"health-boundary-probe\",\n  \"stack\": \"nodejs-standard-library\",\n  \"components\": [\n    \"frontend\",\n    \"backend\",\n    \"persistence\",\n    \"tests\"\n  ],\n  \"files\": [\n    {\n      \"path\": \"package.json\",\n      \"content\": \"{\\n  \\\"name\\\": \\\"health-boundary-probe\\\",\\n  \\\"version\\\": \\\"1.0.0\\\",\\n  \\\"type\\\": \\\"module\\\"\\n}\"\n    },\n    {\n      \"path\": \"server.js\",\n      \"content\": \"import http from 'http';\\n\\nconst server = http.createServer((req, res) => {\\n  if (req.url === '/health') {\\n    res.writeHead(200);\\n    res.end('OK');\\n  } else {\\n    res.writeHead(404);\\n    res.end();\\n  }\\n});\\n\\nconst PORT = process.env.PORT || 3000;\\nserver.listen(PORT, () => console.log(`Server running on port ${PORT}`));\"\n    },\n    {\n      \"path\": \"index.html\",\n      \"content\": \"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head><meta charset=\\\"UTF-8\\\"><title>Health Boundary Probe</title></head>\\n<body><h1>Welcome to Health-Boundary-Probe Frontend</h1></body>\\n</html>\"\n    },\n    {\n      \"path\": \"test-server.js\",\n      \"content\": \"import http from 'http';\\n\\nconst server = http.createServer((req, res) => {\\n  if (req.url === '/health') {\\n    res.writeHead(200);\\n    res.end('OK');\\n  } else {\\n    res.writeHead(404);\\n    res.end();\\n  }\\n});\\n\\nconst PORT = process.env.PORT || 3001;\\nserver.listen(PORT, () => console.log(`Test server running on port ${PORT}`));\"\n    },\n    {\n      \"path\": \"test-client.js\",\n      \"content\": \"import http from 'http';\\n\\nfetch('http://localhost:3001/health')\\n  .then(res => res.text())\\n  .then(data => {\\n    if (data === 'OK') process.exit(0);\\n    else throw new Error('Health check failed');\\n  })\\n  .catch(err => { console.error(err); process.exit(1) });\"\n    }\n  ],\n  \"dependencies\": [],\n  \"setup_commands\": [\n    \"node server.js &\",\n    \"sleep 2 && node test-client.js\"\n  ],\n  \"validation_commands\": [\n    \"curl http://localhost:3001/health | grep -q OK || exit 1\"\n  ],\n  \"entrypoints\": [\n    \"./server.js\",\n    \"./test-server.js\",\n    \"./index.html\"\n  ],\n  \"preview_strategy\": {\n    \"type\": \"static-file-serving\",\n    \"port\": 3002,\n    \"path\": \".\"\n  },\n  \"preview_command\": \"npx serve . -p 3002\",\n  \"constraints\": [\n    \"sem dependencias externas\",\n    \"Nao uses Obsidian\"\n  ],\n  \"component_files\": {\n    \"frontend\": [\"index.html\"],\n    \"backend\": [\"server.js\"],\n    \"tests\": [\"test-server.js\", \"test-client.js\"]\n  },\n  \"rationale\": \"Projeto minimalista usando apenas Node.js standard library para evitar dependências externas. O backend serve um endpoint de saúde simples, o frontend é uma página HTML estática e os testes validam a resposta do health check diretamente no terminal.\"\n}",
+  "duration_seconds": 38.094575,
+  "diagnostics": {
+    "provider": "ollama",
+    "model": "qwen3.5:9b",
+    "attempt_count": 1,
+    "durations": [
+      38.093
+    ],
+    "timeout_config": {
+      "connect": 5.0,
+      "read": 300.0,
+      "write": 15.0,
+      "pool": 5.0
+    },
+    "prompt_length": 583,
+    "base_prompt_length": 583,
+    "correction_prompt_length": 0,
+    "effective_prompt_length": 2578,
+    "attempts": [
+      {
+        "attempt": 1,
+        "phase": "plan",
+        "duration": 38.09299999999348,
+        "prompt_length": 583,
+        "status": "SUCCEEDED",
+        "error_type": "",
+        "error_category": "",
+        "retry_reason": "",
+        "response_length": 2644,
+        "partial_response": false,
+        "raw_response_length": 2644,
+        "parse_status": "NOT_PROCESSED",
+        "local_repairs": [],
+        "schema_errors": [],
+        "semantic_errors": [],
+        "security_errors": [],
+        "correction_errors": [],
+        "corrected_by_model": false,
+        "final_plan_hash": "",
+        "base_prompt_length": 583,
+        "correction_prompt_length": 0,
+        "effective_prompt_length": 2578,
+        "structured_output_enabled": false,
+        "correction_schema_sha256": "",
+        "correction_schema_length": 0,
+        "correction_schema_version": "",
+        "streaming_enabled": true
+      }
+    ],
+    "readiness": [
+      {
+        "attempt": 1,
+        "service_available": true,
+        "model_exists": true,
+        "model_loaded": true,
+        "model_metadata": {
+          "family": "qwen35",
+          "parameter_size": "9.7B",
+          "quantization_level": "Q4_K_M",
+          "size_bytes": 6594474711
+        },
+        "duration": 0.156
+      }
+    ],
+    "generation_config": {
+      "max_output_tokens": 16384,
+      "context_tokens": 8192,
+      "keep_alive": "15m",
+      "stream": true,
+      "json_format": true,
+      "structured_output_enabled": false,
+      "correction_schema_sha256": "",
+      "correction_schema_length": 0,
+      "correction_schema_version": "",
+      "streaming_enabled": true
+    },
+    "first_error": null,
+    "final_error": null,
+    "locally_repaired": false,
+    "local_repairs": [],
+    "corrected_by_model": false,
+    "final_plan_hash": ""
+  }
+}
