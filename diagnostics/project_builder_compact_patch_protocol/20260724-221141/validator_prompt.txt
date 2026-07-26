@@ -1,0 +1,5 @@
+Cria um projeto full-stack pequeno chamado health-boundary-probe, com frontend, backend, persistencia simples, testes executaveis e preview. Usa apenas Node.js standard library, sem dependencias externas. Nao uses Obsidian.
+
+ProjectBuilder intent constraints (mandatory):
+{"negative_constraints": ["sem dependencias externas", "Nao uses Obsidian"], "excluded_targets": ["Obsidian"], "separate_work_not_executed": []}
+Do not create files, commands, dependencies or preview targets that violate these constraints. Work listed in separate_work_not_executed is outside this project plan.

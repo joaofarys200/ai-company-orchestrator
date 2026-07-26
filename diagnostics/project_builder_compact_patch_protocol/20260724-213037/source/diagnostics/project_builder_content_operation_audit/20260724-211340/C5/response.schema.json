@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "operations"
+  ],
+  "properties": {
+    "operations": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://local.invalid/project-builder/typed-operations.schema.json",
+      "title": "ProjectBuilder Typed Offline Operations",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "op",
+              "value"
+            ],
+            "properties": {
+              "op": {
+                "const": "set_components"
+              },
+              "value": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "uniqueItems": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "op",
+              "component",
+              "paths"
+            ],
+            "properties": {
+              "op": {
+                "const": "set_component_files"
+              },
+              "component": {
+                "type": "string",
+                "minLength": 1
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "op",
+              "field",
+              "value"
+            ],
+            "properties": {
+              "op": {
+                "const": "set_preview_strategy"
+              },
+              "field": {
+                "enum": [
+                  "enabled",
+                  "method",
+                  "healthcheck_path",
+                  "command"
+                ]
+              },
+              "value": {}
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "op",
+              "path",
+              "expected_sha256",
+              "old_text",
+              "new_text",
+              "expected_occurrences"
+            ],
+            "properties": {
+              "op": {
+                "const": "replace_text"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "old_text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "new_text": {
+                "type": "string"
+              },
+              "expected_occurrences": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

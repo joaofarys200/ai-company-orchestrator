@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import importlib.metadata
 import inspect
+import os
 import sys
 import time
 from collections.abc import Callable
 
-from .config import AirLLMSettings
+from .compat.qwen35 import maybe_enable_patch
+from .config import AirLLMSettings, AirLLMConfigurationError, parse_boolean
+from .diagnostics import DiagnosticState, emit_failure
 from .prompting import render_chat_prompt
 
 
@@ -87,17 +90,47 @@ def _token_count(input_ids: object) -> int:
     return int(shape[-1])
 
 
+def _diagnostic_mode_hint() -> bool:
+    """Read the process override early enough to diagnose configuration failures."""
+    raw_value = os.environ.get("AIRLLM_DIAGNOSTIC_MODE", "false")
+    try:
+        return parse_boolean(raw_value, "AIRLLM_DIAGNOSTIC_MODE")
+    except AirLLMConfigurationError:
+        return False
+
+
+def _declared_architecture(model_config: object) -> str:
+    architectures = getattr(model_config, "architectures", None) or []
+    return str(architectures[0]) if architectures else "unknown"
+
+
+def _declared_layer_count(model_config: object) -> int | None:
+    text_config = getattr(model_config, "text_config", model_config)
+    value = getattr(text_config, "num_hidden_layers", None)
+    return value if isinstance(value, int) and value > 0 else None
+
+
 def main() -> int:
+    state = DiagnosticState()
+    diagnostic_mode = _diagnostic_mode_hint()
     try:
         preparation_started = time.perf_counter()
+        state.set_phase("configuration")
         settings = AirLLMSettings.from_environment()
+        diagnostic_mode = settings.diagnostic_mode
         settings.apply_cache_environment()
 
+        state.set_phase("imports")
         import torch
         from airllm import AutoModel
+        from transformers import AutoConfig
 
         installed_version = importlib.metadata.version("airllm")
+        state.airllm_version = installed_version
+        state.torch_version = str(torch.__version__)
         validate_airllm_version(installed_version)
+
+        state.set_phase("cuda_check")
         if not torch.cuda.is_available():
             raise RuntimeError(
                 "CUDA is not available. Install a CUDA-compatible Torch build "
@@ -114,7 +147,13 @@ def main() -> int:
         print(f"Maximum new tokens: {settings.max_new_tokens}")
         print(f"Temperature: {settings.temperature}")
         print(f"Profiling mode: {settings.profiling_mode}")
+        print(f"Diagnostic mode: {settings.diagnostic_mode}")
+        print(
+            "Qwen 3.5 compatibility patch: "
+            f"{settings.enable_qwen35_compat_patch}"
+        )
 
+        state.set_phase("path_preparation")
         settings.shards_path.mkdir(parents=True, exist_ok=True)
         load_kwargs = build_model_load_kwargs(
             settings,
@@ -124,9 +163,27 @@ def main() -> int:
             AutoModel.from_pretrained,
             load_kwargs,
         )
+        state.load_kwargs = dict(load_kwargs)
         print(f"AutoModel.from_pretrained signature: {loader_signature}")
         print(f"Model load kwargs: {sorted(load_kwargs)}")
 
+        state.set_phase("model_configuration_download")
+        model_config = AutoConfig.from_pretrained(
+            settings.model,
+            trust_remote_code=True,
+        )
+        state.architecture = _declared_architecture(model_config)
+        print(f"Declared architecture: {state.architecture}")
+        patch_counts = maybe_enable_patch(
+            enabled=settings.enable_qwen35_compat_patch,
+            model_ref=settings.model,
+            architecture=state.architecture,
+            expected_layer_count=_declared_layer_count(model_config),
+        )
+        if patch_counts is not None:
+            print(f"Qwen 3.5 checkpoint categories: {dict(patch_counts)}")
+
+        state.set_phase("model_loading_or_sharding")
         model = AutoModel.from_pretrained(settings.model, **load_kwargs)
         preparation_duration = time.perf_counter() - preparation_started
 
@@ -140,8 +197,13 @@ def main() -> int:
                 "content": "Reply with one short greeting.",
             },
         ]
+        state.set_phase("tokenizer_loading")
         tokenizer = model.tokenizer
+
+        state.set_phase("prompt_rendering")
         prompt = render_chat_prompt(tokenizer, messages)
+
+        state.set_phase("tokenization")
         encoded = tokenizer(
             prompt,
             return_tensors="pt",
@@ -159,6 +221,7 @@ def main() -> int:
                 f"({prompt_tokens} > {settings.max_context} tokens)."
             )
 
+        state.set_phase("generation")
         cuda_input_ids = input_ids.to("cuda")
         torch.cuda.synchronize()
         generation_started = time.perf_counter()
@@ -169,6 +232,7 @@ def main() -> int:
         torch.cuda.synchronize()
         generation_duration = time.perf_counter() - generation_started
 
+        state.set_phase("decoding")
         sequences = getattr(output, "sequences", None)
         if sequences is None:
             raise RuntimeError("AirLLM generate() did not return sequences.")
@@ -192,9 +256,11 @@ def main() -> int:
         print(response)
         return 0
     except Exception as exc:
-        print(
-            f"AirLLM smoke test failed: {type(exc).__name__}: {exc}",
-            file=sys.stderr,
+        emit_failure(
+            exc,
+            state,
+            diagnostic_mode=diagnostic_mode,
+            stream=sys.stderr,
         )
         return 1
 

@@ -1,0 +1,84 @@
+{
+  "results": [
+    {
+      "test": "M2_original_correction",
+      "json_valid": true,
+      "response_sha256": "e021bef2af8e9418e8426c54107e7eca1f4eccc08f36a53e6916fea53d6b050c",
+      "accepted_by_focal_validator": false,
+      "error_codes": [
+        "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+        "MAPPED_FILE_NOT_FOUND",
+        "MISSING_REQUIRED_COMPONENT",
+        "PERSISTENCE_NOT_IMPLEMENTED"
+      ],
+      "error_count": 6,
+      "paths_in_response": [
+        "db/storage.json",
+        "index-preview.html",
+        "public/styles.css",
+        "routes/health.js",
+        "run-tests.js",
+        "server.js",
+        "src/index.html"
+      ]
+    },
+    {
+      "test": "M3_closed_paths",
+      "json_valid": true,
+      "response_sha256": "57dcaca7ffc38b25ccdee9ab68fc19d6106560e95730c85edcfee374b1b4dd70",
+      "accepted_by_focal_validator": false,
+      "error_codes": [
+        "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+        "MISSING_COMPONENT_MAPPING",
+        "MISSING_HEALTH_ROUTE",
+        "PERSISTENCE_NOT_IMPLEMENTED"
+      ],
+      "error_count": 7,
+      "paths_in_response": []
+    },
+    {
+      "test": "M5b_apply",
+      "json_valid": true,
+      "response_sha256": "14c1645d989c4300e85adc211933dbced1286b22796774deed93346771639696",
+      "accepted_by_focal_validator": false,
+      "error_codes": [
+        "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+        "MISSING_COMPONENT_MAPPING",
+        "MISSING_HEALTH_ROUTE",
+        "PERSISTENCE_NOT_IMPLEMENTED"
+      ],
+      "error_count": 7,
+      "paths_in_response": []
+    },
+    {
+      "test": "M4_operations",
+      "json_valid": true,
+      "operations_count": 3,
+      "operation_contract_valid": false,
+      "operation_errors": [
+        "components_not_final_array",
+        "persistence_not_mapped_to_server.js"
+      ]
+    },
+    {
+      "test": "M5a_diagnosis",
+      "json_valid": true,
+      "existing_paths_closed": true,
+      "diagnosis_errors": [
+        "persistence_assigned_to_package_json_or_no_durable_artifact",
+        "health_route_treated_as_missing_without_mapping_evidence"
+      ]
+    }
+  ],
+  "determinism": {
+    "M2_matches_preserved_response": true
+  },
+  "correction_effectiveness": {
+    "errors_resolved": 3,
+    "new_error_codes": 2,
+    "out_of_scope_changes": 0,
+    "critical_regressions": 1,
+    "score": 0,
+    "formula": "3 - 2 - 0 - 1"
+  }
+}

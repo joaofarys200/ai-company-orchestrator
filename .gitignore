@@ -57,6 +57,7 @@ logs/
 *.tmp
 *.temp
 .cache/
+diagnostics/project_builder_flight_recorder/
 scratch/
 
 # OS/editor noise

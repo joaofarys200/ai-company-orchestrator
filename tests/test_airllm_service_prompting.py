@@ -198,6 +198,8 @@ def test_configuration_failure_returns_nonzero_without_importing_heavy_modules(
 def test_loading_experimental_modules_does_not_import_airllm_torch_or_cuda():
     module_names = [
         "services.airllm_server.config",
+        "services.airllm_server.diagnostics",
+        "services.airllm_server.compat.qwen35",
         "services.airllm_server.prompting",
         "services.airllm_server.smoke_test",
     ]

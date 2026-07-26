@@ -1,0 +1,41 @@
+[
+  {
+    "wall_time": "2026-07-24T14:12:40.233464+00:00",
+    "monotonic": 607946.5820289,
+    "processes": {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "Get-Process ollama,python -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,CPU,WorkingSet64,Threads | ConvertTo-Json -Compress"
+      ],
+      "exit_code": 0,
+      "stdout": "[{\"Id\":10416,\"ProcessName\":\"ollama\",\"CPU\":14.3125,\"WorkingSet64\":48955392,\"Threads\":[\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\"]},{\"Id\":4508,\"ProcessName\":\"python\",\"CPU\":2.640625,\"WorkingSet64\":186908672,\"Threads\":[\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\"]},{\"Id\":20296,\"ProcessName\":\"python\",\"CPU\":0,\"WorkingSet64\":4276224,\"Threads\":[\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\",\"System.Diagnostics.ProcessThread\"]}]\n",
+      "stderr": "",
+      "duration_seconds": 0.2217
+    },
+    "memory": {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize,FreePhysicalMemory | ConvertTo-Json -Compress"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Get-CimInstance : Access denied \nAt line:1 char:1\n+ Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMem ...\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : PermissionDenied: (root\\cimv2:Win32_OperatingSystem:String) [Get-CimInstance], CimExcept \n   ion\n    + FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n",
+      "duration_seconds": 0.2615
+    },
+    "gpu": {
+      "command": [
+        "nvidia-smi",
+        "--query-gpu=utilization.gpu,memory.total,memory.used,power.draw",
+        "--format=csv,noheader,nounits"
+      ],
+      "exit_code": 0,
+      "stdout": "14, 8151, 7228, 10.67\n",
+      "stderr": "",
+      "duration_seconds": 0.0578
+    }
+  }
+]

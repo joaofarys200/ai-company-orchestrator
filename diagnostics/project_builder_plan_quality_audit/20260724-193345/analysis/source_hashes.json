@@ -1,0 +1,102 @@
+[
+  {
+    "path": "source/flight_recorder/errors.json",
+    "sha256": "9d5829dcd403ec09a6f8674ff9226dc1743495028d16af27d85bbde3305889d0",
+    "size_bytes": 16903
+  },
+  {
+    "path": "source/flight_recorder/events.jsonl",
+    "sha256": "354d4c69a328245f3223731b20dd4791f7628e54841463509e22513c65d797db",
+    "size_bytes": 489956
+  },
+  {
+    "path": "source/flight_recorder/final_state.json",
+    "sha256": "7a749d48f09c28c9132e24b53fff291e2cabc89a5154b244b78a3c5ec954a8dc",
+    "size_bytes": 168
+  },
+  {
+    "path": "source/flight_recorder/payload_metrics.json",
+    "sha256": "fe1e322321f3d3446b9561d9869721d1f737103356ffdbd98da10b2030a2edc0",
+    "size_bytes": 1152
+  },
+  {
+    "path": "source/flight_recorder/resource_samples.jsonl",
+    "sha256": "a28dcbf9fd8cd4418ddc08b88774698a2558f7ad991e211c8f505a4bbcb234b4",
+    "size_bytes": 1880
+  },
+  {
+    "path": "source/flight_recorder/summary.json",
+    "sha256": "43e29df3615198a1bf08a0b15ef0b2e7b6b5f84e01e9ede6229e47b38cf58f28",
+    "size_bytes": 10967
+  },
+  {
+    "path": "source/flight_recorder/timeline.md",
+    "sha256": "d1c242c6843ff373f1c2916c1b83879498301778322debce77a7348c3b87ad41",
+    "size_bytes": 94657
+  },
+  {
+    "path": "source/mission/criterion-wp1.json",
+    "sha256": "3484374e8e14c0951203f01ac8a4e4bc9e7d330da1390954a653bc5ec60b2bfc",
+    "size_bytes": 499
+  },
+  {
+    "path": "source/mission/events.jsonl",
+    "sha256": "47ed64230a804106a98c1a4cf47aed3b7a596532a90570f9704b34cd4d8b41d9",
+    "size_bytes": 4669
+  },
+  {
+    "path": "source/mission/mission.json",
+    "sha256": "154bbe6fbe676f9d319469e0cb1ff67f63bc38a9fce75ece846fafb4f0fb2b59",
+    "size_bytes": 738
+  },
+  {
+    "path": "source/ollama_requester_audit/audit_report.md",
+    "sha256": "fb78802c72192714e2c1d5fa4246abb5bb53a56d7b8556cdd6a15bbcf618b90a",
+    "size_bytes": 13326
+  },
+  {
+    "path": "source/ollama_requester_audit/requester_comparison.json",
+    "sha256": "e8058123ffd72f4d63fba8df670881b5c888f28d3408b3929d5cabf852759ed4",
+    "size_bytes": 129152
+  },
+  {
+    "path": "source/ollama_requester_audit/wp1_payload.json",
+    "sha256": "f3af637597a95aaea4b38b6f3f51002f9c41350c36ea99d95338a55fd2a6892f",
+    "size_bytes": 3149
+  },
+  {
+    "path": "source/ollama_requester_audit/wp1_prompt.txt",
+    "sha256": "8908d8296b423dc47f4fa31bbd46a9a571ffb761af169dcf656edd9eee7d3173",
+    "size_bytes": 587
+  },
+  {
+    "path": "source/ollama_requester_audit/wp1_schema.json",
+    "sha256": "d54f3a10861759b063cd3ce6ba5e89cdeb6bea15d10e24749275047ee463b1c2",
+    "size_bytes": 2054
+  },
+  {
+    "path": "source/ollama_requester_audit/wp1_schema_prompt.txt",
+    "sha256": "3a554f267f4450ec1718fee4ef754d84edf638d6434d9bb601934d6b0711cfe2",
+    "size_bytes": 1243
+  },
+  {
+    "path": "source/project_build_journal.json",
+    "sha256": "ad5513e20facc8045f6cf117299b667e98bf880d90b3c6ed145159b9efec8997",
+    "size_bytes": 269881
+  },
+  {
+    "path": "agents/orchestrator/project_builder.py",
+    "sha256": "bb6a3d0f5ae7104e1dc0afb223f4d367f4e2abcb2caba5c3918874a5034fb251",
+    "size_bytes": 335220
+  },
+  {
+    "path": "agents/mission_executor.py",
+    "sha256": "d507a2ade96eabbbae4e69d56c094a9f99957ae480924cd9006d7667437ec671",
+    "size_bytes": 55765
+  },
+  {
+    "path": "agents/orchestrator/flight_recorder.py",
+    "sha256": "d5b15e0eff59cee6365f96a4399d8db2a81ea6682db9a48c56fecb31eeb230dd",
+    "size_bytes": 25061
+  }
+]

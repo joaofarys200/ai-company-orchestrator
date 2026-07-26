@@ -1,0 +1,22 @@
+{
+  "decision": "BOUNDARY_HEALTHY_WP1_RETRY_AUTHORIZED",
+  "primary_finding": "The direct runtime and actual OllamaPlanRequester boundary passed; the historical PLAN_READ_TIMEOUT was not reproduced.",
+  "secondary_finding": "The internal ProjectBuilder plan schema is not valid JSON Schema when sent as Ollama format, but the actual focal correction schema passes.",
+  "hypotheses": {
+    "H1": {"state": "REFUTED", "evidence": ["warmup", "A1", "A2"]},
+    "H2": {"state": "REFUTED", "evidence": ["B1", "B2"]},
+    "H3": {"state": "PARTIAL", "evidence": ["C1 HTTP 400 for internal schema", "C-focal HTTP 200 for actual focal schema"]},
+    "H4": {"state": "NOT_DEMONSTRATED", "evidence": ["D exact first-call payload passed"]},
+    "H5": {"state": "REFUTED", "evidence": ["requester_comparison exact SHA-256 match"]},
+    "H6": {"state": "REFUTED", "evidence": ["direct first byte and content observed"]},
+    "H7": {"state": "REFUTED", "evidence": ["httpcore per-read behavior and frequent D chunks"]},
+    "H8": {"state": "REFUTED_FOR_CURRENT_RUN", "evidence": ["D-cold load_duration=15.716s, 84% GPU"]},
+    "H9": {"state": "NOT_DEMONSTRATED", "evidence": ["CIM RAM counters denied; no VRAM exhaustion observed"]},
+    "H10": {"state": "NOT_SUPPORTED", "evidence": ["D stopped normally at eval_count=848"]},
+    "H11": {"state": "REFUTED_FOR_FIRST_CALL", "evidence": ["D and requester pass with think=false and format=json"]},
+    "H12": {"state": "PARTIAL", "evidence": ["schema is in prompt but D completes"]}
+  },
+  "wp1_executed": false,
+  "wp2_executed": false,
+  "production_changed": false
+}

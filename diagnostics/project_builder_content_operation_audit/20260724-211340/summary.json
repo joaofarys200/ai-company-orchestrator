@@ -1,0 +1,462 @@
+{
+  "model": "qwen3.5:9b",
+  "model_calls": 6,
+  "manual_baseline_passed": true,
+  "initial_server_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31",
+  "cases": [
+    {
+      "id": "C1",
+      "description": "exact P1 prompt and schema",
+      "status": "FAILED",
+      "assessment": {
+        "json_valid": true,
+        "schema_valid": true,
+        "generation_complete": true,
+        "operation_count": 6,
+        "server_content_operations": [],
+        "server_content_operation_present": false,
+        "target_correct": true,
+        "expected_hash_correct": true,
+        "content_non_empty": true,
+        "paths_invented": [],
+        "contract_errors": [],
+        "required_actions_valid": true,
+        "validators": {
+          "valid": false,
+          "error_codes": [
+            "PERSISTENCE_NOT_IMPLEMENTED"
+          ],
+          "errors": [
+            {
+              "code": "PERSISTENCE_NOT_IMPLEMENTED",
+              "field_path": "component_files.persistence",
+              "message": "O componente persistence nao demonstra leitura e escrita duravel; estado em memoria nao e persistencia.",
+              "expected_type": "mapped artifact implementing durable read and write operations",
+              "received_type": "string",
+              "offending_value": "no durable read/write mechanism in mapped persistence artifacts",
+              "repairable": false,
+              "suggestion": "Associa persistence a um artefacto existente que implemente leitura e escrita duravel.",
+              "phase": "PLAN_SEMANTIC_VALIDATION",
+              "file": "server.js",
+              "line": null,
+              "symbol": "",
+              "target": "server.js",
+              "expected": "mapped artifact implementing durable read and write operations",
+              "actual": "no durable read/write mechanism in mapped persistence artifacts",
+              "component": "persistence"
+            }
+          ]
+        },
+        "persistence_signals": {
+          "filesystem_import": false,
+          "deterministic_storage_path": false,
+          "durable_read": false,
+          "durable_write": false,
+          "missing_file_handling": false,
+          "health_preserved": true,
+          "external_dependency_import": false
+        },
+        "operation_error": null,
+        "normalized_operation_count": 6
+      }
+    },
+    {
+      "id": "C2",
+      "description": "explicitly mandatory content operation",
+      "status": "FAILED",
+      "assessment": {
+        "json_valid": false,
+        "schema_valid": false,
+        "generation_complete": false,
+        "operation_count": 0,
+        "server_content_operations": [],
+        "server_content_operation_present": false,
+        "target_correct": false,
+        "expected_hash_correct": false,
+        "content_non_empty": false,
+        "paths_invented": [],
+        "contract_errors": [
+          "INVALID_JSON"
+        ],
+        "required_actions_valid": true,
+        "validators": {},
+        "persistence_signals": {},
+        "operation_error": {
+          "type": "JSONDecodeError",
+          "message": "Unterminated string starting at: line 30 column 26 (char 649)"
+        },
+        "lexical_content_attempt": {
+          "present": true,
+          "op": "replace_file_content",
+          "target": "server.js",
+          "target_correct": true,
+          "hash": "",
+          "hash_complete": false
+        }
+      }
+    },
+    {
+      "id": "C3",
+      "description": "only required operation branches; server.js content target",
+      "status": "FAILED",
+      "assessment": {
+        "json_valid": false,
+        "schema_valid": false,
+        "generation_complete": false,
+        "operation_count": 0,
+        "server_content_operations": [],
+        "server_content_operation_present": false,
+        "target_correct": false,
+        "expected_hash_correct": false,
+        "content_non_empty": false,
+        "paths_invented": [],
+        "contract_errors": [
+          "INVALID_JSON"
+        ],
+        "required_actions_valid": true,
+        "validators": {},
+        "persistence_signals": {},
+        "operation_error": {
+          "type": "JSONDecodeError",
+          "message": "Unterminated string starting at: line 1 column 564 (char 563)"
+        },
+        "lexical_content_attempt": {
+          "present": true,
+          "op": "replace_file_content",
+          "target": "server.js",
+          "target_correct": true,
+          "hash": "",
+          "hash_complete": false
+        }
+      }
+    },
+    {
+      "id": "C4",
+      "description": "full-file replacement with structural template",
+      "status": "FAILED",
+      "assessment": {
+        "json_valid": false,
+        "schema_valid": false,
+        "generation_complete": false,
+        "operation_count": 0,
+        "server_content_operations": [],
+        "server_content_operation_present": false,
+        "target_correct": false,
+        "expected_hash_correct": false,
+        "content_non_empty": false,
+        "paths_invented": [],
+        "contract_errors": [
+          "INVALID_JSON"
+        ],
+        "required_actions_valid": true,
+        "validators": {},
+        "persistence_signals": {},
+        "operation_error": {
+          "type": "JSONDecodeError",
+          "message": "Unterminated string starting at: line 1 column 549 (char 548)"
+        },
+        "lexical_content_attempt": {
+          "present": true,
+          "op": "replace_file_content",
+          "target": "server.js",
+          "target_correct": true,
+          "hash": "",
+          "hash_complete": false
+        }
+      }
+    },
+    {
+      "id": "C5",
+      "description": "localized replace_text with exact insertion point",
+      "status": "FAILED",
+      "assessment": {
+        "json_valid": true,
+        "schema_valid": true,
+        "generation_complete": true,
+        "operation_count": 1,
+        "server_content_operations": [
+          {
+            "op": "replace_text",
+            "path": "server.js",
+            "content_non_empty": true,
+            "expected_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31",
+            "expected_hash_correct": true
+          }
+        ],
+        "server_content_operation_present": true,
+        "target_correct": true,
+        "expected_hash_correct": true,
+        "content_non_empty": true,
+        "paths_invented": [],
+        "contract_errors": [],
+        "required_actions_valid": true,
+        "validators": {
+          "valid": false,
+          "error_codes": [
+            "MISSING_REQUESTED_COMPONENTS",
+            "MISSING_COMPONENT_MAPPING",
+            "MISSING_IMPORT",
+            "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+            "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+            "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+            "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+            "PERSISTENCE_NOT_IMPLEMENTED",
+            "MISSING_HEALTH_ROUTE"
+          ],
+          "errors": [
+            {
+              "code": "MISSING_REQUESTED_COMPONENTS",
+              "field_path": "components",
+              "message": "Plano nao promete componentes pedidos: ['preview'].",
+              "expected_type": "array containing requested components",
+              "received_type": "array",
+              "offending_value": "<array items=4>",
+              "repairable": false,
+              "suggestion": "Adiciona os componentes pedidos e os respetivos ficheiros reais.",
+              "phase": "PLAN_SEMANTIC_VALIDATION",
+              "file": "",
+              "line": null,
+              "symbol": "",
+              "target": "",
+              "expected": "array containing requested components",
+              "actual": "",
+              "component": ""
+            },
+            {
+              "code": "MISSING_COMPONENT_MAPPING",
+              "field_path": "component_files",
+              "message": "Plano full stack sem component_files para: ['frontend', 'backend'].",
+              "expected_type": "object[array[string]]",
+              "received_type": "object",
+              "offending_value": "<object items=0>",
+              "repairable": false,
+              "suggestion": "Mapeia frontend e backend para ficheiros que existam no plano.",
+              "phase": "PLAN_SEMANTIC_VALIDATION",
+              "file": "",
+              "line": null,
+              "symbol": "",
+              "target": "",
+              "expected": "object[array[string]]",
+              "actual": "",
+              "component": ""
+            },
+            {
+              "code": "MISSING_IMPORT",
+              "field_path": "files[server.js].content",
+              "message": "http e usado sem uma declaracao local ou import/require correspondente.",
+              "expected_type": "Import or require the Node.js built-in module \"http\".",
+              "received_type": "string",
+              "offending_value": "undeclared identifier http",
+              "repairable": false,
+              "suggestion": "Import or require the Node.js built-in module \"http\".",
+              "phase": "PLAN_SEMANTIC_VALIDATION",
+              "file": "server.js",
+              "line": 12,
+              "symbol": "http",
+              "target": "",
+              "expected": "Import or require the Node.js built-in module \"http\".",
+              "actual": "undeclared identifier http",
+              "component": ""
+            },
+            {
+              "code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+              "field_path": "component_files.frontend",
+              "message": "O componente declarado frontend nao tem nenhum artefacto real mapeado.",
+              "expected_type": "at least one component_files path present in the planned files",
+              "received_type": "string",
+              "offending_value": "[]",
+              "repairable": false,
+              "suggestion": "Mapeia frontend para pelo menos um ficheiro existente que implemente o componente.",
+              "phase": "PLAN_SEMANTIC_VALIDATION",
+              "file": "",
+              "line": null,
+              "symbol": "",
+              "target": "",
+              "expected": "at least one component_files path present in the planned files",
+              "actual": "[]",
+              "component": "frontend"
+            },
+            {
+              "code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+              "field_path": "component_files.backend",
+              "message": "O componente declarado backend nao tem nenhum artefacto real mapeado.",
+              "expected_type": "at least one component_files path present in the planned files",
+              "received_type": "string",
+              "offending_value": "[]",
+              "repairable": false,
+              "suggestion": "Mapeia backend para pelo menos um ficheiro existente que implemente o componente.",
+              "phase": "PLAN_SEMANTIC_VALIDATION",
+              "file": "",
+              "line": null,
+              "symbol": "",
+              "target": "",
+              "expected": "at least one component_files path present in the planned files",
+              "actual": "[]",
+              "component": "backend"
+            },
+            {
+              "code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+              "field_path": "component_files.persistence",
+              "message": "O componente declarado persistence nao tem nenhum artefacto real mapeado.",
+              "expected_type": "at least one component_files path present in the planned files",
+              "received_type": "string",
+              "offending_value": "[]",
+              "repairable": false,
+              "suggestion": "Mapeia persistence para pelo menos um ficheiro existente que implemente o componente.",
+              "phase": "PLAN_SEMANTIC_VALIDATION",
+              "file": "",
+              "line": null,
+              "symbol": "",
+              "target": "",
+              "expected": "at least one component_files path present in the planned files",
+              "actual": "[]",
+              "component": "persistence"
+            },
+            {
+              "code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+              "field_path": "component_files.tests",
+              "message": "O componente declarado tests nao tem nenhum artefacto real mapeado.",
+              "expected_type": "at least one component_files path present in the planned files",
+              "received_type": "string",
+              "offending_value": "[]",
+              "repairable": false,
+              "suggestion": "Mapeia tests para pelo menos um ficheiro existente que implemente o componente.",
+              "phase": "PLAN_SEMANTIC_VALIDATION",
+              "file": "",
+              "line": null,
+              "symbol": "",
+              "target": "",
+              "expected": "at least one component_files path present in the planned files",
+              "actual": "[]",
+              "component": "tests"
+            },
+            {
+              "code": "PERSISTENCE_NOT_IMPLEMENTED",
+              "field_path": "component_files.persistence",
+              "message": "O componente persistence nao demonstra leitura e escrita duravel; estado em memoria nao e persistencia.",
+              "expected_type": "mapped artifact implementing durable read and write operations",
+              "received_type": "string",
+              "offending_value": "no durable read/write mechanism in mapped persistence artifacts",
+              "repairable": false,
+              "suggestion": "Associa persistence a um artefacto existente que implemente leitura e escrita duravel.",
+              "phase": "PLAN_SEMANTIC_VALIDATION",
+              "file": "",
+              "line": null,
+              "symbol": "",
+              "target": "",
+              "expected": "mapped artifact implementing durable read and write operations",
+              "actual": "no durable read/write mechanism in mapped persistence artifacts",
+              "component": "persistence"
+            },
+            {
+              "code": "MISSING_HEALTH_ROUTE",
+              "field_path": "preview_strategy.healthcheck_path",
+              "message": "Nenhum artefacto backend contem evidencia textual da rota /health.",
+              "expected_type": "health route in a mapped backend artifact",
+              "received_type": "string",
+              "offending_value": "route not found",
+              "repairable": false,
+              "suggestion": "Implementa a rota de healthcheck no backend associado.",
+              "phase": "PLAN_SEMANTIC_VALIDATION",
+              "file": "",
+              "line": null,
+              "symbol": "",
+              "target": "/health",
+              "expected": "health route in a mapped backend artifact",
+              "actual": "route not found",
+              "component": "backend"
+            }
+          ]
+        },
+        "persistence_signals": {
+          "filesystem_import": true,
+          "deterministic_storage_path": true,
+          "durable_read": true,
+          "durable_write": true,
+          "missing_file_handling": true,
+          "health_preserved": true,
+          "external_dependency_import": false
+        },
+        "operation_error": null,
+        "normalized_operation_count": 1
+      }
+    },
+    {
+      "id": "C6",
+      "description": "required_actions followed by operations",
+      "status": "FAILED",
+      "assessment": {
+        "json_valid": false,
+        "schema_valid": false,
+        "generation_complete": false,
+        "operation_count": 0,
+        "server_content_operations": [],
+        "server_content_operation_present": false,
+        "target_correct": false,
+        "expected_hash_correct": false,
+        "content_non_empty": false,
+        "paths_invented": [],
+        "contract_errors": [
+          "INVALID_JSON"
+        ],
+        "required_actions_valid": true,
+        "validators": {},
+        "persistence_signals": {},
+        "operation_error": {
+          "type": "JSONDecodeError",
+          "message": "Unterminated string starting at: line 1 column 549 (char 548)"
+        },
+        "lexical_content_attempt": {
+          "present": true,
+          "op": "replace_file_content",
+          "target": "server.js",
+          "target_correct": true,
+          "hash": "",
+          "hash_complete": false
+        }
+      }
+    }
+  ],
+  "classifications": {
+    "REQUIRED_OPERATION_NOT_SALIENT": {
+      "evidence": "C1 reproduced the plan-only response. C2 made the operation mandatory but returned an incomplete JSON generation.",
+      "counterevidence": "C2 lexical output began a replace_file_content operation, so salience changed intent without producing a usable response.",
+      "confidence": "medium",
+      "test_needed": "A protocol with mandatory operation plus a bounded content representation."
+    },
+    "SCHEMA_BRANCH_AVOIDANCE": {
+      "evidence": "C1 selected only set_* operations; the original schema allows plan-only output. C3 remained incomplete despite removing replace_text.",
+      "counterevidence": "C3 also had generation incomplete, so branch choice and generation failure are confounded.",
+      "confidence": "medium",
+      "test_needed": "Repeat with a schema requiring one content operation and a compact bounded payload."
+    },
+    "CONTENT_GENERATION_TOO_COMPLEX": {
+      "evidence": "C4 with a structural template still returned incomplete JSON; C2/C3/C6 also emitted truncated content operations.",
+      "counterevidence": "No test produced a complete full-file replacement, so syntax/content quality cannot be separated from truncation.",
+      "confidence": "high",
+      "test_needed": "Bound content size or use a typed edit plan with a compact template expansion."
+    },
+    "LOCAL_TEXT_PATCH_PROTOCOL_PREFERRED": {
+      "evidence": "C5 produced a valid replace_text with correct target and hash.",
+      "counterevidence": "It omitted the required plan-field operations and lost the http import, so real validators failed.",
+      "confidence": "medium",
+      "test_needed": "Require field coverage and validate a compact localized patch that preserves all imports."
+    },
+    "ERROR_TO_OPERATION_LINK_MISSING": {
+      "evidence": "Original schema has no resolved_error_codes or required operation coverage, and C1 legally omitted persistence content.",
+      "counterevidence": "The prompt contains the persistence error text, but the schema does not enforce its resolution.",
+      "confidence": "high",
+      "test_needed": "Offline resolved_error_codes extension, no model call."
+    },
+    "MODEL_CAPACITY_LIMIT_FOR_CODE_PATCH": {
+      "evidence": "Four cases ended with done=false and truncated JSON while attempting content operations.",
+      "counterevidence": "The test set changes prompt/schema representation, so protocol generation pressure remains a confounder.",
+      "confidence": "medium",
+      "test_needed": "A compact operation whose content is a bounded insertion or template slot."
+    }
+  },
+  "decision": "QWEN_9B_TYPED_PATCH_UNRELIABLE",
+  "input_hash_count": 15,
+  "production_changes": false,
+  "materialization": false
+}

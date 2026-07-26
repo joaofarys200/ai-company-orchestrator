@@ -1,0 +1,17 @@
+{
+  "model": "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M",
+  "timeout_seconds": 180,
+  "request_sha256": "e7d92f164ebab57a7475d3725053a77b3b71c2b0f880f3948fde03b0b9cadf37",
+  "prompt_sha256": "872c397a7f21c8c30d713a2f744ec7b886f3a39cb3e6c5150345a3fe4b05d400",
+  "schema_sha256": "c6621dbb511318f5715b588d4f101cbe77f3a76fa86f4c2d147f444dceb335cf",
+  "started_at": "2026-07-24T22:00:38+0100",
+  "http_status": 200,
+  "done": true,
+  "done_reason": "stop",
+  "prompt_eval_count": 707,
+  "eval_count": 546,
+  "response_bytes": 2030,
+  "content_bytes": 1487,
+  "content_sha256": "22ed02b467b880770fbdf0d88af290bc2f0b6a1b56140234364394a164d4b248",
+  "elapsed_seconds": 22.939
+}

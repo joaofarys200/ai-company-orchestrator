@@ -1,0 +1,4 @@
+{
+  "choice": "LOCAL",
+  "confidence": 1.0
+}

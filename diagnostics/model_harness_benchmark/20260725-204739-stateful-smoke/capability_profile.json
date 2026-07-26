@@ -1,0 +1,189 @@
+{
+  "benchmark_version": "model_harness_qwen35_stateful_v2",
+  "configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5",
+  "capabilities": [
+    {
+      "capability": "closed_source_research",
+      "status": "FAILED",
+      "confidence": 0.0,
+      "passed_cases": 0,
+      "failed_cases": 1,
+      "total_cases": 1,
+      "total_calls": 1,
+      "repetitions": 1,
+      "mean_latency_ms": 300360,
+      "p95_latency_ms": 300360.0,
+      "context_range": [
+        2071,
+        2071
+      ],
+      "recovery_used": false,
+      "limitations": [
+        "Fewer than three distinct cases were exercised.",
+        "Fewer than two repetitions were exercised.",
+        "1 scenario repetitions failed."
+      ],
+      "configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5"
+    },
+    {
+      "capability": "constraint_retention",
+      "status": "FAILED",
+      "confidence": 0.0,
+      "passed_cases": 0,
+      "failed_cases": 1,
+      "total_cases": 1,
+      "total_calls": 1,
+      "repetitions": 1,
+      "mean_latency_ms": 300342,
+      "p95_latency_ms": 300342.0,
+      "context_range": [
+        2052,
+        2052
+      ],
+      "recovery_used": false,
+      "limitations": [
+        "Fewer than three distinct cases were exercised.",
+        "Fewer than two repetitions were exercised.",
+        "1 scenario repetitions failed."
+      ],
+      "configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5"
+    },
+    {
+      "capability": "context_scaling",
+      "status": "FAILED",
+      "confidence": 0.0,
+      "passed_cases": 0,
+      "failed_cases": 1,
+      "total_cases": 1,
+      "total_calls": 1,
+      "repetitions": 1,
+      "mean_latency_ms": 300387,
+      "p95_latency_ms": 300387.0,
+      "context_range": [
+        915,
+        915
+      ],
+      "recovery_used": false,
+      "limitations": [
+        "Fewer than three distinct cases were exercised.",
+        "Fewer than two repetitions were exercised.",
+        "1 scenario repetitions failed."
+      ],
+      "configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5"
+    },
+    {
+      "capability": "evidence_based_document_generation",
+      "status": "FAILED",
+      "confidence": 0.0,
+      "passed_cases": 0,
+      "failed_cases": 1,
+      "total_cases": 1,
+      "total_calls": 1,
+      "repetitions": 1,
+      "mean_latency_ms": 300361,
+      "p95_latency_ms": 300361.0,
+      "context_range": [
+        2047,
+        2047
+      ],
+      "recovery_used": false,
+      "limitations": [
+        "Fewer than three distinct cases were exercised.",
+        "Fewer than two repetitions were exercised.",
+        "1 scenario repetitions failed."
+      ],
+      "configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5"
+    },
+    {
+      "capability": "multi_file_reasoning",
+      "status": "FAILED",
+      "confidence": 0.0,
+      "passed_cases": 0,
+      "failed_cases": 2,
+      "total_cases": 2,
+      "total_calls": 2,
+      "repetitions": 1,
+      "mean_latency_ms": 300356.5,
+      "p95_latency_ms": 300369.55,
+      "context_range": [
+        2078,
+        2085
+      ],
+      "recovery_used": false,
+      "limitations": [
+        "Fewer than three distinct cases were exercised.",
+        "Fewer than two repetitions were exercised.",
+        "2 scenario repetitions failed."
+      ],
+      "configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5"
+    },
+    {
+      "capability": "recovery_after_failure",
+      "status": "DEMONSTRATED_PRELIMINARY",
+      "confidence": 0.333,
+      "passed_cases": 2,
+      "failed_cases": 0,
+      "total_cases": 2,
+      "total_calls": 2,
+      "repetitions": 1,
+      "mean_latency_ms": 4,
+      "p95_latency_ms": 7.6,
+      "context_range": [
+        0,
+        0
+      ],
+      "recovery_used": true,
+      "limitations": [
+        "Fewer than three distinct cases were exercised.",
+        "Fewer than two repetitions were exercised."
+      ],
+      "configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5"
+    },
+    {
+      "capability": "short_horizon_planning",
+      "status": "FAILED",
+      "confidence": 0.0,
+      "passed_cases": 0,
+      "failed_cases": 1,
+      "total_cases": 1,
+      "total_calls": 1,
+      "repetitions": 1,
+      "mean_latency_ms": 300395,
+      "p95_latency_ms": 300395.0,
+      "context_range": [
+        2047,
+        2047
+      ],
+      "recovery_used": false,
+      "limitations": [
+        "Fewer than three distinct cases were exercised.",
+        "Fewer than two repetitions were exercised.",
+        "1 scenario repetitions failed."
+      ],
+      "configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5"
+    },
+    {
+      "capability": "stateful_tool_use",
+      "status": "FAILED",
+      "confidence": 0.0,
+      "passed_cases": 0,
+      "failed_cases": 1,
+      "total_cases": 1,
+      "total_calls": 1,
+      "repetitions": 1,
+      "mean_latency_ms": 300324,
+      "p95_latency_ms": 300324.0,
+      "context_range": [
+        2044,
+        2044
+      ],
+      "recovery_used": false,
+      "limitations": [
+        "Fewer than three distinct cases were exercised.",
+        "Fewer than two repetitions were exercised.",
+        "1 scenario repetitions failed."
+      ],
+      "configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5"
+    }
+  ]
+}

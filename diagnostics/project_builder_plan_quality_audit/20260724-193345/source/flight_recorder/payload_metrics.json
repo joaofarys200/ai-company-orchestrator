@@ -1,0 +1,41 @@
+{
+  "schema_version": "project_builder_flight_recorder_v1",
+  "attempts": [
+    {
+      "attempt": 1,
+      "first_response_byte_ms": 12219.0,
+      "first_chunk_ms": 12219.0,
+      "first_content_ms": 12219.0,
+      "first_valid_json_ms": 36984.0,
+      "max_chunk_gap_ms": 141.0,
+      "chunk_count": 516,
+      "bytes_received": 65918,
+      "content_characters": 1989,
+      "done_reason": "stop",
+      "prompt_eval_count": 603,
+      "prompt_eval_duration": 675992000,
+      "eval_count": 623,
+      "eval_duration": 24821587000,
+      "load_duration": 11368885300,
+      "total_duration": 36898827300
+    },
+    {
+      "attempt": 2,
+      "first_response_byte_ms": 2625.0,
+      "first_chunk_ms": 2625.0,
+      "first_content_ms": 2625.0,
+      "first_valid_json_ms": 8657.0,
+      "max_chunk_gap_ms": 125.0,
+      "chunk_count": 113,
+      "bytes_received": 14634,
+      "content_characters": 495,
+      "done_reason": "stop",
+      "prompt_eval_count": 1497,
+      "prompt_eval_duration": 1429047000,
+      "eval_count": 146,
+      "eval_duration": 6073869000,
+      "load_duration": 945376400,
+      "total_duration": 8538444900
+    }
+  ]
+}

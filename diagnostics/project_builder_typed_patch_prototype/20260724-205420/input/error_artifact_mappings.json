@@ -1,0 +1,132 @@
+[
+  {
+    "code": "MISSING_REQUESTED_COMPONENTS",
+    "message": "Plano nao promete componentes pedidos: ['preview'].",
+    "affected_artifacts": [],
+    "evidence": {
+      "field_path": "components",
+      "expected": "array containing requested components",
+      "actual": "<array items=4>"
+    },
+    "required_postconditions": [
+      "Adiciona os componentes pedidos e os respetivos ficheiros reais."
+    ],
+    "content_dependent": false
+  },
+  {
+    "code": "MISSING_COMPONENT_MAPPING",
+    "message": "Plano full stack sem component_files para: ['frontend', 'backend'].",
+    "affected_artifacts": [],
+    "evidence": {
+      "field_path": "component_files",
+      "expected": "object[array[string]]",
+      "actual": "<object items=0>"
+    },
+    "required_postconditions": [
+      "Mapeia frontend e backend para ficheiros que existam no plano."
+    ],
+    "content_dependent": false
+  },
+  {
+    "code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "message": "O componente declarado frontend nao tem nenhum artefacto real mapeado.",
+    "affected_artifacts": [],
+    "evidence": {
+      "field_path": "component_files.frontend",
+      "expected": "at least one component_files path present in the planned files",
+      "actual": "[]",
+      "component": "frontend",
+      "received_mapping": "[]",
+      "expected_artifacts": "at least one component_files path present in the planned files"
+    },
+    "required_postconditions": [
+      "component_files.frontend must contain at least one existing planned artifact."
+    ],
+    "content_dependent": false
+  },
+  {
+    "code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "message": "O componente declarado backend nao tem nenhum artefacto real mapeado.",
+    "affected_artifacts": [],
+    "evidence": {
+      "field_path": "component_files.backend",
+      "expected": "at least one component_files path present in the planned files",
+      "actual": "[]",
+      "component": "backend",
+      "received_mapping": "[]",
+      "expected_artifacts": "at least one component_files path present in the planned files"
+    },
+    "required_postconditions": [
+      "component_files.backend must contain at least one existing planned artifact."
+    ],
+    "content_dependent": false
+  },
+  {
+    "code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "message": "O componente declarado persistence nao tem nenhum artefacto real mapeado.",
+    "affected_artifacts": [],
+    "evidence": {
+      "field_path": "component_files.persistence",
+      "expected": "at least one component_files path present in the planned files",
+      "actual": "[]",
+      "component": "persistence",
+      "received_mapping": "[]",
+      "expected_artifacts": "at least one component_files path present in the planned files"
+    },
+    "required_postconditions": [
+      "component_files.persistence must contain at least one existing planned artifact."
+    ],
+    "content_dependent": false
+  },
+  {
+    "code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "message": "O componente declarado tests nao tem nenhum artefacto real mapeado.",
+    "affected_artifacts": [],
+    "evidence": {
+      "field_path": "component_files.tests",
+      "expected": "at least one component_files path present in the planned files",
+      "actual": "[]",
+      "component": "tests",
+      "received_mapping": "[]",
+      "expected_artifacts": "at least one component_files path present in the planned files"
+    },
+    "required_postconditions": [
+      "component_files.tests must contain at least one existing planned artifact."
+    ],
+    "content_dependent": false
+  },
+  {
+    "code": "PERSISTENCE_NOT_IMPLEMENTED",
+    "message": "O componente persistence nao demonstra leitura e escrita duravel; estado em memoria nao e persistencia.",
+    "affected_artifacts": [],
+    "evidence": {
+      "field_path": "component_files.persistence",
+      "expected": "mapped artifact implementing durable read and write operations",
+      "actual": "no durable read/write mechanism in mapped persistence artifacts",
+      "component": "persistence",
+      "persistence_artifacts": [],
+      "durability_evidence": "no durable read/write mechanism in mapped persistence artifacts"
+    },
+    "required_postconditions": [
+      "A mapped existing artifact must implement durable read and write operations.",
+      "Module arrays, objects, Map, Set or variables alone do not satisfy persistence.",
+      "For dependency-free Node.js plans, node:fs or node:fs/promises may implement the durable storage."
+    ],
+    "content_dependent": false
+  },
+  {
+    "code": "MISSING_HEALTH_ROUTE",
+    "message": "Nenhum artefacto backend contem evidencia textual da rota /health.",
+    "affected_artifacts": [],
+    "evidence": {
+      "field_path": "preview_strategy.healthcheck_path",
+      "target": "/health",
+      "expected": "health route in a mapped backend artifact",
+      "actual": "route not found"
+    },
+    "required_postconditions": [
+      "A mapped backend artifact must implement the declared health route /health."
+    ],
+    "content_dependent": false
+  }
+]

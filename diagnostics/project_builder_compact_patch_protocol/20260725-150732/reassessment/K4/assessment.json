@@ -1,0 +1,24 @@
+{
+  "source": "previous_response_metadata_removed_only",
+  "schema_valid": true,
+  "coverage": false,
+  "binding": false,
+  "apply": false,
+  "validators": false,
+  "errors": [
+    {
+      "code": "DUPLICATE_OPERATION",
+      "message": "The same operation target was selected more than once",
+      "details": {
+        "operation": {
+          "op": "set_component_files",
+          "component": "backend",
+          "paths": [
+            "server.js"
+          ],
+          "id": "op-05"
+        }
+      }
+    }
+  ]
+}

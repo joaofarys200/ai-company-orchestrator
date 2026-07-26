@@ -1,0 +1,71 @@
+{
+  "error_resolutions": [
+    {
+      "error_code": "MISSING_REQUESTED_COMPONENTS",
+      "operation_ids": ["op_001"]
+    },
+    {
+      "error_code": "MISSING_COMPONENT_MAPPING",
+      "operation_ids": ["op_002", "op_003"]
+    },
+    {
+      "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+      "operation_ids": ["op_003"]
+    },
+    {
+      "error_code": "PERSISTENCE_NOT_IMPLEMENTED",
+      "operation_ids": ["op_004"]
+    },
+    {
+      "error_code": "MISSING_HEALTH_ROUTE",
+      "operation_ids": ["op_005"]
+    }
+  ],
+  "operations": [
+    {
+      "id": "op-001",
+      "op": "set_components",
+      "value": [
+        "frontend",
+        "backend",
+        "persistence",
+        "tests",
+        "preview"
+      ]
+    },
+    {
+      "id": "op-002",
+      "op": "set_component_files",
+      "component": "frontend",
+      "paths": [
+        "index.html"
+      ]
+    },
+    {
+      "id": "op-003",
+      "op": "set_component_files",
+      "component": "backend",
+      "paths": [
+        "server.js"
+      ]
+    },
+    {
+      "id": "op-004",
+      "op": "apply_code_transform",
+      "path": "server.js",
+      "transform": "ADD_JSON_FILE_PERSISTENCE",
+      "parameters": {
+        "storage_filename": "data.json"
+      },
+      "expected_sha256": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456"
+    },
+    {
+      "id": "op-005",
+      "op": "set_component_files",
+      "component": "backend",
+      "paths": [
+        "server.js"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 10.539,
+  "prompt_bytes": 9689,
+  "response_bytes": 580,
+  "response_sha256": "f32d89184dfb64a873174443b2b65a6a61aafc7162bbdd032e3b57440679a381",
+  "prompt_sha256": "09fef7d5a717283e1d69eb28722efc23062321bc378f3d186bad68c416c36eae",
+  "prompt_eval_count": null,
+  "eval_count": null
+}

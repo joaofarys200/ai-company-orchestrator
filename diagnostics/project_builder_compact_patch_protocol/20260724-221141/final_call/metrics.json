@@ -1,0 +1,14 @@
+{
+  "model": "qwen3.5:9b",
+  "done": true,
+  "done_reason": "stop",
+  "prompt_eval_count": 638,
+  "eval_count": 470,
+  "elapsed_seconds": 32.668,
+  "content_bytes": 1384,
+  "content_sha256": "b365efcb1add2d8a15868e0a01578387decd52df6c062adc379f48bfa91e4c55",
+  "prompt_sha256": "d6333edfef4d11386bee43a1a927aa43f1e264c57c14fd78153599cf390f6287",
+  "schema_sha256": "62262b2caee0850e1a43fc5f6a5324c4713ab9b6bd0a22ca196e0df32c6009a1",
+  "response_bytes": 1891,
+  "timeout_seconds": 180
+}

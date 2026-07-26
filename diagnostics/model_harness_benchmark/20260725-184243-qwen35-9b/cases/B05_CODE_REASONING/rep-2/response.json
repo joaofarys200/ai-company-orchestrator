@@ -1,0 +1,47 @@
+{
+  "request_id": "e104211a3aa644a39fb4d672c13f6029",
+  "status": "SUCCEEDED",
+  "raw_text": "{\n  \"bug_code\": \"EMPTY_COLLECTION_DIVISION\",\n  \"minimal_fix\": \"return values.reduce((sum, n) => sum + n, 0) / (values.length || 1);\"\n}",
+  "structured_output": {
+    "bug_code": "EMPTY_COLLECTION_DIVISION",
+    "minimal_fix": "return values.reduce((sum, n) => sum + n, 0) / (values.length || 1);"
+  },
+  "usage": {
+    "input_tokens": 79,
+    "output_tokens": 51,
+    "total_tokens": 130
+  },
+  "provider": "ollama",
+  "model": "qwen3.5:9b",
+  "latency_ms": 4596,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "bug_code": "EMPTY_COLLECTION_DIVISION",
+      "minimal_fix": "return values.reduce((sum, n) => sum + n, 0) / (values.length || 1);"
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "recovery": [
+    {
+      "action": "NONE",
+      "reason": "recovery_not_required",
+      "recoverable": false,
+      "retry_requested": false,
+      "input_changed": false
+    }
+  ],
+  "tool_calls": [],
+  "warnings": [],
+  "errors": []
+}

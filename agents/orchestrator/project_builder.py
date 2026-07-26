@@ -35,6 +35,27 @@ except ImportError:  # pragma: no cover - exercised by the conservative fallback
     TreeSitterParser = None
 
 from agents import tools as ag_tools
+from agents.orchestrator.flight_recorder import (
+    NoOpFlightRecorder,
+    ProjectBuilderFlightRecorder,
+    recorder_directory,
+)
+from backend.model_harness import (
+    ContextBuildRequest,
+    ContextBuilder,
+    ContextCandidate,
+    ExecutionConstraints,
+    ExpectedOutput,
+    ModelHarness,
+    ModelPreferences,
+    ModelRequest,
+    ModelResponseStatus,
+    ModelRoute,
+    ModelUsage,
+    OutputFormat,
+    ProviderRegistry,
+    ProviderResult,
+)
 from intelligence.project_context import ProjectContextService
 
 
@@ -312,6 +333,14 @@ class _OllamaGenerationContract:
     correction_schema_length: int = 0
     correction_schema_version: str = ""
     streaming_enabled: bool = True
+
+
+@dataclass(frozen=True)
+class _ProjectBuilderProviderCall:
+    attempt: int
+    prompt_bytes: int
+    correction_bytes: int
+    generation_contract: _OllamaGenerationContract
 
 
 class _PlanAttemptFailure(Exception):
@@ -737,6 +766,7 @@ class ProjectBuildResult:
     validation_errors: list[dict[str, Any]] = field(default_factory=list)
     pre_validation: dict[str, Any] = field(default_factory=dict)
     completion_reason: str = ""
+    flight_recorder_path: str = ""
 
     def report(self) -> str:
         files = "\n".join(f"- {path}" for path in self.files_created) or "- nenhum"
@@ -783,6 +813,7 @@ class ProjectBuildJournal:
         self.path = Path(ag_tools.resolve_workspace_path(self.relative_path))
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.RLock()
+        self.flight_recorder = None
         now = _utc_timestamp()
         self.state: dict[str, Any] = {
             "run_id": self.run_id,
@@ -829,6 +860,7 @@ class ProjectBuildJournal:
             instance.path, Path(ag_tools.resolve_workspace_path("."))
         ).replace(os.sep, "/")
         instance._lock = threading.RLock()
+        instance.flight_recorder = None
         instance.state = json.loads(instance.path.read_text(encoding="utf-8"))
         instance.run_id = str(instance.state["run_id"])
         return instance
@@ -836,6 +868,13 @@ class ProjectBuildJournal:
     def _persist(self) -> None:
         with self._lock:
             self.state["updated_at"] = _utc_timestamp()
+            recorder = self.flight_recorder
+            if recorder is not None:
+                recorder.event(
+                    "journal_write_started",
+                    phase="JOURNAL",
+                    metadata={"path": self.relative_path},
+                )
             temporary = self.path.with_name(f".{self.path.name}.{uuid.uuid4().hex}.tmp")
             payload = json.dumps(self.state, ensure_ascii=False, indent=2)
             try:
@@ -847,6 +886,17 @@ class ProjectBuildJournal:
             finally:
                 if temporary.exists():
                     temporary.unlink()
+                if recorder is not None:
+                    recorder.event(
+                        "journal_write_completed",
+                        phase="JOURNAL",
+                        status="COMPLETED" if self.path.is_file() else "FAILED",
+                        metadata={"path": self.relative_path, "persisted": self.path.is_file()},
+                    )
+
+    def attach_flight_recorder(self, recorder: Any) -> None:
+        with self._lock:
+            self.flight_recorder = recorder
 
     def snapshot(self) -> dict[str, Any]:
         with self._lock:
@@ -3304,7 +3354,19 @@ async def _run_project_command(
     reader_shutdown_seconds: float = 1.0,
 ) -> CommandResult:
     clean_command = _sanitize_command(command)
+    recorder = getattr(journal, "flight_recorder", None) if journal is not None else None
     started = time.monotonic()
+    if recorder is not None:
+        recorder.event(
+            "command_execution_started",
+            phase="TECHNICAL_VALIDATION",
+            metadata={
+                "command_id": command_id,
+                "category": category,
+                "command_sha256": hashlib.sha256(clean_command.encode("utf-8")).hexdigest(),
+                "working_directory": working_directory,
+            },
+        )
     try:
         safe, reason = _command_is_project_safe(command)
         if not safe:
@@ -3320,6 +3382,14 @@ async def _run_project_command(
     except (OSError, ProjectBuilderError, ValueError) as exc:
         duration = time.monotonic() - started
         stderr = f"Comando '{clean_command}' nao executado: {exc}"
+        if recorder is not None:
+            recorder.event(
+                "command_execution_failed",
+                phase="TECHNICAL_VALIDATION",
+                status="FAILED",
+                error=exc,
+                metadata={"command_id": command_id, "blocked": True},
+            )
         return CommandResult(
             command=clean_command,
             ok=False,
@@ -3432,6 +3502,12 @@ async def _run_project_command(
         )
         if journal is not None:
             journal.process_started(command_id, process.pid, category, process_group=str(process.pid))
+        if recorder is not None:
+            recorder.event(
+                "process_started",
+                phase="TECHNICAL_VALIDATION",
+                metadata={"command_id": command_id, "pid": process.pid, "category": category},
+            )
         stdout_task = asyncio.create_task(stdout_state.drain(process.stdout, "stdout", debug))
         stderr_task = asyncio.create_task(stderr_state.drain(process.stderr, "stderr", debug))
         wait_task = asyncio.create_task(process.wait())
@@ -3538,6 +3614,39 @@ async def _run_project_command(
             cleanup_completed=cleanup_completed,
             cleanup_errors=cleanup_errors,
         )
+        if recorder is not None:
+            recorder.event(
+                "command_stdout_progress",
+                phase="TECHNICAL_VALIDATION",
+                metadata={
+                    "command_id": command_id,
+                    "bytes": stdout_state.total_bytes,
+                    "lines": stdout.count("\n") + (1 if stdout else 0),
+                    "truncated": stdout_state.truncated,
+                },
+            )
+            recorder.event(
+                "command_stderr_progress",
+                phase="TECHNICAL_VALIDATION",
+                metadata={
+                    "command_id": command_id,
+                    "bytes": stderr_state.total_bytes,
+                    "lines": stderr.count("\n") + (1 if stderr else 0),
+                    "truncated": stderr_state.truncated,
+                },
+            )
+            recorder.event(
+                "process_timeout" if timed_out else "command_execution_completed",
+                phase="TECHNICAL_VALIDATION",
+                status="FAILED" if timed_out or not result.ok else "COMPLETED",
+                metadata={
+                    "command_id": command_id,
+                    "pid": process.pid,
+                    "exit_code": result.exit_code,
+                    "duration_ms": round(duration * 1000, 3),
+                    "timed_out": timed_out,
+                },
+            )
         return result
     except OSError as exc:
         duration = time.monotonic() - started
@@ -3557,6 +3666,8 @@ async def _run_project_command(
             required=required,
             cleanup_completed=True,
         )
+        if recorder is not None:
+            recorder.event("command_execution_failed", phase="TECHNICAL_VALIDATION", status="FAILED", error=exc, metadata={"command_id": command_id})
         return result
     finally:
         monitor_stop.set()
@@ -3607,6 +3718,13 @@ async def _run_project_command(
                     process.pid,
                     termination_confirmed=termination_succeeded,
                 )
+            if recorder is not None:
+                recorder.event(
+                    "process_terminated",
+                    phase="TECHNICAL_VALIDATION",
+                    status="COMPLETED" if termination_succeeded else "FAILED",
+                    metadata={"command_id": command_id, "pid": process.pid, "termination_confirmed": termination_succeeded},
+                )
         else:
             job.close()
         logger.debug(
@@ -3618,6 +3736,13 @@ async def _run_project_command(
                 "stderr_closed": stderr_state.closed,
             }),
         )
+        if recorder is not None:
+            recorder.event(
+                "process_cleanup_completed",
+                phase="TECHNICAL_VALIDATION",
+                status="COMPLETED" if cleanup_completed else "FAILED",
+                metadata={"command_id": command_id, "cleanup_completed": cleanup_completed, "cleanup_errors": cleanup_errors},
+            )
 
 
 def _find_free_port() -> int:
@@ -3903,6 +4028,36 @@ def _ollama_message_length(messages: list[dict[str, str]]) -> int:
     return sum(len(str(item.get("content") or "").encode("utf-8")) for item in messages)
 
 
+class _ProjectBuilderOllamaHarnessProvider:
+    name = PLAN_PROVIDER
+
+    def __init__(self, requester: "OllamaPlanRequester", model: str):
+        self.requester = requester
+        self.default_model = model
+
+    async def generate(
+        self,
+        request: ModelRequest,
+        route: ModelRoute,
+        progress,
+    ) -> ProviderResult:
+        call = request.execution_constraints.provider_payload
+        if not isinstance(call, _ProjectBuilderProviderCall):
+            raise _PlanAttemptFailure(
+                "PLAN_HTTP_ERROR",
+                "O provider recebeu um contrato de chamada invalido.",
+                retryable=False,
+                error_type="InvalidHarnessProviderCall",
+            )
+        readiness = await self.requester._readiness(call.attempt)
+        return await self.requester._generate_from_provider(
+            request,
+            route,
+            call,
+            readiness,
+        )
+
+
 class OllamaPlanRequester:
     def __init__(
         self,
@@ -3910,6 +4065,8 @@ class OllamaPlanRequester:
         transport: httpx.AsyncBaseTransport | None = None,
         sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
         heartbeat: Callable[[], None] | None = None,
+        flight_recorder: Any | None = None,
+        model_harness: ModelHarness | None = None,
     ):
         self.provider = PLAN_PROVIDER
         self.model = _project_builder_setting("OLLAMA_MODEL", "qwen2.5:14b")
@@ -3921,12 +4078,21 @@ class OllamaPlanRequester:
         self.transport = transport
         self.sleep = sleep
         self.heartbeat_callback = heartbeat
+        self.flight_recorder = flight_recorder
         self._last_heartbeat = 0.0
         self.attempts: list[PlanAttemptRecord] = []
         self.readiness_checks: list[dict[str, Any]] = []
         self.first_error: dict[str, str] | None = None
         self.final_error: dict[str, str] | None = None
         self.prompt_length = 0
+        self.context_builder = ContextBuilder()
+        self.harness_operation_id = f"project_builder:{uuid.uuid4().hex}"
+        if model_harness is None:
+            providers = ProviderRegistry([
+                _ProjectBuilderOllamaHarnessProvider(self, self.model)
+            ])
+            model_harness = ModelHarness(providers)
+        self.model_harness = model_harness
 
     def _heartbeat(self, *, force: bool = False) -> None:
         now = time.monotonic()
@@ -3935,6 +4101,20 @@ class OllamaPlanRequester:
         self.heartbeat_callback()
         self._last_heartbeat = now
 
+    def _record(self, event: str, *, phase: str = "REQUESTER", attempt: int = 0, metadata: dict[str, Any] | None = None, status: str = "OBSERVED", error: BaseException | None = None, progress_counter: int | None = None) -> None:
+        if self.flight_recorder is not None:
+            if progress_counter is not None and hasattr(self.flight_recorder, "next_progress"):
+                progress_counter = self.flight_recorder.next_progress()
+            self.flight_recorder.event(
+                event,
+                phase=phase,
+                attempt=attempt,
+                metadata=metadata,
+                status=status,
+                error=error,
+                progress_counter=progress_counter,
+            )
+
     @property
     def attempt_count(self) -> int:
         return len(self.attempts)
@@ -3942,6 +4122,11 @@ class OllamaPlanRequester:
     def diagnostics(self) -> dict[str, Any]:
         completed = next((item for item in reversed(self.attempts) if item.final_plan_hash), None)
         latest = self.attempts[-1] if self.attempts else None
+        harness_diagnostics = getattr(
+            self.model_harness,
+            "diagnostics",
+            None,
+        )
         return {
             "provider": self.provider,
             "model": self.model,
@@ -3982,6 +4167,11 @@ class OllamaPlanRequester:
             "local_repairs": list(completed.local_repairs) if completed else [],
             "corrected_by_model": bool(completed and completed.corrected_by_model),
             "final_plan_hash": completed.final_plan_hash if completed else "",
+            "model_harness": (
+                harness_diagnostics()
+                if callable(harness_diagnostics)
+                else {"injected": True}
+            ),
         }
 
     def planning_error(self, category: str, message: str) -> ProjectBuilderPlanningError:
@@ -4055,6 +4245,7 @@ class OllamaPlanRequester:
         )
 
     async def _readiness(self, attempt: int) -> dict[str, Any]:
+        self._record("readiness_check_started", attempt=attempt, metadata={"model": self.model})
         self._heartbeat(force=True)
         started = time.monotonic()
         readiness: dict[str, Any] = {
@@ -4145,6 +4336,12 @@ class OllamaPlanRequester:
             if readiness not in self.readiness_checks:
                 readiness["duration"] = round(time.monotonic() - started, 4)
                 self.readiness_checks.append(readiness)
+            self._record(
+                "readiness_check_completed",
+                attempt=attempt,
+                status="COMPLETED" if readiness.get("service_available") and readiness.get("model_exists") else "FAILED",
+                metadata=readiness,
+            )
         return readiness
 
     async def _generate(
@@ -4152,33 +4349,169 @@ class OllamaPlanRequester:
         prompt: str,
         correction: str | None,
         attempt: int,
-        readiness: dict[str, Any],
         generation_contract: _OllamaGenerationContract,
     ) -> str:
         compact = attempt > 1
         messages = _ollama_messages(prompt, correction, compact)
+        candidates = (
+            (
+                ContextCandidate(
+                    source="project_builder:focal_correction",
+                    kind="correction",
+                    content=correction,
+                    relevance_score=1.0,
+                    explicitly_requested=True,
+                ),
+            )
+            if correction
+            else ()
+        )
+        context = self.context_builder.build(ContextBuildRequest(
+            task_summary="ProjectBuilder structured planning",
+            candidates=candidates,
+            allowed_kinds=("correction",),
+            max_items=1,
+            max_chars=max(1, len(correction or "")),
+        ))
+        expected_format = (
+            OutputFormat.JSON_SCHEMA
+            if generation_contract.structured_output_enabled
+            else OutputFormat.JSON
+        )
+        call = _ProjectBuilderProviderCall(
+            attempt=attempt,
+            prompt_bytes=len(prompt.encode("utf-8")),
+            correction_bytes=(
+                len(correction.encode("utf-8"))
+                if correction
+                else 0
+            ),
+            generation_contract=generation_contract,
+        )
+        request = ModelRequest(
+            task_profile="STRUCTURED_EXTRACTION",
+            system_prompt=messages[0]["content"],
+            user_prompt=messages[1]["content"],
+            context=context,
+            allowed_tools=(),
+            expected_output=ExpectedOutput(
+                format=expected_format,
+                schema=(
+                    generation_contract.response_format
+                    if isinstance(
+                        generation_contract.response_format,
+                        dict,
+                    )
+                    else None
+                ),
+                defer_validation=True,
+                validation_owner="ProjectBuilder",
+            ),
+            temperature=0,
+            max_context_tokens=self.num_ctx,
+            max_output_tokens=self.max_output_tokens,
+            metadata={
+                "consumer": "ProjectBuilder",
+                "phase": (
+                    "plan_correction" if correction else "plan"
+                ),
+                "attempt": attempt,
+                "structured_output_enabled": (
+                    generation_contract.structured_output_enabled
+                ),
+                "correction_schema_sha256": (
+                    generation_contract.correction_schema_sha256
+                ),
+                "progress_key": self.harness_operation_id,
+            },
+            model_preferences=ModelPreferences(
+                providers=(self.provider,),
+                models=(self.model,),
+                mode="chat",
+            ),
+            execution_constraints=ExecutionConstraints(
+                max_attempts=1,
+                timeout_seconds=self.timeout_config.read,
+                streaming=generation_contract.streaming_enabled,
+                thinking=False,
+                allow_recovery=False,
+                stop_on_no_progress=False,
+                provider_payload=call,
+            ),
+        )
+        response = await self.model_harness.execute(request)
+        if response.status != ModelResponseStatus.SUCCEEDED:
+            if response.provider_exception is not None:
+                raise response.provider_exception
+            raise _PlanAttemptFailure(
+                "PLAN_HTTP_ERROR",
+                "O Model Harness nao concluiu a chamada de planeamento.",
+                retryable=False,
+                error_type=response.status.value,
+                partial_response=bool(response.raw_text),
+            )
+        return response.raw_text
+
+    async def _generate_from_provider(
+        self,
+        request: ModelRequest,
+        route: ModelRoute,
+        call: _ProjectBuilderProviderCall,
+        readiness: dict[str, Any],
+    ) -> ProviderResult:
+        generation_contract = call.generation_contract
+        attempt = call.attempt
         payload = {
-            "model": self.model,
-            "messages": messages,
-            "stream": generation_contract.streaming_enabled,
+            "model": route.model,
+            "messages": [
+                {"role": "system", "content": request.system_prompt},
+                {"role": "user", "content": request.user_prompt},
+            ],
+            "stream": route.streaming,
             "format": generation_contract.response_format,
-            "think": False,
+            "think": route.thinking,
             "keep_alive": self.keep_alive,
             "options": {
-                "temperature": 0,
+                "temperature": request.temperature,
                 "top_p": 0.8,
-                "num_predict": self.max_output_tokens,
-                "num_ctx": self.num_ctx,
+                "num_predict": request.max_output_tokens,
+                "num_ctx": request.max_context_tokens,
             },
         }
         parts: list[str] = []
         output_length = 0
         done_received = False
         done_reason = ""
-        output_character_limit = self.max_output_tokens * 12
+        stream_started = time.monotonic()
+        first_byte_at: float | None = None
+        first_chunk_at: float | None = None
+        first_content_at: float | None = None
+        last_chunk_at: float | None = None
+        max_chunk_gap = 0.0
+        chunk_count = 0
+        response_bytes = 0
+        first_valid_json_at: float | None = None
+        metrics: dict[str, Any] = {}
+        self._record(
+            "model_attempt_started",
+            attempt=attempt,
+            metadata={"phase": request.metadata.get("phase", "plan")},
+        )
+        output_character_limit = int(request.max_output_tokens or 1) * 12
         try:
             async with self._client(self.timeout_config.to_httpx()) as client:
+                self._record("http_request_started", attempt=attempt, metadata={
+                    "endpoint": "/api/chat",
+                    "prompt_bytes": call.prompt_bytes,
+                    "correction_bytes": call.correction_bytes,
+                })
                 async with client.stream("POST", "/api/chat", json=payload) as response:
+                    self._record(
+                        "response_headers_received",
+                        attempt=attempt,
+                        status="COMPLETED" if response.status_code < 400 else "FAILED",
+                        metadata={"status_code": response.status_code},
+                    )
                     if response.status_code >= 400:
                         response_body = (await response.aread()).decode("utf-8", errors="replace")
                         if (
@@ -4201,6 +4534,18 @@ class OllamaPlanRequester:
                         self._heartbeat()
                         if not line.strip():
                             continue
+                        now = time.monotonic()
+                        chunk_count += 1
+                        response_bytes += len(line.encode("utf-8"))
+                        if first_byte_at is None:
+                            first_byte_at = now
+                            self._record("first_response_byte", attempt=attempt)
+                        if first_chunk_at is None:
+                            first_chunk_at = now
+                            self._record("first_http_chunk", attempt=attempt)
+                        if last_chunk_at is not None:
+                            max_chunk_gap = max(max_chunk_gap, now - last_chunk_at)
+                        last_chunk_at = now
                         try:
                             chunk = json.loads(line)
                         except ValueError as exc:
@@ -4221,8 +4566,25 @@ class OllamaPlanRequester:
                             )
                         content = str((chunk.get("message") or {}).get("content") or "")
                         if content:
+                            if first_content_at is None:
+                                first_content_at = now
+                                self._record("first_nonempty_content", attempt=attempt)
                             parts.append(content)
                             output_length += len(content)
+                            if first_valid_json_at is None:
+                                try:
+                                    extract_json_object("".join(parts))
+                                except Exception:
+                                    pass
+                                else:
+                                    first_valid_json_at = now
+                                    self._record("first_valid_json_object", attempt=attempt)
+                            self._record(
+                                "stream_progress",
+                                attempt=attempt,
+                                metadata={"chunks": chunk_count, "content_chars": output_length},
+                                progress_counter=chunk_count,
+                            )
                         if output_length > output_character_limit:
                             raise _PlanAttemptFailure(
                                 "PLAN_OUTPUT_LIMIT_EXCEEDED",
@@ -4234,8 +4596,37 @@ class OllamaPlanRequester:
                         if chunk.get("done") is True:
                             done_received = True
                             done_reason = str(chunk.get("done_reason") or "")
+                            metrics = {
+                                "attempt": attempt,
+                                "first_response_byte_ms": round((first_byte_at - stream_started) * 1000, 3) if first_byte_at else None,
+                                "first_chunk_ms": round((first_chunk_at - stream_started) * 1000, 3) if first_chunk_at else None,
+                                "first_content_ms": round((first_content_at - stream_started) * 1000, 3) if first_content_at else None,
+                                "first_valid_json_ms": round((first_valid_json_at - stream_started) * 1000, 3) if first_valid_json_at else None,
+                                "max_chunk_gap_ms": round(max_chunk_gap * 1000, 3),
+                                "chunk_count": chunk_count,
+                                "bytes_received": response_bytes,
+                                "content_characters": output_length,
+                                "done_reason": done_reason,
+                            }
+                            metrics.update({
+                                key: chunk.get(key)
+                                for key in (
+                                    "prompt_eval_count", "prompt_eval_duration", "eval_count",
+                                    "eval_duration", "load_duration", "total_duration",
+                                )
+                                if key in chunk
+                            })
+                            self._record("stream_completed", attempt=attempt, status="COMPLETED", metadata=metrics)
+                            if self.flight_recorder is not None:
+                                self.flight_recorder.write_payload_metrics(metrics)
                             break
         except _PlanAttemptFailure:
+            self._record(
+                "requester_failed",
+                attempt=attempt,
+                status="FAILED",
+                metadata={"partial_response": bool(parts), "chunks": chunk_count},
+            )
             raise
         except httpx.ReadTimeout as exc:
             category = (
@@ -4259,6 +4650,7 @@ class OllamaPlanRequester:
                 partial_response=bool(parts),
             ) from exc
         except httpx.HTTPError as exc:
+            self._record("requester_failed", attempt=attempt, status="FAILED", error=exc, metadata={"partial_response": bool(parts)})
             raise _PlanAttemptFailure(
                 "PLAN_HTTP_ERROR",
                 "Erro HTTP controlado durante o planeamento.",
@@ -4283,9 +4675,37 @@ class OllamaPlanRequester:
                 error_type="OutputLimitExceeded",
                 partial_response=bool(parts),
             )
-        return "".join(parts)
+        if self.flight_recorder is not None:
+            self.flight_recorder.write_raw_artifact(
+                f"response_attempt_{attempt}.jsonl",
+                "".join(parts),
+            )
+        return ProviderResult(
+            raw_text="".join(parts),
+            usage=ModelUsage(
+                input_tokens=metrics.get("prompt_eval_count"),
+                output_tokens=metrics.get("eval_count"),
+                total_tokens=(
+                    int(metrics.get("prompt_eval_count") or 0)
+                    + int(metrics.get("eval_count") or 0)
+                    or None
+                ),
+            ),
+            metadata={
+                "done_reason": done_reason,
+                "chunk_count": chunk_count,
+                "bytes_received": response_bytes,
+            },
+        )
 
     async def __call__(self, prompt: str, correction: str | None = None) -> str:
+        self._record(
+            "requester_started",
+            metadata={
+                "prompt_bytes": len(prompt.encode("utf-8")),
+                "correction_bytes": len(correction.encode("utf-8")) if correction else 0,
+            },
+        )
         self._heartbeat(force=True)
         self.prompt_length = max(self.prompt_length, len(prompt.encode("utf-8")))
         while self.attempt_count < PLAN_MAX_ATTEMPTS:
@@ -4299,12 +4719,10 @@ class OllamaPlanRequester:
             generation_contract = _ollama_generation_contract(correction)
             started = time.monotonic()
             try:
-                readiness = await self._readiness(attempt)
                 result = await self._generate(
                     prompt,
                     correction,
                     attempt,
-                    readiness,
                     generation_contract,
                 )
             except _PlanAttemptFailure as failure:
@@ -4367,8 +4785,14 @@ class OllamaPlanRequester:
                     }, ensure_ascii=True),
                 )
                 if can_retry:
+                    self._record(
+                        "request_retry_scheduled",
+                        attempt=attempt,
+                        metadata={"retry_reason": retry_reason},
+                    )
                     await self.sleep(self.backoff)
                     continue
+                self._record("requester_failed", attempt=attempt, status="FAILED", error=failure)
                 raise ProjectBuilderPlanningError(
                     failure.category,
                     failure.message,
@@ -4394,6 +4818,11 @@ class OllamaPlanRequester:
                 streaming_enabled=generation_contract.streaming_enabled,
             ))
             self.final_error = None
+            self._record("requester_completed", attempt=attempt, status="COMPLETED", metadata={
+                "response_bytes": response_length,
+                "duration_ms": round(duration * 1000, 3),
+                "response_sha256": hashlib.sha256(result.encode("utf-8")).hexdigest(),
+            })
             logger.info(
                 "project_builder.plan_attempt_succeeded %s",
                 json.dumps({
@@ -5834,21 +6263,87 @@ def _generic_plan_diagnostics(
     }
 
 
-async def get_valid_project_plan(prompt: str, requester: PlanRequester | None = None) -> ProjectPlan:
+async def get_valid_project_plan(
+    prompt: str,
+    requester: PlanRequester | None = None,
+    flight_recorder: Any | None = None,
+) -> ProjectPlan:
     selected_requester: PlanRequester = requester or OllamaPlanRequester()
     ollama_requester = (
         selected_requester if isinstance(selected_requester, OllamaPlanRequester) else None
     )
     intent = detect_project_creation_intent(prompt)
+    if flight_recorder is not None:
+        flight_recorder.event(
+            "prompt_build_started",
+            phase="PREPARATION",
+            metadata={"prompt_bytes": len(prompt.encode("utf-8"))},
+        )
     planning_prompt = _prompt_with_intent_constraints(prompt, intent)
+    if flight_recorder is not None:
+        flight_recorder.event(
+            "prompt_build_completed",
+            phase="PREPARATION",
+            metadata={
+                "prompt_bytes": len(prompt.encode("utf-8")),
+                "planning_prompt_bytes": len(planning_prompt.encode("utf-8")),
+                "planning_prompt_sha256": hashlib.sha256(planning_prompt.encode("utf-8")).hexdigest(),
+            },
+        )
+        flight_recorder.event(
+            "request_payload_built",
+            phase="PREPARATION",
+            metadata={"planning_prompt_bytes": len(planning_prompt.encode("utf-8"))},
+        )
     first_raw = await _maybe_await_plan(selected_requester, planning_prompt, None)
     corrected_by_model = False
     call_count = 1
     validation_history: list[dict[str, Any]] = []
     correction: str | None = None
+    validation_event_names = (
+        "structural_validation",
+        "security_validation",
+        "semantic_validation",
+        "integrity_validation",
+        "component_validation",
+        "persistence_contract_validation",
+        "entrypoint_validation",
+        "preview_contract_validation",
+    )
     try:
+        if flight_recorder is not None:
+            flight_recorder.event("requester_parse_started", phase="REQUESTER")
+            flight_recorder.event("plan_decode_started", phase="PLAN")
+            flight_recorder.event("plan_schema_validation_started", phase="PLAN")
+            for event_name in validation_event_names:
+                flight_recorder.event(f"{event_name}_started", phase="VALIDATION")
         processed = _validated_raw_project_plan(first_raw, prompt)
+        if flight_recorder is not None:
+            flight_recorder.event("requester_parse_completed", phase="REQUESTER", status="COMPLETED")
+            flight_recorder.event("plan_schema_validation_completed", phase="PLAN", status="COMPLETED")
+            flight_recorder.event("plan_decode_completed", phase="PLAN", status="COMPLETED", metadata={
+                "plan_hash": processed.final_plan_hash,
+            })
+            for event_name in validation_event_names:
+                flight_recorder.event(f"{event_name}_completed", phase="VALIDATION", status="COMPLETED")
     except _PlanValidationFailure as first_error:
+        if flight_recorder is not None:
+            flight_recorder.event("requester_parse_completed", phase="REQUESTER", status="FAILED", error=first_error.cause)
+            flight_recorder.event(
+                "plan_schema_validation_completed",
+                phase="PLAN",
+                status="FAILED",
+                error=first_error.cause,
+                metadata={"category": first_error.category},
+            )
+            for event_name in validation_event_names:
+                flight_recorder.event(
+                    f"{event_name}_completed",
+                    phase="VALIDATION",
+                    status="FAILED",
+                    error=first_error.cause,
+                    metadata={"category": first_error.category},
+                )
         validation_history.append(_planning_validation_record("original", first_raw, first_error))
         if ollama_requester is not None:
             ollama_requester.note_validation_failure(first_error)
@@ -5862,6 +6357,15 @@ async def get_valid_project_plan(prompt: str, requester: PlanRequester | None = 
                     diagnostics,
                 ) from first_error.cause
         correction = _structured_plan_correction(first_error, first_raw, prompt)
+        if flight_recorder is not None:
+            flight_recorder.event("focal_correction_started", phase="FOCAL_CORRECTION", metadata={
+                "category": first_error.category,
+            })
+            flight_recorder.event("correction_prompt_built", phase="FOCAL_CORRECTION", metadata={
+                "prompt_bytes": len(correction.encode("utf-8")),
+                "prompt_sha256": hashlib.sha256(correction.encode("utf-8")).hexdigest(),
+            })
+            flight_recorder.event("correction_request_started", phase="FOCAL_CORRECTION")
         corrected_raw = await _maybe_await_plan(
             selected_requester,
             planning_prompt,
@@ -5870,8 +6374,33 @@ async def get_valid_project_plan(prompt: str, requester: PlanRequester | None = 
         call_count += 1
         corrected_by_model = True
         try:
+            if flight_recorder is not None:
+                flight_recorder.event("correction_response_received", phase="FOCAL_CORRECTION", metadata={
+                    "response_bytes": len(str(corrected_raw).encode("utf-8")),
+                })
+                flight_recorder.event("correction_effectiveness_started", phase="FOCAL_CORRECTION")
             processed = _validated_correction_response(corrected_raw, prompt, first_error)
+            if flight_recorder is not None:
+                flight_recorder.event("correction_effectiveness_completed", phase="FOCAL_CORRECTION", status="COMPLETED")
+                flight_recorder.event("correction_applied", phase="FOCAL_CORRECTION", status="COMPLETED", metadata={
+                    "plan_hash": processed.final_plan_hash,
+                })
+                flight_recorder.event("focal_correction_completed", phase="FOCAL_CORRECTION", status="COMPLETED")
         except _PlanValidationFailure as second_error:
+            if flight_recorder is not None:
+                flight_recorder.event(
+                    "correction_effectiveness_completed",
+                    phase="FOCAL_CORRECTION",
+                    status="FAILED",
+                    error=second_error.cause,
+                    metadata={"category": second_error.category},
+                )
+                flight_recorder.event(
+                    "focal_correction_completed",
+                    phase="FOCAL_CORRECTION",
+                    status="FAILED",
+                    error=second_error.cause,
+                )
             validation_history.append(_planning_validation_record("corrected", corrected_raw, second_error))
             if ollama_requester is not None:
                 ollama_requester.note_validation_failure(second_error)
@@ -6407,6 +6936,7 @@ async def _run_backend_healthcheck(
     preview_strategy: dict[str, Any],
     journal: ProjectBuildJournal | None = None,
 ) -> CommandResult:
+    recorder = getattr(journal, "flight_recorder", None) if journal is not None else None
     entrypoint = check.command.split(":", 1)[1]
     absolute_entrypoint = Path(project_dir, entrypoint)
     if not absolute_entrypoint.is_file():
@@ -6423,6 +6953,12 @@ async def _run_backend_healthcheck(
     if not health_path.startswith("/"):
         health_path = f"/{health_path}"
     health_url = f"http://127.0.0.1:{port}{health_path}"
+    if recorder is not None:
+        recorder.event(
+            "healthcheck_started",
+            phase="HEALTHCHECK",
+            metadata={"entrypoint": entrypoint, "url": health_url},
+        )
     environment = os.environ.copy()
     environment["PORT"] = str(port)
     started = time.monotonic()
@@ -6624,6 +7160,19 @@ async def _run_backend_healthcheck(
     exit_code = 0 if success else (process.returncode if process and process.returncode is not None else 1)
     if not success and reason:
         stderr = f"{stderr}\n{reason}".strip()
+    if recorder is not None:
+        recorder.event(
+            "healthcheck_completed" if success else "healthcheck_failed",
+            phase="HEALTHCHECK",
+            status="COMPLETED" if success else "FAILED",
+            metadata={
+                "entrypoint": entrypoint,
+                "url": health_url,
+                "exit_code": exit_code,
+                "duration_ms": round(duration * 1000, 3),
+                "cleanup_completed": cleanup_completed,
+            },
+        )
     return CommandResult(
         command=f"{executable} {entrypoint} [healthcheck {health_url}]",
         ok=success,
@@ -7037,22 +7586,47 @@ def _planning_failure_result(
     )
 
 
-async def build_project(
+async def _build_project_impl(
     prompt: str,
     plan_requester: PlanRequester | None = None,
     projects_root_rel: str = PROJECT_ROOT_REL,
     start_preview: bool = True,
     on_file: FileCallback | None = None,
     on_log: LogCallback | None = None,
+    *,
+    flight_recorder: Any | None = None,
+    project_id: str = "",
+    mission_id: str = "",
+    execution_id: str = "",
 ) -> ProjectBuildResult:
     creation_intent = detect_project_creation_intent(prompt)
     if not creation_intent.is_creation_request:
         raise ProjectBuilderError("Pedido nao parece ser criacao de projeto.")
 
     journal = ProjectBuildJournal()
-    selected_requester = plan_requester or OllamaPlanRequester(heartbeat=journal.heartbeat)
+    recorder = flight_recorder
+    if recorder is None:
+        recorder = NoOpFlightRecorder()
+    journal.attach_flight_recorder(recorder)
+    if hasattr(recorder, "set_context"):
+        recorder.set_context(
+            project_id=project_id,
+            mission_id=mission_id,
+            execution_id=execution_id,
+            build_run_id=journal.run_id,
+        )
+    recorder.event(
+        "build_project_entered",
+        phase="EXECUTION",
+        metadata={"prompt_bytes": len(prompt.encode("utf-8")), "project_id": project_id},
+    )
+    selected_requester = plan_requester or OllamaPlanRequester(
+        heartbeat=journal.heartbeat,
+        flight_recorder=recorder,
+    )
     try:
-        plan = await get_valid_project_plan(prompt, selected_requester)
+        with recorder.span("planning", phase="PLANNING"):
+            plan = await get_valid_project_plan(prompt, selected_requester, recorder)
     except ProjectBuilderPlanningError as exc:
         journal.record_planning_failure(exc)
         if exc.category in {"PLAN_SEMANTIC_INVALID", "PLAN_CORRECTION_FAILED"}:
@@ -7068,9 +7642,15 @@ async def build_project(
             retryable=category in PLAN_RETRYABLE_CATEGORIES,
         )])
         raise
+    recorder.event("configuration_resolved", phase="PREPARATION", metadata={
+        "projects_root": projects_root_rel,
+        "start_preview": start_preview,
+        "requester": type(selected_requester).__name__,
+    })
     project_rel_dir = unique_project_rel_dir(plan.project_name, projects_root_rel)
     project_dir = ag_tools.resolve_workspace_path(project_rel_dir)
-    validation, _ = _materialize_validation_plan(prompt, plan, project_dir)
+    with recorder.span("project_context_loaded", phase="PREPARATION", metadata={"project_dir": project_dir}):
+        validation, _ = _materialize_validation_plan(prompt, plan, project_dir)
     journal.record_plan(plan, validation, project_rel_dir)
     journal.transition("MATERIALIZING", completed_step="plan_validated")
     os.makedirs(project_dir, exist_ok=False)
@@ -7079,24 +7659,33 @@ async def build_project(
 
     files_created: list[str] = []
     materialized_files: list[dict[str, Any]] = []
-    for file_item in plan.files:
-        safe_path = _safe_relative_file_path(file_item.path)
-        abs_path = _assert_project_child(project_rel_dir, safe_path)
-        os.makedirs(os.path.dirname(abs_path), exist_ok=True)
-        Path(abs_path).write_text(file_item.content, encoding="utf-8")
-        rel_path = f"{project_rel_dir}/{safe_path}".replace("\\", "/")
-        files_created.append(rel_path)
-        materialized_files.append({
-            "relative_path": safe_path,
-            "size_bytes": os.path.getsize(abs_path),
-            "sha256": _streaming_sha256(abs_path),
-            "created_at": _utc_timestamp(),
-        })
-        if on_file:
-            on_file(rel_path, file_item.content)
+    with recorder.span("materialization", phase="MATERIALIZATION"):
+        for file_item in plan.files:
+            safe_path = _safe_relative_file_path(file_item.path)
+            abs_path = _assert_project_child(project_rel_dir, safe_path)
+            recorder.event("file_write_started", phase="MATERIALIZATION", metadata={
+                "relative_path": safe_path,
+                "operation": "create",
+                "size_bytes": len(file_item.content.encode("utf-8")),
+                "sha256": hashlib.sha256(file_item.content.encode("utf-8")).hexdigest(),
+            })
+            os.makedirs(os.path.dirname(abs_path), exist_ok=True)
+            Path(abs_path).write_text(file_item.content, encoding="utf-8")
+            rel_path = f"{project_rel_dir}/{safe_path}".replace("\\", "/")
+            files_created.append(rel_path)
+            materialized_files.append({
+                "relative_path": safe_path,
+                "size_bytes": os.path.getsize(abs_path),
+                "sha256": _streaming_sha256(abs_path),
+                "created_at": _utc_timestamp(),
+            })
+            recorder.event("file_write_completed", phase="MATERIALIZATION", status="COMPLETED", metadata=materialized_files[-1])
+            if on_file:
+                on_file(rel_path, file_item.content)
     journal.record_artifacts(materialized_files)
 
-    pre_validation = prevalidate_validation_plan(validation, plan, project_dir)
+    with recorder.span("pre_validation", phase="PRE_VALIDATION"):
+        pre_validation = prevalidate_validation_plan(validation, plan, project_dir)
     if not pre_validation.valid:
         validation.static_errors = list(pre_validation.errors)
         validation.failed_checks = list(dict.fromkeys(
@@ -7140,6 +7729,9 @@ async def build_project(
 
     journal.record_prevalidation(pre_validation, validation)
 
+    recorder.event("component_validation", phase="VALIDATION", status="RUNNING")
+    recorder.event("entrypoint_validation", phase="VALIDATION", status="RUNNING")
+    recorder.event("preview_contract_validation", phase="VALIDATION", status="RUNNING")
     _, project_context = _project_context_entrypoints(project_dir)
     executed, skipped, preview_started, preview_url = await _execute_validation_plan(
         validation,
@@ -7148,6 +7740,15 @@ async def build_project(
         allow_preview=start_preview,
         journal=journal,
     )
+    recorder.event("component_validation", phase="VALIDATION", status="COMPLETED", metadata={
+        "missing_components": validation.missing_components,
+    })
+    recorder.event("entrypoint_validation", phase="VALIDATION", status="COMPLETED", metadata={
+        "failed_checks": validation.failed_checks,
+    })
+    recorder.event("preview_contract_validation", phase="VALIDATION", status="COMPLETED", metadata={
+        "preview_started": preview_started,
+    })
     for result in executed:
         result.output = result.output[:4000]
         result.stdout = result.stdout[:4000]
@@ -7217,3 +7818,85 @@ async def build_project(
         pre_validation=pre_validation.to_dict(),
         completion_reason=("TECHNICALLY_VALIDATED" if validation.success else "VALIDATION_FAILED"),
     )
+
+
+async def build_project(
+    prompt: str,
+    plan_requester: PlanRequester | None = None,
+    projects_root_rel: str = PROJECT_ROOT_REL,
+    start_preview: bool = True,
+    on_file: FileCallback | None = None,
+    on_log: LogCallback | None = None,
+    *,
+    flight_recorder: Any | None = None,
+    project_id: str = "",
+    mission_id: str = "",
+    execution_id: str = "",
+    finalize_flight_recorder: bool = True,
+) -> ProjectBuildResult:
+    """Run the existing builder with optional persistent observability."""
+    enabled = _project_builder_setting("PROJECT_BUILDER_FLIGHT_RECORDER_ENABLED", "1").lower() not in {
+        "0", "false", "no", "off",
+    }
+    recorder = flight_recorder
+    if recorder is None:
+        recorder = (
+            ProjectBuilderFlightRecorder(
+                recorder_directory(ag_tools.resolve_workspace_path(".")),
+                project_id=project_id,
+                mission_id=mission_id,
+                execution_id=execution_id,
+                diagnostics_enabled=(
+                    _project_builder_setting("PROJECT_BUILDER_FLIGHT_RECORDER_DIAGNOSTICS", "0").lower()
+                    in {"1", "true", "yes", "on"}
+                ),
+            )
+            if enabled else NoOpFlightRecorder()
+        )
+    result: ProjectBuildResult | None = None
+    try:
+        result = await _build_project_impl(
+            prompt,
+            plan_requester=plan_requester,
+            projects_root_rel=projects_root_rel,
+            start_preview=start_preview,
+            on_file=on_file,
+            on_log=on_log,
+            flight_recorder=recorder,
+            project_id=project_id,
+            mission_id=mission_id,
+            execution_id=execution_id,
+        )
+        recorder.event(
+            "build_completed",
+            phase="EXECUTION",
+            status="COMPLETED" if result.technical_success else "FAILED",
+            metadata={
+                "status": result.status,
+                "technical_success": result.technical_success,
+                "project_rel_dir": result.project_rel_dir,
+                "files_created": len(result.files_created),
+            },
+        )
+        result.flight_recorder_path = str(getattr(recorder, "directory", ""))
+        return result
+    except asyncio.CancelledError as exc:
+        recorder.event("build_interrupted", phase="EXECUTION", status="INTERRUPTED", error=exc)
+        raise
+    except BaseException as exc:
+        recorder.event("build_failed", phase="EXECUTION", status="FAILED", error=exc)
+        raise
+    finally:
+        final_status = result.status if result is not None else "FAILED"
+        final_state = {
+            "status": final_status,
+            "technical_success": bool(result and result.technical_success),
+            "build_run_id": result.build_run_id if result is not None else "",
+            "project_rel_dir": result.project_rel_dir if result is not None else "",
+            "files_created": result.files_created if result is not None else [],
+        }
+        if finalize_flight_recorder:
+            recorder.close(
+                status="SUCCEEDED" if result is not None and result.technical_success else final_status,
+                final_state=final_state,
+            )

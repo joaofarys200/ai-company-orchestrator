@@ -1,0 +1,54 @@
+{
+  "case_id": "B03_REFERENCE_DISCIPLINE",
+  "repetition": 2,
+  "status": "SUCCEEDED",
+  "harness_passed": true,
+  "semantic_passed": true,
+  "passed": true,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "selected_refs": [
+        "file:tests/test_a.py"
+      ]
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "criteria": [
+    {
+      "criterion": "selects_test_reference_only",
+      "passed": true,
+      "evidence": "received=['file:tests/test_a.py']"
+    }
+  ],
+  "response_sha256": "780b50adcf38cd10a6bb37bb8ef44e882f846e0c0366dac704a47758fdc2bb37",
+  "response_bytes": 55,
+  "wall_latency_ms": 2695,
+  "harness_latency_ms": 2695,
+  "usage": {
+    "input_tokens": 58,
+    "output_tokens": 25,
+    "total_tokens": 83
+  },
+  "provider_metrics": {
+    "done": true,
+    "done_reason": "stop",
+    "total_duration_ns": 2517856900,
+    "load_duration_ns": 1056156900,
+    "prompt_eval_count": 58,
+    "prompt_eval_duration_ns": 109211000,
+    "eval_count": 25,
+    "eval_duration_ns": 1346549000,
+    "tokens_per_second": 18.566
+  }
+}

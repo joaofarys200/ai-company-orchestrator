@@ -1,0 +1,245 @@
+{
+  "name": "C1",
+  "started_at": "2026-07-24T14:06:15.018589+00:00",
+  "duration_seconds": 1.370249,
+  "read_timeout_seconds": 300.0,
+  "stream": true,
+  "format": {
+    "type": "object",
+    "additional_properties": false,
+    "properties": {
+      "project_name": {
+        "type": "string",
+        "required": true,
+        "non_empty": true
+      },
+      "stack": {
+        "type": "string",
+        "required": true,
+        "non_empty": true
+      },
+      "components": {
+        "type": "array[string]",
+        "required": false,
+        "default": [],
+        "allowed_items": [
+          "frontend",
+          "backend",
+          "persistence",
+          "tests",
+          "preview"
+        ]
+      },
+      "files": {
+        "type": "array[object]",
+        "required": true,
+        "min_items": 1,
+        "max_items": 40,
+        "item_schema": {
+          "type": "object",
+          "additional_properties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "required": true,
+              "non_empty": true
+            },
+            "content": {
+              "type": "string",
+              "required": true
+            }
+          }
+        }
+      },
+      "dependencies": {
+        "type": "array[string]",
+        "required": false,
+        "default": []
+      },
+      "setup_commands": {
+        "type": "array[string]",
+        "required": false,
+        "default": []
+      },
+      "validation_commands": {
+        "type": "array[string]",
+        "required": false,
+        "default": []
+      },
+      "entrypoints": {
+        "type": "array[string]",
+        "required": false,
+        "default": []
+      },
+      "preview_strategy": {
+        "type": "object",
+        "required": false,
+        "default": {},
+        "additional_properties": true
+      },
+      "preview_command": {
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      "constraints": {
+        "type": "array[string]",
+        "required": false,
+        "default": []
+      },
+      "component_files": {
+        "type": "object[array[string]]",
+        "required": false,
+        "default": {}
+      },
+      "rationale": {
+        "type": "string",
+        "required": false,
+        "default": ""
+      }
+    }
+  },
+  "chunks": 0,
+  "bytes_received": 0,
+  "json_objects": 0,
+  "content_bytes": 0,
+  "time_to_headers": 1.369189,
+  "time_to_first_byte": null,
+  "time_to_first_http_chunk": null,
+  "time_to_first_json": null,
+  "time_to_first_content": null,
+  "max_chunk_interval": null,
+  "done": false,
+  "done_reason": null,
+  "prompt_eval_count": null,
+  "prompt_eval_duration": null,
+  "eval_count": null,
+  "eval_duration": null,
+  "load_duration": null,
+  "total_duration": null,
+  "first_content_offset": null,
+  "useful_terminated": false,
+  "events": [
+    {
+      "event": "call_started",
+      "wall_time": "2026-07-24T14:06:15.018589+00:00",
+      "monotonic_offset": 0.000627,
+      "stream": true,
+      "format": {
+        "type": "object",
+        "additional_properties": false,
+        "properties": {
+          "project_name": {
+            "type": "string",
+            "required": true,
+            "non_empty": true
+          },
+          "stack": {
+            "type": "string",
+            "required": true,
+            "non_empty": true
+          },
+          "components": {
+            "type": "array[string]",
+            "required": false,
+            "default": [],
+            "allowed_items": [
+              "frontend",
+              "backend",
+              "persistence",
+              "tests",
+              "preview"
+            ]
+          },
+          "files": {
+            "type": "array[object]",
+            "required": true,
+            "min_items": 1,
+            "max_items": 40,
+            "item_schema": {
+              "type": "object",
+              "additional_properties": false,
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "required": true,
+                  "non_empty": true
+                },
+                "content": {
+                  "type": "string",
+                  "required": true
+                }
+              }
+            }
+          },
+          "dependencies": {
+            "type": "array[string]",
+            "required": false,
+            "default": []
+          },
+          "setup_commands": {
+            "type": "array[string]",
+            "required": false,
+            "default": []
+          },
+          "validation_commands": {
+            "type": "array[string]",
+            "required": false,
+            "default": []
+          },
+          "entrypoints": {
+            "type": "array[string]",
+            "required": false,
+            "default": []
+          },
+          "preview_strategy": {
+            "type": "object",
+            "required": false,
+            "default": {},
+            "additional_properties": true
+          },
+          "preview_command": {
+            "type": "string",
+            "required": false,
+            "default": ""
+          },
+          "constraints": {
+            "type": "array[string]",
+            "required": false,
+            "default": []
+          },
+          "component_files": {
+            "type": "object[array[string]]",
+            "required": false,
+            "default": {}
+          },
+          "rationale": {
+            "type": "string",
+            "required": false,
+            "default": ""
+          }
+        }
+      },
+      "payload_bytes": 3271
+    },
+    {
+      "event": "headers_received",
+      "wall_time": "2026-07-24T14:06:16.388073+00:00",
+      "monotonic_offset": 1.369189,
+      "status_code": 400,
+      "headers": {
+        "content-type": "application/json",
+        "date": "Fri, 24 Jul 2026 14:06:16 GMT",
+        "transfer-encoding": "chunked"
+      }
+    },
+    {
+      "event": "http_error",
+      "wall_time": "2026-07-24T14:06:16.388743+00:00",
+      "monotonic_offset": 1.369901,
+      "status_code": 400,
+      "body": "{\"error\":\"{\\\"error\\\":{\\\"code\\\":400,\\\"message\\\":\\\"Field 'json_schema': \\\\\\\"json_schema\\\\\\\": JSON schema conversion failed:\\\\nUnrecognized schema: {\\\\\\\"type\\\\\\\":\\\\\\\"array[string]\\\\\\\",\\\\\\\"required\\\\\\\":false,\\\\\\\"default\\\\\\\":[],\\\\\\\"allowed_items\\\\\\\":[\\\\\\\"frontend\\\\\\\",\\\\\\\"backend\\\\\\\",\\\\\\\"persistence\\\\\\\",\\\\\\\"tests\\\\\\\",\\\\\\\"preview\\\\\\\"]}\\\\nUnrecognized schema: {\\\\\\\"type\\\\\\\":\\\\\\\"array[object]\\\\\\\",\\\\\\\"required\\\\\\\":true,\\\\\\\"min_items\\\\\\\":1,\\\\\\\"max_items\\\\\\\":40,\\\\\\\"item_schema\\\\\\\":{\\\\\\\"type\\\\\\\":\\\\\\\"object\\\\\\\",\\\\\\\"additional_properties\\\\\\\":false,\\\\\\\"properties\\\\\\\":{\\\\\\\"path\\\\\\\":{\\\\\\\"type\\\\\\\":\\\\\\\"string\\\\\\\",\\\\\\\"required\\\\\\\":true,\\\\\\\"non_empty\\\\\\\":true},\\\\\\\"content\\\\\\\":{\\\\\\\"type\\\\\\\":\\\\\\\"string\\\\\\\",\\\\\\\"required\\\\\\\":true}}}}\\\\nUnrecognized schema: {\\\\\\\"type\\\\\\\":\\\\\\\"array[string]\\\\\\\",\\\\\\\"required\\\\\\\":false,\\\\\\\"default\\\\\\\":[]}\\\\nUnrecognized schema: {\\\\\\\"type\\\\\\\":\\\\\\\"array[string]\\\\\\\",\\\\\\\"required\\\\\\\":false,\\\\\\\"default\\\\\\\":[]}\\\\nUnrecognized schema: {\\\\\\\"type\\\\\\\":\\\\\\\"array[string]\\\\\\\",\\\\\\\"required\\\\\\\":false,\\\\\\\"default\\\\\\\":[]}\\\\nUnrecognized schema: {\\\\\\\"type\\\\\\\":\\\\\\\"array[string]\\\\\\\",\\\\\\\"required\\\\\\\":false,\\\\\\\"default\\\\\\\":[]}\\\\nUnrecognized schema: {\\\\\\\"type\\\\\\\":\\\\\\\"array[string]\\\\\\\",\\\\\\\"required\\\\\\\":false,\\\\\\\"default\\\\\\\":[]}\\\\nUnrecognized schema: {\\\\\\\"type\\\\\\\":\\\\\\\"object[array[string]]\\\\\\\",\\\\\\\"required\\\\\\\":false,\\\\\\\"default\\\\\\\":{}}\\\",\\\"type\\\":\\\"invalid_request_error\\\"}}\"}"
+    }
+  ],
+  "payload_file": "payloads\\C1.json"
+}

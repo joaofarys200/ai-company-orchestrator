@@ -63,6 +63,11 @@ Supported variables:
 - `AIRLLM_MAX_NEW_TOKENS`: positive generation limit, not greater than context.
 - `AIRLLM_TEMPERATURE`: number from 0 through 2.
 - `AIRLLM_PROFILING_MODE`: `true/false`, `1/0`, or `yes/no`.
+- `AIRLLM_DIAGNOSTIC_MODE`: prints the failure phase, safe runtime metadata,
+  and full traceback when true; false preserves the short failure output.
+- `AIRLLM_ENABLE_QWEN35_COMPAT_PATCH`: opt-in experimental correction for the
+  nested Qwen 3.5 text-layer paths. It defaults to false and does not establish
+  functional or multimodal support.
 - `HF_HOME`: optional root for Hugging Face data.
 - `HUGGINGFACE_HUB_CACHE`: optional model repository cache.
 
@@ -87,6 +92,13 @@ back to CPU because this phase is intended to validate the target GPU path.
 python -m services.airllm_server.smoke_test
 ```
 
+For one controlled diagnostic run in PowerShell:
+
+```powershell
+$env:AIRLLM_DIAGNOSTIC_MODE = "true"
+python -m services.airllm_server.smoke_test
+```
+
 The first execution may download the selected model and split it into layer
 shards. The model is loaded once. The prompt is tokenized without truncation;
 the run fails if its original token count exceeds `AIRLLM_MAX_CONTEXT`.
@@ -94,6 +106,37 @@ the run fails if its original token count exceeds `AIRLLM_MAX_CONTEXT`.
 The output includes Torch/AirLLM versions, GPU name, selected configuration,
 preparation/loading duration, prompt and completion token counts, generation
 duration, tokens per second, and only the newly generated text.
+
+The explicit diagnostic phases are `configuration`, `imports`, `cuda_check`,
+`path_preparation`, `model_configuration_download`,
+`model_loading_or_sharding`, `tokenizer_loading`, `prompt_rendering`,
+`tokenization`, `generation`, and `decoding`. AirLLM 3.0.1 loads its tokenizer
+inside model construction, so a tokenizer failure originating there is reported
+under `model_loading_or_sharding`; `tokenizer_loading` verifies the returned
+tokenizer after construction.
+
+## Qwen 3.5 compatibility status
+
+The installed AirLLM 3.0.1 has no explicit override for
+`Qwen3_5MoeForConditionalGeneration`; it selects `AirLLMBaseModel`. That generic
+class assumes `model.layers`, while this checkpoint uses
+`model.language_model.layers`. In `airllm/utils.py`, `split_and_save_layers()`
+tests the short prefix as a substring and slices as if it started at offset zero.
+For a real key such as
+`model.language_model.layers.0.mlp.experts.gate_up_proj`, this sends the exact
+string `"layers"` to `int()` at installed line 237.
+
+The failure parses keys from `model.safetensors.index.json`; it is not parsing a
+file path. It occurs while discovering decoder-layer indices, before disk-space
+checking, weight-shard download, or shard creation.
+
+The opt-in local patch validates every index key before installing an in-memory
+architecture override. Indices must match `0|[1-9][0-9]*`, all declared decoder
+layers must be present, and unknown keys fail closed. It recognizes the model's
+visual and MTP parameters but deliberately does not stream those branches. The
+patch only changes the nested text paths and therefore remains unproven for
+generation; it emits a runtime warning and must not be treated as support for
+image input, MTP, MoE execution, Gated DeltaNet execution, or production use.
 
 ## Disk planning
 
@@ -135,4 +178,3 @@ Remove-Item -LiteralPath $ResolvedAirLLMCleanupTarget -Recurse -Force
 Repeat the same inspect-first procedure separately for a chosen Hugging Face
 cache directory. Never delete a broad drive, home directory, or unresolved
 environment-variable path.
-

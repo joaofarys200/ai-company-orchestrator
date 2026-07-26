@@ -1,0 +1,47 @@
+{
+  "request_id": "d4ece629dc7d4fb6ad2642a866d30c1a",
+  "status": "SUCCEEDED",
+  "raw_text": "{\n  \"choice\": \"LOCAL\",\n  \"confidence\": 1.0\n}",
+  "structured_output": {
+    "choice": "LOCAL",
+    "confidence": 1.0
+  },
+  "usage": {
+    "input_tokens": 64,
+    "output_tokens": 21,
+    "total_tokens": 85
+  },
+  "provider": "ollama",
+  "model": "qwen3.5:9b",
+  "latency_ms": 2261,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "choice": "LOCAL",
+      "confidence": 1.0
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "recovery": [
+    {
+      "action": "NONE",
+      "reason": "recovery_not_required",
+      "recoverable": false,
+      "retry_requested": false,
+      "input_changed": false
+    }
+  ],
+  "tool_calls": [],
+  "warnings": [],
+  "errors": []
+}

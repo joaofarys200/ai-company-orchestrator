@@ -1,0 +1,109 @@
+{
+  "manual_status": "MANUAL_COMPACT_PATCH_PASSED",
+  "tests": "39/39 passed",
+  "reassessment": {
+    "K1": {
+      "source": "previous_response_hash_removed_only",
+      "schema_new": true,
+      "coverage": false,
+      "binding": true,
+      "apply": false,
+      "validators": false,
+      "errors": [
+        {
+          "code": "INVALID_TRANSFORM_PARAMETER",
+          "message": "storage_filename must be a single JSON filename",
+          "details": {
+            "value": null
+          }
+        }
+      ],
+      "model_hash_fields_removed": 1
+    },
+    "K2": {
+      "source": "previous_response_hash_removed_only",
+      "schema_new": true,
+      "coverage": false,
+      "binding": true,
+      "apply": false,
+      "validators": false,
+      "errors": [
+        {
+          "code": "INVALID_TRANSFORM_PARAMETER",
+          "message": "storage_filename must be a single JSON filename",
+          "details": {
+            "value": null
+          }
+        }
+      ],
+      "model_hash_fields_removed": 1
+    },
+    "K3": {
+      "source": "previous_response_hash_removed_only",
+      "schema_new": true,
+      "coverage": false,
+      "binding": true,
+      "apply": false,
+      "validators": false,
+      "errors": [
+        {
+          "code": "INVALID_TRANSFORM_PARAMETER",
+          "message": "storage_filename must be a single JSON filename",
+          "details": {
+            "value": null
+          }
+        }
+      ],
+      "model_hash_fields_removed": 1
+    },
+    "K4": {
+      "source": "previous_response_hash_removed_only",
+      "schema_new": true,
+      "coverage": false,
+      "binding": true,
+      "apply": false,
+      "validators": false,
+      "errors": [
+        {
+          "code": "UNKNOWN_OPERATION_REFERENCE",
+          "message": "error_resolutions references unknown operation",
+          "details": {
+            "operation_id": "op_01"
+          }
+        }
+      ],
+      "model_hash_fields_removed": 1
+    }
+  },
+  "final_call": {
+    "done": true,
+    "done_reason": "stop",
+    "json_valid": true,
+    "schema_valid": true,
+    "coverage": false,
+    "binding": true,
+    "apply": false,
+    "validators": false,
+    "errors": [
+      {
+        "code": "UNKNOWN_OPERATION_REFERENCE",
+        "message": "error_resolutions references unknown operation",
+        "details": {
+          "operation_id": "op_01"
+        }
+      }
+    ],
+    "model": "qwen3.5:9b",
+    "elapsed_seconds": 32.668,
+    "content_sha256": "b365efcb1add2d8a15868e0a01578387decd52df6c062adc379f48bfa91e4c55"
+  },
+  "decision": "MODEL_SEMANTIC_SELECTION_FAILED",
+  "model_calls": 1,
+  "no_retry": true,
+  "no_local_repair": true,
+  "production_changes": false,
+  "materialization": false,
+  "wp_execution": false,
+  "npm_execution": false,
+  "preview_started": false
+}

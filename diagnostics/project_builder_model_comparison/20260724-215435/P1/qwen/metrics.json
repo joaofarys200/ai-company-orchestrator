@@ -1,0 +1,17 @@
+{
+  "model": "qwen3.5:9b",
+  "timeout_seconds": 180,
+  "request_sha256": "c667072bcb3477c3451737dcbf7627cd4b033223b762c158d4ec6ec3db3ca16c",
+  "prompt_sha256": "cff4b902282a077d373f4edd743700e789b45cb1e156c003711ade08d8906409",
+  "schema_sha256": "10624637f7707f2bad4dfb981699ea4b6d0bf80e801e598b379968d0324014a6",
+  "started_at": "2026-07-24T21:59:17+0100",
+  "http_status": 200,
+  "done": true,
+  "done_reason": "stop",
+  "prompt_eval_count": 2585,
+  "eval_count": 107,
+  "response_bytes": 866,
+  "content_bytes": 483,
+  "content_sha256": "5925f58455857c47353bd07a6fbd42d8de79e12c504b6ccc1725d61afc7bfbce",
+  "elapsed_seconds": 19.676
+}

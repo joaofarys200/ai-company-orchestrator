@@ -1,0 +1,206 @@
+{
+  "errors": [
+    {
+      "error_code": "MISSING_REQUESTED_COMPONENTS",
+      "authorized_plan_fields": [
+        "components"
+      ],
+      "candidate_files": [],
+      "operation_types": [
+        "set_components"
+      ],
+      "evidence": {
+        "missing_components": [
+          "preview"
+        ]
+      },
+      "reason": "The requested preview component is absent; set the complete final component list."
+    },
+    {
+      "error_code": "MISSING_COMPONENT_MAPPING",
+      "authorized_plan_fields": [
+        "component_files"
+      ],
+      "candidate_files": [
+        "index.html",
+        "server.js",
+        "test.js"
+      ],
+      "operation_types": [
+        "set_component_files"
+      ],
+      "evidence": {
+        "affected_components": [
+          "frontend",
+          "backend",
+          "persistence",
+          "tests",
+          "preview"
+        ],
+        "valid_paths": [
+          "index.html",
+          "package.json",
+          "server.js",
+          "test.js"
+        ]
+      },
+      "reason": "Map each affected component to existing planned files only."
+    },
+    {
+      "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+      "authorized_plan_fields": [
+        "component_files"
+      ],
+      "candidate_files": [
+        "index.html"
+      ],
+      "operation_types": [
+        "set_component_files"
+      ],
+      "evidence": {
+        "affected_components": [
+          "frontend"
+        ],
+        "valid_paths": [
+          "index.html",
+          "package.json",
+          "server.js",
+          "test.js"
+        ]
+      },
+      "reason": "Map each affected component to existing planned files only."
+    },
+    {
+      "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+      "authorized_plan_fields": [
+        "component_files"
+      ],
+      "candidate_files": [
+        "server.js"
+      ],
+      "operation_types": [
+        "set_component_files"
+      ],
+      "evidence": {
+        "affected_components": [
+          "backend"
+        ],
+        "valid_paths": [
+          "index.html",
+          "package.json",
+          "server.js",
+          "test.js"
+        ]
+      },
+      "reason": "Map each affected component to existing planned files only."
+    },
+    {
+      "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+      "authorized_plan_fields": [
+        "component_files"
+      ],
+      "candidate_files": [
+        "server.js"
+      ],
+      "operation_types": [
+        "set_component_files"
+      ],
+      "evidence": {
+        "affected_components": [
+          "persistence"
+        ],
+        "valid_paths": [
+          "index.html",
+          "package.json",
+          "server.js",
+          "test.js"
+        ]
+      },
+      "reason": "Map each affected component to existing planned files only."
+    },
+    {
+      "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+      "authorized_plan_fields": [
+        "component_files"
+      ],
+      "candidate_files": [
+        "test.js"
+      ],
+      "operation_types": [
+        "set_component_files"
+      ],
+      "evidence": {
+        "affected_components": [
+          "tests"
+        ],
+        "valid_paths": [
+          "index.html",
+          "package.json",
+          "server.js",
+          "test.js"
+        ]
+      },
+      "reason": "Map each affected component to existing planned files only."
+    },
+    {
+      "error_code": "PERSISTENCE_NOT_IMPLEMENTED",
+      "authorized_plan_fields": [
+        "component_files"
+      ],
+      "candidate_files": [
+        "server.js"
+      ],
+      "operation_types": [
+        "set_component_files",
+        "replace_file_content",
+        "replace_text"
+      ],
+      "evidence": {
+        "backend_entrypoint": [
+          "server.js"
+        ],
+        "durability": "no durable read/write mechanism"
+      },
+      "reason": "Persistence is absent; modify only existing backend entrypoint \"server.js\" using Node.js standard-library durable read/write behavior."
+    },
+    {
+      "error_code": "MISSING_HEALTH_ROUTE",
+      "authorized_plan_fields": [
+        "component_files",
+        "preview_strategy"
+      ],
+      "candidate_files": [
+        "server.js"
+      ],
+      "operation_types": [
+        "set_component_files",
+        "set_preview_strategy"
+      ],
+      "evidence": {
+        "healthcheck_path": "/health",
+        "route_files": [
+          "server.js"
+        ],
+        "unmapped_backend_files": [
+          "server.js"
+        ]
+      },
+      "reason": "The route \"/health\" already exists in \"server.js\"; map that existing backend file and do not create a route file."
+    }
+  ],
+  "authorized_fields": [
+    "component_files",
+    "components",
+    "preview_strategy"
+  ],
+  "authorized_operations": [
+    "replace_file_content",
+    "replace_text",
+    "set_component_files",
+    "set_components",
+    "set_preview_strategy"
+  ],
+  "replacement_targets": [
+    "server.js"
+  ]
+}

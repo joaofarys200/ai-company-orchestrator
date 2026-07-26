@@ -1,0 +1,77 @@
+{
+  "audit": "full_system_health",
+  "date": "2026-07-22",
+  "branch": "system/full-health-audit",
+  "status": "SYSTEM_STABLE_WP1_MODEL_BLOCKED",
+  "failures": [
+    {
+      "id": "A-01",
+      "class": "IMPORT_OR_PACKAGING",
+      "symptom": "focal v2 collection import failed",
+      "root_cause": "external regular tests package shadowed local tests",
+      "severity": "high",
+      "wp1_blocking": true,
+      "state": "fixed",
+      "correction": "tests/__init__.py"
+    },
+    {
+      "id": "E-01",
+      "class": "PROJECTBUILDER_LOGIC",
+      "symptom": "large-file suite stalled",
+      "root_cause": "quadratic SequenceMatcher comparison on repetitive lines",
+      "severity": "high",
+      "wp1_blocking": false,
+      "state": "fixed",
+      "correction": "bounded logical edit comparison"
+    },
+    {
+      "id": "K-01",
+      "class": "MODEL_PROTOCOL",
+      "symptom": "real WP1 plan did not arrive",
+      "root_cause": "qwen3.5:9b Ollama plan stream reached PLAN_READ_TIMEOUT",
+      "severity": "high",
+      "wp1_blocking": true,
+      "state": "confirmed in attempt 2",
+      "evidence": "attempt 1 duration 300.687s, partial_response false"
+    },
+    {
+      "id": "G-01",
+      "class": "EXECUTION_OR_PROCESS_CONTROL",
+      "symptom": "outer diagnostic process ended before allowed second model call completed",
+      "root_cause": "420s observation window was shorter than two 300s internal reads",
+      "severity": "medium",
+      "wp1_blocking": true,
+      "state": "confirmed audit limitation",
+      "production_changed": false
+    }
+  ],
+  "wp1_runs": [
+    {
+      "attempt": 1,
+      "project_id": "health-attempt-1-c429262dd0",
+      "mission_id": "wp1-b447ae6a7d7b45eb",
+      "execution_id": "71c34a62f4004a43a9c54b019b1b7e25",
+      "build_run_id": "34ff0b1118ef4cbb8c1cede503fa8804",
+      "final_state": "FAILED",
+      "journal_state": "INTERRUPTED",
+      "plan_hash": "",
+      "files_created": [],
+      "preview": false
+    },
+    {
+      "attempt": 2,
+      "project_id": "health-attempt-2-7b370c4342",
+      "mission_id": "wp1-de42615c7fbd4126",
+      "execution_id": "0bbc7c53751b48a6a17fced87f632fdf",
+      "build_run_id": "66c62227ca7f4740821fcdd3968404a1",
+      "final_state": "FAILED",
+      "journal_state": "INTERRUPTED",
+      "plan_hash": "",
+      "files_created": [],
+      "preview": false,
+      "first_model_error": "PLAN_READ_TIMEOUT"
+    }
+  ],
+  "airllm_changes_included": false,
+  "wp2_executed": false
+}

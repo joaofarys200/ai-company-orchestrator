@@ -1,0 +1,32 @@
+{
+  "case_id": "B01_LOCAL_CHOICE",
+  "title": "Escolha local sob restricao de rede",
+  "capability": "constraint_based_choice",
+  "task_profile": "LOCAL_CHOICE",
+  "system_prompt": "Return only JSON matching the supplied schema. Use only the allowed values and do not add fields.",
+  "user_prompt": "Choose LOCAL or REMOTE for a task that must run without network access. Return the choice and a confidence from 0 to 1.",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "choice",
+      "confidence"
+    ],
+    "properties": {
+      "choice": {
+        "type": "string",
+        "enum": [
+          "LOCAL",
+          "REMOTE"
+        ]
+      },
+      "confidence": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    }
+  },
+  "allowed_tools": [],
+  "context_candidates": []
+}

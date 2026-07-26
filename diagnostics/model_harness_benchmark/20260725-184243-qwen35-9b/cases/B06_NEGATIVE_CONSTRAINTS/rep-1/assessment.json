@@ -1,0 +1,62 @@
+{
+  "case_id": "B06_NEGATIVE_CONSTRAINTS",
+  "repetition": 1,
+  "status": "SUCCEEDED",
+  "harness_passed": true,
+  "semantic_passed": true,
+  "passed": true,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "files": [
+        "index.html",
+        "styles.css",
+        "app.js"
+      ],
+      "dependencies": []
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "criteria": [
+    {
+      "criterion": "only_allowed_files",
+      "passed": true,
+      "evidence": "files=['index.html', 'styles.css', 'app.js']"
+    },
+    {
+      "criterion": "no_dependencies",
+      "passed": true,
+      "evidence": "dependencies=[]"
+    }
+  ],
+  "response_sha256": "82163feb49a4f11131370951672e1b240803937d41c7da50f53fe53deb22a691",
+  "response_bytes": 91,
+  "wall_latency_ms": 3897,
+  "harness_latency_ms": 3897,
+  "usage": {
+    "input_tokens": 67,
+    "output_tokens": 39,
+    "total_tokens": 106
+  },
+  "provider_metrics": {
+    "done": true,
+    "done_reason": "stop",
+    "total_duration_ns": 3715132100,
+    "load_duration_ns": 1172512900,
+    "prompt_eval_count": 67,
+    "prompt_eval_duration_ns": 252712000,
+    "eval_count": 39,
+    "eval_duration_ns": 2231815000,
+    "tokens_per_second": 17.475
+  }
+}

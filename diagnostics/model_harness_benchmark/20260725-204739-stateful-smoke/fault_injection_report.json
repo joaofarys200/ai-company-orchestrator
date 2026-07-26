@@ -1,0 +1,58 @@
+{
+  "benchmark_version": "model_harness_qwen35_stateful_v2",
+  "cases": [
+    {
+      "scenario_id": "E02_TRUNCATED_JSON",
+      "fault": "truncated_json",
+      "provider": "deterministic-fault-provider",
+      "model_benchmark": false,
+      "harness_benchmark": true,
+      "expected_stop_reason": "COMPLETED",
+      "actual_stop_reason": "COMPLETED",
+      "calls": 2,
+      "unique_request_fingerprints": 2,
+      "identical_retry": false,
+      "recovery": [
+        {
+          "action": "PARSE_RECOVERY",
+          "reason": "PARSING:JSON_PARSE_FAILED",
+          "recoverable": true,
+          "retry_requested": true,
+          "input_changed": true
+        },
+        {
+          "action": "NONE",
+          "reason": "recovery_not_required",
+          "recoverable": false,
+          "retry_requested": false,
+          "input_changed": false
+        }
+      ],
+      "passed": true
+    },
+    {
+      "scenario_id": "E07_REPEATED_TOOL_CALL",
+      "fault": "repeated_tool_call",
+      "provider": "deterministic-tool-fixture",
+      "model_benchmark": false,
+      "harness_benchmark": true,
+      "expected_stop_reason": "REPEATED_TOOL_CALL",
+      "actual_stop_reason": "REPEATED_TOOL_CALL",
+      "calls": 2,
+      "unique_request_fingerprints": 1,
+      "identical_retry": false,
+      "recovery": [],
+      "progress": {
+        "event_count": 2,
+        "distinct_inputs": 0,
+        "distinct_outputs": 0,
+        "conditions": [
+          "REPEATED_TOOL_CALLS"
+        ],
+        "latest_outcome": "CALLED"
+      },
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}

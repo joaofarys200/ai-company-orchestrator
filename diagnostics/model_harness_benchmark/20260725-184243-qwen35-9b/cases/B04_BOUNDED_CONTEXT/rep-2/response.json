@@ -1,0 +1,47 @@
+{
+  "request_id": "670d0a08be034703a8fbb2429d5382d0",
+  "status": "SUCCEEDED",
+  "raw_text": "{\n  \"codename\": \"ORBIT\",\n  \"port\": 4317\n}",
+  "structured_output": {
+    "codename": "ORBIT",
+    "port": 4317
+  },
+  "usage": {
+    "input_tokens": 125,
+    "output_tokens": 24,
+    "total_tokens": 149
+  },
+  "provider": "ollama",
+  "model": "qwen3.5:9b",
+  "latency_ms": 2812,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "codename": "ORBIT",
+      "port": 4317
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "recovery": [
+    {
+      "action": "NONE",
+      "reason": "recovery_not_required",
+      "recoverable": false,
+      "retry_requested": false,
+      "input_changed": false
+    }
+  ],
+  "tool_calls": [],
+  "warnings": [],
+  "errors": []
+}

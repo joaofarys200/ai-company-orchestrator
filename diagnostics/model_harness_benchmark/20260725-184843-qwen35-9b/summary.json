@@ -1,0 +1,305 @@
+{
+  "benchmark_version": "model_harness_qwen35_capabilities_v1",
+  "completed_at": "2026-07-25T18:49:47.721797+00:00",
+  "model": "qwen3.5:9b",
+  "config": {
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "context_tokens": 8192,
+    "output_tokens": 768,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "repetitions": 2,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0
+  },
+  "runtime": {
+    "before": {
+      "python": "3.12.4 (tags/v3.12.4:8e8a4ba, Jun  6 2024, 19:30:16) [MSC v.1940 64 bit (AMD64)]",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "ollama_version": "ollama version is 0.32.3",
+      "model_list_entry": {
+        "name": "qwen3.5:9b",
+        "model": "qwen3.5:9b",
+        "modified_at": "2026-07-06T12:33:54.8280526+01:00",
+        "size": 6594474711,
+        "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen35",
+          "families": [
+            "qwen35"
+          ],
+          "parameter_size": "9.7B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 262144,
+          "embedding_length": 4096
+        },
+        "capabilities": [
+          "vision",
+          "completion",
+          "tools",
+          "thinking"
+        ]
+      },
+      "model_details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M"
+      },
+      "model_capabilities": [
+        "completion",
+        "vision",
+        "tools",
+        "thinking"
+      ],
+      "model_info": {
+        "general.architecture": "qwen35",
+        "general.parameter_count": 9653104368,
+        "qwen35.block_count": 32,
+        "qwen35.context_length": 262144,
+        "qwen35.embedding_length": 4096,
+        "qwen35.vision.block_count": 27,
+        "qwen35.vision.embedding_length": 1152
+      },
+      "ollama_ps_before": {
+        "models": []
+      },
+      "gpu_before": {
+        "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "driver_version": "581.34",
+        "memory_total_mib": 8151,
+        "memory_used_mib": 1129,
+        "memory_free_mib": 6682,
+        "utilization_percent": 15
+      }
+    },
+    "after": {
+      "ollama_ps": {
+        "models": [
+          {
+            "name": "qwen3.5:9b",
+            "model": "qwen3.5:9b",
+            "size": 6420137242,
+            "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "qwen35",
+              "families": [
+                "qwen35"
+              ],
+              "parameter_size": "9.7B",
+              "quantization_level": "Q4_K_M"
+            },
+            "expires_at": "2026-07-25T20:04:45.8007143+01:00",
+            "size_vram": 5372704192,
+            "context_length": 8192
+          }
+        ]
+      },
+      "gpu": {
+        "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "driver_version": "581.34",
+        "memory_total_mib": 8151,
+        "memory_used_mib": 7384,
+        "memory_free_mib": 427,
+        "utilization_percent": 4
+      }
+    }
+  },
+  "total_cases": 8,
+  "passed_cases": 8,
+  "failed_cases": 0,
+  "total_calls": 16,
+  "passed_calls": 16,
+  "harness_validation_passed_calls": 16,
+  "semantic_passed_calls": 16,
+  "exactly_reproducible_cases": 8,
+  "latency_ms": {
+    "min": 2261,
+    "median": 3112.5,
+    "p95": 6504.0,
+    "max": 12687,
+    "mean": 3753.25
+  },
+  "tokens_per_second": {
+    "min": 21.346,
+    "median": 23.981,
+    "max": 25.526,
+    "mean": 23.783
+  },
+  "integrity": {
+    "unchanged": true,
+    "before": {
+      "workspace_projects": {
+        "exists": true,
+        "file_count": 33,
+        "total_bytes": 30523,
+        "tree_sha256": "afb3939180357df275278574389aaddc0b30cba386bb6598f5aa3b35c0c3160a"
+      },
+      "mission_metadata": {
+        "exists": true,
+        "file_count": 1774,
+        "total_bytes": 62423904,
+        "tree_sha256": "1b535fa6c3923c9a10742fddc84da31d50bc8cfa95de885a5a4fd82d5802594e"
+      }
+    },
+    "after": {
+      "workspace_projects": {
+        "exists": true,
+        "file_count": 33,
+        "total_bytes": 30523,
+        "tree_sha256": "afb3939180357df275278574389aaddc0b30cba386bb6598f5aa3b35c0c3160a"
+      },
+      "mission_metadata": {
+        "exists": true,
+        "file_count": 1774,
+        "total_bytes": 62423904,
+        "tree_sha256": "1b535fa6c3923c9a10742fddc84da31d50bc8cfa95de885a5a4fd82d5802594e"
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_id": "B01_LOCAL_CHOICE",
+      "title": "Escolha local sob restricao de rede",
+      "capability": "constraint_based_choice",
+      "passed": true,
+      "passed_repetitions": 2,
+      "total_repetitions": 2,
+      "exact_output_reproducible": true,
+      "unique_response_hashes": [
+        "b111705d49223f8186f0a1d6301f03dc5ec01e160cae5e625b8a2441997a7557"
+      ],
+      "mean_latency_ms": 7474,
+      "criteria_failures": [],
+      "validation_failures": []
+    },
+    {
+      "case_id": "B02_STRUCTURED_EXTRACTION",
+      "title": "Extracao factual estruturada",
+      "capability": "structured_extraction",
+      "passed": true,
+      "passed_repetitions": 2,
+      "total_repetitions": 2,
+      "exact_output_reproducible": true,
+      "unique_response_hashes": [
+        "ced769b3bf5294a345cd7d121c848ac3d5eff3f8d4c03f2f235315e700c712f9"
+      ],
+      "mean_latency_ms": 4383.5,
+      "criteria_failures": [],
+      "validation_failures": []
+    },
+    {
+      "case_id": "B03_REFERENCE_DISCIPLINE",
+      "title": "Selecao sem inventar referencias",
+      "capability": "reference_discipline",
+      "passed": true,
+      "passed_repetitions": 2,
+      "total_repetitions": 2,
+      "exact_output_reproducible": true,
+      "unique_response_hashes": [
+        "780b50adcf38cd10a6bb37bb8ef44e882f846e0c0366dac704a47758fdc2bb37"
+      ],
+      "mean_latency_ms": 2564.5,
+      "criteria_failures": [],
+      "validation_failures": []
+    },
+    {
+      "case_id": "B04_BOUNDED_CONTEXT",
+      "title": "Recuperacao a partir de contexto selecionado",
+      "capability": "bounded_context_use",
+      "passed": true,
+      "passed_repetitions": 2,
+      "total_repetitions": 2,
+      "exact_output_reproducible": true,
+      "unique_response_hashes": [
+        "b5bb488fc7804c340ac2f2dfc62f574c82005b52cd3b0e60ac00272162006813"
+      ],
+      "mean_latency_ms": 2425.5,
+      "criteria_failures": [],
+      "validation_failures": []
+    },
+    {
+      "case_id": "B05_CODE_REASONING",
+      "title": "Diagnostico de bug localizado",
+      "capability": "code_reasoning",
+      "passed": true,
+      "passed_repetitions": 2,
+      "total_repetitions": 2,
+      "exact_output_reproducible": true,
+      "unique_response_hashes": [
+        "66219013570e134e9e4ae168b36065b1fd7326c37c5b76f573122b85b030fb76"
+      ],
+      "mean_latency_ms": 3851.5,
+      "criteria_failures": [],
+      "validation_failures": []
+    },
+    {
+      "case_id": "B06_NEGATIVE_CONSTRAINTS",
+      "title": "Plano respeitando exclusoes",
+      "capability": "negative_constraint_following",
+      "passed": true,
+      "passed_repetitions": 2,
+      "total_repetitions": 2,
+      "exact_output_reproducible": true,
+      "unique_response_hashes": [
+        "82163feb49a4f11131370951672e1b240803937d41c7da50f53fe53deb22a691"
+      ],
+      "mean_latency_ms": 3112.5,
+      "criteria_failures": [],
+      "validation_failures": []
+    },
+    {
+      "case_id": "B07_TOOL_SELECTION",
+      "title": "Selecao de tool sem execucao",
+      "capability": "tool_selection",
+      "passed": true,
+      "passed_repetitions": 2,
+      "total_repetitions": 2,
+      "exact_output_reproducible": true,
+      "unique_response_hashes": [
+        "07523e9769f5551c640df390c5266669b27fb94f7368f6e68ec8763d3c4e7bc2"
+      ],
+      "mean_latency_ms": 2791,
+      "criteria_failures": [],
+      "validation_failures": []
+    },
+    {
+      "case_id": "B08_INSTRUCTION_HIERARCHY",
+      "title": "Resistencia a instrucao contraditoria",
+      "capability": "instruction_hierarchy",
+      "passed": true,
+      "passed_repetitions": 2,
+      "total_repetitions": 2,
+      "exact_output_reproducible": true,
+      "unique_response_hashes": [
+        "bd9068dc40c1824ec499396693dc1a5d145f95335fe098c5d1faae303b834a9b"
+      ],
+      "mean_latency_ms": 3423.5,
+      "criteria_failures": [],
+      "validation_failures": []
+    }
+  ],
+  "capabilities_demonstrated": [
+    "constraint_based_choice",
+    "structured_extraction",
+    "reference_discipline",
+    "bounded_context_use",
+    "code_reasoning",
+    "negative_constraint_following",
+    "tool_selection",
+    "instruction_hierarchy"
+  ],
+  "limitations_observed": []
+}

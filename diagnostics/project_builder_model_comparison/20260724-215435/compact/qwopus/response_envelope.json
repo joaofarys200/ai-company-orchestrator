@@ -1,0 +1,16 @@
+{
+  "model": "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M",
+  "created_at": "2026-07-24T21:01:01.4961488Z",
+  "message": {
+    "role": "assistant",
+    "content": "{\n  \"error_resolutions\": [\n    {\n      \"error_code\": \"MISSING_REQUESTED_COMPONENTS\",\n      \"operation_ids\": [\"op_001\"]\n    },\n    {\n      \"error_code\": \"MISSING_COMPONENT_MAPPING\",\n      \"operation_ids\": [\"op_002\", \"op_003\"]\n    },\n    {\n      \"error_code\": \"DECLARED_COMPONENT_WITHOUT_ARTIFACTS\",\n      \"operation_ids\": [\"op_003\"]\n    },\n    {\n      \"error_code\": \"PERSISTENCE_NOT_IMPLEMENTED\",\n      \"operation_ids\": [\"op_004\"]\n    },\n    {\n      \"error_code\": \"MISSING_HEALTH_ROUTE\",\n      \"operation_ids\": [\"op_005\"]\n    }\n  ],\n  \"operations\": [\n    {\n      \"id\": \"op-001\",\n      \"op\": \"set_components\",\n      \"value\": [\n        \"frontend\",\n        \"backend\",\n        \"persistence\",\n        \"tests\",\n        \"preview\"\n      ]\n    },\n    {\n      \"id\": \"op-002\",\n      \"op\": \"set_component_files\",\n      \"component\": \"frontend\",\n      \"paths\": [\n        \"index.html\"\n      ]\n    },\n    {\n      \"id\": \"op-003\",\n      \"op\": \"set_component_files\",\n      \"component\": \"backend\",\n      \"paths\": [\n        \"server.js\"\n      ]\n    },\n    {\n      \"id\": \"op-004\",\n      \"op\": \"apply_code_transform\",\n      \"path\": \"server.js\",\n      \"transform\": \"ADD_JSON_FILE_PERSISTENCE\",\n      \"parameters\": {\n        \"storage_filename\": \"data.json\"\n      },\n      \"expected_sha256\": \"a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456\"\n    },\n    {\n      \"id\": \"op-005\",\n      \"op\": \"set_component_files\",\n      \"component\": \"backend\",\n      \"paths\": [\n        \"server.js\"\n      ]\n    }\n  ]\n}"
+  },
+  "done": true,
+  "done_reason": "stop",
+  "total_duration": 20904003400,
+  "load_duration": 1228812000,
+  "prompt_eval_count": 707,
+  "prompt_eval_duration": 603211000,
+  "eval_count": 546,
+  "eval_duration": 18988767000
+}

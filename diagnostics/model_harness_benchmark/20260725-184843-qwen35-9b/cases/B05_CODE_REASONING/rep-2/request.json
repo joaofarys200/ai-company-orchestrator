@@ -1,0 +1,46 @@
+{
+  "request_id": "b214831f7d37416fa2cc6de5053d1d5d",
+  "request_fingerprint": "58ac68c0317a481401cbb1191b6ed452956491ce4b7c661944b1ef98231d97d5",
+  "task_profile": "STRUCTURED_EXTRACTION",
+  "system_prompt": "Diagnose the concrete bug and propose the smallest guard. Return JSON only.",
+  "user_prompt": "JavaScript:\nfunction average(values) {\n  return values.reduce((sum, n) => sum + n, 0) / values.length;\n}\nThe required behavior for an empty array is to return 0.",
+  "context": {
+    "items": [],
+    "decisions": [],
+    "total_chars": 0
+  },
+  "allowed_tools": [],
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "bug_code",
+      "minimal_fix"
+    ],
+    "properties": {
+      "bug_code": {
+        "type": "string",
+        "enum": [
+          "EMPTY_COLLECTION_DIVISION"
+        ]
+      },
+      "minimal_fix": {
+        "type": "string"
+      }
+    }
+  },
+  "generation": {
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "context_tokens": 8192,
+    "output_tokens": 768,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "repetitions": 2,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0
+  }
+}

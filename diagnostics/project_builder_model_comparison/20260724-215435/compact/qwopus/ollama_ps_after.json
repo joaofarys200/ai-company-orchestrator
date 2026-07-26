@@ -1,0 +1,10 @@
+{
+  "command": [
+    "ollama",
+    "ps"
+  ],
+  "exit_code": 0,
+  "stdout": "NAME                                          ID              SIZE      PROCESSOR          CONTEXT    UNTIL              \nhf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M    8594f5e223c8    6.4 GB    15%/85% CPU/GPU    8192       4 minutes from now    \n",
+  "stderr": "",
+  "elapsed_seconds": 0.158
+}

@@ -1,0 +1,73 @@
+{
+  "configuration": {
+    "provider": "ollama",
+    "model": "qwen3.5:9b",
+    "context_tokens": 8192,
+    "temperature": 0,
+    "top_p": 0.8,
+    "think": false,
+    "stream": true
+  },
+  "objective_sha256": "43beed8ea9097099f19fcb7e97b7dcf98a0e96ecc8583b4c18e878e8b3047321",
+  "exact_correction_prompt_sha256": "2a1645421ca2a8c02c23593793c135a9cedc520d87d43326af7d113ef7fb0a25",
+  "preserved_correction_response_sha256": "e021bef2af8e9418e8426c54107e7eca1f4eccc08f36a53e6916fea53d6b050c",
+  "results": [
+    {
+      "name": "M1_exact",
+      "status": "NOT_EXECUTED",
+      "reason": "The real planning prompt content was not persisted; only length 609 and a SHA-256 were retained. The saved equivalent prompt is 583 bytes and cannot be called exact.",
+      "saved_equivalent_prompt_bytes": 583,
+      "recorded_prompt_bytes": 609
+    },
+    {
+      "name": "M2_original_correction",
+      "status_code": 200,
+      "duration_seconds": 22.995,
+      "chunks": 113,
+      "content_characters": 495,
+      "content_sha256": "e021bef2af8e9418e8426c54107e7eca1f4eccc08f36a53e6916fea53d6b050c",
+      "done_reason": "stop",
+      "error": null
+    },
+    {
+      "name": "M3_closed_paths",
+      "status_code": 200,
+      "duration_seconds": 4.697,
+      "chunks": 32,
+      "content_characters": 154,
+      "content_sha256": "57dcaca7ffc38b25ccdee9ab68fc19d6106560e95730c85edcfee374b1b4dd70",
+      "done_reason": "stop",
+      "error": null
+    },
+    {
+      "name": "M4_operations",
+      "status_code": 200,
+      "duration_seconds": 10.869,
+      "chunks": 132,
+      "content_characters": 631,
+      "content_sha256": "94caf9dae5388967d6dd51d84d443215085dcdc062ea071b47d1077b3b0518a3",
+      "done_reason": "stop",
+      "error": null
+    },
+    {
+      "name": "M5a_diagnosis",
+      "status_code": 200,
+      "duration_seconds": 8.029,
+      "chunks": 100,
+      "content_characters": 474,
+      "content_sha256": "299c18e6529e734b8ca63720303ce4299121d6e9fb198db09ec65b48e5b348e7",
+      "done_reason": "stop",
+      "error": null
+    },
+    {
+      "name": "M5b_apply",
+      "status_code": 200,
+      "duration_seconds": 4.565,
+      "chunks": 42,
+      "content_characters": 185,
+      "content_sha256": "14c1645d989c4300e85adc211933dbced1286b22796774deed93346771639696",
+      "done_reason": "stop",
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "error_resolutions": [
+    {
+      "error_code": "MISSING_REQUESTED_COMPONENTS",
+      "operation_ids": [
+        "op-1"
+      ]
+    },
+    {
+      "error_code": "MISSING_COMPONENT_MAPPING",
+      "operation_ids": [
+        "op-2",
+        "op-3",
+        "op-4",
+        "op-5"
+      ]
+    },
+    {
+      "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+      "operation_ids": [
+        "op-2",
+        "op-3",
+        "op-4",
+        "op-5",
+        "op-6"
+      ]
+    },
+    {
+      "error_code": "PERSISTENCE_NOT_IMPLEMENTED",
+      "operation_ids": [
+        "op-8"
+      ]
+    },
+    {
+      "error_code": "MISSING_HEALTH_ROUTE",
+      "operation_ids": [
+        "op-3"
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "id": "op-1",
+      "op": "set_components",
+      "value": [
+        "frontend",
+        "backend",
+        "persistence",
+        "tests",
+        "preview"
+      ]
+    },
+    {
+      "id": "op-2",
+      "op": "set_component_files",
+      "component": "frontend",
+      "paths": [
+        "index.html"
+      ]
+    },
+    {
+      "id": "op-3",
+      "op": "set_component_files",
+      "component": "backend",
+      "paths": [
+        "server.js"
+      ]
+    },
+    {
+      "id": "op-4",
+      "op": "set_component_files",
+      "component": "persistence",
+      "paths": [
+        "server.js"
+      ]
+    },
+    {
+      "id": "op-5",
+      "op": "set_component_files",
+      "component": "tests",
+      "paths": [
+        "test.js"
+      ]
+    },
+    {
+      "id": "op-6",
+      "op": "set_component_files",
+      "component": "preview",
+      "paths": [
+        "index.html"
+      ]
+    },
+    {
+      "id": "op-7",
+      "op": "set_preview_strategy",
+      "field": "healthcheck_path",
+      "value": "/health"
+    },
+    {
+      "id": "op-8",
+      "op": "apply_code_transform",
+      "path": "server.js",
+      "transform": "ADD_JSON_FILE_PERSISTENCE",
+      "parameters": {
+        "storage_filename": "data.json"
+      },
+      "expected_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31"
+    }
+  ]
+}

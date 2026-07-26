@@ -1,0 +1,16 @@
+{
+  "model": "qwen3.5:9b",
+  "created_at": "2026-07-25T18:48:58.2400592Z",
+  "message": {
+    "role": "assistant",
+    "content": "{\n  \"choice\": \"LOCAL\",\n  \"confidence\": 1.0\n}"
+  },
+  "done": true,
+  "done_reason": "stop",
+  "total_duration": 12532138700,
+  "load_duration": 11379354600,
+  "prompt_eval_count": 64,
+  "prompt_eval_duration": 275066000,
+  "eval_count": 21,
+  "eval_duration": 854424000
+}

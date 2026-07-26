@@ -1,0 +1,76 @@
+{
+  "case_id": "B02_STRUCTURED_EXTRACTION",
+  "repetition": 2,
+  "status": "SUCCEEDED",
+  "harness_passed": true,
+  "semantic_passed": true,
+  "passed": true,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "invoice_id": "INV-204",
+      "customer": "Ada Lovelace",
+      "amount": 125.4,
+      "currency": "EUR",
+      "paid_on": "2026-07-24"
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "criteria": [
+    {
+      "criterion": "exact_invoice_id",
+      "passed": true,
+      "evidence": "received='INV-204'"
+    },
+    {
+      "criterion": "exact_customer",
+      "passed": true,
+      "evidence": "received='Ada Lovelace'"
+    },
+    {
+      "criterion": "exact_amount",
+      "passed": true,
+      "evidence": "received=125.4"
+    },
+    {
+      "criterion": "exact_currency",
+      "passed": true,
+      "evidence": "received='EUR'"
+    },
+    {
+      "criterion": "exact_paid_on",
+      "passed": true,
+      "evidence": "received='2026-07-24'"
+    }
+  ],
+  "response_sha256": "ced769b3bf5294a345cd7d121c848ac3d5eff3f8d4c03f2f235315e700c712f9",
+  "response_bytes": 126,
+  "wall_latency_ms": 5322,
+  "harness_latency_ms": 5321,
+  "usage": {
+    "input_tokens": 75,
+    "output_tokens": 66,
+    "total_tokens": 141
+  },
+  "provider_metrics": {
+    "done": true,
+    "done_reason": "stop",
+    "total_duration_ns": 5147667900,
+    "load_duration_ns": 1183822900,
+    "prompt_eval_count": 75,
+    "prompt_eval_duration_ns": 131756000,
+    "eval_count": 66,
+    "eval_duration_ns": 3819149000,
+    "tokens_per_second": 17.281
+  }
+}

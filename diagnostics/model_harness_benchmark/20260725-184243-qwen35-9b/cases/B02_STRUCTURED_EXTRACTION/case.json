@@ -1,0 +1,38 @@
+{
+  "case_id": "B02_STRUCTURED_EXTRACTION",
+  "title": "Extracao factual estruturada",
+  "capability": "structured_extraction",
+  "task_profile": "STRUCTURED_EXTRACTION",
+  "system_prompt": "Extract only facts explicitly present in the source. Return JSON matching the schema.",
+  "user_prompt": "SOURCE: Invoice INV-204 belongs to Ada Lovelace. The total is 125.40 EUR. It was paid on 2026-07-24.",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "invoice_id",
+      "customer",
+      "amount",
+      "currency",
+      "paid_on"
+    ],
+    "properties": {
+      "invoice_id": {
+        "type": "string"
+      },
+      "customer": {
+        "type": "string"
+      },
+      "amount": {
+        "type": "number"
+      },
+      "currency": {
+        "type": "string"
+      },
+      "paid_on": {
+        "type": "string"
+      }
+    }
+  },
+  "allowed_tools": [],
+  "context_candidates": []
+}

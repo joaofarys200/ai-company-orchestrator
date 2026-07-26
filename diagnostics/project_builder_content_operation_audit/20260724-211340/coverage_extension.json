@@ -1,0 +1,186 @@
+{
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "resolved_error_codes",
+      "operations"
+    ],
+    "properties": {
+      "resolved_error_codes": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "operations": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://local.invalid/project-builder/typed-operations.schema.json",
+        "title": "ProjectBuilder Typed Offline Operations",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value"
+              ],
+              "properties": {
+                "op": {
+                  "const": "set_components"
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "component",
+                "paths"
+              ],
+              "properties": {
+                "op": {
+                  "const": "set_component_files"
+                },
+                "component": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "paths": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "field",
+                "value"
+              ],
+              "properties": {
+                "op": {
+                  "const": "set_preview_strategy"
+                },
+                "field": {
+                  "enum": [
+                    "enabled",
+                    "method",
+                    "healthcheck_path",
+                    "command"
+                  ]
+                },
+                "value": {}
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "path",
+                "expected_sha256",
+                "content"
+              ],
+              "properties": {
+                "op": {
+                  "const": "replace_file_content"
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "content": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "path",
+                "expected_sha256",
+                "old_text",
+                "new_text",
+                "expected_occurrences"
+              ],
+              "properties": {
+                "op": {
+                  "const": "replace_text"
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "old_text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "new_text": {
+                  "type": "string"
+                },
+                "expected_occurrences": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "required_error_codes": [
+    "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "MISSING_COMPONENT_MAPPING",
+    "MISSING_HEALTH_ROUTE",
+    "MISSING_REQUESTED_COMPONENTS",
+    "PERSISTENCE_NOT_IMPLEMENTED"
+  ],
+  "c1": {
+    "accepted": false,
+    "error": {
+      "code": "PERSISTENCE_OPERATION_REQUIRED",
+      "message": "PERSISTENCE_NOT_IMPLEMENTED requires a server.js content operation before validators run",
+      "missing": [
+        "PERSISTENCE_NOT_IMPLEMENTED"
+      ]
+    }
+  },
+  "manual": {
+    "accepted": true,
+    "normalized_operation_count": 8
+  },
+  "prevalidator_block": true
+}

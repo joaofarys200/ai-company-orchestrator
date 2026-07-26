@@ -1,0 +1,72 @@
+{
+  "model": "qwen3.5:9b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Return one valid JSON object matching the supplied correction schema. No markdown or prose."
+    },
+    {
+      "role": "user",
+      "content": "Produces uma correcao minima valida para o erro indicado. Nao devolvas ficheiros inalterados.\nSchema:\n{\"type\":\"object\",\"required\":[\"plan_updates\",\"replacements\"],\"additionalProperties\":false,\"properties\":{\"plan_updates\":{\"type\":\"object\",\"properties\":{\"components\":{\"const\":[\"frontend\",\"backend\",\"persistence\",\"tests\",\"preview\"]}},\"additionalProperties\":false},\"replacements\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"path\",\"content\"],\"additionalProperties\":false,\"properties\":{\"path\":{\"type\":\"string\",\"enum\":[\"backend/server.js\",\"package.json\",\"tests/run-tests.js\"]},\"content\":{\"type\":\"string\",\"minLength\":1}}}}}}"
+    }
+  ],
+  "stream": true,
+  "think": false,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0,
+    "top_p": 0.8,
+    "num_predict": 512,
+    "num_ctx": 8192
+  },
+  "format": {
+    "type": "object",
+    "required": [
+      "plan_updates",
+      "replacements"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "plan_updates": {
+        "type": "object",
+        "properties": {
+          "components": {
+            "const": [
+              "frontend",
+              "backend",
+              "persistence",
+              "tests",
+              "preview"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "replacements": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "path",
+            "content"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "enum": [
+                "backend/server.js",
+                "package.json",
+                "tests/run-tests.js"
+              ]
+            },
+            "content": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "plan_updates": {
+    "components": [
+      "frontend",
+      "backend",
+      "persistence",
+      "tests",
+      "preview"
+    ],
+    "component_files": {
+      "frontend": [
+        "index.html"
+      ],
+      "backend": [
+        "server.js"
+      ],
+      "persistence": [
+        "server.js"
+      ],
+      "tests": [
+        "test.js"
+      ],
+      "preview": [
+        "index.html"
+      ]
+    },
+    "preview_strategy": {
+      "type": "static-server",
+      "healthcheck_path": "/health"
+    }
+  },
+  "replacements": [
+    {
+      "path": "server.js",
+      "content": "import http from 'node:http';\nimport fs from 'node:fs';\n\nconst dataPath = new URL('./data.json', import.meta.url);\nfunction readData() {\n  if (!fs.existsSync(dataPath)) return {};\n  return JSON.parse(fs.readFileSync(dataPath, 'utf8'));\n}\nfunction writeData(value) {\n  fs.writeFileSync(dataPath, JSON.stringify(value));\n}\nwriteData(readData());\n\nconst server = http.createServer((req, res) => {\n  if (req.url === '/health') {\n    res.writeHead(200);\n    res.end('OK');\n  } else {\n    res.writeHead(404);\n    res.end();\n  }\n});\n\nconst PORT = process.env.PORT || 3000;\nserver.listen(PORT, () => console.log(`Server running on port ${PORT}`));"
+    }
+  ]
+}

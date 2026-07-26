@@ -1,0 +1,51 @@
+{
+  "captured_at": "2026-07-25T23:10:26.778399+00:00",
+  "unchanged_since_live_run": false,
+  "changed_trees": [
+    "workspace_projects",
+    "mission_metadata"
+  ],
+  "tree_changes": {
+    "workspace_projects": {
+      "before": {
+        "exists": true,
+        "file_count": 28,
+        "total_bytes": 29916,
+        "tree_sha256": "19ef89052044a5bc45a7fd2922be5a4570cc476733118dee09d7b9c38ebff4fa"
+      },
+      "after": {
+        "exists": true,
+        "file_count": 35,
+        "total_bytes": 31076,
+        "tree_sha256": "49266549b55926c911d73530609e19ef000ade2032769d7f077908dd7919faa4"
+      }
+    },
+    "mission_metadata": {
+      "before": {
+        "exists": true,
+        "file_count": 1840,
+        "total_bytes": 65181448,
+        "tree_sha256": "4d05ff8cdcbcec4f5551be25f5efb2ed18b99e36fa67c36ba30fe27446f53356"
+      },
+      "after": {
+        "exists": true,
+        "file_count": 1901,
+        "total_bytes": 67719504,
+        "tree_sha256": "11dd2c34bc8b2bb9ec59943c33750201877bf84129f3023b5a11c86948e338b4"
+      }
+    }
+  },
+  "critical_file_changes": {},
+  "observed_test_outputs": {
+    "new_project_builder_journals": 61,
+    "new_workspace_project_fixture_files": 2,
+    "rewritten_project_metadata_files": [
+      "workspace/.jarvis/projects/flight-recorder-integration/project_context.json",
+      "workspace/.jarvis/projects/flight-recorder-integration/symbols_index.json",
+      "workspace/.jarvis/projects/task-app/project_context.json",
+      "workspace/.jarvis/projects/task-app/symbols_index.json"
+    ]
+  },
+  "attribution": "Observed after the prescribed full pytest run; journal contents and paths identify ProjectBuilder test fixtures. The live diagnostic before/after comparison remained unchanged.",
+  "cleanup_performed": false
+}

@@ -1,0 +1,60 @@
+{
+  "case_id": "B07_TOOL_SELECTION",
+  "repetition": 2,
+  "status": "SUCCEEDED",
+  "harness_passed": true,
+  "semantic_passed": true,
+  "passed": true,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "tool_name": "read_file",
+      "arguments": {
+        "path": "config.json"
+      }
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "criteria": [
+    {
+      "criterion": "read_only_tool",
+      "passed": true,
+      "evidence": "tool='read_file'"
+    },
+    {
+      "criterion": "correct_path",
+      "passed": true,
+      "evidence": "arguments={'path': 'config.json'}"
+    }
+  ],
+  "response_sha256": "07523e9769f5551c640df390c5266669b27fb94f7368f6e68ec8763d3c4e7bc2",
+  "response_bytes": 78,
+  "wall_latency_ms": 3152,
+  "harness_latency_ms": 3152,
+  "usage": {
+    "input_tokens": 55,
+    "output_tokens": 32,
+    "total_tokens": 87
+  },
+  "provider_metrics": {
+    "done": true,
+    "done_reason": "stop",
+    "total_duration_ns": 2967820700,
+    "load_duration_ns": 1167789400,
+    "prompt_eval_count": 55,
+    "prompt_eval_duration_ns": 112415000,
+    "eval_count": 32,
+    "eval_duration_ns": 1675744000,
+    "tokens_per_second": 19.096
+  }
+}

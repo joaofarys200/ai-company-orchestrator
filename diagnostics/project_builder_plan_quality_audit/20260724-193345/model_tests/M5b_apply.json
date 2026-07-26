@@ -1,0 +1,93 @@
+{
+  "name": "M5b_apply",
+  "model": "qwen3.5:9b",
+  "status_code": 200,
+  "duration_seconds": 4.565,
+  "chunks": 42,
+  "raw_bytes": 5550,
+  "content_characters": 185,
+  "content_sha256": "14c1645d989c4300e85adc211933dbced1286b22796774deed93346771639696",
+  "done_reason": "stop",
+  "error": null,
+  "content": "{\n  \"plan_updates\": {\n    \"components\": [\"frontend\",\"backend\",\"persistence\",\"tests\",\"preview\"],\n    \"preview_strategy\": {\"healthcheck_path\":\"/health\"}\n  },\n  \"replacements\": [\n    ]\n  }",
+  "payload": {
+    "model": "qwen3.5:9b",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Es um gerador de planos de projeto. Responde apenas JSON valido, sem markdown ou prosa. Nao chames ferramentas nem reveles raciocinio interno. Nao uses Obsidian. Nao escrevas ficheiros .md para codigo. Todos os paths devem ser relativos ao projeto. Os testes devem exercitar entrypoints e componentes reais; testes triviais nao sao validacao. Como instalacoes arbitrarias sao bloqueadas, prefere standard-library sem dependencias externas."
+      },
+      {
+        "role": "user",
+        "content": "Cria um plano que cumpra este schema autoritativo:\n{\"type\":\"object\",\"additional_properties\":false,\"properties\":{\"project_name\":{\"type\":\"string\",\"required\":true,\"non_empty\":true},\"stack\":{\"type\":\"string\",\"required\":true,\"non_empty\":true},\"components\":{\"type\":\"array[string]\",\"required\":false,\"default\":[],\"allowed_items\":[\"frontend\",\"backend\",\"persistence\",\"tests\",\"preview\"]},\"files\":{\"type\":\"array[object]\",\"required\":true,\"min_items\":1,\"max_items\":40,\"item_schema\":{\"type\":\"object\",\"additional_properties\":false,\"properties\":{\"path\":{\"type\":\"string\",\"required\":true,\"non_empty\":true},\"content\":{\"type\":\"string\",\"required\":true}}}},\"dependencies\":{\"type\":\"array[string]\",\"required\":false,\"default\":[]},\"setup_commands\":{\"type\":\"array[string]\",\"required\":false,\"default\":[]},\"validation_commands\":{\"type\":\"array[string]\",\"required\":false,\"default\":[]},\"entrypoints\":{\"type\":\"array[string]\",\"required\":false,\"default\":[]},\"preview_strategy\":{\"type\":\"object\",\"required\":false,\"default\":{},\"additional_properties\":true},\"preview_command\":{\"type\":\"string\",\"required\":false,\"default\":\"\"},\"constraints\":{\"type\":\"array[string]\",\"required\":false,\"default\":[]},\"component_files\":{\"type\":\"object[array[string]]\",\"required\":false,\"default\":{}},\"rationale\":{\"type\":\"string\",\"required\":false,\"default\":\"\"}}}\nOs paths em files devem ser unicos e entrypoints deve ser sempre array de strings. Nao omitas campos obrigatorios nem adiciones propriedades desconhecidas. Os comandos executam no root do projeto e devem terminar rapidamente. Pedido e constraints obrigatorias:\n\nSchema correction required (structured):\n{\"protocol\":\"project_builder_focal_correction_v2\",\"instruction\":\"Correct only the listed semantic errors. Do not regenerate or return the complete plan. This is the second and final model call; there is no third correction.\",\"response_schema\":{\"plan_updates\":{\"description\":\"only plan fields actually changed, each containing its complete final value\",\"allowed_fields\":[\"component_files\",\"components\",\"preview_strategy\"],\"value_semantics\":\"complete final values only; never append, add, patch or delta operations\"},\"replacements\":[{\"path\":\"one existing path from allowed_replacements\",\"content\":\"complete corrected file content\"}]},\"model_generated_manifest_forbidden\":true,\"errors\":[{\"error_code\":\"MISSING_REQUESTED_COMPONENTS\",\"messages\":[\"Plano nao promete componentes pedidos: ['preview'].\"],\"evidence\":[{\"field_path\":\"components\",\"expected\":\"array containing requested components\",\"actual\":\"<array items=4>\"}],\"required_postconditions\":[\"Adiciona os componentes pedidos e os respetivos ficheiros reais.\"],\"allowed_plan_updates\":[\"components\"],\"allowed_replacements\":[],\"file_creation_allowed\":false},{\"error_code\":\"MISSING_COMPONENT_MAPPING\",\"messages\":[\"Plano full stack sem component_files para: ['frontend', 'backend'].\"],\"evidence\":[{\"field_path\":\"component_files\",\"expected\":\"object[array[string]]\",\"actual\":\"<object items=0>\"}],\"required_postconditions\":[\"Mapeia frontend e backend para ficheiros que existam no plano.\"],\"allowed_plan_updates\":[\"component_files\"],\"allowed_replacements\":[],\"file_creation_allowed\":false},{\"error_code\":\"DECLARED_COMPONENT_WITHOUT_ARTIFACTS\",\"messages\":[\"O componente declarado frontend nao tem nenhum artefacto real mapeado.\",\"O componente declarado backend nao tem nenhum artefacto real mapeado.\",\"O componente declarado persistence nao tem nenhum artefacto real mapeado.\",\"O componente declarado tests nao tem nenhum artefacto real mapeado.\"],\"evidence\":[{\"field_path\":\"component_files.frontend\",\"expected\":\"at least one component_files path present in the planned files\",\"actual\":\"[]\",\"component\":\"frontend\",\"received_mapping\":\"[]\",\"expected_artifacts\":\"at least one component_files path present in the planned files\"},{\"field_path\":\"component_files.backend\",\"expected\":\"at least one component_files path present in the planned files\",\"actual\":\"[]\",\"component\":\"backend\",\"received_mapping\":\"[]\",\"expected_artifacts\":\"at least one component_files path present in the planned files\"},{\"field_path\":\"component_files.persistence\",\"expected\":\"at least one component_files path present in the planned files\",\"actual\":\"[]\",\"component\":\"persistence\",\"received_mapping\":\"[]\",\"expected_artifacts\":\"at least one component_files path present in the planned files\"},{\"field_path\":\"component_files.tests\",\"expected\":\"at least one component_files path present in the planned files\",\"actual\":\"[]\",\"component\":\"tests\",\"received_mapping\":\"[]\",\"expected_artifacts\":\"at least one component_files path present in the planned files\"}],\"required_postconditions\":[\"component_files.frontend must contain at least one existing planned artifact.\",\"component_files.backend must contain at least one existing planned artifact.\",\"component_files.persistence must contain at least one existing planned artifact.\",\"component_files.tests must contain at least one existing planned artifact.\"],\"allowed_plan_updates\":[\"component_files\"],\"allowed_replacements\":[],\"file_creation_allowed\":false},{\"error_code\":\"PERSISTENCE_NOT_IMPLEMENTED\",\"messages\":[\"O componente persistence nao demonstra leitura e escrita duravel; estado em memoria nao e persistencia.\"],\"evidence\":[{\"field_path\":\"component_files.persistence\",\"expected\":\"mapped artifact implementing durable read and write operations\",\"actual\":\"no durable read/write mechanism in mapped persistence artifacts\",\"component\":\"persistence\",\"persistence_artifacts\":[],\"durability_evidence\":\"no durable read/write mechanism in mapped persistence artifacts\"}],\"required_postconditions\":[\"A mapped existing artifact must implement durable read and write operations.\",\"Module arrays, objects, Map, Set or variables alone do not satisfy persistence.\",\"For dependency-free Node.js plans, node:fs or node:fs/promises may implement the durable storage.\"],\"allowed_plan_updates\":[\"component_files\"],\"allowed_replacements\":[],\"file_creation_allowed\":false},{\"error_code\":\"MISSING_HEALTH_ROUTE\",\"messages\":[\"Nenhum artefacto backend contem evidencia textual da rota /health.\"],\"evidence\":[{\"field_path\":\"preview_strategy.healthcheck_path\",\"target\":\"/health\",\"expected\":\"health route in a mapped backend artifact\",\"actual\":\"route not found\"}],\"required_postconditions\":[\"A mapped backend artifact must implement the declared health route /health.\"],\"allowed_plan_updates\":[\"preview_strategy\"],\"allowed_replacements\":[],\"file_creation_allowed\":false}],\"allowed_plan_updates\":[\"component_files\",\"components\",\"preview_strategy\"],\"plan_update_context\":{\"components\":{\"original_complete_value\":[\"frontend\",\"backend\",\"persistence\",\"tests\"],\"missing_requested_components\":[\"preview\"],\"expected_final_complete_value\":[\"frontend\",\"backend\",\"persistence\",\"tests\",\"preview\"]}},\"plan_update_semantics\":{\"mandatory_rule\":\"plan_updates não usa operações append, add, patch ou delta. Cada campo contém o seu valor final completo.\",\"mandatory_components_example\":{\"Original\":[\"frontend\",\"backend\",\"persistence\",\"tests\"],\"Inválido\":[\"preview\"],\"Válido\":[\"frontend\",\"backend\",\"persistence\",\"tests\",\"preview\"]}},\"allowed_replacements\":[],\"replacement_allowlist_semantics\":{\"mandatory_rule\":\"The files in allowed_replacements are an allowlist, not a list of mandatory changes.\",\"rules\":[\"Return only files whose final content is actually different from the original content.\",\"Before including a replacement, silently compare it byte for byte with the original content.\",\"If the content is identical byte for byte, omit the replacement.\",\"An error may be resolved by changing only a subset of its allowed files.\"],\"mandatory_subset_example\":{\"allowed_replacements\":[\"tests/run-tests.js\",\"backend/server.js\"],\"condition\":\"Only tests/run-tests.js needs to change.\",\"valid_response_fragment\":{\"replacements\":[{\"path\":\"tests/run-tests.js\",\"content\":\"<complete corrected content of tests/run-tests.js>\"}]},\"must_be_omitted\":[\"backend/server.js\"]}},\"affected_files\":{},\"test_entrypoint_contracts\":[],\"requirements\":[\"Do not regenerate or return the complete project plan.\",\"Do not return files whose content is unchanged.\",\"Do not create, remove or rename files unless an error explicitly allows it.\",\"Return the complete content of every replaced file, never a partial patch.\",\"Treat every required_postcondition as mandatory; do not discuss or bypass it.\",\"Do not change artifacts outside the per-error allowlists.\",\"Do not return correction_manifest, changed_artifacts or any field outside response_schema.\",\"Every plan_updates field must contain its complete final value, never an append/add/patch/delta.\",\"Allowed replacement files are optional candidates; return only the changed subset.\",\"Return exactly one valid JSON object without markdown or additional text.\"],\"silent_verification_before_response\":[\"Every error is actually resolved.\",\"Every returned plan update or replacement has a real content or value change.\",\"Every replacement path is allowed and appears exactly once.\",\"No artifact outside the requested scope changed.\",\"Every returned file has a content hash different from its original hash.\",\"components contains the complete final array, not only newly added components.\",\"The response is syntactically valid JSON matching response_schema.\"]}\n\nApply only the approved diagnosis below. Keep the path namespace closed to [\"package.json\", \"server.js\", \"index.html\", \"test.js\"]. Do not create paths. Diagnosis:\n{\n  \"required_changes\": [\n    \"Add 'preview' to the components list.\",\n    \"Map all existing files (package.json, server.js, index.html, test.js) into their respective component categories: frontend, backend, persistence, tests, preview.\",\n    \"Update package.json and/or server.js to include a /health route implementation.\"\n  ],\n  \"existing_paths\": [\n    \"package.json\",\n    \"server.js\",\n    \"index.html\",\n    \"test.js\"\n  ],\n  \"blocked_changes\": [],\n  \"dependencies\": []\n}"
+      }
+    ],
+    "stream": true,
+    "think": false,
+    "keep_alive": "15m",
+    "options": {
+      "temperature": 0,
+      "top_p": 0.8,
+      "num_predict": 2048,
+      "num_ctx": 8192
+    },
+    "format": {
+      "type": "object",
+      "required": [
+        "plan_updates",
+        "replacements"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "plan_updates": {
+          "type": "object",
+          "properties": {
+            "component_files": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "components": {
+              "const": [
+                "frontend",
+                "backend",
+                "persistence",
+                "tests",
+                "preview"
+              ]
+            },
+            "preview_strategy": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
+        "replacements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "content"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "maxItems": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,230 @@
+{
+  "model": "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M",
+  "stream": false,
+  "think": false,
+  "format": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://local.invalid/project-builder/compact-patch-response.schema.json",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "error_resolutions",
+      "operations"
+    ],
+    "properties": {
+      "error_resolutions": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "error_code",
+            "operation_ids"
+          ],
+          "properties": {
+            "error_code": {
+              "enum": [
+                "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+                "MISSING_COMPONENT_MAPPING",
+                "MISSING_HEALTH_ROUTE",
+                "MISSING_REQUESTED_COMPONENTS",
+                "PERSISTENCE_NOT_IMPLEMENTED"
+              ]
+            },
+            "operation_ids": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 12,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "maxLength": 36
+              }
+            }
+          }
+        }
+      },
+      "operations": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 12,
+        "items": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "op",
+                "value"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^op-[A-Za-z0-9_-]{1,32}$",
+                  "maxLength": 36
+                },
+                "op": {
+                  "const": "set_components"
+                },
+                "value": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 5,
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "frontend",
+                      "backend",
+                      "persistence",
+                      "tests",
+                      "preview"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "op",
+                "component",
+                "paths"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^op-[A-Za-z0-9_-]{1,32}$",
+                  "maxLength": 36
+                },
+                "op": {
+                  "const": "set_component_files"
+                },
+                "component": {
+                  "enum": [
+                    "frontend",
+                    "backend",
+                    "persistence",
+                    "tests",
+                    "preview"
+                  ]
+                },
+                "paths": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 5,
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "index.html",
+                      "package.json",
+                      "server.js",
+                      "test.js"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "op",
+                "field",
+                "value"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^op-[A-Za-z0-9_-]{1,32}$",
+                  "maxLength": 36
+                },
+                "op": {
+                  "const": "set_preview_strategy"
+                },
+                "field": {
+                  "enum": [
+                    "enabled",
+                    "method",
+                    "healthcheck_path",
+                    "command"
+                  ]
+                },
+                "value": {
+                  "type": "string",
+                  "maxLength": 64
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "op",
+                "path",
+                "transform",
+                "parameters",
+                "expected_sha256"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^op-[A-Za-z0-9_-]{1,32}$",
+                  "maxLength": 36
+                },
+                "op": {
+                  "const": "apply_code_transform"
+                },
+                "path": {
+                  "enum": [
+                    "server.js"
+                  ]
+                },
+                "transform": {
+                  "enum": [
+                    "ADD_JSON_FILE_PERSISTENCE",
+                    "PRESERVE_HEALTH_ROUTE",
+                    "EXPORT_SERVER_FOR_TESTS",
+                    "PRESERVE_HTTP_IMPORT"
+                  ]
+                },
+                "parameters": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "storage_filename": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_.-]{1,64}\\.json$",
+                      "maxLength": 64
+                    }
+                  }
+                },
+                "expected_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "options": {
+    "temperature": 0,
+    "top_p": 0.8,
+    "num_ctx": 8192
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are returning a compact typed correction protocol for a validated project plan.\nResolve every listed error.\nEvery error code must appear exactly once in error_resolutions.\nDo not generate source code. Do not create paths. Do not omit plan operations.\nUse only the closed operation catalog and registered transforms.\nA response with incomplete error coverage is invalid.\nProject: health-boundary-probe | stack: nodejs-standard-library\nAllowed existing paths: [\"package.json\", \"server.js\", \"index.html\", \"test.js\"]\nInitial server.js SHA-256: 5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31\nInitial components: [frontend, backend, persistence, tests]; requested component: preview.\nInitial preview strategy exists and must remain coherent; existing server.js contains /health.\nInitial errors:\n- MISSING_REQUESTED_COMPONENTS: Plano nao promete componentes pedidos: ['preview']. Acao: Adiciona os componentes pedidos e os respetivos ficheiros reais.\n- MISSING_COMPONENT_MAPPING: Plano full stack sem component_files para: ['frontend', 'backend']. Acao: Mapeia frontend e backend para ficheiros que existam no plano.\n- DECLARED_COMPONENT_WITHOUT_ARTIFACTS: O componente declarado frontend nao tem nenhum artefacto real mapeado. Acao: Mapeia frontend para pelo menos um ficheiro existente que implemente o componente.\n- PERSISTENCE_NOT_IMPLEMENTED: O componente persistence nao demonstra leitura e escrita duravel; estado em memoria nao e persistencia. Acao: Associa persistence a um artefacto existente que implemente leitura e escrita duravel.\n- MISSING_HEALTH_ROUTE: Nenhum artefacto backend contem evidencia textual da rota /health. Acao: Implementa a rota de healthcheck no backend associado.\nOperation catalog:\n- set_components: value is the complete final component array.\n- set_component_files: component plus complete final paths array.\n- set_preview_strategy: field and final value; healthcheck_path must be /health.\n- apply_code_transform: path server.js, transform and parameters, expected_sha256.\nTransform catalog:\n- ADD_JSON_FILE_PERSISTENCE: only server.js; adds node:fs, deterministic JSON path, durable read/write and missing-file handling; preserves node:http and /health; no external dependencies.\n- PRESERVE_HEALTH_ROUTE, EXPORT_SERVER_FOR_TESTS, PRESERVE_HTTP_IMPORT: preservation transforms only where their preconditions apply.\nError to operation compatibility:\n- MISSING_REQUESTED_COMPONENTS -> set_components\n- MISSING_COMPONENT_MAPPING -> set_component_files\n- DECLARED_COMPONENT_WITHOUT_ARTIFACTS -> set_component_files\n- PERSISTENCE_NOT_IMPLEMENTED -> apply_code_transform ADD_JSON_FILE_PERSISTENCE on server.js\n- MISSING_HEALTH_ROUTE -> set_component_files backend server.js when /health already exists\nThe response must contain exactly two top-level keys: error_resolutions and operations.\nEach operation id must be unique and each referenced operation id must exist.\nUse no replace_file_content, replace_text, arbitrary code, file creation, diff, JSON Patch, append, retry or autorepair.\nReturn JSON only."
+    }
+  ]
+}

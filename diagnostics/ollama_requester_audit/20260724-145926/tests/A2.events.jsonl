@@ -1,0 +1,7 @@
+{"event": "call_started", "wall_time": "2026-07-24T14:04:06.088963+00:00", "monotonic_offset": 0.000284, "stream": false, "format": null, "payload_bytes": 239}
+{"event": "headers_received", "wall_time": "2026-07-24T14:04:07.957430+00:00", "monotonic_offset": 1.868623, "status_code": 200, "headers": {"content-type": "application/json; charset=utf-8", "date": "Fri, 24 Jul 2026 14:04:07 GMT", "content-length": "309"}}
+{"event": "first_byte", "wall_time": "2026-07-24T14:04:07.958041+00:00", "monotonic_offset": 1.868946, "bytes": 309}
+{"event": "first_http_chunk", "wall_time": "2026-07-24T14:04:07.958041+00:00", "monotonic_offset": 1.868951, "bytes": 309}
+{"event": "valid_json_object", "wall_time": "2026-07-24T14:04:07.958041+00:00", "monotonic_offset": 1.868978, "index": 1}
+{"event": "first_non_empty_content", "wall_time": "2026-07-24T14:04:07.958041+00:00", "monotonic_offset": 1.868983, "characters": 12}
+{"event": "generation_done", "wall_time": "2026-07-24T14:04:07.958041+00:00", "monotonic_offset": 1.868986, "done_reason": "stop"}

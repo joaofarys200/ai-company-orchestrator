@@ -1,0 +1,17 @@
+{
+  "input/original_plan.json": "83318b1eba01bb28619f9d9111a6c7b4663dc8bfb160959d231cd26f4672f2e9",
+  "input/initial_errors.json": "07d83dcb5d342fc8e81b3d640d20a2eac520882a85846f6dfb2536f73aa09c5f",
+  "scope_derivation.json": "b90a972b25200db6b3f3e073864b693b9eca8fcfd19368ffc04c0f63b764f7d3",
+  "operations.schema.json": "a80d9d2ce7832db89c16b66d2e7a5b3577e850ecc348f1f47a265e85111627d5",
+  "model_prompt_used.txt": "d36ac6f6a94b2400a26f850ab193f73171644d0e310ea36d0f6872eda3a6575b",
+  "model_request.json": "604dbd4710cd2cb280287479c9326a4d7a8efa8ecc4d448a0c475b555743929e",
+  "model_response_raw.txt": "5925f58455857c47353bd07a6fbd42d8de79e12c504b6ccc1725d61afc7bfbce",
+  "model_operations.json": "3668b07695bec86ae73cc4330b08eb5d7e7c368d5c8b2613955def7d10976fca",
+  "model_normalized_operations.json": "13a566d6c0a3874ea7fd3891d0156743431dd8932794620b615f81dc6d17e1b5",
+  "model_validation.json": "e057a34eae3f7d6339d6e29f7702902e8e98855c11d24d0dca0291991a5ff60c",
+  "manual_operations.json": "d0949f177eb2ef520980f443e0cacaa88dbb8b20b660e85a6b89d2937db9fa5d",
+  "manual_composed_plan.json": "0de51c70918915e6526720d3c9fae0992acc2a6a6dd07bbd3230d8dfb934e935",
+  "manual_changes.json": "d254c0317e0daf0d228fa5b908d52e613f3b8925f092bfdecbce9d0524de560a",
+  "manual_validation.json": "271cb4bc3bf6541f287faf6bed3131a070fe7eb420f6909ffe7cfeb05183b063",
+  "FINAL_REPORT.md": "d0d8626227e89475073dbce585acd610922abb2bdce1ddbff4dd383f3e6f9d57"
+}

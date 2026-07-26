@@ -1,0 +1,16 @@
+{
+  "model": "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M",
+  "created_at": "2026-07-24T21:00:38.2751401Z",
+  "message": {
+    "role": "assistant",
+    "content": "{\n  \"operations\": [\n    {\n      \"op\": \"set_components\",\n      \"value\": [\n        \"backend\",\n        \"frontend\",\n        \"persistence\",\n        \"preview\",\n        \"tests\"\n      ]\n    },\n    {\n      \"op\": \"set_component_files\",\n      \"component\": \"preview\",\n      \"paths\": [\n        \"index.html\"\n      ]\n    },\n    {\n      \"op\": \"set_component_files\",\n      \"component\": \"backend\",\n      \"paths\": [\n        \"server.js\"\n      ]\n    },\n    {\n      \"op\": \"set_component_files\",\n      \"component\": \"persistence\",\n      \"paths\": [\n        \"server.js\"\n      ]\n    },\n    {\n      \"op\": \"set_component_files\",\n      \"component\": \"tests\",\n      \"paths\": [\n        \"test.js\"\n      ]\n    },\n    {\n      \"op\": \"set_component_files\",\n      \"component\": \"frontend\",\n      \"paths\": [\n        \"index.html\"\n      ]\n    },\n    {\n      \"op\": \"set_preview_strategy\",\n      \"field\": \"enabled\",\n      \"value\": {\n        \"enabled\": true\n      }\n    },\n    {\n      \"op\": \"set_preview_strategy\",\n      \"field\": \"method\",\n      \"value\": {\n        \"method\": \"static-server\"\n      }\n    },\n    {\n      \"op\": \"set_preview_strategy\",\n      \"field\": \"healthcheck_path\",\n      \"value\": {\n        \"healthcheck_path\": \"/health\"\n      }\n    },\n    {\n      \"op\": \"set_preview_strategy\",\n      \"field\": \"command\",\n      \"value\": {\n        \"command\": \"node server.js\"\n      }\n    }\n  ]\n}"
+  },
+  "done": true,
+  "done_reason": "stop",
+  "total_duration": 28283892300,
+  "load_duration": 10686063000,
+  "prompt_eval_count": 2583,
+  "prompt_eval_duration": 2545248000,
+  "eval_count": 430,
+  "eval_duration": 15010255000
+}

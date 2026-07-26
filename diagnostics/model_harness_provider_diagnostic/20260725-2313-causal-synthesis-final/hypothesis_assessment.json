@@ -1,0 +1,181 @@
+{
+  "H1_SCHEMA_COMPLEXITY": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "full_schema_direct": "SUCCEEDED",
+      "all_schema_reductions": [
+        "SUCCEEDED",
+        "SUCCEEDED",
+        "SUCCEEDED",
+        "SUCCEEDED",
+        "SUCCEEDED"
+      ]
+    }
+  },
+  "H2_PROVIDER_ADAPTER": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "direct": "SUCCEEDED",
+      "harness": "SUCCEEDED",
+      "same_provider_adapter": true
+    }
+  },
+  "H3_STREAM_HANDLING": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "buffered": "SUCCEEDED",
+      "streamed": "SUCCEEDED",
+      "first_streamed_token_observed": true
+    }
+  },
+  "H4_TOOL_AND_FORMAT_COMBINATION": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "all_tools_full_schema": "SUCCEEDED"
+    }
+  },
+  "H5_CONTEXT_OR_OUTPUT_OPTIONS": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "stateful_prompt_no_schema": "SUCCEEDED",
+      "exact_options_full_request": "SUCCEEDED"
+    }
+  },
+  "H6_HTTP_TIMEOUT_LAYER": {
+    "status": "SUPPORTED",
+    "evidence": {
+      "controlled_exception": {
+        "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+        "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+        "classification": "READ_TIMEOUT",
+        "class": "ReadTimeout",
+        "module": "httpx",
+        "stage": "T13",
+        "timeout_type": "read",
+        "errno": null,
+        "status_http": null,
+        "message_redacted": "",
+        "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "causes": [
+          {
+            "class": "ReadTimeout",
+            "module": "httpx",
+            "message_redacted": "",
+            "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "errno": null,
+            "status_http": null
+          },
+          {
+            "class": "ReadTimeout",
+            "module": "httpcore",
+            "message_redacted": "",
+            "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "errno": null,
+            "status_http": null
+          },
+          {
+            "class": "TimeoutError",
+            "module": "builtins",
+            "message_redacted": "",
+            "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "errno": null,
+            "status_http": null
+          },
+          {
+            "class": "CancelledError",
+            "module": "asyncio.exceptions",
+            "message_redacted": "Cancelled via cancel scope 1fbc83efaa0; reason: deadline exceeded",
+            "message_sha256": "480a89bc442b7c6f81b9c6c4a2fd4fbe010b8623572cd6f9c9024749c2a2ed3b",
+            "errno": null,
+            "status_http": null
+          }
+        ],
+        "traceback": [
+          {
+            "file": "backend/model_harness/benchmarking/provider_diagnostic.py",
+            "line": 1714,
+            "function": "direct_ollama_call"
+          },
+          {
+            "file": "contextlib.py",
+            "line": 210,
+            "function": "__aenter__"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1583,
+            "function": "stream"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1629,
+            "function": "send"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1657,
+            "function": "_send_handling_auth"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1694,
+            "function": "_send_handling_redirects"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1730,
+            "function": "_send_single_request"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+            "line": 393,
+            "function": "handle_async_request"
+          },
+          {
+            "file": "contextlib.py",
+            "line": 158,
+            "function": "__exit__"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+            "line": 118,
+            "function": "map_httpcore_exceptions"
+          }
+        ]
+      },
+      "historical_http_500_after_5m": 8,
+      "historical_partial_output": false
+    }
+  },
+  "H7_OLLAMA_RUNTIME": {
+    "status": "SUPPORTED",
+    "evidence": {
+      "runner_chain_proven": true,
+      "cuda_load_failure": "FOUND",
+      "clean_controls_pass": true
+    }
+  },
+  "H8_HARNESS_RESPONSE_PATH": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "direct": "SUCCEEDED",
+      "harness": "SUCCEEDED"
+    }
+  },
+  "H9_REQUEST_SERIALIZATION": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "exact_direct": "SUCCEEDED",
+      "exact_harness": "SUCCEEDED",
+      "same_payload_sha256": true
+    }
+  },
+  "H10_MODEL_COLD_OR_RELOAD": {
+    "status": "PARTIALLY_SUPPORTED",
+    "evidence": {
+      "historical_stuck_slot": true,
+      "isolated_runner_controls_pass": true,
+      "underlying_trigger_proven": false
+    }
+  }
+}

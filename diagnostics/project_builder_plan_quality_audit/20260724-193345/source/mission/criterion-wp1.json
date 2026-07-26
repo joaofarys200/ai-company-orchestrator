@@ -1,0 +1,18 @@
+{
+  "criterion_id": "criterion-wp1",
+  "mission_id": "mission-9864320f2fa3",
+  "owner_type": "WORK_PACKAGE",
+  "owner_id": "wp1",
+  "description": "O ProjectBuilder deve produzir evidence tecnica observavel.",
+  "status": "PENDING",
+  "required_evidence_kinds": [
+    "VALIDATION"
+  ],
+  "evidence_refs": [],
+  "validated_at": null,
+  "validation_note": "",
+  "required": true,
+  "created_at": "2026-07-24T15:12:04.837597+00:00",
+  "updated_at": "2026-07-24T15:12:04.837597+00:00",
+  "version": 1
+}

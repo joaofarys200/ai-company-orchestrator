@@ -1,0 +1,19 @@
+{
+  "done": true,
+  "done_reason": "stop",
+  "json_valid": true,
+  "schema_valid": true,
+  "coverage": false,
+  "binding": true,
+  "apply": false,
+  "validators": false,
+  "errors": [
+    {
+      "code": "UNKNOWN_OPERATION_REFERENCE",
+      "message": "error_resolutions references unknown operation",
+      "details": {
+        "operation_id": "op_01"
+      }
+    }
+  ]
+}

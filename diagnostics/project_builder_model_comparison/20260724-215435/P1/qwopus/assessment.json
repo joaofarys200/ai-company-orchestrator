@@ -1,0 +1,22 @@
+{
+  "case": "qwopus",
+  "done": true,
+  "done_reason": "stop",
+  "json_valid": true,
+  "schema_valid": true,
+  "operations_valid": false,
+  "server_js_operation": false,
+  "persistence_operation": false,
+  "plan_operations": 10,
+  "invented_paths": [],
+  "validators_valid": false,
+  "errors": [
+    {
+      "code": "INVALID_FIELD_TYPE",
+      "message": "Invalid value for preview field: enabled",
+      "details": {
+        "field": "enabled"
+      }
+    }
+  ]
+}

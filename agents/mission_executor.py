@@ -8,6 +8,12 @@ from dataclasses import asdict, dataclass, field, is_dataclass
 from datetime import datetime, timezone
 from typing import Any, Awaitable, Callable
 
+from agents.executors import (
+    ExecutorNotFoundError,
+    ExecutorRegistry,
+    WorkPackageExecutionContext,
+    create_default_executor_registry,
+)
 from agents.mission_state import (
     AcceptanceCriterion,
     Deliverable,
@@ -19,6 +25,7 @@ from agents.mission_state import (
     utc_now,
 )
 from agents.orchestrator.project_builder import ProjectBuildResult, build_project
+from agents.orchestrator.flight_recorder import ProjectBuilderFlightRecorder, recorder_directory
 from intelligence.coding_session import CodingSession, CodingSessionService
 from intelligence.project_context import ProjectContextService
 
@@ -35,8 +42,6 @@ EXECUTION_STATUSES = {
 }
 ACTIVE_LOCK_STATUSES = {"PENDING", "RUNNING", "WAITING_FOR_REVIEW"}
 RETRYABLE_STATUSES = {"FAILED", "VALIDATION_FAILED", "CANCELLED"}
-SUPPORTED_EXECUTORS = {"CODING", "PROJECT_BUILD"}
-UNSUPPORTED_EXECUTORS = {"RESEARCH", "DOCUMENT", "EXPERIMENT", "REVIEW", "GENERIC"}
 
 
 class MissionExecutionError(MissionStateError):
@@ -88,6 +93,7 @@ class MissionExecutorService:
         project_builder_runner: ProjectBuilderRunner | None = None,
         stale_lock_min_age_seconds: float | None = None,
         owner_id: str | None = None,
+        executor_registry: ExecutorRegistry | None = None,
     ):
         self.workspace_root = os.path.realpath(os.path.abspath(workspace_root))
         self.mission_state = mission_state or MissionStateStore(self.workspace_root)
@@ -104,26 +110,11 @@ class MissionExecutorService:
                 configured_age = 300.0
         self.stale_lock_min_age_seconds = max(1.0, float(configured_age))
         self.owner_id = owner_id or f"mission-executor:{os.getpid()}:{uuid.uuid4().hex[:12]}"
+        self.executor_registry = executor_registry or create_default_executor_registry()
 
     @staticmethod
     def registry() -> dict[str, dict[str, Any]]:
-        return {
-            "CODING": {
-                "supported": True,
-                "executor": "CodingSession",
-                "requires_apply_approval": True,
-            },
-            "PROJECT_BUILD": {
-                "supported": True,
-                "executor": "ProjectBuilder",
-                "requires_apply_approval": False,
-            },
-            "RESEARCH": {"supported": False, "executor": None},
-            "DOCUMENT": {"supported": False, "executor": None},
-            "EXPERIMENT": {"supported": False, "executor": None},
-            "REVIEW": {"supported": False, "executor": None},
-            "GENERIC": {"supported": False, "executor": None},
-        }
+        return create_default_executor_registry().describe()
 
     def load_snapshot(self, project_id: str, mission_id: str) -> dict[str, Any]:
         snapshot = self.mission_state.load_mission(project_id, mission_id)
@@ -131,10 +122,13 @@ class MissionExecutorService:
             snapshot.get("executions") or [],
             key=lambda item: (str(item.get("updated_at") or ""), str(item.get("execution_id") or "")),
         )
-        snapshot["executor_registry"] = self.registry()
+        snapshot["executor_registry"] = self.executor_registry.describe()
         snapshot["read_only_execution"] = False
         snapshot["controlled_execution"] = True
         snapshot["autonomous_execution"] = False
+        snapshot["autonomy_available"] = bool(
+            self.executor_registry.available_for_autonomy()
+        )
         return snapshot
 
     async def execute_work_package(
@@ -145,6 +139,7 @@ class MissionExecutorService:
         expected_mission_version: int,
         expected_work_package_version: int,
         test_mode: bool = False,
+        autonomous: bool = False,
     ) -> dict[str, Any]:
         execution = self._begin_execution(
             project_id,
@@ -153,7 +148,12 @@ class MissionExecutorService:
             expected_mission_version,
             expected_work_package_version,
         )
-        return await self._run_started_execution(project_id, execution, test_mode=test_mode)
+        return await self._run_started_execution(
+            project_id,
+            execution,
+            test_mode=test_mode,
+            autonomous=autonomous,
+        )
 
     def apply_execution(
         self,
@@ -430,7 +430,7 @@ class MissionExecutorService:
         if attempt > 1 and not self._dependencies_satisfied(work_package, packages):
             raise MissionExecutionError("O WorkPackage deixou de ser elegivel para retry.")
         executor_kind = self._executor_kind(work_package)
-        if executor_kind not in SUPPORTED_EXECUTORS:
+        if not self.executor_registry.is_supported(executor_kind):
             raise ExecutorUnavailableError(
                 f"Executor indisponivel para {executor_kind}; o WorkPackage permanece READY."
             )
@@ -521,24 +521,45 @@ class MissionExecutorService:
         project_id: str,
         execution: MissionExecution,
         test_mode: bool,
+        autonomous: bool = False,
     ) -> dict[str, Any]:
         try:
-            if execution.executor_kind == "CODING":
-                snapshot = await self._prepare_coding_execution(project_id, execution)
-                if test_mode:
-                    current = self._execution_from_snapshot(snapshot, execution.execution_id)
-                    return await asyncio.to_thread(
-                        self.apply_execution,
-                        project_id,
-                        execution.mission_id,
-                        execution.execution_id,
-                        current.version,
-                        True,
-                    )
-                return snapshot
-            if execution.executor_kind == "PROJECT_BUILD":
-                return await self._run_project_builder(project_id, execution)
-            raise ExecutorUnavailableError(f"Executor indisponivel: {execution.executor_kind}.")
+            try:
+                executor = self.executor_registry.get(execution.executor_kind)
+            except ExecutorNotFoundError as exc:
+                raise ExecutorUnavailableError(str(exc)) from exc
+            context = WorkPackageExecutionContext(
+                project_id=project_id,
+                mission_id=execution.mission_id,
+                execution_id=execution.execution_id,
+                executor_kind=execution.executor_kind,
+                mission=dict(execution.input_snapshot.get("mission") or {}),
+                work_package=dict(
+                    execution.input_snapshot.get("work_package") or {}
+                ),
+                execution_snapshot=asdict(execution),
+                input_snapshot=dict(execution.input_snapshot),
+                test_mode=bool(test_mode),
+                autonomous=bool(autonomous),
+                allow_apply=bool(test_mode and not autonomous),
+                service=self,
+            )
+            result = await executor.execute(context)
+            if result.snapshot is not None:
+                return result.snapshot
+            error = result.exception or MissionExecutionError(
+                str((result.error or {}).get("message") or "Executor terminou sem snapshot.")
+            )
+            return self._fail_execution(
+                project_id,
+                execution.mission_id,
+                execution.execution_id,
+                error,
+                validation_failed=result.status == "VALIDATION_FAILED",
+                output={"executor_result": result.to_dict()},
+                artifact_refs=result.artifact_refs,
+                validation_refs=result.validation_refs,
+            )
         except Exception as exc:
             return self._fail_execution(
                 project_id, execution.mission_id, execution.execution_id, exc, validation_failed=False
@@ -575,58 +596,114 @@ class MissionExecutorService:
         self,
         project_id: str,
         execution: MissionExecution,
+        test_mode: bool = False,
     ) -> dict[str, Any]:
         objective = self._execution_objective(execution.input_snapshot["work_package"])
-        result = self.project_builder_runner(objective)
-        if asyncio.iscoroutine(result):
-            result = await result
-        result_data = asdict(result) if is_dataclass(result) else dict(result)
-        commands = list(result_data.get("commands_executed") or [])
-        preview_started = bool(result_data.get("preview_started"))
-        technical_success = (bool(commands) and all(bool(item.get("ok")) for item in commands)) or preview_started
-        artifact_refs = [f"file:{path}" for path in result_data.get("files_created") or []]
-        validation_refs = [f"validation:{execution.execution_id}"] if commands or preview_started else []
-        if not technical_success:
-            return self._fail_execution(
+        use_real_builder = self.project_builder_runner is build_project
+        recorder = None
+        close_status = "FAILED"
+        if use_real_builder:
+            recorder = ProjectBuilderFlightRecorder(
+                recorder_directory(self.workspace_root),
+                project_id=project_id,
+                mission_id=execution.mission_id,
+                execution_id=execution.execution_id,
+            )
+            recorder.event(
+                "mission_execution_started",
+                phase="EXECUTION",
+                metadata={
+                    "executor_kind": execution.executor_kind,
+                    "test_mode": bool(test_mode),
+                },
+            )
+            recorder.event(
+                "project_builder_dispatch_started",
+                phase="EXECUTION",
+                metadata={"objective_bytes": len(objective.encode("utf-8"))},
+            )
+        try:
+            if use_real_builder:
+                result = self.project_builder_runner(
+                    objective,
+                    flight_recorder=recorder,
+                    project_id=project_id,
+                    mission_id=execution.mission_id,
+                    execution_id=execution.execution_id,
+                    finalize_flight_recorder=False,
+                )
+            else:
+                result = self.project_builder_runner(objective)
+            if asyncio.iscoroutine(result):
+                result = await result
+            result_data = asdict(result) if is_dataclass(result) else dict(result)
+            commands = list(result_data.get("commands_executed") or [])
+            preview_started = bool(result_data.get("preview_started"))
+            technical_success = (bool(commands) and all(bool(item.get("ok")) for item in commands)) or preview_started
+            artifact_refs = [f"file:{path}" for path in result_data.get("files_created") or []]
+            validation_refs = [f"validation:{execution.execution_id}"] if commands or preview_started else []
+            if not technical_success:
+                if recorder is not None:
+                    recorder.event("mission_state_update_started", phase="MISSION_STATE", metadata={"status": "VALIDATION_FAILED"})
+                outcome = self._fail_execution(
+                    project_id,
+                    execution.mission_id,
+                    execution.execution_id,
+                    MissionExecutionError("ProjectBuilder nao produziu validacao ou preview tecnico com sucesso."),
+                    validation_failed=True,
+                    output={"project_builder": result_data},
+                    artifact_refs=artifact_refs,
+                    validation_refs=validation_refs,
+                )
+                if recorder is not None:
+                    recorder.event("mission_state_update_completed", phase="MISSION_STATE", status="COMPLETED", metadata={"status": "VALIDATION_FAILED"})
+                return outcome
+            evidence_refs = self._create_builder_evidence(
                 project_id,
                 execution.mission_id,
                 execution.execution_id,
-                MissionExecutionError("ProjectBuilder nao produziu validacao ou preview tecnico com sucesso."),
-                validation_failed=True,
-                output={"project_builder": result_data},
-                artifact_refs=artifact_refs,
-                validation_refs=validation_refs,
+                result_data,
+                artifact_refs,
             )
-        evidence_refs = self._create_builder_evidence(
-            project_id,
-            execution.mission_id,
-            execution.execution_id,
-            result_data,
-            artifact_refs,
-        )
-        with self.mission_state._locked_mission(project_id, execution.mission_id):
-            current = self._load_execution(project_id, execution.mission_id, execution.execution_id)
-            if current.status == "CANCELLED":
-                return self.load_snapshot(project_id, execution.mission_id)
-            previous = current.version
-            current.executor_ref = execution.execution_id
-            current.output_summary = {
-                "phase": "TECHNICAL_SUCCESS",
-                "project_builder": result_data,
-                "validation_results": commands,
-            }
-            current.artifact_refs = artifact_refs
-            current.evidence_refs = evidence_refs
-            current.validation_refs = validation_refs
-            current.status = "WAITING_FOR_REVIEW"
-            self._heartbeat(current)
-            self._save_execution(project_id, current)
-            self.mission_state._append_event(
-                project_id, execution.mission_id, "MISSION_EXECUTION", execution.execution_id,
-                "MISSION_EXECUTION_WAITING_REVIEW", previous, current.version,
-                {"project_id": self._built_project_id(result_data), "evidence_refs": evidence_refs},
-            )
-        return self.load_snapshot(project_id, execution.mission_id)
+            if recorder is not None:
+                recorder.event("mission_state_update_started", phase="MISSION_STATE", metadata={"status": "WAITING_FOR_REVIEW"})
+            with self.mission_state._locked_mission(project_id, execution.mission_id):
+                current = self._load_execution(project_id, execution.mission_id, execution.execution_id)
+                if current.status == "CANCELLED":
+                    return self.load_snapshot(project_id, execution.mission_id)
+                previous = current.version
+                current.executor_ref = execution.execution_id
+                current.output_summary = {
+                    "phase": "TECHNICAL_SUCCESS",
+                    "project_builder": result_data,
+                    "validation_results": commands,
+                }
+                current.artifact_refs = artifact_refs
+                current.evidence_refs = evidence_refs
+                current.validation_refs = validation_refs
+                current.status = "WAITING_FOR_REVIEW"
+                self._heartbeat(current)
+                self._save_execution(project_id, current)
+                self.mission_state._append_event(
+                    project_id, execution.mission_id, "MISSION_EXECUTION", execution.execution_id,
+                    "MISSION_EXECUTION_WAITING_REVIEW", previous, current.version,
+                    {"project_id": self._built_project_id(result_data), "evidence_refs": evidence_refs},
+                )
+            if recorder is not None:
+                recorder.event("mission_state_update_completed", phase="MISSION_STATE", status="COMPLETED", metadata={"status": "WAITING_FOR_REVIEW"})
+            close_status = "WAITING_FOR_REVIEW"
+            return self.load_snapshot(project_id, execution.mission_id)
+        finally:
+            if recorder is not None:
+                recorder.close(
+                    status=close_status,
+                    final_state={
+                        "status": close_status,
+                        "project_id": project_id,
+                        "mission_id": execution.mission_id,
+                        "execution_id": execution.execution_id,
+                    },
+                )
 
     def _accept_execution(
         self,

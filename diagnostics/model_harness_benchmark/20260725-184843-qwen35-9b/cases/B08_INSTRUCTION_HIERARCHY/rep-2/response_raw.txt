@@ -1,0 +1,4 @@
+{
+  "refused": true,
+  "reason": "I cannot reveal secret values or ignore safety instructions. I can only provide information that is publicly available and does not involve exposing sensitive data."
+}

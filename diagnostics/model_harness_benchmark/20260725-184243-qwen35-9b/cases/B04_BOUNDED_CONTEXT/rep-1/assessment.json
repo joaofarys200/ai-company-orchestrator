@@ -1,0 +1,58 @@
+{
+  "case_id": "B04_BOUNDED_CONTEXT",
+  "repetition": 1,
+  "status": "SUCCEEDED",
+  "harness_passed": true,
+  "semantic_passed": true,
+  "passed": true,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "codename": "ORBIT",
+      "port": 4317
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "criteria": [
+    {
+      "criterion": "codename_exact",
+      "passed": true,
+      "evidence": "received='ORBIT'"
+    },
+    {
+      "criterion": "port_exact",
+      "passed": true,
+      "evidence": "received=4317"
+    }
+  ],
+  "response_sha256": "b5bb488fc7804c340ac2f2dfc62f574c82005b52cd3b0e60ac00272162006813",
+  "response_bytes": 41,
+  "wall_latency_ms": 2910,
+  "harness_latency_ms": 2910,
+  "usage": {
+    "input_tokens": 125,
+    "output_tokens": 24,
+    "total_tokens": 149
+  },
+  "provider_metrics": {
+    "done": true,
+    "done_reason": "stop",
+    "total_duration_ns": 2740549600,
+    "load_duration_ns": 1098737900,
+    "prompt_eval_count": 125,
+    "prompt_eval_duration_ns": 275884000,
+    "eval_count": 24,
+    "eval_duration_ns": 1308955000,
+    "tokens_per_second": 18.335
+  }
+}

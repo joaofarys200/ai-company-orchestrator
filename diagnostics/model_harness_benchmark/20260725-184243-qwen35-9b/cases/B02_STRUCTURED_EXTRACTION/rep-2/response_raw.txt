@@ -1,0 +1,7 @@
+{
+  "invoice_id": "INV-204",
+  "customer": "Ada Lovelace",
+  "amount": 125.4,
+  "currency": "EUR",
+  "paid_on": "2026-07-24"
+}

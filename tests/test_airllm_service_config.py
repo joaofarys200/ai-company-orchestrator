@@ -20,6 +20,8 @@ def valid_values(tmp_path: Path) -> dict[str, str]:
         "AIRLLM_MAX_NEW_TOKENS": "256",
         "AIRLLM_TEMPERATURE": "0",
         "AIRLLM_PROFILING_MODE": "true",
+        "AIRLLM_DIAGNOSTIC_MODE": "true",
+        "AIRLLM_ENABLE_QWEN35_COMPAT_PATCH": "false",
         "HF_HOME": str(tmp_path / "huggingface"),
         "HUGGINGFACE_HUB_CACHE": str(tmp_path / "huggingface" / "hub"),
     }
@@ -35,6 +37,8 @@ def test_valid_configuration(tmp_path: Path):
     assert settings.max_new_tokens == 256
     assert settings.temperature == 0
     assert settings.profiling_mode is True
+    assert settings.diagnostic_mode is True
+    assert settings.enable_qwen35_compat_patch is False
     assert settings.hf_home == (tmp_path / "huggingface").resolve()
     assert settings.huggingface_hub_cache == (
         tmp_path / "huggingface" / "hub"
@@ -111,6 +115,18 @@ def test_invalid_boolean_values(value: str):
         parse_boolean(value, "SETTING")
 
 
+@pytest.mark.parametrize(
+    "name",
+    ["AIRLLM_DIAGNOSTIC_MODE", "AIRLLM_ENABLE_QWEN35_COMPAT_PATCH"],
+)
+def test_diagnostic_and_patch_flags_are_strict_booleans(tmp_path: Path, name: str):
+    values = valid_values(tmp_path)
+    values[name] = "maybe"
+
+    with pytest.raises(AirLLMConfigurationError, match=name):
+        AirLLMSettings.from_mapping(values)
+
+
 def test_shards_path_is_normalized_to_absolute(tmp_path: Path):
     values = valid_values(tmp_path)
     values["AIRLLM_SHARDS_PATH"] = str(tmp_path / "nested" / ".." / "shards")
@@ -136,4 +152,3 @@ def test_no_compression_values_are_normalized(tmp_path: Path, value: str):
     values["AIRLLM_COMPRESSION"] = value
 
     assert AirLLMSettings.from_mapping(values).compression is None
-

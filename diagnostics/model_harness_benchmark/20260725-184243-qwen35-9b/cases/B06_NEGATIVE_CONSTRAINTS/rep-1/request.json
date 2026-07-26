@@ -1,0 +1,53 @@
+{
+  "request_id": "a2198dcb7cb44eb3876e0b82627c53c8",
+  "request_fingerprint": "3299f28ef48e2cebe518c9709d193c35648d931a6c8448cc29209838f762286b",
+  "task_profile": "MISSION_PLANNING",
+  "system_prompt": "Return a minimal file plan. Respect every negative constraint and use only allowed paths.",
+  "user_prompt": "Create a static browser page. Allowed paths are index.html, app.js and styles.css. Do not use React, dependencies, Markdown, package managers or any other path.",
+  "context": {
+    "items": [],
+    "decisions": [],
+    "total_chars": 0
+  },
+  "allowed_tools": [],
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "files",
+      "dependencies"
+    ],
+    "properties": {
+      "files": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "enum": [
+            "index.html",
+            "app.js",
+            "styles.css"
+          ]
+        }
+      },
+      "dependencies": {
+        "type": "array",
+        "maxItems": 0
+      }
+    }
+  },
+  "generation": {
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "context_tokens": 8192,
+    "output_tokens": 768,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "repetitions": 2,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0
+  }
+}

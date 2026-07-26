@@ -601,7 +601,48 @@ class CodingSessionService:
     def _logical_edit_scope(original: str, resulting: str) -> dict[str, Any]:
         original_lines = original.splitlines()
         resulting_lines = resulting.splitlines()
-        matcher = difflib.SequenceMatcher(a=original_lines, b=resulting_lines, autojunk=False)
+        total_line_count = max(len(original_lines), len(resulting_lines), 1)
+        if original == resulting:
+            return {
+                "changed_line_count": 0,
+                "changed_region_count": 0,
+                "total_line_count": total_line_count,
+                "logical_change_ratio": 0.0,
+            }
+
+        prefix = 0
+        while (
+            prefix < len(original_lines)
+            and prefix < len(resulting_lines)
+            and original_lines[prefix] == resulting_lines[prefix]
+        ):
+            prefix += 1
+
+        original_end = len(original_lines)
+        resulting_end = len(resulting_lines)
+        suffix = 0
+        while (
+            original_end - suffix > prefix
+            and resulting_end - suffix > prefix
+            and original_lines[original_end - suffix - 1] == resulting_lines[resulting_end - suffix - 1]
+        ):
+            suffix += 1
+
+        original_core = original_lines[prefix : original_end - suffix]
+        resulting_core = resulting_lines[prefix : resulting_end - suffix]
+
+        # A controlled textual patch has one logical region. Avoid quadratic
+        # SequenceMatcher work when a large file contains repeated lines.
+        if len(original_core) * len(resulting_core) > 4_000_000:
+            changed_line_count = max(len(original_core), len(resulting_core), 1)
+            return {
+                "changed_line_count": changed_line_count,
+                "changed_region_count": 1,
+                "total_line_count": total_line_count,
+                "logical_change_ratio": changed_line_count / total_line_count,
+            }
+
+        matcher = difflib.SequenceMatcher(a=original_core, b=resulting_core, autojunk=False)
         changed_line_count = 0
         changed_region_count = 0
         for tag, old_start, old_end, new_start, new_end in matcher.get_opcodes():
@@ -609,7 +650,6 @@ class CodingSessionService:
                 continue
             changed_region_count += 1
             changed_line_count += max(old_end - old_start, new_end - new_start)
-        total_line_count = max(len(original_lines), len(resulting_lines), 1)
         return {
             "changed_line_count": changed_line_count,
             "changed_region_count": changed_region_count,

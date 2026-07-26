@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/project-builder/compact-patch-response.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "error_resolutions",
+    "operations"
+  ],
+  "properties": {
+    "error_resolutions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error_code",
+          "operation_ids"
+        ],
+        "properties": {
+          "error_code": {
+            "enum": [
+              "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+              "MISSING_COMPONENT_MAPPING",
+              "MISSING_HEALTH_ROUTE",
+              "MISSING_REQUESTED_COMPONENTS",
+              "PERSISTENCE_NOT_IMPLEMENTED"
+            ]
+          },
+          "operation_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 12,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "maxLength": 36
+            }
+          }
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "op",
+              "value"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^op-[A-Za-z0-9_-]{1,32}$",
+                "maxLength": 36
+              },
+              "op": {
+                "const": "set_components"
+              },
+              "value": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 5,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "frontend",
+                    "backend",
+                    "persistence",
+                    "tests",
+                    "preview"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "op",
+              "component",
+              "paths"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^op-[A-Za-z0-9_-]{1,32}$",
+                "maxLength": 36
+              },
+              "op": {
+                "const": "set_component_files"
+              },
+              "component": {
+                "enum": [
+                  "frontend",
+                  "backend",
+                  "persistence",
+                  "tests",
+                  "preview"
+                ]
+              },
+              "paths": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 5,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "index.html",
+                    "package.json",
+                    "server.js",
+                    "test.js"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "op",
+              "field",
+              "value"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^op-[A-Za-z0-9_-]{1,32}$",
+                "maxLength": 36
+              },
+              "op": {
+                "const": "set_preview_strategy"
+              },
+              "field": {
+                "enum": [
+                  "enabled",
+                  "method",
+                  "healthcheck_path",
+                  "command"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "maxLength": 64
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "op",
+              "path",
+              "transform",
+              "parameters",
+              "expected_sha256"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^op-[A-Za-z0-9_-]{1,32}$",
+                "maxLength": 36
+              },
+              "op": {
+                "const": "apply_code_transform"
+              },
+              "path": {
+                "enum": [
+                  "server.js"
+                ]
+              },
+              "transform": {
+                "enum": [
+                  "ADD_JSON_FILE_PERSISTENCE"
+                ]
+              },
+              "parameters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "storage_filename": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_.-]{1,64}\\.json$",
+                    "maxLength": 64
+                  }
+                }
+              },
+              "expected_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

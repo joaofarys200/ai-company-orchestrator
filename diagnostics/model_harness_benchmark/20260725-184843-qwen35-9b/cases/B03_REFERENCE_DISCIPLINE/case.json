@@ -1,0 +1,26 @@
+{
+  "case_id": "B03_REFERENCE_DISCIPLINE",
+  "title": "Selecao sem inventar referencias",
+  "capability": "reference_discipline",
+  "task_profile": "STRUCTURED_EXTRACTION",
+  "system_prompt": "Select references only from the explicit allowlist. Return JSON matching the schema.",
+  "user_prompt": "Allowed references: file:src/a.py, file:tests/test_a.py. Select the reference that contains tests for a.py.",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "selected_refs"
+    ],
+    "properties": {
+      "selected_refs": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "allowed_tools": [],
+  "context_candidates": []
+}

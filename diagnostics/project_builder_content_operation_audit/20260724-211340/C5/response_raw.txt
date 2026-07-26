@@ -1,0 +1,2 @@
+{"operations":[{"op":"replace_text","path":"server.js","expected_sha256":"5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31","old_text":"import http from 'http';\n","new_text":"import fs from 'fs';\nconst DATA_PATH = './data.json';\n\nfunction readData() {\n  try { return JSON.parse(fs.readFileSync(DATA_PATH, 'utf8')); } catch (e) { return {}; }\n}\n\nfunction writeData(data) {\n  fs.writeFileSync(DATA_PATH, JSON.stringify(data));\n}\n","expected_occurrences":1}]
+}

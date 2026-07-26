@@ -1,0 +1,16 @@
+{
+  "model": "qwen3.5:9b",
+  "created_at": "2026-07-25T18:44:33.7247391Z",
+  "message": {
+    "role": "assistant",
+    "content": "{\n  \"invoice_id\": \"INV-204\",\n  \"customer\": \"Ada Lovelace\",\n  \"amount\": 125.4,\n  \"currency\": \"EUR\",\n  \"paid_on\": \"2026-07-24\"\n}"
+  },
+  "done": true,
+  "done_reason": "stop",
+  "total_duration": 5277762400,
+  "load_duration": 1187465700,
+  "prompt_eval_count": 75,
+  "prompt_eval_duration": 274286000,
+  "eval_count": 66,
+  "eval_duration": 3747352000
+}

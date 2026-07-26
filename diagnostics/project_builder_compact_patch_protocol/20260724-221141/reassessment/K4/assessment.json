@@ -1,0 +1,18 @@
+{
+  "source": "previous_response_hash_removed_only",
+  "schema_new": true,
+  "coverage": false,
+  "binding": true,
+  "apply": false,
+  "validators": false,
+  "errors": [
+    {
+      "code": "UNKNOWN_OPERATION_REFERENCE",
+      "message": "error_resolutions references unknown operation",
+      "details": {
+        "operation_id": "op_01"
+      }
+    }
+  ],
+  "model_hash_fields_removed": 1
+}

@@ -1,0 +1,406 @@
+{
+  "schema_version": "project_builder_flight_recorder_v1",
+  "run_id": "5ac225a31d8b471db547d15b36b9d0e4",
+  "project_id": "flight-recorder-wp1-9864320f2fa3",
+  "mission_id": "mission-9864320f2fa3",
+  "execution_id": "ce4090ed6d0a46be809b4dccade64353",
+  "build_run_id": "a794351f203f48828fde4de76fa34972",
+  "status": "VALIDATION_FAILED",
+  "event_count": 745,
+  "error_count": 14,
+  "slowest_phase": {
+    "phase": "PLANNING",
+    "operation": "planning",
+    "duration_ms": 46172.0,
+    "status": "FAILED",
+    "span_id": "51d791dfacde48bc8c0260e62ca82a8d"
+  },
+  "largest_gap": {
+    "previous_event": "heartbeat",
+    "next_event": "heartbeat",
+    "gap_ms": 5000.0,
+    "classification": "sem progresso"
+  },
+  "last_progress": null,
+  "last_phase_started": {
+    "schema_version": "project_builder_flight_recorder_v1",
+    "run_id": "5ac225a31d8b471db547d15b36b9d0e4",
+    "project_id": "flight-recorder-wp1-9864320f2fa3",
+    "mission_id": "mission-9864320f2fa3",
+    "execution_id": "ce4090ed6d0a46be809b4dccade64353",
+    "build_run_id": "a794351f203f48828fde4de76fa34972",
+    "phase": "REQUESTER",
+    "event": "requester_started",
+    "status": "OBSERVED",
+    "wall_clock_timestamp": "2026-07-24T15:12:42.416262+00:00",
+    "monotonic_offset_ms": 37266.0,
+    "duration_ms": null,
+    "parent_span_id": "",
+    "span_id": "",
+    "attempt": 0,
+    "thread_id": 17888,
+    "process_id": 6208,
+    "metadata": {
+      "prompt_bytes": 609,
+      "correction_bytes": 7596
+    },
+    "error_type": "",
+    "error_message": "",
+    "progress_counter": null
+  },
+  "last_phase_completed": {
+    "schema_version": "project_builder_flight_recorder_v1",
+    "run_id": "5ac225a31d8b471db547d15b36b9d0e4",
+    "project_id": "flight-recorder-wp1-9864320f2fa3",
+    "mission_id": "mission-9864320f2fa3",
+    "execution_id": "ce4090ed6d0a46be809b4dccade64353",
+    "build_run_id": "a794351f203f48828fde4de76fa34972",
+    "phase": "EXECUTION",
+    "event": "build_completed",
+    "status": "FAILED",
+    "wall_clock_timestamp": "2026-07-24T15:12:51.355357+00:00",
+    "monotonic_offset_ms": 46203.0,
+    "duration_ms": null,
+    "parent_span_id": "",
+    "span_id": "",
+    "attempt": 0,
+    "thread_id": 17888,
+    "process_id": 6208,
+    "metadata": {
+      "status": "VALIDATION_FAILED",
+      "technical_success": false,
+      "project_rel_dir": "",
+      "files_created": 0
+    },
+    "error_type": "",
+    "error_message": "",
+    "progress_counter": null
+  },
+  "max_period_without_progress_ms": 10016.0,
+  "partial_response": false,
+  "retry_observed": false,
+  "second_attempt_started": true,
+  "orphan_process_observed": false,
+  "materialization_partial": false,
+  "journal_persisted": true,
+  "mission_state_updated": false,
+  "false_success": false,
+  "durations": [
+    {
+      "phase": "PLANNING",
+      "operation": "planning",
+      "duration_ms": 46172.0,
+      "status": "FAILED",
+      "span_id": "51d791dfacde48bc8c0260e62ca82a8d"
+    }
+  ],
+  "gaps": [
+    {
+      "previous_event": "mission_execution_started",
+      "next_event": "project_builder_dispatch_started",
+      "gap_ms": 0.0,
+      "classification": "desconhecido"
+    },
+    {
+      "previous_event": "project_builder_dispatch_started",
+      "next_event": "build_project_entered",
+      "gap_ms": 16.0,
+      "classification": "desconhecido"
+    },
+    {
+      "previous_event": "build_project_entered",
+      "next_event": "span_started",
+      "gap_ms": 0.0,
+      "classification": "desconhecido"
+    },
+    {
+      "previous_event": "span_started",
+      "next_event": "prompt_build_started",
+      "gap_ms": 0.0,
+      "classification": "desconhecido"
+    },
+    {
+      "previous_event": "prompt_build_started",
+      "next_event": "prompt_build_completed",
+      "gap_ms": 0.0,
+      "classification": "desconhecido"
+    },
+    {
+      "previous_event": "prompt_build_completed",
+      "next_event": "request_payload_built",
+      "gap_ms": 0.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "request_payload_built",
+      "next_event": "requester_started",
+      "gap_ms": 0.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "requester_started",
+      "next_event": "journal_write_started",
+      "gap_ms": 0.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "journal_write_started",
+      "next_event": "journal_write_completed",
+      "gap_ms": 0.0,
+      "classification": "I/O"
+    },
+    {
+      "previous_event": "journal_write_completed",
+      "next_event": "readiness_check_started",
+      "gap_ms": 15.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "readiness_check_started",
+      "next_event": "journal_write_started",
+      "gap_ms": 0.0,
+      "classification": "I/O"
+    },
+    {
+      "previous_event": "journal_write_started",
+      "next_event": "journal_write_completed",
+      "gap_ms": 0.0,
+      "classification": "I/O"
+    },
+    {
+      "previous_event": "journal_write_completed",
+      "next_event": "journal_write_started",
+      "gap_ms": 172.0,
+      "classification": "I/O"
+    },
+    {
+      "previous_event": "journal_write_started",
+      "next_event": "journal_write_completed",
+      "gap_ms": 16.0,
+      "classification": "I/O"
+    },
+    {
+      "previous_event": "journal_write_completed",
+      "next_event": "readiness_check_completed",
+      "gap_ms": 0.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "readiness_check_completed",
+      "next_event": "model_attempt_started",
+      "gap_ms": 0.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "model_attempt_started",
+      "next_event": "http_request_started",
+      "gap_ms": 140.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "http_request_started",
+      "next_event": "heartbeat",
+      "gap_ms": 4657.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "heartbeat",
+      "next_event": "heartbeat",
+      "gap_ms": 5000.0,
+      "classification": "sem progresso"
+    },
+    {
+      "previous_event": "heartbeat",
+      "next_event": "response_headers_received",
+      "gap_ms": 2406.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "response_headers_received",
+      "next_event": "journal_write_started",
+      "gap_ms": 0.0,
+      "classification": "I/O"
+    },
+    {
+      "previous_event": "journal_write_started",
+      "next_event": "journal_write_completed",
+      "gap_ms": 16.0,
+      "classification": "I/O"
+    },
+    {
+      "previous_event": "journal_write_completed",
+      "next_event": "first_response_byte",
+      "gap_ms": 0.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "first_response_byte",
+      "next_event": "first_http_chunk",
+      "gap_ms": 0.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "first_http_chunk",
+      "next_event": "first_nonempty_content",
+      "gap_ms": 0.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "first_nonempty_content",
+      "next_event": "stream_progress",
+      "gap_ms": 0.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 125.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 31.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 47.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 31.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 47.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 31.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 47.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 47.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 31.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 47.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 31.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 125.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 31.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 47.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 47.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 31.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 47.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 32.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 46.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 32.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 125.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 47.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 31.0,
+      "classification": "modelo"
+    },
+    {
+      "previous_event": "stream_progress",
+      "next_event": "stream_progress",
+      "gap_ms": 47.0,
+      "classification": "modelo"
+    }
+  ],
+  "final_state": {
+    "status": "VALIDATION_FAILED",
+    "technical_success": false,
+    "build_run_id": "a794351f203f48828fde4de76fa34972",
+    "project_rel_dir": "",
+    "files_created": []
+  }
+}

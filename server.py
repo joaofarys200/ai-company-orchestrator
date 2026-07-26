@@ -42,6 +42,7 @@ from intelligence.project_context import ProjectContextError, ProjectContextServ
 from intelligence.coding_session import CodingSessionError, CodingSessionService
 from agents.mission_state import MissionStateError
 from agents.mission_executor import MissionExecutorService
+from agents.mission_autonomy import MissionAutonomyController
 from agents.planner_engine import PersistentPlanner
 from voice_service import VoiceService
 
@@ -56,6 +57,11 @@ mission_executor_service = MissionExecutorService(
     os.path.dirname(os.path.abspath(__file__)),
     mission_state=mission_planner.mission_state,
     coding_service=coding_session_service,
+)
+mission_autonomy_controller = MissionAutonomyController(
+    os.path.dirname(os.path.abspath(__file__)),
+    mission_state=mission_planner.mission_state,
+    executor_service=mission_executor_service,
 )
 
 VOICE_CONFIRMATION_WORDS = {
@@ -681,12 +687,14 @@ async def dispatch_mission_operation(websocket, msg: dict, selected_project_id: 
         "criterion_create", "criterion_set_status", "mission_resume_snapshot",
         "mission_execute_work_package", "mission_apply_execution", "mission_review_execution",
         "mission_retry_execution", "mission_cancel_execution", "mission_release_stale_lock",
+        "mission_autonomy_run",
     }
     if operation not in mission_operations:
         return False
     project_id = str(msg.get("project_id") or selected_project_id or "").strip()
     try:
         snapshot = None
+        autonomy_cycle = None
         if operation == "mission_list":
             await send_mission_list(websocket, project_id)
             return True
@@ -883,6 +891,26 @@ async def dispatch_mission_operation(websocket, msg: dict, selected_project_id: 
                 bool(msg.get("confirmed")),
                 msg.get("minimum_age_seconds"),
             )
+        elif operation == "mission_autonomy_run":
+            if msg.get("confirmed") is not True:
+                raise MissionStateError(
+                    "O ciclo autonomo exige confirmacao explicita."
+                )
+            cycle_result = await mission_autonomy_controller.run_cycle(
+                project_id,
+                msg.get("mission_id"),
+                expected_mission_version=msg.get(
+                    "expected_mission_version"
+                ),
+                max_work_packages=msg.get("max_work_packages", 1),
+                test_mode=bool(msg.get("test_mode", False)),
+            )
+            autonomy_cycle = cycle_result.to_dict()
+            snapshot = await asyncio.to_thread(
+                mission_executor_service.load_snapshot,
+                project_id,
+                msg.get("mission_id"),
+            )
         if snapshot is not None:
             active_mission_store = getattr(mission_planner, "mission_state", mission_planner)
             if mission_executor_service.mission_state is active_mission_store:
@@ -891,6 +919,9 @@ async def dispatch_mission_operation(websocket, msg: dict, selected_project_id: 
                     project_id,
                     snapshot["mission"]["mission_id"],
                 )
+            if autonomy_cycle is not None:
+                snapshot["autonomy_cycle"] = autonomy_cycle
+                snapshot["autonomous_execution"] = True
             await send_ws(websocket, {"type": "mission_snapshot", "data": snapshot})
             await send_mission_list(websocket, project_id)
         return True
