@@ -1,0 +1,77 @@
+{
+  "operations": [
+    {
+      "op": "set_components",
+      "value": [
+        "backend",
+        "frontend",
+        "persistence",
+        "preview",
+        "tests"
+      ]
+    },
+    {
+      "op": "set_component_files",
+      "component": "preview",
+      "paths": [
+        "index.html"
+      ]
+    },
+    {
+      "op": "set_component_files",
+      "component": "backend",
+      "paths": [
+        "server.js"
+      ]
+    },
+    {
+      "op": "set_component_files",
+      "component": "persistence",
+      "paths": [
+        "server.js"
+      ]
+    },
+    {
+      "op": "set_component_files",
+      "component": "tests",
+      "paths": [
+        "test.js"
+      ]
+    },
+    {
+      "op": "set_component_files",
+      "component": "frontend",
+      "paths": [
+        "index.html"
+      ]
+    },
+    {
+      "op": "set_preview_strategy",
+      "field": "enabled",
+      "value": {
+        "enabled": true
+      }
+    },
+    {
+      "op": "set_preview_strategy",
+      "field": "method",
+      "value": {
+        "method": "static-server"
+      }
+    },
+    {
+      "op": "set_preview_strategy",
+      "field": "healthcheck_path",
+      "value": {
+        "healthcheck_path": "/health"
+      }
+    },
+    {
+      "op": "set_preview_strategy",
+      "field": "command",
+      "value": {
+        "command": "node server.js"
+      }
+    }
+  ]
+}

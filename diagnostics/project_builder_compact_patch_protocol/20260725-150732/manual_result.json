@@ -1,0 +1,140 @@
+{
+  "success": true,
+  "trusted_bindings": [
+    {
+      "operation_id": "op-07",
+      "path": "server.js",
+      "expected_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31",
+      "source": "initial_virtual_snapshot"
+    }
+  ],
+  "operations_applied": [
+    {
+      "op": "set_components",
+      "value": [
+        "frontend",
+        "backend",
+        "persistence",
+        "tests",
+        "preview"
+      ],
+      "id": "op-01"
+    },
+    {
+      "op": "set_component_files",
+      "component": "frontend",
+      "paths": [
+        "index.html"
+      ],
+      "id": "op-02"
+    },
+    {
+      "op": "set_component_files",
+      "component": "backend",
+      "paths": [
+        "server.js"
+      ],
+      "id": "op-03"
+    },
+    {
+      "op": "set_component_files",
+      "component": "persistence",
+      "paths": [
+        "server.js"
+      ],
+      "id": "op-04"
+    },
+    {
+      "op": "set_component_files",
+      "component": "tests",
+      "paths": [
+        "test.js"
+      ],
+      "id": "op-05"
+    },
+    {
+      "op": "set_component_files",
+      "component": "preview",
+      "paths": [
+        "index.html"
+      ],
+      "id": "op-06"
+    },
+    {
+      "op": "apply_code_transform",
+      "path": "server.js",
+      "transform": "ADD_JSON_FILE_PERSISTENCE",
+      "id": "op-07",
+      "parameters": {
+        "storage_filename": "data.json"
+      },
+      "_trusted_expected_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31"
+    }
+  ],
+  "validator_report": {
+    "valid": true,
+    "error_codes": [],
+    "plan_hash": "eea6e5de00c62c5f772506cee7d5a93dedf36bbe9d68dd6bdece10269917fa2d",
+    "static_analysis": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "checked_components": [
+        "frontend",
+        "backend",
+        "persistence",
+        "tests",
+        "preview"
+      ],
+      "checked_entrypoints": [
+        "server.js",
+        "index.html"
+      ],
+      "checked_scripts": [],
+      "checked_dependencies": [],
+      "virtual_files": [
+        {
+          "normalized_path": "index.html",
+          "component": "preview",
+          "language": "html",
+          "extension": ".html",
+          "content_hash": "a8cab61f58e3f5ed320006c932aaf480dfaa6f21f30b0e0673d3defc21c1aafb",
+          "size_bytes": 146
+        },
+        {
+          "normalized_path": "package.json",
+          "component": "",
+          "language": "json",
+          "extension": ".json",
+          "content_hash": "f5c8a011c0805a73f6206bb0b0f93912c027caa4dacc48c998827acd7ff551ab",
+          "size_bytes": 79
+        },
+        {
+          "normalized_path": "server.js",
+          "component": "persistence",
+          "language": "javascript",
+          "extension": ".js",
+          "content_hash": "4aa7c8fb2be2e79a10e44cef45ee81e3c79e25522c2d774922ab244782611a67",
+          "size_bytes": 640
+        },
+        {
+          "normalized_path": "test.js",
+          "component": "tests",
+          "language": "javascript",
+          "extension": ".js",
+          "content_hash": "7336da35b8f653e5a273ba8a6de0672f7277eef30d4396eede1145e431c76fe3",
+          "size_bytes": 314
+        }
+      ]
+    }
+  },
+  "virtual_diff": [
+    {
+      "path": "server.js",
+      "before_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31",
+      "after_sha256": "4aa7c8fb2be2e79a10e44cef45ee81e3c79e25522c2d774922ab244782611a67",
+      "unified_diff": "--- server.js\n+++ server.js\n@@ -1,4 +1,16 @@\n-import http from 'http';\n+import http from 'node:http';\n+import fs from 'node:fs';\n+\n+const dataPath = new URL('./data.json', import.meta.url);\n+function readData() {\n+  if (!fs.existsSync(dataPath)) return {};\n+  return JSON.parse(fs.readFileSync(dataPath, 'utf8'));\n+}\n+function writeData(value) {\n+  fs.writeFileSync(dataPath, JSON.stringify(value));\n+}\n+writeData(readData());\n+\n \n const server = http.createServer((req, res) => {\n   if (req.url === '/health') {\n"
+    }
+  ],
+  "error": null
+}

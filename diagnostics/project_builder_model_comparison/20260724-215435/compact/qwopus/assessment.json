@@ -1,0 +1,24 @@
+{
+  "case": "qwopus",
+  "done": true,
+  "done_reason": "stop",
+  "json_valid": true,
+  "schema_valid": true,
+  "operations_valid": false,
+  "server_js_operation": true,
+  "persistence_operation": true,
+  "plan_operations": 4,
+  "invented_paths": [],
+  "validators_valid": false,
+  "errors": [
+    {
+      "code": "HASH_MISMATCH",
+      "message": "Transform hash does not match original content",
+      "details": {
+        "path": "server.js",
+        "expected": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+        "actual": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31"
+      }
+    }
+  ]
+}

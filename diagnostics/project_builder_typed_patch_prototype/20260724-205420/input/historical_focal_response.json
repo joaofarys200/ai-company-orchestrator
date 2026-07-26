@@ -1,0 +1,36 @@
+{
+  "plan_updates": {
+    "component_files": {
+      "frontend": [
+        "src/index.html",
+        "public/styles.css"
+      ],
+      "backend": [
+        "server.js",
+        "routes/health.js"
+      ],
+      "persistence": [
+        "db/storage.json"
+      ],
+      "tests": [
+        "run-tests.js"
+      ],
+      "preview": [
+        "index-preview.html"
+      ]
+    },
+    "components": [
+      "frontend",
+      "backend",
+      "persistence",
+      "tests",
+      "preview"
+    ],
+    "preview_strategy": {
+      "healthcheck_path": "/health",
+      "enabled": true,
+      "method": "GET"
+    }
+  },
+  "replacements": []
+}

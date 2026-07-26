@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from websocket_schema import WebSocketPayloadError, normalize_ws_message, validate_client_message
+from agents.mission_autonomy import AutonomyCycleResult
 from agents.mission_executor import MissionExecutorService
 from agents.mission_state import MissionStateStore
 
@@ -41,6 +42,7 @@ class MissionWebSocketSchemaTest(unittest.TestCase):
             {"type": "mission_retry_execution", "project_id": "task-app", "mission_id": "m", "execution_id": "e", "expected_execution_version": 1},
             {"type": "mission_cancel_execution", "project_id": "task-app", "mission_id": "m", "execution_id": "e", "expected_execution_version": 1, "confirmed": True},
             {"type": "mission_release_stale_lock", "project_id": "task-app", "mission_id": "m", "execution_id": "e", "expected_execution_version": 1, "confirmed": True},
+            {"type": "mission_autonomy_run", "project_id": "task-app", "mission_id": "m", "expected_mission_version": 1, "max_work_packages": 1, "confirmed": True, "test_mode": False},
         ]
         for message in messages:
             with self.subTest(message["type"]):
@@ -66,6 +68,16 @@ class MissionWebSocketSchemaTest(unittest.TestCase):
                 "type": "mission_review_execution", "project_id": "task-app", "mission_id": "m",
                 "execution_id": "e", "decision": "SKIP", "review_note": "", "accepted_evidence_refs": [],
                 "expected_execution_version": 1,
+            })
+        with self.assertRaises(WebSocketPayloadError):
+            validate_client_message({
+                "type": "mission_autonomy_run", "project_id": "task-app", "mission_id": "m",
+                "expected_mission_version": 1, "confirmed": False,
+            })
+        with self.assertRaises(WebSocketPayloadError):
+            validate_client_message({
+                "type": "mission_autonomy_run", "project_id": "task-app", "mission_id": "m",
+                "expected_mission_version": 1, "confirmed": True, "max_work_packages": 4,
             })
 
     def test_normalizes_mission_server_messages(self):
@@ -160,6 +172,102 @@ class MissionWebSocketDispatchTest(unittest.IsolatedAsyncioTestCase):
             self.assertEqual([item["type"] for item in websocket.messages], ["mission_snapshot", "mission_list"])
             self.assertEqual(websocket.messages[0]["data"]["executions"][0]["status"], "WAITING_FOR_REVIEW")
             self.assertFalse(websocket.messages[0]["data"]["autonomous_execution"])
+
+    async def test_dispatch_runs_only_explicit_confirmed_autonomy_cycle(self):
+        import server
+
+        class FakeAutonomyController:
+            def __init__(self):
+                self.calls = []
+
+            async def run_cycle(self, project_id, mission_id, **kwargs):
+                self.calls.append((project_id, mission_id, kwargs))
+                return AutonomyCycleResult(
+                    project_id=project_id,
+                    mission_id=mission_id,
+                    status="NO_ELIGIBLE_WORK",
+                    stop_reason="eligible_work_packages_is_empty",
+                    snapshot_version=3,
+                    cycle_id="cycle",
+                )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            Path(
+                temp_dir,
+                "workspace",
+                "projects",
+                "task-app",
+            ).mkdir(parents=True)
+            store = MissionStateStore(temp_dir)
+            snapshot = store.create_mission(
+                "task-app",
+                "Autonomy",
+                "No packages",
+                mission_id="m",
+            )
+            snapshot = store.set_mission_status(
+                "task-app",
+                "m",
+                "READY",
+                snapshot["mission"]["version"],
+            )
+            snapshot = store.set_mission_status(
+                "task-app",
+                "m",
+                "ACTIVE",
+                snapshot["mission"]["version"],
+            )
+            executor = MissionExecutorService(
+                temp_dir,
+                mission_state=store,
+                coding_service=object(),
+                project_builder_runner=lambda _prompt: None,
+            )
+            autonomy = FakeAutonomyController()
+            previous_planner = server.mission_planner
+            previous_executor = server.mission_executor_service
+            previous_autonomy = server.mission_autonomy_controller
+            server.mission_planner = store
+            server.mission_executor_service = executor
+            server.mission_autonomy_controller = autonomy
+            websocket = WebSocketCollector()
+            try:
+                handled = await server.dispatch_mission_operation(
+                    websocket,
+                    {
+                        "type": "mission_autonomy_run",
+                        "project_id": "task-app",
+                        "mission_id": "m",
+                        "expected_mission_version": snapshot["mission"]["version"],
+                        "max_work_packages": 1,
+                        "confirmed": True,
+                        "test_mode": True,
+                    },
+                    "task-app",
+                )
+            finally:
+                server.mission_planner = previous_planner
+                server.mission_executor_service = previous_executor
+                server.mission_autonomy_controller = previous_autonomy
+            self.assertTrue(handled)
+            self.assertEqual(
+                [item["type"] for item in websocket.messages],
+                ["mission_snapshot", "mission_list"],
+            )
+            data = websocket.messages[0]["data"]
+            self.assertTrue(data["autonomous_execution"])
+            self.assertEqual(
+                data["autonomy_cycle"]["status"],
+                "NO_ELIGIBLE_WORK",
+            )
+            self.assertEqual(
+                autonomy.calls[0][2],
+                {
+                    "expected_mission_version": snapshot["mission"]["version"],
+                    "max_work_packages": 1,
+                    "test_mode": True,
+                },
+            )
 
 
 if __name__ == "__main__":

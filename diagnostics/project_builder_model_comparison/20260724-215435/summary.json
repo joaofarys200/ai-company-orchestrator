@@ -1,0 +1,169 @@
+{
+  "decision": "QWOPUS_NO_MATERIAL_IMPROVEMENT",
+  "model_calls": 4,
+  "no_retries": true,
+  "no_local_repair": true,
+  "production_changes": false,
+  "materialization": false,
+  "wp_execution": false,
+  "npm_execution": false,
+  "preview_started": false,
+  "source_hashes": {
+    "typed/model_request.json": "604dbd4710cd2cb280287479c9326a4d7a8efa8ecc4d448a0c475b555743929e",
+    "typed/model_prompt_used.txt": "d36ac6f6a94b2400a26f850ab193f73171644d0e310ea36d0f6872eda3a6575b",
+    "typed/response.schema.json": "5c1aeed0b03376ac1f0ffab6320899eab9d3c8de92e6c3d04d16473a5a9e3d6b",
+    "typed/operations.schema.json": "a80d9d2ce7832db89c16b66d2e7a5b3577e850ecc348f1f47a265e85111627d5",
+    "typed/plan.json": "83318b1eba01bb28619f9d9111a6c7b4663dc8bfb160959d231cd26f4672f2e9",
+    "typed/initial_errors.json": "07d83dcb5d342fc8e81b3d640d20a2eac520882a85846f6dfb2536f73aa09c5f",
+    "typed/namespace.json": "c7de3956155f81d23607b9bb4fdae5f40e96f10ddebbec22923cda96550a81b2",
+    "typed/historical_metrics.json": "6fa67c2f723ddc9f687a126e95307f732ded7cc888bc993f4ef87880f466965e",
+    "compact/prompt.txt": "f2078c0514619104c7ee9cd12179814c8ddd49d648c8322a3ed9f97bb1efeeb3",
+    "compact/request_template.json": "0951069e7a4d9f8c293d628e47860cfd17688781e21d23b92aa29c502bbd8410",
+    "compact/response_schema.json": "d0addb7384dad1155108c47230f9318adc2bd09059c4c4113b2bcf973fe690f3",
+    "compact/compact_schema.json": "638032ab4290c96f53b9b0c267f9cfb03b10238091c85129bb976d337393c1d3",
+    "compact/plan.json": "83318b1eba01bb28619f9d9111a6c7b4663dc8bfb160959d231cd26f4672f2e9",
+    "compact/initial_errors.json": "07d83dcb5d342fc8e81b3d640d20a2eac520882a85846f6dfb2536f73aa09c5f",
+    "compact/validator_prompt.txt": "8908d8296b423dc47f4fa31bbd46a9a571ffb761af169dcf656edd9eee7d3173",
+    "compact/historical_qwen_metrics.json": "936674fd83fd1c08e8f8b0a168ac66a319aa32cd7a8cf9b7ed1d55d8fc7e9931",
+    "compact/historical_qwen_response.json": "db70132453e837813685a0969c2984fdafafad5d51b0f82d8f29c93d8c5d3050"
+  },
+  "equivalence": {
+    "p1_non_model_differences": [],
+    "compact_non_model_differences": [],
+    "p1_prompt_equal": true,
+    "compact_prompt_equal": true,
+    "p1_schema_equal": true,
+    "compact_schema_equal": true
+  },
+  "cases": {
+    "p1": {
+      "qwen3.5:9b": {
+        "case": "qwen",
+        "done": true,
+        "done_reason": "stop",
+        "json_valid": true,
+        "schema_valid": true,
+        "operations_valid": true,
+        "server_js_operation": false,
+        "persistence_operation": false,
+        "plan_operations": 6,
+        "invented_paths": [],
+        "validators_valid": false,
+        "errors": [
+          {
+            "code": "PERSISTENCE_NOT_IMPLEMENTED",
+            "field_path": "component_files.persistence",
+            "message": "O componente persistence nao demonstra leitura e escrita duravel; estado em memoria nao e persistencia.",
+            "expected_type": "mapped artifact implementing durable read and write operations",
+            "received_type": "string",
+            "offending_value": "no durable read/write mechanism in mapped persistence artifacts",
+            "repairable": false,
+            "suggestion": "Associa persistence a um artefacto existente que implemente leitura e escrita duravel.",
+            "phase": "PLAN_SEMANTIC_VALIDATION",
+            "file": "server.js",
+            "line": null,
+            "symbol": "",
+            "target": "server.js",
+            "expected": "mapped artifact implementing durable read and write operations",
+            "actual": "no durable read/write mechanism in mapped persistence artifacts",
+            "component": "persistence"
+          }
+        ],
+        "persistence_detected_in_content": false,
+        "accepted_operation_count": 6,
+        "model": "qwen3.5:9b",
+        "elapsed_seconds": 19.676,
+        "content_sha256": "5925f58455857c47353bd07a6fbd42d8de79e12c504b6ccc1725d61afc7bfbce"
+      },
+      "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M": {
+        "case": "qwopus",
+        "done": true,
+        "done_reason": "stop",
+        "json_valid": true,
+        "schema_valid": true,
+        "operations_valid": false,
+        "server_js_operation": false,
+        "persistence_operation": false,
+        "plan_operations": 10,
+        "invented_paths": [],
+        "validators_valid": false,
+        "errors": [
+          {
+            "code": "INVALID_FIELD_TYPE",
+            "message": "Invalid value for preview field: enabled",
+            "details": {
+              "field": "enabled"
+            }
+          }
+        ],
+        "model": "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M",
+        "elapsed_seconds": 30.334,
+        "content_sha256": "1e11d37c2d13e0d5e2ef9e1e667b3f33eeaa7732f627b6cc8bc77f10e86d947e"
+      }
+    },
+    "compact": {
+      "qwen3.5:9b": {
+        "case": "qwen",
+        "done": true,
+        "done_reason": "stop",
+        "json_valid": true,
+        "schema_valid": true,
+        "operations_valid": false,
+        "server_js_operation": true,
+        "persistence_operation": true,
+        "plan_operations": 4,
+        "invented_paths": [],
+        "validators_valid": false,
+        "errors": [
+          {
+            "code": "HASH_MISMATCH",
+            "message": "Transform hash does not match original content",
+            "details": {
+              "path": "server.js",
+              "expected": "a1b2c3d4e5f67890abcdef1234567890fedcba9876543210abcdef1234567890",
+              "actual": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31"
+            }
+          }
+        ],
+        "model": "qwen3.5:9b",
+        "elapsed_seconds": 24.296,
+        "content_sha256": "bcf98ea4a8345832ec718b12f2db9387553e6527016fe0e612c50bc0e5b83402"
+      },
+      "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M": {
+        "case": "qwopus",
+        "done": true,
+        "done_reason": "stop",
+        "json_valid": true,
+        "schema_valid": true,
+        "operations_valid": false,
+        "server_js_operation": true,
+        "persistence_operation": true,
+        "plan_operations": 4,
+        "invented_paths": [],
+        "validators_valid": false,
+        "errors": [
+          {
+            "code": "HASH_MISMATCH",
+            "message": "Transform hash does not match original content",
+            "details": {
+              "path": "server.js",
+              "expected": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+              "actual": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31"
+            }
+          }
+        ],
+        "model": "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M",
+        "elapsed_seconds": 22.939,
+        "content_sha256": "22ed02b467b880770fbdf0d88af290bc2f0b6a1b56140234364394a164d4b248"
+      }
+    }
+  },
+  "completeness": {
+    "qwen": true,
+    "qwopus": true
+  },
+  "validator_success": {
+    "qwen": false,
+    "qwopus": false
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "request_id": "6412300320cf4c07af21969fa1967a68",
+  "status": "SUCCEEDED",
+  "raw_text": "{\n  \"selected_refs\": [\n    \"file:tests/test_a.py\"\n  ]\n}",
+  "structured_output": {
+    "selected_refs": [
+      "file:tests/test_a.py"
+    ]
+  },
+  "usage": {
+    "input_tokens": 58,
+    "output_tokens": 25,
+    "total_tokens": 83
+  },
+  "provider": "ollama",
+  "model": "qwen3.5:9b",
+  "latency_ms": 2695,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "selected_refs": [
+        "file:tests/test_a.py"
+      ]
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "recovery": [
+    {
+      "action": "NONE",
+      "reason": "recovery_not_required",
+      "recoverable": false,
+      "retry_requested": false,
+      "input_changed": false
+    }
+  ],
+  "tool_calls": [],
+  "warnings": [],
+  "errors": []
+}

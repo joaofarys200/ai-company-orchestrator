@@ -1,0 +1,368 @@
+{
+  "benchmark_version": "model_harness_qwen35_stateful_v2",
+  "created_at": "2026-07-25T20:47:41.082107+00:00",
+  "configuration": {
+    "mode": "smoke",
+    "model": "qwen3.5:9b",
+    "output_dir": "diagnostics\\model_harness_benchmark\\20260725-204739-stateful-smoke",
+    "repetitions": 1,
+    "seed": 42,
+    "context_tokens": 8192,
+    "max_steps": 6,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "think": false,
+    "stream": false,
+    "max_output_tokens": 1024,
+    "base_url": "http://127.0.0.1:11434",
+    "fault_injection": true,
+    "debug_prompts": false
+  },
+  "configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5",
+  "prompts_stored": false,
+  "fixture_catalog_sha256": "687a422faf1a52362cb40bfa17c415e46970d15f9d27e0efc22e9dbce41959d5",
+  "scenario_count": 10,
+  "scenarios": [
+    {
+      "scenario_id": "A01_FIND_RELEVANT_FILE",
+      "group": "A",
+      "capability": "stateful_tool_use",
+      "objective_sha256": "eeb03b8da232378a99906c3d937571c2add8007c44724df001131102994553e8",
+      "constraints_sha256": "d36b87cced009a2feef4a7fc314f26a3a0ba43e0121a4283b59ee13ad104213f",
+      "fixture_id": "a01-find-symbol",
+      "fixture_sha256": "1748ae4be49e49a362b646d7d571e9302ee306573eaae69589fcaba9683b080a",
+      "available_tools": [
+        "list_files",
+        "read_file",
+        "search_text",
+        "inspect_symbol",
+        "query_fixture_index",
+        "finish"
+      ],
+      "max_steps": 5,
+      "expected_stop_reason": "COMPLETED",
+      "fault_injection": false,
+      "variant": 1
+    },
+    {
+      "scenario_id": "B02_CONSTRAINT_RETENTION",
+      "group": "B",
+      "capability": "constraint_retention",
+      "objective_sha256": "a3b50ea210fccea85856ebc55129406cd56311ff53577fd9b32fdfe30fef5b2b",
+      "constraints_sha256": "e039d8f39d7486a6ddd47ec13d4fc2c6cb429422c733c20cde70fe0512057cfa",
+      "fixture_id": "b02-constraints",
+      "fixture_sha256": "e5a08a7ab30b7d8dfbafd78f80cb6f6e4d37fb47e8bd7709e28ab5cd4d40b96c",
+      "available_tools": [
+        "list_files",
+        "read_file",
+        "search_text",
+        "inspect_symbol",
+        "query_fixture_index",
+        "finish"
+      ],
+      "max_steps": 5,
+      "expected_stop_reason": "COMPLETED",
+      "fault_injection": false,
+      "variant": 1
+    },
+    {
+      "scenario_id": "C02_TWO_FILE_DEPENDENCY",
+      "group": "C",
+      "capability": "multi_file_reasoning",
+      "objective_sha256": "969fbea702cf68429ef792c5ab5deed7b91bc72b7e51fb0e6550e6ec40da684b",
+      "constraints_sha256": "d36b87cced009a2feef4a7fc314f26a3a0ba43e0121a4283b59ee13ad104213f",
+      "fixture_id": "c02-two-file",
+      "fixture_sha256": "4727e9263e049d0310632ccd2f9f9cf610d9241215a8b9ca5df1cdcd32b1cf77",
+      "available_tools": [
+        "list_files",
+        "read_file",
+        "search_text",
+        "inspect_symbol",
+        "query_fixture_index",
+        "finish"
+      ],
+      "max_steps": 6,
+      "expected_stop_reason": "COMPLETED",
+      "fault_injection": false,
+      "variant": 1
+    },
+    {
+      "scenario_id": "C05_INSUFFICIENT_EVIDENCE",
+      "group": "C",
+      "capability": "multi_file_reasoning",
+      "objective_sha256": "d056d94780d51be573ea2a287ca67b7387f598c2ed7fa4fa31d397b2bb3d1b66",
+      "constraints_sha256": "d36b87cced009a2feef4a7fc314f26a3a0ba43e0121a4283b59ee13ad104213f",
+      "fixture_id": "c05-insufficient",
+      "fixture_sha256": "565b7edd77758061f43ac3f75bdf280fb942b3248a6f0e351e85c1f0773bd7fa",
+      "available_tools": [
+        "list_files",
+        "read_file",
+        "search_text",
+        "inspect_symbol",
+        "query_fixture_index",
+        "finish"
+      ],
+      "max_steps": 5,
+      "expected_stop_reason": "NEEDS_MORE_EVIDENCE",
+      "fault_injection": false,
+      "variant": 1
+    },
+    {
+      "scenario_id": "D02_CONTEXT_1000",
+      "group": "D",
+      "capability": "context_scaling",
+      "objective_sha256": "99960a955128956f70ee841bc86025cdea5ae5782b8c6caa48b0d4eefa88c0f9",
+      "constraints_sha256": "e3e0374d75976205b883372c997d9707a3705158c25e3e3382a19aaf171a7132",
+      "fixture_id": "d-context-1000",
+      "fixture_sha256": "9747fa3bcf5a8521a9c1502e4cdb905a2b64ebde2ea9b6393d6323e132695ab5",
+      "available_tools": [
+        "read_file",
+        "finish"
+      ],
+      "max_steps": 3,
+      "expected_stop_reason": "COMPLETED",
+      "fault_injection": false,
+      "variant": 1
+    },
+    {
+      "scenario_id": "E02_TRUNCATED_JSON",
+      "group": "E",
+      "capability": "recovery_after_failure",
+      "objective_sha256": "e7c16d5deca569abfbb8ba17602deffdf9de63f0068f79e834650825ff4b8664",
+      "constraints_sha256": "d36b87cced009a2feef4a7fc314f26a3a0ba43e0121a4283b59ee13ad104213f",
+      "fixture_id": "e-fault-base",
+      "fixture_sha256": "47099415394332f140ffc2cc8b8aa818d792379a4caa400f33396e85ac1ea258",
+      "available_tools": [
+        "read_file",
+        "finish"
+      ],
+      "max_steps": 3,
+      "expected_stop_reason": "COMPLETED",
+      "fault_injection": true,
+      "variant": 1
+    },
+    {
+      "scenario_id": "E07_REPEATED_TOOL_CALL",
+      "group": "E",
+      "capability": "recovery_after_failure",
+      "objective_sha256": "e7c16d5deca569abfbb8ba17602deffdf9de63f0068f79e834650825ff4b8664",
+      "constraints_sha256": "d36b87cced009a2feef4a7fc314f26a3a0ba43e0121a4283b59ee13ad104213f",
+      "fixture_id": "e-fault-base",
+      "fixture_sha256": "47099415394332f140ffc2cc8b8aa818d792379a4caa400f33396e85ac1ea258",
+      "available_tools": [
+        "read_file",
+        "finish"
+      ],
+      "max_steps": 3,
+      "expected_stop_reason": "REPEATED_TOOL_CALL",
+      "fault_injection": true,
+      "variant": 1
+    },
+    {
+      "scenario_id": "F01_LOCALIZED_FIX_PLAN",
+      "group": "F",
+      "capability": "short_horizon_planning",
+      "objective_sha256": "31097601902a41a46bf7009372e170c214b52d2fcb01bfbe83386fd5a28379ac",
+      "constraints_sha256": "d36b87cced009a2feef4a7fc314f26a3a0ba43e0121a4283b59ee13ad104213f",
+      "fixture_id": "f01-plan",
+      "fixture_sha256": "8584af1631738db2eb5d97b6e1aff81fa3f885ac338bc20e4d5c4d6d119e34d2",
+      "available_tools": [
+        "list_files",
+        "read_file",
+        "search_text",
+        "inspect_symbol",
+        "query_fixture_index",
+        "finish"
+      ],
+      "max_steps": 5,
+      "expected_stop_reason": "COMPLETED",
+      "fault_injection": false,
+      "variant": 1
+    },
+    {
+      "scenario_id": "G02_EVIDENCE_BASED_PARAGRAPH",
+      "group": "G",
+      "capability": "evidence_based_document_generation",
+      "objective_sha256": "976096cb4149b141c4d8a8242d3a704926e3ed5afd9d3570400b3ad97e451eda",
+      "constraints_sha256": "d36b87cced009a2feef4a7fc314f26a3a0ba43e0121a4283b59ee13ad104213f",
+      "fixture_id": "g02-paragraph",
+      "fixture_sha256": "da413367c29ccaab5c942011d48e1024ae8d43a6ba43ebdbc2c6d69c3e93cd81",
+      "available_tools": [
+        "list_files",
+        "read_file",
+        "search_text",
+        "inspect_symbol",
+        "query_fixture_index",
+        "finish"
+      ],
+      "max_steps": 5,
+      "expected_stop_reason": "COMPLETED",
+      "fault_injection": false,
+      "variant": 1
+    },
+    {
+      "scenario_id": "G06_NO_SUPPORTED_CONCLUSION",
+      "group": "G",
+      "capability": "closed_source_research",
+      "objective_sha256": "9439f98e8092c374a1d755e3123dc543ab4d873360ff26432caddccf4004011c",
+      "constraints_sha256": "d36b87cced009a2feef4a7fc314f26a3a0ba43e0121a4283b59ee13ad104213f",
+      "fixture_id": "g06-unsupported",
+      "fixture_sha256": "5eaa53170a9369ac1823d5d173e9fbbb9a40d1a6e6a763c962e81b8545f16f4f",
+      "available_tools": [
+        "list_files",
+        "read_file",
+        "search_text",
+        "inspect_symbol",
+        "query_fixture_index",
+        "finish"
+      ],
+      "max_steps": 5,
+      "expected_stop_reason": "UNSUPPORTED_CONCLUSION",
+      "fault_injection": false,
+      "variant": 1
+    }
+  ],
+  "runtime_before": {
+    "python": "3.12.4 (tags/v3.12.4:8e8a4ba, Jun  6 2024, 19:30:16) [MSC v.1940 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "ollama_version": "ollama version is 0.32.3",
+    "model_list_entry": {
+      "name": "qwen3.5:9b",
+      "model": "qwen3.5:9b",
+      "modified_at": "2026-07-06T12:33:54.8280526+01:00",
+      "size": 6594474711,
+      "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 262144,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "vision",
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    "model_details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen35",
+      "families": [
+        "qwen35"
+      ],
+      "parameter_size": "9.7B",
+      "quantization_level": "Q4_K_M"
+    },
+    "model_capabilities": [
+      "completion",
+      "vision",
+      "tools",
+      "thinking"
+    ],
+    "model_info": {
+      "general.architecture": "qwen35",
+      "general.parameter_count": 9653104368,
+      "qwen35.block_count": 32,
+      "qwen35.context_length": 262144,
+      "qwen35.embedding_length": 4096,
+      "qwen35.vision.block_count": 27,
+      "qwen35.vision.embedding_length": 1152
+    },
+    "ollama_ps_before": {
+      "models": []
+    },
+    "gpu_before": {
+      "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+      "driver_version": "581.34",
+      "memory_total_mib": 8151,
+      "memory_used_mib": 4276,
+      "memory_free_mib": 3535,
+      "utilization_percent": 61
+    }
+  },
+  "integrity_before": {
+    "trees": {
+      "workspace_projects": {
+        "exists": true,
+        "file_count": 33,
+        "total_bytes": 30523,
+        "tree_sha256": "afb3939180357df275278574389aaddc0b30cba386bb6598f5aa3b35c0c3160a"
+      },
+      "mission_metadata": {
+        "exists": true,
+        "file_count": 1807,
+        "total_bytes": 63803061,
+        "tree_sha256": "43854c8d9ebff2fa0fdf7081072a570448af1bdf27717fb5358a27461e1c985b"
+      },
+      "chroma_collections": {
+        "exists": true,
+        "file_count": 5,
+        "total_bytes": 4284580,
+        "tree_sha256": "e130636a31ba50b2aaabbb00f3ae64b5b52ced7d0789d4088d77b9e961fad2fe"
+      },
+      "frontend_source": {
+        "exists": true,
+        "file_count": 21,
+        "total_bytes": 213007,
+        "tree_sha256": "ef7c4d05a85969f6569ba15e855fde11536740db32b6b749d380b52d9999c8a5"
+      }
+    },
+    "critical_files": {
+      "agents/orchestrator/project_builder.py": {
+        "exists": true,
+        "size_bytes": 342032,
+        "sha256": "3484b147f1326cf07c223a5d03a3653e66758e20c2a88e9b462072eacfffdbeb"
+      },
+      "agents/mission_state.py": {
+        "exists": true,
+        "size_bytes": 55579,
+        "sha256": "998ce3f9e5dbbbe22da9b74185db61b49a967ded399f58944cd432a590ea25cc"
+      },
+      "agents/mission_executor.py": {
+        "exists": true,
+        "size_bytes": 56579,
+        "sha256": "b09734185a6fb48fb4b02de9c344a766734b626cd5e029775a261ad65f885a58"
+      },
+      "agents/mission_autonomy.py": {
+        "exists": true,
+        "size_bytes": 32510,
+        "sha256": "87ad895b57429c68f2f090c7dcfd0b22669ead79ed8fd73c7b8c6cc4bbc11671"
+      },
+      "agents/executors/registry.py": {
+        "exists": true,
+        "size_bytes": 5561,
+        "sha256": "03fdd968bfba1dc12f65dc4196c76f24c7349d1e56fec55690584bd7ba3bbf1b"
+      },
+      "intelligence/coding_session.py": {
+        "exists": true,
+        "size_bytes": 47873,
+        "sha256": "d8aa025372eaa960bfd74ff283552584cf02d331f0bde82e6c5a1a197752c1a6"
+      },
+      "server.py": {
+        "exists": true,
+        "size_bytes": 118598,
+        "sha256": "005e7609901bdeb628ffaabdf2298c82b2b58ca10b43537ad9f8a26adf16d749"
+      }
+    },
+    "fixture_catalog_sha256": "687a422faf1a52362cb40bfa17c415e46970d15f9d27e0efc22e9dbce41959d5"
+  },
+  "safety": {
+    "network": "localhost_ollama_only",
+    "tool_registry": "benchmark_read_only",
+    "project_mutation": false,
+    "mission_mutation": false,
+    "subprocess_tools": false,
+    "shell_tools": false,
+    "prompt_content_logged": false
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "case_id": "B07_TOOL_SELECTION",
+  "title": "Selecao de tool sem execucao",
+  "capability": "tool_selection",
+  "task_profile": "TOOL_SELECTION",
+  "system_prompt": "Select exactly one allowed tool but do not execute it. Return the proposed call as JSON.",
+  "user_prompt": "Inspect config.json without changing any file. Allowed tool: read_file. Forbidden tool: write_file.",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "tool_name",
+      "arguments"
+    ],
+    "properties": {
+      "tool_name": {
+        "type": "string",
+        "enum": [
+          "read_file"
+        ]
+      },
+      "arguments": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "enum": [
+              "config.json"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "allowed_tools": [
+    "read_file"
+  ],
+  "context_candidates": []
+}

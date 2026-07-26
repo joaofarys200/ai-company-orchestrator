@@ -1,0 +1,269 @@
+{
+  "diagnostic_version": "stateful_provider_path_diagnostic_v1",
+  "started_at": "2026-07-25T22:39:15.740292+00:00",
+  "command_scope": "stateful_provider_path_only",
+  "configuration": {
+    "scenario": "A01_FIND_RELEVANT_FILE",
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "timeout_seconds": 300.0,
+    "output_dir": "diagnostics\\model_harness_provider_diagnostic\\20260725-2240-isolated-matrix",
+    "mode": "matrix",
+    "keep_alive": "15m",
+    "debug_payload": false,
+    "capture_ollama_logs": true,
+    "compare_v1": true,
+    "direct_ollama": true,
+    "reset_model_between_variants": true,
+    "context_tokens": 8192,
+    "max_output_tokens": 1024,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false
+  },
+  "source_stateful_run": "diagnostics/model_harness_benchmark/20260725-204739-stateful-smoke",
+  "source_v1_run": "diagnostics/model_harness_benchmark/20260725-184843-qwen35-9b",
+  "v1_source": {
+    "case_id": "B07_TOOL_SELECTION",
+    "request_artifact": "diagnostics/model_harness_benchmark/20260725-184843-qwen35-9b/cases/B07_TOOL_SELECTION/rep-1/request.json",
+    "response_status": "SUCCEEDED",
+    "response_latency_ms": 2817,
+    "response_validation": "PASSED",
+    "request_fingerprint": "3959cbb91e0ef8984fb269caad98ba1a7276ad05b9d3ba49dbc6682174d034f8"
+  },
+  "scenario": "A01_FIND_RELEVANT_FILE",
+  "request_reconstruction": {
+    "historical_context_hash": "b60189b24418aef225772e48495225f0e8a6026498e0c31c5d148e76636c133a",
+    "reconstructed_context_hash": "b60189b24418aef225772e48495225f0e8a6026498e0c31c5d148e76636c133a",
+    "context_hash_matches": true,
+    "historical_request_fingerprint": "91105c160dedcdb569fc4570e723aea3f55c778e9231d64e3b11816e8855b6b7",
+    "reconstructed_request_fingerprint": "91105c160dedcdb569fc4570e723aea3f55c778e9231d64e3b11816e8855b6b7",
+    "request_fingerprint_matches": true,
+    "historical_configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5",
+    "configuration_equivalent": {
+      "equivalent": true,
+      "differences": {}
+    }
+  },
+  "request_hashes": {
+    "system_prompt": {
+      "sha256": "1b8f2ed230c9663c19196860aa1348e18b800f13f02b7521489831419234cdeb",
+      "chars": 829
+    },
+    "user_prompt": {
+      "sha256": "1fb193249b0f2b6c074f9f8473a69d9109e4aa01c4cb2478a9be47de83561599",
+      "chars": 782
+    },
+    "effective_user_prompt": {
+      "sha256": "edfcde8296aa2630d40bd55caadccb47d0ef35d6344145a6e4133c17040970e1",
+      "chars": 3604
+    },
+    "context": {
+      "sha256": "b60189b24418aef225772e48495225f0e8a6026498e0c31c5d148e76636c133a",
+      "items_sha256": "06b98145b1d87bc1660fd0ceab25a80ed59fc4e2bd76618331b91aa46faa555f",
+      "chars": 2044
+    },
+    "schema": {
+      "sha256": "17b993fcf2e562e823c8061a79b883b34d28260de2f4d5b107cd2f394a965380",
+      "bytes": 1341
+    },
+    "messages": {
+      "sha256": "96272f81400bd141aaff9a789d2d22404ad977f5f54ea1ff012ecf8c7b933001",
+      "count": 2
+    },
+    "tools": {
+      "top_level_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "top_level_count": 0,
+      "context_representation_sha256": "1e235708ef9c3f193ce929ea19ef37ad2932627873951b07868ca0944cf78b7b",
+      "context_representation_count": 1
+    },
+    "options": {
+      "sha256": "1d51ecf0945919bdbc0063693fdfb6cee5a4d95bb2f983f9c120fdd641df8973",
+      "value": {
+        "temperature": 0.0,
+        "top_p": 0.8,
+        "seed": 42,
+        "num_ctx": 8192,
+        "num_predict": 1024
+      }
+    },
+    "payload": {
+      "sha256": "bf09f238164d9001392710211ed2e3716f68a7f274c1a26837580693b6e6b5e8",
+      "bytes": 6622
+    }
+  },
+  "payload_content_stored": false,
+  "prompts_stored": false,
+  "integrity_before": {
+    "captured_at": "2026-07-25T22:39:15.740292+00:00",
+    "trees": {
+      "workspace_projects": {
+        "exists": true,
+        "file_count": 28,
+        "total_bytes": 29916,
+        "tree_sha256": "19ef89052044a5bc45a7fd2922be5a4570cc476733118dee09d7b9c38ebff4fa"
+      },
+      "mission_metadata": {
+        "exists": true,
+        "file_count": 1840,
+        "total_bytes": 65181448,
+        "tree_sha256": "4d05ff8cdcbcec4f5551be25f5efb2ed18b99e36fa67c36ba30fe27446f53356"
+      },
+      "chroma_collections": {
+        "exists": true,
+        "file_count": 5,
+        "total_bytes": 4284580,
+        "tree_sha256": "e130636a31ba50b2aaabbb00f3ae64b5b52ced7d0789d4088d77b9e961fad2fe"
+      },
+      "frontend_source": {
+        "exists": true,
+        "file_count": 21,
+        "total_bytes": 213007,
+        "tree_sha256": "ef7c4d05a85969f6569ba15e855fde11536740db32b6b749d380b52d9999c8a5"
+      }
+    },
+    "critical_files": {
+      "backend/model_harness/contracts.py": {
+        "exists": true,
+        "size_bytes": 9995,
+        "sha256": "0a19db62f9b1d7f8f72af09e99b5516769d78c6e48413478e70aeb89072857b6"
+      },
+      "backend/model_harness/context_builder.py": {
+        "exists": true,
+        "size_bytes": 4564,
+        "sha256": "dcfc7f2146ec665e7cab2f5a86443b8c09ddf5d92e1edfaadf92552296719c6e"
+      },
+      "backend/model_harness/harness.py": {
+        "exists": true,
+        "size_bytes": 9826,
+        "sha256": "f26b68ce6e78f56725ecb4b7eda437a5c04a77eaa4ead9ccee9bef7cd5211abc"
+      },
+      "backend/model_harness/profiles.py": {
+        "exists": true,
+        "size_bytes": 6566,
+        "sha256": "f8436bfb223d68eb0ac459ab6698ad6058f8cb06ef03fc8ac6ae8bf414dff664"
+      },
+      "backend/model_harness/provider.py": {
+        "exists": true,
+        "size_bytes": 3818,
+        "sha256": "c63e1cc7398852244137bbd46dc9e75f9310f5e945ec15558593de5e2deedaf7"
+      },
+      "backend/model_harness/recovery.py": {
+        "exists": true,
+        "size_bytes": 5245,
+        "sha256": "b2237a9a3fe7738e9d4a6cc6a87425fd90cfbe5b33d064ec1c17c422d22db882"
+      },
+      "backend/model_harness/router.py": {
+        "exists": true,
+        "size_bytes": 2751,
+        "sha256": "e6b8ae057db0152d24305f954ebfd8a342699b55881850697d8fb8b6b2990a9c"
+      },
+      "backend/model_harness/validation.py": {
+        "exists": true,
+        "size_bytes": 11637,
+        "sha256": "ee553af094cc5f8612992e8720feae33881372e33922cb00b3f08483fde6373c"
+      },
+      "backend/model_harness/benchmarking/runner.py": {
+        "exists": true,
+        "size_bytes": 88250,
+        "sha256": "f21866acec99024337f9f2cb4fc4ba2f3a34ed875f0a89590809f14263809798"
+      },
+      "scripts/model_harness_benchmark.py": {
+        "exists": true,
+        "size_bytes": 47212,
+        "sha256": "042d55a09defc4e6b41c0607a632d36db4228e88b399ad8fc5e2337d8feedbc9"
+      },
+      "scripts/model_harness_stateful_benchmark.py": {
+        "exists": true,
+        "size_bytes": 3717,
+        "sha256": "e3076e2b5fd0ff171c500d1b5e53986be52cca1f7cd41867008aa50ff9b5316e"
+      },
+      "agents/orchestrator/project_builder.py": {
+        "exists": true,
+        "size_bytes": 342032,
+        "sha256": "3484b147f1326cf07c223a5d03a3653e66758e20c2a88e9b462072eacfffdbeb"
+      },
+      "agents/mission_state.py": {
+        "exists": true,
+        "size_bytes": 55579,
+        "sha256": "998ce3f9e5dbbbe22da9b74185db61b49a967ded399f58944cd432a590ea25cc"
+      },
+      "agents/mission_executor.py": {
+        "exists": true,
+        "size_bytes": 56579,
+        "sha256": "b09734185a6fb48fb4b02de9c344a766734b626cd5e029775a261ad65f885a58"
+      },
+      "agents/mission_autonomy.py": {
+        "exists": true,
+        "size_bytes": 32510,
+        "sha256": "87ad895b57429c68f2f090c7dcfd0b22669ead79ed8fd73c7b8c6cc4bbc11671"
+      },
+      "agents/executors/registry.py": {
+        "exists": true,
+        "size_bytes": 5561,
+        "sha256": "03fdd968bfba1dc12f65dc4196c76f24c7349d1e56fec55690584bd7ba3bbf1b"
+      },
+      "intelligence/coding_session.py": {
+        "exists": true,
+        "size_bytes": 47873,
+        "sha256": "d8aa025372eaa960bfd74ff283552584cf02d331f0bde82e6c5a1a197752c1a6"
+      }
+    },
+    "fixture_catalog_sha256": "687a422faf1a52362cb40bfa17c415e46970d15f9d27e0efc22e9dbce41959d5"
+  },
+  "safety": {
+    "network": "localhost_ollama_only",
+    "tools_executed": false,
+    "fixture_materialization": false,
+    "project_mutation": false,
+    "mission_mutation": false,
+    "production_provider_modified": false,
+    "production_prompts_modified": false,
+    "global_ollama_configuration_modified": false
+  },
+  "post_run_synthesis": {
+    "source_runs": {
+      "clean": "20260725-2240-isolated-matrix",
+      "partial_contamination": "20260725-2225-stateful-provider-matrix",
+      "stream": "20260725-2252-exact-stream-probe"
+    },
+    "source_artifacts": {
+      "clean_summary": {
+        "path": "summary.json",
+        "sha256": "f789dd190a22b782db5c0e90da458ba4fbbb16503c828dc4e7af02ded40e0c56",
+        "exists": true
+      },
+      "clean_matrix": {
+        "path": "matrix_results.json",
+        "sha256": "9317b60a5ea6f17202be23bb17cb7ce5c85dd1fe0ff50e59edfbc5dbad337eab",
+        "exists": true
+      },
+      "partial_matrix": {
+        "path": "matrix_results.json",
+        "sha256": "4ceb6200a5e97316b8f16507c80d45f471d7d87215c4788841ee2928c635d260",
+        "exists": true
+      },
+      "stream_matrix": {
+        "path": "matrix_results.json",
+        "sha256": "51cfcbc37cfdb3196012b5dd6f0fbb83b7f3aa135ff09c089234881d767e4c6f",
+        "exists": true
+      },
+      "historical_step_trace": {
+        "path": "step_trace.jsonl",
+        "sha256": "2b8336ebda13f6c9d5794ea0c84f749eac806e95ad13e8b6538a4280d300ddf4",
+        "exists": true
+      },
+      "historical_ollama_log": {
+        "path": "server.log",
+        "sha256": "8e08a266cec8ee4f6a48e6e029bef91dce10969d10a93d832f6265c91ff25ce9",
+        "exists": true
+      }
+    },
+    "ollama_restart_performed": false,
+    "model_runner_unloads_explicitly_approved": true,
+    "production_fix_implemented": false,
+    "full_smoke_rerun": false
+  }
+}

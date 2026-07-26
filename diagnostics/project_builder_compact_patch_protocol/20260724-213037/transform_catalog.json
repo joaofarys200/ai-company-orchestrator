@@ -1,0 +1,65 @@
+{
+  "ADD_JSON_FILE_PERSISTENCE": {
+    "paths": [
+      "server.js"
+    ],
+    "parameters": [
+      "storage_filename"
+    ],
+    "preconditions": [
+      "expected hash",
+      "http import",
+      "/health route",
+      "Node server structure",
+      "no existing fs persistence"
+    ],
+    "postconditions": [
+      "node:fs import",
+      "deterministic storage URL",
+      "durable read",
+      "durable write",
+      "missing-file handling",
+      "health preserved"
+    ],
+    "implementation_sha256": "6cc5624bdbe8715898a2b65c20f85c33f8cbcbee20f84e862e842b4c94998cab"
+  },
+  "PRESERVE_HEALTH_ROUTE": {
+    "paths": [
+      "server.js"
+    ],
+    "parameters": [],
+    "preconditions": [
+      "/health exists"
+    ],
+    "postconditions": [
+      "/health unchanged"
+    ],
+    "implementation_sha256": "6cc5624bdbe8715898a2b65c20f85c33f8cbcbee20f84e862e842b4c94998cab"
+  },
+  "EXPORT_SERVER_FOR_TESTS": {
+    "paths": [
+      "server.js"
+    ],
+    "parameters": [],
+    "preconditions": [
+      "server structure"
+    ],
+    "postconditions": [
+      "existing test export preserved"
+    ],
+    "implementation_sha256": "6cc5624bdbe8715898a2b65c20f85c33f8cbcbee20f84e862e842b4c94998cab"
+  },
+  "PRESERVE_HTTP_IMPORT": {
+    "paths": [
+      "server.js"
+    ],
+    "parameters": [],
+    "preconditions": [
+      "http import exists"
+    ],
+    "postconditions": [
+      "http import preserved"
+    ],
+    "implementation_sha256": "6cc5624bdbe8715898a2b65c20f85c33f8cbcbee20f84e862e842b4c94998cab"
+  }
+}

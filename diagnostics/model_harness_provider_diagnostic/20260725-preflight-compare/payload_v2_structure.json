@@ -1,0 +1,85 @@
+{
+  "source": "stateful_v2_reconstructed_first_request",
+  "endpoint": "/api/chat",
+  "http_method": "POST",
+  "headers": [
+    "accept",
+    "content-type",
+    "host",
+    "user-agent"
+  ],
+  "payload_bytes": 6622,
+  "payload_sha256": "bf09f238164d9001392710211ed2e3716f68a7f274c1a26837580693b6e6b5e8",
+  "message_count": 2,
+  "role_order": [
+    "system",
+    "user"
+  ],
+  "messages": [
+    {
+      "role": "system",
+      "content_chars": 829,
+      "content_bytes": 829,
+      "content_sha256": "1b8f2ed230c9663c19196860aa1348e18b800f13f02b7521489831419234cdeb"
+    },
+    {
+      "role": "user",
+      "content_chars": 3604,
+      "content_bytes": 3604,
+      "content_sha256": "edfcde8296aa2630d40bd55caadccb47d0ef35d6344145a6e4133c17040970e1"
+    }
+  ],
+  "system_prompt_size": 829,
+  "user_prompt_size": 3604,
+  "schema": {
+    "sha256": "17b993fcf2e562e823c8061a79b883b34d28260de2f4d5b107cd2f394a965380",
+    "bytes": 1341,
+    "nodes": 22,
+    "properties": 13,
+    "arrays": 6,
+    "objects": 3,
+    "enums": 3,
+    "enum_values": 20,
+    "required": 13,
+    "optionals": 0,
+    "refs": 0,
+    "refs_resolved": 0,
+    "oneOf": 0,
+    "anyOf": 0,
+    "allOf": 0,
+    "nullable_representations": 0,
+    "additionalProperties": 2,
+    "patterns": 0,
+    "limits": 3,
+    "examples": 0,
+    "defaults": 0,
+    "descriptions": 0,
+    "titles": 0,
+    "maximum_depth": 7,
+    "refs_list": [],
+    "cycles_or_recursion": [],
+    "potentially_problematic": [
+      {
+        "path": "#/properties/arguments",
+        "construction": "unconstrained_object"
+      }
+    ],
+    "compatibility_conclusion": "HEURISTIC_ONLY_REQUIRES_MATRIX_CONFIRMATION"
+  },
+  "tool_count": 0,
+  "tool_schema_size": 2,
+  "tool_transport": "no_top_level_tools_context_and_schema_only",
+  "options": {
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_predict": 1024
+  },
+  "think": false,
+  "stream": false,
+  "keep_alive": "15m",
+  "provider_adapter": "OllamaBenchmarkProvider",
+  "http_client": "httpx.AsyncClient.post buffered",
+  "response_handling": "buffer_complete_response"
+}

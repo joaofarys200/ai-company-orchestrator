@@ -1,0 +1,18 @@
+{
+  "source": "previous_response_hash_removed_only",
+  "schema_new": true,
+  "coverage": false,
+  "binding": true,
+  "apply": false,
+  "validators": false,
+  "errors": [
+    {
+      "code": "INVALID_TRANSFORM_PARAMETER",
+      "message": "storage_filename must be a single JSON filename",
+      "details": {
+        "value": null
+      }
+    }
+  ],
+  "model_hash_fields_removed": 1
+}

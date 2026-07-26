@@ -1,0 +1,7 @@
+{
+  "valid": true,
+  "plan_hash": "27178ad3782d6d1b8b61d11a3aafb13141100ff8350f6031facd4654ab3a1383",
+  "error_codes": [],
+  "focal_protocol_can_represent": false,
+  "reason": "server.js is not in the run allowlist because allowed_replacements was empty"
+}

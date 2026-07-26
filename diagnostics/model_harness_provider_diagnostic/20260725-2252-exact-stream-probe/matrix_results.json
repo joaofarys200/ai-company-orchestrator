@@ -1,0 +1,378 @@
+{
+  "diagnostic_version": "stateful_provider_path_diagnostic_v1",
+  "results": [
+    {
+      "variant_id": "EXACT_STREAM_PROBE",
+      "status": "SUCCEEDED",
+      "execution_path": "direct_ollama",
+      "duration_ms": 20794.731,
+      "status_code": 200,
+      "response_bytes": 8383,
+      "response_sha256": "4c9bf9c7ccedabefe1406c1127fbd6da0dc11be1791430695eba79a08de0f240",
+      "model_content_chars": 228,
+      "model_content_sha256": "9d93abebfe2b368e40f30f870772ab77e95b4520cb3f0314e94ed7aaaac44f12",
+      "done": true,
+      "done_reason": "stop",
+      "input_tokens": 988,
+      "output_tokens": 91,
+      "json_valid": true,
+      "schema_valid": true,
+      "partial_response": false,
+      "exception": null,
+      "timeline": [
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T00",
+          "name": "diagnostic_start",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:08.858264+00:00",
+          "monotonic_ns": 725329078000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "diagnostic_version": "stateful_provider_path_diagnostic_v1"
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T01",
+          "name": "scenario_loaded",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:49:08.858264+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T02",
+          "name": "context_built",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:49:08.858264+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T03",
+          "name": "request_constructed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:49:08.858264+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T04",
+          "name": "profile_resolved",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:49:08.858264+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T05",
+          "name": "route_resolved",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:49:08.858264+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T06",
+          "name": "schema_generated",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:49:08.858264+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T07",
+          "name": "schema_normalized",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:49:08.858264+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T08",
+          "name": "payload_serialized",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:08.858264+00:00",
+          "monotonic_ns": 725329078000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "payload_sha256": "14108d131706ca0f3ad1d290087e656d4e75ca8d358bc5be674d19f9dfe38d3c",
+            "payload_bytes": 6621,
+            "stream": true
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T09",
+          "name": "provider_call_started",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:08.858264+00:00",
+          "monotonic_ns": 725329078000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "endpoint": "/api/chat",
+            "execution_path": "direct_ollama"
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T10",
+          "name": "dns_or_endpoint_resolved",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:08.859793+00:00",
+          "monotonic_ns": 725329078000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "scheme": "http",
+            "host": "127.0.0.1",
+            "port": 11434,
+            "resolution": "httpcore_trace_for_actual_connection"
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T11",
+          "name": "tcp_connected",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:09.276058+00:00",
+          "monotonic_ns": 725329500000000,
+          "elapsed_ms": 422.0,
+          "details": {
+            "httpcore_event": "connection.connect_tcp.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T12",
+          "name": "request_headers_sent",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:09.276753+00:00",
+          "monotonic_ns": 725329500000000,
+          "elapsed_ms": 422.0,
+          "details": {
+            "httpcore_event": "http11.send_request_headers.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T13",
+          "name": "request_body_sent",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:09.276753+00:00",
+          "monotonic_ns": 725329500000000,
+          "elapsed_ms": 422.0,
+          "details": {
+            "httpcore_event": "http11.send_request_body.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T14",
+          "name": "response_headers_received",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:23.716498+00:00",
+          "monotonic_ns": 725343937000000,
+          "elapsed_ms": 14859.0,
+          "details": {
+            "httpcore_event": "http11.receive_response_headers.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T15",
+          "name": "first_byte_received",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:23.717511+00:00",
+          "monotonic_ns": 725343937000000,
+          "elapsed_ms": 14859.0,
+          "details": {
+            "bytes": 125
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T16",
+          "name": "first_chunk_received",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:23.717511+00:00",
+          "monotonic_ns": 725343937000000,
+          "elapsed_ms": 14859.0,
+          "details": {
+            "bytes": 125
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T17",
+          "name": "first_token_observed",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:23.717511+00:00",
+          "monotonic_ns": 725343937000000,
+          "elapsed_ms": 14859.0,
+          "details": {
+            "observation": "first non-empty content in streamed Ollama chunk"
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T18",
+          "name": "response_completed",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:28.553706+00:00",
+          "monotonic_ns": 725348765000000,
+          "elapsed_ms": 19687.0,
+          "details": {
+            "response_bytes": 8383,
+            "partial_response": false
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T19",
+          "name": "parsing_started",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:28.553706+00:00",
+          "monotonic_ns": 725348765000000,
+          "elapsed_ms": 19687.0,
+          "details": {}
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T20",
+          "name": "parsing_completed",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:28.553706+00:00",
+          "monotonic_ns": 725348765000000,
+          "elapsed_ms": 19687.0,
+          "details": {
+            "envelope_keys": [
+              "created_at",
+              "done",
+              "done_reason",
+              "eval_count",
+              "eval_duration",
+              "load_duration",
+              "message",
+              "model",
+              "prompt_eval_count",
+              "prompt_eval_duration",
+              "total_duration"
+            ],
+            "model_content_chars": 228
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T21",
+          "name": "validation_completed",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:28.553706+00:00",
+          "monotonic_ns": 725348765000000,
+          "elapsed_ms": 19687.0,
+          "details": {
+            "json_valid": true,
+            "schema_valid": true
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T22",
+          "name": "recovery_decided",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:49:28.553706+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "Direct Ollama calls do not invoke RecoveryCoordinator."
+          }
+        },
+        {
+          "correlation_id": "42f9592d04034f44bdd6d1b7db52cecb",
+          "variant_id": "EXACT_STREAM_PROBE",
+          "stage": "T23",
+          "name": "diagnostic_completed",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:49:29.653744+00:00",
+          "monotonic_ns": 725349875000000,
+          "elapsed_ms": 20797.0,
+          "details": {
+            "status": "SUCCEEDED",
+            "exception_classification": ""
+          }
+        }
+      ],
+      "payload_sha256": "14108d131706ca0f3ad1d290087e656d4e75ca8d358bc5be674d19f9dfe38d3c",
+      "payload_bytes": 6621,
+      "notes": [],
+      "title": "Exact full payload with stream=true"
+    }
+  ],
+  "executed": [
+    "EXACT_STREAM_PROBE"
+  ],
+  "not_executed": []
+}

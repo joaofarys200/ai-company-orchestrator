@@ -1,0 +1,10 @@
+{
+  "command": [
+    "ollama",
+    "ps"
+  ],
+  "exit_code": 0,
+  "stdout": "NAME          ID              SIZE      PROCESSOR          CONTEXT    UNTIL              \nqwen3.5:9b    6488c96fa5fa    6.4 GB    16%/84% CPU/GPU    8192       4 minutes from now    \n",
+  "stderr": "",
+  "elapsed_seconds": 0.24
+}

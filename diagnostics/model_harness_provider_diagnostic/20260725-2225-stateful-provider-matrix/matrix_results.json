@@ -1,0 +1,1298 @@
+{
+  "diagnostic_version": "stateful_provider_path_diagnostic_v1",
+  "results": [
+    {
+      "variant_id": "D01_BASELINE_SIMPLE",
+      "status": "OLLAMA_SERVER_ERROR",
+      "execution_path": "direct_ollama",
+      "duration_ms": 28483.506,
+      "status_code": 500,
+      "response_bytes": 288,
+      "response_sha256": "9cf13235b7b3024b25894f0a1d8cf0bac2d2cd4c6820047339d966d9955c7d2e",
+      "model_content_chars": 0,
+      "model_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "done": null,
+      "done_reason": "",
+      "input_tokens": null,
+      "output_tokens": null,
+      "json_valid": null,
+      "schema_valid": null,
+      "partial_response": true,
+      "exception": {
+        "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+        "variant_id": "D01_BASELINE_SIMPLE",
+        "classification": "OLLAMA_SERVER_ERROR",
+        "class": "HTTPStatusError",
+        "module": "httpx",
+        "stage": "T14",
+        "timeout_type": "",
+        "errno": null,
+        "status_http": 500,
+        "message_redacted": "Server error '500 Internal Server Error' for url 'http://127.0.0.1:11434/api/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500",
+        "message_sha256": "495c2f7b94bf3e5ca99ad3532a6103aa50b141a1803504e371f248f92869b762",
+        "causes": [
+          {
+            "class": "HTTPStatusError",
+            "module": "httpx",
+            "message_redacted": "Server error '500 Internal Server Error' for url 'http://127.0.0.1:11434/api/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500",
+            "message_sha256": "495c2f7b94bf3e5ca99ad3532a6103aa50b141a1803504e371f248f92869b762",
+            "errno": null,
+            "status_http": 500
+          }
+        ],
+        "traceback": [
+          {
+            "file": "backend/model_harness/benchmarking/provider_diagnostic.py",
+            "line": 1729,
+            "function": "direct_ollama_call"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_models.py",
+            "line": 829,
+            "function": "raise_for_status"
+          }
+        ]
+      },
+      "timeline": [
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T00",
+          "name": "diagnostic_start",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": 723866484000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "diagnostic_version": "stateful_provider_path_diagnostic_v1"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T01",
+          "name": "scenario_loaded",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T02",
+          "name": "context_built",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T03",
+          "name": "request_constructed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T04",
+          "name": "profile_resolved",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T05",
+          "name": "route_resolved",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T06",
+          "name": "schema_generated",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T07",
+          "name": "schema_normalized",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T08",
+          "name": "payload_serialized",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": 723866484000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "payload_sha256": "62e49cc055e92726c03af3be483704229df69d19c6ed516adb907be11df783fa",
+            "payload_bytes": 271,
+            "stream": false
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T09",
+          "name": "provider_call_started",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": 723866484000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "endpoint": "/api/chat",
+            "execution_path": "direct_ollama"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T10",
+          "name": "dns_or_endpoint_resolved",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:24:46.267123+00:00",
+          "monotonic_ns": 723866484000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "scheme": "http",
+            "host": "127.0.0.1",
+            "port": 11434,
+            "resolution": "httpcore_trace_for_actual_connection"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T11",
+          "name": "tcp_connected",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:24:47.126726+00:00",
+          "monotonic_ns": 723867343000000,
+          "elapsed_ms": 859.0,
+          "details": {
+            "httpcore_event": "connection.connect_tcp.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T12",
+          "name": "request_headers_sent",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:24:47.137420+00:00",
+          "monotonic_ns": 723867359000000,
+          "elapsed_ms": 875.0,
+          "details": {
+            "httpcore_event": "http11.send_request_headers.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T13",
+          "name": "request_body_sent",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:24:47.138144+00:00",
+          "monotonic_ns": 723867359000000,
+          "elapsed_ms": 875.0,
+          "details": {
+            "httpcore_event": "http11.send_request_body.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T14",
+          "name": "response_headers_received",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:25:11.983788+00:00",
+          "monotonic_ns": 723892203000000,
+          "elapsed_ms": 25719.0,
+          "details": {
+            "httpcore_event": "http11.receive_response_headers.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T15",
+          "name": "first_byte_received",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.751208+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "first_byte_received was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T16",
+          "name": "first_chunk_received",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.751208+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "first_chunk_received was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T17",
+          "name": "first_token_observed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.751208+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "first_token_observed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T18",
+          "name": "response_completed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.751208+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "response_completed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T19",
+          "name": "parsing_started",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.751208+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "parsing_started was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T20",
+          "name": "parsing_completed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.751208+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "parsing_completed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T21",
+          "name": "validation_completed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.751208+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "validation_completed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T22",
+          "name": "recovery_decided",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.751208+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "recovery_decided was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+          "variant_id": "D01_BASELINE_SIMPLE",
+          "stage": "T23",
+          "name": "diagnostic_completed",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:25:14.750109+00:00",
+          "monotonic_ns": 723894968000000,
+          "elapsed_ms": 28484.0,
+          "details": {
+            "status": "OLLAMA_SERVER_ERROR",
+            "exception_classification": "OLLAMA_SERVER_ERROR"
+          }
+        }
+      ],
+      "payload_sha256": "62e49cc055e92726c03af3be483704229df69d19c6ed516adb907be11df783fa",
+      "payload_bytes": 271,
+      "notes": [],
+      "title": "Minimal prompt without schema or tools"
+    },
+    {
+      "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+      "status": "READ_TIMEOUT",
+      "execution_path": "direct_ollama",
+      "duration_ms": 301520.533,
+      "status_code": null,
+      "response_bytes": 0,
+      "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "model_content_chars": 0,
+      "model_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "done": null,
+      "done_reason": "",
+      "input_tokens": null,
+      "output_tokens": null,
+      "json_valid": null,
+      "schema_valid": null,
+      "partial_response": false,
+      "exception": {
+        "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+        "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+        "classification": "READ_TIMEOUT",
+        "class": "ReadTimeout",
+        "module": "httpx",
+        "stage": "T13",
+        "timeout_type": "read",
+        "errno": null,
+        "status_http": null,
+        "message_redacted": "",
+        "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "causes": [
+          {
+            "class": "ReadTimeout",
+            "module": "httpx",
+            "message_redacted": "",
+            "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "errno": null,
+            "status_http": null
+          },
+          {
+            "class": "ReadTimeout",
+            "module": "httpcore",
+            "message_redacted": "",
+            "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "errno": null,
+            "status_http": null
+          },
+          {
+            "class": "TimeoutError",
+            "module": "builtins",
+            "message_redacted": "",
+            "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "errno": null,
+            "status_http": null
+          },
+          {
+            "class": "CancelledError",
+            "module": "asyncio.exceptions",
+            "message_redacted": "Cancelled via cancel scope 1fbc83efaa0; reason: deadline exceeded",
+            "message_sha256": "480a89bc442b7c6f81b9c6c4a2fd4fbe010b8623572cd6f9c9024749c2a2ed3b",
+            "errno": null,
+            "status_http": null
+          }
+        ],
+        "traceback": [
+          {
+            "file": "backend/model_harness/benchmarking/provider_diagnostic.py",
+            "line": 1714,
+            "function": "direct_ollama_call"
+          },
+          {
+            "file": "contextlib.py",
+            "line": 210,
+            "function": "__aenter__"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1583,
+            "function": "stream"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1629,
+            "function": "send"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1657,
+            "function": "_send_handling_auth"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1694,
+            "function": "_send_handling_redirects"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1730,
+            "function": "_send_single_request"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+            "line": 393,
+            "function": "handle_async_request"
+          },
+          {
+            "file": "contextlib.py",
+            "line": 158,
+            "function": "__exit__"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+            "line": 118,
+            "function": "map_httpcore_exceptions"
+          }
+        ]
+      },
+      "timeline": [
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T00",
+          "name": "diagnostic_start",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:25:14.767766+00:00",
+          "monotonic_ns": 723894984000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "diagnostic_version": "stateful_provider_path_diagnostic_v1"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T01",
+          "name": "scenario_loaded",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.767766+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T02",
+          "name": "context_built",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.767766+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T03",
+          "name": "request_constructed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.767766+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T04",
+          "name": "profile_resolved",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.767766+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T05",
+          "name": "route_resolved",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.767766+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T06",
+          "name": "schema_generated",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.767766+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T07",
+          "name": "schema_normalized",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:25:14.767766+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T08",
+          "name": "payload_serialized",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:25:14.767766+00:00",
+          "monotonic_ns": 723894984000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "payload_sha256": "073d8044907220e469f00630fd0ce8d5af0207d98b0d872960a8f4585f7cf6ec",
+            "payload_bytes": 5271,
+            "stream": false
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T09",
+          "name": "provider_call_started",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:25:14.767766+00:00",
+          "monotonic_ns": 723894984000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "endpoint": "/api/chat",
+            "execution_path": "direct_ollama"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T10",
+          "name": "dns_or_endpoint_resolved",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:25:14.769277+00:00",
+          "monotonic_ns": 723894984000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "scheme": "http",
+            "host": "127.0.0.1",
+            "port": 11434,
+            "resolution": "httpcore_trace_for_actual_connection"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T11",
+          "name": "tcp_connected",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:25:15.413178+00:00",
+          "monotonic_ns": 723895625000000,
+          "elapsed_ms": 641.0,
+          "details": {
+            "httpcore_event": "connection.connect_tcp.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T12",
+          "name": "request_headers_sent",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:25:15.414390+00:00",
+          "monotonic_ns": 723895625000000,
+          "elapsed_ms": 641.0,
+          "details": {
+            "httpcore_event": "http11.send_request_headers.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T13",
+          "name": "request_body_sent",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:25:15.414390+00:00",
+          "monotonic_ns": 723895625000000,
+          "elapsed_ms": 641.0,
+          "details": {
+            "httpcore_event": "http11.send_request_body.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T14",
+          "name": "response_headers_received",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.289406+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "response_headers_received was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T15",
+          "name": "first_byte_received",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.289406+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "first_byte_received was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T16",
+          "name": "first_chunk_received",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.289406+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "first_chunk_received was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T17",
+          "name": "first_token_observed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.289406+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "first_token_observed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T18",
+          "name": "response_completed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.289406+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "response_completed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T19",
+          "name": "parsing_started",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.289406+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "parsing_started was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T20",
+          "name": "parsing_completed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.289406+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "parsing_completed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T21",
+          "name": "validation_completed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.289406+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "validation_completed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T22",
+          "name": "recovery_decided",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.289406+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "recovery_decided was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "stage": "T23",
+          "name": "diagnostic_completed",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:30:16.289406+00:00",
+          "monotonic_ns": 724196500000000,
+          "elapsed_ms": 301516.0,
+          "details": {
+            "status": "READ_TIMEOUT",
+            "exception_classification": "READ_TIMEOUT"
+          }
+        }
+      ],
+      "payload_sha256": "073d8044907220e469f00630fd0ce8d5af0207d98b0d872960a8f4585f7cf6ec",
+      "payload_bytes": 5271,
+      "notes": [],
+      "title": "Exact stateful messages without structured format"
+    },
+    {
+      "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+      "status": "READ_TIMEOUT",
+      "execution_path": "direct_ollama",
+      "duration_ms": 303345.066,
+      "status_code": null,
+      "response_bytes": 0,
+      "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "model_content_chars": 0,
+      "model_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "done": null,
+      "done_reason": "",
+      "input_tokens": null,
+      "output_tokens": null,
+      "json_valid": null,
+      "schema_valid": null,
+      "partial_response": false,
+      "exception": {
+        "correlation_id": "18bef29512f34f51845126d986df796c",
+        "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+        "classification": "READ_TIMEOUT",
+        "class": "ReadTimeout",
+        "module": "httpx",
+        "stage": "T13",
+        "timeout_type": "read",
+        "errno": null,
+        "status_http": null,
+        "message_redacted": "",
+        "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "causes": [
+          {
+            "class": "ReadTimeout",
+            "module": "httpx",
+            "message_redacted": "",
+            "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "errno": null,
+            "status_http": null
+          },
+          {
+            "class": "ReadTimeout",
+            "module": "httpcore",
+            "message_redacted": "",
+            "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "errno": null,
+            "status_http": null
+          },
+          {
+            "class": "TimeoutError",
+            "module": "builtins",
+            "message_redacted": "",
+            "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "errno": null,
+            "status_http": null
+          },
+          {
+            "class": "CancelledError",
+            "module": "asyncio.exceptions",
+            "message_redacted": "Cancelled via cancel scope 1fbc87d6ba0; reason: deadline exceeded",
+            "message_sha256": "fe3760406f603e355c95d59c4983d9a8a73aef33ccf4b96bedf6ddd8ce4ea579",
+            "errno": null,
+            "status_http": null
+          }
+        ],
+        "traceback": [
+          {
+            "file": "backend/model_harness/benchmarking/provider_diagnostic.py",
+            "line": 1714,
+            "function": "direct_ollama_call"
+          },
+          {
+            "file": "contextlib.py",
+            "line": 210,
+            "function": "__aenter__"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1583,
+            "function": "stream"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1629,
+            "function": "send"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1657,
+            "function": "_send_handling_auth"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1694,
+            "function": "_send_handling_redirects"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_client.py",
+            "line": 1730,
+            "function": "_send_single_request"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+            "line": 393,
+            "function": "handle_async_request"
+          },
+          {
+            "file": "contextlib.py",
+            "line": 158,
+            "function": "__exit__"
+          },
+          {
+            "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+            "line": 118,
+            "function": "map_httpcore_exceptions"
+          }
+        ]
+      },
+      "timeline": [
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T00",
+          "name": "diagnostic_start",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": 724196531000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "diagnostic_version": "stateful_provider_path_diagnostic_v1"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T01",
+          "name": "scenario_loaded",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T02",
+          "name": "context_built",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T03",
+          "name": "request_constructed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T04",
+          "name": "profile_resolved",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T05",
+          "name": "route_resolved",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T06",
+          "name": "schema_generated",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T07",
+          "name": "schema_normalized",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "The direct HTTP path receives an already constructed payload."
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T08",
+          "name": "payload_serialized",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": 724196531000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "payload_sha256": "c87662331c82e3e1044814dd1775813c89e74654f40825d79dbdd0d54915e359",
+            "payload_bytes": 5420,
+            "stream": false
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T09",
+          "name": "provider_call_started",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": 724196531000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "endpoint": "/api/chat",
+            "execution_path": "direct_ollama"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T10",
+          "name": "dns_or_endpoint_resolved",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:30:16.313072+00:00",
+          "monotonic_ns": 724196531000000,
+          "elapsed_ms": 0.0,
+          "details": {
+            "scheme": "http",
+            "host": "127.0.0.1",
+            "port": 11434,
+            "resolution": "httpcore_trace_for_actual_connection"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T11",
+          "name": "tcp_connected",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:30:16.934580+00:00",
+          "monotonic_ns": 724197156000000,
+          "elapsed_ms": 625.0,
+          "details": {
+            "httpcore_event": "connection.connect_tcp.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T12",
+          "name": "request_headers_sent",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:30:16.936591+00:00",
+          "monotonic_ns": 724197156000000,
+          "elapsed_ms": 625.0,
+          "details": {
+            "httpcore_event": "http11.send_request_headers.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T13",
+          "name": "request_body_sent",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:30:16.937384+00:00",
+          "monotonic_ns": 724197156000000,
+          "elapsed_ms": 625.0,
+          "details": {
+            "httpcore_event": "http11.send_request_body.complete",
+            "info_keys": [
+              "return_value"
+            ]
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T14",
+          "name": "response_headers_received",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:35:19.658193+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "response_headers_received was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T15",
+          "name": "first_byte_received",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:35:19.658193+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "first_byte_received was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T16",
+          "name": "first_chunk_received",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:35:19.658193+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "first_chunk_received was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T17",
+          "name": "first_token_observed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:35:19.658193+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "first_token_observed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T18",
+          "name": "response_completed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:35:19.658193+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "response_completed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T19",
+          "name": "parsing_started",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:35:19.658193+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "parsing_started was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T20",
+          "name": "parsing_completed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:35:19.658193+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "parsing_completed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T21",
+          "name": "validation_completed",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:35:19.658193+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "validation_completed was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T22",
+          "name": "recovery_decided",
+          "status": "NOT_OBSERVABLE",
+          "utc": "2026-07-25T22:35:19.658193+00:00",
+          "monotonic_ns": null,
+          "elapsed_ms": null,
+          "details": {
+            "reason": "recovery_decided was not reached or is unavailable in this path"
+          }
+        },
+        {
+          "correlation_id": "18bef29512f34f51845126d986df796c",
+          "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+          "stage": "T23",
+          "name": "diagnostic_completed",
+          "status": "OBSERVED",
+          "utc": "2026-07-25T22:35:19.658193+00:00",
+          "monotonic_ns": 724499875000000,
+          "elapsed_ms": 303344.0,
+          "details": {
+            "status": "READ_TIMEOUT",
+            "exception_classification": "READ_TIMEOUT"
+          }
+        }
+      ],
+      "payload_sha256": "c87662331c82e3e1044814dd1775813c89e74654f40825d79dbdd0d54915e359",
+      "payload_bytes": 5420,
+      "notes": [],
+      "title": "Exact stateful messages with minimal schema"
+    }
+  ],
+  "in_progress": true
+}

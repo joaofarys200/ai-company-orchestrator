@@ -1,0 +1,23 @@
+{
+  "case": "K3",
+  "done": true,
+  "done_reason": "stop",
+  "content_sha256": "0d84f8d24bd98d85a282ff8e5d62902dcf8416d35a04462e7773fea151a82ee1",
+  "json_valid": true,
+  "schema_valid": true,
+  "coverage_valid": false,
+  "transform_valid": false,
+  "apply_success": false,
+  "validators_valid": false,
+  "errors": [
+    {
+      "code": "HASH_MISMATCH",
+      "message": "Transform hash does not match original content",
+      "details": {
+        "path": "server.js",
+        "expected": "a1b2c3d4e5f67890abcdef1234567890fedcba9876543210abcdef1234567890",
+        "actual": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31"
+      }
+    }
+  ]
+}

@@ -1,0 +1,238 @@
+{
+  "exceptions": [
+    {
+      "correlation_id": "3ef3898eb58d42478cd42cbbc6309aad",
+      "variant_id": "D01_BASELINE_SIMPLE",
+      "classification": "OLLAMA_SERVER_ERROR",
+      "class": "HTTPStatusError",
+      "module": "httpx",
+      "stage": "T14",
+      "timeout_type": "",
+      "errno": null,
+      "status_http": 500,
+      "message_redacted": "Server error '500 Internal Server Error' for url 'http://127.0.0.1:11434/api/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500",
+      "message_sha256": "495c2f7b94bf3e5ca99ad3532a6103aa50b141a1803504e371f248f92869b762",
+      "causes": [
+        {
+          "class": "HTTPStatusError",
+          "module": "httpx",
+          "message_redacted": "Server error '500 Internal Server Error' for url 'http://127.0.0.1:11434/api/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500",
+          "message_sha256": "495c2f7b94bf3e5ca99ad3532a6103aa50b141a1803504e371f248f92869b762",
+          "errno": null,
+          "status_http": 500
+        }
+      ],
+      "traceback": [
+        {
+          "file": "backend/model_harness/benchmarking/provider_diagnostic.py",
+          "line": 1729,
+          "function": "direct_ollama_call"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_models.py",
+          "line": 829,
+          "function": "raise_for_status"
+        }
+      ]
+    },
+    {
+      "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+      "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+      "classification": "READ_TIMEOUT",
+      "class": "ReadTimeout",
+      "module": "httpx",
+      "stage": "T13",
+      "timeout_type": "read",
+      "errno": null,
+      "status_http": null,
+      "message_redacted": "",
+      "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "causes": [
+        {
+          "class": "ReadTimeout",
+          "module": "httpx",
+          "message_redacted": "",
+          "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "errno": null,
+          "status_http": null
+        },
+        {
+          "class": "ReadTimeout",
+          "module": "httpcore",
+          "message_redacted": "",
+          "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "errno": null,
+          "status_http": null
+        },
+        {
+          "class": "TimeoutError",
+          "module": "builtins",
+          "message_redacted": "",
+          "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "errno": null,
+          "status_http": null
+        },
+        {
+          "class": "CancelledError",
+          "module": "asyncio.exceptions",
+          "message_redacted": "Cancelled via cancel scope 1fbc83efaa0; reason: deadline exceeded",
+          "message_sha256": "480a89bc442b7c6f81b9c6c4a2fd4fbe010b8623572cd6f9c9024749c2a2ed3b",
+          "errno": null,
+          "status_http": null
+        }
+      ],
+      "traceback": [
+        {
+          "file": "backend/model_harness/benchmarking/provider_diagnostic.py",
+          "line": 1714,
+          "function": "direct_ollama_call"
+        },
+        {
+          "file": "contextlib.py",
+          "line": 210,
+          "function": "__aenter__"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_client.py",
+          "line": 1583,
+          "function": "stream"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_client.py",
+          "line": 1629,
+          "function": "send"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_client.py",
+          "line": 1657,
+          "function": "_send_handling_auth"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_client.py",
+          "line": 1694,
+          "function": "_send_handling_redirects"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_client.py",
+          "line": 1730,
+          "function": "_send_single_request"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+          "line": 393,
+          "function": "handle_async_request"
+        },
+        {
+          "file": "contextlib.py",
+          "line": 158,
+          "function": "__exit__"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+          "line": 118,
+          "function": "map_httpcore_exceptions"
+        }
+      ]
+    },
+    {
+      "correlation_id": "18bef29512f34f51845126d986df796c",
+      "variant_id": "D03_STATEFUL_PROMPT_MINIMAL_SCHEMA",
+      "classification": "READ_TIMEOUT",
+      "class": "ReadTimeout",
+      "module": "httpx",
+      "stage": "T13",
+      "timeout_type": "read",
+      "errno": null,
+      "status_http": null,
+      "message_redacted": "",
+      "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "causes": [
+        {
+          "class": "ReadTimeout",
+          "module": "httpx",
+          "message_redacted": "",
+          "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "errno": null,
+          "status_http": null
+        },
+        {
+          "class": "ReadTimeout",
+          "module": "httpcore",
+          "message_redacted": "",
+          "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "errno": null,
+          "status_http": null
+        },
+        {
+          "class": "TimeoutError",
+          "module": "builtins",
+          "message_redacted": "",
+          "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "errno": null,
+          "status_http": null
+        },
+        {
+          "class": "CancelledError",
+          "module": "asyncio.exceptions",
+          "message_redacted": "Cancelled via cancel scope 1fbc87d6ba0; reason: deadline exceeded",
+          "message_sha256": "fe3760406f603e355c95d59c4983d9a8a73aef33ccf4b96bedf6ddd8ce4ea579",
+          "errno": null,
+          "status_http": null
+        }
+      ],
+      "traceback": [
+        {
+          "file": "backend/model_harness/benchmarking/provider_diagnostic.py",
+          "line": 1714,
+          "function": "direct_ollama_call"
+        },
+        {
+          "file": "contextlib.py",
+          "line": 210,
+          "function": "__aenter__"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_client.py",
+          "line": 1583,
+          "function": "stream"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_client.py",
+          "line": 1629,
+          "function": "send"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_client.py",
+          "line": 1657,
+          "function": "_send_handling_auth"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_client.py",
+          "line": 1694,
+          "function": "_send_handling_redirects"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_client.py",
+          "line": 1730,
+          "function": "_send_single_request"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+          "line": 393,
+          "function": "handle_async_request"
+        },
+        {
+          "file": "contextlib.py",
+          "line": 158,
+          "function": "__exit__"
+        },
+        {
+          "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+          "line": 118,
+          "function": "map_httpcore_exceptions"
+        }
+      ]
+    }
+  ],
+  "in_progress": true
+}

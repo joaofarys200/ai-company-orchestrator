@@ -1,0 +1,83 @@
+{
+  "request_id": "6b3002d1fb934bc2a90127010f752bca",
+  "request_fingerprint": "0c5a5e9a0ce62f800465a32aeed8db3226a884c41dc251ad1fed49d534e93a12",
+  "task_profile": "STRUCTURED_EXTRACTION",
+  "system_prompt": "Answer only from AUTHORITATIVE_CONTEXT and return JSON.",
+  "user_prompt": "What are the project codename and service port?",
+  "context": {
+    "items": [
+      {
+        "source": "decision:service",
+        "kind": "decision",
+        "content": "Project codename is ORBIT; service port is 4317.",
+        "inclusion_reason": "relevance_score=1.000",
+        "content_sha256": "f1e4b13ca33a2519b10ab179beb13657f752a60b05be3358144b8a1e1c862ce6"
+      },
+      {
+        "source": "unrelated:theme",
+        "kind": "note",
+        "content": "The dashboard theme is monochrome.",
+        "inclusion_reason": "relevance_score=0.100",
+        "content_sha256": "c5dabc944fcf8b3b8328adab366e8077f7751235d0784237c228e6dc25739018"
+      }
+    ],
+    "decisions": [
+      {
+        "source": "decision:service",
+        "kind": "decision",
+        "included": true,
+        "reason": "relevance_score=1.000",
+        "content_sha256": "f1e4b13ca33a2519b10ab179beb13657f752a60b05be3358144b8a1e1c862ce6",
+        "size_chars": 48
+      },
+      {
+        "source": "history:all",
+        "kind": "full_history",
+        "included": false,
+        "reason": "bulk_context_requires_explicit_request",
+        "content_sha256": "2e50bb216a4f3cd3409cc6ac63df94bb3959b95c21094f6512317c9b941a8689",
+        "size_chars": 32
+      },
+      {
+        "source": "unrelated:theme",
+        "kind": "note",
+        "included": true,
+        "reason": "relevance_score=0.100",
+        "content_sha256": "c5dabc944fcf8b3b8328adab366e8077f7751235d0784237c228e6dc25739018",
+        "size_chars": 34
+      }
+    ],
+    "total_chars": 82
+  },
+  "allowed_tools": [],
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "codename",
+      "port"
+    ],
+    "properties": {
+      "codename": {
+        "type": "string"
+      },
+      "port": {
+        "type": "integer"
+      }
+    }
+  },
+  "generation": {
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "context_tokens": 8192,
+    "output_tokens": 768,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "repetitions": 2,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0
+  }
+}

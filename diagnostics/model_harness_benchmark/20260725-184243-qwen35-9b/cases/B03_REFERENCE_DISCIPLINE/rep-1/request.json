@@ -1,0 +1,43 @@
+{
+  "request_id": "a06445ffd94c408abb99d5108bcd3645",
+  "request_fingerprint": "7cfd7f98379408d218b3e9f770fd7238531b3f673180437571de883052839f1b",
+  "task_profile": "STRUCTURED_EXTRACTION",
+  "system_prompt": "Select references only from the explicit allowlist. Return JSON matching the schema.",
+  "user_prompt": "Allowed references: file:src/a.py, file:tests/test_a.py. Select the reference that contains tests for a.py.",
+  "context": {
+    "items": [],
+    "decisions": [],
+    "total_chars": 0
+  },
+  "allowed_tools": [],
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "selected_refs"
+    ],
+    "properties": {
+      "selected_refs": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "generation": {
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "context_tokens": 8192,
+    "output_tokens": 768,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "repetitions": 2,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0
+  }
+}

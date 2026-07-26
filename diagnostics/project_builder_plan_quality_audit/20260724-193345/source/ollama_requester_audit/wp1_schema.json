@@ -1,0 +1,95 @@
+{
+  "type": "object",
+  "additional_properties": false,
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "required": true,
+      "non_empty": true
+    },
+    "stack": {
+      "type": "string",
+      "required": true,
+      "non_empty": true
+    },
+    "components": {
+      "type": "array[string]",
+      "required": false,
+      "default": [],
+      "allowed_items": [
+        "frontend",
+        "backend",
+        "persistence",
+        "tests",
+        "preview"
+      ]
+    },
+    "files": {
+      "type": "array[object]",
+      "required": true,
+      "min_items": 1,
+      "max_items": 40,
+      "item_schema": {
+        "type": "object",
+        "additional_properties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "required": true,
+            "non_empty": true
+          },
+          "content": {
+            "type": "string",
+            "required": true
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array[string]",
+      "required": false,
+      "default": []
+    },
+    "setup_commands": {
+      "type": "array[string]",
+      "required": false,
+      "default": []
+    },
+    "validation_commands": {
+      "type": "array[string]",
+      "required": false,
+      "default": []
+    },
+    "entrypoints": {
+      "type": "array[string]",
+      "required": false,
+      "default": []
+    },
+    "preview_strategy": {
+      "type": "object",
+      "required": false,
+      "default": {},
+      "additional_properties": true
+    },
+    "preview_command": {
+      "type": "string",
+      "required": false,
+      "default": ""
+    },
+    "constraints": {
+      "type": "array[string]",
+      "required": false,
+      "default": []
+    },
+    "component_files": {
+      "type": "object[array[string]]",
+      "required": false,
+      "default": {}
+    },
+    "rationale": {
+      "type": "string",
+      "required": false,
+      "default": ""
+    }
+  }
+}

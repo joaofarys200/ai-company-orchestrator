@@ -1,0 +1,51 @@
+{
+  "json_valid": true,
+  "schema_valid": true,
+  "generation_complete": true,
+  "operation_count": 6,
+  "server_content_operations": [],
+  "server_content_operation_present": false,
+  "target_correct": true,
+  "expected_hash_correct": true,
+  "content_non_empty": true,
+  "paths_invented": [],
+  "contract_errors": [],
+  "required_actions_valid": true,
+  "validators": {
+    "valid": false,
+    "error_codes": [
+      "PERSISTENCE_NOT_IMPLEMENTED"
+    ],
+    "errors": [
+      {
+        "code": "PERSISTENCE_NOT_IMPLEMENTED",
+        "field_path": "component_files.persistence",
+        "message": "O componente persistence nao demonstra leitura e escrita duravel; estado em memoria nao e persistencia.",
+        "expected_type": "mapped artifact implementing durable read and write operations",
+        "received_type": "string",
+        "offending_value": "no durable read/write mechanism in mapped persistence artifacts",
+        "repairable": false,
+        "suggestion": "Associa persistence a um artefacto existente que implemente leitura e escrita duravel.",
+        "phase": "PLAN_SEMANTIC_VALIDATION",
+        "file": "server.js",
+        "line": null,
+        "symbol": "",
+        "target": "server.js",
+        "expected": "mapped artifact implementing durable read and write operations",
+        "actual": "no durable read/write mechanism in mapped persistence artifacts",
+        "component": "persistence"
+      }
+    ]
+  },
+  "persistence_signals": {
+    "filesystem_import": false,
+    "deterministic_storage_path": false,
+    "durable_read": false,
+    "durable_write": false,
+    "missing_file_handling": false,
+    "health_preserved": true,
+    "external_dependency_import": false
+  },
+  "operation_error": null,
+  "normalized_operation_count": 6
+}

@@ -1,0 +1,8 @@
+[
+  {
+    "path": "server.js",
+    "before_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31",
+    "after_sha256": "4aa7c8fb2be2e79a10e44cef45ee81e3c79e25522c2d774922ab244782611a67",
+    "unified_diff": "--- server.js\n+++ server.js\n@@ -1,4 +1,16 @@\n-import http from 'http';\n+import http from 'node:http';\n+import fs from 'node:fs';\n+\n+const dataPath = new URL('./data.json', import.meta.url);\n+function readData() {\n+  if (!fs.existsSync(dataPath)) return {};\n+  return JSON.parse(fs.readFileSync(dataPath, 'utf8'));\n+}\n+function writeData(value) {\n+  fs.writeFileSync(dataPath, JSON.stringify(value));\n+}\n+writeData(readData());\n+\n \n const server = http.createServer((req, res) => {\n   if (req.url === '/health') {\n"
+  }
+]

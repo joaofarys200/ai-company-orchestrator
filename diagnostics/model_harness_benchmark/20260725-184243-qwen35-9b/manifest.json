@@ -1,0 +1,168 @@
+{
+  "benchmark_version": "model_harness_qwen35_capabilities_v1",
+  "created_at": "2026-07-25T18:44:07.757446+00:00",
+  "repo_root": "C:\\Users\\joaor\\Desktop\\ai-company-orchestrator",
+  "command": "scripts\\model_harness_benchmark.py --model qwen3.5:9b --output diagnostics\\model_harness_benchmark\\20260725-184243-qwen35-9b --repetitions 2",
+  "config": {
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "context_tokens": 8192,
+    "output_tokens": 768,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "repetitions": 2,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0
+  },
+  "runtime": {
+    "python": "3.12.4 (tags/v3.12.4:8e8a4ba, Jun  6 2024, 19:30:16) [MSC v.1940 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "ollama_version": "ollama version is 0.32.3",
+    "model_list_entry": {
+      "name": "qwen3.5:9b",
+      "model": "qwen3.5:9b",
+      "modified_at": "2026-07-06T12:33:54.8280526+01:00",
+      "size": 6594474711,
+      "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 262144,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "vision",
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    "model_details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen35",
+      "families": [
+        "qwen35"
+      ],
+      "parameter_size": "9.7B",
+      "quantization_level": "Q4_K_M"
+    },
+    "model_capabilities": [
+      "completion",
+      "vision",
+      "tools",
+      "thinking"
+    ],
+    "model_info": {
+      "general.architecture": "qwen35",
+      "general.parameter_count": 9653104368,
+      "qwen35.block_count": 32,
+      "qwen35.context_length": 262144,
+      "qwen35.embedding_length": 4096,
+      "qwen35.vision.block_count": 27,
+      "qwen35.vision.embedding_length": 1152
+    },
+    "ollama_ps_before": {
+      "models": []
+    },
+    "gpu_before": {
+      "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+      "driver_version": "581.34",
+      "memory_total_mib": 8151,
+      "memory_used_mib": 1123,
+      "memory_free_mib": 6688,
+      "utilization_percent": 15
+    }
+  },
+  "cases": [
+    {
+      "case_id": "B01_LOCAL_CHOICE",
+      "title": "Escolha local sob restricao de rede",
+      "capability": "constraint_based_choice",
+      "task_profile": "LOCAL_CHOICE",
+      "system_prompt_sha256": "4dc836b49a82b0b450fafe6dedeb6df1bdc4385c92bf87a4c743e332bc1c91c3",
+      "user_prompt_sha256": "a53698f2689f5eed04e84246577d445eb3f35f3830371011fefc3108f692a4f9",
+      "schema_sha256": "05978512ae794c8920cd40a705d44bb0e4ce7867984227e675ec96f3722a5b40",
+      "repetitions": 2
+    },
+    {
+      "case_id": "B02_STRUCTURED_EXTRACTION",
+      "title": "Extracao factual estruturada",
+      "capability": "structured_extraction",
+      "task_profile": "STRUCTURED_EXTRACTION",
+      "system_prompt_sha256": "a81bea0eb0922d476a88ae2b7407a52923e7215ba551ca48609885734daee62b",
+      "user_prompt_sha256": "f591eb5706fbb8ebfb6e8be5ad6a998b1bf8d52e115020b154a3a3e64adca4bb",
+      "schema_sha256": "fa90d563ff15392c10d445e260d7e81fb8f4888882c3e92199235834bcf335bc",
+      "repetitions": 2
+    },
+    {
+      "case_id": "B03_REFERENCE_DISCIPLINE",
+      "title": "Selecao sem inventar referencias",
+      "capability": "reference_discipline",
+      "task_profile": "STRUCTURED_EXTRACTION",
+      "system_prompt_sha256": "60acaa3d3dbc35b01cc992abdae7fcc826552acc1f0117b1bfcf6a7f909d79ab",
+      "user_prompt_sha256": "4d95e1a1c0e84af765908dfecc28fe8bd231929c59bdf03c595f2ff46b6bac64",
+      "schema_sha256": "16322e5dbd48d6429a574b5f9cd105e6901b3c0ec062bb8a15fe94246d58d437",
+      "repetitions": 2
+    },
+    {
+      "case_id": "B04_BOUNDED_CONTEXT",
+      "title": "Recuperacao a partir de contexto selecionado",
+      "capability": "bounded_context_use",
+      "task_profile": "STRUCTURED_EXTRACTION",
+      "system_prompt_sha256": "1c70518c684a4ae735325ac4bab20bcebde4465fe0c5557163ec4a4f9e463f7c",
+      "user_prompt_sha256": "1fc293ff80d25b7b65bc734228c7036ec63177972a06e74fb5f616d0a7c9d1b3",
+      "schema_sha256": "5b56b6440fc7a59912657c937168c76cbb98a77404c0e0569c85d742e3dfb078",
+      "repetitions": 2
+    },
+    {
+      "case_id": "B05_CODE_REASONING",
+      "title": "Diagnostico de bug localizado",
+      "capability": "code_reasoning",
+      "task_profile": "STRUCTURED_EXTRACTION",
+      "system_prompt_sha256": "5d50f074b24d68fb5c0562f5aa7f37287e7d4672f8cd701295bebc518cac4c43",
+      "user_prompt_sha256": "a72cfad4371ebb914ed6c8485d34895d9b31a7f68ac5b2c6378d7b0cd00edb55",
+      "schema_sha256": "ccfbef7bdc0b3ac06c4349bc8dc05db6d0e1208a2a986c901624f3cdf8fe88ad",
+      "repetitions": 2
+    },
+    {
+      "case_id": "B06_NEGATIVE_CONSTRAINTS",
+      "title": "Plano respeitando exclusoes",
+      "capability": "negative_constraint_following",
+      "task_profile": "MISSION_PLANNING",
+      "system_prompt_sha256": "6fd36debb46d89d4fdcb67bd8ea04fd0f02153083a0395e8af41fbe0049aee8d",
+      "user_prompt_sha256": "94d59a86978340c34503df09611248d43810c27ea333abcf43574eea911d3e16",
+      "schema_sha256": "18ba5e2ba29c201da146c30f4e5bca6a2ca261c7c0bf348d67d5dde1a428e699",
+      "repetitions": 2
+    },
+    {
+      "case_id": "B07_TOOL_SELECTION",
+      "title": "Selecao de tool sem execucao",
+      "capability": "tool_selection",
+      "task_profile": "TOOL_SELECTION",
+      "system_prompt_sha256": "8508f13fe185dbb8c58d997b973965f048451a7f5f249e687a899f103aef8d1d",
+      "user_prompt_sha256": "7ae46feb4c87859d3e4d34dfe5ab881749077ff8660004fd07e8c150a81f8498",
+      "schema_sha256": "1e35db4b03c680df3789867274872932cd2034e5e1ca7b3e7a6e073e55527674",
+      "repetitions": 2
+    },
+    {
+      "case_id": "B08_INSTRUCTION_HIERARCHY",
+      "title": "Resistencia a instrucao contraditoria",
+      "capability": "instruction_hierarchy",
+      "task_profile": "DOCUMENT_REVIEW",
+      "system_prompt_sha256": "20ce56fa54172513543e7db6fe22e0752848e1a874aa7ae2fe027dd2cf42ea82",
+      "user_prompt_sha256": "165660ef9721fbe84b99ba25e58978657cc2e2176681988db8be26bed36acb50",
+      "schema_sha256": "c3ff1493926d2e92c7772c6487cdc3888d5b51d1aa839b4638517668adfe33dd",
+      "repetitions": 2
+    }
+  ]
+}

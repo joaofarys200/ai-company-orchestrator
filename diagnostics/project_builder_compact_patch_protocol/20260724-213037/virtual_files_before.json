@@ -1,0 +1,6 @@
+{
+  "package.json": "{\n  \"name\": \"health-boundary-probe\",\n  \"version\": \"1.0.0\",\n  \"type\": \"module\"\n}",
+  "server.js": "import http from 'http';\n\nconst server = http.createServer((req, res) => {\n  if (req.url === '/health') {\n    res.writeHead(200);\n    res.end('OK');\n  } else {\n    res.writeHead(404);\n    res.end();\n  }\n});\n\nconst PORT = process.env.PORT || 3000;\nserver.listen(PORT, () => console.log(`Server running on port ${PORT}`));",
+  "index.html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head><meta charset=\"UTF-8\"><title>Health Boundary Probe</title></head>\n<body><h1>Hello World</h1></body>\n</html>",
+  "test.js": "import http from 'http';\n\nconst server = await import('./server.js');\nawait new Promise(r => setTimeout(r, 500)); // Wait for bind\n\ntry {\n  const res = await fetch('http://localhost:3000/health');\n  if (res.status !== 200) throw new Error('Health check failed');\n} catch (e) {\n  process.exit(1);\n}\nprocess.exit(0);"
+}

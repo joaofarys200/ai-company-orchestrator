@@ -1,0 +1,58 @@
+[
+  {
+    "op": "set_components",
+    "value": [
+      "frontend",
+      "backend",
+      "persistence",
+      "tests",
+      "preview"
+    ]
+  },
+  {
+    "op": "set_component_files",
+    "component": "frontend",
+    "paths": [
+      "index.html"
+    ]
+  },
+  {
+    "op": "set_component_files",
+    "component": "backend",
+    "paths": [
+      "server.js"
+    ]
+  },
+  {
+    "op": "set_component_files",
+    "component": "persistence",
+    "paths": [
+      "server.js"
+    ]
+  },
+  {
+    "op": "set_component_files",
+    "component": "tests",
+    "paths": [
+      "test.js"
+    ]
+  },
+  {
+    "op": "set_component_files",
+    "component": "preview",
+    "paths": [
+      "index.html"
+    ]
+  },
+  {
+    "op": "set_preview_strategy",
+    "field": "healthcheck_path",
+    "value": "/health"
+  },
+  {
+    "op": "replace_file_content",
+    "path": "server.js",
+    "expected_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31",
+    "content": "import http from 'node:http';\nimport fs from 'node:fs';\n\nconst dataPath = new URL('./data.json', import.meta.url);\nfunction readData() {\n  if (!fs.existsSync(dataPath)) return {};\n  return JSON.parse(fs.readFileSync(dataPath, 'utf8'));\n}\nfunction writeData(value) {\n  fs.writeFileSync(dataPath, JSON.stringify(value));\n}\nwriteData(readData());\n\nconst server = http.createServer((req, res) => {\n  if (req.url === '/health') {\n    res.writeHead(200);\n    res.end('OK');\n  } else {\n    res.writeHead(404);\n    res.end();\n  }\n});\n\nconst PORT = process.env.PORT || 3000;\nserver.listen(PORT, () => console.log(`Server running on port ${PORT}`));"
+  }
+]

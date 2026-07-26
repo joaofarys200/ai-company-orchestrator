@@ -1,0 +1,37 @@
+{
+  "VALID_PLAN_FIELDS": [
+    "component_files",
+    "components",
+    "constraints",
+    "dependencies",
+    "entrypoints",
+    "files",
+    "preview_command",
+    "preview_strategy",
+    "project_name",
+    "rationale",
+    "setup_commands",
+    "stack",
+    "validation_commands"
+  ],
+  "VALID_COMPONENT_IDS": [
+    "backend",
+    "frontend",
+    "persistence",
+    "preview",
+    "tests"
+  ],
+  "VALID_FILE_PATHS": [
+    "index.html",
+    "package.json",
+    "server.js",
+    "test.js"
+  ],
+  "VALID_ENTRYPOINT_PATHS": [
+    "index.html",
+    "server.js"
+  ],
+  "VALID_REPLACEMENT_TARGETS": [
+    "server.js"
+  ]
+}

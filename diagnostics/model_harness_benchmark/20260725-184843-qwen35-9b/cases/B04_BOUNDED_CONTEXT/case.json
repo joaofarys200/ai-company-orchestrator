@@ -1,0 +1,48 @@
+{
+  "case_id": "B04_BOUNDED_CONTEXT",
+  "title": "Recuperacao a partir de contexto selecionado",
+  "capability": "bounded_context_use",
+  "task_profile": "STRUCTURED_EXTRACTION",
+  "system_prompt": "Answer only from AUTHORITATIVE_CONTEXT and return JSON.",
+  "user_prompt": "What are the project codename and service port?",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "codename",
+      "port"
+    ],
+    "properties": {
+      "codename": {
+        "type": "string"
+      },
+      "port": {
+        "type": "integer"
+      }
+    }
+  },
+  "allowed_tools": [],
+  "context_candidates": [
+    {
+      "source": "decision:service",
+      "kind": "decision",
+      "content": "Project codename is ORBIT; service port is 4317.",
+      "relevance_score": 1.0,
+      "explicitly_requested": false
+    },
+    {
+      "source": "unrelated:theme",
+      "kind": "note",
+      "content": "The dashboard theme is monochrome.",
+      "relevance_score": 0.1,
+      "explicitly_requested": false
+    },
+    {
+      "source": "history:all",
+      "kind": "full_history",
+      "content": "Old project codename was LEGACY.",
+      "relevance_score": 0.9,
+      "explicitly_requested": false
+    }
+  ]
+}

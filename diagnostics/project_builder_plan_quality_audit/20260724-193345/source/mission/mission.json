@@ -1,0 +1,16 @@
+{
+  "mission_id": "mission-9864320f2fa3",
+  "project_id": "flight-recorder-wp1-9864320f2fa3",
+  "title": "Flight Recorder WP1",
+  "objective": "Cria um projeto full-stack pequeno chamado health-boundary-probe, com frontend, backend, persistencia simples, testes executaveis e preview. Usa apenas Node.js standard library, sem dependencias externas. Nao uses Obsidian.",
+  "description": "Unica execucao WP1 instrumentada para diagnostico do ProjectBuilder.",
+  "status": "ACTIVE",
+  "created_at": "2026-07-24T15:12:04.674651+00:00",
+  "updated_at": "2026-07-24T15:12:51.435672+00:00",
+  "started_at": "2026-07-24T15:12:05.034602+00:00",
+  "completed_at": null,
+  "current_phase": "",
+  "progress": 0.0,
+  "metadata": {},
+  "version": 7
+}

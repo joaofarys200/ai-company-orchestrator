@@ -1,0 +1,42 @@
+{
+  "valid": true,
+  "resolutions": [
+    {
+      "error_code": "MISSING_REQUESTED_COMPONENTS",
+      "operation_ids": [
+        "op-1"
+      ]
+    },
+    {
+      "error_code": "MISSING_COMPONENT_MAPPING",
+      "operation_ids": [
+        "op-2",
+        "op-3",
+        "op-4",
+        "op-5"
+      ]
+    },
+    {
+      "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+      "operation_ids": [
+        "op-2",
+        "op-3",
+        "op-4",
+        "op-5",
+        "op-6"
+      ]
+    },
+    {
+      "error_code": "PERSISTENCE_NOT_IMPLEMENTED",
+      "operation_ids": [
+        "op-8"
+      ]
+    },
+    {
+      "error_code": "MISSING_HEALTH_ROUTE",
+      "operation_ids": [
+        "op-3"
+      ]
+    }
+  ]
+}

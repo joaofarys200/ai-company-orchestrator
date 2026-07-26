@@ -1,0 +1,57 @@
+{
+  "valid": true,
+  "error_codes": [],
+  "plan_hash": "27178ad3782d6d1b8b61d11a3aafb13141100ff8350f6031facd4654ab3a1383",
+  "static_analysis": {
+    "valid": true,
+    "errors": [],
+    "warnings": [],
+    "checked_components": [
+      "frontend",
+      "backend",
+      "persistence",
+      "tests",
+      "preview"
+    ],
+    "checked_entrypoints": [
+      "server.js",
+      "index.html"
+    ],
+    "checked_scripts": [],
+    "checked_dependencies": [],
+    "virtual_files": [
+      {
+        "normalized_path": "index.html",
+        "component": "preview",
+        "language": "html",
+        "extension": ".html",
+        "content_hash": "a8cab61f58e3f5ed320006c932aaf480dfaa6f21f30b0e0673d3defc21c1aafb",
+        "size_bytes": 146
+      },
+      {
+        "normalized_path": "package.json",
+        "component": "",
+        "language": "json",
+        "extension": ".json",
+        "content_hash": "f5c8a011c0805a73f6206bb0b0f93912c027caa4dacc48c998827acd7ff551ab",
+        "size_bytes": 79
+      },
+      {
+        "normalized_path": "server.js",
+        "component": "persistence",
+        "language": "javascript",
+        "extension": ".js",
+        "content_hash": "ac908968523ef9bfab6c3cf85ab77d37206ff1b96bfa9384e8599fe1c0edb523",
+        "size_bytes": 639
+      },
+      {
+        "normalized_path": "test.js",
+        "component": "tests",
+        "language": "javascript",
+        "extension": ".js",
+        "content_hash": "7336da35b8f653e5a273ba8a6de0672f7277eef30d4396eede1145e431c76fe3",
+        "size_bytes": 314
+      }
+    ]
+  }
+}

@@ -102,6 +102,7 @@ CLIENT_MESSAGE_TYPES = {
     "mission_retry_execution",
     "mission_cancel_execution",
     "mission_release_stale_lock",
+    "mission_autonomy_run",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
@@ -143,6 +144,9 @@ MISSION_CLIENT_REQUIRED_FIELDS = {
     "mission_release_stale_lock": (
         "project_id", "mission_id", "execution_id", "expected_execution_version", "confirmed",
     ),
+    "mission_autonomy_run": (
+        "project_id", "mission_id", "expected_mission_version", "confirmed",
+    ),
 }
 
 
@@ -174,9 +178,30 @@ def validate_client_message(message: Mapping[str, Any]) -> dict[str, Any]:
             raise WebSocketPayloadError(f"{version_field} deve ser um inteiro positivo.")
     if message_type.endswith("_update") and not isinstance(payload.get("changes"), dict):
         raise WebSocketPayloadError("changes deve ser um objeto JSON.")
-    if message_type in {"mission_apply_execution", "mission_cancel_execution", "mission_release_stale_lock"}:
+    if message_type in {
+        "mission_apply_execution",
+        "mission_cancel_execution",
+        "mission_release_stale_lock",
+        "mission_autonomy_run",
+    }:
         if payload.get("confirmed") is not True:
             raise WebSocketPayloadError(f"{message_type} exige confirmed=true.")
+    if message_type == "mission_autonomy_run":
+        max_work_packages = payload.get("max_work_packages", 1)
+        if (
+            isinstance(max_work_packages, bool)
+            or not isinstance(max_work_packages, int)
+            or max_work_packages < 1
+            or max_work_packages > 3
+        ):
+            raise WebSocketPayloadError(
+                "max_work_packages deve ser um inteiro entre 1 e 3."
+            )
+        if "test_mode" in payload and not isinstance(
+            payload.get("test_mode"),
+            bool,
+        ):
+            raise WebSocketPayloadError("test_mode deve ser booleano.")
     if message_type == "mission_review_execution":
         decision = _as_str(payload.get("decision")).strip().upper()
         if decision not in {"ACCEPT", "REJECT"}:

@@ -1,0 +1,53 @@
+{
+  "request_id": "3dee167f1f564e11974d48fa86f8f293",
+  "status": "SUCCEEDED",
+  "raw_text": "{\n  \"invoice_id\": \"INV-204\",\n  \"customer\": \"Ada Lovelace\",\n  \"amount\": 125.4,\n  \"currency\": \"EUR\",\n  \"paid_on\": \"2026-07-24\"\n}",
+  "structured_output": {
+    "invoice_id": "INV-204",
+    "customer": "Ada Lovelace",
+    "amount": 125.4,
+    "currency": "EUR",
+    "paid_on": "2026-07-24"
+  },
+  "usage": {
+    "input_tokens": 75,
+    "output_tokens": 66,
+    "total_tokens": 141
+  },
+  "provider": "ollama",
+  "model": "qwen3.5:9b",
+  "latency_ms": 4442,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "invoice_id": "INV-204",
+      "customer": "Ada Lovelace",
+      "amount": 125.4,
+      "currency": "EUR",
+      "paid_on": "2026-07-24"
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "recovery": [
+    {
+      "action": "NONE",
+      "reason": "recovery_not_required",
+      "recoverable": false,
+      "retry_requested": false,
+      "input_changed": false
+    }
+  ],
+  "tool_calls": [],
+  "warnings": [],
+  "errors": []
+}

@@ -1,0 +1,40 @@
+{
+  "operations": [
+    {
+      "op": "set_components",
+      "value": [
+        "frontend",
+        "backend",
+        "persistence",
+        "tests",
+        "preview"
+      ]
+    },
+    {
+      "op": "set_component_files",
+      "component": "frontend",
+      "paths": [
+        "index.html"
+      ]
+    },
+    {
+      "op": "set_component_files",
+      "component": "backend",
+      "paths": [
+        "server.js"
+      ]
+    },
+    {
+      "op": "apply_code_transform",
+      "path": "server.js",
+      "transform": "ADD_JSON_FILE_PERSISTENCE"
+    },
+    {
+      "op": "set_component_files",
+      "component": "backend",
+      "paths": [
+        "server.js"
+      ]
+    }
+  ]
+}

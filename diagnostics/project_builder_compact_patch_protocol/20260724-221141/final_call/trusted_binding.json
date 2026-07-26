@@ -1,0 +1,57 @@
+{
+  "bindings": [
+    {
+      "operation_id": "op-04",
+      "path": "server.js",
+      "expected_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31",
+      "source": "initial_virtual_snapshot"
+    }
+  ],
+  "operations": [
+    {
+      "id": "op-01",
+      "op": "set_components",
+      "value": [
+        "frontend",
+        "backend",
+        "persistence",
+        "tests",
+        "preview"
+      ]
+    },
+    {
+      "id": "op-02",
+      "op": "set_component_files",
+      "component": "frontend",
+      "paths": [
+        "index.html"
+      ]
+    },
+    {
+      "id": "op-03",
+      "op": "set_component_files",
+      "component": "backend",
+      "paths": [
+        "server.js"
+      ]
+    },
+    {
+      "id": "op-04",
+      "op": "apply_code_transform",
+      "path": "server.js",
+      "transform": "ADD_JSON_FILE_PERSISTENCE",
+      "parameters": {
+        "storage_filename": ".data.json"
+      },
+      "_trusted_expected_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31"
+    },
+    {
+      "id": "op-05",
+      "op": "set_component_files",
+      "component": "backend",
+      "paths": [
+        "server.js"
+      ]
+    }
+  ]
+}

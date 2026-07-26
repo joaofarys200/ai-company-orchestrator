@@ -40,6 +40,22 @@ from agents.orchestrator.flight_recorder import (
     ProjectBuilderFlightRecorder,
     recorder_directory,
 )
+from backend.model_harness import (
+    ContextBuildRequest,
+    ContextBuilder,
+    ContextCandidate,
+    ExecutionConstraints,
+    ExpectedOutput,
+    ModelHarness,
+    ModelPreferences,
+    ModelRequest,
+    ModelResponseStatus,
+    ModelRoute,
+    ModelUsage,
+    OutputFormat,
+    ProviderRegistry,
+    ProviderResult,
+)
 from intelligence.project_context import ProjectContextService
 
 
@@ -317,6 +333,14 @@ class _OllamaGenerationContract:
     correction_schema_length: int = 0
     correction_schema_version: str = ""
     streaming_enabled: bool = True
+
+
+@dataclass(frozen=True)
+class _ProjectBuilderProviderCall:
+    attempt: int
+    prompt_bytes: int
+    correction_bytes: int
+    generation_contract: _OllamaGenerationContract
 
 
 class _PlanAttemptFailure(Exception):
@@ -4004,6 +4028,36 @@ def _ollama_message_length(messages: list[dict[str, str]]) -> int:
     return sum(len(str(item.get("content") or "").encode("utf-8")) for item in messages)
 
 
+class _ProjectBuilderOllamaHarnessProvider:
+    name = PLAN_PROVIDER
+
+    def __init__(self, requester: "OllamaPlanRequester", model: str):
+        self.requester = requester
+        self.default_model = model
+
+    async def generate(
+        self,
+        request: ModelRequest,
+        route: ModelRoute,
+        progress,
+    ) -> ProviderResult:
+        call = request.execution_constraints.provider_payload
+        if not isinstance(call, _ProjectBuilderProviderCall):
+            raise _PlanAttemptFailure(
+                "PLAN_HTTP_ERROR",
+                "O provider recebeu um contrato de chamada invalido.",
+                retryable=False,
+                error_type="InvalidHarnessProviderCall",
+            )
+        readiness = await self.requester._readiness(call.attempt)
+        return await self.requester._generate_from_provider(
+            request,
+            route,
+            call,
+            readiness,
+        )
+
+
 class OllamaPlanRequester:
     def __init__(
         self,
@@ -4012,6 +4066,7 @@ class OllamaPlanRequester:
         sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
         heartbeat: Callable[[], None] | None = None,
         flight_recorder: Any | None = None,
+        model_harness: ModelHarness | None = None,
     ):
         self.provider = PLAN_PROVIDER
         self.model = _project_builder_setting("OLLAMA_MODEL", "qwen2.5:14b")
@@ -4030,6 +4085,14 @@ class OllamaPlanRequester:
         self.first_error: dict[str, str] | None = None
         self.final_error: dict[str, str] | None = None
         self.prompt_length = 0
+        self.context_builder = ContextBuilder()
+        self.harness_operation_id = f"project_builder:{uuid.uuid4().hex}"
+        if model_harness is None:
+            providers = ProviderRegistry([
+                _ProjectBuilderOllamaHarnessProvider(self, self.model)
+            ])
+            model_harness = ModelHarness(providers)
+        self.model_harness = model_harness
 
     def _heartbeat(self, *, force: bool = False) -> None:
         now = time.monotonic()
@@ -4059,6 +4122,11 @@ class OllamaPlanRequester:
     def diagnostics(self) -> dict[str, Any]:
         completed = next((item for item in reversed(self.attempts) if item.final_plan_hash), None)
         latest = self.attempts[-1] if self.attempts else None
+        harness_diagnostics = getattr(
+            self.model_harness,
+            "diagnostics",
+            None,
+        )
         return {
             "provider": self.provider,
             "model": self.model,
@@ -4099,6 +4167,11 @@ class OllamaPlanRequester:
             "local_repairs": list(completed.local_repairs) if completed else [],
             "corrected_by_model": bool(completed and completed.corrected_by_model),
             "final_plan_hash": completed.final_plan_hash if completed else "",
+            "model_harness": (
+                harness_diagnostics()
+                if callable(harness_diagnostics)
+                else {"injected": True}
+            ),
         }
 
     def planning_error(self, category: str, message: str) -> ProjectBuilderPlanningError:
@@ -4276,23 +4349,133 @@ class OllamaPlanRequester:
         prompt: str,
         correction: str | None,
         attempt: int,
-        readiness: dict[str, Any],
         generation_contract: _OllamaGenerationContract,
     ) -> str:
         compact = attempt > 1
         messages = _ollama_messages(prompt, correction, compact)
+        candidates = (
+            (
+                ContextCandidate(
+                    source="project_builder:focal_correction",
+                    kind="correction",
+                    content=correction,
+                    relevance_score=1.0,
+                    explicitly_requested=True,
+                ),
+            )
+            if correction
+            else ()
+        )
+        context = self.context_builder.build(ContextBuildRequest(
+            task_summary="ProjectBuilder structured planning",
+            candidates=candidates,
+            allowed_kinds=("correction",),
+            max_items=1,
+            max_chars=max(1, len(correction or "")),
+        ))
+        expected_format = (
+            OutputFormat.JSON_SCHEMA
+            if generation_contract.structured_output_enabled
+            else OutputFormat.JSON
+        )
+        call = _ProjectBuilderProviderCall(
+            attempt=attempt,
+            prompt_bytes=len(prompt.encode("utf-8")),
+            correction_bytes=(
+                len(correction.encode("utf-8"))
+                if correction
+                else 0
+            ),
+            generation_contract=generation_contract,
+        )
+        request = ModelRequest(
+            task_profile="STRUCTURED_EXTRACTION",
+            system_prompt=messages[0]["content"],
+            user_prompt=messages[1]["content"],
+            context=context,
+            allowed_tools=(),
+            expected_output=ExpectedOutput(
+                format=expected_format,
+                schema=(
+                    generation_contract.response_format
+                    if isinstance(
+                        generation_contract.response_format,
+                        dict,
+                    )
+                    else None
+                ),
+                defer_validation=True,
+                validation_owner="ProjectBuilder",
+            ),
+            temperature=0,
+            max_context_tokens=self.num_ctx,
+            max_output_tokens=self.max_output_tokens,
+            metadata={
+                "consumer": "ProjectBuilder",
+                "phase": (
+                    "plan_correction" if correction else "plan"
+                ),
+                "attempt": attempt,
+                "structured_output_enabled": (
+                    generation_contract.structured_output_enabled
+                ),
+                "correction_schema_sha256": (
+                    generation_contract.correction_schema_sha256
+                ),
+                "progress_key": self.harness_operation_id,
+            },
+            model_preferences=ModelPreferences(
+                providers=(self.provider,),
+                models=(self.model,),
+                mode="chat",
+            ),
+            execution_constraints=ExecutionConstraints(
+                max_attempts=1,
+                timeout_seconds=self.timeout_config.read,
+                streaming=generation_contract.streaming_enabled,
+                thinking=False,
+                allow_recovery=False,
+                stop_on_no_progress=False,
+                provider_payload=call,
+            ),
+        )
+        response = await self.model_harness.execute(request)
+        if response.status != ModelResponseStatus.SUCCEEDED:
+            if response.provider_exception is not None:
+                raise response.provider_exception
+            raise _PlanAttemptFailure(
+                "PLAN_HTTP_ERROR",
+                "O Model Harness nao concluiu a chamada de planeamento.",
+                retryable=False,
+                error_type=response.status.value,
+                partial_response=bool(response.raw_text),
+            )
+        return response.raw_text
+
+    async def _generate_from_provider(
+        self,
+        request: ModelRequest,
+        route: ModelRoute,
+        call: _ProjectBuilderProviderCall,
+        readiness: dict[str, Any],
+    ) -> ProviderResult:
+        generation_contract = call.generation_contract
+        attempt = call.attempt
         payload = {
-            "model": self.model,
-            "messages": messages,
-            "stream": generation_contract.streaming_enabled,
+            "model": route.model,
+            "messages": [
+                {"role": "system", "content": request.system_prompt},
+                {"role": "user", "content": request.user_prompt},
+            ],
+            "stream": route.streaming,
             "format": generation_contract.response_format,
-            "think": False,
+            "think": route.thinking,
             "keep_alive": self.keep_alive,
             "options": {
-                "temperature": 0,
+                "temperature": request.temperature,
                 "top_p": 0.8,
-                "num_predict": self.max_output_tokens,
-                "num_ctx": self.num_ctx,
+                "num_predict": request.max_output_tokens,
+                "num_ctx": request.max_context_tokens,
             },
         }
         parts: list[str] = []
@@ -4308,18 +4491,19 @@ class OllamaPlanRequester:
         chunk_count = 0
         response_bytes = 0
         first_valid_json_at: float | None = None
+        metrics: dict[str, Any] = {}
         self._record(
             "model_attempt_started",
             attempt=attempt,
-            metadata={"phase": "plan_correction" if correction else "plan"},
+            metadata={"phase": request.metadata.get("phase", "plan")},
         )
-        output_character_limit = self.max_output_tokens * 12
+        output_character_limit = int(request.max_output_tokens or 1) * 12
         try:
             async with self._client(self.timeout_config.to_httpx()) as client:
                 self._record("http_request_started", attempt=attempt, metadata={
                     "endpoint": "/api/chat",
-                    "prompt_bytes": len(prompt.encode("utf-8")),
-                    "correction_bytes": len(correction.encode("utf-8")) if correction else 0,
+                    "prompt_bytes": call.prompt_bytes,
+                    "correction_bytes": call.correction_bytes,
                 })
                 async with client.stream("POST", "/api/chat", json=payload) as response:
                     self._record(
@@ -4496,7 +4680,23 @@ class OllamaPlanRequester:
                 f"response_attempt_{attempt}.jsonl",
                 "".join(parts),
             )
-        return "".join(parts)
+        return ProviderResult(
+            raw_text="".join(parts),
+            usage=ModelUsage(
+                input_tokens=metrics.get("prompt_eval_count"),
+                output_tokens=metrics.get("eval_count"),
+                total_tokens=(
+                    int(metrics.get("prompt_eval_count") or 0)
+                    + int(metrics.get("eval_count") or 0)
+                    or None
+                ),
+            ),
+            metadata={
+                "done_reason": done_reason,
+                "chunk_count": chunk_count,
+                "bytes_received": response_bytes,
+            },
+        )
 
     async def __call__(self, prompt: str, correction: str | None = None) -> str:
         self._record(
@@ -4519,12 +4719,10 @@ class OllamaPlanRequester:
             generation_contract = _ollama_generation_contract(correction)
             started = time.monotonic()
             try:
-                readiness = await self._readiness(attempt)
                 result = await self._generate(
                     prompt,
                     correction,
                     attempt,
-                    readiness,
                     generation_contract,
                 )
             except _PlanAttemptFailure as failure:

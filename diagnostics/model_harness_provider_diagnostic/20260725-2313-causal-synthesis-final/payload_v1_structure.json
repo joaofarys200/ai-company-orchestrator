@@ -1,0 +1,82 @@
+{
+  "source": "bounded_v1_historical_success:B07_TOOL_SELECTION",
+  "endpoint": "/api/chat",
+  "http_method": "POST",
+  "headers": [
+    "accept",
+    "content-type",
+    "host",
+    "user-agent"
+  ],
+  "payload_bytes": 716,
+  "payload_sha256": "7319573d2f1692863601152450b05c7f2b3bc927a3adfe5a3978248207ec8979",
+  "message_count": 2,
+  "role_order": [
+    "system",
+    "user"
+  ],
+  "messages": [
+    {
+      "role": "system",
+      "content_chars": 88,
+      "content_bytes": 88,
+      "content_sha256": "8508f13fe185dbb8c58d997b973965f048451a7f5f249e687a899f103aef8d1d"
+    },
+    {
+      "role": "user",
+      "content_chars": 99,
+      "content_bytes": 99,
+      "content_sha256": "7ae46feb4c87859d3e4d34dfe5ab881749077ff8660004fd07e8c150a81f8498"
+    }
+  ],
+  "system_prompt_size": 88,
+  "user_prompt_size": 99,
+  "context_size": 0,
+  "schema": {
+    "sha256": "1e35db4b03c680df3789867274872932cd2034e5e1ca7b3e7a6e073e55527674",
+    "bytes": 291,
+    "nodes": 6,
+    "properties": 3,
+    "arrays": 0,
+    "objects": 2,
+    "enums": 2,
+    "enum_values": 2,
+    "required": 3,
+    "optionals": 0,
+    "refs": 0,
+    "refs_resolved": 0,
+    "oneOf": 0,
+    "anyOf": 0,
+    "allOf": 0,
+    "nullable_representations": 0,
+    "additionalProperties": 2,
+    "patterns": 0,
+    "limits": 0,
+    "examples": 0,
+    "defaults": 0,
+    "descriptions": 0,
+    "titles": 0,
+    "maximum_depth": 6,
+    "refs_list": [],
+    "cycles_or_recursion": [],
+    "potentially_problematic": [],
+    "compatibility_conclusion": "NO_HEURISTIC_INCOMPATIBILITY_FOUND"
+  },
+  "tool_count": 0,
+  "tool_schema_size": 2,
+  "context_tool_representation_size": 0,
+  "tool_transport": "no_top_level_tools_context_and_schema_only",
+  "options": {
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_predict": 768
+  },
+  "think": false,
+  "stream": false,
+  "keep_alive": "15m",
+  "provider_adapter": "OllamaBenchmarkProvider",
+  "http_client": "httpx.AsyncClient.post buffered",
+  "response_handling": "buffer_complete_response"
+}

@@ -1,0 +1,55 @@
+{
+  "request_id": "d87b7c813ae046ad8fdff0303b3aa314",
+  "status": "SUCCEEDED",
+  "raw_text": "{\n  \"files\": [\n    \"index.html\",\n    \"styles.css\",\n    \"app.js\"\n  ],\n  \"dependencies\": []\n}",
+  "structured_output": {
+    "files": [
+      "index.html",
+      "styles.css",
+      "app.js"
+    ],
+    "dependencies": []
+  },
+  "usage": {
+    "input_tokens": 67,
+    "output_tokens": 39,
+    "total_tokens": 106
+  },
+  "provider": "ollama",
+  "model": "qwen3.5:9b",
+  "latency_ms": 3701,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "files": [
+        "index.html",
+        "styles.css",
+        "app.js"
+      ],
+      "dependencies": []
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "recovery": [
+    {
+      "action": "NONE",
+      "reason": "recovery_not_required",
+      "recoverable": false,
+      "retry_requested": false,
+      "input_changed": false
+    }
+  ],
+  "tool_calls": [],
+  "warnings": [],
+  "errors": []
+}

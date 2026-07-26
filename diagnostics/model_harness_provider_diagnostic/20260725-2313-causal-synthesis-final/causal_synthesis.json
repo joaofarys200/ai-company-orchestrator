@@ -1,0 +1,640 @@
+{
+  "decision": "MODEL_HARNESS_STATEFUL_PROVIDER_PATH_DIAGNOSED",
+  "diagnosis": {
+    "decision": "MODEL_HARNESS_STATEFUL_PROVIDER_PATH_DIAGNOSED",
+    "root_cause": "The historical request reached Ollama, acquired the only llama-server slot, processed all 988 prompt tokens, and initialized its sampler, but the runner emitted no observable completion and never returned the slot to idle. The client then hit its 300-second read timeout; cancellation did not make the slot available, so the following seven requests queued and timed out. The identical full payload succeeds both directly and through ModelHarness after isolating runner state.",
+    "blocking_phase": "ollama_generation_after_sampler_initialization_before_first_token_and_response_headers",
+    "responsible_component": "Ollama llama-server runner and single-slot lifecycle",
+    "request_or_harness_cause": false,
+    "trigger_assessment": {
+      "status": "LIKELY_NOT_CONCLUSIVE",
+      "candidate": "host/runtime resource pressure",
+      "evidence": "The original load reported 659.2 MiB free system RAM; an independent first clean-up probe later crashed during CUDA shared-object initialization. A clean runner passed all request controls. This supports resource pressure as a trigger but does not prove it is the sole trigger."
+    },
+    "confidence": {
+      "blocking_component_and_phase": "high",
+      "underlying_trigger": "medium"
+    },
+    "production_fix_implemented": false,
+    "minimum_safe_fix": "In a separate scoped phase, add a bounded provider health guard for zero-byte ReadTimeouts: preserve the original exception, inspect runner availability, and recycle only the selected model runner before a later request. Prove the exact stateful request and the bounded v1 request; do not increase timeout."
+  },
+  "exact_reconstruction_proven": true,
+  "historical_request": {
+    "scenario_id": "A01_FIND_RELEVANT_FILE",
+    "latency_ms": 300324,
+    "provider_status": [
+      "model_response_status=PROVIDER_FAILED"
+    ],
+    "input_tokens": null,
+    "output_tokens": null,
+    "model_output_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "historical_runner": {
+    "status": "FOUND",
+    "source_sha256": "3899ff859fa3cc7b2f34e1f1e0fea43cfe5d1efe11e874786c17c4076192f73c",
+    "source_line_start": 2273,
+    "source_line_end": 2739,
+    "expected_prompt_tokens": 988,
+    "prompt_tokens_observed": 988,
+    "request_reached_server_stream": true,
+    "slot_selected": true,
+    "task_processing_started": true,
+    "sampler_initialized": true,
+    "generation_completion_observed": false,
+    "slot_idle_after_task_observed": false,
+    "five_minute_http_500_count": 8,
+    "cancelled_task_ids": [
+      0,
+      16,
+      18,
+      20,
+      22,
+      24,
+      26,
+      28
+    ],
+    "subsequent_server_stream_count": 7,
+    "subsequent_slot_selection_count": 0,
+    "subsequent_task_processing_count": 0,
+    "system_memory": {
+      "total": "15.7 GiB",
+      "free": "659.2 MiB",
+      "free_swap": "5.7 GiB"
+    },
+    "gpu_memory": {
+      "available": "6.3 GiB",
+      "free": "6.8 GiB",
+      "minimum": "457.0 MiB"
+    },
+    "evidence_lines": [
+      {
+        "line_number": 2273,
+        "text": "time=2026-07-25T21:48:05.503+01:00 level=INFO source=sched.go:623 msg=\"system memory\" total=\"15.7 GiB\" free=\"659.2 MiB\" free_swap=\"5.7 GiB\"",
+        "line_sha256": "bd2ab0ece3809405affcf04cee88f2c157125e9c6bed353350f29c1f43a569bc"
+      },
+      {
+        "line_number": 2274,
+        "text": "time=2026-07-25T21:48:05.503+01:00 level=INFO source=sched.go:630 msg=\"gpu memory\" id=0 library=CUDA available=\"6.3 GiB\" free=\"6.8 GiB\" minimum=\"457.0 MiB\" overhead=\"0 B\"",
+        "line_sha256": "5bab386e5c49bb83dee19b66f647e63c75fdfbb8f166cec8942f8b2794a40eae"
+      },
+      {
+        "line_number": 2669,
+        "text": "srv  server_strea: conv_id= (empty=1)",
+        "line_sha256": "6f90e3c787004f0782e2e4feffb44411dd552d43756d0d059a7e365afe968775"
+      },
+      {
+        "line_number": 2670,
+        "text": "slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1",
+        "line_sha256": "c1add363e13d1685ef26ed522d8c8f331c000fb1bf87e47313afe08f90b89149"
+      },
+      {
+        "line_number": 2681,
+        "text": "slot launch_slot_: id  0 | task 0 | processing task, is_child = 0",
+        "line_sha256": "beea2f8c4e6bd993334556735419c332b8f26b7b513342e1d3ad880a6c454798"
+      },
+      {
+        "line_number": 2682,
+        "text": "slot   operator(): id  0 | task 0 | new prompt, n_ctx_slot = 8192, n_keep = 4, task.n_tokens = 988",
+        "line_sha256": "1029ff4236c59ff8793cb03ae3257e16b6b5601fc625f5f56fe947c55a54efa9"
+      },
+      {
+        "line_number": 2687,
+        "text": "slot init_sampler: id  0 | task 0 | init sampler, took 0.29 ms, tokens: text = 988, total = 988",
+        "line_sha256": "fd1c297fe7361850d7e26244725dea7cc8cf41064cdfabf3f80c313c674644c5"
+      },
+      {
+        "line_number": 2693,
+        "text": "[GIN] 2026/07/25 - 21:53:01 | 500 |          5m0s |       127.0.0.1 | POST     \"/api/chat\"",
+        "line_sha256": "5d29da83e068e1168e920c82ebbd7ae0aba0ef5eab5558f9cfe8049b7e4f6bfe"
+      },
+      {
+        "line_number": 2694,
+        "text": "srv          stop: cancel task, id_task = 0",
+        "line_sha256": "e81fecce15c171bc4fe747a83341cabeab37595083d87a332af6f59baf6f15b6"
+      },
+      {
+        "line_number": 2702,
+        "text": "[GIN] 2026/07/25 - 21:58:02 | 500 |          5m0s |       127.0.0.1 | POST     \"/api/chat\"",
+        "line_sha256": "8e8e2a9566cf97a72e0d43abe6a8c22f01b4f9cdb22093caabb752fd3ad711f6"
+      },
+      {
+        "line_number": 2703,
+        "text": "srv          stop: cancel task, id_task = 16",
+        "line_sha256": "8b82a1788f261b87f162f27cab5edcdf51c38a2ee123456013f49c277a5f234a"
+      },
+      {
+        "line_number": 2708,
+        "text": "[GIN] 2026/07/25 - 22:03:02 | 500 |          5m0s |       127.0.0.1 | POST     \"/api/chat\"",
+        "line_sha256": "32159d56a7fb952748d7ce6ece017eaec7e2a4c6ff93e6480b2b4e6e4633a1de"
+      },
+      {
+        "line_number": 2709,
+        "text": "srv          stop: cancel task, id_task = 18",
+        "line_sha256": "9943a688105c27826627c177f3876f96f686d0ad04c9c0e72ef3de307b7143af"
+      },
+      {
+        "line_number": 2713,
+        "text": "[GIN] 2026/07/25 - 22:08:02 | 500 |          5m0s |       127.0.0.1 | POST     \"/api/chat\"",
+        "line_sha256": "0f77a26ae4fd6e4271fe78dc98659b5d0df1be70ca71bcb2d912d7d70d555943"
+      },
+      {
+        "line_number": 2714,
+        "text": "srv          stop: cancel task, id_task = 20",
+        "line_sha256": "a92bb2e3ed8a99a6011056727520d19f32d259162ebd3b5f79b3ee87d7e353d1"
+      },
+      {
+        "line_number": 2718,
+        "text": "[GIN] 2026/07/25 - 22:13:03 | 500 |          5m0s |       127.0.0.1 | POST     \"/api/chat\"",
+        "line_sha256": "475a769629b674ceee860f78ef9deefdf0d06f9c3259831f7b2a289baa4190f2"
+      },
+      {
+        "line_number": 2719,
+        "text": "srv          stop: cancel task, id_task = 22",
+        "line_sha256": "0edecd261412a1c5f140cc30a97e1c251404bff0c976112f56cb0417722be1fe"
+      },
+      {
+        "line_number": 2729,
+        "text": "[GIN] 2026/07/25 - 22:18:03 | 500 |          5m0s |       127.0.0.1 | POST     \"/api/chat\"",
+        "line_sha256": "44091a90a54bfbc9479a75b47c89a3169732b2038d2e2409bc38ba225d3c7928"
+      },
+      {
+        "line_number": 2730,
+        "text": "srv          stop: cancel task, id_task = 24",
+        "line_sha256": "30867e0eb3bd025d2230d77f56434ef791e9337860135c9b699db38db4858912"
+      },
+      {
+        "line_number": 2734,
+        "text": "[GIN] 2026/07/25 - 22:23:03 | 500 |          5m0s |       127.0.0.1 | POST     \"/api/chat\"",
+        "line_sha256": "537bd182f2c08be6520286759832b669e16c311dbf9a5a0ba6fe946d11008617"
+      },
+      {
+        "line_number": 2735,
+        "text": "srv          stop: cancel task, id_task = 26",
+        "line_sha256": "7b31b78e32b92a654ec3f5cfc459decb2326538f6b40a41e1c0c558cfcf95ab4"
+      },
+      {
+        "line_number": 2739,
+        "text": "[GIN] 2026/07/25 - 22:28:04 | 500 |          5m0s |       127.0.0.1 | POST     \"/api/chat\"",
+        "line_sha256": "12f20d801333de92430e769c33afa8f928d710dfa0db0d40fa9a14b69bc22b5b"
+      },
+      {
+        "line_number": 2741,
+        "text": "srv          stop: cancel task, id_task = 28",
+        "line_sha256": "d004227d9be403be19a70fc99b743c52b8c814f58d57c73a73e88c5f1e93e768"
+      }
+    ]
+  },
+  "independent_cuda_failure": {
+    "status": "FOUND",
+    "source_sha256": "3899ff859fa3cc7b2f34e1f1e0fea43cfe5d1efe11e874786c17c4076192f73c",
+    "source_line_start": 3034,
+    "source_line_end": 3043,
+    "cuda_error": true,
+    "runner_exit_0xc0000409": true,
+    "load_failed": true,
+    "evidence_lines": [
+      {
+        "line_number": 3034,
+        "text": "CUDA error: shared object initialization failed",
+        "line_sha256": "0b230019cbf74b1238e3441f8e6e015526320ada31f5571d369326f02647fa90"
+      },
+      {
+        "line_number": 3035,
+        "text": "[LOCAL_PATH] CUDA error",
+        "line_sha256": "22790b0175c68f82e48e604e86c1be4b8158fc0c4b82b2f82df84579c690de63"
+      },
+      {
+        "line_number": 3036,
+        "text": "  current device: 0, in function ggml_cuda_flash_attn_ext_mma_f16_case at [LOCAL_PATH]",
+        "line_sha256": "79460063461c4c89be040ba1ed1863af5a918f01c77692554f216d21031f98c2"
+      },
+      {
+        "line_number": 3037,
+        "text": "  cudaFuncSetAttribute(reinterpret_cast<fattn_kernel_ptr_t>(fattn_kernel), cudaFuncAttributeMaxDynamicSharedMemorySize, nbytes_shared_total)",
+        "line_sha256": "b91cd804d0b0ed73011f82b0ff6cf80c6f7681bf06cd9c7b954b5dceb6ba6b24"
+      },
+      {
+        "line_number": 3038,
+        "text": "time=2026-07-25T23:25:05.157+01:00 level=INFO source=llama_server.go:1312 msg=\"waiting for llama-server to become available\" status=\"llm server not responding\"",
+        "line_sha256": "a7d8519ef7107a8faff2e01ac11859bea32ccfb676bb5ffe7391d97a0c41a136"
+      },
+      {
+        "line_number": 3039,
+        "text": "time=2026-07-25T23:25:11.729+01:00 level=INFO source=llama_server.go:1312 msg=\"waiting for llama-server to become available\" status=\"llm server error\"",
+        "line_sha256": "f848db4fc9b841c3904171986d11101e70ac637dc1c457c030dce55f27297fa9"
+      },
+      {
+        "line_number": 3040,
+        "text": "time=2026-07-25T23:25:11.969+01:00 level=ERROR source=llama_server.go:985 msg=\"llama-server terminated\" error=\"exit status 0xc0000409\" exit.code=3221226505 exit.hex=0xc0000409 exit.ntstatus=\"The system detected an overrun of a stack-based buffer in this application. This overrun could potentially allow a malicious user to gain control of this application.\"",
+        "line_sha256": "4dcf5c4883ad7489a2bca88e4dc11c3ced88ebcbecf299ad45577a7b73fcd4b7"
+      },
+      {
+        "line_number": 3041,
+        "text": "time=2026-07-25T23:25:11.981+01:00 level=INFO source=sched.go:651 msg=\"Load failed\" model=[LOCAL_PATH] error=\"llama-server process has terminated: exit status 0xc0000409: The system detected an overrun of a stack-based buffer in this application. This overrun could potentially allow a malicious user to gain control of this application.: CUDA error: shared object initialization failed\"",
+        "line_sha256": "557542ebc62790bd0aeaac084c790e7b5297dbc2d2859ba993a496cbede684e4"
+      },
+      {
+        "line_number": 3042,
+        "text": "[GIN] 2026/07/25 - 23:25:11 | 500 |   24.8445843s |       127.0.0.1 | POST     \"/api/chat\"",
+        "line_sha256": "cd96bf04e04ccc4c02dc45bad5bf7730f89551c3f657377b1a2312c850292395"
+      },
+      {
+        "line_number": 3043,
+        "text": "[GIN] 2026/07/25 - 23:25:12 | 200 |            0s |       127.0.0.1 | GET      \"/api/ps\"",
+        "line_sha256": "62eacf5a68485f332f73bb0f2bf5bf49379a23e9e2d25f0d544ff7459a3cd8fe"
+      }
+    ]
+  },
+  "clean_controls": {
+    "all_tools": {
+      "variant_id": "D06_FULL_SCHEMA_ALL_TOOLS",
+      "status": "SUCCEEDED",
+      "duration_ms": 35415.141,
+      "status_code": 200,
+      "response_bytes": 576,
+      "model_content_chars": 228,
+      "done": true,
+      "done_reason": "stop",
+      "input_tokens": 988,
+      "output_tokens": 91,
+      "json_valid": true,
+      "schema_valid": true,
+      "payload_sha256": "bf09f238164d9001392710211ed2e3716f68a7f274c1a26837580693b6e6b5e8"
+    },
+    "direct": {
+      "variant_id": "D07_DIRECT_OLLAMA_FULL_REQUEST",
+      "status": "SUCCEEDED",
+      "duration_ms": 34919.42,
+      "status_code": 200,
+      "response_bytes": 576,
+      "model_content_chars": 228,
+      "done": true,
+      "done_reason": "stop",
+      "input_tokens": 988,
+      "output_tokens": 91,
+      "json_valid": true,
+      "schema_valid": true,
+      "payload_sha256": "bf09f238164d9001392710211ed2e3716f68a7f274c1a26837580693b6e6b5e8"
+    },
+    "harness": {
+      "variant_id": "D08_HARNESS_FULL_REQUEST",
+      "status": "SUCCEEDED",
+      "duration_ms": 34712.003,
+      "status_code": null,
+      "response_bytes": 0,
+      "model_content_chars": 228,
+      "done": true,
+      "done_reason": "stop",
+      "input_tokens": 988,
+      "output_tokens": 91,
+      "json_valid": true,
+      "schema_valid": true,
+      "payload_sha256": "bf09f238164d9001392710211ed2e3716f68a7f274c1a26837580693b6e6b5e8"
+    },
+    "stream": {
+      "variant_id": "D07S_DIRECT_OLLAMA_FULL_REQUEST_STREAM",
+      "status": "SUCCEEDED",
+      "duration_ms": 20794.731,
+      "status_code": 200,
+      "response_bytes": 8383,
+      "model_content_chars": 228,
+      "done": true,
+      "done_reason": "stop",
+      "input_tokens": 988,
+      "output_tokens": 91,
+      "json_valid": true,
+      "schema_valid": true,
+      "payload_sha256": "14108d131706ca0f3ad1d290087e656d4e75ca8d358bc5be674d19f9dfe38d3c"
+    }
+  },
+  "bounded_v1": {
+    "status": "SUCCEEDED",
+    "passed": true,
+    "wall_latency_ms": 2817,
+    "input_tokens": 55,
+    "output_tokens": 32
+  },
+  "resource_comparison": {
+    "stateful_gpu_before": {
+      "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+      "driver_version": "581.34",
+      "memory_total_mib": 8151,
+      "memory_used_mib": 4276,
+      "memory_free_mib": 3535,
+      "utilization_percent": 61
+    },
+    "stateful_gpu_after": {
+      "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+      "driver_version": "581.34",
+      "memory_total_mib": 8151,
+      "memory_used_mib": 7645,
+      "memory_free_mib": 166,
+      "utilization_percent": 39
+    },
+    "v1_gpu_before": {
+      "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+      "driver_version": "581.34",
+      "memory_total_mib": 8151,
+      "memory_used_mib": 1129,
+      "memory_free_mib": 6682,
+      "utilization_percent": 15
+    },
+    "original_ollama_system_memory": {
+      "total": "15.7 GiB",
+      "free": "659.2 MiB",
+      "free_swap": "5.7 GiB"
+    }
+  },
+  "hypotheses": {
+    "H1_SCHEMA_COMPLEXITY": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "full_schema_direct": "SUCCEEDED",
+        "all_schema_reductions": [
+          "SUCCEEDED",
+          "SUCCEEDED",
+          "SUCCEEDED",
+          "SUCCEEDED",
+          "SUCCEEDED"
+        ]
+      }
+    },
+    "H2_PROVIDER_ADAPTER": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "direct": "SUCCEEDED",
+        "harness": "SUCCEEDED",
+        "same_provider_adapter": true
+      }
+    },
+    "H3_STREAM_HANDLING": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "buffered": "SUCCEEDED",
+        "streamed": "SUCCEEDED",
+        "first_streamed_token_observed": true
+      }
+    },
+    "H4_TOOL_AND_FORMAT_COMBINATION": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "all_tools_full_schema": "SUCCEEDED"
+      }
+    },
+    "H5_CONTEXT_OR_OUTPUT_OPTIONS": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "stateful_prompt_no_schema": "SUCCEEDED",
+        "exact_options_full_request": "SUCCEEDED"
+      }
+    },
+    "H6_HTTP_TIMEOUT_LAYER": {
+      "status": "SUPPORTED",
+      "evidence": {
+        "controlled_exception": {
+          "correlation_id": "c6435e2c2e7d4a3d9c061e9709c631f7",
+          "variant_id": "D02_STATEFUL_PROMPT_NO_SCHEMA",
+          "classification": "READ_TIMEOUT",
+          "class": "ReadTimeout",
+          "module": "httpx",
+          "stage": "T13",
+          "timeout_type": "read",
+          "errno": null,
+          "status_http": null,
+          "message_redacted": "",
+          "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "causes": [
+            {
+              "class": "ReadTimeout",
+              "module": "httpx",
+              "message_redacted": "",
+              "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "errno": null,
+              "status_http": null
+            },
+            {
+              "class": "ReadTimeout",
+              "module": "httpcore",
+              "message_redacted": "",
+              "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "errno": null,
+              "status_http": null
+            },
+            {
+              "class": "TimeoutError",
+              "module": "builtins",
+              "message_redacted": "",
+              "message_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "errno": null,
+              "status_http": null
+            },
+            {
+              "class": "CancelledError",
+              "module": "asyncio.exceptions",
+              "message_redacted": "Cancelled via cancel scope 1fbc83efaa0; reason: deadline exceeded",
+              "message_sha256": "480a89bc442b7c6f81b9c6c4a2fd4fbe010b8623572cd6f9c9024749c2a2ed3b",
+              "errno": null,
+              "status_http": null
+            }
+          ],
+          "traceback": [
+            {
+              "file": "backend/model_harness/benchmarking/provider_diagnostic.py",
+              "line": 1714,
+              "function": "direct_ollama_call"
+            },
+            {
+              "file": "contextlib.py",
+              "line": 210,
+              "function": "__aenter__"
+            },
+            {
+              "file": "venv/Lib/site-packages/httpx/_client.py",
+              "line": 1583,
+              "function": "stream"
+            },
+            {
+              "file": "venv/Lib/site-packages/httpx/_client.py",
+              "line": 1629,
+              "function": "send"
+            },
+            {
+              "file": "venv/Lib/site-packages/httpx/_client.py",
+              "line": 1657,
+              "function": "_send_handling_auth"
+            },
+            {
+              "file": "venv/Lib/site-packages/httpx/_client.py",
+              "line": 1694,
+              "function": "_send_handling_redirects"
+            },
+            {
+              "file": "venv/Lib/site-packages/httpx/_client.py",
+              "line": 1730,
+              "function": "_send_single_request"
+            },
+            {
+              "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+              "line": 393,
+              "function": "handle_async_request"
+            },
+            {
+              "file": "contextlib.py",
+              "line": 158,
+              "function": "__exit__"
+            },
+            {
+              "file": "venv/Lib/site-packages/httpx/_transports/default.py",
+              "line": 118,
+              "function": "map_httpcore_exceptions"
+            }
+          ]
+        },
+        "historical_http_500_after_5m": 8,
+        "historical_partial_output": false
+      }
+    },
+    "H7_OLLAMA_RUNTIME": {
+      "status": "SUPPORTED",
+      "evidence": {
+        "runner_chain_proven": true,
+        "cuda_load_failure": "FOUND",
+        "clean_controls_pass": true
+      }
+    },
+    "H8_HARNESS_RESPONSE_PATH": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "direct": "SUCCEEDED",
+        "harness": "SUCCEEDED"
+      }
+    },
+    "H9_REQUEST_SERIALIZATION": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "exact_direct": "SUCCEEDED",
+        "exact_harness": "SUCCEEDED",
+        "same_payload_sha256": true
+      }
+    },
+    "H10_MODEL_COLD_OR_RELOAD": {
+      "status": "PARTIALLY_SUPPORTED",
+      "evidence": {
+        "historical_stuck_slot": true,
+        "isolated_runner_controls_pass": true,
+        "underlying_trigger_proven": false
+      }
+    }
+  },
+  "regressions": [],
+  "limitations": [
+    "The exact low-level cause of the runner stall below the sampler boundary is not emitted by Ollama logs.",
+    "Resource pressure is correlated with the failure but was not independently manipulated, so it remains a likely trigger rather than a proven sole cause.",
+    "The historical buffered provider collapsed the concrete ReadTimeout to PROVIDER_FAILED; the diagnostic reproduced the concrete ReadTimeout in the same contaminated runner state."
+  ],
+  "source_artifacts": {
+    "clean_summary": {
+      "path": "summary.json",
+      "sha256": "f789dd190a22b782db5c0e90da458ba4fbbb16503c828dc4e7af02ded40e0c56",
+      "exists": true
+    },
+    "clean_matrix": {
+      "path": "matrix_results.json",
+      "sha256": "9317b60a5ea6f17202be23bb17cb7ce5c85dd1fe0ff50e59edfbc5dbad337eab",
+      "exists": true
+    },
+    "partial_matrix": {
+      "path": "matrix_results.json",
+      "sha256": "4ceb6200a5e97316b8f16507c80d45f471d7d87215c4788841ee2928c635d260",
+      "exists": true
+    },
+    "stream_matrix": {
+      "path": "matrix_results.json",
+      "sha256": "51cfcbc37cfdb3196012b5dd6f0fbb83b7f3aa135ff09c089234881d767e4c6f",
+      "exists": true
+    },
+    "historical_step_trace": {
+      "path": "step_trace.jsonl",
+      "sha256": "2b8336ebda13f6c9d5794ea0c84f749eac806e95ad13e8b6538a4280d300ddf4",
+      "exists": true
+    },
+    "historical_ollama_log": {
+      "path": "server.log",
+      "sha256": "638c9eefefb850dd89586ac667dda182507f62b2bb588633614eb11286f1cb8e",
+      "exists": true
+    }
+  },
+  "validation_results": {
+    "focal_pytest": {
+      "status": "PASSED",
+      "passed": 35,
+      "duration_seconds": 0.71
+    },
+    "full_pytest": {
+      "status": "PASSED",
+      "passed": 529,
+      "skipped": 1,
+      "warnings": 14,
+      "duration_seconds": 133.29
+    },
+    "py_compile": {
+      "status": "PASSED"
+    },
+    "import_server": {
+      "status": "PASSED",
+      "output": "IMPORT_SERVER_OK"
+    },
+    "full_stateful_smoke_rerun": false,
+    "post_validation_integrity": {
+      "captured_at": "2026-07-25T23:10:26.778399+00:00",
+      "unchanged_since_live_run": false,
+      "changed_trees": [
+        "workspace_projects",
+        "mission_metadata"
+      ],
+      "tree_changes": {
+        "workspace_projects": {
+          "before": {
+            "exists": true,
+            "file_count": 28,
+            "total_bytes": 29916,
+            "tree_sha256": "19ef89052044a5bc45a7fd2922be5a4570cc476733118dee09d7b9c38ebff4fa"
+          },
+          "after": {
+            "exists": true,
+            "file_count": 35,
+            "total_bytes": 31076,
+            "tree_sha256": "49266549b55926c911d73530609e19ef000ade2032769d7f077908dd7919faa4"
+          }
+        },
+        "mission_metadata": {
+          "before": {
+            "exists": true,
+            "file_count": 1840,
+            "total_bytes": 65181448,
+            "tree_sha256": "4d05ff8cdcbcec4f5551be25f5efb2ed18b99e36fa67c36ba30fe27446f53356"
+          },
+          "after": {
+            "exists": true,
+            "file_count": 1901,
+            "total_bytes": 67719504,
+            "tree_sha256": "11dd2c34bc8b2bb9ec59943c33750201877bf84129f3023b5a11c86948e338b4"
+          }
+        }
+      },
+      "critical_file_changes": {},
+      "observed_test_outputs": {
+        "new_project_builder_journals": 61,
+        "new_workspace_project_fixture_files": 2,
+        "rewritten_project_metadata_files": [
+          "workspace/.jarvis/projects/flight-recorder-integration/project_context.json",
+          "workspace/.jarvis/projects/flight-recorder-integration/symbols_index.json",
+          "workspace/.jarvis/projects/task-app/project_context.json",
+          "workspace/.jarvis/projects/task-app/symbols_index.json"
+        ]
+      },
+      "attribution": "Observed after the prescribed full pytest run; journal contents and paths identify ProjectBuilder test fixtures. The live diagnostic before/after comparison remained unchanged.",
+      "cleanup_performed": false
+    }
+  }
+}

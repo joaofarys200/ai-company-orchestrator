@@ -1,0 +1,53 @@
+{
+  "case_id": "B01_LOCAL_CHOICE",
+  "repetition": 2,
+  "status": "SUCCEEDED",
+  "harness_passed": true,
+  "semantic_passed": true,
+  "passed": true,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "choice": "LOCAL",
+      "confidence": 1.0
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "criteria": [
+    {
+      "criterion": "chooses_local",
+      "passed": true,
+      "evidence": "received='LOCAL'"
+    }
+  ],
+  "response_sha256": "b111705d49223f8186f0a1d6301f03dc5ec01e160cae5e625b8a2441997a7557",
+  "response_bytes": 44,
+  "wall_latency_ms": 2520,
+  "harness_latency_ms": 2519,
+  "usage": {
+    "input_tokens": 64,
+    "output_tokens": 21,
+    "total_tokens": 85
+  },
+  "provider_metrics": {
+    "done": true,
+    "done_reason": "stop",
+    "total_duration_ns": 2327668100,
+    "load_duration_ns": 1076891800,
+    "prompt_eval_count": 64,
+    "prompt_eval_duration_ns": 112195000,
+    "eval_count": 21,
+    "eval_duration_ns": 1131168000,
+    "tokens_per_second": 18.565
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "case_id": "B06_NEGATIVE_CONSTRAINTS",
+  "title": "Plano respeitando exclusoes",
+  "capability": "negative_constraint_following",
+  "task_profile": "MISSION_PLANNING",
+  "system_prompt": "Return a minimal file plan. Respect every negative constraint and use only allowed paths.",
+  "user_prompt": "Create a static browser page. Allowed paths are index.html, app.js and styles.css. Do not use React, dependencies, Markdown, package managers or any other path.",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "files",
+      "dependencies"
+    ],
+    "properties": {
+      "files": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "enum": [
+            "index.html",
+            "app.js",
+            "styles.css"
+          ]
+        }
+      },
+      "dependencies": {
+        "type": "array",
+        "maxItems": 0
+      }
+    }
+  },
+  "allowed_tools": [],
+  "context_candidates": []
+}

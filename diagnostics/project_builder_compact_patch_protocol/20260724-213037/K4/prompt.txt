@@ -1,0 +1,34 @@
+You are returning a compact typed correction protocol for a validated project plan.
+Resolve every listed error.
+Every error code must appear exactly once in error_resolutions.
+Do not generate source code. Do not create paths. Do not omit plan operations.
+Use only the closed operation catalog and registered transforms.
+A response with incomplete error coverage is invalid.
+Project: health-boundary-probe | stack: nodejs-standard-library
+Allowed existing paths: ["package.json", "server.js", "index.html", "test.js"]
+Initial server.js SHA-256: 5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31
+Initial components: [frontend, backend, persistence, tests]; requested component: preview.
+Initial preview strategy exists and must remain coherent; existing server.js contains /health.
+Initial errors:
+- MISSING_REQUESTED_COMPONENTS: Plano nao promete componentes pedidos: ['preview']. Acao: Adiciona os componentes pedidos e os respetivos ficheiros reais.
+- MISSING_COMPONENT_MAPPING: Plano full stack sem component_files para: ['frontend', 'backend']. Acao: Mapeia frontend e backend para ficheiros que existam no plano.
+- DECLARED_COMPONENT_WITHOUT_ARTIFACTS: O componente declarado frontend nao tem nenhum artefacto real mapeado. Acao: Mapeia frontend para pelo menos um ficheiro existente que implemente o componente.
+- PERSISTENCE_NOT_IMPLEMENTED: O componente persistence nao demonstra leitura e escrita duravel; estado em memoria nao e persistencia. Acao: Associa persistence a um artefacto existente que implemente leitura e escrita duravel.
+- MISSING_HEALTH_ROUTE: Nenhum artefacto backend contem evidencia textual da rota /health. Acao: Implementa a rota de healthcheck no backend associado.
+Operation catalog:
+- set_components: complete final array.
+- set_component_files: complete final paths for a component.
+- apply_code_transform: server.js with ADD_JSON_FILE_PERSISTENCE, storage_filename and expected_sha256.
+Transform catalog:
+- ADD_JSON_FILE_PERSISTENCE: only server.js; adds node:fs, deterministic JSON path, durable read/write and missing-file handling; preserves node:http and /health; no external dependencies.
+- PRESERVE_HEALTH_ROUTE, EXPORT_SERVER_FOR_TESTS, PRESERVE_HTTP_IMPORT: preservation transforms only where their preconditions apply.
+Error to operation compatibility:
+- MISSING_REQUESTED_COMPONENTS -> set_components
+- MISSING_COMPONENT_MAPPING -> set_component_files
+- DECLARED_COMPONENT_WITHOUT_ARTIFACTS -> set_component_files
+- PERSISTENCE_NOT_IMPLEMENTED -> apply_code_transform ADD_JSON_FILE_PERSISTENCE on server.js
+- MISSING_HEALTH_ROUTE -> set_component_files backend server.js when /health already exists
+The response must contain exactly two top-level keys: error_resolutions and operations.
+Each operation id must be unique and each referenced operation id must exist.
+Use no replace_file_content, replace_text, arbitrary code, file creation, diff, JSON Patch, append, retry or autorepair.
+Return JSON only.

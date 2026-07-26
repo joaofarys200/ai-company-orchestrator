@@ -1,0 +1,81 @@
+{
+  "root_type": "array",
+  "allows_empty_array": true,
+  "max_items": null,
+  "branch_order": [
+    "set_components",
+    "set_component_files",
+    "set_preview_strategy",
+    "replace_file_content",
+    "replace_text"
+  ],
+  "branches": [
+    {
+      "op": "set_components",
+      "property_count": 2,
+      "additional_properties": false,
+      "required": [
+        "op",
+        "value"
+      ],
+      "content_fields": []
+    },
+    {
+      "op": "set_component_files",
+      "property_count": 3,
+      "additional_properties": false,
+      "required": [
+        "op",
+        "component",
+        "paths"
+      ],
+      "content_fields": []
+    },
+    {
+      "op": "set_preview_strategy",
+      "property_count": 3,
+      "additional_properties": false,
+      "required": [
+        "op",
+        "field",
+        "value"
+      ],
+      "content_fields": []
+    },
+    {
+      "op": "replace_file_content",
+      "property_count": 4,
+      "additional_properties": false,
+      "required": [
+        "op",
+        "path",
+        "expected_sha256",
+        "content"
+      ],
+      "content_fields": [
+        "content"
+      ]
+    },
+    {
+      "op": "replace_text",
+      "property_count": 6,
+      "additional_properties": false,
+      "required": [
+        "op",
+        "path",
+        "expected_sha256",
+        "old_text",
+        "new_text",
+        "expected_occurrences"
+      ],
+      "content_fields": [
+        "old_text",
+        "new_text"
+      ]
+    }
+  ],
+  "has_error_coverage_field": false,
+  "represents_error_to_operation_dependency": false,
+  "allows_plan_field_only_response": true,
+  "observation": "A formally valid non-empty response may contain only set_* operations and omit content operations."
+}

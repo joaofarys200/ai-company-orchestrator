@@ -1,0 +1,8 @@
+[
+  {
+    "path": "server.js",
+    "before_sha256": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31",
+    "after_sha256": "ac908968523ef9bfab6c3cf85ab77d37206ff1b96bfa9384e8599fe1c0edb523",
+    "changed": true
+  }
+]

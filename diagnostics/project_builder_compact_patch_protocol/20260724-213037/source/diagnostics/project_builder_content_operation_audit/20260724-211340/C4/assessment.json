@@ -1,0 +1,30 @@
+{
+  "json_valid": false,
+  "schema_valid": false,
+  "generation_complete": false,
+  "operation_count": 0,
+  "server_content_operations": [],
+  "server_content_operation_present": false,
+  "target_correct": false,
+  "expected_hash_correct": false,
+  "content_non_empty": false,
+  "paths_invented": [],
+  "contract_errors": [
+    "INVALID_JSON"
+  ],
+  "required_actions_valid": true,
+  "validators": {},
+  "persistence_signals": {},
+  "operation_error": {
+    "type": "JSONDecodeError",
+    "message": "Unterminated string starting at: line 1 column 549 (char 548)"
+  },
+  "lexical_content_attempt": {
+    "present": true,
+    "op": "replace_file_content",
+    "target": "server.js",
+    "target_correct": true,
+    "hash": "",
+    "hash_complete": false
+  }
+}

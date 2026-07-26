@@ -1,0 +1,207 @@
+{
+  "diagnostic_version": "stateful_provider_path_diagnostic_v1",
+  "started_at": "2026-07-25T22:23:26.072847+00:00",
+  "completed_at": "2026-07-25T22:23:38.497412+00:00",
+  "mode": "compare",
+  "scenario": "A01_FIND_RELEVANT_FILE",
+  "model": "qwen3.5:9b",
+  "reconstruction": {
+    "historical_context_hash": "b60189b24418aef225772e48495225f0e8a6026498e0c31c5d148e76636c133a",
+    "reconstructed_context_hash": "b60189b24418aef225772e48495225f0e8a6026498e0c31c5d148e76636c133a",
+    "context_hash_matches": true,
+    "historical_request_fingerprint": "91105c160dedcdb569fc4570e723aea3f55c778e9231d64e3b11816e8855b6b7",
+    "reconstructed_request_fingerprint": "91105c160dedcdb569fc4570e723aea3f55c778e9231d64e3b11816e8855b6b7",
+    "request_fingerprint_matches": true,
+    "historical_configuration_hash": "db1cfa6c9ab21f1002e9d6c6ce9eb3897995512bfa9de0815df89cb4ac4380b5",
+    "configuration_equivalent": {
+      "equivalent": true,
+      "differences": {}
+    }
+  },
+  "request_hashes": {
+    "system_prompt": {
+      "sha256": "1b8f2ed230c9663c19196860aa1348e18b800f13f02b7521489831419234cdeb",
+      "chars": 829
+    },
+    "user_prompt": {
+      "sha256": "1fb193249b0f2b6c074f9f8473a69d9109e4aa01c4cb2478a9be47de83561599",
+      "chars": 782
+    },
+    "effective_user_prompt": {
+      "sha256": "edfcde8296aa2630d40bd55caadccb47d0ef35d6344145a6e4133c17040970e1",
+      "chars": 3604
+    },
+    "context": {
+      "sha256": "b60189b24418aef225772e48495225f0e8a6026498e0c31c5d148e76636c133a",
+      "items_sha256": "06b98145b1d87bc1660fd0ceab25a80ed59fc4e2bd76618331b91aa46faa555f",
+      "chars": 2044
+    },
+    "schema": {
+      "sha256": "17b993fcf2e562e823c8061a79b883b34d28260de2f4d5b107cd2f394a965380",
+      "bytes": 1341
+    },
+    "messages": {
+      "sha256": "96272f81400bd141aaff9a789d2d22404ad977f5f54ea1ff012ecf8c7b933001",
+      "count": 2
+    },
+    "tools": {
+      "top_level_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "top_level_count": 0,
+      "context_representation_sha256": "1e235708ef9c3f193ce929ea19ef37ad2932627873951b07868ca0944cf78b7b",
+      "context_representation_count": 1
+    },
+    "options": {
+      "sha256": "1d51ecf0945919bdbc0063693fdfb6cee5a4d95bb2f983f9c120fdd641df8973",
+      "value": {
+        "temperature": 0.0,
+        "top_p": 0.8,
+        "seed": 42,
+        "num_ctx": 8192,
+        "num_predict": 1024
+      }
+    },
+    "payload": {
+      "sha256": "bf09f238164d9001392710211ed2e3716f68a7f274c1a26837580693b6e6b5e8",
+      "bytes": 6622
+    }
+  },
+  "v1_source": {
+    "case_id": "B07_TOOL_SELECTION",
+    "request_artifact": "diagnostics/model_harness_benchmark/20260725-184843-qwen35-9b/cases/B07_TOOL_SELECTION/rep-1/request.json",
+    "response_status": "SUCCEEDED",
+    "response_latency_ms": 2817,
+    "response_validation": "PASSED",
+    "request_fingerprint": "3959cbb91e0ef8984fb269caad98ba1a7276ad05b9d3ba49dbc6682174d034f8"
+  },
+  "schema_analysis": {
+    "sha256": "17b993fcf2e562e823c8061a79b883b34d28260de2f4d5b107cd2f394a965380",
+    "bytes": 1341,
+    "nodes": 22,
+    "properties": 13,
+    "arrays": 6,
+    "objects": 3,
+    "enums": 3,
+    "enum_values": 20,
+    "required": 13,
+    "optionals": 0,
+    "refs": 0,
+    "refs_resolved": 0,
+    "oneOf": 0,
+    "anyOf": 0,
+    "allOf": 0,
+    "nullable_representations": 0,
+    "additionalProperties": 2,
+    "patterns": 0,
+    "limits": 3,
+    "examples": 0,
+    "defaults": 0,
+    "descriptions": 0,
+    "titles": 0,
+    "maximum_depth": 7,
+    "refs_list": [],
+    "cycles_or_recursion": [],
+    "potentially_problematic": [
+      {
+        "path": "#/properties/arguments",
+        "construction": "unconstrained_object"
+      }
+    ],
+    "compatibility_conclusion": "HEURISTIC_ONLY_REQUIRES_MATRIX_CONFIRMATION"
+  },
+  "matrix_statuses": {},
+  "hypotheses": {
+    "H1_SCHEMA_COMPLEXITY": {
+      "status": "NOT_TESTED",
+      "evidence": {
+        "minimal_schema": "NOT_TESTED",
+        "full_schema": "NOT_TESTED",
+        "schema_metrics_sha256": "17b993fcf2e562e823c8061a79b883b34d28260de2f4d5b107cd2f394a965380"
+      }
+    },
+    "H2_PROVIDER_ADAPTER": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "v1_adapter": "OllamaBenchmarkProvider",
+        "v2_adapter": "OllamaBenchmarkProvider",
+        "harness_result": "NOT_TESTED",
+        "direct_result": "NOT_TESTED"
+      }
+    },
+    "H3_STREAM_HANDLING": {
+      "status": "NOT_TESTED",
+      "evidence": {
+        "buffered_result": "NOT_TESTED",
+        "stream_result": "NOT_TESTED",
+        "stream_first_token": "[REDACTED]"
+      }
+    },
+    "H4_TOOL_AND_FORMAT_COMBINATION": {
+      "status": "PARTIALLY_SUPPORTED",
+      "evidence": {
+        "no_tools": "NOT_TESTED",
+        "one_tool": "NOT_TESTED",
+        "all_tools": "NOT_TESTED",
+        "top_level_tool_count": 0
+      }
+    },
+    "H5_CONTEXT_OR_OUTPUT_OPTIONS": {
+      "status": "NOT_TESTED",
+      "evidence": {
+        "same_generation_options_baseline": true,
+        "baseline": "NOT_TESTED",
+        "stateful_no_schema": "NOT_TESTED"
+      }
+    },
+    "H6_HTTP_TIMEOUT_LAYER": {
+      "status": "NOT_TESTED",
+      "evidence": {
+        "direct_exception": null,
+        "harness_exception": null
+      }
+    },
+    "H7_OLLAMA_RUNTIME": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "pressure_observed": false,
+        "gpu_free_mib_min": 3424,
+        "gpu_free_mib_max": 3424,
+        "loaded_context_lengths": [],
+        "model_reload_observed": false
+      }
+    },
+    "H8_HARNESS_RESPONSE_PATH": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "direct": "NOT_TESTED",
+        "harness": "NOT_TESTED"
+      }
+    },
+    "H9_REQUEST_SERIALIZATION": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "payload_serialized": true,
+        "payload_bytes": 6622,
+        "payload_sha256": "bf09f238164d9001392710211ed2e3716f68a7f274c1a26837580693b6e6b5e8"
+      }
+    },
+    "H10_MODEL_COLD_OR_RELOAD": {
+      "status": "NOT_SUPPORTED",
+      "evidence": {
+        "model_reload_observed": false,
+        "loaded_context_lengths": []
+      }
+    }
+  },
+  "diagnosis": {
+    "decision": "IMPLEMENTATION_INCOMPLETE",
+    "root_cause": "No live diagnostic path was executed.",
+    "blocking_phase": "NOT_TESTED",
+    "minimum_safe_fix": "Run exact or matrix mode.",
+    "confidence": "high"
+  },
+  "integrity_unchanged": true,
+  "decision": "IMPLEMENTATION_INCOMPLETE",
+  "production_fix_implemented": false,
+  "timeout_increased_as_fix": false,
+  "operational_tools_executed": false
+}

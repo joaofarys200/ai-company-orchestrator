@@ -1,0 +1,16 @@
+{
+  "model": "qwen3.5:9b",
+  "created_at": "2026-07-25T18:49:36.1482248Z",
+  "message": {
+    "role": "assistant",
+    "content": "{\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"config.json\"\n  }\n}"
+  },
+  "done": true,
+  "done_reason": "stop",
+  "total_duration": 2625818200,
+  "load_duration": 1158488100,
+  "prompt_eval_count": 55,
+  "prompt_eval_duration": 144828000,
+  "eval_count": 32,
+  "eval_duration": 1258714000
+}

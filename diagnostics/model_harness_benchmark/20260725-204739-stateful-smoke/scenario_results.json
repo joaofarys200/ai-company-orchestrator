@@ -1,0 +1,736 @@
+[
+  {
+    "scenario_id": "A01_FIND_RELEVANT_FILE",
+    "repetition": 1,
+    "group": "A",
+    "capability": "stateful_tool_use",
+    "status": "FAIL",
+    "stop_reason": "VALIDATION_FAILED",
+    "step_count": 1,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "finished_with_structured_decision",
+        "passed": false,
+        "evidence": "finish_present=False"
+      },
+      {
+        "criterion": "expected_stop_reason",
+        "passed": false,
+        "evidence": "expected=COMPLETED, actual=VALIDATION_FAILED"
+      },
+      {
+        "criterion": "required_tools_used",
+        "passed": false,
+        "evidence": "required=['finish', 'inspect_symbol', 'list_files', 'read_file'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_observed",
+        "passed": false,
+        "evidence": "required=['file:src/invoice.py'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_cited",
+        "passed": false,
+        "evidence": "required=['file:src/invoice.py'], cited=[]"
+      },
+      {
+        "criterion": "required_semantics",
+        "passed": false,
+        "evidence": "required_terms=['src/invoice.py', 'normalize_invoice']"
+      },
+      {
+        "criterion": "forbidden_semantics_absent",
+        "passed": true,
+        "evidence": "forbidden_terms=[]"
+      },
+      {
+        "criterion": "constraints_retained",
+        "passed": false,
+        "evidence": "expected=['C1', 'C2'], received=[]"
+      },
+      {
+        "criterion": "no_repeated_tool_call",
+        "passed": true,
+        "evidence": "step_count=1"
+      },
+      {
+        "criterion": "step_limit_respected",
+        "passed": true,
+        "evidence": "steps=1, configured=5"
+      }
+    ],
+    "total_latency_ms": 300324,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "response_hashes": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "context_range_chars": [
+      2044,
+      2044
+    ],
+    "recovery_used": false,
+    "errors": [
+      "model_response_status=PROVIDER_FAILED"
+    ]
+  },
+  {
+    "scenario_id": "B02_CONSTRAINT_RETENTION",
+    "repetition": 1,
+    "group": "B",
+    "capability": "constraint_retention",
+    "status": "FAIL",
+    "stop_reason": "VALIDATION_FAILED",
+    "step_count": 1,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "finished_with_structured_decision",
+        "passed": false,
+        "evidence": "finish_present=False"
+      },
+      {
+        "criterion": "expected_stop_reason",
+        "passed": false,
+        "evidence": "expected=COMPLETED, actual=VALIDATION_FAILED"
+      },
+      {
+        "criterion": "required_tools_used",
+        "passed": false,
+        "evidence": "required=['finish', 'read_file'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_observed",
+        "passed": false,
+        "evidence": "required=['file:public/config.json', 'file:src/loader.py'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_cited",
+        "passed": false,
+        "evidence": "required=['file:public/config.json', 'file:src/loader.py'], cited=[]"
+      },
+      {
+        "criterion": "required_semantics",
+        "passed": false,
+        "evidence": "required_terms=['eu-west-1', 'src/loader.py']"
+      },
+      {
+        "criterion": "forbidden_semantics_absent",
+        "passed": true,
+        "evidence": "forbidden_terms=['forbidden-region', 'private/secret.txt']"
+      },
+      {
+        "criterion": "constraints_retained",
+        "passed": false,
+        "evidence": "expected=['C1', 'C2', 'C3'], received=[]"
+      },
+      {
+        "criterion": "no_repeated_tool_call",
+        "passed": true,
+        "evidence": "step_count=1"
+      },
+      {
+        "criterion": "step_limit_respected",
+        "passed": true,
+        "evidence": "steps=1, configured=5"
+      }
+    ],
+    "total_latency_ms": 300342,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "response_hashes": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "context_range_chars": [
+      2052,
+      2052
+    ],
+    "recovery_used": false,
+    "errors": [
+      "model_response_status=PROVIDER_FAILED"
+    ]
+  },
+  {
+    "scenario_id": "C02_TWO_FILE_DEPENDENCY",
+    "repetition": 1,
+    "group": "C",
+    "capability": "multi_file_reasoning",
+    "status": "FAIL",
+    "stop_reason": "VALIDATION_FAILED",
+    "step_count": 1,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "finished_with_structured_decision",
+        "passed": false,
+        "evidence": "finish_present=False"
+      },
+      {
+        "criterion": "expected_stop_reason",
+        "passed": false,
+        "evidence": "expected=COMPLETED, actual=VALIDATION_FAILED"
+      },
+      {
+        "criterion": "required_tools_used",
+        "passed": false,
+        "evidence": "required=['finish', 'read_file'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_observed",
+        "passed": false,
+        "evidence": "required=['file:backend/api.js', 'file:frontend/client.js'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_cited",
+        "passed": false,
+        "evidence": "required=['file:backend/api.js', 'file:frontend/client.js'], cited=[]"
+      },
+      {
+        "criterion": "required_semantics",
+        "passed": false,
+        "evidence": "required_terms=['display_name', 'payload.name', 'backend', 'frontend']"
+      },
+      {
+        "criterion": "forbidden_semantics_absent",
+        "passed": true,
+        "evidence": "forbidden_terms=[]"
+      },
+      {
+        "criterion": "constraints_retained",
+        "passed": false,
+        "evidence": "expected=['C1', 'C2'], received=[]"
+      },
+      {
+        "criterion": "no_repeated_tool_call",
+        "passed": true,
+        "evidence": "step_count=1"
+      },
+      {
+        "criterion": "step_limit_respected",
+        "passed": true,
+        "evidence": "steps=1, configured=6"
+      }
+    ],
+    "total_latency_ms": 300342,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "response_hashes": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "context_range_chars": [
+      2078,
+      2078
+    ],
+    "recovery_used": false,
+    "errors": [
+      "model_response_status=PROVIDER_FAILED"
+    ]
+  },
+  {
+    "scenario_id": "C05_INSUFFICIENT_EVIDENCE",
+    "repetition": 1,
+    "group": "C",
+    "capability": "multi_file_reasoning",
+    "status": "FAIL",
+    "stop_reason": "VALIDATION_FAILED",
+    "step_count": 1,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "finished_with_structured_decision",
+        "passed": false,
+        "evidence": "finish_present=False"
+      },
+      {
+        "criterion": "expected_stop_reason",
+        "passed": false,
+        "evidence": "expected=NEEDS_MORE_EVIDENCE, actual=VALIDATION_FAILED"
+      },
+      {
+        "criterion": "required_tools_used",
+        "passed": false,
+        "evidence": "required=['finish', 'read_file', 'search_text'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_observed",
+        "passed": false,
+        "evidence": "required=['file:src/invoice.py'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_cited",
+        "passed": false,
+        "evidence": "required=['file:src/invoice.py'], cited=[]"
+      },
+      {
+        "criterion": "required_semantics",
+        "passed": false,
+        "evidence": "required_terms=['calculate_tax', 'missing|absent|unavailable']"
+      },
+      {
+        "criterion": "forbidden_semantics_absent",
+        "passed": true,
+        "evidence": "forbidden_terms=[]"
+      },
+      {
+        "criterion": "constraints_retained",
+        "passed": false,
+        "evidence": "expected=['C1', 'C2'], received=[]"
+      },
+      {
+        "criterion": "no_repeated_tool_call",
+        "passed": true,
+        "evidence": "step_count=1"
+      },
+      {
+        "criterion": "step_limit_respected",
+        "passed": true,
+        "evidence": "steps=1, configured=5"
+      }
+    ],
+    "total_latency_ms": 300371,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "response_hashes": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "context_range_chars": [
+      2085,
+      2085
+    ],
+    "recovery_used": false,
+    "errors": [
+      "model_response_status=PROVIDER_FAILED"
+    ]
+  },
+  {
+    "scenario_id": "D02_CONTEXT_1000",
+    "repetition": 1,
+    "group": "D",
+    "capability": "context_scaling",
+    "status": "FAIL",
+    "stop_reason": "VALIDATION_FAILED",
+    "step_count": 1,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "finished_with_structured_decision",
+        "passed": false,
+        "evidence": "finish_present=False"
+      },
+      {
+        "criterion": "expected_stop_reason",
+        "passed": false,
+        "evidence": "expected=COMPLETED, actual=VALIDATION_FAILED"
+      },
+      {
+        "criterion": "required_tools_used",
+        "passed": false,
+        "evidence": "required=['finish', 'read_file'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_observed",
+        "passed": false,
+        "evidence": "required=['file:corpus.txt'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_cited",
+        "passed": false,
+        "evidence": "required=['file:corpus.txt'], cited=[]"
+      },
+      {
+        "criterion": "required_semantics",
+        "passed": false,
+        "evidence": "required_terms=['NEBULA', '4821']"
+      },
+      {
+        "criterion": "forbidden_semantics_absent",
+        "passed": true,
+        "evidence": "forbidden_terms=['9999']"
+      },
+      {
+        "criterion": "constraints_retained",
+        "passed": false,
+        "evidence": "expected=['C1', 'C2', 'C3'], received=[]"
+      },
+      {
+        "criterion": "no_repeated_tool_call",
+        "passed": true,
+        "evidence": "step_count=1"
+      },
+      {
+        "criterion": "step_limit_respected",
+        "passed": true,
+        "evidence": "steps=1, configured=3"
+      },
+      {
+        "criterion": "context_target_materialized",
+        "passed": false,
+        "evidence": "target_tokens=1000, max_context_chars=915"
+      }
+    ],
+    "total_latency_ms": 300387,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "response_hashes": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "context_range_chars": [
+      915,
+      915
+    ],
+    "recovery_used": false,
+    "errors": [
+      "model_response_status=PROVIDER_FAILED"
+    ]
+  },
+  {
+    "scenario_id": "E02_TRUNCATED_JSON",
+    "repetition": 1,
+    "group": "E",
+    "capability": "recovery_after_failure",
+    "status": "PASS",
+    "stop_reason": "COMPLETED",
+    "step_count": 1,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "recovery_transformer_changed_input",
+        "passed": true,
+        "evidence": "calls=2, unique_fingerprints=2, status=SUCCEEDED"
+      }
+    ],
+    "total_latency_ms": 8,
+    "input_tokens": 10,
+    "output_tokens": 10,
+    "response_hashes": [
+      "11bec2db0e99977c840a5df4b17be528421aadd5f4aa79d3622c126c481397fb"
+    ],
+    "context_range_chars": [
+      0,
+      0
+    ],
+    "recovery_used": true,
+    "errors": []
+  },
+  {
+    "scenario_id": "E07_REPEATED_TOOL_CALL",
+    "repetition": 1,
+    "group": "E",
+    "capability": "recovery_after_failure",
+    "status": "PASS",
+    "stop_reason": "REPEATED_TOOL_CALL",
+    "step_count": 2,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [
+      "read_file",
+      "read_file"
+    ],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "deterministic_fault_stop",
+        "passed": true,
+        "evidence": "fault=repeated_tool_call, expected=REPEATED_TOOL_CALL, actual=REPEATED_TOOL_CALL"
+      }
+    ],
+    "total_latency_ms": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "response_hashes": [
+      "44c4c22ccd0290156ea6509fb30fa565d898e09f10784e6dd8cddcfd82d3ae62"
+    ],
+    "context_range_chars": [
+      0,
+      0
+    ],
+    "recovery_used": false,
+    "errors": []
+  },
+  {
+    "scenario_id": "F01_LOCALIZED_FIX_PLAN",
+    "repetition": 1,
+    "group": "F",
+    "capability": "short_horizon_planning",
+    "status": "FAIL",
+    "stop_reason": "VALIDATION_FAILED",
+    "step_count": 1,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "finished_with_structured_decision",
+        "passed": false,
+        "evidence": "finish_present=False"
+      },
+      {
+        "criterion": "expected_stop_reason",
+        "passed": false,
+        "evidence": "expected=COMPLETED, actual=VALIDATION_FAILED"
+      },
+      {
+        "criterion": "required_tools_used",
+        "passed": false,
+        "evidence": "required=['finish', 'read_file'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_observed",
+        "passed": false,
+        "evidence": "required=['file:src/parser.py', 'file:tests/test_parser.py'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_cited",
+        "passed": false,
+        "evidence": "required=['file:src/parser.py', 'file:tests/test_parser.py'], cited=[]"
+      },
+      {
+        "criterion": "required_semantics",
+        "passed": false,
+        "evidence": "required_terms=['parse_port', 'test']"
+      },
+      {
+        "criterion": "forbidden_semantics_absent",
+        "passed": true,
+        "evidence": "forbidden_terms=[]"
+      },
+      {
+        "criterion": "constraints_retained",
+        "passed": false,
+        "evidence": "expected=['C1', 'C2'], received=[]"
+      },
+      {
+        "criterion": "no_repeated_tool_call",
+        "passed": true,
+        "evidence": "step_count=1"
+      },
+      {
+        "criterion": "step_limit_respected",
+        "passed": true,
+        "evidence": "steps=1, configured=5"
+      },
+      {
+        "criterion": "plan_length",
+        "passed": false,
+        "evidence": "plan_steps=0"
+      },
+      {
+        "criterion": "plan_steps_verifiable",
+        "passed": false,
+        "evidence": "Every step requires evidence, completion and constraints."
+      },
+      {
+        "criterion": "plan_dependencies_ordered",
+        "passed": false,
+        "evidence": "Dependencies may only name earlier plan steps."
+      },
+      {
+        "criterion": "plan_non_redundant",
+        "passed": false,
+        "evidence": "Plan step descriptions must be unique."
+      }
+    ],
+    "total_latency_ms": 300395,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "response_hashes": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "context_range_chars": [
+      2047,
+      2047
+    ],
+    "recovery_used": false,
+    "errors": [
+      "model_response_status=PROVIDER_FAILED"
+    ]
+  },
+  {
+    "scenario_id": "G02_EVIDENCE_BASED_PARAGRAPH",
+    "repetition": 1,
+    "group": "G",
+    "capability": "evidence_based_document_generation",
+    "status": "FAIL",
+    "stop_reason": "VALIDATION_FAILED",
+    "step_count": 1,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "finished_with_structured_decision",
+        "passed": false,
+        "evidence": "finish_present=False"
+      },
+      {
+        "criterion": "expected_stop_reason",
+        "passed": false,
+        "evidence": "expected=COMPLETED, actual=VALIDATION_FAILED"
+      },
+      {
+        "criterion": "required_tools_used",
+        "passed": false,
+        "evidence": "required=['finish', 'read_file'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_observed",
+        "passed": false,
+        "evidence": "required=['file:sources/S1.txt', 'file:sources/S2.txt'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_cited",
+        "passed": false,
+        "evidence": "required=['file:sources/S1.txt', 'file:sources/S2.txt'], cited=[]"
+      },
+      {
+        "criterion": "required_semantics",
+        "passed": false,
+        "evidence": "required_terms=['120', '18', 'S1', 'S2']"
+      },
+      {
+        "criterion": "forbidden_semantics_absent",
+        "passed": true,
+        "evidence": "forbidden_terms=[]"
+      },
+      {
+        "criterion": "constraints_retained",
+        "passed": false,
+        "evidence": "expected=['C1', 'C2'], received=[]"
+      },
+      {
+        "criterion": "no_repeated_tool_call",
+        "passed": true,
+        "evidence": "step_count=1"
+      },
+      {
+        "criterion": "step_limit_respected",
+        "passed": true,
+        "evidence": "steps=1, configured=5"
+      }
+    ],
+    "total_latency_ms": 300361,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "response_hashes": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "context_range_chars": [
+      2047,
+      2047
+    ],
+    "recovery_used": false,
+    "errors": [
+      "model_response_status=PROVIDER_FAILED"
+    ]
+  },
+  {
+    "scenario_id": "G06_NO_SUPPORTED_CONCLUSION",
+    "repetition": 1,
+    "group": "G",
+    "capability": "closed_source_research",
+    "status": "FAIL",
+    "stop_reason": "VALIDATION_FAILED",
+    "step_count": 1,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "finished_with_structured_decision",
+        "passed": false,
+        "evidence": "finish_present=False"
+      },
+      {
+        "criterion": "expected_stop_reason",
+        "passed": false,
+        "evidence": "expected=UNSUPPORTED_CONCLUSION, actual=VALIDATION_FAILED"
+      },
+      {
+        "criterion": "required_tools_used",
+        "passed": false,
+        "evidence": "required=['finish', 'read_file'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_observed",
+        "passed": false,
+        "evidence": "required=['file:sources/S1.txt', 'file:sources/S2.txt'], observed=[]"
+      },
+      {
+        "criterion": "required_evidence_cited",
+        "passed": false,
+        "evidence": "required=['file:sources/S1.txt', 'file:sources/S2.txt'], cited=[]"
+      },
+      {
+        "criterion": "required_semantics",
+        "passed": false,
+        "evidence": "required_terms=['correlation', 'causal']"
+      },
+      {
+        "criterion": "forbidden_semantics_absent",
+        "passed": true,
+        "evidence": "forbidden_terms=[]"
+      },
+      {
+        "criterion": "constraints_retained",
+        "passed": false,
+        "evidence": "expected=['C1', 'C2'], received=[]"
+      },
+      {
+        "criterion": "no_repeated_tool_call",
+        "passed": true,
+        "evidence": "step_count=1"
+      },
+      {
+        "criterion": "step_limit_respected",
+        "passed": true,
+        "evidence": "steps=1, configured=5"
+      }
+    ],
+    "total_latency_ms": 300360,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "response_hashes": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "context_range_chars": [
+      2071,
+      2071
+    ],
+    "recovery_used": false,
+    "errors": [
+      "model_response_status=PROVIDER_FAILED"
+    ]
+  }
+]

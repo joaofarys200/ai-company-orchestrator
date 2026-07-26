@@ -99,6 +99,8 @@ class AirLLMSettings:
     max_new_tokens: int
     temperature: float
     profiling_mode: bool
+    diagnostic_mode: bool = False
+    enable_qwen35_compat_patch: bool = False
     hf_home: Path | None = None
     huggingface_hub_cache: Path | None = None
 
@@ -128,6 +130,14 @@ class AirLLMSettings:
             profiling_mode=parse_boolean(
                 values.get("AIRLLM_PROFILING_MODE", "false"),
                 "AIRLLM_PROFILING_MODE",
+            ),
+            diagnostic_mode=parse_boolean(
+                values.get("AIRLLM_DIAGNOSTIC_MODE", "false"),
+                "AIRLLM_DIAGNOSTIC_MODE",
+            ),
+            enable_qwen35_compat_patch=parse_boolean(
+                values.get("AIRLLM_ENABLE_QWEN35_COMPAT_PATCH", "false"),
+                "AIRLLM_ENABLE_QWEN35_COMPAT_PATCH",
             ),
             hf_home=_optional_absolute_path(values, "HF_HOME"),
             huggingface_hub_cache=_optional_absolute_path(
@@ -166,4 +176,3 @@ class AirLLMSettings:
             os.environ["HUGGINGFACE_HUB_CACHE"] = str(
                 self.huggingface_hub_cache
             )
-

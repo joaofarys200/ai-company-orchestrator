@@ -1,0 +1,9 @@
+{"wall_clock_timestamp":"2026-07-24T15:12:10.156868+00:00","monotonic_offset_ms":5016.0,"active_span":"planning","idle_duration_ms":5016.0,"progress_counter":0,"cpu_percent":0.0,"memory_rss_bytes":186150912}
+{"wall_clock_timestamp":"2026-07-24T15:12:15.168773+00:00","monotonic_offset_ms":10016.0,"active_span":"planning","idle_duration_ms":10016.0,"progress_counter":0,"cpu_percent":0.0,"memory_rss_bytes":185561088}
+{"wall_clock_timestamp":"2026-07-24T15:12:20.184506+00:00","monotonic_offset_ms":15031.0,"active_span":"planning","idle_duration_ms":15.0,"progress_counter":46,"cpu_percent":0.0,"memory_rss_bytes":185610240}
+{"wall_clock_timestamp":"2026-07-24T15:12:25.196427+00:00","monotonic_offset_ms":20047.0,"active_span":"planning","idle_duration_ms":0.0,"progress_counter":154,"cpu_percent":0.0,"memory_rss_bytes":185724928}
+{"wall_clock_timestamp":"2026-07-24T15:12:30.208876+00:00","monotonic_offset_ms":25063.0,"active_span":"planning","idle_duration_ms":47.0,"progress_counter":263,"cpu_percent":0.0,"memory_rss_bytes":185835520}
+{"wall_clock_timestamp":"2026-07-24T15:12:35.220172+00:00","monotonic_offset_ms":30078.0,"active_span":"planning","idle_duration_ms":47.0,"progress_counter":375,"cpu_percent":0.0,"memory_rss_bytes":185942016}
+{"wall_clock_timestamp":"2026-07-24T15:12:40.230886+00:00","monotonic_offset_ms":35078.0,"active_span":"planning","idle_duration_ms":0.0,"progress_counter":463,"cpu_percent":0.0,"memory_rss_bytes":186040320}
+{"wall_clock_timestamp":"2026-07-24T15:12:45.237849+00:00","monotonic_offset_ms":40094.0,"active_span":"planning","idle_duration_ms":2891.0,"progress_counter":515,"cpu_percent":0.0,"memory_rss_bytes":187555840}
+{"wall_clock_timestamp":"2026-07-24T15:12:50.243940+00:00","monotonic_offset_ms":45094.0,"active_span":"planning","idle_duration_ms":31.0,"progress_counter":611,"cpu_percent":0.0,"memory_rss_bytes":187715584}

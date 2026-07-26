@@ -1,0 +1,292 @@
+Return only one JSON object with this shape: {"operations": [...]}.
+Do not return a corrected full plan, prose, JSON Patch, or operations outside this schema.
+Use final values for fields; no append, add, patch, delta, fuzzy matching, defaults, file creation, rename, delete, or command execution.
+Every path must be an exact member of VALID_FILE_PATHS. No new or derived path is allowed.
+Replace content only after matching expected_sha256. Preserve unrelated content.
+Do not omit a correction required by an actionable error. A field operation must contain its complete final value.
+All operations are validated and applied deterministically by the program; an invalid operation fails closed.
+CURRENT PLAN:
+{
+  "project_name": "health-boundary-probe",
+  "stack": "nodejs-standard-library",
+  "components": [
+    "frontend",
+    "backend",
+    "persistence",
+    "tests"
+  ],
+  "files": [
+    {
+      "path": "package.json",
+      "content": "{\n  \"name\": \"health-boundary-probe\",\n  \"version\": \"1.0.0\",\n  \"type\": \"module\"\n}"
+    },
+    {
+      "path": "server.js",
+      "content": "import http from 'http';\n\nconst server = http.createServer((req, res) => {\n  if (req.url === '/health') {\n    res.writeHead(200);\n    res.end('OK');\n  } else {\n    res.writeHead(404);\n    res.end();\n  }\n});\n\nconst PORT = process.env.PORT || 3000;\nserver.listen(PORT, () => console.log(`Server running on port ${PORT}`));"
+    },
+    {
+      "path": "index.html",
+      "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head><meta charset=\"UTF-8\"><title>Health Boundary Probe</title></head>\n<body><h1>Hello World</h1></body>\n</html>"
+    },
+    {
+      "path": "test.js",
+      "content": "import http from 'http';\n\nconst server = await import('./server.js');\nawait new Promise(r => setTimeout(r, 500)); // Wait for bind\n\ntry {\n  const res = await fetch('http://localhost:3000/health');\n  if (res.status !== 200) throw new Error('Health check failed');\n} catch (e) {\n  process.exit(1);\n}\nprocess.exit(0);"
+    }
+  ],
+  "dependencies": [],
+  "setup_commands": [
+    "node server.js"
+  ],
+  "validation_commands": [
+    "node test.js",
+    "curl http://localhost:3000/health"
+  ],
+  "entrypoints": [
+    "./server.js",
+    "./index.html"
+  ],
+  "preview_strategy": {
+    "type": "static-server"
+  },
+  "preview_command": "",
+  "constraints": [],
+  "component_files": {},
+  "rationale": "Projeto minimalista full-stack usando apenas Node.js standard library. O backend serve um endpoint de health check simples, o frontend é uma página HTML estática servida pelo mesmo processo HTTP para evitar complexidade desnecessária com múltiplos servidores ou dependências externas."
+}
+CURRENT FILE SHA256 VALUES:
+{
+  "index.html": "a8cab61f58e3f5ed320006c932aaf480dfaa6f21f30b0e0673d3defc21c1aafb",
+  "package.json": "f5c8a011c0805a73f6206bb0b0f93912c027caa4dacc48c998827acd7ff551ab",
+  "server.js": "5bdbf49b0e707cf43da23ffb5d642e9ed97f8e98e103a8a0c9a69e6ccca9bd31",
+  "test.js": "7336da35b8f653e5a273ba8a6de0672f7277eef30d4396eede1145e431c76fe3"
+}
+ACTIONABLE ERRORS:
+[
+  {
+    "error_code": "MISSING_REQUESTED_COMPONENTS",
+    "authorized_plan_fields": [
+      "components"
+    ],
+    "candidate_files": [],
+    "operation_types": [
+      "set_components"
+    ],
+    "evidence": {
+      "missing_components": [
+        "preview"
+      ]
+    },
+    "reason": "The requested preview component is absent; set the complete final component list."
+  },
+  {
+    "error_code": "MISSING_COMPONENT_MAPPING",
+    "authorized_plan_fields": [
+      "component_files"
+    ],
+    "candidate_files": [
+      "index.html",
+      "server.js",
+      "test.js"
+    ],
+    "operation_types": [
+      "set_component_files"
+    ],
+    "evidence": {
+      "affected_components": [
+        "frontend",
+        "backend",
+        "persistence",
+        "tests",
+        "preview"
+      ],
+      "valid_paths": [
+        "index.html",
+        "package.json",
+        "server.js",
+        "test.js"
+      ]
+    },
+    "reason": "Map each affected component to existing planned files only."
+  },
+  {
+    "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "authorized_plan_fields": [
+      "component_files"
+    ],
+    "candidate_files": [
+      "index.html"
+    ],
+    "operation_types": [
+      "set_component_files"
+    ],
+    "evidence": {
+      "affected_components": [
+        "frontend"
+      ],
+      "valid_paths": [
+        "index.html",
+        "package.json",
+        "server.js",
+        "test.js"
+      ]
+    },
+    "reason": "Map each affected component to existing planned files only."
+  },
+  {
+    "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "authorized_plan_fields": [
+      "component_files"
+    ],
+    "candidate_files": [
+      "server.js"
+    ],
+    "operation_types": [
+      "set_component_files"
+    ],
+    "evidence": {
+      "affected_components": [
+        "backend"
+      ],
+      "valid_paths": [
+        "index.html",
+        "package.json",
+        "server.js",
+        "test.js"
+      ]
+    },
+    "reason": "Map each affected component to existing planned files only."
+  },
+  {
+    "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "authorized_plan_fields": [
+      "component_files"
+    ],
+    "candidate_files": [
+      "server.js"
+    ],
+    "operation_types": [
+      "set_component_files"
+    ],
+    "evidence": {
+      "affected_components": [
+        "persistence"
+      ],
+      "valid_paths": [
+        "index.html",
+        "package.json",
+        "server.js",
+        "test.js"
+      ]
+    },
+    "reason": "Map each affected component to existing planned files only."
+  },
+  {
+    "error_code": "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "authorized_plan_fields": [
+      "component_files"
+    ],
+    "candidate_files": [
+      "test.js"
+    ],
+    "operation_types": [
+      "set_component_files"
+    ],
+    "evidence": {
+      "affected_components": [
+        "tests"
+      ],
+      "valid_paths": [
+        "index.html",
+        "package.json",
+        "server.js",
+        "test.js"
+      ]
+    },
+    "reason": "Map each affected component to existing planned files only."
+  },
+  {
+    "error_code": "PERSISTENCE_NOT_IMPLEMENTED",
+    "authorized_plan_fields": [
+      "component_files"
+    ],
+    "candidate_files": [
+      "server.js"
+    ],
+    "operation_types": [
+      "set_component_files",
+      "replace_file_content",
+      "replace_text"
+    ],
+    "evidence": {
+      "backend_entrypoint": [
+        "server.js"
+      ],
+      "durability": "no durable read/write mechanism"
+    },
+    "reason": "Persistence is absent; modify only existing backend entrypoint \"server.js\" using Node.js standard-library durable read/write behavior."
+  },
+  {
+    "error_code": "MISSING_HEALTH_ROUTE",
+    "authorized_plan_fields": [
+      "component_files",
+      "preview_strategy"
+    ],
+    "candidate_files": [
+      "server.js"
+    ],
+    "operation_types": [
+      "set_component_files",
+      "set_preview_strategy"
+    ],
+    "evidence": {
+      "healthcheck_path": "/health",
+      "route_files": [
+        "server.js"
+      ],
+      "unmapped_backend_files": [
+        "server.js"
+      ]
+    },
+    "reason": "The route \"/health\" already exists in \"server.js\"; map that existing backend file and do not create a route file."
+  }
+]
+CLOSED NAMESPACE:
+{
+  "VALID_PLAN_FIELDS": [
+    "component_files",
+    "components",
+    "constraints",
+    "dependencies",
+    "entrypoints",
+    "files",
+    "preview_command",
+    "preview_strategy",
+    "project_name",
+    "rationale",
+    "setup_commands",
+    "stack",
+    "validation_commands"
+  ],
+  "VALID_COMPONENT_IDS": [
+    "backend",
+    "frontend",
+    "persistence",
+    "preview",
+    "tests"
+  ],
+  "VALID_FILE_PATHS": [
+    "index.html",
+    "package.json",
+    "server.js",
+    "test.js"
+  ],
+  "VALID_ENTRYPOINT_PATHS": [
+    "index.html",
+    "server.js"
+  ],
+  "VALID_REPLACEMENT_TARGETS": [
+    "server.js"
+  ]
+}
+OPERATIONS SCHEMA (Draft 2020-12):
+{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://local.invalid/project-builder/typed-operations.schema.json","title":"ProjectBuilder Typed Offline Operations","type":"array","items":{"oneOf":[{"type":"object","additionalProperties":false,"required":["op","value"],"properties":{"op":{"const":"set_components"},"value":{"type":"array","items":{"type":"string"},"uniqueItems":true}}},{"type":"object","additionalProperties":false,"required":["op","component","paths"],"properties":{"op":{"const":"set_component_files"},"component":{"type":"string","minLength":1},"paths":{"type":"array","items":{"type":"string","minLength":1},"uniqueItems":true}}},{"type":"object","additionalProperties":false,"required":["op","field","value"],"properties":{"op":{"const":"set_preview_strategy"},"field":{"enum":["enabled","method","healthcheck_path","command"]},"value":{}}},{"type":"object","additionalProperties":false,"required":["op","path","expected_sha256","content"],"properties":{"op":{"const":"replace_file_content"},"path":{"type":"string","minLength":1},"expected_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},"content":{"type":"string","minLength":1}}},{"type":"object","additionalProperties":false,"required":["op","path","expected_sha256","old_text","new_text","expected_occurrences"],"properties":{"op":{"const":"replace_text"},"path":{"type":"string","minLength":1},"expected_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},"old_text":{"type":"string","minLength":1},"new_text":{"type":"string"},"expected_occurrences":{"type":"integer","minimum":1}}}]}}

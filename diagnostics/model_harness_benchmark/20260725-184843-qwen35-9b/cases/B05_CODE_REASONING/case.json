@@ -1,0 +1,29 @@
+{
+  "case_id": "B05_CODE_REASONING",
+  "title": "Diagnostico de bug localizado",
+  "capability": "code_reasoning",
+  "task_profile": "STRUCTURED_EXTRACTION",
+  "system_prompt": "Diagnose the concrete bug and propose the smallest guard. Return JSON only.",
+  "user_prompt": "JavaScript:\nfunction average(values) {\n  return values.reduce((sum, n) => sum + n, 0) / values.length;\n}\nThe required behavior for an empty array is to return 0.",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "bug_code",
+      "minimal_fix"
+    ],
+    "properties": {
+      "bug_code": {
+        "type": "string",
+        "enum": [
+          "EMPTY_COLLECTION_DIVISION"
+        ]
+      },
+      "minimal_fix": {
+        "type": "string"
+      }
+    }
+  },
+  "allowed_tools": [],
+  "context_candidates": []
+}

@@ -1,0 +1,71 @@
+{
+  "ollama_list": {
+    "command": [
+      "ollama",
+      "list"
+    ],
+    "exit_code": 0,
+    "stdout": "NAME                                          ID              SIZE      MODIFIED      \nhf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M    8594f5e223c8    6.6 GB    6 minutes ago    \nqwen3.5:9b                                    6488c96fa5fa    6.6 GB    2 weeks ago      \nqwen2.5:14b                                   7cdf5a0187d5    9.0 GB    5 weeks ago      \nhermes3:latest                                4f6b83f30b62    4.7 GB    5 weeks ago      \ngemma4:latest                                 c6eb396dbd59    9.6 GB    5 weeks ago      \nqwen2.5:7b                                    845dbda0ea48    4.7 GB    6 weeks ago      \n",
+    "stderr": "",
+    "elapsed_seconds": 0.064
+  },
+  "ollama_ps": {
+    "command": [
+      "ollama",
+      "ps"
+    ],
+    "exit_code": 0,
+    "stdout": "NAME                                          ID              SIZE      PROCESSOR          CONTEXT    UNTIL              \nhf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M    8594f5e223c8    6.4 GB    15%/85% CPU/GPU    8192       4 minutes from now    \n",
+    "stderr": "",
+    "elapsed_seconds": 0.037
+  },
+  "models": {
+    "qwen3.5:9b": {
+      "command": [
+        "ollama",
+        "show",
+        "qwen3.5:9b"
+      ],
+      "exit_code": 0,
+      "stdout": "  Model\n    architecture        qwen35    \n    parameters          9.7B      \n    context length      262144    \n    embedding length    4096      \n    quantization        Q4_K_M    \n    requires            0.17.1    \n\n  Capabilities\n    completion    \n    vision        \n    tools         \n    thinking      \n\n  Parameters\n    presence_penalty    1.5     \n    temperature         1       \n    top_k               20      \n    top_p               0.95    \n\n  License\n    Apache License               \n    Version 2.0, January 2004    \n    ...                          \n\n",
+      "stderr": "",
+      "elapsed_seconds": 0.063
+    },
+    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M": {
+      "command": [
+        "ollama",
+        "show",
+        "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q4_K_M"
+      ],
+      "exit_code": 0,
+      "stdout": "  Model\n    architecture        qwen35    \n    parameters          8.95B     \n    context length      262144    \n    embedding length    4096      \n    quantization        Q4_K_M    \n\n  Capabilities\n    completion    \n    vision        \n    tools         \n    thinking      \n\n  Projector\n    architecture        clip       \n    parameters          456.01M    \n    embedding length    1152       \n    dimensions          4096       \n\n  Parameters\n    temperature       0.6               \n    top_k             20                \n    top_p             0.95              \n    repeat_penalty    1                 \n    stop              \"<|im_start|>\"    \n    stop              \"<|im_end|>\"      \n\n",
+      "stderr": "",
+      "elapsed_seconds": 0.059
+    }
+  },
+  "hardware": {
+    "system": {
+      "command": [
+        "powershell",
+        "-NoProfile",
+        "-Command",
+        "Get-CimInstance Win32_ComputerSystem | Select-Object Manufacturer,Model,TotalPhysicalMemory | ConvertTo-Json -Compress"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Get-CimInstance : Access denied \nAt line:1 char:1\n+ Get-CimInstance Win32_ComputerSystem | Select-Object Manufacturer,Mod ...\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : PermissionDenied: (root\\cimv2:Win32_ComputerSystem:String) [Get-CimInstance], CimExcepti \n   on\n    + FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand\n \n",
+      "elapsed_seconds": 0.406
+    },
+    "gpu": {
+      "command": [
+        "nvidia-smi",
+        "--query-gpu=name,memory.total,memory.used,driver_version",
+        "--format=csv,noheader,nounits"
+      ],
+      "exit_code": 0,
+      "stdout": "NVIDIA GeForce RTX 5060 Laptop GPU, 8151, 7297, 581.34\n",
+      "stderr": "",
+      "elapsed_seconds": 0.074
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "request_id": "e03afd9679b2477eb73c7d3b1dc9df81",
+  "request_fingerprint": "f2edee62b2ce0edbc6bda0de99b510c5f2bdc3d905cb0925031c1c795868ea29",
+  "task_profile": "LOCAL_CHOICE",
+  "system_prompt": "Return only JSON matching the supplied schema. Use only the allowed values and do not add fields.",
+  "user_prompt": "Choose LOCAL or REMOTE for a task that must run without network access. Return the choice and a confidence from 0 to 1.",
+  "context": {
+    "items": [],
+    "decisions": [],
+    "total_chars": 0
+  },
+  "allowed_tools": [],
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "choice",
+      "confidence"
+    ],
+    "properties": {
+      "choice": {
+        "type": "string",
+        "enum": [
+          "LOCAL",
+          "REMOTE"
+        ]
+      },
+      "confidence": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    }
+  },
+  "generation": {
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "context_tokens": 8192,
+    "output_tokens": 768,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "repetitions": 2,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0
+  }
+}

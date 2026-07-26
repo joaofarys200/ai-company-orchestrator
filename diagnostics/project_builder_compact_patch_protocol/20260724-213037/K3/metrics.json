@@ -1,0 +1,20 @@
+{
+  "model": "qwen3.5:9b",
+  "options": {
+    "temperature": 0,
+    "top_p": 0.8,
+    "num_ctx": 8192
+  },
+  "request_sha256": "90ec5c465732ffd92a713b0c3c5f5def9ce147bf81fb43effd44012fab680993",
+  "started_at": "2026-07-24T21:43:56+0100",
+  "timeout_seconds": 180,
+  "http_status": 200,
+  "done": true,
+  "done_reason": "stop",
+  "prompt_eval_count": 709,
+  "eval_count": 518,
+  "response_bytes": 1933,
+  "content_bytes": 1429,
+  "content_sha256": "0d84f8d24bd98d85a282ff8e5d62902dcf8416d35a04462e7773fea151a82ee1",
+  "elapsed_seconds": 25.677
+}

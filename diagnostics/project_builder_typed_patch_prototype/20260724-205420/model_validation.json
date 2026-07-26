@@ -1,0 +1,26 @@
+{
+  "valid": false,
+  "error_codes": [
+    "PERSISTENCE_NOT_IMPLEMENTED"
+  ],
+  "errors": [
+    {
+      "code": "PERSISTENCE_NOT_IMPLEMENTED",
+      "field_path": "component_files.persistence",
+      "message": "O componente persistence nao demonstra leitura e escrita duravel; estado em memoria nao e persistencia.",
+      "expected_type": "mapped artifact implementing durable read and write operations",
+      "received_type": "string",
+      "offending_value": "no durable read/write mechanism in mapped persistence artifacts",
+      "repairable": false,
+      "suggestion": "Associa persistence a um artefacto existente que implemente leitura e escrita duravel.",
+      "phase": "PLAN_SEMANTIC_VALIDATION",
+      "file": "server.js",
+      "line": null,
+      "symbol": "",
+      "target": "server.js",
+      "expected": "mapped artifact implementing durable read and write operations",
+      "actual": "no durable read/write mechanism in mapped persistence artifacts",
+      "component": "persistence"
+    }
+  ]
+}

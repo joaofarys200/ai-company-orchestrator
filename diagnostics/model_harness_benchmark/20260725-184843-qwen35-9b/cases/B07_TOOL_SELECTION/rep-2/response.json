@@ -1,0 +1,51 @@
+{
+  "request_id": "4c6af1c7e8a344d685443e5d574ea520",
+  "status": "SUCCEEDED",
+  "raw_text": "{\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"config.json\"\n  }\n}",
+  "structured_output": {
+    "tool_name": "read_file",
+    "arguments": {
+      "path": "config.json"
+    }
+  },
+  "usage": {
+    "input_tokens": 55,
+    "output_tokens": 32,
+    "total_tokens": 87
+  },
+  "provider": "ollama",
+  "model": "qwen3.5:9b",
+  "latency_ms": 2765,
+  "validation": {
+    "status": "PASSED",
+    "issues": [],
+    "structured_output": {
+      "tool_name": "read_file",
+      "arguments": {
+        "path": "config.json"
+      }
+    },
+    "completed_stages": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "delegated_to": ""
+  },
+  "recovery": [
+    {
+      "action": "NONE",
+      "reason": "recovery_not_required",
+      "recoverable": false,
+      "retry_requested": false,
+      "input_changed": false
+    }
+  ],
+  "tool_calls": [],
+  "warnings": [],
+  "errors": []
+}

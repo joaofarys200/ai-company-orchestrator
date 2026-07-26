@@ -1,0 +1,55 @@
+{
+  "request_id": "013217b58b4f45fa947899a6fdbb2a37",
+  "request_fingerprint": "3fc6d51e9e45bdd382f74f6bffa2b345ffc1ab0067c34430d7ed4563791636a2",
+  "task_profile": "STRUCTURED_EXTRACTION",
+  "system_prompt": "Extract only facts explicitly present in the source. Return JSON matching the schema.",
+  "user_prompt": "SOURCE: Invoice INV-204 belongs to Ada Lovelace. The total is 125.40 EUR. It was paid on 2026-07-24.",
+  "context": {
+    "items": [],
+    "decisions": [],
+    "total_chars": 0
+  },
+  "allowed_tools": [],
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "invoice_id",
+      "customer",
+      "amount",
+      "currency",
+      "paid_on"
+    ],
+    "properties": {
+      "invoice_id": {
+        "type": "string"
+      },
+      "customer": {
+        "type": "string"
+      },
+      "amount": {
+        "type": "number"
+      },
+      "currency": {
+        "type": "string"
+      },
+      "paid_on": {
+        "type": "string"
+      }
+    }
+  },
+  "generation": {
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "context_tokens": 8192,
+    "output_tokens": 768,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "repetitions": 2,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0
+  }
+}

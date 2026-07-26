@@ -1,0 +1,29 @@
+{
+  "VALID_ERROR_CODES": [
+    "DECLARED_COMPONENT_WITHOUT_ARTIFACTS",
+    "MISSING_COMPONENT_MAPPING",
+    "MISSING_HEALTH_ROUTE",
+    "MISSING_REQUESTED_COMPONENTS",
+    "PERSISTENCE_NOT_IMPLEMENTED"
+  ],
+  "VALID_COMPONENT_IDS": [
+    "frontend",
+    "backend",
+    "persistence",
+    "tests",
+    "preview"
+  ],
+  "VALID_FILE_PATHS": [
+    "index.html",
+    "package.json",
+    "server.js",
+    "test.js"
+  ],
+  "VALID_ENTRYPOINT_PATHS": [
+    "index.html",
+    "server.js"
+  ],
+  "VALID_TRANSFORM_TARGETS": [
+    "server.js"
+  ]
+}

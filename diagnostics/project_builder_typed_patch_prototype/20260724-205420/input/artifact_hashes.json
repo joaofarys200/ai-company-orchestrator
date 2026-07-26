@@ -1,0 +1,14 @@
+{
+  "original_plan.json": "83318b1eba01bb28619f9d9111a6c7b4663dc8bfb160959d231cd26f4672f2e9",
+  "initial_errors.json": "07d83dcb5d342fc8e81b3d640d20a2eac520882a85846f6dfb2536f73aa09c5f",
+  "error_artifact_mappings.json": "95bcb2f22146eca079627424a59b908c7b80f87478b4154a72bb49ab209e9612",
+  "ideal_minimal_correction.json": "e78bb98050a4a22bed93f1430a546bf68e57c020e475c7efd622e0153589fee2",
+  "ideal_corrected_plan.json": "2b76659b55a41c4fd1b309ecc0416591cef24a82bb5c879b9e01921e924feb9d",
+  "offline_validation.json": "8a042122882dca4980eccd39150247890b70fde0776ce84e78b083787e0255e1",
+  "historical_focal_response.json": "720a82102355640bb44a44168a2ee7c9648fd3c3710249c5250afc0117a6d25a",
+  "current_focal_schema.json": "536c635baf277e162a478705bd2fda3e9d5f8176832eac514138873b2edb114f",
+  "real_file_paths.json": "027cd4c4a7793d8c16828e2295b18a9213b0262f80088a2dd9a461200d42f1be",
+  "flight_recorder/summary.json": "43e29df3615198a1bf08a0b15ef0b2e7b6b5f84e01e9ede6229e47b38cf58f28",
+  "flight_recorder/final_state.json": "7a749d48f09c28c9132e24b53fff291e2cabc89a5154b244b78a3c5ec954a8dc",
+  "flight_recorder/errors.json": "9d5829dcd403ec09a6f8674ff9226dc1743495028d16af27d85bbde3305889d0"
+}
