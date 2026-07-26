@@ -1,0 +1,122 @@
+from backend.capability_registry.benchmark_result import (
+    LoadedBenchmarkResult,
+    LoadedCapabilityResult,
+)
+from backend.capability_registry.capability import (
+    CAPABILITY_ALIASES,
+    canonical_capability_id,
+    default_capability_catalog,
+)
+from backend.capability_registry.compatibility import (
+    CompatibilityRegistry,
+    default_compatibility_rules,
+)
+from backend.capability_registry.contracts import (
+    REGISTRY_VERSION,
+    SUPPORTED_CAPABILITY_STATUSES,
+    BenchmarkEvidence,
+    BenchmarkEvidenceKind,
+    BenchmarkOutcome,
+    Capability,
+    CapabilityCompatibility,
+    CapabilityConfiguration,
+    CapabilityConstraint,
+    CapabilityDecision,
+    CapabilityDefinition,
+    CapabilityEvidence,
+    CapabilityId,
+    CapabilityLimitation,
+    CapabilityMetrics,
+    CapabilityRegistrySnapshot,
+    CapabilityRequirement,
+    CapabilitySelection,
+    CapabilityStatus,
+    CompatibilityRule,
+    CompatibilityTarget,
+    ConstraintOperator,
+    LimitationSeverity,
+    ModelCapabilityProfile,
+    RegistryValidationIssue,
+    RegistryValidationResult,
+    SelectionReason,
+    ValidationSeverity,
+)
+from backend.capability_registry.exceptions import (
+    BenchmarkArtifactError,
+    BenchmarkHashMismatchError,
+    CapabilityRegistryError,
+    CapabilityRegistryNotLoadedError,
+    CapabilityRegistryValidationError,
+    UnknownCapabilityError,
+    UnknownCompatibilityTargetError,
+    UnknownModelError,
+    UnsupportedBenchmarkFormatError,
+)
+from backend.capability_registry.loader import BenchmarkLoader
+from backend.capability_registry.model_profile import ModelProfileBuilder
+from backend.capability_registry.registry import CapabilityRegistry
+from backend.capability_registry.selector import (
+    DeterministicCapabilitySelector,
+)
+from backend.capability_registry.telemetry import (
+    CapabilityRegistryTelemetry,
+    CapabilityRegistryTelemetryRecord,
+)
+from backend.capability_registry.validator import (
+    CapabilityRegistryValidator,
+)
+
+
+__all__ = [
+    "BenchmarkArtifactError",
+    "BenchmarkEvidence",
+    "BenchmarkEvidenceKind",
+    "BenchmarkHashMismatchError",
+    "BenchmarkLoader",
+    "BenchmarkOutcome",
+    "CAPABILITY_ALIASES",
+    "Capability",
+    "CapabilityCompatibility",
+    "CapabilityConfiguration",
+    "CapabilityConstraint",
+    "CapabilityDecision",
+    "CapabilityDefinition",
+    "CapabilityEvidence",
+    "CapabilityId",
+    "CapabilityLimitation",
+    "CapabilityMetrics",
+    "CapabilityRegistry",
+    "CapabilityRegistryError",
+    "CapabilityRegistryNotLoadedError",
+    "CapabilityRegistrySnapshot",
+    "CapabilityRegistryTelemetry",
+    "CapabilityRegistryTelemetryRecord",
+    "CapabilityRegistryValidationError",
+    "CapabilityRegistryValidator",
+    "CapabilityRequirement",
+    "CapabilitySelection",
+    "CapabilityStatus",
+    "CompatibilityRegistry",
+    "CompatibilityRule",
+    "CompatibilityTarget",
+    "ConstraintOperator",
+    "DeterministicCapabilitySelector",
+    "LimitationSeverity",
+    "LoadedBenchmarkResult",
+    "LoadedCapabilityResult",
+    "ModelCapabilityProfile",
+    "ModelProfileBuilder",
+    "REGISTRY_VERSION",
+    "RegistryValidationIssue",
+    "RegistryValidationResult",
+    "SUPPORTED_CAPABILITY_STATUSES",
+    "SelectionReason",
+    "UnknownCapabilityError",
+    "UnknownCompatibilityTargetError",
+    "UnknownModelError",
+    "UnsupportedBenchmarkFormatError",
+    "ValidationSeverity",
+    "canonical_capability_id",
+    "default_capability_catalog",
+    "default_compatibility_rules",
+]
