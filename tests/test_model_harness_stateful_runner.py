@@ -22,6 +22,7 @@ from backend.model_harness.benchmarking import (
     FixtureFile,
     FixtureSpec,
     ScenarioGroup,
+    ScenarioResult,
     ScenarioStatus,
     StopReason,
     benchmark_scenarios,
@@ -38,6 +39,7 @@ from backend.model_harness.benchmarking.runner import (
 from backend.model_harness.benchmarking.tools import (
     create_read_only_tool_registry,
 )
+from scripts import model_harness_stateful_benchmark as stateful_cli
 from scripts.model_harness_stateful_benchmark import (
     build_parser,
     config_from_args,
@@ -181,6 +183,21 @@ def test_prompt_does_not_include_full_history_and_requires_constraints():
         "read_file",
         "finish",
     ]
+
+
+def test_stateful_runner_enables_selected_model_runner_recycle():
+    runner = StatefulBenchmarkRunner(
+        _config(
+            "diagnostics/model_harness_benchmark/"
+            "stateful-runner-guard-config-test"
+        ),
+        live_provider=_provider(),
+    )
+
+    assert (
+        runner.ollama_config.recycle_loaded_model_before_first_request
+        is True
+    )
 
 
 @pytest.mark.integration
@@ -374,6 +391,11 @@ def test_runner_generates_required_artifacts_without_prompts(monkeypatch):
         assert summary["integrity"]["unchanged"] is True
         assert summary["model_calls"] == 2
         assert summary["fault_injection_steps"] == 0
+        assert any(
+            "benchmark-only" in item
+            and "production Provider and ModelHarness are unchanged" in item
+            for item in summary["limitations"]
+        )
     finally:
         if output.exists():
             shutil.rmtree(output)
@@ -412,6 +434,89 @@ def test_cli_supports_required_modes_and_flags():
     assert config.max_steps == 5
     assert config.fault_injection is False
     assert config.debug_prompts is True
+
+
+def test_cli_presentation_serializes_complete_scenario_result(
+    monkeypatch,
+    capsys,
+):
+    scenario_result = ScenarioResult(
+        scenario_id="T01_PRESENTATION",
+        repetition=1,
+        group="A",
+        capability="stateful_tool_use",
+        status=ScenarioStatus.PASS,
+        stop_reason=StopReason.COMPLETED,
+        step_count=1,
+        final_conclusion="done",
+        evidence_refs=("file:facts.txt",),
+        tools_called=("finish",),
+        retained_constraints=("C1",),
+        plan_steps=0,
+        criteria=(),
+        total_latency_ms=10,
+        input_tokens=5,
+        output_tokens=2,
+        response_hashes=("response-hash",),
+        context_range_chars=(10, 10),
+        recovery_used=False,
+    )
+    summary = {
+        "scenario_repetitions": 1,
+        "passed_repetitions": 1,
+        "failed_repetitions": 0,
+        "model_calls": 1,
+        "integrity": {"unchanged": True},
+        "decision": "MODEL_HARNESS_STATEFUL_CAPABILITIES_VALIDATED",
+        "infrastructure_errors": [],
+    }
+
+    class FakeRunner:
+        def __init__(self, _config):
+            self.scenario_results = [scenario_result]
+
+        async def run(self):
+            return summary
+
+    monkeypatch.setattr(
+        stateful_cli,
+        "StatefulBenchmarkRunner",
+        FakeRunner,
+    )
+
+    exit_code = asyncio.run(stateful_cli.async_main([
+        "--output",
+        (
+            "diagnostics/model_harness_benchmark/"
+            "stateful-presentation-test"
+        ),
+        "--no-fault-injection",
+    ]))
+    payload = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert payload["scenario_results"] == [{
+        "scenario_id": "T01_PRESENTATION",
+        "repetition": 1,
+        "group": "A",
+        "capability": "stateful_tool_use",
+        "status": "PASS",
+        "stop_reason": "COMPLETED",
+        "step_count": 1,
+        "final_conclusion": "done",
+        "evidence_refs": ["file:facts.txt"],
+        "tools_called": ["finish"],
+        "retained_constraints": ["C1"],
+        "plan_steps": 0,
+        "criteria": [],
+        "total_latency_ms": 10,
+        "input_tokens": 5,
+        "output_tokens": 2,
+        "response_hashes": ["response-hash"],
+        "context_range_chars": [10, 10],
+        "recovery_used": False,
+        "errors": [],
+    }]
 
 
 def test_report_has_all_required_sections():

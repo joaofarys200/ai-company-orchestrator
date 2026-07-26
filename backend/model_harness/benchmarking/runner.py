@@ -408,6 +408,8 @@ class StatefulBenchmarkRunner:
             repetitions=config.repetitions,
             keep_alive=config.keep_alive,
             timeout_seconds=config.timeout_seconds,
+            # Benchmark-only isolation; production calls may be concurrent.
+            recycle_loaded_model_before_first_request=True,
         )
         self.live_provider = (
             live_provider
@@ -2021,6 +2023,10 @@ def build_summary(
             "Read-only tool execution does not demonstrate productive tools.",
             "FULL mode was not executed unless explicitly shown by mode.",
             "Model results apply only to the recorded configuration.",
+            (
+                "Selected Ollama runner recycling is benchmark-only; "
+                "the production Provider and ModelHarness are unchanged."
+            ),
         ],
     }
 
