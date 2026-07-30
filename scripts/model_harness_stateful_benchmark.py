@@ -17,6 +17,9 @@ from backend.model_harness.benchmarking import (  # noqa: E402
     BenchmarkConfig,
     BenchmarkMode,
 )
+from backend.model_harness.benchmarking.contracts import (  # noqa: E402
+    to_jsonable,
+)
 from backend.model_harness.benchmarking.runner import (  # noqa: E402
     StatefulBenchmarkRunner,
 )
@@ -91,12 +94,12 @@ def config_from_args(args: argparse.Namespace) -> BenchmarkConfig:
     )
 
 
-async def async_main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
-    config = config_from_args(args)
-    runner = StatefulBenchmarkRunner(config)
-    summary = await runner.run()
-    print(json.dumps({
+def build_presentation_payload(
+    config: BenchmarkConfig,
+    runner: StatefulBenchmarkRunner,
+    summary: dict,
+) -> dict:
+    return {
         "benchmark_version": BENCHMARK_VERSION,
         "output": str(Path(config.output_dir).resolve()),
         "mode": config.mode.value,
@@ -106,7 +109,23 @@ async def async_main(argv: list[str] | None = None) -> int:
         "model_calls": summary["model_calls"],
         "integrity_unchanged": summary["integrity"]["unchanged"],
         "decision": summary["decision"],
-    }, ensure_ascii=False, indent=2))
+        "scenario_results": [
+            to_jsonable(result)
+            for result in runner.scenario_results
+        ],
+    }
+
+
+async def async_main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    config = config_from_args(args)
+    runner = StatefulBenchmarkRunner(config)
+    summary = await runner.run()
+    print(json.dumps(
+        build_presentation_payload(config, runner, summary),
+        ensure_ascii=False,
+        indent=2,
+    ))
     return 0 if (
         summary["failed_repetitions"] == 0
         and summary["integrity"]["unchanged"]

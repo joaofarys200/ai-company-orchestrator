@@ -63,6 +63,21 @@ class GeminiLiveService:
         "voice_cancel_directive",
     }
 
+    # These tools observe the desktop or read already available information. They
+    # are safe to expose in voice mode without enabling write/command tools.
+    VOICE_READ_ONLY_TOOLS = {
+        "list_active_windows",
+        "capture_screen",
+        "list_directory",
+        "read_file",
+        "obsidian_list_notes",
+        "obsidian_read_note",
+        "obsidian_search_notes",
+        "firecrawl_scrape_url",
+        "browserbase_load_page",
+        "youtube_get_transcript",
+    }
+
     def __init__(
         self,
         api_key,
@@ -115,6 +130,7 @@ class GeminiLiveService:
         self.active_tool_count = 0
         self.enable_interruption = os.getenv("VOICE_INTERRUPTION", "true").lower() == "true"
         self.allow_tools = self._env_bool("VOICE_ALLOW_TOOLS", False)
+        self.allow_read_only_tools = self._env_bool("VOICE_ALLOW_READONLY_TOOLS", True)
         self.allowed_tools = self._env_csv("VOICE_ALLOWED_TOOLS")
         self.voice_confirmation_mode = self._env_bool("VOICE_CONFIRMATION_MODE", True)
 
@@ -415,6 +431,10 @@ class GeminiLiveService:
     def is_tool_allowed(self, name):
         if self.is_voice_control_tool(name):
             return True
+        if name in self.VOICE_READ_ONLY_TOOLS:
+            if not self.allow_read_only_tools:
+                return False
+            return not self.allowed_tools or name in self.allowed_tools
         if not self.allow_tools:
             return False
         if self.allowed_tools:
@@ -557,10 +577,23 @@ class GeminiLiveService:
             declarations.extend(self.get_voice_control_tool_declarations())
 
         if not self.allow_tools:
+            if self.allow_read_only_tools:
+                from agents import JARVIS_TOOLS
+                for tool in JARVIS_TOOLS:
+                    name = tool["name"]
+                    if name not in self.VOICE_READ_ONLY_TOOLS:
+                        continue
+                    if self.allowed_tools and name not in self.allowed_tools:
+                        continue
+                    declarations.append({
+                        "name": name,
+                        "description": tool["description"],
+                        "parameters": self.map_schema_to_gemini(tool["input_schema"]),
+                    })
             if declarations:
-                print("GeminiLive: Voice confirmation tools enabled; computer tools disabled.")
+                print("GeminiLive: Voice read-only tools enabled; write and command tools disabled.")
                 return [{"functionDeclarations": declarations}]
-            print("GeminiLive: Voice tools disabled by VOICE_ALLOW_TOOLS=false.")
+            print("GeminiLive: Voice tools disabled by configuration.")
             return []
 
         from agents import JARVIS_TOOLS
@@ -811,9 +844,15 @@ Cada tarefa deve deixar o sistema melhor do que estava anteriormente.
                         execution_prompt = """
 ## EXECUCAO
 
-Modo voz seguro ativo.
+Modo voz seguro ativo, com leitura do ambiente permitida.
 
-Nao abras paineis, nao captures o ecra, nao controles apps externas e nao executes comandos no computador.
+Podes usar ferramentas read-only para compreender o estado atual: listar janelas visiveis,
+capturar o ecra, listar/ler ficheiros e pesquisar paginas ou fontes. Usa essas ferramentas
+quando o pedido depender do ambiente real do utilizador ou de informacao externa.
+
+Nao alteres ficheiros, nao executes comandos e nao abras aplicacoes nesta fase.
+Para abrir uma aplicacao, alterar o computador ou iniciar uma tarefa com efeitos laterais,
+prepara uma diretiva e aguarda confirmacao explicita.
 
 Quando o utilizador pedir uma tarefa concreta para construir, criar, alterar, investigar
 ou executar, chama voice_prepare_directive com o texto exato da tarefa. Isto apenas

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Any, Mapping, TypedDict
 
 
@@ -45,6 +46,7 @@ SERVER_MESSAGE_TYPES = {
     "ast_state",
     "projects_list",
     "project_context",
+    "project_file_save_result",
     "project_references",
     "semantic_results",
     "coding_session",
@@ -73,6 +75,7 @@ CLIENT_MESSAGE_TYPES = {
     "get_ast_state",
     "list_projects",
     "open_project",
+    "save_project_file",
     "index_project",
     "find_references",
     "semantic_search",
@@ -178,6 +181,14 @@ def validate_client_message(message: Mapping[str, Any]) -> dict[str, Any]:
             raise WebSocketPayloadError(f"{version_field} deve ser um inteiro positivo.")
     if message_type.endswith("_update") and not isinstance(payload.get("changes"), dict):
         raise WebSocketPayloadError("changes deve ser um objeto JSON.")
+    if message_type == "save_project_file":
+        if not _as_str(payload.get("project_id")).strip() or not _as_str(payload.get("filename")).strip():
+            raise WebSocketPayloadError("save_project_file exige project_id e filename.")
+        if not isinstance(payload.get("content"), str):
+            raise WebSocketPayloadError("content deve ser texto.")
+        expected_sha256 = _as_str(payload.get("expected_sha256")).strip().lower()
+        if not re.fullmatch(r"[a-f0-9]{64}", expected_sha256):
+            raise WebSocketPayloadError("expected_sha256 deve ser um SHA-256 valido.")
     if message_type in {
         "mission_apply_execution",
         "mission_cancel_execution",
@@ -311,7 +322,19 @@ def normalize_ws_message(message: Mapping[str, Any]) -> dict[str, Any]:
             "type": "project_context",
             "context": message.get("context") if isinstance(message.get("context"), dict) else None,
             "files": message.get("files") if isinstance(message.get("files"), dict) else {},
+            "file_hashes": message.get("file_hashes") if isinstance(message.get("file_hashes"), dict) else {},
             "symbols": message.get("symbols") if isinstance(message.get("symbols"), dict) else {},
+        }
+
+    if message_type == "project_file_save_result":
+        return {
+            "type": "project_file_save_result",
+            "ok": _as_bool(message.get("ok")),
+            "project_id": _as_str(message.get("project_id")),
+            "filename": _as_str(message.get("filename")),
+            "sha256": _as_str(message.get("sha256")),
+            "size_bytes": message.get("size_bytes", 0),
+            "error": _as_str(message.get("error")),
         }
 
     if message_type == "project_references":

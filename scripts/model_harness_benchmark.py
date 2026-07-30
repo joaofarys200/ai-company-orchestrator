@@ -68,6 +68,7 @@ class BenchmarkConfig:
     repetitions: int
     keep_alive: str
     timeout_seconds: float
+    recycle_loaded_model_before_first_request: bool = False
 
 
 @dataclass(frozen=True)
@@ -95,6 +96,8 @@ class OllamaBenchmarkProvider:
         self.default_model = config.model
         self.envelopes: dict[str, dict[str, Any]] = {}
         self.runtime_after: dict[str, dict[str, Any]] = {}
+        self.runner_guard_events: list[dict[str, Any]] = []
+        self._runner_guard_completed = False
 
     async def generate(
         self,
@@ -157,7 +160,18 @@ class OllamaBenchmarkProvider:
             base_url=self.config.base_url,
             timeout=timeout,
         ) as client:
-            response = await client.post("/api/chat", json=payload)
+            await self._prepare_selected_runner(client, route.model)
+            try:
+                response = await client.post("/api/chat", json=payload)
+            except httpx.ReadTimeout:
+                if self.config.recycle_loaded_model_before_first_request:
+                    await self._stop_selected_runner(
+                        client,
+                        route.model,
+                        reason="zero_byte_read_timeout",
+                    )
+                    self._runner_guard_completed = False
+                raise
             response.raise_for_status()
             envelope = response.json()
             runtime = await client.get("/api/ps")
@@ -190,7 +204,111 @@ class OllamaBenchmarkProvider:
                     "prompt_eval_duration"
                 ),
                 "eval_duration": envelope.get("eval_duration"),
+                "runner_guard": tuple(self.runner_guard_events),
             },
+        )
+
+    async def _prepare_selected_runner(
+        self,
+        client: httpx.AsyncClient,
+        model: str,
+    ) -> None:
+        if (
+            not self.config.recycle_loaded_model_before_first_request
+            or self._runner_guard_completed
+        ):
+            return
+        loaded = await self._selected_model_loaded(client, model)
+        if loaded:
+            stopped = await self._stop_selected_runner(
+                client,
+                model,
+                reason="stateful_session_preflight",
+            )
+            if not stopped:
+                raise RuntimeError(
+                    "OLLAMA_SELECTED_RUNNER_RECYCLE_FAILED"
+                )
+        else:
+            self.runner_guard_events.append({
+                "event": "selected_runner_preflight",
+                "model": model,
+                "reason": "stateful_session_preflight",
+                "status": "NOT_LOADED",
+                "elapsed_ms": 0.0,
+            })
+        self._runner_guard_completed = True
+
+    async def _stop_selected_runner(
+        self,
+        client: httpx.AsyncClient,
+        model: str,
+        *,
+        reason: str,
+    ) -> bool:
+        started = time.perf_counter()
+        try:
+            completed = await asyncio.to_thread(
+                subprocess.run,
+                ["ollama", "stop", model],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=False,
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            self.runner_guard_events.append({
+                "event": "selected_runner_recycle",
+                "model": model,
+                "reason": reason,
+                "status": "FAILED",
+                "error_type": type(exc).__name__,
+                "elapsed_ms": round(
+                    (time.perf_counter() - started) * 1_000,
+                    3,
+                ),
+            })
+            return False
+        unloaded = False
+        if completed.returncode == 0:
+            deadline = time.monotonic() + 15.0
+            while time.monotonic() < deadline:
+                try:
+                    unloaded = not await self._selected_model_loaded(
+                        client,
+                        model,
+                    )
+                except (httpx.HTTPError, ValueError):
+                    unloaded = False
+                if unloaded:
+                    break
+                await asyncio.sleep(0.25)
+        self.runner_guard_events.append({
+            "event": "selected_runner_recycle",
+            "model": model,
+            "reason": reason,
+            "status": "RECYCLED" if unloaded else "FAILED",
+            "exit_code": completed.returncode,
+            "elapsed_ms": round(
+                (time.perf_counter() - started) * 1_000,
+                3,
+            ),
+        })
+        return unloaded
+
+    @staticmethod
+    async def _selected_model_loaded(
+        client: httpx.AsyncClient,
+        model: str,
+    ) -> bool:
+        response = await client.get("/api/ps", timeout=5.0)
+        response.raise_for_status()
+        payload = response.json()
+        return any(
+            str(item.get("name") or item.get("model") or "") == model
+            for item in payload.get("models") or ()
+            if isinstance(item, dict)
         )
 
 

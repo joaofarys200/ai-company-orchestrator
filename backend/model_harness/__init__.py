@@ -59,6 +59,19 @@ from backend.model_harness.provider import (
     ModelProvider,
     ProviderRegistry,
 )
+from backend.model_harness.providers import (
+    AnthropicMessagesProvider,
+    AnthropicProviderError,
+    GeminiOpenAIProvider,
+    GeminiProviderError,
+    OllamaChatProvider,
+    OllamaExecutionOptions,
+    OllamaIncompleteResponseError,
+    OllamaModelNotFoundError,
+    OllamaOutputLimitError,
+    OllamaProviderResponseError,
+    OllamaStructuredOutputUnsupportedError,
+)
 from backend.model_harness.recovery import (
     RecoveryCoordinator,
     RecoveryPolicy,
@@ -71,6 +84,11 @@ from backend.model_harness.telemetry import (
     TelemetryRecord,
     TelemetrySink,
 )
+from backend.model_harness.runtime import (
+    create_runtime_model_harness,
+    get_model_harness,
+    get_runtime_model_harness,
+)
 from backend.model_harness.validation import (
     ModelValidationPipeline,
     ValidationRule,
@@ -80,6 +98,8 @@ from backend.model_harness.validation import (
 __all__ = [
     "AUTO_EXCLUDED_CONTEXT_KINDS",
     "CallableModelProvider",
+    "AnthropicMessagesProvider",
+    "AnthropicProviderError",
     "ContextBuildRequest",
     "ContextBuilder",
     "ContextCandidate",
@@ -90,6 +110,8 @@ __all__ = [
     "EnumConstraint",
     "ExecutionConstraints",
     "ExpectedOutput",
+    "GeminiOpenAIProvider",
+    "GeminiProviderError",
     "InMemoryTelemetrySink",
     "InvalidModelRequestError",
     "ModelHarness",
@@ -106,6 +128,13 @@ __all__ = [
     "ModelUsage",
     "ModelValidationPipeline",
     "OutputFormat",
+    "OllamaChatProvider",
+    "OllamaExecutionOptions",
+    "OllamaIncompleteResponseError",
+    "OllamaModelNotFoundError",
+    "OllamaOutputLimitError",
+    "OllamaProviderResponseError",
+    "OllamaStructuredOutputUnsupportedError",
     "ProgressCondition",
     "ProgressEvent",
     "ProgressSnapshot",
@@ -137,4 +166,7 @@ __all__ = [
     "ValidationStage",
     "ValidationStatus",
     "create_default_task_profile_registry",
+    "create_runtime_model_harness",
+    "get_model_harness",
+    "get_runtime_model_harness",
 ]
