@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -134,6 +135,48 @@ def test_obsidian_and_sandbox_are_not_available_as_projects(tmp_path):
         service.open_project("obsidian_vault")
     with pytest.raises(ProjectContextError):
         service.open_project("sandbox_dir")
+
+
+def test_manual_project_file_save_is_atomic_and_preserves_crlf_and_bom(tmp_path):
+    service = make_service(tmp_path)
+    project = tmp_path / "workspace" / "projects" / "editor-app"
+    project.mkdir()
+    source = project / "app.js"
+    original = b"\xef\xbb\xbffunction boot() {\r\n  return 1;\r\n}\r\n"
+    source.write_bytes(original)
+    original_hash = hashlib.sha256(original).hexdigest()
+
+    payload = service.project_payload("editor-app")
+    result = service.save_project_file(
+        "editor-app",
+        "app.js",
+        "function boot() {\n  return 2;\n}\n",
+        payload["file_hashes"]["app.js"],
+    )
+
+    expected = b"\xef\xbb\xbffunction boot() {\r\n  return 2;\r\n}\r\n"
+    assert original_hash != result["sha256"]
+    assert source.read_bytes() == expected
+    assert result["sha256"] == hashlib.sha256(expected).hexdigest()
+    assert not list(project.glob("*.jarvis-editor-tmp"))
+
+
+def test_manual_project_file_save_rejects_stale_hash_and_paths_outside_project(tmp_path):
+    service = make_service(tmp_path)
+    project = tmp_path / "workspace" / "projects" / "editor-app"
+    project.mkdir()
+    source = project / "app.js"
+    source.write_text("const value = 1;\n", encoding="utf-8")
+    payload = service.project_payload("editor-app")
+    expected_hash = payload["file_hashes"]["app.js"]
+    source.write_text("const value = 2;\n", encoding="utf-8")
+
+    with pytest.raises(ProjectContextError, match="mudou no disco"):
+        service.save_project_file("editor-app", "app.js", "const value = 3;\n", expected_hash)
+    with pytest.raises(ProjectContextError, match="Caminho"):
+        service.save_project_file("editor-app", "../outside.js", "bad", expected_hash)
+
+    assert source.read_text(encoding="utf-8") == "const value = 2;\n"
 
 
 def test_task_app_smoke_uses_real_project_and_finds_add_task():

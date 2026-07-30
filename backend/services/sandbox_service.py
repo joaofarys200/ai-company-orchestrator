@@ -3,12 +3,26 @@ import json
 import os
 import socketserver
 import threading
+from dataclasses import dataclass
+from typing import Any
 
 from backend.health import check_frontend_static
 from backend.logging_config import get_logger, log_event
 
 
 logger = get_logger(__name__)
+
+
+@dataclass(slots=True)
+class FrontendServerHandle:
+    server: Any
+    thread: threading.Thread
+
+    def stop(self) -> None:
+        self.server.shutdown()
+        self.server.server_close()
+        if self.thread.is_alive():
+            self.thread.join(timeout=2)
 
 
 class NoCacheHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -19,7 +33,10 @@ class NoCacheHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 
-def start_frontend_http_server(project_root: str, port: int = 8000) -> None:
+def start_frontend_http_server(
+    project_root: str,
+    port: int = 8000,
+) -> FrontendServerHandle | None:
     dist_dir = os.path.join(project_root, "frontend", "dist")
 
     class FrontendHTTPRequestHandler(NoCacheHTTPRequestHandler):
@@ -35,21 +52,43 @@ def start_frontend_http_server(project_root: str, port: int = 8000) -> None:
                 return
             super().do_GET()
 
-    def run_server():
-        handler = lambda *args, **kwargs: FrontendHTTPRequestHandler(*args, directory=dist_dir, **kwargs)
-        socketserver.TCPServer.allow_reuse_address = True
-        try:
-            with socketserver.TCPServer(("", port), handler) as httpd:
-                log_event(
-                    logger,
-                    "frontend_static.started",
-                    message=f"Frontend HTTP server running on http://localhost:{port}",
-                    port=port,
-                    health_path="/healthz",
-                )
-                httpd.serve_forever()
-        except Exception as e:
-            log_event(logger, "frontend_static.start_error", level="error", port=port, error=str(e))
+    def handler(*args, **kwargs):
+        return FrontendHTTPRequestHandler(
+            *args,
+            directory=dist_dir,
+            **kwargs,
+        )
 
-    thread = threading.Thread(target=run_server, daemon=True)
+    socketserver.TCPServer.allow_reuse_address = True
+    try:
+        server = socketserver.TCPServer(("", port), handler)
+    except Exception as start_error:
+        log_event(
+            logger,
+            "frontend_static.start_error",
+            level="error",
+            port=port,
+            error=str(start_error),
+        )
+        return None
+
+    def run_server() -> None:
+        log_event(
+            logger,
+            "frontend_static.started",
+            message=(
+                "Frontend HTTP server running on "
+                f"http://localhost:{port}"
+            ),
+            port=port,
+            health_path="/healthz",
+        )
+        server.serve_forever()
+
+    thread = threading.Thread(
+        target=run_server,
+        daemon=True,
+        name="jarvis-frontend-static",
+    )
     thread.start()
+    return FrontendServerHandle(server=server, thread=thread)

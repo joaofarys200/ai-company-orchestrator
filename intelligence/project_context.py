@@ -8,6 +8,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -307,16 +308,140 @@ class ProjectContextService:
                     if os.path.getsize(path) > MAX_VIEW_FILE_BYTES:
                         continue
                     relative_path = os.path.relpath(path, root).replace(os.sep, "/")
-                    files[relative_path] = Path(path).read_text(encoding="utf-8", errors="replace")
+                    raw = Path(path).read_bytes()
+                    if raw.startswith(b"\xef\xbb\xbf"):
+                        raw = raw[3:]
+                    files[relative_path] = raw.decode("utf-8", errors="replace")
                 except OSError:
                     continue
         return files
 
+    @staticmethod
+    def _hash_file(path: str) -> str:
+        digest = hashlib.sha256()
+        with open(path, "rb") as handle:
+            while chunk := handle.read(HASH_CHUNK_BYTES):
+                digest.update(chunk)
+        return digest.hexdigest()
+
+    @staticmethod
+    def _preserve_line_endings(original: bytes, content: str) -> str:
+        crlf_count = original.count(b"\r\n")
+        lf_count = original.count(b"\n") - crlf_count
+        cr_count = original.count(b"\r") - crlf_count
+        if crlf_count and not lf_count and not cr_count:
+            newline = "\r\n"
+        elif lf_count and not crlf_count and not cr_count:
+            newline = "\n"
+        elif cr_count and not crlf_count and not lf_count:
+            newline = "\r"
+        else:
+            return content
+        return content.replace("\r\n", "\n").replace("\r", "\n").replace("\n", newline)
+
+    @staticmethod
+    def _resolve_existing_project_file(root: str, relative_path: str) -> str:
+        normalized = str(relative_path or "").replace("\\", "/").strip("/")
+        if not normalized or os.path.isabs(normalized) or normalized.startswith("../") or "/../" in normalized:
+            raise ProjectContextError("Caminho de ficheiro invalido.")
+        ignored = {item.lower() for item in IGNORED_DIRECTORIES}
+        if any(part.lower() in ignored for part in normalized.split("/")[:-1]):
+            raise ProjectContextError("Edicao de diretorios gerados ou dependencias nao permitida.")
+        if Path(normalized).suffix.lower() not in TEXT_FILE_SUFFIXES:
+            raise ProjectContextError("O editor apenas permite ficheiros de texto suportados.")
+        target = os.path.realpath(os.path.abspath(os.path.join(root, normalized)))
+        try:
+            if os.path.commonpath([root, target]) != root:
+                raise ProjectContextError("Acesso fora do projeto nao permitido.")
+        except ValueError as exc:
+            raise ProjectContextError("Acesso fora do projeto nao permitido.") from exc
+        source_path = os.path.abspath(os.path.join(root, normalized))
+        if os.path.islink(source_path):
+            raise ProjectContextError("Edicao de links simbolicos nao permitida.")
+        if not os.path.isfile(target):
+            raise ProjectContextError("O ficheiro selecionado nao existe.")
+        return target
+
+    def project_file_hashes(self, project_id: str, filenames: set[str]) -> dict[str, str]:
+        root = self.project_root(project_id)
+        hashes: dict[str, str] = {}
+        for relative_path in filenames:
+            try:
+                target = self._resolve_existing_project_file(root, relative_path)
+                hashes[relative_path] = self._hash_file(target)
+            except ProjectContextError:
+                continue
+        return hashes
+
+    def save_project_file(
+        self,
+        project_id: str,
+        relative_path: str,
+        content: str,
+        expected_sha256: str,
+    ) -> dict[str, Any]:
+        root = self.project_root(project_id)
+        target = self._resolve_existing_project_file(root, relative_path)
+        expected_hash = str(expected_sha256 or "").strip().lower()
+        if not re.fullmatch(r"[a-f0-9]{64}", expected_hash):
+            raise ProjectContextError("Hash original do ficheiro em falta ou invalido.")
+        if not isinstance(content, str) or "\x00" in content:
+            raise ProjectContextError("O editor apenas permite guardar ficheiros de texto.")
+
+        current_bytes = Path(target).read_bytes()
+        current_hash = hashlib.sha256(current_bytes).hexdigest()
+        if current_hash != expected_hash:
+            raise ProjectContextError(
+                "O ficheiro mudou no disco desde que foi aberto. Reabra o projeto antes de guardar."
+            )
+
+        has_bom = current_bytes.startswith(b"\xef\xbb\xbf")
+        original_body = current_bytes[3:] if has_bom else current_bytes
+        normalized_content = self._preserve_line_endings(original_body, content)
+        resulting_bytes = normalized_content.encode("utf-8")
+        if has_bom:
+            resulting_bytes = b"\xef\xbb\xbf" + resulting_bytes
+        if len(resulting_bytes) > MAX_VIEW_FILE_BYTES:
+            raise ProjectContextError(
+                f"O ficheiro excede o limite de edicao manual de {MAX_VIEW_FILE_BYTES} bytes."
+            )
+
+        descriptor, temporary_path = tempfile.mkstemp(
+            prefix=f".{Path(target).name}.",
+            suffix=".jarvis-editor-tmp",
+            dir=os.path.dirname(target),
+        )
+        try:
+            original_mode = os.stat(target).st_mode
+            with os.fdopen(descriptor, "wb") as handle:
+                descriptor = -1
+                handle.write(resulting_bytes)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.chmod(temporary_path, original_mode)
+            os.replace(temporary_path, target)
+        except Exception:
+            if descriptor >= 0:
+                os.close(descriptor)
+            if os.path.exists(temporary_path):
+                os.remove(temporary_path)
+            raise
+
+        resulting_hash = hashlib.sha256(resulting_bytes).hexdigest()
+        return {
+            "project_id": self._validate_project_id(project_id),
+            "filename": relative_path.replace("\\", "/"),
+            "sha256": resulting_hash,
+            "size_bytes": len(resulting_bytes),
+        }
+
     def project_payload(self, project_id: str, reindex: bool = False) -> dict[str, Any]:
         context = self.index_project(project_id) if reindex else self.open_project(project_id)
+        files = self.read_project_files(project_id)
         return {
             "context": context.to_dict(),
-            "files": self.read_project_files(project_id),
+            "files": files,
+            "file_hashes": self.project_file_hashes(project_id, set(files)),
             "symbols": self.load_index(project_id),
         }
 

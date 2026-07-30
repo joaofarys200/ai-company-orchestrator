@@ -510,7 +510,18 @@ export interface ProjectContextMessage {
   type: 'project_context';
   context: ProjectContextData | null;
   files: Record<string, string>;
+  file_hashes: Record<string, string>;
   symbols: AstState;
+}
+
+export interface ProjectFileSaveResultMessage {
+  type: 'project_file_save_result';
+  ok: boolean;
+  project_id: string;
+  filename: string;
+  sha256: string;
+  size_bytes: number;
+  error: string;
 }
 
 export interface ProjectReferencesMessage {
@@ -569,6 +580,7 @@ export type ServerMessage =
   | AstStateMessage
   | ProjectsListMessage
   | ProjectContextMessage
+  | ProjectFileSaveResultMessage
   | ProjectReferencesMessage
   | SemanticResultsMessage
   | CodingSessionMessage
@@ -593,6 +605,7 @@ export type ClientMessage =
   | { type: 'get_ast_state'; project_id?: string }
   | { type: 'list_projects' }
   | { type: 'open_project'; project_id: string }
+  | { type: 'save_project_file'; project_id: string; filename: string; content: string; expected_sha256: string }
   | { type: 'index_project'; project_id: string }
   | { type: 'find_references'; project_id: string; symbol: string }
   | { type: 'semantic_search'; project_id: string; query: string }
@@ -1052,7 +1065,18 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         type,
         context: normalizeProjectContext(raw.context),
         files: isRecord(raw.files) ? Object.fromEntries(Object.entries(raw.files).map(([key, value]) => [key, asString(value)])) : {},
+        file_hashes: isRecord(raw.file_hashes) ? Object.fromEntries(Object.entries(raw.file_hashes).map(([key, value]) => [key, asString(value)])) : {},
         symbols: normalizeAst(raw.symbols) ?? {},
+      };
+    case 'project_file_save_result':
+      return {
+        type,
+        ok: asBoolean(raw.ok),
+        project_id: asString(raw.project_id),
+        filename: asString(raw.filename),
+        sha256: asString(raw.sha256),
+        size_bytes: asNumber(raw.size_bytes),
+        error: asString(raw.error),
       };
     case 'project_references':
       return { type, data: normalizeReferences(raw.data) };
