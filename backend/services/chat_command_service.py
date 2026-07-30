@@ -11,7 +11,7 @@ from backend.application_services import ApplicationServices
 from backend.errors import safe_user_error
 from backend.logging_config import log_event
 from backend.services.model_service import ModelExecutionService
-from backend.websocket_gateway import ConnectionManager
+from backend.websocket.gateway import ConnectionManager
 
 
 @dataclass(slots=True)

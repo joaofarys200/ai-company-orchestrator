@@ -46,7 +46,7 @@ from backend.application_services import (
     ApplicationServices,
     create_application_services,
 )
-from backend.websocket_gateway import (
+from backend.websocket.gateway import (
     ConnectionManager,
     WebSocketGateway,
     extract_ws_token,
@@ -56,13 +56,13 @@ from backend.websocket_gateway import (
     reject_unauthorized_ws,
     resolve_under_base,
 )
-from backend.websocket_dispatcher import WebSocketSessionState
-from backend.websocket_handlers import (
-    MissionWebSocketHandler,
+from backend.websocket.context import WebSocketSessionState
+from backend.websocket.handlers.common import (
     WebSocketResponder,
     WebSocketRuntimeCallbacks,
-    create_websocket_handlers,
 )
+from backend.websocket.handlers.missions import MissionWebSocketHandler
+from backend.websocket.registry import create_websocket_handlers
 from backend.message_protocol import (
     chat_message,
     file_message,
@@ -292,8 +292,11 @@ async def send_ws(websocket, message: dict):
 
 
 async def send_project_context(websocket, project_id: str, reindex: bool = False):
+    services = _current_application_services()
     responder = WebSocketResponder(
-        _current_application_services(),
+        services.project_context,
+        services.coding_sessions,
+        services.mission_planner,
         connection_manager,
     )
     await responder.send_project_context(
@@ -304,8 +307,11 @@ async def send_project_context(websocket, project_id: str, reindex: bool = False
 
 
 async def send_latest_coding_session(websocket, project_id: str):
+    services = _current_application_services()
     responder = WebSocketResponder(
-        _current_application_services(),
+        services.project_context,
+        services.coding_sessions,
+        services.mission_planner,
         connection_manager,
     )
     await responder.send_latest_coding_session(
@@ -315,8 +321,11 @@ async def send_latest_coding_session(websocket, project_id: str):
 
 
 async def send_mission_list(websocket, project_id: str):
+    services = _current_application_services()
     responder = WebSocketResponder(
-        _current_application_services(),
+        services.project_context,
+        services.coding_sessions,
+        services.mission_planner,
         connection_manager,
     )
     await responder.send_mission_list(websocket, project_id)
@@ -328,10 +337,17 @@ async def dispatch_mission_operation(websocket, msg: dict, selected_project_id: 
         return False
     services = _current_application_services()
     responder = WebSocketResponder(
-        services,
+        services.project_context,
+        services.coding_sessions,
+        services.mission_planner,
         connection_manager,
     )
-    handler = MissionWebSocketHandler(services, responder)
+    handler = MissionWebSocketHandler(
+        services.mission_planner,
+        services.mission_executor,
+        services.mission_autonomy,
+        responder,
+    )
     await handler.handle(
         websocket,
         msg,

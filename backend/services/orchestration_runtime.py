@@ -19,7 +19,7 @@ from backend.services.local_app_service import (
     find_local_app_request,
 )
 from backend.services.model_service import ModelExecutionService
-from backend.websocket_gateway import ConnectionManager
+from backend.websocket.gateway import ConnectionManager
 
 
 CASUAL_CHAT_SYSTEM_PROMPT = (

@@ -14,7 +14,7 @@ from backend.services.local_app_service import (
     normalize_voice_command_text,
 )
 from backend.services.voice_service import normalize_voice_prompt
-from backend.websocket_gateway import ConnectionManager
+from backend.websocket.gateway import ConnectionManager
 
 
 VOICE_CONFIRMATION_WORDS = {

@@ -6,7 +6,7 @@ import re
 from typing import Any
 
 from backend.logging_config import log_event
-from backend.websocket_gateway import resolve_under_base
+from backend.websocket.gateway import resolve_under_base
 
 
 AVAILABLE_TEMPLATE_NAMES = {
