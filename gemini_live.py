@@ -1,4 +1,4 @@
-﻿import os
+import os
 import json
 import asyncio
 import base64
@@ -933,7 +933,10 @@ nao captures o ecra, nao controles apps externas e nao executes comandos no comp
                                 except Exception as e:
                                     print(f"GeminiLive Read Error: {e}")
                         except websockets.exceptions.ConnectionClosed as ce:
-                            print(f"GeminiLive WebSocket connection closed in read_loop: {ce}")
+                            if ce.rcvd and ce.rcvd.code in (1000, 1001, 1008):
+                                print(f"GeminiLive: Live session completed or rotated cleanly ({ce.rcvd.code}).")
+                            else:
+                                print(f"GeminiLive WebSocket connection closed in read_loop: {ce}")
                         except asyncio.CancelledError:
                             raise
                                 
@@ -949,7 +952,10 @@ nao captures o ecra, nao controles apps externas e nao executes comandos no comp
                                 finally:
                                     self.send_queue.task_done()
                         except websockets.exceptions.ConnectionClosed as ce:
-                            print(f"GeminiLive WebSocket connection closed in write_loop: {ce}")
+                            if ce.rcvd and ce.rcvd.code in (1000, 1001, 1008):
+                                pass
+                            else:
+                                print(f"GeminiLive WebSocket connection closed in write_loop: {ce}")
                         except asyncio.CancelledError:
                             raise
                             

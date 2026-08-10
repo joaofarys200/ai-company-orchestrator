@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
 import os
 import traceback
 import uuid
@@ -8,6 +9,10 @@ from dataclasses import asdict, dataclass, field, is_dataclass
 from datetime import datetime, timezone
 from typing import Any, Awaitable, Callable
 
+from agents.agent_profiles import (
+    AgentProfileRegistry,
+    create_default_agent_profile_registry,
+)
 from agents.executors import (
     ExecutorNotFoundError,
     ExecutorRegistry,
@@ -26,7 +31,12 @@ from agents.mission_state import (
 )
 from agents.orchestrator.project_builder import ProjectBuildResult, build_project
 from agents.orchestrator.flight_recorder import ProjectBuilderFlightRecorder, recorder_directory
-from intelligence.coding_session import CodingSession, CodingSessionService
+from backend.model_harness import ModelHarness, get_runtime_model_harness
+from intelligence.coding_session import (
+    CodingSession,
+    CodingSessionService,
+    ModelHarnessPlanRequester,
+)
 from intelligence.project_context import ProjectContextService
 
 
@@ -94,6 +104,8 @@ class MissionExecutorService:
         stale_lock_min_age_seconds: float | None = None,
         owner_id: str | None = None,
         executor_registry: ExecutorRegistry | None = None,
+        model_harness: ModelHarness | None = None,
+        agent_profiles: AgentProfileRegistry | None = None,
     ):
         self.workspace_root = os.path.realpath(os.path.abspath(workspace_root))
         self.mission_state = mission_state or MissionStateStore(self.workspace_root)
@@ -111,6 +123,10 @@ class MissionExecutorService:
         self.stale_lock_min_age_seconds = max(1.0, float(configured_age))
         self.owner_id = owner_id or f"mission-executor:{os.getpid()}:{uuid.uuid4().hex[:12]}"
         self.executor_registry = executor_registry or create_default_executor_registry()
+        self.model_harness = model_harness or get_runtime_model_harness()
+        self.agent_profiles = (
+            agent_profiles or create_default_agent_profile_registry()
+        )
 
     @staticmethod
     def registry() -> dict[str, dict[str, Any]]:
@@ -543,6 +559,10 @@ class MissionExecutorService:
                 autonomous=bool(autonomous),
                 allow_apply=bool(test_mode and not autonomous),
                 service=self,
+                model_harness=self.model_harness,
+                agent_profile=self._agent_profile_for_execution(
+                    execution
+                ),
             )
             result = await executor.execute(context)
             if result.snapshot is not None:
@@ -572,7 +592,54 @@ class MissionExecutorService:
     ) -> dict[str, Any]:
         work_package = execution.input_snapshot["work_package"]
         objective = self._execution_objective(work_package)
-        session = await self.coding_service.create_assisted_session(project_id, objective)
+        agent_profile = self._agent_profile_for_execution(execution)
+        requester = ModelHarnessPlanRequester(
+            self.model_harness,
+            metadata={
+                "mission_id": execution.mission_id,
+                "work_package_id": execution.work_package_id,
+                "execution_id": execution.execution_id,
+                "caller_type": "agent",
+                "caller_id": agent_profile["id"],
+                "executor": execution.executor_kind,
+                "agent_role": agent_profile["role"],
+                "agent_system_prompt": agent_profile["system_prompt"],
+            },
+        )
+        self._persist_model_context(
+            project_id,
+            execution.mission_id,
+            execution.execution_id,
+            agent_profile,
+            requester.records,
+        )
+        create_session = self.coding_service.create_assisted_session
+        parameters = inspect.signature(create_session).parameters
+        try:
+            if "requester" in parameters:
+                session = await create_session(
+                    project_id,
+                    objective,
+                    requester=requester,
+                )
+            else:
+                session = await create_session(project_id, objective)
+        except Exception:
+            self._persist_model_context(
+                project_id,
+                execution.mission_id,
+                execution.execution_id,
+                agent_profile,
+                requester.records,
+            )
+            raise
+        self._persist_model_context(
+            project_id,
+            execution.mission_id,
+            execution.execution_id,
+            agent_profile,
+            requester.records,
+        )
         with self.mission_state._locked_mission(project_id, execution.mission_id):
             current = self._load_execution(project_id, execution.mission_id, execution.execution_id)
             if current.status == "CANCELLED":
@@ -586,11 +653,51 @@ class MissionExecutorService:
                 "coding_session_id": session.session_id,
                 "change_plan": session.change_plan,
                 "proposed_changes": session.proposed_changes,
+                "model_calls": list(requester.records),
+                "agent_profile": agent_profile,
             }
             current.artifact_refs = self._coding_artifact_refs(project_id, session)
             self._heartbeat(current)
             self._save_execution(project_id, current)
         return self.load_snapshot(project_id, execution.mission_id)
+
+    def _agent_profile_for_execution(
+        self,
+        execution: MissionExecution,
+    ) -> dict[str, Any]:
+        work_package = dict(
+            execution.input_snapshot.get("work_package") or {}
+        )
+        metadata = work_package.get("metadata")
+        profile = self.agent_profiles.resolve(
+            execution.executor_kind,
+            metadata if isinstance(metadata, dict) else {},
+        )
+        return profile.to_dict()
+
+    def _persist_model_context(
+        self,
+        project_id: str,
+        mission_id: str,
+        execution_id: str,
+        agent_profile: dict[str, Any],
+        model_calls: list[dict[str, Any]],
+    ) -> None:
+        with self.mission_state._locked_mission(project_id, mission_id):
+            execution = self._load_execution(
+                project_id,
+                mission_id,
+                execution_id,
+            )
+            execution.input_snapshot["agent_profile"] = dict(
+                agent_profile
+            )
+            execution.output_summary = {
+                **execution.output_summary,
+                "model_calls": [dict(item) for item in model_calls],
+            }
+            self._heartbeat(execution)
+            self._save_execution(project_id, execution)
 
     async def _run_project_builder(
         self,

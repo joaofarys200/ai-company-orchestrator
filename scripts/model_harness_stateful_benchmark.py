@@ -58,6 +58,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--base-url",
         default="http://127.0.0.1:11434",
     )
+    parser.add_argument(
+        "--transition-policy",
+        choices=("model_selected", "contract_driven"),
+        default="model_selected",
+    )
     return parser
 
 
@@ -91,6 +96,7 @@ def config_from_args(args: argparse.Namespace) -> BenchmarkConfig:
         fault_injection=args.fault_injection,
         debug_prompts=args.debug_prompts,
         base_url=args.base_url,
+        transition_policy=args.transition_policy,
     )
 
 

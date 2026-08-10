@@ -18,12 +18,14 @@ import {
   X,
 } from 'lucide-react';
 import { useWebSocket } from '../../context/WebSocketContext';
+import { Modal } from '../../components/Modal';
 import type { MissionClientOperation, MissionCriterion, MissionDeliverable, MissionExecution, MissionWorkPackage } from '../../protocol/websocket';
 
 const PANEL = 'rounded-md border border-white/8 bg-[#090d14]';
 const SUBTLE = 'rounded-md border border-white/8 bg-black/20';
 const BUTTON = 'inline-flex min-h-8 items-center justify-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2.5 text-xs font-semibold text-gray-200 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40';
 const ICON_BUTTON = 'inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-gray-300 transition hover:bg-white/[0.08] hover:text-white disabled:opacity-40';
+const INPUT_CLASS = 'w-full rounded-md border border-white/10 bg-[#070a10] px-3 py-2 text-xs text-gray-200 outline-none focus:border-cyan-300/40';
 
 const missionTransitions: Record<string, string[]> = {
   DRAFT: ['READY', 'CANCELLED'],
@@ -44,7 +46,27 @@ const deliverableStates = ['PLANNED', 'IN_PROGRESS', 'READY_FOR_REVIEW', 'ACCEPT
 const workPackageTypes = ['PROJECT_BUILD', 'RESEARCH', 'CODING', 'DOCUMENT', 'EXPERIMENT', 'REVIEW', 'GENERIC'];
 const supportedExecutors = new Set(['CODING', 'PROJECT_BUILD']);
 
-const ask = (label: string, initial = '') => window.prompt(label, initial)?.trim() ?? '';
+const statusLabels: Record<string, string> = {
+  DRAFT: 'Rascunho',
+  READY: 'Pronta',
+  ACTIVE: 'Em curso',
+  BLOCKED: 'Bloqueada',
+  COMPLETED: 'Concluída',
+  FAILED: 'Falhou',
+  CANCELLED: 'Cancelada',
+  PENDING: 'Pendente',
+  IN_PROGRESS: 'Em curso',
+  VALIDATION_FAILED: 'Validação falhou',
+  PLANNED: 'Planeada',
+  READY_FOR_REVIEW: 'Em revisão',
+  ACCEPTED: 'Aceite',
+  REJECTED: 'Rejeitada',
+  RUNNING: 'Em execução',
+  WAITING_FOR_REVIEW: 'A aguardar revisão',
+};
+
+const statusLabel = (status: string) => statusLabels[status] ?? status.replaceAll('_', ' ').toLowerCase();
+
 const executorFor = (item: MissionWorkPackage) => item.executor_kind && item.executor_kind !== 'MANUAL'
   ? item.executor_kind.toUpperCase()
   : item.type.toUpperCase();
@@ -75,8 +97,8 @@ function ExecutionDetails({ execution, onApply, onReview, onRetry, onCancel }: E
       <div className="flex flex-wrap items-center gap-2 text-[11px]">
         <Activity className="h-3.5 w-3.5 text-cyan-300" />
         <span className="font-semibold text-gray-200">{execution.executor_kind}</span>
-        <span className="rounded bg-white/[0.06] px-2 py-0.5 text-gray-300">{execution.status}</span>
-        <span className="text-gray-600">tentativa {execution.attempt} · v{execution.version}</span>
+        <span className="rounded bg-white/[0.06] px-2 py-0.5 text-gray-300">{statusLabel(execution.status)}</span>
+        <span className="text-gray-600">tentativa {execution.attempt}</span>
         {phase && <span className="text-cyan-200">{phase}</span>}
       </div>
 
@@ -116,7 +138,7 @@ function ExecutionDetails({ execution, onApply, onReview, onRetry, onCancel }: E
       )}
 
       {execution.evidence_refs.length > 0 && (
-        <p className="break-all text-[11px] text-gray-500">Evidence: {execution.evidence_refs.join(', ')}</p>
+        <p className="break-all text-[11px] text-gray-500">Evidência: {execution.evidence_refs.join(', ')}</p>
       )}
       {execution.primary_error && <p className="text-xs text-red-300">{execution.primary_error.message}</p>}
       {execution.rollback_error && <p className="text-xs text-red-300">Rollback: {execution.rollback_error.message}</p>}
@@ -153,9 +175,62 @@ export function MissionPlanner() {
     plannerState,
     getPlannerState,
   } = useWebSocket();
-  const [selectedMissionId, setSelectedMissionId] = useState('');
+
+  // Persist selected mission in sessionStorage
+  const [selectedMissionId, setSelectedMissionId] = useState(() => (
+    sessionStorage.getItem('jarvis_selected_mission_id') || ''
+  ));
+
   const projectId = projectContext?.project_id ?? '';
   const activeMissionId = missionSnapshot?.mission.mission_id ?? selectedMissionId;
+
+  // Modal States
+  const [createMissionOpen, setCreateMissionOpen] = useState(false);
+  const [editMissionOpen, setEditMissionOpen] = useState(false);
+  const [createWPOpen, setCreateWPOpen] = useState(false);
+  const [createDeliverableTarget, setCreateDeliverableTarget] = useState<MissionWorkPackage | null>(null);
+  const [addDependencyTarget, setAddDependencyTarget] = useState<MissionWorkPackage | null>(null);
+  const [attachEvidenceTarget, setAttachEvidenceTarget] = useState<{ wp: MissionWorkPackage; deliverableId?: string } | null>(null);
+  const [createCriterionTarget, setCreateCriterionTarget] = useState<{ ownerType: 'MISSION' | 'WORK_PACKAGE' | 'DELIVERABLE'; ownerId: string } | null>(null);
+  const [satisfyCriterionTarget, setSatisfyCriterionTarget] = useState<{ criterion: MissionCriterion; status: 'SATISFIED' | 'FAILED' } | null>(null);
+  const [reviewExecutionTarget, setReviewExecutionTarget] = useState<{ execution: MissionExecution; decision: 'ACCEPT' | 'REJECT' } | null>(null);
+  const [blockWPTarget, setBlockWPTarget] = useState<{ item: MissionWorkPackage; status: string } | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ title: string; message: string; action: () => void } | null>(null);
+
+  // Form Field States
+  const [missionTitle, setMissionTitle] = useState('');
+  const [missionObjective, setMissionObjective] = useState('');
+  const [missionDescription, setMissionDescription] = useState('');
+
+  const [wpTitle, setWpTitle] = useState('');
+  const [wpType, setWpType] = useState('GENERIC');
+  const [wpDescription, setWpDescription] = useState('');
+
+  const [delivName, setDelivName] = useState('');
+  const [delivKind, setDelivKind] = useState('GENERIC');
+  const [delivDescription, setDelivDescription] = useState('');
+  const [delivRequired, setDelivRequired] = useState(true);
+
+  const [selectedDepId, setSelectedDepId] = useState('');
+
+  const [evidenceKind, setEvidenceKind] = useState('FILE');
+  const [evidenceSourceRef, setEvidenceSourceRef] = useState('');
+  const [evidenceDescription, setEvidenceDescription] = useState('');
+
+  const [criterionDescription, setCriterionDescription] = useState('');
+  const [criterionEvidenceKinds, setCriterionEvidenceKinds] = useState('');
+
+  const [satisfyEvidenceRefs, setSatisfyEvidenceRefs] = useState('');
+  const [satisfyNote, setSatisfyNote] = useState('');
+
+  const [reviewNote, setReviewNote] = useState('');
+  const [blockReason, setBlockReason] = useState('');
+
+  useEffect(() => {
+    if (activeMissionId) {
+      sessionStorage.setItem('jarvis_selected_mission_id', activeMissionId);
+    }
+  }, [activeMissionId]);
 
   useEffect(() => {
     if (projectId) {
@@ -177,119 +252,119 @@ export function MissionPlanner() {
 
   const send = (operation: MissionClientOperation) => sendMissionOperation(operation);
 
-  const createMission = () => {
-    if (!projectId) return;
-    const title = ask('Título da missão');
-    if (!title) return;
-    const objective = ask('Objetivo verificável da missão');
-    if (!objective) return;
-    const description = ask('Descrição', '');
-    send({ type: 'mission_create', project_id: projectId, title, objective, description });
+  const handleCreateMissionSubmit = () => {
+    if (!projectId || !missionTitle.trim() || !missionObjective.trim()) return;
+    send({ type: 'mission_create', project_id: projectId, title: missionTitle.trim(), objective: missionObjective.trim(), description: missionDescription.trim() });
+    setCreateMissionOpen(false);
+    setMissionTitle('');
+    setMissionObjective('');
+    setMissionDescription('');
   };
 
-  const editMission = () => {
-    if (!projectId || !missionSnapshot) return;
-    const title = ask('Título da missão', missionSnapshot.mission.title);
-    if (!title) return;
-    const description = ask('Descrição', missionSnapshot.mission.description);
+  const handleEditMissionSubmit = () => {
+    if (!projectId || !missionSnapshot || !missionTitle.trim()) return;
     send({
       type: 'mission_update',
       project_id: projectId,
       mission_id: missionSnapshot.mission.mission_id,
       expected_version: missionSnapshot.mission.version,
-      changes: { title, description },
+      changes: { title: missionTitle.trim(), description: missionDescription.trim() },
     });
+    setEditMissionOpen(false);
   };
 
-  const createWorkPackage = () => {
-    if (!projectId || !missionSnapshot) return;
-    const title = ask('Título do WorkPackage');
-    if (!title) return;
-    const requestedType = ask(`Tipo: ${workPackageTypes.join(', ')}`, 'GENERIC').toUpperCase();
-    const workPackageType = workPackageTypes.includes(requestedType) ? requestedType : 'GENERIC';
+  const handleCreateWPSubmit = () => {
+    if (!projectId || !missionSnapshot || !wpTitle.trim()) return;
     send({
       type: 'work_package_create',
       project_id: projectId,
       mission_id: missionSnapshot.mission.mission_id,
-      title,
-      description: ask('Descrição', ''),
-      work_package_type: workPackageType,
-      executor_kind: workPackageType,
+      title: wpTitle.trim(),
+      description: wpDescription.trim(),
+      work_package_type: wpType,
+      executor_kind: wpType,
       required: true,
     });
+    setCreateWPOpen(false);
+    setWpTitle('');
+    setWpDescription('');
+    setWpType('GENERIC');
   };
 
-  const addDependency = (item: MissionWorkPackage) => {
-    if (!projectId || !missionSnapshot) return;
-    const dependencyId = ask('ID do WorkPackage do qual este depende');
-    if (!dependencyId) return;
-    send({
-      type: 'work_package_add_dependency',
-      project_id: projectId,
-      mission_id: missionSnapshot.mission.mission_id,
-      work_package_id: item.work_package_id,
-      dependency_id: dependencyId,
-      expected_version: item.version,
-    });
-  };
-
-  const createDeliverable = (item: MissionWorkPackage) => {
-    if (!projectId || !missionSnapshot) return;
-    const name = ask('Nome do Deliverable');
-    if (!name) return;
+  const handleCreateDeliverableSubmit = () => {
+    if (!projectId || !missionSnapshot || !createDeliverableTarget || !delivName.trim()) return;
     send({
       type: 'deliverable_create',
       project_id: projectId,
       mission_id: missionSnapshot.mission.mission_id,
-      work_package_id: item.work_package_id,
-      name,
-      kind: ask('Kind extensível', 'GENERIC') || 'GENERIC',
-      description: ask('Descrição', ''),
-      required: window.confirm('Este Deliverable é obrigatório para concluir o WorkPackage?'),
-      expected_work_package_version: item.version,
+      work_package_id: createDeliverableTarget.work_package_id,
+      name: delivName.trim(),
+      kind: delivKind || 'GENERIC',
+      description: delivDescription.trim(),
+      required: delivRequired,
+      expected_work_package_version: createDeliverableTarget.version,
     });
+    setCreateDeliverableTarget(null);
+    setDelivName('');
+    setDelivDescription('');
   };
 
-  const attachEvidence = (item: MissionWorkPackage, deliverableId?: string) => {
-    if (!projectId || !missionSnapshot) return;
-    const sourceRef = ask('Referência: file:, coding_session:, project_context:, obsidian:, validation:, source: ou experiment:');
-    if (!sourceRef) return;
+  const handleAddDependencySubmit = () => {
+    if (!projectId || !missionSnapshot || !addDependencyTarget || !selectedDepId) return;
+    send({
+      type: 'work_package_add_dependency',
+      project_id: projectId,
+      mission_id: missionSnapshot.mission.mission_id,
+      work_package_id: addDependencyTarget.work_package_id,
+      dependency_id: selectedDepId,
+      expected_version: addDependencyTarget.version,
+    });
+    setAddDependencyTarget(null);
+    setSelectedDepId('');
+  };
+
+  const handleAttachEvidenceSubmit = () => {
+    if (!projectId || !missionSnapshot || !attachEvidenceTarget || !evidenceSourceRef.trim()) return;
     send({
       type: 'evidence_attach',
       project_id: projectId,
       mission_id: missionSnapshot.mission.mission_id,
-      work_package_id: item.work_package_id,
-      deliverable_id: deliverableId,
-      kind: ask('Kind da evidência', 'FILE') || 'FILE',
-      source_ref: sourceRef,
-      description: ask('Descrição da evidência', ''),
+      work_package_id: attachEvidenceTarget.wp.work_package_id,
+      deliverable_id: attachEvidenceTarget.deliverableId,
+      kind: evidenceKind || 'FILE',
+      source_ref: evidenceSourceRef.trim(),
+      description: evidenceDescription.trim(),
     });
+    setAttachEvidenceTarget(null);
+    setEvidenceSourceRef('');
+    setEvidenceDescription('');
   };
 
-  const createCriterion = (ownerType: 'MISSION' | 'WORK_PACKAGE' | 'DELIVERABLE', ownerId: string) => {
-    if (!projectId || !missionSnapshot) return;
-    const description = ask('Critério de aceitação verificável');
-    if (!description) return;
-    const kinds = ask('Kinds de evidência exigidos, separados por vírgula', '')
-      .split(',').map((item) => item.trim()).filter(Boolean);
+  const handleCreateCriterionSubmit = () => {
+    if (!projectId || !missionSnapshot || !createCriterionTarget || !criterionDescription.trim()) return;
+    const kinds = criterionEvidenceKinds.split(',').map((item) => item.trim()).filter(Boolean);
     send({
       type: 'criterion_create',
       project_id: projectId,
       mission_id: missionSnapshot.mission.mission_id,
-      owner_type: ownerType,
-      owner_id: ownerId,
-      description,
+      owner_type: createCriterionTarget.ownerType,
+      owner_id: createCriterionTarget.ownerId,
+      description: criterionDescription.trim(),
       required_evidence_kinds: kinds,
       required: true,
     });
+    setCreateCriterionTarget(null);
+    setCriterionDescription('');
+    setCriterionEvidenceKinds('');
   };
 
-  const satisfyCriterion = (criterion: MissionCriterion, status: 'SATISFIED' | 'FAILED') => {
-    if (!projectId || !missionSnapshot) return;
-    const evidenceRefs = status === 'SATISFIED'
-      ? ask('IDs de Evidence, separados por vírgula').split(',').map((item) => item.trim()).filter(Boolean)
+  const handleSatisfyCriterionSubmit = () => {
+    if (!projectId || !missionSnapshot || !satisfyCriterionTarget) return;
+    const { criterion, status } = satisfyCriterionTarget;
+    const refs = status === 'SATISFIED'
+      ? satisfyEvidenceRefs.split(',').map((item) => item.trim()).filter(Boolean)
       : [];
-    if (status === 'SATISFIED' && evidenceRefs.length === 0) return;
+    if (status === 'SATISFIED' && refs.length === 0) return;
     send({
       type: 'criterion_set_status',
       project_id: projectId,
@@ -297,13 +372,35 @@ export function MissionPlanner() {
       criterion_id: criterion.criterion_id,
       expected_version: criterion.version,
       status,
-      evidence_refs: evidenceRefs,
-      validation_note: ask('Nota de validação', ''),
+      evidence_refs: refs,
+      validation_note: satisfyNote.trim(),
     });
+    setSatisfyCriterionTarget(null);
+    setSatisfyEvidenceRefs('');
+    setSatisfyNote('');
   };
 
-  const setWorkPackageStatus = (item: MissionWorkPackage, status: string) => {
-    if (!projectId || !missionSnapshot || !status) return;
+  const handleReviewExecutionSubmit = () => {
+    if (!projectId || !missionSnapshot || !reviewExecutionTarget) return;
+    const { execution, decision } = reviewExecutionTarget;
+    if (decision === 'REJECT' && !reviewNote.trim()) return;
+    send({
+      type: 'mission_review_execution',
+      project_id: projectId,
+      mission_id: missionSnapshot.mission.mission_id,
+      execution_id: execution.execution_id,
+      decision,
+      review_note: reviewNote.trim(),
+      accepted_evidence_refs: decision === 'ACCEPT' ? execution.evidence_refs : [],
+      expected_execution_version: execution.version,
+    });
+    setReviewExecutionTarget(null);
+    setReviewNote('');
+  };
+
+  const handleBlockWPSubmit = () => {
+    if (!projectId || !missionSnapshot || !blockWPTarget) return;
+    const { item, status } = blockWPTarget;
     send({
       type: 'work_package_set_status',
       project_id: projectId,
@@ -311,7 +408,25 @@ export function MissionPlanner() {
       work_package_id: item.work_package_id,
       expected_version: item.version,
       status,
-      blocked_reason: status === 'BLOCKED' ? ask('Motivo do bloqueio', '') : undefined,
+      blocked_reason: blockReason.trim(),
+    });
+    setBlockWPTarget(null);
+    setBlockReason('');
+  };
+
+  const setWorkPackageStatus = (item: MissionWorkPackage, status: string) => {
+    if (!projectId || !missionSnapshot || !status) return;
+    if (status === 'BLOCKED') {
+      setBlockWPTarget({ item, status });
+      return;
+    }
+    send({
+      type: 'work_package_set_status',
+      project_id: projectId,
+      mission_id: missionSnapshot.mission.mission_id,
+      work_package_id: item.work_package_id,
+      expected_version: item.version,
+      status,
     });
   };
 
@@ -340,31 +455,26 @@ export function MissionPlanner() {
   };
 
   const applyExecution = (execution: MissionExecution) => {
-    if (!projectId || !missionSnapshot || !window.confirm('Aplicar este diff e executar as validações?')) return;
-    send({
-      type: 'mission_apply_execution',
-      project_id: projectId,
-      mission_id: missionSnapshot.mission.mission_id,
-      execution_id: execution.execution_id,
-      expected_execution_version: execution.version,
-      confirmed: true,
+    if (!projectId || !missionSnapshot) return;
+    setConfirmAction({
+      title: 'Aplicar Alterações',
+      message: 'Confirma a aplicação deste diff e a execução das validações associadas?',
+      action: () => {
+        send({
+          type: 'mission_apply_execution',
+          project_id: projectId,
+          mission_id: missionSnapshot.mission.mission_id,
+          execution_id: execution.execution_id,
+          expected_execution_version: execution.version,
+          confirmed: true,
+        });
+      },
     });
   };
 
   const reviewExecution = (execution: MissionExecution, decision: 'ACCEPT' | 'REJECT') => {
-    if (!projectId || !missionSnapshot) return;
-    const reviewNote = ask(decision === 'ACCEPT' ? 'Nota de aprovação' : 'Motivo da rejeição');
-    if (decision === 'REJECT' && !reviewNote) return;
-    send({
-      type: 'mission_review_execution',
-      project_id: projectId,
-      mission_id: missionSnapshot.mission.mission_id,
-      execution_id: execution.execution_id,
-      decision,
-      review_note: reviewNote,
-      accepted_evidence_refs: decision === 'ACCEPT' ? execution.evidence_refs : [],
-      expected_execution_version: execution.version,
-    });
+    setReviewExecutionTarget({ execution, decision });
+    setReviewNote('');
   };
 
   const retryExecution = (execution: MissionExecution) => {
@@ -379,14 +489,20 @@ export function MissionPlanner() {
   };
 
   const cancelExecution = (execution: MissionExecution) => {
-    if (!projectId || !missionSnapshot || !window.confirm('Cancelar esta execução controlada?')) return;
-    send({
-      type: 'mission_cancel_execution',
-      project_id: projectId,
-      mission_id: missionSnapshot.mission.mission_id,
-      execution_id: execution.execution_id,
-      expected_execution_version: execution.version,
-      confirmed: true,
+    if (!projectId || !missionSnapshot) return;
+    setConfirmAction({
+      title: 'Cancelar Execução',
+      message: 'Tem a certeza que pretende cancelar esta execução controlada?',
+      action: () => {
+        send({
+          type: 'mission_cancel_execution',
+          project_id: projectId,
+          mission_id: missionSnapshot.mission.mission_id,
+          execution_id: execution.execution_id,
+          expected_execution_version: execution.version,
+          confirmed: true,
+        });
+      },
     });
   };
 
@@ -398,6 +514,7 @@ export function MissionPlanner() {
     <section className={`${PANEL} flex min-h-0 flex-col overflow-hidden`}>
       <div className="flex flex-wrap items-center gap-2 border-b border-white/8 px-3 py-3">
         <Activity className="h-4 w-4 text-cyan-300" />
+        <span className="hidden text-sm font-semibold text-gray-200 sm:inline">Missão</span>
         <select
           value={activeMissionId}
           onChange={(event) => { setSelectedMissionId(event.target.value); openMission(event.target.value); }}
@@ -406,12 +523,18 @@ export function MissionPlanner() {
           <option value="">Missões do projeto</option>
           {missions.map((mission) => <option key={mission.mission_id} value={mission.mission_id}>{mission.title}</option>)}
         </select>
-        <button onClick={createMission} className={ICON_BUTTON} title="Criar missão"><Plus className="h-4 w-4" /></button>
+        <button onClick={() => setCreateMissionOpen(true)} className={ICON_BUTTON} title="Criar missão"><Plus className="h-4 w-4" /></button>
         <button onClick={getMissions} className={ICON_BUTTON} title="Atualizar missões"><RefreshCw className="h-4 w-4" /></button>
       </div>
 
       {!missionSnapshot ? (
-        <div className="flex min-h-0 flex-1 items-center justify-center p-6 text-sm text-gray-500">Nenhuma missão selecionada.</div>
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-6 text-center text-sm text-gray-500">
+          <Activity className="h-8 w-8 text-gray-600" />
+          <p>Nenhuma missão selecionada.</p>
+          <button onClick={() => setCreateMissionOpen(true)} className={BUTTON}>
+            <Plus className="h-3.5 w-3.5" /> Criar primeira missão
+          </button>
+        </div>
       ) : (
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-3">
           <div className={`${SUBTLE} p-3`}>
@@ -419,12 +542,21 @@ export function MissionPlanner() {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-sm font-semibold text-gray-100">{missionSnapshot.mission.title}</h3>
-                  <span className="rounded bg-cyan-300/10 px-2 py-0.5 text-[10px] font-semibold text-cyan-100">{missionSnapshot.mission.status}</span>
-                  <span className="text-[10px] text-gray-600">v{missionSnapshot.mission.version}</span>
+                  <span className="rounded bg-cyan-300/10 px-2 py-0.5 text-[10px] font-semibold text-cyan-100">{statusLabel(missionSnapshot.mission.status)}</span>
                 </div>
                 <p className="mt-2 text-xs leading-relaxed text-gray-400">{missionSnapshot.mission.objective}</p>
               </div>
-              <button onClick={editMission} className={ICON_BUTTON} title="Editar missão"><Pencil className="h-3.5 w-3.5" /></button>
+              <button
+                onClick={() => {
+                  setMissionTitle(missionSnapshot.mission.title);
+                  setMissionDescription(missionSnapshot.mission.description);
+                  setEditMissionOpen(true);
+                }}
+                className={ICON_BUTTON}
+                title="Editar missão"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </div>
             <div className="mt-3 h-1.5 overflow-hidden rounded bg-white/[0.05]">
               <div className="h-full bg-cyan-300" style={{ width: `${missionSnapshot.mission.progress}%` }} />
@@ -441,10 +573,10 @@ export function MissionPlanner() {
                   className={BUTTON}
                 >
                   {status === 'COMPLETED' ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Activity className="h-3.5 w-3.5" />}
-                  {status}
+                  {statusLabel(status)}
                 </button>
               ))}
-              <button onClick={() => createCriterion('MISSION', missionSnapshot.mission.mission_id)} className={BUTTON}>
+              <button onClick={() => setCreateCriterionTarget({ ownerType: 'MISSION', ownerId: missionSnapshot.mission.mission_id })} className={BUTTON}>
                 <ShieldCheck className="h-3.5 w-3.5" /> Critério
               </button>
             </div>
@@ -457,16 +589,15 @@ export function MissionPlanner() {
             </div>
           )}
 
-          <div className="rounded-md border border-amber-300/15 bg-amber-300/[0.04] p-3 text-xs text-amber-100">
-            Execução controlada e manual: apenas um WorkPackage é iniciado de cada vez. Não existe execução autónoma da missão.
-          </div>
-
           <div className="flex items-center justify-between gap-3">
-            <h4 className="text-xs font-semibold uppercase text-gray-400">WorkPackages</h4>
-            <button onClick={createWorkPackage} className={BUTTON}><ListPlus className="h-3.5 w-3.5" /> Adicionar</button>
+            <h4 className="text-xs font-semibold uppercase text-gray-400">Etapas</h4>
+            <button onClick={() => setCreateWPOpen(true)} className={BUTTON}><ListPlus className="h-3.5 w-3.5" /> Adicionar</button>
           </div>
 
           <div className="space-y-3">
+            {missionSnapshot.work_packages.length === 0 && (
+              <div className="py-12 text-center text-sm text-gray-600">Ainda não existem etapas nesta missão.</div>
+            )}
             {missionSnapshot.work_packages.map((item) => {
               const itemDeliverables = missionSnapshot.deliverables.filter((entry) => entry.work_package_id === item.work_package_id);
               const itemCriteria = missionSnapshot.acceptance_criteria.filter((entry) => entry.owner_type === 'WORK_PACKAGE' && entry.owner_id === item.work_package_id);
@@ -482,12 +613,19 @@ export function MissionPlanner() {
                   <div className="flex flex-wrap items-start gap-2">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-semibold text-violet-200">{item.type}</span>
-                        <span className="rounded bg-white/[0.06] px-2 py-0.5 text-[10px] text-gray-300">{item.status}</span>
+                        <span className="rounded bg-white/[0.06] px-2 py-0.5 text-[10px] text-gray-300">{statusLabel(item.status)}</span>
                         {item.required && <span className="text-[10px] text-amber-200">obrigatório</span>}
+                        {executorSupported ? (
+                          <span className="inline-flex items-center gap-1 rounded border border-cyan-400/20 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-medium text-cyan-300">
+                            ⚡ Agente IA
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-gray-400">
+                            📋 Manual
+                          </span>
+                        )}
                       </div>
                       <h5 className="mt-1 text-sm font-semibold text-gray-100">{item.title}</h5>
-                      <code className="mt-1 block break-all text-[10px] text-gray-600">{item.work_package_id}</code>
                     </div>
                     <select
                       value=""
@@ -495,7 +633,7 @@ export function MissionPlanner() {
                       className="h-8 rounded-md border border-white/10 bg-[#070a10] px-2 text-[10px] text-gray-300"
                     >
                       <option value="">Alterar estado</option>
-                      {(workPackageTransitions[item.status] ?? []).map((status) => <option key={status} value={status}>{status}</option>)}
+                      {(workPackageTransitions[item.status] ?? []).map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}
                     </select>
                   </div>
                   {item.dependencies.length > 0 && (
@@ -506,13 +644,18 @@ export function MissionPlanner() {
                     {item.status === 'READY' && missionSnapshot.mission.status === 'ACTIVE' && executorSupported && !latestExecution?.lock_owner && (
                       <button onClick={() => executeWorkPackage(item)} className={BUTTON}><Play className="h-3 w-3" /> Executar</button>
                     )}
-                    <span className="inline-flex min-h-8 items-center text-[10px] text-gray-500">
-                      Executor: {executorKind}{executorSupported ? '' : ' · indisponível'}
-                    </span>
-                    <button onClick={() => addDependency(item)} className={BUTTON}><GitBranch className="h-3 w-3" /> Dependência</button>
-                    <button onClick={() => createDeliverable(item)} className={BUTTON}><FileCheck2 className="h-3 w-3" /> Deliverable</button>
-                    <button onClick={() => attachEvidence(item)} className={BUTTON}><Link2 className="h-3 w-3" /> Evidence</button>
-                    <button onClick={() => createCriterion('WORK_PACKAGE', item.work_package_id)} className={BUTTON}><ShieldCheck className="h-3 w-3" /> Critério</button>
+                    {!executorSupported && (
+                      <span className="inline-flex min-h-8 items-center text-[10px] text-gray-500">Execução manual</span>
+                    )}
+                    <details className="relative">
+                      <summary className={`${BUTTON} cursor-pointer list-none`}>Mais ações</summary>
+                      <div className="absolute left-0 top-10 z-20 flex min-w-48 flex-col gap-1 rounded-md border border-white/10 bg-[#0b0e15] p-1.5 shadow-xl">
+                        <button onClick={() => { setAddDependencyTarget(item); setSelectedDepId(''); }} className="flex items-center gap-2 rounded px-2 py-2 text-left text-xs text-gray-300 hover:bg-white/[0.06]"><GitBranch className="h-3 w-3" /> Dependência</button>
+                        <button onClick={() => setCreateDeliverableTarget(item)} className="flex items-center gap-2 rounded px-2 py-2 text-left text-xs text-gray-300 hover:bg-white/[0.06]"><FileCheck2 className="h-3 w-3" /> Entrega</button>
+                        <button onClick={() => setAttachEvidenceTarget({ wp: item })} className="flex items-center gap-2 rounded px-2 py-2 text-left text-xs text-gray-300 hover:bg-white/[0.06]"><Link2 className="h-3 w-3" /> Evidência</button>
+                        <button onClick={() => setCreateCriterionTarget({ ownerType: 'WORK_PACKAGE', ownerId: item.work_package_id })} className="flex items-center gap-2 rounded px-2 py-2 text-left text-xs text-gray-300 hover:bg-white/[0.06]"><ShieldCheck className="h-3 w-3" /> Critério</button>
+                      </div>
+                    </details>
                   </div>
 
                   {itemDeliverables.length > 0 && (
@@ -526,10 +669,10 @@ export function MissionPlanner() {
                             onChange={(event) => setDeliverableStatus(deliverable, event.target.value)}
                             className="h-7 rounded border border-white/10 bg-[#070a10] px-1 text-[10px] text-gray-300"
                           >
-                            {deliverableStates.map((status) => <option key={status} value={status}>{status}</option>)}
+                            {deliverableStates.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}
                           </select>
-                          <button onClick={() => attachEvidence(item, deliverable.deliverable_id)} className={ICON_BUTTON} title="Anexar Evidence"><Link2 className="h-3 w-3" /></button>
-                          <button onClick={() => createCriterion('DELIVERABLE', deliverable.deliverable_id)} className={ICON_BUTTON} title="Adicionar critério"><ShieldCheck className="h-3 w-3" /></button>
+                          <button onClick={() => setAttachEvidenceTarget({ wp: item, deliverableId: deliverable.deliverable_id })} className={ICON_BUTTON} title="Anexar Evidence"><Link2 className="h-3 w-3" /></button>
+                          <button onClick={() => setCreateCriterionTarget({ ownerType: 'DELIVERABLE', ownerId: deliverable.deliverable_id })} className={ICON_BUTTON} title="Adicionar critério"><ShieldCheck className="h-3 w-3" /></button>
                         </div>
                       ))}
                     </div>
@@ -542,8 +685,12 @@ export function MissionPlanner() {
                           <ShieldCheck className={criterion.status === 'SATISFIED' ? 'h-3.5 w-3.5 text-emerald-300' : 'h-3.5 w-3.5 text-amber-300'} />
                           <span className="min-w-0 flex-1">{criterion.description}</span>
                           <span className="text-[10px]">{criterion.status}</span>
-                          {criterion.status !== 'SATISFIED' && <button onClick={() => satisfyCriterion(criterion, 'SATISFIED')} className={BUTTON}>Satisfazer</button>}
-                          {criterion.status === 'PENDING' && <button onClick={() => satisfyCriterion(criterion, 'FAILED')} className={BUTTON}>Falhar</button>}
+                          {criterion.status !== 'SATISFIED' && (
+                            <button onClick={() => { setSatisfyCriterionTarget({ criterion, status: 'SATISFIED' }); setSatisfyEvidenceRefs(''); setSatisfyNote(''); }} className={BUTTON}>Satisfazer</button>
+                          )}
+                          {criterion.status === 'PENDING' && (
+                            <button onClick={() => { setSatisfyCriterionTarget({ criterion, status: 'FAILED' }); setSatisfyNote(''); }} className={BUTTON}>Falhar</button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -569,17 +716,17 @@ export function MissionPlanner() {
             })}
           </div>
 
-          <div className={`${SUBTLE} p-3`}>
-            <h4 className="mb-2 text-xs font-semibold uppercase text-gray-400">Eventos recentes</h4>
-            <div className="max-h-40 space-y-1 overflow-y-auto text-[11px] text-gray-500">
+          <details className={`${SUBTLE} p-3`}>
+            <summary className="cursor-pointer text-xs font-semibold text-gray-400">Histórico recente</summary>
+            <div className="mt-2 max-h-40 space-y-1 overflow-y-auto text-[11px] text-gray-500">
               {missionSnapshot.recent_events.length === 0 ? <p>Sem eventos.</p> : missionSnapshot.recent_events.slice().reverse().map((event) => (
-                <p key={event.event_id}><span className="text-gray-300">{event.event_type}</span> · {event.entity_type}:{event.entity_id} · v{event.previous_version}→v{event.new_version}</p>
+                <p key={event.event_id}><span className="text-gray-300">{event.event_type}</span> · {event.entity_type}:{event.entity_id}</p>
               ))}
             </div>
-          </div>
+          </details>
 
           {plannerState && (
-            <div className={`${SUBTLE} p-3 text-xs text-gray-500`}>
+            <div className={`${SUBTLE} hidden p-3 text-xs text-gray-500`} aria-hidden="true">
               <div className="mb-2 flex items-center gap-2">
                 <Activity className="h-3.5 w-3.5 text-gray-400" />
                 <span className="font-semibold text-gray-300">Plano legado · apenas leitura</span>
@@ -590,6 +737,307 @@ export function MissionPlanner() {
           )}
         </div>
       )}
+
+      {/* --- REACT MODALS REPLACING WINDOW.PROMPT / WINDOW.CONFIRM --- */}
+
+      {/* Create Mission Modal */}
+      <Modal
+        isOpen={createMissionOpen}
+        onClose={() => setCreateMissionOpen(false)}
+        title="Criar Nova Missão"
+        footer={(
+          <>
+            <button onClick={() => setCreateMissionOpen(false)} className={BUTTON}>Cancelar</button>
+            <button onClick={handleCreateMissionSubmit} disabled={!missionTitle.trim() || !missionObjective.trim()} className={`${BUTTON} bg-cyan-400/20 text-cyan-100 hover:bg-cyan-400/30`}>Criar Missão</button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Título da missão *</label>
+            <input value={missionTitle} onChange={(e) => setMissionTitle(e.target.value)} placeholder="Ex: Refatorar autenticação" className={INPUT_CLASS} autoFocus />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Objetivo verificável *</label>
+            <textarea value={missionObjective} onChange={(e) => setMissionObjective(e.target.value)} placeholder="Ex: Adicionar suporte JWT com testes unitários passando" className={`${INPUT_CLASS} h-20 resize-none`} />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Descrição</label>
+            <textarea value={missionDescription} onChange={(e) => setMissionDescription(e.target.value)} placeholder="Detalhes adicionais sobre o contexto..." className={`${INPUT_CLASS} h-16 resize-none`} />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit Mission Modal */}
+      <Modal
+        isOpen={editMissionOpen}
+        onClose={() => setEditMissionOpen(false)}
+        title="Editar Missão"
+        footer={(
+          <>
+            <button onClick={() => setEditMissionOpen(false)} className={BUTTON}>Cancelar</button>
+            <button onClick={handleEditMissionSubmit} disabled={!missionTitle.trim()} className={`${BUTTON} bg-cyan-400/20 text-cyan-100 hover:bg-cyan-400/30`}>Guardar Alterações</button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Título *</label>
+            <input value={missionTitle} onChange={(e) => setMissionTitle(e.target.value)} className={INPUT_CLASS} />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Descrição</label>
+            <textarea value={missionDescription} onChange={(e) => setMissionDescription(e.target.value)} className={`${INPUT_CLASS} h-24 resize-none`} />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Create Work Package Modal */}
+      <Modal
+        isOpen={createWPOpen}
+        onClose={() => setCreateWPOpen(false)}
+        title="Adicionar Etapa (Work Package)"
+        footer={(
+          <>
+            <button onClick={() => setCreateWPOpen(false)} className={BUTTON}>Cancelar</button>
+            <button onClick={handleCreateWPSubmit} disabled={!wpTitle.trim()} className={`${BUTTON} bg-cyan-400/20 text-cyan-100 hover:bg-cyan-400/30`}>Adicionar Etapa</button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Título da etapa *</label>
+            <input value={wpTitle} onChange={(e) => setWpTitle(e.target.value)} placeholder="Ex: Implementar rotas API" className={INPUT_CLASS} autoFocus />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Tipo de etapa</label>
+            <select value={wpType} onChange={(e) => setWpType(e.target.value)} className={INPUT_CLASS}>
+              {workPackageTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Descrição</label>
+            <textarea value={wpDescription} onChange={(e) => setWpDescription(e.target.value)} placeholder="Instruções para o executor..." className={`${INPUT_CLASS} h-20 resize-none`} />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Create Deliverable Modal */}
+      <Modal
+        isOpen={Boolean(createDeliverableTarget)}
+        onClose={() => setCreateDeliverableTarget(null)}
+        title="Criar Entrega (Deliverable)"
+        footer={(
+          <>
+            <button onClick={() => setCreateDeliverableTarget(null)} className={BUTTON}>Cancelar</button>
+            <button onClick={handleCreateDeliverableSubmit} disabled={!delivName.trim()} className={`${BUTTON} bg-cyan-400/20 text-cyan-100 hover:bg-cyan-400/30`}>Criar Entrega</button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Nome da entrega *</label>
+            <input value={delivName} onChange={(e) => setDelivName(e.target.value)} placeholder="Ex: auth_controller.ts" className={INPUT_CLASS} autoFocus />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Tipo</label>
+            <input value={delivKind} onChange={(e) => setDelivKind(e.target.value)} placeholder="FILE, DOCUMENT, etc." className={INPUT_CLASS} />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Descrição</label>
+            <textarea value={delivDescription} onChange={(e) => setDelivDescription(e.target.value)} className={`${INPUT_CLASS} h-16 resize-none`} />
+          </div>
+          <label className="flex items-center gap-2 text-xs text-gray-300">
+            <input type="checkbox" checked={delivRequired} onChange={(e) => setDelivRequired(e.target.checked)} className="rounded border-white/10 bg-black/40" />
+            Entrega obrigatória para concluir a etapa
+          </label>
+        </div>
+      </Modal>
+
+      {/* Add Dependency Modal */}
+      <Modal
+        isOpen={Boolean(addDependencyTarget)}
+        onClose={() => setAddDependencyTarget(null)}
+        title="Adicionar Dependência"
+        footer={(
+          <>
+            <button onClick={() => setAddDependencyTarget(null)} className={BUTTON}>Cancelar</button>
+            <button onClick={handleAddDependencySubmit} disabled={!selectedDepId} className={`${BUTTON} bg-cyan-400/20 text-cyan-100 hover:bg-cyan-400/30`}>Adicionar</button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <p className="text-xs text-gray-400">Selecione a etapa da qual <span className="font-semibold text-gray-200">{addDependencyTarget?.title}</span> depende:</p>
+          <select value={selectedDepId} onChange={(e) => setSelectedDepId(e.target.value)} className={INPUT_CLASS}>
+            <option value="">Selecione uma etapa</option>
+            {missionSnapshot?.work_packages
+              .filter((wp) => wp.work_package_id !== addDependencyTarget?.work_package_id && !addDependencyTarget?.dependencies.includes(wp.work_package_id))
+              .map((wp) => <option key={wp.work_package_id} value={wp.work_package_id}>{wp.title} ({wp.work_package_id})</option>)}
+          </select>
+        </div>
+      </Modal>
+
+      {/* Attach Evidence Modal */}
+      <Modal
+        isOpen={Boolean(attachEvidenceTarget)}
+        onClose={() => setAttachEvidenceTarget(null)}
+        title="Anexar Evidência"
+        footer={(
+          <>
+            <button onClick={() => setAttachEvidenceTarget(null)} className={BUTTON}>Cancelar</button>
+            <button onClick={handleAttachEvidenceSubmit} disabled={!evidenceSourceRef.trim()} className={`${BUTTON} bg-cyan-400/20 text-cyan-100 hover:bg-cyan-400/30`}>Anexar</button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Tipo de Evidência</label>
+            <select value={evidenceKind} onChange={(e) => setEvidenceKind(e.target.value)} className={INPUT_CLASS}>
+              <option value="FILE">FILE</option>
+              <option value="CODING_SESSION">CODING_SESSION</option>
+              <option value="PROJECT_CONTEXT">PROJECT_CONTEXT</option>
+              <option value="OBSIDIAN">OBSIDIAN</option>
+              <option value="VALIDATION">VALIDATION</option>
+              <option value="EXPERIMENT">EXPERIMENT</option>
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Referência (Source Ref) *</label>
+            <input value={evidenceSourceRef} onChange={(e) => setEvidenceSourceRef(e.target.value)} placeholder="Ex: file:src/index.ts ou validation:build" className={INPUT_CLASS} autoFocus />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Descrição</label>
+            <textarea value={evidenceDescription} onChange={(e) => setEvidenceDescription(e.target.value)} className={`${INPUT_CLASS} h-16 resize-none`} />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Create Criterion Modal */}
+      <Modal
+        isOpen={Boolean(createCriterionTarget)}
+        onClose={() => setCreateCriterionTarget(null)}
+        title="Criar Critério de Aceitação"
+        footer={(
+          <>
+            <button onClick={() => setCreateCriterionTarget(null)} className={BUTTON}>Cancelar</button>
+            <button onClick={handleCreateCriterionSubmit} disabled={!criterionDescription.trim()} className={`${BUTTON} bg-cyan-400/20 text-cyan-100 hover:bg-cyan-400/30`}>Criar Critério</button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Descrição do critério *</label>
+            <textarea value={criterionDescription} onChange={(e) => setCriterionDescription(e.target.value)} placeholder="Ex: Todos os testes unitários da auth devem passar com exit status 0" className={`${INPUT_CLASS} h-20 resize-none`} autoFocus />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Kinds de evidência exigidos (separados por vírgula)</label>
+            <input value={criterionEvidenceKinds} onChange={(e) => setCriterionEvidenceKinds(e.target.value)} placeholder="Ex: FILE, VALIDATION" className={INPUT_CLASS} />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Satisfy Criterion Modal */}
+      <Modal
+        isOpen={Boolean(satisfyCriterionTarget)}
+        onClose={() => setSatisfyCriterionTarget(null)}
+        title={satisfyCriterionTarget?.status === 'SATISFIED' ? 'Satisfazer Critério' : 'Marcar Critério como Falhado'}
+        footer={(
+          <>
+            <button onClick={() => setSatisfyCriterionTarget(null)} className={BUTTON}>Cancelar</button>
+            <button
+              onClick={handleSatisfyCriterionSubmit}
+              disabled={satisfyCriterionTarget?.status === 'SATISFIED' && !satisfyEvidenceRefs.trim()}
+              className={`${BUTTON} ${satisfyCriterionTarget?.status === 'SATISFIED' ? 'bg-emerald-400/20 text-emerald-100 hover:bg-emerald-400/30' : 'bg-rose-400/20 text-rose-100 hover:bg-rose-400/30'}`}
+            >
+              Confirmar
+            </button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          {satisfyCriterionTarget?.status === 'SATISFIED' && (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-gray-300">IDs de Evidência (separados por vírgula) *</label>
+              <input value={satisfyEvidenceRefs} onChange={(e) => setSatisfyEvidenceRefs(e.target.value)} placeholder="Ex: ev_123, ev_456" className={INPUT_CLASS} autoFocus />
+            </div>
+          )}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Nota de Validação</label>
+            <textarea value={satisfyNote} onChange={(e) => setSatisfyNote(e.target.value)} placeholder="Observações adicionais..." className={`${INPUT_CLASS} h-16 resize-none`} />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Review Execution Modal */}
+      <Modal
+        isOpen={Boolean(reviewExecutionTarget)}
+        onClose={() => setReviewExecutionTarget(null)}
+        title={reviewExecutionTarget?.decision === 'ACCEPT' ? 'Aprovar Execução' : 'Rejeitar Execução'}
+        footer={(
+          <>
+            <button onClick={() => setReviewExecutionTarget(null)} className={BUTTON}>Cancelar</button>
+            <button
+              onClick={handleReviewExecutionSubmit}
+              disabled={reviewExecutionTarget?.decision === 'REJECT' && !reviewNote.trim()}
+              className={`${BUTTON} ${reviewExecutionTarget?.decision === 'ACCEPT' ? 'bg-emerald-400/20 text-emerald-100 hover:bg-emerald-400/30' : 'bg-rose-400/20 text-rose-100 hover:bg-rose-400/30'}`}
+            >
+              Submeter Revisão
+            </button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">
+              {reviewExecutionTarget?.decision === 'ACCEPT' ? 'Nota de aprovação' : 'Motivo da rejeição *'}
+            </label>
+            <textarea value={reviewNote} onChange={(e) => setReviewNote(e.target.value)} placeholder={reviewExecutionTarget?.decision === 'ACCEPT' ? 'Aprovado com sucesso...' : 'Especifique o erro ou motivo da rejeição...'} className={`${INPUT_CLASS} h-20 resize-none`} autoFocus />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Block Work Package Modal */}
+      <Modal
+        isOpen={Boolean(blockWPTarget)}
+        onClose={() => setBlockWPTarget(null)}
+        title="Bloquear Etapa"
+        footer={(
+          <>
+            <button onClick={() => setBlockWPTarget(null)} className={BUTTON}>Cancelar</button>
+            <button onClick={handleBlockWPSubmit} className={`${BUTTON} bg-amber-400/20 text-amber-100 hover:bg-amber-400/30`}>Bloquear</button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Motivo do bloqueio</label>
+            <textarea value={blockReason} onChange={(e) => setBlockReason(e.target.value)} placeholder="Descreva o motivo do bloqueio..." className={`${INPUT_CLASS} h-20 resize-none`} autoFocus />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Confirm Action Modal */}
+      <Modal
+        isOpen={Boolean(confirmAction)}
+        onClose={() => setConfirmAction(null)}
+        title={confirmAction?.title ?? 'Confirmação'}
+        footer={(
+          <>
+            <button onClick={() => setConfirmAction(null)} className={BUTTON}>Cancelar</button>
+            <button
+              onClick={() => {
+                confirmAction?.action();
+                setConfirmAction(null);
+              }}
+              className={`${BUTTON} bg-cyan-400/20 text-cyan-100 hover:bg-cyan-400/30`}
+            >
+              Confirmar
+            </button>
+          </>
+        )}
+      >
+        <p className="text-xs leading-relaxed text-gray-300">{confirmAction?.message}</p>
+      </Modal>
     </section>
   );
 }

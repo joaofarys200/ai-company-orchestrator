@@ -1,0 +1,571 @@
+{
+  "scenario_id": "S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE",
+  "repetition": 3,
+  "status": "FAIL",
+  "stop_reason": "SEMANTIC_VALIDATION_FAILED",
+  "duration_seconds": 48.817,
+  "steps_used": 9,
+  "tool_sequence": [
+    "list_files",
+    "inspect_symbol",
+    "read_file",
+    "apply_patch",
+    "run_validation",
+    "read_file",
+    "apply_patch",
+    "run_validation"
+  ],
+  "structurally_valid_responses": 9,
+  "response_count": 9,
+  "schema_failures": 0,
+  "invalid_tools": 1,
+  "repeated_calls": 0,
+  "premature_finish": 0,
+  "validation_runs": 2,
+  "failed_validations": 2,
+  "corrections_after_failure": 0,
+  "tests_executed": [
+    {
+      "command": "node --check src/tasks.js",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "C:\\Users\\joaor\\Desktop\\ai-company-orchestrator\\diagnostics\\model_harness_productive_benchmark\\20260730-qwen-recovery-5x-definitive\\fixtures\\S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE\\rep-3\\project\\src\\tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at checkSyntax (node:internal/main/check_syntax:72:5)\n\nNode.js v24.16.0\n",
+      "duration_ms": 51
+    },
+    {
+      "command": "node tests/tasks.test.js",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "file:///C:/Users/joaor/Desktop/ai-company-orchestrator/diagnostics/model_harness_productive_benchmark/20260730-qwen-recovery-5x-definitive/fixtures/S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE/rep-3/project/src/tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at compileSourceTextModule (node:internal/modules/esm/utils:318:16)\n    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:90:18)\n    at #translate (node:internal/modules/esm/loader:435:20)\n    at afterLoad (node:internal/modules/esm/loader:491:29)\n    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:496:12)\n    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:549:36)\n    at afterResolve (node:internal/modules/esm/loader:597:52)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:12)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)\n    at ModuleJob.link (node:internal/modules/esm/module_job:253:17)\n\nNode.js v24.16.0\n",
+      "duration_ms": 55
+    },
+    {
+      "command": "node --check src/tasks.js",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "C:\\Users\\joaor\\Desktop\\ai-company-orchestrator\\diagnostics\\model_harness_productive_benchmark\\20260730-qwen-recovery-5x-definitive\\fixtures\\S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE\\rep-3\\project\\src\\tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at checkSyntax (node:internal/main/check_syntax:72:5)\n\nNode.js v24.16.0\n",
+      "duration_ms": 47
+    },
+    {
+      "command": "node tests/tasks.test.js",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "file:///C:/Users/joaor/Desktop/ai-company-orchestrator/diagnostics/model_harness_productive_benchmark/20260730-qwen-recovery-5x-definitive/fixtures/S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE/rep-3/project/src/tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at compileSourceTextModule (node:internal/modules/esm/utils:318:16)\n    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:90:18)\n    at #translate (node:internal/modules/esm/loader:435:20)\n    at afterLoad (node:internal/modules/esm/loader:491:29)\n    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:496:12)\n    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:549:36)\n    at afterResolve (node:internal/modules/esm/loader:597:52)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:12)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)\n    at ModuleJob.link (node:internal/modules/esm/module_job:253:17)\n\nNode.js v24.16.0\n",
+      "duration_ms": 50
+    }
+  ],
+  "false_success": false,
+  "fixture_integrity": false,
+  "unrelated_file_unchanged": true,
+  "input_tokens": 9118,
+  "output_tokens": 703,
+  "latency_ms": 47913,
+  "steps": [
+    {
+      "step": 1,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "list_files",
+      "arguments": {
+        "path": "."
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"list_files\",\n  \"arguments\": {\n    \"path\": \".\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "files": [
+          "README.md",
+          "package.json",
+          "src/app.js",
+          "src/tasks.js",
+          "tests/tasks.test.js"
+        ],
+        "reference": "project:file-list"
+      },
+      "latency_ms": 3817,
+      "input_tokens": 410,
+      "output_tokens": 55,
+      "response_sha256": "13ff679a372b5462fbb0c35c2a58351831db50115f106fcec8c4657f9789530e",
+      "request_id": "a3362ed57ff04d709dbd688a15a75894",
+      "provider": "ollama",
+      "model": "qwen3.5:9b",
+      "task_profile": "TOOL_SELECTION",
+      "schema_validation": "PASSED",
+      "files_read": [],
+      "files_changed": []
+    },
+    {
+      "step": 2,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "inspect_symbol",
+      "arguments": {
+        "name": "addTask"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"inspect_symbol\",\n  \"arguments\": {\n    \"name\": \"addTask\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "symbol": "addTask",
+        "definitions": [
+          {
+            "path": "src/tasks.js",
+            "line": 5,
+            "signature": "export function addTask(tasks, value) {",
+            "reference": "src/tasks.js:L5"
+          }
+        ]
+      },
+      "latency_ms": 4039,
+      "input_tokens": 473,
+      "output_tokens": 57,
+      "response_sha256": "67e314eb471c3e80bd174c51d9ea4a415cc9f1b74ca304aa87ba1975bd952c51",
+      "request_id": "04171deceac440cea6624859b84aea46",
+      "provider": "ollama",
+      "model": "qwen3.5:9b",
+      "task_profile": "TOOL_SELECTION",
+      "schema_validation": "PASSED",
+      "files_read": [],
+      "files_changed": []
+    },
+    {
+      "step": 3,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "read_file",
+      "arguments": {
+        "path": "src/tasks.js"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "path": "src/tasks.js",
+        "content": "export function normalizeTask(value) {\n  return String(value ?? '').trim();\n}\n\nexport function addTask(tasks, value) {\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}\n\nexport function taskCountLabel(tasks) {\n  return `${tasks.length} tasks`;\n}\n",
+        "sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+        "reference": "src/tasks.js:full"
+      },
+      "latency_ms": 4022,
+      "input_tokens": 550,
+      "output_tokens": 58,
+      "response_sha256": "4e8632771223afaff3175baea5f820a87455320bc6f873ac38c5b3a49d750db2",
+      "request_id": "df0ece6aa65b43a480931db2bc868c73",
+      "provider": "ollama",
+      "model": "qwen3.5:9b",
+      "task_profile": "TOOL_SELECTION",
+      "schema_validation": "PASSED",
+      "files_read": [
+        "src/tasks.js"
+      ],
+      "files_changed": []
+    },
+    {
+      "step": 4,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "apply_patch",
+      "arguments": {
+        "path": "src/tasks.js",
+        "old_text": "export function addTask(tasks, value) {\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}",
+        "new_text": "export function addTask(tasks, value) {\n  if (!value || String(value).trim() === '') {\n    return tasks;\n  }\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"apply_patch\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\",\n    \"old_text\": \"export function addTask(tasks, value) {\\n  const normalized = normalizeTask(value);\\n  return [...tasks, normalized];\\n}\",\n    \"new_text\": \"export function addTask(tasks, value) {\\n  if (!value || String(value).trim() === '') {\\n    return tasks;\\n  }\\n  const normalized = normalizeTask(value);\\n  return [...tasks, normalized];\\n}\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "path": "src/tasks.js",
+        "changed": true,
+        "before_sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+        "after_sha256": "daa7b1d8eba6f4c03be43dea61ed0037cc04bfdad968058d9a721938ddc36f48"
+      },
+      "latency_ms": 7656,
+      "input_tokens": 747,
+      "output_tokens": 151,
+      "response_sha256": "a5d213dbe4822709daa1135f75971251c27dce74f38e467cf3ea208076e4a5ef",
+      "request_id": "e2750caa9175441f87150adf55a4b755",
+      "provider": "ollama",
+      "model": "qwen3.5:9b",
+      "task_profile": "TOOL_SELECTION",
+      "schema_validation": "PASSED",
+      "files_read": [
+        "src/tasks.js"
+      ],
+      "files_changed": [
+        "src/tasks.js"
+      ]
+    },
+    {
+      "step": 5,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "run_validation",
+      "arguments": {},
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"run_validation\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "passed": false,
+        "commands": [
+          {
+            "command": "node --check src/tasks.js",
+            "exit_code": 1,
+            "stdout": "",
+            "stderr": "C:\\Users\\joaor\\Desktop\\ai-company-orchestrator\\diagnostics\\model_harness_productive_benchmark\\20260730-qwen-recovery-5x-definitive\\fixtures\\S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE\\rep-3\\project\\src\\tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at checkSyntax (node:internal/main/check_syntax:72:5)\n\nNode.js v24.16.0\n",
+            "duration_ms": 51
+          },
+          {
+            "command": "node tests/tasks.test.js",
+            "exit_code": 1,
+            "stdout": "",
+            "stderr": "file:///C:/Users/joaor/Desktop/ai-company-orchestrator/diagnostics/model_harness_productive_benchmark/20260730-qwen-recovery-5x-definitive/fixtures/S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE/rep-3/project/src/tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at compileSourceTextModule (node:internal/modules/esm/utils:318:16)\n    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:90:18)\n    at #translate (node:internal/modules/esm/loader:435:20)\n    at afterLoad (node:internal/modules/esm/loader:491:29)\n    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:496:12)\n    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:549:36)\n    at afterResolve (node:internal/modules/esm/loader:597:52)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:12)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)\n    at ModuleJob.link (node:internal/modules/esm/module_job:253:17)\n\nNode.js v24.16.0\n",
+            "duration_ms": 55
+          }
+        ],
+        "run_number": 1
+      },
+      "latency_ms": 3586,
+      "input_tokens": 970,
+      "output_tokens": 46,
+      "response_sha256": "d223d522ff1fb9640466384421103644c95492aa97a50ff41498ab5a5e0b220c",
+      "request_id": "3cb7aaaab7bb4b19b23a63c5d288b4dd",
+      "provider": "ollama",
+      "model": "qwen3.5:9b",
+      "task_profile": "TOOL_SELECTION",
+      "schema_validation": "PASSED",
+      "files_read": [
+        "src/tasks.js"
+      ],
+      "files_changed": [
+        "src/tasks.js"
+      ]
+    },
+    {
+      "step": 6,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "read_file",
+      "arguments": {
+        "path": "src/tasks.js"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "path": "src/tasks.js",
+        "content": "export function normalizeTask(value {\n  return String(value ?? '').trim();\n}\n\nexport function addTask(tasks, value) {\n  if (!value || String(value).trim() === '') {\n    return tasks;\n  }\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}\n\nexport function taskCountLabel(tasks) {\n  return `${tasks.length} tasks`;\n}\n",
+        "sha256": "2303066130eceab29b019b4fe53d78e5ca081c3fafa7b5bae9c74716a969641d",
+        "reference": "src/tasks.js:full"
+      },
+      "latency_ms": 5051,
+      "input_tokens": 1443,
+      "output_tokens": 58,
+      "response_sha256": "4e8632771223afaff3175baea5f820a87455320bc6f873ac38c5b3a49d750db2",
+      "request_id": "e4c879284a064be8a9c5777e5b85a979",
+      "provider": "ollama",
+      "model": "qwen3.5:9b",
+      "task_profile": "TOOL_SELECTION",
+      "schema_validation": "PASSED",
+      "files_read": [
+        "src/tasks.js"
+      ],
+      "files_changed": [
+        "src/tasks.js"
+      ]
+    },
+    {
+      "step": 7,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "apply_patch",
+      "arguments": {
+        "path": "src/tasks.js",
+        "old_text": "export function addTask(tasks, value) {\n  if (!value || String(value).trim() === '') {\n    return tasks;\n  }\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}",
+        "new_text": "export function addTask(tasks, value) {\n  if (typeof value !== 'string' || !value.trim()) {\n    return tasks;\n  }\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"apply_patch\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\",\n    \"old_text\": \"export function addTask(tasks, value) {\\n  if (!value || String(value).trim() === '') {\\n    return tasks;\\n  }\\n  const normalized = normalizeTask(value);\\n  return [...tasks, normalized];\\n}\",\n    \"new_text\": \"export function addTask(tasks, value) {\\n  if (typeof value !== 'string' || !value.trim()) {\\n    return tasks;\\n  }\\n  const normalized = normalizeTask(value);\\n  return [...tasks, normalized];\\n}\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "path": "src/tasks.js",
+        "changed": true,
+        "before_sha256": "2303066130eceab29b019b4fe53d78e5ca081c3fafa7b5bae9c74716a969641d",
+        "after_sha256": "8890a74fddf21533189ab9b1efcc558667aa5d5a519ca713e80f10ee6fd450df"
+      },
+      "latency_ms": 9826,
+      "input_tokens": 1465,
+      "output_tokens": 176,
+      "response_sha256": "49181eebebe3ff9752537622a39c7317df447991bc2949457b6c442749b9e3cb",
+      "request_id": "3db97745241f48619f6d91353c5f42b3",
+      "provider": "ollama",
+      "model": "qwen3.5:9b",
+      "task_profile": "TOOL_SELECTION",
+      "schema_validation": "PASSED",
+      "files_read": [
+        "src/tasks.js"
+      ],
+      "files_changed": [
+        "src/tasks.js"
+      ]
+    },
+    {
+      "step": 8,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "run_validation",
+      "arguments": {},
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"run_validation\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "passed": false,
+        "commands": [
+          {
+            "command": "node --check src/tasks.js",
+            "exit_code": 1,
+            "stdout": "",
+            "stderr": "C:\\Users\\joaor\\Desktop\\ai-company-orchestrator\\diagnostics\\model_harness_productive_benchmark\\20260730-qwen-recovery-5x-definitive\\fixtures\\S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE\\rep-3\\project\\src\\tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at checkSyntax (node:internal/main/check_syntax:72:5)\n\nNode.js v24.16.0\n",
+            "duration_ms": 47
+          },
+          {
+            "command": "node tests/tasks.test.js",
+            "exit_code": 1,
+            "stdout": "",
+            "stderr": "file:///C:/Users/joaor/Desktop/ai-company-orchestrator/diagnostics/model_harness_productive_benchmark/20260730-qwen-recovery-5x-definitive/fixtures/S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE/rep-3/project/src/tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at compileSourceTextModule (node:internal/modules/esm/utils:318:16)\n    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:90:18)\n    at #translate (node:internal/modules/esm/loader:435:20)\n    at afterLoad (node:internal/modules/esm/loader:491:29)\n    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:496:12)\n    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:549:36)\n    at afterResolve (node:internal/modules/esm/loader:597:52)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:12)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)\n    at ModuleJob.link (node:internal/modules/esm/module_job:253:17)\n\nNode.js v24.16.0\n",
+            "duration_ms": 50
+          }
+        ],
+        "run_number": 2
+      },
+      "latency_ms": 4673,
+      "input_tokens": 1577,
+      "output_tokens": 45,
+      "response_sha256": "d223d522ff1fb9640466384421103644c95492aa97a50ff41498ab5a5e0b220c",
+      "request_id": "08a4107affcb4da88983f1f76900b941",
+      "provider": "ollama",
+      "model": "qwen3.5:9b",
+      "task_profile": "TOOL_SELECTION",
+      "schema_validation": "PASSED",
+      "files_read": [
+        "src/tasks.js"
+      ],
+      "files_changed": [
+        "src/tasks.js"
+      ]
+    },
+    {
+      "step": 9,
+      "status": "SEMANTICALLY_INVALID",
+      "action": "CALL_TOOL",
+      "tool_name": "read_file",
+      "arguments": {
+        "path": "src/tasks.js"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": false,
+      "validation_error": "expected next tool 'show_diff', received 'read_file'",
+      "observation": {},
+      "latency_ms": 5243,
+      "input_tokens": 1483,
+      "output_tokens": 57,
+      "response_sha256": "4e8632771223afaff3175baea5f820a87455320bc6f873ac38c5b3a49d750db2",
+      "request_id": "6fb429e4e3314165a979e5bb7437a430",
+      "provider": "ollama",
+      "model": "qwen3.5:9b",
+      "task_profile": "TOOL_SELECTION",
+      "schema_validation": "PASSED",
+      "files_read": [],
+      "files_changed": []
+    }
+  ],
+  "errors": [
+    "step 9: expected next tool 'show_diff', received 'read_file'",
+    "a real validation failure occurred but the model did not recover correctly"
+  ],
+  "recovery": {
+    "run_id": "run-03-1b1fe4eba3b2",
+    "mission_id": "mission-run-03-1b1fe4eba3b2",
+    "agent_id": "qwen-productive-benchmark-agent",
+    "executor": "ModelHarnessControlledIDEExecutor",
+    "provider": "ollama",
+    "model": "qwen3.5:9b",
+    "task_profile": "TOOL_SELECTION",
+    "fixture_root": "C:/Users/joaor/Desktop/ai-company-orchestrator/diagnostics/model_harness_productive_benchmark/20260730-qwen-recovery-5x-definitive/fixtures/S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE/rep-3/project",
+    "files_read": [
+      "src/tasks.js"
+    ],
+    "files_changed": [
+      "src/tasks.js"
+    ],
+    "first_change": {
+      "ordinal": 1,
+      "phase": "FIRST_CHANGE",
+      "path": "src/tasks.js",
+      "before_sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+      "after_sha256": "daa7b1d8eba6f4c03be43dea61ed0037cc04bfdad968058d9a721938ddc36f48",
+      "old_text_sha256": "dfc1d13920836dc0b711d8cb01ee472ab75ecb868d0475bf9c40b4e574480b1b",
+      "new_text_sha256": "285ecf4ec8e899d241c9a8f2ea048825cad48c0fa4c3e21647fb7572f5f283e3",
+      "patch_sha256": "12799fff5622b45f2c9e70fc2d110e1131fd0e9e4417a71bf82a6d6d3d0d540d",
+      "timestamp": "2026-07-30T18:06:52.148036+00:00"
+    },
+    "regression": {
+      "type": "normalize_task_signature_syntax_error",
+      "path": "src/tasks.js",
+      "injected_at": "2026-07-30T18:06:55.757063+00:00",
+      "before_sha256": "daa7b1d8eba6f4c03be43dea61ed0037cc04bfdad968058d9a721938ddc36f48",
+      "after_sha256": "2303066130eceab29b019b4fe53d78e5ca081c3fafa7b5bae9c74716a969641d",
+      "expected_failure_command": "node --check src/tasks.js",
+      "injection_count": 1
+    },
+    "regression_injection_count": 1,
+    "first_validation": {
+      "passed": false,
+      "commands": [
+        {
+          "command": "node --check src/tasks.js",
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "C:\\Users\\joaor\\Desktop\\ai-company-orchestrator\\diagnostics\\model_harness_productive_benchmark\\20260730-qwen-recovery-5x-definitive\\fixtures\\S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE\\rep-3\\project\\src\\tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at checkSyntax (node:internal/main/check_syntax:72:5)\n\nNode.js v24.16.0\n",
+          "duration_ms": 51
+        },
+        {
+          "command": "node tests/tasks.test.js",
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "file:///C:/Users/joaor/Desktop/ai-company-orchestrator/diagnostics/model_harness_productive_benchmark/20260730-qwen-recovery-5x-definitive/fixtures/S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE/rep-3/project/src/tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at compileSourceTextModule (node:internal/modules/esm/utils:318:16)\n    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:90:18)\n    at #translate (node:internal/modules/esm/loader:435:20)\n    at afterLoad (node:internal/modules/esm/loader:491:29)\n    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:496:12)\n    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:549:36)\n    at afterResolve (node:internal/modules/esm/loader:597:52)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:12)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)\n    at ModuleJob.link (node:internal/modules/esm/module_job:253:17)\n\nNode.js v24.16.0\n",
+          "duration_ms": 55
+        }
+      ],
+      "run_number": 1
+    },
+    "failure_persisted": true,
+    "post_failure_action": {
+      "tool": "read_file",
+      "arguments": {
+        "path": "src/tasks.js"
+      }
+    },
+    "second_change": {
+      "ordinal": 2,
+      "phase": "CORRECTIVE_CHANGE",
+      "path": "src/tasks.js",
+      "before_sha256": "2303066130eceab29b019b4fe53d78e5ca081c3fafa7b5bae9c74716a969641d",
+      "after_sha256": "8890a74fddf21533189ab9b1efcc558667aa5d5a519ca713e80f10ee6fd450df",
+      "old_text_sha256": "285ecf4ec8e899d241c9a8f2ea048825cad48c0fa4c3e21647fb7572f5f283e3",
+      "new_text_sha256": "ca4eff74aa71e6ea580d7ff56438ea0ae099eea8547d2dc68ad221d61e40eaf3",
+      "patch_sha256": "8eb474d1d6725ef2616f84245de54357746bb62e0ff0a527cbdd7f3861fbffc8",
+      "timestamp": "2026-07-30T18:07:10.793203+00:00"
+    },
+    "materially_distinct_second_change": true,
+    "retest": {
+      "passed": false,
+      "commands": [
+        {
+          "command": "node --check src/tasks.js",
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "C:\\Users\\joaor\\Desktop\\ai-company-orchestrator\\diagnostics\\model_harness_productive_benchmark\\20260730-qwen-recovery-5x-definitive\\fixtures\\S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE\\rep-3\\project\\src\\tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at checkSyntax (node:internal/main/check_syntax:72:5)\n\nNode.js v24.16.0\n",
+          "duration_ms": 47
+        },
+        {
+          "command": "node tests/tasks.test.js",
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "file:///C:/Users/joaor/Desktop/ai-company-orchestrator/diagnostics/model_harness_productive_benchmark/20260730-qwen-recovery-5x-definitive/fixtures/S3_RECOVERY_AFTER_REAL_VALIDATION_FAILURE/rep-3/project/src/tasks.js:1\nexport function normalizeTask(value {\n                                    ^\n\nSyntaxError: Unexpected token '{'\n    at compileSourceTextModule (node:internal/modules/esm/utils:318:16)\n    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:90:18)\n    at #translate (node:internal/modules/esm/loader:435:20)\n    at afterLoad (node:internal/modules/esm/loader:491:29)\n    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:496:12)\n    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:549:36)\n    at afterResolve (node:internal/modules/esm/loader:597:52)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:12)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)\n    at ModuleJob.link (node:internal/modules/esm/module_job:253:17)\n\nNode.js v24.16.0\n",
+          "duration_ms": 50
+        }
+      ],
+      "run_number": 2
+    },
+    "recovery_persisted": false,
+    "validation_state": "FAILED_VALIDATION",
+    "validation_state_history": [
+      {
+        "state": "NOT_RUN",
+        "timestamp": "2026-07-30T18:06:32.533528+00:00",
+        "metadata": {}
+      },
+      {
+        "state": "FIRST_CHANGE_APPLIED",
+        "timestamp": "2026-07-30T18:06:52.149068+00:00",
+        "metadata": {
+          "path": "src/tasks.js",
+          "patch_sha256": "12799fff5622b45f2c9e70fc2d110e1131fd0e9e4417a71bf82a6d6d3d0d540d"
+        }
+      },
+      {
+        "state": "REGRESSION_INJECTED",
+        "timestamp": "2026-07-30T18:06:55.757063+00:00",
+        "metadata": {
+          "regression_type": "normalize_task_signature_syntax_error",
+          "path": "src/tasks.js"
+        }
+      },
+      {
+        "state": "FAILED_VALIDATION",
+        "timestamp": "2026-07-30T18:06:55.862916+00:00",
+        "metadata": {
+          "run_number": 1,
+          "exit_codes": [
+            1,
+            1
+          ]
+        }
+      },
+      {
+        "state": "FAILURE_EVIDENCE_READ",
+        "timestamp": "2026-07-30T18:07:00.945294+00:00",
+        "metadata": {
+          "path": "src/tasks.js"
+        }
+      },
+      {
+        "state": "CORRECTION_APPLIED",
+        "timestamp": "2026-07-30T18:07:10.793203+00:00",
+        "metadata": {
+          "path": "src/tasks.js",
+          "patch_sha256": "8eb474d1d6725ef2616f84245de54357746bb62e0ff0a527cbdd7f3861fbffc8"
+        }
+      },
+      {
+        "state": "FAILED_VALIDATION",
+        "timestamp": "2026-07-30T18:07:15.586029+00:00",
+        "metadata": {
+          "run_number": 2,
+          "exit_codes": [
+            1,
+            1
+          ]
+        }
+      }
+    ],
+    "finish_attempts": 0,
+    "repeated_tool_calls": 0,
+    "fixture_hashes_before": {
+      "package.json": "3b6c6306cfcecda5256ff822f3453abd75e4b650de4dc263456f8057094ec8e9",
+      "README.md": "10d9a4fd2b791a6c858579e0d66c6af1f473db826b23c80b268362c195697f55",
+      "src/app.js": "a38bed56d5468e4e831bd488080ab25f323e2314d57923d39ae4a19928bc2c68",
+      "src/tasks.js": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+      "tests/tasks.test.js": "b5f3e42f8361b890c0ac325b50591f9d07eb2a7d7efb4e518fcdb84e5143551f"
+    },
+    "fixture_hashes_after": {
+      "package.json": "3b6c6306cfcecda5256ff822f3453abd75e4b650de4dc263456f8057094ec8e9",
+      "README.md": "10d9a4fd2b791a6c858579e0d66c6af1f473db826b23c80b268362c195697f55",
+      "src/app.js": "a38bed56d5468e4e831bd488080ab25f323e2314d57923d39ae4a19928bc2c68",
+      "src/tasks.js": "8890a74fddf21533189ab9b1efcc558667aa5d5a519ca713e80f10ee6fd450df",
+      "tests/tasks.test.js": "b5f3e42f8361b890c0ac325b50591f9d07eb2a7d7efb4e518fcdb84e5143551f"
+    },
+    "unrelated_sha256_before": "10d9a4fd2b791a6c858579e0d66c6af1f473db826b23c80b268362c195697f55",
+    "unrelated_sha256_after": "10d9a4fd2b791a6c858579e0d66c6af1f473db826b23c80b268362c195697f55",
+    "outside_fixture_unchanged": true,
+    "harness_error": ""
+  }
+}

@@ -27,6 +27,12 @@ class TelemetryRecord:
     allowed_tool_count: int
     progress_conditions: tuple[str, ...]
     metadata_keys: tuple[str, ...]
+    mission_id: str
+    caller_type: str
+    caller_id: str
+    executor: str
+    step: int | None
+    tools_available: tuple[str, ...]
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -82,6 +88,12 @@ class ModelTelemetry:
             allowed_tool_count=record.allowed_tool_count,
             progress_conditions=list(record.progress_conditions),
             metadata_keys=list(record.metadata_keys),
+            mission_id=record.mission_id,
+            caller_type=record.caller_type,
+            caller_id=record.caller_id,
+            executor=record.executor,
+            step=record.step,
+            tools_available=list(record.tools_available),
         )
         return record
 

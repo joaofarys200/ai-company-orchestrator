@@ -1,0 +1,67 @@
+{
+  "diagnostic_version": "stateful_tool_sequence_semantic_diagnostic_v1",
+  "started_at": "2026-07-27T13:48:32.549535+00:00",
+  "scenario_id": "A01_FIND_RELEVANT_FILE",
+  "fixture_sha256": "1748ae4be49e49a362b646d7d571e9302ee306573eaae69589fcaba9683b080a",
+  "model": "qwen3.5:9b",
+  "configuration": {
+    "context_tokens": 8192,
+    "max_output_tokens": 1024,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "timeout_seconds": 300.0,
+    "repetitions": 2
+  },
+  "variants": [
+    {
+      "variant_id": "S01_CURRENT",
+      "title": "Current behavior",
+      "explicit_state": false,
+      "structured_prevalidation": false,
+      "conditioned_schema": false,
+      "semantic_retry": false
+    },
+    {
+      "variant_id": "S02_EXPLICIT_STATE",
+      "title": "Explicit required, completed and remaining tools",
+      "explicit_state": true,
+      "structured_prevalidation": false,
+      "conditioned_schema": false,
+      "semantic_retry": false
+    },
+    {
+      "variant_id": "S03_PREVALIDATION",
+      "title": "Structured pre-tool rejection of premature FINISH",
+      "explicit_state": true,
+      "structured_prevalidation": true,
+      "conditioned_schema": false,
+      "semantic_retry": false
+    },
+    {
+      "variant_id": "S04_CONDITIONED_SCHEMA",
+      "title": "FINISH excluded while required evidence tools remain",
+      "explicit_state": true,
+      "structured_prevalidation": false,
+      "conditioned_schema": true,
+      "semantic_retry": false
+    },
+    {
+      "variant_id": "S05_SEMANTIC_RETRY",
+      "title": "One retry with rejection reason and next required tool",
+      "explicit_state": true,
+      "structured_prevalidation": true,
+      "conditioned_schema": false,
+      "semantic_retry": true
+    }
+  ],
+  "script_sha256": "603887b183a381a530193be13510b11f20492c1388ed993bc0661d0a844f4489",
+  "safety": {
+    "scenario_count": 1,
+    "semantic_context_builder": false,
+    "fixture_sandbox_only": true,
+    "model_selects_tools": true
+  }
+}

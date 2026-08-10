@@ -18,9 +18,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Awaitable, Callable
 
-import httpx
-
 import sandbox
+from backend.model_harness import (
+    ExecutionConstraints,
+    ExpectedOutput,
+    ModelHarness,
+    ModelRequest,
+    ModelResponseStatus,
+    OutputFormat,
+    get_runtime_model_harness,
+)
 from intelligence.project_context import ProjectContextError, ProjectContextService
 from workspace_policy import validate_local_command
 
@@ -113,9 +120,11 @@ class CodingSessionService:
         self,
         project_service: ProjectContextService | None = None,
         new_file_writer: Callable[[str, str], str] | None = None,
+        plan_requester: PlanRequester | None = None,
     ):
         self.projects = project_service or ProjectContextService()
         self.new_file_writer = new_file_writer
+        self.plan_requester = plan_requester
 
     def create_session(
         self,
@@ -178,7 +187,11 @@ class CodingSessionService:
             "symbols": graph,
             "files": self._limited_files(self.projects.read_project_files(project_id)),
         }
-        selected_requester = requester or request_edit_plan_from_ollama
+        selected_requester = (
+            requester
+            or self.plan_requester
+            or request_edit_plan_from_model_harness
+        )
         first_raw = await _maybe_await(selected_requester, request_payload, None)
         try:
             plan_data = _extract_json(first_raw)
@@ -965,32 +978,171 @@ class CodingSessionService:
         path.write_text(json.dumps(session.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-async def request_edit_plan_from_ollama(payload: dict[str, Any], correction: str | None = None) -> str:
-    model = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
-    correction_text = f"\nCorrige este erro da resposta anterior: {correction}" if correction else ""
-    system = (
-        "Es um planeador de alteracoes de codigo. Responde apenas JSON valido. Nao chames tools. "
-        "Nao uses Obsidian, nao apagues ficheiros e nao inventes paths. Usa apenas ficheiros, simbolos e conteudo fornecidos."
-    )
-    user = (
-        "Produz JSON com {\"changes\":[{\"file\":\"...\",\"operation\":\"replace_symbol|replace_text|create_file\","
-        "\"symbol\":\"opcional\",\"old_text\":\"obrigatorio para replace_text\",\"new_code\":\"...\","
-        "\"reason\":\"...\"}],\"risks\":[\"...\"]}. "
-        "Para funcoes/classes usa replace_symbol e devolve o bloco completo do simbolo. "
-        f"Dados reais do projeto: {json.dumps(payload, ensure_ascii=False)}{correction_text}"
-    )
-    request = {
-        "model": model,
-        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-        "stream": False,
-        "think": False,
-        "options": {"temperature": 0, "top_p": 0.8},
-    }
-    async with httpx.AsyncClient(timeout=120.0) as client:
-        response = await client.post("http://localhost:11434/api/chat", json=request)
-        response.raise_for_status()
-        data = response.json()
-    return str((data.get("message") or {}).get("content") or "")
+CODE_EDIT_PLAN_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "required": ["changes", "risks"],
+    "additionalProperties": False,
+    "properties": {
+        "changes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "file",
+                    "operation",
+                    "new_code",
+                    "reason",
+                ],
+                "additionalProperties": False,
+                "properties": {
+                    "file": {"type": "string", "minLength": 1},
+                    "operation": {
+                        "type": "string",
+                        "enum": [
+                            "replace_symbol",
+                            "replace_text",
+                            "create_file",
+                        ],
+                    },
+                    "symbol": {"type": "string"},
+                    "old_text": {"type": "string"},
+                    "new_code": {"type": "string"},
+                    "reason": {"type": "string", "minLength": 1},
+                },
+            },
+        },
+        "risks": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
+    },
+}
+
+
+class ModelHarnessPlanRequester:
+    def __init__(
+        self,
+        model_harness: ModelHarness | None = None,
+        *,
+        metadata: dict[str, Any] | None = None,
+    ):
+        self.model_harness = (
+            model_harness or get_runtime_model_harness()
+        )
+        self.metadata = dict(metadata or {})
+        self.records: list[dict[str, Any]] = []
+
+    async def __call__(
+        self,
+        payload: dict[str, Any],
+        correction: str | None = None,
+    ) -> dict[str, Any]:
+        step = len(self.records) + 1
+        response = await self.model_harness.execute(
+            ModelRequest(
+                task_profile="STRUCTURED_EXTRACTION",
+                system_prompt=self._system_prompt(),
+                user_prompt=self._user_prompt(payload, correction),
+                expected_output=ExpectedOutput(
+                    format=OutputFormat.JSON_SCHEMA,
+                    schema=CODE_EDIT_PLAN_SCHEMA,
+                ),
+                temperature=0.0,
+                metadata={
+                    **self.metadata,
+                    "step": step,
+                    "top_p": 0.8,
+                    "contract": "coding_session_edit_plan_v1",
+                },
+                execution_constraints=ExecutionConstraints(
+                    max_attempts=1,
+                    timeout_seconds=120.0,
+                    streaming=False,
+                    thinking=False,
+                    allow_recovery=False,
+                ),
+            )
+        )
+        self.records.append({
+            "request_id": response.request_id,
+            "status": response.status.value,
+            "provider": response.provider,
+            "model": response.model,
+            "latency_ms": response.latency_ms,
+            "validation_result": response.validation.status.value,
+            "step": step,
+        })
+        if response.status == ModelResponseStatus.PROVIDER_FAILED:
+            if response.provider_exception is not None:
+                raise response.provider_exception
+            raise CodingSessionError(
+                "O ModelHarness nao conseguiu obter resposta do provider."
+            )
+        if response.status != ModelResponseStatus.SUCCEEDED:
+            issue_codes = [
+                issue.code for issue in response.validation.issues
+            ]
+            raise CodingSessionError(
+                "Plano rejeitado pelo contrato do ModelHarness: "
+                + ", ".join(issue_codes or [response.status.value])
+            )
+        if not isinstance(response.structured_output, dict):
+            raise CodingSessionError(
+                "O ModelHarness nao devolveu um plano estruturado."
+            )
+        return dict(response.structured_output)
+
+    def _system_prompt(self) -> str:
+        profile_prompt = str(
+            self.metadata.get("agent_system_prompt") or ""
+        ).strip()
+        contract_prompt = (
+            "Es um planeador de alteracoes de codigo. Responde apenas JSON "
+            "valido conforme o schema. Nao chames tools. Nao uses Obsidian, "
+            "nao apagues ficheiros e nao inventes paths. Usa apenas "
+            "ficheiros, simbolos e conteudo fornecidos."
+        )
+        return (
+            f"{profile_prompt}\n\n{contract_prompt}"
+            if profile_prompt
+            else contract_prompt
+        )
+
+    @staticmethod
+    def _user_prompt(
+        payload: dict[str, Any],
+        correction: str | None,
+    ) -> str:
+        correction_text = (
+            "\nCorrige este erro da resposta anterior: "
+            f"{correction}"
+            if correction
+            else ""
+        )
+        return (
+            "Produz o plano de edicao. Para funcoes/classes usa "
+            "replace_symbol e devolve o bloco completo do simbolo. "
+            "Para replace_text inclui old_text exato. "
+            "Dados reais do projeto: "
+            f"{json.dumps(payload, ensure_ascii=False)}"
+            f"{correction_text}"
+        )
+
+
+async def request_edit_plan_from_model_harness(
+    payload: dict[str, Any],
+    correction: str | None = None,
+) -> dict[str, Any]:
+    return await ModelHarnessPlanRequester()(payload, correction)
+
+
+async def request_edit_plan_from_ollama(
+    payload: dict[str, Any],
+    correction: str | None = None,
+) -> dict[str, Any]:
+    """Compatibility alias; model access now always crosses ModelHarness."""
+    return await request_edit_plan_from_model_harness(payload, correction)
 
 
 async def _maybe_await(requester: PlanRequester, payload: dict[str, Any], correction: str | None):

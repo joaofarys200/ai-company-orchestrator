@@ -66,9 +66,11 @@ As variaveis documentadas em `.env.example` cobrem o runtime principal:
 - `VOICE_VAD_SENSITIVITY`: sensibilidade WebRTC VAD de `0` a `3`; valores mais baixos sao menos agressivos.
 - `VOICE_RMS_THRESHOLD` e `VOICE_MIN_SPEECH_MS`: filtram ruido curto no modo local.
 - `VOICE_INTERRUPTION`, `VOICE_INTERRUPT_MIN_SPEECH_MS`, `VOICE_INTERRUPT_COOLDOWN_MS`, `VOICE_INTERRUPT_RMS_THRESHOLD`: controlam quando a voz do Gemini Live pode ser interrompida pelo microfone.
-- `VOICE_CONFIRMATION_MODE`: quando `true`, comandos por voz ficam pendentes ate dizeres `confirma`, `executa` ou `avanca`.
+- `VOICE_CONFIRMATION_MODE`: quando `true`, comandos por voz com efeitos laterais ficam pendentes ate dizeres `confirma`, `executa` ou `avanca`; consultas read-only podem avancar diretamente.
 - `VOICE_CONFIRMATION_TTL_SECONDS`: tempo maximo para confirmar uma diretiva de voz pendente.
 - `VOICE_ALLOW_TOOLS`: permite ou bloqueia ferramentas no Gemini Live por voz; por seguranca deve ficar `false` ate quereres comandos de computador por voz.
+- `VOICE_ALLOW_READONLY_TOOLS`: permite observacao do ambiente, leitura de ficheiros e pesquisa sem alterar o computador; ativo por omissao.
+- `VOICE_AUTO_READONLY`: inicia diretamente pedidos de pesquisa e observacao read-only, sem confirmacao.
 - `VOICE_ALLOWED_TOOLS`: lista opcional separada por virgulas para limitar as ferramentas permitidas quando `VOICE_ALLOW_TOOLS=true`.
 - `FIRECRAWL_API_KEY`, `APIFY_API_TOKEN`, `BROWSERBASE_API_KEY`, `COMPOSIO_API_KEY`: ferramentas externas opcionais.
 - `OBSIDIAN_VAULT_PATH`: caminho opcional para um cofre Obsidian local.

@@ -1,0 +1,211 @@
+{
+  "benchmark_version": "model_harness_qwen35_stateful_v2",
+  "created_at": "2026-07-26T21:20:23.530397+00:00",
+  "configuration": {
+    "mode": "standard",
+    "model": "qwen3.5:9b",
+    "output_dir": "diagnostics\\model_harness_benchmark\\20260726-a01-stateful-guard-two-runs",
+    "repetitions": 2,
+    "seed": 42,
+    "context_tokens": 8192,
+    "max_steps": 6,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "think": false,
+    "stream": false,
+    "max_output_tokens": 1024,
+    "base_url": "http://127.0.0.1:11434",
+    "fault_injection": false,
+    "debug_prompts": false
+  },
+  "configuration_hash": "795295d53c7bf8179128746e2bdc3d2aa2c071ee4fd1d112a97ab1c3ef0258d1",
+  "prompts_stored": false,
+  "fixture_catalog_sha256": "687a422faf1a52362cb40bfa17c415e46970d15f9d27e0efc22e9dbce41959d5",
+  "scenario_count": 1,
+  "scenarios": [
+    {
+      "scenario_id": "A01_FIND_RELEVANT_FILE",
+      "group": "A",
+      "capability": "stateful_tool_use",
+      "objective_sha256": "eeb03b8da232378a99906c3d937571c2add8007c44724df001131102994553e8",
+      "constraints_sha256": "d36b87cced009a2feef4a7fc314f26a3a0ba43e0121a4283b59ee13ad104213f",
+      "fixture_id": "a01-find-symbol",
+      "fixture_sha256": "1748ae4be49e49a362b646d7d571e9302ee306573eaae69589fcaba9683b080a",
+      "available_tools": [
+        "list_files",
+        "read_file",
+        "search_text",
+        "inspect_symbol",
+        "query_fixture_index",
+        "finish"
+      ],
+      "max_steps": 5,
+      "expected_stop_reason": "COMPLETED",
+      "fault_injection": false,
+      "variant": 1
+    }
+  ],
+  "runtime_before": {
+    "python": "3.12.4 (tags/v3.12.4:8e8a4ba, Jun  6 2024, 19:30:16) [MSC v.1940 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "ollama_version": "ollama version is 0.32.4",
+    "model_list_entry": {
+      "name": "qwen3.5:9b",
+      "model": "qwen3.5:9b",
+      "modified_at": "2026-07-06T12:33:54.8280526+01:00",
+      "size": 6594474711,
+      "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 262144,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "vision",
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    "model_details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen35",
+      "families": [
+        "qwen35"
+      ],
+      "parameter_size": "9.7B",
+      "quantization_level": "Q4_K_M"
+    },
+    "model_capabilities": [
+      "completion",
+      "vision",
+      "tools",
+      "thinking"
+    ],
+    "model_info": {
+      "general.architecture": "qwen35",
+      "general.parameter_count": 9653104368,
+      "qwen35.block_count": 32,
+      "qwen35.context_length": 262144,
+      "qwen35.embedding_length": 4096,
+      "qwen35.vision.block_count": 27,
+      "qwen35.vision.embedding_length": 1152
+    },
+    "ollama_ps_before": {
+      "models": [
+        {
+          "name": "qwen3.5:9b",
+          "model": "qwen3.5:9b",
+          "size": 6420137242,
+          "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen35",
+            "families": [
+              "qwen35"
+            ],
+            "parameter_size": "9.7B",
+            "quantization_level": "Q4_K_M"
+          },
+          "expires_at": "2026-07-26T22:35:01.228176+01:00",
+          "size_vram": 5372704192,
+          "context_length": 8192
+        }
+      ]
+    },
+    "gpu_before": {
+      "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+      "driver_version": "581.34",
+      "memory_total_mib": 8151,
+      "memory_used_mib": 7340,
+      "memory_free_mib": 471,
+      "utilization_percent": 20
+    }
+  },
+  "integrity_before": {
+    "trees": {
+      "workspace_projects": {
+        "exists": true,
+        "file_count": 35,
+        "total_bytes": 31076,
+        "tree_sha256": "49266549b55926c911d73530609e19ef000ade2032769d7f077908dd7919faa4"
+      },
+      "mission_metadata": {
+        "exists": true,
+        "file_count": 2033,
+        "total_bytes": 73228820,
+        "tree_sha256": "f5b43b3e5a48bcca4bb172e45f5fedd84506e455f290a902d85f9b3c80287245"
+      },
+      "chroma_collections": {
+        "exists": true,
+        "file_count": 5,
+        "total_bytes": 4284580,
+        "tree_sha256": "e130636a31ba50b2aaabbb00f3ae64b5b52ced7d0789d4088d77b9e961fad2fe"
+      },
+      "frontend_source": {
+        "exists": true,
+        "file_count": 21,
+        "total_bytes": 213007,
+        "tree_sha256": "ef7c4d05a85969f6569ba15e855fde11536740db32b6b749d380b52d9999c8a5"
+      }
+    },
+    "critical_files": {
+      "agents/orchestrator/project_builder.py": {
+        "exists": true,
+        "size_bytes": 342032,
+        "sha256": "3484b147f1326cf07c223a5d03a3653e66758e20c2a88e9b462072eacfffdbeb"
+      },
+      "agents/mission_state.py": {
+        "exists": true,
+        "size_bytes": 55579,
+        "sha256": "998ce3f9e5dbbbe22da9b74185db61b49a967ded399f58944cd432a590ea25cc"
+      },
+      "agents/mission_executor.py": {
+        "exists": true,
+        "size_bytes": 56579,
+        "sha256": "b09734185a6fb48fb4b02de9c344a766734b626cd5e029775a261ad65f885a58"
+      },
+      "agents/mission_autonomy.py": {
+        "exists": true,
+        "size_bytes": 32510,
+        "sha256": "87ad895b57429c68f2f090c7dcfd0b22669ead79ed8fd73c7b8c6cc4bbc11671"
+      },
+      "agents/executors/registry.py": {
+        "exists": true,
+        "size_bytes": 5561,
+        "sha256": "03fdd968bfba1dc12f65dc4196c76f24c7349d1e56fec55690584bd7ba3bbf1b"
+      },
+      "intelligence/coding_session.py": {
+        "exists": true,
+        "size_bytes": 47873,
+        "sha256": "d8aa025372eaa960bfd74ff283552584cf02d331f0bde82e6c5a1a197752c1a6"
+      },
+      "server.py": {
+        "exists": true,
+        "size_bytes": 118598,
+        "sha256": "005e7609901bdeb628ffaabdf2298c82b2b58ca10b43537ad9f8a26adf16d749"
+      }
+    },
+    "fixture_catalog_sha256": "687a422faf1a52362cb40bfa17c415e46970d15f9d27e0efc22e9dbce41959d5"
+  },
+  "safety": {
+    "network": "localhost_ollama_only",
+    "tool_registry": "benchmark_read_only",
+    "project_mutation": false,
+    "mission_mutation": false,
+    "subprocess_tools": false,
+    "shell_tools": false,
+    "prompt_content_logged": false
+  }
+}

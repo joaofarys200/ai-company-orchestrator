@@ -1,0 +1,168 @@
+[
+  {
+    "scenario_id": "A01_FIND_RELEVANT_FILE",
+    "repetition": 1,
+    "group": "A",
+    "capability": "stateful_tool_use",
+    "status": "FAIL",
+    "stop_reason": "VALIDATION_FAILED",
+    "step_count": 2,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [
+      "list_files"
+    ],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "finished_with_structured_decision",
+        "passed": false,
+        "evidence": "finish_present=False"
+      },
+      {
+        "criterion": "expected_stop_reason",
+        "passed": false,
+        "evidence": "expected=COMPLETED, actual=VALIDATION_FAILED"
+      },
+      {
+        "criterion": "required_tools_used",
+        "passed": false,
+        "evidence": "required=['finish', 'inspect_symbol', 'list_files', 'read_file'], observed=['list_files']"
+      },
+      {
+        "criterion": "required_evidence_observed",
+        "passed": true,
+        "evidence": "required=['file:src/invoice.py'], observed=['file:docs/format.txt', 'file:src/invoice.py', 'file:src/main.py']"
+      },
+      {
+        "criterion": "required_evidence_cited",
+        "passed": false,
+        "evidence": "required=['file:src/invoice.py'], cited=[]"
+      },
+      {
+        "criterion": "required_semantics",
+        "passed": false,
+        "evidence": "required_terms=['src/invoice.py', 'normalize_invoice']"
+      },
+      {
+        "criterion": "forbidden_semantics_absent",
+        "passed": true,
+        "evidence": "forbidden_terms=[]"
+      },
+      {
+        "criterion": "constraints_retained",
+        "passed": false,
+        "evidence": "expected=['C1', 'C2'], received=[]"
+      },
+      {
+        "criterion": "no_repeated_tool_call",
+        "passed": true,
+        "evidence": "step_count=2"
+      },
+      {
+        "criterion": "step_limit_respected",
+        "passed": true,
+        "evidence": "steps=2, configured=5"
+      }
+    ],
+    "total_latency_ms": 25590,
+    "input_tokens": 2116,
+    "output_tokens": 170,
+    "response_hashes": [
+      "9d93abebfe2b368e40f30f870772ab77e95b4520cb3f0314e94ed7aaaac44f12",
+      "9e082a3b1118797a3afcb49106934356641adc8315e40c43a8936ea8fd1ddf1c"
+    ],
+    "context_range_chars": [
+      2044,
+      2193
+    ],
+    "recovery_used": false,
+    "errors": [
+      "Finish attempted before required evidence tools: inspect_symbol, read_file"
+    ]
+  },
+  {
+    "scenario_id": "A01_FIND_RELEVANT_FILE",
+    "repetition": 2,
+    "group": "A",
+    "capability": "stateful_tool_use",
+    "status": "FAIL",
+    "stop_reason": "VALIDATION_FAILED",
+    "step_count": 2,
+    "final_conclusion": "",
+    "evidence_refs": [],
+    "tools_called": [
+      "list_files"
+    ],
+    "retained_constraints": [],
+    "plan_steps": 0,
+    "criteria": [
+      {
+        "criterion": "finished_with_structured_decision",
+        "passed": false,
+        "evidence": "finish_present=False"
+      },
+      {
+        "criterion": "expected_stop_reason",
+        "passed": false,
+        "evidence": "expected=COMPLETED, actual=VALIDATION_FAILED"
+      },
+      {
+        "criterion": "required_tools_used",
+        "passed": false,
+        "evidence": "required=['finish', 'inspect_symbol', 'list_files', 'read_file'], observed=['list_files']"
+      },
+      {
+        "criterion": "required_evidence_observed",
+        "passed": true,
+        "evidence": "required=['file:src/invoice.py'], observed=['file:docs/format.txt', 'file:src/invoice.py', 'file:src/main.py']"
+      },
+      {
+        "criterion": "required_evidence_cited",
+        "passed": false,
+        "evidence": "required=['file:src/invoice.py'], cited=[]"
+      },
+      {
+        "criterion": "required_semantics",
+        "passed": false,
+        "evidence": "required_terms=['src/invoice.py', 'normalize_invoice']"
+      },
+      {
+        "criterion": "forbidden_semantics_absent",
+        "passed": true,
+        "evidence": "forbidden_terms=[]"
+      },
+      {
+        "criterion": "constraints_retained",
+        "passed": false,
+        "evidence": "expected=['C1', 'C2'], received=[]"
+      },
+      {
+        "criterion": "no_repeated_tool_call",
+        "passed": true,
+        "evidence": "step_count=2"
+      },
+      {
+        "criterion": "step_limit_respected",
+        "passed": true,
+        "evidence": "steps=2, configured=5"
+      }
+    ],
+    "total_latency_ms": 11802,
+    "input_tokens": 2116,
+    "output_tokens": 170,
+    "response_hashes": [
+      "9d93abebfe2b368e40f30f870772ab77e95b4520cb3f0314e94ed7aaaac44f12",
+      "9e082a3b1118797a3afcb49106934356641adc8315e40c43a8936ea8fd1ddf1c"
+    ],
+    "context_range_chars": [
+      2044,
+      2193
+    ],
+    "recovery_used": false,
+    "errors": [
+      "Finish attempted before required evidence tools: inspect_symbol, read_file"
+    ]
+  }
+]

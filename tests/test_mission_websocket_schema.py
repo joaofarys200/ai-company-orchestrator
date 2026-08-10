@@ -91,6 +91,47 @@ class MissionWebSocketSchemaTest(unittest.TestCase):
             {"type": "mission_snapshot", "data": snapshot},
         )
 
+    def test_validates_manual_file_save_and_preserves_hash_metadata(self):
+        digest = "a" * 64
+        payload = {
+            "type": "save_project_file",
+            "project_id": "task-app",
+            "filename": "app.js",
+            "content": "",
+            "expected_sha256": digest,
+        }
+        self.assertEqual(validate_client_message(payload), payload)
+        with self.assertRaises(WebSocketPayloadError):
+            validate_client_message({**payload, "expected_sha256": "invalid"})
+
+        context_message = normalize_ws_message({
+            "type": "project_context",
+            "context": {"project_id": "task-app"},
+            "files": {"app.js": ""},
+            "file_hashes": {"app.js": digest},
+            "symbols": {},
+        })
+        self.assertEqual(context_message["file_hashes"], {"app.js": digest})
+        self.assertEqual(
+            normalize_ws_message({
+                "type": "project_file_save_result",
+                "ok": True,
+                "project_id": "task-app",
+                "filename": "app.js",
+                "sha256": digest,
+                "size_bytes": 0,
+            }),
+            {
+                "type": "project_file_save_result",
+                "ok": True,
+                "project_id": "task-app",
+                "filename": "app.js",
+                "sha256": digest,
+                "size_bytes": 0,
+                "error": "",
+            },
+        )
+
 
 class MissionWebSocketDispatchTest(unittest.IsolatedAsyncioTestCase):
     async def test_dispatch_creates_and_returns_persistent_snapshot_without_execution(self):

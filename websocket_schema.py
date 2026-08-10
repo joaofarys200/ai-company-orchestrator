@@ -74,6 +74,7 @@ CLIENT_MESSAGE_TYPES = {
     "get_planner_state",
     "get_ast_state",
     "list_projects",
+    "create_project",
     "open_project",
     "save_project_file",
     "index_project",

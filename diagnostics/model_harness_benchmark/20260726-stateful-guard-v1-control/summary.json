@@ -1,0 +1,194 @@
+{
+  "benchmark_version": "model_harness_qwen35_capabilities_v1",
+  "completed_at": "2026-07-26T21:19:26.499175+00:00",
+  "model": "qwen3.5:9b",
+  "config": {
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "context_tokens": 8192,
+    "output_tokens": 768,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "repetitions": 1,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0,
+    "recycle_loaded_model_before_first_request": false
+  },
+  "runtime": {
+    "before": {
+      "python": "3.12.4 (tags/v3.12.4:8e8a4ba, Jun  6 2024, 19:30:16) [MSC v.1940 64 bit (AMD64)]",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "ollama_version": "ollama version is 0.32.4",
+      "model_list_entry": {
+        "name": "qwen3.5:9b",
+        "model": "qwen3.5:9b",
+        "modified_at": "2026-07-06T12:33:54.8280526+01:00",
+        "size": 6594474711,
+        "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen35",
+          "families": [
+            "qwen35"
+          ],
+          "parameter_size": "9.7B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 262144,
+          "embedding_length": 4096
+        },
+        "capabilities": [
+          "vision",
+          "completion",
+          "tools",
+          "thinking"
+        ]
+      },
+      "model_details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M"
+      },
+      "model_capabilities": [
+        "completion",
+        "vision",
+        "tools",
+        "thinking"
+      ],
+      "model_info": {
+        "general.architecture": "qwen35",
+        "general.parameter_count": 9653104368,
+        "qwen35.block_count": 32,
+        "qwen35.context_length": 262144,
+        "qwen35.embedding_length": 4096,
+        "qwen35.vision.block_count": 27,
+        "qwen35.vision.embedding_length": 1152
+      },
+      "ollama_ps_before": {
+        "models": []
+      },
+      "gpu_before": {
+        "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "driver_version": "581.34",
+        "memory_total_mib": 8151,
+        "memory_used_mib": 1153,
+        "memory_free_mib": 6658,
+        "utilization_percent": 20
+      }
+    },
+    "after": {
+      "ollama_ps": {
+        "models": [
+          {
+            "name": "qwen3.5:9b",
+            "model": "qwen3.5:9b",
+            "size": 6420137242,
+            "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "qwen35",
+              "families": [
+                "qwen35"
+              ],
+              "parameter_size": "9.7B",
+              "quantization_level": "Q4_K_M"
+            },
+            "expires_at": "2026-07-26T22:34:24.0489353+01:00",
+            "size_vram": 5372704192,
+            "context_length": 8192
+          }
+        ]
+      },
+      "gpu": {
+        "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "driver_version": "581.34",
+        "memory_total_mib": 8151,
+        "memory_used_mib": 7394,
+        "memory_free_mib": 417,
+        "utilization_percent": 26
+      }
+    }
+  },
+  "total_cases": 1,
+  "passed_cases": 1,
+  "failed_cases": 0,
+  "total_calls": 1,
+  "passed_calls": 1,
+  "harness_validation_passed_calls": 1,
+  "semantic_passed_calls": 1,
+  "exactly_reproducible_cases": 1,
+  "latency_ms": {
+    "min": 14009,
+    "median": 14009,
+    "p95": 14009.0,
+    "max": 14009,
+    "mean": 14009
+  },
+  "tokens_per_second": {
+    "min": 20.561,
+    "median": 20.561,
+    "max": 20.561,
+    "mean": 20.561
+  },
+  "integrity": {
+    "unchanged": true,
+    "before": {
+      "workspace_projects": {
+        "exists": true,
+        "file_count": 35,
+        "total_bytes": 31076,
+        "tree_sha256": "49266549b55926c911d73530609e19ef000ade2032769d7f077908dd7919faa4"
+      },
+      "mission_metadata": {
+        "exists": true,
+        "file_count": 2033,
+        "total_bytes": 73228820,
+        "tree_sha256": "f5b43b3e5a48bcca4bb172e45f5fedd84506e455f290a902d85f9b3c80287245"
+      }
+    },
+    "after": {
+      "workspace_projects": {
+        "exists": true,
+        "file_count": 35,
+        "total_bytes": 31076,
+        "tree_sha256": "49266549b55926c911d73530609e19ef000ade2032769d7f077908dd7919faa4"
+      },
+      "mission_metadata": {
+        "exists": true,
+        "file_count": 2033,
+        "total_bytes": 73228820,
+        "tree_sha256": "f5b43b3e5a48bcca4bb172e45f5fedd84506e455f290a902d85f9b3c80287245"
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_id": "B07_TOOL_SELECTION",
+      "title": "Selecao de tool sem execucao",
+      "capability": "tool_selection",
+      "passed": true,
+      "passed_repetitions": 1,
+      "total_repetitions": 1,
+      "exact_output_reproducible": true,
+      "unique_response_hashes": [
+        "07523e9769f5551c640df390c5266669b27fb94f7368f6e68ec8763d3c4e7bc2"
+      ],
+      "mean_latency_ms": 14009,
+      "criteria_failures": [],
+      "validation_failures": []
+    }
+  ],
+  "capabilities_demonstrated": [
+    "tool_selection"
+  ],
+  "limitations_observed": []
+}

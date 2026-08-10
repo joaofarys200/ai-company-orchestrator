@@ -1,0 +1,35 @@
+{
+  "sha256": "17b993fcf2e562e823c8061a79b883b34d28260de2f4d5b107cd2f394a965380",
+  "bytes": 1341,
+  "nodes": 22,
+  "properties": 13,
+  "arrays": 6,
+  "objects": 3,
+  "enums": 3,
+  "enum_values": 20,
+  "required": 13,
+  "optionals": 0,
+  "refs": 0,
+  "refs_resolved": 0,
+  "oneOf": 0,
+  "anyOf": 0,
+  "allOf": 0,
+  "nullable_representations": 0,
+  "additionalProperties": 2,
+  "patterns": 0,
+  "limits": 3,
+  "examples": 0,
+  "defaults": 0,
+  "descriptions": 0,
+  "titles": 0,
+  "maximum_depth": 7,
+  "refs_list": [],
+  "cycles_or_recursion": [],
+  "potentially_problematic": [
+    {
+      "path": "#/properties/arguments",
+      "construction": "unconstrained_object"
+    }
+  ],
+  "compatibility_conclusion": "HEURISTIC_ONLY_REQUIRES_MATRIX_CONFIRMATION"
+}

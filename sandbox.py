@@ -1,4 +1,4 @@
-﻿import os
+import os
 import subprocess
 import threading
 import http.server
@@ -84,9 +84,17 @@ def start_local_fallback_server():
     thread = threading.Thread(target=run_server, daemon=True)
     thread.start()
 
-import docker
+IS_DOCKER_ACTIVE = False
+
+def get_sandbox_status():
+    return {
+        "mode": "docker" if IS_DOCKER_ACTIVE else "local_fallback",
+        "port": PORT,
+        "is_docker": IS_DOCKER_ACTIVE,
+    }
 
 def start_docker_sandbox():
+    global IS_DOCKER_ACTIVE
     init_sandbox_dir()
     
     # Stop existing sandbox first
@@ -107,9 +115,11 @@ def start_docker_sandbox():
             ports={'80/tcp': PORT},
             volumes={abs_sandbox_dir: {'bind': '/usr/share/nginx/html', 'mode': 'ro'}}
         )
+        IS_DOCKER_ACTIVE = True
         log_event(logger, "sandbox.docker.started", port=PORT)
         return True
     except Exception as e:
+        IS_DOCKER_ACTIVE = False
         log_event(logger, "sandbox.docker.start_error", level="warning", port=PORT, error=str(e))
         start_local_fallback_server()
         return True

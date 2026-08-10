@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import hashlib
 import json
 import os
@@ -169,6 +170,163 @@ def decision_schema(allowed_tools: tuple[str, ...]) -> dict[str, Any]:
         },
         "additionalProperties": False,
     }
+
+
+def condition_stateful_transition_request(
+    request: ModelRequest,
+    registry: BenchmarkToolRegistry,
+) -> ModelRequest:
+    """Make the current workflow transition explicit and machine-enforced."""
+    if request.expected_output is None:
+        raise ValueError("Transition contract requires expected_output.")
+    payload, suffix = _decode_stateful_prompt(request.user_prompt)
+    required = list(
+        payload.get("required_tools")
+        or payload.get("required_tools_before_finish")
+        or ()
+    )
+    completed = list(
+        payload.get("completed_tools")
+        or payload.get("tools_already_called")
+        or ()
+    )
+    remaining = [
+        tool
+        for tool in required
+        if tool != "finish" and tool not in completed
+    ]
+    known_references = tuple(
+        str(item)
+        for item in payload.get("known_references") or ()
+        if str(item)
+    )
+    minimum_evidence = int(
+        payload.get("minimum_evidence_references") or 0
+    )
+    finish_allowed = (
+        not remaining
+        and len(known_references) >= minimum_evidence
+    )
+    if not remaining and not finish_allowed:
+        raise ValueError(
+            "TRANSITION_CONTRACT_BLOCKED: required evidence is missing."
+        )
+    next_required_tool = (
+        "finish" if finish_allowed else remaining[0]
+    )
+    decision_values = (
+        ("FINISH",) if finish_allowed else ("CALL_TOOL",)
+    )
+    tool_values = (next_required_tool,)
+    stop_values = (
+        (str(payload.get("expected_supported_stop") or "COMPLETED"),)
+        if finish_allowed
+        else ("",)
+    )
+    schema = copy.deepcopy(request.expected_output.schema)
+    if not isinstance(schema, dict):
+        raise ValueError("Transition contract requires a JSON schema.")
+    properties = schema["properties"]
+    properties["decision"]["enum"] = list(decision_values)
+    properties["tool_name"]["enum"] = list(tool_values)
+    properties["arguments"] = copy.deepcopy(
+        registry.definition(next_required_tool).input_schema
+    )
+    properties["stop_reason"]["enum"] = list(stop_values)
+    if finish_allowed:
+        properties["conclusion"]["minLength"] = 1
+        argument_properties = properties["arguments"]["properties"]
+        argument_properties["conclusion"]["minLength"] = 1
+        argument_properties["stop_reason"]["enum"] = list(stop_values)
+        properties["evidence_refs"]["items"]["enum"] = list(
+            known_references
+        )
+        properties["evidence_refs"]["minItems"] = minimum_evidence
+        properties["evidence_refs"]["maxItems"] = len(known_references)
+    else:
+        properties["conclusion"]["maxLength"] = 0
+        properties["evidence_refs"]["maxItems"] = 0
+    constraint_ids = tuple(
+        str(item.get("id") or "")
+        for item in payload.get("active_constraints") or ()
+        if isinstance(item, Mapping) and str(item.get("id") or "")
+    )
+    if constraint_ids:
+        retained = properties["retained_constraint_ids"]
+        retained["items"]["enum"] = list(constraint_ids)
+        retained["minItems"] = len(constraint_ids)
+        retained["maxItems"] = len(constraint_ids)
+    else:
+        properties["retained_constraint_ids"]["maxItems"] = 0
+    if not bool(payload.get("planning_required")):
+        properties["plan"]["maxItems"] = 0
+    payload["transition_contract"] = {
+        "next_required_tool": next_required_tool,
+        "allowed_tools_this_step": list(tool_values),
+        "finish_allowed": finish_allowed,
+        "authorized_evidence_refs": list(known_references),
+        "evidence_refs_policy": (
+            "cite_authorized_refs"
+            if finish_allowed
+            else "must_be_empty"
+        ),
+    }
+    marker = " TRANSITION_CONTRACT is authoritative."
+    system_prompt = request.system_prompt
+    if marker not in system_prompt:
+        system_prompt += (
+            marker
+            + " Select only its next_required_tool. During CALL_TOOL, "
+            "evidence_refs must be empty. During FINISH, copy "
+            "evidence_refs only from authorized_evidence_refs."
+        )
+    expected = replace(
+        request.expected_output,
+        schema=schema,
+        enum_constraints=(
+            EnumConstraint("$.decision", decision_values),
+            EnumConstraint("$.tool_name", tool_values),
+            EnumConstraint("$.stop_reason", stop_values),
+        ),
+        reference_constraints=(
+            ReferenceConstraint(
+                "$.evidence_refs",
+                known_references,
+                allow_empty=not finish_allowed,
+            ),
+        ),
+    )
+    return replace(
+        request,
+        system_prompt=system_prompt,
+        user_prompt=(
+            json.dumps(
+                payload,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + suffix
+        ),
+        expected_output=expected,
+        metadata={
+            **dict(request.metadata),
+            "transition_policy": "contract_driven",
+            "next_required_tool": next_required_tool,
+        },
+        request_id=uuid.uuid4().hex,
+    )
+
+
+def _decode_stateful_prompt(
+    prompt: str,
+) -> tuple[dict[str, Any], str]:
+    decoder = json.JSONDecoder()
+    start = len(prompt) - len(prompt.lstrip())
+    value, end = decoder.raw_decode(prompt, idx=start)
+    if not isinstance(value, dict):
+        raise ValueError("Stateful prompt must start with a JSON object.")
+    return value, prompt[end:]
 
 
 def build_step_context(
@@ -680,6 +838,24 @@ class StatefulBenchmarkRunner:
                         stop_on_no_progress=True,
                     ),
                 )
+                if self.config.transition_policy == "contract_driven":
+                    request = condition_stateful_transition_request(
+                        request,
+                        self.registry,
+                    )
+                    allowed_this_step = tuple(
+                        request.expected_output.schema["properties"][
+                            "tool_name"
+                        ]["enum"]
+                    )
+                    benchmark_step = replace(
+                        benchmark_step,
+                        transition=ExpectedTransition(
+                            allowed_tools=allowed_this_step,
+                            allow_finish="finish" in allowed_this_step,
+                            minimum_evidence=scenario.minimum_evidence,
+                        ),
+                    )
                 if self.config.debug_prompts:
                     self._write_debug_prompt(
                         scenario,

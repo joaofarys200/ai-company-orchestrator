@@ -1,0 +1,77 @@
+{
+  "scenario_id": "S4_STATEFUL_DISCIPLINE",
+  "repetition": 1,
+  "status": "FAIL",
+  "stop_reason": "SEMANTIC_VALIDATION_FAILED",
+  "duration_seconds": 7.994,
+  "steps_used": 2,
+  "tool_sequence": [
+    "list_files"
+  ],
+  "structurally_valid_responses": 2,
+  "response_count": 2,
+  "schema_failures": 0,
+  "invalid_tools": 1,
+  "repeated_calls": 0,
+  "premature_finish": 0,
+  "validation_runs": 0,
+  "failed_validations": 0,
+  "corrections_after_failure": 0,
+  "tests_executed": [],
+  "false_success": false,
+  "fixture_integrity": true,
+  "unrelated_file_unchanged": true,
+  "input_tokens": 793,
+  "output_tokens": 112,
+  "latency_ms": 7961,
+  "steps": [
+    {
+      "step": 1,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "list_files",
+      "arguments": {
+        "path": "."
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"list_files\",\n  \"arguments\": {\n    \"path\": \".\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "files": [
+          "README.md",
+          "package.json",
+          "src/app.js",
+          "src/tasks.js",
+          "tests/tasks.test.js"
+        ],
+        "reference": "project:file-list"
+      },
+      "latency_ms": 4021,
+      "input_tokens": 365,
+      "output_tokens": 55,
+      "response_sha256": "13ff679a372b5462fbb0c35c2a58351831db50115f106fcec8c4657f9789530e"
+    },
+    {
+      "step": 2,
+      "status": "SEMANTICALLY_INVALID",
+      "action": "CALL_TOOL",
+      "tool_name": "read_file",
+      "arguments": {
+        "path": "src/tasks.js"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": false,
+      "validation_error": "expected next tool 'inspect_symbol', received 'read_file'",
+      "observation": {},
+      "latency_ms": 3940,
+      "input_tokens": 428,
+      "output_tokens": 57,
+      "response_sha256": "4e8632771223afaff3175baea5f820a87455320bc6f873ac38c5b3a49d750db2"
+    }
+  ],
+  "errors": [
+    "step 2: expected next tool 'inspect_symbol', received 'read_file'"
+  ]
+}

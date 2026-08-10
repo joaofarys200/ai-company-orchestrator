@@ -3,6 +3,7 @@ import hashlib
 import json
 import shutil
 import uuid
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -198,6 +199,95 @@ def test_stateful_runner_enables_selected_model_runner_recycle():
         runner.ollama_config.recycle_loaded_model_before_first_request
         is True
     )
+
+
+def test_contract_driven_runner_enforces_each_legal_transition():
+    requests = []
+
+    async def callback(request, _route, _progress):
+        requests.append(request)
+        prompt = json.loads(request.user_prompt)
+        tool_name = request.expected_output.schema["properties"][
+            "tool_name"
+        ]["enum"][0]
+        constraints = [
+            item["id"] for item in prompt["active_constraints"]
+        ]
+        if tool_name == "read_file":
+            decision = {
+                "decision": "CALL_TOOL",
+                "tool_name": tool_name,
+                "arguments": {"path": "facts.txt"},
+                "conclusion": "",
+                "stop_reason": "",
+                "evidence_refs": [],
+                "retained_constraint_ids": constraints,
+                "plan": [],
+            }
+        else:
+            conclusion = "The status is ready."
+            decision = {
+                "decision": "FINISH",
+                "tool_name": "finish",
+                "arguments": {
+                    "conclusion": conclusion,
+                    "stop_reason": "COMPLETED",
+                },
+                "conclusion": conclusion,
+                "stop_reason": "COMPLETED",
+                "evidence_refs": ["file:facts.txt"],
+                "retained_constraint_ids": constraints,
+                "plan": [],
+            }
+        return ProviderResult(raw_text=json.dumps(decision))
+
+    provider = CallableModelProvider(
+        "ollama",
+        "deterministic-model",
+        callback,
+    )
+    runner = StatefulBenchmarkRunner(
+        replace(
+            _config(
+                "diagnostics/model_harness_benchmark/"
+                "stateful-contract-driven-test"
+            ),
+            transition_policy="contract_driven",
+        ),
+        live_provider=provider,
+    )
+
+    result, _steps = asyncio.run(
+        runner._run_live_scenario(_scenario(), 1)
+    )
+
+    assert result.status == ScenarioStatus.PASS
+    assert result.tools_called == ("read_file", "finish")
+    assert [
+        request.expected_output.schema["properties"]["tool_name"]["enum"]
+        for request in requests
+    ] == [["read_file"], ["finish"]]
+    assert all(
+        json.loads(request.user_prompt)["transition_contract"][
+            "next_required_tool"
+        ] == expected
+        for request, expected in zip(
+            requests,
+            ("read_file", "finish"),
+            strict=True,
+        )
+    )
+    assert requests[0].expected_output.schema["properties"][
+        "evidence_refs"
+    ]["maxItems"] == 0
+    assert requests[1].expected_output.schema["properties"][
+        "evidence_refs"
+    ]["items"]["enum"] == ["file:facts.txt"]
+
+
+def test_benchmark_config_rejects_unknown_transition_policy():
+    with pytest.raises(ValueError, match="transition_policy"):
+        replace(_config("diagnostics/invalid-policy"), transition_policy="x")
 
 
 @pytest.mark.integration
@@ -424,6 +514,8 @@ def test_cli_supports_required_modes_and_flags():
         "90",
         "--no-fault-injection",
         "--debug-prompts",
+        "--transition-policy",
+        "contract_driven",
     ])
     config = config_from_args(args)
 
@@ -434,6 +526,7 @@ def test_cli_supports_required_modes_and_flags():
     assert config.max_steps == 5
     assert config.fault_injection is False
     assert config.debug_prompts is True
+    assert config.transition_policy == "contract_driven"
 
 
 def test_cli_presentation_serializes_complete_scenario_result(
