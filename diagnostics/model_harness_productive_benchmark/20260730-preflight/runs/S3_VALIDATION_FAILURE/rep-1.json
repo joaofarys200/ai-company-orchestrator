@@ -1,0 +1,77 @@
+{
+  "scenario_id": "S3_VALIDATION_FAILURE",
+  "repetition": 1,
+  "status": "FAIL",
+  "stop_reason": "TOOL_FAILED",
+  "duration_seconds": 7.274,
+  "steps_used": 2,
+  "tool_sequence": [
+    "list_files"
+  ],
+  "structurally_valid_responses": 2,
+  "response_count": 2,
+  "schema_failures": 0,
+  "invalid_tools": 1,
+  "repeated_calls": 0,
+  "premature_finish": 0,
+  "validation_runs": 0,
+  "failed_validations": 0,
+  "corrections_after_failure": 0,
+  "tests_executed": [],
+  "false_success": false,
+  "fixture_integrity": true,
+  "unrelated_file_unchanged": true,
+  "input_tokens": 771,
+  "output_tokens": 85,
+  "latency_ms": 7248,
+  "steps": [
+    {
+      "step": 1,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "list_files",
+      "arguments": {
+        "path": "."
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"list_files\",\n  \"arguments\": {\n    \"path\": \".\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "files": [
+          "README.md",
+          "package.json",
+          "src/app.js",
+          "src/tasks.js",
+          "tests/tasks.test.js"
+        ],
+        "reference": "project:file-list"
+      },
+      "latency_ms": 4229,
+      "input_tokens": 356,
+      "output_tokens": 56,
+      "response_sha256": "13ff679a372b5462fbb0c35c2a58351831db50115f106fcec8c4657f9789530e"
+    },
+    {
+      "step": 2,
+      "status": "TOOL_FAILED",
+      "action": "CALL_TOOL",
+      "tool_name": "inspect_symbol",
+      "arguments": {
+        "name": "src/tasks.js"
+      },
+      "raw_response": "{\"action\":\"CALL_TOOL\",\"tool_name\":\"inspect_symbol\",\"arguments\":{\"name\":\"src/tasks.js\"},\"conclusion\":\"\",\"evidence_refs\":[]}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "ValueError: Symbol not found: src/tasks.js",
+      "observation": {},
+      "latency_ms": 3019,
+      "input_tokens": 415,
+      "output_tokens": 29,
+      "response_sha256": "baca992e3b31e99002c4bf7562b2f936a4f9049d4d76d8e7d91b877cb584cb00"
+    }
+  ],
+  "errors": [
+    "step 2: ValueError: Symbol not found: src/tasks.js"
+  ]
+}

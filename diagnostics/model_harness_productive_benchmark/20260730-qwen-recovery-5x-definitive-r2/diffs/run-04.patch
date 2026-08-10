@@ -1,0 +1,15 @@
+--- a/src/tasks.js
++++ b/src/tasks.js
+@@ -1,8 +1,11 @@
+-export function normalizeTask(value) {
++export function normalizeTask(value {
+   return String(value ?? '').trim();
+ }
+ 
+ export function addTask(tasks, value) {
++  if (!value || String(value).trim() === '') {
++    return tasks;
++  }
+   const normalized = normalizeTask(value);
+   return [...tasks, normalized];
+ }

@@ -20,6 +20,7 @@ PROJECT_HANDLERS = {
     "run_project": "run_project",
     "stop_project": "stop_project",
     "list_projects": "list_projects",
+    "create_project": "create_project",
     "open_project": "open_project",
     "save_project_file": "save_project_file",
     "index_project": "index_project",
@@ -160,6 +161,44 @@ class ProjectWebSocketHandler:
                 ),
             },
         )
+
+    async def create_project(
+        self,
+        websocket: Any,
+        message: dict,
+        session: WebSocketSessionState,
+    ) -> None:
+        project_id = str(message.get("project_id", "")).strip()
+        project_name = message.get("project_name")
+        template = message.get("template")
+        try:
+            context = await asyncio.to_thread(
+                self.project_context.create_project,
+                project_id,
+                project_name,
+                template,
+            )
+            await self.responder.send_project_context(
+                websocket,
+                context.project_id,
+            )
+            session.selected_project_id = context.project_id
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "projects_list",
+                    "projects": self.project_context.list_projects(),
+                },
+            )
+            await self.connections.send(
+                websocket,
+                system_message(f"Projeto '{context.project_name}' criado com sucesso."),
+            )
+        except ProjectContextError as project_error:
+            await self.connections.send(
+                websocket,
+                system_message(str(project_error)),
+            )
 
     async def open_project(
         self,

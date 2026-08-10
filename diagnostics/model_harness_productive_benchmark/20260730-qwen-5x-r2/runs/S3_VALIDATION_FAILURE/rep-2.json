@@ -1,0 +1,207 @@
+{
+  "scenario_id": "S3_VALIDATION_FAILURE",
+  "repetition": 2,
+  "status": "FAIL",
+  "stop_reason": "SEMANTIC_VALIDATION_FAILED",
+  "duration_seconds": 27.376,
+  "steps_used": 6,
+  "tool_sequence": [
+    "list_files",
+    "inspect_symbol",
+    "read_file",
+    "apply_patch",
+    "run_validation"
+  ],
+  "structurally_valid_responses": 6,
+  "response_count": 6,
+  "schema_failures": 0,
+  "invalid_tools": 1,
+  "repeated_calls": 0,
+  "premature_finish": 0,
+  "validation_runs": 1,
+  "failed_validations": 1,
+  "corrections_after_failure": 0,
+  "tests_executed": [
+    {
+      "command": "node --check src/tasks.js",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "duration_ms": 45
+    },
+    {
+      "command": "node tests/tasks.test.js",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'existing',\n+   ''\n  ]\n\n    at file:///C:/Users/joaor/Desktop/ai-company-orchestrator/diagnostics/model_harness_productive_benchmark/20260730-qwen-5x-r2/fixtures/S3_VALIDATION_FAILURE/rep-2/project/tests/tasks.test.js:5:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:633:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [ 'existing', '' ],\n  expected: [ 'existing' ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.16.0\n",
+      "duration_ms": 55
+    }
+  ],
+  "false_success": false,
+  "fixture_integrity": false,
+  "unrelated_file_unchanged": true,
+  "input_tokens": 4261,
+  "output_tokens": 418,
+  "latency_ms": 27248,
+  "steps": [
+    {
+      "step": 1,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "list_files",
+      "arguments": {
+        "path": "."
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"list_files\",\n  \"arguments\": {\n    \"path\": \".\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "files": [
+          "README.md",
+          "package.json",
+          "src/app.js",
+          "src/tasks.js",
+          "tests/tasks.test.js"
+        ],
+        "reference": "project:file-list"
+      },
+      "latency_ms": 3679,
+      "input_tokens": 387,
+      "output_tokens": 54,
+      "response_sha256": "13ff679a372b5462fbb0c35c2a58351831db50115f106fcec8c4657f9789530e"
+    },
+    {
+      "step": 2,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "inspect_symbol",
+      "arguments": {
+        "name": "addTask"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"inspect_symbol\",\n  \"arguments\": {\n    \"name\": \"addTask\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "symbol": "addTask",
+        "definitions": [
+          {
+            "path": "src/tasks.js",
+            "line": 5,
+            "signature": "export function addTask(tasks, value) {",
+            "reference": "src/tasks.js:L5"
+          }
+        ]
+      },
+      "latency_ms": 3867,
+      "input_tokens": 450,
+      "output_tokens": 56,
+      "response_sha256": "67e314eb471c3e80bd174c51d9ea4a415cc9f1b74ca304aa87ba1975bd952c51"
+    },
+    {
+      "step": 3,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "read_file",
+      "arguments": {
+        "path": "src/tasks.js"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "path": "src/tasks.js",
+        "content": "export function normalizeTask(value) {\n  return String(value ?? '').trim();\n}\n\nexport function addTask(tasks, value) {\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}\n\nexport function taskCountLabel(tasks) {\n  return `${tasks.length} tasks`;\n}\n",
+        "sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+        "reference": "src/tasks.js:full"
+      },
+      "latency_ms": 3755,
+      "input_tokens": 527,
+      "output_tokens": 58,
+      "response_sha256": "4e8632771223afaff3175baea5f820a87455320bc6f873ac38c5b3a49d750db2"
+    },
+    {
+      "step": 4,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "apply_patch",
+      "arguments": {
+        "path": "src/tasks.js",
+        "old_text": "export function addTask(tasks, value) {\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}",
+        "new_text": "export function addTask(tasks, value) {\n  if (value === undefined || value === null) { return tasks; }\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"apply_patch\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\",\n    \"old_text\": \"export function addTask(tasks, value) {\\n  const normalized = normalizeTask(value);\\n  return [...tasks, normalized];\\n}\",\n    \"new_text\": \"export function addTask(tasks, value) {\\n  if (value === undefined || value === null) { return tasks; }\\n  const normalized = normalizeTask(value);\\n  return [...tasks, normalized];\\n}\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "path": "src/tasks.js",
+        "changed": true,
+        "before_sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+        "after_sha256": "cd444ee455186df40b44eb282be0f7f251c425bb2c71c1a06f6fae7b1eb67b09"
+      },
+      "latency_ms": 7589,
+      "input_tokens": 724,
+      "output_tokens": 147,
+      "response_sha256": "8f208cbcdcd5d112a4e0f6ffe1b5c02d4b4b4a622bbbb8214ee8dbea02e1e3f1"
+    },
+    {
+      "step": 5,
+      "status": "TOOL_SUCCEEDED",
+      "action": "CALL_TOOL",
+      "tool_name": "run_validation",
+      "arguments": {},
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"run_validation\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": true,
+      "validation_error": "",
+      "observation": {
+        "passed": false,
+        "commands": [
+          {
+            "command": "node --check src/tasks.js",
+            "exit_code": 0,
+            "stdout": "",
+            "stderr": "",
+            "duration_ms": 45
+          },
+          {
+            "command": "node tests/tasks.test.js",
+            "exit_code": 1,
+            "stdout": "",
+            "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'existing',\n+   ''\n  ]\n\n    at file:///C:/Users/joaor/Desktop/ai-company-orchestrator/diagnostics/model_harness_productive_benchmark/20260730-qwen-5x-r2/fixtures/S3_VALIDATION_FAILURE/rep-2/project/tests/tasks.test.js:5:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:633:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: [ 'existing', '' ],\n  expected: [ 'existing' ],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.16.0\n",
+            "duration_ms": 55
+          }
+        ],
+        "run_number": 1
+      },
+      "latency_ms": 3486,
+      "input_tokens": 944,
+      "output_tokens": 45,
+      "response_sha256": "d223d522ff1fb9640466384421103644c95492aa97a50ff41498ab5a5e0b220c"
+    },
+    {
+      "step": 6,
+      "status": "SEMANTICALLY_INVALID",
+      "action": "CALL_TOOL",
+      "tool_name": "read_file",
+      "arguments": {
+        "path": "src/tasks.js"
+      },
+      "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+      "structured_valid": true,
+      "semantic_valid": false,
+      "validation_error": "expected next tool 'apply_patch', received 'read_file'",
+      "observation": {},
+      "latency_ms": 4872,
+      "input_tokens": 1229,
+      "output_tokens": 58,
+      "response_sha256": "4e8632771223afaff3175baea5f820a87455320bc6f873ac38c5b3a49d750db2"
+    }
+  ],
+  "errors": [
+    "step 6: expected next tool 'apply_patch', received 'read_file'"
+  ]
+}

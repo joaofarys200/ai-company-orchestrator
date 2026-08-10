@@ -1,0 +1,14 @@
+{
+  "workspace_projects": {
+    "exists": true,
+    "file_count": 35,
+    "total_bytes": 31076,
+    "tree_sha256": "49266549b55926c911d73530609e19ef000ade2032769d7f077908dd7919faa4"
+  },
+  "mission_metadata": {
+    "exists": true,
+    "file_count": 2033,
+    "total_bytes": 73228820,
+    "tree_sha256": "f5b43b3e5a48bcca4bb172e45f5fedd84506e455f290a902d85f9b3c80287245"
+  }
+}

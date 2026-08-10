@@ -1,0 +1,61 @@
+{
+  "request_id": "0092d09c2ae3452d8df66b0576e7dd5a",
+  "request_fingerprint": "3959cbb91e0ef8984fb269caad98ba1a7276ad05b9d3ba49dbc6682174d034f8",
+  "task_profile": "TOOL_SELECTION",
+  "system_prompt": "Select exactly one allowed tool but do not execute it. Return the proposed call as JSON.",
+  "user_prompt": "Inspect config.json without changing any file. Allowed tool: read_file. Forbidden tool: write_file.",
+  "context": {
+    "items": [],
+    "decisions": [],
+    "total_chars": 0
+  },
+  "allowed_tools": [
+    "read_file"
+  ],
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "tool_name",
+      "arguments"
+    ],
+    "properties": {
+      "tool_name": {
+        "type": "string",
+        "enum": [
+          "read_file"
+        ]
+      },
+      "arguments": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "enum": [
+              "config.json"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "generation": {
+    "model": "qwen3.5:9b",
+    "base_url": "http://127.0.0.1:11434",
+    "context_tokens": 8192,
+    "output_tokens": 768,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "repetitions": 1,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0,
+    "recycle_loaded_model_before_first_request": false
+  }
+}

@@ -1,0 +1,1831 @@
+{
+  "diagnostic_version": "stateful_tool_sequence_semantic_diagnostic_v1",
+  "variants": [
+    {
+      "variant": {
+        "variant_id": "S04_CONDITIONED_SCHEMA",
+        "title": "Schema conditioned by the current legal transition",
+        "explicit_state": true,
+        "structured_prevalidation": false,
+        "conditioned_schema": true,
+        "semantic_retry": false
+      },
+      "repetitions": [
+        {
+          "repetition": 1,
+          "strict_pass": true,
+          "recovered_sequence": true,
+          "scenario_status": "PASS",
+          "stop_reason": "COMPLETED",
+          "expected_sequence": [
+            "list_files",
+            "inspect_symbol",
+            "read_file",
+            "finish"
+          ],
+          "actual_sequence": [
+            "list_files",
+            "inspect_symbol",
+            "read_file",
+            "finish"
+          ],
+          "premature_finish_attempts": 0,
+          "repeated_tool_calls": 0,
+          "timeouts": 0,
+          "model_calls": 4,
+          "semantic_retries": 0,
+          "prevalidation_events": [],
+          "errors": [],
+          "scenario_result": {
+            "scenario_id": "A01_FIND_RELEVANT_FILE",
+            "repetition": 1,
+            "group": "A",
+            "capability": "stateful_tool_use",
+            "status": "PASS",
+            "stop_reason": "COMPLETED",
+            "step_count": 4,
+            "final_conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+            "evidence_refs": [
+              "file:docs/format.txt",
+              "file:src/invoice.py",
+              "file:src/main.py",
+              "symbol:normalize_invoice@src/invoice.py:1"
+            ],
+            "tools_called": [
+              "list_files",
+              "inspect_symbol",
+              "read_file",
+              "finish"
+            ],
+            "retained_constraints": [
+              "C1",
+              "C2"
+            ],
+            "plan_steps": 0,
+            "criteria": [
+              {
+                "criterion": "finished_with_structured_decision",
+                "passed": true,
+                "evidence": "finish_present=True"
+              },
+              {
+                "criterion": "expected_stop_reason",
+                "passed": true,
+                "evidence": "expected=COMPLETED, actual=COMPLETED"
+              },
+              {
+                "criterion": "required_tools_used",
+                "passed": true,
+                "evidence": "required=['finish', 'inspect_symbol', 'list_files', 'read_file'], observed=['list_files', 'inspect_symbol', 'read_file', 'finish']"
+              },
+              {
+                "criterion": "required_evidence_observed",
+                "passed": true,
+                "evidence": "required=['file:src/invoice.py'], observed=['file:docs/format.txt', 'file:src/invoice.py', 'file:src/main.py', 'symbol:normalize_invoice@src/invoice.py:1']"
+              },
+              {
+                "criterion": "required_evidence_cited",
+                "passed": true,
+                "evidence": "required=['file:src/invoice.py'], cited=['file:docs/format.txt', 'file:src/invoice.py', 'file:src/main.py', 'symbol:normalize_invoice@src/invoice.py:1']"
+              },
+              {
+                "criterion": "required_semantics",
+                "passed": true,
+                "evidence": "required_terms=['src/invoice.py', 'normalize_invoice']"
+              },
+              {
+                "criterion": "forbidden_semantics_absent",
+                "passed": true,
+                "evidence": "forbidden_terms=[]"
+              },
+              {
+                "criterion": "constraints_retained",
+                "passed": true,
+                "evidence": "expected=['C1', 'C2'], received=['C1', 'C2']"
+              },
+              {
+                "criterion": "no_repeated_tool_call",
+                "passed": true,
+                "evidence": "step_count=4"
+              },
+              {
+                "criterion": "step_limit_respected",
+                "passed": true,
+                "evidence": "steps=4, configured=5"
+              }
+            ],
+            "total_latency_ms": 38391,
+            "input_tokens": 5278,
+            "output_tokens": 296,
+            "response_hashes": [
+              "9d93abebfe2b368e40f30f870772ab77e95b4520cb3f0314e94ed7aaaac44f12",
+              "cc241abc6861d8ddd6a5812423e9493ef07cd3bec5adc3b33eb67e1e44f0e948",
+              "a355992ab96d6af36a42b1dbf3ddf4108d1ca2ffd083decfb62ba1b02d2616d5",
+              "b70475e71697c95beec65fc41cf6b7dd2750a987c040e4cb3e5af48b3ac5932e"
+            ],
+            "context_range_chars": [
+              2044,
+              2829
+            ],
+            "recovery_used": false,
+            "errors": []
+          },
+          "steps": [
+            {
+              "scenario_id": "A01_FIND_RELEVANT_FILE",
+              "repetition": 1,
+              "step_number": 1,
+              "objective": "Identify the file and line defining normalize_invoice. List the fixture, locate the symbol, read its file, then finish.",
+              "current_constraints": [
+                "C1",
+                "C2"
+              ],
+              "available_tools": [
+                "list_files",
+                "read_file",
+                "search_text",
+                "inspect_symbol",
+                "query_fixture_index",
+                "finish"
+              ],
+              "selected_tool": "list_files",
+              "tool_arguments": {
+                "path": ""
+              },
+              "normalized_observation": {
+                "tool_name": "list_files",
+                "status": "SUCCEEDED",
+                "result": {
+                  "count": 3,
+                  "file_count": 3
+                },
+                "references": [
+                  "file:docs/format.txt",
+                  "file:src/invoice.py",
+                  "file:src/main.py"
+                ],
+                "result_sha256": "5e77616dc59d1aaeebc86357298683f2563ca4b97f72630c81c832418fbb7d2e",
+                "summary": "Listed 3 files.",
+                "error_code": ""
+              },
+              "model_output_hash": "9d93abebfe2b368e40f30f870772ab77e95b4520cb3f0314e94ed7aaaac44f12",
+              "context_hash": "b60189b24418aef225772e48495225f0e8a6026498e0c31c5d148e76636c133a",
+              "context_chars": 2044,
+              "context_items": 4,
+              "context_decisions": [
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C1",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "276c3c20a82037e332d282161a47d94590bf3c5a37518fbf1d7e9b8c719768c2",
+                  "size": 62,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C2",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "6347c0170d037fb6bf4d26d702c9828389323c2d2b5066f77008e077cded36c1",
+                  "size": 63,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:objective",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "eeb03b8da232378a99906c3d937571c2add8007c44724df001131102994553e8",
+                  "size": 119,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:tools",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "d367b22d5902687b5af7679e6cbd201cc80543a9e714198b94ce5ccb3d46caa1",
+                  "size": 1800,
+                  "priority": 95
+                }
+              ],
+              "validation_result": {
+                "status": "PASSED",
+                "issues": [],
+                "structured_output": {
+                  "decision": "CALL_TOOL",
+                  "tool_name": "list_files",
+                  "arguments": {
+                    "path": ""
+                  },
+                  "conclusion": "",
+                  "stop_reason": "",
+                  "evidence_refs": [],
+                  "retained_constraint_ids": [
+                    "C1",
+                    "C2"
+                  ],
+                  "plan": []
+                },
+                "completed_stages": [
+                  "PARSING",
+                  "SCHEMA",
+                  "ENUMS",
+                  "REFERENCES",
+                  "PRECONDITIONS",
+                  "COMPATIBILITY",
+                  "ACCEPTANCE_CRITERIA"
+                ],
+                "delegated_to": ""
+              },
+              "progress_result": {
+                "event_count": 3,
+                "distinct_inputs": 1,
+                "distinct_outputs": 1,
+                "conditions": [],
+                "latest_outcome": "CALLED"
+              },
+              "recovery_result": [
+                {
+                  "action": "NONE",
+                  "reason": "recovery_not_required",
+                  "recoverable": false,
+                  "retry_requested": false,
+                  "input_changed": false
+                }
+              ],
+              "stop_reason": "",
+              "latency_ms": 18909,
+              "input_tokens": 1083,
+              "output_tokens": 91,
+              "tokens_per_second": null,
+              "request_fingerprint": "e4d5eb6357228bd1677bc2d33b214aaad9ff4b1dfc5256396d6f8936714bafbb",
+              "tool_result_hash": "5e77616dc59d1aaeebc86357298683f2563ca4b97f72630c81c832418fbb7d2e"
+            },
+            {
+              "scenario_id": "A01_FIND_RELEVANT_FILE",
+              "repetition": 1,
+              "step_number": 2,
+              "objective": "Identify the file and line defining normalize_invoice. List the fixture, locate the symbol, read its file, then finish.",
+              "current_constraints": [
+                "C1",
+                "C2"
+              ],
+              "available_tools": [
+                "list_files",
+                "read_file",
+                "search_text",
+                "inspect_symbol",
+                "query_fixture_index",
+                "finish"
+              ],
+              "selected_tool": "inspect_symbol",
+              "tool_arguments": {
+                "symbol": "normalize_invoice"
+              },
+              "normalized_observation": {
+                "tool_name": "inspect_symbol",
+                "status": "SUCCEEDED",
+                "result": {
+                  "symbol": "normalize_invoice",
+                  "match_count": 1
+                },
+                "references": [
+                  "symbol:normalize_invoice@src/invoice.py:1"
+                ],
+                "result_sha256": "5412b4a290f28e71172e767f5b7f22b5b3d37e29ffbd44406f56a9087590bf53",
+                "summary": "inspect_symbol returned 1 matches.",
+                "error_code": ""
+              },
+              "model_output_hash": "cc241abc6861d8ddd6a5812423e9493ef07cd3bec5adc3b33eb67e1e44f0e948",
+              "context_hash": "28bae6977f5c7c4208b02fbf64e35d34945a5973c473ae0a280efadb37e36f57",
+              "context_chars": 2193,
+              "context_items": 6,
+              "context_decisions": [
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C1",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "276c3c20a82037e332d282161a47d94590bf3c5a37518fbf1d7e9b8c719768c2",
+                  "size": 62,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C2",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "6347c0170d037fb6bf4d26d702c9828389323c2d2b5066f77008e077cded36c1",
+                  "size": 63,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:objective",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "eeb03b8da232378a99906c3d937571c2add8007c44724df001131102994553e8",
+                  "size": 119,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:tools",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "d367b22d5902687b5af7679e6cbd201cc80543a9e714198b94ce5ccb3d46caa1",
+                  "size": 1800,
+                  "priority": 95
+                },
+                {
+                  "source": "observation:list_files:5e77616dc59d1aae",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "5e77616dc59d1aaeebc86357298683f2563ca4b97f72630c81c832418fbb7d2e",
+                  "size": 70,
+                  "priority": 90
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:recent-decisions",
+                  "included": true,
+                  "reason": "relevance_score=0.800",
+                  "hash": "115892645151e6b2d83382b36477c1390432e9f2e052064f5f8d97bb22e3b1f0",
+                  "size": 79,
+                  "priority": 60
+                }
+              ],
+              "validation_result": {
+                "status": "PASSED",
+                "issues": [],
+                "structured_output": {
+                  "decision": "CALL_TOOL",
+                  "tool_name": "inspect_symbol",
+                  "arguments": {
+                    "symbol": "normalize_invoice"
+                  },
+                  "conclusion": "",
+                  "stop_reason": "",
+                  "evidence_refs": [],
+                  "retained_constraint_ids": [
+                    "C1",
+                    "C2"
+                  ],
+                  "plan": []
+                },
+                "completed_stages": [
+                  "PARSING",
+                  "SCHEMA",
+                  "ENUMS",
+                  "REFERENCES",
+                  "PRECONDITIONS",
+                  "COMPATIBILITY",
+                  "ACCEPTANCE_CRITERIA"
+                ],
+                "delegated_to": ""
+              },
+              "progress_result": {
+                "event_count": 6,
+                "distinct_inputs": 2,
+                "distinct_outputs": 2,
+                "conditions": [],
+                "latest_outcome": "CALLED"
+              },
+              "recovery_result": [
+                {
+                  "action": "NONE",
+                  "reason": "recovery_not_required",
+                  "recoverable": false,
+                  "retry_requested": false,
+                  "input_changed": false
+                }
+              ],
+              "stop_reason": "",
+              "latency_ms": 5216,
+              "input_tokens": 1241,
+              "output_tokens": 45,
+              "tokens_per_second": null,
+              "request_fingerprint": "b49b20ce5670907c30424fe4d7f65285e42d80a1b98dfe4f6c3b8b7740af62d5",
+              "tool_result_hash": "5412b4a290f28e71172e767f5b7f22b5b3d37e29ffbd44406f56a9087590bf53"
+            },
+            {
+              "scenario_id": "A01_FIND_RELEVANT_FILE",
+              "repetition": 1,
+              "step_number": 3,
+              "objective": "Identify the file and line defining normalize_invoice. List the fixture, locate the symbol, read its file, then finish.",
+              "current_constraints": [
+                "C1",
+                "C2"
+              ],
+              "available_tools": [
+                "list_files",
+                "read_file",
+                "search_text",
+                "inspect_symbol",
+                "query_fixture_index",
+                "finish"
+              ],
+              "selected_tool": "read_file",
+              "tool_arguments": {
+                "path": "src/invoice.py"
+              },
+              "normalized_observation": {
+                "tool_name": "read_file",
+                "status": "SUCCEEDED",
+                "result": {
+                  "path": "src/invoice.py",
+                  "size_chars": 104,
+                  "line_count": 3,
+                  "truncated": false,
+                  "content_sha256": "04fa6e4f644d9fdaea4de9259d4ec570146faa16f93237ebb25ceaf246295401"
+                },
+                "references": [
+                  "file:src/invoice.py"
+                ],
+                "result_sha256": "60abadcd6c02e4b7f36b87ceadd1f297720aa1a320a29282e7d815e301e6a917",
+                "summary": "Read src/invoice.py (104 chars, truncated=False).",
+                "error_code": ""
+              },
+              "model_output_hash": "a355992ab96d6af36a42b1dbf3ddf4108d1ca2ffd083decfb62ba1b02d2616d5",
+              "context_hash": "bbf47d632f770bd7120e8881e7bb0eb83a21f3efdfd13864bf4d346920029fd4",
+              "context_chars": 2466,
+              "context_items": 7,
+              "context_decisions": [
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C1",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "276c3c20a82037e332d282161a47d94590bf3c5a37518fbf1d7e9b8c719768c2",
+                  "size": 62,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C2",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "6347c0170d037fb6bf4d26d702c9828389323c2d2b5066f77008e077cded36c1",
+                  "size": 63,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:objective",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "eeb03b8da232378a99906c3d937571c2add8007c44724df001131102994553e8",
+                  "size": 119,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:tools",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "d367b22d5902687b5af7679e6cbd201cc80543a9e714198b94ce5ccb3d46caa1",
+                  "size": 1800,
+                  "priority": 95
+                },
+                {
+                  "source": "observation:inspect_symbol:5412b4a290f28e71",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "5412b4a290f28e71172e767f5b7f22b5b3d37e29ffbd44406f56a9087590bf53",
+                  "size": 191,
+                  "priority": 90
+                },
+                {
+                  "source": "observation:list_files:5e77616dc59d1aae",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "5e77616dc59d1aaeebc86357298683f2563ca4b97f72630c81c832418fbb7d2e",
+                  "size": 70,
+                  "priority": 89
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:recent-decisions",
+                  "included": true,
+                  "reason": "relevance_score=0.800",
+                  "hash": "afcd83b77476f11f38501449b982c186ad40d979615fab2c960d53936000e48d",
+                  "size": 161,
+                  "priority": 60
+                }
+              ],
+              "validation_result": {
+                "status": "PASSED",
+                "issues": [],
+                "structured_output": {
+                  "decision": "CALL_TOOL",
+                  "tool_name": "read_file",
+                  "arguments": {
+                    "path": "src/invoice.py"
+                  },
+                  "conclusion": "",
+                  "stop_reason": "",
+                  "evidence_refs": [],
+                  "retained_constraint_ids": [
+                    "C1",
+                    "C2"
+                  ],
+                  "plan": []
+                },
+                "completed_stages": [
+                  "PARSING",
+                  "SCHEMA",
+                  "ENUMS",
+                  "REFERENCES",
+                  "PRECONDITIONS",
+                  "COMPATIBILITY",
+                  "ACCEPTANCE_CRITERIA"
+                ],
+                "delegated_to": ""
+              },
+              "progress_result": {
+                "event_count": 9,
+                "distinct_inputs": 3,
+                "distinct_outputs": 3,
+                "conditions": [],
+                "latest_outcome": "CALLED"
+              },
+              "recovery_result": [
+                {
+                  "action": "NONE",
+                  "reason": "recovery_not_required",
+                  "recoverable": false,
+                  "retry_requested": false,
+                  "input_changed": false
+                }
+              ],
+              "stop_reason": "",
+              "latency_ms": 5555,
+              "input_tokens": 1379,
+              "output_tokens": 48,
+              "tokens_per_second": null,
+              "request_fingerprint": "2e90e8f62f50f7f10f710f952ddb0f2e94cf3636e4fd1be7e6b47ef95572ef78",
+              "tool_result_hash": "60abadcd6c02e4b7f36b87ceadd1f297720aa1a320a29282e7d815e301e6a917"
+            },
+            {
+              "scenario_id": "A01_FIND_RELEVANT_FILE",
+              "repetition": 1,
+              "step_number": 4,
+              "objective": "Identify the file and line defining normalize_invoice. List the fixture, locate the symbol, read its file, then finish.",
+              "current_constraints": [
+                "C1",
+                "C2"
+              ],
+              "available_tools": [
+                "list_files",
+                "read_file",
+                "search_text",
+                "inspect_symbol",
+                "query_fixture_index",
+                "finish"
+              ],
+              "selected_tool": "finish",
+              "tool_arguments": {
+                "conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+                "stop_reason": "COMPLETED"
+              },
+              "normalized_observation": {
+                "tool_name": "finish",
+                "status": "SUCCEEDED",
+                "result": {
+                  "accepted": true,
+                  "conclusion_sha256": "4d6a495451793368d037e4c64cbfb3a16a1cac7cf03d333d6c14b4ff1dcfe210",
+                  "stop_reason": "COMPLETED"
+                },
+                "references": [],
+                "result_sha256": "192f1a5ea566baab2dc0772a9d8daa5b49b8c5d9793c3dedda479d102d293227",
+                "summary": "finish completed.",
+                "error_code": ""
+              },
+              "model_output_hash": "b70475e71697c95beec65fc41cf6b7dd2750a987c040e4cb3e5af48b3ac5932e",
+              "context_hash": "e70dded4836783e15891fc6378925f51c01a955e9cc344a3618457c6f5f33f0d",
+              "context_chars": 2829,
+              "context_items": 8,
+              "context_decisions": [
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C1",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "276c3c20a82037e332d282161a47d94590bf3c5a37518fbf1d7e9b8c719768c2",
+                  "size": 62,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C2",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "6347c0170d037fb6bf4d26d702c9828389323c2d2b5066f77008e077cded36c1",
+                  "size": 63,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:objective",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "eeb03b8da232378a99906c3d937571c2add8007c44724df001131102994553e8",
+                  "size": 119,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:tools",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "d367b22d5902687b5af7679e6cbd201cc80543a9e714198b94ce5ccb3d46caa1",
+                  "size": 1800,
+                  "priority": 95
+                },
+                {
+                  "source": "observation:read_file:60abadcd6c02e4b7",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "60abadcd6c02e4b7f36b87ceadd1f297720aa1a320a29282e7d815e301e6a917",
+                  "size": 286,
+                  "priority": 90
+                },
+                {
+                  "source": "observation:inspect_symbol:5412b4a290f28e71",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "5412b4a290f28e71172e767f5b7f22b5b3d37e29ffbd44406f56a9087590bf53",
+                  "size": 191,
+                  "priority": 89
+                },
+                {
+                  "source": "observation:list_files:5e77616dc59d1aae",
+                  "included": true,
+                  "reason": "relevance_score=0.840",
+                  "hash": "5e77616dc59d1aaeebc86357298683f2563ca4b97f72630c81c832418fbb7d2e",
+                  "size": 70,
+                  "priority": 88
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:recent-decisions",
+                  "included": true,
+                  "reason": "relevance_score=0.800",
+                  "hash": "efef8a1c2354d35019af2edc0640cc520a53c6008a12b6f2e1b3099f89df90e8",
+                  "size": 238,
+                  "priority": 60
+                }
+              ],
+              "validation_result": {
+                "status": "PASSED",
+                "issues": [],
+                "structured_output": {
+                  "decision": "FINISH",
+                  "tool_name": "finish",
+                  "arguments": {
+                    "conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+                    "stop_reason": "COMPLETED"
+                  },
+                  "conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+                  "stop_reason": "COMPLETED",
+                  "evidence_refs": [
+                    "file:docs/format.txt",
+                    "file:src/invoice.py",
+                    "file:src/main.py",
+                    "symbol:normalize_invoice@src/invoice.py:1"
+                  ],
+                  "retained_constraint_ids": [
+                    "C1",
+                    "C2"
+                  ],
+                  "plan": []
+                },
+                "completed_stages": [
+                  "PARSING",
+                  "SCHEMA",
+                  "ENUMS",
+                  "REFERENCES",
+                  "PRECONDITIONS",
+                  "COMPATIBILITY",
+                  "ACCEPTANCE_CRITERIA"
+                ],
+                "delegated_to": ""
+              },
+              "progress_result": {
+                "event_count": 12,
+                "distinct_inputs": 4,
+                "distinct_outputs": 4,
+                "conditions": [],
+                "latest_outcome": "CALLED"
+              },
+              "recovery_result": [
+                {
+                  "action": "NONE",
+                  "reason": "recovery_not_required",
+                  "recoverable": false,
+                  "retry_requested": false,
+                  "input_changed": false
+                }
+              ],
+              "stop_reason": "COMPLETED",
+              "latency_ms": 8711,
+              "input_tokens": 1575,
+              "output_tokens": 112,
+              "tokens_per_second": null,
+              "request_fingerprint": "648fb2f3f17aac180a312e455ab9d6d710e277cedf99f05f3357947e041c77dc",
+              "tool_result_hash": "192f1a5ea566baab2dc0772a9d8daa5b49b8c5d9793c3dedda479d102d293227"
+            }
+          ],
+          "provider_attempts": [
+            {
+              "variant_id": "S04_CONDITIONED_SCHEMA",
+              "repetition": 1,
+              "step": 1,
+              "semantic_retry": false,
+              "request_fingerprint": "83f0a5b006a01cd17096bbb3308cbd51c57cfa56cc04f5d474f4865999319040",
+              "schema_sha256": "f123e68d325004575123a22b001ea81f1fe538715f8084650eb4424506e7a47c",
+              "state": {
+                "required_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file",
+                  "finish"
+                ],
+                "completed_tools": [],
+                "remaining_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file"
+                ],
+                "finish_allowed": false
+              },
+              "rejection": {},
+              "status": "SUCCEEDED",
+              "duration_ms": 18909.182,
+              "output_sha256": "9d93abebfe2b368e40f30f870772ab77e95b4520cb3f0314e94ed7aaaac44f12",
+              "decision": {
+                "decision": "CALL_TOOL",
+                "tool_name": "list_files",
+                "arguments": {
+                  "path": ""
+                },
+                "conclusion": "",
+                "stop_reason": "",
+                "evidence_refs": [],
+                "retained_constraint_ids": [
+                  "C1",
+                  "C2"
+                ],
+                "plan": []
+              },
+              "premature_finish": false,
+              "input_tokens": 1083,
+              "output_tokens": 91
+            },
+            {
+              "variant_id": "S04_CONDITIONED_SCHEMA",
+              "repetition": 1,
+              "step": 2,
+              "semantic_retry": false,
+              "request_fingerprint": "85da017d848c350c5ff0706028290aa30f3cd1238e6d46486c6a4bb4e4e9a259",
+              "schema_sha256": "2762464ca58cd5a24a44b658603a8fb59e6f64c2fee47bf45f5c18d660ed266c",
+              "state": {
+                "required_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file",
+                  "finish"
+                ],
+                "completed_tools": [
+                  "list_files"
+                ],
+                "remaining_tools": [
+                  "inspect_symbol",
+                  "read_file"
+                ],
+                "finish_allowed": false
+              },
+              "rejection": {},
+              "status": "SUCCEEDED",
+              "duration_ms": 5215.654,
+              "output_sha256": "cc241abc6861d8ddd6a5812423e9493ef07cd3bec5adc3b33eb67e1e44f0e948",
+              "decision": {
+                "decision": "CALL_TOOL",
+                "tool_name": "inspect_symbol",
+                "arguments": {
+                  "symbol": "normalize_invoice"
+                },
+                "conclusion": "",
+                "stop_reason": "",
+                "evidence_refs": [],
+                "retained_constraint_ids": [
+                  "C1",
+                  "C2"
+                ],
+                "plan": []
+              },
+              "premature_finish": false,
+              "input_tokens": 1241,
+              "output_tokens": 45
+            },
+            {
+              "variant_id": "S04_CONDITIONED_SCHEMA",
+              "repetition": 1,
+              "step": 3,
+              "semantic_retry": false,
+              "request_fingerprint": "fae446708002cf70ee4085e6c275e7150ef6a8c883289c4e472787e5d8c87cf0",
+              "schema_sha256": "ac3f2c0e8d6d96129b8a1b1fbd386371d4151e49b84dfc700d36b81d436236d9",
+              "state": {
+                "required_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file",
+                  "finish"
+                ],
+                "completed_tools": [
+                  "list_files",
+                  "inspect_symbol"
+                ],
+                "remaining_tools": [
+                  "read_file"
+                ],
+                "finish_allowed": false
+              },
+              "rejection": {},
+              "status": "SUCCEEDED",
+              "duration_ms": 5555.536,
+              "output_sha256": "a355992ab96d6af36a42b1dbf3ddf4108d1ca2ffd083decfb62ba1b02d2616d5",
+              "decision": {
+                "decision": "CALL_TOOL",
+                "tool_name": "read_file",
+                "arguments": {
+                  "path": "src/invoice.py"
+                },
+                "conclusion": "",
+                "stop_reason": "",
+                "evidence_refs": [],
+                "retained_constraint_ids": [
+                  "C1",
+                  "C2"
+                ],
+                "plan": []
+              },
+              "premature_finish": false,
+              "input_tokens": 1379,
+              "output_tokens": 48
+            },
+            {
+              "variant_id": "S04_CONDITIONED_SCHEMA",
+              "repetition": 1,
+              "step": 4,
+              "semantic_retry": false,
+              "request_fingerprint": "ea84fd65417665f8440ec131d7800bdde5e17a78fc3a0bb5940a02eedc732571",
+              "schema_sha256": "31deb2ad49c6a2035d5269b2ca7ef0e2a74bf75ace15e510473d72582da4ccde",
+              "state": {
+                "required_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file",
+                  "finish"
+                ],
+                "completed_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file"
+                ],
+                "remaining_tools": [],
+                "finish_allowed": true
+              },
+              "rejection": {},
+              "status": "SUCCEEDED",
+              "duration_ms": 8711.54,
+              "output_sha256": "b70475e71697c95beec65fc41cf6b7dd2750a987c040e4cb3e5af48b3ac5932e",
+              "decision": {
+                "decision": "FINISH",
+                "tool_name": "finish",
+                "arguments": {
+                  "conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+                  "stop_reason": "COMPLETED"
+                },
+                "conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+                "stop_reason": "COMPLETED",
+                "evidence_refs": [
+                  "file:docs/format.txt",
+                  "file:src/invoice.py",
+                  "file:src/main.py",
+                  "symbol:normalize_invoice@src/invoice.py:1"
+                ],
+                "retained_constraint_ids": [
+                  "C1",
+                  "C2"
+                ],
+                "plan": []
+              },
+              "premature_finish": false,
+              "input_tokens": 1575,
+              "output_tokens": 112
+            }
+          ]
+        },
+        {
+          "repetition": 2,
+          "strict_pass": true,
+          "recovered_sequence": true,
+          "scenario_status": "PASS",
+          "stop_reason": "COMPLETED",
+          "expected_sequence": [
+            "list_files",
+            "inspect_symbol",
+            "read_file",
+            "finish"
+          ],
+          "actual_sequence": [
+            "list_files",
+            "inspect_symbol",
+            "read_file",
+            "finish"
+          ],
+          "premature_finish_attempts": 0,
+          "repeated_tool_calls": 0,
+          "timeouts": 0,
+          "model_calls": 4,
+          "semantic_retries": 0,
+          "prevalidation_events": [],
+          "errors": [],
+          "scenario_result": {
+            "scenario_id": "A01_FIND_RELEVANT_FILE",
+            "repetition": 2,
+            "group": "A",
+            "capability": "stateful_tool_use",
+            "status": "PASS",
+            "stop_reason": "COMPLETED",
+            "step_count": 4,
+            "final_conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+            "evidence_refs": [
+              "file:docs/format.txt",
+              "file:src/invoice.py",
+              "file:src/main.py",
+              "symbol:normalize_invoice@src/invoice.py:1"
+            ],
+            "tools_called": [
+              "list_files",
+              "inspect_symbol",
+              "read_file",
+              "finish"
+            ],
+            "retained_constraints": [
+              "C1",
+              "C2"
+            ],
+            "plan_steps": 0,
+            "criteria": [
+              {
+                "criterion": "finished_with_structured_decision",
+                "passed": true,
+                "evidence": "finish_present=True"
+              },
+              {
+                "criterion": "expected_stop_reason",
+                "passed": true,
+                "evidence": "expected=COMPLETED, actual=COMPLETED"
+              },
+              {
+                "criterion": "required_tools_used",
+                "passed": true,
+                "evidence": "required=['finish', 'inspect_symbol', 'list_files', 'read_file'], observed=['list_files', 'inspect_symbol', 'read_file', 'finish']"
+              },
+              {
+                "criterion": "required_evidence_observed",
+                "passed": true,
+                "evidence": "required=['file:src/invoice.py'], observed=['file:docs/format.txt', 'file:src/invoice.py', 'file:src/main.py', 'symbol:normalize_invoice@src/invoice.py:1']"
+              },
+              {
+                "criterion": "required_evidence_cited",
+                "passed": true,
+                "evidence": "required=['file:src/invoice.py'], cited=['file:docs/format.txt', 'file:src/invoice.py', 'file:src/main.py', 'symbol:normalize_invoice@src/invoice.py:1']"
+              },
+              {
+                "criterion": "required_semantics",
+                "passed": true,
+                "evidence": "required_terms=['src/invoice.py', 'normalize_invoice']"
+              },
+              {
+                "criterion": "forbidden_semantics_absent",
+                "passed": true,
+                "evidence": "forbidden_terms=[]"
+              },
+              {
+                "criterion": "constraints_retained",
+                "passed": true,
+                "evidence": "expected=['C1', 'C2'], received=['C1', 'C2']"
+              },
+              {
+                "criterion": "no_repeated_tool_call",
+                "passed": true,
+                "evidence": "step_count=4"
+              },
+              {
+                "criterion": "step_limit_respected",
+                "passed": true,
+                "evidence": "steps=4, configured=5"
+              }
+            ],
+            "total_latency_ms": 21967,
+            "input_tokens": 5278,
+            "output_tokens": 296,
+            "response_hashes": [
+              "9d93abebfe2b368e40f30f870772ab77e95b4520cb3f0314e94ed7aaaac44f12",
+              "cc241abc6861d8ddd6a5812423e9493ef07cd3bec5adc3b33eb67e1e44f0e948",
+              "a355992ab96d6af36a42b1dbf3ddf4108d1ca2ffd083decfb62ba1b02d2616d5",
+              "b70475e71697c95beec65fc41cf6b7dd2750a987c040e4cb3e5af48b3ac5932e"
+            ],
+            "context_range_chars": [
+              2044,
+              2829
+            ],
+            "recovery_used": false,
+            "errors": []
+          },
+          "steps": [
+            {
+              "scenario_id": "A01_FIND_RELEVANT_FILE",
+              "repetition": 2,
+              "step_number": 1,
+              "objective": "Identify the file and line defining normalize_invoice. List the fixture, locate the symbol, read its file, then finish.",
+              "current_constraints": [
+                "C1",
+                "C2"
+              ],
+              "available_tools": [
+                "list_files",
+                "read_file",
+                "search_text",
+                "inspect_symbol",
+                "query_fixture_index",
+                "finish"
+              ],
+              "selected_tool": "list_files",
+              "tool_arguments": {
+                "path": ""
+              },
+              "normalized_observation": {
+                "tool_name": "list_files",
+                "status": "SUCCEEDED",
+                "result": {
+                  "count": 3,
+                  "file_count": 3
+                },
+                "references": [
+                  "file:docs/format.txt",
+                  "file:src/invoice.py",
+                  "file:src/main.py"
+                ],
+                "result_sha256": "5e77616dc59d1aaeebc86357298683f2563ca4b97f72630c81c832418fbb7d2e",
+                "summary": "Listed 3 files.",
+                "error_code": ""
+              },
+              "model_output_hash": "9d93abebfe2b368e40f30f870772ab77e95b4520cb3f0314e94ed7aaaac44f12",
+              "context_hash": "b60189b24418aef225772e48495225f0e8a6026498e0c31c5d148e76636c133a",
+              "context_chars": 2044,
+              "context_items": 4,
+              "context_decisions": [
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C1",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "276c3c20a82037e332d282161a47d94590bf3c5a37518fbf1d7e9b8c719768c2",
+                  "size": 62,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C2",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "6347c0170d037fb6bf4d26d702c9828389323c2d2b5066f77008e077cded36c1",
+                  "size": 63,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:objective",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "eeb03b8da232378a99906c3d937571c2add8007c44724df001131102994553e8",
+                  "size": 119,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:tools",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "d367b22d5902687b5af7679e6cbd201cc80543a9e714198b94ce5ccb3d46caa1",
+                  "size": 1800,
+                  "priority": 95
+                }
+              ],
+              "validation_result": {
+                "status": "PASSED",
+                "issues": [],
+                "structured_output": {
+                  "decision": "CALL_TOOL",
+                  "tool_name": "list_files",
+                  "arguments": {
+                    "path": ""
+                  },
+                  "conclusion": "",
+                  "stop_reason": "",
+                  "evidence_refs": [],
+                  "retained_constraint_ids": [
+                    "C1",
+                    "C2"
+                  ],
+                  "plan": []
+                },
+                "completed_stages": [
+                  "PARSING",
+                  "SCHEMA",
+                  "ENUMS",
+                  "REFERENCES",
+                  "PRECONDITIONS",
+                  "COMPATIBILITY",
+                  "ACCEPTANCE_CRITERIA"
+                ],
+                "delegated_to": ""
+              },
+              "progress_result": {
+                "event_count": 3,
+                "distinct_inputs": 1,
+                "distinct_outputs": 1,
+                "conditions": [],
+                "latest_outcome": "CALLED"
+              },
+              "recovery_result": [
+                {
+                  "action": "NONE",
+                  "reason": "recovery_not_required",
+                  "recoverable": false,
+                  "retry_requested": false,
+                  "input_changed": false
+                }
+              ],
+              "stop_reason": "",
+              "latency_ms": 6404,
+              "input_tokens": 1083,
+              "output_tokens": 91,
+              "tokens_per_second": null,
+              "request_fingerprint": "e4d5eb6357228bd1677bc2d33b214aaad9ff4b1dfc5256396d6f8936714bafbb",
+              "tool_result_hash": "5e77616dc59d1aaeebc86357298683f2563ca4b97f72630c81c832418fbb7d2e"
+            },
+            {
+              "scenario_id": "A01_FIND_RELEVANT_FILE",
+              "repetition": 2,
+              "step_number": 2,
+              "objective": "Identify the file and line defining normalize_invoice. List the fixture, locate the symbol, read its file, then finish.",
+              "current_constraints": [
+                "C1",
+                "C2"
+              ],
+              "available_tools": [
+                "list_files",
+                "read_file",
+                "search_text",
+                "inspect_symbol",
+                "query_fixture_index",
+                "finish"
+              ],
+              "selected_tool": "inspect_symbol",
+              "tool_arguments": {
+                "symbol": "normalize_invoice"
+              },
+              "normalized_observation": {
+                "tool_name": "inspect_symbol",
+                "status": "SUCCEEDED",
+                "result": {
+                  "symbol": "normalize_invoice",
+                  "match_count": 1
+                },
+                "references": [
+                  "symbol:normalize_invoice@src/invoice.py:1"
+                ],
+                "result_sha256": "5412b4a290f28e71172e767f5b7f22b5b3d37e29ffbd44406f56a9087590bf53",
+                "summary": "inspect_symbol returned 1 matches.",
+                "error_code": ""
+              },
+              "model_output_hash": "cc241abc6861d8ddd6a5812423e9493ef07cd3bec5adc3b33eb67e1e44f0e948",
+              "context_hash": "28bae6977f5c7c4208b02fbf64e35d34945a5973c473ae0a280efadb37e36f57",
+              "context_chars": 2193,
+              "context_items": 6,
+              "context_decisions": [
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C1",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "276c3c20a82037e332d282161a47d94590bf3c5a37518fbf1d7e9b8c719768c2",
+                  "size": 62,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C2",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "6347c0170d037fb6bf4d26d702c9828389323c2d2b5066f77008e077cded36c1",
+                  "size": 63,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:objective",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "eeb03b8da232378a99906c3d937571c2add8007c44724df001131102994553e8",
+                  "size": 119,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:tools",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "d367b22d5902687b5af7679e6cbd201cc80543a9e714198b94ce5ccb3d46caa1",
+                  "size": 1800,
+                  "priority": 95
+                },
+                {
+                  "source": "observation:list_files:5e77616dc59d1aae",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "5e77616dc59d1aaeebc86357298683f2563ca4b97f72630c81c832418fbb7d2e",
+                  "size": 70,
+                  "priority": 90
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:recent-decisions",
+                  "included": true,
+                  "reason": "relevance_score=0.800",
+                  "hash": "115892645151e6b2d83382b36477c1390432e9f2e052064f5f8d97bb22e3b1f0",
+                  "size": 79,
+                  "priority": 60
+                }
+              ],
+              "validation_result": {
+                "status": "PASSED",
+                "issues": [],
+                "structured_output": {
+                  "decision": "CALL_TOOL",
+                  "tool_name": "inspect_symbol",
+                  "arguments": {
+                    "symbol": "normalize_invoice"
+                  },
+                  "conclusion": "",
+                  "stop_reason": "",
+                  "evidence_refs": [],
+                  "retained_constraint_ids": [
+                    "C1",
+                    "C2"
+                  ],
+                  "plan": []
+                },
+                "completed_stages": [
+                  "PARSING",
+                  "SCHEMA",
+                  "ENUMS",
+                  "REFERENCES",
+                  "PRECONDITIONS",
+                  "COMPATIBILITY",
+                  "ACCEPTANCE_CRITERIA"
+                ],
+                "delegated_to": ""
+              },
+              "progress_result": {
+                "event_count": 6,
+                "distinct_inputs": 2,
+                "distinct_outputs": 2,
+                "conditions": [],
+                "latest_outcome": "CALLED"
+              },
+              "recovery_result": [
+                {
+                  "action": "NONE",
+                  "reason": "recovery_not_required",
+                  "recoverable": false,
+                  "retry_requested": false,
+                  "input_changed": false
+                }
+              ],
+              "stop_reason": "",
+              "latency_ms": 4041,
+              "input_tokens": 1241,
+              "output_tokens": 45,
+              "tokens_per_second": null,
+              "request_fingerprint": "b49b20ce5670907c30424fe4d7f65285e42d80a1b98dfe4f6c3b8b7740af62d5",
+              "tool_result_hash": "5412b4a290f28e71172e767f5b7f22b5b3d37e29ffbd44406f56a9087590bf53"
+            },
+            {
+              "scenario_id": "A01_FIND_RELEVANT_FILE",
+              "repetition": 2,
+              "step_number": 3,
+              "objective": "Identify the file and line defining normalize_invoice. List the fixture, locate the symbol, read its file, then finish.",
+              "current_constraints": [
+                "C1",
+                "C2"
+              ],
+              "available_tools": [
+                "list_files",
+                "read_file",
+                "search_text",
+                "inspect_symbol",
+                "query_fixture_index",
+                "finish"
+              ],
+              "selected_tool": "read_file",
+              "tool_arguments": {
+                "path": "src/invoice.py"
+              },
+              "normalized_observation": {
+                "tool_name": "read_file",
+                "status": "SUCCEEDED",
+                "result": {
+                  "path": "src/invoice.py",
+                  "size_chars": 104,
+                  "line_count": 3,
+                  "truncated": false,
+                  "content_sha256": "04fa6e4f644d9fdaea4de9259d4ec570146faa16f93237ebb25ceaf246295401"
+                },
+                "references": [
+                  "file:src/invoice.py"
+                ],
+                "result_sha256": "60abadcd6c02e4b7f36b87ceadd1f297720aa1a320a29282e7d815e301e6a917",
+                "summary": "Read src/invoice.py (104 chars, truncated=False).",
+                "error_code": ""
+              },
+              "model_output_hash": "a355992ab96d6af36a42b1dbf3ddf4108d1ca2ffd083decfb62ba1b02d2616d5",
+              "context_hash": "bbf47d632f770bd7120e8881e7bb0eb83a21f3efdfd13864bf4d346920029fd4",
+              "context_chars": 2466,
+              "context_items": 7,
+              "context_decisions": [
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C1",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "276c3c20a82037e332d282161a47d94590bf3c5a37518fbf1d7e9b8c719768c2",
+                  "size": 62,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C2",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "6347c0170d037fb6bf4d26d702c9828389323c2d2b5066f77008e077cded36c1",
+                  "size": 63,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:objective",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "eeb03b8da232378a99906c3d937571c2add8007c44724df001131102994553e8",
+                  "size": 119,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:tools",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "d367b22d5902687b5af7679e6cbd201cc80543a9e714198b94ce5ccb3d46caa1",
+                  "size": 1800,
+                  "priority": 95
+                },
+                {
+                  "source": "observation:inspect_symbol:5412b4a290f28e71",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "5412b4a290f28e71172e767f5b7f22b5b3d37e29ffbd44406f56a9087590bf53",
+                  "size": 191,
+                  "priority": 90
+                },
+                {
+                  "source": "observation:list_files:5e77616dc59d1aae",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "5e77616dc59d1aaeebc86357298683f2563ca4b97f72630c81c832418fbb7d2e",
+                  "size": 70,
+                  "priority": 89
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:recent-decisions",
+                  "included": true,
+                  "reason": "relevance_score=0.800",
+                  "hash": "afcd83b77476f11f38501449b982c186ad40d979615fab2c960d53936000e48d",
+                  "size": 161,
+                  "priority": 60
+                }
+              ],
+              "validation_result": {
+                "status": "PASSED",
+                "issues": [],
+                "structured_output": {
+                  "decision": "CALL_TOOL",
+                  "tool_name": "read_file",
+                  "arguments": {
+                    "path": "src/invoice.py"
+                  },
+                  "conclusion": "",
+                  "stop_reason": "",
+                  "evidence_refs": [],
+                  "retained_constraint_ids": [
+                    "C1",
+                    "C2"
+                  ],
+                  "plan": []
+                },
+                "completed_stages": [
+                  "PARSING",
+                  "SCHEMA",
+                  "ENUMS",
+                  "REFERENCES",
+                  "PRECONDITIONS",
+                  "COMPATIBILITY",
+                  "ACCEPTANCE_CRITERIA"
+                ],
+                "delegated_to": ""
+              },
+              "progress_result": {
+                "event_count": 9,
+                "distinct_inputs": 3,
+                "distinct_outputs": 3,
+                "conditions": [],
+                "latest_outcome": "CALLED"
+              },
+              "recovery_result": [
+                {
+                  "action": "NONE",
+                  "reason": "recovery_not_required",
+                  "recoverable": false,
+                  "retry_requested": false,
+                  "input_changed": false
+                }
+              ],
+              "stop_reason": "",
+              "latency_ms": 4092,
+              "input_tokens": 1379,
+              "output_tokens": 48,
+              "tokens_per_second": null,
+              "request_fingerprint": "2e90e8f62f50f7f10f710f952ddb0f2e94cf3636e4fd1be7e6b47ef95572ef78",
+              "tool_result_hash": "60abadcd6c02e4b7f36b87ceadd1f297720aa1a320a29282e7d815e301e6a917"
+            },
+            {
+              "scenario_id": "A01_FIND_RELEVANT_FILE",
+              "repetition": 2,
+              "step_number": 4,
+              "objective": "Identify the file and line defining normalize_invoice. List the fixture, locate the symbol, read its file, then finish.",
+              "current_constraints": [
+                "C1",
+                "C2"
+              ],
+              "available_tools": [
+                "list_files",
+                "read_file",
+                "search_text",
+                "inspect_symbol",
+                "query_fixture_index",
+                "finish"
+              ],
+              "selected_tool": "finish",
+              "tool_arguments": {
+                "conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+                "stop_reason": "COMPLETED"
+              },
+              "normalized_observation": {
+                "tool_name": "finish",
+                "status": "SUCCEEDED",
+                "result": {
+                  "accepted": true,
+                  "conclusion_sha256": "4d6a495451793368d037e4c64cbfb3a16a1cac7cf03d333d6c14b4ff1dcfe210",
+                  "stop_reason": "COMPLETED"
+                },
+                "references": [],
+                "result_sha256": "192f1a5ea566baab2dc0772a9d8daa5b49b8c5d9793c3dedda479d102d293227",
+                "summary": "finish completed.",
+                "error_code": ""
+              },
+              "model_output_hash": "b70475e71697c95beec65fc41cf6b7dd2750a987c040e4cb3e5af48b3ac5932e",
+              "context_hash": "e70dded4836783e15891fc6378925f51c01a955e9cc344a3618457c6f5f33f0d",
+              "context_chars": 2829,
+              "context_items": 8,
+              "context_decisions": [
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C1",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "276c3c20a82037e332d282161a47d94590bf3c5a37518fbf1d7e9b8c719768c2",
+                  "size": 62,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:constraint:C2",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "6347c0170d037fb6bf4d26d702c9828389323c2d2b5066f77008e077cded36c1",
+                  "size": 63,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:objective",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "eeb03b8da232378a99906c3d937571c2add8007c44724df001131102994553e8",
+                  "size": 119,
+                  "priority": 100
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:tools",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "d367b22d5902687b5af7679e6cbd201cc80543a9e714198b94ce5ccb3d46caa1",
+                  "size": 1800,
+                  "priority": 95
+                },
+                {
+                  "source": "observation:read_file:60abadcd6c02e4b7",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "60abadcd6c02e4b7f36b87ceadd1f297720aa1a320a29282e7d815e301e6a917",
+                  "size": 286,
+                  "priority": 90
+                },
+                {
+                  "source": "observation:inspect_symbol:5412b4a290f28e71",
+                  "included": true,
+                  "reason": "explicitly_requested",
+                  "hash": "5412b4a290f28e71172e767f5b7f22b5b3d37e29ffbd44406f56a9087590bf53",
+                  "size": 191,
+                  "priority": 89
+                },
+                {
+                  "source": "observation:list_files:5e77616dc59d1aae",
+                  "included": true,
+                  "reason": "relevance_score=0.840",
+                  "hash": "5e77616dc59d1aaeebc86357298683f2563ca4b97f72630c81c832418fbb7d2e",
+                  "size": 70,
+                  "priority": 88
+                },
+                {
+                  "source": "scenario:A01_FIND_RELEVANT_FILE:recent-decisions",
+                  "included": true,
+                  "reason": "relevance_score=0.800",
+                  "hash": "efef8a1c2354d35019af2edc0640cc520a53c6008a12b6f2e1b3099f89df90e8",
+                  "size": 238,
+                  "priority": 60
+                }
+              ],
+              "validation_result": {
+                "status": "PASSED",
+                "issues": [],
+                "structured_output": {
+                  "decision": "FINISH",
+                  "tool_name": "finish",
+                  "arguments": {
+                    "conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+                    "stop_reason": "COMPLETED"
+                  },
+                  "conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+                  "stop_reason": "COMPLETED",
+                  "evidence_refs": [
+                    "file:docs/format.txt",
+                    "file:src/invoice.py",
+                    "file:src/main.py",
+                    "symbol:normalize_invoice@src/invoice.py:1"
+                  ],
+                  "retained_constraint_ids": [
+                    "C1",
+                    "C2"
+                  ],
+                  "plan": []
+                },
+                "completed_stages": [
+                  "PARSING",
+                  "SCHEMA",
+                  "ENUMS",
+                  "REFERENCES",
+                  "PRECONDITIONS",
+                  "COMPATIBILITY",
+                  "ACCEPTANCE_CRITERIA"
+                ],
+                "delegated_to": ""
+              },
+              "progress_result": {
+                "event_count": 12,
+                "distinct_inputs": 4,
+                "distinct_outputs": 4,
+                "conditions": [],
+                "latest_outcome": "CALLED"
+              },
+              "recovery_result": [
+                {
+                  "action": "NONE",
+                  "reason": "recovery_not_required",
+                  "recoverable": false,
+                  "retry_requested": false,
+                  "input_changed": false
+                }
+              ],
+              "stop_reason": "COMPLETED",
+              "latency_ms": 7430,
+              "input_tokens": 1575,
+              "output_tokens": 112,
+              "tokens_per_second": null,
+              "request_fingerprint": "648fb2f3f17aac180a312e455ab9d6d710e277cedf99f05f3357947e041c77dc",
+              "tool_result_hash": "192f1a5ea566baab2dc0772a9d8daa5b49b8c5d9793c3dedda479d102d293227"
+            }
+          ],
+          "provider_attempts": [
+            {
+              "variant_id": "S04_CONDITIONED_SCHEMA",
+              "repetition": 2,
+              "step": 1,
+              "semantic_retry": false,
+              "request_fingerprint": "83f0a5b006a01cd17096bbb3308cbd51c57cfa56cc04f5d474f4865999319040",
+              "schema_sha256": "f123e68d325004575123a22b001ea81f1fe538715f8084650eb4424506e7a47c",
+              "state": {
+                "required_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file",
+                  "finish"
+                ],
+                "completed_tools": [],
+                "remaining_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file"
+                ],
+                "finish_allowed": false
+              },
+              "rejection": {},
+              "status": "SUCCEEDED",
+              "duration_ms": 6403.697,
+              "output_sha256": "9d93abebfe2b368e40f30f870772ab77e95b4520cb3f0314e94ed7aaaac44f12",
+              "decision": {
+                "decision": "CALL_TOOL",
+                "tool_name": "list_files",
+                "arguments": {
+                  "path": ""
+                },
+                "conclusion": "",
+                "stop_reason": "",
+                "evidence_refs": [],
+                "retained_constraint_ids": [
+                  "C1",
+                  "C2"
+                ],
+                "plan": []
+              },
+              "premature_finish": false,
+              "input_tokens": 1083,
+              "output_tokens": 91
+            },
+            {
+              "variant_id": "S04_CONDITIONED_SCHEMA",
+              "repetition": 2,
+              "step": 2,
+              "semantic_retry": false,
+              "request_fingerprint": "85da017d848c350c5ff0706028290aa30f3cd1238e6d46486c6a4bb4e4e9a259",
+              "schema_sha256": "2762464ca58cd5a24a44b658603a8fb59e6f64c2fee47bf45f5c18d660ed266c",
+              "state": {
+                "required_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file",
+                  "finish"
+                ],
+                "completed_tools": [
+                  "list_files"
+                ],
+                "remaining_tools": [
+                  "inspect_symbol",
+                  "read_file"
+                ],
+                "finish_allowed": false
+              },
+              "rejection": {},
+              "status": "SUCCEEDED",
+              "duration_ms": 4041.574,
+              "output_sha256": "cc241abc6861d8ddd6a5812423e9493ef07cd3bec5adc3b33eb67e1e44f0e948",
+              "decision": {
+                "decision": "CALL_TOOL",
+                "tool_name": "inspect_symbol",
+                "arguments": {
+                  "symbol": "normalize_invoice"
+                },
+                "conclusion": "",
+                "stop_reason": "",
+                "evidence_refs": [],
+                "retained_constraint_ids": [
+                  "C1",
+                  "C2"
+                ],
+                "plan": []
+              },
+              "premature_finish": false,
+              "input_tokens": 1241,
+              "output_tokens": 45
+            },
+            {
+              "variant_id": "S04_CONDITIONED_SCHEMA",
+              "repetition": 2,
+              "step": 3,
+              "semantic_retry": false,
+              "request_fingerprint": "fae446708002cf70ee4085e6c275e7150ef6a8c883289c4e472787e5d8c87cf0",
+              "schema_sha256": "ac3f2c0e8d6d96129b8a1b1fbd386371d4151e49b84dfc700d36b81d436236d9",
+              "state": {
+                "required_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file",
+                  "finish"
+                ],
+                "completed_tools": [
+                  "list_files",
+                  "inspect_symbol"
+                ],
+                "remaining_tools": [
+                  "read_file"
+                ],
+                "finish_allowed": false
+              },
+              "rejection": {},
+              "status": "SUCCEEDED",
+              "duration_ms": 4092.647,
+              "output_sha256": "a355992ab96d6af36a42b1dbf3ddf4108d1ca2ffd083decfb62ba1b02d2616d5",
+              "decision": {
+                "decision": "CALL_TOOL",
+                "tool_name": "read_file",
+                "arguments": {
+                  "path": "src/invoice.py"
+                },
+                "conclusion": "",
+                "stop_reason": "",
+                "evidence_refs": [],
+                "retained_constraint_ids": [
+                  "C1",
+                  "C2"
+                ],
+                "plan": []
+              },
+              "premature_finish": false,
+              "input_tokens": 1379,
+              "output_tokens": 48
+            },
+            {
+              "variant_id": "S04_CONDITIONED_SCHEMA",
+              "repetition": 2,
+              "step": 4,
+              "semantic_retry": false,
+              "request_fingerprint": "ea84fd65417665f8440ec131d7800bdde5e17a78fc3a0bb5940a02eedc732571",
+              "schema_sha256": "31deb2ad49c6a2035d5269b2ca7ef0e2a74bf75ace15e510473d72582da4ccde",
+              "state": {
+                "required_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file",
+                  "finish"
+                ],
+                "completed_tools": [
+                  "list_files",
+                  "inspect_symbol",
+                  "read_file"
+                ],
+                "remaining_tools": [],
+                "finish_allowed": true
+              },
+              "rejection": {},
+              "status": "SUCCEEDED",
+              "duration_ms": 7429.985,
+              "output_sha256": "b70475e71697c95beec65fc41cf6b7dd2750a987c040e4cb3e5af48b3ac5932e",
+              "decision": {
+                "decision": "FINISH",
+                "tool_name": "finish",
+                "arguments": {
+                  "conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+                  "stop_reason": "COMPLETED"
+                },
+                "conclusion": "The file defining normalize_invoice is src/invoice.py at line 1.",
+                "stop_reason": "COMPLETED",
+                "evidence_refs": [
+                  "file:docs/format.txt",
+                  "file:src/invoice.py",
+                  "file:src/main.py",
+                  "symbol:normalize_invoice@src/invoice.py:1"
+                ],
+                "retained_constraint_ids": [
+                  "C1",
+                  "C2"
+                ],
+                "plan": []
+              },
+              "premature_finish": false,
+              "input_tokens": 1575,
+              "output_tokens": 112
+            }
+          ]
+        }
+      ],
+      "strict_consecutive_success": true,
+      "recovered_consecutive_sequence": true,
+      "total_model_calls": 8,
+      "total_premature_finish_attempts": 0,
+      "total_repeated_tool_calls": 0,
+      "total_timeouts": 0,
+      "runner_guard": [
+        {
+          "event": "selected_runner_recycle",
+          "model": "qwen3.5:9b",
+          "reason": "stateful_session_preflight",
+          "status": "RECYCLED",
+          "exit_code": 0,
+          "elapsed_ms": 553.772
+        }
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import { useWebSocket } from './context/WebSocketContext';
 import { ChatPanel } from './features/chat';
 import { AgentLibrary } from './features/settings';
 import { HologramCore, WorkspaceViewer } from './features/workspace';
-import { X, Users, BookOpen, Activity, PanelRightClose } from 'lucide-react';
+import { X, Users, BookOpen, Activity, ChevronDown, PanelRightClose } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 
@@ -17,6 +17,7 @@ const TEMPLATE_OPTIONS = [
 
 function App() {
   const {
+    isConnected,
     activeTemplate,
     selectTemplate,
     chatPanelOpen,
@@ -26,17 +27,14 @@ function App() {
   } = useWebSocket();
 
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+  const [isTeamOpen, setIsTeamOpen] = useState(false);
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     selectTemplate(e.target.value);
   };
 
   return (
-    <div className="min-h-screen bg-[#030407] text-gray-200 flex flex-col relative font-sans overflow-hidden">
-      {/* Background technical sci-fi grid lines */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0c0f1d_1px,transparent_1px),linear-gradient(to_bottom,#0c0f1d_1px,transparent_1px)] bg-[size:2.2rem_2.2rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,#000_80%,transparent_100%)] opacity-40 pointer-events-none" />
-      <div className="absolute top-0 left-1/4 w-[500px] h-[200px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-0 right-1/4 w-[500px] h-[200px] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen bg-[#0b0b0a] text-stone-200 flex flex-col relative font-sans overflow-hidden">
 
       {/* ── MAIN: Ecrã completamente limpo — só o hologram ── */}
       <main className="flex-grow flex items-center justify-center z-10 relative overflow-hidden">
@@ -110,23 +108,28 @@ function App() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 18 }}
               transition={{ type: 'spring', damping: 28, stiffness: 210 }}
-              className="fixed inset-0 sm:inset-4 bg-[#05070e]/97 border border-white/8 shadow-[0_24px_90px_rgba(0,0,0,0.62)] z-40 flex flex-col backdrop-blur-2xl select-none sm:rounded-lg overflow-hidden"
+              className="fixed inset-0 sm:inset-2 bg-[#05070e]/97 border border-white/8 shadow-[0_24px_90px_rgba(0,0,0,0.62)] z-40 flex flex-col backdrop-blur-2xl sm:rounded-lg overflow-hidden"
             >
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 px-4 py-3 border-b border-white/8 bg-white/[0.025] shrink-0">
+              <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-b border-white/8 bg-white/[0.025] shrink-0">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="h-9 w-9 rounded-md border border-cyan-300/20 bg-cyan-300/10 flex items-center justify-center">
-                    <Users className="w-4 h-4 text-cyan-200" />
+                  <div className="relative h-8 w-8 rounded-md border border-cyan-300/20 bg-cyan-300/10 flex items-center justify-center">
+                    <Activity className="w-4 h-4 text-cyan-200" />
+                    <span
+                      className={`absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full border-2 border-[#090b12] ${
+                        isConnected ? 'bg-emerald-400' : 'bg-rose-400'
+                      }`}
+                    />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-white truncate">Enxame de agentes</div>
-                    <div className="text-xs text-gray-500 truncate">Configuracao, workspace e memoria operacional</div>
+                    <div className="text-sm font-semibold text-white truncate">Workspace</div>
+                    <div className="hidden text-xs text-gray-500 truncate sm:block">Projetos, alterações e missões</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex min-w-0 items-center gap-2">
                   <select
                     value={activeTemplate?.template_name || 'builder_swarm'}
                     onChange={handleTemplateChange}
-                    className="h-9 px-3 bg-black/35 border border-white/10 rounded-md text-gray-200 outline-none focus:border-cyan-300/40 cursor-pointer text-xs"
+                    className="hidden h-9 max-w-44 px-3 bg-black/35 border border-white/10 rounded-md text-gray-200 outline-none focus:border-cyan-300/40 cursor-pointer text-xs md:block"
                   >
                     {TEMPLATE_OPTIONS.map((template) => (
                       <option key={template.value} value={template.value}>
@@ -135,11 +138,26 @@ function App() {
                     ))}
                   </select>
                   <button
+                    onClick={() => setIsTeamOpen((current) => !current)}
+                    className={`flex h-9 items-center justify-center gap-2 border px-2.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+                      isTeamOpen
+                        ? 'border-cyan-300/30 bg-cyan-300/10 text-cyan-100'
+                        : 'border-white/8 bg-white/[0.035] text-gray-400 hover:bg-white/[0.07] hover:text-white'
+                    }`}
+                    aria-expanded={isTeamOpen}
+                    title="Ver equipa"
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    <span>{activeTemplate?.agents?.length || 0}</span>
+                    <ChevronDown className={`w-3 h-3 transition-transform ${isTeamOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  <button
                     onClick={() => setIsLibraryOpen(true)}
-                    className="flex h-9 items-center justify-center gap-2 px-3 border border-cyan-300/20 hover:border-cyan-300/35 bg-cyan-300/10 hover:bg-cyan-300/15 text-cyan-100 font-semibold text-xs rounded-md transition-all cursor-pointer"
+                    className="flex h-9 items-center justify-center gap-2 px-2.5 border border-white/8 bg-white/[0.035] hover:bg-white/[0.07] text-gray-300 hover:text-white font-medium text-xs rounded-md transition-all cursor-pointer"
+                    title="Abrir biblioteca"
                   >
                     <BookOpen className="w-3.5 h-3.5" />
-                    <span>Biblioteca</span>
+                    <span className="hidden lg:inline">Biblioteca</span>
                   </button>
                   <button
                     onClick={() => setDevPanelOpen(false)}
@@ -150,8 +168,8 @@ function App() {
                   </button>
                 </div>
               </div>
-              {activeTemplate?.agents && activeTemplate.agents.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2 overflow-y-auto px-4 py-2 border-b border-white/8 text-xs shrink-0 max-h-24">
+              {isTeamOpen && activeTemplate?.agents && activeTemplate.agents.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2 overflow-y-auto px-4 py-2 border-b border-white/8 text-xs shrink-0 max-h-28">
                   {activeTemplate.agents.map((agent) => (
                     <div key={agent.id} className="flex items-center gap-2.5 px-3 py-2 bg-white/[0.035] border border-white/8 rounded-md min-w-0">
                       <div className="w-7 h-7 rounded-md bg-cyan-300/10 border border-cyan-300/15 flex items-center justify-center">
@@ -165,7 +183,7 @@ function App() {
                   ))}
                 </div>
               )}
-              <div className="flex-grow overflow-hidden p-3 min-h-0">
+              <div className="flex-grow overflow-hidden p-2 min-h-0">
                 <WorkspaceViewer />
               </div>
             </motion.div>

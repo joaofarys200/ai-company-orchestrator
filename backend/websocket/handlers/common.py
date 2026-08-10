@@ -125,11 +125,24 @@ class InitialSyncHandler:
         session: WebSocketSessionState,
     ) -> None:
         send = self.responder.connections.send
+        try:
+            from sandbox import get_sandbox_status
+            sandbox_st = get_sandbox_status()
+        except Exception:
+            sandbox_st = {"mode": "local_fallback", "port": 8080, "is_docker": False}
+
         await send(
             websocket,
             system_message(
                 "Conectado ao servidor Jarvis WebSocket na porta 8001!"
             ),
+        )
+        await send(
+            websocket,
+            {
+                "type": "sandbox_status",
+                "status": sandbox_st,
+            },
         )
 
         template_name = self.callbacks.normalize_template_name(

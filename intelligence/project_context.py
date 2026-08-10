@@ -142,6 +142,66 @@ class ProjectContextService:
             projects.append({"project_id": entry.name, "project_name": entry.name, "root_path": os.path.realpath(entry.path)})
         return projects
 
+    def create_project(self, project_id: str, project_name: str | None = None, template: str | None = None) -> ProjectContext:
+        clean_id = self._validate_project_id(project_id)
+        projects_root = self.path_resolver(self.projects_root_rel)
+        os.makedirs(projects_root, exist_ok=True)
+        project_root = os.path.join(projects_root, clean_id)
+        if os.path.exists(project_root):
+            raise ProjectContextError(f"O projeto '{clean_id}' ja existe.")
+        
+        os.makedirs(project_root, exist_ok=True)
+        display_name = project_name or clean_id
+
+        if template == "web-app":
+            index_html = f"""<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{display_name}</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <h1>{display_name}</h1>
+        <p>Projeto criado via JARVIS OS.</p>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>"""
+            styles_css = """body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 2rem;
+}"""
+            app_js = f"console.log('Iniciado {display_name}');"
+            package_json = json.dumps({
+                "name": clean_id,
+                "version": "1.0.0",
+                "description": f"Projeto {display_name}",
+                "main": "app.js",
+                "scripts": {
+                    "start": "node app.js"
+                }
+            }, indent=2)
+
+            with open(os.path.join(project_root, "index.html"), "w", encoding="utf-8") as f:
+                f.write(index_html)
+            with open(os.path.join(project_root, "styles.css"), "w", encoding="utf-8") as f:
+                f.write(styles_css)
+            with open(os.path.join(project_root, "app.js"), "w", encoding="utf-8") as f:
+                f.write(app_js)
+            with open(os.path.join(project_root, "package.json"), "w", encoding="utf-8") as f:
+                f.write(package_json)
+        else:
+            readme = f"# {display_name}\n\nProjeto criado via JARVIS OS.\n"
+            with open(os.path.join(project_root, "README.md"), "w", encoding="utf-8") as f:
+                f.write(readme)
+
+        return self.open_project(clean_id)
+
     def open_project(self, project_id: str) -> ProjectContext:
         clean_id = self._validate_project_id(project_id)
         root = self.project_root(clean_id)

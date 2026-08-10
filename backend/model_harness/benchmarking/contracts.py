@@ -409,6 +409,7 @@ class BenchmarkConfig:
     base_url: str = "http://127.0.0.1:11434"
     fault_injection: bool = True
     debug_prompts: bool = False
+    transition_policy: str = "model_selected"
 
     def __post_init__(self) -> None:
         if self.repetitions < 1:
@@ -417,6 +418,14 @@ class BenchmarkConfig:
             raise ValueError("context_tokens e max_steps devem ser positivos.")
         if self.timeout_seconds <= 0:
             raise ValueError("timeout deve ser positivo.")
+        if self.transition_policy not in {
+            "model_selected",
+            "contract_driven",
+        }:
+            raise ValueError(
+                "transition_policy deve ser model_selected ou "
+                "contract_driven."
+            )
 
     @property
     def configuration_hash(self) -> str:

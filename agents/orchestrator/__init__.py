@@ -3,7 +3,6 @@ import re
 import asyncio
 import json
 import subprocess
-import httpx
 import base64
 import io
 import yaml
@@ -12,11 +11,16 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from PIL import ImageGrab
 from sandbox import SANDBOX_DIR
+from backend.model_harness import (
+    ExecutionConstraints,
+    ExpectedOutput,
+    ModelPreferences,
+    ModelRequest,
+    ModelResponseStatus,
+    OutputFormat,
+    get_model_harness,
+)
 
-try:
-    import anthropic
-except ImportError:
-    pass
 try:
     from crewai import Agent, Task, Crew, LLM
     from crewai.tools import tool
@@ -827,94 +831,37 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
             if use_fallback:
                 gemini_key = os.getenv("GEMINI_API_KEY")
                 if gemini_key and glb.is_gemini_valid:
-                    # Call Gemini 2.5 Flash as standard cloud fallback for specialists (extremely fast and competent)
-                    url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
-                    headers = {
-                        "Authorization": f"Bearer {gemini_key}",
-                        "Content-Type": "application/json"
-                    }
-                    
-                    gemini_messages = [{"role": "system", "content": specialist_system}]
-                    for msg in messages:
-                        role = msg["role"]
-                        content = msg.get("content")
-                        if role == "user":
-                            gemini_messages.append({"role": "user", "content": content})
-                        elif role == "assistant":
-                            formatted_assistant = {"role": "assistant"}
-                            if isinstance(content, str):
-                                formatted_assistant["content"] = content
-                            elif isinstance(content, list):
-                                text_val = ""
-                                for item in content:
-                                    if item.get("type") == "text":
-                                        text_val += item.get("text", "")
-                                formatted_assistant["content"] = text_val
-                            if "tool_calls" in msg:
-                                formatted_assistant["tool_calls"] = msg["tool_calls"]
-                            gemini_messages.append(formatted_assistant)
-                        elif role == "tool_result":
-                            gemini_messages.append({
-                                "role": "tool",
-                                "tool_call_id": msg.get("tool_use_id"),
-                                "content": str(content)
-                            })
-                            
-                    gemini_tools = []
-                    for tool in specialist_tools:
-                        gemini_tools.append({
-                            "type": "function",
-                            "function": {
-                                "name": tool["name"],
-                                "description": tool["description"],
-                                "parameters": tool["input_schema"]
-                            }
-                        })
-                        
-                    payload = {
-                        "model": "gemini-2.5-flash",
-                        "messages": gemini_messages,
-                        "tools": gemini_tools,
-                        "temperature": 0.2
-                    }
-                    
                     try:
-                        async with httpx.AsyncClient(timeout=45.0) as client:
-                            res = await client.post(url, json=payload, headers=headers)
-                            
-                        if res.status_code == 200:
-                            choice = res.json().get("choices", [{}])[0]
-                            resp_msg = choice.get("message", {})
-                            response_text = resp_msg.get("content") or ""
-                            
-                            raw_tool_calls = resp_msg.get("tool_calls", [])
-                            for idx, rtc in enumerate(raw_tool_calls):
-                                func_info = rtc.get("function", {})
-                                name = func_info.get("name")
-                                args_str = func_info.get("arguments", "{}")
-                                
-                                if isinstance(args_str, str):
-                                    try:
-                                        args = json.loads(args_str)
-                                    except Exception:
-                                        args = {}
-                                else:
-                                    args = args_str
-                                    
-                                call_id = rtc.get("id") or f"call_{step}_{idx}"
-                                tool_calls.append({
-                                    "id": call_id,
-                                    "name": name,
-                                    "input": args
-                                })
-                                
-                            assistant_message = {"role": "assistant", "content": response_text}
-                            if raw_tool_calls:
-                                assistant_message["tool_calls"] = raw_tool_calls
-                            messages.append(assistant_message)
-                            use_fallback = False
-                        else:
-                            print(f"[{nome}] Gemini fallback returned status {res.status_code}: {res.text}. Trying Ollama.")
+                        res_json = await query_model_with_tools(
+                            "gemini",
+                            "gemini-2.5-flash",
+                            messages,
+                            specialist_tools,
+                            specialist_system,
+                            timeout_seconds=45.0,
+                        )
+                        resp_msg = res_json.get("message", {})
+                        response_text = resp_msg.get("content") or ""
+                        raw_tool_calls = resp_msg.get("tool_calls", [])
+                        for idx, rtc in enumerate(raw_tool_calls):
+                            func_info = rtc.get("function", {})
+                            name = func_info.get("name")
+                            args = func_info.get("arguments", {})
+                            if not isinstance(args, dict):
+                                args = {}
+                            tool_calls.append({
+                                "id": rtc.get("id") or f"call_{step}_{idx}",
+                                "name": name,
+                                "input": args,
+                            })
+                        assistant_message = {
+                            "role": "assistant",
+                            "content": response_text,
+                        }
+                        if raw_tool_calls:
+                            assistant_message["tool_calls"] = raw_tool_calls
+                        messages.append(assistant_message)
+                        use_fallback = False
                     except Exception as e:
                         print(f"[{nome}] Gemini fallback exception: {e}. Trying Ollama.")
                         
@@ -1121,34 +1068,60 @@ async def classify_task_complexity(prompt: str) -> str:
     
     if env_bool("ORCHESTRATOR_COMPLEXITY_MODEL_ENABLED", False) and mode in {"local", "ollama"}:
         try:
-            url = "http://localhost:11434/api/generate"
-            payload = {
-                "model": os.getenv("OLLAMA_MODEL", "qwen2.5:14b"),
-                "prompt": f"<|im_start|>system\n{system_instruction}<|im_end|>\n<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n",
-                "stream": False,
-                "options": {"num_predict": 10}
-            }
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                res = await client.post(url, json=payload)
-                if res.status_code == 200:
-                    val = res.json().get("response", "").strip().upper()
-                    if "COMPLEX" in val:
-                        return "COMPLEX"
-                    return "SIMPLE"
+            request = ModelRequest(
+                task_profile="CODE_REASONING",
+                system_prompt=system_instruction,
+                user_prompt=prompt,
+                expected_output=ExpectedOutput(
+                    format=OutputFormat.TEXT
+                ),
+                temperature=0.0,
+                max_output_tokens=10,
+                metadata={
+                    "consumer": "orchestrator",
+                    "operation": "complexity_classification",
+                },
+                model_preferences=ModelPreferences(
+                    providers=("ollama",),
+                    models=(
+                        os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
+                    ),
+                    mode="chat",
+                ),
+                execution_constraints=ExecutionConstraints(
+                    max_attempts=1,
+                    timeout_seconds=10.0,
+                    streaming=False,
+                    thinking=False,
+                    allow_recovery=False,
+                    stop_on_no_progress=False,
+                ),
+            )
+            response = await get_model_harness().execute(request)
+            if response.status == ModelResponseStatus.SUCCEEDED:
+                val = response.raw_text.strip().upper()
+                if "COMPLEX" in val:
+                    return "COMPLEX"
+                return "SIMPLE"
         except Exception:
             pass
 
     return "COMPLEX" if any(w in clean for w in ["website", "landing page", "pomodoro", "site", "app", "jogo", "game", "desenvolve"]) else "SIMPLE"
 
 
-# --- query_ollama_with_tools ---
-async def query_ollama_with_tools(model_name: str, messages: list, tools: list, system_prompt: str) -> dict:
-    url = "http://localhost:11434/api/chat"
-    
-    # Map input schemas to Ollama format
-    ollama_tools = []
+# --- shared model tool transport ---
+async def query_model_with_tools(
+    provider_name: str,
+    model_name: str,
+    messages: list,
+    tools: list,
+    system_prompt: str,
+    *,
+    timeout_seconds: float = 120.0,
+) -> dict:
+    tool_schemas = []
     for tool in tools:
-        ollama_tools.append({
+        tool_schemas.append({
             "type": "function",
             "function": {
                 "name": tool["name"],
@@ -1157,10 +1130,7 @@ async def query_ollama_with_tools(model_name: str, messages: list, tools: list, 
             }
         })
         
-    payload_messages = []
-    if system_prompt:
-        payload_messages.append({"role": "system", "content": system_prompt})
-        
+    conversation_messages = []
     for msg in messages:
         role = msg["role"]
         content = msg["content"]
@@ -1184,33 +1154,116 @@ async def query_ollama_with_tools(model_name: str, messages: list, tools: list, 
             payload_msg = {"role": "assistant", "content": text_content}
             if tool_calls:
                 payload_msg["tool_calls"] = tool_calls
-            payload_messages.append(payload_msg)
+            conversation_messages.append(payload_msg)
         elif role == "tool_result":
-            payload_messages.append({
+            conversation_messages.append({
                 "role": "tool",
                 "name": msg.get("tool_name", "tool"),
-                "content": str(content)
+                "tool_call_id": msg.get("tool_use_id"),
+                "content": (
+                    content if isinstance(content, list) else str(content)
+                )
             })
         else:
-            payload_messages.append({"role": role, "content": str(content)})
-            
-    payload = {
-        "model": model_name,
-        "messages": payload_messages,
-        "stream": False,
-        "think": False,
-        "options": {
-            "temperature": 0,
-            "top_p": 0.8
-        }
+            conversation_messages.append({
+                "role": role,
+                "content": str(content),
+            })
+
+    allowed_tools = tuple(
+        str(item.get("name") or "")
+        for item in tools
+        if str(item.get("name") or "")
+    )
+    output_format = (
+        OutputFormat.TOOL_CALLS
+        if allowed_tools
+        else OutputFormat.JSON
+    )
+    user_prompt = next(
+        (
+            str(item.get("content") or "")
+            for item in reversed(conversation_messages)
+            if item.get("role") == "user"
+        ),
+        "Continua a tarefa atual.",
+    )
+    request = ModelRequest(
+        task_profile=(
+            "TOOL_SELECTION"
+            if allowed_tools
+            else "STRUCTURED_EXTRACTION"
+        ),
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        allowed_tools=allowed_tools,
+        expected_output=ExpectedOutput(format=output_format),
+        temperature=0.0,
+        max_context_tokens=8_192,
+        max_output_tokens=2_048,
+        metadata={
+            "consumer": "orchestrator",
+            "operation": "tool_decision",
+            "conversation_messages": conversation_messages,
+            "tool_schemas": tool_schemas,
+            "top_p": 0.8,
+        },
+        model_preferences=ModelPreferences(
+            providers=(provider_name,),
+            models=(model_name,),
+            mode="chat",
+        ),
+        execution_constraints=ExecutionConstraints(
+            max_attempts=1,
+            timeout_seconds=timeout_seconds,
+            streaming=False,
+            thinking=False,
+            allow_recovery=False,
+            stop_on_no_progress=False,
+        ),
+    )
+    response = await get_model_harness().execute(request)
+    if response.status == ModelResponseStatus.PROVIDER_FAILED:
+        if response.provider_exception is not None:
+            raise response.provider_exception
+        raise RuntimeError(
+            f"O provider {provider_name} falhou sem excecao."
+        )
+    return {
+        "message": {
+            "role": "assistant",
+            "content": response.raw_text,
+            "tool_calls": [
+                {
+                    "id": call.call_id,
+                    "type": "function",
+                    "function": {
+                        "name": call.name,
+                        "arguments": dict(call.arguments),
+                    },
+                }
+                for call in response.tool_calls
+            ],
+        },
+        "model": response.model,
+        "done": response.status == ModelResponseStatus.SUCCEEDED,
+        "done_reason": response.status.value,
     }
-    if ollama_tools:
-        payload["tools"] = ollama_tools
-        
-    async with httpx.AsyncClient(timeout=120.0) as client:
-        response = await client.post(url, json=payload)
-        response.raise_for_status()
-        return response.json()
+
+
+async def query_ollama_with_tools(
+    model_name: str,
+    messages: list,
+    tools: list,
+    system_prompt: str,
+) -> dict:
+    return await query_model_with_tools(
+        "ollama",
+        model_name,
+        messages,
+        tools,
+        system_prompt,
+    )
 
 
 # --- split_response_messages ---
@@ -1630,83 +1683,51 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         run_fallback = True
         used_local_fallback = False
         if mode == "claude":
-            # API CLAUDE (CLOUD / PAGO)
             api_key = os.getenv("ANTHROPIC_API_KEY")
             if not api_key:
                 on_msg("JARVIS", "Orquestrador", "Erro: A chave API 'ANTHROPIC_API_KEY' nÃ£o estÃ¡ configurada no .env.")
                 return "Erro: ANTHROPIC_API_KEY em falta."
-                
-            client = anthropic.Anthropic(api_key=api_key)
-            loop = asyncio.get_running_loop()
             try:
-                # Convert list format or tool results for Anthropic
                 claude_messages = []
                 for msg in messages:
-                    role = msg["role"]
-                    content = msg["content"]
-                    
-                    if role == "tool_result":
-                        if msg.get("tool_name") == "capture_screen" and msg.get("b64_data"):
-                            claude_messages.append({
-                                "role": "user",
-                                "content": [
-                                    {
-                                        "type": "tool_result",
-                                        "tool_use_id": msg["tool_use_id"],
-                                        "content": [
-                                            {"type": "text", "text": str(content)},
-                                            {
-                                                "type": "image",
-                                                "source": {
-                                                    "type": "base64",
-                                                    "media_type": "image/png",
-                                                    "data": msg["b64_data"]
-                                                }
-                                            }
-                                        ]
-                                    }
-                                ]
-                            })
-                        else:
-                            claude_messages.append({
-                                "role": "user",
-                                "content": [
-                                    {
-                                        "type": "tool_result",
-                                        "tool_use_id": msg["tool_use_id"],
-                                        "content": str(content)
-                                    }
-                                ]
-                            })
-                    elif role == "assistant" and isinstance(content, str):
-                        claude_messages.append({"role": "assistant", "content": content})
-                    elif role == "user":
-                        claude_messages.append({"role": "user", "content": content})
-                    else:
-                        claude_messages.append(msg)
-                        
-                response = await loop.run_in_executor(
-                    None,
-                    lambda: client.messages.create(
-                        model="claude-3-5-sonnet-latest",
-                        max_tokens=4000,
-                        system=dynamic_system_prompt,
-                        messages=claude_messages,
-                        tools=active_jarvis_tools
-                    )
+                    normalized = dict(msg)
+                    if (
+                        msg.get("role") == "tool_result"
+                        and msg.get("tool_name") == "capture_screen"
+                        and msg.get("b64_data")
+                    ):
+                        normalized["content"] = [
+                            {
+                                "type": "text",
+                                "text": str(msg.get("content") or ""),
+                            },
+                            {
+                                "type": "image",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": "image/png",
+                                    "data": msg["b64_data"],
+                                },
+                            },
+                        ]
+                    claude_messages.append(normalized)
+                res_json = await query_model_with_tools(
+                    "anthropic",
+                    "claude-3-5-sonnet-latest",
+                    claude_messages,
+                    active_jarvis_tools,
+                    dynamic_system_prompt,
+                    timeout_seconds=120.0,
                 )
-                
-                for c in response.content:
-                    if c.type == "text":
-                        response_text += c.text
-                    elif c.type == "tool_use":
-                        tool_calls.append({
-                            "id": c.id,
-                            "name": c.name,
-                            "input": c.input
-                        })
-                        
-                # Update history
+                response_message = res_json.get("message", {})
+                response_text = response_message.get("content") or ""
+                for raw_call in response_message.get("tool_calls", []):
+                    function = raw_call.get("function", {})
+                    tool_calls.append({
+                        "id": raw_call.get("id") or "",
+                        "name": function.get("name"),
+                        "input": function.get("arguments") or {},
+                    })
                 assistant_content = [{"type": "text", "text": response_text}] if response_text else []
                 for tc in tool_calls:
                     assistant_content.append({
@@ -1729,110 +1750,45 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
             if gemini_key and glb.is_gemini_valid and mode != "local":
                 on_msg("JARVIS", "Orquestrador", "Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...")
                 
-                url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
-                headers = {
-                    "Authorization": f"Bearer {gemini_key}",
-                    "Content-Type": "application/json"
-                }
-                
-                # Format messages for Gemini OpenAI compatibility layer
-                gemini_messages = [{"role": "system", "content": dynamic_system_prompt}]
-                for msg in messages:
-                    role = msg["role"]
-                    content = msg.get("content")
-                    
-                    if role == "user":
-                        gemini_messages.append({"role": "user", "content": content})
-                    elif role == "assistant":
-                        formatted_assistant = {"role": "assistant"}
-                        if isinstance(content, str):
-                            formatted_assistant["content"] = content
-                        elif isinstance(content, list):
-                            text_val = ""
-                            for item in content:
-                                if item.get("type") == "text":
-                                    text_val += item.get("text", "")
-                            formatted_assistant["content"] = text_val
-                            
-                        if "tool_calls" in msg:
-                            formatted_assistant["tool_calls"] = msg["tool_calls"]
-                        gemini_messages.append(formatted_assistant)
-                    elif role == "tool_result":
-                        gemini_messages.append({
-                            "role": "tool",
-                            "tool_call_id": msg.get("tool_use_id"),
-                            "content": str(content)
-                        })
-                
-                gemini_tools = []
-                for tool in active_jarvis_tools:
-                    gemini_tools.append({
-                        "type": "function",
-                        "function": {
-                            "name": tool["name"],
-                            "description": tool["description"],
-                            "parameters": tool["input_schema"]
-                        }
-                    })
-                
                 gemini_models = ["gemini-2.5-pro", "gemini-2.5-flash"]
                 gemini_success = False
                 
                 for g_model in gemini_models:
-                    payload = {
-                        "model": g_model,
-                        "messages": gemini_messages,
-                        "tools": gemini_tools,
-                        "temperature": 0.2
-                    }
-                    
                     try:
-                        async with httpx.AsyncClient(timeout=30.0) as client:
-                            res = await client.post(url, json=payload, headers=headers)
-                        
-                        if res.status_code == 200:
-                            choice = res.json().get("choices", [{}])[0]
-                            resp_msg = choice.get("message", {})
-                            response_text = resp_msg.get("content") or ""
-                            
-                            raw_tool_calls = resp_msg.get("tool_calls", [])
-                            for idx, rtc in enumerate(raw_tool_calls):
-                                func_info = rtc.get("function", {})
-                                name = func_info.get("name")
-                                if not name:  # CRITICAL: skip tool calls with empty/None name
-                                    continue
-                                args_str = func_info.get("arguments", "{}")
-                                
-                                if isinstance(args_str, str):
-                                    try:
-                                        args = json.loads(args_str)
-                                    except Exception:
-                                        args = {}
-                                else:
-                                    args = args_str
-                                    
-                                call_id = rtc.get("id") or f"call_{step}_{idx}"
-                                tool_calls.append({
-                                    "id": call_id,
-                                    "name": name,
-                                    "input": args
-                                })
-                            
-                            assistant_message = {"role": "assistant", "content": response_text}
-                            if raw_tool_calls:
-                                assistant_message["tool_calls"] = raw_tool_calls
-                            messages.append(assistant_message)
-                            
-                            run_fallback = False
-                            gemini_success = True
-                            break
-                        else:
-                            err_body = res.text
-                            print(f"[Gemini Fallback] {g_model} failed with status {res.status_code}: {err_body}")
-                            # Dynamically invalidate Gemini if quota exceeded or bad request at runtime
-                            if res.status_code in (429, 400) or "RESOURCE_EXHAUSTED" in err_body or "quota" in err_body.lower():
-                                glb.is_gemini_valid = False
-                                print("[JARVIS] Gemini quota/rate-limit detetado em runtime. Gemini desativado para esta sessÃ£o.")
+                        res_json = await query_model_with_tools(
+                            "gemini",
+                            g_model,
+                            messages,
+                            active_jarvis_tools,
+                            dynamic_system_prompt,
+                            timeout_seconds=30.0,
+                        )
+                        resp_msg = res_json.get("message", {})
+                        response_text = resp_msg.get("content") or ""
+                        raw_tool_calls = resp_msg.get("tool_calls", [])
+                        for idx, rtc in enumerate(raw_tool_calls):
+                            func_info = rtc.get("function", {})
+                            name = func_info.get("name")
+                            if not name:
+                                continue
+                            args = func_info.get("arguments", {})
+                            if not isinstance(args, dict):
+                                args = {}
+                            tool_calls.append({
+                                "id": rtc.get("id") or f"call_{step}_{idx}",
+                                "name": name,
+                                "input": args,
+                            })
+                        assistant_message = {
+                            "role": "assistant",
+                            "content": response_text,
+                        }
+                        if raw_tool_calls:
+                            assistant_message["tool_calls"] = raw_tool_calls
+                        messages.append(assistant_message)
+                        run_fallback = False
+                        gemini_success = True
+                        break
                     except Exception as e:
                         print(f"[Gemini Fallback] Error with {g_model}: {e}")
                 
@@ -1904,7 +1860,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                 messages.append({"role": "assistant", "content": response_text})
                 
             except Exception as e:
-                err_msg = f"Erro no Ollama local: {str(e)}. Confirma que o Ollama estÃ¡ ativo na porta 11434 com o modelo {model_name} descarregado."
+                err_msg = f"Erro no provider local: {str(e)}. Confirma que o serviÃ§o Ollama estÃ¡ ativo e que o modelo {model_name} estÃ¡ instalado."
                 on_msg("JARVIS", "Orquestrador", err_msg)
                 return finish_orchestration(err_msg, success=False, reason="ollama_error")
 

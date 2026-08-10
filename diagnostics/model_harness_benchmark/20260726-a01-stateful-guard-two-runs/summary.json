@@ -1,0 +1,341 @@
+{
+  "benchmark_version": "model_harness_qwen35_stateful_v2",
+  "started_at": "2026-07-26T21:20:23.530397+00:00",
+  "completed_at": "2026-07-26T21:21:05.959043+00:00",
+  "duration_seconds": 42.429,
+  "mode": "standard",
+  "model": "qwen3.5:9b",
+  "configuration": {
+    "mode": "standard",
+    "model": "qwen3.5:9b",
+    "output_dir": "diagnostics\\model_harness_benchmark\\20260726-a01-stateful-guard-two-runs",
+    "repetitions": 2,
+    "seed": 42,
+    "context_tokens": 8192,
+    "max_steps": 6,
+    "keep_alive": "15m",
+    "timeout_seconds": 300.0,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "think": false,
+    "stream": false,
+    "max_output_tokens": 1024,
+    "base_url": "http://127.0.0.1:11434",
+    "fault_injection": false,
+    "debug_prompts": false
+  },
+  "configuration_hash": "795295d53c7bf8179128746e2bdc3d2aa2c071ee4fd1d112a97ab1c3ef0258d1",
+  "scenario_definitions": 1,
+  "scenario_repetitions": 2,
+  "passed_repetitions": 0,
+  "failed_repetitions": 2,
+  "status_counts": {
+    "FAIL": 2
+  },
+  "total_steps": 4,
+  "model_calls": 4,
+  "fault_injection_steps": 0,
+  "provider_failed_steps": 0,
+  "validation_passed_steps": 4,
+  "recovery_used_repetitions": 0,
+  "reproducibility": {
+    "eligible_cases": 1,
+    "exact_cases": 1,
+    "all_exact": true,
+    "cases": {
+      "A01_FIND_RELEVANT_FILE": true
+    }
+  },
+  "performance": {
+    "latency_ms": {
+      "min": 5598,
+      "median": 6550.0,
+      "p95": 16924.3,
+      "max": 18694,
+      "mean": 9348
+    },
+    "tokens_per_second": {
+      "min": 18.89,
+      "median": 19.009500000000003,
+      "max": 19.144,
+      "mean": 19.013
+    },
+    "prompt_tokens": 4232,
+    "completion_tokens": 340,
+    "context_chars": {
+      "min": 2044,
+      "max": 2193
+    }
+  },
+  "capability_statuses": {
+    "stateful_tool_use": "FAILED"
+  },
+  "stop_reasons": {
+    "VALIDATION_FAILED": 2
+  },
+  "integrity": {
+    "before": {
+      "trees": {
+        "workspace_projects": {
+          "exists": true,
+          "file_count": 35,
+          "total_bytes": 31076,
+          "tree_sha256": "49266549b55926c911d73530609e19ef000ade2032769d7f077908dd7919faa4"
+        },
+        "mission_metadata": {
+          "exists": true,
+          "file_count": 2033,
+          "total_bytes": 73228820,
+          "tree_sha256": "f5b43b3e5a48bcca4bb172e45f5fedd84506e455f290a902d85f9b3c80287245"
+        },
+        "chroma_collections": {
+          "exists": true,
+          "file_count": 5,
+          "total_bytes": 4284580,
+          "tree_sha256": "e130636a31ba50b2aaabbb00f3ae64b5b52ced7d0789d4088d77b9e961fad2fe"
+        },
+        "frontend_source": {
+          "exists": true,
+          "file_count": 21,
+          "total_bytes": 213007,
+          "tree_sha256": "ef7c4d05a85969f6569ba15e855fde11536740db32b6b749d380b52d9999c8a5"
+        }
+      },
+      "critical_files": {
+        "agents/orchestrator/project_builder.py": {
+          "exists": true,
+          "size_bytes": 342032,
+          "sha256": "3484b147f1326cf07c223a5d03a3653e66758e20c2a88e9b462072eacfffdbeb"
+        },
+        "agents/mission_state.py": {
+          "exists": true,
+          "size_bytes": 55579,
+          "sha256": "998ce3f9e5dbbbe22da9b74185db61b49a967ded399f58944cd432a590ea25cc"
+        },
+        "agents/mission_executor.py": {
+          "exists": true,
+          "size_bytes": 56579,
+          "sha256": "b09734185a6fb48fb4b02de9c344a766734b626cd5e029775a261ad65f885a58"
+        },
+        "agents/mission_autonomy.py": {
+          "exists": true,
+          "size_bytes": 32510,
+          "sha256": "87ad895b57429c68f2f090c7dcfd0b22669ead79ed8fd73c7b8c6cc4bbc11671"
+        },
+        "agents/executors/registry.py": {
+          "exists": true,
+          "size_bytes": 5561,
+          "sha256": "03fdd968bfba1dc12f65dc4196c76f24c7349d1e56fec55690584bd7ba3bbf1b"
+        },
+        "intelligence/coding_session.py": {
+          "exists": true,
+          "size_bytes": 47873,
+          "sha256": "d8aa025372eaa960bfd74ff283552584cf02d331f0bde82e6c5a1a197752c1a6"
+        },
+        "server.py": {
+          "exists": true,
+          "size_bytes": 118598,
+          "sha256": "005e7609901bdeb628ffaabdf2298c82b2b58ca10b43537ad9f8a26adf16d749"
+        }
+      },
+      "fixture_catalog_sha256": "687a422faf1a52362cb40bfa17c415e46970d15f9d27e0efc22e9dbce41959d5"
+    },
+    "after": {
+      "trees": {
+        "workspace_projects": {
+          "exists": true,
+          "file_count": 35,
+          "total_bytes": 31076,
+          "tree_sha256": "49266549b55926c911d73530609e19ef000ade2032769d7f077908dd7919faa4"
+        },
+        "mission_metadata": {
+          "exists": true,
+          "file_count": 2033,
+          "total_bytes": 73228820,
+          "tree_sha256": "f5b43b3e5a48bcca4bb172e45f5fedd84506e455f290a902d85f9b3c80287245"
+        },
+        "chroma_collections": {
+          "exists": true,
+          "file_count": 5,
+          "total_bytes": 4284580,
+          "tree_sha256": "e130636a31ba50b2aaabbb00f3ae64b5b52ced7d0789d4088d77b9e961fad2fe"
+        },
+        "frontend_source": {
+          "exists": true,
+          "file_count": 21,
+          "total_bytes": 213007,
+          "tree_sha256": "ef7c4d05a85969f6569ba15e855fde11536740db32b6b749d380b52d9999c8a5"
+        }
+      },
+      "critical_files": {
+        "agents/orchestrator/project_builder.py": {
+          "exists": true,
+          "size_bytes": 342032,
+          "sha256": "3484b147f1326cf07c223a5d03a3653e66758e20c2a88e9b462072eacfffdbeb"
+        },
+        "agents/mission_state.py": {
+          "exists": true,
+          "size_bytes": 55579,
+          "sha256": "998ce3f9e5dbbbe22da9b74185db61b49a967ded399f58944cd432a590ea25cc"
+        },
+        "agents/mission_executor.py": {
+          "exists": true,
+          "size_bytes": 56579,
+          "sha256": "b09734185a6fb48fb4b02de9c344a766734b626cd5e029775a261ad65f885a58"
+        },
+        "agents/mission_autonomy.py": {
+          "exists": true,
+          "size_bytes": 32510,
+          "sha256": "87ad895b57429c68f2f090c7dcfd0b22669ead79ed8fd73c7b8c6cc4bbc11671"
+        },
+        "agents/executors/registry.py": {
+          "exists": true,
+          "size_bytes": 5561,
+          "sha256": "03fdd968bfba1dc12f65dc4196c76f24c7349d1e56fec55690584bd7ba3bbf1b"
+        },
+        "intelligence/coding_session.py": {
+          "exists": true,
+          "size_bytes": 47873,
+          "sha256": "d8aa025372eaa960bfd74ff283552584cf02d331f0bde82e6c5a1a197752c1a6"
+        },
+        "server.py": {
+          "exists": true,
+          "size_bytes": 118598,
+          "sha256": "005e7609901bdeb628ffaabdf2298c82b2b58ca10b43537ad9f8a26adf16d749"
+        }
+      },
+      "fixture_catalog_sha256": "687a422faf1a52362cb40bfa17c415e46970d15f9d27e0efc22e9dbce41959d5"
+    },
+    "unchanged": true,
+    "integrity_failed": false
+  },
+  "runtime": {
+    "before": {
+      "python": "3.12.4 (tags/v3.12.4:8e8a4ba, Jun  6 2024, 19:30:16) [MSC v.1940 64 bit (AMD64)]",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "ollama_version": "ollama version is 0.32.4",
+      "model_list_entry": {
+        "name": "qwen3.5:9b",
+        "model": "qwen3.5:9b",
+        "modified_at": "2026-07-06T12:33:54.8280526+01:00",
+        "size": 6594474711,
+        "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen35",
+          "families": [
+            "qwen35"
+          ],
+          "parameter_size": "9.7B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 262144,
+          "embedding_length": 4096
+        },
+        "capabilities": [
+          "vision",
+          "completion",
+          "tools",
+          "thinking"
+        ]
+      },
+      "model_details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M"
+      },
+      "model_capabilities": [
+        "completion",
+        "vision",
+        "tools",
+        "thinking"
+      ],
+      "model_info": {
+        "general.architecture": "qwen35",
+        "general.parameter_count": 9653104368,
+        "qwen35.block_count": 32,
+        "qwen35.context_length": 262144,
+        "qwen35.embedding_length": 4096,
+        "qwen35.vision.block_count": 27,
+        "qwen35.vision.embedding_length": 1152
+      },
+      "ollama_ps_before": {
+        "models": [
+          {
+            "name": "qwen3.5:9b",
+            "model": "qwen3.5:9b",
+            "size": 6420137242,
+            "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "qwen35",
+              "families": [
+                "qwen35"
+              ],
+              "parameter_size": "9.7B",
+              "quantization_level": "Q4_K_M"
+            },
+            "expires_at": "2026-07-26T22:35:01.228176+01:00",
+            "size_vram": 5372704192,
+            "context_length": 8192
+          }
+        ]
+      },
+      "gpu_before": {
+        "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "driver_version": "581.34",
+        "memory_total_mib": 8151,
+        "memory_used_mib": 7340,
+        "memory_free_mib": 471,
+        "utilization_percent": 20
+      }
+    },
+    "after": {
+      "ollama_ps": {
+        "models": [
+          {
+            "name": "qwen3.5:9b",
+            "model": "qwen3.5:9b",
+            "size": 6420137242,
+            "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "qwen35",
+              "families": [
+                "qwen35"
+              ],
+              "parameter_size": "9.7B",
+              "quantization_level": "Q4_K_M"
+            },
+            "expires_at": "2026-07-26T22:36:03.5845901+01:00",
+            "size_vram": 5372704192,
+            "context_length": 8192
+          }
+        ]
+      },
+      "gpu": {
+        "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "driver_version": "581.34",
+        "memory_total_mib": 8151,
+        "memory_used_mib": 7343,
+        "memory_free_mib": 468,
+        "utilization_percent": 45
+      }
+    }
+  },
+  "infrastructure_errors": [],
+  "decision": "MODEL_HARNESS_STATEFUL_CAPABILITIES_PARTIALLY_VALIDATED",
+  "limitations": [
+    "Fixtures are synthetic and closed-source.",
+    "Read-only tool execution does not demonstrate productive tools.",
+    "FULL mode was not executed unless explicitly shown by mode.",
+    "Model results apply only to the recorded configuration."
+  ]
+}

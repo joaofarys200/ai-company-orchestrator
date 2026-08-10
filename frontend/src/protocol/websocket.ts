@@ -556,6 +556,15 @@ export interface UnknownServerMessage {
   payload: Record<string, unknown>;
 }
 
+export interface SandboxStatusMessage {
+  type: 'sandbox_status';
+  status: {
+    mode: 'docker' | 'local_fallback';
+    port: number;
+    is_docker: boolean;
+  };
+}
+
 export type ServerMessage =
   | SystemMessage
   | ChatProtocolMessage
@@ -584,6 +593,7 @@ export type ServerMessage =
   | ProjectReferencesMessage
   | SemanticResultsMessage
   | CodingSessionMessage
+  | SandboxStatusMessage
   | UiMessage
   | UiThemeMessage
   | UnknownServerMessage;
@@ -604,6 +614,7 @@ export type ClientMessage =
   | { type: 'get_planner_state' }
   | { type: 'get_ast_state'; project_id?: string }
   | { type: 'list_projects' }
+  | { type: 'create_project'; project_id: string; project_name?: string; template?: string }
   | { type: 'open_project'; project_id: string }
   | { type: 'save_project_file'; project_id: string; filename: string; content: string; expected_sha256: string }
   | { type: 'index_project'; project_id: string }

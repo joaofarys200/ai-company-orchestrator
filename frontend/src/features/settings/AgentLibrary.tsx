@@ -44,11 +44,12 @@ const PRESET_AGENTS = [
 ];
 
 export const AgentLibrary: React.FC<AgentLibraryProps> = ({ isOpen, onClose }) => {
-  const { sendDirective } = useWebSocket();
+  const { sendDirective, setChatPanelOpen } = useWebSocket();
 
   const handleSpawn = (agent: typeof PRESET_AGENTS[0]) => {
     const directive = `/spawn ${agent.name} | ${agent.specialty} | ${agent.task}`;
     sendDirective(directive);
+    setChatPanelOpen(true);
     onClose();
   };
 

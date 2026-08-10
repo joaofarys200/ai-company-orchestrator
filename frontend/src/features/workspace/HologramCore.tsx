@@ -56,24 +56,24 @@ export const HologramCore: React.FC = () => {
     }
     if (systemStatus === 'PROCESSING') {
       return {
-        hex: '#a855f7', // purple
-        rgba: 'rgba(168, 85, 247, 0.15)',
-        glow: 'shadow-[0_0_40px_rgba(168,85,247,0.5)]',
-        glowRgb: 'rgba(168, 85, 247, 0.5)',
-        border: 'border-purple-500/40',
-        text: 'text-purple-400',
-        coreBg: 'from-[#3b0764]/80 via-[#020617]/95 to-[#05070e]/98'
+        hex: '#d99a6c', // terracotta
+        rgba: 'rgba(217, 154, 108, 0.15)',
+        glow: 'shadow-[0_0_40px_rgba(217,154,108,0.32)]',
+        glowRgb: 'rgba(217, 154, 108, 0.34)',
+        border: 'border-orange-300/35',
+        text: 'text-orange-200',
+        coreBg: 'from-[#3a2117]/80 via-[#141311]/95 to-[#0b0b0a]/98'
       };
     }
     if (systemStatus === 'ONLINE') {
       return {
-        hex: '#06b6d4', // cyan
-        rgba: 'rgba(6, 182, 212, 0.15)',
-        glow: 'shadow-[0_0_30px_rgba(6,182,212,0.35)]',
-        glowRgb: 'rgba(6, 182, 212, 0.35)',
-        border: 'border-cyan-500/30',
-        text: 'text-cyan-400',
-        coreBg: 'from-[#083344]/80 via-[#020617]/95 to-[#05070e]/98'
+        hex: '#d99a6c', // terracotta
+        rgba: 'rgba(217, 154, 108, 0.12)',
+        glow: 'shadow-[0_0_30px_rgba(217,154,108,0.24)]',
+        glowRgb: 'rgba(217, 154, 108, 0.28)',
+        border: 'border-orange-300/30',
+        text: 'text-orange-200',
+        coreBg: 'from-[#2a1c15]/80 via-[#141311]/95 to-[#0b0b0a]/98'
       };
     }
     return {
@@ -251,8 +251,8 @@ export const HologramCore: React.FC = () => {
             className={`w-1.5 h-1.5 rounded-full mt-3 ${
               voiceStatus === 'listening' ? 'bg-emerald-400 shadow-[0_0_8px_#10b981]' :
               voiceStatus === 'transcribing' ? 'bg-amber-400 shadow-[0_0_8px_#f59e0b]' :
-              systemStatus === 'PROCESSING' ? 'bg-purple-400 shadow-[0_0_8px_#a855f7]' :
-              'bg-cyan-400 shadow-[0_0_8px_#06b6d4]'
+              systemStatus === 'PROCESSING' ? 'bg-orange-300 shadow-[0_0_8px_#d99a6c]' :
+              'bg-orange-300 shadow-[0_0_8px_#d99a6c]'
             }`}
           />
         </motion.div>
@@ -300,7 +300,7 @@ export const HologramCore: React.FC = () => {
         <button
           onClick={() => setChatPanelOpen(!chatPanelOpen)}
           className={`p-2 rounded-full hover:bg-white/5 transition-all cursor-pointer ${
-            chatPanelOpen ? 'text-violet-400 drop-shadow-[0_0_4px_rgba(168,85,247,0.5)]' : 'text-gray-400 hover:text-white'
+            chatPanelOpen ? 'text-orange-200 drop-shadow-[0_0_4px_rgba(217,154,108,0.42)]' : 'text-gray-400 hover:text-white'
           }`}
           title="Abrir Chat (ou diz 'abre o chat')"
         >
@@ -311,7 +311,7 @@ export const HologramCore: React.FC = () => {
         <button
           onClick={() => setDevPanelOpen(!devPanelOpen)}
           className={`p-2 rounded-full hover:bg-white/5 transition-all cursor-pointer ${
-            devPanelOpen ? 'text-cyan-400 drop-shadow-[0_0_4px_rgba(6,182,212,0.5)]' : 'text-gray-400 hover:text-white'
+            devPanelOpen ? 'text-orange-200 drop-shadow-[0_0_4px_rgba(217,154,108,0.42)]' : 'text-gray-400 hover:text-white'
           }`}
           title="Abrir Painel Dev (ou diz 'painel dev')"
         >

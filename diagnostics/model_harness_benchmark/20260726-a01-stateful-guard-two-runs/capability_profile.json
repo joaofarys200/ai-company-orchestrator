@@ -1,0 +1,28 @@
+{
+  "benchmark_version": "model_harness_qwen35_stateful_v2",
+  "configuration_hash": "795295d53c7bf8179128746e2bdc3d2aa2c071ee4fd1d112a97ab1c3ef0258d1",
+  "capabilities": [
+    {
+      "capability": "stateful_tool_use",
+      "status": "FAILED",
+      "confidence": 0.0,
+      "passed_cases": 0,
+      "failed_cases": 2,
+      "total_cases": 2,
+      "total_calls": 4,
+      "repetitions": 2,
+      "mean_latency_ms": 9348,
+      "p95_latency_ms": 16924.3,
+      "context_range": [
+        2044,
+        2193
+      ],
+      "recovery_used": false,
+      "limitations": [
+        "Fewer than three distinct cases were exercised.",
+        "2 scenario repetitions failed."
+      ],
+      "configuration_hash": "795295d53c7bf8179128746e2bdc3d2aa2c071ee4fd1d112a97ab1c3ef0258d1"
+    }
+  ]
+}

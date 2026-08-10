@@ -42,6 +42,13 @@ export type {
   TemplateSuggestion,
 } from '../protocol/websocket';
 
+export interface ProjectFileSaveState {
+  ok: boolean;
+  filename: string;
+  sha256: string;
+  error: string;
+}
+
 interface WebSocketContextType {
   isConnected: boolean;
   systemStatus: SystemStatus;
@@ -49,6 +56,9 @@ interface WebSocketContextType {
   chatMessages: ChatMessage[];
   debateMessages: ChatMessage[];
   projectFiles: { [filename: string]: string };
+  projectFileHashes: { [filename: string]: string };
+  projectFileSaveState: ProjectFileSaveState | null;
+  isSavingProjectFile: boolean;
   activeTemplate: ActiveTemplate | null;
   kanban: KanbanState;
   arena: ArenaState;
@@ -85,12 +95,15 @@ interface WebSocketContextType {
   openMission: (missionId: string) => void;
   sendMissionOperation: (operation: MissionClientOperation) => void;
   getAstState: () => void;
+  sandboxStatus: { mode: 'docker' | 'local_fallback'; port: number; is_docker: boolean } | null;
   projects: ProjectSummary[];
   projectContext: ProjectContextData | null;
   projectReferences: ProjectReferenceResult | null;
   semanticResults: string;
   isIndexingProject: boolean;
   openProject: (projectId: string) => void;
+  createProject: (projectId: string, projectName?: string, template?: string) => void;
+  saveProjectFile: (filename: string, content: string) => void;
   reindexProject: () => void;
   findReferences: (symbol: string) => void;
   semanticSearch: (query: string) => void;
@@ -124,6 +137,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [debateMessages, setDebateMessages] = useState<ChatMessage[]>([]);
   const [projectFiles, setProjectFiles] = useState<{ [filename: string]: string }>({});
+  const [projectFileHashes, setProjectFileHashes] = useState<{ [filename: string]: string }>({});
+  const [projectFileSaveState, setProjectFileSaveState] = useState<ProjectFileSaveState | null>(null);
+  const [isSavingProjectFile, setIsSavingProjectFile] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<ActiveTemplate | null>(null);
   const [projectOutput, setProjectOutput] = useState<string>('');
   const [isProjectRunning, setIsProjectRunning] = useState(false);
@@ -144,6 +160,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [projectReferences, setProjectReferences] = useState<ProjectReferenceResult | null>(null);
   const [semanticResults, setSemanticResults] = useState('');
   const [isIndexingProject, setIsIndexingProject] = useState(false);
+  const [sandboxStatus, setSandboxStatus] = useState<{ mode: 'docker' | 'local_fallback'; port: number; is_docker: boolean } | null>(null);
   const [codingSession, setCodingSession] = useState<CodingSessionData | null>(null);
   const [isCodingSessionBusy, setIsCodingSessionBusy] = useState(false);
 
@@ -340,11 +357,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         window.clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
       }
-      // Auto-enable voice on startup (after a short delay to let the backend settle)
+      // Auto-enable voice on startup only if user explicitly opted in via localStorage
       window.setTimeout(() => {
-        if (ws.readyState === WebSocket.OPEN) {
+        const autoConnect = localStorage.getItem('jarvis_voice_auto_connect') === 'true';
+        if (autoConnect && ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify({ type: 'toggle_voice', active: true } satisfies ClientMessage));
-          console.log('[WebSocket] Auto-enabled voice on startup');
+          console.log('[WebSocket] Auto-enabled voice on startup based on user preference');
         }
       }, 1500);
     };
@@ -477,10 +495,20 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           case 'project_context':
             setProjectContext(msg.context);
             setProjectFiles(msg.files);
+            setProjectFileHashes(msg.file_hashes);
             setAstState(Object.keys(msg.symbols).length > 0 ? msg.symbols : null);
             setProjectReferences(null);
             setSemanticResults('');
             setIsIndexingProject(false);
+            break;
+          case 'project_file_save_result':
+            setProjectFileSaveState({
+              ok: msg.ok,
+              filename: msg.filename,
+              sha256: msg.sha256,
+              error: msg.error,
+            });
+            setIsSavingProjectFile(false);
             break;
           case 'project_references':
             setProjectReferences(msg.data);
@@ -491,6 +519,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           case 'coding_session':
             setCodingSession(msg.data);
             setIsCodingSessionBusy(false);
+            break;
+          case 'sandbox_status':
+            setSandboxStatus(msg.status);
             break;
           case 'unknown':
             console.warn('[WebSocket] Unknown message type:', msg.originalType);
@@ -640,6 +671,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const openProject = useCallback((projectId: string) => {
     if (socketRef.current?.readyState === WebSocket.OPEN && projectId) {
       setProjectFiles({});
+      setProjectFileHashes({});
+      setProjectFileSaveState(null);
       setAstState(null);
       setProjectReferences(null);
       setProjectOutput('');
@@ -651,6 +684,49 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       sendClientMessage({ type: 'open_project', project_id: projectId });
     }
   }, [sendClientMessage]);
+
+  const createProject = useCallback((projectId: string, projectName?: string, template?: string) => {
+    if (socketRef.current?.readyState === WebSocket.OPEN && projectId.trim()) {
+      setProjectFiles({});
+      setProjectFileHashes({});
+      setProjectFileSaveState(null);
+      setAstState(null);
+      setProjectReferences(null);
+      setProjectOutput('');
+      setPreviewUrl('about:blank');
+      setIsProjectRunning(false);
+      setCodingSession(null);
+      setMissions([]);
+      setMissionSnapshot(null);
+      sendClientMessage({
+        type: 'create_project',
+        project_id: projectId.trim(),
+        project_name: projectName?.trim(),
+        template,
+      });
+    }
+  }, [sendClientMessage]);
+
+  const saveProjectFile = useCallback((filename: string, content: string) => {
+    const expectedHash = projectFileHashes[filename];
+    if (
+      socketRef.current?.readyState !== WebSocket.OPEN
+      || !projectContext?.project_id
+      || !filename
+      || !expectedHash
+    ) {
+      return;
+    }
+    setIsSavingProjectFile(true);
+    setProjectFileSaveState(null);
+    sendClientMessage({
+      type: 'save_project_file',
+      project_id: projectContext.project_id,
+      filename,
+      content,
+      expected_sha256: expectedHash,
+    });
+  }, [projectContext?.project_id, projectFileHashes, sendClientMessage]);
 
   const reindexProject = useCallback(() => {
     if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id) {
@@ -711,6 +787,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         chatMessages,
         debateMessages,
         projectFiles,
+        projectFileHashes,
+        projectFileSaveState,
+        isSavingProjectFile,
         activeTemplate,
         kanban,
         arena,
@@ -747,12 +826,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         openMission,
         sendMissionOperation,
         getAstState,
+        sandboxStatus,
         projects,
         projectContext,
         projectReferences,
         semanticResults,
         isIndexingProject,
         openProject,
+        createProject,
+        saveProjectFile,
         reindexProject,
         findReferences,
         semanticSearch,

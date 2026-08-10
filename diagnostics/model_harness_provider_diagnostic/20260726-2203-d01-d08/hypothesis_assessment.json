@@ -1,0 +1,87 @@
+{
+  "H1_SCHEMA_COMPLEXITY": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "minimal_schema": "SUCCEEDED",
+      "full_schema": "SUCCEEDED",
+      "schema_metrics_sha256": "17b993fcf2e562e823c8061a79b883b34d28260de2f4d5b107cd2f394a965380"
+    }
+  },
+  "H2_PROVIDER_ADAPTER": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "v1_adapter": "OllamaBenchmarkProvider",
+      "v2_adapter": "OllamaBenchmarkProvider",
+      "harness_result": "SUCCEEDED",
+      "direct_result": "SUCCEEDED"
+    }
+  },
+  "H3_STREAM_HANDLING": {
+    "status": "NOT_TESTED",
+    "evidence": {
+      "buffered_result": "SUCCEEDED",
+      "stream_result": "NOT_TESTED",
+      "stream_first_token": false
+    }
+  },
+  "H4_TOOL_AND_FORMAT_COMBINATION": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "no_tools": "SUCCEEDED",
+      "one_tool": "SUCCEEDED",
+      "all_tools": "SUCCEEDED",
+      "top_level_tool_count": 0
+    }
+  },
+  "H5_CONTEXT_OR_OUTPUT_OPTIONS": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "same_generation_options_baseline": true,
+      "baseline": "SUCCEEDED",
+      "stateful_no_schema": "SUCCEEDED"
+    }
+  },
+  "H6_HTTP_TIMEOUT_LAYER": {
+    "status": "NOT_TESTED",
+    "evidence": {
+      "direct_exception": null,
+      "harness_exception": null
+    }
+  },
+  "H7_OLLAMA_RUNTIME": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "pressure_observed": false,
+      "gpu_free_mib_min": 260,
+      "gpu_free_mib_max": 6618,
+      "loaded_context_lengths": [
+        8192
+      ],
+      "model_reload_observed": true
+    }
+  },
+  "H8_HARNESS_RESPONSE_PATH": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "direct": "SUCCEEDED",
+      "harness": "SUCCEEDED"
+    }
+  },
+  "H9_REQUEST_SERIALIZATION": {
+    "status": "NOT_SUPPORTED",
+    "evidence": {
+      "payload_serialized": true,
+      "payload_bytes": 6622,
+      "payload_sha256": "bf09f238164d9001392710211ed2e3716f68a7f274c1a26837580693b6e6b5e8"
+    }
+  },
+  "H10_MODEL_COLD_OR_RELOAD": {
+    "status": "PARTIALLY_SUPPORTED",
+    "evidence": {
+      "model_reload_observed": true,
+      "loaded_context_lengths": [
+        8192
+      ]
+    }
+  }
+}

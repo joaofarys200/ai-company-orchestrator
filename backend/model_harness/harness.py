@@ -230,6 +230,9 @@ class ModelHarness:
         progress,
         recovery_action: str,
     ) -> None:
+        step = request.metadata.get("step")
+        if isinstance(step, bool) or not isinstance(step, int):
+            step = None
         self.telemetry.record(
             request_id=request.request_id,
             request_fingerprint=request.fingerprint(),
@@ -263,6 +266,14 @@ class ModelHarness:
                     "secret",
                 }
             )),
+            mission_id=str(request.metadata.get("mission_id") or ""),
+            caller_type=str(
+                request.metadata.get("caller_type") or "unknown"
+            ),
+            caller_id=str(request.metadata.get("caller_id") or ""),
+            executor=str(request.metadata.get("executor") or ""),
+            step=step,
+            tools_available=tuple(request.allowed_tools),
         )
 
     @staticmethod

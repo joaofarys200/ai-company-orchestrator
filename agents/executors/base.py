@@ -44,6 +44,8 @@ class WorkPackageExecutionContext:
     autonomous: bool
     allow_apply: bool
     service: Any = field(repr=False)
+    model_harness: Any = field(default=None, repr=False)
+    agent_profile: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass

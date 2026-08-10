@@ -1,0 +1,9 @@
+{
+  "name": "jarvis-model-harness-fixture",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/tasks.js && node --check src/app.js && node --check tests/tasks.test.js",
+    "test": "node tests/tasks.test.js"
+  }
+}

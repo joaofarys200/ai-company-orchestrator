@@ -1,0 +1,6 @@
+{
+  "tool_name": "read_file",
+  "arguments": {
+    "path": "config.json"
+  }
+}

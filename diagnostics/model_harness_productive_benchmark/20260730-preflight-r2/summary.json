@@ -1,0 +1,886 @@
+{
+  "benchmark": "model_harness_productive_qwen_v1",
+  "model": "qwen3.5:9b",
+  "configuration": {
+    "context_tokens": 8192,
+    "output_tokens": 512,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "think": false,
+    "seed": 42,
+    "repetitions_per_scenario": 1
+  },
+  "started_at": "2026-07-30T14:44:10.548120+00:00",
+  "completed_at": "2026-07-30T14:45:55.946616+00:00",
+  "missions": {
+    "passed": 3,
+    "total": 4,
+    "completion_rate": 75.0
+  },
+  "responses": {
+    "structurally_valid": 24,
+    "total": 24,
+    "valid_rate": 100.0
+  },
+  "metrics": {
+    "premature_finish": 0,
+    "invalid_tools": 1,
+    "repeated_calls": 0,
+    "schema_failures": 0,
+    "validation_runs": 3,
+    "failed_validations": 0,
+    "corrections_after_failure": 0,
+    "false_successes": 0,
+    "total_steps": 24,
+    "total_latency_ms": 104741,
+    "input_tokens": 14522,
+    "output_tokens": 1454
+  },
+  "source_integrity_unchanged": true,
+  "scenarios": {
+    "S1_INSPECTION": {
+      "title": "Inspecao read-only",
+      "passed": 1,
+      "total": 1,
+      "completion_rate": 100.0,
+      "premature_finish": 0,
+      "invalid_tools": 0,
+      "repeated_calls": 0,
+      "schema_failures": 0,
+      "average_steps": 4.0,
+      "average_latency_seconds": 16.253
+    },
+    "S2_SIMPLE_EDIT": {
+      "title": "Alteracao simples validada",
+      "passed": 1,
+      "total": 1,
+      "completion_rate": 100.0,
+      "premature_finish": 0,
+      "invalid_tools": 0,
+      "repeated_calls": 0,
+      "schema_failures": 0,
+      "average_steps": 7.0,
+      "average_latency_seconds": 29.189
+    },
+    "S3_VALIDATION_FAILURE": {
+      "title": "Falha, correcao e reteste",
+      "passed": 0,
+      "total": 1,
+      "completion_rate": 0.0,
+      "premature_finish": 0,
+      "invalid_tools": 1,
+      "repeated_calls": 0,
+      "schema_failures": 0,
+      "average_steps": 6.0,
+      "average_latency_seconds": 29.267
+    },
+    "S4_STATEFUL_DISCIPLINE": {
+      "title": "Disciplina stateful",
+      "passed": 1,
+      "total": 1,
+      "completion_rate": 100.0,
+      "premature_finish": 0,
+      "invalid_tools": 0,
+      "repeated_calls": 0,
+      "schema_failures": 0,
+      "average_steps": 7.0,
+      "average_latency_seconds": 30.544
+    }
+  },
+  "promotion": {
+    "completion_rate_at_least_80": false,
+    "all_responses_structurally_valid": true,
+    "zero_false_successes": true,
+    "zero_incomplete_successes": true,
+    "source_integrity_unchanged": true,
+    "promoted": false
+  },
+  "results": [
+    {
+      "scenario_id": "S1_INSPECTION",
+      "repetition": 1,
+      "status": "PASS",
+      "stop_reason": "COMPLETED",
+      "duration_seconds": 16.253,
+      "steps_used": 4,
+      "tool_sequence": [
+        "list_files",
+        "inspect_symbol",
+        "read_file",
+        "finish"
+      ],
+      "structurally_valid_responses": 4,
+      "response_count": 4,
+      "schema_failures": 0,
+      "invalid_tools": 0,
+      "repeated_calls": 0,
+      "premature_finish": 0,
+      "validation_runs": 0,
+      "failed_validations": 0,
+      "corrections_after_failure": 0,
+      "tests_executed": [],
+      "false_success": false,
+      "fixture_integrity": true,
+      "unrelated_file_unchanged": true,
+      "input_tokens": 1717,
+      "output_tokens": 214,
+      "latency_ms": 16214,
+      "steps": [
+        {
+          "step": 1,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "list_files",
+          "arguments": {
+            "path": "."
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"list_files\",\n  \"arguments\": {\n    \"path\": \".\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "files": [
+              "README.md",
+              "package.json",
+              "src/app.js",
+              "src/tasks.js",
+              "tests/tasks.test.js"
+            ],
+            "reference": "project:file-list"
+          },
+          "latency_ms": 4409,
+          "input_tokens": 303,
+          "output_tokens": 56,
+          "response_sha256": "13ff679a372b5462fbb0c35c2a58351831db50115f106fcec8c4657f9789530e"
+        },
+        {
+          "step": 2,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "inspect_symbol",
+          "arguments": {
+            "name": "normalizeTask"
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"inspect_symbol\",\n  \"arguments\": {\n    \"name\": \"normalizeTask\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "symbol": "normalizeTask",
+            "definitions": [
+              {
+                "path": "src/tasks.js",
+                "line": 1,
+                "signature": "export function normalizeTask(value) {",
+                "reference": "src/tasks.js:L1"
+              }
+            ]
+          },
+          "latency_ms": 4013,
+          "input_tokens": 362,
+          "output_tokens": 57,
+          "response_sha256": "22459b9293b0a0fb51b75b8ed72ab47802ad0f03e74785d4caeb4da82a2d8352"
+        },
+        {
+          "step": 3,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "read_file",
+          "arguments": {
+            "path": "src/tasks.js"
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "path": "src/tasks.js",
+            "content": "export function normalizeTask(value) {\n  return String(value ?? '').trim();\n}\n\nexport function addTask(tasks, value) {\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}\n\nexport function taskCountLabel(tasks) {\n  return `${tasks.length} tasks`;\n}\n",
+            "sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+            "reference": "src/tasks.js:full"
+          },
+          "latency_ms": 4169,
+          "input_tokens": 431,
+          "output_tokens": 58,
+          "response_sha256": "4e8632771223afaff3175baea5f820a87455320bc6f873ac38c5b3a49d750db2"
+        },
+        {
+          "step": 4,
+          "status": "FINISHED",
+          "action": "FINISH",
+          "tool_name": "finish",
+          "arguments": {},
+          "raw_response": "{\n  \"action\": \"FINISH\",\n  \"tool_name\": \"finish\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {},
+          "latency_ms": 3623,
+          "input_tokens": 621,
+          "output_tokens": 43,
+          "response_sha256": "ed8784fe041c4104ef7ee39d790168f69034d15caaff275d55fe585a34f1c3da"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "scenario_id": "S2_SIMPLE_EDIT",
+      "repetition": 1,
+      "status": "PASS",
+      "stop_reason": "COMPLETED",
+      "duration_seconds": 29.189,
+      "steps_used": 7,
+      "tool_sequence": [
+        "list_files",
+        "inspect_symbol",
+        "read_file",
+        "apply_patch",
+        "run_validation",
+        "show_diff",
+        "finish"
+      ],
+      "structurally_valid_responses": 7,
+      "response_count": 7,
+      "schema_failures": 0,
+      "invalid_tools": 0,
+      "repeated_calls": 0,
+      "premature_finish": 0,
+      "validation_runs": 1,
+      "failed_validations": 0,
+      "corrections_after_failure": 0,
+      "tests_executed": [
+        {
+          "command": "node --check src/tasks.js",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 56
+        },
+        {
+          "command": "node tests/tasks.test.js",
+          "exit_code": 0,
+          "stdout": "fixture tests passed\n",
+          "stderr": "",
+          "duration_ms": 63
+        }
+      ],
+      "false_success": false,
+      "fixture_integrity": true,
+      "unrelated_file_unchanged": true,
+      "input_tokens": 4490,
+      "output_tokens": 400,
+      "latency_ms": 29028,
+      "steps": [
+        {
+          "step": 1,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "list_files",
+          "arguments": {
+            "path": "."
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"list_files\",\n  \"arguments\": {\n    \"path\": \".\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "files": [
+              "README.md",
+              "package.json",
+              "src/app.js",
+              "src/tasks.js",
+              "tests/tasks.test.js"
+            ],
+            "reference": "project:file-list"
+          },
+          "latency_ms": 4031,
+          "input_tokens": 337,
+          "output_tokens": 56,
+          "response_sha256": "13ff679a372b5462fbb0c35c2a58351831db50115f106fcec8c4657f9789530e"
+        },
+        {
+          "step": 2,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "inspect_symbol",
+          "arguments": {
+            "name": "addTask"
+          },
+          "raw_response": "{\"action\":\"CALL_TOOL\",\"tool_name\":\"inspect_symbol\",\"arguments\":{\"name\":\"addTask\"},\"conclusion\":\"\",\"evidence_refs\":[]}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "symbol": "addTask",
+            "definitions": [
+              {
+                "path": "src/tasks.js",
+                "line": 5,
+                "signature": "export function addTask(tasks, value) {",
+                "reference": "src/tasks.js:L5"
+              }
+            ]
+          },
+          "latency_ms": 3014,
+          "input_tokens": 396,
+          "output_tokens": 28,
+          "response_sha256": "ada50791f54bd77c2771545fccc09f563baa637021b99eabac447f33dfa1a044"
+        },
+        {
+          "step": 3,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "read_file",
+          "arguments": {
+            "path": "src/tasks.js"
+          },
+          "raw_response": "{\"action\":\"CALL_TOOL\",\"tool_name\":\"read_file\",\"arguments\":{\"path\":\"src/tasks.js\"},\"conclusion\":\"\",\"evidence_refs\":[]}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "path": "src/tasks.js",
+            "content": "export function normalizeTask(value) {\n  return String(value ?? '').trim();\n}\n\nexport function addTask(tasks, value) {\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}\n\nexport function taskCountLabel(tasks) {\n  return `${tasks.length} tasks`;\n}\n",
+            "sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+            "reference": "src/tasks.js:full"
+          },
+          "latency_ms": 3092,
+          "input_tokens": 467,
+          "output_tokens": 29,
+          "response_sha256": "4c58ca2ff9613751281e62f63aba7d4d35ca60aa9df0321b6156d08608021bef"
+        },
+        {
+          "step": 4,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "apply_patch",
+          "arguments": {
+            "path": "src/tasks.js",
+            "old_text": "export function addTask(tasks, value) {\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}",
+            "new_text": "export function addTask(tasks, value) {\n  if (!value || String(value).trim() === '') {\n    return tasks;\n  }\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}"
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"apply_patch\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\",\n    \"old_text\": \"export function addTask(tasks, value) {\\n  const normalized = normalizeTask(value);\\n  return [...tasks, normalized];\\n}\",\n    \"new_text\": \"export function addTask(tasks, value) {\\n  if (!value || String(value).trim() === '') {\\n    return tasks;\\n  }\\n  const normalized = normalizeTask(value);\\n  return [...tasks, normalized];\\n}\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "path": "src/tasks.js",
+            "changed": true,
+            "before_sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+            "after_sha256": "daa7b1d8eba6f4c03be43dea61ed0037cc04bfdad968058d9a721938ddc36f48"
+          },
+          "latency_ms": 7837,
+          "input_tokens": 658,
+          "output_tokens": 152,
+          "response_sha256": "a5d213dbe4822709daa1135f75971251c27dce74f38e467cf3ea208076e4a5ef"
+        },
+        {
+          "step": 5,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "run_validation",
+          "arguments": {},
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"run_validation\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "passed": true,
+            "commands": [
+              {
+                "command": "node --check src/tasks.js",
+                "exit_code": 0,
+                "stdout": "",
+                "stderr": "",
+                "duration_ms": 56
+              },
+              {
+                "command": "node tests/tasks.test.js",
+                "exit_code": 0,
+                "stdout": "fixture tests passed\n",
+                "stderr": "",
+                "duration_ms": 63
+              }
+            ],
+            "run_number": 1
+          },
+          "latency_ms": 3399,
+          "input_tokens": 879,
+          "output_tokens": 45,
+          "response_sha256": "d223d522ff1fb9640466384421103644c95492aa97a50ff41498ab5a5e0b220c"
+        },
+        {
+          "step": 6,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "show_diff",
+          "arguments": {},
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"show_diff\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "changed_paths": [
+              "src/tasks.js"
+            ],
+            "unified_diff": "--- a/src/tasks.js\n+++ b/src/tasks.js\n@@ -3,6 +3,9 @@\n }\n \n export function addTask(tasks, value) {\n+  if (!value || String(value).trim() === '') {\n+    return tasks;\n+  }\n   const normalized = normalizeTask(value);\n   return [...tasks, normalized];\n }\n",
+            "reference": "project:final-diff"
+          },
+          "latency_ms": 3758,
+          "input_tokens": 904,
+          "output_tokens": 46,
+          "response_sha256": "09ad01796e4741c1e1cc5a24dc41faad2cb8946c7cdecfe5eef75d103042737b"
+        },
+        {
+          "step": 7,
+          "status": "FINISHED",
+          "action": "FINISH",
+          "tool_name": "finish",
+          "arguments": {},
+          "raw_response": "{\n  \"action\": \"FINISH\",\n  \"tool_name\": \"finish\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {},
+          "latency_ms": 3897,
+          "input_tokens": 849,
+          "output_tokens": 44,
+          "response_sha256": "ed8784fe041c4104ef7ee39d790168f69034d15caaff275d55fe585a34f1c3da"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "scenario_id": "S3_VALIDATION_FAILURE",
+      "repetition": 1,
+      "status": "FAIL",
+      "stop_reason": "SEMANTIC_VALIDATION_FAILED",
+      "duration_seconds": 29.267,
+      "steps_used": 6,
+      "tool_sequence": [
+        "list_files",
+        "inspect_symbol",
+        "read_file",
+        "apply_patch",
+        "run_validation"
+      ],
+      "structurally_valid_responses": 6,
+      "response_count": 6,
+      "schema_failures": 0,
+      "invalid_tools": 1,
+      "repeated_calls": 0,
+      "premature_finish": 0,
+      "validation_runs": 1,
+      "failed_validations": 0,
+      "corrections_after_failure": 0,
+      "tests_executed": [
+        {
+          "command": "node --check src/tasks.js",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 55
+        },
+        {
+          "command": "node tests/tasks.test.js",
+          "exit_code": 0,
+          "stdout": "fixture tests passed\n",
+          "stderr": "",
+          "duration_ms": 58
+        }
+      ],
+      "false_success": false,
+      "fixture_integrity": false,
+      "unrelated_file_unchanged": true,
+      "input_tokens": 3815,
+      "output_tokens": 420,
+      "latency_ms": 29101,
+      "steps": [
+        {
+          "step": 1,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "list_files",
+          "arguments": {
+            "path": "."
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"list_files\",\n  \"arguments\": {\n    \"path\": \".\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "files": [
+              "README.md",
+              "package.json",
+              "src/app.js",
+              "src/tasks.js",
+              "tests/tasks.test.js"
+            ],
+            "reference": "project:file-list"
+          },
+          "latency_ms": 4051,
+          "input_tokens": 361,
+          "output_tokens": 56,
+          "response_sha256": "13ff679a372b5462fbb0c35c2a58351831db50115f106fcec8c4657f9789530e"
+        },
+        {
+          "step": 2,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "inspect_symbol",
+          "arguments": {
+            "name": "addTask"
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"inspect_symbol\",\n  \"arguments\": {\n    \"name\": \"addTask\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "symbol": "addTask",
+            "definitions": [
+              {
+                "path": "src/tasks.js",
+                "line": 5,
+                "signature": "export function addTask(tasks, value) {",
+                "reference": "src/tasks.js:L5"
+              }
+            ]
+          },
+          "latency_ms": 4229,
+          "input_tokens": 420,
+          "output_tokens": 57,
+          "response_sha256": "67e314eb471c3e80bd174c51d9ea4a415cc9f1b74ca304aa87ba1975bd952c51"
+        },
+        {
+          "step": 3,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "read_file",
+          "arguments": {
+            "path": "src/tasks.js"
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "path": "src/tasks.js",
+            "content": "export function normalizeTask(value) {\n  return String(value ?? '').trim();\n}\n\nexport function addTask(tasks, value) {\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}\n\nexport function taskCountLabel(tasks) {\n  return `${tasks.length} tasks`;\n}\n",
+            "sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+            "reference": "src/tasks.js:full"
+          },
+          "latency_ms": 4236,
+          "input_tokens": 491,
+          "output_tokens": 58,
+          "response_sha256": "4e8632771223afaff3175baea5f820a87455320bc6f873ac38c5b3a49d750db2"
+        },
+        {
+          "step": 4,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "apply_patch",
+          "arguments": {
+            "path": "src/tasks.js",
+            "old_text": "export function addTask(tasks, value) {\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}",
+            "new_text": "export function addTask(tasks, value) {\n  if (value === undefined || value === null || String(value).trim() === '') {\n    return tasks;\n  }\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}"
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"apply_patch\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\",\n    \"old_text\": \"export function addTask(tasks, value) {\\n  const normalized = normalizeTask(value);\\n  return [...tasks, normalized];\\n}\",\n    \"new_text\": \"export function addTask(tasks, value) {\\n  if (value === undefined || value === null || String(value).trim() === '') {\\n    return tasks;\\n  }\\n  const normalized = normalizeTask(value);\\n  return [...tasks, normalized];\\n}\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "path": "src/tasks.js",
+            "changed": true,
+            "before_sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+            "after_sha256": "7466c331f5ed2e53a47869e94a4aa7807444a2e0b6e3de4c35c3e40b3a35a419"
+          },
+          "latency_ms": 8532,
+          "input_tokens": 682,
+          "output_tokens": 158,
+          "response_sha256": "afae79146606d2ac47e99fe77f58b1f281b06eb49b081887ee8471ff17048be4"
+        },
+        {
+          "step": 5,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "run_validation",
+          "arguments": {},
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"run_validation\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "passed": true,
+            "commands": [
+              {
+                "command": "node --check src/tasks.js",
+                "exit_code": 0,
+                "stdout": "",
+                "stderr": "",
+                "duration_ms": 55
+              },
+              {
+                "command": "node tests/tasks.test.js",
+                "exit_code": 0,
+                "stdout": "fixture tests passed\n",
+                "stderr": "",
+                "duration_ms": 58
+              }
+            ],
+            "run_number": 1
+          },
+          "latency_ms": 4077,
+          "input_tokens": 918,
+          "output_tokens": 45,
+          "response_sha256": "d223d522ff1fb9640466384421103644c95492aa97a50ff41498ab5a5e0b220c"
+        },
+        {
+          "step": 6,
+          "status": "SEMANTICALLY_INVALID",
+          "action": "CALL_TOOL",
+          "tool_name": "run_validation",
+          "arguments": {},
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"run_validation\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": false,
+          "validation_error": "expected next tool 'apply_patch', received 'run_validation'",
+          "observation": {},
+          "latency_ms": 3976,
+          "input_tokens": 943,
+          "output_tokens": 46,
+          "response_sha256": "d223d522ff1fb9640466384421103644c95492aa97a50ff41498ab5a5e0b220c"
+        }
+      ],
+      "errors": [
+        "step 6: expected next tool 'apply_patch', received 'run_validation'"
+      ]
+    },
+    {
+      "scenario_id": "S4_STATEFUL_DISCIPLINE",
+      "repetition": 1,
+      "status": "PASS",
+      "stop_reason": "COMPLETED",
+      "duration_seconds": 30.544,
+      "steps_used": 7,
+      "tool_sequence": [
+        "list_files",
+        "inspect_symbol",
+        "read_file",
+        "apply_patch",
+        "run_validation",
+        "show_diff",
+        "finish"
+      ],
+      "structurally_valid_responses": 7,
+      "response_count": 7,
+      "schema_failures": 0,
+      "invalid_tools": 0,
+      "repeated_calls": 0,
+      "premature_finish": 0,
+      "validation_runs": 1,
+      "failed_validations": 0,
+      "corrections_after_failure": 0,
+      "tests_executed": [
+        {
+          "command": "node --check src/tasks.js",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 57
+        },
+        {
+          "command": "node tests/tasks.test.js",
+          "exit_code": 0,
+          "stdout": "fixture tests passed\n",
+          "stderr": "",
+          "duration_ms": 55
+        }
+      ],
+      "false_success": false,
+      "fixture_integrity": true,
+      "unrelated_file_unchanged": true,
+      "input_tokens": 4500,
+      "output_tokens": 420,
+      "latency_ms": 30398,
+      "steps": [
+        {
+          "step": 1,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "list_files",
+          "arguments": {
+            "path": "."
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"list_files\",\n  \"arguments\": {\n    \"path\": \".\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "files": [
+              "README.md",
+              "package.json",
+              "src/app.js",
+              "src/tasks.js",
+              "tests/tasks.test.js"
+            ],
+            "reference": "project:file-list"
+          },
+          "latency_ms": 4173,
+          "input_tokens": 339,
+          "output_tokens": 56,
+          "response_sha256": "13ff679a372b5462fbb0c35c2a58351831db50115f106fcec8c4657f9789530e"
+        },
+        {
+          "step": 2,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "inspect_symbol",
+          "arguments": {
+            "name": "taskCountLabel"
+          },
+          "raw_response": "{\"action\":\"CALL_TOOL\",\"tool_name\":\"inspect_symbol\",\"arguments\":{\"name\":\"taskCountLabel\"},\"conclusion\":\"\",\"evidence_refs\":[]}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "symbol": "taskCountLabel",
+            "definitions": [
+              {
+                "path": "src/tasks.js",
+                "line": 10,
+                "signature": "export function taskCountLabel(tasks) {",
+                "reference": "src/tasks.js:L10"
+              }
+            ]
+          },
+          "latency_ms": 3065,
+          "input_tokens": 398,
+          "output_tokens": 29,
+          "response_sha256": "1b74610e6117bbe10c223763c1e98f1c775fb68c8a220e83519fb2cf84adc846"
+        },
+        {
+          "step": 3,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "read_file",
+          "arguments": {
+            "path": "src/tasks.js"
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"read_file\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "path": "src/tasks.js",
+            "content": "export function normalizeTask(value) {\n  return String(value ?? '').trim();\n}\n\nexport function addTask(tasks, value) {\n  const normalized = normalizeTask(value);\n  return [...tasks, normalized];\n}\n\nexport function taskCountLabel(tasks) {\n  return `${tasks.length} tasks`;\n}\n",
+            "sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+            "reference": "src/tasks.js:full"
+          },
+          "latency_ms": 4258,
+          "input_tokens": 472,
+          "output_tokens": 58,
+          "response_sha256": "4e8632771223afaff3175baea5f820a87455320bc6f873ac38c5b3a49d750db2"
+        },
+        {
+          "step": 4,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "apply_patch",
+          "arguments": {
+            "path": "src/tasks.js",
+            "old_text": "export function taskCountLabel(tasks) {\n  return `${tasks.length} tasks`;\n}",
+            "new_text": "export function taskCountLabel(tasks) {\n  const count = tasks.length;\n  if (count === 1) {\n    return '1 task';\n  }\n  return `${count} tasks`;\n}"
+          },
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"apply_patch\",\n  \"arguments\": {\n    \"path\": \"src/tasks.js\",\n    \"old_text\": \"export function taskCountLabel(tasks) {\\n  return `${tasks.length} tasks`;\\n}\",\n    \"new_text\": \"export function taskCountLabel(tasks) {\\n  const count = tasks.length;\\n  if (count === 1) {\\n    return '1 task';\\n  }\\n  return `${count} tasks`;\\n}\"\n  },\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "path": "src/tasks.js",
+            "changed": true,
+            "before_sha256": "248b9a13521e7cd637af0dc3c6fb3c4414c02e2602cd7956e046ec9815911992",
+            "after_sha256": "66cc58742dc90895d1197ab485d20d65fb4731c27ff664149c3faf110b73cbb0"
+          },
+          "latency_ms": 7347,
+          "input_tokens": 663,
+          "output_tokens": 140,
+          "response_sha256": "d4e146811dfe63a29f1cb083ac4c9efe7a53d14c5770397645b770add31ecad9"
+        },
+        {
+          "step": 5,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "run_validation",
+          "arguments": {},
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"run_validation\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "passed": true,
+            "commands": [
+              {
+                "command": "node --check src/tasks.js",
+                "exit_code": 0,
+                "stdout": "",
+                "stderr": "",
+                "duration_ms": 57
+              },
+              {
+                "command": "node tests/tasks.test.js",
+                "exit_code": 0,
+                "stdout": "fixture tests passed\n",
+                "stderr": "",
+                "duration_ms": 55
+              }
+            ],
+            "run_number": 1
+          },
+          "latency_ms": 3472,
+          "input_tokens": 876,
+          "output_tokens": 46,
+          "response_sha256": "d223d522ff1fb9640466384421103644c95492aa97a50ff41498ab5a5e0b220c"
+        },
+        {
+          "step": 6,
+          "status": "TOOL_SUCCEEDED",
+          "action": "CALL_TOOL",
+          "tool_name": "show_diff",
+          "arguments": {},
+          "raw_response": "{\n  \"action\": \"CALL_TOOL\",\n  \"tool_name\": \"show_diff\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {
+            "changed_paths": [
+              "src/tasks.js"
+            ],
+            "unified_diff": "--- a/src/tasks.js\n+++ b/src/tasks.js\n@@ -8,5 +8,9 @@\n }\n \n export function taskCountLabel(tasks) {\n-  return `${tasks.length} tasks`;\n+  const count = tasks.length;\n+  if (count === 1) {\n+    return '1 task';\n+  }\n+  return `${count} tasks`;\n }\n",
+            "reference": "project:final-diff"
+          },
+          "latency_ms": 3949,
+          "input_tokens": 899,
+          "output_tokens": 46,
+          "response_sha256": "09ad01796e4741c1e1cc5a24dc41faad2cb8946c7cdecfe5eef75d103042737b"
+        },
+        {
+          "step": 7,
+          "status": "FINISHED",
+          "action": "FINISH",
+          "tool_name": "finish",
+          "arguments": {},
+          "raw_response": "{\n  \"action\": \"FINISH\",\n  \"tool_name\": \"finish\",\n  \"arguments\": {},\n  \"conclusion\": \"\",\n  \"evidence_refs\": []\n}",
+          "structured_valid": true,
+          "semantic_valid": true,
+          "validation_error": "",
+          "observation": {},
+          "latency_ms": 4134,
+          "input_tokens": 853,
+          "output_tokens": 45,
+          "response_sha256": "ed8784fe041c4104ef7ee39d790168f69034d15caaff275d55fe585a34f1c3da"
+        }
+      ],
+      "errors": []
+    }
+  ]
+}

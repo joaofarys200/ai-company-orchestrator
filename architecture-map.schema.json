@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "agents": {
+      "type": "array"
+    },
+    "benchmarks": {
+      "type": "array"
+    },
+    "blueprint": {
+      "type": "object"
+    },
+    "components": {
+      "type": "array"
+    },
+    "contracts": {
+      "type": "array"
+    },
+    "datastores": {
+      "type": "array"
+    },
+    "diagnostics": {
+      "type": "array"
+    },
+    "endpoints": {
+      "type": "array"
+    },
+    "evidence_index": {
+      "type": "array"
+    },
+    "external_dependencies": {
+      "type": "array"
+    },
+    "layers": {
+      "type": "array"
+    },
+    "meta": {
+      "type": "object"
+    },
+    "providers": {
+      "type": "array"
+    },
+    "relations": {
+      "type": "array"
+    },
+    "risks": {
+      "type": "array"
+    },
+    "state_machines": {
+      "type": "array"
+    },
+    "summary": {
+      "type": "object"
+    },
+    "systems": {
+      "type": "array"
+    },
+    "tests": {
+      "type": "array"
+    },
+    "tools": {
+      "type": "array"
+    },
+    "unknowns": {
+      "type": "array"
+    },
+    "websockets": {
+      "type": "array"
+    },
+    "workflows": {
+      "type": "array"
+    }
+  },
+  "required": [
+    "meta",
+    "summary",
+    "blueprint",
+    "systems",
+    "layers",
+    "components",
+    "relations",
+    "workflows",
+    "risks",
+    "unknowns",
+    "evidence_index"
+  ],
+  "type": "object"
+}

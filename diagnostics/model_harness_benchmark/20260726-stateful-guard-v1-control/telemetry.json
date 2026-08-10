@@ -1,0 +1,34 @@
+[
+  {
+    "timestamp": "2026-07-26T21:19:24.052449+00:00",
+    "request_id": "0092d09c2ae3452d8df66b0576e7dd5a",
+    "request_fingerprint": "3959cbb91e0ef8984fb269caad98ba1a7276ad05b9d3ba49dbc6682174d034f8",
+    "task_profile": "TOOL_SELECTION",
+    "provider": "ollama",
+    "model": "qwen3.5:9b",
+    "latency_ms": 14009,
+    "input_tokens": 55,
+    "output_tokens": 32,
+    "pipeline": [
+      "PARSING",
+      "SCHEMA",
+      "ENUMS",
+      "REFERENCES",
+      "PRECONDITIONS",
+      "COMPATIBILITY",
+      "ACCEPTANCE_CRITERIA"
+    ],
+    "validation_status": "PASSED",
+    "recovery_action": "NONE",
+    "result_status": "SUCCEEDED",
+    "context_items": 0,
+    "allowed_tool_count": 1,
+    "progress_conditions": [],
+    "metadata_keys": [
+      "benchmark_version",
+      "case_id",
+      "consumer",
+      "repetition"
+    ]
+  }
+]

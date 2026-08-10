@@ -23,7 +23,6 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any, Awaitable, Callable
 
-import httpx
 from dotenv import dotenv_values
 
 try:
@@ -50,11 +49,16 @@ from backend.model_harness import (
     ModelPreferences,
     ModelRequest,
     ModelResponseStatus,
-    ModelRoute,
-    ModelUsage,
+    OllamaChatProvider,
+    OllamaExecutionOptions,
+    OllamaIncompleteResponseError,
+    OllamaModelNotFoundError,
+    OllamaOutputLimitError,
+    OllamaProviderResponseError,
+    OllamaStructuredOutputUnsupportedError,
     OutputFormat,
-    ProviderRegistry,
-    ProviderResult,
+    create_runtime_model_harness,
+    get_model_harness,
 )
 from intelligence.project_context import ProjectContextService
 
@@ -83,7 +87,6 @@ NODE_BUILTINS = {
     "net", "os", "path", "querystring", "stream", "string_decoder", "timers", "url",
     "util", "worker_threads", "zlib",
 }
-OLLAMA_BASE_URL = "http://127.0.0.1:11434"
 PLAN_PROVIDER = "ollama"
 PLAN_MAX_ATTEMPTS = 2
 PLAN_RETRYABLE_CATEGORIES = {
@@ -281,15 +284,6 @@ class PlanTimeoutConfig:
     write: float = 15.0
     pool: float = 5.0
 
-    def to_httpx(self, *, readiness: bool = False) -> httpx.Timeout:
-        read_timeout = min(self.read, 15.0) if readiness else self.read
-        return httpx.Timeout(
-            connect=self.connect,
-            read=read_timeout,
-            write=self.write,
-            pool=self.pool,
-        )
-
     def to_dict(self) -> dict[str, float]:
         return asdict(self)
 
@@ -333,14 +327,6 @@ class _OllamaGenerationContract:
     correction_schema_length: int = 0
     correction_schema_version: str = ""
     streaming_enabled: bool = True
-
-
-@dataclass(frozen=True)
-class _ProjectBuilderProviderCall:
-    attempt: int
-    prompt_bytes: int
-    correction_bytes: int
-    generation_contract: _OllamaGenerationContract
 
 
 class _PlanAttemptFailure(Exception):
@@ -4028,41 +4014,11 @@ def _ollama_message_length(messages: list[dict[str, str]]) -> int:
     return sum(len(str(item.get("content") or "").encode("utf-8")) for item in messages)
 
 
-class _ProjectBuilderOllamaHarnessProvider:
-    name = PLAN_PROVIDER
-
-    def __init__(self, requester: "OllamaPlanRequester", model: str):
-        self.requester = requester
-        self.default_model = model
-
-    async def generate(
-        self,
-        request: ModelRequest,
-        route: ModelRoute,
-        progress,
-    ) -> ProviderResult:
-        call = request.execution_constraints.provider_payload
-        if not isinstance(call, _ProjectBuilderProviderCall):
-            raise _PlanAttemptFailure(
-                "PLAN_HTTP_ERROR",
-                "O provider recebeu um contrato de chamada invalido.",
-                retryable=False,
-                error_type="InvalidHarnessProviderCall",
-            )
-        readiness = await self.requester._readiness(call.attempt)
-        return await self.requester._generate_from_provider(
-            request,
-            route,
-            call,
-            readiness,
-        )
-
-
 class OllamaPlanRequester:
     def __init__(
         self,
         *,
-        transport: httpx.AsyncBaseTransport | None = None,
+        transport: Any | None = None,
         sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
         heartbeat: Callable[[], None] | None = None,
         flight_recorder: Any | None = None,
@@ -4088,10 +4044,16 @@ class OllamaPlanRequester:
         self.context_builder = ContextBuilder()
         self.harness_operation_id = f"project_builder:{uuid.uuid4().hex}"
         if model_harness is None:
-            providers = ProviderRegistry([
-                _ProjectBuilderOllamaHarnessProvider(self, self.model)
-            ])
-            model_harness = ModelHarness(providers)
+            if transport is None:
+                model_harness = get_model_harness()
+            else:
+                model_harness = create_runtime_model_harness(
+                    ollama_provider=OllamaChatProvider(
+                        default_model=self.model,
+                        transport=transport,
+                        keep_alive=self.keep_alive,
+                    )
+                )
         self.model_harness = model_harness
 
     def _heartbeat(self, *, force: bool = False) -> None:
@@ -4237,113 +4199,6 @@ class OllamaPlanRequester:
         record.final_plan_hash = result.final_plan_hash
         self.final_error = None
 
-    def _client(self, timeout: httpx.Timeout) -> httpx.AsyncClient:
-        return httpx.AsyncClient(
-            base_url=OLLAMA_BASE_URL,
-            timeout=timeout,
-            transport=self.transport,
-        )
-
-    async def _readiness(self, attempt: int) -> dict[str, Any]:
-        self._record("readiness_check_started", attempt=attempt, metadata={"model": self.model})
-        self._heartbeat(force=True)
-        started = time.monotonic()
-        readiness: dict[str, Any] = {
-            "attempt": attempt,
-            "service_available": False,
-            "model_exists": False,
-            "model_loaded": None,
-        }
-        try:
-            async with self._client(self.timeout_config.to_httpx(readiness=True)) as client:
-                response = await client.get("/api/tags")
-                if response.status_code >= 500:
-                    raise _PlanAttemptFailure(
-                        "OLLAMA_UNAVAILABLE",
-                        f"Ollama readiness devolveu HTTP {response.status_code}.",
-                        retryable=True,
-                        error_type="HTTPStatusError",
-                    )
-                if response.status_code >= 400:
-                    raise _PlanAttemptFailure(
-                        "OLLAMA_UNAVAILABLE",
-                        f"Ollama readiness devolveu HTTP {response.status_code}.",
-                        retryable=False,
-                        error_type="HTTPStatusError",
-                    )
-                readiness["service_available"] = True
-                data = response.json()
-                models = data.get("models") or []
-                selected = next(
-                    (
-                        item for item in models
-                        if str(item.get("name") or item.get("model") or "") == self.model
-                    ),
-                    None,
-                )
-                if selected is None:
-                    readiness["duration"] = round(time.monotonic() - started, 4)
-                    self.readiness_checks.append(readiness)
-                    raise _PlanAttemptFailure(
-                        "MODEL_NOT_FOUND",
-                        f"O modelo configurado '{self.model}' nao existe no Ollama local.",
-                        retryable=False,
-                        error_type="ModelNotFound",
-                    )
-                readiness["model_exists"] = True
-                details = selected.get("details") or {}
-                readiness["model_metadata"] = {
-                    "family": details.get("family"),
-                    "parameter_size": details.get("parameter_size"),
-                    "quantization_level": details.get("quantization_level"),
-                    "size_bytes": selected.get("size"),
-                }
-                try:
-                    running = await client.get("/api/ps")
-                    if running.status_code < 400:
-                        loaded_models = running.json().get("models") or []
-                        readiness["model_loaded"] = any(
-                            str(item.get("name") or item.get("model") or "") == self.model
-                            for item in loaded_models
-                        )
-                except httpx.HTTPError:
-                    readiness["model_loaded"] = None
-        except _PlanAttemptFailure:
-            raise
-        except (httpx.ConnectTimeout, httpx.ConnectError, httpx.PoolTimeout) as exc:
-            raise _PlanAttemptFailure(
-                "OLLAMA_UNAVAILABLE",
-                "O servico Ollama nao respondeu ao readiness check.",
-                retryable=True,
-                error_type=type(exc).__name__,
-            ) from exc
-        except httpx.ReadTimeout as exc:
-            raise _PlanAttemptFailure(
-                "OLLAMA_UNAVAILABLE",
-                "O readiness check do Ollama excedeu o timeout.",
-                retryable=True,
-                error_type=type(exc).__name__,
-            ) from exc
-        except (ValueError, httpx.HTTPError) as exc:
-            raise _PlanAttemptFailure(
-                "OLLAMA_UNAVAILABLE",
-                "Resposta invalida no readiness check do Ollama.",
-                retryable=False,
-                error_type=type(exc).__name__,
-            ) from exc
-        finally:
-            self._heartbeat(force=True)
-            if readiness not in self.readiness_checks:
-                readiness["duration"] = round(time.monotonic() - started, 4)
-                self.readiness_checks.append(readiness)
-            self._record(
-                "readiness_check_completed",
-                attempt=attempt,
-                status="COMPLETED" if readiness.get("service_available") and readiness.get("model_exists") else "FAILED",
-                metadata=readiness,
-            )
-        return readiness
-
     async def _generate(
         self,
         prompt: str,
@@ -4378,15 +4233,70 @@ class OllamaPlanRequester:
             if generation_contract.structured_output_enabled
             else OutputFormat.JSON
         )
-        call = _ProjectBuilderProviderCall(
+
+        def on_provider_event(
+            event: str,
+            metadata: dict[str, Any],
+            status: str,
+        ) -> None:
+            self._heartbeat(force=event != "stream_progress")
+            event_metadata = dict(metadata)
+            if event == "readiness_check_completed":
+                readiness = {
+                    "attempt": attempt,
+                    **event_metadata,
+                }
+                self.readiness_checks.append(readiness)
+                event_metadata = readiness
+            elif event == "http_request_started":
+                event_metadata.update({
+                    "prompt_bytes": len(prompt.encode("utf-8")),
+                    "correction_bytes": (
+                        len(correction.encode("utf-8"))
+                        if correction
+                        else 0
+                    ),
+                })
+            elif (
+                event == "stream_completed"
+                and self.flight_recorder is not None
+            ):
+                self.flight_recorder.write_payload_metrics({
+                    "attempt": attempt,
+                    **event_metadata,
+                })
+            self._record(
+                event,
+                attempt=attempt,
+                status=status,
+                metadata=event_metadata,
+                progress_counter=(
+                    int(event_metadata.get("chunks") or 0)
+                    if event == "stream_progress"
+                    else None
+                ),
+            )
+
+        provider_options = OllamaExecutionOptions(
+            connect_timeout=self.timeout_config.connect,
+            read_timeout=self.timeout_config.read,
+            write_timeout=self.timeout_config.write,
+            pool_timeout=self.timeout_config.pool,
+            readiness_timeout=min(self.timeout_config.read, 15.0),
+            keep_alive=self.keep_alive,
+            require_readiness=True,
+            require_done=True,
+            output_character_limit=self.max_output_tokens * 12,
+            event_callback=on_provider_event,
+        )
+        self._record(
+            "model_attempt_started",
             attempt=attempt,
-            prompt_bytes=len(prompt.encode("utf-8")),
-            correction_bytes=(
-                len(correction.encode("utf-8"))
-                if correction
-                else 0
-            ),
-            generation_contract=generation_contract,
+            metadata={
+                "phase": (
+                    "plan_correction" if correction else "plan"
+                ),
+            },
         )
         request = ModelRequest(
             task_profile="STRUCTURED_EXTRACTION",
@@ -4436,13 +4346,15 @@ class OllamaPlanRequester:
                 thinking=False,
                 allow_recovery=False,
                 stop_on_no_progress=False,
-                provider_payload=call,
+                provider_payload=provider_options,
             ),
         )
         response = await self.model_harness.execute(request)
         if response.status != ModelResponseStatus.SUCCEEDED:
             if response.provider_exception is not None:
-                raise response.provider_exception
+                raise self._provider_failure(
+                    response.provider_exception,
+                ) from response.provider_exception
             raise _PlanAttemptFailure(
                 "PLAN_HTTP_ERROR",
                 "O Model Harness nao concluiu a chamada de planeamento.",
@@ -4450,252 +4362,111 @@ class OllamaPlanRequester:
                 error_type=response.status.value,
                 partial_response=bool(response.raw_text),
             )
-        return response.raw_text
-
-    async def _generate_from_provider(
-        self,
-        request: ModelRequest,
-        route: ModelRoute,
-        call: _ProjectBuilderProviderCall,
-        readiness: dict[str, Any],
-    ) -> ProviderResult:
-        generation_contract = call.generation_contract
-        attempt = call.attempt
-        payload = {
-            "model": route.model,
-            "messages": [
-                {"role": "system", "content": request.system_prompt},
-                {"role": "user", "content": request.user_prompt},
-            ],
-            "stream": route.streaming,
-            "format": generation_contract.response_format,
-            "think": route.thinking,
-            "keep_alive": self.keep_alive,
-            "options": {
-                "temperature": request.temperature,
-                "top_p": 0.8,
-                "num_predict": request.max_output_tokens,
-                "num_ctx": request.max_context_tokens,
-            },
-        }
-        parts: list[str] = []
-        output_length = 0
-        done_received = False
-        done_reason = ""
-        stream_started = time.monotonic()
-        first_byte_at: float | None = None
-        first_chunk_at: float | None = None
-        first_content_at: float | None = None
-        last_chunk_at: float | None = None
-        max_chunk_gap = 0.0
-        chunk_count = 0
-        response_bytes = 0
-        first_valid_json_at: float | None = None
-        metrics: dict[str, Any] = {}
-        self._record(
-            "model_attempt_started",
-            attempt=attempt,
-            metadata={"phase": request.metadata.get("phase", "plan")},
-        )
-        output_character_limit = int(request.max_output_tokens or 1) * 12
-        try:
-            async with self._client(self.timeout_config.to_httpx()) as client:
-                self._record("http_request_started", attempt=attempt, metadata={
-                    "endpoint": "/api/chat",
-                    "prompt_bytes": call.prompt_bytes,
-                    "correction_bytes": call.correction_bytes,
-                })
-                async with client.stream("POST", "/api/chat", json=payload) as response:
-                    self._record(
-                        "response_headers_received",
-                        attempt=attempt,
-                        status="COMPLETED" if response.status_code < 400 else "FAILED",
-                        metadata={"status_code": response.status_code},
-                    )
-                    if response.status_code >= 400:
-                        response_body = (await response.aread()).decode("utf-8", errors="replace")
-                        if (
-                            generation_contract.structured_output_enabled
-                            and _is_structured_output_rejection(response_body)
-                        ):
-                            raise _PlanAttemptFailure(
-                                "CORRECTION_STRUCTURED_OUTPUT_UNSUPPORTED",
-                                "O provider rejeitou structured output com JSON Schema.",
-                                retryable=False,
-                                error_type="StructuredOutputUnsupported",
-                            )
-                        raise _PlanAttemptFailure(
-                            "PLAN_HTTP_ERROR",
-                            f"Ollama planning devolveu HTTP {response.status_code}.",
-                            retryable=response.status_code >= 500,
-                            error_type="HTTPStatusError",
-                        )
-                    async for line in response.aiter_lines():
-                        self._heartbeat()
-                        if not line.strip():
-                            continue
-                        now = time.monotonic()
-                        chunk_count += 1
-                        response_bytes += len(line.encode("utf-8"))
-                        if first_byte_at is None:
-                            first_byte_at = now
-                            self._record("first_response_byte", attempt=attempt)
-                        if first_chunk_at is None:
-                            first_chunk_at = now
-                            self._record("first_http_chunk", attempt=attempt)
-                        if last_chunk_at is not None:
-                            max_chunk_gap = max(max_chunk_gap, now - last_chunk_at)
-                        last_chunk_at = now
-                        try:
-                            chunk = json.loads(line)
-                        except ValueError as exc:
-                            raise _PlanAttemptFailure(
-                                "PLAN_HTTP_ERROR",
-                                "Ollama devolveu um chunk de streaming invalido.",
-                                retryable=False,
-                                error_type=type(exc).__name__,
-                                partial_response=bool(parts),
-                            ) from exc
-                        if chunk.get("error"):
-                            raise _PlanAttemptFailure(
-                                "PLAN_HTTP_ERROR",
-                                "Ollama devolveu erro durante a geracao.",
-                                retryable=False,
-                                error_type="OllamaStreamError",
-                                partial_response=bool(parts),
-                            )
-                        content = str((chunk.get("message") or {}).get("content") or "")
-                        if content:
-                            if first_content_at is None:
-                                first_content_at = now
-                                self._record("first_nonempty_content", attempt=attempt)
-                            parts.append(content)
-                            output_length += len(content)
-                            if first_valid_json_at is None:
-                                try:
-                                    extract_json_object("".join(parts))
-                                except Exception:
-                                    pass
-                                else:
-                                    first_valid_json_at = now
-                                    self._record("first_valid_json_object", attempt=attempt)
-                            self._record(
-                                "stream_progress",
-                                attempt=attempt,
-                                metadata={"chunks": chunk_count, "content_chars": output_length},
-                                progress_counter=chunk_count,
-                            )
-                        if output_length > output_character_limit:
-                            raise _PlanAttemptFailure(
-                                "PLAN_OUTPUT_LIMIT_EXCEEDED",
-                                "O plano excedeu o limite de output configurado.",
-                                retryable=False,
-                                error_type="OutputLimitExceeded",
-                                partial_response=True,
-                            )
-                        if chunk.get("done") is True:
-                            done_received = True
-                            done_reason = str(chunk.get("done_reason") or "")
-                            metrics = {
-                                "attempt": attempt,
-                                "first_response_byte_ms": round((first_byte_at - stream_started) * 1000, 3) if first_byte_at else None,
-                                "first_chunk_ms": round((first_chunk_at - stream_started) * 1000, 3) if first_chunk_at else None,
-                                "first_content_ms": round((first_content_at - stream_started) * 1000, 3) if first_content_at else None,
-                                "first_valid_json_ms": round((first_valid_json_at - stream_started) * 1000, 3) if first_valid_json_at else None,
-                                "max_chunk_gap_ms": round(max_chunk_gap * 1000, 3),
-                                "chunk_count": chunk_count,
-                                "bytes_received": response_bytes,
-                                "content_characters": output_length,
-                                "done_reason": done_reason,
-                            }
-                            metrics.update({
-                                key: chunk.get(key)
-                                for key in (
-                                    "prompt_eval_count", "prompt_eval_duration", "eval_count",
-                                    "eval_duration", "load_duration", "total_duration",
-                                )
-                                if key in chunk
-                            })
-                            self._record("stream_completed", attempt=attempt, status="COMPLETED", metadata=metrics)
-                            if self.flight_recorder is not None:
-                                self.flight_recorder.write_payload_metrics(metrics)
-                            break
-        except _PlanAttemptFailure:
-            self._record(
-                "requester_failed",
-                attempt=attempt,
-                status="FAILED",
-                metadata={"partial_response": bool(parts), "chunks": chunk_count},
-            )
-            raise
-        except httpx.ReadTimeout as exc:
-            category = (
-                "MODEL_LOAD_TIMEOUT"
-                if readiness.get("model_loaded") is False and not parts
-                else "PLAN_READ_TIMEOUT"
-            )
-            raise _PlanAttemptFailure(
-                category,
-                "Ollama excedeu o timeout de leitura durante o planeamento.",
-                retryable=True,
-                error_type=type(exc).__name__,
-                partial_response=bool(parts),
-            ) from exc
-        except (httpx.ConnectTimeout, httpx.ConnectError, httpx.PoolTimeout) as exc:
-            raise _PlanAttemptFailure(
-                "OLLAMA_UNAVAILABLE",
-                "Nao foi possivel ligar ao Ollama para gerar o plano.",
-                retryable=True,
-                error_type=type(exc).__name__,
-                partial_response=bool(parts),
-            ) from exc
-        except httpx.HTTPError as exc:
-            self._record("requester_failed", attempt=attempt, status="FAILED", error=exc, metadata={"partial_response": bool(parts)})
-            raise _PlanAttemptFailure(
-                "PLAN_HTTP_ERROR",
-                "Erro HTTP controlado durante o planeamento.",
-                retryable=False,
-                error_type=type(exc).__name__,
-                partial_response=bool(parts),
-            ) from exc
-
-        if not done_received:
-            raise _PlanAttemptFailure(
-                "PLAN_HTTP_ERROR",
-                "O streaming terminou sem done=true.",
-                retryable=False,
-                error_type="IncompleteStream",
-                partial_response=bool(parts),
-            )
-        if done_reason.lower() == "length":
-            raise _PlanAttemptFailure(
-                "PLAN_OUTPUT_LIMIT_EXCEEDED",
-                "O modelo terminou por atingir o limite de output.",
-                retryable=False,
-                error_type="OutputLimitExceeded",
-                partial_response=bool(parts),
-            )
         if self.flight_recorder is not None:
             self.flight_recorder.write_raw_artifact(
                 f"response_attempt_{attempt}.jsonl",
-                "".join(parts),
+                response.raw_text,
             )
-        return ProviderResult(
-            raw_text="".join(parts),
-            usage=ModelUsage(
-                input_tokens=metrics.get("prompt_eval_count"),
-                output_tokens=metrics.get("eval_count"),
-                total_tokens=(
-                    int(metrics.get("prompt_eval_count") or 0)
-                    + int(metrics.get("eval_count") or 0)
-                    or None
-                ),
-            ),
-            metadata={
-                "done_reason": done_reason,
-                "chunk_count": chunk_count,
-                "bytes_received": response_bytes,
-            },
+        return response.raw_text
+
+    def _provider_failure(
+        self,
+        error: BaseException,
+    ) -> _PlanAttemptFailure:
+        error_type = type(error).__name__
+        partial = bool(
+            getattr(error, "partial_response", False)
+        )
+        if isinstance(error, OllamaModelNotFoundError):
+            return _PlanAttemptFailure(
+                "MODEL_NOT_FOUND",
+                str(error),
+                retryable=False,
+                error_type=error_type,
+                partial_response=partial,
+            )
+        if isinstance(
+            error,
+            OllamaStructuredOutputUnsupportedError,
+        ):
+            return _PlanAttemptFailure(
+                "CORRECTION_STRUCTURED_OUTPUT_UNSUPPORTED",
+                str(error),
+                retryable=False,
+                error_type=error_type,
+                partial_response=partial,
+            )
+        if isinstance(error, OllamaOutputLimitError):
+            return _PlanAttemptFailure(
+                "PLAN_OUTPUT_LIMIT_EXCEEDED",
+                str(error),
+                retryable=False,
+                error_type=error_type,
+                partial_response=partial,
+            )
+        if isinstance(error, OllamaIncompleteResponseError):
+            return _PlanAttemptFailure(
+                "PLAN_HTTP_ERROR",
+                str(error),
+                retryable=False,
+                error_type=error_type,
+                partial_response=partial,
+            )
+        if error_type in {
+            "ConnectTimeout",
+            "ConnectError",
+            "PoolTimeout",
+        }:
+            return _PlanAttemptFailure(
+                "OLLAMA_UNAVAILABLE",
+                "Nao foi possivel ligar ao Ollama para gerar o plano.",
+                retryable=True,
+                error_type=error_type,
+                partial_response=partial,
+            )
+        if error_type == "ReadTimeout":
+            latest_readiness = (
+                self.readiness_checks[-1]
+                if self.readiness_checks
+                else {}
+            )
+            category = (
+                "MODEL_LOAD_TIMEOUT"
+                if latest_readiness.get("model_loaded") is False
+                and not partial
+                else "PLAN_READ_TIMEOUT"
+            )
+            return _PlanAttemptFailure(
+                category,
+                "Ollama excedeu o timeout de leitura durante o planeamento.",
+                retryable=True,
+                error_type=error_type,
+                partial_response=partial,
+            )
+        response = getattr(error, "response", None)
+        status_code = getattr(response, "status_code", None)
+        if isinstance(status_code, int):
+            return _PlanAttemptFailure(
+                "PLAN_HTTP_ERROR",
+                f"Ollama planning devolveu HTTP {status_code}.",
+                retryable=status_code >= 500,
+                error_type=error_type,
+                partial_response=partial,
+            )
+        if isinstance(error, OllamaProviderResponseError):
+            return _PlanAttemptFailure(
+                "PLAN_HTTP_ERROR",
+                str(error),
+                retryable=False,
+                error_type=error_type,
+                partial_response=partial,
+            )
+        return _PlanAttemptFailure(
+            "PLAN_HTTP_ERROR",
+            "Erro controlado no provider durante o planeamento.",
+            retryable=False,
+            error_type=error_type,
+            partial_response=partial,
         )
 
     async def __call__(self, prompt: str, correction: str | None = None) -> str:

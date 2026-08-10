@@ -1,0 +1,35 @@
+{
+  "diagnostic_version": "stateful_tool_sequence_semantic_diagnostic_v1",
+  "started_at": "2026-07-27T18:41:02.403797+00:00",
+  "scenario_id": "A01_FIND_RELEVANT_FILE",
+  "fixture_sha256": "1748ae4be49e49a362b646d7d571e9302ee306573eaae69589fcaba9683b080a",
+  "model": "qwen3.5:9b",
+  "configuration": {
+    "context_tokens": 8192,
+    "max_output_tokens": 1024,
+    "temperature": 0.0,
+    "top_p": 0.8,
+    "seed": 42,
+    "think": false,
+    "stream": false,
+    "timeout_seconds": 300.0,
+    "repetitions": 2
+  },
+  "variants": [
+    {
+      "variant_id": "S04_CONDITIONED_SCHEMA",
+      "title": "Schema conditioned by the current legal transition",
+      "explicit_state": true,
+      "structured_prevalidation": false,
+      "conditioned_schema": true,
+      "semantic_retry": false
+    }
+  ],
+  "script_sha256": "caa79f54c7d95171a347853974740364f892ac63e84158e152941ddca11b373c",
+  "safety": {
+    "scenario_count": 1,
+    "semantic_context_builder": false,
+    "fixture_sandbox_only": true,
+    "model_selects_tools": true
+  }
+}
