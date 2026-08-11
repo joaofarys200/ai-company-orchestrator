@@ -137,8 +137,8 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
         TaskProfile(
             name="TOOL_SELECTION",
             temperature=0.0,
-            max_context_tokens=8_192,
-            max_output_tokens=2_048,
+            max_context_tokens=32_768,
+            max_output_tokens=4_096,
             expected_output=ExpectedOutput(format=OutputFormat.TOOL_CALLS),
             validation_pipeline=structured_stages,
             allowed_tools=("*",),

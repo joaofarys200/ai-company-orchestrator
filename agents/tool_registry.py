@@ -97,6 +97,8 @@ def infer_permissions(tool_name: str) -> tuple[str, ...]:
         "youtube_get_transcript",
         "apify_run_actor",
         "composio_execute_action",
+        "read_pdf",
+        "search_arxiv",
     }:
         return ("network", "external")
     if tool_name in {"chamar_swarm_dominio", "criar_agente_especialista"}:

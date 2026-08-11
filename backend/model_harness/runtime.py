@@ -9,6 +9,7 @@ from backend.model_harness.providers.anthropic import (
 )
 from backend.model_harness.providers.gemini import GeminiOpenAIProvider
 from backend.model_harness.providers.ollama import OllamaChatProvider
+from backend.model_harness.providers.openrouter import OpenRouterProvider
 from backend.model_harness.telemetry import ModelTelemetry
 
 
@@ -21,12 +22,14 @@ def create_runtime_model_harness(
     ollama_provider: OllamaChatProvider | None = None,
     gemini_provider: GeminiOpenAIProvider | None = None,
     anthropic_provider: AnthropicMessagesProvider | None = None,
+    openrouter_provider: OpenRouterProvider | None = None,
     telemetry: ModelTelemetry | None = None,
 ) -> ModelHarness:
     providers = [
         ollama_provider or OllamaChatProvider(),
         gemini_provider or GeminiOpenAIProvider(),
         anthropic_provider or AnthropicMessagesProvider(),
+        openrouter_provider or OpenRouterProvider(),
     ]
     return ModelHarness(
         ProviderRegistry(providers),

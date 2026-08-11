@@ -307,6 +307,81 @@ async def run_firecrawl_scrape(url: str) -> str:
     return await run_local_scrape(url)
 
 
+# --- read_pdf ---
+async def read_pdf(file_path: str, max_pages: int = 20) -> str:
+    """Extracts text content from a local PDF file using pdfplumber.
+    Returns the extracted text page by page up to max_pages."""
+    try:
+        import pdfplumber
+        from pathlib import Path as _Path
+
+        p = _Path(file_path)
+        if not p.is_absolute():
+            p = _Path(SANDBOX_DIR) / file_path
+        if not p.exists():
+            return f"Erro: O ficheiro PDF '{file_path}' nao foi encontrado."
+
+        loop = asyncio.get_running_loop()
+        def extract():
+            pages_text = []
+            with pdfplumber.open(str(p)) as pdf:
+                total = len(pdf.pages)
+                for i, page in enumerate(pdf.pages[:max_pages]):
+                    text = page.extract_text() or ""
+                    pages_text.append(f"--- Pagina {i+1}/{total} ---\n{text}")
+            return "\n\n".join(pages_text)
+
+        text = await loop.run_in_executor(None, extract)
+        return text or "O PDF nao continha texto extraivel."
+    except ImportError:
+        return "Erro: pdfplumber nao esta instalado."
+    except Exception as e:
+        return f"Erro ao ler o PDF '{file_path}': {str(e)}"
+
+
+# --- search_arxiv ---
+async def search_arxiv(query: str, max_results: int = 5) -> str:
+    """Searches arXiv.org for academic papers matching a query.
+    Returns title, authors, abstract and PDF link for each result."""
+    try:
+        encoded = query.replace(" ", "+")
+        url = (
+            f"https://export.arxiv.org/api/query"
+            f"?search_query=all:{encoded}&start=0&max_results={max_results}"
+        )
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(url)
+            resp.raise_for_status()
+            content = resp.text
+
+        import xml.etree.ElementTree as ET
+        ns = {"atom": "http://www.w3.org/2005/Atom"}
+        root = ET.fromstring(content)
+        entries = root.findall("atom:entry", ns)
+        if not entries:
+            return f"Nenhum resultado encontrado no arXiv para: '{query}'"
+
+        results = []
+        for entry in entries:
+            title = (entry.findtext("atom:title", "", ns) or "").strip().replace("\n", " ")
+            summary = (entry.findtext("atom:summary", "", ns) or "").strip()[:400]
+            authors = ", ".join(
+                (a.findtext("atom:name", "", ns) or "").strip()
+                for a in entry.findall("atom:author", ns)
+            )
+            pdf_link = next(
+                (lnk.get("href", "") for lnk in entry.findall("atom:link", ns)
+                 if lnk.get("type") == "application/pdf"),
+                ""
+            )
+            results.append(
+                f"**{title}**\nAutores: {authors}\nResumo: {summary}...\nPDF: {pdf_link}"
+            )
+        return "\n\n".join(results)
+    except Exception as e:
+        return f"Erro ao pesquisar no arXiv: {str(e)}"
+
+
 # --- run_apify_actor ---
 async def run_apify_actor(actor_id: str, input_data: dict) -> str:
     """Runs a specific Apify Actor and returns the dataset output."""
@@ -863,6 +938,42 @@ JARVIS_TOOLS = [
                 }
             },
             "required": ["chave", "descricao", "correcao"]
+        }
+    },
+    {
+        "name": "read_pdf",
+        "description": "Extracts and returns the full text content of a local PDF file (research papers, documents, reports). Use this to read academic papers the user has placed in the sandbox.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to the PDF file. Relative to the sandbox directory or absolute."
+                },
+                "max_pages": {
+                    "type": "integer",
+                    "description": "Maximum number of pages to extract. Defaults to 20."
+                }
+            },
+            "required": ["file_path"]
+        }
+    },
+    {
+        "name": "search_arxiv",
+        "description": "Searches arXiv.org for academic research papers. Returns titles, authors, abstracts and PDF links. Ideal for literature reviews and finding related work for a thesis.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "The search query (e.g. 'multi-agent orchestration large language models')."
+                },
+                "max_results": {
+                    "type": "integer",
+                    "description": "Maximum number of papers to return. Defaults to 5."
+                }
+            },
+            "required": ["query"]
         }
     }
 ]
