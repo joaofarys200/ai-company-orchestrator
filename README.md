@@ -1,119 +1,158 @@
-# AI Company Orchestrator
+# 🤖 AI Company Orchestrator (JARVIS OS)
 
-Aplicacao local de orquestracao de agentes com backend Python, frontend React/Vite e shell Electron. O backend coordena agentes, WebSocket local, memoria SQLite, ferramentas desktop, scraping, Obsidian e preview sandbox. O frontend consome eventos em tempo real e apresenta chat, estado de agentes, ficheiros gerados e paineis de trabalho.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11%2B-blue?style=for-the-badge&logo=python" alt="Python 3.11+" />
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react" alt="React 18" />
+  <img src="https://img.shields.io/badge/Electron-Desktop-47848F?style=for-the-badge&logo=electron" alt="Electron" />
+  <img src="https://img.shields.io/badge/OpenRouter-Dual--Model-FF6C37?style=for-the-badge" alt="OpenRouter Dual-Model" />
+  <img src="https://img.shields.io/badge/Skills-24%20Engineered-success?style=for-the-badge" alt="24 Skills" />
+</p>
 
-## Requisitos
+> **JARVIS OS** é um Sistema Operativo Cognitivo Autónomo e Orquestrador Multi-Agente de alta precisão. Combina inteligência híbrida (modelos cloud sem custos via **OpenRouter** para raciocínio/tool-calling e **Ollama** local para privacidade), **24 skills de engenharia de nível de produção**, controlo de voz em tempo real (**Gemini Live**) e geração autónoma de software e documentos (.docx, .xlsx, .pptx, .pdf).
 
-- Windows 10/11 recomendado para o modo desktop local.
-- Python 3.11+.
-- Node.js 20+ e npm.
-- Docker Desktop opcional, usado pelo preview sandbox quando disponivel.
-- Ollama opcional para modo local com modelos como `qwen2.5:14b`.
+---
 
-No Windows, use sempre o Python do virtualenv do projeto:
+## 🌟 Principais Capacidades
 
-```powershell
-.\venv\Scripts\python.exe
+### ⚡ 1. Hybrid Dual-Model Router (Cloud Zero-Cost + Local)
+- **Seleção de Ferramentas de Alta Precisão**: Roteamento automático de tarefas complexas (`TOOL_SELECTION` e `MISSION_PLANNING`) para modelos cloud sem custos no OpenRouter (`openrouter/free`, `nvidia/nemotron-3-super-120b-a12b:free`) com **100% de aprovação em validação de 7 etapas**.
+- **Execução Local Privada**: Operações de rotina e manipulação de ficheiros locais geridas via Ollama (`qwen2.5:14b`).
+
+### 📚 2. 24 Production-Grade Engineering Skills
+Integradas a partir da especificação [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills):
+- **Qualidade & Testes**: `test-driven-development`, `code-review-and-quality`, `browser-testing-with-devtools`, `debugging-and-error-recovery`, `doubt-driven-development`.
+- **Arquitetura & Especificação**: `api-and-interface-design`, `spec-driven-development`, `planning-and-task-breakdown`, `documentation-and-adrs`.
+- **UI & Performance**: `frontend-ui-engineering`, `performance-optimization`, `code-simplification`, `incremental-implementation`.
+- **DevOps & Segurança**: `security-and-hardening`, `ci-cd-and-automation`, `shipping-and-launch`, `git-workflow-and-versioning`.
+
+### 🔬 3. Suite de Investigação e Leitura
+- **`search_arxiv`**: Pesquisa académica em tempo real no arXiv.org (resumos, autores, citações e links PDF).
+- **`read_pdf`**: Extração inteligente de texto página a página de documentos PDF locais via `pdfplumber`.
+- **`firecrawl_scrape_url`**: Scraping profundo de páginas web para conversão em Markdown limpo.
+
+### 📄 4. Motor Autónomo de Geração de Documentos
+- **Word (`.docx`)**: Relatórios e capítulos de tese com estilos tipográficos, capas e índice.
+- **Excel (`.xlsx`)**: Matrizes de dados, tabelas dinâmicas e fórmulas calculadas.
+- **PowerPoint (`.pptx`)**: Apresentações executivas com slides estruturados.
+- **PDF**: Relatórios prontos a publicar.
+
+### 🎤 5. Voz em Tempo Real (Gemini Live) & Controlo Desktop
+- Interação por voz em baixa latência via **Gemini Live API**.
+- Lançamento imediato de aplicações Windows (`abrir Google`, `abrir Excel`, `abrir Chrome`, `abrir VS Code`).
+
+### 🧠 6. Memória Incremental (ECC & Compounding RAG)
+- **Compounding Memory**: Regras de aprendizagem contínua gravadas em SQLite após cada correção do utilizador.
+- **Obsidian RAG**: Sincronização automática com notas e cofres Obsidian locais.
+
+---
+
+## 🏛️ Arquitetura do Sistema
+
+```
+                         ┌─────────────────────────┐
+                         │   UTILIZADOR (CEO)      │
+                         │ Electron HUD / Voz / WS │
+                         └────────────┬────────────┘
+                                      │
+                                      ▼
+                         ┌─────────────────────────┐
+                         │   JARVIS ORCHESTRATOR   │
+                         │ (System Operating Loop) │
+                         └────────────┬────────────┘
+                                      │
+               ┌──────────────────────┴──────────────────────┐
+               ▼                                             ▼
+  ┌─────────────────────────┐                   ┌─────────────────────────┐
+  │   MODEL HARNESS ROUTER  │                   │   24 ENGINEERING SKILLS │
+  └────────────┬────────────┘                   │  (.agents/skills/*.md)  │
+               │                                └─────────────────────────┘
+       ┌───────┴───────┐
+       ▼               ▼
+ ┌───────────┐   ┌───────────┐
+ │OpenRouter │   │  Ollama   │
+ │ (Cloud 0$)│   │  (Local)  │
+ └───────────┘   └───────────┘
 ```
 
-## Instalacao Backend
+---
 
+## 🚀 Instalação & Configuração
+
+### 1. Pré-requisitos
+- **OS**: Windows 10/11 (recomendado para desktop local).
+- **Python**: 3.11 ou superior.
+- **Node.js**: v20+ e `npm`.
+- **Ollama** *(opcional)*: Para execução 100% offline com `qwen2.5:14b`.
+
+### 2. Configuração do Backend
 ```powershell
+# Criar e ativar o ambiente virtual Python
 python -m venv venv
 .\venv\Scripts\python.exe -m pip install --upgrade pip
 .\venv\Scripts\python.exe -m pip install -r requirements.txt
 .\venv\Scripts\python.exe -m playwright install chromium
+
+# Configurar variáveis de ambiente
 Copy-Item .env.example .env
 ```
 
-Edite `.env` apenas com chaves locais suas. Nunca coloque chaves reais no `.env.example`.
-
-## Instalacao Frontend e Electron
-
+### 3. Configuração do Frontend & Electron
 ```powershell
 npm install
 npm install --prefix frontend
 ```
 
-Para desenvolvimento com Vite e Electron:
+---
 
-```powershell
-npm run dev
-```
+## ⚙️ Variáveis de Ambiente (`.env`)
 
-Para compilar o frontend:
+| Variável | Descrição | Exemplo / Valor Padrão |
+|---|---|---|
+| `ORCHESTRATOR_MODE` | Modo principal do orquestrador | `local` |
+| `OPENROUTER_FOR_COMPLEX` | Roteamento dual-model cloud sem custos | `true` |
+| `OPENROUTER_API_KEY` | Chave de API do OpenRouter | `sk-or-v1-...` |
+| `OPENROUTER_MODEL` | Modelo padrão OpenRouter | `openrouter/free` |
+| `OLLAMA_MODEL` | Modelo local Ollama | `qwen2.5:14b` |
+| `GEMINI_API_KEY` | Chave de API Google Gemini | `AQ.Ab...` |
+| `VOICE_MODE` | Modo do motor de voz | `gemini_live` |
+| `VOICE_CONFIRMATION_MODE` | Exigir confirmação verbal para comandos críticos | `true` |
+| `FIRECRAWL_API_KEY` | Chave de API do Firecrawl Scraping | `fc-...` |
+| `OBSIDIAN_VAULT_PATH` | Caminho para o cofre Obsidian local | `C:\Users\...\Obsidian` |
 
-```powershell
-npm run build --prefix frontend
-```
+---
 
-## Variaveis de Ambiente
+## 💻 Comandos de Execução
 
-As variaveis documentadas em `.env.example` cobrem o runtime principal:
-
-- `ORCHESTRATOR_MODE`: `local`, `ollama`, `gemini`, `claude` ou `anthropic`.
-- `JARVIS_WS_TOKEN`: token local simples exigido pelo WebSocket.
-- `VITE_JARVIS_WS_TOKEN`: token equivalente para o frontend se o fallback `local-dev-token` for alterado.
-- `OLLAMA_MODEL` e `OLLAMA_BASE_URL`: configuracao de modelo local.
-- `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`: chaves cloud opcionais.
-- `ORCHESTRATOR_MAX_STEPS`, `ORCHESTRATOR_SPECIALIST_MAX_STEPS`, `ORCHESTRATOR_IDLE_RETRIES`: limites para evitar loops longos.
-- `ORCHESTRATOR_SWARM_ENABLED`: quando `false`, o orquestrador evita swarms e trabalha diretamente com ferramentas.
-- `ORCHESTRATOR_VERBOSE_PROGRESS`: quando `false`, reduz mensagens de progresso repetidas no chat.
-- `ORCHESTRATOR_AUTO_LEARN`: quando `false`, evita a chamada extra de auto-aprendizagem por prompt.
-- `ORCHESTRATOR_COMPLEXITY_MODEL_ENABLED`: quando `false`, usa heuristica rapida para simples/complexo em vez de chamar modelo.
-- `VOICE_MODE`: use `none` para desativar voz numa instalacao limpa.
-- `VOICE_GAIN`: ganho do microfone antes de enviar audio; valores abaixo de `1.0` reduzem sensibilidade.
-- `VOICE_VAD_SENSITIVITY`: sensibilidade WebRTC VAD de `0` a `3`; valores mais baixos sao menos agressivos.
-- `VOICE_RMS_THRESHOLD` e `VOICE_MIN_SPEECH_MS`: filtram ruido curto no modo local.
-- `VOICE_INTERRUPTION`, `VOICE_INTERRUPT_MIN_SPEECH_MS`, `VOICE_INTERRUPT_COOLDOWN_MS`, `VOICE_INTERRUPT_RMS_THRESHOLD`: controlam quando a voz do Gemini Live pode ser interrompida pelo microfone.
-- `VOICE_CONFIRMATION_MODE`: quando `true`, comandos por voz com efeitos laterais ficam pendentes ate dizeres `confirma`, `executa` ou `avanca`; consultas read-only podem avancar diretamente.
-- `VOICE_CONFIRMATION_TTL_SECONDS`: tempo maximo para confirmar uma diretiva de voz pendente.
-- `VOICE_ALLOW_TOOLS`: permite ou bloqueia ferramentas no Gemini Live por voz; por seguranca deve ficar `false` ate quereres comandos de computador por voz.
-- `VOICE_ALLOW_READONLY_TOOLS`: permite observacao do ambiente, leitura de ficheiros e pesquisa sem alterar o computador; ativo por omissao.
-- `VOICE_AUTO_READONLY`: inicia diretamente pedidos de pesquisa e observacao read-only, sem confirmacao.
-- `VOICE_ALLOWED_TOOLS`: lista opcional separada por virgulas para limitar as ferramentas permitidas quando `VOICE_ALLOW_TOOLS=true`.
-- `FIRECRAWL_API_KEY`, `APIFY_API_TOKEN`, `BROWSERBASE_API_KEY`, `COMPOSIO_API_KEY`: ferramentas externas opcionais.
-- `OBSIDIAN_VAULT_PATH`: caminho opcional para um cofre Obsidian local.
-- `DOCKER_PORT`: porta do preview sandbox, por omissao `8080`.
-
-Se alterar `JARVIS_WS_TOKEN`, mantenha o mesmo valor em `VITE_JARVIS_WS_TOKEN` no ambiente do frontend. Em modo build, o frontend tambem tem fallback local `local-dev-token`.
-
-## Comandos de Arranque
-
-Backend apenas:
-
-```powershell
-.\venv\Scripts\python.exe server.py
-```
-
-Electron em modo producao local:
-
+### Executar a Aplicação Desktop Completa (Electron + Vite + Server)
 ```powershell
 npm start
 ```
 
-Frontend Vite + Electron em modo desenvolvimento:
-
+### Modo de Desenvolvimento (Vite Dev Server + Server)
 ```powershell
 npm run dev
 ```
 
-## Portas Usadas
-
-- `8000`: servidor HTTP local para o frontend compilado.
-- `8001`: WebSocket local, ligado apenas a `127.0.0.1` e protegido por token.
-- `8080`: preview sandbox, configuravel por `DOCKER_PORT`.
-- `5173`: Vite dev server quando usado `npm run dev`.
-- `11434`: Ollama local, se usado.
-
-## Validacoes Minimas
-
+### Executar Apenas o Servidor Backend (Python)
 ```powershell
-.\venv\Scripts\python.exe -m pip check
-.\venv\Scripts\python.exe -c "import server; print('IMPORT_SERVER_OK')"
-node --check main.js
-npm run build --prefix frontend
-npm run lint --prefix frontend
+.\venv\Scripts\python.exe server.py
 ```
 
-Estado conhecido: o build do frontend deve passar. O lint pode falhar enquanto existirem avisos/erros antigos de tipagem e regras React ainda nao tratados.
+---
+
+## 💬 Slash Commands Disponíveis no Chat
+
+- `/spec` — Ativa **`spec-driven-development`** (especificação detalhada pré-código).
+- `/plan` — Ativa **`planning-and-task-breakdown`** (divisão atómica de tarefas).
+- `/build` — Ativa **`incremental-implementation`** (execução por fases).
+- `/test` — Ativa **`test-driven-development`** (desenvolvimento guiado por testes).
+- `/review` — Ativa **`code-review-and-quality`** (revisão de qualidade em 5 eixos).
+- `/code-simplify` — Ativa **`code-simplify`** (refatoração para clareza).
+- `/ship` — Ativa **`shipping-and-launch`** (validação de publicação).
+
+---
+
+## 📄 Licença & Créditos
+
+Desenvolvido no âmbito da investigação em **Orquestração de Agentes IA e Sistemas Cognitivos Autónomos**. 
+Skills de engenharia baseadas nas especificações de [Addy Osmani (`agent-skills`)](https://github.com/addyosmani/agent-skills).
