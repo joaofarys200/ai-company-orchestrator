@@ -47,6 +47,7 @@ EXTERNAL_TOOLS = {
     "firecrawl_scrape_url", "browserbase_load_page", "youtube_get_transcript",
     "apify_run_actor", "composio_execute_action", "frontend_ui_command",
     "list_active_windows", "capture_screen",
+    "read_pdf", "search_arxiv",
 }
 ENGINEERING_TOOLS = {
     "semantic_code_search", "refactor_move_symbol", "refactor_rename_symbol",
@@ -994,6 +995,14 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
                 elif tool_name == "firecrawl_scrape_url":
                     url = tool_input.get("url")
                     result_str = await ag_tools.run_firecrawl_scrape(url)
+                elif tool_name == "read_pdf":
+                    fp = tool_input.get("file_path")
+                    mp = tool_input.get("max_pages", 20)
+                    result_str = await ag_tools.read_pdf(fp, max_pages=mp)
+                elif tool_name == "search_arxiv":
+                    q = tool_input.get("query")
+                    mr = tool_input.get("max_results", 5)
+                    result_str = await ag_tools.search_arxiv(q, max_results=mr)
                 elif tool_name == "browserbase_load_page":
                     url = tool_input.get("url")
                     result_str = await ag_tools.run_browserbase_load(url)
@@ -1199,8 +1208,8 @@ async def query_model_with_tools(
         allowed_tools=allowed_tools,
         expected_output=ExpectedOutput(format=output_format),
         temperature=0.0,
-        max_context_tokens=8_192,
-        max_output_tokens=2_048,
+        max_context_tokens=None,
+        max_output_tokens=None,
         metadata={
             "consumer": "orchestrator",
             "operation": "tool_decision",
@@ -1209,8 +1218,8 @@ async def query_model_with_tools(
             "top_p": 0.8,
         },
         model_preferences=ModelPreferences(
-            providers=(provider_name,),
-            models=(model_name,),
+            providers=() if (os.getenv("GEMINI_FOR_COMPLEX", "").lower() in ("true", "1", "yes") and provider_name in ("local", "ollama")) else (provider_name,),
+            models=() if (os.getenv("GEMINI_FOR_COMPLEX", "").lower() in ("true", "1", "yes") and provider_name in ("local", "ollama")) else (model_name,),
             mode="chat",
         ),
         execution_constraints=ExecutionConstraints(
@@ -1324,7 +1333,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
     agents_cfg = template["agents"]
     
     # Load ECC Contexts
-    skills_context = swarm.load_skills_for_template(template)
+    skills_context = swarm.load_skills_for_template(template, prompt_text=prompt_text)
     session_context = memory.load_session_context()
     obsidian_context = obs_tools.buscar_contexto_obsidian(prompt_text)
     
@@ -1446,7 +1455,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         "- MEMÃ“RIA DO WORKSPACE: Deves criar e manter ativamente um ficheiro 'sandbox_dir/MEMORY.md' (ou ler 'MEMORY.md' se existir) que descreva o progresso das tarefas, decisÃµes chave tomadas e os prÃ³ximos passos. Atualiza este ficheiro sempre que concluÃ­res uma fase importante de desenvolvimento para garantir o alinhamento da equipa (Hive Mind).\n"
         "- Fala SEMPRE em portuguÃªs de Portugal (PT-PT)\n"
         "- Usa 'CEO' moderadamente, sem repetir em cada frase\n"
-        "- Para abrir programas ou comandos de terminal: usa execute_command imediatamente\n"
+        "- Para abrir programas, sites ou navegadores (ex: Google, YouTube, Chrome, Word, Excel): chama `execute_command` (`Start-Process 'https://google.com'`) IMEDIATAMENTE. NUNCA respondas que ja esta aberto sem executar o comando.\n"
         "- Podes misturar mensagens no mesmo passo para conversaÃ§Ãµes dinÃ¢micas\n"
     )
     
@@ -2529,6 +2538,14 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                 elif tool_name == "firecrawl_scrape_url":
                     url = tool_input.get("url")
                     result_str = await ag_tools.run_firecrawl_scrape(url)
+                elif tool_name == "read_pdf":
+                    fp = tool_input.get("file_path")
+                    mp = tool_input.get("max_pages", 20)
+                    result_str = await ag_tools.read_pdf(fp, max_pages=mp)
+                elif tool_name == "search_arxiv":
+                    q = tool_input.get("query")
+                    mr = tool_input.get("max_results", 5)
+                    result_str = await ag_tools.search_arxiv(q, max_results=mr)
                 elif tool_name == "browserbase_load_page":
                     url = tool_input.get("url")
                     result_str = await ag_tools.run_browserbase_load(url)

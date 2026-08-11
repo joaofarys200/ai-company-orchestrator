@@ -41,11 +41,51 @@ def _env_bool(name: str, default: bool = False) -> bool:
 
 _ECC_BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 _SKILL_AGENT_MAP = {
-    "pm": "pm-brief",
-    "qa": "qa-checklist",
-    "designer": "ui-ux-guide",
-    "coder": "web-dev"
+    "pm": ["pm-brief", "idea-refine", "interview-me"],
+    "qa": ["qa-checklist", "browser-testing-with-devtools", "debugging-and-error-recovery"],
+    "tester": ["qa-checklist", "browser-testing-with-devtools", "debugging-and-error-recovery"],
+    "designer": ["ui-ux-guide", "frontend-ui-engineering"],
+    "coder": ["web-dev", "test-driven-development", "code-review-and-quality", "code-simplification", "incremental-implementation"],
+    "dev_lead": ["api-and-interface-design", "spec-driven-development", "planning-and-task-breakdown", "documentation-and-adrs"],
+    "sys_admin": ["ci-cd-and-automation", "git-workflow-and-versioning"],
+    "ops_specialist": ["observability-and-instrumentation", "security-and-hardening"],
 }
+
+_PROMPT_KEYWORD_SKILLS = [
+    (["test", "tdd", "assert", "jest", "pytest", "spec"], "test-driven-development"),
+    (["refactor", "limpar", "simplificar", "clean code"], "code-simplification"),
+    (["api", "rest", "endpoint", "interface", "swagger"], "api-and-interface-design"),
+    (["ui", "ux", "frontend", "css", "component", "taildwind"], "frontend-ui-engineering"),
+    (["bug", "erro", "fix", "debug", "stacktrace"], "debugging-and-error-recovery"),
+    (["git", "commit", "branch", "pr", "merge"], "git-workflow-and-versioning"),
+    (["segurança", "security", "auth", "token", "jwt"], "security-and-hardening"),
+    (["doc", "readme", "adr", "documentar"], "documentation-and-adrs"),
+    (["desempenho", "perf", "webperf", "lenta", "otimizar"], "performance-optimization"),
+    (["deploy", "ci", "cd", "docker", "release", "ship"], "shipping-and-launch"),
+]
+
+
+def _read_skill_file(skill_name: str) -> str:
+    """Reads a skill file from .agents/skills/<name>/SKILL.md or config/skills/<name>.md."""
+    p1 = Path(_ECC_BASE_DIR) / ".agents" / "skills" / skill_name / "SKILL.md"
+    if p1.exists():
+        content = p1.read_text(encoding="utf-8")
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            if len(parts) >= 3:
+                return parts[2].strip()
+        return content.strip()
+
+    p2 = Path(_ECC_BASE_DIR) / "config" / "skills" / f"{skill_name}.md"
+    if p2.exists():
+        content = p2.read_text(encoding="utf-8")
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            if len(parts) >= 3:
+                return parts[2].strip()
+        return content.strip()
+
+    return ""
 
 
 def _build_local_llm():
@@ -58,31 +98,36 @@ local_llm = _build_local_llm()
 
 # --- load_agent_skills ---
 def load_agent_skills(agent_name: str) -> str:
-    """ECC Skill Loader — loads the Markdown skill file for a given agent."""
-    skill_name = _SKILL_AGENT_MAP.get(agent_name.lower())
-    if not skill_name:
-        return ""
-    skills_dir = Path(_ECC_BASE_DIR) / "config" / "skills"
-    skill_path = skills_dir / f"{skill_name}.md"
-    if skill_path.exists():
-        content = skill_path.read_text(encoding="utf-8")
-        # Strip YAML frontmatter
-        if content.startswith("---"):
-            parts = content.split("---", 2)
-            if len(parts) >= 3:
-                return parts[2].strip()
-        return content.strip()
-    return ""
+    """ECC Skill Loader — loads all Markdown skill files mapped to a given agent."""
+    skill_names = _SKILL_AGENT_MAP.get(agent_name.lower(), [])
+    skills: list[str] = []
+    for s_name in skill_names:
+        text = _read_skill_file(s_name)
+        if text:
+            skills.append(f"#### Skill: {s_name}\n{text[:1200]}...")
+    return "\n\n".join(skills)
 
 
 # --- load_skills_for_template ---
-def load_skills_for_template(template_cfg: dict) -> str:
-    """Loads and concatenates skills for all agents in a template."""
+def load_skills_for_template(template_cfg: dict, prompt_text: str = "") -> str:
+    """Loads and concatenates skills for all agents in a template, plus prompt-triggered skills."""
     skills_text = ""
     for agent_name in template_cfg.get("agents", {}).keys():
         skill = load_agent_skills(agent_name)
         if skill:
             skills_text += f"\n\n### Skills de {agent_name.capitalize()}\n{skill}"
+
+    if prompt_text:
+        prompt_lower = prompt_text.lower()
+        matched_skills = []
+        for keywords, skill_name in _PROMPT_KEYWORD_SKILLS:
+            if any(k in prompt_lower for k in keywords):
+                text = _read_skill_file(skill_name)
+                if text:
+                    matched_skills.append(f"#### Skill Relevante: {skill_name}\n{text[:1200]}...")
+        if matched_skills:
+            skills_text += "\n\n### Skills de Engenharia Ativadas por Contexto\n" + "\n\n".join(matched_skills)
+
     return skills_text
 
 

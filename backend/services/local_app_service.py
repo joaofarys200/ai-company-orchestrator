@@ -133,15 +133,37 @@ LOCAL_APP_TARGETS = [
         "command": "Start-Process -FilePath explorer.exe",
     },
     {
+        "id": "google",
+        "label": "Google",
+        "terms": [
+            "google",
+            "pagina do google",
+            "site do google",
+            "google com",
+            "pesquisa do google",
+        ],
+        "command": "Start-Process 'https://www.google.com'",
+    },
+    {
         "id": "chrome",
         "label": "Chrome",
-        "terms": ["chrome", "google chrome"],
-        "command": "Start-Process -FilePath chrome.exe",
+        "terms": [
+            "chrome",
+            "google chrome",
+            "navegador chrome",
+            "browser",
+            "navegador",
+        ],
+        "command": "Start-Process -FilePath chrome.exe -ArgumentList 'https://www.google.com'",
     },
     {
         "id": "edge",
         "label": "Edge",
-        "terms": ["edge", "microsoft edge"],
+        "terms": [
+            "edge",
+            "microsoft edge",
+            "navegador edge",
+        ],
         "command": "Start-Process -FilePath msedge.exe",
     },
     {
