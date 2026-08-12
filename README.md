@@ -16,7 +16,7 @@
 
 ### ⚡ 1. Hybrid Dual-Model Router (Cloud Zero-Cost + Local)
 - **Seleção de Ferramentas de Alta Precisão**: Roteamento automático de tarefas complexas (`TOOL_SELECTION` e `MISSION_PLANNING`) para modelos cloud sem custos no OpenRouter (`openrouter/free`, `nvidia/nemotron-3-super-120b-a12b:free`) com **100% de aprovação em validação de 7 etapas**.
-- **Execução Local Privada**: Operações de rotina e manipulação de ficheiros locais geridas via Ollama (`qwen2.5:14b`).
+- **Execução Local Privada**: Operações de rotina e manipulação de ficheiros locais geridas via Ollama (`qwen3.5:9b`).
 
 ### 📚 2. 24 Production-Grade Engineering Skills
 Integradas a partir da especificação [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills):
@@ -82,7 +82,7 @@ Integradas a partir da especificação [`addyosmani/agent-skills`](https://githu
 - **OS**: Windows 10/11 (recomendado para desktop local).
 - **Python**: 3.11 ou superior.
 - **Node.js**: v20+ e `npm`.
-- **Ollama** *(opcional)*: Para execução 100% offline com `qwen2.5:14b`.
+- **Ollama** *(opcional)*: Para execução 100% offline com `qwen3.5:9b`.
 
 ### 2. Configuração do Backend
 ```powershell
@@ -112,7 +112,7 @@ npm install --prefix frontend
 | `OPENROUTER_FOR_COMPLEX` | Roteamento dual-model cloud sem custos | `true` |
 | `OPENROUTER_API_KEY` | Chave de API do OpenRouter | `sk-or-v1-...` |
 | `OPENROUTER_MODEL` | Modelo padrão OpenRouter | `openrouter/free` |
-| `OLLAMA_MODEL` | Modelo local Ollama | `qwen2.5:14b` |
+| `OLLAMA_MODEL` | Modelo local Ollama | `qwen3.5:9b` |
 | `GEMINI_API_KEY` | Chave de API Google Gemini | `AQ.Ab...` |
 | `VOICE_MODE` | Modo do motor de voz | `gemini_live` |
 | `VOICE_CONFIRMATION_MODE` | Exigir confirmação verbal para comandos críticos | `true` |

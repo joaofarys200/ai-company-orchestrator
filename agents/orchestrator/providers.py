@@ -6,7 +6,7 @@ def get_orchestrator_mode() -> str:
 
 
 def get_default_ollama_model() -> str:
-    return os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
+    return os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
 
 
 __all__ = [

@@ -868,7 +868,7 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
                         
                 if use_fallback:
                     # Local Ollama fallback (when both Groq and Gemini fail/are missing)
-                    model_name = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
+                    model_name = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
                     res_json = await query_ollama_with_tools(model_name, messages, specialist_tools, specialist_system)
                     msg_out = res_json.get("message", {})
                     response_text = msg_out.get("content", "") or ""
@@ -1519,7 +1519,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
     task_requirements = infer_task_requirements(prompt_text)
     implementation_plan = ImplementationPlan()
     if task_requirements.requires_artifacts:
-        model_name_for_plan = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
+        model_name_for_plan = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
         try:
             implementation_plan = await request_implementation_plan_from_ollama(
                 model_name_for_plan,
@@ -1552,7 +1552,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
     task_plan = create_task_plan(prompt_text)
     trace = OrchestrationTrace(
         prompt=prompt_text,
-        model=os.getenv("OLLAMA_MODEL", "qwen2.5:14b"),
+        model=os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
         intent="TASK",
         enabled=env_bool("ORCHESTRATION_DEBUG", False),
         plan=asdict(task_plan),
@@ -1747,7 +1747,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         if run_fallback:
             # OLLAMA LOCAL (GRATUITO)
             used_local_fallback = True
-            model_name = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
+            model_name = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
             if verbose_progress:
                 on_msg("JARVIS", "Orquestrador", f"A utilizar modelo local {model_name} via Ollama...")
             # Inject a local-model specific delegation reinforcement into system prompt
@@ -1833,7 +1833,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                 response_text = ""
             elif task_plan.current_step.id == "criar_ficheiros" and task_state.implementation_plan.valid:
                 planned_call = await request_planned_write_file_from_ollama(
-                    os.getenv("OLLAMA_MODEL", "qwen2.5:14b"),
+                    os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
                     prompt_text,
                     task_state,
                 )
@@ -1858,7 +1858,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     response_text = ""
             elif not structured_action_recovery_attempted:
                 structured_action_recovery_attempted = True
-                model_name = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
+                model_name = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
                 try:
                     json_action_text = await request_structured_action_from_ollama(
                         model_name,
@@ -1993,7 +1993,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         if not tool_calls:
             if task_plan.current_step.id == "criar_ficheiros" and task_state.implementation_plan.valid:
                 planned_call = await request_planned_write_file_from_ollama(
-                    os.getenv("OLLAMA_MODEL", "qwen2.5:14b"),
+                    os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
                     prompt_text,
                     task_state,
                 )
@@ -2143,7 +2143,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                 )
             ):
                 planned_call = await request_planned_write_file_from_ollama(
-                    os.getenv("OLLAMA_MODEL", "qwen2.5:14b"),
+                    os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
                     prompt_text,
                     task_state,
                 )
