@@ -106,7 +106,9 @@ class ModelHarnessContractsTest(unittest.TestCase):
                 "CODE_REASONING",
                 "MISSION_PLANNING",
                 "RESEARCH",
+                "ACADEMIC_RESEARCH",
                 "DOCUMENT",
+                "DOCUMENT_GENERATION",
                 "DOCUMENT_REVIEW",
             },
         )

@@ -156,6 +156,19 @@ class ModelHarness:
             )
             if not can_transform:
                 return response
+
+            # --- Automatic Failover Chain ---
+            if response.status == ModelResponseStatus.PROVIDER_FAILED and route and route.provider == "gemini" and self.providers.has("ollama"):
+                from backend.model_harness.contracts import ModelPreferences
+                current = replace(
+                    current,
+                    model_preferences=ModelPreferences(
+                        providers=("ollama",),
+                        models=(),
+                        mode=current.model_preferences.mode,
+                    ),
+                )
+
             updated = await self.recovery.transform(
                 current,
                 response,
