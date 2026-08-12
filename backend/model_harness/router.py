@@ -25,11 +25,10 @@ class ModelRouter:
         self.providers = providers
 
     @property
-    def _cloud_for_complex(self) -> bool:
+    def _gemini_for_complex(self) -> bool:
         v = (
-            os.getenv("CLOUD_FOR_COMPLEX")
-            or os.getenv("OPENROUTER_FOR_COMPLEX")
-            or os.getenv("GEMINI_FOR_COMPLEX")
+            os.getenv("GEMINI_FOR_COMPLEX")
+            or os.getenv("CLOUD_FOR_COMPLEX")
             or ""
         )
         return v.strip().lower() in ("true", "1", "yes")
@@ -39,25 +38,21 @@ class ModelRouter:
         request: ModelRequest,
         profile: TaskProfile,
     ) -> ModelRoute:
-        # --- Dual-model override: route complex tasks to OpenRouter/Gemini when enabled ---
+        # --- Dual-model override: route complex tasks to Gemini when enabled ---
         if (
-            self._cloud_for_complex
+            self._gemini_for_complex
             and profile.name in _COMPLEX_PROFILES
             and not request.model_preferences.providers  # no explicit override
+            and self.providers.has("gemini")
         ):
-            target_provider = next(
-                (p for p in ("openrouter", "gemini", "anthropic") if self.providers.has(p)),
-                None,
+            provider = self.providers.get("gemini")
+            return ModelRoute(
+                provider="gemini",
+                model=provider.default_model,
+                mode=request.model_preferences.mode or "chat",
+                streaming=profile.streaming,
+                thinking=profile.thinking,
             )
-            if target_provider:
-                provider = self.providers.get(target_provider)
-                return ModelRoute(
-                    provider=target_provider,
-                    model=provider.default_model,
-                    mode=request.model_preferences.mode or "chat",
-                    streaming=profile.streaming,
-                    thinking=profile.thinking,
-                )
 
         # --- Standard routing ---
         requested = tuple(

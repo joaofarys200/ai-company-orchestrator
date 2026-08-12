@@ -60,8 +60,6 @@ from backend.model_harness.provider import (
     ProviderRegistry,
 )
 from backend.model_harness.providers import (
-    AnthropicMessagesProvider,
-    AnthropicProviderError,
     GeminiOpenAIProvider,
     GeminiProviderError,
     OllamaChatProvider,

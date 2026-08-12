@@ -1691,69 +1691,9 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         tool_calls = []
         run_fallback = True
         used_local_fallback = False
-        if mode == "claude":
-            api_key = os.getenv("ANTHROPIC_API_KEY")
-            if not api_key:
-                on_msg("JARVIS", "Orquestrador", "Erro: A chave API 'ANTHROPIC_API_KEY' nÃ£o estÃ¡ configurada no .env.")
-                return "Erro: ANTHROPIC_API_KEY em falta."
-            try:
-                claude_messages = []
-                for msg in messages:
-                    normalized = dict(msg)
-                    if (
-                        msg.get("role") == "tool_result"
-                        and msg.get("tool_name") == "capture_screen"
-                        and msg.get("b64_data")
-                    ):
-                        normalized["content"] = [
-                            {
-                                "type": "text",
-                                "text": str(msg.get("content") or ""),
-                            },
-                            {
-                                "type": "image",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": "image/png",
-                                    "data": msg["b64_data"],
-                                },
-                            },
-                        ]
-                    claude_messages.append(normalized)
-                res_json = await query_model_with_tools(
-                    "anthropic",
-                    "claude-3-5-sonnet-latest",
-                    claude_messages,
-                    active_jarvis_tools,
-                    dynamic_system_prompt,
-                    timeout_seconds=120.0,
-                )
-                response_message = res_json.get("message", {})
-                response_text = response_message.get("content") or ""
-                for raw_call in response_message.get("tool_calls", []):
-                    function = raw_call.get("function", {})
-                    tool_calls.append({
-                        "id": raw_call.get("id") or "",
-                        "name": function.get("name"),
-                        "input": function.get("arguments") or {},
-                    })
-                assistant_content = [{"type": "text", "text": response_text}] if response_text else []
-                for tc in tool_calls:
-                    assistant_content.append({
-                        "type": "tool_use",
-                        "id": tc["id"],
-                        "name": tc["name"],
-                        "input": tc["input"]
-                    })
-                messages.append({"role": "assistant", "content": assistant_content})
-                run_fallback = False
-                
-            except Exception as e:
-                err_msg = f"Erro ao comunicar com a Anthropic API: {str(e)}"
-                on_msg("JARVIS", "Orquestrador", err_msg)
-                return err_msg
 
         if run_fallback:
+
             # Try Gemini Cloud fallback first if GEMINI_API_KEY is configured and valid
             gemini_key = os.getenv("GEMINI_API_KEY")
             if gemini_key and glb.is_gemini_valid and mode != "local":
