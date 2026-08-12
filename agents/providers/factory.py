@@ -1,6 +1,5 @@
 import os
 
-from agents.providers.anthropic import AnthropicProvider
 from agents.providers.gemini import GeminiProvider
 from agents.providers.ollama import OllamaProvider
 
@@ -8,8 +7,6 @@ from agents.providers.ollama import OllamaProvider
 def get_llm_provider(mode: str | None = None):
     selected_mode = (mode or os.getenv("ORCHESTRATOR_MODE", "local")).lower()
     providers = {
-        "claude": AnthropicProvider(),
-        "anthropic": AnthropicProvider(),
         "gemini": GeminiProvider(),
         "local": OllamaProvider(),
         "ollama": OllamaProvider(),

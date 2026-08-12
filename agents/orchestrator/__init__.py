@@ -868,7 +868,7 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
                         
                 if use_fallback:
                     # Local Ollama fallback (when both Groq and Gemini fail/are missing)
-                    model_name = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
+                    model_name = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
                     res_json = await query_ollama_with_tools(model_name, messages, specialist_tools, specialist_system)
                     msg_out = res_json.get("message", {})
                     response_text = msg_out.get("content", "") or ""
@@ -1519,7 +1519,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
     task_requirements = infer_task_requirements(prompt_text)
     implementation_plan = ImplementationPlan()
     if task_requirements.requires_artifacts:
-        model_name_for_plan = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
+        model_name_for_plan = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
         try:
             implementation_plan = await request_implementation_plan_from_ollama(
                 model_name_for_plan,
@@ -1552,7 +1552,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
     task_plan = create_task_plan(prompt_text)
     trace = OrchestrationTrace(
         prompt=prompt_text,
-        model=os.getenv("OLLAMA_MODEL", "qwen2.5:14b"),
+        model=os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
         intent="TASK",
         enabled=env_bool("ORCHESTRATION_DEBUG", False),
         plan=asdict(task_plan),
@@ -1691,69 +1691,9 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         tool_calls = []
         run_fallback = True
         used_local_fallback = False
-        if mode == "claude":
-            api_key = os.getenv("ANTHROPIC_API_KEY")
-            if not api_key:
-                on_msg("JARVIS", "Orquestrador", "Erro: A chave API 'ANTHROPIC_API_KEY' nÃ£o estÃ¡ configurada no .env.")
-                return "Erro: ANTHROPIC_API_KEY em falta."
-            try:
-                claude_messages = []
-                for msg in messages:
-                    normalized = dict(msg)
-                    if (
-                        msg.get("role") == "tool_result"
-                        and msg.get("tool_name") == "capture_screen"
-                        and msg.get("b64_data")
-                    ):
-                        normalized["content"] = [
-                            {
-                                "type": "text",
-                                "text": str(msg.get("content") or ""),
-                            },
-                            {
-                                "type": "image",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": "image/png",
-                                    "data": msg["b64_data"],
-                                },
-                            },
-                        ]
-                    claude_messages.append(normalized)
-                res_json = await query_model_with_tools(
-                    "anthropic",
-                    "claude-3-5-sonnet-latest",
-                    claude_messages,
-                    active_jarvis_tools,
-                    dynamic_system_prompt,
-                    timeout_seconds=120.0,
-                )
-                response_message = res_json.get("message", {})
-                response_text = response_message.get("content") or ""
-                for raw_call in response_message.get("tool_calls", []):
-                    function = raw_call.get("function", {})
-                    tool_calls.append({
-                        "id": raw_call.get("id") or "",
-                        "name": function.get("name"),
-                        "input": function.get("arguments") or {},
-                    })
-                assistant_content = [{"type": "text", "text": response_text}] if response_text else []
-                for tc in tool_calls:
-                    assistant_content.append({
-                        "type": "tool_use",
-                        "id": tc["id"],
-                        "name": tc["name"],
-                        "input": tc["input"]
-                    })
-                messages.append({"role": "assistant", "content": assistant_content})
-                run_fallback = False
-                
-            except Exception as e:
-                err_msg = f"Erro ao comunicar com a Anthropic API: {str(e)}"
-                on_msg("JARVIS", "Orquestrador", err_msg)
-                return err_msg
 
         if run_fallback:
+
             # Try Gemini Cloud fallback first if GEMINI_API_KEY is configured and valid
             gemini_key = os.getenv("GEMINI_API_KEY")
             if gemini_key and glb.is_gemini_valid and mode != "local":
@@ -1807,7 +1747,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         if run_fallback:
             # OLLAMA LOCAL (GRATUITO)
             used_local_fallback = True
-            model_name = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
+            model_name = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
             if verbose_progress:
                 on_msg("JARVIS", "Orquestrador", f"A utilizar modelo local {model_name} via Ollama...")
             # Inject a local-model specific delegation reinforcement into system prompt
@@ -1893,7 +1833,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                 response_text = ""
             elif task_plan.current_step.id == "criar_ficheiros" and task_state.implementation_plan.valid:
                 planned_call = await request_planned_write_file_from_ollama(
-                    os.getenv("OLLAMA_MODEL", "qwen2.5:14b"),
+                    os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
                     prompt_text,
                     task_state,
                 )
@@ -1918,7 +1858,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     response_text = ""
             elif not structured_action_recovery_attempted:
                 structured_action_recovery_attempted = True
-                model_name = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
+                model_name = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
                 try:
                     json_action_text = await request_structured_action_from_ollama(
                         model_name,
@@ -2053,7 +1993,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         if not tool_calls:
             if task_plan.current_step.id == "criar_ficheiros" and task_state.implementation_plan.valid:
                 planned_call = await request_planned_write_file_from_ollama(
-                    os.getenv("OLLAMA_MODEL", "qwen2.5:14b"),
+                    os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
                     prompt_text,
                     task_state,
                 )
@@ -2203,7 +2143,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                 )
             ):
                 planned_call = await request_planned_write_file_from_ollama(
-                    os.getenv("OLLAMA_MODEL", "qwen2.5:14b"),
+                    os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
                     prompt_text,
                     task_state,
                 )

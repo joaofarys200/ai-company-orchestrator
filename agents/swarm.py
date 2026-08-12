@@ -13,10 +13,6 @@ from PIL import ImageGrab
 from sandbox import SANDBOX_DIR
 
 try:
-    import anthropic
-except ImportError:
-    pass
-try:
     from crewai import Agent, Task, Crew, LLM
     from crewai.tools import tool
 except ImportError:
@@ -66,26 +62,22 @@ _PROMPT_KEYWORD_SKILLS = [
 
 
 def _read_skill_file(skill_name: str) -> str:
-    """Reads a skill file from .agents/skills/<name>/SKILL.md or config/skills/<name>.md."""
+    """Reads and compiles a skill file from .agents/skills/<name>/SKILL.md or config/skills/<name>.md using SkVM."""
+    from backend.model_harness.skvm import SkillVMCompiler
+    raw_content = ""
     p1 = Path(_ECC_BASE_DIR) / ".agents" / "skills" / skill_name / "SKILL.md"
     if p1.exists():
-        content = p1.read_text(encoding="utf-8")
-        if content.startswith("---"):
-            parts = content.split("---", 2)
-            if len(parts) >= 3:
-                return parts[2].strip()
-        return content.strip()
+        raw_content = p1.read_text(encoding="utf-8")
+    else:
+        p2 = Path(_ECC_BASE_DIR) / "config" / "skills" / f"{skill_name}.md"
+        if p2.exists():
+            raw_content = p2.read_text(encoding="utf-8")
 
-    p2 = Path(_ECC_BASE_DIR) / "config" / "skills" / f"{skill_name}.md"
-    if p2.exists():
-        content = p2.read_text(encoding="utf-8")
-        if content.startswith("---"):
-            parts = content.split("---", 2)
-            if len(parts) >= 3:
-                return parts[2].strip()
-        return content.strip()
+    if not raw_content:
+        return ""
 
-    return ""
+    compiled = SkillVMCompiler.compile_markdown_skill(raw_content, skill_name=skill_name)
+    return compiled.to_prompt_contract()
 
 
 def _build_local_llm():
@@ -98,13 +90,13 @@ local_llm = _build_local_llm()
 
 # --- load_agent_skills ---
 def load_agent_skills(agent_name: str) -> str:
-    """ECC Skill Loader — loads all Markdown skill files mapped to a given agent."""
+    """ECC Skill Loader — loads all compiled skill files mapped to a given agent."""
     skill_names = _SKILL_AGENT_MAP.get(agent_name.lower(), [])
     skills: list[str] = []
     for s_name in skill_names:
         text = _read_skill_file(s_name)
         if text:
-            skills.append(f"#### Skill: {s_name}\n{text[:1200]}...")
+            skills.append(text)
     return "\n\n".join(skills)
 
 

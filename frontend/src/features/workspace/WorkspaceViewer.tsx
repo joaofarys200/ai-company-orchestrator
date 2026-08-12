@@ -1043,26 +1043,33 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
 
           {activeTab === 'knowledge' && (
             <ViewFrame key="knowledge" className="flex flex-col gap-3 lg:flex-row">
-              <aside className={`${PANEL} flex max-h-64 shrink-0 flex-col overflow-hidden lg:max-h-none lg:w-72`}>
+              <aside className={`${PANEL} flex max-h-64 shrink-0 flex-col overflow-hidden lg:max-h-none lg:w-80`}>
                 <div className="border-b border-white/8 px-3 py-3">
                   <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-gray-100">Obsidian</h3>
-                    <span className="text-xs text-gray-500">{filteredNotes.length}</span>
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-cyan-300" />
+                      <h3 className="text-sm font-semibold text-gray-100">Base de Conhecimento RAG</h3>
+                    </div>
+                    <span className="rounded-full bg-cyan-300/10 px-2 py-0.5 text-[10px] font-semibold text-cyan-200">{filteredNotes.length} notas</span>
                   </div>
-                  <div className="relative">
+                  <div className="relative mb-2">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-600" />
                     <input
                       type="text"
-                      placeholder="Pesquisar"
+                      placeholder="Pesquisar contexto ou notas..."
                       value={noteSearch}
                       onChange={(event) => setNoteSearch(event.target.value)}
                       className="h-9 w-full rounded-md border border-white/8 bg-black/30 pl-9 pr-3 text-sm text-gray-200 outline-none transition focus:border-cyan-300/30"
                     />
                   </div>
+                  <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Índice RAG Sincronizado · 24 Skills Ativas</span>
+                  </div>
                 </div>
                 <div className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
                   {filteredNotes.length === 0 ? (
-                    <div className="py-8 text-center text-xs text-gray-600">Sem notas</div>
+                    <div className="py-8 text-center text-xs text-gray-600">Sem notas na base de conhecimento</div>
                   ) : (
                     filteredNotes.map((name) => (
                       <button
@@ -1073,35 +1080,40 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                         }}
                         className={`w-full rounded-md px-3 py-2 text-left text-xs transition-all ${
                           selectedNoteName === name
-                            ? 'bg-cyan-400/10 text-cyan-100'
-                            : 'text-gray-400 hover:bg-white/[0.05] hover:text-gray-100'
+                            ? 'bg-cyan-400/10 text-cyan-100 border border-cyan-400/20'
+                            : 'text-gray-400 hover:bg-white/[0.05] hover:text-gray-100 border border-transparent'
                         }`}
                       >
-                        <span className="block truncate">{name}</span>
+                        <div className="flex items-center justify-between">
+                          <span className="block truncate font-medium">{name}</span>
+                          <ChevronRight className="h-3 w-3 text-gray-600" />
+                        </div>
                       </button>
                     ))
                   )}
                 </div>
                 <button
                   onClick={() => {
-                    const newName = prompt('Nome da nova nota');
+                    const newName = prompt('Nome da nova nota de conhecimento:');
                     if (newName) {
-                      saveNote(newName, `# ${newName}`);
+                      saveNote(newName, `# ${newName}\n\nEscreva aqui o contexto ou regras de conhecimento...`);
                       setSelectedNoteName(newName);
                     }
                   }}
-                  className="m-2 rounded-md border border-cyan-300/20 bg-cyan-300/10 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-300/15"
+                  className="m-2 flex items-center justify-center gap-2 rounded-md border border-cyan-300/20 bg-cyan-300/10 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-300/15"
                 >
-                  Nova nota
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Nova Nota de Conhecimento</span>
                 </button>
               </aside>
 
               <section className={`${PANEL} min-w-0 flex-1 overflow-hidden`}>
                 {currentNote && currentNote.filename === selectedNoteName ? (
                   <div className="flex h-full flex-col">
-                    <div className="flex items-center gap-3 border-b border-white/8 px-3 py-3">
+                    <div className="flex items-center gap-3 border-b border-white/8 px-4 py-3 bg-white/[0.02]">
                       <BookOpen className="h-4 w-4 text-cyan-300" />
                       <span className="min-w-0 flex-1 truncate text-sm font-semibold text-gray-100">{currentNote.filename}</span>
+                      <span className="rounded bg-emerald-300/10 px-2 py-0.5 text-[10px] text-emerald-200">Indexado RAG</span>
                       <button onClick={() => saveNote(currentNote.filename, editNoteContent)} className={`${BUTTON_BASE} border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15`}>
                         <Save className="h-4 w-4" />
                         <span>Guardar</span>
@@ -1111,11 +1123,19 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                       value={editNoteContent}
                       onChange={(event) => setEditNoteContent(event.target.value)}
                       className="min-h-0 flex-1 resize-none bg-[#040609] p-4 font-mono text-sm leading-relaxed text-gray-300 outline-none"
-                      placeholder="Markdown"
+                      placeholder="Escreva a nota em Markdown..."
                     />
                   </div>
                 ) : (
-                  <EmptyState icon={BookOpen} title="Selecione uma nota." />
+                  <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/10">
+                      <BookOpen className="h-6 w-6 text-cyan-300" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-200">Base de Conhecimento RAG & Obsidian Vault</h3>
+                    <p className="max-w-md text-xs text-gray-500">
+                      Selecione uma nota à esquerda para editar ou criar novos documentos de arquitetura, decisões técnicas e diretivas de projeto.
+                    </p>
+                  </div>
                 )}
               </section>
             </ViewFrame>
@@ -1124,11 +1144,11 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
           {activeTab === 'rules' && (
             <ViewFrame key="rules" className="grid grid-cols-1 gap-3 overflow-hidden xl:grid-cols-3">
               <MemoryColumn
-                title="Compounding"
+                title="Regras Aprendidas (RHO Engine)"
                 icon={Brain}
                 tone="text-cyan-200"
                 count={`${rules.length} regras`}
-                empty="Sem regras ativas."
+                empty="Sem regras de compilação ativas."
               >
                 {rules.map((rule) => (
                   <article key={rule.rule_key} className={`${SUBTLE_PANEL} p-3`}>
@@ -1148,7 +1168,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                       </button>
                     </div>
                     <p className="mb-2 text-xs leading-relaxed text-gray-500">{rule.description}</p>
-                    <p className="rounded-md bg-black/25 p-2 text-xs leading-relaxed text-gray-300">{rule.correction}</p>
+                    <p className="rounded-md bg-black/25 p-2 font-mono text-xs leading-relaxed text-cyan-200/90">{rule.correction}</p>
                   </article>
                 ))}
               </MemoryColumn>

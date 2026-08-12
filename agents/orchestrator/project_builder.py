@@ -4025,7 +4025,7 @@ class OllamaPlanRequester:
         model_harness: ModelHarness | None = None,
     ):
         self.provider = PLAN_PROVIDER
-        self.model = _project_builder_setting("OLLAMA_MODEL", "qwen2.5:14b")
+        self.model = _project_builder_setting("OLLAMA_MODEL", "qwen3.5:9b")
         self.timeout_config = project_builder_plan_timeout_config()
         self.max_output_tokens = _positive_int_setting("PROJECT_BUILDER_PLAN_MAX_OUTPUT_TOKENS", 16_384)
         self.num_ctx = _positive_int_setting("PROJECT_BUILDER_PLAN_CONTEXT_TOKENS", 32_768)

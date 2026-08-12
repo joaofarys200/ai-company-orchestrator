@@ -1,4 +1,4 @@
-﻿import os
+import os
 import json
 import asyncio
 import websockets
@@ -537,6 +537,16 @@ def start_frontend_http_server():
         port=8000,
     )
 
+def _free_port_if_locked(port: int = 8001) -> None:
+    """Closes any orphaned background processes holding the port before binding."""
+    try:
+        if os.name == "nt":
+            cmd = f'cmd.exe /c "for /f \\"tokens=5\\" %a in (\'netstat -aon ^| findstr :{port}\') do taskkill /f /pid %a"'
+            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+
+
 async def main():
     runtime_state.main_loop = asyncio.get_running_loop()
     lifecycle = ApplicationLifecycle(
@@ -548,9 +558,18 @@ async def main():
     lifecycle.startup()
     log_event(logger, "runtime.health", health=build_runtime_health())
     log_event(logger, "websocket.server.starting", host=WS_HOST, port=8001)
+    
     try:
         async with websockets.serve(handle_client, WS_HOST, 8001):
             await asyncio.Future()
+    except OSError as exc:
+        if exc.errno in (10048, 98):  # Address already in use
+            _free_port_if_locked(8001)
+            await asyncio.sleep(0.5)
+            async with websockets.serve(handle_client, WS_HOST, 8001):
+                await asyncio.Future()
+        else:
+            raise
     finally:
         lifecycle.shutdown()
 

@@ -63,7 +63,8 @@ class RecoveryPolicy:
             return RecoveryRecord(
                 action=RecoveryAction.ESCALATION,
                 reason="provider_failed",
-                recoverable=False,
+                recoverable=True,
+                retry_requested=True,
             )
         if response.status != ModelResponseStatus.VALIDATION_FAILED:
             return RecoveryRecord(
@@ -120,6 +121,29 @@ class RecoveryPolicyRegistry:
             ) from exc
 
 
+def default_recovery_transformer(
+    request: ModelRequest,
+    response: ModelResponse,
+    decision: RecoveryRecord,
+) -> ModelRequest | None:
+    from dataclasses import replace
+    if response.status == ModelResponseStatus.PROVIDER_FAILED:
+        failover_prompt = request.user_prompt + "\n\n[NOTIFICACAO DE FAILOVER: Provider alternado por resiliencia]"
+        return replace(request, user_prompt=failover_prompt, metadata={**dict(request.metadata), "_failover": True})
+    if not response.validation or not response.validation.issues:
+        return None
+    issue = response.validation.issues[0]
+    repair_instruction = (
+        f"\n\n[CORRECAO AUTONOMA - VIGIL ENGINE]\n"
+        f"A sua tentativa anterior falhou na etapa {issue.stage.value} ({issue.code}).\n"
+        f"Mensagem de erro: {issue.message}\n"
+        f"INSTRUCAO: Corrija o formato imediatamente. Se for uma chamada de ferramenta/JSON, "
+        f"forneca a estrutura estrita de argumentos sem texto extra."
+    )
+    from dataclasses import replace
+    return replace(request, user_prompt=request.user_prompt + repair_instruction)
+
+
 class RecoveryCoordinator:
     def __init__(
         self,
@@ -127,7 +151,7 @@ class RecoveryCoordinator:
         transformer: RecoveryTransformer | None = None,
     ):
         self.policies = policies or RecoveryPolicyRegistry()
-        self.transformer = transformer
+        self.transformer = transformer or default_recovery_transformer
 
     def decide(
         self,

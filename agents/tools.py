@@ -13,10 +13,6 @@ from PIL import ImageGrab
 from sandbox import SANDBOX_DIR
 
 try:
-    import anthropic
-except ImportError:
-    pass
-try:
     from crewai import Agent, Task, Crew, LLM
     from crewai.tools import tool
 except ImportError:

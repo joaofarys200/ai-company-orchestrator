@@ -17,7 +17,9 @@ TASK_PROFILE_NAMES = {
     "CODE_REASONING",
     "MISSION_PLANNING",
     "RESEARCH",
+    "ACADEMIC_RESEARCH",
     "DOCUMENT",
+    "DOCUMENT_GENERATION",
     "DOCUMENT_REVIEW",
 }
 
@@ -175,6 +177,16 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
             recovery_policy="SEMANTIC_CONSERVATIVE",
         ),
         TaskProfile(
+            name="ACADEMIC_RESEARCH",
+            temperature=0.2,
+            max_context_tokens=32_768,
+            max_output_tokens=16_384,
+            expected_output=ExpectedOutput(format=OutputFormat.TOOL_CALLS),
+            validation_pipeline=structured_stages,
+            allowed_tools=("search_arxiv", "read_pdf", "firecrawl_scrape_url", "web_search"),
+            recovery_policy="STRUCTURED_CONSERVATIVE",
+        ),
+        TaskProfile(
             name="DOCUMENT",
             temperature=0.3,
             max_context_tokens=32_768,
@@ -183,6 +195,16 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
             validation_pipeline=text_stages,
             allowed_tools=(),
             recovery_policy="SEMANTIC_CONSERVATIVE",
+        ),
+        TaskProfile(
+            name="DOCUMENT_GENERATION",
+            temperature=0.1,
+            max_context_tokens=32_768,
+            max_output_tokens=16_384,
+            expected_output=ExpectedOutput(format=OutputFormat.TOOL_CALLS),
+            validation_pipeline=structured_stages,
+            allowed_tools=("write_file", "execute_command", "read_file"),
+            recovery_policy="STRUCTURED_CONSERVATIVE",
         ),
         TaskProfile(
             name="DOCUMENT_REVIEW",

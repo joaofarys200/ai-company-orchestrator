@@ -104,20 +104,24 @@ def start_docker_sandbox():
         # Convert path to absolute
         abs_sandbox_dir = os.path.abspath(SANDBOX_DIR)
         
-        client = docker.from_env()
-        log_event(logger, "sandbox.docker.starting", port=PORT)
-        
-        # Run docker container in background
-        client.containers.run(
-            "nginx:alpine",
-            name="jarvis-sandbox",
-            detach=True,
-            ports={'80/tcp': PORT},
-            volumes={abs_sandbox_dir: {'bind': '/usr/share/nginx/html', 'mode': 'ro'}}
-        )
-        IS_DOCKER_ACTIVE = True
-        log_event(logger, "sandbox.docker.started", port=PORT)
-        return True
+        try:
+            import docker
+            client = docker.from_env()
+            log_event(logger, "sandbox.docker.starting", port=PORT)
+            
+            # Run docker container in background
+            client.containers.run(
+                "nginx:alpine",
+                name="jarvis-sandbox",
+                detach=True,
+                ports={'80/tcp': PORT},
+                volumes={abs_sandbox_dir: {'bind': '/usr/share/nginx/html', 'mode': 'ro'}}
+            )
+            IS_DOCKER_ACTIVE = True
+            log_event(logger, "sandbox.docker.started", port=PORT)
+            return True
+        except ImportError:
+            raise RuntimeError("módulo 'docker' não está instalado no ambiente Python")
     except Exception as e:
         IS_DOCKER_ACTIVE = False
         log_event(logger, "sandbox.docker.start_error", level="warning", port=PORT, error=str(e))
@@ -126,6 +130,7 @@ def start_docker_sandbox():
 
 def stop_docker_sandbox():
     try:
+        import docker
         client = docker.from_env()
         container = client.containers.get("jarvis-sandbox")
         container.remove(force=True)
