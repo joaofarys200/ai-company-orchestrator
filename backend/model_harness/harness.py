@@ -22,6 +22,8 @@ from backend.model_harness.provider import ProviderRegistry
 from backend.model_harness.recovery import RecoveryCoordinator
 from backend.model_harness.router import ModelRouter
 from backend.model_harness.telemetry import ModelTelemetry
+from backend.model_harness.rho import RetrospectiveEngine
+from backend.model_harness.she import SHERuleBank
 from backend.model_harness.validation import ModelValidationPipeline
 
 
@@ -37,6 +39,8 @@ class ModelHarness:
         validation: ModelValidationPipeline | None = None,
         recovery: RecoveryCoordinator | None = None,
         telemetry: ModelTelemetry | None = None,
+        rho: RetrospectiveEngine | None = None,
+        she: SHERuleBank | None = None,
     ):
         self.providers = providers
         self.profiles = profiles or create_default_task_profile_registry()
@@ -44,6 +48,8 @@ class ModelHarness:
         self.validation = validation or ModelValidationPipeline()
         self.recovery = recovery or RecoveryCoordinator()
         self.telemetry = telemetry or ModelTelemetry()
+        self.rho = rho or RetrospectiveEngine()
+        self.she = she or SHERuleBank()
         self._progress: dict[str, ProgressTracker] = {}
 
     async def execute(self, request: ModelRequest) -> ModelResponse:
@@ -52,6 +58,18 @@ class ModelHarness:
                 "ModelHarness.execute requer ModelRequest."
             )
         profile = self.profiles.get(request.task_profile)
+        original_request = request
+
+        # Injetar Regras de Segurança (SHE) e Regras de Autocorreção Aprendidas (RHO)
+        she_rules = self.she.assemble_dynamic_rules(request.user_prompt, request.task_profile)
+        rho_rules = self.rho.get_compounding_rules(request.task_profile)
+        enhanced_system_prompt = request.system_prompt
+        if she_rules:
+            enhanced_system_prompt += f"\n{she_rules}"
+        if rho_rules:
+            enhanced_system_prompt += "\n### REGRAS APRENDIDAS DE TENTATIVAS ANTERIORES (RHO ENGINE)\n" + "\n".join(f"- {r}" for r in rho_rules)
+
+        request = replace(request, system_prompt=enhanced_system_prompt)
         current = self._apply_profile(request, profile)
         progress_key = str(
             current.metadata.get("progress_key")
@@ -142,7 +160,7 @@ class ModelHarness:
             recovery_history.append(decision)
             response.recovery = tuple(recovery_history)
             self._record_telemetry(
-                current,
+                original_request,
                 profile,
                 response,
                 progress,
@@ -155,6 +173,10 @@ class ModelHarness:
                 and attempt < current.execution_constraints.max_attempts
             )
             if not can_transform:
+                try:
+                    self.rho.record_trajectory(current, response)
+                except Exception:
+                    pass
                 return response
 
             # --- Automatic Failover Chain ---
@@ -175,6 +197,10 @@ class ModelHarness:
                 decision,
             )
             if updated is None:
+                try:
+                    self.rho.record_trajectory(current, response)
+                except Exception:
+                    pass
                 return response
             recovery_history[-1] = replace(
                 decision,

@@ -70,6 +70,8 @@ from backend.model_harness.providers import (
     OllamaProviderResponseError,
     OllamaStructuredOutputUnsupportedError,
 )
+from backend.model_harness.rho import RetrospectiveEngine
+from backend.model_harness.she import SHERuleBank, SafetyRule
 from backend.model_harness.recovery import (
     RecoveryCoordinator,
     RecoveryPolicy,
@@ -148,6 +150,9 @@ __all__ = [
     "RecoveryPolicyRegistry",
     "RecoveryRecord",
     "ReferenceConstraint",
+    "RetrospectiveEngine",
+    "SHERuleBank",
+    "SafetyRule",
     "TASK_PROFILE_NAMES",
     "TaskContext",
     "TaskProfile",
