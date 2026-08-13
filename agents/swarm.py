@@ -427,6 +427,29 @@ def crew_youtube_get_transcript(video_id_or_url: str) -> str:
     return run_sync(ag_tools.run_youtube_transcript(video_id_or_url))
 
 
+# --- crew_capture_screen ---
+@tool("capture_screen")
+def crew_capture_screen() -> str:
+    """Captures a screenshot of the user's desktop screen and returns the image format/path."""
+    fmt, b64_or_path = run_sync(ag_tools.run_capture_screen())
+    return f"Screenshot captured successfully format={fmt} path={b64_or_path[:100]}"
+
+# --- crew_web_search ---
+@tool("web_search")
+def crew_web_search(query: str) -> str:
+    """Performs a web search or URL scrape to gather information, research competitors, or find documentation."""
+    if query.startswith("http://") or query.startswith("https://"):
+        return run_sync(ag_tools.run_local_scrape(query))
+    return run_sync(ag_tools.run_firecrawl_scrape(query))
+
+# --- crew_run_unit_tests ---
+@tool("run_unit_tests")
+def crew_run_unit_tests(test_path: str = "tests") -> str:
+    """Executes automated unit tests using python unittest or pytest in the current workspace directory."""
+    cmd = f".\\venv\\Scripts\\python.exe -m unittest discover -s {test_path}" if os.name == "nt" else f"python -m unittest discover -s {test_path}"
+    return run_sync(ag_tools.run_local_command(cmd))
+
+
 # --- CREW_TOOLS ---
 CREW_TOOLS = [
     crew_apply_code_patch,
@@ -443,6 +466,9 @@ CREW_TOOLS = [
     crew_obsidian_search_notes,
     crew_firecrawl_scrape_url,
     crew_browserbase_load_page,
-    crew_youtube_get_transcript
+    crew_youtube_get_transcript,
+    crew_capture_screen,
+    crew_web_search,
+    crew_run_unit_tests,
 ]
 
