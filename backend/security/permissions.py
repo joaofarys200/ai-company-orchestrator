@@ -16,6 +16,12 @@ class PermissionLevel(Enum):
     IRREVERSIBLE_ACTION = auto()
 
 
+class AutonomyLevel(str, Enum):
+    LEVEL_0_ASSISTED = "LEVEL_0_ASSISTED"
+    LEVEL_1_SUPERVISED = "LEVEL_1_SUPERVISED"
+    LEVEL_2_BOUNDED = "LEVEL_2_BOUNDED"
+
+
 @dataclass(frozen=True)
 class ToolPermissionSpec:
     tool_name: str
@@ -50,9 +56,14 @@ TOOL_PERMISSIONS: dict[str, ToolPermissionSpec] = {
 
 
 class PermissionPolicyManager:
-    """Manages execution permissions and human approval gates for agent tool calls."""
+    """Manages execution permissions, autonomy levels, and human approval gates for agent tool calls."""
 
-    def __init__(self, allowed_levels: set[PermissionLevel] | None = None):
+    def __init__(
+        self,
+        allowed_levels: set[PermissionLevel] | None = None,
+        autonomy_level: AutonomyLevel = AutonomyLevel.LEVEL_1_SUPERVISED,
+    ):
+        self.autonomy_level = autonomy_level
         if allowed_levels is None:
             self.allowed_levels = {
                 PermissionLevel.READ_ONLY,
@@ -70,10 +81,15 @@ class PermissionPolicyManager:
         """
         spec = TOOL_PERMISSIONS.get(tool_name)
         if not spec:
-            # Default fallback for unknown tools: allow execution if not explicitly dangerous
             return True, False, f"Ferramenta '{tool_name}' sem especificação explícita de risco."
 
-        if spec.requires_human_approval:
+        # LEVEL 0 ASSISTED: Every external tool requires approval
+        if self.autonomy_level == AutonomyLevel.LEVEL_0_ASSISTED:
+            if spec.level in {PermissionLevel.NETWORK_READ, PermissionLevel.NETWORK_WRITE, PermissionLevel.EXTERNAL_ACCOUNT, PermissionLevel.FINANCIAL_ACTION, PermissionLevel.IRREVERSIBLE_ACTION}:
+                return True, True, f"Modo ASSISTED (Level 0): ação externa '{tool_name}' requer confirmação humana."
+
+        # High risk actions ALWAYS require approval regardless of autonomy level
+        if spec.requires_human_approval or spec.level in {PermissionLevel.FINANCIAL_ACTION, PermissionLevel.EXTERNAL_ACCOUNT, PermissionLevel.IRREVERSIBLE_ACTION}:
             return True, True, f"Ação de alto risco '{tool_name}' ({spec.level.name}) requer aprovação humana explícita."
 
         if spec.level not in self.allowed_levels:
@@ -82,4 +98,10 @@ class PermissionPolicyManager:
         return True, False, "Permissão concedida."
 
 
-__all__ = ["PermissionLevel", "ToolPermissionSpec", "TOOL_PERMISSIONS", "PermissionPolicyManager"]
+__all__ = [
+    "PermissionLevel",
+    "AutonomyLevel",
+    "ToolPermissionSpec",
+    "TOOL_PERMISSIONS",
+    "PermissionPolicyManager",
+]

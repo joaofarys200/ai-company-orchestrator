@@ -2,7 +2,7 @@ import sys, os
 sys.path.insert(0, os.path.abspath("."))
 
 import unittest
-from backend.models.economic_mission import EconomicMission
+from backend.models.economic_mission import EconomicMission, EconomicStage
 from agents.economic_runner import EconomicMissionRunner
 from backend.security.permissions import PermissionPolicyManager
 
@@ -17,7 +17,7 @@ class TestEconomicRunner(unittest.IsolatedAsyncioTestCase):
         runner = EconomicMissionRunner(mission)
         packages = runner.decompose_mission_into_work_packages()
 
-        self.assertEqual(len(packages), 4)
+        self.assertEqual(len(packages), 8)
         self.assertEqual(packages[0]["role"], "Researcher (Clara)")
         self.assertEqual(packages[1]["role"], "Analyst (Alex)")
         self.assertEqual(packages[2]["role"], "Builder (Devon)")
@@ -32,6 +32,8 @@ class TestEconomicRunner(unittest.IsolatedAsyncioTestCase):
         res = await runner.execute_step(packages[0])
         self.assertEqual(res["status"], "COMPLETED")
         self.assertEqual(packages[0]["status"], "COMPLETED")
+        self.assertEqual(mission.current_stage, EconomicStage.DISCOVERING
+)
 
     async def test_execute_step_high_risk_requires_approval(self):
         mission = EconomicMission(objective="Publicação financeira")
@@ -47,7 +49,7 @@ class TestEconomicRunner(unittest.IsolatedAsyncioTestCase):
         }
         res = await runner.execute_step(high_risk_wp)
         self.assertEqual(res["status"], "PENDING_APPROVAL")
-        self.assertEqual(mission.status, "PENDING_APPROVAL")
+        self.assertEqual(mission.current_stage, EconomicStage.PAUSED)
 
 
 if __name__ == "__main__":
