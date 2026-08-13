@@ -1,32 +1,20 @@
 from __future__ import annotations
 
-import json
 import sqlite3
 import time
-from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from backend.model_harness.contracts import ModelRequest, ModelResponse, ModelResponseStatus
+from backend.security.sanitizer import SensitiveDataSanitizer
 
-
-DB_PATH = Path("database.db")
-
-
-@dataclass(frozen=True)
-class TrajectoryRecord:
-    request_id: str
-    task_profile: str
-    fingerprint: str
-    status: str
-    attempts_count: int
-    failure_reason: str
-    timestamp: float
+DB_PATH = Path("config/rho.sqlite")
 
 
 class RetrospectiveEngine:
-    """Retrospective Harness Optimization (RHO) — 2026 Paper Implementation.
-
-    Records model execution trajectories in SQLite and automatically synthesizes
+    """
+    RHO (Retrospective Heuristic Optimization) Engine.
+    Records trajectory outcomes in SQLite and dynamically synthesizes
     compounding self-healing rules when validation failures repeat 2+ times.
     """
 
@@ -35,6 +23,7 @@ class RetrospectiveEngine:
         self._init_db()
 
     def _init_db(self) -> None:
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
                 """
@@ -68,14 +57,19 @@ class RetrospectiveEngine:
         """Stores trajectory record and triggers RHO rule synthesis if failures repeat."""
         failure_reason = ""
         if response.validation and response.validation.issues:
-            failure_reason = f"{response.validation.issues[0].stage.value}:{response.validation.issues[0].code}"
+            failure_reason = "; ".join(f"{i.stage}:{i.message}" for i in response.validation.issues)
         elif response.errors:
-            failure_reason = str(response.errors[0].get("message", "unknown_error"))
+            failure_reason = "; ".join(f"{e.get('stage')}:{e.get('message')}" for e in response.errors)
+
+        # Apply Universal Secret Sanitizer before database insertion
+        failure_reason = SensitiveDataSanitizer.sanitize_text(failure_reason)
 
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute(
+            cur = conn.cursor()
+            cur.execute(
                 """
-                INSERT INTO model_trajectories (request_id, task_profile, fingerprint, status, attempts_count, failure_reason, created_at)
+                INSERT INTO model_trajectories 
+                (request_id, task_profile, fingerprint, status, attempts_count, failure_reason, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -83,7 +77,7 @@ class RetrospectiveEngine:
                     request.task_profile,
                     request.fingerprint(),
                     response.status.value,
-                    len(response.recovery) + 1,
+                    len(response.recovery) + 1 if response.recovery else 1,
                     failure_reason,
                     time.time(),
                 ),
@@ -91,46 +85,46 @@ class RetrospectiveEngine:
             conn.commit()
 
         if response.status != ModelResponseStatus.SUCCEEDED and failure_reason:
-            self._evaluate_failure_pattern(request.task_profile, failure_reason)
+            self._evaluate_and_synthesize_rules(request.task_profile, failure_reason)
 
-    def _evaluate_failure_pattern(self, task_profile: str, failure_reason: str) -> None:
-        """If 2 or more failures of the same pattern occur, synthesize a compounding rule."""
+    def _evaluate_and_synthesize_rules(self, task_profile: str, failure_trigger: str) -> None:
+        """Synthesizes compounding heuristic rules if the same failure trigger repeats 2+ times."""
+        sanitized_trigger = SensitiveDataSanitizer.sanitize_text(failure_trigger)
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.cursor()
             cur.execute(
                 """
-                SELECT COUNT(*) FROM model_trajectories
-                WHERE task_profile = ? AND failure_reason = ? AND created_at > ?
+                SELECT COUNT(*) FROM model_trajectories 
+                WHERE task_profile = ? AND failure_reason = ? AND status != 'SUCCEEDED'
                 """,
-                (task_profile, failure_reason, time.time() - 3600),
+                (task_profile, sanitized_trigger),
             )
             count = cur.fetchone()[0]
 
             if count >= 2:
-                rule_text = f"AUTO-RULE [RHO-{task_profile}]: Evita falha {failure_reason}. Garanta estrita conformidade com argumentos de ferramentas e formatos JSON."
+                rule_text = f"EVITAR FALHA EM {task_profile}: {sanitized_trigger}. Assegurar estrita conformidade de esquema e argumentos válidos."
                 cur.execute(
                     """
-                    INSERT INTO rho_compounding_rules (task_profile, rule_text, failure_trigger, created_at)
-                    VALUES (?, ?, ?, ?)
+                    INSERT INTO rho_compounding_rules (task_profile, rule_text, failure_trigger, occurrences, created_at)
+                    VALUES (?, ?, ?, ?, ?)
                     """,
-                    (task_profile, rule_text, failure_reason, time.time()),
+                    (task_profile, rule_text, sanitized_trigger, count, time.time()),
                 )
                 conn.commit()
 
     def get_compounding_rules(self, task_profile: str) -> list[str]:
-        """Fetches active RHO compounding rules for a task profile."""
+        """Retrieves learned compounding rules for a specific task profile."""
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.cursor()
             cur.execute(
                 """
-                SELECT rule_text FROM rho_compounding_rules
-                WHERE task_profile = ?
-                ORDER BY id DESC LIMIT 5
+                SELECT rule_text FROM rho_compounding_rules 
+                WHERE task_profile = ? 
+                ORDER BY occurrences DESC LIMIT 5
                 """,
                 (task_profile,),
             )
-            rows = cur.fetchall()
-            return [row[0] for row in rows]
+            return [row[0] for row in cur.fetchall()]
 
 
-__all__ = ["RetrospectiveEngine", "TrajectoryRecord"]
+__all__ = ["RetrospectiveEngine"]
