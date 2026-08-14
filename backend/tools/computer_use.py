@@ -50,6 +50,7 @@ class ComputerUseEngine:
                 browser = await p.chromium.launch(headless=True)
                 page = await browser.new_page()
                 page.on("console", lambda msg: console_logs.append(f"[{msg.type.upper()}] {msg.text}"))
+                page.on("pageerror", lambda err: console_logs.append(f"[ERROR] [PAGEERROR] {str(err)}"))
 
                 await page.goto(url, wait_until="load", timeout=timeout_ms)
                 page_title = await page.title()

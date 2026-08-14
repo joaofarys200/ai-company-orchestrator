@@ -16,6 +16,7 @@ class RetrospectiveEngine:
     RHO (Retrospective Heuristic Optimization) Engine.
     Records trajectory outcomes in SQLite and dynamically synthesizes
     compounding self-healing rules when validation failures repeat 2+ times.
+    Enforces deduplication and top-5 bounded rule retrieval.
     """
 
     def __init__(self, db_path: Path | str = DB_PATH):
@@ -47,7 +48,8 @@ class RetrospectiveEngine:
                     rule_text TEXT NOT NULL,
                     failure_trigger TEXT NOT NULL,
                     occurrences INTEGER DEFAULT 1,
-                    created_at REAL NOT NULL
+                    created_at REAL NOT NULL,
+                    UNIQUE(task_profile, failure_trigger)
                 )
                 """
             )
@@ -88,7 +90,7 @@ class RetrospectiveEngine:
             self._evaluate_and_synthesize_rules(request.task_profile, failure_reason)
 
     def _evaluate_and_synthesize_rules(self, task_profile: str, failure_trigger: str) -> None:
-        """Synthesizes compounding heuristic rules if the same failure trigger repeats 2+ times."""
+        """Synthesizes compounding heuristic rules with deduplication and frequency tracking."""
         sanitized_trigger = SensitiveDataSanitizer.sanitize_text(failure_trigger)
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.cursor()
@@ -107,20 +109,23 @@ class RetrospectiveEngine:
                     """
                     INSERT INTO rho_compounding_rules (task_profile, rule_text, failure_trigger, occurrences, created_at)
                     VALUES (?, ?, ?, ?, ?)
+                    ON CONFLICT(task_profile, failure_trigger) DO UPDATE SET
+                        occurrences = excluded.occurrences,
+                        created_at = excluded.created_at
                     """,
                     (task_profile, rule_text, sanitized_trigger, count, time.time()),
                 )
                 conn.commit()
 
     def get_compounding_rules(self, task_profile: str) -> list[str]:
-        """Retrieves learned compounding rules for a specific task profile."""
+        """Retrieves learned compounding rules for a specific task profile, strictly bounded to top 5."""
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.cursor()
             cur.execute(
                 """
-                SELECT rule_text FROM rho_compounding_rules 
+                SELECT DISTINCT rule_text FROM rho_compounding_rules 
                 WHERE task_profile = ? 
-                ORDER BY occurrences DESC LIMIT 5
+                ORDER BY occurrences DESC, created_at DESC LIMIT 5
                 """,
                 (task_profile,),
             )
