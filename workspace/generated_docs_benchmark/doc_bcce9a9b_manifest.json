@@ -1,0 +1,46 @@
+{
+  "document_id": "doc_bcce9a9b",
+  "document_title": "Documentação de Endpoints REST e GraphQL",
+  "target_format": "markdown",
+  "revision": 1,
+  "generated_by": "JARVIS OS Document Pipeline",
+  "sources": [
+    {
+      "title": "Internal Knowledge Base",
+      "uri": "obsidian://technical_docs"
+    },
+    {
+      "title": "Market Analytics Engine",
+      "uri": "analyzer://saas_metrics"
+    }
+  ],
+  "claims": [
+    {
+      "claim": "Document covers Pesquisa aprofundada para Documentação de Endpoints REST e GraphQL",
+      "verified": true,
+      "source_ref": "obsidian://technical_docs"
+    },
+    {
+      "claim": "All financial models conform to GAAP/SaaS metrics",
+      "verified": true,
+      "source_ref": "analyzer://saas_metrics"
+    }
+  ],
+  "sections": [
+    "Executive Summary",
+    "Technical Architecture & Methodology",
+    "Market Analysis & Data Evidence",
+    "Risk Assessment & Mitigations",
+    "Conclusion & Strategic Recommendations"
+  ],
+  "validation": {
+    "sources_checked": true,
+    "claims_checked": true,
+    "completeness_checked": true,
+    "formatting_checked": true,
+    "technical_review_passed": true
+  },
+  "sha256_fingerprint": "24ee626006a3dcf55cb7d9eb0fd686a8bf0a49307b71b9e5d3ad7a4b4e050326",
+  "created_at": 1786650103.4078574,
+  "metadata": {}
+}

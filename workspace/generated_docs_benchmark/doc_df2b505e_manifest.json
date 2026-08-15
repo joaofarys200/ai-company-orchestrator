@@ -1,0 +1,46 @@
+{
+  "document_id": "doc_df2b505e",
+  "document_title": "Relatório Técnico de Arquitetura Distribuída",
+  "target_format": "markdown",
+  "revision": 1,
+  "generated_by": "JARVIS OS Document Pipeline",
+  "sources": [
+    {
+      "title": "Internal Knowledge Base",
+      "uri": "obsidian://technical_docs"
+    },
+    {
+      "title": "Market Analytics Engine",
+      "uri": "analyzer://saas_metrics"
+    }
+  ],
+  "claims": [
+    {
+      "claim": "Document covers Pesquisa aprofundada para Relatório Técnico de Arquitetura Distribuída",
+      "verified": true,
+      "source_ref": "obsidian://technical_docs"
+    },
+    {
+      "claim": "All financial models conform to GAAP/SaaS metrics",
+      "verified": true,
+      "source_ref": "analyzer://saas_metrics"
+    }
+  ],
+  "sections": [
+    "Executive Summary",
+    "Technical Architecture & Methodology",
+    "Market Analysis & Data Evidence",
+    "Risk Assessment & Mitigations",
+    "Conclusion & Strategic Recommendations"
+  ],
+  "validation": {
+    "sources_checked": true,
+    "claims_checked": true,
+    "completeness_checked": true,
+    "formatting_checked": true,
+    "technical_review_passed": true
+  },
+  "sha256_fingerprint": "97f4d573469f1c635796786280d1e21c76e2b596fcd9522452a6296ca6e640d4",
+  "created_at": 1786650207.5993545,
+  "metadata": {}
+}

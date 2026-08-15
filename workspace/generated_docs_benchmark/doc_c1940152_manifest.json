@@ -1,0 +1,46 @@
+{
+  "document_id": "doc_c1940152",
+  "document_title": "Benchmarking de Latência e Model Harness",
+  "target_format": "markdown",
+  "revision": 1,
+  "generated_by": "JARVIS OS Document Pipeline",
+  "sources": [
+    {
+      "title": "Internal Knowledge Base",
+      "uri": "obsidian://technical_docs"
+    },
+    {
+      "title": "Market Analytics Engine",
+      "uri": "analyzer://saas_metrics"
+    }
+  ],
+  "claims": [
+    {
+      "claim": "Document covers Pesquisa aprofundada para Benchmarking de Latência e Model Harness",
+      "verified": true,
+      "source_ref": "obsidian://technical_docs"
+    },
+    {
+      "claim": "All financial models conform to GAAP/SaaS metrics",
+      "verified": true,
+      "source_ref": "analyzer://saas_metrics"
+    }
+  ],
+  "sections": [
+    "Executive Summary",
+    "Technical Architecture & Methodology",
+    "Market Analysis & Data Evidence",
+    "Risk Assessment & Mitigations",
+    "Conclusion & Strategic Recommendations"
+  ],
+  "validation": {
+    "sources_checked": true,
+    "claims_checked": true,
+    "completeness_checked": true,
+    "formatting_checked": true,
+    "technical_review_passed": true
+  },
+  "sha256_fingerprint": "82e33c105a6b54c2455a640b06fdc4bd94df915eccb8326dd947f5e63d4f077a",
+  "created_at": 1786649916.175352,
+  "metadata": {}
+}

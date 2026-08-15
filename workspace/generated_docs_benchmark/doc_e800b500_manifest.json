@@ -1,0 +1,46 @@
+{
+  "document_id": "doc_e800b500",
+  "document_title": "Relatório de Tendências de RAG e AST Patching",
+  "target_format": "markdown",
+  "revision": 1,
+  "generated_by": "JARVIS OS Document Pipeline",
+  "sources": [
+    {
+      "title": "Internal Knowledge Base",
+      "uri": "obsidian://technical_docs"
+    },
+    {
+      "title": "Market Analytics Engine",
+      "uri": "analyzer://saas_metrics"
+    }
+  ],
+  "claims": [
+    {
+      "claim": "Document covers Pesquisa aprofundada para Relatório de Tendências de RAG e AST Patching",
+      "verified": true,
+      "source_ref": "obsidian://technical_docs"
+    },
+    {
+      "claim": "All financial models conform to GAAP/SaaS metrics",
+      "verified": true,
+      "source_ref": "analyzer://saas_metrics"
+    }
+  ],
+  "sections": [
+    "Executive Summary",
+    "Technical Architecture & Methodology",
+    "Market Analysis & Data Evidence",
+    "Risk Assessment & Mitigations",
+    "Conclusion & Strategic Recommendations"
+  ],
+  "validation": {
+    "sources_checked": true,
+    "claims_checked": true,
+    "completeness_checked": true,
+    "formatting_checked": true,
+    "technical_review_passed": true
+  },
+  "sha256_fingerprint": "137e2c6c4090dc501daba1e8b3e77ef905b9bb27de1621bedacc84e86989912a",
+  "created_at": 1786649771.631689,
+  "metadata": {}
+}

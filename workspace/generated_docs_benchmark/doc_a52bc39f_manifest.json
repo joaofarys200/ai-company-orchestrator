@@ -1,0 +1,46 @@
+{
+  "document_id": "doc_a52bc39f",
+  "document_title": "Manual de Boas-Vindas e Tutoriais Interativos",
+  "target_format": "markdown",
+  "revision": 1,
+  "generated_by": "JARVIS OS Document Pipeline",
+  "sources": [
+    {
+      "title": "Internal Knowledge Base",
+      "uri": "obsidian://technical_docs"
+    },
+    {
+      "title": "Market Analytics Engine",
+      "uri": "analyzer://saas_metrics"
+    }
+  ],
+  "claims": [
+    {
+      "claim": "Document covers Pesquisa aprofundada para Manual de Boas-Vindas e Tutoriais Interativos",
+      "verified": true,
+      "source_ref": "obsidian://technical_docs"
+    },
+    {
+      "claim": "All financial models conform to GAAP/SaaS metrics",
+      "verified": true,
+      "source_ref": "analyzer://saas_metrics"
+    }
+  ],
+  "sections": [
+    "Executive Summary",
+    "Technical Architecture & Methodology",
+    "Market Analysis & Data Evidence",
+    "Risk Assessment & Mitigations",
+    "Conclusion & Strategic Recommendations"
+  ],
+  "validation": {
+    "sources_checked": true,
+    "claims_checked": true,
+    "completeness_checked": true,
+    "formatting_checked": true,
+    "technical_review_passed": true
+  },
+  "sha256_fingerprint": "a237637c647f3912d29a6b918bf7291065e7ec9349a329c4418ede54a028a767",
+  "created_at": 1786649771.7797272,
+  "metadata": {}
+}
