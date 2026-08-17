@@ -19,6 +19,7 @@ from backend.websocket.handlers.common import (
 from backend.websocket.handlers.knowledge import (
     KnowledgeWebSocketHandler,
 )
+from backend.websocket.handlers.lectures import LectureWebSocketHandler
 from backend.websocket.handlers.missions import (
     MissionWebSocketHandler,
 )
@@ -83,6 +84,10 @@ def create_websocket_handlers(
             services.mission_executor,
             services.mission_autonomy,
             responder,
+        ).routes(),
+        "lecture": LectureWebSocketHandler(
+            connections=connections,
+            logger=logger,
         ).routes(),
     }
     for domain, routes in domains.items():

@@ -57,6 +57,10 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "mission_cancel_execution",
         "mission_release_stale_lock",
         "mission_autonomy_run",
+        "start_lecture_recording",
+        "stop_lecture_recording",
+        "get_lecture_status",
+        "list_lecture_history",
     }
 )
 

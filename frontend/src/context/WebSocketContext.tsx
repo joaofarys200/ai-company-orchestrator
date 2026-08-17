@@ -27,6 +27,16 @@ import {
   type UiAction,
 } from '../protocol/websocket';
 
+declare global {
+  interface Window {
+    jarvisIPC?: {
+      send: (message: any) => void;
+      onMessage: (callback: (data: any) => void) => () => void;
+      isNativeIPC: boolean;
+    };
+  }
+}
+
 export type {
   ActiveTemplate,
   Agent,
@@ -183,7 +193,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const shouldReconnectRef = useRef(true);
 
   const sendClientMessage = useCallback((message: ClientMessage) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) {
+      window.jarvisIPC.send(message);
+    } else if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify(message));
     }
   }, []);
@@ -340,7 +352,163 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }));
   }
 
+  const handleServerMessage = useCallback((msg: any) => {
+    switch (msg.type) {
+      case 'system':
+        addSystemMessage(msg.content);
+        setIsCodingSessionBusy(false);
+        break;
+      case 'chat':
+        addChatMessage(msg);
+        break;
+      case 'file':
+        setProjectFiles((prev) => ({
+          ...prev,
+          [msg.filename]: msg.content,
+        }));
+        break;
+      case 'kanban':
+        handleKanbanUpdate(msg.card_id, msg.status);
+        break;
+      case 'state':
+        if (msg.value === 'processing') {
+          setSystemStatus('PROCESSING');
+        } else {
+          setSystemStatus('ONLINE');
+        }
+        break;
+      case 'voice_status':
+        setVoiceStatus(msg.status);
+        if (msg.status === 'transcribed' && msg.text) {
+          addSystemMessage(`Transcrição de Voz: ${msg.text}`);
+        }
+        break;
+      case 'template_changed':
+        handleTemplateChanged(msg);
+        break;
+      case 'arena_update':
+        handleArenaUpdate(msg);
+        break;
+      case 'project_output':
+        setProjectOutput((prev) => prev + msg.content);
+        break;
+      case 'project_status':
+        setIsProjectRunning(Boolean(msg.running));
+        if (msg.preview_url) {
+          setPreviewUrl(msg.preview_url);
+        }
+        break;
+      case 'ui':
+      case 'ui_action':
+        handleUiAction(msg.action);
+        break;
+      case 'ui_theme':
+        addSystemMessage(`Tema visual solicitado: ${msg.theme}`);
+        break;
+      case 'complete':
+        addSystemMessage(`Orquestração concluída: ${msg.result || 'Sucesso'}`);
+        break;
+      case 'notes_list':
+        setNotes(msg.notes);
+        break;
+      case 'note_content':
+        setCurrentNote({ filename: msg.filename, content: msg.content });
+        break;
+      case 'rules_list':
+        setRules(msg.rules);
+        break;
+      case 'rules_updated':
+        setRules(msg.rules);
+        break;
+      case 'architecture_list':
+        setArchitecture(msg.architecture);
+        break;
+      case 'architecture_updated':
+        setArchitecture(msg.architecture);
+        break;
+      case 'decisions_list':
+        setDecisions(msg.decisions);
+        break;
+      case 'decisions_updated':
+        setDecisions(msg.decisions);
+        break;
+      case 'planner_state':
+        setPlannerState(msg.data);
+        break;
+      case 'mission_list':
+        setMissions(msg.missions);
+        break;
+      case 'mission_snapshot':
+        setMissionSnapshot(msg.data);
+        break;
+      case 'ast_state':
+        setAstState(msg.data);
+        break;
+      case 'projects_list':
+        setProjects(msg.projects);
+        break;
+      case 'project_context':
+        setProjectContext(msg.context);
+        setProjectFiles(msg.files);
+        setProjectFileHashes(msg.file_hashes);
+        setAstState(Object.keys(msg.symbols).length > 0 ? msg.symbols : null);
+        setProjectReferences(null);
+        setSemanticResults('');
+        setIsIndexingProject(false);
+        break;
+      case 'project_file_save_result':
+        setProjectFileSaveState({
+          ok: msg.ok,
+          filename: msg.filename,
+          sha256: msg.sha256,
+          error: msg.error,
+        });
+        setIsSavingProjectFile(false);
+        break;
+      case 'project_references':
+        setProjectReferences(msg.data);
+        break;
+      case 'semantic_results':
+        setSemanticResults(msg.content);
+        break;
+      case 'coding_session':
+        setCodingSession(msg.data);
+        setIsCodingSessionBusy(false);
+        break;
+      case 'sandbox_status':
+        setSandboxStatus(msg.status);
+        break;
+      case 'unknown':
+        console.warn('[Transport] Unknown message type:', msg.originalType);
+        break;
+      default:
+        break;
+    }
+  }, []);
+
   const connect = useCallback(function connectSocket() {
+    // 1. Native Electron IPC Mode
+    if (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) {
+      console.log('[Transport] Connected via Native Electron IPC Bridge');
+      setIsConnected(true);
+      setSystemStatus('ONLINE');
+      const unsubscribe = window.jarvisIPC.onMessage((rawData) => {
+        try {
+          const msg = normalizeServerMessage(rawData);
+          if (msg) {
+            console.log('[Native IPC] Message received:', msg.type);
+            handleServerMessage(msg);
+          }
+        } catch (e) {
+          console.error('[Native IPC] Error processing message:', e);
+        }
+      });
+      return () => {
+        unsubscribe();
+      };
+    }
+
+    // 2. WebSocket Fallback Mode
     if (socketRef.current?.readyState === WebSocket.OPEN) return;
 
     const wsToken = import.meta.env.VITE_JARVIS_WS_TOKEN || 'local-dev-token';
@@ -397,144 +565,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           return;
         }
         console.log('[WebSocket] Message received:', msg.type);
-
-        switch (msg.type) {
-          case 'system':
-            addSystemMessage(msg.content);
-            setIsCodingSessionBusy(false);
-            break;
-          case 'chat':
-            addChatMessage(msg);
-            break;
-          case 'file':
-            setProjectFiles((prev) => ({
-              ...prev,
-              [msg.filename]: msg.content,
-            }));
-            break;
-          case 'kanban':
-            handleKanbanUpdate(msg.card_id, msg.status);
-            break;
-          case 'state':
-            if (msg.value === 'processing') {
-              setSystemStatus('PROCESSING');
-            } else {
-              setSystemStatus('ONLINE');
-            }
-            break;
-          case 'voice_status':
-            setVoiceStatus(msg.status);
-            if (msg.status === 'transcribed' && msg.text) {
-              addSystemMessage(`Transcrição de Voz: ${msg.text}`);
-            }
-            break;
-          case 'template_changed':
-            handleTemplateChanged(msg);
-            break;
-          case 'arena_update':
-            handleArenaUpdate(msg);
-            break;
-          case 'project_output':
-            setProjectOutput((prev) => prev + msg.content);
-            break;
-          case 'project_status':
-            setIsProjectRunning(Boolean(msg.running));
-            if (msg.preview_url) {
-              setPreviewUrl(msg.preview_url);
-            }
-            break;
-          case 'ui':
-          case 'ui_action':
-            handleUiAction(msg.action);
-            break;
-          case 'ui_theme':
-            addSystemMessage(`Tema visual solicitado: ${msg.theme}`);
-            break;
-          case 'complete':
-            addSystemMessage(`Orquestração concluída: ${msg.result || 'Sucesso'}`);
-            break;
-          case 'notes_list':
-            setNotes(msg.notes);
-            break;
-          case 'note_content':
-            setCurrentNote({ filename: msg.filename, content: msg.content });
-            break;
-          case 'rules_list':
-            setRules(msg.rules);
-            break;
-          case 'rules_updated':
-            setRules(msg.rules);
-            break;
-          case 'architecture_list':
-            setArchitecture(msg.architecture);
-            break;
-          case 'architecture_updated':
-            setArchitecture(msg.architecture);
-            break;
-          case 'decisions_list':
-            setDecisions(msg.decisions);
-            break;
-          case 'decisions_updated':
-            setDecisions(msg.decisions);
-            break;
-          case 'planner_state':
-            setPlannerState(msg.data);
-            break;
-          case 'mission_list':
-            setMissions(msg.missions);
-            break;
-          case 'mission_snapshot':
-            setMissionSnapshot(msg.data);
-            break;
-          case 'ast_state':
-            setAstState(msg.data);
-            break;
-          case 'projects_list':
-            setProjects(msg.projects);
-            break;
-          case 'project_context':
-            setProjectContext(msg.context);
-            setProjectFiles(msg.files);
-            setProjectFileHashes(msg.file_hashes);
-            setAstState(Object.keys(msg.symbols).length > 0 ? msg.symbols : null);
-            setProjectReferences(null);
-            setSemanticResults('');
-            setIsIndexingProject(false);
-            break;
-          case 'project_file_save_result':
-            setProjectFileSaveState({
-              ok: msg.ok,
-              filename: msg.filename,
-              sha256: msg.sha256,
-              error: msg.error,
-            });
-            setIsSavingProjectFile(false);
-            break;
-          case 'project_references':
-            setProjectReferences(msg.data);
-            break;
-          case 'semantic_results':
-            setSemanticResults(msg.content);
-            break;
-          case 'coding_session':
-            setCodingSession(msg.data);
-            setIsCodingSessionBusy(false);
-            break;
-          case 'sandbox_status':
-            setSandboxStatus(msg.status);
-            break;
-          case 'unknown':
-            console.warn('[WebSocket] Unknown message type:', msg.originalType);
-            break;
-          default:
-            break;
-        }
+        handleServerMessage(msg);
       } catch (err) {
         console.error('[WebSocket] Error parsing message data:', err);
         addSystemMessage('Erro ao processar uma mensagem do backend.');
       }
     };
-  }, []);
+  }, [handleServerMessage]);
 
   useEffect(() => {
     shouldReconnectRef.current = true;

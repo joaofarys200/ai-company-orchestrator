@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { spawn, execFileSync } = require('child_process');
 const fs = require('fs');
@@ -26,6 +26,18 @@ function logElectron(event, details = {}) {
   }));
 }
 
+// Forward messages from Renderer to Python Backend stdin
+ipcMain.on('jarvis-to-backend', (event, message) => {
+  if (pythonProcess && pythonProcess.stdin && !pythonProcess.killed) {
+    try {
+      const line = JSON.stringify(message) + '\n';
+      pythonProcess.stdin.write(line);
+    } catch (err) {
+      console.error('[Electron IPC] Error writing to Python stdin:', err);
+    }
+  }
+});
+
 function startPythonBackend() {
   if (pythonProcess) {
     logElectron('backend.start_skipped', { reason: 'already_running', pid: pythonProcess.pid });
@@ -51,21 +63,43 @@ function startPythonBackend() {
     shell: false
   });
 
-  // Pipe Python stdout to Electron main console
+  // Pipe Python stdout and forward JSON messages to Renderer via IPC
+  let stdoutBuffer = '';
   pythonProcess.stdout.on('data', (data) => {
-    const output = data.toString();
-    console.log(`[Python STDOUT] ${output.trim()}`);
+    stdoutBuffer += data.toString();
+    const lines = stdoutBuffer.split('\n');
+    stdoutBuffer = lines.pop() || ''; // Keep incomplete trailing line in buffer
 
-    // If the frontend server starts running, load the page immediately if window exists
-    if (output.includes('Frontend HTTP server running') && mainWindow) {
-      console.log('[Electron] Servidor Python detetado!');
-      const isDev = process.argv.includes('--dev') || process.env.VITE_DEV === '1' || process.env.npm_lifecycle_event === 'dev';
-      if (isDev) {
-        console.log('[Electron] Modo dev Vite ativo. A carregar http://localhost:5173...');
-        mainWindow.loadURL('http://localhost:5173');
-      } else {
-        console.log('[Electron] A carregar a UI de produção em http://localhost:8000...');
-        mainWindow.loadURL('http://localhost:8000');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+
+      // Check if line is a JSON message destined for the UI
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (parsed && typeof parsed === 'object' && parsed.type && mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('jarvis-from-backend', parsed);
+            continue;
+          }
+        } catch (e) {
+          // Not a JSON message or parse error, fallback to normal log
+        }
+      }
+
+      console.log(`[Python STDOUT] ${trimmed}`);
+
+      // If the frontend server starts running, load the page immediately if window exists
+      if (trimmed.includes('Frontend HTTP server running') && mainWindow) {
+        console.log('[Electron] Servidor Python detetado!');
+        const isDev = process.argv.includes('--dev') || process.env.VITE_DEV === '1' || process.env.npm_lifecycle_event === 'dev';
+        if (isDev) {
+          console.log('[Electron] Modo dev Vite ativo. A carregar http://localhost:5173...');
+          mainWindow.loadURL('http://localhost:5173');
+        } else {
+          console.log('[Electron] A carregar a UI de produção em http://localhost:8000...');
+          mainWindow.loadURL('http://localhost:8000');
+        }
       }
     }
   });
@@ -119,7 +153,8 @@ function createWindow() {
     backgroundColor: "#08090d",
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js'),
     }
   });
 

@@ -444,18 +444,30 @@ async def handle_client(websocket, *args):
     await websocket_gateway.handle_client(websocket, *args)
 
 
+from backend.transport_gateway import StdioTransportGateway
+
+_global_dispatcher = None
+_global_initial_sync = None
+stdio_transport_gateway: Optional[StdioTransportGateway] = None
+
 def _create_websocket_gateway() -> WebSocketGateway:
-    dispatcher, initial_sync = create_websocket_handlers(
+    global _global_dispatcher, _global_initial_sync, stdio_transport_gateway
+    _global_dispatcher, _global_initial_sync = create_websocket_handlers(
         services=_current_application_services(),
         connections=connection_manager,
         callbacks=_websocket_callbacks(),
         logger=logger,
     )
+    stdio_transport_gateway = StdioTransportGateway(
+        dispatcher=_global_dispatcher,
+        logger=logger,
+        on_broadcast=lambda msg: connection_manager.broadcast(msg),
+    )
     return WebSocketGateway(
         auth_token=WS_AUTH_TOKEN,
         connections=connection_manager,
-        dispatcher=dispatcher,
-        on_connect=initial_sync.handle,
+        dispatcher=_global_dispatcher,
+        on_connect=_global_initial_sync.handle,
         logger=logger,
     )
 
@@ -556,6 +568,13 @@ async def main():
         start_frontend=start_frontend_http_server,
     )
     lifecycle.startup()
+
+    # Start Native Stdio Transport Gateway for Electron desktop IPC
+    stdio_task = None
+    if stdio_transport_gateway is not None:
+        stdio_task = stdio_transport_gateway.start(runtime_state.main_loop)
+        log_event(logger, "stdio_ipc.gateway.started")
+
     log_event(logger, "runtime.health", health=build_runtime_health())
     log_event(logger, "websocket.server.starting", host=WS_HOST, port=8001)
     
@@ -571,6 +590,8 @@ async def main():
         else:
             raise
     finally:
+        if stdio_transport_gateway is not None:
+            stdio_transport_gateway.stop()
         lifecycle.shutdown()
 
 if __name__ == "__main__":
