@@ -99,15 +99,48 @@ class ModelExecutionService:
         max_output_tokens: int = 512,
         timeout_seconds: float = 30.0,
     ) -> ModelResponse:
-        return await self.execute(
-            provider="ollama",
-            model=os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
-            operation=operation,
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
-            conversation_messages=conversation_messages,
-            output_format=output_format,
-            temperature=temperature,
-            max_output_tokens=max_output_tokens,
-            timeout_seconds=timeout_seconds,
-        )
+        mode = os.getenv("ORCHESTRATOR_MODE", "local").strip().lower()
+        if mode in ("gemini", "cloud") and os.getenv("GEMINI_API_KEY"):
+            gemini_model = os.getenv("GEMINI_CREW_MODEL", "gemini-2.5-flash").replace("gemini/", "").strip()
+            return await self.execute(
+                provider="gemini",
+                model=gemini_model,
+                operation=operation,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                conversation_messages=conversation_messages,
+                output_format=output_format,
+                temperature=temperature,
+                max_output_tokens=max_output_tokens,
+                timeout_seconds=timeout_seconds,
+            )
+
+        try:
+            return await self.execute(
+                provider="ollama",
+                model=os.getenv("OLLAMA_MODEL", "qwen3.5:9b"),
+                operation=operation,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                conversation_messages=conversation_messages,
+                output_format=output_format,
+                temperature=temperature,
+                max_output_tokens=max_output_tokens,
+                timeout_seconds=timeout_seconds,
+            )
+        except Exception as e:
+            if os.getenv("GEMINI_API_KEY"):
+                gemini_model = os.getenv("GEMINI_CREW_MODEL", "gemini-2.5-flash").replace("gemini/", "").strip()
+                return await self.execute(
+                    provider="gemini",
+                    model=gemini_model,
+                    operation=operation,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    conversation_messages=conversation_messages,
+                    output_format=output_format,
+                    temperature=temperature,
+                    max_output_tokens=max_output_tokens,
+                    timeout_seconds=timeout_seconds,
+                )
+            raise e

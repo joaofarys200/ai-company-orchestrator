@@ -65,6 +65,12 @@ class ModelRouter:
             for item in profile.preferred_providers
             if item.strip()
         )
+        
+        # Respect global ORCHESTRATOR_MODE preference from environment
+        orchestrator_mode = (os.getenv("ORCHESTRATOR_MODE") or "").strip().lower()
+        if orchestrator_mode in ("gemini", "cloud") and self.providers.has("gemini") and not requested:
+            preferred = ("gemini",) + tuple(p for p in preferred if p != "gemini")
+
         if requested:
             candidates = requested
             strict = True
