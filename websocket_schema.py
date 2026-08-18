@@ -55,6 +55,17 @@ SERVER_MESSAGE_TYPES = {
     "ui",
     "ui_action",
     "ui_theme",
+    "sandbox_status",
+    "lecture_status",
+    "lecture_status_response",
+    "lecture_history",
+    "lecture_history_response",
+    "lecture_started",
+    "lecture_recording_started",
+    "lecture_session_update",
+    "lecture_transcribing_started",
+    "lecture_synthesis_completed",
+    "lecture_audio_level",
 }
 
 
