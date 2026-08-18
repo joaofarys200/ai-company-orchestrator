@@ -279,6 +279,12 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
   const codingStatus = codingSession ? codingStatusMeta(codingSession.status) : null;
 
   useEffect(() => {
+    if (notes.length === 0) {
+      getNotes();
+    }
+  }, [notes.length, getNotes]);
+
+  useEffect(() => {
     if (!currentNote) return;
     const timeoutId = window.setTimeout(() => setEditNoteContent(currentNote.content), 0);
     return () => window.clearTimeout(timeoutId);

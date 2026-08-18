@@ -486,6 +486,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, []);
 
+  const isReady = useCallback(() => {
+    return Boolean((typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) || socketRef.current?.readyState === WebSocket.OPEN);
+  }, []);
+
   const connect = useCallback(function connectSocket() {
     // 1. Native Electron IPC Mode
     if (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) {
@@ -503,6 +507,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           console.error('[Native IPC] Error processing message:', e);
         }
       });
+
+      // Request initial state synchronization
+      window.setTimeout(() => {
+        if (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) {
+          window.jarvisIPC.send({ type: 'get_notes' });
+          window.jarvisIPC.send({ type: 'get_rules' });
+          window.jarvisIPC.send({ type: 'list_projects' });
+          window.jarvisIPC.send({ type: 'get_planner_state' });
+        }
+      }, 50);
+
       return () => {
         unsubscribe();
       };
@@ -575,10 +590,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     shouldReconnectRef.current = true;
-    connect();
+    const cleanup = connect();
 
     return () => {
       shouldReconnectRef.current = false;
+      if (cleanup && typeof cleanup === 'function') {
+        cleanup();
+      }
       if (socketRef.current) {
         socketRef.current.close();
         socketRef.current = null;
@@ -593,7 +611,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Action senders
   const sendDirective = (text: string) => {
     const cleanText = text.trim();
-    if (!cleanText || socketRef.current?.readyState !== WebSocket.OPEN) return;
+    if (!cleanText || !isReady()) return;
 
     sendClientMessage({ type: 'directive', text: cleanText });
     const timestamp = new Date().toLocaleTimeString('pt-PT', { hour12: false });
@@ -608,19 +626,19 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const selectTemplate = (templateName: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       sendClientMessage({ type: 'select_template', template: templateName });
     }
   };
 
   const toggleVoice = (active: boolean) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       sendClientMessage({ type: 'toggle_voice', active });
     }
   };
 
   const runProject = () => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id) {
+    if (isReady() && projectContext?.project_id) {
       setProjectOutput('[Client] A enviar comando de execução para o servidor...\n');
       setIsProjectRunning(true);
       sendClientMessage({ type: 'run_project', project_id: projectContext.project_id });
@@ -628,7 +646,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const stopProject = () => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       setIsProjectRunning(false);
       sendClientMessage({ type: 'stop_project' });
     }
@@ -640,73 +658,73 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const getNotes = useCallback(() => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       sendClientMessage({ type: 'get_notes' });
     }
-  }, [sendClientMessage]);
+  }, [isReady, sendClientMessage]);
 
   const readNote = useCallback((filename: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       sendClientMessage({ type: 'read_note', filename });
     }
-  }, [sendClientMessage]);
+  }, [isReady, sendClientMessage]);
 
   const saveNote = useCallback((filename: string, content: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       sendClientMessage({ type: 'save_note', filename, content });
     }
-  }, [sendClientMessage]);
+  }, [isReady, sendClientMessage]);
 
   const deleteRule = useCallback((key: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       sendClientMessage({ type: 'delete_rule', key });
     }
-  }, [sendClientMessage]);
+  }, [isReady, sendClientMessage]);
 
   const deleteArchitecture = useCallback((module: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       sendClientMessage({ type: 'delete_architecture', module });
     }
-  }, [sendClientMessage]);
+  }, [isReady, sendClientMessage]);
 
   const deleteDecision = useCallback((decision: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       sendClientMessage({ type: 'delete_decision', decision });
     }
-  }, [sendClientMessage]);
+  }, [isReady, sendClientMessage]);
 
   const getPlannerState = useCallback(() => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       sendClientMessage({ type: 'get_planner_state' });
     }
-  }, [sendClientMessage]);
+  }, [isReady, sendClientMessage]);
 
   const getMissions = useCallback(() => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id) {
+    if (isReady() && projectContext?.project_id) {
       sendClientMessage({ type: 'mission_list', project_id: projectContext.project_id });
     }
-  }, [projectContext?.project_id, sendClientMessage]);
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
 
   const openMission = useCallback((missionId: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id && missionId) {
+    if (isReady() && projectContext?.project_id && missionId) {
       sendClientMessage({ type: 'mission_resume_snapshot', project_id: projectContext.project_id, mission_id: missionId });
     }
-  }, [projectContext?.project_id, sendClientMessage]);
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
 
   const sendMissionOperation = useCallback((operation: MissionClientOperation) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (isReady()) {
       sendClientMessage(operation);
     }
-  }, [sendClientMessage]);
+  }, [isReady, sendClientMessage]);
 
   const getAstState = useCallback(() => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id) {
+    if (isReady() && projectContext?.project_id) {
       sendClientMessage({ type: 'get_ast_state', project_id: projectContext.project_id });
     }
-  }, [projectContext?.project_id, sendClientMessage]);
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
 
   const openProject = useCallback((projectId: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectId) {
+    if (isReady() && projectId) {
       setProjectFiles({});
       setProjectFileHashes({});
       setProjectFileSaveState(null);
@@ -720,10 +738,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setMissionSnapshot(null);
       sendClientMessage({ type: 'open_project', project_id: projectId });
     }
-  }, [sendClientMessage]);
+  }, [isReady, sendClientMessage]);
 
   const createProject = useCallback((projectId: string, projectName?: string, template?: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectId.trim()) {
+    if (isReady() && projectId.trim()) {
       setProjectFiles({});
       setProjectFileHashes({});
       setProjectFileSaveState(null);
@@ -742,12 +760,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         template,
       });
     }
-  }, [sendClientMessage]);
+  }, [isReady, sendClientMessage]);
 
   const saveProjectFile = useCallback((filename: string, content: string) => {
     const expectedHash = projectFileHashes[filename];
     if (
-      socketRef.current?.readyState !== WebSocket.OPEN
+      !isReady()
       || !projectContext?.project_id
       || !filename
       || !expectedHash
@@ -763,37 +781,37 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       content,
       expected_sha256: expectedHash,
     });
-  }, [projectContext?.project_id, projectFileHashes, sendClientMessage]);
+  }, [isReady, projectContext?.project_id, projectFileHashes, sendClientMessage]);
 
   const reindexProject = useCallback(() => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id) {
+    if (isReady() && projectContext?.project_id) {
       setIsIndexingProject(true);
       sendClientMessage({ type: 'index_project', project_id: projectContext.project_id });
     }
-  }, [projectContext?.project_id, sendClientMessage]);
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
 
   const findReferences = useCallback((symbol: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id && symbol.trim()) {
+    if (isReady() && projectContext?.project_id && symbol.trim()) {
       sendClientMessage({ type: 'find_references', project_id: projectContext.project_id, symbol: symbol.trim() });
     }
-  }, [projectContext?.project_id, sendClientMessage]);
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
 
   const semanticSearch = useCallback((query: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id && query.trim()) {
+    if (isReady() && projectContext?.project_id && query.trim()) {
       setSemanticResults('A pesquisar...');
       sendClientMessage({ type: 'semantic_search', project_id: projectContext.project_id, query: query.trim() });
     }
-  }, [projectContext?.project_id, sendClientMessage]);
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
 
   const createCodingSession = useCallback((objective: string) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id && objective.trim()) {
+    if (isReady() && projectContext?.project_id && objective.trim()) {
       setIsCodingSessionBusy(true);
       sendClientMessage({ type: 'create_coding_session', project_id: projectContext.project_id, objective: objective.trim() });
     }
-  }, [projectContext?.project_id, sendClientMessage]);
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
 
   const applyCodingSession = useCallback(() => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id && codingSession?.session_id) {
+    if (isReady() && projectContext?.project_id && codingSession?.session_id) {
       setIsCodingSessionBusy(true);
       sendClientMessage({
         type: 'apply_coding_session',
@@ -801,10 +819,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         session_id: codingSession.session_id,
       });
     }
-  }, [codingSession?.session_id, projectContext?.project_id, sendClientMessage]);
+  }, [codingSession?.session_id, isReady, projectContext?.project_id, sendClientMessage]);
 
   const rollbackCodingSession = useCallback(() => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && projectContext?.project_id && codingSession?.session_id) {
+    if (isReady() && projectContext?.project_id && codingSession?.session_id) {
       setIsCodingSessionBusy(true);
       sendClientMessage({
         type: 'rollback_coding_session',
@@ -813,7 +831,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         confirmed: true,
       });
     }
-  }, [codingSession?.session_id, projectContext?.project_id, sendClientMessage]);
+  }, [codingSession?.session_id, isReady, projectContext?.project_id, sendClientMessage]);
 
   return (
     <WebSocketContext.Provider
