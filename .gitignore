@@ -53,6 +53,7 @@ CV -*
 
 # Logs and temporary files
 logs/
+temp_audio/
 *.log
 *.tmp
 *.temp

@@ -218,31 +218,62 @@ async def run_obsidian_search_notes(query: str) -> str:
         try:
             vault_path = get_obsidian_vault_path()
             results = []
-            query_lower = query.lower()
+            query_lower = query.lower().strip()
+            keywords = [w.strip().lower() for w in re.findall(r"[\w\-]+", query) if len(w.strip()) > 2]
+            if not keywords and not query_lower:
+                return "Pesquisa vazia."
+
+            scored_matches = []
             for root, _, files in os.walk(vault_path):
+                if ".obsidian" in root:
+                    continue
                 for f in files:
                     if f.lower().endswith(".md"):
                         full_path = os.path.join(root, f)
                         rel_path = os.path.relpath(full_path, vault_path).replace("\\", "/")
-                        matched = False
+                        rel_lower = rel_path.lower()
+                        
+                        score = 0
                         snippet = ""
-                        if query_lower in rel_path.lower():
-                            matched = True
-                            snippet = "[Correspondência no nome do ficheiro]"
-                        else:
-                            try:
-                                with open(full_path, "r", encoding="utf-8") as file_obj:
-                                    content = file_obj.read()
-                                if query_lower in content.lower():
-                                    matched = True
-                                    idx = content.lower().find(query_lower)
+
+                        try:
+                            with open(full_path, "r", encoding="utf-8", errors="ignore") as file_obj:
+                                content = file_obj.read()
+                        except Exception:
+                            content = ""
+
+                        content_lower = content.lower()
+
+                        # Exact full query match
+                        if query_lower in rel_lower:
+                            score += 100
+                            snippet = "[Correspondência exata no nome do ficheiro]"
+                        elif query_lower in content_lower:
+                            score += 80
+                            idx = content_lower.find(query_lower)
+                            start = max(0, idx - 40)
+                            end = min(len(content), idx + len(query) + 40)
+                            snippet = "..." + content[start:end].replace("\n", " ") + "..."
+
+                        # Keyword token matches
+                        for kw in keywords:
+                            if kw in rel_lower:
+                                score += 20
+                            if kw in content_lower:
+                                score += min(content_lower.count(kw), 10)
+                                if not snippet:
+                                    idx = content_lower.find(kw)
                                     start = max(0, idx - 40)
-                                    end = min(len(content), idx + len(query) + 40)
+                                    end = min(len(content), idx + len(kw) + 60)
                                     snippet = "..." + content[start:end].replace("\n", " ") + "..."
-                            except Exception:
-                                continue
-                        if matched:
-                            results.append(f"- **{rel_path}**: {snippet}")
+
+                        if score > 0:
+                            scored_matches.append((score, rel_path, snippet or "[Conteúdo relevante]"))
+
+            scored_matches.sort(key=lambda x: x[0], reverse=True)
+            for score, rel_path, snip in scored_matches[:10]:
+                results.append(f"- **{rel_path}** (Score {score}): {snip}")
+
             return "\n".join(results) if results else f"Nenhuma nota correspondente a '{query}' encontrada."
         except Exception as e:
             return f"Erro ao pesquisar notas: {str(e)}"
