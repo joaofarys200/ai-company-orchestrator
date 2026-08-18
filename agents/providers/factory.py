@@ -18,6 +18,8 @@ def get_llm_provider(mode: str | None = None):
 
 
 def build_crewai_llm(llm_cls, mode: str | None = None, temperature: float | None = None):
+    if llm_cls is None:
+        return None
     resolved_temperature = (
         float(os.getenv("CREWAI_TEMPERATURE", "0.2"))
         if temperature is None

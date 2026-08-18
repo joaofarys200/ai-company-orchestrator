@@ -25,7 +25,11 @@ try:
     from crewai import Agent, Task, Crew, LLM
     from crewai.tools import tool
 except ImportError:
-    pass
+    Agent = Task = Crew = LLM = None
+    def tool(*args, **kwargs):
+        if len(args) == 1 and callable(args[0]) and not kwargs:
+            return args[0]
+        return lambda f: f
 
 import agents.globals as glb
 import agents.utils as utils

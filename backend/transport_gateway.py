@@ -65,6 +65,9 @@ class StdioTransportGateway:
 
     async def _listen_loop(self) -> None:
         """Lê linhas do sys.stdin em background sem bloquear o event loop."""
+        if sys.stdin is None or getattr(sys.stdin, "closed", True):
+            return
+
         reader = asyncio.StreamReader()
         protocol = asyncio.StreamReaderProtocol(reader)
         try:
@@ -83,12 +86,18 @@ class StdioTransportGateway:
                     await self._handle_raw_line(line)
             except asyncio.CancelledError:
                 break
+            except (OSError, ValueError):
+                break
             except Exception as e:
                 if self.logger:
                     log_event(self.logger, "ipc.read_error", error=str(e))
+                break
 
     async def _threaded_read_loop(self) -> None:
         """Loop de leitura em thread separada com executor para Windows Proactor/Selector."""
+        if sys.stdin is None or getattr(sys.stdin, "closed", True):
+            return
+
         loop = self._loop or asyncio.get_running_loop()
         while self._running:
             try:
@@ -100,10 +109,13 @@ class StdioTransportGateway:
                     await self._handle_raw_line(cleaned_line)
             except asyncio.CancelledError:
                 break
+            except (OSError, ValueError):
+                # Stdin desconectado ou inválido
+                break
             except Exception as e:
                 if self.logger:
                     log_event(self.logger, "ipc.threaded_read_error", error=str(e))
-                await asyncio.sleep(0.1)
+                break
 
     async def _handle_raw_line(self, line: str) -> None:
         """Processa e despacha a linha JSON recebida."""

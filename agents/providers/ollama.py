@@ -6,7 +6,11 @@ import os
 import threading
 from typing import Any, Mapping
 
-from crewai.llms.base_llm import BaseLLM
+try:
+    from crewai.llms.base_llm import BaseLLM
+except ImportError:
+    class BaseLLM:
+        pass
 
 from backend.model_harness import (
     ExecutionConstraints,
