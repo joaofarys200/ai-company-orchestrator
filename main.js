@@ -93,13 +93,9 @@ function startPythonBackend() {
       if (trimmed.includes('Frontend HTTP server running') && mainWindow) {
         console.log('[Electron] Servidor Python detetado!');
         const isDev = process.argv.includes('--dev') || process.env.VITE_DEV === '1' || process.env.npm_lifecycle_event === 'dev';
-        if (isDev) {
-          console.log('[Electron] Modo dev Vite ativo. A carregar http://localhost:5173...');
-          mainWindow.loadURL('http://localhost:5173');
-        } else {
-          console.log('[Electron] A carregar a UI de produção em http://localhost:8000...');
-          mainWindow.loadURL('http://localhost:8000');
-        }
+        const targetUrl = isDev ? 'http://localhost:5173' : 'http://localhost:8000';
+        console.log(`[Electron] A carregar UI em ${targetUrl}...`);
+        loadURLWithRetry(targetUrl);
       }
     }
   });
@@ -145,6 +141,22 @@ function clearBackendRestartTimer() {
   }
 }
 
+function loadURLWithRetry(url, maxRetries = 30, delayMs = 600) {
+  let attempts = 0;
+  function tryLoad() {
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    mainWindow.loadURL(url).catch(() => {
+      attempts += 1;
+      if (attempts < maxRetries) {
+        setTimeout(tryLoad, delayMs);
+      } else {
+        console.error(`[Electron] Não foi possível carregar ${url} após ${maxRetries} tentativas.`);
+      }
+    });
+  }
+  tryLoad();
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1300,
@@ -155,6 +167,16 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
+    }
+  });
+
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    if (validatedURL && (validatedURL.includes('5173') || validatedURL.includes('8000'))) {
+      setTimeout(() => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.loadURL(validatedURL).catch(() => {});
+        }
+      }, 1000);
     }
   });
 
