@@ -1,7 +1,7 @@
 ---
 title: ADR-014 - Automated Defense and Resilience for FINDING-03-WEBSOCKET-PATH-JAIL
 status: ACCEPTED
-date: 2026-08-18
+date: 2026-08-19
 ---
 
 # Context
