@@ -111,6 +111,7 @@ interface WebSocketContextType {
   projectReferences: ProjectReferenceResult | null;
   semanticResults: string;
   isIndexingProject: boolean;
+  listProjects: () => void;
   openProject: (projectId: string) => void;
   createProject: (projectId: string, projectName?: string, template?: string) => void;
   saveProjectFile: (filename: string, content: string) => void;
@@ -540,6 +541,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         window.clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
       }
+
+      // Initial state synchronization on connect
+      window.setTimeout(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'list_projects' } satisfies ClientMessage));
+          ws.send(JSON.stringify({ type: 'get_notes' } satisfies ClientMessage));
+          ws.send(JSON.stringify({ type: 'get_rules' } satisfies ClientMessage));
+          ws.send(JSON.stringify({ type: 'get_planner_state' } satisfies ClientMessage));
+        }
+      }, 50);
+
       // Auto-enable voice on startup only if user explicitly opted in via localStorage
       window.setTimeout(() => {
         const autoConnect = localStorage.getItem('jarvis_voice_auto_connect') === 'true';
@@ -723,6 +735,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [isReady, projectContext?.project_id, sendClientMessage]);
 
+  const listProjects = useCallback(() => {
+    if (isReady()) {
+      sendClientMessage({ type: 'list_projects' });
+    }
+  }, [isReady, sendClientMessage]);
+
   const openProject = useCallback((projectId: string) => {
     if (isReady() && projectId) {
       setProjectFiles({});
@@ -887,6 +905,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         projectReferences,
         semanticResults,
         isIndexingProject,
+        listProjects,
         openProject,
         createProject,
         saveProjectFile,

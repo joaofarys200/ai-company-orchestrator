@@ -207,6 +207,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     projectReferences,
     semanticResults,
     isIndexingProject,
+    listProjects,
     openProject,
     createProject,
     reindexProject,
@@ -283,6 +284,21 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
       getNotes();
     }
   }, [notes.length, getNotes]);
+
+  useEffect(() => {
+    if (projects.length === 0) {
+      listProjects();
+    }
+  }, [projects.length, listProjects]);
+
+  useEffect(() => {
+    if (projects.length > 0 && !projectContext) {
+      const defaultProj = projects.find((p) => p.project_id === 'task-app') || projects[0];
+      if (defaultProj) {
+        openProject(defaultProj.project_id);
+      }
+    }
+  }, [projects, projectContext, openProject]);
 
   useEffect(() => {
     if (!currentNote) return;
@@ -534,10 +550,10 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                       className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs transition-colors ${
                         project.project_id === projectContext?.project_id
                           ? 'bg-cyan-300/10 text-cyan-100'
-                          : 'text-gray-300 hover:bg-white/[0.05]'
+                          : 'text-gray-400 hover:bg-white/[0.05]'
                       }`}
                     >
-                      <FolderOpen className="h-3.5 w-3.5 shrink-0" />
+                      <FolderOpen className="h-3.5 w-3.5 shrink-0 text-gray-500" />
                       <span className="truncate">{project.project_name}</span>
                       {project.project_id === projectContext?.project_id && <Check className="ml-auto h-3.5 w-3.5" />}
                     </button>
@@ -576,6 +592,14 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 </div>
               </>
             )}
+            <button
+              onClick={() => setCreateProjectModalOpen(true)}
+              className="flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-cyan-300/30 bg-cyan-300/10 px-3 text-xs font-semibold text-cyan-100 transition-colors hover:bg-cyan-300/20"
+              title="Criar novo projeto ou workspace"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Novo Projeto</span>
+            </button>
           </div>
 
           <nav className="workspace-primary-nav flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
@@ -828,7 +852,29 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                   />
                 </React.Suspense>
               ) : (
-                <EmptyState icon={Code2} title="Selecione um projeto para abrir o editor." />
+                <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center text-gray-400">
+                  <Code2 className="h-10 w-10 text-cyan-300/60" />
+                  <h4 className="text-sm font-semibold text-white">Nenhum Projeto Ativo</h4>
+                  <p className="max-w-sm text-xs text-gray-500">Selecione ou crie um projeto para abrir o explorador de ficheiros e editor.</p>
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      onClick={() => setCreateProjectModalOpen(true)}
+                      className={`${BUTTON_BASE} border-cyan-300/30 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/20`}
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Criar Novo Projeto</span>
+                    </button>
+                    {regularProjects.length > 0 && (
+                      <button
+                        onClick={() => setProjectPickerOpen(true)}
+                        className={`${BUTTON_BASE} border-white/10 bg-white/[0.04] text-gray-200 hover:bg-white/[0.08]`}
+                      >
+                        <FolderOpen className="h-4 w-4 text-cyan-300" />
+                        <span>Abrir {regularProjects[0].project_name}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
               )}
             </ViewFrame>
           )}
