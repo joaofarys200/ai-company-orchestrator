@@ -1,0 +1,73 @@
+[
+  {
+    "action_id": "ACT-PROC-E2E-TEST",
+    "incident_id": "INC-E2E-001",
+    "action_type": "TERMINATE_PROCESS",
+    "target": "PID: 49152 (evil_cryptominer.exe)",
+    "rationale": "Processo suspeito n\u00e3o-assinado em execu\u00e7\u00e3o a partir de AppData\\Local\\Temp com alto consumo de CPU",
+    "evidence_ids": [
+      "EV-PROC-TEMP-001",
+      "EV-NET-SUSP-002"
+    ],
+    "permission_level": "LOW_RISK_MUTATION",
+    "requested_by": "sentinel_correlation_engine",
+    "approval_required": true,
+    "approved_by": null,
+    "approval_session_id": null,
+    "approval_timestamp": null,
+    "pre_state": {
+      "pid": 49152,
+      "name": "evil_cryptominer.exe",
+      "path": "C:\\Temp\\evil_cryptominer.exe"
+    },
+    "execution_result": {},
+    "post_state": {},
+    "verification_result": {},
+    "rollback_available": false,
+    "rollback_plan": "Revers\u00e3o n\u00e3o aplic\u00e1vel a finaliza\u00e7\u00e3o de processos",
+    "rollback_result": null,
+    "status": "WAITING_APPROVAL",
+    "created_at": 1787695177.2222004,
+    "updated_at": 1787695177.2222018,
+    "error_message": null,
+    "schema_version": 1
+  },
+  {
+    "action_id": "ACT-NET-E2E-TEST",
+    "incident_id": "INC-E2E-002",
+    "action_type": "BLOCK_NETWORK_ENDPOINT",
+    "target": "198.51.100.42:443",
+    "rationale": "Tentativa reiterada de beaconing C2 para endere\u00e7o IP n\u00e3o catalogado",
+    "evidence_ids": [
+      "EV-NET-C2-001"
+    ],
+    "permission_level": "LOW_RISK_MUTATION",
+    "requested_by": "sentinel_correlation_engine",
+    "approval_required": true,
+    "approved_by": "human_operator",
+    "approval_session_id": "session_admin_01",
+    "approval_timestamp": 1787694997.222206,
+    "pre_state": {
+      "rule_exists": false
+    },
+    "execution_result": {
+      "rule_name": "JARVIS-SENTINEL-ACT-NET-E2E-TEST",
+      "action": "BLOCK"
+    },
+    "post_state": {
+      "rule_exists": true
+    },
+    "verification_result": {
+      "verified": true,
+      "reason": "Regra ativa no Windows Firewall"
+    },
+    "rollback_available": true,
+    "rollback_plan": "Remover regra JARVIS-SENTINEL-ACT-NET-E2E-TEST",
+    "rollback_result": null,
+    "status": "COMPLETED",
+    "created_at": 1787694697.222208,
+    "updated_at": 1787694997.2222085,
+    "error_message": null,
+    "schema_version": 1
+  }
+]

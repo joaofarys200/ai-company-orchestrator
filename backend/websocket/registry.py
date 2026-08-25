@@ -24,8 +24,10 @@ from backend.websocket.handlers.missions import (
     MissionWebSocketHandler,
 )
 from backend.websocket.handlers.projects import ProjectWebSocketHandler
+from backend.websocket.handlers.sentinel import SentinelWebSocketHandler
 from backend.websocket.handlers.system import SystemWebSocketHandler
 from backend.websocket.handlers.voice import VoiceWebSocketHandler
+from security.sentinel.watchdog import SentinelWatchdogService
 
 
 def create_websocket_handlers(
@@ -46,6 +48,8 @@ def create_websocket_handlers(
         result_sender=connections.send,
         result_broadcaster=connections.broadcast,
     )
+    watchdog = services.sentinel_watchdog or SentinelWatchdogService()
+
     domains = {
         "chat": ChatWebSocketHandler(
             services.agents,
@@ -88,6 +92,10 @@ def create_websocket_handlers(
         "lecture": LectureWebSocketHandler(
             connections=connections,
             logger=logger,
+        ).routes(),
+        "sentinel": SentinelWebSocketHandler(
+            watchdog=watchdog,
+            connections=connections,
         ).routes(),
     }
     for domain, routes in domains.items():

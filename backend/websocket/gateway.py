@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+import inspect
 import hmac
 import json
 import os
@@ -121,6 +123,7 @@ def serialize_server_message(message: dict) -> str:
 @dataclass(slots=True)
 class ConnectionManager:
     connections: set[Any] = field(default_factory=set)
+    broadcast_hooks: list[Any] = field(default_factory=list)
 
     @property
     def count(self) -> int:
@@ -132,18 +135,31 @@ class ConnectionManager:
     def disconnect(self, websocket: Any) -> None:
         self.connections.discard(websocket)
 
+    def add_broadcast_hook(self, hook: Any) -> None:
+        if hook not in self.broadcast_hooks:
+            self.broadcast_hooks.append(hook)
+
+    def remove_broadcast_hook(self, hook: Any) -> None:
+        if hook in self.broadcast_hooks:
+            self.broadcast_hooks.remove(hook)
+
     async def send(self, websocket: Any, message: dict) -> None:
         await websocket.send(serialize_server_message(message))
 
     async def broadcast(self, message: dict) -> None:
-        if not self.connections:
-            return
         payload = serialize_server_message(message)
         for connection in list(self.connections):
             try:
                 await connection.send(payload)
             except Exception:
                 self.disconnect(connection)
+        for hook in list(self.broadcast_hooks):
+            try:
+                res = hook(message)
+                if asyncio.iscoroutine(res):
+                    await res
+            except Exception:
+                pass
 
 
 InitialConnectionHandler = Callable[

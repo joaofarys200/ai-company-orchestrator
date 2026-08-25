@@ -438,6 +438,8 @@ export const ChatPanel: React.FC = () => {
           <button
             onClick={handleSubmit}
             disabled={!inputVal.trim()}
+            title="Enviar diretiva"
+            aria-label="Enviar diretiva"
             className="flex h-9 items-center gap-2 px-4 bg-cyan-300 hover:bg-cyan-200 disabled:bg-white/[0.04] disabled:text-gray-600 disabled:border-white/8 disabled:cursor-not-allowed border border-cyan-300/20 text-black font-semibold text-xs rounded-md cursor-pointer transition-all active:scale-98"
           >
             <span>Executar</span>

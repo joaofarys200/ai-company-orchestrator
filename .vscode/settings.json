@@ -1,0 +1,30 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/venv/Scripts/python.exe",
+  "python.pythonPath": "${workspaceFolder}/venv/Scripts/python.exe",
+  "python.analysis.include": [
+    "agents",
+    "backend",
+    "services",
+    "intelligence",
+    "tests"
+  ],
+  "python.analysis.exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/obsidian_vault",
+    "**/docs",
+    "**/dist",
+    "**/venv",
+    "**/__pyrefly_virtual__"
+  ],
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}",
+    "${workspaceFolder}/backend",
+    "${workspaceFolder}/agents",
+    "${workspaceFolder}/services",
+    "${workspaceFolder}/intelligence"
+  ],
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports": "none"
+  }
+}

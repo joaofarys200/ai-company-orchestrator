@@ -4,14 +4,18 @@ Live agent activation and frontend protocol integration test
 
 import asyncio
 import json
+import pytest
 import websockets
 
 WS_URL = "ws://127.0.0.1:8001/?token=local-dev-token"
 
+@pytest.mark.anyio
 async def test_live_agent():
     print(f"[*] Connecting to JARVIS WebSocket: {WS_URL}")
-    async with websockets.connect(WS_URL) as ws:
-        print("[+] Connected successfully!")
+    try:
+        ws_conn = websockets.connect(WS_URL, open_timeout=1.0)
+        async with ws_conn as ws:
+            print("[+] Connected successfully!")
 
         # 1. Send directive to activate the agent orchestrator
         directive = {
@@ -48,6 +52,9 @@ async def test_live_agent():
 
         print(f"\n[+] Total messages received from backend/agent: {len(messages_received)}")
         assert len(messages_received) > 0, "No messages received from backend"
+    except (OSError, websockets.exceptions.WebSocketException) as exc:
+        pytest.skip(f"Live dev server not running on {WS_URL}: {exc}")
+
 
 if __name__ == "__main__":
     asyncio.run(test_live_agent())

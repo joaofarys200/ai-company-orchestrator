@@ -24,6 +24,7 @@ class ApplicationServices:
     mission_planner: Any
     mission_executor: "MissionExecutorService"
     mission_autonomy: "MissionAutonomyController"
+    sentinel_watchdog: Any
 
     def with_overrides(self, **changes: Any) -> "ApplicationServices":
         """Return a shallow service view without constructing new services."""
@@ -37,6 +38,7 @@ def create_application_services(
     database_module: Any,
     agents_module: Any,
     sandbox_module: Any,
+    sentinel_watchdog: Any = None,
 ) -> ApplicationServices:
     from agents.mission_autonomy import MissionAutonomyController
     from agents.mission_executor import MissionExecutorService
@@ -68,4 +70,5 @@ def create_application_services(
         mission_planner=mission_planner,
         mission_executor=mission_executor,
         mission_autonomy=mission_autonomy,
+        sentinel_watchdog=sentinel_watchdog,
     )

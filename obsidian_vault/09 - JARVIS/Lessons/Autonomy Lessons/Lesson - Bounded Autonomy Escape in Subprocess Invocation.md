@@ -52,13 +52,16 @@ A função `workspace_policy.py` inspecionava apenas o argumento `cwd` do `subpr
 ## 4. Corrective Action
 1. **Banimento Global de `shell=True`**: Todos os subprocessos do JARVIS agora passam estritamente listas de argumentos (`shell=False`), neutralizando comandos compostos.
 2. **Enforce de Path Jail Canónico com `os.path.commonpath`**:
-   ```python
-   def enforce_jail(target_path: str, jail_root: str):
-       real_target = os.path.realpath(os.path.abspath(target_path))
-       real_jail = os.path.realpath(os.path.abspath(jail_root))
-       if os.path.commonpath([real_jail, real_target]) != real_jail:
-           raise PermissionError(f"Acesso negado fora do jail: {real_target}")
-   ```
+
+```python
+import os
+
+def enforce_jail(target_path: str, jail_root: str):
+    real_target = os.path.realpath(os.path.abspath(target_path))
+    real_jail = os.path.realpath(os.path.abspath(jail_root))
+    if os.path.commonpath([real_jail, real_target]) != real_jail:
+        raise PermissionError(f"Acesso negado fora do jail: {real_target}")
+```
 3. **Formalização em ADR**: Registado no [[ADR-002 - Process Sandboxing and Path Jail Enforcement]].
 
 ---

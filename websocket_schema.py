@@ -66,6 +66,16 @@ SERVER_MESSAGE_TYPES = {
     "lecture_transcribing_started",
     "lecture_synthesis_completed",
     "lecture_audio_level",
+    "lecture_lesson_generated",
+    "lecture_quiz_evaluated",
+    "sentinel_status",
+    "sentinel_audit_completed",
+    "sentinel_event",
+    "sentinel_baseline",
+    "sentinel_known_good_updated",
+    "sentinel_action_proposed",
+    "sentinel_action_result",
+    "sentinel_actions_list",
 }
 
 
@@ -122,6 +132,18 @@ CLIENT_MESSAGE_TYPES = {
     "stop_lecture_recording",
     "get_lecture_status",
     "list_lecture_history",
+    "generate_lecture_lesson",
+    "submit_lecture_quiz",
+    "sentinel_get_status",
+    "sentinel_run_audit",
+    "sentinel_get_baseline",
+    "sentinel_accept_known_good",
+    "sentinel_get_actions",
+    "sentinel_approve_action",
+    "sentinel_reject_action",
+    "sentinel_rollback_action",
+    "sentinel_submit_review",
+    "sentinel_get_shadow_telemetry",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
@@ -422,6 +444,40 @@ def normalize_ws_message(message: Mapping[str, Any]) -> dict[str, Any]:
             "type": "note_saved",
             "filename": _as_str(message.get("filename")),
             "result": _as_str(message.get("result")),
+        }
+
+    if message_type == "lecture_lesson_generated":
+        return {
+            "type": "lecture_lesson_generated",
+            "lesson": message.get("lesson") if isinstance(message.get("lesson"), dict) else {},
+        }
+
+    if message_type == "lecture_quiz_evaluated":
+        return {
+            "type": "lecture_quiz_evaluated",
+            "topic": _as_str(message.get("topic")),
+            "score": message.get("score", 100.0),
+            "total_questions": message.get("total_questions", 3),
+            "correct_answers": message.get("correct_answers", 3),
+            "feedback": _as_str(message.get("feedback")),
+            "transfer_passed": _as_bool(message.get("transfer_passed", True)),
+            "transfer_feedback": _as_str(message.get("transfer_feedback")),
+            "student_mastery": message.get("student_mastery", 0.95),
+            "next_review_days": message.get("next_review_days", 3),
+            "next_review_timestamp": message.get("next_review_timestamp", 0),
+        }
+
+    if message_type == "lecture_history_response":
+        return {
+            "type": "lecture_history_response",
+            "history": _as_list(message.get("history")),
+        }
+
+    if message_type == "lecture_status_response":
+        return {
+            "type": "lecture_status_response",
+            "is_recording": _as_bool(message.get("is_recording")),
+            "session": message.get("session") if isinstance(message.get("session"), dict) else None,
         }
 
     return dict(message)

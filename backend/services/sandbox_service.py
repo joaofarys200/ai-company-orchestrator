@@ -61,7 +61,7 @@ def start_frontend_http_server(
 
     socketserver.TCPServer.allow_reuse_address = True
     try:
-        server = socketserver.TCPServer(("", port), handler)
+        server = socketserver.ThreadingTCPServer(("", port), handler)
     except Exception as start_error:
         log_event(
             logger,

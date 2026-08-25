@@ -882,6 +882,10 @@ class StatefulBenchmarkRunner:
                     except (TypeError, ValueError) as exc:
                         semantic_issues.append(str(exc))
                 else:
+                    if response.status == ModelResponseStatus.PROVIDER_FAILED or response.errors:
+                        stop_reason = StopReason.RECOVERY_EXHAUSTED
+                    elif response.status == ModelResponseStatus.STOPPED:
+                        stop_reason = StopReason.NO_PROGRESS
                     semantic_issues.append(
                         f"model_response_status={response.status.value}"
                     )
@@ -908,7 +912,10 @@ class StatefulBenchmarkRunner:
                 if response.status == ModelResponseStatus.PROVIDER_FAILED:
                     stop_reason = StopReason.RECOVERY_EXHAUSTED
                 elif response.status == ModelResponseStatus.STOPPED:
-                    stop_reason = _progress_stop_reason(progress.conditions)
+                    if response.errors:
+                        stop_reason = StopReason.RECOVERY_EXHAUSTED
+                    else:
+                        stop_reason = _progress_stop_reason(progress.conditions)
                     semantic_issues.append(
                         "ModelHarness progress guard stopped the request."
                     )

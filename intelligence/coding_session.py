@@ -205,6 +205,13 @@ class CodingSessionService:
                 raise CodingSessionError(
                     f"Plano de alteracao invalido depois de uma correcao: {second_error}"
                 ) from second_error
+
+        # Deterministic Artifact Repair for CodingSession
+        changes = self._repair_missing_artifacts_in_changes(
+            project_id=project_id,
+            objective=objective,
+            changes=changes,
+        )
         return self.create_session(project_id, objective, changes, risks)
 
     def apply_session(self, project_id: str, session_id: str) -> CodingSession:
@@ -964,6 +971,69 @@ class CodingSessionService:
             raise CodingSessionError("O JSON nao contem changes.")
         risks = data.get("risks") if isinstance(data.get("risks"), list) else []
         return changes, [str(item) for item in risks]
+
+    def _repair_missing_artifacts_in_changes(
+        self,
+        project_id: str,
+        objective: str,
+        changes: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        from intelligence.artifact_inference import DeterministicRepairEngine, normalize_text
+
+        try:
+            existing_files = self.projects.read_project_files(project_id)
+        except Exception:
+            existing_files = {}
+
+        # If it's a minor localized symbol replacement on an existing file and entrypoints already exist, do not force-create unrelated files
+        has_entrypoint = any(f.lower() in ("index.html", "server.py", "app.py", "main.py") for f in existing_files)
+        all_symbol_ops = all(c.get("operation") in ("replace_symbol", "replace_text") for c in changes)
+        norm_obj = normalize_text(objective)
+        is_explicit_creation = any(w in norm_obj for w in ("cria", "criar", "adiciona", "adicionar", "novo", "nova", "create", "add", "new"))
+
+        if has_entrypoint and all_symbol_ops and not is_explicit_creation:
+            return changes
+
+        planned_files = dict(existing_files)
+        for change in changes:
+            file_path = change.get("file")
+            if not file_path:
+                continue
+            if change.get("operation") == "create_file":
+                planned_files[file_path] = change.get("new_code", "")
+            elif change.get("operation") == "replace_text" and file_path in planned_files:
+                old = change.get("old_text", "")
+                new = change.get("new_code", "")
+                if old:
+                    planned_files[file_path] = planned_files[file_path].replace(old, new, 1)
+
+        try:
+            context_dict = self.projects.open_project(project_id).to_dict()
+        except Exception:
+            context_dict = None
+
+        repair_engine = DeterministicRepairEngine()
+        repair_result = repair_engine.repair_plan(
+            prompt=objective,
+            planned_files=planned_files,
+            project_name=project_id,
+            project_context=context_dict,
+        )
+
+        if not repair_result.repaired:
+            return changes
+
+        repaired_changes = list(changes)
+        for action in repair_result.actions:
+            if action.action_type == "CREATE_FILE":
+                if not any(c.get("file") == action.relative_path for c in repaired_changes):
+                    repaired_changes.append({
+                        "file": action.relative_path,
+                        "operation": "create_file",
+                        "new_code": action.content,
+                        "reason": action.reason,
+                    })
+        return repaired_changes
 
     def _session_dir(self, project_id: str, session_id: str) -> str:
         return os.path.join(self.projects.metadata_dir(project_id), "coding_sessions", session_id)

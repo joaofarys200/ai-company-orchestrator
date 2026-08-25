@@ -1,0 +1,31 @@
+{
+  "venvPath": ".",
+  "venv": "venv",
+  "pythonVersion": "3.14",
+  "include": [
+    "agents",
+    "backend",
+    "services",
+    "intelligence",
+    "tests",
+    "*.py"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/obsidian_vault",
+    "**/docs",
+    "**/dist",
+    "**/venv",
+    "**/__pyrefly_virtual__"
+  ],
+  "extraPaths": [
+    ".",
+    "backend",
+    "agents",
+    "services",
+    "intelligence"
+  ],
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none"
+}

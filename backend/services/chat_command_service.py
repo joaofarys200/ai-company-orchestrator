@@ -233,249 +233,7 @@ class ChatCommandService:
                 "OPENCLAW",
                 "Orquestrador",
                 (
-                    f"âš ï¸ Comando desconhecido: `{name}`. "
-                    "Digite `/help` para ajuda."
-                ),
-            )
-
-    async def _review(self) -> None:
-        await self.callbacks.broadcast_state("processing")
-        await self.connections.broadcast(
-            {
-                "type": "system",
-                "content": (
-                    "A iniciar auditoria QA automÃ¡tica nos "
-                    "ficheiros da sandbox..."
-                ),
-            }
-        )
-        html, css, javascript = self._read_sandbox_files()
-        task = (
-            "Analisa os ficheiros da sandbox:\n"
-            f"HTML:\n{html}\n\nCSS:\n{css}\n\n"
-            f"JS:\n{javascript}\n\nFaz um relatÃ³rio "
-            "detalhado de testes, indicando se existem erros "
-            "de visualizaÃ§Ã£o, sintaxe ou de caminho de imagens. "
-            "Termina com 'APROVAÃ‡ÃƒO: SIM' ou "
-            "'APROVAÃ‡ÃƒO: NÃƒO'."
-        )
-        report = (
-            await self.services.agents.spawn_specialist_agent(
-                nome="Quinn",
-                especialidade="Auditor QA",
-                backstory=(
-                    "Ã‰s o Quinn, o auditor de qualidade "
-                    "experiente da agÃªncia. Analisas cÃ³digo "
-                    "para garantir que tudo funciona."
-                ),
-                tarefa=task,
-                contexto_projeto=(
-                    "Auditoria de qualidade manual via "
-                    "slash command."
-                ),
-                on_msg=self.callbacks.on_agent_message,
-            )
-        )
-        await self._chat(
-            "QUINN",
-            "QA Engineer (Slash Command)",
-            report,
-        )
-        await self.callbacks.broadcast_state("idle")
-
-    async def _refactor(self) -> None:
-        await self.callbacks.broadcast_state("processing")
-        await self.connections.broadcast(
-            {
-                "type": "system",
-                "content": (
-                    "ðŸ”„ A iniciar ciclo Self-Healing "
-                    "(Devon â†’ Quinn, atÃ© 3 tentativas)..."
-                ),
-            }
-        )
-        maximum_cycles = 3
-        feedback = ""
-        approved = False
-        for cycle in range(1, maximum_cycles + 1):
-            await self.connections.broadcast(
-                {
-                    "type": "system",
-                    "content": (
-                        f"ðŸ”§ Ciclo {cycle}/{maximum_cycles} "
-                        "â€” Devon a refatorar..."
-                    ),
-                }
-            )
-            html, css, javascript = (
-                self._read_sandbox_files()
-            )
-            feedback_section = (
-                "\n\nâš ï¸ Feedback do QA "
-                f"(ciclo anterior):\n{feedback}"
-                if feedback
-                else ""
-            )
-            task = (
-                "Otimiza o cÃ³digo da sandbox para garantir "
-                "mÃ¡xima performance e conformidade com as "
-                f"regras de visualizaÃ§Ã£o:{feedback_section}\n"
-                f"HTML:\n{html}\n\nCSS:\n{css}\n\n"
-                f"JS:\n{javascript}\n\nRetorna as versÃµes "
-                "completas otimizadas e limpas em blocos de "
-                "cÃ³digo markdown: ```html ... ```, "
-                "```css ... ``` e ```javascript ... ```."
-            )
-            refactor_report = (
-                await self.services.agents
-                .spawn_specialist_agent(
-                    nome="Devon",
-                    especialidade="Programador OtimizaÃ§Ã£o",
-                    backstory=(
-                        "Ã‰s o Devon, o programador core da "
-                        "agÃªncia. Refatoras cÃ³digo para "
-                        "garantir clareza, performance e beleza."
-                    ),
-                    tarefa=task,
-                    contexto_projeto=(
-                        f"Ciclo Self-Healing {cycle}/"
-                        f"{maximum_cycles}."
-                    ),
-                    on_msg=self.callbacks.on_agent_message,
-                )
-            )
-            matches = (
-                re.search(
-                    r"```html\n(.*?)\n```",
-                    refactor_report,
-                    re.DOTALL,
-                ),
-                re.search(
-                    r"```css\n(.*?)\n```",
-                    refactor_report,
-                    re.DOTALL,
-                ),
-                re.search(
-                    r"```(?:javascript|js)\n(.*?)\n```",
-                    refactor_report,
-                    re.DOTALL,
-                ),
-            )
-            refined = self._write_sandbox_files(*matches)
-            if refined:
-                await self._chat(
-                    "DEVON",
-                    f"Programador (Ciclo {cycle})",
-                    (
-                        "âœ… CÃ³digo atualizado na sandbox: "
-                        + ", ".join(refined)
-                    ),
-                )
-            else:
-                await self._chat(
-                    "DEVON",
-                    f"Programador (Ciclo {cycle})",
-                    refactor_report,
-                )
-                break
-            await self.connections.broadcast(
-                {
-                    "type": "system",
-                    "content": (
-                        "ðŸ” Quinn a auditar cÃ³digo "
-                        f"(ciclo {cycle})..."
-                    ),
-                }
-            )
-            new_html, new_css, new_javascript = (
-                self._read_sandbox_files()
-            )
-            review_task = (
-                "Analisa os ficheiros da sandbox (ciclo "
-                f"Self-Healing {cycle}):\nHTML:\n{new_html}\n\n"
-                f"CSS:\n{new_css}\n\nJS:\n{new_javascript}\n\n"
-                "Faz um relatÃ³rio detalhado de testes, "
-                "indicando se existem erros de visualizaÃ§Ã£o, "
-                "sintaxe ou de caminho de imagens. Termina com "
-                "'APROVAÃ‡ÃƒO: SIM' ou 'APROVAÃ‡ÃƒO: NÃƒO'."
-            )
-            qa_report = (
-                await self.services.agents
-                .spawn_specialist_agent(
-                    nome="Quinn",
-                    especialidade="Auditor QA",
-                    backstory=(
-                        "Ã‰s o Quinn, o auditor de qualidade "
-                        "experiente da agÃªncia. Analisas "
-                        "cÃ³digo para garantir que tudo funciona."
-                    ),
-                    tarefa=review_task,
-                    contexto_projeto=(
-                        "Auto-auditoria Self-Healing "
-                        f"ciclo {cycle}."
-                    ),
-                    on_msg=self.callbacks.on_agent_message,
-                )
-            )
-            await self._chat(
-                "QUINN",
-                f"QA (Ciclo {cycle})",
-                qa_report,
-            )
-            if "APROVAÃ‡ÃƒO: SIM" in qa_report.upper():
-                await self._chat(
-                    "OPENCLAW",
-                    "Orquestrador",
-                    (
-                        "âœ… **Self-Healing concluÃ­do** em "
-                        f"{cycle} ciclo(s). QA aprovou o cÃ³digo!"
-                    ),
-                )
-                approved = True
-                break
-            feedback = qa_report
-            await self.connections.broadcast(
-                {
-                    "type": "system",
-                    "content": (
-                        "âš ï¸ QA rejeitou "
-                        f"(ciclo {cycle}). Devon irÃ¡ corrigir "
-                        "automaticamente..."
-                    ),
-                }
-            )
-        if not approved:
-            await self._chat(
-                "OPENCLAW",
-                "Orquestrador",
-                (
-                    "âš ï¸ **Self-Healing atingiu o limite de "
-                    f"{maximum_cycles} ciclos.** RevÃª o cÃ³digo "
-                    "manualmente."
-                ),
-            )
-        await self.callbacks.broadcast_state("idle")
-
-    async def _theme(self, arguments: str) -> None:
-        theme = arguments.strip().lower()
-        if theme in {"neon", "cyberpunk", "clean"}:
-            await self.connections.broadcast(
-                {"type": "ui_theme", "theme": theme}
-            )
-            await self._chat(
-                "OPENCLAW",
-                "Orquestrador",
-                (
-                    "ðŸŽ¨ Tema visual alterado para: "
-                    f"**{theme.upper()}**"
-                ),
-            )
-        else:
-            await self._chat(
-                "OPENCLAW",
-                "Orquestrador",
-                (
-                    "âš ï¸ Tema desconhecido. Temas vÃ¡lidos: "
+                    "⚠️ Tema desconhecido. Temas validos: "
                     "`/theme neon`, `/theme cyberpunk`, "
                     "`/theme clean`"
                 ),
@@ -484,16 +242,19 @@ class ChatCommandService:
     async def _spawn(self, arguments: str) -> None:
         try:
             parts = arguments.split("|")
+            if len(parts) < 3:
+                raise ValueError("Formato invalido.")
             name = parts[0].strip()
             specialty = parts[1].strip()
             task = parts[2].strip()
+            if not name or not specialty or not task:
+                raise ValueError("Nome, especialidade e tarefa sao obrigatorios.")
             await self.callbacks.broadcast_state("processing")
             await self.connections.broadcast(
                 {
                     "type": "system",
                     "content": (
-                        "A criar e executar subagente "
-                        f"especialista {name}..."
+                        f"A criar e executar subagente especialista {name} ({specialty})..."
                     ),
                 }
             )
@@ -503,12 +264,12 @@ class ChatCommandService:
                     nome=name,
                     especialidade=specialty,
                     backstory=(
-                        f"Ã‰s o subagente especialista {name}, "
+                        f"Es o subagente especialista {name}, "
                         f"focado em {specialty}."
                     ),
                     tarefa=task,
                     contexto_projeto=(
-                        "CriaÃ§Ã£o ad-hoc via comando de barra."
+                        "Criacao ad-hoc via comando de barra."
                     ),
                     on_msg=self.callbacks.on_agent_message,
                 )
@@ -516,20 +277,34 @@ class ChatCommandService:
             await self._chat(
                 name.upper(),
                 specialty,
-                result,
+                result or f"Tarefa concluida pelo especialista {name}.",
             )
             await self.callbacks.broadcast_state("idle")
-        except Exception:
+        except ValueError:
             await self._chat(
                 "OPENCLAW",
                 "Orquestrador",
                 (
-                    "âš ï¸ Formato invÃ¡lido. Uso: "
+                    "⚠️ Formato invalido. Uso: "
                     "`/spawn Nome | Especialidade | Tarefa` "
                     "(ex: `/spawn Marta | Dev SQL | Cria uma "
                     "query para clientes`)"
                 ),
             )
+            await self.callbacks.broadcast_state("idle")
+        except Exception as exc:
+            log_event(
+                self.logger,
+                "chat_command.spawn_error",
+                level="error",
+                error=str(exc),
+            )
+            await self._chat(
+                "OPENCLAW",
+                "Orquestrador",
+                f"❌ Erro ao executar subagente: {exc}",
+            )
+            await self.callbacks.broadcast_state("idle")
 
     async def _arena(self, arguments: str) -> None:
         prompt = arguments.strip()

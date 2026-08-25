@@ -1,22 +1,28 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Editor, { loader, type BeforeMount, type OnMount } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import {
   Braces,
+  Check,
   ChevronDown,
   ChevronRight,
   CircleAlert,
   Code2,
+  Copy,
   FileCode2,
   FileJson,
+  FileSpreadsheet,
   FileText,
   Files,
   Folder,
   FolderOpen,
   GitPullRequest,
+  Layers,
+  Palette,
   Play,
   Save,
   Search,
+  WandSparkles,
   X,
 } from 'lucide-react';
 
@@ -85,6 +91,7 @@ const languageByExtension: Record<string, string> = {
   md: 'markdown',
   mjs: 'javascript',
   py: 'python',
+  sql: 'sql',
   toml: 'ini',
   ts: 'typescript',
   tsx: 'typescript',
@@ -129,9 +136,14 @@ function buildTree(filenames: string[]): FileTreeNode[] {
 
 function FileIcon({ filename }: { filename: string }) {
   const extension = filename.split('.').pop()?.toLowerCase();
-  if (extension === 'json') return <FileJson className="h-3.5 w-3.5 shrink-0 text-amber-300" />;
+  if (extension === 'json') return <FileJson className="h-3.5 w-3.5 shrink-0 text-amber-400" />;
   if (extension === 'md' || extension === 'txt') return <FileText className="h-3.5 w-3.5 shrink-0 text-sky-300" />;
-  if (['js', 'jsx', 'ts', 'tsx'].includes(extension ?? '')) return <Braces className="h-3.5 w-3.5 shrink-0 text-yellow-300" />;
+  if (['js', 'mjs', 'cjs'].includes(extension ?? '')) return <Braces className="h-3.5 w-3.5 shrink-0 text-amber-300" />;
+  if (['ts', 'tsx', 'jsx'].includes(extension ?? '')) return <Braces className="h-3.5 w-3.5 shrink-0 text-cyan-400" />;
+  if (['html', 'htm'].includes(extension ?? '')) return <FileCode2 className="h-3.5 w-3.5 shrink-0 text-orange-400" />;
+  if (['css', 'scss', 'less'].includes(extension ?? '')) return <Palette className="h-3.5 w-3.5 shrink-0 text-pink-400" />;
+  if (extension === 'py') return <FileCode2 className="h-3.5 w-3.5 shrink-0 text-emerald-400" />;
+  if (['yaml', 'yml', 'toml'].includes(extension ?? '')) return <FileSpreadsheet className="h-3.5 w-3.5 shrink-0 text-violet-400" />;
   return <FileCode2 className="h-3.5 w-3.5 shrink-0 text-cyan-300/80" />;
 }
 
@@ -157,21 +169,27 @@ function TreeRow({
     <>
       <button
         type="button"
-        onClick={() => node.type === 'directory' ? onToggle(node.path) : onSelect(node.path)}
-        className={`flex h-6 w-full items-center gap-1.5 pr-2 text-left text-[12px] transition-colors ${
-          selected ? 'bg-[#37373d] text-white' : 'text-[#cccccc] hover:bg-white/[0.045]'
+        onClick={() => (node.type === 'directory' ? onToggle(node.path) : onSelect(node.path))}
+        className={`group flex h-7 w-full items-center gap-1.5 pr-2 text-left text-xs transition-colors ${
+          selected
+            ? 'bg-cyan-500/15 text-cyan-200 font-medium border-l-2 border-cyan-400'
+            : 'text-gray-300 hover:bg-white/[0.04] hover:text-white'
         }`}
-        style={{ paddingLeft: `${6 + depth * 12}px` }}
+        style={{ paddingLeft: `${8 + depth * 14}px` }}
         title={node.path}
       >
         {node.type === 'directory' ? (
           <>
-            {isExpanded
-              ? <ChevronDown className="h-3.5 w-3.5 shrink-0 text-gray-400" />
-              : <ChevronRight className="h-3.5 w-3.5 shrink-0 text-gray-400" />}
-            {isExpanded
-              ? <FolderOpen className="h-3.5 w-3.5 shrink-0 text-cyan-300/80" />
-              : <Folder className="h-3.5 w-3.5 shrink-0 text-cyan-300/70" />}
+            {isExpanded ? (
+              <ChevronDown className="h-3.5 w-3.5 shrink-0 text-gray-400 group-hover:text-gray-200" />
+            ) : (
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 text-gray-400 group-hover:text-gray-200" />
+            )}
+            {isExpanded ? (
+              <FolderOpen className="h-3.5 w-3.5 shrink-0 text-cyan-300" />
+            ) : (
+              <Folder className="h-3.5 w-3.5 shrink-0 text-cyan-400/70" />
+            )}
           </>
         ) : (
           <>
@@ -211,7 +229,13 @@ export function CodeEditor({
   insights,
 }: CodeEditorProps) {
   const filenames = useMemo(() => Object.keys(files).sort((left, right) => left.localeCompare(right)), [files]);
-  const tree = useMemo(() => buildTree(filenames), [filenames]);
+  const [fileFilter, setFileFilter] = useState('');
+  const filteredFilenames = useMemo(() => {
+    if (!fileFilter.trim()) return filenames;
+    return filenames.filter((f) => f.toLowerCase().includes(fileFilter.toLowerCase().trim()));
+  }, [filenames, fileFilter]);
+  const tree = useMemo(() => buildTree(filteredFilenames), [filteredFilenames]);
+
   const [openFiles, setOpenFiles] = useState<string[]>(selectedFile ? [selectedFile] : []);
   const [drafts, setDrafts] = useState<Record<string, string>>(files);
   const [expanded, setExpanded] = useState<Set<string>>(() => {
@@ -221,6 +245,8 @@ export function CodeEditor({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [insightsOpen, setInsightsOpen] = useState(false);
   const [cursor, setCursor] = useState({ line: 1, column: 1 });
+  const [copiedPath, setCopiedPath] = useState(false);
+  const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const saveCurrentRef = useRef<() => void>(() => undefined);
 
   const currentDraft = selectedFile ? drafts[selectedFile] ?? files[selectedFile] ?? '' : '';
@@ -231,13 +257,28 @@ export function CodeEditor({
     if (!selectedFile || !currentDirty || isSaving) return;
     onSaveFile(selectedFile, currentDraft);
   }, [currentDirty, currentDraft, isSaving, onSaveFile, selectedFile]);
+
   useEffect(() => {
     saveCurrentRef.current = saveCurrent;
   }, [saveCurrent]);
 
+  const formatCode = useCallback(() => {
+    if (editorInstanceRef.current) {
+      editorInstanceRef.current.getAction('editor.action.formatDocument')?.run();
+    }
+  }, []);
+
+  const copyFilePath = useCallback(() => {
+    if (!selectedFile) return;
+    navigator.clipboard.writeText(selectedFile);
+    setCopiedPath(true);
+    setTimeout(() => setCopiedPath(false), 1500);
+  }, [selectedFile]);
+
   const visibleOpenFiles = selectedFile && !openFiles.includes(selectedFile)
     ? [...openFiles, selectedFile]
     : openFiles;
+
   const visibleExpanded = useMemo(() => {
     const next = new Set(expanded);
     const parentParts = selectedFile.split('/').slice(0, -1);
@@ -246,28 +287,38 @@ export function CodeEditor({
   }, [expanded, selectedFile]);
 
   const handleEditorMount: OnMount = (editor, editorApi) => {
+    editorInstanceRef.current = editor;
     editor.focus();
     editor.onDidChangeCursorPosition((event) => {
       setCursor({ line: event.position.lineNumber, column: event.position.column });
     });
     editor.addCommand(editorApi.KeyMod.CtrlCmd | editorApi.KeyCode.KeyS, () => saveCurrentRef.current());
+    editor.addCommand(editorApi.KeyMod.Shift | editorApi.KeyMod.Alt | editorApi.KeyCode.KeyF, formatCode);
   };
 
   const handleBeforeMount: BeforeMount = (editorApi) => {
-    editorApi.editor.defineTheme('jarvis-vscode-dark', {
+    editorApi.editor.defineTheme('jarvis-studio-dark', {
       base: 'vs-dark',
       inherit: true,
-      rules: [],
+      rules: [
+        { token: 'comment', foreground: '6b7280', fontStyle: 'italic' },
+        { token: 'keyword', foreground: 'c084fc', fontStyle: 'bold' },
+        { token: 'string', foreground: '34d399' },
+        { token: 'number', foreground: 'f59e0b' },
+        { token: 'type', foreground: '38bdf8' },
+        { token: 'function', foreground: '60a5fa' },
+      ],
       colors: {
-        'editor.background': '#090b10',
-        'editorGutter.background': '#090b10',
-        'editorLineNumber.foreground': '#4f535d',
-        'editorLineNumber.activeForeground': '#c6c9d0',
-        'editor.selectionBackground': '#264f78',
-        'editor.inactiveSelectionBackground': '#1d3a56',
-        'editorCursor.foreground': '#67e8f9',
-        'editorIndentGuide.background1': '#20232b',
-        'editorIndentGuide.activeBackground1': '#39404d',
+        'editor.background': '#07090e',
+        'editorGutter.background': '#07090e',
+        'editorLineNumber.foreground': '#374151',
+        'editorLineNumber.activeForeground': '#9ca3af',
+        'editor.selectionBackground': '#1e3a5f',
+        'editor.inactiveSelectionBackground': '#14253d',
+        'editorCursor.foreground': '#38bdf8',
+        'editorIndentGuide.background1': '#111827',
+        'editorIndentGuide.activeBackground1': '#1f2937',
+        'editorOverviewRuler.border': '#07090e',
       },
     });
   };
@@ -300,94 +351,142 @@ export function CodeEditor({
   };
 
   return (
-    <div className="relative flex h-full min-h-[32rem] overflow-hidden border border-white/8 bg-[#090b10]">
-      <nav className="z-30 flex w-11 shrink-0 flex-col items-center border-r border-[#272a31] bg-[#14171d] py-1">
+    <div className="relative flex h-full min-h-[32rem] overflow-hidden rounded-lg border border-white/10 bg-[#07090e] shadow-2xl">
+      {/* ── 1. Activity Bar (Navigation Icons) ── */}
+      <nav className="z-30 flex w-12 shrink-0 flex-col items-center border-r border-white/8 bg-[#0b0e17] py-2">
         <button
           type="button"
           onClick={() => setSidebarOpen((current) => !current)}
-          className={`relative flex h-11 w-11 items-center justify-center border-l-2 ${
-            sidebarOpen ? 'border-cyan-300 text-white' : 'border-transparent text-gray-500 hover:text-gray-200'
+          className={`relative flex h-10 w-10 items-center justify-center rounded-lg transition-all ${
+            sidebarOpen ? 'bg-cyan-500/15 text-cyan-300 font-semibold shadow-[0_0_12px_rgba(34,211,238,0.15)]' : 'text-gray-400 hover:bg-white/[0.05] hover:text-gray-200'
           }`}
-          title="Explorador"
+          title="Explorador de Ficheiros"
         >
           <Files className="h-5 w-5" />
+          {sidebarOpen && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r bg-cyan-400" />}
         </button>
+
         <button
           type="button"
           onClick={() => setInsightsOpen((current) => !current)}
-          className={`relative flex h-11 w-11 items-center justify-center border-l-2 ${
-            insightsOpen ? 'border-violet-300 text-white' : 'border-transparent text-gray-500 hover:text-gray-200'
+          className={`relative mt-1 flex h-10 w-10 items-center justify-center rounded-lg transition-all ${
+            insightsOpen ? 'bg-violet-500/15 text-violet-300 font-semibold shadow-[0_0_12px_rgba(167,139,250,0.15)]' : 'text-gray-400 hover:bg-white/[0.05] hover:text-gray-200'
           }`}
-          title="Símbolos e referências"
+          title="Símbolos e Relações"
         >
           <Search className="h-5 w-5" />
+          {insightsOpen && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r bg-violet-400" />}
         </button>
+
+        <div className="my-2 h-px w-6 bg-white/8" />
+
         <button
           type="button"
           onClick={onOpenChanges}
-          className="flex h-11 w-11 items-center justify-center border-l-2 border-transparent text-gray-500 hover:text-gray-200"
-          title="Alteração assistida"
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-400 hover:bg-white/[0.05] hover:text-cyan-300 transition-all"
+          title="Alterações e Diff"
         >
           <GitPullRequest className="h-5 w-5" />
         </button>
+
         <button
           type="button"
           onClick={onOpenPreview}
-          className="flex h-11 w-11 items-center justify-center border-l-2 border-transparent text-gray-500 hover:text-gray-200"
-          title="Preview"
+          className="mt-1 flex h-10 w-10 items-center justify-center rounded-lg text-gray-400 hover:bg-emerald-500/15 hover:text-emerald-300 transition-all"
+          title="Executar Preview"
         >
           <Play className="h-5 w-5" />
         </button>
+
+        <div className="mt-auto flex flex-col items-center gap-1">
+          <span className="text-[10px] font-mono text-gray-400">{filenames.length}f</span>
+        </div>
       </nav>
 
+      {/* ── 2. Sidebar Explorer ── */}
       {sidebarOpen && (
-        <aside className="absolute inset-y-0 left-11 z-20 flex w-64 flex-col border-r border-[#272a31] bg-[#101319] md:relative md:left-auto md:z-auto">
-          <div className="flex h-9 items-center justify-between px-3">
-            <span className="text-[11px] font-medium uppercase text-[#bbbbbb]">Explorador</span>
-            <span className="text-[11px] text-gray-600">{filenames.length}</span>
+        <aside className="absolute inset-y-0 left-12 z-20 flex w-64 flex-col border-r border-white/8 bg-[#0a0d15] md:relative md:left-auto md:z-auto">
+          {/* Header */}
+          <div className="flex h-10 items-center justify-between border-b border-white/8 px-3.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Explorador</span>
+            <span className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[10px] text-cyan-300">{filenames.length} ficheiros</span>
           </div>
-          <div className="flex h-7 items-center gap-1 border-y border-white/[0.04] px-1.5 text-xs font-semibold text-[#cccccc]">
-            <ChevronDown className="h-3.5 w-3.5" />
-            <span className="truncate uppercase" title={rootPath}>{projectName}</span>
+
+          {/* Project Title Badge */}
+          <div className="flex h-8 items-center gap-1.5 border-b border-white/[0.04] bg-white/[0.02] px-3 text-xs font-medium text-gray-300">
+            <Layers className="h-3.5 w-3.5 text-cyan-400" />
+            <span className="truncate font-semibold text-white" title={rootPath}>{projectName}</span>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto py-1">
-            {tree.length === 0 ? (
-              <div className="px-4 py-8 text-center text-xs text-gray-600">Sem ficheiros editáveis</div>
-            ) : tree.map((node) => (
-              <TreeRow
-                key={`${node.type}-${node.path}`}
-                node={node}
-                depth={0}
-                selectedFile={selectedFile}
-                expanded={visibleExpanded}
-                onToggle={toggleDirectory}
-                onSelect={selectFile}
+
+          {/* Quick File Filter */}
+          <div className="border-b border-white/8 px-2 py-1.5">
+            <div className="flex items-center gap-1.5 rounded border border-white/8 bg-black/30 px-2 py-1 text-xs text-gray-400 focus-within:border-cyan-400/40">
+              <Search className="h-3 w-3 text-gray-400" />
+              <input
+                type="text"
+                value={fileFilter}
+                onChange={(e) => setFileFilter(e.target.value)}
+                placeholder="Filtrar ficheiros..."
+                className="w-full bg-transparent text-xs text-gray-200 outline-none placeholder:text-gray-400"
               />
-            ))}
+              {fileFilter && (
+                <button onClick={() => setFileFilter('')} className="text-gray-400 hover:text-white">
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* File Tree */}
+          <div className="min-h-0 flex-1 overflow-y-auto py-1.5 select-none">
+            {tree.length === 0 ? (
+              <div className="px-4 py-8 text-center text-xs text-gray-400">
+                {fileFilter ? 'Nenhum ficheiro corresponde ao filtro' : 'Sem ficheiros editáveis'}
+              </div>
+            ) : (
+              tree.map((node) => (
+                <TreeRow
+                  key={`${node.type}-${node.path}`}
+                  node={node}
+                  depth={0}
+                  selectedFile={selectedFile}
+                  expanded={visibleExpanded}
+                  onToggle={toggleDirectory}
+                  onSelect={selectFile}
+                />
+              ))
+            )}
           </div>
         </aside>
       )}
 
-      <section className="flex min-w-0 flex-1 flex-col bg-[#090b10]">
-        <div className="flex h-9 shrink-0 overflow-x-auto border-b border-[#272a31] bg-[#101319]">
+      {/* ── 3. Main Editor Body ── */}
+      <section className="flex min-w-0 flex-1 flex-col bg-[#07090e]">
+        {/* Editor Tabs */}
+        <div className="flex h-9 shrink-0 items-center overflow-x-auto border-b border-white/8 bg-[#0b0e17] px-1 gap-1">
           {visibleOpenFiles.map((filename) => {
             const active = filename === selectedFile;
+            const isDirty = dirtyFiles.has(filename);
             return (
               <div
                 key={filename}
-                className={`group flex h-9 min-w-32 max-w-52 shrink-0 items-center gap-1 border-r border-[#272a31] px-1 text-xs ${
-                  active ? 'border-t border-t-cyan-300 bg-[#090b10] text-white' : 'text-gray-500 hover:bg-white/[0.025] hover:text-gray-300'
+                className={`group flex h-7 min-w-32 max-w-56 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs transition-all ${
+                  active
+                    ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/30 font-medium'
+                    : 'text-gray-400 hover:bg-white/[0.04] hover:text-gray-200 border border-transparent'
                 }`}
                 title={filename}
               >
                 <button
                   type="button"
                   onClick={() => selectFile(filename)}
-                  className="flex min-w-0 flex-1 items-center gap-2 px-2"
+                  className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
                 >
                   <FileIcon filename={filename} />
-                  <span className="min-w-0 flex-1 truncate text-left">{filename.split('/').pop()}</span>
-                  {dirtyFiles.has(filename) && <span className="h-2 w-2 shrink-0 rounded-full bg-gray-300" />}
+                  <span className="min-w-0 flex-1 truncate">{filename.split('/').pop()}</span>
+                  {isDirty && (
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400 ring-2 ring-amber-400/20" title="Alterações não gravadas" />
+                  )}
                 </button>
                 <button
                   type="button"
@@ -395,7 +494,7 @@ export function CodeEditor({
                     event.stopPropagation();
                     closeFile(filename);
                   }}
-                  className="hidden h-6 w-6 shrink-0 items-center justify-center rounded hover:bg-white/10 group-hover:flex"
+                  className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
                   aria-label={`Fechar ${filename}`}
                 >
                   <X className="h-3 w-3" />
@@ -407,31 +506,64 @@ export function CodeEditor({
 
         {selectedFile ? (
           <>
-            <div className="flex h-8 shrink-0 items-center gap-1 border-b border-white/[0.04] px-3 text-[11px] text-gray-500">
-              {selectedFile.split('/').map((part, index, parts) => (
-                <span key={`${part}-${index}`} className="flex items-center gap-1">
-                  {index > 0 && <ChevronRight className="h-3 w-3 text-gray-700" />}
-                  <span className={index === parts.length - 1 ? 'text-gray-300' : ''}>{part}</span>
-                </span>
-              ))}
-              <div className="ml-auto flex items-center gap-2">
+            {/* Breadcrumb & Action Toolbar */}
+            <div className="flex h-8 shrink-0 items-center justify-between gap-2 border-b border-white/8 bg-[#090c14] px-3 text-xs text-gray-400">
+              {/* Path Breadcrumbs */}
+              <div className="flex min-w-0 items-center gap-1 overflow-hidden font-mono text-[11px]">
+                {selectedFile.split('/').map((part, index, parts) => (
+                  <span key={`${part}-${index}`} className="flex items-center gap-1">
+                    {index > 0 && <ChevronRight className="h-3 w-3 text-gray-400 shrink-0" />}
+                    <span className={index === parts.length - 1 ? 'font-semibold text-cyan-200' : 'text-gray-400'}>
+                      {part}
+                    </span>
+                  </span>
+                ))}
+                <button
+                  onClick={copyFilePath}
+                  className="ml-1.5 p-1 text-gray-400 hover:text-cyan-300 rounded transition-colors"
+                  title="Copiar caminho relativo"
+                >
+                  {copiedPath ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                </button>
+              </div>
+
+              {/* Formatting & Save Toolbar */}
+              <div className="flex items-center gap-2 shrink-0">
                 {saveState?.filename === selectedFile && !saveState.ok && (
-                  <span className="flex max-w-72 items-center gap-1 truncate text-rose-300" title={saveState.error}>
+                  <span className="flex max-w-72 items-center gap-1 truncate text-rose-300 text-[11px]" title={saveState.error}>
                     <CircleAlert className="h-3.5 w-3.5 shrink-0" />
                     {saveState.error}
                   </span>
                 )}
+
+                <button
+                  type="button"
+                  onClick={formatCode}
+                  className="flex items-center gap-1 rounded bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-gray-300 hover:bg-white/[0.08] hover:text-cyan-200 border border-white/8 transition-colors"
+                  title="Formatar Código (Shift+Alt+F)"
+                >
+                  <WandSparkles className="h-3 w-3 text-cyan-400" />
+                  <span>Formatar</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={saveCurrent}
                   disabled={!currentDirty || isSaving}
-                  className="flex h-6 w-6 items-center justify-center rounded text-gray-500 hover:bg-white/[0.06] hover:text-white disabled:opacity-30"
-                  title="Guardar (Ctrl+S)"
+                  className={`flex items-center gap-1 rounded px-2.5 py-0.5 text-[11px] font-medium transition-all ${
+                    currentDirty
+                      ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-400/40 hover:bg-cyan-500/30'
+                      : 'bg-white/[0.03] text-gray-400 border border-white/8 opacity-50 cursor-not-allowed'
+                  }`}
+                  title="Guardar ficheiro (Ctrl+S)"
                 >
-                  <Save className={`h-3.5 w-3.5 ${isSaving ? 'animate-pulse' : ''}`} />
+                  <Save className={`h-3 w-3 ${isSaving ? 'animate-pulse' : ''}`} />
+                  <span>{isSaving ? 'A gravar...' : 'Guardar'}</span>
                 </button>
               </div>
             </div>
+
+            {/* Monaco Code Editor */}
             <div className="min-h-0 flex-1">
               <Editor
                 path={`${projectId}/${selectedFile}`}
@@ -442,20 +574,20 @@ export function CodeEditor({
                 onChange={(value) => {
                   setDrafts((current) => ({ ...current, [selectedFile]: value ?? '' }));
                 }}
-                theme="jarvis-vscode-dark"
+                theme="jarvis-studio-dark"
                 options={{
                   automaticLayout: true,
                   bracketPairColorization: { enabled: true },
                   cursorBlinking: 'smooth',
                   cursorSmoothCaretAnimation: 'on',
-                  fontFamily: "'Cascadia Code', 'Cascadia Mono', Consolas, monospace",
+                  fontFamily: "'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace",
                   fontLigatures: true,
-                  fontSize: 13,
+                  fontSize: 13.5,
                   folding: true,
                   guides: { indentation: true, bracketPairs: true },
-                  lineHeight: 21,
+                  lineHeight: 22,
                   minimap: { enabled: true, maxColumn: 90, renderCharacters: false },
-                  padding: { top: 10, bottom: 10 },
+                  padding: { top: 12, bottom: 12 },
                   renderLineHighlight: 'all',
                   scrollBeyondLastLine: false,
                   smoothScrolling: true,
@@ -464,23 +596,38 @@ export function CodeEditor({
                 }}
               />
             </div>
-            <footer className="flex h-6 shrink-0 items-center gap-4 bg-[#117a8b] px-2 text-[11px] text-white">
-              <Code2 className="h-3 w-3" />
-              <span className="ml-auto">Ln {cursor.line}, Col {cursor.column}</span>
-              <span>UTF-8</span>
-              <span>{languageFor(selectedFile)}</span>
+
+            {/* Status Bar */}
+            <footer className="flex h-6 shrink-0 items-center justify-between border-t border-white/8 bg-[#090c14] px-3 font-mono text-[11px] text-gray-400">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1 text-cyan-300 font-semibold">
+                  <Code2 className="h-3 w-3" />
+                  {languageFor(selectedFile).toUpperCase()}
+                </span>
+                <span className="text-gray-400">UTF-8</span>
+                <span className="text-gray-400">Espaços: 2</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span>Ln {cursor.line}, Col {cursor.column}</span>
+              </div>
             </footer>
           </>
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 text-gray-600">
-            <Code2 className="h-8 w-8" />
-            <span className="text-sm">Selecione um ficheiro</span>
+          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 text-gray-400">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03]">
+              <Code2 className="h-6 w-6 text-cyan-400" />
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-semibold text-white">Nenhum ficheiro aberto</p>
+              <p className="mt-0.5 text-xs text-gray-400">Selecione um ficheiro no explorador lateral para editar e formatar código.</p>
+            </div>
           </div>
         )}
       </section>
 
+      {/* ── 4. Insights Sidebar (Symbols / References) ── */}
       {insightsOpen && (
-        <div className="absolute inset-y-0 right-0 z-20 flex w-[min(20rem,calc(100%-2.75rem))] bg-[#101319] xl:relative xl:z-auto xl:w-auto">
+        <div className="absolute inset-y-0 right-0 z-20 flex w-[min(22rem,calc(100%-3rem))] border-l border-white/8 bg-[#0a0d15] shadow-2xl xl:relative xl:z-auto xl:w-auto">
           {insights}
         </div>
       )}

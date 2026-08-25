@@ -61,6 +61,18 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "stop_lecture_recording",
         "get_lecture_status",
         "list_lecture_history",
+        "generate_lecture_lesson",
+        "submit_lecture_quiz",
+        "sentinel_get_status",
+        "sentinel_run_audit",
+        "sentinel_get_baseline",
+        "sentinel_accept_known_good",
+        "sentinel_get_actions",
+        "sentinel_approve_action",
+        "sentinel_reject_action",
+        "sentinel_rollback_action",
+        "sentinel_submit_review",
+        "sentinel_get_shadow_telemetry",
     }
 )
 

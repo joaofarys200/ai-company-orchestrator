@@ -1,0 +1,5 @@
+{
+  "store_prompt": "Guarda esta informação para esta missão: o código de teste é JARVIS-8472.",
+  "query_prompt": "Qual era o código que te pedi para guardar?",
+  "has_memory_ui": true
+}

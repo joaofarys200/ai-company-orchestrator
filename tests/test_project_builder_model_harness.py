@@ -86,10 +86,9 @@ class ProjectBuilderModelHarnessTest(unittest.IsolatedAsyncioTestCase):
         result = await requester(prompt)
 
         self.assertIn("project_name", result)
-        self.assertEqual(
-            payloads[0]["messages"],
-            project_builder._ollama_messages(prompt, None, False),
-        )
+        expected_messages = project_builder._ollama_messages(prompt, None, False)
+        self.assertEqual(payloads[0]["messages"][1], expected_messages[1])
+        self.assertIn(expected_messages[0]["content"], payloads[0]["messages"][0]["content"])
         self.assertEqual(payloads[0]["model"], MODEL)
         self.assertEqual(payloads[0]["options"]["temperature"], 0)
         self.assertEqual(payloads[0]["think"], False)

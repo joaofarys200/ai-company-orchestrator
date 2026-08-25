@@ -178,26 +178,26 @@ class ProjectWebSocketHandler:
                 project_name,
                 template,
             )
+            session.selected_project_id = context.project_id
             await self.responder.send_project_context(
                 websocket,
                 context.project_id,
             )
-            session.selected_project_id = context.project_id
-            await self.connections.send(
-                websocket,
+            projects = self.project_context.list_projects()
+            await self.connections.broadcast(
                 {
                     "type": "projects_list",
-                    "projects": self.project_context.list_projects(),
-                },
+                    "projects": projects,
+                }
             )
             await self.connections.send(
                 websocket,
                 system_message(f"Projeto '{context.project_name}' criado com sucesso."),
             )
-        except ProjectContextError as project_error:
+        except Exception as project_error:
             await self.connections.send(
                 websocket,
-                system_message(str(project_error)),
+                system_message(f"Erro ao criar projeto: {project_error}"),
             )
 
     async def open_project(

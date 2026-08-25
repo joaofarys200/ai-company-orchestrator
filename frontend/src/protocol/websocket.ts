@@ -565,6 +565,220 @@ export interface SandboxStatusMessage {
   };
 }
 
+export interface LectureQuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correct_index: number;
+  explanation: string;
+}
+
+export interface LectureCueItem {
+  cue: string;
+  idea: string;
+}
+
+export interface LectureTransferQuestion {
+  id: string;
+  scenario: string;
+  expected_concept: string;
+}
+
+export interface LectureLessonData {
+  topic: string;
+  subject: string;
+  professor: string;
+  date: string;
+  markdown_path: string;
+  markdown_content: string;
+  summary: string;
+  cue_column: LectureCueItem[];
+  quiz: LectureQuizQuestion[];
+  transfer_question: LectureTransferQuestion;
+}
+
+export interface LectureHistoryItem {
+  title: string;
+  subject: string;
+  date: string;
+  markdown_path?: string;
+  status: string;
+}
+
+export interface LectureQuizResult {
+  topic: string;
+  score: number;
+  total_questions: number;
+  correct_answers: number;
+  feedback: string;
+  transfer_passed: boolean;
+  transfer_feedback: string;
+  student_mastery: number;
+  next_review_days: number;
+  next_review_timestamp: number;
+}
+
+export interface LectureLessonGeneratedMessage {
+  type: 'lecture_lesson_generated';
+  lesson: LectureLessonData;
+}
+
+export interface LectureQuizEvaluatedMessage {
+  type: 'lecture_quiz_evaluated';
+  topic: string;
+  score: number;
+  total_questions: number;
+  correct_answers: number;
+  feedback: string;
+  transfer_passed: boolean;
+  transfer_feedback: string;
+  student_mastery: number;
+  next_review_days: number;
+  next_review_timestamp: number;
+}
+
+export interface LectureHistoryResponseMessage {
+  type: 'lecture_history_response';
+  history: LectureHistoryItem[];
+}
+
+export interface LectureStatusResponseMessage {
+  type: 'lecture_status_response';
+  is_recording: boolean;
+  session?: Record<string, unknown>;
+}
+
+export interface LectureRecordingStartedMessage {
+  type: 'lecture_recording_started';
+  session: Record<string, unknown>;
+}
+
+export interface LectureSynthesisCompletedMessage {
+  type: 'lecture_synthesis_completed';
+  session: Record<string, unknown>;
+  markdown_path: string;
+}
+
+export interface SentinelStatusData {
+  schema_version: number;
+  status: 'RUNNING' | 'PAUSED' | 'STOPPED';
+  lifecycle_state: 'STARTING' | 'BASELINE_RUNNING' | 'READY' | 'DEGRADED' | 'FAILED' | 'PAUSED' | 'STOPPED';
+  shadow_mode?: boolean;
+  shadow_state?: string;
+  posture: 'GOOD' | 'MONITORING' | 'ATTENTION' | 'HIGH_RISK' | 'DEGRADED' | 'UNKNOWN';
+  is_baseline_ready: boolean;
+  degraded_reason?: string | null;
+  degraded_collectors?: string[];
+  baseline_duration_seconds?: number;
+  is_auditing_now: boolean;
+  scan_interval_seconds: number;
+  total_scans: number;
+  last_scan_time: number;
+  last_scan_duration_seconds: number;
+  next_scan_in_seconds: number;
+  active_baseline_id: string | null;
+  open_events_count: number;
+  high_risk_events_count: number;
+  actions_count?: number;
+  pending_actions_count?: number;
+  cpu_percent: number;
+  memory_mb: number;
+}
+
+export interface SentinelActionData {
+  action_id: string;
+  incident_id: string;
+  action_type: 'TERMINATE_PROCESS' | 'DISABLE_SCHEDULED_TASK' | 'BLOCK_NETWORK_ENDPOINT' | 'QUARANTINE_FILE' | 'MARK_KNOWN_GOOD';
+  target: string;
+  rationale: string;
+  evidence_ids: string[];
+  permission_level: 'READ_ONLY' | 'LOW_RISK_MUTATION' | 'HIGH_RISK_MUTATION' | 'CRITICAL_MUTATION';
+  requested_by: string;
+  approval_required: boolean;
+  approved_by?: string | null;
+  approval_session_id?: string | null;
+  approval_timestamp?: number | null;
+  pre_state?: Record<string, unknown>;
+  execution_result?: Record<string, unknown>;
+  post_state?: Record<string, unknown>;
+  verification_result?: Record<string, unknown>;
+  rollback_available: boolean;
+  rollback_plan?: string;
+  rollback_result?: Record<string, unknown> | null;
+  status: 'PROPOSED' | 'WAITING_APPROVAL' | 'APPROVED' | 'EXECUTING' | 'VERIFYING' | 'COMPLETED' | 'FAILED' | 'ROLLED_BACK' | 'REJECTED';
+  created_at: number;
+  updated_at: number;
+  error_message?: string | null;
+  schema_version?: number;
+}
+
+export interface SentinelSecurityEventData {
+  event_id: string;
+  fingerprint: string;
+  timestamp: number;
+  first_seen: number;
+  last_seen: number;
+  occurrence_count: number;
+  category: string;
+  severity: 'BENIGN' | 'SUSPICIOUS' | 'HIGH_RISK' | 'CONFIRMED_MALICIOUS' | 'UNKNOWN';
+  confidence: number;
+  evidence_ids: string[];
+  rationale: string;
+  recommended_action: string;
+  affected_process?: Record<string, unknown> | null;
+  affected_network_endpoint?: Record<string, unknown> | null;
+  status: string;
+  is_known_good: boolean;
+  observation_timeline: Array<{ timestamp: number; note: string }>;
+  model_classification?: string;
+  human_review?: Record<string, any> | null;
+  schema_version?: number;
+}
+
+export interface SentinelStatusMessage {
+  type: 'sentinel_status';
+  data: SentinelStatusData;
+}
+
+export interface SentinelAuditCompletedMessage {
+  type: 'sentinel_audit_completed';
+  data: Record<string, unknown>;
+}
+
+export interface SentinelEventMessage {
+  type: 'sentinel_event';
+  event: SentinelSecurityEventData;
+}
+
+export interface SentinelBaselineMessage {
+  type: 'sentinel_baseline';
+  data: Record<string, unknown> | null;
+}
+
+export interface SentinelKnownGoodUpdatedMessage {
+  type: 'sentinel_known_good_updated';
+  item_key: string;
+  status: string;
+}
+
+export interface SentinelActionProposedMessage {
+  type: 'sentinel_action_proposed';
+  action: SentinelActionData;
+}
+
+export interface SentinelActionResultMessage {
+  type: 'sentinel_action_result';
+  action_id: string;
+  success: boolean;
+  action?: SentinelActionData | null;
+  message: string;
+}
+
+export interface SentinelActionsListMessage {
+  type: 'sentinel_actions_list';
+  data: SentinelActionData[];
+}
+
 export type ServerMessage =
   | SystemMessage
   | ChatProtocolMessage
@@ -593,9 +807,23 @@ export type ServerMessage =
   | ProjectReferencesMessage
   | SemanticResultsMessage
   | CodingSessionMessage
-  | SandboxStatusMessage
   | UiMessage
   | UiThemeMessage
+  | SandboxStatusMessage
+  | LectureLessonGeneratedMessage
+  | LectureQuizEvaluatedMessage
+  | LectureHistoryResponseMessage
+  | LectureStatusResponseMessage
+  | LectureRecordingStartedMessage
+  | LectureSynthesisCompletedMessage
+  | SentinelStatusMessage
+  | SentinelAuditCompletedMessage
+  | SentinelEventMessage
+  | SentinelBaselineMessage
+  | SentinelKnownGoodUpdatedMessage
+  | SentinelActionProposedMessage
+  | SentinelActionResultMessage
+  | SentinelActionsListMessage
   | UnknownServerMessage;
 
 export type ClientMessage =
@@ -624,6 +852,22 @@ export type ClientMessage =
   | { type: 'apply_coding_session'; project_id: string; session_id: string }
   | { type: 'rollback_coding_session'; project_id: string; session_id: string; confirmed: boolean }
   | { type: 'get_coding_session'; project_id: string }
+  | { type: 'start_lecture_recording'; subject?: string; title?: string; professor?: string }
+  | { type: 'stop_lecture_recording' }
+  | { type: 'get_lecture_status' }
+  | { type: 'list_lecture_history' }
+  | { type: 'generate_lecture_lesson'; topic: string; subject?: string; professor?: string }
+  | { type: 'submit_lecture_quiz'; topic: string; answers: Record<string, number>; transfer_answer: string }
+  | { type: 'sentinel_get_status' }
+  | { type: 'sentinel_run_audit' }
+  | { type: 'sentinel_get_baseline' }
+  | { type: 'sentinel_accept_known_good'; item_key: string; reason?: string; user?: string }
+  | { type: 'sentinel_get_actions' }
+  | { type: 'sentinel_approve_action'; action_id: string; user?: string; session_id?: string; incident_id?: string }
+  | { type: 'sentinel_reject_action'; action_id: string; reason?: string; user?: string }
+  | { type: 'sentinel_rollback_action'; action_id: string; user?: string; session_id?: string }
+  | { type: 'sentinel_submit_review'; event_id: string; final_classification: string; reason?: string; operator?: string }
+  | { type: 'sentinel_get_shadow_telemetry' }
   | MissionClientOperation;
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
@@ -634,7 +878,9 @@ const asString = (value: unknown, fallback = ''): string => {
   return typeof value === 'string' ? value : fallback;
 };
 
-const asBoolean = (value: unknown): boolean => Boolean(value);
+const asBoolean = (value: unknown, fallback = false): boolean => {
+  return typeof value === 'boolean' ? value : (value !== undefined && value !== null ? Boolean(value) : fallback);
+};
 
 const asNumber = (value: unknown, fallback = 0): number => {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
@@ -1095,6 +1341,162 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
       return { type, query: asString(raw.query), content: asString(raw.content) };
     case 'coding_session':
       return { type, data: normalizeCodingSession(raw.data) };
+    case 'lecture_lesson_generated':
+      return {
+        type,
+        lesson: (raw.lesson as LectureLessonData) || {
+          topic: '',
+          subject: '',
+          professor: '',
+          date: '',
+          markdown_path: '',
+          markdown_content: '',
+          summary: '',
+          cue_column: [],
+          quiz: [],
+          transfer_question: { id: '', scenario: '', expected_concept: '' },
+        },
+      };
+    case 'lecture_quiz_evaluated':
+      return {
+        type,
+        topic: asString(raw.topic),
+        score: asNumber(raw.score, 100),
+        total_questions: asNumber(raw.total_questions, 3),
+        correct_answers: asNumber(raw.correct_answers, 3),
+        feedback: asString(raw.feedback),
+        transfer_passed: asBoolean(raw.transfer_passed),
+        transfer_feedback: asString(raw.transfer_feedback),
+        student_mastery: asNumber(raw.student_mastery, 0.95),
+        next_review_days: asNumber(raw.next_review_days, 3),
+        next_review_timestamp: asNumber(raw.next_review_timestamp, 0),
+      };
+    case 'lecture_history_response':
+      return {
+        type,
+        history: asRecordArray(raw.history).map((h) => ({
+          title: asString(h.title),
+          subject: asString(h.subject),
+          date: asString(h.date),
+          markdown_path: h.markdown_path ? asString(h.markdown_path) : undefined,
+          status: asString(h.status, 'COMPLETED'),
+        })),
+      };
+    case 'lecture_status_response':
+      return {
+        type,
+        is_recording: asBoolean(raw.is_recording),
+        session: isRecord(raw.session) ? raw.session : undefined,
+      };
+    case 'lecture_recording_started':
+      return {
+        type,
+        session: isRecord(raw.session) ? raw.session : {},
+      };
+    case 'lecture_synthesis_completed':
+      return {
+        type,
+        session: isRecord(raw.session) ? raw.session : {},
+        markdown_path: asString(raw.markdown_path),
+      };
+    case 'sentinel_status':
+      return {
+        type,
+        data: isRecord(raw.data)
+          ? {
+              schema_version: asNumber((raw.data as Record<string, unknown>).schema_version, 1),
+              status: asString((raw.data as Record<string, unknown>).status, 'STOPPED') as 'RUNNING' | 'PAUSED' | 'STOPPED',
+              lifecycle_state: asString((raw.data as Record<string, unknown>).lifecycle_state, 'STOPPED') as 'STARTING' | 'BASELINE_RUNNING' | 'READY' | 'DEGRADED' | 'FAILED' | 'PAUSED' | 'STOPPED',
+              posture: asString((raw.data as Record<string, unknown>).posture, 'UNKNOWN') as 'GOOD' | 'MONITORING' | 'ATTENTION' | 'HIGH_RISK' | 'DEGRADED' | 'UNKNOWN',
+              is_baseline_ready: asBoolean((raw.data as Record<string, unknown>).is_baseline_ready),
+              degraded_reason: typeof (raw.data as Record<string, unknown>).degraded_reason === 'string' ? (raw.data as Record<string, unknown>).degraded_reason as string : null,
+              degraded_collectors: asStringArray((raw.data as Record<string, unknown>).degraded_collectors),
+              baseline_duration_seconds: asNumber((raw.data as Record<string, unknown>).baseline_duration_seconds, 0),
+              is_auditing_now: asBoolean((raw.data as Record<string, unknown>).is_auditing_now),
+              scan_interval_seconds: asNumber((raw.data as Record<string, unknown>).scan_interval_seconds, 60),
+              total_scans: asNumber((raw.data as Record<string, unknown>).total_scans, 0),
+              last_scan_time: asNumber((raw.data as Record<string, unknown>).last_scan_time, 0),
+              last_scan_duration_seconds: asNumber((raw.data as Record<string, unknown>).last_scan_duration_seconds, 0),
+              next_scan_in_seconds: asNumber((raw.data as Record<string, unknown>).next_scan_in_seconds, 0),
+              active_baseline_id: typeof (raw.data as Record<string, unknown>).active_baseline_id === 'string' ? (raw.data as Record<string, unknown>).active_baseline_id as string : null,
+              open_events_count: asNumber((raw.data as Record<string, unknown>).open_events_count, 0),
+              high_risk_events_count: asNumber((raw.data as Record<string, unknown>).high_risk_events_count, 0),
+              cpu_percent: asNumber((raw.data as Record<string, unknown>).cpu_percent, 0),
+              memory_mb: asNumber((raw.data as Record<string, unknown>).memory_mb, 0),
+            }
+          : {
+              schema_version: 1,
+              status: 'STOPPED',
+              lifecycle_state: 'STOPPED',
+              posture: 'UNKNOWN',
+              is_baseline_ready: false,
+              degraded_reason: null,
+              degraded_collectors: [],
+              baseline_duration_seconds: 0,
+              is_auditing_now: false,
+              scan_interval_seconds: 60,
+              total_scans: 0,
+              last_scan_time: 0,
+              last_scan_duration_seconds: 0,
+              next_scan_in_seconds: 0,
+              active_baseline_id: null,
+              open_events_count: 0,
+              high_risk_events_count: 0,
+              cpu_percent: 0,
+              memory_mb: 0,
+            },
+      };
+    case 'sentinel_audit_completed':
+      return { type, data: isRecord(raw.data) ? (raw.data as Record<string, unknown>) : {} };
+    case 'sentinel_event': {
+      const ev = isRecord(raw.event) ? (raw.event as Record<string, unknown>) : {};
+      return {
+        type,
+        event: {
+          event_id: asString(ev.event_id),
+          fingerprint: asString(ev.fingerprint),
+          timestamp: asNumber(ev.timestamp),
+          first_seen: asNumber(ev.first_seen),
+          last_seen: asNumber(ev.last_seen),
+          occurrence_count: asNumber(ev.occurrence_count, 1),
+          category: asString(ev.category),
+          severity: asString(ev.severity, 'UNKNOWN') as 'BENIGN' | 'SUSPICIOUS' | 'HIGH_RISK' | 'CONFIRMED_MALICIOUS' | 'UNKNOWN',
+          confidence: asNumber(ev.confidence, 1.0),
+          evidence_ids: asStringArray(ev.evidence_ids),
+          rationale: asString(ev.rationale),
+          recommended_action: asString(ev.recommended_action),
+          affected_process: isRecord(ev.affected_process) ? (ev.affected_process as Record<string, unknown>) : null,
+          affected_network_endpoint: isRecord(ev.affected_network_endpoint) ? (ev.affected_network_endpoint as Record<string, unknown>) : null,
+          status: asString(ev.status, 'OPEN'),
+          is_known_good: asBoolean(ev.is_known_good),
+          observation_timeline: asRecordArray(ev.observation_timeline).map((ot) => ({
+            timestamp: asNumber(ot.timestamp),
+            note: asString(ot.note),
+          })),
+        },
+      };
+    }
+    case 'sentinel_baseline':
+      return { type, data: isRecord(raw.data) ? (raw.data as Record<string, unknown>) : null };
+    case 'sentinel_known_good_updated':
+      return { type, item_key: asString(raw.item_key), status: asString(raw.status) };
+    case 'sentinel_action_proposed': {
+      const act = isRecord(raw.action) ? (raw.action as Record<string, unknown>) : {};
+      return { type, action: normalizeSentinelAction(act) };
+    }
+    case 'sentinel_action_result':
+      return {
+        type,
+        action_id: asString(raw.action_id),
+        success: asBoolean(raw.success),
+        action: isRecord(raw.action) ? normalizeSentinelAction(raw.action as Record<string, unknown>) : null,
+        message: asString(raw.message),
+      };
+    case 'sentinel_actions_list':
+      return {
+        type,
+        data: asRecordArray(raw.data).map(normalizeSentinelAction),
+      };
     case 'ui':
     case 'ui_action':
       return { type, action: asString(raw.action) };
@@ -1104,3 +1506,31 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
       return { type: 'unknown', originalType: type, payload: raw };
   }
 };
+
+export const normalizeSentinelAction = (raw: Record<string, unknown>): SentinelActionData => ({
+  action_id: asString(raw.action_id),
+  incident_id: asString(raw.incident_id),
+  action_type: asString(raw.action_type, 'MARK_KNOWN_GOOD') as SentinelActionData['action_type'],
+  target: asString(raw.target),
+  rationale: asString(raw.rationale),
+  evidence_ids: asStringArray(raw.evidence_ids),
+  permission_level: asString(raw.permission_level, 'LOW_RISK_MUTATION') as SentinelActionData['permission_level'],
+  requested_by: asString(raw.requested_by, 'sentinel_correlation_engine'),
+  approval_required: asBoolean(raw.approval_required, true),
+  approved_by: typeof raw.approved_by === 'string' ? raw.approved_by : null,
+  approval_session_id: typeof raw.approval_session_id === 'string' ? raw.approval_session_id : null,
+  approval_timestamp: typeof raw.approval_timestamp === 'number' ? raw.approval_timestamp : null,
+  pre_state: isRecord(raw.pre_state) ? (raw.pre_state as Record<string, unknown>) : {},
+  execution_result: isRecord(raw.execution_result) ? (raw.execution_result as Record<string, unknown>) : {},
+  post_state: isRecord(raw.post_state) ? (raw.post_state as Record<string, unknown>) : {},
+  verification_result: isRecord(raw.verification_result) ? (raw.verification_result as Record<string, unknown>) : {},
+  rollback_available: asBoolean(raw.rollback_available, false),
+  rollback_plan: asString(raw.rollback_plan),
+  rollback_result: isRecord(raw.rollback_result) ? (raw.rollback_result as Record<string, unknown>) : null,
+  status: asString(raw.status, 'PROPOSED') as SentinelActionData['status'],
+  created_at: asNumber(raw.created_at, Date.now() / 1000),
+  updated_at: asNumber(raw.updated_at, Date.now() / 1000),
+  error_message: typeof raw.error_message === 'string' ? raw.error_message : null,
+  schema_version: asNumber(raw.schema_version, 1),
+});
+

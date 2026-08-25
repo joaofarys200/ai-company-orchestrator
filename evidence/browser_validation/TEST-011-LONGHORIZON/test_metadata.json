@@ -1,0 +1,66 @@
+{
+  "missions_executed": [
+    {
+      "mission_id": "M01",
+      "prompt": "Verificar estado do enxame de agentes.",
+      "duration_seconds": 1.238403081893921,
+      "status": "COMPLETED"
+    },
+    {
+      "mission_id": "M02",
+      "prompt": "Listar ficheiros no projeto ativo.",
+      "duration_seconds": 1.2419648170471191,
+      "status": "COMPLETED"
+    },
+    {
+      "mission_id": "M03",
+      "prompt": "Apresentar sumário da arquitetura do sistema.",
+      "duration_seconds": 1.2413322925567627,
+      "status": "COMPLETED"
+    },
+    {
+      "mission_id": "M04",
+      "prompt": "Verificar tarefas no quadro Kanban.",
+      "duration_seconds": 1.255950927734375,
+      "status": "COMPLETED"
+    },
+    {
+      "mission_id": "M05",
+      "prompt": "Pesquisar referências à classe EvidenceGateway.",
+      "duration_seconds": 1.2498180866241455,
+      "status": "COMPLETED"
+    },
+    {
+      "mission_id": "M06",
+      "prompt": "Validar notas disponíveis no Obsidian Knowledge Vault.",
+      "duration_seconds": 1.2471067905426025,
+      "status": "COMPLETED"
+    },
+    {
+      "mission_id": "M07",
+      "prompt": "Inspecionar estado atual do Mission Planner.",
+      "duration_seconds": 1.2515599727630615,
+      "status": "COMPLETED"
+    },
+    {
+      "mission_id": "M08",
+      "prompt": "Consultar regras de persistência e memória técnica.",
+      "duration_seconds": 1.2407021522521973,
+      "status": "COMPLETED"
+    },
+    {
+      "mission_id": "M09",
+      "prompt": "Verificar diagnóstico de infraestrutura e sandbox.",
+      "duration_seconds": 1.258880376815796,
+      "status": "COMPLETED"
+    },
+    {
+      "mission_id": "M10",
+      "prompt": "Emitir relatório de prontidão operacional.",
+      "duration_seconds": 1.2407958507537842,
+      "status": "COMPLETED"
+    }
+  ],
+  "total_completed": 10,
+  "ui_alive_after_sequence": true
+}

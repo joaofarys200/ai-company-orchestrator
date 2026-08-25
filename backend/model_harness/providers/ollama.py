@@ -105,8 +105,27 @@ class OllamaChatProvider:
         self.keep_alive = (
             keep_alive
             or os.getenv("OLLAMA_KEEP_ALIVE")
-            or "15m"
+            or "30m"
         )
+
+    async def warmup(self, model: str | None = None) -> bool:
+        """Sends a lightweight warmup probe to preload model weights into memory/VRAM."""
+        target_model = (model or self.default_model).strip()
+        try:
+            timeout = httpx.Timeout(connect=5.0, read=30.0, write=5.0, pool=5.0)
+            async with self._client(timeout) as client:
+                resp = await client.post(
+                    "/api/generate",
+                    json={
+                        "model": target_model,
+                        "prompt": "ping",
+                        "keep_alive": self.keep_alive,
+                        "options": {"num_predict": 1},
+                    },
+                )
+                return resp.status_code < 400
+        except Exception:
+            return False
 
     async def generate(
         self,
@@ -534,8 +553,15 @@ class OllamaChatProvider:
                 "temperature": request.temperature,
                 "num_ctx": request.max_context_tokens,
                 "num_predict": request.max_output_tokens,
+                "num_batch": int(os.getenv("OLLAMA_NUM_BATCH", "512")),
             },
         }
+        thread_cfg = os.getenv("OLLAMA_NUM_THREAD")
+        if thread_cfg and thread_cfg.isdigit():
+            payload["options"]["num_thread"] = int(thread_cfg)
+        else:
+            payload["options"]["num_thread"] = min(8, max(2, (os.cpu_count() or 4) - 1))
+
         top_p = request.metadata.get("top_p")
         if isinstance(top_p, (int, float)) and not isinstance(top_p, bool):
             payload["options"]["top_p"] = float(top_p)

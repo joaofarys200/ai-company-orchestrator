@@ -7398,6 +7398,32 @@ async def _build_project_impl(
     try:
         with recorder.span("planning", phase="PLANNING"):
             plan = await get_valid_project_plan(prompt, selected_requester, recorder)
+
+        # Deterministic Artifact Repair (Fase 9.2)
+        try:
+            from intelligence.artifact_inference import DeterministicRepairEngine
+            repair_engine = DeterministicRepairEngine()
+            planned_files_dict = {f.path: f.content for f in plan.files}
+            repair_result = repair_engine.repair_plan(
+                prompt=prompt,
+                planned_files=planned_files_dict,
+                project_name=plan.project_name,
+            )
+            if repair_result.repaired:
+                for action in repair_result.actions:
+                    if action.action_type == "CREATE_FILE":
+                        if not any(f.path == action.relative_path for f in plan.files):
+                            plan.files.append(ProjectFile(path=action.relative_path, content=action.content))
+                            if "frontend" not in plan.components and action.relative_path.endswith((".html", ".css", ".js")):
+                                plan.components.append("frontend")
+                            if action.relative_path.endswith(".html") and action.relative_path not in plan.entrypoints:
+                                plan.entrypoints.append(action.relative_path)
+                    elif action.action_type == "PATCH_FILE":
+                        for f in plan.files:
+                            if f.path == action.relative_path:
+                                f.content = action.content
+        except Exception:
+            pass
     except ProjectBuilderPlanningError as exc:
         journal.record_planning_failure(exc)
         if exc.category in {"PLAN_SEMANTIC_INVALID", "PLAN_CORRECTION_FAILED"}:

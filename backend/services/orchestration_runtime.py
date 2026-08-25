@@ -680,6 +680,18 @@ class OrchestrationService:
                 await self.run_casual_chat(prompt)
                 await self.callbacks.broadcast_state("idle")
                 return
+
+            try:
+                from intelligence.artifact_inference import CapabilityDetector
+                detected_caps = CapabilityDetector().detect(prompt)
+                log_event(
+                    self.logger,
+                    "orchestration.capabilities_detected",
+                    capabilities=[c.value for c in detected_caps],
+                )
+            except Exception:
+                pass
+
             if await self._run_project_builder_if_requested(
                 prompt
             ):

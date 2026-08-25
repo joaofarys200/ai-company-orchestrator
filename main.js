@@ -87,15 +87,13 @@ function startPythonBackend() {
         }
       }
 
-      console.log(`[Python STDOUT] ${trimmed}`);
-
       // If the frontend server starts running, load the page immediately if window exists
       if (trimmed.includes('Frontend HTTP server running') && mainWindow) {
         console.log('[Electron] Servidor Python detetado!');
-        const isDev = process.argv.includes('--dev') || process.env.VITE_DEV === '1' || process.env.npm_lifecycle_event === 'dev';
+        const isDev = (process.argv.includes('--dev') || process.env.VITE_DEV === '1') && process.env.npm_lifecycle_event === 'dev';
         const targetUrl = isDev ? 'http://localhost:5173' : 'http://localhost:8000';
         console.log(`[Electron] A carregar UI em ${targetUrl}...`);
-        loadURLWithRetry(targetUrl);
+        loadURLWithRetry(targetUrl, 15, 500, 'http://localhost:8000');
       }
     }
   });
@@ -134,27 +132,111 @@ function scheduleBackendRestart(exitCode) {
   }, BACKEND_RESTART_DELAY_MS);
 }
 
-function clearBackendRestartTimer() {
-  if (backendRestartTimer) {
-    clearTimeout(backendRestartTimer);
-    backendRestartTimer = null;
-  }
+function showDiagnosticErrorPage(failedUrls, reason) {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const isPythonRunning = Boolean(pythonProcess && !pythonProcess.killed);
+  const pid = pythonProcess ? pythonProcess.pid : 'N/A';
+  mainWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(`
+    <!DOCTYPE html>
+    <html lang="pt-PT">
+    <head>
+      <meta charset="UTF-8">
+      <title>JARVIS OS // Erro de Inicialização</title>
+      <style>
+        body {
+          background-color: #08090d;
+          color: #e2e8f0;
+          font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          margin: 0;
+          padding: 24px;
+          box-sizing: border-box;
+        }
+        .card {
+          background: #0f131f;
+          border: 1px solid rgba(244, 63, 94, 0.3);
+          border-radius: 12px;
+          padding: 32px;
+          max-width: 580px;
+          width: 100%;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        h2 { color: #f43f5e; margin-top: 0; font-size: 18px; letter-spacing: 1px; }
+        p { font-size: 13px; line-height: 1.6; color: #94a3b8; }
+        .details {
+          background: #05070d;
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 6px;
+          padding: 12px;
+          font-family: monospace;
+          font-size: 12px;
+          color: #38bdf8;
+          margin: 16px 0;
+        }
+        .btn {
+          display: inline-block;
+          background: #0284c7;
+          color: #fff;
+          font-weight: 600;
+          font-size: 13px;
+          padding: 10px 20px;
+          border-radius: 6px;
+          border: none;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .btn:hover { background: #0369a1; }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <h2>⚠️ NÃO FOI POSSÍVEL CONECTAR AOS SERVIÇOS DO JARVIS OS</h2>
+        <p>O Electron tentou ligar-se aos seguintes endpoints locais sem sucesso:</p>
+        <div class="details">
+          URLs tentados: ${failedUrls.join(', ')}<br/>
+          Estado Backend Python: ${isPythonRunning ? `EM EXECUÇÃO (PID ${pid})` : 'DESLIGADO'}<br/>
+          Motivo: ${reason}
+        </div>
+        <p><strong>Como resolver:</strong></p>
+        <ul style="font-size: 12px; color: #cbd5e1; padding-left: 20px;">
+          <li>Para desenvolvimento com Vite: execute <code>npm run dev</code> num terminal.</li>
+          <li>Para modo desktop padrão: execute <code>npm start</code>.</li>
+        </ul>
+        <div style="margin-top: 24px;">
+          <button class="btn" onclick="location.reload()">Tentar Novamente</button>
+        </div>
+      </div>
+    </body>
+    </html>
+  `)).catch(() => {});
 }
 
-function loadURLWithRetry(url, maxRetries = 30, delayMs = 600) {
+function loadURLWithRetry(url, maxRetries = 20, delayMs = 600, fallbackUrl = 'http://localhost:8000') {
   let attempts = 0;
-  function tryLoad() {
+  const attemptedUrls = [url];
+  if (fallbackUrl && fallbackUrl !== url) attemptedUrls.push(fallbackUrl);
+
+  function tryLoad(currentUrl) {
     if (!mainWindow || mainWindow.isDestroyed()) return;
-    mainWindow.loadURL(url).catch(() => {
+    mainWindow.loadURL(currentUrl).catch(() => {
       attempts += 1;
       if (attempts < maxRetries) {
-        setTimeout(tryLoad, delayMs);
+        setTimeout(() => tryLoad(currentUrl), delayMs);
+      } else if (fallbackUrl && currentUrl !== fallbackUrl) {
+        console.log(`[Electron] Falha ao carregar ${currentUrl}. A alternar para fallback: ${fallbackUrl}`);
+        attempts = 0;
+        tryLoad(fallbackUrl);
       } else {
-        console.error(`[Electron] Não foi possível carregar ${url} após ${maxRetries} tentativas.`);
+        console.error(`[Electron] Não foi possível carregar ${attemptedUrls.join(' ou ')} após múltiplas tentativas.`);
+        showDiagnosticErrorPage(attemptedUrls, 'Timeout na resposta dos servidores locais.');
       }
     });
   }
-  tryLoad();
+  tryLoad(url);
 }
 
 function createWindow() {

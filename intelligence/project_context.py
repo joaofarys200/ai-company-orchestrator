@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unicodedata
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -100,8 +101,15 @@ class ProjectContextService:
     @staticmethod
     def _validate_project_id(project_id: str) -> str:
         clean_id = str(project_id or "").strip()
+        if not clean_id:
+            raise ProjectContextError("project_id obrigatorio.")
         if not PROJECT_ID_PATTERN.fullmatch(clean_id):
-            raise ProjectContextError("project_id invalido.")
+            normalized = unicodedata.normalize("NFKD", clean_id)
+            ascii_clean = "".join(c for c in normalized if not unicodedata.combining(c))
+            clean_id = re.sub(r"[^A-Za-z0-9._-]", "-", ascii_clean).strip(".-_")
+            clean_id = re.sub(r"-+", "-", clean_id)
+            if not clean_id or not PROJECT_ID_PATTERN.fullmatch(clean_id):
+                raise ProjectContextError("project_id invalido.")
         if "obsidian" in clean_id.lower() or clean_id.lower() in {"sandbox", "sandbox_dir"}:
             raise ProjectContextError("Este diretorio nao pode ser usado como projeto IDE.")
         return clean_id
@@ -129,6 +137,38 @@ class ProjectContextService:
     def index_path(self, project_id: str) -> str:
         return os.path.join(self.metadata_dir(project_id), "symbols_index.json")
 
+    def _get_display_name(self, project_id: str, project_dir: str) -> str:
+        ctx_path = os.path.join(self.metadata_dir(project_id), "project_context.json")
+        if os.path.isfile(ctx_path):
+            try:
+                with open(ctx_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if data.get("project_name"):
+                        return str(data["project_name"])
+            except Exception:
+                pass
+        pkg_path = os.path.join(project_dir, "package.json")
+        if os.path.isfile(pkg_path):
+            try:
+                with open(pkg_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if data.get("description") and str(data["description"]).startswith("Projeto "):
+                        return str(data["description"]).replace("Projeto ", "").strip()
+                    if data.get("name"):
+                        return str(data["name"])
+            except Exception:
+                pass
+        readme_path = os.path.join(project_dir, "README.md")
+        if os.path.isfile(readme_path):
+            try:
+                with open(readme_path, "r", encoding="utf-8") as f:
+                    first_line = f.readline().strip()
+                    if first_line.startswith("# "):
+                        return first_line[2:].strip()
+            except Exception:
+                pass
+        return project_id
+
     def list_projects(self) -> list[dict[str, str]]:
         projects_root = self.path_resolver(self.projects_root_rel)
         if not os.path.isdir(projects_root):
@@ -137,9 +177,14 @@ class ProjectContextService:
         for entry in sorted(os.scandir(projects_root), key=lambda item: item.name.lower()):
             if not entry.is_dir() or not PROJECT_ID_PATTERN.fullmatch(entry.name):
                 continue
-            if "obsidian" in entry.name.lower() or entry.name.lower() == "sandbox_dir":
+            if "obsidian" in entry.name.lower() or entry.name.lower() in {"sandbox", "sandbox_dir"}:
                 continue
-            projects.append({"project_id": entry.name, "project_name": entry.name, "root_path": os.path.realpath(entry.path)})
+            display_name = self._get_display_name(entry.name, entry.path)
+            projects.append({
+                "project_id": entry.name,
+                "project_name": display_name,
+                "root_path": os.path.realpath(entry.path),
+            })
         return projects
 
     def create_project(self, project_id: str, project_name: str | None = None, template: str | None = None) -> ProjectContext:
@@ -151,7 +196,7 @@ class ProjectContextService:
             raise ProjectContextError(f"O projeto '{clean_id}' ja existe.")
         
         os.makedirs(project_root, exist_ok=True)
-        display_name = project_name or clean_id
+        display_name = str(project_name or "").strip() or clean_id
 
         if template == "web-app":
             index_html = f"""<!DOCTYPE html>
@@ -199,6 +244,17 @@ class ProjectContextService:
             readme = f"# {display_name}\n\nProjeto criado via JARVIS OS.\n"
             with open(os.path.join(project_root, "README.md"), "w", encoding="utf-8") as f:
                 f.write(readme)
+
+        # Persist project context metadata with display name
+        meta_dir = self.metadata_dir(clean_id)
+        os.makedirs(meta_dir, exist_ok=True)
+        ctx_data = {
+            "project_id": clean_id,
+            "project_name": display_name,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        with open(self.context_path(clean_id), "w", encoding="utf-8") as f:
+            json.dump(ctx_data, f, indent=2, ensure_ascii=False)
 
         return self.open_project(clean_id)
 

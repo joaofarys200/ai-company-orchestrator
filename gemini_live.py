@@ -7,8 +7,16 @@ import queue
 import time
 import numpy as np
 import websockets
-import sounddevice as sd
-import webrtcvad
+try:
+    import sounddevice as sd
+except ImportError:
+    sd = None
+
+try:
+    import webrtcvad
+except ImportError:
+    webrtcvad = None
+
 from dotenv import load_dotenv
 
 # Load env
@@ -100,15 +108,15 @@ class GeminiLiveService:
         self.is_running = False
         self.loop = None
         
-        # Audio setups
+        # Audio setups (20ms ultra-low latency standard frame)
         self.input_sample_rate = 16000
         self.output_sample_rate = 24000
-        self.interval_size = 30  # ms
-        self.input_block_size = int(self.input_sample_rate * self.interval_size / 1000) # 480 samples
+        self.interval_size = self._env_int("VOICE_INTERVAL_MS", 20, 10, 30)
+        self.input_block_size = int(self.input_sample_rate * self.interval_size / 1000) # 320 samples @ 20ms
         
         # webrtcvad for local interruption detection
         self.vad_sensitivity = self._env_int("VOICE_VAD_SENSITIVITY", 2, 0, 3)
-        self.vad = webrtcvad.Vad(self.vad_sensitivity)
+        self.vad = webrtcvad.Vad(self.vad_sensitivity) if webrtcvad is not None else None
         self.interrupt_min_speech_ms = self._env_int("VOICE_INTERRUPT_MIN_SPEECH_MS", 500, 0, 5000)
         self.interrupt_cooldown_ms = self._env_int("VOICE_INTERRUPT_COOLDOWN_MS", 1200, 0, 10000)
         self.interrupt_rms_threshold = self._env_float("VOICE_INTERRUPT_RMS_THRESHOLD", 900.0, 0.0, 32768.0)
@@ -220,20 +228,13 @@ class GeminiLiveService:
             if self.on_state_change:
                 self.on_state_change("listening")
                 
-        # Send raw PCM block (base64) using the new audio API format
-        base64_audio = base64.b64encode(raw_bytes).decode("utf-8")
-        payload = {
-            "realtimeInput": {
-                "audio": {
-                    "mimeType": "audio/pcm;rate=16000",
-                    "data": base64_audio
-                }
-            }
-        }
+        # Send raw PCM block (base64) using the new audio API format with zero-alloc string formatting
+        base64_audio = base64.b64encode(raw_bytes).decode("ascii")
+        payload_str = f'{{"realtimeInput":{{"audio":{{"mimeType":"audio/pcm;rate=16000","data":"{base64_audio}"}}}}}}'
         
         if self.loop and self.loop.is_running() and self.send_queue is not None:
             try:
-                self.loop.call_soon_threadsafe(self.send_queue.put_nowait, json.dumps(payload))
+                self.loop.call_soon_threadsafe(self.send_queue.put_nowait, payload_str)
             except RuntimeError:
                 # The audio callback can race with shutdown while the loop is closing.
                 pass

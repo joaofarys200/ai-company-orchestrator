@@ -18,6 +18,7 @@ from backend.websocket.handlers.missions import (
     message_type,
 )
 from backend.websocket.handlers.projects import ProjectWebSocketHandler
+from backend.websocket.handlers.sentinel import SentinelWebSocketHandler
 from backend.websocket.handlers.system import SystemWebSocketHandler
 from backend.websocket.handlers.voice import VoiceWebSocketHandler
 from backend.websocket.registry import create_websocket_handlers
@@ -31,6 +32,7 @@ __all__ = [
     "KnowledgeWebSocketHandler",
     "MissionWebSocketHandler",
     "ProjectWebSocketHandler",
+    "SentinelWebSocketHandler",
     "SystemWebSocketHandler",
     "VoiceWebSocketHandler",
     "WebSocketResponder",

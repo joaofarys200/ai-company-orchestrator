@@ -86,11 +86,28 @@ import agents
 PROJECT_ROOT = os.path.realpath(
     os.path.abspath(os.path.dirname(__file__))
 )
+connection_manager = ConnectionManager()
+
+from security.sentinel.watchdog import SentinelWatchdogService
+
+sentinel_watchdog = SentinelWatchdogService(
+    scan_interval_seconds=60,
+    event_callback=lambda ev: connection_manager.broadcast({
+        "type": "sentinel_event",
+        "event": ev.to_dict(),
+    }),
+    status_callback=lambda st: connection_manager.broadcast({
+        "type": "sentinel_status",
+        "data": st,
+    }),
+)
+
 application_services = create_application_services(
     PROJECT_ROOT,
     database_module=database,
     agents_module=agents,
     sandbox_module=sandbox,
+    sentinel_watchdog=sentinel_watchdog,
 )
 runtime_state = ApplicationRuntimeState()
 logger = get_logger(__name__)
@@ -99,7 +116,6 @@ coding_session_service = application_services.coding_sessions
 mission_planner = application_services.mission_planner
 mission_executor_service = application_services.mission_executor
 mission_autonomy_controller = application_services.mission_autonomy
-connection_manager = ConnectionManager()
 model_execution_service = ModelExecutionService(
     application_services.model_harness
 )
@@ -461,8 +477,10 @@ def _create_websocket_gateway() -> WebSocketGateway:
     stdio_transport_gateway = StdioTransportGateway(
         dispatcher=_global_dispatcher,
         logger=logger,
+        on_connect=_global_initial_sync.handle,
         on_broadcast=lambda msg: connection_manager.broadcast(msg),
     )
+    connection_manager.add_broadcast_hook(stdio_transport_gateway.send_message)
     return WebSocketGateway(
         auth_token=WS_AUTH_TOKEN,
         connections=connection_manager,
@@ -569,11 +587,32 @@ async def main():
     )
     lifecycle.startup()
 
+    # Trigger proactive background warmup for local Ollama inference model
+    async def _async_warmup():
+        try:
+            harness = _current_application_services().model_harness
+            provider = harness.registry.get("ollama")
+            if provider and hasattr(provider, "warmup"):
+                warmed = await provider.warmup()
+                if warmed:
+                    log_event(logger, "model_harness.ollama.warmup_succeeded")
+        except Exception:
+            pass
+
+    asyncio.create_task(_async_warmup())
+
     # Start Native Stdio Transport Gateway for Electron desktop IPC
     stdio_task = None
     if stdio_transport_gateway is not None:
         stdio_task = stdio_transport_gateway.start(runtime_state.main_loop)
         log_event(logger, "stdio_ipc.gateway.started")
+
+    # Start Sentinel continuous background watchdog
+    try:
+        await sentinel_watchdog.start()
+        log_event(logger, "sentinel.watchdog.started", status=sentinel_watchdog.get_status_dict())
+    except Exception as e:
+        log_event(logger, "sentinel.watchdog.start_failed", error=str(e))
 
     log_event(logger, "runtime.health", health=build_runtime_health())
     log_event(logger, "websocket.server.starting", host=WS_HOST, port=8001)
@@ -590,6 +629,10 @@ async def main():
         else:
             raise
     finally:
+        try:
+            await sentinel_watchdog.stop()
+        except Exception:
+            pass
         if stdio_transport_gateway is not None:
             stdio_transport_gateway.stop()
         lifecycle.shutdown()

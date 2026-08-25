@@ -1,0 +1,104 @@
+[
+  {
+    "timestamp": 1787529854.4605558,
+    "url": "http://localhost:8000/",
+    "method": "GET",
+    "resource_type": "document"
+  },
+  {
+    "timestamp": 1787529854.7990167,
+    "url": "http://localhost:8000/assets/index-lcwcxZ-z.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529854.800134,
+    "url": "http://localhost:8000/assets/index-ou7_sbeE.css",
+    "method": "GET",
+    "resource_type": "stylesheet"
+  },
+  {
+    "timestamp": 1787529868.103296,
+    "url": "http://localhost:8000/assets/CodeEditor-8Wy71C5r.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529868.103511,
+    "url": "http://localhost:8000/assets/editor.api-7LjZFtaJ.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529868.1036844,
+    "url": "http://localhost:8000/assets/editor-jjEx9u7D.css",
+    "method": "GET",
+    "resource_type": "stylesheet"
+  },
+  {
+    "timestamp": 1787529868.1038167,
+    "url": "http://localhost:8000/assets/toggleHighContrast-DhSFuaz7.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529868.1039498,
+    "url": "http://localhost:8000/assets/toggleHighContrast--ixms01u.css",
+    "method": "GET",
+    "resource_type": "stylesheet"
+  },
+  {
+    "timestamp": 1787529868.1040688,
+    "url": "http://localhost:8000/assets/register-lGkkHGRa.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529868.777315,
+    "url": "http://localhost:8000/assets/javascript-Mszd5tmw.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529868.777475,
+    "url": "http://localhost:8000/assets/typescript-CL9L0IVh.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529868.7775543,
+    "url": "http://localhost:8000/assets/tsMode-CJagCArR.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529868.7776227,
+    "url": "http://localhost:8000/assets/workers-BvHeS5Se.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529868.9657588,
+    "url": "http://localhost:8000/assets/ts.worker-BFy34-VB.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529869.167243,
+    "url": "http://localhost:8000/assets/editor.worker-s_hwqnK9.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1787529869.33816,
+    "url": "http://localhost:8000/assets/codicon-Brq4_Ui5.ttf",
+    "method": "GET",
+    "resource_type": "font"
+  },
+  {
+    "timestamp": 1787529874.9136019,
+    "url": "http://localhost:8080/",
+    "method": "GET",
+    "resource_type": "document"
+  }
+]

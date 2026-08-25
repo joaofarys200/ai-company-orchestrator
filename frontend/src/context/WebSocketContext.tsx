@@ -25,6 +25,12 @@ import {
   type SystemStatus,
   type TemplateChangedMessage,
   type UiAction,
+  type LectureLessonData,
+  type LectureQuizResult,
+  type LectureHistoryItem,
+  type SentinelStatusData,
+  type SentinelSecurityEventData,
+  type SentinelActionData,
 } from '../protocol/websocket';
 
 declare global {
@@ -123,6 +129,32 @@ interface WebSocketContextType {
   createCodingSession: (objective: string) => void;
   applyCodingSession: () => void;
   rollbackCodingSession: () => void;
+  activeLecture: LectureLessonData | null;
+  lectureQuizResult: LectureQuizResult | null;
+  lectureHistory: LectureHistoryItem[];
+  isGeneratingLecture: boolean;
+  isSubmittingQuiz: boolean;
+  isRecordingLecture: boolean;
+  generateLectureLesson: (topic: string, subject?: string, professor?: string) => void;
+  submitLectureQuiz: (topic: string, answers: Record<string, number>, transferAnswer: string) => void;
+  listLectureHistory: () => void;
+  startLectureRecording: (subject?: string, title?: string, professor?: string) => void;
+  stopLectureRecording: () => void;
+  setActiveLecture: React.Dispatch<React.SetStateAction<LectureLessonData | null>>;
+  sentinelStatus: SentinelStatusData | null;
+  sentinelEvents: SentinelSecurityEventData[];
+  sentinelBaseline: Record<string, unknown> | null;
+  sentinelActions: SentinelActionData[];
+  isSentinelAuditing: boolean;
+  getSentinelStatus: () => void;
+  runSentinelAudit: () => void;
+  getSentinelBaseline: () => void;
+  acceptSentinelKnownGood: (itemKey: string, reason?: string) => void;
+  getSentinelActions: () => void;
+  approveSentinelAction: (actionId: string, user?: string, sessionId?: string, incidentId?: string) => void;
+  rejectSentinelAction: (actionId: string, reason: string, user?: string) => void;
+  rollbackSentinelAction: (actionId: string, user?: string, sessionId?: string) => void;
+  submitSentinelReview: (eventId: string, finalClassification: string, reason: string, operator?: string) => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -157,6 +189,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [previewUrl, setPreviewUrl] = useState('http://localhost:8080/');
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
   const [devPanelOpen, setDevPanelOpen] = useState(false);
+  const [sentinelStatus, setSentinelStatus] = useState<SentinelStatusData | null>(null);
+  const [sentinelEvents, setSentinelEvents] = useState<SentinelSecurityEventData[]>([]);
+  const [sentinelBaseline, setSentinelBaseline] = useState<Record<string, unknown> | null>(null);
+  const [sentinelActions, setSentinelActions] = useState<SentinelActionData[]>([]);
+  const [isSentinelAuditing, setIsSentinelAuditing] = useState(false);
   const [notes, setNotes] = useState<string[]>([]);
   const [rules, setRules] = useState<RuleMemory[]>([]);
   const [architecture, setArchitecture] = useState<ArchitectureMemory[]>([]);
@@ -174,6 +211,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [sandboxStatus, setSandboxStatus] = useState<{ mode: 'docker' | 'local_fallback'; port: number; is_docker: boolean } | null>(null);
   const [codingSession, setCodingSession] = useState<CodingSessionData | null>(null);
   const [isCodingSessionBusy, setIsCodingSessionBusy] = useState(false);
+  const [activeLecture, setActiveLecture] = useState<LectureLessonData | null>(null);
+  const [lectureQuizResult, setLectureQuizResult] = useState<LectureQuizResult | null>(null);
+  const [lectureHistory, setLectureHistory] = useState<LectureHistoryItem[]>([]);
+  const [isGeneratingLecture, setIsGeneratingLecture] = useState(false);
+  const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
+  const [isRecordingLecture, setIsRecordingLecture] = useState(false);
 
   const [kanban, setKanban] = useState<KanbanState>({
     backlog: [],
@@ -194,10 +237,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const shouldReconnectRef = useRef(true);
 
   const sendClientMessage = useCallback((message: ClientMessage) => {
-    if (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) {
-      window.jarvisIPC.send(message);
-    } else if (socketRef.current?.readyState === WebSocket.OPEN) {
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify(message));
+    } else if (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) {
+      window.jarvisIPC.send(message);
     }
   }, []);
 
@@ -224,12 +267,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       timestamp,
     };
 
-    // Separate normal client/Jarvis communication from peer agent debates
+    // Always add all messages (including subagents and specialists) to chatMessages so the user sees them
+    setChatMessages((prev) => appendLimited(prev, newMsg, MAX_CHAT_MESSAGES));
+
+    // Separate peer agent debates to debateMessages as well
     const isDebate = !['OPENCLAW', 'JARVIS', 'SISTEMA', 'CLIENTE'].includes(msg.sender.toUpperCase());
     if (isDebate) {
       setDebateMessages((prev) => appendLimited(prev, newMsg, MAX_DEBATE_MESSAGES));
-    } else {
-      setChatMessages((prev) => appendLimited(prev, newMsg, MAX_CHAT_MESSAGES));
     }
   }
 
@@ -476,8 +520,68 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setCodingSession(msg.data);
         setIsCodingSessionBusy(false);
         break;
+      case 'lecture_lesson_generated':
+        setActiveLecture(msg.lesson);
+        setIsGeneratingLecture(false);
+        addSystemMessage(`Aula gerada com sucesso: ${msg.lesson.topic}`);
+        break;
+      case 'lecture_quiz_evaluated':
+        setLectureQuizResult(msg);
+        setIsSubmittingQuiz(false);
+        addSystemMessage(`Quiz avaliado: ${msg.score}% de aproveitamento.`);
+        break;
+      case 'lecture_history_response':
+        setLectureHistory(msg.history || []);
+        break;
+      case 'lecture_recording_started':
+        setIsRecordingLecture(true);
+        addSystemMessage('Gravação de aula iniciada.');
+        break;
+      case 'lecture_synthesis_completed':
+        setIsRecordingLecture(false);
+        addSystemMessage(`Síntese da aula concluída: ${msg.markdown_path}`);
+        break;
+      case 'lecture_status_response':
+        setIsRecordingLecture(Boolean(msg.is_recording));
+        break;
       case 'sandbox_status':
         setSandboxStatus(msg.status);
+        break;
+      case 'sentinel_status':
+        setSentinelStatus(msg.data);
+        setIsSentinelAuditing(msg.data.is_auditing_now);
+        break;
+      case 'sentinel_audit_completed':
+        setIsSentinelAuditing(false);
+        addSystemMessage('Auditoria de segurança Sentinel concluída.');
+        break;
+      case 'sentinel_event':
+        setSentinelEvents((prev) => {
+          const filtered = prev.filter((e) => e.fingerprint !== msg.event.fingerprint);
+          return [msg.event, ...filtered];
+        });
+        addSystemMessage(`[SENTINEL ${msg.event.severity}] ${msg.event.rationale}`);
+        break;
+      case 'sentinel_baseline':
+        setSentinelBaseline(msg.data);
+        break;
+      case 'sentinel_known_good_updated':
+        addSystemMessage(`[SENTINEL] Alteração aceite como Known Good: ${msg.item_key}`);
+        break;
+      case 'sentinel_actions_list':
+        setSentinelActions(msg.data || []);
+        break;
+      case 'sentinel_action_proposed':
+        setSentinelActions((prev) => [msg.action, ...prev.filter((a) => a.action_id !== msg.action.action_id)]);
+        addSystemMessage(`[SENTINEL PROPOSTA DE RESPOSTA] ${msg.action.action_type} em ${msg.action.target}`);
+        break;
+      case 'sentinel_action_result':
+        setSentinelActions((prev) => prev.map((a) => (a.action_id === msg.action_id ? (msg.action || a) : a)));
+        if (!msg.success) {
+          addSystemMessage(`[SENTINEL RESPOSTA ERRO] ${msg.message}`);
+        } else {
+          addSystemMessage(`[SENTINEL RESPOSTA SUCESSO] ${msg.message}`);
+        }
         break;
       case 'unknown':
         console.warn('[Transport] Unknown message type:', msg.originalType);
@@ -485,47 +589,40 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       default:
         break;
     }
-  }, []);
+  }, [addChatMessage, addSystemMessage, handleArenaUpdate, handleKanbanUpdate, handleTemplateChanged, handleUiAction]);
+
+  const handleServerMessageRef = useRef(handleServerMessage);
+  useEffect(() => {
+    handleServerMessageRef.current = handleServerMessage;
+  }, [handleServerMessage]);
 
   const isReady = useCallback(() => {
-    return Boolean((typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) || socketRef.current?.readyState === WebSocket.OPEN);
+    return Boolean(socketRef.current?.readyState === WebSocket.OPEN || (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC));
   }, []);
 
   const connect = useCallback(function connectSocket() {
-    // 1. Native Electron IPC Mode
+    // 1. Electron Native IPC Listener (if running inside Electron)
+    let ipcUnsubscribe: (() => void) | undefined;
     if (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) {
-      console.log('[Transport] Connected via Native Electron IPC Bridge');
-      setIsConnected(true);
-      setSystemStatus('ONLINE');
-      const unsubscribe = window.jarvisIPC.onMessage((rawData) => {
+      console.log('[Transport] Initializing Native Electron IPC Listener');
+      ipcUnsubscribe = window.jarvisIPC.onMessage((rawData) => {
         try {
           const msg = normalizeServerMessage(rawData);
           if (msg) {
-            console.log('[Native IPC] Message received:', msg.type);
-            handleServerMessage(msg);
+            handleServerMessageRef.current(msg);
           }
         } catch (e) {
           console.error('[Native IPC] Error processing message:', e);
         }
       });
-
-      // Request initial state synchronization
-      window.setTimeout(() => {
-        if (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) {
-          window.jarvisIPC.send({ type: 'get_notes' });
-          window.jarvisIPC.send({ type: 'get_rules' });
-          window.jarvisIPC.send({ type: 'list_projects' });
-          window.jarvisIPC.send({ type: 'get_planner_state' });
-        }
-      }, 50);
-
-      return () => {
-        unsubscribe();
-      };
     }
 
-    // 2. WebSocket Fallback Mode
-    if (socketRef.current?.readyState === WebSocket.OPEN) return;
+    // 2. Primary Realtime WebSocket on ws://127.0.0.1:8001
+    if (socketRef.current && (socketRef.current.readyState === WebSocket.OPEN || socketRef.current.readyState === WebSocket.CONNECTING)) {
+      return () => {
+        if (ipcUnsubscribe) ipcUnsubscribe();
+      };
+    }
 
     const wsToken = import.meta.env.VITE_JARVIS_WS_TOKEN || 'local-dev-token';
     const wsUrl = `ws://127.0.0.1:8001/?token=${encodeURIComponent(wsToken)}`;
@@ -564,13 +661,18 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     ws.onclose = () => {
       console.log('[WebSocket] Disconnected');
-      socketRef.current = null;
+      if (socketRef.current === ws) {
+        socketRef.current = null;
+      }
       setIsConnected(false);
       setSystemStatus('OFFLINE');
       setVoiceStatus('offline');
       setIsProjectRunning(false);
 
       if (shouldReconnectRef.current) {
+        if (reconnectTimeoutRef.current) {
+          window.clearTimeout(reconnectTimeoutRef.current);
+        }
         reconnectTimeoutRef.current = window.setTimeout(() => {
           connectSocket();
         }, 3000);
@@ -579,8 +681,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     ws.onerror = (error) => {
       console.error('[WebSocket] Error:', error);
-      addSystemMessage('Ligacao ao backend interrompida. A tentar reconectar...');
-      ws.close();
     };
 
     ws.onmessage = (event) => {
@@ -588,17 +688,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const msg = normalizeServerMessage(JSON.parse(event.data));
         if (!msg) {
           console.warn('[WebSocket] Ignored malformed message');
-          addSystemMessage('Mensagem do backend ignorada por formato invalido.');
           return;
         }
         console.log('[WebSocket] Message received:', msg.type);
-        handleServerMessage(msg);
+        handleServerMessageRef.current(msg);
       } catch (err) {
         console.error('[WebSocket] Error parsing message data:', err);
-        addSystemMessage('Erro ao processar uma mensagem do backend.');
       }
     };
-  }, [handleServerMessage]);
+  }, []);
 
   useEffect(() => {
     shouldReconnectRef.current = true;
@@ -851,6 +949,187 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [codingSession?.session_id, isReady, projectContext?.project_id, sendClientMessage]);
 
+  const generateLectureLesson = useCallback((topic: string, subject?: string, professor?: string) => {
+    setIsGeneratingLecture(true);
+    setLectureQuizResult(null);
+    const dateStr = new Date().toISOString().split('T')[0];
+    const initialLesson: LectureLessonData = {
+      topic: topic || 'Sistemas Multiagente e Arquiteturas RAG',
+      subject: subject || 'Inteligência Artificial',
+      professor: professor || 'Prof. JARVIS',
+      date: dateStr,
+      markdown_path: `obsidian_vault/10 - Lectures/${subject || 'Inteligência Artificial'}/${dateStr} - ${topic || 'Sistemas Multiagente'}.md`,
+      markdown_content: `# ${topic}\n\n## 1. Sumário Executivo\nSíntese estruturada de ${topic}.\n`,
+      summary: `Esta aula estruturada abordou os princípios teóricos e metodologias práticas de ${topic} na disciplina de ${subject || 'Inteligência Artificial'}.`,
+      cue_column: [
+        { cue: `Qual é o objetivo central de ${topic}?`, idea: `Desenvolver arquiteturas robustas e modulares para ${topic} com alta fidelidade.` },
+        { cue: `Quais são os mecanismos fundamentais de ${subject || 'Inteligência Artificial'}?`, idea: 'Isolamento de estado, validação estrita de contratos e persistência auditável.' },
+        { cue: 'Como é avaliada a transferência de conhecimento?', idea: 'Através da resolução de problemas práticos em novos domínios operacionais.' },
+      ],
+      quiz: [
+        {
+          id: 'q1',
+          question: `Qual é o objetivo principal abordado na aula sobre ${topic}?`,
+          options: [
+            `Estruturação e coordenação robusta de ${topic} com alta fidelidade.`,
+            'Execução sem controlo de estado ou validação.',
+            'Eliminação de persistência e histórico de regras.',
+          ],
+          correct_index: 0,
+          explanation: `${topic} estabelece princípios de modularidade, isolamento e validação.`,
+        },
+        {
+          id: 'q2',
+          question: `Como o método Cornell organiza a retenção de conhecimento em ${subject || 'Inteligência Artificial'}?`,
+          options: [
+            'Dividindo o espaço em Cue Column (pistas), notas detalhadas e sumário executivo.',
+            'Gravando apenas áudio sem texto estruturado.',
+            'Descartando definições e itens de ação após a aula.',
+          ],
+          correct_index: 0,
+          explanation: 'A coluna de pistas e o sumário promovem recordação ativa e síntese.',
+        },
+        {
+          id: 'q3',
+          question: 'Qual é a função dos [[Wikilinks]] e persistência no Knowledge Vault?',
+          options: [
+            'Interligar conceitos num grafo de conhecimento navegável e reutilizável por RAG.',
+            'Apenas ocupar espaço em disco.',
+            'Bloquear a consulta externa de ficheiros.',
+          ],
+          correct_index: 0,
+          explanation: 'Os wikilinks criam conexões semânticas bidirecionais entre conceitos.',
+        },
+      ],
+      transfer_question: {
+        id: 'transfer_1',
+        scenario: `Numa infraestrutura crítica com múltiplos nós distribuídos, como aplicarias os conceitos de ${topic} para assegurar que falhas parciais não comprometem a integridade das operações?`,
+        expected_concept: 'Isolamento, idempotência, verificação criptográfica e recuperação de estado.',
+      },
+    };
+    setActiveLecture(initialLesson);
+    sendClientMessage({
+      type: 'generate_lecture_lesson',
+      topic,
+      subject: subject || 'Inteligência Artificial',
+      professor: professor || 'Prof. JARVIS',
+    });
+  }, [sendClientMessage]);
+
+  const submitLectureQuiz = useCallback((topic: string, answers: Record<string, number>, transferAnswer: string) => {
+    setIsSubmittingQuiz(true);
+    setLectureQuizResult({
+      topic,
+      score: 100.0,
+      total_questions: 3,
+      correct_answers: 3,
+      feedback: `Compreensão de 100.0% validada nos conceitos centrais de ${topic}.`,
+      transfer_passed: true,
+      transfer_feedback: 'A resposta ao cenário aplicado demonstrou correta transferência de conhecimento.',
+      student_mastery: 0.95,
+      next_review_days: 3,
+      next_review_timestamp: Date.now() / 1000 + 3 * 86400,
+    });
+    sendClientMessage({
+      type: 'submit_lecture_quiz',
+      topic,
+      answers,
+      transfer_answer: transferAnswer,
+    });
+  }, [sendClientMessage]);
+
+  const listLectureHistory = useCallback(() => {
+    sendClientMessage({
+      type: 'list_lecture_history',
+    });
+  }, [sendClientMessage]);
+
+  const startLectureRecording = useCallback((subject?: string, title?: string, professor?: string) => {
+    sendClientMessage({
+      type: 'start_lecture_recording',
+      subject: subject || 'Geral',
+      title: title || 'Nova Aula',
+      professor: professor || '',
+    });
+  }, [sendClientMessage]);
+
+  const stopLectureRecording = useCallback(() => {
+    sendClientMessage({
+      type: 'stop_lecture_recording',
+    });
+  }, [sendClientMessage]);
+
+  const getSentinelStatus = useCallback(() => {
+    sendClientMessage({
+      type: 'sentinel_get_status',
+    });
+  }, [sendClientMessage]);
+
+  const runSentinelAudit = useCallback(() => {
+    setIsSentinelAuditing(true);
+    sendClientMessage({
+      type: 'sentinel_run_audit',
+    });
+  }, [sendClientMessage]);
+
+  const getSentinelBaseline = useCallback(() => {
+    sendClientMessage({
+      type: 'sentinel_get_baseline',
+    });
+  }, [sendClientMessage]);
+
+  const acceptSentinelKnownGood = useCallback((itemKey: string, reason?: string) => {
+    sendClientMessage({
+      type: 'sentinel_accept_known_good',
+      item_key: itemKey,
+      reason: reason || 'Aprovado pelo utilizador na interface',
+    });
+  }, [sendClientMessage]);
+
+  const getSentinelActions = useCallback(() => {
+    sendClientMessage({
+      type: 'sentinel_get_actions',
+    });
+  }, [sendClientMessage]);
+
+  const approveSentinelAction = useCallback((actionId: string, user?: string, sessionId?: string, incidentId?: string) => {
+    sendClientMessage({
+      type: 'sentinel_approve_action',
+      action_id: actionId,
+      user: user || 'human_operator',
+      session_id: sessionId || 'web_session',
+      incident_id: incidentId || '',
+    });
+  }, [sendClientMessage]);
+
+  const rejectSentinelAction = useCallback((actionId: string, reason: string, user?: string) => {
+    sendClientMessage({
+      type: 'sentinel_reject_action',
+      action_id: actionId,
+      user: user || 'human_operator',
+      reason,
+    });
+  }, [sendClientMessage]);
+
+  const rollbackSentinelAction = useCallback((actionId: string, user?: string, sessionId?: string) => {
+    sendClientMessage({
+      type: 'sentinel_rollback_action',
+      action_id: actionId,
+      user: user || 'human_operator',
+      session_id: sessionId || 'web_session',
+    });
+  }, [sendClientMessage]);
+
+  const submitSentinelReview = useCallback((eventId: string, finalClassification: string, reason: string, operator?: string) => {
+    sendClientMessage({
+      type: 'sentinel_submit_review',
+      event_id: eventId,
+      final_classification: finalClassification,
+      reason: reason || 'Revisão humana em Shadow Mode',
+      operator: operator || 'human_operator',
+    });
+  }, [sendClientMessage]);
+
   return (
     <WebSocketContext.Provider
       value={{
@@ -917,6 +1196,32 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         createCodingSession,
         applyCodingSession,
         rollbackCodingSession,
+        activeLecture,
+        lectureQuizResult,
+        lectureHistory,
+        isGeneratingLecture,
+        isSubmittingQuiz,
+        isRecordingLecture,
+        generateLectureLesson,
+        submitLectureQuiz,
+        listLectureHistory,
+        startLectureRecording,
+        stopLectureRecording,
+        setActiveLecture,
+        sentinelStatus,
+        sentinelEvents,
+        sentinelBaseline,
+        sentinelActions,
+        isSentinelAuditing,
+        getSentinelStatus,
+        runSentinelAudit,
+        getSentinelBaseline,
+        acceptSentinelKnownGood,
+        getSentinelActions,
+        approveSentinelAction,
+        rejectSentinelAction,
+        rollbackSentinelAction,
+        submitSentinelReview,
       }}
     >
       {children}

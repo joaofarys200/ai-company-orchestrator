@@ -9,11 +9,28 @@ from __future__ import annotations
 import sys
 import json
 import asyncio
-from typing import Any, Callable, Optional, Dict
+from typing import Any, Callable, Optional, Dict, Awaitable
 from dataclasses import dataclass, field
 
 from backend.websocket.context import WebSocketSessionState
 from backend.logging_config import log_event
+
+
+class VirtualIPCClient:
+    """Objeto virtual compatível com WebSocket para handlers existentes."""
+
+    def __init__(self, gateway: "StdioTransportGateway"):
+        self.gateway = gateway
+
+    async def send(self, msg_str: str | dict):
+        if isinstance(msg_str, str):
+            try:
+                msg_dict = json.loads(msg_str)
+            except Exception:
+                msg_dict = {"raw": msg_str}
+        else:
+            msg_dict = msg_str
+        await self.gateway.send_message(msg_dict)
 
 
 class StdioTransportGateway:
@@ -23,12 +40,15 @@ class StdioTransportGateway:
         self,
         dispatcher: Any,
         logger: Any = None,
+        on_connect: Optional[Callable[[Any, WebSocketSessionState], Awaitable[None]]] = None,
         on_broadcast: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> None:
         self.dispatcher = dispatcher
         self.logger = logger
+        self.on_connect = on_connect
         self.on_broadcast = on_broadcast
         self.session_state = WebSocketSessionState()
+        self.virtual_client = VirtualIPCClient(self)
         self._running = False
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._write_lock = asyncio.Lock()
@@ -67,6 +87,14 @@ class StdioTransportGateway:
         """Lê linhas do sys.stdin em background sem bloquear o event loop."""
         if sys.stdin is None or getattr(sys.stdin, "closed", True):
             return
+
+        # Trigger on_connect initial sync if handler provided
+        if self.on_connect:
+            try:
+                await self.on_connect(self.virtual_client, self.session_state)
+            except Exception as e:
+                if self.logger:
+                    log_event(self.logger, "ipc.initial_sync_error", error=str(e))
 
         reader = asyncio.StreamReader()
         protocol = asyncio.StreamReaderProtocol(reader)
@@ -134,33 +162,16 @@ class StdioTransportGateway:
         if not msg_type:
             return
 
-        # Objeto virtual de websocket para handlers existentes
-        class VirtualIPCClient:
-            def __init__(self, gateway: StdioTransportGateway):
-                self.gateway = gateway
-
-            async def send(self, msg_str: str | dict):
-                if isinstance(msg_str, str):
-                    try:
-                        msg_dict = json.loads(msg_str)
-                    except Exception:
-                        msg_dict = {"raw": msg_str}
-                else:
-                    msg_dict = msg_str
-                await self.gateway.send_message(msg_dict)
-
-        virtual_client = VirtualIPCClient(self)
-
         try:
             # Despachar para o WebSocketDispatcher unificado
             if hasattr(self.dispatcher, "dispatch"):
                 await self.dispatcher.dispatch(
-                    websocket=virtual_client,
+                    websocket=self.virtual_client,
                     message=data,
                     session=self.session_state,
                 )
             elif hasattr(self.dispatcher, "handle"):
-                await self.dispatcher.handle(virtual_client, data)
+                await self.dispatcher.handle(self.virtual_client, data)
         except Exception as e:
             await self.send_message({
                 "type": "error",

@@ -1,0 +1,66 @@
+{
+  "interactions": [
+    {
+      "id": "I01",
+      "prompt": "Verificar estado do enxame de agentes.",
+      "duration_seconds": 1.2450377941131592,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "I02",
+      "prompt": "Listar ficheiros no projeto ativo.",
+      "duration_seconds": 1.2549779415130615,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "I03",
+      "prompt": "Apresentar sumário da arquitetura do sistema.",
+      "duration_seconds": 1.2399263381958008,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "I04",
+      "prompt": "Verificar tarefas no quadro Kanban.",
+      "duration_seconds": 1.257096529006958,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "I05",
+      "prompt": "Pesquisar referências à classe EvidenceGateway.",
+      "duration_seconds": 1.2410447597503662,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "I06",
+      "prompt": "Validar notas disponíveis no Obsidian Knowledge Vault.",
+      "duration_seconds": 1.2570462226867676,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "I07",
+      "prompt": "Inspecionar estado atual do Mission Planner.",
+      "duration_seconds": 1.2560791969299316,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "I08",
+      "prompt": "Consultar regras de persistência e memória técnica.",
+      "duration_seconds": 1.243499517440796,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "I09",
+      "prompt": "Verificar diagnóstico de infraestrutura e sandbox.",
+      "duration_seconds": 1.2452311515808105,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "I10",
+      "prompt": "Emitir relatório de prontidão operacional.",
+      "duration_seconds": 1.237767219543457,
+      "status": "COMPLETED"
+    }
+  ],
+  "total_completed": 10,
+  "ui_alive": true
+}

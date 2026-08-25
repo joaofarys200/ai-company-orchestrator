@@ -66,3 +66,22 @@ def test_stdio_gateway_broadcast():
     assert len(broadcast_received) == 1
     assert broadcast_received[0]["type"] == "lecture_audio_level"
     assert broadcast_received[0]["level"] == 0.85
+
+
+def test_connection_manager_broadcast_hooks_invokes_stdio_gateway():
+    from backend.websocket.gateway import ConnectionManager
+
+    cm = ConnectionManager()
+    received_messages = []
+
+    async def mock_hook(msg):
+        received_messages.append(msg)
+
+    cm.add_broadcast_hook(mock_hook)
+
+    test_msg = {"type": "projects_list", "projects": [{"project_id": "dina"}]}
+    asyncio.run(cm.broadcast(test_msg))
+
+    assert len(received_messages) == 1
+    assert received_messages[0]["type"] == "projects_list"
+    assert received_messages[0]["projects"][0]["project_id"] == "dina"

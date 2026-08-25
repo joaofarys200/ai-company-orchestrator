@@ -1,0 +1,237 @@
+[
+  {
+    "timestamp": 1787529912.0558622,
+    "event": "websocket_created",
+    "url": "ws://127.0.0.1:8001/?token=local-dev-token"
+  },
+  {
+    "timestamp": 1787529912.0673716,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Conectado ao servidor Jarvis WebSocket na porta 8001!\"}"
+  },
+  {
+    "timestamp": 1787529912.0793953,
+    "direction": "received",
+    "payload": "{\"type\": \"sandbox_status\", \"status\": {\"mode\": \"local_fallback\", \"port\": 8080, \"is_docker\": false}}"
+  },
+  {
+    "timestamp": 1787529912.0853999,
+    "direction": "received",
+    "payload": "{\"type\": \"template_changed\", \"template_name\": \"builder_swarm\", \"name\": \"Builder Swarm (Constru\\u00e7\\u00e3o e C\\u00f3digo)\", \"description\": \"Respons\\u00e1vel pela engenharia de software: cria\\u00e7\\u00e3o de websites, web apps, APIs, automa\\u00e7\\u00f5es, scripts e bases de dados.\", \"agents\": [{\"id\": \"dev_lead\", \"name\": \"Dev Lead\", \"role\": \"L\\u00edder de Engenharia\", \"icon\": \"briefcase\"}, {\"id\": \"coder\", \"name\": \"Coder\", \"role\": \"Programador Principal\", \"icon\": \"code\"}, {\"id\": \"tester\", \"name\": "
+  },
+  {
+    "timestamp": 1787529912.085584,
+    "direction": "received",
+    "payload": "{\"type\": \"rules_list\", \"rules\": []}"
+  },
+  {
+    "timestamp": 1787529912.0857892,
+    "direction": "received",
+    "payload": "{\"type\": \"architecture_list\", \"architecture\": []}"
+  },
+  {
+    "timestamp": 1787529912.0859268,
+    "direction": "received",
+    "payload": "{\"type\": \"decisions_list\", \"decisions\": []}"
+  },
+  {
+    "timestamp": 1787529912.0861332,
+    "direction": "received",
+    "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
+  },
+  {
+    "timestamp": 1787529912.0864792,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+  },
+  {
+    "timestamp": 1787529912.114039,
+    "direction": "sent",
+    "payload": "{\"type\":\"list_projects\"}"
+  },
+  {
+    "timestamp": 1787529912.114122,
+    "direction": "sent",
+    "payload": "{\"type\":\"get_notes\"}"
+  },
+  {
+    "timestamp": 1787529912.114166,
+    "direction": "sent",
+    "payload": "{\"type\":\"get_rules\"}"
+  },
+  {
+    "timestamp": 1787529912.1141977,
+    "direction": "sent",
+    "payload": "{\"type\":\"get_planner_state\"}"
+  },
+  {
+    "timestamp": 1787529912.150289,
+    "direction": "received",
+    "payload": "{\"type\": \"project_context\", \"context\": {\"project_id\": \"task-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\task-app\", \"project_name\": \"task-app\", \"python_executable\": null, \"runtime_source\": \"unavailable\", \"runtime_version\": null, \"stack\": [\"HTML/JavaScript\"], \"frameworks\": [], \"package_managers\": [], \"entrypoints\": [\"index.html\", \"app.js\"], \"source_roots\": [\".\"], \"package_scripts\": {}, \"suggested_commands\": [{\"kind\": \"syntax\", \"command\": \"node --check \\\"app.js\\\"\","
+  },
+  {
+    "timestamp": 1787529912.1509523,
+    "direction": "received",
+    "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
+  },
+  {
+    "timestamp": 1787529912.1512597,
+    "direction": "received",
+    "payload": "{\"type\": \"coding_session\", \"data\": null}"
+  },
+  {
+    "timestamp": 1787529912.1522484,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": []}"
+  },
+  {
+    "timestamp": 1787529912.153186,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+  },
+  {
+    "timestamp": 1787529912.1641867,
+    "direction": "received",
+    "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
+  },
+  {
+    "timestamp": 1787529912.165781,
+    "direction": "received",
+    "payload": "{\"type\": \"rules_list\", \"rules\": []}"
+  },
+  {
+    "timestamp": 1787529912.1668434,
+    "direction": "received",
+    "payload": "{\"type\": \"planner_state\", \"data\": null}"
+  },
+  {
+    "timestamp": 1787529914.5107563,
+    "direction": "sent",
+    "payload": "{\"type\":\"directive\",\"text\":\"Olá JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
+  },
+  {
+    "timestamp": 1787529914.5448902,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
+  },
+  {
+    "timestamp": 1787529914.5502079,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00c3\\u00a7\\u00c3\\u00a3o iniciada: Ol\\u00e1 JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
+  },
+  {
+    "timestamp": 1787529914.8537884,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Erro ao comunicar com o Ollama local: Gemini devolveu HTTP 429: [{\\n  \\\"error\\\": {\\n    \\\"code\\\": 429,\\n    \\\"message\\\": \\\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\\\n* Quota exceeded for metric: generativelanguage.googleapis."
+  },
+  {
+    "timestamp": 1787529914.8553886,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1787529916.4756157,
+    "direction": "sent",
+    "payload": "{\"type\":\"directive\",\"text\":\"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\"}"
+  },
+  {
+    "timestamp": 1787529916.511999,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
+  },
+  {
+    "timestamp": 1787529916.5155852,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00c3\\u00a7\\u00c3\\u00a3o iniciada: Guarda esta informa\\u00e7\\u00e3o para esta miss\\u00e3o: o c\\u00f3digo de teste \\u00e9 JARVIS-8472.\"}"
+  },
+  {
+    "timestamp": 1787529916.8175054,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Erro ao comunicar com o Ollama local: Gemini devolveu HTTP 429: [{\\n  \\\"error\\\": {\\n    \\\"code\\\": 429,\\n    \\\"message\\\": \\\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\\\n* Quota exceeded for metric: generativelanguage.googleapis."
+  },
+  {
+    "timestamp": 1787529916.817749,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1787529918.5151339,
+    "direction": "sent",
+    "payload": "{\"type\":\"directive\",\"text\":\"Qual era o código que te pedi para guardar?\"}"
+  },
+  {
+    "timestamp": 1787529918.554167,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
+  },
+  {
+    "timestamp": 1787529918.5566502,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00c3\\u00a7\\u00c3\\u00a3o iniciada: Qual era o c\\u00f3digo que te pedi para guardar?\"}"
+  },
+  {
+    "timestamp": 1787529918.8617682,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Erro ao comunicar com o Ollama local: Gemini devolveu HTTP 429: [{\\n  \\\"error\\\": {\\n    \\\"code\\\": 429,\\n    \\\"message\\\": \\\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\\\n* Quota exceeded for metric: generativelanguage.googleapis."
+  },
+  {
+    "timestamp": 1787529918.8633687,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1787529922.5360756,
+    "direction": "sent",
+    "payload": "{\"type\":\"list_projects\"}"
+  },
+  {
+    "timestamp": 1787529922.543182,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+  },
+  {
+    "timestamp": 1787529926.7685487,
+    "direction": "sent",
+    "payload": "{\"type\":\"list_projects\"}"
+  },
+  {
+    "timestamp": 1787529926.7810154,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+  },
+  {
+    "timestamp": 1787529927.924169,
+    "direction": "sent",
+    "payload": "{\"type\":\"get_notes\"}"
+  },
+  {
+    "timestamp": 1787529927.9557617,
+    "direction": "received",
+    "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
+  },
+  {
+    "timestamp": 1787529931.5897722,
+    "direction": "sent",
+    "payload": "{\"type\":\"directive\",\"text\":\"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
+  },
+  {
+    "timestamp": 1787529931.6150432,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
+  },
+  {
+    "timestamp": 1787529931.6187873,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00c3\\u00a7\\u00c3\\u00a3o iniciada: Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
+  },
+  {
+    "timestamp": 1787529931.9895167,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Erro ao comunicar com o Ollama local: Gemini devolveu HTTP 429: [{\\n  \\\"error\\\": {\\n    \\\"code\\\": 429,\\n    \\\"message\\\": \\\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\\\n* Quota exceeded for metric: generativelanguage.googleapis."
+  },
+  {
+    "timestamp": 1787529931.991415,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  }
+]

@@ -12,6 +12,7 @@ import {
   FileCode,
   FolderOpen,
   GitPullRequest,
+  GraduationCap,
   KanbanSquare,
   LayoutDashboard,
   Layers,
@@ -34,13 +35,15 @@ import {
 } from 'lucide-react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import { MissionPlanner } from '../planner';
+import { LecturesPanel } from '../lectures/LecturesPanel';
+import { SentinelDashboard } from '../sentinel/SentinelDashboard';
 import { Modal } from '../../components/Modal';
 
 interface WorkspaceViewerProps {
   onClose?: () => void;
 }
 
-type TabType = 'kanban' | 'debates' | 'files' | 'preview' | 'terminal' | 'coding' | 'knowledge' | 'rules' | 'planner';
+type TabType = 'kanban' | 'debates' | 'files' | 'preview' | 'terminal' | 'coding' | 'knowledge' | 'rules' | 'planner' | 'lectures' | 'sentinel';
 
 const PANEL = 'bg-[#0f1b20]/80 border border-[#a1bebf]/15 rounded-md shadow-[0_16px_50px_rgba(0,0,0,0.28)]';
 const SUBTLE_PANEL = 'bg-[#a1bebf]/[0.045] border border-[#a1bebf]/15 rounded-md';
@@ -54,13 +57,15 @@ const KANBAN_COLUMNS = [
   { id: 'done', label: 'Concluido', tone: 'border-emerald-400/30', dot: 'bg-emerald-400' },
 ] as const;
 
-type WorkspaceSection = 'overview' | 'code' | 'run' | 'missions' | 'more';
+type WorkspaceSection = 'overview' | 'code' | 'run' | 'missions' | 'learning' | 'sentinel' | 'more';
 
 const PRIMARY_SECTIONS: Array<{ id: WorkspaceSection; label: string; icon: LucideIcon; defaultTab: TabType }> = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard, defaultTab: 'kanban' },
   { id: 'code', label: 'Código', icon: Code2, defaultTab: 'files' },
   { id: 'run', label: 'Executar', icon: Rocket, defaultTab: 'preview' },
   { id: 'missions', label: 'Missões', icon: Activity, defaultTab: 'planner' },
+  { id: 'learning', label: 'Aulas', icon: GraduationCap, defaultTab: 'lectures' },
+  { id: 'sentinel', label: 'Segurança', icon: Shield, defaultTab: 'sentinel' },
   { id: 'more', label: 'Mais', icon: MoreHorizontal, defaultTab: 'debates' },
 ];
 
@@ -75,6 +80,12 @@ const SECONDARY_TABS: Record<WorkspaceSection, Array<{ id: TabType; label: strin
     { id: 'terminal', label: 'Consola', icon: Terminal },
   ],
   missions: [],
+  learning: [
+    { id: 'lectures', label: 'Aulas & Cornell', icon: GraduationCap },
+  ],
+  sentinel: [
+    { id: 'sentinel', label: 'Sentinel Watchdog', icon: Shield },
+  ],
   more: [
     { id: 'debates', label: 'Debates', icon: MessageSquare },
     { id: 'knowledge', label: 'Conhecimento', icon: BookOpen },
@@ -268,12 +279,17 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
       ? 'code'
       : activeTab === 'preview' || activeTab === 'terminal'
         ? 'run'
-          : activeTab === 'planner'
-            ? 'missions'
+        : activeTab === 'planner'
+          ? 'missions'
+          : activeTab === 'lectures'
+            ? 'learning'
             : 'more';
-  const projectFilter = projectSearch.trim().toLowerCase();
+  const normalizeSearch = (text: string) => (
+    text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+  );
+  const projectFilter = normalizeSearch(projectSearch);
   const filteredProjects = projects.filter((project) => (
-    `${project.project_name} ${project.project_id}`.toLowerCase().includes(projectFilter)
+    normalizeSearch(`${project.project_name} ${project.project_id}`).includes(projectFilter)
   ));
   const regularProjects = filteredProjects.filter((project) => !TECHNICAL_PROJECT_PATTERN.test(`${project.project_name} ${project.project_id}`));
   const technicalProjects = filteredProjects.filter((project) => TECHNICAL_PROJECT_PATTERN.test(`${project.project_name} ${project.project_id}`));
@@ -286,10 +302,8 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
   }, [notes.length, getNotes]);
 
   useEffect(() => {
-    if (projects.length === 0) {
-      listProjects();
-    }
-  }, [projects.length, listProjects]);
+    listProjects();
+  }, [listProjects]);
 
   useEffect(() => {
     if (projects.length > 0 && !projectContext) {
@@ -496,9 +510,15 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     return (
       <header className="workspace-header border-b border-white/8 bg-[#091217]/95">
         <div className="flex min-h-14 items-center gap-2 px-3">
-          <div className="relative shrink-0">
+          <div className="relative flex shrink-0 items-center gap-1.5">
             <button
-              onClick={() => setProjectPickerOpen((current) => !current)}
+              onClick={() => {
+                setProjectPickerOpen((current) => {
+                  const next = !current;
+                  if (next) listProjects();
+                  return next;
+                });
+              }}
               className={`flex h-9 w-44 items-center gap-2 rounded-md border px-3 text-left text-xs font-semibold transition-colors sm:w-52 ${
                 projectPickerOpen
                   ? 'border-cyan-300/30 bg-cyan-300/8 text-white'
@@ -521,23 +541,32 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 />
                 <div className="absolute left-0 top-11 z-30 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-white/10 bg-[#0a0d14] shadow-2xl">
                 <div className="border-b border-white/8 p-2 space-y-2">
-                  <button
-                    onClick={() => {
-                      setCreateProjectModalOpen(true);
-                      setProjectPickerOpen(false);
-                    }}
-                    className="flex w-full items-center justify-center gap-2 rounded-md border border-cyan-300/30 bg-cyan-300/10 py-1.5 text-xs font-semibold text-cyan-100 transition-colors hover:bg-cyan-300/20"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>Criar novo projeto</span>
-                  </button>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => {
+                        setCreateProjectModalOpen(true);
+                        setProjectPickerOpen(false);
+                      }}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-md border border-cyan-300/30 bg-cyan-300/10 py-1.5 text-xs font-semibold text-cyan-100 transition-colors hover:bg-cyan-300/20"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Criar novo projeto</span>
+                    </button>
+                    <button
+                      onClick={() => listProjects()}
+                      className="flex h-8 w-8 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-gray-400 hover:text-white transition-colors"
+                      title="Recarregar lista de projetos"
+                    >
+                      <RefreshCw className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-600" />
                     <input
                       autoFocus
                       value={projectSearch}
                       onChange={(event) => setProjectSearch(event.target.value)}
-                      placeholder="Pesquisar projetos"
+                      placeholder="Pesquisar projetos..."
                       className="h-9 w-full rounded-md border border-white/8 bg-black/25 pl-9 pr-3 text-xs text-gray-200 outline-none focus:border-cyan-300/30"
                     />
                   </div>
@@ -602,7 +631,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
             </button>
           </div>
 
-          <nav className="workspace-primary-nav flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
+          <nav className="workspace-primary-nav flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
             {PRIMARY_SECTIONS.map((section) => {
               const Icon = section.icon;
               const active = activeSection === section.id;
@@ -610,14 +639,14 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 <button
                   key={section.id}
                   onClick={() => activateSection(section.id)}
-                  className={`workspace-primary-tab flex h-9 shrink-0 items-center gap-2 rounded-md border px-3 text-xs font-semibold transition-all ${
+                  className={`workspace-primary-tab flex h-8.5 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-semibold transition-all ${
                     active
-                      ? 'border-cyan-400/30 bg-cyan-400/10 text-cyan-100'
-                      : 'border-transparent text-gray-500 hover:bg-white/[0.04] hover:text-gray-200'
+                      ? 'bg-cyan-500/15 text-cyan-200 border border-cyan-400/30 shadow-[0_0_12px_rgba(34,211,238,0.12)]'
+                      : 'border border-transparent text-gray-400 hover:bg-white/[0.04] hover:text-gray-200'
                   }`}
                   data-active={active}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className={`h-4 w-4 ${active ? 'text-cyan-300' : 'text-gray-400'}`} />
                   <span>{section.label}</span>
                 </button>
               );
@@ -626,11 +655,11 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
 
           {sandboxStatus && !sandboxStatus.is_docker && (
             <span
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-amber-400/25 bg-amber-400/10 px-2.5 py-1 text-[11px] font-medium text-amber-200"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-amber-400/25 bg-amber-400/10 px-2.5 py-1 text-[11px] font-medium text-amber-200"
               title="Contentor Docker indisponível. O preview da sandbox está a rodar no servidor local de fallback."
             >
               <Shield className="h-3.5 w-3.5 text-amber-400" />
-              <span className="hidden md:inline">Fallback Local (Sem Docker)</span>
+              <span className="hidden md:inline">Fallback Local</span>
             </span>
           )}
 
@@ -642,7 +671,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
         </div>
 
         {secondaryTabs.length > 0 && (
-          <nav className="workspace-secondary-nav flex h-10 items-center gap-1 overflow-x-auto border-t border-white/[0.05] px-3 sm:pl-[13.75rem]">
+          <nav className="workspace-secondary-nav flex h-10 items-center gap-2 overflow-x-auto border-t border-white/[0.06] bg-[#070b10]/60 px-4">
             {secondaryTabs.map((tab) => {
               const Icon = tab.icon;
               const active = activeTab === tab.id;
@@ -650,13 +679,20 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 <button
                   key={tab.id}
                   onClick={() => activateTab(tab.id)}
-                  className={`workspace-secondary-tab flex h-8 items-center gap-2 rounded-md px-3 text-xs font-medium transition-colors ${
-                    active ? 'bg-white/[0.07] text-white' : 'text-gray-500 hover:text-gray-200'
+                  className={`workspace-secondary-tab flex h-7.5 items-center gap-2 rounded-md px-3 text-xs font-medium transition-all ${
+                    active
+                      ? 'bg-white/[0.09] text-white border border-white/12 shadow-sm font-semibold'
+                      : 'text-gray-400 hover:bg-white/[0.04] hover:text-gray-200 border border-transparent'
                   }`}
                   data-active={active}
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className={`h-3.5 w-3.5 ${active ? 'text-cyan-300' : 'text-gray-400'}`} />
                   <span>{tab.label}</span>
+                  {tab.id === 'files' && projectFiles && Object.keys(projectFiles).length > 0 && (
+                    <span className="ml-1 rounded bg-white/10 px-1.5 py-0.2 text-[10px] font-mono text-gray-300">
+                      {Object.keys(projectFiles).length}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -1492,6 +1528,18 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
               </section>
             </ViewFrame>
           )}
+
+          {activeTab === 'lectures' && (
+            <ViewFrame key="lectures" className="h-full">
+              <LecturesPanel />
+            </ViewFrame>
+          )}
+
+          {activeTab === 'sentinel' && (
+            <ViewFrame key="sentinel" className="h-full">
+              <SentinelDashboard />
+            </ViewFrame>
+          )}
         </AnimatePresence>
       </div>
 
@@ -1505,14 +1553,24 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
             <button onClick={() => setCreateProjectModalOpen(false)} className={`${BUTTON_BASE} border-white/10 text-gray-400`}>Cancelar</button>
             <button
               onClick={() => {
-                if (newProjectId.trim()) {
-                  createProject(newProjectId.trim(), newProjectName.trim(), newProjectTemplate);
+                const rawId = newProjectId.trim() || newProjectName.trim();
+                if (!rawId) return;
+                const cleanId = rawId
+                  .normalize('NFD')
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .replace(/[^a-zA-Z0-9._-]/g, '-')
+                  .replace(/-+/g, '-')
+                  .replace(/^-|-$/g, '')
+                  .toLowerCase();
+                const displayName = newProjectName.trim() || rawId;
+                if (cleanId) {
+                  createProject(cleanId, displayName, newProjectTemplate);
                   setCreateProjectModalOpen(false);
                   setNewProjectId('');
                   setNewProjectName('');
                 }
               }}
-              disabled={!newProjectId.trim()}
+              disabled={!newProjectId.trim() && !newProjectName.trim()}
               className={`${BUTTON_BASE} border-cyan-300/30 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/20`}
             >
               Criar Projeto
@@ -1522,21 +1580,65 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
       >
         <div className="space-y-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-300">ID do projeto (diretório) *</label>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Nome de exibição</label>
             <input
-              value={newProjectId}
-              onChange={(e) => setNewProjectId(e.target.value)}
-              placeholder="ex: meu-novo-app"
+              value={newProjectName}
+              onChange={(e) => {
+                const name = e.target.value;
+                setNewProjectName(name);
+                if (!newProjectId || newProjectId === newProjectName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase()) {
+                  setNewProjectId(
+                    name
+                      .normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/[^a-zA-Z0-9._-]/g, '-')
+                      .replace(/-+/g, '-')
+                      .replace(/^-|-$/g, '')
+                      .toLowerCase()
+                  );
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const rawId = newProjectId.trim() || newProjectName.trim();
+                  if (rawId) {
+                    const cleanId = rawId.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9._-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+                    const displayName = newProjectName.trim() || rawId;
+                    if (cleanId) {
+                      createProject(cleanId, displayName, newProjectTemplate);
+                      setCreateProjectModalOpen(false);
+                      setNewProjectId('');
+                      setNewProjectName('');
+                    }
+                  }
+                }
+              }}
+              placeholder="ex: Meu Novo App"
               className="h-9 w-full rounded-md border border-white/10 bg-black/40 px-3 text-xs text-gray-200 outline-none focus:border-cyan-300/40"
               autoFocus
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-300">Nome de exibição</label>
+            <label className="mb-1 block text-xs font-medium text-gray-300">ID do projeto (diretório) *</label>
             <input
-              value={newProjectName}
-              onChange={(e) => setNewProjectName(e.target.value)}
-              placeholder="ex: Meu Novo App"
+              value={newProjectId}
+              onChange={(e) => setNewProjectId(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const rawId = newProjectId.trim() || newProjectName.trim();
+                  if (rawId) {
+                    const cleanId = rawId.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9._-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+                    const displayName = newProjectName.trim() || rawId;
+                    if (cleanId) {
+                      createProject(cleanId, displayName, newProjectTemplate);
+                      setCreateProjectModalOpen(false);
+                      setNewProjectId('');
+                      setNewProjectName('');
+                    }
+                  }
+                }
+              }}
+              placeholder="ex: meu-novo-app"
               className="h-9 w-full rounded-md border border-white/10 bg-black/40 px-3 text-xs text-gray-200 outline-none focus:border-cyan-300/40"
             />
           </div>

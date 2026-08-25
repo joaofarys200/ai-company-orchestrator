@@ -9,8 +9,13 @@ import yaml
 import datetime
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from PIL import ImageGrab
+try:
+    from PIL import ImageGrab  # type: ignore
+except ImportError:
+    ImageGrab = None
 from sandbox import SANDBOX_DIR
+
+_SPAWNED_AGENTS_PATH = Path("workspace") / ".cache" / "spawned_agents.json"
 from backend.model_harness import (
     ExecutionConstraints,
     ExpectedOutput,
@@ -22,8 +27,8 @@ from backend.model_harness import (
 )
 
 try:
-    from crewai import Agent, Task, Crew, LLM
-    from crewai.tools import tool
+    from crewai import Agent, Task, Crew, LLM  # type: ignore
+    from crewai.tools import tool  # type: ignore
 except ImportError:
     Agent = Task = Crew = LLM = None
     def tool(*args, **kwargs):
@@ -700,6 +705,7 @@ def register_spawned_agent(nome: str, especialidade: str, tarefa: str, resultado
         })
         # Keep last 30 spawned agents
         registry["agents"] = registry["agents"][-30:]
+        _SPAWNED_AGENTS_PATH.parent.mkdir(parents=True, exist_ok=True)
         _SPAWNED_AGENTS_PATH.write_text(
             json.dumps(registry, indent=2, ensure_ascii=False), encoding="utf-8"
         )
@@ -872,31 +878,43 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
                         
                 if use_fallback:
                     # Local Ollama fallback (when both Groq and Gemini fail/are missing)
-                    model_name = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
-                    res_json = await query_ollama_with_tools(model_name, messages, specialist_tools, specialist_system)
-                    msg_out = res_json.get("message", {})
-                    response_text = msg_out.get("content", "") or ""
-                    
-                    raw_tool_calls = msg_out.get("tool_calls", [])
-                    for idx, rtc in enumerate(raw_tool_calls):
-                        func_info = rtc.get("function", {})
-                        name = func_info.get("name")
-                        args = func_info.get("arguments", {})
+                    try:
+                        model_name = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
+                        res_json = await query_ollama_with_tools(model_name, messages, specialist_tools, specialist_system)
+                        msg_out = res_json.get("message", {})
+                        response_text = msg_out.get("content", "") or ""
                         
-                        if isinstance(args, str):
-                            try:
-                                args = json.loads(args)
-                            except Exception:
-                                args = {}
-                                
-                        call_id = rtc.get("id") or f"call_{step}_{idx}"
-                        tool_calls.append({
-                            "id": call_id,
-                            "name": name,
-                            "input": args
-                        })
-                        
-                    messages.append({"role": "assistant", "content": response_text})
+                        raw_tool_calls = msg_out.get("tool_calls", [])
+                        for idx, rtc in enumerate(raw_tool_calls):
+                            func_info = rtc.get("function", {})
+                            name = func_info.get("name")
+                            args = func_info.get("arguments", {})
+                            
+                            if isinstance(args, str):
+                                try:
+                                    args = json.loads(args)
+                                except Exception:
+                                    args = {}
+                                    
+                            call_id = rtc.get("id") or f"call_{step}_{idx}"
+                            tool_calls.append({
+                                "id": call_id,
+                                "name": name,
+                                "input": args
+                            })
+                            
+                        messages.append({"role": "assistant", "content": response_text})
+                    except Exception as e:
+                        print(f"[{nome}] Ollama fallback exception: {e}")
+                        if not response_text:
+                            response_text = (
+                                f"## Relatório de {nome} ({especialidade})\n\n"
+                                f"**Tarefa:** {tarefa}\n\n"
+                                f"⚠️ Não foi possível obter resposta do modelo de IA (Gemini/Ollama offline ou sem chave configurada).\n"
+                                f"*Detalhes do erro:* `{e}`"
+                            )
+                        final_response_text = response_text
+                        break
             
             # If the agent wrote text and didn't call tools, show it
             if response_text.strip() and not tool_calls:
