@@ -19,7 +19,7 @@
 - **Nome no Perfil**: `João Faria`
 - **Localização**: `Maia / Porto, Portugal`
 - **Links Sociais**:
-  - LinkedIn: `https://www.linkedin.com/in/joaofarys200`
+  - LinkedIn: `https://www.linkedin.com/in/joao-faria-645bb3302/`
   - Email: `joaopedrofaria2003@gmail.com`
 
 ---
