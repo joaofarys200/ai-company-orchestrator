@@ -1,16 +1,17 @@
 # 🤖 JARVIS OS — Autonomous Multi-Agent Cognitive Platform
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Status-Independent_Engineering_Project-3b82f6?style=for-the-badge&logo=rocket&logoColor=white" alt="Independent Project" />
   <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.11+" />
   <img src="https://img.shields.io/badge/TypeScript-React_18-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript / React 18" />
   <img src="https://img.shields.io/badge/Electron-Desktop_HUD-47848F?style=for-the-badge&logo=electron&logoColor=white" alt="Electron Desktop" />
   <img src="https://img.shields.io/badge/Test_Suites-953_Passed-22c55e?style=for-the-badge&logo=pytest&logoColor=white" alt="953 Pytest Passed" />
   <img src="https://img.shields.io/badge/Architecture-10_SVG_Blueprints-38bdf8?style=for-the-badge" alt="10 Architecture Blueprints" />
-  <img src="https://img.shields.io/badge/Privacy-100%25_Offline_Option-a855f7?style=for-the-badge" alt="100% Offline Capable" />
+  <img src="https://img.shields.io/badge/Privacy-100%25_Offline_Capable-a855f7?style=for-the-badge" alt="100% Offline Capable" />
   <img src="https://img.shields.io/badge/License-MIT-amber?style=for-the-badge" alt="MIT License" />
 </p>
 
-> **JARVIS OS** is a deterministic, multi-agent cognitive operating system and autonomous orchestration platform designed for production engineering, secure local computing, and long-horizon goal execution.
+> **JARVIS OS** is an independent, deterministic multi-agent cognitive operating system and autonomous orchestration platform designed for reliable software engineering, local host safety monitoring, and long-horizon goal execution.
 
 ---
 
@@ -18,25 +19,51 @@
 
 | Area | Documentation Link | Description |
 |---|---|---|
-| 🏛️ **Architecture** | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Deep technical architecture specification &amp; invariants |
-| 📊 **Diagrams** | [`docs/diagrams/`](./docs/diagrams/) | 10 high-fidelity standalone SVG architecture diagrams |
-| 📐 **JSON Schemas** | [`schemas/README.md`](./schemas/README.md) | Canonical Draft-07 schemas for all data contracts |
-| 🛡️ **Security Policy** | [`SECURITY.md`](./SECURITY.md) | Sentinel watchdog, vulnerability reporting &amp; sandbox boundaries |
+| 🏛️ **Architecture** | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Deep technical architecture specification & invariants |
+| 📊 **Diagrams** | [`docs/diagrams/`](./docs/diagrams/) | 10 high-fidelity standalone SVG architecture blueprints |
+| 📐 **JSON Schemas** | [`schemas/README.md`](./schemas/README.md) | Canonical Draft-07 schemas for all internal data contracts |
+| 🛡️ **Security Policy** | [`SECURITY.md`](./SECURITY.md) | Sentinel watchdog, vulnerability reporting & sandbox boundaries |
 | 🗺️ **Project Map** | [`docs/PROJECT_MAP.md`](./docs/PROJECT_MAP.md) | Physical directory, module, and dependency index |
 | ⚖️ **ADRs** | [`docs/decisions/`](./docs/decisions/) | Architecture Decision Records (ADR-001 to ADR-006) |
-| 📈 **Benchmarks** | [Benchmark Reports](#-benchmarks--validation-reports) | 10 empirical validation &amp; capability test reports |
-| 🤝 **Contributing** | [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Contribution standards, code style &amp; PR requirements |
+| 📈 **Benchmarks** | [Benchmark Reports](#-benchmarks--empirical-validation-reports) | 10 empirical validation & capability test reports |
+| 🤝 **Contributing** | [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Contribution standards, code style & PR requirements |
 | 📜 **Changelog** | [`CHANGELOG.md`](./CHANGELOG.md) | Factual historical release and feature log |
 
 ---
 
-## 🌟 Overview
+## 🌟 Overview & Technical Philosophy
 
-JARVIS OS bridges human natural language intent and deterministic desktop software execution. Rather than relying on unconstrained language generation, JARVIS OS treats AI models as **stochastic reasoning components operating inside strict mechanical harnesses**, bounded by typed schemas, AST symbol parsers, real browser QA, and host endpoint security monitoring.
+Current LLMs are stochastic and unconstrained when generating code or issuing terminal commands. JARVIS OS addresses this fundamental reliability gap by treating AI models as **stochastic reasoning units operating inside deterministic, mechanical harnesses**.
+
+Every agent interaction is bounded by:
+- **Canonical Typed Schemas (Draft-07)** enforcing input/output invariants.
+- **AST Symbol Parsers** modifying exact code nodes rather than hallucinating full-file rewrites.
+- **Chrome DevTools Autonomous QA** verifying rendered web output, DOM states, and network errors.
+- **Host EDR Monitoring (Security Sentinel)** observing Windows process trees, open ports, and filesystem writes with human approval gates.
+
+---
+
+## 🚦 Engineering Status & Validation Matrix
+
+To ensure absolute scientific integrity and avoid exaggerated claims, all platform capabilities are classified into explicit lifecycle states:
+
+| Component | Maturity State | Description & Verification Evidence |
+|---|---|---|
+| **Multi-Agent Orchestrator** | `IMPLEMENTED & AUTOMATED` | Clara, Alex, Devon, and Quinn personas with DAG WorkPackage scheduling. Verified by 45+ unit tests. |
+| **Model Harness & Routing** | `IMPLEMENTED & AUTOMATED` | Multi-provider routing (Ollama local, OpenRouter free, Gemini/Claude/OpenAI cloud) with 7-stage schema validation. |
+| **Coding Agent 2.0 Engine** | `VALIDATED IN TRIALS` | AST symbol replacements, cross-file TypeScript aliases, automated rollback. Validated across 4 benchmark suites. |
+| **Security Sentinel (EDR)** | `VALIDATED IN TRIALS` | Windows process, port, task, and filesystem telemetry with baseline drift scoring and one-click rollback. |
+| **Real Browser DevTools QA** | `VALIDATED IN TRIALS` | Headless/headed Chrome DevTools automation capturing DOM trees and network traces via Playwright. |
+| **Knowledge Vault & RAG** | `IMPLEMENTED & AUTOMATED` | SQLite compounding rules engine + Obsidian Markdown Vault with bi-directional epistemic graphs. |
+| **Cornell Lecture Audio** | `IMPLEMENTED & AUTOMATED` | Live voice recording + Whisper transcription into Cornell notes and interactive quizzes. |
+| **Continuous Self-Improvement**| `EXPERIMENTAL` | ECC error-correction loops recording failure patterns from user corrections to prevent recurring errors. |
+| **Self-Driving Enterprise** | `PLANNED` | Long-horizon multi-project budget allocation and fully autonomous multi-repo maintenance. |
 
 ---
 
 ## 🏛️ System Architecture
+
+JARVIS OS is architected into modular, decoupled layers connecting user interfaces, cognitive agents, execution sandboxes, and host security monitors:
 
 ![JARVIS OS System Architecture](./docs/diagrams/01-system-architecture.svg)
 
@@ -44,51 +71,51 @@ JARVIS OS bridges human natural language intent and deterministic desktop softwa
 
 ## ⚡ Core Capabilities
 
-1. **Autonomous Missions**: Hierarchical mission decomposition into atomic WorkPackages with dependency DAG resolution and deterministic checkpoints.
-2. **Multi-Agent Swarm**: Four specialized autonomous agents (**Clara**, **Alex**, **Devon**, **Quinn**) collaborating via structured debate and consensus channels.
-3. **Coding Agent 2.0 Engine**: AST symbol extraction, cross-file typed semantic resolution, multi-file atomic patches, and autonomous self-repair loops.
-4. **Hybrid Model Harness**: Multi-provider routing with local offline execution (Ollama `qwen3.5:9b`), zero-cost cloud reasoning (OpenRouter), and commercial cloud failover with 7-stage schema validation.
-5. **Continuous Compounding Memory**: SQLite-backed rules engine with ECC self-correction learning from user feedback on every turn.
+1. **Autonomous Mission Orchestration**: Decomposes high-level natural language goals into atomic WorkPackages resolved via dependency DAGs with deterministic checkpointing.
+2. **Multi-Agent Swarm Collaboration**: Four specialized personas (**Clara**, **Alex**, **Devon**, **Quinn**) operating over structured message buses with debate and consensus protocols.
+3. **Coding Agent 2.0 Engine**: Replaces fragile text diffs with deterministic AST symbol manipulation, cross-file typed alias resolution, and atomic multi-file patch application.
+4. **Hybrid Model Harness**: Multi-provider execution router supporting 100% offline local models (`qwen3.5:9b` via Ollama), zero-cost cloud reasoning (OpenRouter), and commercial cloud failover with 7-stage schema validation.
+5. **Continuous Compounding Memory**: SQLite-persisted rules engine learning from human corrections on every turn with ECC self-correction injection.
 6. **Bi-Directional Knowledge Vault**: Over 100 structured Markdown notes in an Obsidian vault with vector semantic search and backlink graphs.
-7. **Cornell Lecture Synthesis**: Voice-recorded lectures transcribed with Whisper, formatted as Cornell notes with cues and summaries, and synthesized into interactive quizzes.
-8. **Real Browser QA &amp; Computer Use**: Chrome DevTools Protocol automation capturing DOM trees, network error logs, and multi-step visual screenshots.
-9. **Security Sentinel (EDR Watchdog)**: Real-time Windows host telemetry monitor (processes, ports, persistence, FS) with human approval gates and one-click rollback.
-10. **4-Tier Economic Taxonomy**: Strict evidence categorization separating synthetic benchmarks from external observations and real financial transactions.
+7. **Cornell Lecture Synthesis**: Voice-recorded lectures transcribed via Whisper, formatted as Cornell notes with cues, summaries, and self-grading interactive quizzes.
+8. **Real Browser QA & DevTools Automation**: Chrome DevTools Protocol automation capturing DOM trees, console exceptions, network traces, and multi-step visual screenshots.
+9. **Security Sentinel (EDR Watchdog)**: Real-time host telemetry monitor (process spawn trees, listening ports, Task Scheduler persistence, filesystem writes) with human approval gates.
+10. **4-Tier Economic Evidence Taxonomy**: Scientific classification separating synthetic test benchmarks from external observations and real financial transactions.
 
 ---
 
 ## 👥 Multi-Agent Swarm Architecture
 
-JARVIS OS organizes autonomous tasks across four specialized agent personas:
+Autonomous tasks are distributed across four specialized agent personas with strict role boundaries:
 
 ![Multi-Agent Swarm Architecture](./docs/diagrams/02-agent-architecture.svg)
 
-- **Clara (Executive &amp; Coordinator)**: Decomposes CEO directives into scoped missions, schedules work packages, and synthesizes executive reports.
-- **Alex (Systems Architect)**: Authors Architecture Decision Records (ADRs), maps dependency graphs, and validates API contracts.
-- **Devon (Coding Engineer)**: Performs AST symbol replacements, applies multi-file atomic patches, and operates the build/repair loop.
-- **Quinn (QA, Sentinel &amp; Adversary)**: Runs headless browser DevTools tests, executes Security Sentinel audits, and enforces quality gates.
+- **Clara (Executive & Coordinator)**: Decomposes directives into scoped missions, schedules WorkPackage DAGs, and synthesizes executive reports.
+- **Alex (Systems Architect)**: Authors Architecture Decision Records (ADRs), maps cross-module dependency graphs, and validates API contracts.
+- **Devon (Coding Engineer)**: Performs AST symbol replacements, applies multi-file atomic patches, and operates the build/repair compiler loop.
+- **Quinn (QA, Sentinel & Adversary)**: Executes headless Chrome DevTools tests, runs Security Sentinel audits, and enforces code quality gates.
 
 ---
 
 ## 💻 Coding Agent 2.0 Pipeline
 
-The Coding Agent pipeline replaces whole-file rewrites with deterministic AST symbol manipulation:
+The Coding Agent pipeline replaces full-file rewriting with deterministic AST symbol manipulation:
 
 ```
 Prompt ──> Specification ──> Artifact Inference ──> Repository Graph
   ──> AST Symbol Graph ──> Coding Session Plan ──> Atomic Patch Engine
-  ──> Build Pipeline (tsc/py_compile) ──> Browser DevTools QA ──> Self-Repair Loop
+  ──> Build Pipeline (tsc / py_compile) ──> Browser DevTools QA ──> Self-Repair Loop
 ```
 
 ![Coding Agent Pipeline](./docs/diagrams/03-coding-agent-pipeline.svg)
 
-- **AST Symbol Replacement**: Changes only target function/class nodes, preventing collateral syntax breakage in surrounding code.
+- **AST Symbol Replacement**: Targets specific function or class nodes, preventing syntax regressions in surrounding code.
 - **Cross-File Type Resolution**: Resolves TypeScript `@/*` path aliases and Python relative imports across monorepos.
-- **Automated Checkpoints &amp; Rollback**: Captures pre-modification byte snapshots with instant restoration on test failure.
+- **Automated Checkpoints & Rollback**: Captures pre-modification byte snapshots with instant restoration on test failure.
 
 ---
 
-## 🔄 Model Harness &amp; Routing
+## 🔄 Model Harness & Multi-Provider Routing
 
 The Model Harness (`backend/model_harness/`) provides multi-provider abstraction with deterministic output guarantees:
 
@@ -107,7 +134,7 @@ Request ──> Context Builder ──> Profile Router ──> Provider Executio
 
 ## 🛡️ Security Sentinel Watchdog (EDR)
 
-Security Sentinel (`security/sentinel/`) continuously guards the host operating system against anomalous agent behaviors:
+Security Sentinel (`security/sentinel/`) continuously guards the host operating system against unauthorized or anomalous agent operations:
 
 ```
 Windows Host ──> Process/Port/FS Collectors ──> Baseline Drift Analysis
@@ -123,7 +150,7 @@ Windows Host ──> Process/Port/FS Collectors ──> Baseline Drift Analysis
 
 ---
 
-## 📚 Knowledge Vault &amp; Continuous Learning
+## 📚 Knowledge Vault & Continuous Learning
 
 ```
 Obsidian Markdown Vault ──> Bi-Directional Epistemic Graph ──> Vector Embeddings / RAG
@@ -141,19 +168,38 @@ Obsidian Markdown Vault ──> Bi-Directional Epistemic Graph ──> Vector Em
 
 ## ⚖️ 4-Tier Economic Evidence Taxonomy
 
-To ensure complete scientific integrity and prevent exaggerated claims, JARVIS OS classifies all economic activities into 4 explicit tiers:
+To ensure scientific honesty and prevent exaggerated claims, JARVIS OS classifies all economic activities into 4 explicit tiers:
 
 ![Economic Evidence Taxonomy](./docs/diagrams/08-economic-evidence-flow.svg)
 
 | Tier | Category | Operational Definition | Verification Proof |
 |---|---|---|---|
-| **Tier 1** | `SYNTHETIC_BENCHMARK` | Simulated coding problem suites and unit trials | Automated test assertion logs &amp; exit codes |
-| **Tier 2** | `EXTERNAL_OBSERVED` | Real-world read-only web/paper data extraction | SHA256 content hashes &amp; HTTP headers |
-| **Tier 3** | `EXTERNAL_VERIFIED` | Authenticated API calls and live browser automation | Network traces &amp; DevTools DOM snapshots |
-| **Tier 4** | `FINANCIAL_TRANSACTION` | Actual monetary exchange or bank transfer | Cryptographic signatures &amp; settlement receipts |
+| **Tier 1** | `SYNTHETIC_BENCHMARK` | Simulated coding problem suites and unit trials | Automated test assertion logs & exit codes |
+| **Tier 2** | `EXTERNAL_OBSERVED` | Real-world read-only web/paper data extraction | SHA256 content hashes & HTTP headers |
+| **Tier 3** | `EXTERNAL_VERIFIED` | Authenticated API calls and live browser automation | Network traces & DevTools DOM snapshots |
+| **Tier 4** | `FINANCIAL_TRANSACTION` | Actual monetary exchange or bank transfer | Cryptographic signatures & settlement receipts |
 
 > [!IMPORTANT]
 > **No synthetic simulation or test benchmark is ever represented as real financial revenue.**
+
+---
+
+## 📈 Benchmarks & Empirical Validation Reports
+
+Detailed empirical reports documenting capabilities and validation trials:
+
+| Report Document | Focus Area | Key Findings & Metrics |
+|---|---|---|
+| [`JARVIS_CODING_AGENT_2_REPORT.md`](./docs/JARVIS_CODING_AGENT_2_REPORT.md) | Coding Agent 2.0 | AST symbol parser benchmark suite |
+| [`JARVIS_CODING_AGENT_2_2_REAL_REPOSITORY_REPORT.md`](./docs/JARVIS_CODING_AGENT_2_2_REAL_REPOSITORY_REPORT.md) | Real-World Trial | Multi-file refactoring on active repositories |
+| [`JARVIS_CODING_AGENT_2_3_LONG_HORIZON_REPORT.md`](./docs/JARVIS_CODING_AGENT_2_3_LONG_HORIZON_REPORT.md) | Long-Horizon Workflows | Multi-package dependencies & rollback recovery |
+| [`JARVIS_CODING_AGENT_2_4_TYPED_SEMANTICS_REPORT.md`](./docs/JARVIS_CODING_AGENT_2_4_TYPED_SEMANTICS_REPORT.md) | Typed Semantics | TypeScript `@/*` path alias resolution |
+| [`SENTINEL_S5_DETECTION_QUALITY_REPORT.md`](./docs/SENTINEL_S5_DETECTION_QUALITY_REPORT.md) | Sentinel Detection | EDR incident scoring and anomalous spawn detection |
+| [`SENTINEL_S6_SHADOW_MODE_REPORT.md`](./docs/SENTINEL_S6_SHADOW_MODE_REPORT.md) | Shadow Mode | Zero-overhead continuous background telemetry |
+| [`OBSIDIAN_KNOWLEDGE_GRAPH_AND_EPISTEMIC_REPORT.md`](./docs/OBSIDIAN_KNOWLEDGE_GRAPH_AND_EPISTEMIC_REPORT.md) | Knowledge Engineering | Bi-directional graph topology and RAG search |
+| [`JARVIS_REALTIME_BROWSER_VALIDATION_REPORT.md`](./docs/JARVIS_REALTIME_BROWSER_VALIDATION_REPORT.md) | Autonomous QA | Chrome DevTools real-time DOM & console verification |
+| [`JARVIS_PHASE7_SELF_IMPROVEMENT_REPORT.md`](./docs/JARVIS_PHASE7_SELF_IMPROVEMENT_REPORT.md) | Self-Improvement | Error-correction compounding memory loops |
+| [`JARVIS_PHASE10_REAL_WORLD_VALUE_REPORT.md`](./docs/JARVIS_PHASE10_REAL_WORLD_VALUE_REPORT.md) | Value Validation | Controlled execution of empirical value tasks |
 
 ---
 
@@ -167,7 +213,8 @@ ai-company-orchestrator/
 ├── diagnostics/             # Environment diagnostic tools and system telemetry scripts
 ├── docs/                    # Architectural specifications, benchmark reports, diagrams, and ADRs
 │   ├── decisions/           # Architecture Decision Records (ADR-001 to ADR-006)
-│   └── diagrams/            # Standalone vector SVG architecture diagrams (01 to 10)
+│   ├── diagrams/            # Standalone vector SVG architecture diagrams (01 to 10)
+│   └── portfolio_readmes/   # Production README templates for academic portfolio repos
 ├── evidence/                # Verified test run evidence (screenshots, DOM dumps, event logs)
 ├── frontend/                # React 18 + Tailwind + Monaco Editor desktop workspace HUD
 ├── intelligence/            # Coding Agent 2.0 (AST repair, repo graph, semantic resolver, build loop)
@@ -203,7 +250,7 @@ python -m venv venv
 Copy-Item .env.example .env
 ```
 
-### 3. Frontend &amp; Desktop HUD Setup
+### 3. Frontend & Desktop HUD Setup
 ```powershell
 npm install
 npm install --prefix frontend
@@ -223,7 +270,7 @@ npm run dev
 
 ---
 
-## 🧪 Testing &amp; Verification
+## 🧪 Testing & Verification
 
 JARVIS OS maintains a comprehensive automated testing suite:
 
@@ -246,23 +293,6 @@ npm run build --prefix frontend
 
 ---
 
-## 📊 Benchmarks &amp; Validation Reports
-
-Detailed empirical reports documenting capabilities and validation trials:
-
-- [`JARVIS_CODING_AGENT_2_REPORT.md`](./docs/JARVIS_CODING_AGENT_2_REPORT.md) — Coding Agent 2.0 Benchmark Suite.
-- [`JARVIS_CODING_AGENT_2_2_REAL_REPOSITORY_REPORT.md`](./docs/JARVIS_CODING_AGENT_2_2_REAL_REPOSITORY_REPORT.md) — Real Repository Trial &amp; Refactoring.
-- [`JARVIS_CODING_AGENT_2_3_LONG_HORIZON_REPORT.md`](./docs/JARVIS_CODING_AGENT_2_3_LONG_HORIZON_REPORT.md) — Long-Horizon Multi-File Coding Trials.
-- [`JARVIS_CODING_AGENT_2_4_TYPED_SEMANTICS_REPORT.md`](./docs/JARVIS_CODING_AGENT_2_4_TYPED_SEMANTICS_REPORT.md) — TypeScript Typed Semantic Resolution.
-- [`SENTINEL_S5_DETECTION_QUALITY_REPORT.md`](./docs/SENTINEL_S5_DETECTION_QUALITY_REPORT.md) — Security Sentinel Detection Benchmark.
-- [`SENTINEL_S6_SHADOW_MODE_REPORT.md`](./docs/SENTINEL_S6_SHADOW_MODE_REPORT.md) — Sentinel Zero-Interference Shadow Mode.
-- [`OBSIDIAN_KNOWLEDGE_GRAPH_AND_EPISTEMIC_REPORT.md`](./docs/OBSIDIAN_KNOWLEDGE_GRAPH_AND_EPISTEMIC_REPORT.md) — Epistemic Graph &amp; Knowledge Engineering.
-- [`JARVIS_REALTIME_BROWSER_VALIDATION_REPORT.md`](./docs/JARVIS_REALTIME_BROWSER_VALIDATION_REPORT.md) — Real-Time Browser DevTools Autonomous QA.
-- [`JARVIS_PHASE7_SELF_IMPROVEMENT_REPORT.md`](./docs/JARVIS_PHASE7_SELF_IMPROVEMENT_REPORT.md) — Self-Improvement &amp; Failure Memory Loop.
-- [`JARVIS_PHASE10_REAL_WORLD_VALUE_REPORT.md`](./docs/JARVIS_PHASE10_REAL_WORLD_VALUE_REPORT.md) — Controlled Real-World Economic Value Validation.
-
----
-
 ## 🔒 Security
 
 For vulnerability disclosures, Sentinel EDR architecture details, and sandbox boundaries, please consult [`SECURITY.md`](./SECURITY.md).
@@ -271,4 +301,4 @@ For vulnerability disclosures, Sentinel EDR architecture details, and sandbox bo
 
 ## 📜 License
 
-Developed in the context of research on **Autonomous Multi-Agent Cognitive Systems &amp; Software Engineering Automation**. Distributed under the **MIT License**. Engineering skills based on specifications by [Addy Osmani (`agent-skills`)](https://github.com/addyosmani/agent-skills).
+Developed as an independent research and engineering project on **Autonomous Multi-Agent Cognitive Systems & Software Engineering Automation**. Distributed under the **MIT License**. Engineering skills based on specifications by [Addy Osmani (`agent-skills`)](https://github.com/addyosmani/agent-skills).
