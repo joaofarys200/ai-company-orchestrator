@@ -1,476 +1,486 @@
 [
   {
-    "timestamp": 1788038117.9543588,
+    "timestamp": 1788178332.723968,
     "event": "websocket_created",
     "url": "ws://127.0.0.1:8001/?token=local-dev-token"
   },
   {
-    "timestamp": 1788038117.989522,
+    "timestamp": 1788178332.751226,
     "direction": "received",
     "payload": "{\"type\": \"system\", \"content\": \"Conectado ao servidor Jarvis WebSocket na porta 8001!\"}"
   },
   {
-    "timestamp": 1788038118.026838,
+    "timestamp": 1788178332.7596028,
     "direction": "received",
     "payload": "{\"type\": \"sandbox_status\", \"status\": {\"mode\": \"local_fallback\", \"port\": 8080, \"is_docker\": false}}"
   },
   {
-    "timestamp": 1788038118.0280182,
+    "timestamp": 1788178332.7612557,
     "direction": "received",
     "payload": "{\"type\": \"template_changed\", \"template_name\": \"builder_swarm\", \"name\": \"Builder Swarm (Constru\\u00e7\\u00e3o e C\\u00f3digo)\", \"description\": \"Respons\\u00e1vel pela engenharia de software: cria\\u00e7\\u00e3o de websites, web apps, APIs, automa\\u00e7\\u00f5es, scripts e bases de dados.\", \"agents\": [{\"id\": \"dev_lead\", \"name\": \"Dev Lead\", \"role\": \"L\\u00edder de Engenharia\", \"icon\": \"briefcase\"}, {\"id\": \"coder\", \"name\": \"Coder\", \"role\": \"Programador Principal\", \"icon\": \"code\"}, {\"id\": \"tester\", \"name\": "
   },
   {
-    "timestamp": 1788038118.0285316,
+    "timestamp": 1788178332.7616346,
     "direction": "received",
     "payload": "{\"type\": \"rules_list\", \"rules\": []}"
   },
   {
-    "timestamp": 1788038118.0290563,
+    "timestamp": 1788178332.7618423,
     "direction": "received",
     "payload": "{\"type\": \"architecture_list\", \"architecture\": []}"
   },
   {
-    "timestamp": 1788038118.0293858,
+    "timestamp": 1788178332.761954,
     "direction": "received",
     "payload": "{\"type\": \"decisions_list\", \"decisions\": []}"
   },
   {
-    "timestamp": 1788038118.0297523,
+    "timestamp": 1788178332.768208,
+    "direction": "received",
+    "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
+  },
+  {
+    "timestamp": 1788178332.7701912,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+  },
+  {
+    "timestamp": 1788178332.7969596,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788038118.0298476,
+    "timestamp": 1788178332.797028,
     "direction": "sent",
     "payload": "{\"type\":\"get_notes\"}"
   },
   {
-    "timestamp": 1788038118.0299385,
+    "timestamp": 1788178332.7970634,
     "direction": "sent",
     "payload": "{\"type\":\"get_rules\"}"
   },
   {
-    "timestamp": 1788038118.0299811,
+    "timestamp": 1788178332.7970922,
     "direction": "sent",
     "payload": "{\"type\":\"get_planner_state\"}"
   },
   {
-    "timestamp": 1788038118.0378065,
-    "direction": "received",
-    "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
-  },
-  {
-    "timestamp": 1788038118.0385728,
-    "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
-  },
-  {
-    "timestamp": 1788038118.2295625,
+    "timestamp": 1788178332.9219162,
     "direction": "received",
     "payload": "{\"type\": \"project_context\", \"context\": {\"project_id\": \"task-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\task-app\", \"project_name\": \"task-app\", \"python_executable\": null, \"runtime_source\": \"unavailable\", \"runtime_version\": null, \"stack\": [\"HTML/JavaScript\"], \"frameworks\": [], \"package_managers\": [], \"entrypoints\": [\"index.html\", \"app.js\"], \"source_roots\": [\".\"], \"package_scripts\": {}, \"suggested_commands\": [{\"kind\": \"syntax\", \"command\": \"node --check \\\"app.js\\\"\","
   },
   {
-    "timestamp": 1788038118.2332628,
+    "timestamp": 1788178332.9227338,
     "direction": "received",
     "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
   },
   {
-    "timestamp": 1788038118.2337298,
+    "timestamp": 1788178332.9233353,
     "direction": "received",
     "payload": "{\"type\": \"coding_session\", \"data\": null}"
   },
   {
-    "timestamp": 1788038118.2342257,
+    "timestamp": 1788178332.923788,
     "direction": "received",
     "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": []}"
   },
   {
-    "timestamp": 1788038118.2416723,
+    "timestamp": 1788178332.924872,
     "direction": "received",
     "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
   },
   {
-    "timestamp": 1788038118.2538195,
+    "timestamp": 1788178332.9321613,
     "direction": "received",
     "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
   },
   {
-    "timestamp": 1788038118.2543721,
+    "timestamp": 1788178332.9325774,
     "direction": "received",
     "payload": "{\"type\": \"rules_list\", \"rules\": []}"
   },
   {
-    "timestamp": 1788038118.2554073,
+    "timestamp": 1788178332.9332368,
     "direction": "received",
     "payload": "{\"type\": \"planner_state\", \"data\": null}"
   },
   {
-    "timestamp": 1788038120.7370298,
+    "timestamp": 1788178335.1861863,
     "direction": "sent",
     "payload": "{\"type\":\"directive\",\"text\":\"Olá JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
   },
   {
-    "timestamp": 1788038120.740022,
+    "timestamp": 1788178335.1979177,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
   },
   {
-    "timestamp": 1788038120.7430785,
+    "timestamp": 1788178335.2002099,
     "direction": "received",
     "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00e7\\u00e3o iniciada: Ol\\u00e1 JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
   },
   {
-    "timestamp": 1788038122.9062004,
+    "timestamp": 1788178335.641728,
+    "direction": "received",
+    "payload": "{\"type\": \"sentinel_status\", \"data\": {\"schema_version\": 1, \"status\": \"RUNNING\", \"lifecycle_state\": \"READY\", \"shadow_mode\": true, \"shadow_state\": \"COLLECTING\", \"is_baseline_ready\": true, \"degraded_reason\": null, \"degraded_collectors\": [], \"baseline_duration_seconds\": 8.92, \"posture\": \"MONITORING\", \"is_auditing_now\": false, \"scan_interval_seconds\": 60, \"total_scans\": 0, \"last_scan_time\": 0.0, \"last_scan_duration_seconds\": 0.0, \"next_scan_in_seconds\": 0, \"active_baseline_id\": \"BASELINE-1788178326-53"
+  },
+  {
+    "timestamp": 1788178337.1359725,
     "direction": "sent",
     "payload": "{\"type\":\"directive\",\"text\":\"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\"}"
   },
   {
-    "timestamp": 1788038122.9407625,
+    "timestamp": 1788178337.157348,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
   },
   {
-    "timestamp": 1788038122.9424543,
+    "timestamp": 1788178337.1577175,
     "direction": "received",
     "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00e7\\u00e3o iniciada: Guarda esta informa\\u00e7\\u00e3o para esta miss\\u00e3o: o c\\u00f3digo de teste \\u00e9 JARVIS-8472.\"}"
   },
   {
-    "timestamp": 1788038123.8884618,
+    "timestamp": 1788178337.8108091,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Como OpenClaw, coordeno a nossa equipa de especialistas para transformar as suas vis\\u00f5es\"}"
+    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Sou o OpenClaw, o seu assistente central e orquestrador da ag\\u00eancia. Coordeno a nossa equipa de especialistas para desenvolver e entregar os seus projetos com efici\\u00eancia e qualidade.\"}"
   },
   {
-    "timestamp": 1788038123.892365,
+    "timestamp": 1788178337.8134832,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
   },
   {
-    "timestamp": 1788038124.9420397,
+    "timestamp": 1788178339.1549544,
     "direction": "sent",
     "payload": "{\"type\":\"directive\",\"text\":\"Qual era o código que te pedi para guardar?\"}"
   },
   {
-    "timestamp": 1788038124.9893045,
+    "timestamp": 1788178339.197086,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
   },
   {
-    "timestamp": 1788038124.9898546,
+    "timestamp": 1788178339.1975634,
     "direction": "received",
     "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00e7\\u00e3o iniciada: Qual era o c\\u00f3digo que te pedi para guardar?\"}"
   },
   {
-    "timestamp": 1788038125.3081238,
+    "timestamp": 1788178340.5389392,
     "direction": "received",
-    "payload": "{\"type\": \"sentinel_status\", \"data\": {\"schema_version\": 1, \"status\": \"RUNNING\", \"lifecycle_state\": \"READY\", \"shadow_mode\": true, \"shadow_state\": \"COLLECTING\", \"is_baseline_ready\": true, \"degraded_reason\": null, \"degraded_collectors\": [], \"baseline_duration_seconds\": 13.69, \"posture\": \"MONITORING\", \"is_auditing_now\": false, \"scan_interval_seconds\": 60, \"total_scans\": 0, \"last_scan_time\": 0.0, \"last_scan_duration_seconds\": 0.0, \"next_scan_in_seconds\": 0, \"active_baseline_id\": \"BASELINE-1788038111-0"
+    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"O c\\u00f3digo que me pediu para guardar \\u00e9 JARVIS-8472.\"}"
   },
   {
-    "timestamp": 1788038125.8954148,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Processando pedido: 'Qual era o c\\u00f3digo que te pedi para guardar?'\"}"
-  },
-  {
-    "timestamp": 1788038125.9007442,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador (Queen)\", \"content\": \"\\u00f0\\u0178\\u2018\\u2018 *Analisando complexidade do pedido e determinando rota do Swarm...*\"}"
-  },
-  {
-    "timestamp": 1788038125.9077928,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador (Queen)\", \"content\": \"Rota determinada: SIMPLE (diretamente com ferramentas rapidas).\"}"
-  },
-  {
-    "timestamp": 1788038125.9224045,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Ol\\u00e1, CEO. Sou o OpenClaw, o seu assistente central e orquestrador de IA, respons\\u00e1vel por coordenar a nossa equipa de especialistas e garantir a execu\\u00e7\\u00e3o dos projetos. O c\\u00f3digo de teste JARVIS-8472 foi guardado.\"}"
-  },
-  {
-    "timestamp": 1788038125.9280305,
+    "timestamp": 1788178340.5402966,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
   },
   {
-    "timestamp": 1788038129.027306,
+    "timestamp": 1788178341.3222995,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Ol\\u00e1. Sou o OpenClaw, o seu assistente central e COO, e a minha\"}"
+  },
+  {
+    "timestamp": 1788178341.3242462,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1788178343.1300766,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788038129.0347083,
+    "timestamp": 1788178343.1351614,
     "direction": "received",
     "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
   },
   {
-    "timestamp": 1788038133.8669696,
+    "timestamp": 1788178347.476078,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788038133.874203,
+    "timestamp": 1788178347.4795623,
     "direction": "received",
     "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
   },
   {
-    "timestamp": 1788038135.069735,
+    "timestamp": 1788178348.6277385,
     "direction": "sent",
     "payload": "{\"type\":\"get_notes\"}"
   },
   {
-    "timestamp": 1788038135.1258483,
+    "timestamp": 1788178348.6846473,
     "direction": "received",
     "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
   },
   {
-    "timestamp": 1788038138.6405916,
+    "timestamp": 1788178352.0487058,
     "direction": "sent",
     "payload": "{\"type\":\"directive\",\"text\":\"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
   },
   {
-    "timestamp": 1788038138.6925237,
+    "timestamp": 1788178352.082944,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
   },
   {
-    "timestamp": 1788038138.6930306,
+    "timestamp": 1788178352.0853863,
     "direction": "received",
     "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00e7\\u00e3o iniciada: Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
   },
   {
-    "timestamp": 1788038142.3511343,
-    "direction": "sent",
-    "payload": "{\"type\":\"list_projects\"}"
-  },
-  {
-    "timestamp": 1788038142.363724,
+    "timestamp": 1788178353.5402925,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Essa quest\\u00e3o n\\u00e3o se enquadra nas nossas \\u00e1reas de especializa\\u00e7\\u00e3o ou nas minhas capacidades como orquestrador da ag\\u00eancia, Sir.\"}"
+    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"N\\u00e3o tenho acesso a essa informa\\u00e7\\u00e3o, Sir. A minha fun\\u00e7\\u00e3o \\u00e9 gerir a equipa e os projetos da ag\\u00eancia.\"}"
   },
   {
-    "timestamp": 1788038142.3835185,
+    "timestamp": 1788178353.541763,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
   },
   {
-    "timestamp": 1788038142.3844166,
+    "timestamp": 1788178355.549586,
+    "direction": "sent",
+    "payload": "{\"type\":\"list_projects\"}"
+  },
+  {
+    "timestamp": 1788178355.5632188,
     "direction": "received",
     "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
   },
   {
-    "timestamp": 1788038143.6078498,
+    "timestamp": 1788178356.4860263,
     "direction": "sent",
     "payload": "{\"type\":\"list_lecture_history\"}"
   },
   {
-    "timestamp": 1788038143.615507,
+    "timestamp": 1788178356.4875948,
     "direction": "received",
     "payload": "{\"type\": \"lecture_history_response\", \"history\": [{\"title\": \"2026-08-18 - Sistemas Multiagente e Arquiteturas RAG\", \"subject\": \"Intelig\\u00eancia Artificial\", \"markdown_path\": \"obsidian_vault/10 - Lectures/Intelig\\u00eancia Artificial/2026-08-18 - Sistemas Multiagente e Arquiteturas RAG.md\", \"date\": \"2026-08-18\", \"status\": \"COMPLETED\"}, {\"title\": \"2026-08-19 - Sistemas Multiagente e Arquiteturas RAG\", \"subject\": \"Intelig\\u00eancia Artificial\", \"markdown_path\": \"obsidian_vault/10 - Lectures/Inteli"
   },
   {
-    "timestamp": 1788038144.6271925,
+    "timestamp": 1788178357.5582857,
     "direction": "sent",
     "payload": "{\"type\":\"generate_lecture_lesson\",\"topic\":\"Sistemas Multiagente e Arquiteturas RAG\",\"subject\":\"Inteligência Artificial\",\"professor\":\"Prof. JARVIS\"}"
   },
   {
-    "timestamp": 1788038144.6995978,
+    "timestamp": 1788178357.6167212,
     "direction": "received",
-    "payload": "{\"type\": \"lecture_lesson_generated\", \"lesson\": {\"topic\": \"Sistemas Multiagente e Arquiteturas RAG\", \"subject\": \"Intelig\\u00eancia Artificial\", \"professor\": \"Prof. JARVIS\", \"date\": \"2026-08-29\", \"markdown_path\": \"obsidian_vault/10 - Lectures/Intelig\\u00eancia Artificial/2026-08-29 - Sistemas Multiagente e Arquiteturas RAG.md\", \"markdown_content\": \"---\\ntype: lecture_notes\\ndomain: academic\\nstatus: verified\\nsource_type: PRIMARY_SOURCE\\nconfidence: high\\nsubject: \\\"Intelig\\u00eancia Artificial\\\"\\"
+    "payload": "{\"type\": \"lecture_lesson_generated\", \"lesson\": {\"topic\": \"Sistemas Multiagente e Arquiteturas RAG\", \"subject\": \"Intelig\\u00eancia Artificial\", \"professor\": \"Prof. JARVIS\", \"date\": \"2026-08-31\", \"markdown_path\": \"obsidian_vault/10 - Lectures/Intelig\\u00eancia Artificial/2026-08-31 - Sistemas Multiagente e Arquiteturas RAG.md\", \"markdown_content\": \"---\\ntype: lecture_notes\\ndomain: academic\\nstatus: verified\\nsource_type: PRIMARY_SOURCE\\nconfidence: high\\nsubject: \\\"Intelig\\u00eancia Artificial\\\"\\"
   },
   {
-    "timestamp": 1788038147.2972598,
+    "timestamp": 1788178359.4299748,
     "direction": "sent",
     "payload": "{\"type\":\"submit_lecture_quiz\",\"topic\":\"Sistemas Multiagente e Arquiteturas RAG\",\"answers\":{\"q1\":0,\"q2\":0,\"q3\":0},\"transfer_answer\":\"Aplicando nós distribuídos com isolamento de falhas, idempotência nas transações e recuperação atómica de estado.\"}"
   },
   {
-    "timestamp": 1788038147.3645613,
+    "timestamp": 1788178359.4925234,
     "direction": "received",
-    "payload": "{\"type\": \"lecture_quiz_evaluated\", \"topic\": \"Sistemas Multiagente e Arquiteturas RAG\", \"score\": 100.0, \"total_questions\": 3, \"correct_answers\": 3, \"feedback\": \"Compreens\\u00e3o de 100.0% validada nos conceitos centrais de Sistemas Multiagente e Arquiteturas RAG.\", \"transfer_passed\": true, \"transfer_feedback\": \"A resposta ao cen\\u00e1rio aplicado demonstrou correta transfer\\u00eancia de conhecimento.\", \"student_mastery\": 0.95, \"next_review_days\": 3, \"next_review_timestamp\": 1788297347.2780285}"
+    "payload": "{\"type\": \"lecture_quiz_evaluated\", \"topic\": \"Sistemas Multiagente e Arquiteturas RAG\", \"score\": 100.0, \"total_questions\": 3, \"correct_answers\": 3, \"feedback\": \"Compreens\\u00e3o de 100.0% validada nos conceitos centrais de Sistemas Multiagente e Arquiteturas RAG.\", \"transfer_passed\": true, \"transfer_feedback\": \"A resposta ao cen\\u00e1rio aplicado demonstrou correta transfer\\u00eancia de conhecimento.\", \"student_mastery\": 0.95, \"next_review_days\": 3, \"next_review_timestamp\": 1788437559.4240236}"
   },
   {
-    "timestamp": 1788038153.385451,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
-  },
-  {
-    "timestamp": 1788038153.5003538,
+    "timestamp": 1788178364.1489956,
     "direction": "sent",
     "payload": "{\"type\":\"directive\",\"text\":\"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\"}"
   },
   {
-    "timestamp": 1788038153.5551617,
+    "timestamp": 1788178364.2009099,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
   },
   {
-    "timestamp": 1788038153.5570576,
+    "timestamp": 1788178364.2012048,
     "direction": "received",
     "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00e7\\u00e3o iniciada: Cria uma pequena aplica\\u00e7\\u00e3o web de lista de tarefas com frontend funcional.\"}"
   },
   {
-    "timestamp": 1788038153.5970354,
+    "timestamp": 1788178364.2284713,
     "direction": "received",
     "payload": "{\"type\": \"project_output\", \"content\": \"[ProjectBuilder] A gerar plano JSON e criar projeto isolado...\\n\"}"
   },
   {
-    "timestamp": 1788038157.3023448,
+    "timestamp": 1788178367.9078739,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788038157.3099675,
+    "timestamp": 1788178367.9122946,
     "direction": "received",
     "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
   },
   {
-    "timestamp": 1788038157.9882615,
+    "timestamp": 1788178368.537678,
     "direction": "sent",
     "payload": "{\"type\":\"get_ast_state\",\"project_id\":\"task-app\"}"
   },
   {
-    "timestamp": 1788038158.02888,
+    "timestamp": 1788178368.570095,
     "direction": "received",
     "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
   },
   {
-    "timestamp": 1788038158.5292294,
+    "timestamp": 1788178369.0509114,
     "direction": "sent",
     "payload": "{\"type\":\"get_ast_state\",\"project_id\":\"task-app\"}"
   },
   {
-    "timestamp": 1788038158.5841694,
+    "timestamp": 1788178369.0876646,
     "direction": "received",
     "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
   },
   {
-    "timestamp": 1788038165.698004,
+    "timestamp": 1788178369.891488,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Project Builder\", \"content\": \"Project Builder falhou: ProjectBuilder planning failed: {\\\"category\\\": \\\"OLLAMA_UNAVAILABLE\\\", \\\"provider\\\": \\\"ollama\\\", \\\"model\\\": \\\"qwen3.5:9b\\\", \\\"attempt_count\\\": 2, \\\"durations\\\": [2.3076, 2.3281], \\\"timeout_config\\\": {\\\"connect\\\": 5.0, \\\"read\\\": 300.0, \\\"write\\\": 15.0, \\\"pool\\\": 5.0}, \\\"prompt_length\\\": 378, \\\"attempts\\\": [{\\\"attempt\\\": 1, \\\"phase\\\": \\\"plan\\\", \\\"duration\\\": 2.3075510999769904, \\\"prompt_length\\\": "
+  },
+  {
+    "timestamp": 1788178369.8972769,
+    "direction": "received",
+    "payload": "{\"type\": \"project_output\", \"content\": \"Project Builder falhou: ProjectBuilder planning failed: {\\\"category\\\": \\\"OLLAMA_UNAVAILABLE\\\", \\\"provider\\\": \\\"ollama\\\", \\\"model\\\": \\\"qwen3.5:9b\\\", \\\"attempt_count\\\": 2, \\\"durations\\\": [2.3076, 2.3281], \\\"timeout_config\\\": {\\\"connect\\\": 5.0, \\\"read\\\": 300.0, \\\"write\\\": 15.0, \\\"pool\\\": 5.0}, \\\"prompt_length\\\": 378, \\\"attempts\\\": [{\\\"attempt\\\": 1, \\\"phase\\\": \\\"plan\\\", \\\"duration\\\": 2.3075510999769904, \\\"prompt_length\\\": 378, \\\"status\\\": \\\"FAILED\\\", \\\"error_ty"
+  },
+  {
+    "timestamp": 1788178369.8976815,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1788178369.897864,
+    "direction": "received",
+    "payload": "{\"type\": \"complete\", \"result\": \"Project Builder falhou: ProjectBuilder planning failed: {\\\"category\\\": \\\"OLLAMA_UNAVAILABLE\\\", \\\"provider\\\": \\\"ollama\\\", \\\"model\\\": \\\"qwen3.5:9b\\\", \\\"attempt_count\\\": 2, \\\"durations\\\": [2.3076, 2.3281], \\\"timeout_config\\\": {\\\"connect\\\": 5.0, \\\"read\\\": 300.0, \\\"write\\\": 15.0, \\\"pool\\\": 5.0}, \\\"prompt_length\\\": 378, \\\"attempts\\\": [{\\\"attempt\\\": 1, \\\"phase\\\": \\\"plan\\\", \\\"duration\\\": 2.3075510999769904, \\\"prompt_length\\\": 378, \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\"
+  },
+  {
+    "timestamp": 1788178374.147334,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788038165.7061343,
+    "timestamp": 1788178374.1500769,
     "direction": "received",
     "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
   },
   {
-    "timestamp": 1788038170.8251126,
+    "timestamp": 1788178377.9628618,
     "direction": "sent",
     "payload": "{\"type\":\"mission_list\",\"project_id\":\"task-app\"}"
   },
   {
-    "timestamp": 1788038170.8252516,
+    "timestamp": 1788178377.9629083,
     "direction": "sent",
     "payload": "{\"type\":\"get_planner_state\"}"
   },
   {
-    "timestamp": 1788038170.828622,
+    "timestamp": 1788178377.9639208,
     "direction": "received",
     "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": []}"
   },
   {
-    "timestamp": 1788038170.832666,
+    "timestamp": 1788178377.9651275,
     "direction": "received",
     "payload": "{\"type\": \"planner_state\", \"data\": null}"
   },
   {
-    "timestamp": 1788038174.4717412,
+    "timestamp": 1788178381.3662992,
     "event": "websocket_created",
     "url": "ws://127.0.0.1:8001/?token=local-dev-token"
   },
   {
-    "timestamp": 1788038174.5057151,
+    "timestamp": 1788178381.376742,
     "direction": "received",
     "payload": "{\"type\": \"system\", \"content\": \"Conectado ao servidor Jarvis WebSocket na porta 8001!\"}"
   },
   {
-    "timestamp": 1788038174.510278,
+    "timestamp": 1788178381.3770185,
     "direction": "received",
     "payload": "{\"type\": \"sandbox_status\", \"status\": {\"mode\": \"local_fallback\", \"port\": 8080, \"is_docker\": false}}"
   },
   {
-    "timestamp": 1788038174.512414,
+    "timestamp": 1788178381.3809948,
     "direction": "received",
     "payload": "{\"type\": \"template_changed\", \"template_name\": \"builder_swarm\", \"name\": \"Builder Swarm (Constru\\u00e7\\u00e3o e C\\u00f3digo)\", \"description\": \"Respons\\u00e1vel pela engenharia de software: cria\\u00e7\\u00e3o de websites, web apps, APIs, automa\\u00e7\\u00f5es, scripts e bases de dados.\", \"agents\": [{\"id\": \"dev_lead\", \"name\": \"Dev Lead\", \"role\": \"L\\u00edder de Engenharia\", \"icon\": \"briefcase\"}, {\"id\": \"coder\", \"name\": \"Coder\", \"role\": \"Programador Principal\", \"icon\": \"code\"}, {\"id\": \"tester\", \"name\": "
   },
   {
-    "timestamp": 1788038174.5134425,
+    "timestamp": 1788178381.3812368,
     "direction": "received",
     "payload": "{\"type\": \"rules_list\", \"rules\": []}"
   },
   {
-    "timestamp": 1788038174.514105,
+    "timestamp": 1788178381.3814256,
     "direction": "received",
     "payload": "{\"type\": \"architecture_list\", \"architecture\": []}"
   },
   {
-    "timestamp": 1788038174.51471,
+    "timestamp": 1788178381.3815806,
     "direction": "received",
     "payload": "{\"type\": \"decisions_list\", \"decisions\": []}"
   },
   {
-    "timestamp": 1788038174.5317001,
+    "timestamp": 1788178381.3848276,
     "direction": "received",
     "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
   },
   {
-    "timestamp": 1788038174.5328815,
+    "timestamp": 1788178381.3868635,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+  },
+  {
+    "timestamp": 1788178381.4186156,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788038174.5330694,
+    "timestamp": 1788178381.4188352,
     "direction": "sent",
     "payload": "{\"type\":\"get_notes\"}"
   },
   {
-    "timestamp": 1788038174.5331771,
+    "timestamp": 1788178381.4189055,
     "direction": "sent",
     "payload": "{\"type\":\"get_rules\"}"
   },
   {
-    "timestamp": 1788038174.5332747,
+    "timestamp": 1788178381.418944,
     "direction": "sent",
     "payload": "{\"type\":\"get_planner_state\"}"
   },
   {
-    "timestamp": 1788038174.543819,
-    "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
-  },
-  {
-    "timestamp": 1788038174.9186265,
+    "timestamp": 1788178381.5125208,
     "direction": "received",
     "payload": "{\"type\": \"project_context\", \"context\": {\"project_id\": \"task-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\task-app\", \"project_name\": \"task-app\", \"python_executable\": null, \"runtime_source\": \"unavailable\", \"runtime_version\": null, \"stack\": [\"HTML/JavaScript\"], \"frameworks\": [], \"package_managers\": [], \"entrypoints\": [\"index.html\", \"app.js\"], \"source_roots\": [\".\"], \"package_scripts\": {}, \"suggested_commands\": [{\"kind\": \"syntax\", \"command\": \"node --check \\\"app.js\\\"\","
   },
   {
-    "timestamp": 1788038174.9209666,
+    "timestamp": 1788178381.5127861,
     "direction": "received",
     "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
   },
   {
-    "timestamp": 1788038174.9234166,
+    "timestamp": 1788178381.5135946,
     "direction": "received",
     "payload": "{\"type\": \"coding_session\", \"data\": null}"
   },
   {
-    "timestamp": 1788038174.9241402,
+    "timestamp": 1788178381.5138566,
     "direction": "received",
     "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": []}"
   },
   {
-    "timestamp": 1788038174.9316683,
+    "timestamp": 1788178381.515388,
     "direction": "received",
     "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
   },
   {
-    "timestamp": 1788038174.9534447,
+    "timestamp": 1788178381.5234492,
     "direction": "received",
     "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
   },
   {
-    "timestamp": 1788038174.954574,
+    "timestamp": 1788178381.5239546,
     "direction": "received",
     "payload": "{\"type\": \"rules_list\", \"rules\": []}"
   },
   {
-    "timestamp": 1788038174.9553382,
+    "timestamp": 1788178381.5241039,
     "direction": "received",
     "payload": "{\"type\": \"planner_state\", \"data\": null}"
   }

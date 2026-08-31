@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0a0d14; }
+      .stage-box { fill: #111722; stroke: #1e293b; stroke-width: 1.5; rx: 8px; }
+      .step-active { fill: #0e2a3b; stroke: #0284c7; stroke-width: 1.5; rx: 6px; }
+      .step-graph { fill: #1a1e38; stroke: #6366f1; stroke-width: 1.5; rx: 6px; }
+      .step-exec { fill: #271838; stroke: #a855f7; stroke-width: 1.5; rx: 6px; }
+      .step-qa { fill: #0c2b20; stroke: #10b981; stroke-width: 1.5; rx: 6px; }
+      .step-repair { fill: #34141e; stroke: #e11d48; stroke-width: 1.5; rx: 6px; }
+      
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #94a3b8; }
+      .stage-title { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+      .step-name { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; fill: #f1f5f9; }
+      .step-detail { font-family: system-ui, -apple-system, sans-serif; font-size: 9.5px; fill: #94a3b8; }
+      .file-tag { font-family: monospace; font-size: 9px; fill: #38bdf8; }
+      
+      .arrow { stroke: #38bdf8; stroke-width: 1.5; fill: none; }
+      .arrow-purple { stroke: #c084fc; stroke-width: 1.5; fill: none; }
+      .arrow-green { stroke: #34d399; stroke-width: 1.5; fill: none; }
+      .arrow-loop { stroke: #fb7185; stroke-width: 1.5; fill: none; stroke-dasharray: 4,4; }
+    </style>
+    
+    <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+    <marker id="arr-loop" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fb7185" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" class="bg" />
+
+  <!-- Header -->
+  <text x="30" y="38" class="title">JARVIS OS — Coding Agent 2.0 Pipeline</text>
+  <text x="30" y="56" class="subtitle">Deterministic Symbol Resolution, Multi-File Patching, Build Verification &amp; Autonomous Self-Repair Loop</text>
+
+  <!-- ── ROW 1: SPECIFICATION & GRAPH DISCOVERY ── -->
+
+  <!-- 1. Prompt & Spec -->
+  <rect x="30" y="80" width="215" height="135" class="step-active" />
+  <text x="42" y="100" class="stage-title" style="fill:#38bdf8;">1. SPECIFICATION</text>
+  <text x="42" y="120" class="step-name">Natural Language Prompt</text>
+  <text x="42" y="136" class="step-detail">• Intent extraction &amp; constraints</text>
+  <text x="42" y="152" class="step-name">Spec-Driven Contract</text>
+  <text x="42" y="168" class="step-detail">• Acceptance criteria &amp; invariants</text>
+  <text x="42" y="196" class="file-tag">spec-driven-development</text>
+
+  <path d="M 245 147 L 270 147" class="arrow" marker-end="url(#arr)" />
+
+  <!-- 2. Artifact Inference -->
+  <rect x="275" y="80" width="215" height="135" class="step-active" />
+  <text x="287" y="100" class="stage-title" style="fill:#38bdf8;">2. ARTIFACT INFERENCE</text>
+  <text x="287" y="120" class="step-name">Target File Discovery</text>
+  <text x="287" y="136" class="step-detail">• Entrypoint &amp; schema mapping</text>
+  <text x="287" y="152" class="step-name">Confidence Scoring</text>
+  <text x="287" y="168" class="step-detail">• Provenance tracking &amp; boundary check</text>
+  <text x="287" y="196" class="file-tag">intelligence/artifact_inference.py</text>
+
+  <path d="M 490 147 L 515 147" class="arrow" marker-end="url(#arr)" />
+
+  <!-- 3. Repository Graph -->
+  <rect x="520" y="80" width="215" height="135" class="step-graph" />
+  <text x="532" y="100" class="stage-title" style="fill:#818cf8;">3. REPOSITORY GRAPH</text>
+  <text x="532" y="120" class="step-name">Monorepo Structure</text>
+  <text x="532" y="136" class="step-detail">• tsconfig / package.json resolver</text>
+  <text x="532" y="152" class="step-name">Typed Semantic Resolver</text>
+  <text x="532" y="168" class="step-detail">• Cross-file import paths &amp; aliases</text>
+  <text x="532" y="196" class="file-tag">intelligence/repository_graph.py</text>
+
+  <path d="M 735 147 L 760 147" class="arrow" marker-end="url(#arr)" />
+
+  <!-- 4. AST Symbol Graph -->
+  <rect x="765" y="80" width="205" height="135" class="step-graph" />
+  <text x="777" y="100" class="stage-title" style="fill:#818cf8;">4. AST SYMBOL GRAPH</text>
+  <text x="777" y="120" class="step-name">Symbol Extraction</text>
+  <text x="777" y="136" class="step-detail">• Functions, classes, interfaces</text>
+  <text x="777" y="152" class="step-name">AST Node Mapping</text>
+  <text x="777" y="168" class="step-detail">• Byte ranges &amp; symbol hash checks</text>
+  <text x="777" y="196" class="file-tag">intelligence/project_context.py</text>
+
+  <!-- Connection: Row 1 to Row 2 -->
+  <path d="M 867 215 L 867 255" class="arrow-purple" marker-end="url(#arr-purple)" />
+
+  <!-- ── ROW 2: PLANNING, PATCHING & EXECUTION ── -->
+
+  <!-- 8. Build Pipeline -->
+  <rect x="30" y="260" width="215" height="135" class="step-exec" />
+  <text x="42" y="280" class="stage-title" style="fill:#c084fc;">7. BUILD &amp; RUNTIME</text>
+  <text x="42" y="300" class="step-name">Compilation &amp; Lint</text>
+  <text x="42" y="316" class="step-detail">• py_compile, tsc, eslint verification</text>
+  <text x="42" y="332" class="step-name">Sandbox Execution</text>
+  <text x="42" y="348" class="step-detail">• Background process / port preview</text>
+  <text x="42" y="376" class="file-tag">intelligence/build_pipeline.py</text>
+
+  <path d="M 275 327 L 250 327" class="arrow-purple" marker-end="url(#arr-purple)" />
+
+  <!-- 7. Atomic Patch Engine -->
+  <rect x="275" y="260" width="215" height="135" class="step-exec" />
+  <text x="287" y="280" class="stage-title" style="fill:#c084fc;">6. ATOMIC PATCH ENGINE</text>
+  <text x="287" y="300" class="step-name">Safe Symbol Replacement</text>
+  <text x="287" y="316" class="step-detail">• Verbatim AST snippet swap</text>
+  <text x="287" y="332" class="step-name">Automated Checkpoint</text>
+  <text x="287" y="348" class="step-detail">• Pre-modification byte backup</text>
+  <text x="287" y="376" class="file-tag">agents/patch_engine.py</text>
+
+  <path d="M 520 327 L 495 327" class="arrow-purple" marker-end="url(#arr-purple)" />
+
+  <!-- 6. Cross-File Validator -->
+  <rect x="520" y="260" width="215" height="135" class="step-exec" />
+  <text x="532" y="280" class="stage-title" style="fill:#c084fc;">5. CROSS-FILE VALIDATOR</text>
+  <text x="532" y="300" class="step-name">Contract Check</text>
+  <text x="532" y="316" class="step-detail">• Signature &amp; export alignment</text>
+  <text x="532" y="332" class="step-name">Dependency Impact</text>
+  <text x="532" y="348" class="step-detail">• Cascading mutation prevention</text>
+  <text x="532" y="376" class="file-tag">intelligence/cross_file_validator.py</text>
+
+  <path d="M 765 327 L 740 327" class="arrow-purple" marker-end="url(#arr-purple)" />
+
+  <!-- 5. Coding Session Planner -->
+  <rect x="765" y="260" width="205" height="135" class="step-exec" />
+  <text x="777" y="280" class="stage-title" style="fill:#c084fc;">5. CODING SESSION</text>
+  <text x="777" y="300" class="step-name">Deterministic Planning</text>
+  <text x="777" y="316" class="step-detail">• Multi-file unified diff proposals</text>
+  <text x="777" y="332" class="step-name">Session State Machine</text>
+  <text x="777" y="348" class="step-detail">• PROPOSED -> SUCCEEDED / ROLLED_BACK</text>
+  <text x="777" y="376" class="file-tag">intelligence/coding_session.py</text>
+
+  <!-- Connection: Row 2 to Row 3 -->
+  <path d="M 137 395 L 137 435" class="arrow-green" marker-end="url(#arr-green)" />
+
+  <!-- ── ROW 3: BROWSER QA, VERIFICATION & SELF-REPAIR LOOP ── -->
+
+  <!-- 9. Real Browser QA -->
+  <rect x="30" y="440" width="460" height="145" class="step-qa" />
+  <text x="42" y="460" class="stage-title" style="fill:#34d399;">8. REAL BROWSER QA &amp; EVIDENCE CAPTURE</text>
+  
+  <rect x="42" y="472" width="210" height="70" class="stage-box" />
+  <text x="52" y="492" class="step-name">Chrome DevTools Protocol</text>
+  <text x="52" y="508" class="step-detail">• Headless browser DOM snapshot</text>
+  <text x="52" y="524" class="step-detail">• Console error &amp; network failure detection</text>
+
+  <rect x="262" y="472" width="215" height="70" class="stage-box" />
+  <text x="272" y="492" class="step-name">Visual &amp; State Evidence</text>
+  <text x="272" y="508" class="step-detail">• Automated screenshots (before/action/after)</text>
+  <text x="272" y="524" class="step-detail">• Verified pass/fail verdict</text>
+  <text x="42" y="568" class="file-tag">evidence/browser_validation/ (TEST-001 to TEST-011)</text>
+
+  <!-- 10. Autonomous Self-Repair Loop -->
+  <rect x="520" y="440" width="450" height="145" class="step-repair" />
+  <text x="532" y="460" class="stage-title" style="fill:#fb7185;">9. AUTONOMOUS SELF-REPAIR &amp; FAILURE MEMORY</text>
+
+  <rect x="532" y="472" width="205" height="70" class="stage-box" />
+  <text x="542" y="492" class="step-name">Failure Memory Bank</text>
+  <text x="542" y="508" class="step-detail">• Pattern fingerprinting &amp; repetition blocker</text>
+  <text x="542" y="524" class="step-detail">• Injects negative examples to prevent loops</text>
+
+  <rect x="747" y="472" width="210" height="70" class="stage-box" />
+  <text x="757" y="492" class="step-name">AST Repair v2</text>
+  <text x="757" y="508" class="step-detail">• Automatic syntax / token fix</text>
+  <text x="757" y="524" class="step-detail">• Rollback to last known-good checkpoint</text>
+  <text x="532" y="568" class="file-tag">intelligence/autonomous_repair_loop.py</text>
+
+  <!-- Repair Loop Arrow returning to Coding Session -->
+  <path d="M 900 440 C 980 380, 980 320, 975 320" class="arrow-loop" marker-end="url(#arr-loop)" />
+  <text x="910" y="380" font-family="sans-serif" font-size="10" font-weight="700" fill="#fb7185">Repair Loop</text>
+</svg>

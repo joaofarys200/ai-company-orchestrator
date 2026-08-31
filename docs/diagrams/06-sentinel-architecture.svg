@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0a0d14; }
+      .panel { fill: #111722; stroke: #1e293b; stroke-width: 1.5; rx: 8px; }
+      .subpanel { fill: #161f2e; stroke: #2a3a52; stroke-width: 1; rx: 6px; }
+      
+      .collector-box { fill: #0e2a3b; stroke: #0284c7; stroke-width: 1.5; rx: 6px; }
+      .baseline-box { fill: #2f230b; stroke: #d97706; stroke-width: 1.5; rx: 6px; }
+      .threat-box { fill: #34141e; stroke: #e11d48; stroke-width: 1.5; rx: 6px; }
+      .approval-box { fill: #271838; stroke: #a855f7; stroke-width: 2; rx: 6px; }
+      .action-box { fill: #0c2b20; stroke: #10b981; stroke-width: 1.5; rx: 6px; }
+      
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #94a3b8; }
+      .stage-title { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+      .node-title { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; fill: #f1f5f9; }
+      .node-desc { font-family: system-ui, -apple-system, sans-serif; font-size: 10px; fill: #94a3b8; }
+      .tag { font-family: monospace; font-size: 9px; }
+      
+      .arrow { stroke: #38bdf8; stroke-width: 1.5; fill: none; }
+      .arrow-amber { stroke: #fbbf24; stroke-width: 1.5; fill: none; }
+      .arrow-red { stroke: #fb7185; stroke-width: 1.5; fill: none; }
+      .arrow-purple { stroke: #c084fc; stroke-width: 2; fill: none; }
+      .arrow-green { stroke: #34d399; stroke-width: 1.5; fill: none; }
+      .arrow-rollback { stroke: #fbbf24; stroke-width: 1.5; fill: none; stroke-dasharray: 4,4; }
+    </style>
+    
+    <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fbbf24" />
+    </marker>
+    <marker id="arr-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fb7185" />
+    </marker>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+    <marker id="arr-rollback" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fbbf24" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" class="bg" />
+
+  <!-- Header -->
+  <text x="30" y="38" class="title">JARVIS OS — Security Sentinel Watchdog (EDR)</text>
+  <text x="30" y="56" class="subtitle">Real-Time Host Telemetry, Baseline Drift Detection, Human Approval Gates &amp; Verified Reversible Response</text>
+
+  <!-- ── 1. HOST COLLECTORS (WINDOWS) ── -->
+  <rect x="30" y="80" width="220" height="240" class="panel" />
+  <text x="45" y="102" class="stage-title" style="fill:#38bdf8;">1. HOST COLLECTORS</text>
+
+  <rect x="45" y="115" width="190" height="42" class="collector-box" />
+  <text x="55" y="133" class="node-title">Process Activity</text>
+  <text x="55" y="147" class="node-desc">PID, Parent PID, CLI arguments, hash</text>
+
+  <rect x="45" y="165" width="190" height="42" class="collector-box" />
+  <text x="55" y="183" class="node-title">Network &amp; Ports</text>
+  <text x="55" y="197" class="node-desc">Listening sockets, external endpoints</text>
+
+  <rect x="45" y="215" width="190" height="42" class="collector-box" />
+  <text x="55" y="233" class="node-title">Persistence &amp; Tasks</text>
+  <text x="55" y="247" class="node-desc">Scheduled tasks, registry run keys</text>
+
+  <rect x="45" y="265" width="190" height="42" class="collector-box" />
+  <text x="55" y="283" class="node-title">Filesystem &amp; Hosts</text>
+  <text x="55" y="297" class="node-desc">Critical system paths &amp; driver states</text>
+
+  <path d="M 250 200 L 280 200" class="arrow" marker-end="url(#arr)" />
+
+  <!-- ── 2. BASELINE & CORRELATION ENGINE ── -->
+  <rect x="285" y="80" width="220" height="240" class="panel" />
+  <text x="300" y="102" class="stage-title" style="fill:#fbbf24;">2. BASELINE &amp; DRIFT</text>
+
+  <rect x="300" y="115" width="190" height="85" class="baseline-box" />
+  <text x="310" y="133" class="node-title">Known-Good Baseline</text>
+  <text x="310" y="151" class="node-desc">• Snapshot at startup</text>
+  <text x="310" y="167" class="node-desc">• User-accepted benign whitelist</text>
+  <text x="310" y="183" class="node-desc">• Drift distance calculation</text>
+
+  <rect x="300" y="210" width="190" height="95" class="subpanel" />
+  <text x="310" y="228" class="node-title">Temporal Correlation Engine</text>
+  <text x="310" y="246" class="node-desc">• Merges events in 60s windows</text>
+  <text x="310" y="262" class="node-desc">• Severity: BENIGN -> SUSPICIOUS</text>
+  <text x="310" y="278" class="node-desc">• HIGH_RISK -> MALICIOUS</text>
+  <text x="310" y="294" class="tag" fill="#fbbf24">security/sentinel/correlation.py</text>
+
+  <path d="M 505 200 L 535 200" class="arrow-amber" marker-end="url(#arr-amber)" />
+
+  <!-- ── 3. THREAT DETECTION & INCIDENT ── -->
+  <rect x="540" y="80" width="200" height="240" class="threat-box" />
+  <text x="555" y="102" class="stage-title" style="fill:#fb7185;">3. INCIDENT CLASSIFIER</text>
+
+  <rect x="555" y="115" width="170" height="90" class="subpanel" />
+  <text x="565" y="133" class="node-title">Security Incident</text>
+  <text x="565" y="151" class="node-desc">• Threat fingerprinting</text>
+  <text x="565" y="167" class="node-desc">• Evidence attachment IDs</text>
+  <text x="565" y="183" class="node-desc">• Auto-recommended action</text>
+  <text x="565" y="197" class="tag" fill="#fb7185">IncidentStatus: OPEN</text>
+
+  <rect x="555" y="215" width="170" height="90" class="subpanel" />
+  <text x="565" y="233" class="node-title">Risk Scoring Matrix</text>
+  <text x="565" y="251" class="node-desc">• Confidence % score</text>
+  <text x="565" y="267" class="node-desc">• Blast radius estimation</text>
+  <text x="565" y="283" class="node-desc">• Permission level gate</text>
+
+  <path d="M 740 200 L 770 200" class="arrow-red" marker-end="url(#arr-red)" />
+
+  <!-- ── 4. HUMAN APPROVAL GATE ── -->
+  <rect x="775" y="80" width="195" height="240" class="approval-box" />
+  <text x="790" y="102" class="stage-title" style="fill:#c084fc;">4. HUMAN APPROVAL</text>
+
+  <rect x="790" y="115" width="165" height="110" class="subpanel" />
+  <text x="800" y="133" class="node-title">Approval Modal UI</text>
+  <text x="800" y="151" class="node-desc">• Interactive review prompt</text>
+  <text x="800" y="167" class="node-desc">• Shows rationale &amp; target</text>
+  <text x="800" y="183" class="node-desc">• Pre-state snapshot view</text>
+  <text x="800" y="207" class="tag" fill="#c084fc">WAITING_APPROVAL</text>
+
+  <rect x="790" y="235" width="165" height="70" class="subpanel" />
+  <text x="800" y="253" class="node-title">Decision Audit</text>
+  <text x="800" y="269" class="node-desc">• APPROVE / REJECT</text>
+  <text x="800" y="285" class="node-desc">• Sign-off by user token</text>
+
+  <!-- Connection: Row 1 to Row 2 -->
+  <path d="M 872 320 L 872 360" class="arrow-purple" marker-end="url(#arr-purple)" />
+
+  <!-- ── 5. BOTTOM ROW: RESPONSE ACTIONS, VERIFICATION & ROLLBACK ── -->
+  <rect x="30" y="360" width="940" height="230" class="panel" />
+  <text x="45" y="382" class="stage-title" style="fill:#34d399;">5. RESPONSE ACTIONS, POST-VERIFICATION &amp; REVERSIBLE ROLLBACK</text>
+
+  <rect x="45" y="398" width="275" height="175" class="action-box" />
+  <text x="57" y="420" class="stage-title" style="fill:#34d399;">Automated Response Actions</text>
+  <text x="57" y="442" class="node-title">• TERMINATE_PROCESS</text>
+  <text x="57" y="456" class="node-desc">Encerra árvore de processos filhos (taskkill /F /T)</text>
+  <text x="57" y="474" class="node-title">• QUARANTINE_FILE</text>
+  <text x="57" y="488" class="node-desc">Move ficheiro suspeito para sentinel/quarantine/</text>
+  <text x="57" y="506" class="node-title">• DISABLE_SCHEDULED_TASK</text>
+  <text x="57" y="520" class="node-desc">Desativa tarefas e chaves de persistência host</text>
+  <text x="57" y="542" class="tag" fill="#34d399">security/sentinel/response/</text>
+
+  <path d="M 320 485 L 350 485" class="arrow-green" marker-end="url(#arr-green)" />
+
+  <rect x="355" y="398" width="290" height="175" class="subpanel" />
+  <text x="367" y="420" class="stage-title" style="fill:#38bdf8;">Execution &amp; Post-State Verification</text>
+  <text x="367" y="442" class="node-title">• Atomic Execution</text>
+  <text x="367" y="456" class="node-desc">Executa a ação aprovada e captura o código de retorno</text>
+  <text x="367" y="474" class="node-title">• Post-State Audit</text>
+  <text x="367" y="488" class="node-desc">Re-inspeciona sockets e processos para confirmar terminação</text>
+  <text x="367" y="506" class="node-title">• Status Update</text>
+  <text x="367" y="520" class="node-desc">Muda incidente para CONTAINED ou RESOLVED</text>
+  <text x="367" y="542" class="tag" fill="#38bdf8">SentinelVerificationEngine</text>
+
+  <path d="M 645 485 L 675 485" class="arrow" marker-end="url(#arr)" />
+
+  <rect x="680" y="398" width="275" height="175" class="baseline-box" />
+  <text x="692" y="420" class="stage-title" style="fill:#fbbf24;">One-Click Snapshot Rollback</text>
+  <text x="692" y="442" class="node-title">• Reversible Mutations</text>
+  <text x="692" y="456" class="node-desc">Restaura ficheiros em quarentena para o local original</text>
+  <text x="692" y="474" class="node-title">• Re-enable Tasks</text>
+  <text x="692" y="488" class="node-desc">Reativa tarefas agendadas em caso de falso positivo</text>
+  <text x="692" y="506" class="node-title">• Full State Recovery</text>
+  <text x="692" y="520" class="node-desc">Garante zero perda de dados acidental</text>
+  <text x="692" y="542" class="tag" fill="#fbbf24">Status: ROLLED_BACK</text>
+
+  <!-- Rollback Loop indicator -->
+  <path d="M 817 398 C 817 340, 480 340, 480 398" class="arrow-rollback" marker-end="url(#arr-rollback)" />
+  <text x="590" y="352" font-family="sans-serif" font-size="10" font-weight="700" fill="#fbbf24">Undo / Rollback</text>
+</svg>

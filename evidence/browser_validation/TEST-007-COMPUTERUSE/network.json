@@ -1,102 +1,102 @@
 [
   {
-    "timestamp": 1788038198.4288487,
+    "timestamp": 1788178401.0378191,
     "url": "http://localhost:8000/",
     "method": "GET",
     "resource_type": "document"
   },
   {
-    "timestamp": 1788038198.8303342,
-    "url": "http://localhost:8000/assets/index-DC-0GnbK.js",
+    "timestamp": 1788178401.4033897,
+    "url": "http://localhost:8000/assets/index-BGVyiw7O.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038198.8306625,
-    "url": "http://localhost:8000/assets/index-C2wN8_K8.css",
+    "timestamp": 1788178401.403507,
+    "url": "http://localhost:8000/assets/index-BxUOax09.css",
     "method": "GET",
     "resource_type": "stylesheet"
   },
   {
-    "timestamp": 1788038211.4369595,
-    "url": "http://localhost:8000/assets/CodeEditor-0lsvnhLj.js",
+    "timestamp": 1788178412.0504866,
+    "url": "http://localhost:8000/assets/CodeEditor-CqoGQeti.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038211.4374757,
-    "url": "http://localhost:8000/assets/editor.api-D5lxkGCw.js",
+    "timestamp": 1788178412.0506678,
+    "url": "http://localhost:8000/assets/editor.api-C3XdcBy-.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038211.437726,
+    "timestamp": 1788178412.050772,
     "url": "http://localhost:8000/assets/editor-jjEx9u7D.css",
     "method": "GET",
     "resource_type": "stylesheet"
   },
   {
-    "timestamp": 1788038211.438192,
-    "url": "http://localhost:8000/assets/toggleHighContrast-DeraHyMA.js",
+    "timestamp": 1788178412.050893,
+    "url": "http://localhost:8000/assets/toggleHighContrast-DijhrTkk.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038211.439886,
+    "timestamp": 1788178412.0509722,
     "url": "http://localhost:8000/assets/toggleHighContrast--ixms01u.css",
     "method": "GET",
     "resource_type": "stylesheet"
   },
   {
-    "timestamp": 1788038211.4400883,
-    "url": "http://localhost:8000/assets/register-CfpO_Rgw.js",
+    "timestamp": 1788178412.0510406,
+    "url": "http://localhost:8000/assets/register-DxeDKRsB.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038212.2398963,
-    "url": "http://localhost:8000/assets/javascript-tVR5MAVK.js",
+    "timestamp": 1788178412.5919483,
+    "url": "http://localhost:8000/assets/javascript-1otiyGh1.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038212.2400599,
-    "url": "http://localhost:8000/assets/typescript-D0vI_kmg.js",
+    "timestamp": 1788178412.5920873,
+    "url": "http://localhost:8000/assets/typescript-B3Q30eiW.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038212.240236,
-    "url": "http://localhost:8000/assets/tsMode-J4BLyE9J.js",
+    "timestamp": 1788178412.5921717,
+    "url": "http://localhost:8000/assets/tsMode-Chvul00q.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038212.2404552,
-    "url": "http://localhost:8000/assets/workers-mwvPmZXX.js",
+    "timestamp": 1788178412.5922487,
+    "url": "http://localhost:8000/assets/workers-DFy4Dsnk.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038212.4017696,
-    "url": "http://localhost:8000/assets/ts.worker-BFy34-VB.js",
-    "method": "GET",
-    "resource_type": "script"
-  },
-  {
-    "timestamp": 1788038212.5487118,
+    "timestamp": 1788178412.8051612,
     "url": "http://localhost:8000/assets/editor.worker-s_hwqnK9.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038212.7863533,
+    "timestamp": 1788178412.8383262,
+    "url": "http://localhost:8000/assets/ts.worker-BFy34-VB.js",
+    "method": "GET",
+    "resource_type": "script"
+  },
+  {
+    "timestamp": 1788178413.2491264,
     "url": "http://localhost:8000/assets/codicon-Brq4_Ui5.ttf",
     "method": "GET",
     "resource_type": "font"
   },
   {
-    "timestamp": 1788038218.019803,
+    "timestamp": 1788178417.796327,
     "url": "http://localhost:8080/",
     "method": "GET",
     "resource_type": "document"

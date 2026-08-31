@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0a0d14; }
+      .panel { fill: #111722; stroke: #1e293b; stroke-width: 1.5; rx: 8px; }
+      .subpanel { fill: #161f2e; stroke: #2a3a52; stroke-width: 1; rx: 6px; }
+      
+      .obsidian-box { fill: #1f1838; stroke: #8b5cf6; stroke-width: 1.5; rx: 6px; }
+      .rag-box { fill: #0e2a3b; stroke: #0284c7; stroke-width: 1.5; rx: 6px; }
+      .lecture-box { fill: #2f230b; stroke: #d97706; stroke-width: 1.5; rx: 6px; }
+      .memory-box { fill: #0c2b20; stroke: #10b981; stroke-width: 1.5; rx: 6px; }
+      
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #94a3b8; }
+      .stage-title { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+      .node-title { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; fill: #f1f5f9; }
+      .node-desc { font-family: system-ui, -apple-system, sans-serif; font-size: 10px; fill: #94a3b8; }
+      .tag { font-family: monospace; font-size: 9px; }
+      
+      .arrow { stroke: #38bdf8; stroke-width: 1.5; fill: none; }
+      .arrow-purple { stroke: #c084fc; stroke-width: 1.5; fill: none; }
+      .arrow-amber { stroke: #fbbf24; stroke-width: 1.5; fill: none; }
+      .arrow-green { stroke: #34d399; stroke-width: 1.5; fill: none; }
+    </style>
+    
+    <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fbbf24" />
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" class="bg" />
+
+  <!-- Header -->
+  <text x="30" y="38" class="title">JARVIS OS — Knowledge System &amp; Continuous Learning</text>
+  <text x="30" y="56" class="subtitle">Obsidian Epistemic Graph, Bi-Directional RAG, Cornell Lecture Synthesis &amp; Compounding Memory</text>
+
+  <!-- ── 1. OBSIDIAN KNOWLEDGE VAULT ── -->
+  <rect x="30" y="80" width="460" height="230" class="panel" />
+  <text x="45" y="102" class="stage-title" style="fill:#c084fc;">1. OBSIDIAN KNOWLEDGE VAULT &amp; EPISTEMIC GRAPH</text>
+
+  <rect x="45" y="115" width="200" height="85" class="obsidian-box" />
+  <text x="55" y="133" class="node-title">Local Markdown Vault</text>
+  <text x="55" y="151" class="node-desc">• 100+ curated research notes</text>
+  <text x="55" y="167" class="node-desc">• Wikilinks ([[Note]]) &amp; tags (#ai)</text>
+  <text x="55" y="183" class="node-desc">• Frontmatter metadata schema</text>
+
+  <rect x="260" y="115" width="215" height="85" class="subpanel" />
+  <text x="270" y="133" class="node-title">Epistemic Graph Builder</text>
+  <text x="270" y="151" class="node-desc">• Automated backlink graph</text>
+  <text x="270" y="167" class="node-desc">• Knowledge gap detection</text>
+  <text x="270" y="183" class="node-desc">• Cross-domain clustering</text>
+
+  <rect x="45" y="210" width="430" height="85" class="subpanel" />
+  <text x="55" y="228" class="node-title">Vault Tool Integration (agents/obsidian_tools.py)</text>
+  <text x="55" y="246" class="node-desc">• list_vault_notes, read_vault_note, search_vault_notes, create_vault_note, append_vault_note</text>
+  <text x="55" y="262" class="node-desc">• Safe atomic file operations within OBSIDIAN_VAULT_PATH boundary</text>
+  <text x="55" y="278" class="tag" fill="#c084fc">docs/OBSIDIAN_KNOWLEDGE_GRAPH_AND_EPISTEMIC_REPORT.md</text>
+
+  <!-- ── 2. BI-DIRECTIONAL RAG & VECTOR SEARCH ── -->
+  <rect x="510" y="80" width="460" height="230" class="panel" />
+  <text x="525" y="102" class="stage-title" style="fill:#38bdf8;">2. BI-DIRECTIONAL RAG &amp; SEMANTIC EMBEDDINGS</text>
+
+  <rect x="525" y="115" width="210" height="85" class="rag-box" />
+  <text x="535" y="133" class="node-title">Semantic Code &amp; Doc Index</text>
+  <text x="535" y="151" class="node-desc">• ChromaDB / Local Embeddings</text>
+  <text x="535" y="167" class="node-desc">• Hybrid keyword + vector scoring</text>
+  <text x="535" y="183" class="node-desc">• Top-K contextual chunking</text>
+
+  <rect x="745" y="115" width="210" height="85" class="subpanel" />
+  <text x="755" y="133" class="node-title">Dynamic Context Injection</text>
+  <text x="755" y="151" class="node-desc">• Injects relevant excerpts</text>
+  <text x="755" y="167" class="node-desc">• Relevance thresholding</text>
+  <text x="755" y="183" class="node-desc">• Token budget compaction</text>
+
+  <rect x="525" y="210" width="430" height="85" class="subpanel" />
+  <text x="535" y="228" class="node-title">Research &amp; Scraper Ingestion</text>
+  <text x="535" y="246" class="node-desc">• search_arxiv: Live academic paper abstracts &amp; PDF links</text>
+  <text x="535" y="262" class="node-desc">• read_pdf: Local PDF text extraction via pdfplumber</text>
+  <text x="535" y="278" class="node-desc">• firecrawl_scrape_url: Clean web markdown conversion</text>
+
+  <!-- ── 3. CORNELL LECTURE RECORDER & QUIZ GENERATOR ── -->
+  <rect x="30" y="330" width="460" height="265" class="panel" />
+  <text x="45" y="352" class="stage-title" style="fill:#fbbf24;">3. CORNELL LECTURE RECORDER &amp; SYNTHESIS</text>
+
+  <rect x="45" y="365" width="210" height="95" class="lecture-box" />
+  <text x="55" y="383" class="node-title">Audio Lecture Recorder</text>
+  <text x="55" y="401" class="node-desc">• Real-time microphone capture</text>
+  <text x="55" y="417" class="node-desc">• WAV stream slicing &amp; noise filter</text>
+  <text x="55" y="433" class="node-desc">• Audio level metering</text>
+  <text x="55" y="449" class="tag" fill="#fbbf24">services/lecture_recorder.py</text>
+
+  <rect x="265" y="365" width="210" height="95" class="subpanel" />
+  <text x="275" y="383" class="node-title">Cornell Synthesizer</text>
+  <text x="275" y="401" class="node-desc">• Whisper transcription</text>
+  <text x="275" y="417" class="node-desc">• Cornell Note format generation</text>
+  <text x="275" y="433" class="node-desc">• Key Cues, Summary, Questions</text>
+  <text x="275" y="449" class="tag" fill="#fbbf24">services/lecture_synthesizer.py</text>
+
+  <rect x="45" y="470" width="430" height="110" class="subpanel" />
+  <text x="55" y="490" class="node-title">Interactive Lecture Quiz Engine</text>
+  <text x="55" y="508" class="node-desc">• Automated 5-question multiple choice + transfer task generation</text>
+  <text x="55" y="524" class="node-desc">• Real-time evaluation &amp; feedback score in the Frontend Workspace HUD</text>
+  <text x="55" y="540" class="node-desc">• Automatically saves generated study guides directly into the Obsidian Vault</text>
+  <text x="55" y="562" class="tag" fill="#fbbf24">frontend/src/features/lectures/LecturesPanel.tsx</text>
+
+  <!-- ── 4. COMPOUNDING MEMORY & FAILURE BANK ── -->
+  <rect x="510" y="330" width="460" height="265" class="panel" />
+  <text x="525" y="352" class="stage-title" style="fill:#34d399;">4. COMPOUNDING MEMORY &amp; AGENT CONTINUOUS LEARNING</text>
+
+  <rect x="525" y="365" width="210" height="95" class="memory-box" />
+  <text x="535" y="383" class="node-title">Compounding Rules (SQLite)</text>
+  <text x="535" y="401" class="node-desc">• User corrections &amp; preferences</text>
+  <text x="535" y="417" class="node-desc">• Persistent key-value memory</text>
+  <text x="535" y="433" class="node-desc">• ECC error-correction loop</text>
+  <text x="535" y="449" class="tag" fill="#34d399">persistence/repositories/rules.py</text>
+
+  <rect x="745" y="365" width="210" height="95" class="subpanel" />
+  <text x="755" y="383" class="node-title">Failure Memory Bank</text>
+  <text x="755" y="401" class="node-desc">• Records broken patch patterns</text>
+  <text x="755" y="417" class="node-desc">• Prevents repeating buggy fixes</text>
+  <text x="755" y="433" class="node-desc">• Auto-pruning stale items</text>
+  <text x="755" y="449" class="tag" fill="#34d399">intelligence/failure_memory.py</text>
+
+  <rect x="525" y="470" width="430" height="110" class="subpanel" />
+  <text x="535" y="490" class="node-title">Long-Horizon Mission Feedback Loop</text>
+  <text x="535" y="508" class="node-desc">• Completed mission outcomes feedback into architectural guidelines</text>
+  <text x="535" y="524" class="node-desc">• Agents query past solved incidents before embarking on complex refactorings</text>
+  <text x="535" y="540" class="node-desc">• Continuous improvement without model fine-tuning or weight retraining</text>
+  <text x="535" y="562" class="tag" fill="#34d399">Phase 7: Self-Improvement Cycle</text>
+
+  <!-- Connectors -->
+  <path d="M 260 310 L 260 330" class="arrow-amber" marker-end="url(#arr-amber)" />
+  <path d="M 740 310 L 740 330" class="arrow-green" marker-end="url(#arr-green)" />
+</svg>

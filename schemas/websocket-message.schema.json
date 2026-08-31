@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jarvis/websocket-message/v1",
+  "title": "WebSocketMessage",
+  "description": "Duplex envelope contract for all client/server communication in JARVIS OS.",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical message opcode distinguishing payload structure."
+    },
+    "content": {
+      "type": "string",
+      "description": "General text content payload."
+    },
+    "sender": {
+      "type": "string",
+      "description": "Origin of the message (e.g. user, assistant, agent name, system)."
+    },
+    "role": {
+      "type": "string",
+      "description": "Persona or role label."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Target project workspace identifier."
+    },
+    "mission_id": {
+      "type": "string",
+      "description": "Associated mission identifier."
+    },
+    "filename": {
+      "type": "string",
+      "description": "Target relative file path."
+    },
+    "data": {
+      "type": ["object", "array", "string", "number", "boolean", "null"],
+      "description": "Structured domain data payload."
+    },
+    "ok": {
+      "type": "boolean",
+      "description": "Operation success flag on response messages."
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if operation failed."
+    }
+  },
+  "additionalProperties": true
+}

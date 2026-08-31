@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0a0d14; }
+      .panel { fill: #111722; stroke: #1e293b; stroke-width: 1.5; rx: 8px; }
+      .subpanel { fill: #161f2e; stroke: #2a3a52; stroke-width: 1; rx: 6px; }
+      
+      .clara-box { fill: #1a1e38; stroke: #6366f1; stroke-width: 1.5; rx: 8px; }
+      .alex-box { fill: #0e2a3b; stroke: #0284c7; stroke-width: 1.5; rx: 8px; }
+      .devon-box { fill: #271838; stroke: #a855f7; stroke-width: 1.5; rx: 8px; }
+      .quinn-box { fill: #0c2b20; stroke: #10b981; stroke-width: 1.5; rx: 8px; }
+      
+      .hub-box { fill: #1f1b2e; stroke: #c084fc; stroke-width: 2; rx: 10px; }
+      .channel-box { fill: #1e293b; stroke: #475569; stroke-width: 1; rx: 4px; }
+      
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #94a3b8; }
+      .section-title { font-family: system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 600; fill: #c084fc; }
+      .agent-name { font-family: system-ui, -apple-system, sans-serif; font-size: 15px; font-weight: 700; }
+      .agent-role { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; }
+      .node-title { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; fill: #e2e8f0; }
+      .node-desc { font-family: system-ui, -apple-system, sans-serif; font-size: 10px; fill: #94a3b8; }
+      .tag { font-family: monospace; font-size: 9px; font-weight: 600; }
+      
+      .arrow { stroke: #64748b; stroke-width: 1.5; fill: none; }
+      .arrow-dashed { stroke: #64748b; stroke-width: 1.5; fill: none; stroke-dasharray: 4,4; }
+      .arrow-purple { stroke: #c084fc; stroke-width: 2; fill: none; }
+      .arrow-indigo { stroke: #818cf8; stroke-width: 1.5; fill: none; }
+      .arrow-cyan { stroke: #38bdf8; stroke-width: 1.5; fill: none; }
+      .arrow-green { stroke: #34d399; stroke-width: 1.5; fill: none; }
+    </style>
+    
+    <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+    </marker>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+    <marker id="arr-indigo" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#818cf8" />
+    </marker>
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" class="bg" />
+
+  <!-- Header -->
+  <text x="30" y="38" class="title">JARVIS OS — Multi-Agent Swarm Architecture</text>
+  <text x="30" y="56" class="subtitle">Specialized Autonomous Roles, Collaborative Consensus &amp; Shared Memory Bus</text>
+
+  <!-- 4 AGENT CARDS -->
+  
+  <!-- CLARA -->
+  <rect x="30" y="80" width="220" height="230" class="clara-box" />
+  <circle cx="55" cy="105" r="14" fill="#6366f1" />
+  <text x="50" y="110" font-family="sans-serif" font-size="13" font-weight="700" fill="#fff">C</text>
+  <text x="80" y="104" class="agent-name" fill="#818cf8">Clara</text>
+  <text x="80" y="119" class="agent-role" fill="#a5b4fc">Executive &amp; Coordinator</text>
+  <line x1="45" y1="132" x2="235" y2="132" stroke="#312e81" stroke-width="1" />
+  <text x="45" y="150" class="node-title">• Intent Scoping &amp; Decomposition</text>
+  <text x="45" y="166" class="node-desc">Traduz diretivas do CEO em planos</text>
+  <text x="45" y="184" class="node-title">• Resource &amp; Mission Allocation</text>
+  <text x="45" y="200" class="node-desc">Distribui WorkPackages aos agentes</text>
+  <text x="45" y="218" class="node-title">• Executive Synthesis</text>
+  <text x="45" y="234" class="node-desc">Comunicação final e relatórios</text>
+  <rect x="45" y="270" width="190" height="24" class="channel-box" />
+  <text x="55" y="286" class="tag" fill="#818cf8">Skills: planning, shipping</text>
+
+  <!-- ALEX -->
+  <rect x="270" y="80" width="220" height="230" class="alex-box" />
+  <circle cx="295" cy="105" r="14" fill="#0284c7" />
+  <text x="290" y="110" font-family="sans-serif" font-size="13" font-weight="700" fill="#fff">A</text>
+  <text x="320" y="104" class="agent-name" fill="#38bdf8">Alex</text>
+  <text x="320" y="119" class="agent-role" fill="#7dd3fc">Systems Architect</text>
+  <line x1="285" y1="132" x2="475" y2="132" stroke="#075985" stroke-width="1" />
+  <text x="285" y="150" class="node-title">• Architecture Design &amp; ADRs</text>
+  <text x="285" y="166" class="node-desc">Desenho modular e contratos de API</text>
+  <text x="285" y="184" class="node-title">• Dependency &amp; Monorepo Graph</text>
+  <text x="285" y="200" class="node-desc">Resolução de tipos e nós do projeto</text>
+  <text x="285" y="218" class="node-title">• Specification Validation</text>
+  <text x="285" y="234" class="node-desc">Garante ausência de drift arquitetural</text>
+  <rect x="285" y="270" width="190" height="24" class="channel-box" />
+  <text x="295" y="286" class="tag" fill="#38bdf8">Skills: api-design, spec-driven</text>
+
+  <!-- DEVON -->
+  <rect x="510" y="80" width="220" height="230" class="devon-box" />
+  <circle cx="535" cy="105" r="14" fill="#9333ea" />
+  <text x="530" y="110" font-family="sans-serif" font-size="13" font-weight="700" fill="#fff">D</text>
+  <text x="560" y="104" class="agent-name" fill="#c084fc">Devon</text>
+  <text x="560" y="119" class="agent-role" fill="#d8b4fe">Coding Engineer</text>
+  <line x1="525" y1="132" x2="715" y2="132" stroke="#581c87" stroke-width="1" />
+  <text x="525" y="150" class="node-title">• AST &amp; Symbol Modification</text>
+  <text x="525" y="166" class="node-desc">Substituição determinística de nós AST</text>
+  <text x="525" y="184" class="node-title">• Multi-File Atomic Patches</text>
+  <text x="525" y="200" class="node-desc">Geração de diffs com auto-checkpoint</text>
+  <text x="525" y="218" class="node-title">• Build &amp; Self-Repair Loop</text>
+  <text x="525" y="234" class="node-desc">Correção de erros de compilação/testes</text>
+  <rect x="525" y="270" width="190" height="24" class="channel-box" />
+  <text x="535" y="286" class="tag" fill="#c084fc">Skills: tdd, code-review, simplify</text>
+
+  <!-- QUINN -->
+  <rect x="750" y="80" width="220" height="230" class="quinn-box" />
+  <circle cx="775" cy="105" r="14" fill="#059669" />
+  <text x="770" y="110" font-family="sans-serif" font-size="13" font-weight="700" fill="#fff">Q</text>
+  <text x="800" y="104" class="agent-name" fill="#34d399">Quinn</text>
+  <text x="800" y="119" class="agent-role" fill="#6ee7b7">QA, Sentinel &amp; Adversary</text>
+  <line x1="765" y1="132" x2="955" y2="132" stroke="#064e3b" stroke-width="1" />
+  <text x="765" y="150" class="node-title">• Real Browser QA (DevTools)</text>
+  <text x="765" y="166" class="node-desc">Validação E2E, DOM e network capture</text>
+  <text x="765" y="184" class="node-title">• Security Sentinel Auditing</text>
+  <text x="765" y="200" class="node-desc">Análise de ameaças, baseline e sandbox</text>
+  <text x="765" y="218" class="node-title">• Adversarial Stress Testing</text>
+  <text x="765" y="234" class="node-desc">Testes de regressão e recovery gates</text>
+  <rect x="765" y="270" width="190" height="24" class="channel-box" />
+  <text x="775" y="286" class="tag" fill="#34d399">Skills: devtools-qa, hardening</text>
+
+  <!-- CENTRAL COLLABORATION & DEBATE HUB -->
+  <rect x="30" y="340" width="940" height="130" class="hub-box" />
+  <text x="50" y="365" class="section-title">COLLABORATIVE DEBATE &amp; CONSENSUS BUS</text>
+  
+  <rect x="50" y="380" width="270" height="75" class="subpanel" />
+  <text x="62" y="400" class="node-title">Multi-Agent Debate Protocol</text>
+  <text x="62" y="416" class="node-desc">Resolução de conflitos de arquitetura</text>
+  <text x="62" y="430" class="node-desc">Canais síncronos de discussão inter-agentes</text>
+  <text x="62" y="444" class="node-desc">Registo público no HUD Workspace</text>
+
+  <rect x="340" y="380" width="310" height="75" class="subpanel" />
+  <text x="352" y="400" class="node-title">Deterministic Tool Registry</text>
+  <text x="352" y="416" class="node-desc">30+ ferramentas com validação estrita de tipos</text>
+  <text x="352" y="430" class="node-desc">Sandbox execution boundaries (read/write limits)</text>
+  <text x="352" y="444" class="node-desc">Idempotent tool dispatch with execution hash</text>
+
+  <rect x="670" y="380" width="280" height="75" class="subpanel" />
+  <text x="682" y="400" class="node-title">Shared Mission Context Lock</text>
+  <text x="682" y="416" class="node-desc">Versionamento otimista de estado (expected_version)</text>
+  <text x="682" y="430" class="node-desc">Prevenção de mutações concorrentes</text>
+  <text x="682" y="444" class="node-desc">Stale-lock release &amp; recovery</text>
+
+  <!-- Arrows from Agents to Hub -->
+  <path d="M 140 310 L 140 340" class="arrow-indigo" marker-end="url(#arr-indigo)" />
+  <path d="M 380 310 L 380 340" class="arrow-cyan" marker-end="url(#arr-cyan)" />
+  <path d="M 620 310 L 620 340" class="arrow-purple" marker-end="url(#arr-purple)" />
+  <path d="M 860 310 L 860 340" class="arrow-green" marker-end="url(#arr-green)" />
+
+  <!-- BOTTOM INFRASTRUCTURE / MEMORY / HARNESS BAR -->
+  <rect x="30" y="490" width="460" height="105" class="panel" />
+  <text x="45" y="512" class="section-title" style="fill:#38bdf8;">SHARED MEMORY &amp; CONTEXT LAYER</text>
+  <text x="45" y="534" class="node-title">Compounding Memory (SQLite) + Obsidian Knowledge Graph</text>
+  <text x="45" y="552" class="node-desc">• Regras ativas, decisões prévias e failure memory injectadas em cada prompt</text>
+  <text x="45" y="570" class="node-desc">• Context engineering dinâmico para maximizar taxa de sucesso na 1ª tentativa</text>
+
+  <rect x="510" y="490" width="460" height="105" class="panel" />
+  <text x="525" y="512" class="section-title" style="fill:#fbbf24;">MODEL HARNESS BRIDGE</text>
+  <text x="525" y="534" class="node-title">Dual-Model Profile Router &amp; Output Validator</text>
+  <text x="525" y="552" class="node-desc">• Clara / Alex: Reasoning profile (Nemotron / Qwen-32B / Gemini)</text>
+  <text x="525" y="570" class="node-desc">• Devon / Quinn: Coding &amp; QA profiles com Structured Output e AST parser</text>
+
+  <!-- Arrows from Hub to Bottom -->
+  <path d="M 260 470 L 260 490" class="arrow" marker-end="url(#arr)" />
+  <path d="M 740 470 L 740 490" class="arrow" marker-end="url(#arr)" />
+</svg>

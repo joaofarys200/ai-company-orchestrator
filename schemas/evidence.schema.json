@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jarvis/evidence/v1",
+  "title": "EvidenceRecord",
+  "description": "Verifiable cryptographic and operational evidence attached to deliverables, test suites, or incidents.",
+  "type": "object",
+  "required": ["evidence_id", "kind", "sha256", "created_at"],
+  "properties": {
+    "evidence_id": {
+      "type": "string",
+      "description": "Unique evidence identifier."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["FILE_BYTES", "TEST_OUTPUT", "BROWSER_DOM", "BROWSER_SCREENSHOT", "NETWORK_TRACE", "DIFF_PATCH", "SENTINEL_EVENT", "FINANCIAL_RECEIPT"],
+      "description": "Nature of the evidence payload."
+    },
+    "source_path": {
+      "type": "string",
+      "description": "Relative file path or URL of the evidence artifact."
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Cryptographic SHA256 digest of the artifact."
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Size in bytes."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC creation timestamp."
+    },
+    "verified": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the evidence hash has been checked and verified."
+    }
+  },
+  "additionalProperties": false
+}

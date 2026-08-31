@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jarvis/document-provenance/v1",
+  "title": "DocumentProvenance",
+  "description": "Provenance trail for generated code, notes and reports detailing sources, model trace and confidence.",
+  "type": "object",
+  "required": ["artifact_path", "sha256", "generated_by", "timestamp"],
+  "properties": {
+    "artifact_path": {
+      "type": "string",
+      "description": "Relative file path of the generated artifact."
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA256 digest of the artifact content."
+    },
+    "generated_by": {
+      "type": "string",
+      "description": "Agent name or subsystem responsible for generation."
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Associated coding session or mission ID."
+    },
+    "source_references": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of input files, vault notes or URLs utilized."
+    },
+    "confidence_score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Inference confidence score."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC creation timestamp."
+    }
+  },
+  "additionalProperties": false
+}

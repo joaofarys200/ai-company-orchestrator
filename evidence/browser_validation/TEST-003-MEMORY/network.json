@@ -1,19 +1,19 @@
 [
   {
-    "timestamp": 1788038198.4288487,
+    "timestamp": 1788178401.0378191,
     "url": "http://localhost:8000/",
     "method": "GET",
     "resource_type": "document"
   },
   {
-    "timestamp": 1788038198.8303342,
-    "url": "http://localhost:8000/assets/index-DC-0GnbK.js",
+    "timestamp": 1788178401.4033897,
+    "url": "http://localhost:8000/assets/index-BGVyiw7O.js",
     "method": "GET",
     "resource_type": "script"
   },
   {
-    "timestamp": 1788038198.8306625,
-    "url": "http://localhost:8000/assets/index-C2wN8_K8.css",
+    "timestamp": 1788178401.403507,
+    "url": "http://localhost:8000/assets/index-BxUOax09.css",
     "method": "GET",
     "resource_type": "stylesheet"
   }

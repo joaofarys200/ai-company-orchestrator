@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0a0d14; }
+      .panel { fill: #111722; stroke: #1e293b; stroke-width: 1.5; rx: 8px; }
+      .subpanel { fill: #161f2e; stroke: #2a3a52; stroke-width: 1; rx: 6px; }
+      
+      .route-box { fill: #0e2a3b; stroke: #0284c7; stroke-width: 1.5; rx: 6px; }
+      .provider-box { fill: #2f230b; stroke: #d97706; stroke-width: 1.5; rx: 6px; }
+      .validation-box { fill: #271838; stroke: #a855f7; stroke-width: 1.5; rx: 6px; }
+      .telemetry-box { fill: #0c2b20; stroke: #10b981; stroke-width: 1.5; rx: 6px; }
+      
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #94a3b8; }
+      .stage-title { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+      .node-title { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; fill: #f1f5f9; }
+      .node-desc { font-family: system-ui, -apple-system, sans-serif; font-size: 10px; fill: #94a3b8; }
+      .tag { font-family: monospace; font-size: 9px; }
+      
+      .arrow { stroke: #38bdf8; stroke-width: 1.5; fill: none; }
+      .arrow-amber { stroke: #fbbf24; stroke-width: 1.5; fill: none; }
+      .arrow-purple { stroke: #c084fc; stroke-width: 1.5; fill: none; }
+      .arrow-green { stroke: #34d399; stroke-width: 1.5; fill: none; }
+      .arrow-retry { stroke: #fb7185; stroke-width: 1.5; fill: none; stroke-dasharray: 4,4; }
+    </style>
+    
+    <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fbbf24" />
+    </marker>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+    <marker id="arr-retry" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fb7185" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" class="bg" />
+
+  <!-- Header -->
+  <text x="30" y="38" class="title">JARVIS OS — Model Harness Architecture</text>
+  <text x="30" y="56" class="subtitle">Multi-Provider Profile Routing, Strict Schema Validation, Deterministic Recovery &amp; Latency Telemetry</text>
+
+  <!-- 1. INCOMING REQUEST & CONTEXT BUILDER -->
+  <rect x="30" y="80" width="220" height="250" class="panel" />
+  <text x="45" y="102" class="stage-title" style="fill:#38bdf8;">1. REQUEST &amp; CONTEXT</text>
+  
+  <rect x="45" y="115" width="190" height="50" class="route-box" />
+  <text x="55" y="133" class="node-title">Agent Request</text>
+  <text x="55" y="149" class="node-desc">Prompt + OutputFormat + Constraints</text>
+
+  <rect x="45" y="175" width="190" height="65" class="subpanel" />
+  <text x="55" y="193" class="node-title">ContextBuilder &amp; Compaction</text>
+  <text x="55" y="209" class="node-desc">• Injects relevant rules &amp; failure memories</text>
+  <text x="55" y="223" class="node-desc">• Deduplicates files &amp; computes SHA256</text>
+
+  <rect x="45" y="250" width="190" height="65" class="subpanel" />
+  <text x="55" y="268" class="node-title">Profile Policy Selector</text>
+  <text x="55" y="284" class="node-desc">• default | coding | fast | reasoning</text>
+  <text x="55" y="298" class="node-desc">• Enforces timeout, temperature, retry limit</text>
+
+  <!-- Arrow to Router -->
+  <path d="M 250 205 L 285 205" class="arrow" marker-end="url(#arr)" />
+
+  <!-- 2. ROUTER & PROVIDER ADAPTERS -->
+  <rect x="290" y="80" width="250" height="250" class="panel" />
+  <text x="305" y="102" class="stage-title" style="fill:#fbbf24;">2. PROVIDER ADAPTERS</text>
+
+  <rect x="305" y="115" width="220" height="42" class="provider-box" />
+  <text x="315" y="133" class="node-title">Ollama Local (qwen3.5:9b)</text>
+  <text x="315" y="147" class="node-desc">100% Offline, zero data leakage</text>
+
+  <rect x="305" y="165" width="220" height="42" class="provider-box" />
+  <text x="315" y="183" class="node-title">OpenRouter Zero$ Tier</text>
+  <text x="315" y="197" class="node-desc">Free models: Nemotron, Qwen, DeepSeek</text>
+
+  <rect x="305" y="215" width="220" height="42" class="provider-box" />
+  <text x="315" y="233" class="node-title">Cloud Commercial (Gemini, Claude)</text>
+  <text x="315" y="247" class="node-desc">High-capacity reasoning &amp; vision API</text>
+
+  <rect x="305" y="265" width="220" height="48" class="subpanel" />
+  <text x="315" y="283" class="node-title">Failover &amp; Circuit Breaker</text>
+  <text x="315" y="297" class="node-desc">Fast fallback on 429, 503 or context overflow</text>
+
+  <!-- Arrow to Validation Core -->
+  <path d="M 540 205 L 575 205" class="arrow-amber" marker-end="url(#arr-amber)" />
+
+  <!-- 3. VALIDATION & RECOVERY PIPELINE -->
+  <rect x="580" y="80" width="390" height="250" class="panel" />
+  <text x="595" y="102" class="stage-title" style="fill:#c084fc;">3. 7-STAGE VALIDATION &amp; RECOVERY</text>
+
+  <rect x="595" y="115" width="170" height="45" class="validation-box" />
+  <text x="605" y="133" class="node-title">1. Parsing &amp; Syntax</text>
+  <text x="605" y="147" class="node-desc">JSON / AST snippet balance</text>
+
+  <rect x="780" y="115" width="175" height="45" class="validation-box" />
+  <text x="790" y="133" class="node-title">2. JSON Schema</text>
+  <text x="790" y="147" class="node-desc">Required keys &amp; type matching</text>
+
+  <rect x="595" y="168" width="170" height="45" class="validation-box" />
+  <text x="605" y="186" class="node-title">3. Enum Constraints</text>
+  <text x="605" y="200" class="node-desc">Allowed vocabulary enforcement</text>
+
+  <rect x="780" y="168" width="175" height="45" class="validation-box" />
+  <text x="790" y="186" class="node-title">4. Reference Resolution</text>
+  <text x="790" y="200" class="node-desc">File &amp; symbol existence check</text>
+
+  <rect x="595" y="221" width="170" height="45" class="validation-box" />
+  <text x="605" y="239" class="node-title">5. Preconditions</text>
+  <text x="605" y="253" class="node-desc">State machine readiness check</text>
+
+  <rect x="780" y="221" width="175" height="45" class="validation-box" />
+  <text x="790" y="239" class="node-title">6. Compatibility</text>
+  <text x="790" y="253" class="node-desc">Cross-module signature contract</text>
+
+  <rect x="595" y="274" width="360" height="44" class="subpanel" />
+  <text x="605" y="292" class="node-title">7. Deterministic Recovery Engine</text>
+  <text x="605" y="306" class="node-desc">Parse recovery -> Mechanical fix -> Semantic retry -> Escalation</text>
+
+  <!-- Retry Arrow loop -->
+  <path d="M 955 295 C 990 295, 990 135, 545 135" class="arrow-retry" marker-end="url(#arr-retry)" />
+  <text x="965" y="220" font-family="sans-serif" font-size="9" font-weight="700" fill="#fb7185">Retry Loop</text>
+
+  <!-- 4. BOTTOM TELEMETRY, PROGRESS & BENCHMARKING BAR -->
+  <rect x="30" y="355" width="940" height="235" class="panel" />
+  <text x="45" y="380" class="stage-title" style="fill:#34d399;">4. TELEMETRY, OBSERVED PROGRESS &amp; PROFILES BENCHMARKING</text>
+
+  <rect x="45" y="395" width="290" height="180" class="telemetry-box" />
+  <text x="57" y="415" class="node-title">Latency &amp; Token Telemetry</text>
+  <text x="57" y="435" class="node-desc">• Duration MS, tokens used, cost USD (0$ if free)</text>
+  <text x="57" y="455" class="node-desc">• Provider reliability &amp; error-rate tracking</text>
+  <text x="57" y="475" class="node-desc">• Call tracing with unique request_id</text>
+  <text x="57" y="505" class="tag" fill="#34d399">TelemetryRecord dataclass</text>
+  <text x="57" y="525" class="node-desc">backend/model_harness/telemetry.py</text>
+
+  <rect x="355" y="395" width="300" height="180" class="subpanel" />
+  <text x="367" y="415" class="node-title">Progress Monitor (Anti-Stuck Protection)</text>
+  <text x="367" y="435" class="node-desc">• Detects NO_PROGRESS in reasoning sequences</text>
+  <text x="367" y="455" class="node-desc">• Halts REPEATED_FAILURES &amp; loops</text>
+  <text x="367" y="475" class="node-desc">• Computes semantic difference between attempts</text>
+  <text x="367" y="505" class="tag" fill="#38bdf8">ProgressMonitor class</text>
+  <text x="367" y="525" class="node-desc">backend/model_harness/progress.py</text>
+
+  <rect x="675" y="395" width="280" height="180" class="subpanel" />
+  <text x="687" y="415" class="node-title">Benchmarking &amp; Validation Suite</text>
+  <text x="687" y="435" class="node-desc">• Productive Benchmark: 100% pass rate</text>
+  <text x="687" y="455" class="node-desc">• Provider Diagnostic &amp; Resilience tests</text>
+  <text x="687" y="475" class="node-desc">• Stateful Tool Calling &amp; Schema compliance</text>
+  <text x="687" y="505" class="tag" fill="#c084fc">tests/test_model_harness.py</text>
+  <text x="687" y="525" class="node-desc">38 unit test suites covering all providers</text>
+</svg>

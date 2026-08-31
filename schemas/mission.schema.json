@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jarvis/mission/v1",
+  "title": "Mission",
+  "description": "Canonical contract for autonomous multi-agent missions in JARVIS OS.",
+  "type": "object",
+  "required": ["mission_id", "project_id", "title", "objective", "status", "version"],
+  "properties": {
+    "mission_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "description": "Unique identifier for the mission."
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+      "description": "Identifier of the target project workspace."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable title of the mission."
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 1,
+      "description": "High-level goal and desired outcome."
+    },
+    "description": {
+      "type": "string",
+      "default": "",
+      "description": "Detailed explanation of the mission scope."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["DRAFT", "READY", "ACTIVE", "BLOCKED", "COMPLETED", "FAILED", "CANCELLED"],
+      "default": "DRAFT",
+      "description": "Current lifecycle status in the mission state machine."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC creation timestamp."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC last update timestamp."
+    },
+    "started_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO 8601 UTC execution start timestamp."
+    },
+    "completed_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO 8601 UTC completion timestamp."
+    },
+    "current_phase": {
+      "type": "string",
+      "default": "",
+      "description": "Current active execution phase name."
+    },
+    "progress": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 0.0,
+      "description": "Overall mission completion progress ratio (0.0 to 1.0)."
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Extensible key-value metadata."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Optimistic locking version counter."
+    }
+  },
+  "additionalProperties": false
+}

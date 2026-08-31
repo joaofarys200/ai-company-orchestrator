@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0a0d14; }
+      .panel { fill: #111722; stroke: #1e293b; stroke-width: 1.5; rx: 8px; }
+      .subpanel { fill: #161f2e; stroke: #2a3a52; stroke-width: 1; rx: 6px; }
+      
+      .state-draft { fill: #1e293b; stroke: #64748b; stroke-width: 2; rx: 20px; }
+      .state-ready { fill: #0e2a3b; stroke: #0284c7; stroke-width: 2; rx: 20px; }
+      .state-active { fill: #271838; stroke: #a855f7; stroke-width: 2; rx: 20px; }
+      .state-blocked { fill: #2f230b; stroke: #d97706; stroke-width: 2; rx: 20px; }
+      .state-done { fill: #0c2b20; stroke: #10b981; stroke-width: 2; rx: 20px; }
+      .state-fail { fill: #34141e; stroke: #e11d48; stroke-width: 2; rx: 20px; }
+      
+      .box-wp { fill: #1a1e38; stroke: #6366f1; stroke-width: 1.5; rx: 6px; }
+      .box-deliv { fill: #0e2a3b; stroke: #38bdf8; stroke-width: 1.5; rx: 6px; }
+      .box-crit { fill: #0c2b20; stroke: #34d399; stroke-width: 1.5; rx: 6px; }
+      
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #94a3b8; }
+      .section-title { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; fill: #38bdf8; }
+      .state-text { font-family: system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; }
+      .node-title { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; fill: #f1f5f9; }
+      .node-desc { font-family: system-ui, -apple-system, sans-serif; font-size: 10px; fill: #94a3b8; }
+      .tag { font-family: monospace; font-size: 9px; }
+      
+      .arrow { stroke: #38bdf8; stroke-width: 1.5; fill: none; }
+      .arrow-purple { stroke: #c084fc; stroke-width: 1.5; fill: none; }
+      .arrow-green { stroke: #34d399; stroke-width: 1.5; fill: none; }
+      .arrow-amber { stroke: #fbbf24; stroke-width: 1.5; fill: none; }
+      .arrow-red { stroke: #fb7185; stroke-width: 1.5; fill: none; }
+    </style>
+    
+    <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fbbf24" />
+    </marker>
+    <marker id="arr-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fb7185" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" class="bg" />
+
+  <!-- Header -->
+  <text x="30" y="38" class="title">JARVIS OS — Autonomous Mission Lifecycle</text>
+  <text x="30" y="56" class="subtitle">Deterministic State Machine, Hierarchical WorkPackages, Strict Deliverables &amp; Acceptance Criteria</text>
+
+  <!-- ── 1. MISSION STATE MACHINE ── -->
+  <rect x="30" y="80" width="940" height="150" class="panel" />
+  <text x="45" y="102" class="section-title">1. MISSION LEVEL STATE MACHINE (agents/mission_state.py)</text>
+
+  <!-- DRAFT -->
+  <rect x="50" y="125" width="130" height="42" class="state-draft" />
+  <text x="95" y="151" class="state-text" fill="#94a3b8">DRAFT</text>
+  <text x="65" y="180" class="node-desc">Planning &amp; Scoping</text>
+
+  <!-- READY -->
+  <rect x="235" y="125" width="130" height="42" class="state-ready" />
+  <text x="278" y="151" class="state-text" fill="#38bdf8">READY</text>
+  <text x="245" y="180" class="node-desc">Validated &amp; Approved</text>
+
+  <!-- ACTIVE -->
+  <rect x="420" y="125" width="140" height="42" class="state-active" />
+  <text x="462" y="151" class="state-text" fill="#c084fc">ACTIVE</text>
+  <text x="432" y="180" class="node-desc">Autonomy Loop Running</text>
+
+  <!-- BLOCKED -->
+  <rect x="620" y="125" width="130" height="42" class="state-blocked" />
+  <text x="653" y="151" class="state-text" fill="#fbbf24">BLOCKED</text>
+  <text x="635" y="180" class="node-desc">Waiting Dependency</text>
+
+  <!-- COMPLETED -->
+  <rect x="805" y="105" width="145" height="38" class="state-done" />
+  <text x="835" y="129" class="state-text" fill="#34d399">COMPLETED</text>
+
+  <!-- FAILED -->
+  <rect x="805" y="155" width="145" height="38" class="state-fail" />
+  <text x="852" y="179" class="state-text" fill="#fb7185">FAILED</text>
+
+  <!-- State Transitions -->
+  <path d="M 180 146 L 230 146" class="arrow" marker-end="url(#arr)" />
+  <path d="M 365 146 L 415 146" class="arrow-purple" marker-end="url(#arr-purple)" />
+  <path d="M 560 146 L 615 146" class="arrow-amber" marker-end="url(#arr-amber)" />
+  <path d="M 560 135 L 800 120" class="arrow-green" marker-end="url(#arr-green)" />
+  <path d="M 560 155 L 800 170" class="arrow-red" marker-end="url(#arr-red)" />
+  <path d="M 685 125 C 685 105, 520 105, 490 120" class="arrow-purple" marker-end="url(#arr-purple)" />
+
+  <!-- ── 2. HIERARCHICAL STRUCTURE (WORKPACKAGES -> DELIVERABLES -> CRITERIA) ── -->
+  <rect x="30" y="250" width="940" height="340" class="panel" />
+  <text x="45" y="272" class="section-title">2. HIERARCHICAL MISSION DECOMPOSITION &amp; GOVERNANCE</text>
+
+  <!-- WorkPackage Level -->
+  <rect x="50" y="290" width="280" height="280" class="box-wp" />
+  <text x="65" y="312" class="stage-title" style="fill:#818cf8;">WORK PACKAGE</text>
+  <text x="65" y="332" class="node-title">Atomic Execution Unit</text>
+  <text x="65" y="348" class="node-desc">• Type: CODING | RESEARCH | DOCUMENT</text>
+  <text x="65" y="364" class="node-desc">• Status: PENDING -> READY -> IN_PROGRESS</text>
+  <text x="65" y="380" class="node-desc">• Executor: Devon / Clara / Alex / Quinn</text>
+  
+  <rect x="65" y="400" width="250" height="75" class="subpanel" />
+  <text x="75" y="420" class="node-title">Execution Lock &amp; Isolation</text>
+  <text x="75" y="436" class="node-desc">• Prevents concurrent agent race conditions</text>
+  <text x="75" y="450" class="node-desc">• Automatic stale-lock release</text>
+  <text x="75" y="464" class="node-desc">• Version validation (expected_version)</text>
+
+  <rect x="65" y="490" width="250" height="65" class="subpanel" />
+  <text x="75" y="510" class="node-title">Dependency DAG Resolution</text>
+  <text x="75" y="526" class="node-desc">• Blocks until prerequisite WPs complete</text>
+  <text x="75" y="540" class="node-desc">• Automatic top-sort scheduling</text>
+
+  <!-- Arrow WP -> Deliverable -->
+  <path d="M 330 430 L 365 430" class="arrow" marker-end="url(#arr)" />
+
+  <!-- Deliverable Level -->
+  <rect x="370" y="290" width="270" height="280" class="box-deliv" />
+  <text x="385" y="312" class="stage-title" style="fill:#38bdf8;">DELIVERABLES</text>
+  <text x="385" y="332" class="node-title">Verifiable Outputs</text>
+  <text x="385" y="348" class="node-desc">• Code files, test suites, architecture docs</text>
+  <text x="385" y="364" class="node-desc">• Status: PLANNED -> READY_FOR_REVIEW</text>
+  <text x="385" y="380" class="node-desc">• Final status: ACCEPTED or REJECTED</text>
+
+  <rect x="385" y="400" width="240" height="75" class="subpanel" />
+  <text x="395" y="420" class="node-title">Evidence Attachment</text>
+  <text x="395" y="436" class="node-desc">• SHA256 file content hash</text>
+  <text x="395" y="450" class="node-desc">• Test output logs &amp; coverage report</text>
+  <text x="395" y="464" class="node-desc">• Browser DevTools screenshots</text>
+
+  <rect x="385" y="490" width="240" height="65" class="subpanel" />
+  <text x="395" y="510" class="node-title">Immutable Provenance</text>
+  <text x="395" y="526" class="node-desc">• Created by session / executor trace</text>
+  <text x="395" y="540" class="node-desc">• Tamper-evident verification</text>
+
+  <!-- Arrow Deliverable -> Criteria -->
+  <path d="M 640 430 L 675 430" class="arrow-green" marker-end="url(#arr-green)" />
+
+  <!-- Acceptance Criteria Level -->
+  <rect x="680" y="290" width="270" height="280" class="box-crit" />
+  <text x="695" y="312" class="stage-title" style="fill:#34d399;">ACCEPTANCE CRITERIA</text>
+  <text x="695" y="332" class="node-title">Strict Gatekeeper Engine</text>
+  <text x="695" y="348" class="node-desc">• Unambiguous pass/fail predicates</text>
+  <text x="695" y="364" class="node-desc">• Status: PENDING -> SATISFIED | FAILED</text>
+  <text x="695" y="380" class="node-desc">• Quinn / Automated QA enforcement</text>
+
+  <rect x="695" y="400" width="240" height="75" class="subpanel" />
+  <text x="705" y="420" class="node-title">Automated Validation Gates</text>
+  <text x="705" y="436" class="node-desc">• Syntax &amp; Lint tests (exit_code == 0)</text>
+  <text x="705" y="450" class="node-desc">• Unit &amp; integration tests passed</text>
+  <text x="705" y="464" class="node-desc">• Real browser DOM assertions</text>
+
+  <rect x="695" y="490" width="240" height="65" class="subpanel" />
+  <text x="705" y="510" class="node-title">Audit Log &amp; Final Review</text>
+  <text x="705" y="526" class="node-desc">• Sign-off by review execution</text>
+  <text x="705" y="540" class="node-desc">• Records rationale &amp; timestamp</text>
+</svg>

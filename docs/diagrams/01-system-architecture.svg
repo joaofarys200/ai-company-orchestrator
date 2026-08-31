@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0a0d14; }
+      .panel { fill: #111722; stroke: #1e293b; stroke-width: 1.5; rx: 8px; }
+      .subpanel { fill: #161f2e; stroke: #2a3a52; stroke-width: 1; rx: 6px; }
+      .client-box { fill: #0e2a3b; stroke: #0284c7; stroke-width: 1.5; rx: 6px; }
+      .agent-box { fill: #271838; stroke: #9333ea; stroke-width: 1.5; rx: 6px; }
+      .sentinel-box { fill: #34141e; stroke: #e11d48; stroke-width: 1.5; rx: 6px; }
+      .model-box { fill: #2f230b; stroke: #d97706; stroke-width: 1.5; rx: 6px; }
+      .storage-box { fill: #0c2b20; stroke: #059669; stroke-width: 1.5; rx: 6px; }
+      
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #94a3b8; }
+      .section-title { font-family: system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 600; fill: #38bdf8; letter-spacing: 0.5px; }
+      .node-title { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 600; fill: #f1f5f9; }
+      .node-desc { font-family: system-ui, -apple-system, sans-serif; font-size: 10px; fill: #94a3b8; }
+      .badge { font-family: monospace; font-size: 9px; font-weight: 600; fill: #38bdf8; }
+      
+      .arrow { stroke: #475569; stroke-width: 1.5; fill: none; stroke-dasharray: 4,4; }
+      .arrow-solid { stroke: #38bdf8; stroke-width: 1.5; fill: none; }
+      .arrow-purple { stroke: #c084fc; stroke-width: 1.5; fill: none; }
+      .arrow-red { stroke: #fb7185; stroke-width: 1.5; fill: none; }
+      .arrow-green { stroke: #34d399; stroke-width: 1.5; fill: none; }
+    </style>
+    
+    <marker id="arrow-head" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arrow-purple-head" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+    <marker id="arrow-red-head" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fb7185" />
+    </marker>
+    <marker id="arrow-green-head" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="620" class="bg" />
+
+  <!-- Header -->
+  <text x="30" y="38" class="title">JARVIS OS — System Architecture</text>
+  <text x="30" y="56" class="subtitle">Autonomous Multi-Agent Cognitive Platform &amp; Host Operating Environment</text>
+
+  <!-- 1. PRESENTATION LAYER -->
+  <rect x="30" y="75" width="940" height="90" class="panel" />
+  <text x="45" y="96" class="section-title">1. PRESENTATION &amp; CLIENT LAYER (DESKTOP / HUD)</text>
+  
+  <rect x="45" y="107" width="280" height="46" class="client-box" />
+  <text x="57" y="125" class="node-title">Electron Desktop Shell</text>
+  <text x="57" y="141" class="node-desc">Host integration, window lifecycle, dev tools</text>
+
+  <rect x="345" y="107" width="310" height="46" class="client-box" />
+  <text x="357" y="125" class="node-title">React 18 + Tailwind Workspace HUD</text>
+  <text x="357" y="141" class="node-desc">Monaco Editor, Kanban, Mission Planner, Sentinel UI</text>
+
+  <rect x="675" y="107" width="280" height="46" class="client-box" />
+  <text x="687" y="125" class="node-title">Gemini Live Voice &amp; Audio Engine</text>
+  <text x="687" y="141" class="node-desc">Low-latency duplex voice I/O &amp; audio streaming</text>
+
+  <!-- Connection: Client -> Gateway -->
+  <path d="M 500 153 L 500 185" class="arrow-solid" marker-end="url(#arrow-head)" />
+  <text x="510" y="173" class="badge">Duplex WebSocket Protocol</text>
+
+  <!-- 2. APPLICATION CORE & ORCHESTRATION -->
+  <rect x="30" y="190" width="940" height="230" class="panel" />
+  <text x="45" y="211" class="section-title">2. BACKEND RUNTIME &amp; MULTI-AGENT SWARM (PYTHON 3.11+)</text>
+
+  <!-- WebSocket Gateway -->
+  <rect x="45" y="222" width="220" height="60" class="subpanel" />
+  <text x="57" y="242" class="node-title">WebSocket Gateway &amp; Router</text>
+  <text x="57" y="258" class="node-desc">Type-safe dispatch (60+ message types)</text>
+  <text x="57" y="272" class="node-desc">Session state &amp; broadcast bus</text>
+
+  <!-- Multi-Agent Swarm -->
+  <rect x="280" y="222" width="410" height="185" class="subpanel" />
+  <text x="292" y="242" class="section-title" style="fill: #c084fc;">Multi-Agent Swarm Orchestrator</text>
+  
+  <rect x="292" y="252" width="90" height="42" class="agent-box" />
+  <text x="302" y="268" class="node-title">Clara</text>
+  <text x="302" y="282" class="node-desc">Executive/Scope</text>
+
+  <rect x="390" y="252" width="90" height="42" class="agent-box" />
+  <text x="400" y="268" class="node-title">Alex</text>
+  <text x="400" y="282" class="node-desc">Architecture</text>
+
+  <rect x="488" y="252" width="90" height="42" class="agent-box" />
+  <text x="498" y="268" class="node-title">Devon</text>
+  <text x="498" y="282" class="node-desc">Coding Agent</text>
+
+  <rect x="586" y="252" width="90" height="42" class="agent-box" />
+  <text x="596" y="268" class="node-title">Quinn</text>
+  <text x="596" y="282" class="node-desc">QA / Security</text>
+
+  <rect x="292" y="302" width="384" height="44" class="subpanel" style="background:#1a2333;" />
+  <text x="302" y="318" class="node-title">Mission Execution Engine</text>
+  <text x="302" y="334" class="node-desc">WorkPackages, Deliverables, Criteria verification, Locks</text>
+
+  <rect x="292" y="352" width="384" height="44" class="subpanel" />
+  <text x="302" y="368" class="node-title">24 Engineering Skills Engine</text>
+  <text x="302" y="384" class="node-desc">TDD, Code Review, Security Hardening, Refactoring, CI/CD</text>
+
+  <!-- Security Sentinel -->
+  <rect x="705" y="222" width="250" height="185" class="sentinel-box" />
+  <text x="717" y="242" class="section-title" style="fill: #fb7185;">Security Sentinel EDR</text>
+  <text x="717" y="260" class="node-title">Host Watchdog Monitor</text>
+  <text x="717" y="274" class="node-desc">Windows Process, Port &amp; FS Collectors</text>
+  
+  <rect x="717" y="286" width="226" height="52" class="subpanel" />
+  <text x="727" y="304" class="node-title">Correlation &amp; Incident Engine</text>
+  <text x="727" y="318" class="node-desc">Threat detection &amp; human approval</text>
+  <text x="727" y="330" class="node-desc">Response actions + Rollback</text>
+
+  <rect x="717" y="344" width="226" height="52" class="subpanel" />
+  <text x="727" y="362" class="node-title">Sandbox &amp; Isolation</text>
+  <text x="727" y="376" class="node-desc">Docker / Process sandbox execution</text>
+  <text x="727" y="388" class="node-desc">Port mapping &amp; boundary enforcement</text>
+
+  <!-- 3. MODEL HARNESS & INTELLIGENCE -->
+  <rect x="30" y="435" width="460" height="165" class="panel" />
+  <text x="45" y="456" class="section-title" style="fill: #fbbf24;">3. MODEL HARNESS &amp; ROUTING</text>
+  
+  <rect x="45" y="468" width="430" height="58" class="model-box" />
+  <text x="57" y="488" class="node-title">Model Harness Core (Routing &amp; Validation)</text>
+  <text x="57" y="504" class="node-desc">Profiles: Coding, Reasoning, Fast, Default | Structured Output &amp; AST Parser</text>
+  <text x="57" y="518" class="node-desc">Validation Loop: Parse -> Schema -> Enum -> Reference -> Recovery</text>
+
+  <rect x="45" y="534" width="135" height="54" class="subpanel" />
+  <text x="55" y="552" class="node-title">Local Ollama</text>
+  <text x="55" y="566" class="node-desc">qwen3.5:9b / AirLLM</text>
+  <text x="55" y="578" class="node-desc">100% Private</text>
+
+  <rect x="190" y="534" width="140" height="54" class="subpanel" />
+  <text x="200" y="552" class="node-title">OpenRouter Zero$</text>
+  <text x="200" y="566" class="node-desc">Free reasoning tier</text>
+  <text x="200" y="578" class="node-desc">Nemotron / Qwen</text>
+
+  <rect x="340" y="534" width="135" height="54" class="subpanel" />
+  <text x="350" y="552" class="node-title">Cloud APIs</text>
+  <text x="350" y="566" class="node-desc">Gemini / Claude</text>
+  <text x="350" y="578" class="node-desc">OpenAI Fallback</text>
+
+  <!-- 4. KNOWLEDGE & PERSISTENCE -->
+  <rect x="510" y="435" width="460" height="165" class="panel" />
+  <text x="525" y="456" class="section-title" style="fill: #34d399;">4. KNOWLEDGE, PERSISTENCE &amp; RAG</text>
+
+  <rect x="525" y="468" width="210" height="58" class="storage-box" />
+  <text x="537" y="488" class="node-title">Obsidian Knowledge Vault</text>
+  <text x="537" y="504" class="node-desc">Markdown notes, bidirectional RAG</text>
+  <text x="537" y="518" class="node-desc">Cornell lectures &amp; synthesized quizzes</text>
+
+  <rect x="745" y="468" width="210" height="58" class="storage-box" />
+  <text x="757" y="488" class="node-title">SQLite Relational DB</text>
+  <text x="757" y="504" class="node-desc">Rules, architecture decisions,</text>
+  <text x="757" y="518" class="node-desc">chat history &amp; mission checkpoints</text>
+
+  <rect x="525" y="534" width="210" height="54" class="subpanel" />
+  <text x="537" y="552" class="node-title">Workspace Projects (.jarvis/)</text>
+  <text x="537" y="566" class="node-desc">AST symbol graphs &amp; checkpoints</text>
+  <text x="537" y="578" class="node-desc">Safe isolated code root</text>
+
+  <rect x="745" y="534" width="210" height="54" class="subpanel" />
+  <text x="757" y="552" class="node-title">Vector Semantic DB</text>
+  <text x="757" y="566" class="node-desc">Chroma / Semantic embeddings</text>
+  <text x="757" y="578" class="node-desc">Contextual code search</text>
+
+  <!-- Connectors -->
+  <path d="M 380 407 L 380 468" class="arrow-purple" marker-end="url(#arrow-purple-head)" />
+  <path d="M 600 407 L 600 468" class="arrow-green" marker-end="url(#arrow-green-head)" />
+  <path d="M 830 407 L 830 468" class="arrow-red" marker-end="url(#arrow-red-head)" />
+</svg>

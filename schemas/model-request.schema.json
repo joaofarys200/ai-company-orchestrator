@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jarvis/model-request/v1",
+  "title": "ModelRequest",
+  "description": "Contract for invoking AI providers through the JARVIS Model Harness.",
+  "type": "object",
+  "required": ["request_id", "profile", "prompt", "output_format"],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Unique identifier for tracing the model invocation."
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["default", "coding", "fast", "reasoning"],
+      "description": "Routing profile determining model selection, temperature and latency budget."
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Main instructions and query."
+    },
+    "system_prompt": {
+      "type": "string",
+      "description": "System role prompt configuring agent persona."
+    },
+    "output_format": {
+      "type": "string",
+      "enum": ["TEXT", "JSON", "JSON_SCHEMA", "TOOL_CALLS"],
+      "default": "TEXT",
+      "description": "Expected structured output format."
+    },
+    "schema": {
+      "type": ["object", "null"],
+      "description": "Target JSON schema when output_format is JSON_SCHEMA."
+    },
+    "temperature": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 2.0,
+      "default": 0.2,
+      "description": "Sampling temperature."
+    },
+    "max_tokens": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 4096,
+      "description": "Maximum generated tokens."
+    },
+    "timeout_seconds": {
+      "type": "number",
+      "minimum": 1.0,
+      "default": 60.0,
+      "description": "Timeout threshold before failover."
+    }
+  },
+  "additionalProperties": false
+}

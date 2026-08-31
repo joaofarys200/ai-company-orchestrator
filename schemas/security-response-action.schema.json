@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jarvis/security-response-action/v1",
+  "title": "SecurityResponseAction",
+  "description": "Defensive mitigation or containment action with human approval and reversible rollback support.",
+  "type": "object",
+  "required": ["action_id", "incident_id", "action_type", "target", "permission_level", "status"],
+  "properties": {
+    "action_id": {
+      "type": "string",
+      "description": "Unique response action identifier."
+    },
+    "incident_id": {
+      "type": "string",
+      "description": "Associated security incident identifier."
+    },
+    "action_type": {
+      "type": "string",
+      "enum": ["TERMINATE_PROCESS", "DISABLE_SCHEDULED_TASK", "BLOCK_NETWORK_ENDPOINT", "QUARANTINE_FILE", "MARK_KNOWN_GOOD"],
+      "description": "Type of containment operation."
+    },
+    "target": {
+      "type": "string",
+      "description": "Target entity identifier (e.g. PID, file path, task name, port)."
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Why this action is required."
+    },
+    "permission_level": {
+      "type": "string",
+      "enum": ["READ_ONLY", "LOW_RISK_MUTATION", "HIGH_RISK_MUTATION", "CRITICAL_MUTATION"],
+      "description": "Risk classification of the action."
+    },
+    "approval_required": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether human sign-off is mandatory before execution."
+    },
+    "approved_by": {
+      "type": ["string", "null"],
+      "description": "User identifier who authorized execution."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PROPOSED", "WAITING_APPROVAL", "APPROVED", "EXECUTING", "VERIFYING", "COMPLETED", "FAILED", "ROLLED_BACK", "REJECTED"],
+      "description": "Current lifecycle status of the response action."
+    },
+    "rollback_available": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the action supports deterministic one-click rollback."
+    },
+    "pre_state": {
+      "type": "object",
+      "description": "Snapshot of target entity attributes before mutation."
+    },
+    "post_state": {
+      "type": "object",
+      "description": "Snapshot of target entity attributes after mutation to verify containment."
+    }
+  },
+  "additionalProperties": true
+}

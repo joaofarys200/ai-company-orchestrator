@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jarvis/economic-mission/v1",
+  "title": "EconomicMission",
+  "description": "Contract for economic task execution and real-world value validation in JARVIS OS.",
+  "type": "object",
+  "required": ["mission_id", "tier", "title", "status"],
+  "properties": {
+    "mission_id": {
+      "type": "string",
+      "description": "Unique economic mission identifier."
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["SYNTHETIC_BENCHMARK", "EXTERNAL_OBSERVED", "EXTERNAL_VERIFIED", "FINANCIAL_TRANSACTION_VERIFIED"],
+      "description": "Strict factuality tier classification for generated value."
+    },
+    "title": {
+      "type": "string",
+      "description": "Title of the economic task."
+    },
+    "deliverable_type": {
+      "type": "string",
+      "enum": ["CODE_PACKAGE", "RESEARCH_REPORT", "DATASET", "MARKDOWN_NOTE", "DOCUMENT_DOCX", "PRESENTATION_PPTX"],
+      "description": "Category of generated asset."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PLANNED", "IN_PROGRESS", "EVALUATED", "VERIFIED", "REJECTED"],
+      "description": "Evaluation status."
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Attached verifiable evidence IDs."
+    },
+    "value_estimate_usd": {
+      "type": "number",
+      "minimum": 0.0,
+      "description": "Estimated economic value (clearly marked as synthetic unless Tier 4 verified)."
+    }
+  },
+  "additionalProperties": false
+}

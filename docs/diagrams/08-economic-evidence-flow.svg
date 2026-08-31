@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0a0d14; }
+      .panel { fill: #111722; stroke: #1e293b; stroke-width: 1.5; rx: 8px; }
+      .subpanel { fill: #161f2e; stroke: #2a3a52; stroke-width: 1; rx: 6px; }
+      
+      .tier1-box { fill: #1e293b; stroke: #64748b; stroke-width: 1.5; rx: 6px; }
+      .tier2-box { fill: #0e2a3b; stroke: #0284c7; stroke-width: 1.5; rx: 6px; }
+      .tier3-box { fill: #2f230b; stroke: #d97706; stroke-width: 1.5; rx: 6px; }
+      .tier4-box { fill: #0c2b20; stroke: #10b981; stroke-width: 2; rx: 6px; }
+      .alert-box { fill: #34141e; stroke: #e11d48; stroke-width: 1.5; rx: 6px; }
+      
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #94a3b8; }
+      .tier-title { font-family: system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; }
+      .node-title { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; fill: #f1f5f9; }
+      .node-desc { font-family: system-ui, -apple-system, sans-serif; font-size: 10px; fill: #94a3b8; }
+      .tag { font-family: monospace; font-size: 9px; font-weight: 600; }
+      
+      .arrow { stroke: #38bdf8; stroke-width: 1.5; fill: none; }
+      .arrow-amber { stroke: #fbbf24; stroke-width: 1.5; fill: none; }
+      .arrow-green { stroke: #34d399; stroke-width: 1.5; fill: none; }
+    </style>
+    
+    <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fbbf24" />
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" class="bg" />
+
+  <!-- Header -->
+  <text x="30" y="38" class="title">JARVIS OS — 4-Tier Economic Evidence Taxonomy</text>
+  <text x="30" y="56" class="subtitle">Strict Factuality Model: Explicit Boundaries Between Synthetic Trials, Web Observations and Financial Proof</text>
+
+  <!-- ALERT / SCIENTIFIC INTEGRITY PRINCIPLE -->
+  <rect x="30" y="75" width="940" height="55" class="alert-box" />
+  <text x="45" y="96" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#fb7185">CRITICAL FACTUALITY INVARIANT:</text>
+  <text x="45" y="114" font-family="system-ui, sans-serif" font-size="11" fill="#fecdd3">Synthetic Simulations ≠ External Observations ≠ External Verified Actions ≠ Real Financial Transactions. No synthetic trial is claimed as revenue.</text>
+
+  <!-- ── 4 TIERS COLUMNS ── -->
+
+  <!-- TIER 1 -->
+  <rect x="30" y="145" width="220" height="445" class="tier1-box" />
+  <rect x="42" y="157" width="196" height="28" rx="4" fill="#334155" />
+  <text x="52" y="176" class="tier-title" fill="#94a3b8">TIER 1: SYNTHETIC</text>
+  
+  <text x="45" y="210" class="node-title">Synthetic Benchmark Trials</text>
+  <text x="45" y="228" class="node-desc">• Local unit &amp; mock tests</text>
+  <text x="45" y="244" class="node-desc">• Simulated coding problem suites</text>
+  <text x="45" y="260" class="node-desc">• Mock multi-agent debates</text>
+  <text x="45" y="276" class="node-desc">• In-memory sandbox execution</text>
+
+  <line x1="45" y1="290" x2="235" y2="290" stroke="#334155" stroke-width="1" />
+  
+  <text x="45" y="310" class="node-title">Evidence Artifacts:</text>
+  <text x="45" y="328" class="node-desc">• Pytest execution reports</text>
+  <text x="45" y="344" class="node-desc">• Synthetic benchmark scores</text>
+  <text x="45" y="360" class="node-desc">• Test fixture assertions</text>
+
+  <rect x="45" y="535" width="190" height="40" class="subpanel" />
+  <text x="55" y="552" class="tag" fill="#94a3b8">Classification Level:</text>
+  <text x="55" y="567" class="tag" fill="#cbd5e1">SYNTHETIC_BENCHMARK</text>
+
+  <path d="M 250 367 L 270 367" class="arrow" marker-end="url(#arr)" />
+
+  <!-- TIER 2 -->
+  <rect x="270" y="145" width="220" height="445" class="tier2-box" />
+  <rect x="282" y="157" width="196" height="28" rx="4" fill="#0369a1" />
+  <text x="290" y="176" class="tier-title" fill="#7dd3fc">TIER 2: OBSERVED</text>
+
+  <text x="285" y="210" class="node-title">External Read-Only Observation</text>
+  <text x="285" y="228" class="node-desc">• Live web scraping (Firecrawl)</text>
+  <text x="285" y="244" class="node-desc">• arXiv.org academic paper queries</text>
+  <text x="285" y="260" class="node-desc">• GitHub public repo analysis</text>
+  <text x="285" y="276" class="node-desc">• Public documentation inspection</text>
+
+  <line x1="285" y1="290" x2="475" y2="290" stroke="#075985" stroke-width="1" />
+
+  <text x="285" y="310" class="node-title">Evidence Artifacts:</text>
+  <text x="285" y="328" class="node-desc">• SHA256 of downloaded markdown</text>
+  <text x="285" y="344" class="node-desc">• HTTP response headers &amp; URLs</text>
+  <text x="285" y="360" class="node-desc">• Epistemic graph citations</text>
+
+  <rect x="285" y="535" width="190" height="40" class="subpanel" />
+  <text x="295" y="552" class="tag" fill="#38bdf8">Classification Level:</text>
+  <text x="295" y="567" class="tag" fill="#7dd3fc">EXTERNAL_OBSERVED</text>
+
+  <path d="M 490 367 L 510 367" class="arrow-amber" marker-end="url(#arr-amber)" />
+
+  <!-- TIER 3 -->
+  <rect x="510" y="145" width="220" height="445" class="tier3-box" />
+  <rect x="522" y="157" width="196" height="28" rx="4" fill="#b45309" />
+  <text x="532" y="176" class="tier-title" fill="#fde68a">TIER 3: VERIFIED</text>
+
+  <text x="525" y="210" class="node-title">Live Authenticated Actions</text>
+  <text x="525" y="228" class="node-desc">• Real browser DevTools interaction</text>
+  <text x="525" y="244" class="node-desc">• API calls with authorized credentials</text>
+  <text x="525" y="260" class="node-desc">• Git remote pull/push operations</text>
+  <text x="525" y="276" class="node-desc">• Deployed preview server responses</text>
+
+  <line x1="525" y1="290" x2="715" y2="290" stroke="#78350f" stroke-width="1" />
+
+  <text x="525" y="310" class="node-title">Evidence Artifacts:</text>
+  <text x="525" y="328" class="node-desc">• Authenticated network event logs</text>
+  <text x="525" y="344" class="node-desc">• DOM snapshots &amp; screenshots</text>
+  <text x="525" y="360" class="node-desc">• Remote server HTTP 200 proofs</text>
+
+  <rect x="525" y="535" width="190" height="40" class="subpanel" />
+  <text x="535" y="552" class="tag" fill="#fbbf24">Classification Level:</text>
+  <text x="535" y="567" class="tag" fill="#fde68a">EXTERNAL_VERIFIED</text>
+
+  <path d="M 730 367 L 750 367" class="arrow-green" marker-end="url(#arr-green)" />
+
+  <!-- TIER 4 -->
+  <rect x="750" y="145" width="220" height="445" class="tier4-box" />
+  <rect x="762" y="157" width="196" height="28" rx="4" fill="#047857" />
+  <text x="772" y="176" class="tier-title" fill="#a7f3d0">TIER 4: FINANCIAL</text>
+
+  <text x="765" y="210" class="node-title">Real Financial Transactions</text>
+  <text x="765" y="228" class="node-desc">• Bank transfer confirmation receipt</text>
+  <text x="765" y="244" class="node-desc">• Cryptographic blockchain tx hash</text>
+  <text x="765" y="260" class="node-desc">• Stripe / PayPal payment webhook</text>
+  <text x="765" y="276" class="node-desc">• Signed invoices with tax audit trail</text>
+
+  <line x1="765" y1="290" x2="955" y2="290" stroke="#065f46" stroke-width="1" />
+
+  <text x="765" y="310" class="node-title">Evidence Artifacts:</text>
+  <text x="765" y="328" class="node-desc">• Cryptographic transaction signature</text>
+  <text x="765" y="344" class="node-desc">• External processor confirmation ID</text>
+  <text x="765" y="360" class="node-desc">• Irreversible settlement record</text>
+
+  <rect x="765" y="535" width="190" height="40" class="subpanel" />
+  <text x="775" y="552" class="tag" fill="#34d399">Classification Level:</text>
+  <text x="775" y="567" class="tag" fill="#a7f3d0">FINANCIAL_TRANSACTION</text>
+</svg>

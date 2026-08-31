@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0a0d14; }
+      .panel { fill: #111722; stroke: #1e293b; stroke-width: 1.5; rx: 8px; }
+      .subpanel { fill: #161f2e; stroke: #2a3a52; stroke-width: 1; rx: 6px; }
+      
+      .client-col { fill: #0e2a3b; stroke: #0284c7; stroke-width: 1.5; rx: 6px; }
+      .gateway-col { fill: #271838; stroke: #a855f7; stroke-width: 1.5; rx: 6px; }
+      .handler-col { fill: #0c2b20; stroke: #10b981; stroke-width: 1.5; rx: 6px; }
+      
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #94a3b8; }
+      .col-title { font-family: system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; }
+      .node-title { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; fill: #f1f5f9; }
+      .node-desc { font-family: system-ui, -apple-system, sans-serif; font-size: 10px; fill: #94a3b8; }
+      .tag { font-family: monospace; font-size: 9px; }
+      
+      .arrow-req { stroke: #38bdf8; stroke-width: 1.5; fill: none; }
+      .arrow-resp { stroke: #34d399; stroke-width: 1.5; fill: none; }
+      .arrow-broadcast { stroke: #c084fc; stroke-width: 1.5; fill: none; stroke-dasharray: 4,4; }
+    </style>
+    
+    <marker id="arr-req" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arr-resp" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+    <marker id="arr-broad" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" class="bg" />
+
+  <!-- Header -->
+  <text x="30" y="38" class="title">JARVIS OS — Duplex WebSocket Protocol &amp; Runtime Flow</text>
+  <text x="30" y="56" class="subtitle">Single-Port Multiplexed Channel, 60+ Type-Safe Message Handlers &amp; Reactive State Sync</text>
+
+  <!-- ── 3 MAIN COLUMNS ── -->
+
+  <!-- 1. CLIENT (FRONTEND) -->
+  <rect x="30" y="80" width="280" height="510" class="panel" />
+  <rect x="45" y="95" width="250" height="32" class="client-col" />
+  <text x="55" y="116" class="col-title" fill="#7dd3fc">FRONTEND / CLIENT</text>
+
+  <rect x="45" y="140" width="250" height="90" class="subpanel" />
+  <text x="55" y="160" class="node-title">WebSocketContext.tsx</text>
+  <text x="55" y="176" class="node-desc">• Automatic reconnection loop</text>
+  <text x="55" y="190" class="node-desc">• Type-safe sendClientMessage()</text>
+  <text x="55" y="204" class="node-desc">• Reactive React state dispatch</text>
+  <text x="55" y="220" class="tag" fill="#38bdf8">frontend/src/protocol/websocket.ts</text>
+
+  <rect x="45" y="245" width="250" height="150" class="subpanel" />
+  <text x="55" y="265" class="node-title">Workspace Feature Hooks</text>
+  <text x="55" y="285" class="node-desc">• useWebSocket() context consumer</text>
+  <text x="55" y="303" class="node-desc">• Monaco Code Editor buffer sync</text>
+  <text x="55" y="321" class="node-desc">• Mission Planner Kanban state</text>
+  <text x="55" y="339" class="node-desc">• Security Sentinel live alerts</text>
+  <text x="55" y="357" class="node-desc">• Duplex voice &amp; audio chunks</text>
+  <text x="55" y="380" class="tag" fill="#38bdf8">features/workspace/WorkspaceViewer.tsx</text>
+
+  <rect x="45" y="410" width="250" height="160" class="subpanel" />
+  <text x="55" y="430" class="node-title">Client Message Catalog</text>
+  <text x="55" y="448" class="node-desc">• directive, select_template, toggle_voice</text>
+  <text x="55" y="464" class="node-desc">• list_projects, create_project, open_project</text>
+  <text x="55" y="480" class="node-desc">• save_project_file, delete_project_file</text>
+  <text x="55" y="496" class="node-desc">• mission_create, mission_execute_wp</text>
+  <text x="55" y="512" class="node-desc">• sentinel_run_audit, sentinel_approve</text>
+  <text x="55" y="528" class="node-desc">• generate_lecture, submit_quiz</text>
+  <text x="55" y="552" class="tag" fill="#38bdf8">CLIENT_MESSAGE_TYPES (58 canonical)</text>
+
+  <!-- 2. ROUTER & DISPATCHER -->
+  <rect x="340" y="80" width="290" height="510" class="panel" />
+  <rect x="355" y="95" width="260" height="32" class="gateway-col" />
+  <text x="365" y="116" class="col-title" fill="#d8b4fe">GATEWAY &amp; DISPATCHER</text>
+
+  <rect x="355" y="140" width="260" height="90" class="subpanel" />
+  <text x="365" y="160" class="node-title">WebSocketGateway (server.py)</text>
+  <text x="365" y="176" class="node-desc">• ConnectionManager tracking</text>
+  <text x="365" y="190" class="node-desc">• JSON framing &amp; validation check</text>
+  <text x="365" y="204" class="node-desc">• WebSocketSessionState lifecycle</text>
+  <text x="365" y="220" class="tag" fill="#c084fc">backend/websocket/gateway.py</text>
+
+  <rect x="355" y="245" width="260" height="150" class="subpanel" />
+  <text x="365" y="265" class="node-title">WebSocketDispatcher</text>
+  <text x="365" y="285" class="node-desc">• Route registration with domain map</text>
+  <text x="365" y="303" class="node-desc">• Protocol divergence assertion:</text>
+  <text x="365" y="321" class="node-desc">  EXPECTED_MESSAGE_TYPES ==</text>
+  <text x="365" y="339" class="node-desc">  dispatcher.message_types</text>
+  <text x="365" y="357" class="node-desc">• Non-blocking async event loop</text>
+  <text x="365" y="380" class="tag" fill="#c084fc">backend/websocket/dispatcher.py</text>
+
+  <rect x="355" y="410" width="260" height="160" class="subpanel" />
+  <text x="365" y="430" class="node-title">InitialSyncHandler</text>
+  <text x="365" y="448" class="node-desc">• Full bootstrap snapshot on connect:</text>
+  <text x="365" y="464" class="node-desc">  - rules_list, architecture_list</text>
+  <text x="365" y="480" class="node-desc">  - decisions_list, notes_list</text>
+  <text x="365" y="496" class="node-desc">  - projects_list, project_context</text>
+  <text x="365" y="512" class="node-desc">  - mission_list, sentinel_status</text>
+  <text x="365" y="528" class="node-desc">  - sandbox_status, ui_theme</text>
+  <text x="365" y="552" class="tag" fill="#c084fc">backend/websocket/handlers/common.py</text>
+
+  <!-- 3. DOMAIN HANDLERS -->
+  <rect x="660" y="80" width="310" height="510" class="panel" />
+  <rect x="675" y="95" width="280" height="32" class="handler-col" />
+  <text x="685" y="116" class="col-title" fill="#a7f3d0">DOMAIN SERVICES &amp; RESPONDERS</text>
+
+  <rect x="675" y="140" width="280" height="65" class="subpanel" />
+  <text x="685" y="160" class="node-title">Chat &amp; Voice Handlers</text>
+  <text x="685" y="176" class="node-desc">• Streaming assistant tokens</text>
+  <text x="685" y="190" class="node-desc">• Gemini Live audio response synthesis</text>
+
+  <rect x="675" y="215" width="280" height="80" class="subpanel" />
+  <text x="685" y="235" class="node-title">Project &amp; Coding Handlers</text>
+  <text x="685" y="251" class="node-desc">• AST symbol indexing, saving &amp; deletion</text>
+  <text x="685" y="265" class="node-desc">• Coding session apply &amp; verified rollback</text>
+  <text x="685" y="279" class="node-desc">• Sandbox preview runner management</text>
+
+  <rect x="675" y="305" width="280" height="75" class="subpanel" />
+  <text x="685" y="325" class="node-title">Mission Execution Handler</text>
+  <text x="685" y="341" class="node-desc">• WorkPackage step-by-step executor</text>
+  <text x="685" y="355" class="node-desc">• Review sign-off &amp; criteria evaluator</text>
+  <text x="685" y="369" class="node-desc">• Swarm autonomy runner</text>
+
+  <rect x="675" y="390" width="280" height="85" class="subpanel" />
+  <text x="685" y="410" class="node-title">Sentinel Security Handler</text>
+  <text x="685" y="426" class="node-desc">• Real-time threat broadcast alerts</text>
+  <text x="685" y="440" class="node-desc">• Action proposal &amp; approval endpoints</text>
+  <text x="685" y="454" class="node-desc">• Shadow telemetry &amp; baseline sync</text>
+
+  <rect x="675" y="485" width="280" height="85" class="subpanel" />
+  <text x="685" y="505" class="node-title">Lecture &amp; Knowledge Handlers</text>
+  <text x="685" y="521" class="node-desc">• Real-time audio recording stream</text>
+  <text x="685" y="535" class="node-desc">• Cornell notes &amp; quiz synthesis</text>
+  <text x="685" y="549" class="node-desc">• Obsidian vault markdown sync</text>
+
+  <!-- Connectors between Client and Dispatcher -->
+  <path d="M 295 180 L 350 180" class="arrow-req" marker-end="url(#arr-req)" />
+  <path d="M 350 210 L 295 210" class="arrow-resp" marker-end="url(#arr-resp)" />
+  
+  <path d="M 615 280 L 670 280" class="arrow-req" marker-end="url(#arr-req)" />
+  <path d="M 670 340 L 615 340" class="arrow-resp" marker-end="url(#arr-resp)" />
+</svg>

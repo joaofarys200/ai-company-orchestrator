@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "jarvis/security-incident/v1",
+  "title": "SecurityIncident",
+  "description": "Correlated security incident managed by Security Sentinel.",
+  "type": "object",
+  "required": ["incident_id", "severity", "status", "created_at"],
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "description": "Unique incident identifier."
+    },
+    "threat_name": {
+      "type": "string",
+      "description": "Human-readable threat classification name."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["BENIGN", "SUSPICIOUS", "HIGH_RISK", "CONFIRMED_MALICIOUS", "UNKNOWN"],
+      "description": "Aggregate severity score."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["OPEN", "INVESTIGATING", "WAITING_APPROVAL", "CONTAINED", "RESOLVED", "FALSE_POSITIVE", "UNKNOWN"],
+      "description": "Current lifecycle state of the incident."
+    },
+    "event_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of correlated security event IDs."
+    },
+    "recommended_action_type": {
+      "type": "string",
+      "enum": ["TERMINATE_PROCESS", "DISABLE_SCHEDULED_TASK", "BLOCK_NETWORK_ENDPOINT", "QUARANTINE_FILE", "MARK_KNOWN_GOOD"],
+      "description": "Proposed response action."
+    },
+    "created_at": {
+      "type": "number",
+      "description": "Unix timestamp in seconds when incident was opened."
+    },
+    "resolved_at": {
+      "type": ["number", "null"],
+      "description": "Unix timestamp in seconds when incident was resolved."
+    },
+    "resolution_note": {
+      "type": "string",
+      "description": "Summary of action taken to contain or resolve the incident."
+    }
+  },
+  "additionalProperties": true
+}

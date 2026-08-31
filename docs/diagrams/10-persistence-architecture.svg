@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0a0d14; }
+      .panel { fill: #111722; stroke: #1e293b; stroke-width: 1.5; rx: 8px; }
+      .subpanel { fill: #161f2e; stroke: #2a3a52; stroke-width: 1; rx: 6px; }
+      
+      .sqlite-box { fill: #0c2b20; stroke: #10b981; stroke-width: 1.5; rx: 6px; }
+      .workspace-box { fill: #0e2a3b; stroke: #0284c7; stroke-width: 1.5; rx: 6px; }
+      .obsidian-box { fill: #1f1838; stroke: #8b5cf6; stroke-width: 1.5; rx: 6px; }
+      .quarantine-box { fill: #34141e; stroke: #e11d48; stroke-width: 1.5; rx: 6px; }
+      
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 700; fill: #f8fafc; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #94a3b8; }
+      .stage-title { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+      .node-title { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; fill: #f1f5f9; }
+      .node-desc { font-family: system-ui, -apple-system, sans-serif; font-size: 10px; fill: #94a3b8; }
+      .tag { font-family: monospace; font-size: 9px; font-weight: 600; }
+      
+      .arrow { stroke: #38bdf8; stroke-width: 1.5; fill: none; }
+      .arrow-green { stroke: #34d399; stroke-width: 1.5; fill: none; }
+      .arrow-purple { stroke: #c084fc; stroke-width: 1.5; fill: none; }
+      .arrow-red { stroke: #fb7185; stroke-width: 1.5; fill: none; }
+    </style>
+    
+    <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+    <marker id="arr-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fb7185" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" class="bg" />
+
+  <!-- Header -->
+  <text x="30" y="38" class="title">JARVIS OS — Storage &amp; Persistence Architecture</text>
+  <text x="30" y="56" class="subtitle">Multi-Tier State Storage: SQLite Relational Database, Isolated Workspaces, AST Metadata &amp; Knowledge Vault</text>
+
+  <!-- ── 4 STORAGE DOMAINS ── -->
+
+  <!-- 1. SQLITE RELATIONAL DATABASE -->
+  <rect x="30" y="80" width="460" height="240" class="panel" />
+  <text x="45" y="102" class="stage-title" style="fill:#34d399;">1. SQLITE RELATIONAL STORE (database.db)</text>
+
+  <rect x="45" y="115" width="200" height="95" class="sqlite-box" />
+  <text x="55" y="133" class="node-title">Memory &amp; Rules Tables</text>
+  <text x="55" y="151" class="node-desc">• rules (key, value, updated_at)</text>
+  <text x="55" y="167" class="node-desc">• architecture (module, decision)</text>
+  <text x="55" y="183" class="node-desc">• decisions (id, summary, context)</text>
+  <text x="55" y="199" class="tag" fill="#34d399">persistence/repositories/rules.py</text>
+
+  <rect x="260" y="115" width="215" height="95" class="sqlite-box" />
+  <text x="270" y="133" class="node-title">Chat &amp; Session History</text>
+  <text x="270" y="151" class="node-desc">• messages (sender, role, text)</text>
+  <text x="270" y="167" class="node-desc">• kanban_cards (id, column, title)</text>
+  <text x="270" y="183" class="node-desc">• session_memory (key-values)</text>
+  <text x="270" y="199" class="tag" fill="#34d399">database.py</text>
+
+  <rect x="45" y="220" width="430" height="85" class="subpanel" />
+  <text x="55" y="238" class="node-title">Concurrency &amp; Transaction Safety</text>
+  <text x="55" y="254" class="node-desc">• WAL Mode (Write-Ahead Logging) enabled for low-latency concurrent reads/writes</text>
+  <text x="55" y="270" class="node-desc">• Thread-safe connection context managers with automatic rollback on exception</text>
+  <text x="55" y="286" class="node-desc">• Strict parameterized SQL statements eliminating injection vulnerabilities</text>
+
+  <!-- 2. WORKSPACE & CODE ISOLATION -->
+  <rect x="510" y="80" width="460" height="240" class="panel" />
+  <text x="525" y="102" class="stage-title" style="fill:#38bdf8;">2. PROJECT WORKSPACES &amp; SANDBOX ROOTS</text>
+
+  <rect x="525" y="115" width="210" height="95" class="workspace-box" />
+  <text x="535" y="133" class="node-title">Isolated Projects Directory</text>
+  <text x="535" y="151" class="node-desc">• workspace/projects/&lt;project_id&gt;/</text>
+  <text x="535" y="167" class="node-desc">• Safe project boundary check</text>
+  <text x="535" y="183" class="node-desc">• Node / Python / Web templates</text>
+  <text x="535" y="199" class="tag" fill="#38bdf8">intelligence/project_context.py</text>
+
+  <rect x="745" y="115" width="210" height="95" class="workspace-box" />
+  <text x="755" y="133" class="node-title">AST &amp; Metadata Store</text>
+  <text x="755" y="151" class="node-desc">• workspace/.jarvis/projects/&lt;id&gt;/</text>
+  <text x="755" y="167" class="node-desc">• ast_index.json (symbol graph)</text>
+  <text x="755" y="183" class="node-desc">• coding_sessions/&lt;session_id&gt;/</text>
+  <text x="755" y="199" class="tag" fill="#38bdf8">session.json + checkpoints</text>
+
+  <rect x="525" y="220" width="430" height="85" class="subpanel" />
+  <text x="535" y="238" class="node-title">Security Invariant: No Escape from Workspace Root</text>
+  <text x="535" y="254" class="node-desc">• _safe_project_path() prevents path traversal attacks (e.g. ../../windows/)</text>
+  <text x="535" y="270" class="node-desc">• Automatic deletion of project directory cleans up both code root and .jarvis metadata</text>
+  <text x="535" y="286" class="node-desc">• Git ignore rules guarantee private user workspaces are never committed to remote repos</text>
+
+  <!-- 3. OBSIDIAN KNOWLEDGE VAULT -->
+  <rect x="30" y="340" width="460" height="250" class="panel" />
+  <text x="45" y="362" class="stage-title" style="fill:#c084fc;">3. OBSIDIAN KNOWLEDGE VAULT (obsidian_vault/)</text>
+
+  <rect x="45" y="375" width="200" height="100" class="obsidian-box" />
+  <text x="55" y="393" class="node-title">Structured Directories</text>
+  <text x="55" y="411" class="node-desc">• 00 - MOC (Maps of Content)</text>
+  <text x="55" y="427" class="node-desc">• 01 - Fleeting Notes</text>
+  <text x="55" y="443" class="node-desc">• 02 - Literature Notes</text>
+  <text x="55" y="459" class="node-desc">• 10 - Cornell Lectures</text>
+
+  <rect x="260" y="375" width="215" height="100" class="subpanel" />
+  <text x="270" y="393" class="node-title">Epistemic Indexing</text>
+  <text x="270" y="411" class="node-desc">• Bi-directional wikilinks graph</text>
+  <text x="270" y="427" class="node-desc">• Vector semantic embeddings</text>
+  <text x="270" y="443" class="node-desc">• SHA256 content verification</text>
+  <text x="270" y="459" class="tag" fill="#c084fc">RAG Hybrid Search Engine</text>
+
+  <rect x="45" y="485" width="430" height="90" class="subpanel" />
+  <text x="55" y="503" class="node-title">Human-Editable Knowledge Substrate</text>
+  <text x="55" y="519" class="node-desc">• Pure plain-text Markdown format guarantees longevity and zero proprietary lock-in</text>
+  <text x="55" y="535" class="node-desc">• Can be opened and edited directly by the user in Obsidian.md desktop client</text>
+  <text x="55" y="551" class="node-desc">• Real-time sync engine reflects user edits immediately back into agent reasoning</text>
+
+  <!-- 4. SENTINEL QUARANTINE & AUDIT -->
+  <rect x="510" y="340" width="460" height="250" class="panel" />
+  <text x="525" y="362" class="stage-title" style="fill:#fb7185;">4. SENTINEL QUARANTINE &amp; DEFENSE AUDIT</text>
+
+  <rect x="525" y="375" width="210" height="100" class="quarantine-box" />
+  <text x="535" y="393" class="node-title">Quarantine Store</text>
+  <text x="535" y="411" class="node-desc">• sentinel/quarantine/</text>
+  <text x="535" y="427" class="node-desc">• Isolated malicious binaries</text>
+  <text x="535" y="443" class="node-desc">• Preserves permissions &amp; path</text>
+  <text x="535" y="459" class="tag" fill="#fb7185">Strict execution block</text>
+
+  <rect x="745" y="375" width="210" height="100" class="subpanel" />
+  <text x="755" y="393" class="node-title">Response History Audit</text>
+  <text x="755" y="411" class="node-desc">• sentinel/response_history.json</text>
+  <text x="755" y="427" class="node-desc">• Full pre/post state evidence</text>
+  <text x="755" y="443" class="node-desc">• Rollback plan data</text>
+  <text x="755" y="459" class="tag" fill="#fb7185">Immutable audit log</text>
+
+  <rect x="525" y="485" width="430" height="90" class="subpanel" />
+  <text x="535" y="503" class="node-title">One-Click Rollback State Restoration</text>
+  <text x="535" y="519" class="node-desc">• Quarantined files are moved back to original paths if marked as FALSE_POSITIVE</text>
+  <text x="535" y="535" class="node-desc">• Terminated services and scheduled tasks are safely reinstated with pre-state attributes</text>
+  <text x="535" y="551" class="node-desc">• Defense mechanisms guarantee zero unrecoverable collateral damage to host OS</text>
+</svg>

@@ -1,7 +1,7 @@
 ---
 title: ADR-014 - Automated Defense and Resilience for FINDING-02-NETWORK-RETRY-JITTER
 status: ACCEPTED
-date: 2026-08-24
+date: 2026-08-31
 ---
 
 # Context
