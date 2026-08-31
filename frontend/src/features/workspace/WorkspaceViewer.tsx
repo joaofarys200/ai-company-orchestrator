@@ -9,6 +9,7 @@ import {
   ChevronRight,
   CircleAlert,
   Code2,
+  Cpu,
   FileCode,
   FolderOpen,
   GitPullRequest,
@@ -16,6 +17,7 @@ import {
   KanbanSquare,
   LayoutDashboard,
   Layers,
+  Loader2,
   MessageSquare,
   MoreHorizontal,
   Play,
@@ -25,6 +27,8 @@ import {
   Save,
   Search,
   Shield,
+  ShieldAlert,
+  Sparkles,
   Square,
   Terminal,
   Trash2,
@@ -221,11 +225,17 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     listProjects,
     openProject,
     createProject,
+    deleteProject,
+    deleteProjectFile,
     reindexProject,
     findReferences,
     semanticSearch,
     codingSession,
     isCodingSessionBusy,
+    safetyRefusal,
+    clearSafetyRefusal,
+    codingSessionError,
+    clearCodingSessionError,
     createCodingSession,
     applyCodingSession,
     rollbackCodingSession,
@@ -249,6 +259,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
   const [newProjectId, setNewProjectId] = useState('');
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectTemplate, setNewProjectTemplate] = useState('web-app');
+  const [projectToDelete, setProjectToDelete] = useState<{ id: string; name: string } | null>(null);
 
   // Confirmation Modal State
   const [confirmRollbackOpen, setConfirmRollbackOpen] = useState(false);
@@ -571,21 +582,37 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                     />
                   </div>
                 </div>
-                <div className="max-h-80 overflow-y-auto p-1.5">
+                <div className="max-h-80 overflow-y-auto p-1.5 space-y-0.5">
                   {regularProjects.map((project) => (
-                    <button
+                    <div
                       key={project.project_id}
-                      onClick={() => handleProjectSelect(project.project_id)}
-                      className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs transition-colors ${
+                      className={`group flex w-full items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-left text-xs transition-colors ${
                         project.project_id === projectContext?.project_id
                           ? 'bg-cyan-300/10 text-cyan-100'
                           : 'text-gray-400 hover:bg-white/[0.05]'
                       }`}
                     >
-                      <FolderOpen className="h-3.5 w-3.5 shrink-0 text-gray-500" />
-                      <span className="truncate">{project.project_name}</span>
-                      {project.project_id === projectContext?.project_id && <Check className="ml-auto h-3.5 w-3.5" />}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => handleProjectSelect(project.project_id)}
+                        className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                      >
+                        <FolderOpen className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                        <span className="truncate">{project.project_name}</span>
+                        {project.project_id === projectContext?.project_id && <Check className="ml-1 h-3.5 w-3.5 text-cyan-300 shrink-0" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setProjectToDelete({ id: project.project_id, name: project.project_name });
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 rounded transition-all shrink-0"
+                        title={`Eliminar projeto ${project.project_name}`}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   ))}
 
                   {regularProjects.length === 0 && !showTechnicalProjects && (
@@ -602,18 +629,35 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                         <span>{showTechnicalProjects ? 'Ocultar' : 'Mostrar'} {technicalProjects.length} projetos técnicos</span>
                       </button>
                       {showTechnicalProjects && technicalProjects.map((project) => (
-                        <button
+                        <div
                           key={project.project_id}
-                          onClick={() => handleProjectSelect(project.project_id)}
-                          className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs transition-colors ${
+                          className={`group flex w-full items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-left text-xs transition-colors ${
                             project.project_id === projectContext?.project_id
                               ? 'bg-cyan-300/10 text-cyan-100'
                               : 'text-gray-500 hover:bg-white/[0.05] hover:text-gray-300'
                           }`}
                         >
-                          <FolderOpen className="h-3.5 w-3.5 shrink-0" />
-                          <span className="truncate">{project.project_name}</span>
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => handleProjectSelect(project.project_id)}
+                            className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                          >
+                            <FolderOpen className="h-3.5 w-3.5 shrink-0" />
+                            <span className="truncate">{project.project_name}</span>
+                            {project.project_id === projectContext?.project_id && <Check className="ml-1 h-3.5 w-3.5 text-cyan-300 shrink-0" />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setProjectToDelete({ id: project.project_id, name: project.project_name });
+                            }}
+                            className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 rounded transition-all shrink-0"
+                            title={`Eliminar projeto técnico ${project.project_name}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       ))}
                     </>
                   )}
@@ -880,6 +924,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                     selectedFile={selectedFile}
                     onSelectFile={handleFileSelect}
                     onSaveFile={saveProjectFile}
+                    onDeleteFile={deleteProjectFile}
                     onOpenChanges={() => activateTab('coding')}
                     onOpenPreview={() => activateTab('preview')}
                     isSaving={isSavingProjectFile}
@@ -1007,11 +1052,58 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                   <button
                     onClick={() => createCodingSession(codingObjective)}
                     disabled={!projectContext || !codingObjective.trim() || isCodingSessionBusy}
-                    className={`${BUTTON_BASE} w-full border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15`}
+                    className={`${BUTTON_BASE} w-full border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15 ${isCodingSessionBusy ? 'cursor-wait bg-cyan-300/20' : ''}`}
                   >
-                    <WandSparkles className={`h-4 w-4 ${isCodingSessionBusy ? 'animate-pulse' : ''}`} />
-                    <span>Criar plano</span>
+                    {isCodingSessionBusy ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin text-cyan-300" />
+                        <span>A planear alteração...</span>
+                      </>
+                    ) : (
+                      <>
+                        <WandSparkles className="h-4 w-4" />
+                        <span>Criar plano</span>
+                      </>
+                    )}
                   </button>
+
+                  {safetyRefusal && (
+                    <div className="rounded-md border border-rose-500/30 bg-rose-950/40 p-3 text-xs text-rose-200">
+                      <div className="flex items-start gap-2">
+                        <ShieldAlert className="h-4 w-4 shrink-0 text-rose-400 mt-0.5" />
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between font-semibold text-rose-300">
+                            <span>{safetyRefusal.status}</span>
+                            <button onClick={clearSafetyRefusal} className="text-gray-400 hover:text-white">
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                          <p className="text-rose-100/90 leading-relaxed">{safetyRefusal.reason}</p>
+                          <div className="text-[10px] text-rose-300/75 pt-1 border-t border-rose-500/20">
+                            <div><span className="font-semibold">Regra:</span> {safetyRefusal.policy_rule}</div>
+                            <div><span className="font-semibold">Ref ID:</span> {safetyRefusal.request_id}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {codingSessionError && (
+                    <div className="rounded-md border border-amber-500/30 bg-amber-950/40 p-3 text-xs text-amber-200">
+                      <div className="flex items-start gap-2">
+                        <CircleAlert className="h-4 w-4 shrink-0 text-amber-400 mt-0.5" />
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between font-semibold text-amber-300">
+                            <span>Erro no Planeamento</span>
+                            <button onClick={clearCodingSessionError} className="text-gray-400 hover:text-white">
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                          <p className="text-amber-100/90 leading-relaxed">{codingSessionError}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {codingSession && (
                     <div className="space-y-3 border-t border-white/8 pt-3 text-xs">
@@ -1054,8 +1146,17 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                       disabled={codingSession.status !== 'PROPOSED' || isCodingSessionBusy}
                       className={`${BUTTON_BASE} flex-1 border-emerald-300/25 bg-emerald-300/10 text-emerald-100 hover:bg-emerald-300/15`}
                     >
-                      <Play className="h-4 w-4" />
-                      <span>Aplicar</span>
+                      {isCodingSessionBusy ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin text-emerald-300" />
+                          <span>A aplicar...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4" />
+                          <span>Aplicar</span>
+                        </>
+                      )}
                     </button>
                     <button
                       onClick={() => setConfirmRollbackOpen(true)}
@@ -1070,8 +1171,73 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
               </section>
 
               <section className={`${PANEL} min-h-0 overflow-y-auto p-4`}>
-                {!codingSession ? (
-                  <EmptyState icon={GitPullRequest} title="Nenhuma alteracao preparada." />
+                {isCodingSessionBusy ? (
+                  <div className="flex h-full min-h-80 flex-col items-center justify-center gap-5 p-8 text-center animate-in fade-in duration-300">
+                    <div className="relative flex items-center justify-center">
+                      <div className="absolute h-20 w-20 animate-ping rounded-full border border-cyan-400/20 bg-cyan-400/5 duration-1000" />
+                      <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-400/40 bg-gradient-to-br from-cyan-950/80 to-[#0f1b20] shadow-[0_0_30px_rgba(6,182,212,0.25)]">
+                        <Cpu className="h-8 w-8 animate-pulse text-cyan-300" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <h4 className="text-sm font-semibold tracking-wide text-cyan-100 flex items-center justify-center gap-2">
+                        <Sparkles className="h-4 w-4 text-cyan-300 animate-spin" />
+                        <span>A Orquestrar Alteração de Código...</span>
+                      </h4>
+                      <p className="max-w-md text-xs text-gray-400 leading-relaxed">
+                        O agente de engenharia está a analisar a árvore de sintaxe (AST), a mapear dependências e a produzir diffs atómicos de forma transacional.
+                      </p>
+                    </div>
+
+                    <div className="w-full max-w-sm space-y-2 rounded-lg border border-white/8 bg-black/40 p-3.5 text-left text-xs">
+                      <div className="flex items-center gap-2 text-cyan-200">
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-cyan-400" />
+                        <span className="font-medium">1. Mapeamento de contexto e grafos do projeto</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-cyan-200/80 pl-5.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping" />
+                        <span>2. Raciocínio de Código (Gemini / Qwen 3.5 9B)</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-500 pl-5.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-gray-600" />
+                        <span>3. Geração de Diffs unificados e validações</span>
+                      </div>
+                    </div>
+
+                    <div className="h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/10">
+                      <div className="h-full w-full animate-pulse bg-gradient-to-r from-cyan-500 via-teal-300 to-cyan-500" />
+                    </div>
+                  </div>
+                ) : !codingSession ? (
+                  safetyRefusal ? (
+                    <div className="flex h-full min-h-64 flex-col items-center justify-center gap-3 text-center p-6">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-rose-500/30 bg-rose-950/30 text-rose-400">
+                        <ShieldAlert className="h-6 w-6" />
+                      </div>
+                      <h4 className="text-sm font-semibold text-rose-200">{safetyRefusal.status}</h4>
+                      <p className="max-w-md text-xs text-gray-400 leading-relaxed">{safetyRefusal.reason}</p>
+                      <div className="rounded border border-white/8 bg-black/30 px-3 py-2 text-[11px] font-mono text-gray-400">
+                        Política: {safetyRefusal.policy_rule} | Execuções Bloqueadas: 0 ferramentas / 0 ficheiros alterados
+                      </div>
+                    </div>
+                  ) : codingSessionError ? (
+                    <div className="flex h-full min-h-64 flex-col items-center justify-center gap-3 text-center p-6">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-amber-500/30 bg-amber-950/30 text-amber-400">
+                        <CircleAlert className="h-6 w-6" />
+                      </div>
+                      <h4 className="text-sm font-semibold text-amber-200">Não foi possível criar o plano</h4>
+                      <p className="max-w-md text-xs text-gray-300 leading-relaxed">{codingSessionError}</p>
+                      <button
+                        onClick={() => createCodingSession(codingObjective)}
+                        className="mt-2 inline-flex items-center gap-2 rounded-md border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-xs text-cyan-200 hover:bg-cyan-400/20"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        <span>Tentar novamente</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <EmptyState icon={GitPullRequest} title="Nenhuma alteracao preparada." />
+                  )
                 ) : (
                   <div className="space-y-4">
                     {codingSession.proposed_changes.map((change) => (
@@ -1678,6 +1844,52 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
       >
         <p className="text-xs text-gray-300">Tem a certeza que pretende reverter apenas os ficheiros alterados por esta sessão de código?</p>
       </Modal>
+
+      {/* Confirm Delete Project Modal */}
+      {projectToDelete && (
+        <Modal
+          isOpen={Boolean(projectToDelete)}
+          onClose={() => setProjectToDelete(null)}
+          title="Eliminar Projeto"
+          footer={(
+            <>
+              <button
+                type="button"
+                onClick={() => setProjectToDelete(null)}
+                className={`${BUTTON_BASE} border-white/10 text-gray-400`}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteProject(projectToDelete.id);
+                  setProjectToDelete(null);
+                }}
+                className={`${BUTTON_BASE} border-rose-500/30 bg-rose-500/20 text-rose-200 hover:bg-rose-500/30 font-semibold`}
+              >
+                Eliminar Projeto
+              </button>
+            </>
+          )}
+        >
+          <div className="space-y-3 text-xs text-gray-300">
+            <div className="flex items-center gap-3 text-rose-400">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-500/10 border border-rose-500/20 shrink-0">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h4 className="text-sm font-semibold text-white">Eliminar Projeto Permanentemente</h4>
+                <p className="text-xs text-rose-300/80 font-mono mt-0.5 truncate">{projectToDelete.name} ({projectToDelete.id})</p>
+              </div>
+            </div>
+            <p className="leading-relaxed">
+              Tem a certeza de que deseja eliminar o projeto <strong className="text-white">{projectToDelete.name}</strong>?
+              Todos os ficheiros de código, histórico e tarefas associadas serão removidos do disco.
+            </p>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

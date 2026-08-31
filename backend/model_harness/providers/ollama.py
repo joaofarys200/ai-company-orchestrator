@@ -551,8 +551,8 @@ class OllamaChatProvider:
             ),
             "options": {
                 "temperature": request.temperature,
-                "num_ctx": request.max_context_tokens,
-                "num_predict": request.max_output_tokens,
+                "num_ctx": request.max_context_tokens or int(os.getenv("OLLAMA_NUM_CTX", "16384")),
+                "num_predict": request.max_output_tokens or int(os.getenv("OLLAMA_NUM_PREDICT", "4096")),
                 "num_batch": int(os.getenv("OLLAMA_NUM_BATCH", "512")),
             },
         }

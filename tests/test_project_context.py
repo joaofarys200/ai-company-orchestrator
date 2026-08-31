@@ -189,3 +189,42 @@ def test_task_app_smoke_uses_real_project_and_finds_add_task():
     assert any(item["file"] == "app.js" for item in result["definitions"])
     assert any(item["file"] == "index.html" and not item["confirmed"] for item in result["references"])
     assert "obsidian" not in context.root_path.lower()
+
+
+def test_delete_project_removes_project_dir_and_metadata(tmp_path):
+    service = make_service(tmp_path)
+    service.create_project("sample-to-delete", "Sample App")
+    project_dir = tmp_path / "workspace" / "projects" / "sample-to-delete"
+    meta_dir = tmp_path / "workspace" / ".jarvis" / "projects" / "sample-to-delete"
+
+    assert project_dir.is_dir()
+
+    result = service.delete_project("sample-to-delete")
+
+    assert result["deleted"] is True
+    assert not project_dir.exists()
+    assert not meta_dir.exists()
+
+
+def test_delete_project_file_removes_file_and_reindexes(tmp_path):
+    service = make_service(tmp_path)
+    service.create_project("file-delete-app", "File Delete App", template="web-app")
+    project_dir = tmp_path / "workspace" / "projects" / "file-delete-app"
+    js_file = project_dir / "app.js"
+
+    assert js_file.is_file()
+    assert "app.js" in service.read_project_files("file-delete-app")
+
+    result = service.delete_project_file("file-delete-app", "app.js")
+
+    assert result["deleted"] is True
+    assert not js_file.exists()
+    assert "app.js" not in service.read_project_files("file-delete-app")
+
+
+def test_delete_project_file_rejects_paths_outside_project(tmp_path):
+    service = make_service(tmp_path)
+    service.create_project("safe-del-app", "Safe App")
+
+    with pytest.raises(ProjectContextError, match="Caminho"):
+        service.delete_project_file("safe-del-app", "../outside.js")

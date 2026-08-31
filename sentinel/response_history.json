@@ -27,8 +27,8 @@
     "rollback_plan": "Revers\u00e3o n\u00e3o aplic\u00e1vel a finaliza\u00e7\u00e3o de processos",
     "rollback_result": null,
     "status": "WAITING_APPROVAL",
-    "created_at": 1787695177.2222004,
-    "updated_at": 1787695177.2222018,
+    "created_at": 1788038166.8915973,
+    "updated_at": 1788038166.8916001,
     "error_message": null,
     "schema_version": 1
   },
@@ -46,7 +46,7 @@
     "approval_required": true,
     "approved_by": "human_operator",
     "approval_session_id": "session_admin_01",
-    "approval_timestamp": 1787694997.222206,
+    "approval_timestamp": 1788037986.8916078,
     "pre_state": {
       "rule_exists": false
     },
@@ -65,8 +65,8 @@
     "rollback_plan": "Remover regra JARVIS-SENTINEL-ACT-NET-E2E-TEST",
     "rollback_result": null,
     "status": "COMPLETED",
-    "created_at": 1787694697.222208,
-    "updated_at": 1787694997.2222085,
+    "created_at": 1788037686.8916106,
+    "updated_at": 1788037986.8916113,
     "error_message": null,
     "schema_version": 1
   }

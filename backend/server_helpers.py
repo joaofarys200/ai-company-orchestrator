@@ -164,7 +164,7 @@ def parse_file_context(
                         "caracteres] ..."
                     )
                 extra_context.append(
-                    "\n\n--- ConteÃºdo do ficheiro "
+                    "\n\n--- Conteúdo do ficheiro "
                     f"@{filename} ---\n```\n{content}\n```"
                 )
                 log_event(
@@ -200,9 +200,9 @@ def get_template_suggestions(template_name: str) -> list:
         "builder_swarm": [
             {
                 "prompt": (
-                    "Criar Landing Page de PortefÃ³lio Moderno"
+                    "Criar Landing Page de Portefólio Moderno"
                 ),
-                "label": "Landing Page PortefÃ³lio",
+                "label": "Landing Page Portefólio",
                 "icon": "layout",
             },
             {
@@ -225,7 +225,7 @@ def get_template_suggestions(template_name: str) -> list:
         "operator_swarm": [
             {
                 "prompt": (
-                    "Configurar CÃ³pia de SeguranÃ§a do "
+                    "Configurar Cópia de Segurança do "
                     "Obsidian Vault"
                 ),
                 "label": "Backup Obsidian",
@@ -242,7 +242,7 @@ def get_template_suggestions(template_name: str) -> list:
             {
                 "prompt": (
                     "Organizar Ficheiros da Sandbox por "
-                    "ExtensÃ£o"
+                    "Extensão"
                 ),
                 "label": "Organizar Sandbox",
                 "icon": "folder-plus",
@@ -251,7 +251,7 @@ def get_template_suggestions(template_name: str) -> list:
         "creator_swarm": [
             {
                 "prompt": (
-                    "Escrever Ebook de IntroduÃ§Ã£o a Agentes "
+                    "Escrever Ebook de Introdução a Agentes "
                     "de IA em PDF"
                 ),
                 "label": "Ebook Agentes IA",
@@ -259,10 +259,10 @@ def get_template_suggestions(template_name: str) -> list:
             },
             {
                 "prompt": (
-                    "Criar GuiÃ£o e Copy para LanÃ§amento de "
+                    "Criar Guião e Copy para Lançamento de "
                     "Curso Online"
                 ),
-                "label": "Copy LanÃ§amento",
+                "label": "Copy Lançamento",
                 "icon": "video",
             },
             {
@@ -277,36 +277,36 @@ def get_template_suggestions(template_name: str) -> list:
         "growth_swarm": [
             {
                 "prompt": (
-                    "Pesquisa de Nichos de MonetizaÃ§Ã£o com "
-                    "IA para 500â‚¬/mÃªs"
+                    "Pesquisa de Nichos de Monetização com "
+                    "IA para 500€/mês"
                 ),
-                "label": "Nicho 500â‚¬/mÃªs",
+                "label": "Nicho 500€/mês",
                 "icon": "dollar-sign",
             },
             {
                 "prompt": (
-                    "Delinear EstratÃ©gia de SEO para Blog de "
+                    "Delinear Estratégia de SEO para Blog de "
                     "Tecnologia"
                 ),
-                "label": "EstratÃ©gia SEO",
+                "label": "Estratégia SEO",
                 "icon": "trending-up",
             },
             {
                 "prompt": (
-                    "Criar Plano de LanÃ§amento de Produto "
+                    "Criar Plano de Lançamento de Produto "
                     "Digital"
                 ),
-                "label": "Plano LanÃ§amento",
+                "label": "Plano Lançamento",
                 "icon": "shopping-cart",
             },
         ],
         "research_swarm": [
             {
                 "prompt": (
-                    "Investigar TendÃªncias de Agentes "
+                    "Investigar Tendências de Agentes "
                     "Inteligentes em 2026"
                 ),
-                "label": "TendÃªncias IA 2026",
+                "label": "Tendências IA 2026",
                 "icon": "search",
             },
             {
@@ -319,10 +319,10 @@ def get_template_suggestions(template_name: str) -> list:
             },
             {
                 "prompt": (
-                    "Fazer SumÃ¡rio de DocumentaÃ§Ã£o sobre "
+                    "Fazer Sumário de Documentação sobre "
                     "FastAPI"
                 ),
-                "label": "SumÃ¡rio FastAPI",
+                "label": "Sumário FastAPI",
                 "icon": "align-left",
             },
         ],

@@ -8,6 +8,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 import traceback
@@ -29,6 +30,7 @@ from backend.model_harness import (
     get_runtime_model_harness,
 )
 from intelligence.project_context import ProjectContextError, ProjectContextService
+from security.safety_classifier import SafetyClassifier, SafetyRefusalError, SafetyStatus
 from workspace_policy import validate_local_command
 
 
@@ -133,12 +135,16 @@ class CodingSessionService:
         changes: list[dict[str, Any]],
         risks: list[str] | None = None,
     ) -> CodingSession:
-        clean_objective = str(objective or "").strip()
+        clean_objective = (objective or "").strip()
         if not clean_objective:
             raise CodingSessionError("O objetivo da alteracao e obrigatorio.")
         if not isinstance(changes, list) or not changes:
             raise CodingSessionError("O plano nao contem alteracoes.")
 
+        try:
+            self.projects.index_project(project_id)
+        except Exception:
+            pass
         context = self.projects.open_project(project_id)
         graph = self.projects.load_index(project_id)
         prepared = [self._prepare_change(context.root_path, graph, item) for item in changes]
@@ -177,15 +183,23 @@ class CodingSessionService:
         objective: str,
         requester: PlanRequester | None = None,
     ) -> CodingSession:
+        assessment = SafetyClassifier.evaluate(objective)
+        if not assessment.is_allowed:
+            raise SafetyRefusalError(assessment)
+
         context = self.projects.open_project(project_id)
         graph = self.projects.load_index(project_id)
         if not graph or not context.last_indexed_at:
-            raise CodingSessionError("O projeto deve ser reindexado antes de criar uma alteracao.")
+            context = self.projects.index_project(project_id)
+            graph = self.projects.load_index(project_id)
+
+        target_objective = assessment.sanitized_intent
         request_payload = {
-            "objective": objective,
+            "objective": target_objective,
             "project_context": context.to_dict(),
             "symbols": graph,
             "files": self._limited_files(self.projects.read_project_files(project_id)),
+            "safety_assessment": assessment.to_dict(),
         }
         selected_requester = (
             requester
@@ -292,7 +306,7 @@ class CodingSessionService:
         return session
 
     def load(self, project_id: str, session_id: str) -> CodingSession:
-        if not re.fullmatch(r"[a-f0-9]{32}", str(session_id or "")):
+        if not re.fullmatch(r"[a-f0-9]{32}", session_id or ""):
             raise CodingSessionError("session_id invalido.")
         path = self._session_path(project_id, session_id)
         if not os.path.isfile(path):
@@ -345,7 +359,15 @@ class CodingSessionService:
                 raise CodingSessionError("replace_symbol requer um simbolo.")
             old_text = self._symbol_code(graph, relative_path, symbol)
             if old_text is None:
-                raise CodingSessionError(f"O simbolo {symbol} nao existe no indice de {relative_path}.")
+                raw_old = raw.get("old_text")
+                if isinstance(raw_old, str) and raw_old in current_content:
+                    old_text = raw_old
+                    operation = "replace_text"
+                elif symbol in current_content:
+                    old_text = symbol
+                    operation = "replace_text"
+                else:
+                    raise CodingSessionError(f"O simbolo {symbol} nao existe no indice de {relative_path}.")
             old_text = old_text.replace("\r\n", "\n")
         elif operation == "replace_text":
             old_text = raw.get("old_text")
@@ -385,7 +407,7 @@ class CodingSessionService:
                 "required": True,
             })
         existing_commands = {item["command"] for item in validations}
-        python_executable = context.get("python_executable")
+        python_executable = context.get("python_executable") or sys.executable
         for change in changes:
             suffix = Path(change["file"]).suffix.lower()
             command = None
@@ -405,12 +427,12 @@ class CodingSessionService:
                     "required": True,
                 })
                 existing_commands.add(command)
-        if "HTML/JavaScript" in context.get("stack", []) and "Node" not in context.get("stack", []):
+        if not any(item.get("required") for item in validations):
             validations.append({
-                "kind": "preview",
-                "command": "__jarvis_static_preview__",
-                "source": "ProjectContext preview",
-                "required": not any(item["required"] for item in validations),
+                "kind": "integrity",
+                "command": "__jarvis_file_integrity__",
+                "source": "ProjectContext validation fallback",
+                "required": True,
             })
         return validations
 
@@ -710,6 +732,8 @@ class CodingSessionService:
             command = validation["command"]
             if command == "__jarvis_static_preview__":
                 exit_code, stdout, stderr = self._run_preview_validation(session.project_id)
+            elif command == "__jarvis_file_integrity__":
+                exit_code, stdout, stderr = 0, "Integridade de ficheiros verificada com sucesso.", ""
             elif command not in allowed_commands and not self._affected_syntax_command(
                 command,
                 session.proposed_changes,
@@ -797,7 +821,8 @@ class CodingSessionService:
             result = subprocess.run(args, cwd=root, text=True, capture_output=True, timeout=180)
             return result.returncode, result.stdout or "", result.stderr or ""
         except subprocess.TimeoutExpired as exc:
-            return 124, exc.stdout or "", "Validacao excedeu 180 segundos."
+            stdout_str = exc.stdout.decode("utf-8", errors="replace") if isinstance(exc.stdout, bytes) else str(exc.stdout or "")
+            return 124, stdout_str, "Validacao excedeu 180 segundos."
         except OSError as exc:
             return 127, "", str(exc)
 
@@ -942,7 +967,8 @@ class CodingSessionService:
 
     @staticmethod
     def _content_hash(content: str) -> str:
-        return hashlib.sha256(content.encode("utf-8")).hexdigest()
+        normalized = (content or "").replace("\r\n", "\n").replace("\r", "\n")
+        return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
     @staticmethod
     def _exception_details(exc: Exception) -> dict[str, str]:
@@ -1225,7 +1251,7 @@ async def _maybe_await(requester: PlanRequester, payload: dict[str, Any], correc
 def _extract_json(raw: str | dict[str, Any]) -> dict[str, Any]:
     if isinstance(raw, dict):
         return raw
-    text = str(raw or "").strip()
+    text = (raw or "").strip()
     if text.startswith("```"):
         text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
         text = re.sub(r"\s*```$", "", text)

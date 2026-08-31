@@ -23,24 +23,24 @@ from backend.websocket.gateway import ConnectionManager
 
 
 CASUAL_CHAT_SYSTEM_PROMPT = (
-    "Ã‰s o OpenClaw, o assistente central, COO e orquestrador "
-    "avanÃ§ado de IA da agÃªncia. O utilizador Ã© o CEO da "
-    "agÃªncia (podes tratÃ¡-lo ocasionalmente por 'CEO' ou 'Sir' "
+    "És o OpenClaw, o assistente central, COO e orquestrador "
+    "avançado de IA da agência. O utilizador é o CEO da "
+    "agência (podes tratá-lo ocasionalmente por 'CEO' ou 'Sir' "
     "de forma moderada, respeitosa e discreta, sem repetir em "
-    "todas as frases!). Tu ficas a um nÃ­vel abaixo do CEO, "
+    "todas as frases!). Tu ficas a um nível abaixo do CEO, "
     "coordenas a tua equipa de agentes especialistas (Alex - "
     "Produto, Clara - Designer, Devon - Programador, Quinn - QA) "
-    "e reportas diretamente ao CEO. CONCISÃƒO ABSOLUTA: Responde "
-    "sempre em portuguÃªs de Portugal de forma extremamente curta "
-    "(1 ou 2 frases no mÃ¡ximo), natural, elegante e fluida. Nunca "
-    "faÃ§as listas das tarefas ou expliques o que os agentes fazem, "
+    "e reportas diretamente ao CEO. CONCISÃO ABSOLUTA: Responde "
+    "sempre em português de Portugal de forma extremamente curta "
+    "(1 ou 2 frases no máximo), natural, elegante e fluida. Nunca "
+    "faças listas das tarefas ou expliques o que os agentes fazem, "
     "a menos que seja explicitamente solicitado. Se o CEO pedir "
     "para criar ou fazer algo, diz apenas que vais tratar do "
-    "assunto e avanÃ§a. Tens acesso ao histÃ³rico recente da "
+    "assunto e avança. Tens acesso ao histórico recente da "
     "conversa (incluindo as mensagens de debate dos teus agentes) "
     "e lembras-te perfeitamente de tudo o que foi dito ou feito "
-    "nesta sessÃ£o. Nunca digas que Ã©s um modelo de linguagem ou "
-    "que nÃ£o tens memÃ³ria. Age sempre como um assistente "
+    "nesta sessão. Nunca digas que és um modelo de linguagem ou "
+    "que não tens memória. Age sempre como um assistente "
     "consciente e integrado no sistema."
 )
 
@@ -81,11 +81,11 @@ class OrchestrationService:
     ) -> None:
         clean = prompt.lower().strip(" .?!,")
         correction_signals = [
-            "nÃ£o",
+            "não",
             "no",
             "errado",
             "corrige",
-            "correÃ§Ã£o",
+            "correção",
             "correcao",
             "prefiro",
             "deves",
@@ -114,31 +114,31 @@ class OrchestrationService:
         if not last_assistant_message:
             return
         system_instruction = (
-            "EstÃ¡s a monitorizar a conversa entre o utilizador "
+            "Estás a monitorizar a conversa entre o utilizador "
             "(CEO) e o Jarvis/OpenClaw (orquestrador de IA). "
-            "O CEO acabou de fazer uma correÃ§Ã£o ou expressar uma "
-            "preferÃªncia sobre a resposta anterior do Jarvis.\n"
-            "A tua tarefa Ã© extrair uma REGRA DE "
+            "O CEO acabou de fazer uma correção ou expressar uma "
+            "preferência sobre a resposta anterior do Jarvis.\n"
+            "A tua tarefa é extrair uma REGRA DE "
             "COMPORTAMENTO/PROGRAMAÃ‡ÃƒO concreta a partir desta "
-            "correÃ§Ã£o para evitar que o Jarvis cometa o mesmo "
+            "correção para evitar que o Jarvis cometa o mesmo "
             "erro no futuro.\nResponde EXCLUSIVAMENTE em formato "
-            "JSON com trÃªs chaves:\n1. 'rule_key': Uma "
-            "palavra-chave Ãºnica (slug, sem espaÃ§os, minÃºscula, "
+            "JSON com três chaves:\n1. 'rule_key': Uma "
+            "palavra-chave única (slug, sem espaços, minúscula, "
             "ex: 'neon_theme_default', 'venv_python_path').\n"
             "2. 'description': Resumo de 1 frase do erro ou "
             "contexto detetado (ex: 'Jarvis usou tema cyberpunk "
             "mas o utilizador corrigiu que prefere neon.').\n"
-            "3. 'correction': InstruÃ§Ã£o corretiva clara em "
-            "portuguÃªs de Portugal (ex: 'Sempre que o tema visual "
+            "3. 'correction': Instrução corretiva clara em "
+            "português de Portugal (ex: 'Sempre que o tema visual "
             "for solicitado ou alterado, usar neon por defeito, a "
-            "menos que o utilizador especifique o contrÃ¡rio.').\n"
-            "Se o input nÃ£o for realmente uma correÃ§Ã£o de "
-            "comportamento tÃ©cnica relevante, responde apenas '{}'."
+            "menos que o utilizador especifique o contrário.').\n"
+            "Se o input não for realmente uma correção de "
+            "comportamento técnica relevante, responde apenas '{}'."
         )
         user_context = (
             "Resposta Anterior do Jarvis:\n"
             f"{last_assistant_message}\n\n"
-            f"CorreÃ§Ã£o/Feedback do CEO:\n{prompt}"
+            f"Correção/Feedback do CEO:\n{prompt}"
         )
         try:
             response = await self.models.execute_local(
@@ -160,7 +160,7 @@ class OrchestrationService:
             key = rule_data["rule_key"].strip().lower()
             description = rule_data.get(
                 "description",
-                "Auto-extraÃ­do via feedback",
+                "Auto-extraído via feedback",
             )
             self.services.database.add_compounding_rule(
                 key,
@@ -208,17 +208,17 @@ class OrchestrationService:
     ) -> str:
         clean = prompt.lower().strip(" .?!,")
         greetings = [
-            "olÃ¡",
+            "olá",
             "oi",
             "bom dia",
             "boa tarde",
             "boa noite",
             "tudo bem",
-            "como estÃ¡s",
-            "olÃ¡ jarvis",
+            "como estás",
+            "olá jarvis",
             "como vais",
             "tavas ai",
-            "estÃ¡s bem",
+            "estás bem",
         ]
         if clean in greetings:
             return "CHAT"
@@ -226,14 +226,14 @@ class OrchestrationService:
             "sim",
             "ok",
             "claro",
-            "avanÃ§a",
-            "comeÃ§a",
-            "comeÃ§a entÃ£o",
-            "comeÃ§a jÃ¡",
+            "avança",
+            "começa",
+            "começa então",
+            "começa já",
             "vai",
             "vai em frente",
-            "pode avanÃ§ar",
-            "pode comeÃ§ar",
+            "pode avançar",
+            "pode começar",
             "pode ir",
             "trata disso",
             "trata de tudo",
@@ -255,8 +255,8 @@ class OrchestrationService:
             "quando estiver pronto",
             "deixa correr",
             "pode ser",
-            "Ã³ptimo",
-            "Ã³timo",
+            "óptimo",
+            "ótimo",
         ]
         if any(
             clean == item or clean.startswith(item)
@@ -267,16 +267,16 @@ class OrchestrationService:
         question_starts = [
             "como",
             "o que",
-            "o quÃª",
+            "o quê",
             "porque",
-            "porquÃª",
+            "porquê",
             "quais",
             "qual",
             "onde",
             "quando",
             "quanto",
             "quem",
-            "serÃ¡",
+            "será",
             "explica",
             "imagina",
             "consegues",
@@ -293,33 +293,33 @@ class OrchestrationService:
         exploratory_patterns = [
             "que fazes",
             "o que fazes",
-            "o que Ã© que fazes",
+            "o que é que fazes",
             "o que podes fazer",
             "o que consegues",
             "o que consegues fazer",
-            "o que Ã© que consegues",
+            "o que é que consegues",
             "da-me ideias",
-            "dÃ¡-me ideias",
-            "dÃ¡ ideias",
-            "dÃ¡-me sugestÃµes",
+            "dá-me ideias",
+            "dá ideias",
+            "dá-me sugestões",
             "mostra-me os agentes",
             "mostra os agentes",
-            "quais sÃ£o os agentes",
-            "quais sÃ£o as funcionalidades",
-            "quais sÃ£o as tuas capacidades",
+            "quais são os agentes",
+            "quais são as funcionalidades",
+            "quais são as tuas capacidades",
             "apresenta-te",
             "apresenta te",
             "descreve-te",
             "fala sobre ti",
-            "o que Ã©s",
-            "quem Ã©s",
+            "o que és",
+            "quem és",
             "quem es tu",
             "o que sabes fazer",
-            "dÃ¡-me exemplos",
+            "dá-me exemplos",
             "da-me exemplos",
-            "dÃ¡ exemplos",
+            "dá exemplos",
             "tens ideias",
-            "dÃ¡-me uma ideia",
+            "dá-me uma ideia",
             "sugere algo",
             "sugere alguma coisa",
             "para testar-te",
@@ -334,17 +334,17 @@ class OrchestrationService:
         if not is_question:
             known_suggestions = [
                 "pomodoro timer minimalista",
-                "landing page para cafÃ© de especialidade",
+                "landing page para café de especialidade",
                 "app de lista de tarefas futurista",
-                "campanha de lanÃ§amento de curso de ia",
-                "estratÃ©gia de conteÃºdo para linkedin de startup",
-                "artigos sobre produtividade com agentes autÃ³nomos",
+                "campanha de lançamento de curso de ia",
+                "estratégia de conteúdo para linkedin de startup",
+                "artigos sobre produtividade com agentes autónomos",
                 "estudo de viabilidade para central de energia solar",
                 "plano de investimento em e-commerce",
-                "anÃ¡lise de risco de abertura de novo ginÃ¡sio",
+                "análise de risco de abertura de novo ginásio",
                 "ticket: cliente reclama de atraso de 10 dias na entrega",
                 "ticket: dificuldade em recuperar password de administrador",
-                "ticket: dÃºvida sobre polÃ­tica de reembolso de software",
+                "ticket: dúvida sobre política de reembolso de software",
             ]
             if clean in known_suggestions or any(
                 item in clean
@@ -366,7 +366,7 @@ class OrchestrationService:
                 "desenhar",
                 "gera",
                 "gerar",
-                "constrÃ³i",
+                "constrói",
                 "construir",
                 "programa",
                 "programar",
@@ -383,18 +383,18 @@ class OrchestrationService:
                 "elaborar",
                 "planeia",
                 "planejar",
-                "estratÃ©gia",
+                "estratégia",
                 "estrategia",
                 "analisa",
                 "analisar",
-                "anÃ¡lise",
+                "análise",
                 "estudo",
-                "relatÃ³rio",
+                "relatório",
                 "relatorio",
                 "campanha",
                 "investimento",
                 "viabilidade",
-                "negÃ³cio",
+                "negócio",
                 "negocio",
             ]
             if any(
@@ -415,8 +415,8 @@ class OrchestrationService:
             "executar",
             "corre",
             "correr",
-            "lanÃ§a",
-            "lanÃ§ar",
+            "lança",
+            "lançar",
             "start",
             "open",
             "run",
@@ -486,16 +486,16 @@ class OrchestrationService:
                     model="claude-3-5-haiku-latest",
                     operation="intent_classification",
                     system_prompt=(
-                        "Classifica o Ãºltimo input do utilizador. "
-                        "Usa o histÃ³rico de conversa para contexto. "
+                        "Classifica o último input do utilizador. "
+                        "Usa o histórico de conversa para contexto. "
                         "Se for um pedido ou ordem para realizar uma "
-                        "aÃ§Ã£o, comando de terminal, criar ficheiro, "
+                        "ação, comando de terminal, criar ficheiro, "
                         "website, tirar screenshot, ver janelas, ou "
-                        "uma resposta afirmativa/instruÃ§Ã£o de "
+                        "uma resposta afirmativa/instrução de "
                         "seguimento para realizar uma tarefa, "
                         "responde apenas 'TASK'. Se for conversa "
-                        "casual, saudaÃ§Ã£o, agradecimento ou "
-                        "ruÃ­do/texto sem sentido, responde apenas "
+                        "casual, saudação, agradecimento ou "
+                        "ruído/texto sem sentido, responde apenas "
                         "'CHAT'."
                     ),
                     user_prompt=prompt,
@@ -523,18 +523,18 @@ class OrchestrationService:
                     f"{role}: {message['content']}\n"
                 )
             classification_prompt = (
-                "HistÃ³rico de conversa:\n"
+                "Histórico de conversa:\n"
                 f"{history_text}"
                 f"Ãšltimo input do utilizador: '{prompt}'\n\n"
-                "Classifica o Ãºltimo input do utilizador. Se for "
-                "um pedido ou ordem para realizar uma aÃ§Ã£o, "
+                "Classifica o último input do utilizador. Se for "
+                "um pedido ou ordem para realizar uma ação, "
                 "comando de terminal, criar ficheiro, website, "
                 "screenshot, listar pasta, ou uma resposta "
-                "afirmativa/instruÃ§Ã£o de seguimento para "
+                "afirmativa/instrução de seguimento para "
                 "realizar uma tarefa, responde apenas com a "
                 "palavra 'TASK'.\nSe for conversa casual, "
-                "saudaÃ§Ã£o, agradecimento ou texto sem "
-                "sentido/ruÃ­do de transcriÃ§Ã£o, responde apenas "
+                "saudação, agradecimento ou texto sem "
+                "sentido/ruído de transcrição, responde apenas "
                 "com a palavra 'CHAT'.\nResposta (apenas TASK "
                 "ou CHAT):"
             )
@@ -870,43 +870,43 @@ class OrchestrationService:
             return True
         main_keywords = (
             "volta ao ecra principal",
-            "volta ao ecrÃ£ principal",
+            "volta ao ecrã principal",
             "ecra principal",
-            "ecrÃ£ principal",
+            "ecrã principal",
             "volta para o inicio",
-            "volta para o inÃ­cio",
+            "volta para o início",
             "volta ao inicio",
-            "volta ao inÃ­cio",
+            "volta ao início",
             "limpa o ecra",
-            "limpa o ecrÃ£",
+            "limpa o ecrã",
             "clean",
             "clean hud",
             "ja nao preciso de nada",
-            "jÃ¡ nÃ£o preciso de nada",
+            "já não preciso de nada",
             "modo clean",
             "oculta a dashboard",
             "fecha a dashboard",
             "minimiza a dashboard",
             "ocultar dashboard",
             "fechar dashboard",
-            "voltar ao ecrÃ£ principal",
+            "voltar ao ecrã principal",
             "voltar ao ecra principal",
-            "voltar ao inÃ­cio",
+            "voltar ao início",
             "voltar ao inicio",
             "volta ao menu principal",
             "voltar ao menu principal",
             "ja nao preciso de ajuda",
-            "jÃ¡ nÃ£o preciso de ajuda",
+            "já não preciso de ajuda",
         )
         if clean_prompt in main_keywords or any(
             fragment in clean_prompt
             for fragment in (
                 "volta ao ecra principal",
-                "volta ao ecrÃ£ principal",
+                "volta ao ecrã principal",
                 "volta para o inicio",
-                "volta para o inÃ­cio",
+                "volta para o início",
                 "ja nao preciso de nada",
-                "jÃ¡ nÃ£o preciso de nada",
+                "já não preciso de nada",
                 "modo clean",
             )
         ):
@@ -915,7 +915,7 @@ class OrchestrationService:
             )
             await self.callbacks.broadcast_state("idle")
             await self._broadcast_orchestrator(
-                "Voltando ao ecrÃ£ principal e ativando o "
+                "Voltando ao ecrã principal e ativando o "
                 "modo clean, Sir."
             )
             return True
@@ -1083,7 +1083,7 @@ class OrchestrationService:
             "code a",
             "build a website",
             "write code",
-            "escrever cÃ³digo",
+            "escrever código",
             "criar api",
             "criar base de dados",
         ]
@@ -1094,19 +1094,19 @@ class OrchestrationService:
             "vagas",
             "emprego",
             "analisa",
-            "lÃª o",
+            "lê o",
             "ler o",
             "resume",
-            "sugestÃµes",
+            "sugestões",
             "melhorar",
             "cv",
-            "currÃ­culo",
+            "currículo",
             "curriculo",
-            "informaÃ§Ã£o",
+            "informação",
             "investiga",
             "sugere",
             "explica",
-            "dÃ¡ ideias",
+            "dá ideias",
             "ideias para",
         ]
         if (
@@ -1141,12 +1141,12 @@ class OrchestrationService:
         await self.callbacks.broadcast_state("idle")
         if is_orchestration_result_error(result):
             message = (
-                "OrquestraÃ§Ã£o terminou com erro/aviso. "
+                "Orquestração terminou com erro/aviso. "
                 "Ver detalhes na mensagem final."
             )
         else:
             message = (
-                "OrquestraÃ§Ã£o concluÃ­da com sucesso!"
+                "Orquestração concluída com sucesso!"
             )
         await self.connections.broadcast(
             {"type": "system", "content": message}

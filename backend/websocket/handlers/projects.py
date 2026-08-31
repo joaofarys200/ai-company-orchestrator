@@ -23,6 +23,8 @@ PROJECT_HANDLERS = {
     "create_project": "create_project",
     "open_project": "open_project",
     "save_project_file": "save_project_file",
+    "delete_project_file": "delete_project_file",
+    "delete_project": "delete_project",
     "index_project": "index_project",
     "find_references": "find_references",
     "semantic_search": "semantic_search",
@@ -141,7 +143,7 @@ class ProjectWebSocketHandler:
             {
                 "type": "project_output",
                 "content": (
-                    "[Sandbox] ExecuÃ§Ã£o interrompida.\n"
+                    "[Sandbox] Execução interrompida.\n"
                 ),
             },
         )
@@ -269,6 +271,100 @@ class ProjectWebSocketHandler:
                     "filename": filename,
                     "error": str(save_error),
                 },
+            )
+
+    async def delete_project(
+        self,
+        websocket: Any,
+        message: dict,
+        session: WebSocketSessionState,
+    ) -> None:
+        project_id = (
+            message.get("project_id")
+            or session.selected_project_id
+        )
+        try:
+            result = await asyncio.to_thread(
+                self.project_context.delete_project,
+                project_id,
+            )
+            was_active = session.selected_project_id == project_id
+            if was_active:
+                session.selected_project_id = None
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "project_deleted",
+                    "ok": True,
+                    "project_id": project_id,
+                    "was_active": was_active,
+                },
+            )
+            await self.list_projects(websocket, {}, session)
+            await self.connections.send(
+                websocket,
+                system_message(f"Projeto '{project_id}' eliminado com sucesso."),
+            )
+        except (ProjectContextError, OSError, Exception) as delete_error:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "project_delete_error",
+                    "project_id": project_id,
+                    "error": str(delete_error),
+                },
+            )
+            await self.connections.send(
+                websocket,
+                system_message(f"Erro ao eliminar projeto: {delete_error}"),
+            )
+
+    async def delete_project_file(
+        self,
+        websocket: Any,
+        message: dict,
+        session: WebSocketSessionState,
+    ) -> None:
+        project_id = (
+            message.get("project_id")
+            or session.selected_project_id
+        )
+        filename = str(message.get("filename") or "")
+        try:
+            result = await asyncio.to_thread(
+                self.project_context.delete_project_file,
+                project_id,
+                filename,
+            )
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "project_file_deleted",
+                    "ok": True,
+                    **result,
+                },
+            )
+            await self.responder.send_project_context(
+                websocket,
+                project_id,
+            )
+            await self.connections.send(
+                websocket,
+                system_message(f"Ficheiro '{filename}' eliminado com sucesso."),
+            )
+        except (ProjectContextError, OSError, Exception) as delete_error:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "project_file_delete_error",
+                    "project_id": project_id,
+                    "filename": filename,
+                    "error": str(delete_error),
+                },
+            )
+            await self.connections.send(
+                websocket,
+                system_message(f"Erro ao eliminar ficheiro: {delete_error}"),
             )
 
     async def index_project(

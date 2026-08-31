@@ -524,6 +524,33 @@ export interface ProjectFileSaveResultMessage {
   error: string;
 }
 
+export interface ProjectDeletedMessage {
+  type: 'project_deleted';
+  ok: boolean;
+  project_id: string;
+  was_active: boolean;
+}
+
+export interface ProjectDeleteErrorMessage {
+  type: 'project_delete_error';
+  project_id: string;
+  error: string;
+}
+
+export interface ProjectFileDeletedMessage {
+  type: 'project_file_deleted';
+  ok: boolean;
+  project_id: string;
+  filename: string;
+}
+
+export interface ProjectFileDeleteErrorMessage {
+  type: 'project_file_delete_error';
+  project_id: string;
+  filename: string;
+  error: string;
+}
+
 export interface ProjectReferencesMessage {
   type: 'project_references';
   data: ProjectReferenceResult;
@@ -804,6 +831,10 @@ export type ServerMessage =
   | ProjectsListMessage
   | ProjectContextMessage
   | ProjectFileSaveResultMessage
+  | ProjectDeletedMessage
+  | ProjectDeleteErrorMessage
+  | ProjectFileDeletedMessage
+  | ProjectFileDeleteErrorMessage
   | ProjectReferencesMessage
   | SemanticResultsMessage
   | CodingSessionMessage
@@ -843,8 +874,10 @@ export type ClientMessage =
   | { type: 'get_ast_state'; project_id?: string }
   | { type: 'list_projects' }
   | { type: 'create_project'; project_id: string; project_name?: string; template?: string }
+  | { type: 'delete_project'; project_id: string }
   | { type: 'open_project'; project_id: string }
   | { type: 'save_project_file'; project_id: string; filename: string; content: string; expected_sha256: string }
+  | { type: 'delete_project_file'; project_id: string; filename: string }
   | { type: 'index_project'; project_id: string }
   | { type: 'find_references'; project_id: string; symbol: string }
   | { type: 'semantic_search'; project_id: string; query: string }

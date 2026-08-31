@@ -286,7 +286,7 @@ class VoiceDirectiveService:
             {
                 "type": "system",
                 "content": (
-                    "OrquestraÃ§Ã£o iniciada via Voz: "
+                    "Orquestração iniciada via Voz: "
                     f"{prompt}"
                 ),
             }

@@ -65,12 +65,27 @@ export interface ProjectFileSaveState {
   error: string;
 }
 
+export interface SafetyRefusalData {
+  is_allowed: boolean;
+  status: string;
+  category: string;
+  policy_rule: string;
+  reason: string;
+  sanitized_intent: string;
+  request_id: string;
+  timestamp: string;
+}
+
 interface WebSocketContextType {
   isConnected: boolean;
   systemStatus: SystemStatus;
   voiceStatus: string;
   chatMessages: ChatMessage[];
   debateMessages: ChatMessage[];
+  safetyRefusal: SafetyRefusalData | null;
+  clearSafetyRefusal: () => void;
+  codingSessionError: string | null;
+  clearCodingSessionError: () => void;
   projectFiles: { [filename: string]: string };
   projectFileHashes: { [filename: string]: string };
   projectFileSaveState: ProjectFileSaveState | null;
@@ -120,7 +135,9 @@ interface WebSocketContextType {
   listProjects: () => void;
   openProject: (projectId: string) => void;
   createProject: (projectId: string, projectName?: string, template?: string) => void;
+  deleteProject: (projectId: string) => void;
   saveProjectFile: (filename: string, content: string) => void;
+  deleteProjectFile: (filename: string) => void;
   reindexProject: () => void;
   findReferences: (symbol: string) => void;
   semanticSearch: (query: string) => void;
@@ -211,6 +228,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [sandboxStatus, setSandboxStatus] = useState<{ mode: 'docker' | 'local_fallback'; port: number; is_docker: boolean } | null>(null);
   const [codingSession, setCodingSession] = useState<CodingSessionData | null>(null);
   const [isCodingSessionBusy, setIsCodingSessionBusy] = useState(false);
+  const [safetyRefusal, setSafetyRefusal] = useState<SafetyRefusalData | null>(null);
+  const clearSafetyRefusal = useCallback(() => setSafetyRefusal(null), []);
+  const [codingSessionError, setCodingSessionError] = useState<string | null>(null);
+  const clearCodingSessionError = useCallback(() => setCodingSessionError(null), []);
   const [activeLecture, setActiveLecture] = useState<LectureLessonData | null>(null);
   const [lectureQuizResult, setLectureQuizResult] = useState<LectureQuizResult | null>(null);
   const [lectureHistory, setLectureHistory] = useState<LectureHistoryItem[]>([]);
@@ -235,6 +256,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const shouldReconnectRef = useRef(true);
+  const recentMessageHashesRef = useRef<Map<string, number>>(new Map());
 
   const sendClientMessage = useCallback((message: ClientMessage) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
@@ -270,10 +292,38 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // Always add all messages (including subagents and specialists) to chatMessages so the user sees them
     setChatMessages((prev) => appendLimited(prev, newMsg, MAX_CHAT_MESSAGES));
 
-    // Separate peer agent debates to debateMessages as well
-    const isDebate = !['OPENCLAW', 'JARVIS', 'SISTEMA', 'CLIENTE'].includes(msg.sender.toUpperCase());
-    if (isDebate) {
-      setDebateMessages((prev) => appendLimited(prev, newMsg, MAX_DEBATE_MESSAGES));
+    // Check if message is a specialist/subagent or contains multi-agent dialogue tags
+    const agentTags = ['[DEVON]', '[QUINN]', '[SWARM]', '[CLARA]', '[ALEX]', '[MARTA]', '[GUSTAVO]', '[DUARTE]', '[INÊS]', '[INES]', '[PRODUCT]', '[QA]', '[DEV]', '[DESIGN]'];
+    const hasAgentTag = agentTags.some((tag) => msg.content && msg.content.includes(tag));
+    const isSpecialistSender = !['OPENCLAW', 'JARVIS', 'SISTEMA', 'CLIENTE'].includes(msg.sender.toUpperCase());
+
+    if (isSpecialistSender || hasAgentTag || msg.role === 'Specialist' || msg.role === 'Debate') {
+      if (hasAgentTag && msg.content) {
+        // Parse individual agent dialogue turns from content into distinct debate bubbles
+        const regex = /\[([A-ZÇÃÕÁÉÍÓÚ_]+)\]([\s\S]*?)(?=\[[A-ZÇÃÕÁÉÍÓÚ_]+\]|$)/g;
+        let match;
+        let foundAny = false;
+        while ((match = regex.exec(msg.content)) !== null) {
+          const agentName = match[1].trim();
+          const turnContent = match[2].trim();
+          if (turnContent && !['OPENCLAW', 'JARVIS'].includes(agentName)) {
+            foundAny = true;
+            const debateMsg: ChatMessage = {
+              id: Math.random().toString(),
+              sender: agentName.charAt(0) + agentName.slice(1).toLowerCase(),
+              role: 'Especialista',
+              content: turnContent,
+              timestamp,
+            };
+            setDebateMessages((prev) => appendLimited(prev, debateMsg, MAX_DEBATE_MESSAGES));
+          }
+        }
+        if (!foundAny) {
+          setDebateMessages((prev) => appendLimited(prev, newMsg, MAX_DEBATE_MESSAGES));
+        }
+      } else {
+        setDebateMessages((prev) => appendLimited(prev, newMsg, MAX_DEBATE_MESSAGES));
+      }
     }
   }
 
@@ -398,6 +448,22 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }
 
   const handleServerMessage = useCallback((msg: any) => {
+    if (!msg || !msg.type) return;
+
+    // Deduplicate identical messages arriving within 1.5s via dual transport (Electron IPC + WebSocket)
+    const rawKey = `${msg.type}:${msg.sender || ''}:${msg.content || ''}:${msg.card_id || ''}:${msg.status || ''}`;
+    const now = Date.now();
+    const lastSeen = recentMessageHashesRef.current.get(rawKey);
+    if (lastSeen && now - lastSeen < 1500) {
+      return;
+    }
+    recentMessageHashesRef.current.set(rawKey, now);
+    if (recentMessageHashesRef.current.size > 200) {
+      for (const [k, t] of recentMessageHashesRef.current.entries()) {
+        if (now - t > 5000) recentMessageHashesRef.current.delete(k);
+      }
+    }
+
     switch (msg.type) {
       case 'system':
         addSystemMessage(msg.content);
@@ -492,6 +558,23 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'projects_list':
         setProjects(msg.projects);
         break;
+      case 'project_deleted':
+        if (msg.was_active || msg.project_id === projectContext?.project_id) {
+          setProjectContext(null);
+          setProjectFiles({});
+          setProjectFileHashes({});
+        }
+        addSystemMessage(`Projeto '${msg.project_id}' eliminado com sucesso.`);
+        break;
+      case 'project_delete_error':
+        addSystemMessage(`[Erro ao eliminar projeto] ${msg.error}`);
+        break;
+      case 'project_file_deleted':
+        addSystemMessage(`Ficheiro '${msg.filename}' eliminado com sucesso.`);
+        break;
+      case 'project_file_delete_error':
+        addSystemMessage(`[Erro ao eliminar ficheiro] ${msg.error}`);
+        break;
       case 'project_context':
         setProjectContext(msg.context);
         setProjectFiles(msg.files);
@@ -518,6 +601,19 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         break;
       case 'coding_session':
         setCodingSession(msg.data);
+        setSafetyRefusal(null);
+        setCodingSessionError(null);
+        setIsCodingSessionBusy(false);
+        break;
+      case 'coding_session_error':
+        setCodingSessionError(msg.error);
+        setIsCodingSessionBusy(false);
+        addSystemMessage(`[Erro na Alteração Assistida] ${msg.error}`);
+        break;
+      case 'safety_refusal':
+        setSafetyRefusal(msg.data);
+        setCodingSession(null);
+        setCodingSessionError(null);
         setIsCodingSessionBusy(false);
         break;
       case 'lecture_lesson_generated':
@@ -899,6 +995,22 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
   }, [isReady, projectContext?.project_id, projectFileHashes, sendClientMessage]);
 
+  const deleteProject = useCallback((projectId: string) => {
+    if (isReady() && projectId.trim()) {
+      sendClientMessage({ type: 'delete_project', project_id: projectId.trim() });
+    }
+  }, [isReady, sendClientMessage]);
+
+  const deleteProjectFile = useCallback((filename: string) => {
+    if (isReady() && projectContext?.project_id && filename.trim()) {
+      sendClientMessage({
+        type: 'delete_project_file',
+        project_id: projectContext.project_id,
+        filename: filename.trim(),
+      });
+    }
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
+
   const reindexProject = useCallback(() => {
     if (isReady() && projectContext?.project_id) {
       setIsIndexingProject(true);
@@ -921,6 +1033,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const createCodingSession = useCallback((objective: string) => {
     if (isReady() && projectContext?.project_id && objective.trim()) {
+      setSafetyRefusal(null);
+      setCodingSessionError(null);
       setIsCodingSessionBusy(true);
       sendClientMessage({ type: 'create_coding_session', project_id: projectContext.project_id, objective: objective.trim() });
     }
@@ -1187,12 +1301,18 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         listProjects,
         openProject,
         createProject,
+        deleteProject,
         saveProjectFile,
+        deleteProjectFile,
         reindexProject,
         findReferences,
         semanticSearch,
         codingSession,
         isCodingSessionBusy,
+        safetyRefusal,
+        clearSafetyRefusal,
+        codingSessionError,
+        clearCodingSessionError,
         createCodingSession,
         applyCodingSession,
         rollbackCodingSession,

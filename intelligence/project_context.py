@@ -551,6 +551,48 @@ class ProjectContextService:
             "size_bytes": len(resulting_bytes),
         }
 
+    def delete_project(self, project_id: str) -> dict[str, Any]:
+        clean_id = self._validate_project_id(project_id)
+        root = self.project_root(clean_id)
+        meta = self.metadata_dir(clean_id)
+
+        try:
+            sandbox.stop_custom_project()
+        except Exception:
+            pass
+
+        if os.path.isdir(root):
+            shutil.rmtree(root, ignore_errors=False)
+
+        if os.path.isdir(meta):
+            shutil.rmtree(meta, ignore_errors=True)
+
+        return {
+            "project_id": clean_id,
+            "deleted": True,
+        }
+
+    def delete_project_file(self, project_id: str, relative_path: str) -> dict[str, Any]:
+        clean_id = self._validate_project_id(project_id)
+        root = self.project_root(clean_id)
+        target = self._resolve_existing_project_file(root, relative_path)
+
+        if not os.path.isfile(target):
+            raise ProjectContextError(f"O ficheiro '{relative_path}' nao existe no projeto '{clean_id}'.")
+
+        os.remove(target)
+
+        try:
+            self.index_project(clean_id)
+        except Exception:
+            pass
+
+        return {
+            "project_id": clean_id,
+            "filename": relative_path.replace("\\", "/"),
+            "deleted": True,
+        }
+
     def project_payload(self, project_id: str, reindex: bool = False) -> dict[str, Any]:
         context = self.index_project(project_id) if reindex else self.open_project(project_id)
         files = self.read_project_files(project_id)

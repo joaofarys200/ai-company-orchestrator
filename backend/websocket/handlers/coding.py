@@ -10,6 +10,7 @@ from backend.websocket.handlers import bind_handler_methods
 from backend.websocket.handlers.common import WebSocketResponder
 from intelligence.coding_session import CodingSessionError
 from intelligence.project_context import ProjectContextError
+from security.safety_classifier import SafetyRefusalError
 
 
 CODING_HANDLERS = {
@@ -66,13 +67,47 @@ class CodingSessionWebSocketHandler:
                     "data": coding_session.to_dict(),
                 },
             )
+        except SafetyRefusalError as refusal:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "safety_refusal",
+                    "data": refusal.assessment.to_dict(),
+                },
+            )
+            await self.connections.send(
+                websocket,
+                system_message(
+                    f"[{refusal.assessment.status.value}] {refusal.assessment.reason} "
+                    f"(Regra: {refusal.assessment.policy_rule} | Ref: {refusal.assessment.request_id})"
+                ),
+            )
         except (
             CodingSessionError,
             ProjectContextError,
         ) as coding_error:
             await self.connections.send(
                 websocket,
+                {
+                    "type": "coding_session_error",
+                    "error": str(coding_error),
+                },
+            )
+            await self.connections.send(
+                websocket,
                 system_message(str(coding_error)),
+            )
+        except Exception as generic_error:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "coding_session_error",
+                    "error": f"Erro inesperado: {generic_error}",
+                },
+            )
+            await self.connections.send(
+                websocket,
+                system_message(f"Erro na alteracao assistida: {generic_error}"),
             )
 
     async def apply_session(
@@ -108,7 +143,26 @@ class CodingSessionWebSocketHandler:
         ) as coding_error:
             await self.connections.send(
                 websocket,
+                {
+                    "type": "coding_session_error",
+                    "error": str(coding_error),
+                },
+            )
+            await self.connections.send(
+                websocket,
                 system_message(str(coding_error)),
+            )
+        except Exception as generic_error:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "coding_session_error",
+                    "error": f"Erro ao aplicar: {generic_error}",
+                },
+            )
+            await self.connections.send(
+                websocket,
+                system_message(f"Erro ao aplicar: {generic_error}"),
             )
 
     async def rollback_session(
@@ -145,7 +199,26 @@ class CodingSessionWebSocketHandler:
         ) as coding_error:
             await self.connections.send(
                 websocket,
+                {
+                    "type": "coding_session_error",
+                    "error": str(coding_error),
+                },
+            )
+            await self.connections.send(
+                websocket,
                 system_message(str(coding_error)),
+            )
+        except Exception as generic_error:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "coding_session_error",
+                    "error": f"Erro ao reverter: {generic_error}",
+                },
+            )
+            await self.connections.send(
+                websocket,
+                system_message(f"Erro ao reverter: {generic_error}"),
             )
 
     async def get_session(

@@ -59,7 +59,7 @@ class VoiceWebSocketHandler:
                         {
                             "type": "system",
                             "content": (
-                                "Reconhecimento de Voz estÃ¡ "
+                                "Reconhecimento de Voz está "
                                 "desativado no .env "
                                 "(VOICE_MODE=none)."
                             ),

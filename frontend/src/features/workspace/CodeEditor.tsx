@@ -22,6 +22,7 @@ import {
   Play,
   Save,
   Search,
+  Trash2,
   WandSparkles,
   X,
 } from 'lucide-react';
@@ -73,6 +74,7 @@ interface CodeEditorProps {
   selectedFile: string;
   onSelectFile: (filename: string) => void;
   onSaveFile: (filename: string, content: string) => void;
+  onDeleteFile?: (filename: string) => void;
   onOpenChanges: () => void;
   onOpenPreview: () => void;
   isSaving: boolean;
@@ -154,6 +156,7 @@ function TreeRow({
   expanded,
   onToggle,
   onSelect,
+  onDelete,
 }: {
   node: FileTreeNode;
   depth: number;
@@ -161,6 +164,7 @@ function TreeRow({
   expanded: Set<string>;
   onToggle: (path: string) => void;
   onSelect: (path: string) => void;
+  onDelete?: (path: string) => void;
 }) {
   const isExpanded = expanded.has(node.path);
   const selected = node.type === 'file' && node.path === selectedFile;
@@ -197,7 +201,20 @@ function TreeRow({
             <FileIcon filename={node.name} />
           </>
         )}
-        <span className="truncate">{node.name}</span>
+        <span className="min-w-0 flex-1 truncate">{node.name}</span>
+        {node.type === 'file' && onDelete && (
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onDelete(node.path);
+            }}
+            className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-500 hover:text-rose-400 rounded transition-all shrink-0"
+            title={`Eliminar ${node.name}`}
+          >
+            <Trash2 className="h-3 w-3" />
+          </button>
+        )}
       </button>
       {node.type === 'directory' && isExpanded && node.children.map((child) => (
         <TreeRow
@@ -208,6 +225,7 @@ function TreeRow({
           expanded={expanded}
           onToggle={onToggle}
           onSelect={onSelect}
+          onDelete={onDelete}
         />
       ))}
     </>
@@ -222,6 +240,7 @@ export function CodeEditor({
   selectedFile,
   onSelectFile,
   onSaveFile,
+  onDeleteFile,
   onOpenChanges,
   onOpenPreview,
   isSaving,
@@ -244,10 +263,23 @@ export function CodeEditor({
   });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [insightsOpen, setInsightsOpen] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState<string | null>(null);
   const [cursor, setCursor] = useState({ line: 1, column: 1 });
   const [copiedPath, setCopiedPath] = useState(false);
   const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const saveCurrentRef = useRef<() => void>(() => undefined);
+
+  const handleDeleteRequest = (path: string) => {
+    setFileToDelete(path);
+  };
+
+  const handleConfirmDelete = () => {
+    if (fileToDelete && onDeleteFile) {
+      onDeleteFile(fileToDelete);
+      closeFile(fileToDelete);
+      setFileToDelete(null);
+    }
+  };
 
   const currentDraft = selectedFile ? drafts[selectedFile] ?? files[selectedFile] ?? '' : '';
   const dirtyFiles = new Set(filenames.filter((filename) => (drafts[filename] ?? files[filename]) !== files[filename]));
@@ -453,6 +485,7 @@ export function CodeEditor({
                   expanded={visibleExpanded}
                   onToggle={toggleDirectory}
                   onSelect={selectFile}
+                  onDelete={onDeleteFile ? handleDeleteRequest : undefined}
                 />
               ))
             )}
@@ -534,6 +567,18 @@ export function CodeEditor({
                     <CircleAlert className="h-3.5 w-3.5 shrink-0" />
                     {saveState.error}
                   </span>
+                )}
+
+                {onDeleteFile && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteRequest(selectedFile)}
+                    className="flex items-center gap-1 rounded bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-300 hover:bg-rose-500/20 border border-rose-500/20 transition-colors"
+                    title="Eliminar este ficheiro"
+                  >
+                    <Trash2 className="h-3 w-3 text-rose-400" />
+                    <span>Eliminar</span>
+                  </button>
                 )}
 
                 <button
@@ -629,6 +674,42 @@ export function CodeEditor({
       {insightsOpen && (
         <div className="absolute inset-y-0 right-0 z-20 flex w-[min(22rem,calc(100%-3rem))] border-l border-white/8 bg-[#0a0d15] shadow-2xl xl:relative xl:z-auto xl:w-auto">
           {insights}
+        </div>
+      )}
+
+      {/* ── 5. Delete File Confirmation Modal ── */}
+      {fileToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm rounded-lg border border-white/10 bg-[#0d1117] p-5 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3 text-rose-400">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-500/10 border border-rose-500/20">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h4 className="text-sm font-semibold text-white">Eliminar Ficheiro</h4>
+                <p className="text-xs text-gray-400 font-mono truncate">{fileToDelete}</p>
+              </div>
+            </div>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              Tem a certeza de que deseja eliminar permanentemente este ficheiro? Esta ação não pode ser desfeita.
+            </p>
+            <div className="flex justify-end gap-2 pt-2 border-t border-white/8">
+              <button
+                type="button"
+                onClick={() => setFileToDelete(null)}
+                className="rounded-md border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-gray-300 hover:bg-white/[0.08]"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="rounded-md border border-rose-500/30 bg-rose-500/20 px-3 py-1.5 text-xs font-semibold text-rose-200 hover:bg-rose-500/30"
+              >
+                Eliminar Ficheiro
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

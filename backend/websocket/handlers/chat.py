@@ -59,7 +59,7 @@ class ChatWebSocketHandler:
         )
         if prompt_with_context != prompt:
             mentions_count = prompt_with_context.count(
-                "--- ConteÃºdo do ficheiro @"
+                "--- Conteúdo do ficheiro @"
             )
             await self.connections.send(
                 websocket,
@@ -90,7 +90,7 @@ class ChatWebSocketHandler:
         await self.connections.broadcast(
             {
                 "type": "system",
-                "content": f"OrquestraÃ§Ã£o iniciada: {prompt}",
+                "content": f"Orquestração iniciada: {prompt}",
             }
         )
         asyncio.create_task(

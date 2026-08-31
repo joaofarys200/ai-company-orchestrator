@@ -73,7 +73,7 @@ class ChatCommandService:
                     )
                     result_text = response.raw_text
                 else:
-                    result_text = "SimulaÃ§Ã£o Gemini: " + prompt
+                    result_text = "Simulação Gemini: " + prompt
             elif model_id == "qwen":
                 response = await self.models.execute_local(
                     operation="arena_qwen",
@@ -314,7 +314,7 @@ class ChatCommandService:
                 "Orquestrador",
                 (
                     "âš ï¸ Introduza um prompt para a Arena "
-                    "(ex: `/arena Criar um botÃ£o pulsante neon`)"
+                    "(ex: `/arena Criar um botão pulsante neon`)"
                 ),
             )
             return
@@ -329,7 +329,7 @@ class ChatCommandService:
         if not rules:
             text = (
                 "ðŸ§  **Compounding Memory:** Nenhuma regra ou "
-                "liÃ§Ã£o aprendida guardada no SQLite."
+                "lição aprendida guardada no SQLite."
             )
         else:
             text = "ðŸ§  **Compounding Memory (Regras Ativas):**\n"
@@ -365,7 +365,7 @@ class ChatCommandService:
                 "OPENCLAW",
                 "Orquestrador",
                 (
-                    "âœ… Nova regra de memÃ³ria "
+                    "âœ… Nova regra de memória "
                     f"`{key}` gravada com sucesso!"
                 ),
             )
@@ -374,8 +374,8 @@ class ChatCommandService:
                 "OPENCLAW",
                 "Orquestrador",
                 (
-                    "âš ï¸ Formato invÃ¡lido. Uso: "
-                    "`/learn chave | descriÃ§Ã£o | correÃ§Ã£o` "
+                    "âš ï¸ Formato inválido. Uso: "
+                    "`/learn chave | descrição | correção` "
                     "(ex: `/learn python_venv | O utilizador usa "
                     "venv/Scripts/python | Sempre usar o caminho "
                     "completo da venv`)"
@@ -413,7 +413,7 @@ class ChatCommandService:
             )
         else:
             text = (
-                f"âš ï¸ Regra `{key}` nÃ£o encontrada "
+                f"âš ï¸ Regra `{key}` não encontrada "
                 "no SQLite."
             )
         await self._chat("OPENCLAW", "Orquestrador", text)
@@ -423,22 +423,22 @@ class ChatCommandService:
             "OPENCLAW",
             "Orquestrador",
             (
-                "ðŸ“– **Comandos de Barra DisponÃ­veis:**\n"
-                "- `/review` : Audita o cÃ³digo na sandbox "
+                "ðŸ“– **Comandos de Barra Disponíveis:**\n"
+                "- `/review` : Audita o código na sandbox "
                 "(QA Quinn)\n- `/refactor` : Otimiza e limpa "
-                "o cÃ³digo sandbox (Devon)\n"
+                "o código sandbox (Devon)\n"
                 "- `/theme [neon|cyberpunk|clean]` : Muda o "
                 "tema visual da app\n"
                 "- `/spawn Nome | Especialidade | Tarefa` : "
                 "Cria e executa um subagente especialista ad-hoc\n"
                 "- `/arena [prompt]` : Compara a velocidade e o "
-                "cÃ³digo gerado por mÃºltiplos modelos na Swarm "
+                "código gerado por múltiplos modelos na Swarm "
                 "Arena\n- `/rules` : Lista as regras de "
                 "compounding memory ativas no SQLite\n"
                 "- `/learn chave | desc | corr` : Cria ou "
-                "atualiza manualmente uma regra de memÃ³ria\n"
+                "atualiza manualmente uma regra de memória\n"
                 "- `/forget chave` : Remove uma regra de "
-                "memÃ³ria da base de dados\n"
+                "memória da base de dados\n"
                 "- `/help` : Mostra esta ajuda"
             ),
         )

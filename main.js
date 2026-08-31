@@ -90,7 +90,7 @@ function startPythonBackend() {
       // If the frontend server starts running, load the page immediately if window exists
       if (trimmed.includes('Frontend HTTP server running') && mainWindow) {
         console.log('[Electron] Servidor Python detetado!');
-        const isDev = (process.argv.includes('--dev') || process.env.VITE_DEV === '1') && process.env.npm_lifecycle_event === 'dev';
+        const isDev = process.argv.includes('--dev') || process.env.VITE_DEV === '1';
         const targetUrl = isDev ? 'http://localhost:5173' : 'http://localhost:8000';
         console.log(`[Electron] A carregar UI em ${targetUrl}...`);
         loadURLWithRetry(targetUrl, 15, 500, 'http://localhost:8000');
@@ -130,6 +130,13 @@ function scheduleBackendRestart(exitCode) {
     backendRestartTimer = null;
     startPythonBackend();
   }, BACKEND_RESTART_DELAY_MS);
+}
+
+function clearBackendRestartTimer() {
+  if (backendRestartTimer) {
+    clearTimeout(backendRestartTimer);
+    backendRestartTimer = null;
+  }
 }
 
 function showDiagnosticErrorPage(failedUrls, reason) {

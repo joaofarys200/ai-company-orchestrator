@@ -265,15 +265,17 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
         if not script_name:
             on_output_callback("[Project] package.json sem script de preview, dev ou start.\n")
             return {"running": False, "preview_url": None, "root": selected_root}
-        if allow_dependency_install:
-            on_output_callback(f"[Sandbox] package.json detected in {location}. Running 'npm install'...\n")
+        node_modules_dir = os.path.join(package_dir, "node_modules")
+        should_install = allow_dependency_install or not os.path.isdir(node_modules_dir)
+        if should_install:
+            on_output_callback(f"[Sandbox] Dependencias em falta em {location}. A executar 'npm install'...\n")
         else:
             on_output_callback(f"[Project] package.json detetado em {location}. A usar o script existente '{script_name}'.\n")
 
         def run_thread():
             global project_process
             try:
-                if allow_dependency_install:
+                if should_install:
                     install_proc = subprocess.run(
                         "npm install",
                         cwd=package_dir,
@@ -295,14 +297,15 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
                     text=True
                 )
 
-                for line in project_process.stdout:
-                    on_output_callback(line)
+                if project_process.stdout:
+                    for line in project_process.stdout:
+                        on_output_callback(line)
             except Exception as e:
                 on_output_callback(f"[Sandbox Error] {safe_user_error('Erro ao iniciar projeto node', e)}\n")
 
         t = threading.Thread(target=run_thread, daemon=True)
         t.start()
-        preview_url = "http://127.0.0.1:5173/" if script_name in {"dev", "preview"} else None
+        preview_url = "http://127.0.0.1:5173/" if script_name in {"dev", "preview"} else "http://127.0.0.1:3000/"
         return {"running": True, "preview_url": preview_url, "root": selected_root}
 
     if python_entry:
@@ -338,8 +341,9 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
                     stderr=subprocess.STDOUT,
                     text=True
                 )
-                for line in project_process.stdout:
-                    on_output_callback(line)
+                if project_process.stdout:
+                    for line in project_process.stdout:
+                        on_output_callback(line)
             except Exception as e:
                 on_output_callback(f"[Sandbox Error] {safe_user_error('Erro ao iniciar projeto python', e)}\n")
 
@@ -375,23 +379,17 @@ def stop_custom_project():
         project_process = None
         log_event(logger, "sandbox.project_process.stopping", pid=process.pid)
         try:
-            process.terminate()
-            process.wait(timeout=5)
+            if sys.platform == "win32":
+                subprocess.run(
+                    ["taskkill", "/F", "/T", "/PID", str(process.pid)],
+                    shell=False,
+                    capture_output=True,
+                )
+            else:
+                process.terminate()
+                process.wait(timeout=3)
             log_event(logger, "sandbox.project_process.stopped", pid=process.pid)
             return
-        except subprocess.TimeoutExpired:
-            log_event(logger, "sandbox.project_process.force_stop", level="warning", pid=process.pid)
-            try:
-                if sys.platform == 'win32':
-                    subprocess.run(
-                        ["taskkill", "/F", "/T", "/PID", str(process.pid)],
-                        shell=False,
-                        capture_output=True,
-                    )
-                else:
-                    process.kill()
-            except Exception as e:
-                log_event(logger, "sandbox.project_process.force_stop_error", level="error", pid=process.pid, error=str(e))
         except Exception as e:
             log_event(logger, "sandbox.project_process.stop_error", level="error", pid=process.pid, error=str(e))
 

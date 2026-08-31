@@ -648,28 +648,28 @@ def keep_tools(tools: list, names_to_keep: set[str]) -> list:
 
 # --- OPENCLAW_INSTINCTS ---
 OPENCLAW_INSTINCTS = """
-## Instincts (Reflexos AutomÃ¡ticos â€” aplicam-se SEMPRE, sem excepÃ§Ã£o)
+## Instincts (Reflexos Automáticos — aplicam-se SEMPRE, sem excepção)
 
 1. **Instinct: Research-Before-Code**
-   Antes de escrever qualquer ficheiro de cÃ³digo â†’ USA `list_directory` em "sandbox_dir" para ver o estado actual. Se existirem ficheiros relevantes â†’ lÃª-os com `read_file` antes de os sobrescrever.
+   Antes de escrever qualquer ficheiro de código → USA `list_directory` em "sandbox_dir" para ver o estado actual. Se existirem ficheiros relevantes → lê-os com `read_file` antes de os sobrescrever.
 
 2. **Instinct: Kanban Tracking**
-   Quando um agente comeÃ§a uma tarefa â†’ reporta progresso. Quando termina â†’ confirma que estÃ¡ feito.
+   Quando um agente começa uma tarefa → reporta progresso. Quando termina → confirma que está feito.
 
 3. **Instinct: File Verification**
-   ApÃ³s escrever qualquer ficheiro â†’ usa `list_directory` para confirmar que foi guardado.
+   Após escrever qualquer ficheiro → usa `list_directory` para confirmar que foi guardado.
 
 4. **Instinct: Error Recovery**
-   Se um `execute_command` ou `write_file` falhar â†’ tenta uma segunda vez com abordagem alternativa. Se falhar novamente â†’ reporta ao CEO com o erro exacto.
+   Se um `execute_command` ou `write_file` falhar → tenta uma segunda vez com abordagem alternativa. Se falhar novamente → reporta ao CEO com o erro exacto.
 
 5. **Instinct: Scope Lock**
-   Se o pedido do utilizador for ambÃ­guo â†’ clarifica com uma pergunta directa antes de delegar Ã  equipa.
+   Se o pedido do utilizador for ambíguo → clarifica com uma pergunta directa antes de delegar Ã  equipa.
 
 6. **Instinct: Quality Gate**
-   Antes de reportar "concluÃ­do" ao CEO â†’ usa a ferramenta `verificar_qualidade` para confirmar que o trabalho cumpre os critÃ©rios.
+   Antes de reportar "concluído" ao CEO → usa a ferramenta `verificar_qualidade` para confirmar que o trabalho cumpre os critérios.
 
 7. **Instinct: Specialist Peer Review**
-   ApÃ³s receber a resposta de um agente especialista criado via `criar_agente_especialista` â†’ analisa os itens marcados com [VERIFICAR] na resposta. Se existirem â†’ testa-os, pesquisa-os, ou menciona-os ao CEO como pontos pendentes de validaÃ§Ã£o. NUNCA integres um [VERIFICAR] no trabalho final sem o validar primeiro.
+   Após receber a resposta de um agente especialista criado via `criar_agente_especialista` → analisa os itens marcados com [VERIFICAR] na resposta. Se existirem → testa-os, pesquisa-os, ou menciona-os ao CEO como pontos pendentes de validação. NUNCA integres um [VERIFICAR] no trabalho final sem o validar primeiro.
 
 8. **Instinct: Self-Correction and Knowledge Base Updates**
    Quando o utilizador corrigir uma regra de trabalho ou preferencia persistente, usa memoria apenas se a ferramenta adequada estiver disponivel neste pedido. NUNCA uses Obsidian para criar ficheiros de apps, websites, backend, frontend ou sandbox; para isso usa `write_file`.
@@ -678,14 +678,14 @@ OPENCLAW_INSTINCTS = """
 
 # --- RESEARCH_FIRST_RULE ---
 RESEARCH_FIRST_RULE = """
-## Research-First (OBRIGATÃ“RIO antes de qualquer acÃ§Ã£o de escrita)
+## Research-First (OBRIGATÃ“RIO antes de qualquer acção de escrita)
 
-Fluxo obrigatÃ³rio:
-1. `list_directory` em "sandbox_dir" â†’ ver o que existe
-2. `read_file` nos ficheiros relevantes â†’ perceber o estado actual
-3. SÃ³ entÃ£o â†’ escrever, modificar ou delegar
+Fluxo obrigatório:
+1. `list_directory` em "sandbox_dir" → ver o que existe
+2. `read_file` nos ficheiros relevantes → perceber o estado actual
+3. Só então → escrever, modificar ou delegar
 
-NUNCA escrevas cÃ³digo sem primeiro perceber o que jÃ¡ existe na sandbox.
+NUNCA escrevas código sem primeiro perceber o que já existe na sandbox.
 """
 
 
@@ -742,7 +742,7 @@ async def spawn_specialist_agent(
     on_msg
 ) -> str:
     """
-    Dynamic Agent Spawning â€” creates a specialist sub-agent on-the-fly.
+    Dynamic Agent Spawning — creates a specialist sub-agent on-the-fly.
     Now equipped with tool-calling for tool-based claim verification (anti-hallucination).
     """
     on_msg(nome, especialidade, f"*Agente especialista iniciado. A trabalhar em: {tarefa[:80]}...*")
@@ -754,41 +754,41 @@ async def spawn_specialist_agent(
 
     
     confidence_protocol = """
-## Protocolo de ConfianÃ§a (OBRIGATÃ“RIO)
+## Protocolo de Confiança (OBRIGATÃ“RIO)
 
-Em cada afirmaÃ§Ã£o que faÃ§as, usa um destes marcadores:
-- **[CERTO]** â€” facto que conheces com certeza (ex: sintaxe de uma funÃ§Ã£o, comportamento documentado)
-- **[ESTIMATIVA]** â€” raciocÃ­nio dedutivo sÃ³lido, mas nÃ£o testado neste contexto especÃ­fico
-- **[VERIFICAR]** â€” algo que deves confirmar com a documentaÃ§Ã£o ou testes reais antes de usar em produÃ§Ã£o
+Em cada afirmação que faças, usa um destes marcadores:
+- **[CERTO]** — facto que conheces com certeza (ex: sintaxe de uma função, comportamento documentado)
+- **[ESTIMATIVA]** — raciocínio dedutivo sólido, mas não testado neste contexto específico
+- **[VERIFICAR]** — algo que deves confirmar com a documentação ou testes reais antes de usar em produção
 
 No final da tua resposta, inclui SEMPRE:
 ```
-## NÃ­vel de ConfianÃ§a Geral
-AUTO-AVALIAÃ‡ÃƒO: [0-100%] â€” [justificaÃ§Ã£o em 1 frase]
+## Nível de Confiança Geral
+AUTO-AVALIAÃ‡ÃƒO: [0-100%] — [justificação em 1 frase]
 ITENS A VERIFICAR: [lista dos pontos marcados com [VERIFICAR]]
 ```
 
-SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta com [VERIFICAR] Ã© mais Ãºtil do que uma resposta inventada com falsa confianÃ§a.
+Sê honesto. Se não tiveres a certeza de algo, diz-o. Uma resposta honesta com [VERIFICAR] é mais útil do que uma resposta inventada com falsa confiança.
 """
     specialist_system = (
-        f"Chamas-te {nome}. Ã‰s um especialista em {especialidade}.\n"
+        f"Chamas-te {nome}. És um especialista em {especialidade}.\n"
         f"{backstory}\n\n"
         f"## Contexto do Projecto\n{contexto_projeto}\n\n"
         "Tens acesso a ferramentas locais para investigar o workspace e validar as tuas propostas:\n"
         "- `execute_command`: Executa comandos PowerShell para correr testes, interpretadores (ex: python), comandos de banco de dados, etc.\n"
         "- `write_file`: Escreve/cria ficheiros no disco.\n"
-        "- `read_file`: LÃª ficheiros no workspace.\n"
-        "- `list_directory`: Lista ficheiros e diretÃ³rios.\n\n"
-        "## OBRIGAÃ‡ÃƒO DE VALIDAÃ‡ÃƒO PRÃTICA (Anti-AlucinaÃ§Ã£o)\n"
-        "Antes de dares a tua resposta final como concluÃ­da, deves usar a ferramenta `execute_command` (ou outras) "
-        "para testar, validar ou provar as tuas afirmaÃ§Ãµes tÃ©cnicas (por exemplo, testar a query SQL sugerida, "
-        "executar um pequeno script Python para validar lÃ³gica complexa, ou verificar se caminhos/ficheiros existem).\n"
-        "SÃ³ deves dar a resposta como definitiva depois de veres o resultado do teste no terminal e garantires que funciona. "
-        "No final do teu texto, inclui obrigatoriamente a secÃ§Ã£o '## ValidaÃ§Ã£o PrÃ¡tica Realizada' com a descriÃ§Ã£o e output dos testes que executaste.\n"
-        "Responde sempre em portuguÃªs de Portugal. "
-        "Foca-te exclusivamente na tarefa atribuÃ­da. "
-        "Fornece uma resposta completa, detalhada e accionÃ¡vel. "
-        "NÃ£o te apresentes, vai directamente ao trabalho.\n"
+        "- `read_file`: Lê ficheiros no workspace.\n"
+        "- `list_directory`: Lista ficheiros e diretórios.\n\n"
+        "## OBRIGAÃ‡ÃƒO DE VALIDAÃ‡ÃƒO PRÁTICA (Anti-Alucinação)\n"
+        "Antes de dares a tua resposta final como concluída, deves usar a ferramenta `execute_command` (ou outras) "
+        "para testar, validar ou provar as tuas afirmações técnicas (por exemplo, testar a query SQL sugerida, "
+        "executar um pequeno script Python para validar lógica complexa, ou verificar se caminhos/ficheiros existem).\n"
+        "Só deves dar a resposta como definitiva depois de veres o resultado do teste no terminal e garantires que funciona. "
+        "No final do teu texto, inclui obrigatoriamente a secção '## Validação Prática Realizada' com a descrição e output dos testes que executaste.\n"
+        "Responde sempre em português de Portugal. "
+        "Foca-te exclusivamente na tarefa atribuída. "
+        "Fornece uma resposta completa, detalhada e accionável. "
+        "Não te apresentes, vai directamente ao trabalho.\n"
         f"{confidence_protocol}"
     )
     
@@ -802,7 +802,7 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
                 idx_data = f.read()
                 if len(idx_data) > 6000:
                     idx_data = idx_data[:6000] + "\n... [TRUNCADO PARA POUPAR TOKENS] ..."
-                specialist_system += f"\n\n## Project Intelligence (AST & Symbol Graph)\nO mapa estrutural da aplicaÃ§Ã£o (classes, funÃ§Ãµes e imports):\n```json\n{idx_data}\n```"
+                specialist_system += f"\n\n## Project Intelligence (AST & Symbol Graph)\nO mapa estrutural da aplicação (classes, funções e imports):\n```json\n{idx_data}\n```"
     except Exception:
         pass
         
@@ -810,7 +810,7 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
         from intelligence.runtime_observer import RuntimeObserver
         observer = RuntimeObserver()
         rt_state = observer.compile_runtime_state(websocket_connected=True, active_agents=1, frontend_connected=True)
-        specialist_system += f"\n\n## Runtime Awareness (System Health)\nEstado da mÃ¡quina e base de dados em tempo real:\n```json\n{json.dumps(rt_state, indent=2)}\n```"
+        specialist_system += f"\n\n## Runtime Awareness (System Health)\nEstado da máquina e base de dados em tempo real:\n```json\n{json.dumps(rt_state, indent=2)}\n```"
     except Exception:
         pass
 
@@ -931,7 +931,7 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
                 tool_use_id = tc["id"]
                 
                 if verbose_progress:
-                    on_msg(nome, especialidade, f"[ValidaÃ§Ã£o] A executar `{tool_name}`...")
+                    on_msg(nome, especialidade, f"[Validação] A executar `{tool_name}`...")
                 
                 result_str = ""
                 if tool_name == "execute_command":
@@ -956,7 +956,7 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
                     from intelligence.semantic_index import SemanticCodeIndex
                     q = tool_input.get("query", "")
                     idx = SemanticCodeIndex()
-                    idx.build_index() # Garante que o index estÃ¡ atualizado
+                    idx.build_index() # Garante que o index está atualizado
                     result_str = idx.search(q)
                 elif tool_name == "refactor_move_symbol":
                     from agents.refactor_engine import RefactorEngine
@@ -983,7 +983,7 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
                     database.add_engineering_decision(decision, reason, impact)
                     decisions = database.get_engineering_decisions()
                     await server.broadcast({"type": "decisions_updated", "decisions": decisions})
-                    result_str = f"DecisÃ£o de engenharia registada com sucesso no SQLite: '{decision}'"
+                    result_str = f"Decisão de engenharia registada com sucesso no SQLite: '{decision}'"
                 elif tool_name == "atualizar_memoria_arquitetura":
                     import database
                     import server
@@ -994,7 +994,7 @@ SÃª honesto. Se nÃ£o tiveres a certeza de algo, diz-o. Uma resposta honesta 
                     database.add_architecture_memory(module, purpose, dependencies, constraints)
                     arch = database.get_architecture_memory()
                     await server.broadcast({"type": "architecture_updated", "architecture": arch})
-                    result_str = f"MemÃ³ria de arquitetura atualizada com sucesso no SQLite para o mÃ³dulo: '{module}'"
+                    result_str = f"Memória de arquitetura atualizada com sucesso no SQLite para o módulo: '{module}'"
                 elif tool_name == "apply_code_patch":
                     from agents.patch_engine import PatchEngine
                     fp = tool_input.get("file_path")
@@ -1084,7 +1084,7 @@ async def classify_task_complexity(prompt: str) -> str:
     """Classifies task complexity: SIMPLE (command line/terminal/quick files) vs COMPLEX (swarms/apps)."""
     clean = prompt.lower().strip(" .?!,")
     # Immediate checks for command-like tasks
-    simple_keywords = ["abre", "abrir", "run", "execute", "corre", "limpa", "screenshot", "ecrÃ£", "janela", "janelas", "nota", "escreve uma nota", "pesquisa", "procura"]
+    simple_keywords = ["abre", "abrir", "run", "execute", "corre", "limpa", "screenshot", "ecrã", "janela", "janelas", "nota", "escreve uma nota", "pesquisa", "procura"]
     if any(k in clean for k in simple_keywords) and not any(k in clean for k in ["website", "landing page", "pomodoro", "todo list", "app", "site"]):
         return "SIMPLE"
         
@@ -1092,7 +1092,7 @@ async def classify_task_complexity(prompt: str) -> str:
     system_instruction = (
         "Avalia a complexidade do pedido do utilizador. "
         "Se o utilizador pedir para criar um website, landing page, temporizador pomodoro, lista de tarefas, jogo, "
-        "ou qualquer aplicaÃ§Ã£o web/cÃ³digo complexo de mÃºltiplos ficheiros, responde apenas 'COMPLEX'. "
+        "ou qualquer aplicação web/código complexo de múltiplos ficheiros, responde apenas 'COMPLEX'. "
         "Se for um pedido simples de comando de terminal, ler/escrever uma nota simples, abrir um programa local, "
         "tirar screenshot ou ver janelas, responde apenas 'SIMPLE'."
     )
@@ -1137,7 +1137,13 @@ async def classify_task_complexity(prompt: str) -> str:
         except Exception:
             pass
 
-    return "COMPLEX" if any(w in clean for w in ["website", "landing page", "pomodoro", "site", "app", "jogo", "game", "desenvolve"]) else "SIMPLE"
+    complex_keywords = [
+        "website", "landing page", "pomodoro", "site", "app", "jogo", "game", "desenvolve",
+        "debater", "debatam", "debate", "discutam", "discutir", "ideias", "monetizar",
+        "monetização", "monetizacao", "estrategia", "estratégia", "plano", "swarm",
+        "especialistas", "devon", "quinn", "alex", "clara", "marta", "dinheiro", "autonoma", "autónoma"
+    ]
+    return "COMPLEX" if any(w in clean for w in complex_keywords) else "SIMPLE"
 
 
 # --- shared model tool transport ---
@@ -1385,8 +1391,8 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
             continue
         uname = name.upper()
         tag_rules += f"   - Para o {cfg['role']} ({name.capitalize()}) responder no chat: usa a tag `[{uname}]` seguida do texto da resposta dele (ex: `[{uname}] Entendido, OpenClaw. Estou a trabalhar na minha tarefa...`).\n"
-    tag_rules += "   - Para tu (OpenClaw) reportares ao CEO: usa a tag `[OPENCLAW]` no inÃ­cio da tua resposta (ex: `[OPENCLAW] CEO, as tarefas foram concluÃ­das.`).\n"
-    tag_rules += "   - REGRA DE OURO DE FERRAMENTAS: Se decidires chamar uma ferramenta (tool call) no teu passo atual, deves manter a resposta de texto totalmente vazia e limpa (content deve ser ''). NUNCA uses a tag como `[OPENCLAW]` ou qualquer outra palavra se fores chamar uma ferramenta, caso contrÃ¡rio o servidor rejeitarÃ¡ a mensagem com erro 400."
+    tag_rules += "   - Para tu (OpenClaw) reportares ao CEO: usa a tag `[OPENCLAW]` no início da tua resposta (ex: `[OPENCLAW] CEO, as tarefas foram concluídas.`).\n"
+    tag_rules += "   - REGRA DE OURO DE FERRAMENTAS: Se decidires chamar uma ferramenta (tool call) no teu passo atual, deves manter a resposta de texto totalmente vazia e limpa (content deve ser ''). NUNCA uses a tag como `[OPENCLAW]` ou qualquer outra palavra se fores chamar uma ferramenta, caso contrário o servidor rejeitará a mensagem com erro 400."
     
     if verbose_progress:
         on_msg("OPENCLAW", "Orquestrador", f"Processando pedido: '{prompt_text}'")
@@ -1407,7 +1413,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
             role = msg["role"]
             content = msg["content"]
             
-            # CRITICAL FIX: Skip any tool_result messages from prior sessions â€” they can carry
+            # CRITICAL FIX: Skip any tool_result messages from prior sessions — they can carry
             # empty function_response.name fields that cause hard 400 errors on Groq and Gemini.
             # History is only used for user/assistant conversation context.
             if role == "tool_result":
@@ -1440,45 +1446,45 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
     
     # Core identity of the Jarvis CEO
     core_identity = (
-        "Ã‰s o OpenClaw, o orquestrador central de IA, COO e Agente Executivo Universal da agÃªncia. "
-        "A tua missÃ£o Ã© um Sistema Operativo Cognitivo AutÃ³nomo orientado a objetivos. "
-        "NÃ£o Ã©s um simples gerador de sites nem um copiloto de cÃ³digo. A tua funÃ§Ã£o Ã© atingir o objetivo definido pelo utilizador (CEO) utilizando a melhor combinaÃ§Ã£o possÃ­vel de raciocÃ­nio, swarms de domÃ­nio, ferramentas locais e gestÃ£o de recursos.\n"
+        "És o OpenClaw, o orquestrador central de IA, COO e Agente Executivo Universal da agência. "
+        "A tua missão é um Sistema Operativo Cognitivo Autónomo orientado a objetivos. "
+        "Não és um simples gerador de sites nem um copiloto de código. A tua função é atingir o objetivo definido pelo utilizador (CEO) utilizando a melhor combinação possível de raciocínio, swarms de domínio, ferramentas locais e gestão de recursos.\n"
         "Tens acesso a ferramentas locais e externas, mas em cada pedido so podes usar a lista dinamica de ferramentas disponiveis indicada mais abaixo.\n"
-        "LOOP ENGINEERING: A tua primeira acÃ§Ã£o em QUALQUER pedido que envolva tarefas Ã© SEMPRE chamar `declarar_objetivo` "
-        "para definir o Goal e os critÃ©rios de sucesso. SÃ³ depois executas as acÃ§Ãµes. "
+        "LOOP ENGINEERING: A tua primeira acção em QUALQUER pedido que envolva tarefas é SEMPRE chamar `declarar_objetivo` "
+        "para definir o Goal e os critérios de sucesso. Só depois executas as acções. "
         "O loop termina quando `verificar_qualidade(pronto_para_entrega=true)` for chamado com sucesso.\n"
-        "ESTRATÃ‰GIA E EXECUÃ‡ÃƒO DE MEIOS (CRÃTICO):\n"
-        "  - Como CEO cognitivo, tu analisas o objetivo e decides autonomamente quais as ferramentas ou swarms de domÃ­nio acionar.\n"
-        "  - Podes chamar `chamar_swarm_dominio` para delegar trabalho complexo de domÃ­nios especÃ­ficos. Os domÃ­nios disponÃ­veis sÃ£o:\n"
-        "    1. 'builder_swarm' (para criaÃ§Ã£o de cÃ³digo, websites, apps, APIs, scripts, bases de dados).\n"
+        "ESTRATÉGIA E EXECUÃ‡ÃƒO DE MEIOS (CRÍTICO):\n"
+        "  - Como CEO cognitivo, tu analisas o objetivo e decides autonomamente quais as ferramentas ou swarms de domínio acionar.\n"
+        "  - Podes chamar `chamar_swarm_dominio` para delegar trabalho complexo de domínios específicos. Os domínios disponíveis são:\n"
+        "    1. 'builder_swarm' (para criação de código, websites, apps, APIs, scripts, bases de dados).\n"
         "    2. 'operator_swarm' (para organizar ficheiros, backups, lidar com docker/sandbox, comandos de SO).\n"
         "    3. 'creator_swarm' (para designs, ebooks, campanhas de copy, landing pages, infoprodutos).\n"
-        "    4. 'growth_swarm' (para marketing, otimizaÃ§Ã£o de SEO, monetizaÃ§Ã£o, pesquisa de nichos, vendas).\n"
-        "    5. 'research_swarm' (para recolha de informaÃ§Ã£o web, sumÃ¡rios, Obsidian e RAG).\n"
-        "  - Podes encadear mÃºltiplos swarms em sequÃªncia se o objetivo do utilizador for complexo (ex: growth_swarm para pesquisar nichos, depois creator_swarm para redigir o produto, depois builder_swarm para codificar a landing page).\n"
-        "  - Deves preferir aÃ§Ãµes concretas, prÃ¡ticas e verificÃ¡veis (escrever ficheiros, correr scripts de teste, arquivar notas no Obsidian) em vez de respostas teÃ³ricas ou ideias abstratas.\n"
-        "DYNAMIC AGENT SPAWNING: Se precisares de competÃªncias ultra-especÃ­ficas que os swarms nÃ£o cobrem, usa `criar_agente_especialista` para spawnar um subagente focado.\n"
-        "REGRAS DE CHAMADA DE FERRAMENTAS (CRÃTICO): Se decidires chamar uma ferramenta, o teu output deve conter UNICAMENTE a chamada da ferramenta. NÃ£o deves escrever qualquer texto conversacional, explicaÃ§Ãµes, saudaÃ§Ãµes, desculpas, nem tags como [OPENCLAW] nessa resposta. O conteÃºdo de texto (content) deve estar completamente vazio. Escrever texto ou tags ao mesmo tempo que chamas uma ferramenta causa um erro fatal de API 400. SÃ³ deves escrever texto ou usar tags quando NÃƒO estiveres a chamar nenhuma ferramenta.\n"
+        "    4. 'growth_swarm' (para marketing, otimização de SEO, monetização, pesquisa de nichos, vendas).\n"
+        "    5. 'research_swarm' (para recolha de informação web, sumários, Obsidian e RAG).\n"
+        "  - Podes encadear múltiplos swarms em sequência se o objetivo do utilizador for complexo (ex: growth_swarm para pesquisar nichos, depois creator_swarm para redigir o produto, depois builder_swarm para codificar a landing page).\n"
+        "  - Deves preferir ações concretas, práticas e verificáveis (escrever ficheiros, correr scripts de teste, arquivar notas no Obsidian) em vez de respostas teóricas ou ideias abstratas.\n"
+        "DYNAMIC AGENT SPAWNING: Se precisares de competências ultra-específicas que os swarms não cobrem, usa `criar_agente_especialista` para spawnar um subagente focado.\n"
+        "REGRAS DE CHAMADA DE FERRAMENTAS (CRÍTICO): Se decidires chamar uma ferramenta, o teu output deve conter UNICAMENTE a chamada da ferramenta. Não deves escrever qualquer texto conversacional, explicações, saudações, desculpas, nem tags como [OPENCLAW] nessa resposta. O conteúdo de texto (content) deve estar completamente vazio. Escrever texto ou tags ao mesmo tempo que chamas uma ferramenta causa um erro fatal de API 400. Só deves escrever texto ou usar tags quando NÃƒO estiveres a chamar nenhuma ferramenta.\n"
     )
     
     # Agent + task context (template-specific)
     team_context = (
         f"A tua equipa:\n{agents_desc}\n\n"
         f"Fluxo de tarefas:\n{tasks_desc}\n\n"
-        f"Regras de tags para diÃ¡logo:\n{tag_rules}\n"
+        f"Regras de tags para diálogo:\n{tag_rules}\n"
     )
     
     # Operational rules
     operational_rules = (
-        "Regras operacionais (CRÃTICAS):\n"
-        "- CONCISÃƒO ABSOLUTA: Nunca escrevas parÃ¡grafos longos a descrever o que a tua equipa faz ou planeia fazer, a menos que o CEO o peÃ§a explicitamente. NÃ£o faÃ§as resumos ou blÃ¡-blÃ¡-blÃ¡ desnecessÃ¡rio.\n"
-        "- Quando o CEO te pede algo e precisas de chamar uma ferramenta, NÃƒO escrevas qualquer resposta conversacional (nada de 'Compreendido', 'Vou tratar disso' ou '[OPENCLAW]'). Chama a ferramenta imediatamente. SÃ³ podes falar com o CEO com a tag [OPENCLAW] apÃ³s obteres os resultados das ferramentas executadas, ou se precisares de lhe fazer uma pergunta direta para clarificaÃ§Ã£o.\n"
-        "- REGRA ANTI-PROMESSA VAZIA (CRÃTICA): Ã‰ ESTRITAMENTE PROIBIDO responder com frases como 'Vou tratar disso', 'Vou comeÃ§ar' SEM chamar uma ferramenta no mesmo passo. Se o CEO pedir para avanÃ§ar ou confirmar algo, a tua ÃšNICA resposta vÃ¡lida Ã© chamar imediatamente a ferramenta relevante.\n"
-        "- MEMÃ“RIA DO WORKSPACE: Deves criar e manter ativamente um ficheiro 'sandbox_dir/MEMORY.md' (ou ler 'MEMORY.md' se existir) que descreva o progresso das tarefas, decisÃµes chave tomadas e os prÃ³ximos passos. Atualiza este ficheiro sempre que concluÃ­res uma fase importante de desenvolvimento para garantir o alinhamento da equipa (Hive Mind).\n"
-        "- Fala SEMPRE em portuguÃªs de Portugal (PT-PT)\n"
+        "Regras operacionais (CRÍTICAS):\n"
+        "- CONCISÃƒO ABSOLUTA: Nunca escrevas parágrafos longos a descrever o que a tua equipa faz ou planeia fazer, a menos que o CEO o peça explicitamente. Não faças resumos ou blá-blá-blá desnecessário.\n"
+        "- Quando o CEO te pede algo e precisas de chamar uma ferramenta, NÃƒO escrevas qualquer resposta conversacional (nada de 'Compreendido', 'Vou tratar disso' ou '[OPENCLAW]'). Chama a ferramenta imediatamente. Só podes falar com o CEO com a tag [OPENCLAW] após obteres os resultados das ferramentas executadas, ou se precisares de lhe fazer uma pergunta direta para clarificação.\n"
+        "- REGRA ANTI-PROMESSA VAZIA (CRÍTICA): É ESTRITAMENTE PROIBIDO responder com frases como 'Vou tratar disso', 'Vou começar' SEM chamar uma ferramenta no mesmo passo. Se o CEO pedir para avançar ou confirmar algo, a tua ÃšNICA resposta válida é chamar imediatamente a ferramenta relevante.\n"
+        "- MEMÃ“RIA DO WORKSPACE: Deves criar e manter ativamente um ficheiro 'sandbox_dir/MEMORY.md' (ou ler 'MEMORY.md' se existir) que descreva o progresso das tarefas, decisões chave tomadas e os próximos passos. Atualiza este ficheiro sempre que concluíres uma fase importante de desenvolvimento para garantir o alinhamento da equipa (Hive Mind).\n"
+        "- Fala SEMPRE em português de Portugal (PT-PT)\n"
         "- Usa 'CEO' moderadamente, sem repetir em cada frase\n"
         "- Para abrir programas, sites ou navegadores (ex: Google, YouTube, Chrome, Word, Excel): chama `execute_command` (`Start-Process 'https://google.com'`) IMEDIATAMENTE. NUNCA respondas que ja esta aberto sem executar o comando.\n"
-        "- Podes misturar mensagens no mesmo passo para conversaÃ§Ãµes dinÃ¢micas\n"
+        "- Podes misturar mensagens no mesmo passo para conversações dinâmicas\n"
     )
     
     # Assemble full system prompt with ECC patterns
@@ -1515,20 +1521,20 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
             "\n\n[ROTA QUEEN: SIMPLES]\n"
             "Esta tarefa foi classificada como SIMPLES pela Queen Routing. NUNCA chames a ferramenta `chamar_swarm_dominio`.\n"
             "Deves resolver o pedido do utilizador diretamente utilizando as tuas ferramentas locais disponiveis neste pedido (ex: execute_command, write_file) neste loop.\n"
-            "OBRIGATÃ“RIO: Chama uma ferramenta imediatamente neste passo. NÃ£o escrevas texto â€” age."
+            "OBRIGATÃ“RIO: Chama uma ferramenta imediatamente neste passo. Não escrevas texto — age."
         )
     
-    # ECC Pattern 3: Instincts â€” always-on reflexes
+    # ECC Pattern 3: Instincts — always-on reflexes
     system_prompt += "\n" + OPENCLAW_INSTINCTS
     
     # ECC Pattern 4: Research-First rule
     system_prompt += "\n" + RESEARCH_FIRST_RULE
     
-    # ECC Pattern 1: Skills â€” agent skill definitions
+    # ECC Pattern 1: Skills — agent skill definitions
     if skills_context:
         system_prompt += f"\n\n## Skills da Equipa (guias de trabalho para cada agente):{skills_context}"
     
-    # ECC Pattern 2: Memory â€” inject previous session context
+    # ECC Pattern 2: Memory — inject previous session context
     if session_context:
         system_prompt += f"\n\n{session_context}"
 
@@ -1652,7 +1658,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     idx_data = f.read()
                     if len(idx_data) > 6000:
                         idx_data = idx_data[:6000] + "\n... [TRUNCADO PARA POUPAR TOKENS] ..."
-                    project_intelligence = f"## Project Intelligence (AST & Symbol Graph)\nO mapa estrutural da aplicaÃ§Ã£o (classes, funÃ§Ãµes e imports):\n```json\n{idx_data}\n```"
+                    project_intelligence = f"## Project Intelligence (AST & Symbol Graph)\nO mapa estrutural da aplicação (classes, funções e imports):\n```json\n{idx_data}\n```"
         except Exception:
             pass
             
@@ -1661,7 +1667,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
             from intelligence.runtime_observer import RuntimeObserver
             observer = RuntimeObserver()
             rt_state = observer.compile_runtime_state(websocket_connected=True, active_agents=len(agents_cfg), frontend_connected=True)
-            runtime_awareness = f"## Runtime Awareness (System Health)\nEstado da mÃ¡quina e base de dados em tempo real:\n```json\n{json.dumps(rt_state, indent=2)}\n```"
+            runtime_awareness = f"## Runtime Awareness (System Health)\nEstado da máquina e base de dados em tempo real:\n```json\n{json.dumps(rt_state, indent=2)}\n```"
         except Exception:
             pass
         
@@ -1789,12 +1795,12 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                 else "  - Se o objetivo ja foi declarado: NUNCA chames `declarar_objetivo`; chama `list_directory`, `write_file`, `execute_command` ou `verificar_qualidade`.\n"
             )
             local_system_prompt = dynamic_system_prompt + (
-                "\n\n[REFORÃ‡O CRÃTICO ABSOLUTO â€” MODELO LOCAL]:\n"
-                "REGRA MÃXIMA: A tua resposta de texto (content) DEVE ESTAR COMPLETAMENTE VAZIA. NÃ£o escreves nada.\n"
-                "A tua ÃšNICA saÃ­da permitida Ã© uma chamada de ferramenta (tool_call). SEM EXCEÃ‡Ã•ES.\n"
-                "Ã‰ PROIBIDO: escrever planos, resumos, listas, explicaÃ§Ãµes, intenÃ§Ãµes, perguntas ou qualquer texto.\n"
-                "Ã‰ PROIBIDO: dizer 'Vou fazer X', 'Vou criar Y', 'Vou tratar disso' â€” isso Ã© FALHA TOTAL.\n"
-                "A ÃšNICA AÃ‡ÃƒO CORRETA Ã© chamar IMEDIATAMENTE uma das tuas ferramentas:\n"
+                "\n\n[REFORÃ‡O CRÍTICO ABSOLUTO — MODELO LOCAL]:\n"
+                "REGRA MÁXIMA: A tua resposta de texto (content) DEVE ESTAR COMPLETAMENTE VAZIA. Não escreves nada.\n"
+                "A tua ÃšNICA saída permitida é uma chamada de ferramenta (tool_call). SEM EXCEÃ‡Ã•ES.\n"
+                "É PROIBIDO: escrever planos, resumos, listas, explicações, intenções, perguntas ou qualquer texto.\n"
+                "É PROIBIDO: dizer 'Vou fazer X', 'Vou criar Y', 'Vou tratar disso' — isso é FALHA TOTAL.\n"
+                "A ÃšNICA AÃ‡ÃƒO CORRETA é chamar IMEDIATAMENTE uma das tuas ferramentas:\n"
                 f"{complex_action_rule}"
                 "  - Para criar ficheiros de texto/markdown: chama `write_file`\n"
                 "  - Para executar comandos: chama `execute_command`\n"
@@ -1831,7 +1837,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                 messages.append({"role": "assistant", "content": response_text})
                 
             except Exception as e:
-                err_msg = f"Erro no provider local: {str(e)}. Confirma que o serviÃ§o Ollama estÃ¡ ativo e que o modelo {model_name} estÃ¡ instalado."
+                err_msg = f"Erro no provider local: {str(e)}. Confirma que o serviço Ollama está ativo e que o modelo {model_name} está instalado."
                 on_msg("JARVIS", "Orquestrador", err_msg)
                 return finish_orchestration(err_msg, success=False, reason="ollama_error")
 
@@ -2011,7 +2017,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                 continue
             tool_call_history.append(current_call_sigs)
 
-        # If no tool calls â€” detect if model was idle (wrote prose instead of acting)
+        # If no tool calls — detect if model was idle (wrote prose instead of acting)
         if not tool_calls:
             if task_plan.current_step.id == "criar_ficheiros" and task_state.implementation_plan.valid:
                 planned_call = await request_planned_write_file_from_ollama(
@@ -2111,20 +2117,20 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     # Push a stern correction back into messages so next iteration acts
                     allowed_tool_hint = ", ".join(tool["name"] for tool in active_jarvis_tools)
                     correction_msg = (
-                        "[SISTEMA â€” CORREÃ‡ÃƒO CRÃTICA]: A tua Ãºltima resposta foi APENAS TEXTO. Isso Ã© uma FALHA. "
-                        "NÃ£o escreveste nenhuma chamada de ferramenta real. JSON em markdown tambem nao conta como tool_call. "
-                        "AGORA, neste prÃ³ximo passo, chama OBRIGATORIAMENTE uma ferramenta. "
+                        "[SISTEMA — CORREÃ‡ÃƒO CRÍTICA]: A tua última resposta foi APENAS TEXTO. Isso é uma FALHA. "
+                        "Não escreveste nenhuma chamada de ferramenta real. JSON em markdown tambem nao conta como tool_call. "
+                        "AGORA, neste próximo passo, chama OBRIGATORIAMENTE uma ferramenta. "
                         f"Motivo do contrato operacional: {text_decision.reason}. "
                         f"A tarefa atual e: {prompt_text}. Escolhe a ferramenta adequada para executar essa tarefa real "
                         f"usando apenas estas ferramentas disponiveis: {allowed_tool_hint}. "
                         "Para criar ficheiros na sandbox usa `write_file`; nao uses Obsidian para frontend/backend/apps. "
-                        "NÃ£o escrevas mais texto â€” chama uma ferramenta agora."
+                        "Não escrevas mais texto — chama uma ferramenta agora."
                     )
                     messages.append({"role": "user", "content": correction_msg})
                     step += 1
                     continue  # Re-run the loop with the correction injected
                 else:
-                    # Too many idle responses â€” exit
+                    # Too many idle responses — exit
                     run_jarvis_orchestration._idle_count[idle_count_key] = 0  # reset
                     if current_active_card:
                         on_kanban(current_active_card, "done")
@@ -2140,7 +2146,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                         on_msg("JARVIS", "Orquestrador", safe_msg)
                         return finish_orchestration(safe_msg, success=False, reason="local_fallback_interrupted")
                     if response_text.strip():
-                        on_msg("OPENCLAW", "Orquestrador", "OrquestraÃ§Ã£o concluÃ­da!")
+                        on_msg("OPENCLAW", "Orquestrador", "Orquestração concluída!")
                     else:
                         on_msg("OPENCLAW", "Orquestrador", "[WARNING] Orquestracao encerrada sem acao. O modelo local nao chamou ferramentas. Tenta reformular o pedido.")
                     return finish_orchestration(response_text, success=False, reason="ended_without_tool")
@@ -2374,7 +2380,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     database.add_engineering_decision(decision, reason, impact)
                     decisions = database.get_engineering_decisions()
                     await server.broadcast({"type": "decisions_updated", "decisions": decisions})
-                    result_str = f"DecisÃ£o de engenharia registada com sucesso no SQLite: '{decision}'"
+                    result_str = f"Decisão de engenharia registada com sucesso no SQLite: '{decision}'"
                 elif tool_name == "atualizar_memoria_arquitetura":
                     import database
                     import server
@@ -2385,7 +2391,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     database.add_architecture_memory(module, purpose, dependencies, constraints)
                     arch = database.get_architecture_memory()
                     await server.broadcast({"type": "architecture_updated", "architecture": arch})
-                    result_str = f"MemÃ³ria de arquitetura atualizada com sucesso no SQLite para o mÃ³dulo: '{module}'"
+                    result_str = f"Memória de arquitetura atualizada com sucesso no SQLite para o módulo: '{module}'"
                 elif tool_name == "apply_code_patch":
                     from agents.patch_engine import PatchEngine
                     fp = tool_input.get("file_path")
@@ -2401,7 +2407,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                         windows = ag_tools.get_visible_windows_text()
                         result_str = f"Screenshot guardada com sucesso em '{path}'. Janelas abertas detetadas:\n{windows}"
                     else:
-                        result_str = "Erro ao capturar ecrÃ£."
+                        result_str = "Erro ao capturar ecrã."
                 # ECC Pattern 6: Verification Loop handler
                 elif tool_name == "verificar_qualidade":
                     pronto = tool_input.get("pronto_para_entrega", False)
@@ -2420,7 +2426,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                         problemas = list(problemas) + [quality_blocker]
                     if pronto:
                         crit_str = "\n  - ".join(criterios) if criterios else "N/A"
-                        result_str = f"âœ… Quality Gate PASSOU.\nCritÃ©rios cumpridos:\n  - {crit_str}\nTrabalho pronto para entrega ao CEO."
+                        result_str = f"âœ… Quality Gate PASSOU.\nCritérios cumpridos:\n  - {crit_str}\nTrabalho pronto para entrega ao CEO."
                         if current_active_card:
                             on_kanban(current_active_card, "done")
                         # ECC Memory: save session on successful delivery
@@ -2433,22 +2439,22 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                         # Loop Engineering: mark goal as achieved
                         _loop_goal_achieved = True
                     else:
-                        prob_str = "\n  - ".join(problemas) if problemas else "nÃ£o especificados"
+                        prob_str = "\n  - ".join(problemas) if problemas else "não especificados"
                         result_str = f"âš ï¸ Quality Gate FALHOU. Problemas:\n  - {prob_str}\nContinuar a trabalhar antes de reportar ao CEO."
                 # Loop Engineering: Goal Declaration handler
                 elif tool_name == "declarar_objetivo":
                     if _goal_declared:
                         result_str = (
-                            "Erro: O objetivo do loop jÃ¡ foi declarado anteriormente. "
-                            "NÃ£o chames esta ferramenta de novo. Deves avanÃ§ar para a execuÃ§Ã£o usando outras ferramentas "
+                            "Erro: O objetivo do loop já foi declarado anteriormente. "
+                            "Não chames esta ferramenta de novo. Deves avançar para a execução usando outras ferramentas "
                             "(ex: write_file, execute_command) ou chamar 'verificar_qualidade' com pronto_para_entrega=True "
-                            "se o trabalho estiver concluÃ­do ou se nÃ£o houver aÃ§Ãµes adicionais a realizar."
+                            "se o trabalho estiver concluído ou se não houver ações adicionais a realizar."
                         )
                     else:
                         _goal_declared = True
                         _loop_goal = tool_input.get("objetivo", prompt_text)
                         _loop_success_criteria = tool_input.get("criterios_de_sucesso", [])
-                        complexidade = tool_input.get("complexidade_estimada", "mÃ©dia")
+                        complexidade = tool_input.get("complexidade_estimada", "média")
                         crit_str = "\n  - ".join(_loop_success_criteria) if _loop_success_criteria else "N/A"
                         result_str = (
                             "Objetivo registado. No proximo passo e proibido voltar a chamar `declarar_objetivo`. "
@@ -2484,7 +2490,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                             tarefa=tarefa,
                             resultado_resumo=result_str[:200]
                         )
-                        result_str += f"\n\nâœ… Agente **{nome}** guardado no registo para reutilizaÃ§Ã£o futura."
+                        result_str += f"\n\nâœ… Agente **{nome}** guardado no registo para reutilização futura."
                 elif tool_name == "obsidian_list_notes":
                     result_str = await obs_tools.run_obsidian_list_notes()
                 elif tool_name == "obsidian_read_note":
@@ -2568,7 +2574,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         step += 1
         
         # Loop Engineering: Goal-driven termination
-        # Loop exits cleanly when goal is achieved via Quality Gate â€” not just on empty tool_calls
+        # Loop exits cleanly when goal is achieved via Quality Gate — not just on empty tool_calls
         if _loop_goal_achieved:
             duration = __import__('time').time() - _loop_start_time
             stats = memory.save_loop_metrics(
