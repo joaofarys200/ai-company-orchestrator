@@ -593,14 +593,27 @@ class ProjectContextService:
             "deleted": True,
         }
 
+    @property
+    def intake(self) -> Any:
+        from intelligence.project_intake import ProjectIntakeService
+        return ProjectIntakeService(self, workspace_root=self.workspace_root)
+
+    def get_architecture_snapshot(self, project_id: str, force_full: bool = False) -> dict[str, Any]:
+        from intelligence.project_intake import ProjectIntakeService
+        intake_svc = ProjectIntakeService(self, workspace_root=self.workspace_root)
+        snapshot = intake_svc.build_snapshot(project_id, force_full=True) if force_full else intake_svc.ensure_fresh_snapshot(project_id)
+        return snapshot.to_dict()
+
     def project_payload(self, project_id: str, reindex: bool = False) -> dict[str, Any]:
         context = self.index_project(project_id) if reindex else self.open_project(project_id)
         files = self.read_project_files(project_id)
+        arch_snapshot = self.get_architecture_snapshot(project_id, force_full=reindex)
         return {
             "context": context.to_dict(),
             "files": files,
             "file_hashes": self.project_file_hashes(project_id, set(files)),
             "symbols": self.load_index(project_id),
+            "architecture_snapshot": arch_snapshot,
         }
 
     def preview_project(self, project_id: str, on_output_callback) -> dict[str, Any]:

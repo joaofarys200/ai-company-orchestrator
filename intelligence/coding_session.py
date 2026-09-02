@@ -188,10 +188,15 @@ class CodingSessionService:
             raise SafetyRefusalError(assessment)
 
         context = self.projects.open_project(project_id)
-        graph = self.projects.load_index(project_id)
-        if not graph or not context.last_indexed_at:
-            context = self.projects.index_project(project_id)
+        if hasattr(self.projects, "intake"):
+            self.projects.intake.ensure_fresh_snapshot(project_id)
+            context = self.projects.open_project(project_id)
             graph = self.projects.load_index(project_id)
+        else:
+            graph = self.projects.load_index(project_id)
+            if not graph or not context.last_indexed_at:
+                context = self.projects.index_project(project_id)
+                graph = self.projects.load_index(project_id)
 
         target_objective = assessment.sanitized_intent
         request_payload = {
@@ -877,7 +882,15 @@ class CodingSessionService:
         source_hashes = ast_index.get("source_hashes") or {}
         file_metadata = ast_index.get("files") or {}
         if not context.get("last_indexed_at"):
-            raise CodingSessionError("O indice esta ausente ou desatualizado. Reindexe o projeto.")
+            proj_id = context.get("project_id")
+            if proj_id and hasattr(self.projects, "index_project"):
+                refreshed = self.projects.index_project(proj_id)
+                context.update(refreshed.to_dict())
+                ast_index = context.get("ast_index") or {}
+                source_hashes = ast_index.get("source_hashes") or {}
+                file_metadata = ast_index.get("files") or {}
+            else:
+                raise CodingSessionError("O indice esta ausente ou desatualizado. Reindexe o projeto.")
         for change in changes:
             if not change.get("existed"):
                 continue

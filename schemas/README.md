@@ -21,6 +21,7 @@ All schemas follow the **JSON Schema Draft-07** specification and are validated 
 | [`economic-mission.schema.json`](./economic-mission.schema.json) | `jarvis/economic-mission/v1` | Economic tasks categorized by 4 factuality tiers | `agents/controlled_real_world_value_agent.py` | Economic Layer, Evidence Auditor, Clara |
 | [`evidence.schema.json`](./evidence.schema.json) | `jarvis/evidence/v1` | Cryptographic evidence records (SHA256 digests, DOM) | `agents/mission_state.py` | Browser QA, Deliverable Verifier, Audit Logs |
 | [`document-provenance.schema.json`](./document-provenance.schema.json) | `jarvis/document-provenance/v1` | Provenance trail for generated code, notes &amp; docs | `intelligence/artifact_inference.py` | Coding Agent 2.0, Obsidian Vault, PDF Engine |
+| [`project-architecture-snapshot.schema.json`](./project-architecture-snapshot.schema.json) | `jarvis/project-architecture-snapshot/v1` | Deterministic project intake &amp; architecture snapshots | `intelligence/project_intake.py` | Project Intake, Context Builder, Code Workspace |
 
 ---
 

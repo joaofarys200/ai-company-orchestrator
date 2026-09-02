@@ -61,6 +61,15 @@ class WebSocketResponder:
                 "data": payload.get("symbols") or None,
             },
         )
+        if payload.get("architecture_snapshot"):
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "architecture_snapshot",
+                    "project_id": project_id,
+                    "data": payload["architecture_snapshot"],
+                },
+            )
 
     async def send_latest_coding_session(
         self,

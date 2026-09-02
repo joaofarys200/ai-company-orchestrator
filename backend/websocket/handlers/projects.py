@@ -210,6 +210,14 @@ class ProjectWebSocketHandler:
     ) -> None:
         project_id = message.get("project_id")
         try:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "project_intake_status",
+                    "project_id": project_id,
+                    "status": "ANALYZING_PROJECT",
+                },
+            )
             await self.responder.send_project_context(
                 websocket,
                 project_id,
@@ -223,6 +231,14 @@ class ProjectWebSocketHandler:
                 project_id,
             )
             session.selected_project_id = project_id
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "project_intake_status",
+                    "project_id": project_id,
+                    "status": "READY",
+                },
+            )
         except ProjectContextError as project_error:
             await self.connections.send(
                 websocket,
@@ -386,12 +402,28 @@ class ProjectWebSocketHandler:
             )
             return
         try:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "project_intake_status",
+                    "project_id": project_id,
+                    "status": "REFRESHING_ARCHITECTURE",
+                },
+            )
             await self.responder.send_project_context(
                 websocket,
                 project_id,
                 reindex=True,
             )
             session.selected_project_id = project_id
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "project_intake_status",
+                    "project_id": project_id,
+                    "status": "READY",
+                },
+            )
         except ProjectContextError as project_error:
             await self.connections.send(
                 websocket,
