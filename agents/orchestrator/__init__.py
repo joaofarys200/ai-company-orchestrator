@@ -750,7 +750,7 @@ async def spawn_specialist_agent(
     # Buscar notas relevantes no Obsidian com base na tarefa do especialista
     obsidian_context = obs_tools.buscar_contexto_obsidian(tarefa)
     if obsidian_context:
-        on_msg(nome, especialidade, f"ðŸ“– *Injetado contexto relevante do Obsidian na base de conhecimento de {nome}.*")
+        on_msg(nome, especialidade, f"📖 *Injetado contexto relevante do Obsidian na base de conhecimento de {nome}.*")
 
     
     confidence_protocol = """
@@ -764,7 +764,7 @@ Em cada afirmação que faças, usa um destes marcadores:
 No final da tua resposta, inclui SEMPRE:
 ```
 ## Nível de Confiança Geral
-AUTO-AVALIAÃ‡ÃƒO: [0-100%] — [justificação em 1 frase]
+AUTO-AVALIAÇÃƒO: [0-100%] — [justificação em 1 frase]
 ITENS A VERIFICAR: [lista dos pontos marcados com [VERIFICAR]]
 ```
 
@@ -779,7 +779,7 @@ Sê honesto. Se não tiveres a certeza de algo, diz-o. Uma resposta honesta com 
         "- `write_file`: Escreve/cria ficheiros no disco.\n"
         "- `read_file`: Lê ficheiros no workspace.\n"
         "- `list_directory`: Lista ficheiros e diretórios.\n\n"
-        "## OBRIGAÃ‡ÃƒO DE VALIDAÃ‡ÃƒO PRÁTICA (Anti-Alucinação)\n"
+        "## OBRIGAÇÃƒO DE VALIDAÇÃƒO PRÁTICA (Anti-Alucinação)\n"
         "Antes de dares a tua resposta final como concluída, deves usar a ferramenta `execute_command` (ou outras) "
         "para testar, validar ou provar as tuas afirmações técnicas (por exemplo, testar a query SQL sugerida, "
         "executar um pequeno script Python para validar lógica complexa, ou verificar se caminhos/ficheiros existem).\n"
@@ -1045,7 +1045,7 @@ Sê honesto. Se não tiveres a certeza de algo, diz-o. Uma resposta honesta com 
                     correcao = tool_input.get("correcao")
                     import database
                     database.add_compounding_rule(chave, descricao, correcao)
-                    result_str = f"âœ… Regra de Compounding Memory '{chave}' gravada com sucesso no SQLite."
+                    result_str = f"✅ Regra de Compounding Memory '{chave}' gravada com sucesso no SQLite."
                 else:
                     result_str = f"Erro: Ferramenta desconhecida '{tool_name}'"
                     
@@ -1315,8 +1315,8 @@ def split_response_messages(text: str, agent_info: dict = None) -> list[tuple[st
             "CLARA": ("Clara", "UI/UX Designer"),
             "DEVON": ("Devon", "Programador Core"),
             "QUINN": ("Quinn", "QA Engineer"),
-            "JARVIS": ("OPENCLAW", "Orquestrador"),
-            "OPENCLAW": ("OPENCLAW", "Orquestrador")
+            "JARVIS": ("JARVIS", "Orquestrador"),
+            "OPENCLAW": ("JARVIS", "Orquestrador")
         }
     
     tags = list(agent_info.keys())
@@ -1328,12 +1328,12 @@ def split_response_messages(text: str, agent_info: dict = None) -> list[tuple[st
     pattern = re.compile(rf'\[({"|".join(tags)})\]', re.IGNORECASE)
     parts = pattern.split(text)
     if len(parts) == 1:
-        return [("OPENCLAW", "Orquestrador", text.strip())]
+        return [("JARVIS", "Orquestrador", text.strip())]
         
     messages = []
     first_part = parts[0].strip()
     if first_part:
-        messages.append(("OPENCLAW", "Orquestrador", first_part))
+        messages.append(("JARVIS", "Orquestrador", first_part))
         
     for i in range(1, len(parts), 2):
         tag = parts[i].upper()
@@ -1341,7 +1341,7 @@ def split_response_messages(text: str, agent_info: dict = None) -> list[tuple[st
         if not content:
             continue
             
-        sender, role = agent_info.get(tag, ("OPENCLAW", "Orquestrador") if tag in ["JARVIS", "OPENCLAW"] else (tag.capitalize(), "Especialista"))
+        sender, role = agent_info.get(tag, ("JARVIS", "Orquestrador") if tag in ["JARVIS", "OPENCLAW"] else (tag.capitalize(), "Especialista"))
         messages.append((sender, role, content))
         
     return messages
@@ -1381,8 +1381,8 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
     agent_info = {}
     for name, cfg in agents_cfg.items():
         agent_info[name.upper()] = (name.capitalize(), cfg["role"])
-    agent_info["JARVIS"] = ("OPENCLAW", "Orquestrador")
-    agent_info["OPENCLAW"] = ("OPENCLAW", "Orquestrador")
+    agent_info["JARVIS"] = ("JARVIS", "Orquestrador")
+    agent_info["OPENCLAW"] = ("JARVIS", "Orquestrador")
     
     # Compile dialogue tags rule text
     tag_rules = ""
@@ -1390,20 +1390,20 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         if name in ['jarvis', 'openclaw']:
             continue
         uname = name.upper()
-        tag_rules += f"   - Para o {cfg['role']} ({name.capitalize()}) responder no chat: usa a tag `[{uname}]` seguida do texto da resposta dele (ex: `[{uname}] Entendido, OpenClaw. Estou a trabalhar na minha tarefa...`).\n"
-    tag_rules += "   - Para tu (OpenClaw) reportares ao CEO: usa a tag `[OPENCLAW]` no início da tua resposta (ex: `[OPENCLAW] CEO, as tarefas foram concluídas.`).\n"
-    tag_rules += "   - REGRA DE OURO DE FERRAMENTAS: Se decidires chamar uma ferramenta (tool call) no teu passo atual, deves manter a resposta de texto totalmente vazia e limpa (content deve ser ''). NUNCA uses a tag como `[OPENCLAW]` ou qualquer outra palavra se fores chamar uma ferramenta, caso contrário o servidor rejeitará a mensagem com erro 400."
+        tag_rules += f"   - Para o {cfg['role']} ({name.capitalize()}) responder no chat: usa a tag `[{uname}]` seguida do texto da resposta dele (ex: `[{uname}] Entendido, JARVIS. Estou a trabalhar na minha tarefa...`).\n"
+    tag_rules += "   - Para tu (JARVIS) reportares ao CEO: usa a tag `[JARVIS]` no início da tua resposta (ex: `[JARVIS] CEO, as tarefas foram concluídas.`).\n"
+    tag_rules += "   - REGRA DE OURO DE FERRAMENTAS: Se decidires chamar uma ferramenta (tool call) no teu passo atual, deves manter a resposta de texto totalmente vazia e limpa (content deve ser ''). NUNCA uses a tag como `[JARVIS]` ou qualquer outra palavra se fores chamar uma ferramenta, caso contrário o servidor rejeitará a mensagem com erro 400."
     
     if verbose_progress:
-        on_msg("OPENCLAW", "Orquestrador", f"Processando pedido: '{prompt_text}'")
+        on_msg("JARVIS", "Orquestrador", f"Processando pedido: '{prompt_text}'")
     
     # 3. Queen Routing (Roteamento de Complexidade)
     if verbose_progress:
-        on_msg("OPENCLAW", "Orquestrador (Queen)", "ðŸ‘‘ *Analisando complexidade do pedido e determinando rota do Swarm...*")
+        on_msg("JARVIS", "Orquestrador (Queen)", "👑 *Analisando complexidade do pedido e determinando rota do Swarm...*")
     complexity = await classify_task_complexity(prompt_text)
     if verbose_progress:
         route_label = "pelo Swarm Completo" if complexity == "COMPLEX" else "diretamente com ferramentas rapidas"
-        on_msg("OPENCLAW", "Orquestrador (Queen)", f"Rota determinada: {complexity} ({route_label}).")
+        on_msg("JARVIS", "Orquestrador (Queen)", f"Rota determinada: {complexity} ({route_label}).")
     
     messages = []
     # Collect valid assistant tool_call IDs from history to match tool_results correctly
@@ -1453,7 +1453,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         "LOOP ENGINEERING: A tua primeira acção em QUALQUER pedido que envolva tarefas é SEMPRE chamar `declarar_objetivo` "
         "para definir o Goal e os critérios de sucesso. Só depois executas as acções. "
         "O loop termina quando `verificar_qualidade(pronto_para_entrega=true)` for chamado com sucesso.\n"
-        "ESTRATÉGIA E EXECUÃ‡ÃƒO DE MEIOS (CRÍTICO):\n"
+        "ESTRATÉGIA E EXECUÇÃƒO DE MEIOS (CRÍTICO):\n"
         "  - Como CEO cognitivo, tu analisas o objetivo e decides autonomamente quais as ferramentas ou swarms de domínio acionar.\n"
         "  - Podes chamar `chamar_swarm_dominio` para delegar trabalho complexo de domínios específicos. Os domínios disponíveis são:\n"
         "    1. 'builder_swarm' (para criação de código, websites, apps, APIs, scripts, bases de dados).\n"
@@ -1795,12 +1795,12 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                 else "  - Se o objetivo ja foi declarado: NUNCA chames `declarar_objetivo`; chama `list_directory`, `write_file`, `execute_command` ou `verificar_qualidade`.\n"
             )
             local_system_prompt = dynamic_system_prompt + (
-                "\n\n[REFORÃ‡O CRÍTICO ABSOLUTO — MODELO LOCAL]:\n"
+                "\n\n[REFORÇO CRÍTICO ABSOLUTO — MODELO LOCAL]:\n"
                 "REGRA MÁXIMA: A tua resposta de texto (content) DEVE ESTAR COMPLETAMENTE VAZIA. Não escreves nada.\n"
-                "A tua ÃšNICA saída permitida é uma chamada de ferramenta (tool_call). SEM EXCEÃ‡Ã•ES.\n"
+                "A tua ÃšNICA saída permitida é uma chamada de ferramenta (tool_call). SEM EXCEÇÃ•ES.\n"
                 "É PROIBIDO: escrever planos, resumos, listas, explicações, intenções, perguntas ou qualquer texto.\n"
                 "É PROIBIDO: dizer 'Vou fazer X', 'Vou criar Y', 'Vou tratar disso' — isso é FALHA TOTAL.\n"
-                "A ÃšNICA AÃ‡ÃƒO CORRETA é chamar IMEDIATAMENTE uma das tuas ferramentas:\n"
+                "A ÃšNICA AÇÃƒO CORRETA é chamar IMEDIATAMENTE uma das tuas ferramentas:\n"
                 f"{complex_action_rule}"
                 "  - Para criar ficheiros de texto/markdown: chama `write_file`\n"
                 "  - Para executar comandos: chama `execute_command`\n"
@@ -2117,7 +2117,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     # Push a stern correction back into messages so next iteration acts
                     allowed_tool_hint = ", ".join(tool["name"] for tool in active_jarvis_tools)
                     correction_msg = (
-                        "[SISTEMA — CORREÃ‡ÃƒO CRÍTICA]: A tua última resposta foi APENAS TEXTO. Isso é uma FALHA. "
+                        "[SISTEMA — CORREÇÃƒO CRÍTICA]: A tua última resposta foi APENAS TEXTO. Isso é uma FALHA. "
                         "Não escreveste nenhuma chamada de ferramenta real. JSON em markdown tambem nao conta como tool_call. "
                         "AGORA, neste próximo passo, chama OBRIGATORIAMENTE uma ferramenta. "
                         f"Motivo do contrato operacional: {text_decision.reason}. "
@@ -2426,7 +2426,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                         problemas = list(problemas) + [quality_blocker]
                     if pronto:
                         crit_str = "\n  - ".join(criterios) if criterios else "N/A"
-                        result_str = f"âœ… Quality Gate PASSOU.\nCritérios cumpridos:\n  - {crit_str}\nTrabalho pronto para entrega ao CEO."
+                        result_str = f"✅ Quality Gate PASSOU.\nCritérios cumpridos:\n  - {crit_str}\nTrabalho pronto para entrega ao CEO."
                         if current_active_card:
                             on_kanban(current_active_card, "done")
                         # ECC Memory: save session on successful delivery
@@ -2440,7 +2440,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                         _loop_goal_achieved = True
                     else:
                         prob_str = "\n  - ".join(problemas) if problemas else "não especificados"
-                        result_str = f"âš ï¸ Quality Gate FALHOU. Problemas:\n  - {prob_str}\nContinuar a trabalhar antes de reportar ao CEO."
+                        result_str = f"⚠️ï¸ Quality Gate FALHOU. Problemas:\n  - {prob_str}\nContinuar a trabalhar antes de reportar ao CEO."
                 # Loop Engineering: Goal Declaration handler
                 elif tool_name == "declarar_objetivo":
                     if _goal_declared:
@@ -2461,7 +2461,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                             "Chama uma ferramenta de execucao concreta agora: para apps usa `list_directory` em `sandbox_dir`, "
                             "depois `write_file` para criar frontend/backend, depois `execute_command` para validar, e no fim `verificar_qualidade`."
                         )
-                        on_msg("OPENCLAW", "Orquestrador", f"ðŸŽ¯ **Objetivo declarado:** {_loop_goal}")
+                        on_msg("JARVIS", "Orquestrador", f"🎯 **Objetivo declarado:** {_loop_goal}")
                 # Dynamic Agent Spawning handler
                 elif tool_name == "criar_agente_especialista":
                     nome = tool_input.get("nome", "Especialista")
@@ -2471,8 +2471,8 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     contexto = tool_input.get("contexto_projeto", "")
                     guardar = tool_input.get("guardar_agente", False)
                     
-                    on_msg("OPENCLAW", "Orquestrador",
-                        f"ðŸ§  **Spawning** agente especialista: **{nome}** ({especialidade})...")
+                    on_msg("JARVIS", "Orquestrador",
+                        f"🧠 **Spawning** agente especialista: **{nome}** ({especialidade})...")
                     
                     result_str = await spawn_specialist_agent(
                         nome=nome,
@@ -2490,7 +2490,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                             tarefa=tarefa,
                             resultado_resumo=result_str[:200]
                         )
-                        result_str += f"\n\nâœ… Agente **{nome}** guardado no registo para reutilização futura."
+                        result_str += f"\n\n✅ Agente **{nome}** guardado no registo para reutilização futura."
                 elif tool_name == "obsidian_list_notes":
                     result_str = await obs_tools.run_obsidian_list_notes()
                 elif tool_name == "obsidian_read_note":
@@ -2534,7 +2534,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     correcao = tool_input.get("correcao")
                     import database
                     database.add_compounding_rule(chave, descricao, correcao)
-                    result_str = f"âœ… Regra de Compounding Memory '{chave}' gravada com sucesso no SQLite."
+                    result_str = f"✅ Regra de Compounding Memory '{chave}' gravada com sucesso no SQLite."
                 else:
                     result_str = f"Erro: Ferramenta desconhecida '{tool_name}'"
             except Exception as e:
@@ -2589,7 +2589,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
             summary = f"[OK] Loop concluido com sucesso em {mins}m {secs}s ({step} passos)."
             if metrics_str:
                 summary += f"\n{metrics_str}"
-            on_msg("OPENCLAW", "Orquestrador", summary)
+            on_msg("JARVIS", "Orquestrador", summary)
             return finish_orchestration(response_text or summary, success=True, reason="quality_gate_passed")
 
     if step_limit_completion_recovery_available(prompt_text, task_state):
@@ -2597,7 +2597,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
         if missing_without_quality & RECOVERABLE_COMPLETION_EVIDENCE and not (task_state.commands_executed or task_state.sandbox_validated):
             validation_command = deterministic_validation_command_for_state(prompt_text, task_state)
             if validation_command:
-                on_msg("OPENCLAW", "Orquestrador", "Limite atingido com artefactos prontos; a executar validacao deterministica final.")
+                on_msg("JARVIS", "Orquestrador", "Limite atingido com artefactos prontos; a executar validacao deterministica final.")
                 validation_result = await ag_tools.run_local_command(validation_command)
                 validation_tool_id = f"step_limit_recovery_{step}_execute_command"
                 messages.append({
@@ -2662,7 +2662,7 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
             summary = f"[OK] Loop concluido com recuperacao final em {mins}m {secs}s ({step} passos)."
             if metrics_str:
                 summary += f"\n{metrics_str}"
-            on_msg("OPENCLAW", "Orquestrador", summary)
+            on_msg("JARVIS", "Orquestrador", summary)
             return finish_orchestration(summary, success=True, reason="step_limit_completion_recovery")
 
     if current_active_card:
@@ -2700,5 +2700,5 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
     timeout_msg += f"\nTempo: {mins}m {secs}s."
     if metrics_str:
         timeout_msg += f"\n{metrics_str}"
-    on_msg("OPENCLAW", "Orquestrador", timeout_msg)
+    on_msg("JARVIS", "Orquestrador", timeout_msg)
     return finish_orchestration(timeout_msg, success=False, reason="step_limit")

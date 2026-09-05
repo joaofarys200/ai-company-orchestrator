@@ -203,11 +203,15 @@ export const ChatPanel: React.FC = () => {
   };
 
   const renderMessageContent = (msg: ChatMessage) => {
-    const safeText = escapeHtml(msg.content)
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    let text = escapeHtml(msg.content);
+    // Replace markdown bold, italics, code, and newlines
+    text = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong className="text-white font-semibold">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em className="text-cyan-200/90">$1</em>')
+      .replace(/`([^`]+)`/g, '<code className="px-1.5 py-0.5 rounded bg-black/40 border border-white/10 text-cyan-300 font-mono text-xs">$1</code>')
       .replace(/\n/g, '<br />');
 
-    return <span dangerouslySetInnerHTML={{ __html: safeText }} />;
+    return <span dangerouslySetInnerHTML={{ __html: text }} />;
   };
 
   return (
@@ -240,14 +244,18 @@ export const ChatPanel: React.FC = () => {
             <div className="h-12 w-12 rounded-md border border-white/8 bg-white/[0.035] flex items-center justify-center">
               <Bot className="w-6 h-6 text-cyan-300/70" />
             </div>
-            <span className="text-gray-300 font-medium">Aguardando instrucoes por voz ou escrita.</span>
-            <span className="text-gray-600 text-xs">Usa <kbd className="bg-white/[0.06] border border-white/10 px-1.5 py-0.5 rounded">@ficheiro</kbd> para referenciar codigo.</span>
+            <span className="text-gray-300 font-medium">Aguardando instruções por voz ou escrita.</span>
+            <span className="text-gray-600 text-xs">Usa <kbd className="bg-white/[0.06] border border-white/10 px-1.5 py-0.5 rounded">@ficheiro</kbd> para referenciar código.</span>
           </div>
         ) : (
           <AnimatePresence initial={false}>
             {chatMessages.map((msg) => {
-              const isSystem = msg.sender === 'SISTEMA';
-              const isUser = msg.sender === 'CLIENTE';
+              const displaySender = msg.sender.toUpperCase() === 'OPENCLAW' ? 'JARVIS' : msg.sender;
+              const isSystem = displaySender === 'SISTEMA';
+              const isUser = displaySender === 'CLIENTE' || displaySender === 'USER';
+              const isMission = msg.role === 'Missão' || msg.role === 'Mission' || msg.content.includes('Missão criada:') || msg.content.includes('Missão concluída:');
+              const isSafety = msg.role === 'Segurança' || msg.content.includes('⛔ Pedido recusado');
+              const isError = msg.content.includes('❌ A missão') || msg.content.includes('falhou:');
 
               if (isSystem) {
                 return (
@@ -278,13 +286,13 @@ export const ChatPanel: React.FC = () => {
                       {isUser ? (
                         <>
                           <span>{msg.timestamp}</span>
-                          <span className="text-blue-400 font-bold uppercase">{msg.sender}</span>
+                          <span className="text-blue-400 font-bold uppercase">{displaySender}</span>
                           <User className="w-2.5 h-2.5 text-blue-400" />
                         </>
                       ) : (
                         <>
                           <Bot className="w-2.5 h-2.5 text-cyan-400" />
-                          <span className="text-cyan-400 font-bold uppercase">{msg.sender}</span>
+                          <span className="text-cyan-400 font-bold uppercase">{displaySender}</span>
                           <span className="text-[8px] text-gray-600">({msg.role})</span>
                           <span>{msg.timestamp}</span>
                         </>
@@ -296,6 +304,12 @@ export const ChatPanel: React.FC = () => {
                       className={`p-3.5 rounded-md shadow-lg border backdrop-blur-md text-sm leading-relaxed transition-all duration-300 font-sans ${
                         isUser
                           ? 'bg-sky-400/10 border-sky-300/20 text-sky-50'
+                          : isSafety
+                          ? 'bg-rose-950/20 border-rose-500/30 text-rose-100'
+                          : isError
+                          ? 'bg-red-950/20 border-red-500/30 text-red-100'
+                          : isMission
+                          ? 'bg-cyan-950/20 border-cyan-400/30 text-cyan-50'
                           : 'bg-white/[0.045] border-white/8 text-gray-100'
                       }`}
                     >

@@ -1,6 +1,6 @@
 # 🛡️ JARVIS OS — Real Browser Autonomous QA Report
 
-**Data de Auditoria**: 2026-08-31 13:13:17  
+**Data de Auditoria**: 2026-09-02 20:25:34  
 **Motor de Validação**: `RealBrowserAutonomousQAAgent` (Playwright Chromium / Google Chrome Tab)  
 **Ambiente**: Windows 11 / Python 3.14.7 / Vite + React 19 / WebSocket 8001 / HTTP 8000  
 **URL JARVIS**: `http://localhost:8000`  
@@ -46,16 +46,16 @@ O agente inspecionou o DOM dinamicamente sem assumir conhecimento prévio da UI,
 
 | Test ID | Teste | Componente UI | Serviço Backend | Evidência | Resultado |
 |:---|:---|:---|:---|:---|:---:|
-| `TEST-1-SMOKE` | **Smoke Test** | HologramCore / Main Window | Static HTTP Server / WebSocket Gateway | 8 ficheiros | **PASS** (2.44s) |
-| `TEST-2-CONVERSATION` | **Conversation** | ChatPanel / Left Drawer | OrchestrationService / ChatCommandService | 8 ficheiros | **PASS** (2.19s) |
-| `TEST-3-MEMORY` | **Memory Persistence** | ChatPanel & WorkspaceViewer -> Mais -> Memória | MemoryModule / SQLite DB | 8 ficheiros | **PASS** (10.76s) |
-| `TEST-4-RAG` | **Knowledge Vault & RAG** | WorkspaceViewer -> Mais -> Conhecimento | ObsidianTools / RAG Retriever | 8 ficheiros | **PASS** (8.10s) |
-| `TEST-5-LEARNING` | **Aulas / Learning** | WorkspaceViewer -> Aulas | LectureWebSocketHandler / CornellNoteSynthesizer | 8 ficheiros | **PASS** (8.17s) |
-| `TEST-6-CODEGEN` | **Code Generation** | WorkspaceViewer -> Código -> Ficheiros / Alteração | CodingSessionService / SandboxService | 8 ficheiros | **PASS** (10.43s) |
-| `TEST-7-COMPUTERUSE` | **Computer Use** | WorkspaceViewer / Navigation Bar | Frontend Router / WebSocket Router | 8 ficheiros | **PASS** (6.56s) |
-| `TEST-8-RECOVERY` | **Recovery** | WebSocketProvider / HologramCore | WebSocketGateway / Lifecycle | 8 ficheiros | **PASS** (2.80s) |
-| `TEST-9-ECONOMIC` | **Economic Invariant** | HologramCore / WorkspaceViewer | EvidenceGateway / EconomicExecutionGateway | 8 ficheiros | **PASS** (0.12s) |
-| `TEST-10-LONGSESSION` | **Long Session** | ChatPanel / HologramCore | OrchestrationRuntime / StateMachine | 8 ficheiros | **PASS** (14.33s) |
+| `TEST-1-SMOKE` | **Smoke Test** | HologramCore / Main Window | Static HTTP Server / WebSocket Gateway | 8 ficheiros | **PASS** (2.70s) |
+| `TEST-2-CONVERSATION` | **Conversation** | ChatPanel / Left Drawer | OrchestrationService / ChatCommandService | 8 ficheiros | **PASS** (2.74s) |
+| `TEST-3-MEMORY` | **Memory Persistence** | ChatPanel & WorkspaceViewer -> Mais -> Memória | MemoryModule / SQLite DB | 8 ficheiros | **PASS** (11.55s) |
+| `TEST-4-RAG` | **Knowledge Vault & RAG** | WorkspaceViewer -> Mais -> Conhecimento | ObsidianTools / RAG Retriever | 8 ficheiros | **PASS** (8.60s) |
+| `TEST-5-LEARNING` | **Aulas / Learning** | WorkspaceViewer -> Aulas | LectureWebSocketHandler / CornellNoteSynthesizer | 8 ficheiros | **PASS** (9.68s) |
+| `TEST-6-CODEGEN` | **Code Generation** | WorkspaceViewer -> Código -> Ficheiros / Alteração | CodingSessionService / SandboxService | 8 ficheiros | **PASS** (11.03s) |
+| `TEST-7-COMPUTERUSE` | **Computer Use** | WorkspaceViewer / Navigation Bar | Frontend Router / WebSocket Router | 8 ficheiros | **PASS** (7.35s) |
+| `TEST-8-RECOVERY` | **Recovery** | WebSocketProvider / HologramCore | WebSocketGateway / Lifecycle | 8 ficheiros | **PASS** (2.87s) |
+| `TEST-9-ECONOMIC` | **Economic Invariant** | HologramCore / WorkspaceViewer | EvidenceGateway / EconomicExecutionGateway | 8 ficheiros | **PASS** (0.22s) |
+| `TEST-10-LONGSESSION` | **Long Session** | ChatPanel / HologramCore | OrchestrationRuntime / StateMachine | 8 ficheiros | **PASS** (15.54s) |
 
 ---
 
@@ -105,31 +105,31 @@ O agente inspecionou o DOM dinamicamente sem assumir conhecimento prévio da UI,
 
 ## 6. Registo Cronológico de Ações do Utilizador Real
 
-- `[13:12:04] STARTING_APPLICATION_DISCOVERY`
-- `[13:12:07] LAUNCHING_REAL_BROWSER (Chromium / headless=True)`
-- `[13:12:11] DEDICATED_TAB_CREATED`
-- `[13:12:11] INSTRUMENTATION_ATTACHED (Console, Network, WebSocket, PageErrors)`
-- `[13:12:11] NAVIGATE_TO_URL http://localhost:8000`
-- `[13:12:14] OBSERVING_AND_MAPPING_UI_ELEMENTS`
-- `[13:12:14] DISCOVERED_FEATURES: 3 capabilities identified`
-- `[13:12:14] CLICK_CHAT_TOGGLE`
-- `[13:12:15] TYPE_IN_CHAT: 'Olá JARVIS. Explica-me em duas frases o que consegues fazer.'`
-- `[13:12:15] CLICK_SEND_BUTTON`
-- `[13:12:15] CLICK_CLOSE_CHAT`
-- `[13:12:16] CLICK_CHAT_TOGGLE`
-- `[13:12:17] TYPE_IN_CHAT: 'Guarda esta informação para esta missão: o código de teste é JARVIS-8472.'`
-- `[13:12:19] TYPE_IN_CHAT: 'Qual era o código que te pedi para guardar?'`
-- `[13:12:21] CLICK_CLOSE_CHAT`
-- `[13:12:23] CLICK_DEV_PANEL_TOGGLE`
-- `[13:12:23] NAVIGATE_SECTION: 'Mais'`
-- `[13:12:24] NAVIGATE_SUBTAB: 'Memória'`
-- `[13:12:26] CLICK_CLOSE_DEV_PANEL`
-- `[13:12:27] CLICK_DEV_PANEL_TOGGLE`
-- `[13:12:28] NAVIGATE_SECTION: 'Mais'`
-- `[13:12:28] NAVIGATE_SUBTAB: 'Conhecimento'`
-- `[13:12:30] CLICK_CLOSE_DEV_PANEL`
-- `[13:12:31] CLICK_CHAT_TOGGLE`
-- `[13:12:32] TYPE_IN_CHAT (Unknown Query): 'Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?'`
+- `[20:24:17] STARTING_APPLICATION_DISCOVERY`
+- `[20:24:17] LAUNCHING_REAL_BROWSER (Chromium / headless=True)`
+- `[20:24:21] DEDICATED_TAB_CREATED`
+- `[20:24:21] INSTRUMENTATION_ATTACHED (Console, Network, WebSocket, PageErrors)`
+- `[20:24:21] NAVIGATE_TO_URL http://localhost:8000`
+- `[20:24:24] OBSERVING_AND_MAPPING_UI_ELEMENTS`
+- `[20:24:24] DISCOVERED_FEATURES: 3 capabilities identified`
+- `[20:24:24] CLICK_CHAT_TOGGLE`
+- `[20:24:25] TYPE_IN_CHAT: 'Olá JARVIS. Explica-me em duas frases o que consegues fazer.'`
+- `[20:24:25] CLICK_SEND_BUTTON`
+- `[20:24:25] CLICK_CLOSE_CHAT`
+- `[20:24:27] CLICK_CHAT_TOGGLE`
+- `[20:24:27] TYPE_IN_CHAT: 'Guarda esta informação para esta missão: o código de teste é JARVIS-8472.'`
+- `[20:24:29] TYPE_IN_CHAT: 'Qual era o código que te pedi para guardar?'`
+- `[20:24:32] CLICK_CLOSE_CHAT`
+- `[20:24:34] CLICK_DEV_PANEL_TOGGLE`
+- `[20:24:34] NAVIGATE_SECTION: 'Mais'`
+- `[20:24:35] NAVIGATE_SUBTAB: 'Memória'`
+- `[20:24:37] CLICK_CLOSE_DEV_PANEL`
+- `[20:24:38] CLICK_DEV_PANEL_TOGGLE`
+- `[20:24:39] NAVIGATE_SECTION: 'Mais'`
+- `[20:24:40] NAVIGATE_SUBTAB: 'Conhecimento'`
+- `[20:24:41] CLICK_CLOSE_DEV_PANEL`
+- `[20:24:43] CLICK_CHAT_TOGGLE`
+- `[20:24:43] TYPE_IN_CHAT (Unknown Query): 'Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?'`
 
 ---
 
@@ -137,36 +137,36 @@ O agente inspecionou o DOM dinamicamente sem assumir conhecimento prévio da UI,
 
 | Screenshot / Ficheiro | SHA-256 (Prefixo) | Caminho Relativo |
 |:---|:---|:---|
-| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-1-SMOKE/before.png) | `35f128cc04d266c6...` | `evidence/browser/TEST-1-SMOKE/before.png` |
-| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-1-SMOKE/actions.png) | `f4683a638220e888...` | `evidence/browser/TEST-1-SMOKE/actions.png` |
-| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-1-SMOKE/after.png) | `1f4f835ecc187e46...` | `evidence/browser/TEST-1-SMOKE/after.png` |
-| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-2-CONVERSATION/before.png) | `a74ae372222eaf90...` | `evidence/browser/TEST-2-CONVERSATION/before.png` |
-| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-2-CONVERSATION/actions.png) | `550f9baaa25e6c4a...` | `evidence/browser/TEST-2-CONVERSATION/actions.png` |
-| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-2-CONVERSATION/after.png) | `f405a79849ffbcd8...` | `evidence/browser/TEST-2-CONVERSATION/after.png` |
-| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-3-MEMORY/before.png) | `c56118f3f1bacc31...` | `evidence/browser/TEST-3-MEMORY/before.png` |
-| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-3-MEMORY/actions.png) | `ec6e5952b36c8c24...` | `evidence/browser/TEST-3-MEMORY/actions.png` |
-| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-3-MEMORY/after.png) | `abbeb01219dd1f28...` | `evidence/browser/TEST-3-MEMORY/after.png` |
-| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-4-RAG/before.png) | `60599ef9e31ba0ea...` | `evidence/browser/TEST-4-RAG/before.png` |
-| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-4-RAG/actions.png) | `a18065cacb69e002...` | `evidence/browser/TEST-4-RAG/actions.png` |
-| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-4-RAG/after.png) | `e8bda4d70f05d373...` | `evidence/browser/TEST-4-RAG/after.png` |
-| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-5-LEARNING/before.png) | `95b732c6fb85ed03...` | `evidence/browser/TEST-5-LEARNING/before.png` |
-| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-5-LEARNING/actions.png) | `535ece2578bf332e...` | `evidence/browser/TEST-5-LEARNING/actions.png` |
-| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-5-LEARNING/after.png) | `c82b6ae03398919a...` | `evidence/browser/TEST-5-LEARNING/after.png` |
-| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-6-CODEGEN/before.png) | `301de4843dbdcd3d...` | `evidence/browser/TEST-6-CODEGEN/before.png` |
-| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-6-CODEGEN/actions.png) | `fdcb03e0a91e38e5...` | `evidence/browser/TEST-6-CODEGEN/actions.png` |
-| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-6-CODEGEN/after.png) | `b68475c2a4c4d849...` | `evidence/browser/TEST-6-CODEGEN/after.png` |
-| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-7-COMPUTERUSE/before.png) | `698c2c81d3dbe4ed...` | `evidence/browser/TEST-7-COMPUTERUSE/before.png` |
-| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-7-COMPUTERUSE/actions.png) | `e6095ead79427af6...` | `evidence/browser/TEST-7-COMPUTERUSE/actions.png` |
-| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-7-COMPUTERUSE/after.png) | `a2403b2cd7c5c4e1...` | `evidence/browser/TEST-7-COMPUTERUSE/after.png` |
-| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-8-RECOVERY/before.png) | `b55fa79181cc91a9...` | `evidence/browser/TEST-8-RECOVERY/before.png` |
-| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-8-RECOVERY/actions.png) | `8cdb7813ee90fe01...` | `evidence/browser/TEST-8-RECOVERY/actions.png` |
-| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-8-RECOVERY/after.png) | `21b74715e6c2bb9e...` | `evidence/browser/TEST-8-RECOVERY/after.png` |
-| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-9-ECONOMIC/before.png) | `7980173197650c67...` | `evidence/browser/TEST-9-ECONOMIC/before.png` |
-| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-9-ECONOMIC/actions.png) | `c58d2442f34fc24f...` | `evidence/browser/TEST-9-ECONOMIC/actions.png` |
-| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-9-ECONOMIC/after.png) | `599a388959b33b17...` | `evidence/browser/TEST-9-ECONOMIC/after.png` |
-| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-10-LONGSESSION/before.png) | `52d40e594b4e3971...` | `evidence/browser/TEST-10-LONGSESSION/before.png` |
-| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-10-LONGSESSION/actions.png) | `6223a3e871fae826...` | `evidence/browser/TEST-10-LONGSESSION/actions.png` |
-| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-10-LONGSESSION/after.png) | `890bf98af1211bc7...` | `evidence/browser/TEST-10-LONGSESSION/after.png` |
+| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-1-SMOKE/before.png) | `241b3c428ea2f1c3...` | `evidence/browser/TEST-1-SMOKE/before.png` |
+| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-1-SMOKE/actions.png) | `857baec7d45a69d1...` | `evidence/browser/TEST-1-SMOKE/actions.png` |
+| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-1-SMOKE/after.png) | `e3aa1bda170bc3bc...` | `evidence/browser/TEST-1-SMOKE/after.png` |
+| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-2-CONVERSATION/before.png) | `7f15f4fef2115702...` | `evidence/browser/TEST-2-CONVERSATION/before.png` |
+| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-2-CONVERSATION/actions.png) | `e1c452fb3ab6bcb3...` | `evidence/browser/TEST-2-CONVERSATION/actions.png` |
+| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-2-CONVERSATION/after.png) | `ca4a56e55b3923b6...` | `evidence/browser/TEST-2-CONVERSATION/after.png` |
+| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-3-MEMORY/before.png) | `d6b742967a514422...` | `evidence/browser/TEST-3-MEMORY/before.png` |
+| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-3-MEMORY/actions.png) | `3c0b97d597ed97e5...` | `evidence/browser/TEST-3-MEMORY/actions.png` |
+| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-3-MEMORY/after.png) | `b8e4591f27bbed4c...` | `evidence/browser/TEST-3-MEMORY/after.png` |
+| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-4-RAG/before.png) | `8cfbdee310077e7a...` | `evidence/browser/TEST-4-RAG/before.png` |
+| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-4-RAG/actions.png) | `607aadace1cb6876...` | `evidence/browser/TEST-4-RAG/actions.png` |
+| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-4-RAG/after.png) | `b98ed86218f7221a...` | `evidence/browser/TEST-4-RAG/after.png` |
+| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-5-LEARNING/before.png) | `2d1dd4310bef8343...` | `evidence/browser/TEST-5-LEARNING/before.png` |
+| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-5-LEARNING/actions.png) | `22200841bc3fb20b...` | `evidence/browser/TEST-5-LEARNING/actions.png` |
+| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-5-LEARNING/after.png) | `9660dcb716443646...` | `evidence/browser/TEST-5-LEARNING/after.png` |
+| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-6-CODEGEN/before.png) | `9a998755abd49f42...` | `evidence/browser/TEST-6-CODEGEN/before.png` |
+| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-6-CODEGEN/actions.png) | `2b062d43cdbf011f...` | `evidence/browser/TEST-6-CODEGEN/actions.png` |
+| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-6-CODEGEN/after.png) | `198935b512895533...` | `evidence/browser/TEST-6-CODEGEN/after.png` |
+| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-7-COMPUTERUSE/before.png) | `1cb49c8165872a15...` | `evidence/browser/TEST-7-COMPUTERUSE/before.png` |
+| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-7-COMPUTERUSE/actions.png) | `895ac3c40ca0fe8a...` | `evidence/browser/TEST-7-COMPUTERUSE/actions.png` |
+| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-7-COMPUTERUSE/after.png) | `5b270c7d012d52f1...` | `evidence/browser/TEST-7-COMPUTERUSE/after.png` |
+| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-8-RECOVERY/before.png) | `7b1ff031301c4cec...` | `evidence/browser/TEST-8-RECOVERY/before.png` |
+| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-8-RECOVERY/actions.png) | `22b36aec811dd212...` | `evidence/browser/TEST-8-RECOVERY/actions.png` |
+| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-8-RECOVERY/after.png) | `480727a569bbfc02...` | `evidence/browser/TEST-8-RECOVERY/after.png` |
+| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-9-ECONOMIC/before.png) | `31b1b262e531315a...` | `evidence/browser/TEST-9-ECONOMIC/before.png` |
+| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-9-ECONOMIC/actions.png) | `65a7bf08637901b9...` | `evidence/browser/TEST-9-ECONOMIC/actions.png` |
+| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-9-ECONOMIC/after.png) | `4fce55bba7e2a0a1...` | `evidence/browser/TEST-9-ECONOMIC/after.png` |
+| [`before.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-10-LONGSESSION/before.png) | `2c87b79755885600...` | `evidence/browser/TEST-10-LONGSESSION/before.png` |
+| [`actions.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-10-LONGSESSION/actions.png) | `0840c97ba4caa30b...` | `evidence/browser/TEST-10-LONGSESSION/actions.png` |
+| [`after.png`](file:///C:/Users/joaor/Desktop/JarvisOS/evidence/browser/TEST-10-LONGSESSION/after.png) | `dd4afdd83d3560f3...` | `evidence/browser/TEST-10-LONGSESSION/after.png` |
 
 ---
 

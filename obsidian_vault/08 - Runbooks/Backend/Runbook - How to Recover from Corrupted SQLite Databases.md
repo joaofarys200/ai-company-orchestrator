@@ -29,35 +29,35 @@ sources:
     url: https://www.sqlite.org/howtocorrupt.html
 ---
 
-# ðŸ› ï¸ Runbook - How to Recover from Corrupted SQLite Databases
+# 🛠️ï¸ Runbook - How to Recover from Corrupted SQLite Databases
 
-## 1. CritÃ©rios de Sucesso e Falha
-- **CritÃ©rio de Sucesso**: `PRAGMA integrity_check;` retorna `ok`, todos os registos recuperÃ¡veis da tabela `missions` e `steps` sÃ£o restaurados num novo banco e o backend reinicia sem erros.
-- **CritÃ©rio de Falha**: O comando `.recover` falha ou o cabeÃ§alho do arquivo estÃ¡ totalmente zerado sem backup.
+## 1. Critérios de Sucesso e Falha
+- **Critério de Sucesso**: `PRAGMA integrity_check;` retorna `ok`, todos os registos recuperáveis da tabela `missions` e `steps` são restaurados num novo banco e o backend reinicia sem erros.
+- **Critério de Falha**: O comando `.recover` falha ou o cabeçalho do arquivo está totalmente zerado sem backup.
 
 ---
 
-## 2. DiagnÃ³stico Inicial
-Executar no terminal de administraÃ§Ã£o:
+## 2. Diagnóstico Inicial
+Executar no terminal de administração:
 
 ```bash
 sqlite3 database.db "PRAGMA quick_check;"
 sqlite3 database.db "PRAGMA integrity_check;"
 ```
 
-Se a saÃ­da apresentar erros como `*** in database main *** Page N is never used` ou `malformed`, o banco sofreu corrupÃ§Ã£o de pÃ¡ginas.
+Se a saída apresentar erros como `*** in database main *** Page N is never used` ou `malformed`, o banco sofreu corrupção de páginas.
 
 ---
 
-## 3. Procedimento de RecuperaÃ§Ã£o Passo a Passo
+## 3. Procedimento de Recuperação Passo a Passo
 
-### Passo 1: Isolar o Banco e Criar Backup dos BinÃ¡rios
+### Passo 1: Isolar o Banco e Criar Backup dos Binários
 ```bash
 cp database.db database.db.corrupted
 cp database.db-wal database.db-wal.corrupted 2>/dev/null || true
 ```
 
-### Passo 2: Executar Dump de RecuperaÃ§Ã£o com UtilitÃ¡rio Nativo
+### Passo 2: Executar Dump de Recuperação com Utilitário Nativo
 ```bash
 sqlite3 database.db.corrupted ".recover" > recovered_data.sql
 ```
@@ -70,13 +70,13 @@ rm -f database.db database.db-wal database.db-shm
 # Importar dados no novo banco
 sqlite3 database.db < recovered_data.sql
 
-# Reaplicar pragmas de produÃ§Ã£o
+# Reaplicar pragmas de produção
 sqlite3 database.db "PRAGMA journal_mode = WAL;"
 sqlite3 database.db "PRAGMA synchronous = NORMAL;"
 sqlite3 database.db "PRAGMA busy_timeout = 15000;"
 ```
 
-### Passo 4: ValidaÃ§Ã£o de Integridade PÃ³s-RestauraÃ§Ã£o
+### Passo 4: Validação de Integridade Pós-Restauração
 ```bash
 sqlite3 database.db "PRAGMA integrity_check;"
 ```

@@ -32,26 +32,26 @@ sources:
 # ðŸ” JARVIS EvidenceGateway and Market Verification Gate
 
 ## 1. Purpose
-O `EvidenceGateway` atua como a barreira de integridade epistÃªmica do JARVIS OS, garantindo que propostas de produtos, hipÃ³teses de negÃ³cio e scores de oportunidade sejam validados contra evidÃªncias reais antes da alocaÃ§Ã£o de recursos de engenharia.
+O `EvidenceGateway` atua como a barreira de integridade epistêmica do JARVIS OS, garantindo que propostas de produtos, hipóteses de negócio e scores de oportunidade sejam validados contra evidências reais antes da alocação de recursos de engenharia.
 
 ---
 
 ## 2. Responsibilities
-- Auditar e classificar toda a evidÃªncia apresentada pelo agente Alex.
-- Exigir comprovativos de interesse de utilizadores (ex: cliques reais em landing page, prÃ©-inscriÃ§Ãµes por email, conversÃµes de pagamento).
-- Rejeitar planos baseados unicamente em consenso sintÃ©tico de LLMs.
-- Gerar relatÃ³rios de validaÃ§Ã£o com graus de certeza explÃ­citos.
+- Auditar e classificar toda a evidência apresentada pelo agente Alex.
+- Exigir comprovativos de interesse de utilizadores (ex: cliques reais em landing page, pré-inscrições por email, conversões de pagamento).
+- Rejeitar planos baseados unicamente em consenso sintético de LLMs.
+- Gerar relatórios de validação com graus de certeza explícitos.
 
 ---
 
 ## 3. Inputs & Outputs
-- **Inputs**: RelatÃ³rios de mercado do Alex, dados de trÃ¡fego web, formulÃ¡rios de captura de leads.
-- **Outputs**: Certificado de validaÃ§Ã£o de evidÃªncia, pontuaÃ§Ã£o de confianÃ§a auditada.
+- **Inputs**: Relatórios de mercado do Alex, dados de tráfego web, formulários de captura de leads.
+- **Outputs**: Certificado de validação de evidência, pontuação de confiança auditada.
 
 ---
 
 ## 4. State Management & Invariants
-- Nenhuma missÃ£o de escala ou lanÃ§amento pode prosseguir sem a chancela do `EvidenceGateway`.
+- Nenhuma missão de escala ou lançamento pode prosseguir sem a chancela do `EvidenceGateway`.
 
 ---
 
@@ -62,7 +62,7 @@ O `EvidenceGateway` atua como a barreira de integridade epistÃªmica do JARVIS 
 
 ## 6. Failure Modes & Recovery
 - **Failure**: Tentativa de burlar o gateway com dados simulados.
-- **Recovery**: Bloqueio e requisiÃ§Ã£o de teste de fumaÃ§a com utilizadores reais (ver [[How to Validate Product Ideas with Low-Cost Experiments]]).
+- **Recovery**: Bloqueio e requisição de teste de fumaça com utilizadores reais (ver [[How to Validate Product Ideas with Low-Cost Experiments]]).
 
 ---
 
@@ -72,7 +72,7 @@ O `EvidenceGateway` atua como a barreira de integridade epistÃªmica do JARVIS 
 ---
 
 ## 8. Evidence Produced & Tests
-- **Evidence**: Registo de evidÃªncia auditada com selo criptogrÃ¡fico SHA-256.
+- **Evidence**: Registo de evidência auditada com selo criptográfico SHA-256.
 - **Tests**: `tests/test_financial_analytics.py`.
 
 ---

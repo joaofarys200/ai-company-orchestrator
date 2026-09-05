@@ -117,7 +117,7 @@ def serialize_server_message(message: dict) -> str:
     request_id = current_response_request_id()
     if request_id:
         normalized["request_id"] = request_id
-    return json.dumps(normalized)
+    return json.dumps(normalized, ensure_ascii=False)
 
 
 @dataclass(slots=True)

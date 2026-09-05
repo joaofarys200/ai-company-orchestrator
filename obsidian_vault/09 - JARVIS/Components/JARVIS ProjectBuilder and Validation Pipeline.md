@@ -32,26 +32,26 @@ sources:
 # ðŸ—ï¸ JARVIS ProjectBuilder and Validation Pipeline
 
 ## 1. Purpose
-O `ProjectBuilder` Ã© o mÃ³dulo responsÃ¡vel por transformar intenÃ§Ãµes de desenvolvimento e planos estruturados em projetos completos e executÃ¡veis dentro da sandbox, gerindo compilaÃ§Ã£o, instalaÃ§Ã£o de pacotes e validaÃ§Ã£o em mÃºltiplos estÃ¡gios.
+O `ProjectBuilder` é o módulo responsável por transformar intenções de desenvolvimento e planos estruturados em projetos completos e executáveis dentro da sandbox, gerindo compilação, instalação de pacotes e validação em múltiplos estágios.
 
 ---
 
 ## 2. Responsibilities
-- Inicializar a estrutura de diretÃ³rios e ficheiros de configuraÃ§Ã£o (`package.json`, `requirements.txt`, `vite.config.js`).
-- Executar pipelines de prÃ©-validaÃ§Ã£o antes da entrega de cÃ³digo final ao utilizador.
-- Gravar o histÃ³rico completo de aÃ§Ãµes no Flight Recorder para reproduÃ§Ã£o determinÃ­stica de builds.
-- Integrar com o linter e suite de testes de aceitaÃ§Ã£o.
+- Inicializar a estrutura de diretórios e ficheiros de configuração (`package.json`, `requirements.txt`, `vite.config.js`).
+- Executar pipelines de pré-validação antes da entrega de código final ao utilizador.
+- Gravar o histórico completo de ações no Flight Recorder para reprodução determinística de builds.
+- Integrar com o linter e suite de testes de aceitação.
 
 ---
 
 ## 3. Inputs & Outputs
-- **Inputs**: EspecificaÃ§Ã£o funcional da aplicaÃ§Ã£o, templates de projeto, dependÃªncias.
-- **Outputs**: AplicaÃ§Ã£o funcional construÃ­da, servidor de preview ativo, log de execuÃ§Ã£o de testes.
+- **Inputs**: Especificação funcional da aplicação, templates de projeto, dependências.
+- **Outputs**: Aplicação funcional construída, servidor de preview ativo, log de execução de testes.
 
 ---
 
 ## 4. State Management & Invariants
-- Nenhum projeto Ã© marcado como `VALIDATED` se o processo de build ou o teste de fumaÃ§a inicial falhar.
+- Nenhum projeto é marcado como `VALIDATED` se o processo de build ou o teste de fumaça inicial falhar.
 
 ---
 
@@ -62,13 +62,13 @@ O `ProjectBuilder` Ã© o mÃ³dulo responsÃ¡vel por transformar intenÃ§Ãµ
 ---
 
 ## 6. Failure Modes & Recovery
-- **Failure**: Falha na instalaÃ§Ã£o de dependÃªncias npm/pip ou conflitos de versÃ£o.
-- **Recovery**: Triage de log pelo agente Quinn com sugestÃ£o de pinagem de versÃ£o compatÃ­vel.
+- **Failure**: Falha na instalação de dependências npm/pip ou conflitos de versão.
+- **Recovery**: Triage de log pelo agente Quinn com sugestão de pinagem de versão compatível.
 
 ---
 
 ## 7. Security Boundaries
-- InstalaÃ§Ã£o e execuÃ§Ã£o ocorrem estritamente dentro do diretÃ³rio do projeto na sandbox sem acesso de escrita a outros projetos.
+- Instalação e execução ocorrem estritamente dentro do diretório do projeto na sandbox sem acesso de escrita a outros projetos.
 
 ---
 

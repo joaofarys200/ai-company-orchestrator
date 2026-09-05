@@ -66,7 +66,7 @@ class ChatWebSocketHandler:
                 {
                     "type": "system",
                     "content": (
-                        f"ðŸ“Ž {mentions_count} ficheiro(s) "
+                        f"📎 {mentions_count} ficheiro(s) "
                         "injetados como contexto via @mention."
                     ),
                 },
@@ -93,10 +93,16 @@ class ChatWebSocketHandler:
                 "content": f"Orquestração iniciada: {prompt}",
             }
         )
+        project_id = str(
+            message.get("project_id")
+            or _session.selected_project_id
+            or ""
+        ).strip() or None
         asyncio.create_task(
             self.callbacks.run_orchestration_task(
                 prompt_with_context,
                 database_session.id,
+                project_id=project_id,
             )
         )
 

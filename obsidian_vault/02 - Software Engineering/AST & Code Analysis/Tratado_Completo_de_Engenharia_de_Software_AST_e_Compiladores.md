@@ -9,42 +9,42 @@ tags:
 status: verified
 ---
 
-# ðŸ”¬ Tratado Completo de Engenharia de Software, AST, Compiladores & MetaprogramaÃ§Ã£o
+# ðŸ”¬ Tratado Completo de Engenharia de Software, AST, Compiladores & Metaprogramação
 
 ---
 
-## ðŸ“Œ 1. Teoria de Compiladores e Ãrvores de Sintaxe Abstrata (AST)
+## 📍 1. Teoria de Compiladores e Árvores de Sintaxe Abstrata (AST)
 
-### 1.1. Pipeline de CompilaÃ§Ã£o & AnÃ¡lise SintÃ¡tica
-O processo de transformaÃ§Ã£o de cÃ³digo-fonte em instruÃ§Ãµes executÃ¡veis ou representaÃ§Ãµes abstratas segue 4 etapas estritas:
+### 1.1. Pipeline de Compilação & Análise Sintática
+O processo de transformação de código-fonte em instruções executáveis ou representações abstratas segue 4 etapas estritas:
 
 ```
-Source Code (Text) â”€â”€â–º [ Lexer / Scanner ] â”€â”€â–º Token Stream
-                                                    â”‚
+Source Code (Text) ──â–º [ Lexer / Scanner ] ──â–º Token Stream
+                                                    │
                                                     â–¼
                                            [ Parser LALR(1) ]
-                                                    â”‚
+                                                    │
                                                     â–¼
                                          Abstract Syntax Tree (AST)
-                                                    â”‚
+                                                    │
                                                     â–¼
                                        [ Static Analysis / CFG ]
-                                                    â”‚
+                                                    │
                                                     â–¼
                                         Target Code / Bytecode
 ```
 
-1. **AnÃ¡lise LÃ©xica (Lexing)**: Converte uma sequÃªncia de carateres num fluxo de *Tokens* tipados (ex: `IDENTIFIER`, `ASSIGN`, `NUMBER`).
-2. **AnÃ¡lise SintÃ¡tica (Parsing)**: ConstrÃ³i a Ãrvore de Sintaxe Abstrata de acordo com a GramÃ¡tica Livre de Contexto (CFG) da linguagem.
-3. **AnÃ¡lise SemÃ¢ntica**: VerificaÃ§Ã£o de tipos, resoluÃ§Ã£o de escopo de variÃ¡veis e checagem de invariantes de tipagem.
-4. **GeraÃ§Ã£o de CÃ³digo / RefatoraÃ§Ã£o**: TransformaÃ§Ã£o da AST para emitir novo cÃ³digo-fonte, Bytecode Python ou representaÃ§Ã£o IL.
+1. **Análise Léxica (Lexing)**: Converte uma sequência de carateres num fluxo de *Tokens* tipados (ex: `IDENTIFIER`, `ASSIGN`, `NUMBER`).
+2. **Análise Sintática (Parsing)**: Constrói a Árvore de Sintaxe Abstrata de acordo com a Gramática Livre de Contexto (CFG) da linguagem.
+3. **Análise Semântica**: Verificação de tipos, resolução de escopo de variáveis e checagem de invariantes de tipagem.
+4. **Geração de Código / Refatoração**: Transformação da AST para emitir novo código-fonte, Bytecode Python ou representação IL.
 
 ---
 
-## âš™ï¸ 2. ManipulaÃ§Ã£o ProgramÃ¡tica de AST em Python (`ast` Module)
+## âš™ï¸ 2. Manipulação Programática de AST em Python (`ast` Module)
 
-### 2.1. InspecÃ§Ã£o EstÃ¡tica de SÃ­mbolos com `ast.NodeVisitor`
-Para inspecionar um cÃ³digo sem o executar (garantindo seguranÃ§a absoluta contra injeÃ§Ã£o de cÃ³digo), utiliza-se o padrÃ£o Visitor:
+### 2.1. Inspecção Estática de Símbolos com `ast.NodeVisitor`
+Para inspecionar um código sem o executar (garantindo segurança absoluta contra injeção de código), utiliza-se o padrão Visitor:
 
 ```python
 import ast
@@ -74,14 +74,14 @@ class CodeInspector(ast.NodeVisitor):
         self.generic_visit(node)
 ```
 
-### 2.2. TransformaÃ§Ã£o de CÃ³digo CirÃºrgica com `ast.NodeTransformer`
-Para refatorar cÃ³digo automaticamente (ex: injetar decoradores de telemetria ou substituir chamadas inseguras):
+### 2.2. Transformação de Código Cirúrgica com `ast.NodeTransformer`
+Para refatorar código automaticamente (ex: injetar decoradores de telemetria ou substituir chamadas inseguras):
 
 ```python
 import ast
 
 class TelemetryInjector(ast.NodeTransformer):
-    """Injeta automaticamente o decorador @log_execution em todas as funÃ§Ãµes pÃºblicas."""
+    """Injeta automaticamente o decorador @log_execution em todas as funções públicas."""
     
     def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
         self.generic_visit(node)
@@ -101,10 +101,10 @@ def refactor_code(source: str) -> str:
 
 ---
 
-## ðŸ›ï¸ 3. ModelaÃ§Ã£o TÃ¡tica de Domain-Driven Design (DDD) & Clean Architecture
+## ðŸ›ï¸ 3. Modelação Tática de Domain-Driven Design (DDD) & Clean Architecture
 
-### 3.1. ImplementaÃ§Ã£o de Agregados e Invariantes de NegÃ³cio
-Um Agregado DDD Ã© uma fronteira de consistÃªncia transacional. Nenhuma entidade interna do agregado pode ser modificada diretamente por cÃ³digo externo; todas as alteraÃ§Ãµes DEVEM passar pela raiz do agregado (*Aggregate Root*):
+### 3.1. Implementação de Agregados e Invariantes de Negócio
+Um Agregado DDD é uma fronteira de consistência transacional. Nenhuma entidade interna do agregado pode ser modificada diretamente por código externo; todas as alterações DEVEM passar pela raiz do agregado (*Aggregate Root*):
 
 ```python
 from __future__ import annotations
@@ -113,7 +113,7 @@ import uuid
 import time
 
 class DomainException(Exception):
-    """ExceÃ§Ã£o base para violaÃ§Ãµes de regras de negÃ³cio."""
+    """Exceção base para violações de regras de negócio."""
 
 @dataclass(frozen=True)
 class OrderId:
@@ -129,7 +129,7 @@ class OrderLineItem:
         return self.quantity * self.unit_price
 
 class OrderAggregate:
-    """Aggregate Root que garante o invariante de valor mÃ­nimo de encomenda."""
+    """Aggregate Root que garante o invariante de valor mínimo de encomenda."""
     
     def __init__(self, order_id: OrderId, customer_id: str):
         self.id = order_id
@@ -143,7 +143,7 @@ class OrderAggregate:
 
     def add_item(self, product_id: str, quantity: int, unit_price: float) -> None:
         if self._is_submitted:
-            raise DomainException("NÃ£o Ã© possÃ­vel adicionar itens a uma encomenda jÃ¡ submetida.")
+            raise DomainException("Não é possível adicionar itens a uma encomenda já submetida.")
         if quantity <= 0:
             raise DomainException("A quantidade do item deve ser estritamente positiva.")
         
@@ -151,18 +151,18 @@ class OrderAggregate:
 
     def submit(self, min_order_value: float = 50.0) -> None:
         if self.total_amount < min_order_value:
-            raise DomainException(f"O valor total da encomenda (â‚¬{self.total_amount:.2f}) Ã© inferior ao mÃ­nimo (â‚¬{min_order_value:.2f}).")
+            raise DomainException(f"O valor total da encomenda (€{self.total_amount:.2f}) é inferior ao mínimo (€{min_order_value:.2f}).")
         self._is_submitted = True
 ```
 
 ---
 
-## ðŸ§ª 4. VerificaÃ§Ã£o de Cobertura de MutaÃ§Ã£o (Mutation Testing)
+## ðŸ§ª 4. Verificação de Cobertura de Mutação (Mutation Testing)
 
-### 4.1. PrincÃ­pio do Mutation Testing
-Ao contrÃ¡rio da cobertura de cÃ³digo tradicional (*Line/Branch Coverage*), que apenas indica quais linhas foram executadas durante os testes, o **Mutation Testing** avalia se os testes sÃ£o realmente capazes de detetar falhas:
-1. O motor de mutaÃ§Ã£o modifica ligeiramente o cÃ³digo-fonte (ex: altera `>` para `>=`, substitui `+` por `-`, ou substitui `True` por `False`).
-2. Executa a suÃ­te de testes unitÃ¡rios contra o cÃ³digo mutado.
-3. Se algum teste falhar, o mutante Ã© considerado **Killed (Morto)** âœ….
-4. Se todos os testes passarem, o mutante Ã© considerado **Survived (Sobreviveu)** âŒ (indicando que o teste Ã© fraco e nÃ£o valida adequadamente o comportamento).
+### 4.1. Princípio do Mutation Testing
+Ao contrário da cobertura de código tradicional (*Line/Branch Coverage*), que apenas indica quais linhas foram executadas durante os testes, o **Mutation Testing** avalia se os testes são realmente capazes de detetar falhas:
+1. O motor de mutação modifica ligeiramente o código-fonte (ex: altera `>` para `>=`, substitui `+` por `-`, ou substitui `True` por `False`).
+2. Executa a suíte de testes unitários contra o código mutado.
+3. Se algum teste falhar, o mutante é considerado **Killed (Morto)** ✅.
+4. Se todos os testes passarem, o mutante é considerado **Survived (Sobreviveu)** âŒ (indicando que o teste é fraco e não valida adequadamente o comportamento).
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Activity,
+  Brain,
   CheckCircle2,
   CircleAlert,
   FileCheck2,
@@ -15,6 +16,7 @@ import {
   ShieldCheck,
   ThumbsDown,
   ThumbsUp,
+  Users,
   X,
 } from 'lucide-react';
 import { useWebSocket } from '../../context/WebSocketContext';
@@ -174,6 +176,11 @@ export function MissionPlanner() {
     sendMissionOperation,
     plannerState,
     getPlannerState,
+    subdagHistory,
+    getSubDagHistory,
+    adaptationHistory,
+    planEvaluationResult,
+    evaluateMissionPlan,
   } = useWebSocket();
 
   // Persist selected mission in sessionStorage
@@ -196,6 +203,15 @@ export function MissionPlanner() {
   const [reviewExecutionTarget, setReviewExecutionTarget] = useState<{ execution: MissionExecution; decision: 'ACCEPT' | 'REJECT' } | null>(null);
   const [blockWPTarget, setBlockWPTarget] = useState<{ item: MissionWorkPackage; status: string } | null>(null);
   const [confirmAction, setConfirmAction] = useState<{ title: string; message: string; action: () => void } | null>(null);
+
+  // Sub-DAG Dynamic Expansion States (Phase 12)
+  const [proposeSubDagTarget, setProposeSubDagTarget] = useState<MissionWorkPackage | null>(null);
+  const [subDagTrigger, setSubDagTrigger] = useState('REQUIREMENT_DISCOVERY');
+  const [subDagReason, setSubDagReason] = useState('');
+  const [subDagTaskTitle, setSubDagTaskTitle] = useState('');
+  const [subDagTaskType, setSubDagTaskType] = useState('CODING');
+  const [subDagTaskDesc, setSubDagTaskDesc] = useState('');
+  const [subDagCriterion, setSubDagCriterion] = useState('');
 
   // Form Field States
   const [missionTitle, setMissionTitle] = useState('');
@@ -229,8 +245,9 @@ export function MissionPlanner() {
   useEffect(() => {
     if (activeMissionId) {
       sessionStorage.setItem('jarvis_selected_mission_id', activeMissionId);
+      getSubDagHistory(activeMissionId);
     }
-  }, [activeMissionId]);
+  }, [activeMissionId, getSubDagHistory]);
 
   useEffect(() => {
     if (projectId) {
@@ -414,6 +431,55 @@ export function MissionPlanner() {
     setBlockReason('');
   };
 
+  const handleProposeSubDagSubmit = () => {
+    if (!projectId || !missionSnapshot || !proposeSubDagTarget || !subDagTaskTitle.trim()) return;
+    const baseVersion = Number(
+      (missionSnapshot.mission.metadata as Record<string, unknown>)?.graph_version
+      ?? (missionSnapshot as unknown as Record<string, unknown>).graph_version
+      ?? 1
+    );
+    const taskId = `task_dyn_${Date.now()}`;
+    send({
+      type: 'mission_subdag_propose',
+      project_id: projectId,
+      mission_id: missionSnapshot.mission.mission_id,
+      parent_task_id: proposeSubDagTarget.work_package_id,
+      base_graph_version: baseVersion,
+      trigger: subDagTrigger,
+      reason: subDagReason.trim() || 'Expansão dinâmica declarativa de sub-DAG',
+      tasks: [
+        {
+          task_id: taskId,
+          title: subDagTaskTitle.trim(),
+          description: subDagTaskDesc.trim() || subDagTaskTitle.trim(),
+          type: subDagTaskType,
+          required: true,
+          estimated_complexity: 'MEDIUM',
+        },
+      ],
+      dependencies: [],
+      acceptance_criteria: subDagCriterion.trim()
+        ? [
+            {
+              criterion_id: `crit_dyn_${Date.now()}`,
+              description: subDagCriterion.trim(),
+              verification_method: 'AUTOMATED_TEST',
+              threshold: '100% PASS',
+            },
+          ]
+        : [],
+    });
+    setProposeSubDagTarget(null);
+    setSubDagReason('');
+    setSubDagTaskTitle('');
+    setSubDagTaskDesc('');
+    setSubDagCriterion('');
+    window.setTimeout(() => {
+      openMission(missionSnapshot.mission.mission_id);
+      getSubDagHistory(missionSnapshot.mission.mission_id);
+    }, 250);
+  };
+
   const setWorkPackageStatus = (item: MissionWorkPackage, status: string) => {
     if (!projectId || !missionSnapshot || !status) return;
     if (status === 'BLOCKED') {
@@ -543,6 +609,9 @@ export function MissionPlanner() {
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-sm font-semibold text-gray-100">{missionSnapshot.mission.title}</h3>
                   <span className="rounded bg-cyan-300/10 px-2 py-0.5 text-[10px] font-semibold text-cyan-100">{statusLabel(missionSnapshot.mission.status)}</span>
+                  <span className="rounded bg-purple-400/15 border border-purple-400/25 px-2 py-0.5 text-[10px] font-mono font-semibold text-purple-300">
+                    DAG v{String((missionSnapshot.mission.metadata as Record<string, unknown>)?.graph_version ?? (missionSnapshot as unknown as Record<string, unknown>).graph_version ?? 1)}
+                  </span>
                 </div>
                 <p className="mt-2 text-xs leading-relaxed text-gray-400">{missionSnapshot.mission.objective}</p>
               </div>
@@ -624,6 +693,12 @@ export function MissionPlanner() {
                             📋 Manual
                           </span>
                         )}
+                        {Boolean((item as unknown as Record<string, unknown>).parent_task_id) && (
+                          <span className="inline-flex items-center gap-1 rounded border border-purple-400/20 bg-purple-500/10 px-2 py-0.5 text-[10px] font-medium text-purple-300">
+                            🌱 Sub-DAG de {workPackageNames[String((item as unknown as Record<string, unknown>).parent_task_id)] ?? String((item as unknown as Record<string, unknown>).parent_task_id)}
+                            {Number((item as unknown as Record<string, unknown>).expansion_depth) > 0 && ` (Nível ${(item as unknown as Record<string, unknown>).expansion_depth})`}
+                          </span>
+                        )}
                       </div>
                       <h5 className="mt-1 text-sm font-semibold text-gray-100">{item.title}</h5>
                     </div>
@@ -654,6 +729,19 @@ export function MissionPlanner() {
                         <button onClick={() => setCreateDeliverableTarget(item)} className="flex items-center gap-2 rounded px-2 py-2 text-left text-xs text-gray-300 hover:bg-white/[0.06]"><FileCheck2 className="h-3 w-3" /> Entrega</button>
                         <button onClick={() => setAttachEvidenceTarget({ wp: item })} className="flex items-center gap-2 rounded px-2 py-2 text-left text-xs text-gray-300 hover:bg-white/[0.06]"><Link2 className="h-3 w-3" /> Evidência</button>
                         <button onClick={() => setCreateCriterionTarget({ ownerType: 'WORK_PACKAGE', ownerId: item.work_package_id })} className="flex items-center gap-2 rounded px-2 py-2 text-left text-xs text-gray-300 hover:bg-white/[0.06]"><ShieldCheck className="h-3 w-3" /> Critério</button>
+                        <button
+                          onClick={() => {
+                            setProposeSubDagTarget(item);
+                            setSubDagTrigger('REQUIREMENT_DISCOVERY');
+                            setSubDagReason(`Descoberta decorrente da execução de: ${item.title}`);
+                            setSubDagTaskTitle(`Sub-tarefa: Refinar ${item.title}`);
+                            setSubDagTaskDesc('');
+                            setSubDagCriterion('');
+                          }}
+                          className="flex items-center gap-2 rounded px-2 py-2 text-left text-xs text-purple-300 hover:bg-purple-500/10"
+                        >
+                          <GitBranch className="h-3 w-3 text-purple-400" /> Propor Sub-DAG (Fase 12)
+                        </button>
                       </div>
                     </details>
                   </div>
@@ -715,6 +803,231 @@ export function MissionPlanner() {
               );
             })}
           </div>
+
+          <details className={`${SUBTLE} p-3`} open>
+            <summary className="cursor-pointer text-xs font-semibold text-purple-300 flex items-center gap-2">
+              <GitBranch className="h-3.5 w-3.5 text-purple-400" />
+              Histórico de Expansões Dinâmicas (Sub-DAGs)
+              {subdagHistory.length > 0 && (
+                <span className="rounded bg-purple-500/20 px-1.5 py-0.2 text-[10px] text-purple-300">
+                  {subdagHistory.length}
+                </span>
+              )}
+            </summary>
+            <div className="mt-3 space-y-2.5 max-h-64 overflow-y-auto pr-1">
+              {subdagHistory.length === 0 ? (
+                <p className="text-[11px] text-gray-500 italic">Nenhuma expansão dinâmica de sub-DAG registada nesta missão.</p>
+              ) : (
+                subdagHistory.slice().reverse().map((record) => (
+                  <div key={record.proposal_id} className="rounded border border-purple-500/20 bg-purple-950/20 p-2.5 text-xs text-gray-300 space-y-1.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded bg-purple-400/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-purple-200">
+                          v{record.graph_version_before} → v{record.graph_version_after}
+                        </span>
+                        <span className="rounded bg-cyan-400/10 px-1.5 py-0.5 text-[10px] text-cyan-300">
+                          {record.trigger}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-gray-500">{record.timestamp ? new Date(record.timestamp).toLocaleTimeString() : ''}</span>
+                    </div>
+                    <p className="text-[11px] text-gray-300 leading-relaxed font-medium">{record.reason}</p>
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-400">
+                      <span>Pai: <code className="text-purple-300">{workPackageNames[record.parent_task_id] ?? record.parent_task_id}</code></span>
+                      <span>·</span>
+                      <span>+ {record.tasks_added.length} tarefa(s)</span>
+                      {record.edges_added.length > 0 && (
+                        <>
+                          <span>·</span>
+                          <span>+ {record.edges_added.length} aresta(s)</span>
+                        </>
+                      )}
+                    </div>
+                    {record.tasks_added.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {record.tasks_added.map((tid) => (
+                          <span key={tid} className="rounded bg-black/40 border border-white/5 px-1.5 py-0.5 font-mono text-[9px] text-gray-300">
+                            {workPackageNames[tid] ?? tid}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </details>
+
+          {/* Planeamento Adaptativo & Inteligência de Grafo (Fase 13) */}
+          <details className={`${SUBTLE} p-3 border-amber-500/20 bg-amber-950/10`} open>
+            <summary className="cursor-pointer text-xs font-semibold text-amber-300 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Brain className="h-3.5 w-3.5 text-amber-400" />
+                Planeamento Adaptativo & Inteligência de Grafo (Fase 13)
+                {adaptationHistory.length > 0 && (
+                  <span className="rounded bg-amber-500/20 px-1.5 py-0.2 text-[10px] text-amber-300">
+                    {adaptationHistory.length}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (activeMissionId) {
+                      evaluateMissionPlan(activeMissionId);
+                    }
+                  }}
+                  className="rounded bg-amber-400/20 px-2 py-0.5 text-[10px] font-medium text-amber-200 hover:bg-amber-400/30 transition"
+                  title="Avaliar se o plano atual continua válido ou requer adaptação"
+                >
+                  🔍 Avaliar Plano
+                </button>
+              </div>
+            </summary>
+
+            <div className="mt-3 space-y-2.5">
+              {/* Status Header */}
+              <div className="flex flex-wrap items-center justify-between gap-2 p-2 rounded bg-black/30 border border-white/5 text-[11px]">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">Plano Atual:</span>
+                  <span className="font-mono font-bold text-amber-300">
+                    v{String((missionSnapshot.mission.metadata as Record<string, unknown>)?.plan_version ?? 1)}
+                  </span>
+                  <span className="text-gray-500">·</span>
+                  <span className="text-gray-400">Grafo DAG:</span>
+                  <span className="font-mono font-bold text-cyan-300">
+                    v{String((missionSnapshot.mission.metadata as Record<string, unknown>)?.graph_version ?? 1)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">Churn de Plano:</span>
+                  <span className="font-mono font-semibold text-purple-300">
+                    {String((missionSnapshot.mission.metadata as Record<string, unknown>)?.plan_churn_count ?? 0)}
+                  </span>
+                  {planEvaluationResult && (
+                    <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-200">
+                      Decisão: {String(planEvaluationResult.decision)}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Adaptations History List */}
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                {adaptationHistory.length === 0 ? (
+                  <p className="text-[11px] text-gray-500 italic">Nenhuma alteração de estratégia ou adaptação registada nesta missão.</p>
+                ) : (
+                  adaptationHistory.slice().reverse().map((record) => (
+                    <div key={record.adaptation_id || record.proposal_id} className="rounded border border-amber-500/20 bg-amber-950/20 p-2.5 text-xs text-gray-300 space-y-1.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="rounded bg-amber-400/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-amber-200">
+                            v{record.graph_version_before} → v{record.graph_version_after}
+                          </span>
+                          <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                            record.decision === 'REPLAN' ? 'bg-rose-500/20 text-rose-300' : 'bg-sky-500/20 text-sky-300'
+                          }`}>
+                            {record.decision}
+                          </span>
+                          <span className="rounded bg-black/40 px-1.5 py-0.5 text-[10px] text-gray-400">
+                            {record.trigger}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-gray-500">{record.timestamp ? new Date(record.timestamp).toLocaleTimeString() : ''}</span>
+                      </div>
+                      <p className="text-[11px] text-gray-200 font-medium leading-relaxed">{record.reason}</p>
+                      <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-400">
+                        {record.tasks_added.length > 0 && <span className="text-emerald-400">+ {record.tasks_added.length} adicionada(s)</span>}
+                        {record.tasks_removed.length > 0 && <span className="text-rose-400">- {record.tasks_removed.length} removida(s)</span>}
+                        {record.tasks_modified.length > 0 && <span className="text-amber-400">~ {record.tasks_modified.length} modificada(s)</span>}
+                        {record.tasks_preserved.length > 0 && <span className="text-gray-400">✓ {record.tasks_preserved.length} preservada(s)</span>}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </details>
+
+          {/* Multi-Agent Swarm & Hierarchical Fleet (Fase 14) */}
+          <details className={`${SUBTLE} p-3 border-cyan-500/20 bg-cyan-950/10`} open>
+            <summary className="cursor-pointer text-xs font-semibold text-cyan-300 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users className="h-3.5 w-3.5 text-cyan-400" />
+                Multi-Agent Swarm Fleet (Fase 14)
+                <span className="rounded bg-cyan-500/20 px-1.5 py-0.2 text-[10px] text-cyan-300">
+                  7 Agentes Activos
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (activeMissionId && projectId) {
+                      send({
+                        type: 'mission_swarm_status',
+                        project_id: projectId,
+                        mission_id: activeMissionId,
+                      });
+                    }
+                  }}
+                  className="rounded bg-cyan-400/20 px-2 py-0.5 text-[10px] font-medium text-cyan-200 hover:bg-cyan-400/30 transition"
+                  title="Actualizar estado e telemetria do swarm"
+                >
+                  ⚡ Telemetria Swarm
+                </button>
+              </div>
+            </summary>
+
+            <div className="mt-3 space-y-2.5">
+              {/* Swarm Metrics Bar */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[11px]">
+                <div className="p-2 rounded bg-black/30 border border-white/5">
+                  <span className="text-gray-400 block text-[10px]">Modo</span>
+                  <span className="font-mono font-bold text-cyan-300">Hierárquico</span>
+                </div>
+                <div className="p-2 rounded bg-black/30 border border-white/5">
+                  <span className="text-gray-400 block text-[10px]">Concorrência Global</span>
+                  <span className="font-mono font-bold text-emerald-300">Max 8 Tasks</span>
+                </div>
+                <div className="p-2 rounded bg-black/30 border border-white/5">
+                  <span className="text-gray-400 block text-[10px]">Lease TTL</span>
+                  <span className="font-mono font-bold text-purple-300">15s + Heartbeat</span>
+                </div>
+                <div className="p-2 rounded bg-black/30 border border-white/5">
+                  <span className="text-gray-400 block text-[10px]">Prevenção de Conflito</span>
+                  <span className="font-mono font-bold text-amber-300">Path Locks Activos</span>
+                </div>
+              </div>
+
+              {/* Agent Fleet Roster */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {[
+                  { id: 'arch_01', role: 'System Architect', cat: 'Spec & Boundaries', color: 'border-purple-500/30 bg-purple-950/20 text-purple-300' },
+                  { id: 'research_01', role: 'Intelligence Researcher', cat: 'Docs & Code Search', color: 'border-blue-500/30 bg-blue-950/20 text-blue-300' },
+                  { id: 'code_01', role: 'Senior Software Engineer', cat: 'AST Patch & Logic', color: 'border-cyan-500/30 bg-cyan-950/20 text-cyan-300' },
+                  { id: 'code_02', role: 'Fullstack Engineer', cat: 'Components & UI Code', color: 'border-teal-500/30 bg-teal-950/20 text-teal-300' },
+                  { id: 'test_01', role: 'Test & Verification QA', cat: 'Unit & Contract Tests', color: 'border-emerald-500/30 bg-emerald-950/20 text-emerald-300' },
+                  { id: 'browser_01', role: 'Visual & E2E Specialist', cat: 'Playwright & DOM QA', color: 'border-amber-500/30 bg-amber-950/20 text-amber-300' },
+                  { id: 'review_01', role: 'Security & Signoff Lead', cat: 'Multi-Axis Review', color: 'border-rose-500/30 bg-rose-950/20 text-rose-300' },
+                ].map((ag) => (
+                  <div key={ag.id} className={`rounded border p-2 text-xs space-y-1 ${ag.color}`}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-[11px]">{ag.id}</span>
+                      <span className="rounded bg-emerald-500/20 px-1.5 py-0.2 font-mono text-[9px] font-semibold text-emerald-300">
+                        ONLINE · IDLE
+                      </span>
+                    </div>
+                    <div className="font-medium text-[11px] text-gray-200">{ag.role}</div>
+                    <div className="text-[10px] text-gray-400">{ag.cat}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </details>
 
           <details className={`${SUBTLE} p-3`}>
             <summary className="cursor-pointer text-xs font-semibold text-gray-400">Histórico recente</summary>
@@ -1037,6 +1350,98 @@ export function MissionPlanner() {
         )}
       >
         <p className="text-xs leading-relaxed text-gray-300">{confirmAction?.message}</p>
+      </Modal>
+
+      {/* Propose Sub-DAG Modal (Phase 12) */}
+      <Modal
+        isOpen={Boolean(proposeSubDagTarget)}
+        onClose={() => setProposeSubDagTarget(null)}
+        title={`Propor Sub-DAG Dinâmico: ${proposeSubDagTarget?.title ?? ''}`}
+        footer={(
+          <>
+            <button onClick={() => setProposeSubDagTarget(null)} className={BUTTON}>Cancelar</button>
+            <button
+              onClick={handleProposeSubDagSubmit}
+              disabled={!subDagTaskTitle.trim()}
+              className={`${BUTTON} bg-purple-500/20 text-purple-200 border-purple-400/30 hover:bg-purple-500/30`}
+            >
+              <GitBranch className="h-3.5 w-3.5" /> Submeter Proposta
+            </button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <p className="text-[11px] text-gray-400 leading-relaxed">
+            O runtime determinístico validará a proposta em profundidade (max 3), nós (max 50), ausência de ciclos, versionamento concorrente e aplicará atomicamente na DAG.
+          </p>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Gatilho da Expansão</label>
+            <select
+              value={subDagTrigger}
+              onChange={(e) => setSubDagTrigger(e.target.value)}
+              className={INPUT_CLASS}
+            >
+              <option value="REQUIREMENT_DISCOVERY">REQUIREMENT_DISCOVERY (Descoberta de Requisitos)</option>
+              <option value="VALIDATION_FAILURE">VALIDATION_FAILURE (Falha de Validação)</option>
+              <option value="PERFORMANCE_REGRESSION">PERFORMANCE_REGRESSION (Regressão de Desempenho)</option>
+              <option value="SECURITY_HARDENING">SECURITY_HARDENING (Reforço de Segurança)</option>
+              <option value="REFACTOR_DECOMPOSITION">REFACTOR_DECOMPOSITION (Decomposição/Refatoração)</option>
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Justificação / Motivo *</label>
+            <input
+              type="text"
+              value={subDagReason}
+              onChange={(e) => setSubDagReason(e.target.value)}
+              placeholder="Ex: Necessidade de criar módulo de testes e validação de migração"
+              className={INPUT_CLASS}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-gray-300">Título da Sub-Tarefa *</label>
+              <input
+                type="text"
+                value={subDagTaskTitle}
+                onChange={(e) => setSubDagTaskTitle(e.target.value)}
+                placeholder="Ex: Implementar testes de migração"
+                className={INPUT_CLASS}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-gray-300">Tipo da Sub-Tarefa</label>
+              <select
+                value={subDagTaskType}
+                onChange={(e) => setSubDagTaskType(e.target.value)}
+                className={INPUT_CLASS}
+              >
+                {workPackageTypes.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Descrição Técnica</label>
+            <textarea
+              value={subDagTaskDesc}
+              onChange={(e) => setSubDagTaskDesc(e.target.value)}
+              placeholder="Descreva o escopo e detalhes da sub-tarefa a adicionar..."
+              className={`${INPUT_CLASS} h-16 resize-none`}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-300">Critério de Aceitação (Opcional)</label>
+            <input
+              type="text"
+              value={subDagCriterion}
+              onChange={(e) => setSubDagCriterion(e.target.value)}
+              placeholder="Ex: Cobertura de testes unitários superior a 90%"
+              className={INPUT_CLASS}
+            />
+          </div>
+        </div>
       </Modal>
     </section>
   );

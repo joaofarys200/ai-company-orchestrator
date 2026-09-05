@@ -526,10 +526,11 @@ async def run_casual_chat(prompt: str):
         prompt
     )
 
-async def run_orchestration_task(prompt: str, session_id: int):
+async def run_orchestration_task(prompt: str, session_id: int, project_id: str | None = None):
     await _current_orchestration_service().run_task(
         prompt,
         session_id,
+        project_id,
     )
 
 
@@ -569,10 +570,29 @@ def start_frontend_http_server():
 
 def _free_port_if_locked(port: int = 8001) -> None:
     """Closes any orphaned background processes holding the port before binding."""
+    current_pid = os.getpid()
+    try:
+        import psutil
+        for conn in psutil.net_connections(kind="inet"):
+            if conn.laddr and conn.laddr.port == port and conn.status == psutil.CONN_LISTEN:
+                if conn.pid and conn.pid != current_pid:
+                    try:
+                        proc = psutil.Process(conn.pid)
+                        proc.kill()
+                        proc.wait(timeout=1.0)
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        pass
+    except Exception:
+        pass
     try:
         if os.name == "nt":
-            cmd = f'cmd.exe /c "for /f \\"tokens=5\\" %a in (\'netstat -aon ^| findstr :{port}\') do taskkill /f /pid %a"'
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            cmd = (
+                f'powershell.exe -NoProfile -Command "'
+                f'Get-NetTCPConnection -LocalPort {port} -State Listen -ErrorAction SilentlyContinue | '
+                f'Where-Object {{ $_.OwningProcess -ne {current_pid} }} | '
+                f'ForEach-Object {{ Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }}"'
+            )
+            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=2.0)
     except Exception:
         pass
 
@@ -616,18 +636,19 @@ async def main():
 
     log_event(logger, "runtime.health", health=build_runtime_health())
     log_event(logger, "websocket.server.starting", host=WS_HOST, port=8001)
-    
+
     try:
-        async with websockets.serve(handle_client, WS_HOST, 8001):
-            await asyncio.Future()
-    except OSError as exc:
-        if exc.errno in (10048, 98):  # Address already in use
-            _free_port_if_locked(8001)
-            await asyncio.sleep(0.5)
-            async with websockets.serve(handle_client, WS_HOST, 8001):
-                await asyncio.Future()
-        else:
-            raise
+        for attempt in range(3):
+            try:
+                async with websockets.serve(handle_client, WS_HOST, 8001, max_size=33554432):
+                    await asyncio.Future()
+            except OSError as exc:
+                if exc.errno in (10048, 98) and attempt < 2:
+                    log_event(logger, "websocket.server.port_conflict_resolving", port=8001, attempt=attempt + 1)
+                    _free_port_if_locked(8001)
+                    await asyncio.sleep(0.5 * (attempt + 1))
+                else:
+                    raise
     finally:
         try:
             await sentinel_watchdog.stop()

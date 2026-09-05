@@ -33,28 +33,28 @@ sources:
 # â“ Gap - Quantum-Safe Ciphers for Local State Encryption
 
 ## Question
-*Qual o overhead de performance de substituir o AES-256-GCM e HMAC-SHA256 atuais por algoritmos de criptografia pÃ³s-quÃ¢ntica padronizados pelo NIST (como ML-KEM / Kyber e ML-DSA / Dilithium) na encriptaÃ§Ã£o de banco de dados SQLite local em tempo real?*
+*Qual o overhead de performance de substituir o AES-256-GCM e HMAC-SHA256 atuais por algoritmos de criptografia pós-quântica padronizados pelo NIST (como ML-KEM / Kyber e ML-DSA / Dilithium) na encriptação de banco de dados SQLite local em tempo real?*
 
 ---
 
 ## Why It Matters
-Garante que credenciais de longo prazo, dados proprietÃ¡rios de usuÃ¡rios e checkpoints de missÃµes persistidos no cofre local permaneÃ§am protegidos contra ataques do tipo *Harvest Now, Decrypt Later* (HNDL).
+Garante que credenciais de longo prazo, dados proprietários de usuários e checkpoints de missões persistidos no cofre local permaneçam protegidos contra ataques do tipo *Harvest Now, Decrypt Later* (HNDL).
 
 ---
 
 ## What Is Known
 - O NIST padronizou oficialmente o FIPS 203 (ML-KEM) e FIPS 204 (ML-DSA) em 2024.
-- As chaves pÃºblicas e assinaturas sÃ£o significativamente maiores (ex: 2.4 KB para ML-DSA vs 64 bytes para Ed25519).
+- As chaves públicas e assinaturas são significativamente maiores (ex: 2.4 KB para ML-DSA vs 64 bytes para Ed25519).
 
 ---
 
 ## What Is Unknown
-- A degradaÃ§Ã£o de throughput de I/O de disco em SQLite quando blocos WAL sÃ£o cifrados com primitivas pÃ³s-quÃ¢nticas em CPUs sem extensÃµes AVX-512 dedicadas.
+- A degradação de throughput de I/O de disco em SQLite quando blocos WAL são cifrados com primitivas pós-quânticas em CPUs sem extensões AVX-512 dedicadas.
 
 ---
 
 ## Evidence Required
-Benchmark comparativo medindo latÃªncia de gravaÃ§Ã£o de checkpoints em `database.py` com `liboqs` / `pqcrypto` em Python vs AES-256 nativo.
+Benchmark comparativo medindo latência de gravação de checkpoints em `database.py` com `liboqs` / `pqcrypto` em Python vs AES-256 nativo.
 
 ---
 
@@ -65,7 +65,7 @@ Benchmark comparativo medindo latÃªncia de gravaÃ§Ã£o de checkpoints em `d
 ---
 
 ## Implementation Status
-`status: "knowledge_gap"` (Planejado para avaliaÃ§Ã£o futura).
+`status: "knowledge_gap"` (Planejado para avaliação futura).
 
 ---
 

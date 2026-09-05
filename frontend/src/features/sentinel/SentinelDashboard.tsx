@@ -54,9 +54,11 @@ export const SentinelDashboard: React.FC = () => {
   const [selectedEvidence, setSelectedEvidence] = useState<Record<string, unknown> | null>(null);
   const [knownGoodModalItem, setKnownGoodModalItem] = useState<string | null>(null);
   const [knownGoodReason, setKnownGoodReason] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [actionConfirmModal, setActionConfirmModal] = useState<any | null>(null);
   const [rejectReasonModal, setRejectReasonModal] = useState<string | null>(null);
   const [rejectReasonText, setRejectReasonText] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [reviewModalEvent, setReviewModalEvent] = useState<any | null>(null);
   const [reviewClass, setReviewClass] = useState<string>('BENIGN');
   const [reviewReason, setReviewReason] = useState<string>('');
@@ -197,7 +199,7 @@ export const SentinelDashboard: React.FC = () => {
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`flex items-center gap-2 px-4 py-3 text-xs font-medium border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                 isActive
                   ? 'border-cyan-400 text-cyan-300 bg-white/[0.03]'
@@ -433,7 +435,7 @@ export const SentinelDashboard: React.FC = () => {
                         )}
                         <button
                           onClick={() => {
-                            setSelectedEvidence(ev as any);
+                            setSelectedEvidence(ev as unknown as Record<string, unknown>);
                             setActiveTab('evidence');
                           }}
                           className="p-1.5 rounded hover:bg-white/10 text-gray-400 hover:text-white"
@@ -671,7 +673,7 @@ export const SentinelDashboard: React.FC = () => {
 
                             <button
                               onClick={() => {
-                                setSelectedEvidence(action as any);
+                                setSelectedEvidence(action as unknown as Record<string, unknown>);
                                 setActiveTab('evidence');
                               }}
                               className="px-3 py-1.5 rounded bg-white/[0.05] hover:bg-white/10 text-xs text-gray-400 hover:text-white cursor-pointer"

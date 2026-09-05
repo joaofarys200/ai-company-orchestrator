@@ -142,6 +142,41 @@ export interface MissionWorkPackage {
   version: number;
   created_at: string;
   updated_at: string;
+  parent_task_id?: string;
+  subdag_id?: string;
+  expansion_depth?: number;
+}
+
+export interface DynamicSubDagProposal {
+  proposal_id: string;
+  mission_id: string;
+  parent_task_id: string;
+  base_graph_version: number;
+  reason: string;
+  trigger: string;
+  tasks: Array<Record<string, unknown>>;
+  dependencies: Array<[string, string]>;
+  acceptance_criteria: Array<Record<string, unknown>>;
+  requested_scope: Record<string, unknown>;
+  created_at: string;
+  status: string;
+  rejection_reason?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ExpansionRecord {
+  proposal_id: string;
+  mission_id: string;
+  parent_task_id: string;
+  subdag_id: string;
+  graph_version_before: number;
+  graph_version_after: number;
+  trigger: string;
+  reason: string;
+  tasks_added: string[];
+  edges_added: Array<[string, string]>;
+  validation_result: Record<string, unknown>;
+  timestamp: string;
 }
 
 export interface MissionDeliverable {
@@ -256,6 +291,11 @@ export type MissionClientOperation =
   | { type: 'deliverable_update'; project_id: string; mission_id: string; deliverable_id: string; expected_version: number; changes: Record<string, unknown> }
   | { type: 'deliverable_set_status'; project_id: string; mission_id: string; deliverable_id: string; expected_version: number; status: string }
   | { type: 'evidence_attach'; project_id: string; mission_id: string; work_package_id: string; kind: string; source_ref: string; description?: string; deliverable_id?: string }
+  | { type: 'mission_subdag_propose'; project_id: string; mission_id: string; parent_task_id: string; reason: string; trigger?: string; tasks?: unknown[]; dependencies?: unknown[]; acceptance_criteria?: unknown[] }
+  | { type: 'mission_subdag_get_history'; project_id: string; mission_id: string }
+  | { type: 'mission_plan_evaluate'; project_id: string; mission_id: string; observations?: unknown[]; requirement_change?: string; architecture_change?: unknown }
+  | { type: 'mission_adaptation_propose'; project_id: string; mission_id: string; proposal: unknown }
+  | { type: 'mission_adaptation_get_history'; project_id: string; mission_id: string }
   | { type: 'criterion_create'; project_id: string; mission_id: string; owner_type: string; owner_id: string; description: string; required_evidence_kinds?: string[]; required?: boolean }
   | { type: 'criterion_set_status'; project_id: string; mission_id: string; criterion_id: string; expected_version: number; status: string; evidence_refs?: string[]; validation_note?: string }
   | { type: 'mission_execute_work_package'; project_id: string; mission_id: string; work_package_id: string; expected_mission_version: number; expected_work_package_version: number }
@@ -263,7 +303,11 @@ export type MissionClientOperation =
   | { type: 'mission_review_execution'; project_id: string; mission_id: string; execution_id: string; decision: 'ACCEPT' | 'REJECT'; review_note: string; accepted_evidence_refs: string[]; expected_execution_version: number; validation_failed?: boolean }
   | { type: 'mission_retry_execution'; project_id: string; mission_id: string; execution_id: string; expected_execution_version: number }
   | { type: 'mission_cancel_execution'; project_id: string; mission_id: string; execution_id: string; expected_execution_version: number; confirmed: true }
-  | { type: 'mission_release_stale_lock'; project_id: string; mission_id: string; execution_id: string; expected_execution_version: number; confirmed: true; minimum_age_seconds?: number };
+  | { type: 'mission_release_stale_lock'; project_id: string; mission_id: string; execution_id: string; expected_execution_version: number; confirmed: true; minimum_age_seconds?: number }
+  | { type: 'mission_subdag_propose'; project_id: string; mission_id: string; parent_task_id: string; base_graph_version?: number; reason?: string; trigger?: string; tasks: Array<Record<string, unknown>>; dependencies?: Array<[string, string]>; acceptance_criteria?: Array<Record<string, unknown>>; requested_scope?: Record<string, unknown> }
+  | { type: 'mission_subdag_get_history'; project_id: string; mission_id: string }
+  | { type: 'mission_swarm_status'; project_id: string; mission_id: string }
+  | { type: 'mission_swarm_reassign'; project_id: string; mission_id: string; task_id: string; target_agent_id?: string };
 
 export interface AstSymbol {
   name: string;
@@ -739,6 +783,14 @@ export interface SentinelActionData {
   schema_version?: number;
 }
 
+export interface SentinelHumanReviewData {
+  operator?: string;
+  final_classification?: string;
+  reason?: string;
+  is_false_positive?: boolean;
+  timestamp: number;
+}
+
 export interface SentinelSecurityEventData {
   event_id: string;
   fingerprint: string;
@@ -758,7 +810,7 @@ export interface SentinelSecurityEventData {
   is_known_good: boolean;
   observation_timeline: Array<{ timestamp: number; note: string }>;
   model_classification?: string;
-  human_review?: Record<string, any> | null;
+  human_review?: SentinelHumanReviewData | null;
   schema_version?: number;
 }
 
@@ -804,6 +856,69 @@ export interface SentinelActionResultMessage {
 export interface SentinelActionsListMessage {
   type: 'sentinel_actions_list';
   data: SentinelActionData[];
+}
+
+export interface MissionSubDagHistoryMessage {
+  type: 'mission_subdag_history';
+  mission_id: string;
+  history: ExpansionRecord[];
+}
+
+export interface MissionSubDagProposalResultMessage {
+  type: 'mission_subdag_proposal_result';
+  proposal_id: string;
+  success: boolean;
+  message: string;
+  record?: ExpansionRecord | null;
+}
+
+export interface AdaptationRecordData {
+  adaptation_id: string;
+  proposal_id: string;
+  mission_id: string;
+  graph_version_before: number;
+  graph_version_after: number;
+  decision: string;
+  trigger: string;
+  reason: string;
+  tasks_added: string[];
+  tasks_removed: string[];
+  tasks_modified: string[];
+  tasks_preserved: string[];
+  edges_added: string[][];
+  edges_removed: string[][];
+  evidence_ids: string[];
+  timestamp: string;
+  strategy_fingerprint: string;
+}
+
+export interface MissionAdaptationHistoryMessage {
+  type: 'mission_adaptation_history';
+  mission_id: string;
+  history: AdaptationRecordData[];
+}
+
+export interface MissionAdaptationProposalResultMessage {
+  type: 'mission_adaptation_proposal_result';
+  mission_id: string;
+  proposal_id: string;
+  success: boolean;
+  message: string;
+  record?: AdaptationRecordData | null;
+}
+
+export interface MissionPlanEvaluationResultMessage {
+  type: 'mission_plan_evaluation_result';
+  mission_id: string;
+  result: {
+    decision: string;
+    reason: string;
+    trigger: string;
+    observations: Array<Record<string, unknown>>;
+    affected_tasks: string[];
+    recommended_proposal?: Record<string, unknown> | null;
+    metrics: Record<string, unknown>;
+  };
 }
 
 export type ServerMessage =
@@ -855,6 +970,11 @@ export type ServerMessage =
   | SentinelActionProposedMessage
   | SentinelActionResultMessage
   | SentinelActionsListMessage
+  | MissionSubDagHistoryMessage
+  | MissionSubDagProposalResultMessage
+  | MissionAdaptationHistoryMessage
+  | MissionAdaptationProposalResultMessage
+  | MissionPlanEvaluationResultMessage
   | UnknownServerMessage;
 
 export type ClientMessage =
@@ -1529,6 +1649,79 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
       return {
         type,
         data: asRecordArray(raw.data).map(normalizeSentinelAction),
+      };
+    case 'mission_subdag_history':
+      return {
+        type,
+        mission_id: asString(raw.mission_id),
+        history: asRecordArray(raw.history).map((item) => ({
+          proposal_id: asString(item.proposal_id),
+          mission_id: asString(item.mission_id),
+          parent_task_id: asString(item.parent_task_id),
+          subdag_id: asString(item.subdag_id),
+          graph_version_before: asNumber(item.graph_version_before, 1),
+          graph_version_after: asNumber(item.graph_version_after, 2),
+          trigger: asString(item.trigger),
+          reason: asString(item.reason),
+          tasks_added: Array.isArray(item.tasks_added) ? item.tasks_added.map((t) => asString(t)) : [],
+          edges_added: Array.isArray(item.edges_added) ? (item.edges_added as Array<[string, string]>) : [],
+          validation_result: isRecord(item.validation_result) ? item.validation_result : {},
+          timestamp: asString(item.timestamp),
+        })),
+      };
+    case 'mission_subdag_proposal_result':
+      return {
+        type,
+        proposal_id: asString(raw.proposal_id),
+        success: asBoolean(raw.success),
+        message: asString(raw.message),
+        record: isRecord(raw.record) ? (raw.record as unknown as ExpansionRecord) : null,
+      };
+    case 'mission_adaptation_history':
+      return {
+        type,
+        mission_id: asString(raw.mission_id),
+        history: asRecordArray(raw.history).map((item) => ({
+          adaptation_id: asString(item.adaptation_id),
+          proposal_id: asString(item.proposal_id),
+          mission_id: asString(item.mission_id),
+          graph_version_before: asNumber(item.graph_version_before, 1),
+          graph_version_after: asNumber(item.graph_version_after, 2),
+          decision: asString(item.decision),
+          trigger: asString(item.trigger),
+          reason: asString(item.reason),
+          tasks_added: Array.isArray(item.tasks_added) ? item.tasks_added.map(String) : [],
+          tasks_removed: Array.isArray(item.tasks_removed) ? item.tasks_removed.map(String) : [],
+          tasks_modified: Array.isArray(item.tasks_modified) ? item.tasks_modified.map(String) : [],
+          tasks_preserved: Array.isArray(item.tasks_preserved) ? item.tasks_preserved.map(String) : [],
+          edges_added: Array.isArray(item.edges_added) ? (item.edges_added as string[][]) : [],
+          edges_removed: Array.isArray(item.edges_removed) ? (item.edges_removed as string[][]) : [],
+          evidence_ids: Array.isArray(item.evidence_ids) ? item.evidence_ids.map(String) : [],
+          timestamp: asString(item.timestamp),
+          strategy_fingerprint: asString(item.strategy_fingerprint),
+        })),
+      };
+    case 'mission_adaptation_proposal_result':
+      return {
+        type,
+        mission_id: asString(raw.mission_id),
+        proposal_id: asString(raw.proposal_id),
+        success: asBoolean(raw.success),
+        message: asString(raw.message),
+        record: isRecord(raw.record) ? (raw.record as unknown as AdaptationRecordData) : null,
+      };
+    case 'mission_plan_evaluation_result':
+      return {
+        type,
+        mission_id: asString(raw.mission_id),
+        result: isRecord(raw.result) ? (raw.result as unknown as MissionPlanEvaluationResultMessage['result']) : {
+          decision: 'KEEP_PLAN',
+          reason: '',
+          trigger: 'RUNTIME_FAILURE',
+          observations: [],
+          affected_tasks: [],
+          metrics: {},
+        },
       };
     case 'ui':
     case 'ui_action':

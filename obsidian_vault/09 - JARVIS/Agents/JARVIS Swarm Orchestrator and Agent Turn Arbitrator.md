@@ -34,22 +34,22 @@ sources:
 # ðŸ JARVIS Swarm Orchestrator and Agent Turn Arbitrator
 
 ## 1. Purpose
-O mÃ³dulo `agents/swarm.py` orquestra a colaboraÃ§Ã£o hierÃ¡rquica entre mÃºltiplos agentes especializados (Clara, Devon, Alex, Quinn e subagentes especialistas), mapeando dinamicamente habilidades (*Agent Skills*) a partir de palavras-chave do prompt e gerenciando transiÃ§Ãµes de turno sem concorrÃªncia descontrolada.
+O módulo `agents/swarm.py` orquestra a colaboração hierárquica entre múltiplos agentes especializados (Clara, Devon, Alex, Quinn e subagentes especialistas), mapeando dinamicamente habilidades (*Agent Skills*) a partir de palavras-chave do prompt e gerenciando transições de turno sem concorrência descontrolada.
 
 ---
 
 ## 2. Responsibilities
-- Mapear papÃ©is a pacotes de habilidades especializadas (`_SKILL_AGENT_MAP` para `pm`, `qa`, `tester`, `designer`, `coder`, `dev_lead`, `sys_admin`, `ops_specialist`).
-- Identificar automaticamente competÃªncias necessÃ¡rias via detecÃ§Ã£o de keywords em prompts (`_PROMPT_KEYWORD_SKILLS`).
-- Injetar o conteÃºdo de instruÃ§Ãµes das habilidades (`.agents/skills/<skill>/SKILL.md`) no contexto do agente apropriado.
-- Coordenar a execuÃ§Ã£o sequencial ou paralela de tarefas via CrewAI / Swarm.
-- Arbitrar turnos de fala e evitar sobreposiÃ§Ãµes de comandos na sandbox.
+- Mapear papéis a pacotes de habilidades especializadas (`_SKILL_AGENT_MAP` para `pm`, `qa`, `tester`, `designer`, `coder`, `dev_lead`, `sys_admin`, `ops_specialist`).
+- Identificar automaticamente competências necessárias via detecção de keywords em prompts (`_PROMPT_KEYWORD_SKILLS`).
+- Injetar o conteúdo de instruções das habilidades (`.agents/skills/<skill>/SKILL.md`) no contexto do agente apropriado.
+- Coordenar a execução sequencial ou paralela de tarefas via CrewAI / Swarm.
+- Arbitrar turnos de fala e evitar sobreposições de comandos na sandbox.
 
 ---
 
 ## 3. Inputs & Outputs
-- **Inputs**: SolicitaÃ§Ã£o do utilizador, perfil de missÃ£o, estado atual do repositÃ³rio.
-- **Outputs**: Tarefas concluÃ­das, planos de execuÃ§Ã£o estruturados, relatÃ³rios de QA e PRs.
+- **Inputs**: Solicitação do utilizador, perfil de missão, estado atual do repositório.
+- **Outputs**: Tarefas concluídas, planos de execução estruturados, relatórios de QA e PRs.
 
 ---
 
@@ -61,8 +61,8 @@ O mÃ³dulo `agents/swarm.py` orquestra a colaboraÃ§Ã£o hierÃ¡rquica entre
 ---
 
 ## 5. Failure Modes & Recovery
-- **Failure**: Impasse entre agentes (*Deadlock de ColaboraÃ§Ã£o*) ou passagem de bastÃ£o infinita.
-- **Recovery**: O `TurnArbitrator` impÃµe um teto estrito de $N \le 5$ handoffs por tarefa antes de invocar o `MissionAutonomyController`.
+- **Failure**: Impasse entre agentes (*Deadlock de Colaboração*) ou passagem de bastão infinita.
+- **Recovery**: O `TurnArbitrator` impõe um teto estrito de $N \le 5$ handoffs por tarefa antes de invocar o `MissionAutonomyController`.
 
 ---
 

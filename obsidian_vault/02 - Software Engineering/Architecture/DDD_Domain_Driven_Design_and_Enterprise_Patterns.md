@@ -9,43 +9,43 @@ tags:
 status: verified
 ---
 
-# ðŸ° DDD BOK â€” Domain-Driven Design & Enterprise Architecture Patterns
+# ðŸ° DDD BOK — Domain-Driven Design & Enterprise Architecture Patterns
 
-## ðŸ“Œ 1. VisÃ£o Geral
-Este volume compila a metodologia de **Domain-Driven Design (DDD)** desenvolvida por Eric Evans e Martin Fowler para governar a modelaÃ§Ã£o de software complexo no **JARVIS OS**.
+## 📍 1. Visão Geral
+Este volume compila a metodologia de **Domain-Driven Design (DDD)** desenvolvida por Eric Evans e Martin Fowler para governar a modelação de software complexo no **JARVIS OS**.
 
 ---
 
-## ðŸ—£ï¸ 2. Linguagem UbÃ­qua & Contextos Delimitados (Bounded Contexts)
+## ðŸ—£ï¸ 2. Linguagem Ubíqua & Contextos Delimitados (Bounded Contexts)
 
-### 2.1. Linguagem UbÃ­qua (Ubiquitous Language)
-- Todo o cÃ³digo (nomes de classes, variÃ¡veis, mÃ©todos, ficheiros), documentaÃ§Ã£o e especificaÃ§Ãµes utilizam rigorosamente a mesma terminologia do domÃ­nio do utilizador/negÃ³cio.
-- Evitar nomes genÃ©ricos ou ambÃ­guos como `Manager`, `Processor`, `DataHolder`.
+### 2.1. Linguagem Ubíqua (Ubiquitous Language)
+- Todo o código (nomes de classes, variáveis, métodos, ficheiros), documentação e especificações utilizam rigorosamente a mesma terminologia do domínio do utilizador/negócio.
+- Evitar nomes genéricos ou ambíguos como `Manager`, `Processor`, `DataHolder`.
 
 ### 2.2. Contextos Delimitados (Bounded Contexts)
-- Cada subsistema (ex: *Model Harness*, *Workspace Analytics*, *Voice Runtime*) define a sua prÃ³pria fronteira de modelo e vocabulÃ¡rio.
-- **Anti-Corruption Layer (ACL)**: Quando dois contextos delimitados precisam de comunicar, uma camada de traduÃ§Ã£o (ACL) isola o modelo interno de contaminaÃ§Ã£o por modelos externos.
+- Cada subsistema (ex: *Model Harness*, *Workspace Analytics*, *Voice Runtime*) define a sua própria fronteira de modelo e vocabulário.
+- **Anti-Corruption Layer (ACL)**: Quando dois contextos delimitados precisam de comunicar, uma camada de tradução (ACL) isola o modelo interno de contaminação por modelos externos.
 
 ---
 
-## ðŸ§± 3. Blocos de ConstruÃ§Ã£o TÃ¡ticos do DDD
+## ðŸ§± 3. Blocos de Construção Táticos do DDD
 
 ```
-                  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-                  â”‚          ENTIDADE (Entity)          â”‚
-                  â”‚  Possui ID Ãºnico e ciclo de vida    â”‚
-                  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                                     â”‚
-         â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                  ┌Œ─────────────────────────────────────┌
+                  │          ENTIDADE (Entity)          │
+                  │  Possui ID único e ciclo de vida    │
+                  └──────────────────┌¬──────────────────┌˜
+                                     │
+         ┌Œ───────────────────────────┌¼───────────────────────────┌
          â–¼                           â–¼                           â–¼
-  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”             â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”             â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-  â”‚ AGREGADO    â”‚             â”‚ VALUE OBJECTâ”‚             â”‚ EVENTO DE   â”‚
-  â”‚ (Aggregate) â”‚             â”‚ (ImutÃ¡vel)  â”‚             â”‚ DOMÃNIO     â”‚
-  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜             â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜             â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+  ┌Œ─────────────┌             ┌Œ─────────────┌             ┌Œ─────────────┌
+  │ AGREGADO    │             │ VALUE OBJECT│             │ EVENTO DE   │
+  │ (Aggregate) │             │ (Imutável)  │             │ DOMÍNIO     │
+  └─────────────┌˜             └─────────────┌˜             └─────────────┌˜
 ```
 
-1. **Entidades (Entities)**: Objetos definidos por uma identidade Ãºnica imutÃ¡vel que persiste ao longo do tempo (ex: `ProjectContext(project_id="proj_123")`).
-2. **Value Objects**: Objetos imutÃ¡veis sem identidade prÃ³pria, definidos unicamente pelos seus atributos (ex: `MetricSample(value=98.5, timestamp=1700000000)`).
-3. **Agregados (Aggregates)**: Grupo de entidades e Value Objects ligados por uma raiz (*Aggregate Root*) que garante invariantes de consistÃªncia estritos em cada transaÃ§Ã£o.
-4. **RepositÃ³rios (Repositories)**: Interfaces que abstraem a persistÃªncia e recuperaÃ§Ã£o de agregados do disco ou base de dados.
+1. **Entidades (Entities)**: Objetos definidos por uma identidade única imutável que persiste ao longo do tempo (ex: `ProjectContext(project_id="proj_123")`).
+2. **Value Objects**: Objetos imutáveis sem identidade própria, definidos unicamente pelos seus atributos (ex: `MetricSample(value=98.5, timestamp=1700000000)`).
+3. **Agregados (Aggregates)**: Grupo de entidades e Value Objects ligados por uma raiz (*Aggregate Root*) que garante invariantes de consistência estritos em cada transação.
+4. **Repositórios (Repositories)**: Interfaces que abstraem a persistência e recuperação de agregados do disco ou base de dados.
 

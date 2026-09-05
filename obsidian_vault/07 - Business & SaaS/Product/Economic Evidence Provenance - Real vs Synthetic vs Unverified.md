@@ -28,38 +28,38 @@ sources:
     url: https://theleanstartup.com/
 ---
 
-# ðŸ’¹ Economic Evidence Provenance - Real vs Synthetic vs Unverified
+# 💹 Economic Evidence Provenance - Real vs Synthetic vs Unverified
 
 ## 1. Pergunta Central
-> *Como classificar formalmente graus de evidÃªncia de mercado para impedir que agentes analistas (Alex) tomem decisÃµes de investimento baseadas em simulaÃ§Ãµes sintÃ©ticas ou feedback enviesado?*
+> *Como classificar formalmente graus de evidência de mercado para impedir que agentes analistas (Alex) tomem decisões de investimento baseadas em simulações sintéticas ou feedback enviesado?*
 
 ---
 
-## 2. A Hierarquia Quadripartite de ProveniÃªncia EconÃ´mica
+## 2. A Hierarquia Quadripartite de Proveniência EconÃ´mica
 
 ```
-[ NÃ­vel 4: EXTERNAL_VERIFIED (ConfianÃ§a: 0.8 - 1.0) ]
-  - TransaÃ§Ãµes financeiras reais (Stripe, faturas pagas)
-  - Contratos assinados / depÃ³sitos de prÃ©-reserva
-  - Eventos de conversÃ£o verificados via webhook criptograficamente assinado
+[ Nível 4: EXTERNAL_VERIFIED (Confiança: 0.8 - 1.0) ]
+  - Transações financeiras reais (Stripe, faturas pagas)
+  - Contratos assinados / depósitos de pré-reserva
+  - Eventos de conversão verificados via webhook criptograficamente assinado
 
-[ NÃ­vel 3: LOCAL_REAL (ConfianÃ§a: 0.6 - 0.8) ]
-  - MÃ©tricas de telemetria interna e benchmarks de execuÃ§Ã£o
-  - Logs de latÃªncia e consumo de tokens de produÃ§Ã£o
+[ Nível 3: LOCAL_REAL (Confiança: 0.6 - 0.8) ]
+  - Métricas de telemetria interna e benchmarks de execução
+  - Logs de latência e consumo de tokens de produção
 
-[ NÃ­vel 2: EXTERNAL_UNVERIFIED (ConfianÃ§a: 0.3 - 0.5) ]
-  - MenÃ§Ãµes em fÃ³runs, posts no Reddit, enquetes pÃºblicas
+[ Nível 2: EXTERNAL_UNVERIFIED (Confiança: 0.3 - 0.5) ]
+  - Menções em fóruns, posts no Reddit, enquetes públicas
   - Respostas verbais de entrevistas sem compromisso financeiro
 
-[ NÃ­vel 1: SYNTHETIC (ConfianÃ§a: 0.0 - 0.2) ]
+[ Nível 1: SYNTHETIC (Confiança: 0.0 - 0.2) ]
   - Personas simuladas por LLMs
-  - Estimativas heurÃ­sticas e dados gerados por prompting
+  - Estimativas heurísticas e dados gerados por prompting
 ```
 
 ---
 
-## 3. Regra InviolÃ¡vel de GovernanÃ§a
-ProjeÃ§Ãµes de receita para missÃµes do JARVIS OS nÃ£o podem utilizar evidÃªncias de NÃ­vel 1 (`SYNTHETIC`) como prova de validaÃ§Ã£o de mercado (ver [[ADR-005 - Economic Evidence Provenance and Synthetic Data Capping]]).
+## 3. Regra Inviolável de Governança
+Projeções de receita para missões do JARVIS OS não podem utilizar evidências de Nível 1 (`SYNTHETIC`) como prova de validação de mercado (ver [[ADR-005 - Economic Evidence Provenance and Synthetic Data Capping]]).
 
 ---
 

@@ -23,7 +23,7 @@ from backend.websocket.gateway import ConnectionManager
 
 
 CASUAL_CHAT_SYSTEM_PROMPT = (
-    "És o OpenClaw, o assistente central, COO e orquestrador "
+    "És o JARVIS, o assistente central, COO e orquestrador "
     "avançado de IA da agência. O utilizador é o CEO da "
     "agência (podes tratá-lo ocasionalmente por 'CEO' ou 'Sir' "
     "de forma moderada, respeitosa e discreta, sem repetir em "
@@ -73,6 +73,19 @@ class OrchestrationService:
         self.callbacks = callbacks
         self.conversation_history = conversation_history
         self.logger = logger
+        from backend.services.chat_mission_bridge import ChatMissionBridge
+        self.bridge = ChatMissionBridge(
+            mission_state=getattr(services.mission_planner, "mission_state", None) if services.mission_planner else None,
+            mission_planner=services.mission_planner,
+            mission_executor=services.mission_executor,
+            mission_autonomy=services.mission_autonomy,
+            project_intake=getattr(services.project_context, "intake", None) if services.project_context else None,
+            project_context=services.project_context,
+            orchestration_service=self,
+            connections=connections,
+            callbacks=callbacks,
+            logger=logger,
+        )
 
     async def auto_extract_correction(
         self,
@@ -119,7 +132,7 @@ class OrchestrationService:
             "O CEO acabou de fazer uma correção ou expressar uma "
             "preferência sobre a resposta anterior do Jarvis.\n"
             "A tua tarefa é extrair uma REGRA DE "
-            "COMPORTAMENTO/PROGRAMAÃ‡ÃƒO concreta a partir desta "
+            "COMPORTAMENTO/PROGRAMAÇÃƒO concreta a partir desta "
             "correção para evitar que o Jarvis cometa o mesmo "
             "erro no futuro.\nResponde EXCLUSIVAMENTE em formato "
             "JSON com três chaves:\n1. 'rule_key': Uma "
@@ -178,7 +191,7 @@ class OrchestrationService:
                     "sender": "SISTEMA",
                     "role": "System",
                     "content": (
-                        "ðŸ§  *Auto-Aprendizagem:* Nova regra "
+                        "🧠 *Auto-Aprendizagem:* Nova regra "
                         f"`{key}` gravada na minha Compounding "
                         "Memory com base no seu feedback."
                     ),
@@ -639,7 +652,7 @@ class OrchestrationService:
         await self.connections.broadcast(
             {
                 "type": "chat",
-                "sender": "OPENCLAW",
+                "sender": "JARVIS",
                 "role": "Orquestrador",
                 "content": response_text,
             }
@@ -650,6 +663,7 @@ class OrchestrationService:
         self,
         prompt: str,
         session_id: int,
+        project_id: str | None = None,
     ) -> None:
         try:
             clean_prompt = prompt.lower().strip(" .?!,")
@@ -666,6 +680,17 @@ class OrchestrationService:
                         self.conversation_history,
                     )
                 )
+
+            # ── Canonical Chat -> Mission Integration ────────────────────────
+            if self.bridge and self.bridge.mission_state:
+                bridge_res = await self.bridge.handle_directive(
+                    prompt=prompt,
+                    session_id=session_id,
+                    project_id=project_id,
+                )
+                if bridge_res.get("status") in {"COMPLETED", "FAILED", "REFUSED", "BLOCKED"}:
+                    return
+
             intent = await self.classify_intent(
                 prompt,
                 self.conversation_history,
@@ -1020,7 +1045,7 @@ class OrchestrationService:
             await self.connections.broadcast(
                 {
                     "type": "chat",
-                    "sender": "OPENCLAW",
+                    "sender": "JARVIS",
                     "role": "Project Builder",
                     "content": report,
                 }
@@ -1035,7 +1060,7 @@ class OrchestrationService:
             await self.connections.broadcast(
                 {
                     "type": "chat",
-                    "sender": "OPENCLAW",
+                    "sender": "JARVIS",
                     "role": "Project Builder",
                     "content": report,
                 }
@@ -1200,7 +1225,7 @@ class OrchestrationService:
         await self.connections.broadcast(
             {
                 "type": "chat",
-                "sender": "OPENCLAW",
+                "sender": "JARVIS",
                 "role": "Orquestrador",
                 "content": content,
             }

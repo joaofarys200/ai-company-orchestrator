@@ -29,18 +29,18 @@ sources:
     url: internal://server.py
 ---
 
-# ðŸ–¥ï¸ JARVIS IDE Terminal and ANSI Escape Stripping Pipeline
+# 🖥️ï¸ JARVIS IDE Terminal and ANSI Escape Stripping Pipeline
 
 ## 1. Purpose
-O pipeline de terminal da IDE gerencia a captura de stdout/stderr de comandos de compilaÃ§Ã£o, testes e ferramentas executados na sandbox, higienizando caracteres de controle ANSI e transmitindo o fluxo limpo em tempo real para o frontend desktop.
+O pipeline de terminal da IDE gerencia a captura de stdout/stderr de comandos de compilação, testes e ferramentas executados na sandbox, higienizando caracteres de controle ANSI e transmitindo o fluxo limpo em tempo real para o frontend desktop.
 
 ---
 
 ## 2. Responsibilities
-- Capturar a saÃ­da contÃ­nua de subprocessos sem travar em buffers de terminal (*Unbuffered I/O*).
-- Aplicar expressÃµes regulares para remover sequÃªncias de escape ANSI de cores e posicionamento de cursor (`\x1b\[[0-9;]*[a-zA-Z]`) antes de enviar aos modelos ou salvar no histÃ³rico.
-- Preservar a formataÃ§Ã£o textual limpa nos eventos `TERMINAL_OUTPUT`.
-- Interceptar e mascarar segredos no pipeline de saÃ­da antes do broadcast WebSocket.
+- Capturar a saída contínua de subprocessos sem travar em buffers de terminal (*Unbuffered I/O*).
+- Aplicar expressões regulares para remover sequências de escape ANSI de cores e posicionamento de cursor (`\x1b\[[0-9;]*[a-zA-Z]`) antes de enviar aos modelos ou salvar no histórico.
+- Preservar a formatação textual limpa nos eventos `TERMINAL_OUTPUT`.
+- Interceptar e mascarar segredos no pipeline de saída antes do broadcast WebSocket.
 
 ---
 
@@ -57,8 +57,8 @@ O pipeline de terminal da IDE gerencia a captura de stdout/stderr de comandos de
 ---
 
 ## 5. Failure Modes & Recovery
-- **Failure**: SaÃ­da excessivamente longa (megabytes de logs de compilaÃ§Ã£o) saturando o canal WebSocket.
-- **Recovery**: Janela deslizante de truncamento com resumo de Ãºltimas 500 linhas.
+- **Failure**: Saída excessivamente longa (megabytes de logs de compilação) saturando o canal WebSocket.
+- **Recovery**: Janela deslizante de truncamento com resumo de últimas 500 linhas.
 
 ---
 

@@ -30,28 +30,28 @@ sources:
     url: internal://workspace_policy.py
 ---
 
-# ðŸ› ï¸ Runbook - How to Detect and Mitigate Sandbox Escape Attempts
+# 🛠️ï¸ Runbook - How to Detect and Mitigate Sandbox Escape Attempts
 
 ## 1. Symptoms
-- Alerta de seguranÃ§a crÃ­tico `POLICY_VIOLATION_BLOCKED` no log de telemetria.
-- Tentativa de execuÃ§Ã£o de comandos contendo strings como `..`, `/etc/`, `C:\Windows`, `format`, `rm -rf /` ou `curl` direcionado a IPs privados (SSRF).
+- Alerta de segurança crítico `POLICY_VIOLATION_BLOCKED` no log de telemetria.
+- Tentativa de execução de comandos contendo strings como `..`, `/etc/`, `C:\Windows`, `format`, `rm -rf /` ou `curl` direcionado a IPs privados (SSRF).
 
 ---
 
 ## 2. Preconditions
-- O processo do agente estÃ¡ em execuÃ§Ã£o dentro da sandbox.
+- O processo do agente está em execução dentro da sandbox.
 
 ---
 
 ## 3. Diagnosis
 1. Verificar a stacktrace e o payload exato rejeitado por `workspace_policy.py`.
-2. Identificar se a tentativa partiu de um prompt injetado indiretamente de uma pÃ¡gina web externa lida pelo agente.
+2. Identificar se a tentativa partiu de um prompt injetado indiretamente de uma página web externa lida pelo agente.
 
 ---
 
 ## 4. Commands / Queries
 ```bash
-# Inspecionar logs de violaÃ§Ãµes de seguranÃ§a no banco de dados
+# Inspecionar logs de violações de segurança no banco de dados
 sqlite3 database.db "SELECT * FROM telemetry_logs WHERE category = 'POLICY_VIOLATION' ORDER BY timestamp DESC LIMIT 10;"
 ```
 
@@ -59,13 +59,13 @@ sqlite3 database.db "SELECT * FROM telemetry_logs WHERE category = 'POLICY_VIOLA
 
 ## 5. Decision Tree
 ```
-[ ViolaÃ§Ã£o de Path Jail ou Comando Perigoso? ]
+[ Violação de Path Jail ou Comando Perigoso? ]
                      |
                      v
        [ Matar Processo Imediatamente com SIGKILL ]
                      |
                      v
-       [ Congelar MissÃ£o em SECURITY_HALTED ]
+       [ Congelar Missão em SECURITY_HALTED ]
                      |
                      v
        [ Isolar Contexto de Dados Externos ]
@@ -74,24 +74,24 @@ sqlite3 database.db "SELECT * FROM telemetry_logs WHERE category = 'POLICY_VIOLA
 ---
 
 ## 6. Recovery
-1. Encerrar imediatamente a Ã¡rvore de processos do agente infrator.
-2. Reverter o workspace para o Ãºltimo commit seguro usando `git reset --hard HEAD`.
-3. Sanitizar o buffer de contexto removendo o fragmento de dados externos que originou a injeÃ§Ã£o.
+1. Encerrar imediatamente a árvore de processos do agente infrator.
+2. Reverter o workspace para o último commit seguro usando `git reset --hard HEAD`.
+3. Sanitizar o buffer de contexto removendo o fragmento de dados externos que originou a injeção.
 
 ---
 
 ## 7. Verification
-Executar teste de contenÃ§Ã£o de caminho com `tests/test_sandbox_policy.py` para comprovar que o jail permanece intransponÃ­vel.
+Executar teste de contenção de caminho com `tests/test_sandbox_policy.py` para comprovar que o jail permanece intransponível.
 
 ---
 
 ## 8. Rollback
-Se a sandbox tiver sofrido alteraÃ§Ãµes indevidas, restaurar o diretÃ³rio `workspace/` a partir do backup atÃ´mico.
+Se a sandbox tiver sofrido alterações indevidas, restaurar o diretório `workspace/` a partir do backup atÃ´mico.
 
 ---
 
 ## 9. Prevention
-Preservar a proibiÃ§Ã£o estrita de `shell=True` e aplicar delimitaÃ§Ã£o estrita em dados externos (ver [[ADR-010 - Untrusted External Data Isolation via Boundary Delimiters]]).
+Preservar a proibição estrita de `shell=True` e aplicar delimitação estrita em dados externos (ver [[ADR-010 - Untrusted External Data Isolation via Boundary Delimiters]]).
 
 ---
 

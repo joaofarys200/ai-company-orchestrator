@@ -33,29 +33,29 @@ sources:
 
 # âš–ï¸ Comparison: SQLite WAL vs Client-Server PostgreSQL
 
-## 1. Tabela Comparativa de Motores de PersistÃªncia
+## 1. Tabela Comparativa de Motores de Persistência
 
-| DimensÃ£o | SQLite em Modo WAL | PostgreSQL Cliente-Servidor |
+| Dimensão | SQLite em Modo WAL | PostgreSQL Cliente-Servidor |
 |---|---|---|
-| **Arquitetura de Processo** | Embebido no processo da aplicaÃ§Ã£o (In-Process) | Processo daemon separado com conexÃµes TCP/Unix Socket |
-| **LatÃªncia de Leitura/Escrita** | **Microssegundos ($< 10\mu\text{s}$ - sem IPC/rede)** | Milissegundos ($0.5 - 2\text{ms}$ por overhead de rede) |
-| **ConcorrÃªncia de Escrita** | **Escritor Ãºnico global** (MÃºltiplos leitores paralelos) | **MÃºltiplos escritores concorrentes por linha (MVCC)** |
-| **Complexidade Operacional** | Zero (Arquivo Ãºnico `.db`, sem portas nem senhas) | MÃ©dia/Alta (ConfiguraÃ§Ã£o de conexÃµes, backups, pg_hba) |
-| **Capacidade de Dados Recomendada**| AtÃ© centenas de GBs em disco local | Terabytes a Petabytes com particionamento distribuÃ­do |
+| **Arquitetura de Processo** | Embebido no processo da aplicação (In-Process) | Processo daemon separado com conexões TCP/Unix Socket |
+| **Latência de Leitura/Escrita** | **Microssegundos ($< 10\mu\text{s}$ - sem IPC/rede)** | Milissegundos ($0.5 - 2\text{ms}$ por overhead de rede) |
+| **Concorrência de Escrita** | **Escritor único global** (Múltiplos leitores paralelos) | **Múltiplos escritores concorrentes por linha (MVCC)** |
+| **Complexidade Operacional** | Zero (Arquivo único `.db`, sem portas nem senhas) | Média/Alta (Configuração de conexões, backups, pg_hba) |
+| **Capacidade de Dados Recomendada**| Até centenas de GBs em disco local | Terabytes a Petabytes com particionamento distribuído |
 
 ---
 
-## 2. DecisÃ£o de Engenharia para o JARVIS
+## 2. Decisão de Engenharia para o JARVIS
 
 ### When should JARVIS choose SQLite WAL?
-- Para estado local de agente, persistÃªncia de missÃµes desktop e checkpoints de execuÃ§Ã£o rÃ¡pida em mÃ¡quina Ãºnica com latÃªncia ultrabaixa.
+- Para estado local de agente, persistência de missões desktop e checkpoints de execução rápida em máquina única com latência ultrabaixa.
 
 ### When should JARVIS choose PostgreSQL?
-- Para aplicaÃ§Ãµes multi-tenant na nuvem com centenas de usuÃ¡rios escrevendo concorrentemente na mesma tabela.
+- Para aplicações multi-tenant na nuvem com centenas de usuários escrevendo concorrentemente na mesma tabela.
 
 ### What failure mode does each introduce?
-- **SQLite WAL**: Se mÃºltiplos threads tentarem escrever concorrentemente sob carga pesada, ocorrem erros `database is locked` se o `busy_timeout` expirar.
-- **PostgreSQL**: Falhas de conexÃ£o de rede, estouro de conexÃµes no pool e sobrecarga de CPU por conexÃµes ociosas.
+- **SQLite WAL**: Se múltiplos threads tentarem escrever concorrentemente sob carga pesada, ocorrem erros `database is locked` se o `busy_timeout` expirar.
+- **PostgreSQL**: Falhas de conexão de rede, estouro de conexões no pool e sobrecarga de CPU por conexões ociosas.
 
 ---
 

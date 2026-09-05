@@ -36,32 +36,32 @@ sources:
 
 # âš–ï¸ Comparison: Lexical BM25 vs Dense Vector Embeddings vs Hybrid RAG
 
-## 1. Tabela Comparativa de Motores de RecuperaÃ§Ã£o
+## 1. Tabela Comparativa de Motores de Recuperação
 
-| DimensÃ£o | BM25 LÃ©xico Tradicional | Embeddings Densos Vetoriais | RAG HÃ­brido com RRF (Reciprocal Rank Fusion) |
+| Dimensão | BM25 Léxico Tradicional | Embeddings Densos Vetoriais | RAG Híbrido com RRF (Reciprocal Rank Fusion) |
 |---|---|---|---|
-| **Busca de SÃ­mbolos Exatos (IDs/Nomes de FunÃ§Ã£o)** | **Perfeita ($100\%$ de precisÃ£o em nomes raros)** | Pobre (Muitas vezes confunde `get_user` com `fetch_account`) | **Excelente (Preserva correspondÃªncia exata de tokens)** |
-| **CompreensÃ£o SemÃ¢ntica e SinÃ´nimos** | Nula (Falha se a query usar palavras diferentes) | **Excelente (Mapeia conceitos semanticamente prÃ³ximos)** | **Excelente (Combina significado semÃ¢ntico com palavras-chave)** |
-| **Infraestrutura e Custo** | **Zero GPUs, CPU pura ultrarrÃ¡pida** | Requer modelo de embedding e Ã­ndice HNSW | Requer modelo de embedding + motor lÃ©xico leve |
-| **ResiliÃªncia a Queries Fora de DomÃ­nio** | Alta (NÃ£o alucina similaridade falsa) | MÃ©dia (Pode retornar vizinho mais prÃ³ximo mesmo irrelevante) | **MÃ¡xima (PontuaÃ§Ã£o combinada com threshold de corte)** |
+| **Busca de Símbolos Exatos (IDs/Nomes de Função)** | **Perfeita ($100\%$ de precisão em nomes raros)** | Pobre (Muitas vezes confunde `get_user` com `fetch_account`) | **Excelente (Preserva correspondência exata de tokens)** |
+| **Compreensão Semântica e SinÃ´nimos** | Nula (Falha se a query usar palavras diferentes) | **Excelente (Mapeia conceitos semanticamente próximos)** | **Excelente (Combina significado semântico com palavras-chave)** |
+| **Infraestrutura e Custo** | **Zero GPUs, CPU pura ultrarrápida** | Requer modelo de embedding e índice HNSW | Requer modelo de embedding + motor léxico leve |
+| **Resiliência a Queries Fora de Domínio** | Alta (Não alucina similaridade falsa) | Média (Pode retornar vizinho mais próximo mesmo irrelevante) | **Máxima (Pontuação combinada com threshold de corte)** |
 
 ---
 
-## 2. DecisÃ£o de Engenharia para o JARVIS
+## 2. Decisão de Engenharia para o JARVIS
 
 ### When should JARVIS choose BM25?
-- Ao buscar sÃ­mbolos exatos de cÃ³digo, identificadores de erro ou nomes de arquivos (`MissionStateStore`, `EADDRINUSE`).
+- Ao buscar símbolos exatos de código, identificadores de erro ou nomes de arquivos (`MissionStateStore`, `EADDRINUSE`).
 
 ### When should JARVIS choose Dense Vector Embeddings?
-- Ao buscar conceitos de alto nÃ­vel ou perguntas conceituais abertas ("Como funciona o ciclo de vida do agente?").
+- Ao buscar conceitos de alto nível ou perguntas conceituais abertas ("Como funciona o ciclo de vida do agente?").
 
 ### When should JARVIS choose Hybrid RAG com RRF?
-- Na memÃ³ria principal do cofre Obsidian (`agents/obsidian_tools.py`), garantindo que tanto termos tÃ©cnicos exatos quanto intenÃ§Ãµes conceituais sejam encontrados com precisÃ£o.
+- Na memória principal do cofre Obsidian (`agents/obsidian_tools.py`), garantindo que tanto termos técnicos exatos quanto intenções conceituais sejam encontrados com precisão.
 
 ### What failure mode does each introduce?
-- **BM25**: Cegueira a sinÃ´nimos e parÃ¡frases.
-- **Dense Vectors**: Falsos positivos com distÃ¢ncias curtas para conceitos nÃ£o-relacionados.
-- **Hybrid RAG**: Maior complexidade na calibraÃ§Ã£o de pesos de ranqueamento.
+- **BM25**: Cegueira a sinÃ´nimos e paráfrases.
+- **Dense Vectors**: Falsos positivos com distâncias curtas para conceitos não-relacionados.
+- **Hybrid RAG**: Maior complexidade na calibração de pesos de ranqueamento.
 
 ---
 

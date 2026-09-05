@@ -77,9 +77,14 @@ class SafetyClassifier:
             "Solicitação de desenvolvimento de API com capacidades ofensivas de negação de serviço (DDoS).",
         ),
         (
-            r"\b(?:ransomware|keylogger|trojan|rootkit|credential harvest|exploit payload|c2 server)\b",
+            r"\b(?:ransomware|keylogger|trojan|rootkit|credential harvest|exploit payload|c2 server|botnet)\b",
             "SEC-POLICY-CYBER-002",
             "Solicitação de criação de artefactos de malware, ransomware ou exfiltração não autorizada.",
+        ),
+        (
+            r"\b(?:exfiltrat\w*|steal|dump|roubar)\s+.*\b(?:credential|secret|key|password|senha|chave)\w*\b",
+            "SEC-POLICY-CYBER-003",
+            "Solicitação de roubo ou exfiltração não autorizada de credenciais e chaves secretas.",
         ),
     )
 

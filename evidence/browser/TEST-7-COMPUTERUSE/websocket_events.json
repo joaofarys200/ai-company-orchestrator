@@ -1,382 +1,687 @@
 [
   {
-    "timestamp": 1788178332.723968,
+    "timestamp": 1788377062.6073766,
     "event": "websocket_created",
     "url": "ws://127.0.0.1:8001/?token=local-dev-token"
   },
   {
-    "timestamp": 1788178332.751226,
+    "timestamp": 1788377062.6119153,
     "direction": "received",
     "payload": "{\"type\": \"system\", \"content\": \"Conectado ao servidor Jarvis WebSocket na porta 8001!\"}"
   },
   {
-    "timestamp": 1788178332.7596028,
+    "timestamp": 1788377062.6430717,
     "direction": "received",
     "payload": "{\"type\": \"sandbox_status\", \"status\": {\"mode\": \"local_fallback\", \"port\": 8080, \"is_docker\": false}}"
   },
   {
-    "timestamp": 1788178332.7612557,
+    "timestamp": 1788377062.6443295,
     "direction": "received",
-    "payload": "{\"type\": \"template_changed\", \"template_name\": \"builder_swarm\", \"name\": \"Builder Swarm (Constru\\u00e7\\u00e3o e C\\u00f3digo)\", \"description\": \"Respons\\u00e1vel pela engenharia de software: cria\\u00e7\\u00e3o de websites, web apps, APIs, automa\\u00e7\\u00f5es, scripts e bases de dados.\", \"agents\": [{\"id\": \"dev_lead\", \"name\": \"Dev Lead\", \"role\": \"L\\u00edder de Engenharia\", \"icon\": \"briefcase\"}, {\"id\": \"coder\", \"name\": \"Coder\", \"role\": \"Programador Principal\", \"icon\": \"code\"}, {\"id\": \"tester\", \"name\": "
+    "payload": "{\"type\": \"template_changed\", \"template_name\": \"builder_swarm\", \"name\": \"Builder Swarm (Construção e Código)\", \"description\": \"Responsável pela engenharia de software: criação de websites, web apps, APIs, automações, scripts e bases de dados.\", \"agents\": [{\"id\": \"dev_lead\", \"name\": \"Dev Lead\", \"role\": \"Líder de Engenharia\", \"icon\": \"briefcase\"}, {\"id\": \"coder\", \"name\": \"Coder\", \"role\": \"Programador Principal\", \"icon\": \"code\"}, {\"id\": \"tester\", \"name\": \"Tester\", \"role\": \"Auditor de Software (QA)\","
   },
   {
-    "timestamp": 1788178332.7616346,
+    "timestamp": 1788377062.6447642,
     "direction": "received",
     "payload": "{\"type\": \"rules_list\", \"rules\": []}"
   },
   {
-    "timestamp": 1788178332.7618423,
+    "timestamp": 1788377062.645184,
     "direction": "received",
     "payload": "{\"type\": \"architecture_list\", \"architecture\": []}"
   },
   {
-    "timestamp": 1788178332.761954,
+    "timestamp": 1788377062.6456933,
     "direction": "received",
     "payload": "{\"type\": \"decisions_list\", \"decisions\": []}"
   },
   {
-    "timestamp": 1788178332.768208,
+    "timestamp": 1788377062.6463704,
     "direction": "received",
     "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
   },
   {
-    "timestamp": 1788178332.7701912,
+    "timestamp": 1788377062.6475358,
     "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
   },
   {
-    "timestamp": 1788178332.7969596,
+    "timestamp": 1788377062.6608493,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788178332.797028,
+    "timestamp": 1788377062.6610012,
     "direction": "sent",
     "payload": "{\"type\":\"get_notes\"}"
   },
   {
-    "timestamp": 1788178332.7970634,
+    "timestamp": 1788377062.661085,
     "direction": "sent",
     "payload": "{\"type\":\"get_rules\"}"
   },
   {
-    "timestamp": 1788178332.7970922,
+    "timestamp": 1788377062.6611514,
     "direction": "sent",
     "payload": "{\"type\":\"get_planner_state\"}"
   },
   {
-    "timestamp": 1788178332.9219162,
+    "timestamp": 1788377062.882615,
     "direction": "received",
     "payload": "{\"type\": \"project_context\", \"context\": {\"project_id\": \"task-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\task-app\", \"project_name\": \"task-app\", \"python_executable\": null, \"runtime_source\": \"unavailable\", \"runtime_version\": null, \"stack\": [\"HTML/JavaScript\"], \"frameworks\": [], \"package_managers\": [], \"entrypoints\": [\"index.html\", \"app.js\"], \"source_roots\": [\".\"], \"package_scripts\": {}, \"suggested_commands\": [{\"kind\": \"syntax\", \"command\": \"node --check \\\"app.js\\\"\","
   },
   {
-    "timestamp": 1788178332.9227338,
+    "timestamp": 1788377062.8847795,
     "direction": "received",
     "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
   },
   {
-    "timestamp": 1788178332.9233353,
+    "timestamp": 1788377062.8857133,
+    "direction": "received",
+    "payload": "{\"type\": \"architecture_snapshot\", \"project_id\": \"task-app\", \"data\": {\"project\": {\"project_id\": \"task-app\", \"project_name\": \"task-app\", \"root_path\": \"C:/Users/joaor/Desktop/JarvisOS/workspace/projects/task-app\"}, \"stack\": {\"languages\": [\"JavaScript\"], \"frameworks\": [], \"package_managers\": [], \"build_tools\": [], \"test_frameworks\": [], \"containerization\": [], \"evidence\": {\"JavaScript\": {\"source\": \"source_file: app.js\", \"confidence\": 0.8, \"resolution_method\": \"file_extension_scan\", \"status\": \"INFERR"
+  },
+  {
+    "timestamp": 1788377062.8861778,
     "direction": "received",
     "payload": "{\"type\": \"coding_session\", \"data\": null}"
   },
   {
-    "timestamp": 1788178332.923788,
+    "timestamp": 1788377062.905413,
     "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": []}"
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_18af0757801b\", \"project_id\": \"task-app\", \"title\": \"Consultar regras de persistência e memória técnica\", \"objective\": \"Consultar regras de persistência e memória técnica.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 18af0757801b]:\\nConsultar regras de persistência e memória técnica.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T13:29:02.206322+00:00\", \"updated_at\": \"2026-09-02T13:29:05.432322+00:0"
   },
   {
-    "timestamp": 1788178332.924872,
+    "timestamp": 1788377062.9070673,
     "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
   },
   {
-    "timestamp": 1788178332.9321613,
+    "timestamp": 1788377062.9118834,
     "direction": "received",
     "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
   },
   {
-    "timestamp": 1788178332.9325774,
+    "timestamp": 1788377062.912632,
     "direction": "received",
     "payload": "{\"type\": \"rules_list\", \"rules\": []}"
   },
   {
-    "timestamp": 1788178332.9332368,
+    "timestamp": 1788377062.9128683,
     "direction": "received",
     "payload": "{\"type\": \"planner_state\", \"data\": null}"
   },
   {
-    "timestamp": 1788178335.1861863,
+    "timestamp": 1788377065.5418282,
     "direction": "sent",
     "payload": "{\"type\":\"directive\",\"text\":\"Olá JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
   },
   {
-    "timestamp": 1788178335.1979177,
+    "timestamp": 1788377065.5456154,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
   },
   {
-    "timestamp": 1788178335.2002099,
+    "timestamp": 1788377065.5505054,
     "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00e7\\u00e3o iniciada: Ol\\u00e1 JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Olá JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
   },
   {
-    "timestamp": 1788178335.641728,
-    "direction": "received",
-    "payload": "{\"type\": \"sentinel_status\", \"data\": {\"schema_version\": 1, \"status\": \"RUNNING\", \"lifecycle_state\": \"READY\", \"shadow_mode\": true, \"shadow_state\": \"COLLECTING\", \"is_baseline_ready\": true, \"degraded_reason\": null, \"degraded_collectors\": [], \"baseline_duration_seconds\": 8.92, \"posture\": \"MONITORING\", \"is_auditing_now\": false, \"scan_interval_seconds\": 60, \"total_scans\": 0, \"last_scan_time\": 0.0, \"last_scan_duration_seconds\": 0.0, \"next_scan_in_seconds\": 0, \"active_baseline_id\": \"BASELINE-1788178326-53"
-  },
-  {
-    "timestamp": 1788178337.1359725,
+    "timestamp": 1788377067.778877,
     "direction": "sent",
     "payload": "{\"type\":\"directive\",\"text\":\"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\"}"
   },
   {
-    "timestamp": 1788178337.157348,
+    "timestamp": 1788377067.8451335,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
   },
   {
-    "timestamp": 1788178337.1577175,
+    "timestamp": 1788377067.845814,
     "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00e7\\u00e3o iniciada: Guarda esta informa\\u00e7\\u00e3o para esta miss\\u00e3o: o c\\u00f3digo de teste \\u00e9 JARVIS-8472.\"}"
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\"}"
   },
   {
-    "timestamp": 1788178337.8108091,
+    "timestamp": 1788377067.9388108,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Sou o OpenClaw, o seu assistente central e orquestrador da ag\\u00eancia. Coordeno a nossa equipa de especialistas para desenvolver e entregar os seus projetos com efici\\u00eancia e qualidade.\"}"
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_45a9caf97928\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 45a9caf97928]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"READY\", \"created_at\": \"2026-09-02T19:24:27.796583+00:00\", \"updated_at"
   },
   {
-    "timestamp": 1788178337.8134832,
+    "timestamp": 1788377067.9394078,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"🚀 Missão criada: **Guarda esta informação para esta missão: o...** (ID: `m_45a9caf97928`). A submeter ao Mission Gate e iniciar execução...\"}"
+  },
+  {
+    "timestamp": 1788377068.017394,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_45a9caf97928\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 45a9caf97928]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-02T19:24:27.796583+00:00\", \"updated_a"
+  },
+  {
+    "timestamp": 1788377068.3623414,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"running\"}"
+  },
+  {
+    "timestamp": 1788377068.3634398,
+    "direction": "received",
+    "payload": "{\"type\": \"template_changed\", \"template_name\": \"research_swarm\", \"name\": \"Research Swarm (Investigação e Conhecimento)\", \"description\": \"Responsável pela pesquisa na web, indexação de RAG e gestão de notas no cofre do Obsidian.\", \"agents\": [{\"id\": \"researcher\", \"name\": \"Researcher\", \"role\": \"Pesquisador de Informação\", \"icon\": \"code\"}, {\"id\": \"knowledge_manager\", \"name\": \"Knowledge Manager\", \"role\": \"Gestor de Conhecimento\", \"icon\": \"code\"}], \"tasks\": [{\"id\": \"task_research_query\", \"title\": \"Inve"
+  },
+  {
+    "timestamp": 1788377068.3661494,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Processando pedido: 'Guarda esta informação para esta missão: o código de teste é JARVIS-8472.'\"}"
+  },
+  {
+    "timestamp": 1788377068.3716323,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"👑 *Analisando complexidade do pedido e determinando rota do Swarm...*\"}"
+  },
+  {
+    "timestamp": 1788377068.3775487,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"Rota determinada: SIMPLE (diretamente com ferramentas rapidas).\"}"
+  },
+  {
+    "timestamp": 1788377068.3782353,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
+  },
+  {
+    "timestamp": 1788377068.3991182,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Sir, eu coordeno a nossa equipa de especialistas para gerir e executar todos os projetos da agência. O meu objetivo é assegurar que as suas diretrizes são implementadas de forma eficiente e com a máxima qualidade.\"}"
+  },
+  {
+    "timestamp": 1788377068.406154,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
   },
   {
-    "timestamp": 1788178339.1549544,
+    "timestamp": 1788377069.8274934,
     "direction": "sent",
     "payload": "{\"type\":\"directive\",\"text\":\"Qual era o código que te pedi para guardar?\"}"
   },
   {
-    "timestamp": 1788178339.197086,
+    "timestamp": 1788377069.8450236,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
   },
   {
-    "timestamp": 1788178339.1975634,
+    "timestamp": 1788377069.845738,
     "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00e7\\u00e3o iniciada: Qual era o c\\u00f3digo que te pedi para guardar?\"}"
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Qual era o código que te pedi para guardar?\"}"
   },
   {
-    "timestamp": 1788178340.5389392,
+    "timestamp": 1788377069.937807,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"O c\\u00f3digo que me pediu para guardar \\u00e9 JARVIS-8472.\"}"
+    "payload": "{\"type\": \"kanban\", \"card_id\": \"start\", \"status\": \"orchestration\"}"
   },
   {
-    "timestamp": 1788178340.5402966,
+    "timestamp": 1788377069.943351,
+    "direction": "received",
+    "payload": "{\"type\": \"kanban\", \"card_id\": \"task_research_query\", \"status\": \"progress\"}"
+  },
+  {
+    "timestamp": 1788377069.9439788,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"A executar: list_directory...\"}"
+  },
+  {
+    "timestamp": 1788377069.9543266,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
   },
   {
-    "timestamp": 1788178341.3222995,
+    "timestamp": 1788377069.9555755,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"Ol\\u00e1. Sou o OpenClaw, o seu assistente central e COO, e a minha\"}"
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração concluída com sucesso!\"}"
   },
   {
-    "timestamp": 1788178341.3242462,
+    "timestamp": 1788377069.9561574,
+    "direction": "received",
+    "payload": "{\"type\": \"complete\", \"result\": \"[OK] Tarefa concluida com evidencia no TaskState.\"}"
+  },
+  {
+    "timestamp": 1788377069.960429,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"[OK] Quality Gate passou com evidencia no TaskState.\"}"
+  },
+  {
+    "timestamp": 1788377070.0305312,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_45a9caf97928\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 45a9caf97928]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-02T19:24:27.796583+00:00\", \"updated_a"
+  },
+  {
+    "timestamp": 1788377070.0347106,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"🚀 Missão criada: **Qual era o código que te pedi...** (ID: `m_4d59eb565460`). A submeter ao Mission Gate e iniciar execução...\"}"
+  },
+  {
+    "timestamp": 1788377070.1425471,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_45a9caf97928\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 45a9caf97928]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-02T19:24:27.796583+00:00\", \"updated_a"
+  },
+  {
+    "timestamp": 1788377070.2875452,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"running\"}"
+  },
+  {
+    "timestamp": 1788377070.2884467,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Processando pedido: 'Qual era o código que te pedi para guardar?'\"}"
+  },
+  {
+    "timestamp": 1788377070.2927825,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"👑 *Analisando complexidade do pedido e determinando rota do Swarm...*\"}"
+  },
+  {
+    "timestamp": 1788377070.3013332,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"Rota determinada: SIMPLE (diretamente com ferramentas rapidas).\"}"
+  },
+  {
+    "timestamp": 1788377070.3138926,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_45a9caf97928\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 45a9caf97928]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:27.796583+00:00\", \"update"
+  },
+  {
+    "timestamp": 1788377070.3148909,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"✅ Missão **Guarda esta informação para esta missão: o...** concluída com sucesso!\\n\\nTrabalho concluído pelos agentes especialistas para a missão 'm_45a9caf97928'.\"}"
+  },
+  {
+    "timestamp": 1788377070.31536,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
   },
   {
-    "timestamp": 1788178343.1300766,
+    "timestamp": 1788377072.7317898,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
+  },
+  {
+    "timestamp": 1788377073.4334,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"A utilizar modelo local qwen3.5:9b via Ollama...\"}"
+  },
+  {
+    "timestamp": 1788377074.221892,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788178343.1351614,
+    "timestamp": 1788377074.229891,
     "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
   },
   {
-    "timestamp": 1788178347.476078,
+    "timestamp": 1788377075.7475047,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1788377075.750321,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração concluída com sucesso!\"}"
+  },
+  {
+    "timestamp": 1788377075.751854,
+    "direction": "received",
+    "payload": "{\"type\": \"complete\", \"result\": \"Erro no provider local: All connection attempts failed. Confirma que o serviço Ollama está ativo e que o modelo qwen3.5:9b está instalado.\"}"
+  },
+  {
+    "timestamp": 1788377075.7527022,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Erro no provider local: All connection attempts failed. Confirma que o serviço Ollama está ativo e que o modelo qwen3.5:9b está instalado.\"}"
+  },
+  {
+    "timestamp": 1788377075.8924236,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_4d59eb565460\", \"project_id\": \"task-app\", \"title\": \"Qual era o código que te pedi...\", \"objective\": \"Qual era o código que te pedi para guardar?\", \"description\": \"Diretiva iniciada via Chat [Correlation: 4d59eb565460]:\\nQual era o código que te pedi para guardar?\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:29.851551+00:00\", \"updated_at\": \"2026-09-02T19:24:35.865129+00:00\", \"started_at\": \"2026-09-02T19:2"
+  },
+  {
+    "timestamp": 1788377075.8932178,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"✅ Missão **Qual era o código que te pedi...** concluída com sucesso!\\n\\nTrabalho concluído pelos agentes especialistas para a missão 'm_4d59eb565460'.\"}"
+  },
+  {
+    "timestamp": 1788377075.8935375,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1788377078.880456,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788178347.4795623,
+    "timestamp": 1788377078.8903022,
     "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
   },
   {
-    "timestamp": 1788178348.6277385,
+    "timestamp": 1788377080.0495613,
     "direction": "sent",
     "payload": "{\"type\":\"get_notes\"}"
   },
   {
-    "timestamp": 1788178348.6846473,
+    "timestamp": 1788377080.108396,
     "direction": "received",
     "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
   },
   {
-    "timestamp": 1788178352.0487058,
+    "timestamp": 1788377083.6072228,
     "direction": "sent",
     "payload": "{\"type\":\"directive\",\"text\":\"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
   },
   {
-    "timestamp": 1788178352.082944,
+    "timestamp": 1788377083.666996,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
   },
   {
-    "timestamp": 1788178352.0853863,
+    "timestamp": 1788377083.6717317,
     "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00e7\\u00e3o iniciada: Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
   },
   {
-    "timestamp": 1788178353.5402925,
+    "timestamp": 1788377083.7649872,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Orquestrador\", \"content\": \"N\\u00e3o tenho acesso a essa informa\\u00e7\\u00e3o, Sir. A minha fun\\u00e7\\u00e3o \\u00e9 gerir a equipa e os projetos da ag\\u00eancia.\"}"
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_7ade60e08fe9\", \"project_id\": \"task-app\", \"title\": \"Qual a taxa de imposto sobre extraterrestres...\", \"objective\": \"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"description\": \"Diretiva iniciada via Chat [Correlation: 7ade60e08fe9]:\\nQual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"status\": \"READY\", \"created_at\": \"2026-09-02T19:24:43.630345+00:00\", \"updated_at\": \"2026-09-"
   },
   {
-    "timestamp": 1788178353.541763,
+    "timestamp": 1788377083.7675653,
     "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"🚀 Missão criada: **Qual a taxa de imposto sobre extraterrestres...** (ID: `m_7ade60e08fe9`). A submeter ao Mission Gate e iniciar execução...\"}"
   },
   {
-    "timestamp": 1788178355.549586,
+    "timestamp": 1788377083.8399267,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_7ade60e08fe9\", \"project_id\": \"task-app\", \"title\": \"Qual a taxa de imposto sobre extraterrestres...\", \"objective\": \"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"description\": \"Diretiva iniciada via Chat [Correlation: 7ade60e08fe9]:\\nQual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-02T19:24:43.630345+00:00\", \"updated_at\": \"2026-09"
+  },
+  {
+    "timestamp": 1788377084.0519426,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"running\"}"
+  },
+  {
+    "timestamp": 1788377084.0526028,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Processando pedido: 'Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?'\"}"
+  },
+  {
+    "timestamp": 1788377084.0572522,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"👑 *Analisando complexidade do pedido e determinando rota do Swarm...*\"}"
+  },
+  {
+    "timestamp": 1788377084.0652273,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"Rota determinada: SIMPLE (diretamente com ferramentas rapidas).\"}"
+  },
+  {
+    "timestamp": 1788377084.0657856,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
+  },
+  {
+    "timestamp": 1788377087.464698,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788178355.5632188,
+    "timestamp": 1788377087.4703045,
     "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
   },
   {
-    "timestamp": 1788178356.4860263,
+    "timestamp": 1788377088.621285,
     "direction": "sent",
     "payload": "{\"type\":\"list_lecture_history\"}"
   },
   {
-    "timestamp": 1788178356.4875948,
-    "direction": "received",
-    "payload": "{\"type\": \"lecture_history_response\", \"history\": [{\"title\": \"2026-08-18 - Sistemas Multiagente e Arquiteturas RAG\", \"subject\": \"Intelig\\u00eancia Artificial\", \"markdown_path\": \"obsidian_vault/10 - Lectures/Intelig\\u00eancia Artificial/2026-08-18 - Sistemas Multiagente e Arquiteturas RAG.md\", \"date\": \"2026-08-18\", \"status\": \"COMPLETED\"}, {\"title\": \"2026-08-19 - Sistemas Multiagente e Arquiteturas RAG\", \"subject\": \"Intelig\\u00eancia Artificial\", \"markdown_path\": \"obsidian_vault/10 - Lectures/Inteli"
-  },
-  {
-    "timestamp": 1788178357.5582857,
-    "direction": "sent",
-    "payload": "{\"type\":\"generate_lecture_lesson\",\"topic\":\"Sistemas Multiagente e Arquiteturas RAG\",\"subject\":\"Inteligência Artificial\",\"professor\":\"Prof. JARVIS\"}"
-  },
-  {
-    "timestamp": 1788178357.6167212,
-    "direction": "received",
-    "payload": "{\"type\": \"lecture_lesson_generated\", \"lesson\": {\"topic\": \"Sistemas Multiagente e Arquiteturas RAG\", \"subject\": \"Intelig\\u00eancia Artificial\", \"professor\": \"Prof. JARVIS\", \"date\": \"2026-08-31\", \"markdown_path\": \"obsidian_vault/10 - Lectures/Intelig\\u00eancia Artificial/2026-08-31 - Sistemas Multiagente e Arquiteturas RAG.md\", \"markdown_content\": \"---\\ntype: lecture_notes\\ndomain: academic\\nstatus: verified\\nsource_type: PRIMARY_SOURCE\\nconfidence: high\\nsubject: \\\"Intelig\\u00eancia Artificial\\\"\\"
-  },
-  {
-    "timestamp": 1788178359.4299748,
-    "direction": "sent",
-    "payload": "{\"type\":\"submit_lecture_quiz\",\"topic\":\"Sistemas Multiagente e Arquiteturas RAG\",\"answers\":{\"q1\":0,\"q2\":0,\"q3\":0},\"transfer_answer\":\"Aplicando nós distribuídos com isolamento de falhas, idempotência nas transações e recuperação atómica de estado.\"}"
-  },
-  {
-    "timestamp": 1788178359.4925234,
-    "direction": "received",
-    "payload": "{\"type\": \"lecture_quiz_evaluated\", \"topic\": \"Sistemas Multiagente e Arquiteturas RAG\", \"score\": 100.0, \"total_questions\": 3, \"correct_answers\": 3, \"feedback\": \"Compreens\\u00e3o de 100.0% validada nos conceitos centrais de Sistemas Multiagente e Arquiteturas RAG.\", \"transfer_passed\": true, \"transfer_feedback\": \"A resposta ao cen\\u00e1rio aplicado demonstrou correta transfer\\u00eancia de conhecimento.\", \"student_mastery\": 0.95, \"next_review_days\": 3, \"next_review_timestamp\": 1788437559.4240236}"
-  },
-  {
-    "timestamp": 1788178364.1489956,
-    "direction": "sent",
-    "payload": "{\"type\":\"directive\",\"text\":\"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\"}"
-  },
-  {
-    "timestamp": 1788178364.2009099,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
-  },
-  {
-    "timestamp": 1788178364.2012048,
-    "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestra\\u00e7\\u00e3o iniciada: Cria uma pequena aplica\\u00e7\\u00e3o web de lista de tarefas com frontend funcional.\"}"
-  },
-  {
-    "timestamp": 1788178364.2284713,
-    "direction": "received",
-    "payload": "{\"type\": \"project_output\", \"content\": \"[ProjectBuilder] A gerar plano JSON e criar projeto isolado...\\n\"}"
-  },
-  {
-    "timestamp": 1788178367.9078739,
-    "direction": "sent",
-    "payload": "{\"type\":\"list_projects\"}"
-  },
-  {
-    "timestamp": 1788178367.9122946,
-    "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
-  },
-  {
-    "timestamp": 1788178368.537678,
-    "direction": "sent",
-    "payload": "{\"type\":\"get_ast_state\",\"project_id\":\"task-app\"}"
-  },
-  {
-    "timestamp": 1788178368.570095,
-    "direction": "received",
-    "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
-  },
-  {
-    "timestamp": 1788178369.0509114,
-    "direction": "sent",
-    "payload": "{\"type\":\"get_ast_state\",\"project_id\":\"task-app\"}"
-  },
-  {
-    "timestamp": 1788178369.0876646,
-    "direction": "received",
-    "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
-  },
-  {
-    "timestamp": 1788178369.891488,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"OPENCLAW\", \"role\": \"Project Builder\", \"content\": \"Project Builder falhou: ProjectBuilder planning failed: {\\\"category\\\": \\\"OLLAMA_UNAVAILABLE\\\", \\\"provider\\\": \\\"ollama\\\", \\\"model\\\": \\\"qwen3.5:9b\\\", \\\"attempt_count\\\": 2, \\\"durations\\\": [2.3076, 2.3281], \\\"timeout_config\\\": {\\\"connect\\\": 5.0, \\\"read\\\": 300.0, \\\"write\\\": 15.0, \\\"pool\\\": 5.0}, \\\"prompt_length\\\": 378, \\\"attempts\\\": [{\\\"attempt\\\": 1, \\\"phase\\\": \\\"plan\\\", \\\"duration\\\": 2.3075510999769904, \\\"prompt_length\\\": "
-  },
-  {
-    "timestamp": 1788178369.8972769,
-    "direction": "received",
-    "payload": "{\"type\": \"project_output\", \"content\": \"Project Builder falhou: ProjectBuilder planning failed: {\\\"category\\\": \\\"OLLAMA_UNAVAILABLE\\\", \\\"provider\\\": \\\"ollama\\\", \\\"model\\\": \\\"qwen3.5:9b\\\", \\\"attempt_count\\\": 2, \\\"durations\\\": [2.3076, 2.3281], \\\"timeout_config\\\": {\\\"connect\\\": 5.0, \\\"read\\\": 300.0, \\\"write\\\": 15.0, \\\"pool\\\": 5.0}, \\\"prompt_length\\\": 378, \\\"attempts\\\": [{\\\"attempt\\\": 1, \\\"phase\\\": \\\"plan\\\", \\\"duration\\\": 2.3075510999769904, \\\"prompt_length\\\": 378, \\\"status\\\": \\\"FAILED\\\", \\\"error_ty"
-  },
-  {
-    "timestamp": 1788178369.8976815,
+    "timestamp": 1788377088.6224036,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
   },
   {
-    "timestamp": 1788178369.897864,
+    "timestamp": 1788377088.630921,
     "direction": "received",
-    "payload": "{\"type\": \"complete\", \"result\": \"Project Builder falhou: ProjectBuilder planning failed: {\\\"category\\\": \\\"OLLAMA_UNAVAILABLE\\\", \\\"provider\\\": \\\"ollama\\\", \\\"model\\\": \\\"qwen3.5:9b\\\", \\\"attempt_count\\\": 2, \\\"durations\\\": [2.3076, 2.3281], \\\"timeout_config\\\": {\\\"connect\\\": 5.0, \\\"read\\\": 300.0, \\\"write\\\": 15.0, \\\"pool\\\": 5.0}, \\\"prompt_length\\\": 378, \\\"attempts\\\": [{\\\"attempt\\\": 1, \\\"phase\\\": \\\"plan\\\", \\\"duration\\\": 2.3075510999769904, \\\"prompt_length\\\": 378, \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\"
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração terminou com erro/aviso. Ver detalhes na mensagem final.\"}"
   },
   {
-    "timestamp": 1788178374.147334,
+    "timestamp": 1788377088.6330698,
+    "direction": "received",
+    "payload": "{\"type\": \"complete\", \"result\": \"Erro controlado de contrato operacional.\\nEtapa: analisar_workspace.\\nUltima tool: nenhuma.\\nMotivo: Falha ao pedir acao JSON estruturada ao modelo local: All connection attempts failed.\\nEvidencia em falta: workspace listado.\\nProxima correcao sugerida: Verificar Ollama/modelo local e repetir a tarefa..\\nCategoria da falha: provider.\"}"
+  },
+  {
+    "timestamp": 1788377088.6364558,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Erro controlado de contrato operacional.\\nEtapa: analisar_workspace.\\nUltima tool: nenhuma.\\nMotivo: Falha ao pedir acao JSON estruturada ao modelo local: All connection attempts failed.\\nEvidencia em falta: workspace listado.\\nProxima correcao sugerida: Verificar Ollama/modelo local e repetir a tarefa..\\nCategoria da falha: provider.\"}"
+  },
+  {
+    "timestamp": 1788377088.6511333,
+    "direction": "received",
+    "payload": "{\"type\": \"lecture_history_response\", \"history\": [{\"title\": \"2026-08-18 - Sistemas Multiagente e Arquiteturas RAG\", \"subject\": \"Inteligência Artificial\", \"markdown_path\": \"obsidian_vault/10 - Lectures/Inteligência Artificial/2026-08-18 - Sistemas Multiagente e Arquiteturas RAG.md\", \"date\": \"2026-08-18\", \"status\": \"COMPLETED\"}, {\"title\": \"2026-08-19 - Sistemas Multiagente e Arquiteturas RAG\", \"subject\": \"Inteligência Artificial\", \"markdown_path\": \"obsidian_vault/10 - Lectures/Inteligência Artifici"
+  },
+  {
+    "timestamp": 1788377088.97094,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_7ade60e08fe9\", \"project_id\": \"task-app\", \"title\": \"Qual a taxa de imposto sobre extraterrestres...\", \"objective\": \"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"description\": \"Diretiva iniciada via Chat [Correlation: 7ade60e08fe9]:\\nQual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:43.630345+00:00\", \"updated_at\": \"2026"
+  },
+  {
+    "timestamp": 1788377088.971672,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"✅ Missão **Qual a taxa de imposto sobre extraterrestres...** concluída com sucesso!\\n\\nTrabalho concluído pelos agentes especialistas para a missão 'm_7ade60e08fe9'.\"}"
+  },
+  {
+    "timestamp": 1788377088.9759464,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1788377089.5391998,
+    "direction": "sent",
+    "payload": "{\"type\":\"generate_lecture_lesson\",\"topic\":\"Sistemas Multiagente e Arquiteturas RAG\",\"subject\":\"Inteligência Artificial\",\"professor\":\"Prof. JARVIS\"}"
+  },
+  {
+    "timestamp": 1788377089.6091383,
+    "direction": "received",
+    "payload": "{\"type\": \"lecture_lesson_generated\", \"lesson\": {\"topic\": \"Sistemas Multiagente e Arquiteturas RAG\", \"subject\": \"Inteligência Artificial\", \"professor\": \"Prof. JARVIS\", \"date\": \"2026-09-02\", \"markdown_path\": \"obsidian_vault/10 - Lectures/Inteligência Artificial/2026-09-02 - Sistemas Multiagente e Arquiteturas RAG.md\", \"markdown_content\": \"---\\ntype: lecture_notes\\ndomain: academic\\nstatus: verified\\nsource_type: PRIMARY_SOURCE\\nconfidence: high\\nsubject: \\\"Inteligência Artificial\\\"\\nprofessor: \\\"P"
+  },
+  {
+    "timestamp": 1788377091.7760174,
+    "direction": "sent",
+    "payload": "{\"type\":\"submit_lecture_quiz\",\"topic\":\"Sistemas Multiagente e Arquiteturas RAG\",\"answers\":{\"q1\":0,\"q2\":0,\"q3\":0},\"transfer_answer\":\"Aplicando nós distribuídos com isolamento de falhas, idempotência nas transações e recuperação atómica de estado.\"}"
+  },
+  {
+    "timestamp": 1788377091.8149955,
+    "direction": "received",
+    "payload": "{\"type\": \"lecture_quiz_evaluated\", \"topic\": \"Sistemas Multiagente e Arquiteturas RAG\", \"score\": 100.0, \"total_questions\": 3, \"correct_answers\": 3, \"feedback\": \"Compreensão de 100.0% validada nos conceitos centrais de Sistemas Multiagente e Arquiteturas RAG.\", \"transfer_passed\": true, \"transfer_feedback\": \"A resposta ao cenário aplicado demonstrou correta transferência de conhecimento.\", \"student_mastery\": 0.95, \"next_review_days\": 3, \"next_review_timestamp\": 1788636291.7627416}"
+  },
+  {
+    "timestamp": 1788377097.6534996,
+    "direction": "sent",
+    "payload": "{\"type\":\"directive\",\"text\":\"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\"}"
+  },
+  {
+    "timestamp": 1788377097.7144158,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
+  },
+  {
+    "timestamp": 1788377097.7206743,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\"}"
+  },
+  {
+    "timestamp": 1788377097.8204522,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_f51d4d52295b\", \"project_id\": \"task-app\", \"title\": \"Pequena aplicação web de lista de tarefas...\", \"objective\": \"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"description\": \"Diretiva iniciada via Chat [Correlation: f51d4d52295b]:\\nCria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"status\": \"READY\", \"created_at\": \"2026-09-02T19:24:57.668466+00:00\", \"updated_a"
+  },
+  {
+    "timestamp": 1788377097.8247101,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"🚀 Missão criada: **Pequena aplicação web de lista de tarefas...** (ID: `m_f51d4d52295b`). A submeter ao Mission Gate e iniciar execução...\"}"
+  },
+  {
+    "timestamp": 1788377097.9265761,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_f51d4d52295b\", \"project_id\": \"task-app\", \"title\": \"Pequena aplicação web de lista de tarefas...\", \"objective\": \"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"description\": \"Diretiva iniciada via Chat [Correlation: f51d4d52295b]:\\nCria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-02T19:24:57.668466+00:00\", \"updated_"
+  },
+  {
+    "timestamp": 1788377098.086183,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"running\"}"
+  },
+  {
+    "timestamp": 1788377098.0867124,
+    "direction": "received",
+    "payload": "{\"type\": \"project_output\", \"content\": \"[ProjectBuilder] A gerar plano JSON e criar projeto isolado...\\n\"}"
+  },
+  {
+    "timestamp": 1788377101.4611228,
     "direction": "sent",
     "payload": "{\"type\":\"list_projects\"}"
   },
   {
-    "timestamp": 1788178374.1500769,
+    "timestamp": 1788377101.4705198,
     "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"auto-val-app\", \"project_name\": \"auto-val-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\auto-val-app\"}, {\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\":"
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
   },
   {
-    "timestamp": 1788178377.9628618,
+    "timestamp": 1788377102.1075747,
+    "direction": "sent",
+    "payload": "{\"type\":\"get_ast_state\",\"project_id\":\"task-app\"}"
+  },
+  {
+    "timestamp": 1788377102.1675982,
+    "direction": "received",
+    "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
+  },
+  {
+    "timestamp": 1788377102.6391451,
+    "direction": "sent",
+    "payload": "{\"type\":\"get_ast_state\",\"project_id\":\"task-app\"}"
+  },
+  {
+    "timestamp": 1788377102.6844904,
+    "direction": "received",
+    "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
+  },
+  {
+    "timestamp": 1788377103.8051002,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Project Builder\", \"content\": \"Project Builder falhou: ProjectBuilder planning failed: {\\\"category\\\": \\\"OLLAMA_UNAVAILABLE\\\", \\\"provider\\\": \\\"ollama\\\", \\\"model\\\": \\\"qwen3.5:9b\\\", \\\"attempt_count\\\": 2, \\\"durations\\\": [2.3798, 2.3337], \\\"timeout_config\\\": {\\\"connect\\\": 5.0, \\\"read\\\": 300.0, \\\"write\\\": 15.0, \\\"pool\\\": 5.0}, \\\"prompt_length\\\": 378, \\\"attempts\\\": [{\\\"attempt\\\": 1, \\\"phase\\\": \\\"plan\\\", \\\"duration\\\": 2.3797936000628397, \\\"prompt_length\\\": 37"
+  },
+  {
+    "timestamp": 1788377103.8098974,
+    "direction": "received",
+    "payload": "{\"type\": \"project_output\", \"content\": \"Project Builder falhou: ProjectBuilder planning failed: {\\\"category\\\": \\\"OLLAMA_UNAVAILABLE\\\", \\\"provider\\\": \\\"ollama\\\", \\\"model\\\": \\\"qwen3.5:9b\\\", \\\"attempt_count\\\": 2, \\\"durations\\\": [2.3798, 2.3337], \\\"timeout_config\\\": {\\\"connect\\\": 5.0, \\\"read\\\": 300.0, \\\"write\\\": 15.0, \\\"pool\\\": 5.0}, \\\"prompt_length\\\": 378, \\\"attempts\\\": [{\\\"attempt\\\": 1, \\\"phase\\\": \\\"plan\\\", \\\"duration\\\": 2.3797936000628397, \\\"prompt_length\\\": 378, \\\"status\\\": \\\"FAILED\\\", \\\"error_ty"
+  },
+  {
+    "timestamp": 1788377103.8127365,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1788377103.813462,
+    "direction": "received",
+    "payload": "{\"type\": \"complete\", \"result\": \"Project Builder falhou: ProjectBuilder planning failed: {\\\"category\\\": \\\"OLLAMA_UNAVAILABLE\\\", \\\"provider\\\": \\\"ollama\\\", \\\"model\\\": \\\"qwen3.5:9b\\\", \\\"attempt_count\\\": 2, \\\"durations\\\": [2.3798, 2.3337], \\\"timeout_config\\\": {\\\"connect\\\": 5.0, \\\"read\\\": 300.0, \\\"write\\\": 15.0, \\\"pool\\\": 5.0}, \\\"prompt_length\\\": 378, \\\"attempts\\\": [{\\\"attempt\\\": 1, \\\"phase\\\": \\\"plan\\\", \\\"duration\\\": 2.3797936000628397, \\\"prompt_length\\\": 378, \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\"
+  },
+  {
+    "timestamp": 1788377103.9756527,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_f51d4d52295b\", \"project_id\": \"task-app\", \"title\": \"Pequena aplicação web de lista de tarefas...\", \"objective\": \"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"description\": \"Diretiva iniciada via Chat [Correlation: f51d4d52295b]:\\nCria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:57.668466+00:00\", \"updat"
+  },
+  {
+    "timestamp": 1788377103.9775395,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"✅ Missão **Pequena aplicação web de lista de tarefas...** concluída com sucesso!\\n\\nAplicação construída com sucesso no projeto 'task-app'.\"}"
+  },
+  {
+    "timestamp": 1788377103.9780555,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1788377106.2688217,
+    "direction": "received",
+    "payload": "{\"type\": \"sentinel_event\", \"event\": {\"event_id\": \"SEC-EV-1788377106266-aac031\", \"fingerprint\": \"aac031cd757c504b\", \"timestamp\": 1788377106.266318, \"first_seen\": 1788377106.266318, \"last_seen\": 1788377106.266318, \"occurrence_count\": 1, \"category\": \"PROCESS\", \"severity\": \"BENIGN\", \"confidence\": 0.5, \"evidence_ids\": [\"process:5764\"], \"rationale\": \"Novo processo 'node.exe' observado no sistema em C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\venv\\\\Lib\\\\site-packages\\\\playwright\\\\driver\\\\node.exe\", \"recommend"
+  },
+  {
+    "timestamp": 1788377106.2724862,
+    "direction": "received",
+    "payload": "{\"type\": \"sentinel_event\", \"event\": {\"event_id\": \"SEC-EV-1788377106266-1e5803\", \"fingerprint\": \"1e580366a45d29b2\", \"timestamp\": 1788377106.266318, \"first_seen\": 1788377106.266318, \"last_seen\": 1788377106.266318, \"occurrence_count\": 1, \"category\": \"PROCESS\", \"severity\": \"BENIGN\", \"confidence\": 0.5, \"evidence_ids\": [\"process:23900\"], \"rationale\": \"Novo processo 'chrome-headless-shell.exe' observado no sistema em C:\\\\Users\\\\joaor\\\\AppData\\\\Local\\\\ms-playwright\\\\chromium_headless_shell-1234\\\\chrome-"
+  },
+  {
+    "timestamp": 1788377106.273387,
+    "direction": "received",
+    "payload": "{\"type\": \"sentinel_event\", \"event\": {\"event_id\": \"SEC-EV-1788377106266-1f4f17\", \"fingerprint\": \"1f4f17c597d45477\", \"timestamp\": 1788377106.266318, \"first_seen\": 1788377106.266318, \"last_seen\": 1788377106.266318, \"occurrence_count\": 1, \"category\": \"PROCESS\", \"severity\": \"BENIGN\", \"confidence\": 0.5, \"evidence_ids\": [\"process:13880\"], \"rationale\": \"Novo processo 'dllhost.exe' observado no sistema em C:\\\\Windows\\\\System32\\\\dllhost.exe\", \"recommended_action\": \"Nenhuma ação necessária para processos l"
+  },
+  {
+    "timestamp": 1788377106.2738376,
+    "direction": "received",
+    "payload": "{\"type\": \"sentinel_status\", \"data\": {\"schema_version\": 1, \"status\": \"RUNNING\", \"lifecycle_state\": \"READY\", \"shadow_mode\": true, \"shadow_state\": \"COLLECTING\", \"is_baseline_ready\": true, \"degraded_reason\": null, \"degraded_collectors\": [], \"baseline_duration_seconds\": 16.04, \"posture\": \"ATTENTION\", \"is_auditing_now\": false, \"scan_interval_seconds\": 60, \"total_scans\": 1, \"last_scan_time\": 1788377106.268672, \"last_scan_duration_seconds\": 17.99, \"next_scan_in_seconds\": 59, \"active_baseline_id\": \"BASEL"
+  },
+  {
+    "timestamp": 1788377108.1785955,
+    "direction": "sent",
+    "payload": "{\"type\":\"list_projects\"}"
+  },
+  {
+    "timestamp": 1788377108.1866977,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
+  },
+  {
+    "timestamp": 1788377112.797803,
     "direction": "sent",
     "payload": "{\"type\":\"mission_list\",\"project_id\":\"task-app\"}"
   },
   {
-    "timestamp": 1788178377.9629083,
+    "timestamp": 1788377112.7978666,
     "direction": "sent",
     "payload": "{\"type\":\"get_planner_state\"}"
   },
   {
-    "timestamp": 1788178377.9639208,
-    "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": []}"
+    "timestamp": 1788377112.7979095,
+    "direction": "sent",
+    "payload": "{\"type\":\"mission_resume_snapshot\",\"project_id\":\"task-app\",\"mission_id\":\"m_f51d4d52295b\"}"
   },
   {
-    "timestamp": 1788178377.9651275,
+    "timestamp": 1788377112.8148575,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_f51d4d52295b\", \"project_id\": \"task-app\", \"title\": \"Pequena aplicação web de lista de tarefas...\", \"objective\": \"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"description\": \"Diretiva iniciada via Chat [Correlation: f51d4d52295b]:\\nCria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:57.668466+00:00\", \"updat"
+  },
+  {
+    "timestamp": 1788377112.8180764,
     "direction": "received",
     "payload": "{\"type\": \"planner_state\", \"data\": null}"
+  },
+  {
+    "timestamp": 1788377112.818761,
+    "direction": "sent",
+    "payload": "{\"type\":\"mission_resume_snapshot\",\"project_id\":\"task-app\",\"mission_id\":\"m_f51d4d52295b\"}"
+  },
+  {
+    "timestamp": 1788377112.8262138,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_snapshot\", \"data\": {\"mission\": {\"mission_id\": \"m_f51d4d52295b\", \"project_id\": \"task-app\", \"title\": \"Pequena aplicação web de lista de tarefas...\", \"objective\": \"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"description\": \"Diretiva iniciada via Chat [Correlation: f51d4d52295b]:\\nCria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:57.668466+00:00\", \"updated_at\": \"2026-0"
+  },
+  {
+    "timestamp": 1788377112.843122,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_f51d4d52295b\", \"project_id\": \"task-app\", \"title\": \"Pequena aplicação web de lista de tarefas...\", \"objective\": \"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"description\": \"Diretiva iniciada via Chat [Correlation: f51d4d52295b]:\\nCria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:57.668466+00:00\", \"updat"
+  },
+  {
+    "timestamp": 1788377112.918883,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_snapshot\", \"data\": {\"mission\": {\"mission_id\": \"m_f51d4d52295b\", \"project_id\": \"task-app\", \"title\": \"Pequena aplicação web de lista de tarefas...\", \"objective\": \"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"description\": \"Diretiva iniciada via Chat [Correlation: f51d4d52295b]:\\nCria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:57.668466+00:00\", \"updated_at\": \"2026-0"
+  },
+  {
+    "timestamp": 1788377112.920923,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_f51d4d52295b\", \"project_id\": \"task-app\", \"title\": \"Pequena aplicação web de lista de tarefas...\", \"objective\": \"Cria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"description\": \"Diretiva iniciada via Chat [Correlation: f51d4d52295b]:\\nCria uma pequena aplicação web de lista de tarefas com frontend funcional.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:57.668466+00:00\", \"updat"
   }
 ]

@@ -33,28 +33,28 @@ sources:
 
 # âš–ï¸ Comparison: REST Polling vs WebSocket Full-Duplex Streaming
 
-## 1. Tabela Comparativa de ComunicaÃ§Ã£o em Tempo Real
+## 1. Tabela Comparativa de Comunicação em Tempo Real
 
-| DimensÃ£o | Short / Long Polling HTTP/REST | WebSocket Full-Duplex (RFC 6455) |
+| Dimensão | Short / Long Polling HTTP/REST | WebSocket Full-Duplex (RFC 6455) |
 |---|---|---|
-| **Estabelecimento de ConexÃ£o** | Nova conexÃ£o TCP/TLS e headers HTTP a cada requisiÃ§Ã£o | **Upgrade Ãºnico com handshake TCP persistente** |
-| **Overhead de Headers** | 500 - 1500 bytes de cabeÃ§alhos HTTP por polling | **Apenas 2 a 10 bytes de framing por mensagem** |
-| **LatÃªncia de NotificaÃ§Ã£o** | Limitada pelo intervalo de polling ($1 - 5\text{s}$) | **Sub-milissegundo instantÃ¢neo ($< 10\text{ms}$)** |
-| **Suporte a Streaming Bidirecional**| NÃ£o (Cliente sempre inicia a requisiÃ§Ã£o) | **Sim (Servidor e cliente transmitem simultaneamente)** |
+| **Estabelecimento de Conexão** | Nova conexão TCP/TLS e headers HTTP a cada requisição | **Upgrade único com handshake TCP persistente** |
+| **Overhead de Headers** | 500 - 1500 bytes de cabeçalhos HTTP por polling | **Apenas 2 a 10 bytes de framing por mensagem** |
+| **Latência de Notificação** | Limitada pelo intervalo de polling ($1 - 5\text{s}$) | **Sub-milissegundo instantâneo ($< 10\text{ms}$)** |
+| **Suporte a Streaming Bidirecional**| Não (Cliente sempre inicia a requisição) | **Sim (Servidor e cliente transmitem simultaneamente)** |
 
 ---
 
-## 2. DecisÃ£o de Engenharia para o JARVIS
+## 2. Decisão de Engenharia para o JARVIS
 
 ### When should JARVIS choose REST Polling?
-- Para endpoints administrativos esporÃ¡dicos ou operaÃ§Ãµes idempotentes de consulta simples (ex: `GET /health` ou `GET /version`).
+- Para endpoints administrativos esporádicos ou operações idempotentes de consulta simples (ex: `GET /health` ou `GET /version`).
 
 ### When should JARVIS choose WebSockets?
-- Para streaming de telemetria de terminal, progresso de passos de missÃµes em tempo real e sessÃµes de Ã¡udio contÃ­nuo.
+- Para streaming de telemetria de terminal, progresso de passos de missões em tempo real e sessões de áudio contínuo.
 
 ### What failure mode does each introduce?
-- **REST Polling**: DesperdÃ­cio massivo de CPU e I/O de rede com requisiÃ§Ãµes vazias repetitivas.
-- **WebSockets**: Dificuldade em balancear conexÃµes com stateful proxies e risco de conexÃµes zumbis se nÃ£o houver heartbeats (*Ping/Pong frames*).
+- **REST Polling**: Desperdício massivo de CPU e I/O de rede com requisições vazias repetitivas.
+- **WebSockets**: Dificuldade em balancear conexões com stateful proxies e risco de conexões zumbis se não houver heartbeats (*Ping/Pong frames*).
 
 ---
 

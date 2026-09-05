@@ -152,7 +152,7 @@ class VoiceDirectiveService:
                     self.connections.broadcast(
                         {
                             "type": "chat",
-                            "sender": "OPENCLAW",
+                            "sender": "JARVIS",
                             "role": "Orquestrador",
                             "content": text,
                         }
@@ -375,7 +375,7 @@ class VoiceDirectiveService:
         await self.connections.broadcast(
             {
                 "type": "chat",
-                "sender": "OPENCLAW",
+                "sender": "JARVIS",
                 "role": "Voz",
                 "content": f"Entendi esta tarefa: {prompt}",
             }
@@ -454,7 +454,7 @@ class VoiceDirectiveService:
                 await self.connections.broadcast(
                     {
                         "type": "chat",
-                        "sender": "OPENCLAW",
+                        "sender": "JARVIS",
                         "role": "Voz",
                         "content": (
                             f"Abri o {local_app['label']}."
@@ -472,7 +472,7 @@ class VoiceDirectiveService:
             await self.connections.broadcast(
                 {
                     "type": "chat",
-                    "sender": "OPENCLAW",
+                    "sender": "JARVIS",
                     "role": "Voz",
                     "content": (
                         f"Tentei abrir o {local_app['label']}, "

@@ -29,23 +29,23 @@ sources:
     url: https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html
 ---
 
-# ðŸ› ï¸ Runbook - How to Resolve Stale Distributed Locks and Fencing Collisions
+# 🛠️ï¸ Runbook - How to Resolve Stale Distributed Locks and Fencing Collisions
 
-## 1. CritÃ©rios de Sucesso e Falha
-- **CritÃ©rio de Sucesso**: O lock obsoleto Ã© libertado, o token de barreira (*Fencing Token*) Ã© incrementado monotonicamente e a nova tarefa assume a posse exclusiva do recurso sem corrupÃ§Ã£o de estado.
-- **CritÃ©rio de Falha**: Dois nÃ³s concorrentes continuam a tentar escrever com o mesmo fencing token expirado gerando split-brain.
+## 1. Critérios de Sucesso e Falha
+- **Critério de Sucesso**: O lock obsoleto é libertado, o token de barreira (*Fencing Token*) é incrementado monotonicamente e a nova tarefa assume a posse exclusiva do recurso sem corrupção de estado.
+- **Critério de Falha**: Dois nós concorrentes continuam a tentar escrever com o mesmo fencing token expirado gerando split-brain.
 
 ---
 
-## 2. DiagnÃ³stico de ColisÃ£o
+## 2. Diagnóstico de Colisão
 1. Inspecionar logs procurando por: `FENCING_COLLISION: Stale token N rejected by storage layer`.
-2. Verificar se o worker original que detinha o lock estÃ¡ bloqueado em pausa de GC ou desconectado.
+2. Verificar se o worker original que detinha o lock está bloqueado em pausa de GC ou desconectado.
 
 ---
 
-## 3. Procedimento Operacional de ResoluÃ§Ã£o
+## 3. Procedimento Operacional de Resolução
 
-### Passo 1: Invalidar o Lock Antigo no Servidor de CoordenaÃ§Ã£o
+### Passo 1: Invalidar o Lock Antigo no Servidor de Coordenação
 ```python
 def force_release_stale_lock(lock_key: str, last_owner_id: str):
     current_owner = redis_client.get(f"lock:{lock_key}")
@@ -54,16 +54,16 @@ def force_release_stale_lock(lock_key: str, last_owner_id: str):
         print(f"[Lock Resolution] Lock obsoleto {lock_key} removido.")
 ```
 
-### Passo 2: Emitir Novo Fencing Token MonotÃ³nico
+### Passo 2: Emitir Novo Fencing Token Monotónico
 ```python
 def acquire_fenced_lock(lock_key: str, new_owner_id: str) -> int:
-    # 1. Incrementar contador atÃ³mico global
+    # 1. Incrementar contador atómico global
     fencing_token = redis_client.incr(f"fencing_counter:{lock_key}")
     
     # 2. Adquirir lock com lease TTL
     acquired = redis_client.set(f"lock:{lock_key}", new_owner_id, nx=True, ex=30)
     if not acquired:
-        raise TimeoutError("NÃ£o foi possÃ­vel adquirir lock concorrente.")
+        raise TimeoutError("Não foi possível adquirir lock concorrente.")
         
     return fencing_token
 ```

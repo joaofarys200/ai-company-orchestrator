@@ -33,26 +33,26 @@ sources:
 # âš¡ JARVIS MissionExecutorService and Autonomy Controller
 
 ## 1. Purpose
-O `MissionExecutorService` e o `MissionAutonomyController` formam o motor central de despacho e supervisÃ£o do ciclo de vida das missÃµes, coordenando a execuÃ§Ã£o de passos sequenciais e paralelos entre os agentes especialistas.
+O `MissionExecutorService` e o `MissionAutonomyController` formam o motor central de despacho e supervisão do ciclo de vida das missões, coordenando a execução de passos sequenciais e paralelos entre os agentes especialistas.
 
 ---
 
 ## 2. Responsibilities
-- DecomposiÃ§Ã£o de tarefas em Grafos AcÃ­clicos Dirigidos (DAG).
-- Encaminhamento dinÃ¢mico de passos para agentes (Clara, Devon, Alex, Quinn).
-- FiscalizaÃ§Ã£o de timeouts de passos e quotas de consumo de tokens.
+- Decomposição de tarefas em Grafos Acíclicos Dirigidos (DAG).
+- Encaminhamento dinâmico de passos para agentes (Clara, Devon, Alex, Quinn).
+- Fiscalização de timeouts de passos e quotas de consumo de tokens.
 - Circuit breaking e congelamento em `PAUSED_WAITING_HUMAN` quando ocorrem anomalias repetitivas.
 
 ---
 
 ## 3. Inputs & Outputs
-- **Inputs**: Pedidos de missÃ£o de alto nÃ­vel enviados pelo utilizador (via UI ou voz).
-- **Outputs**: Ordem de despacho de ferramentas, passos executados, relatÃ³rios de progresso via WebSocket.
+- **Inputs**: Pedidos de missão de alto nível enviados pelo utilizador (via UI ou voz).
+- **Outputs**: Ordem de despacho de ferramentas, passos executados, relatórios de progresso via WebSocket.
 
 ---
 
 ## 4. State Management & Invariants
-- Uma missÃ£o ativa transita por estados rigorosos da FSM: `PENDING` $\rightarrow$ `PLANNING` $\rightarrow$ `EXECUTING` $\rightarrow$ `VALIDATING` $\rightarrow$ `COMPLETED`.
+- Uma missão ativa transita por estados rigorosos da FSM: `PENDING` $\rightarrow$ `PLANNING` $\rightarrow$ `EXECUTING` $\rightarrow$ `VALIDATING` $\rightarrow$ `COMPLETED`.
 
 ---
 
@@ -64,18 +64,18 @@ O `MissionExecutorService` e o `MissionAutonomyController` formam o motor centra
 ---
 
 ## 6. Failure Modes & Recovery
-- **Failure**: InterrupÃ§Ã£o repentina de processo ou travamento em loop infinito de chamadas de ferramentas.
-- **Recovery**: O watchdog recupera o Ãºltimo checkpoint e ativa reflexÃ£o ou pausa com notificaÃ§Ã£o humana.
+- **Failure**: Interrupção repentina de processo ou travamento em loop infinito de chamadas de ferramentas.
+- **Recovery**: O watchdog recupera o último checkpoint e ativa reflexão ou pausa com notificação humana.
 
 ---
 
 ## 7. Security Boundaries
-- Controla os nÃ­veis de autorizaÃ§Ã£o: operaÃ§Ãµes que alteram o sistema anfitriÃ£o ou branches protegidas exigem aprovaÃ§Ã£o explÃ­cita.
+- Controla os níveis de autorização: operações que alteram o sistema anfitrião ou branches protegidas exigem aprovação explícita.
 
 ---
 
 ## 8. Evidence Produced & Tests
-- **Evidence**: Grafo de execuÃ§Ã£o persistido, registos de telemetria com W3C trace IDs.
+- **Evidence**: Grafo de execução persistido, registos de telemetria com W3C trace IDs.
 - **Tests**: `tests/test_mission_executor.py`, `tests/test_mission_autonomy.py`.
 
 ---

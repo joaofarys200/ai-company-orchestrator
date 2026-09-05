@@ -11,48 +11,48 @@ tags:
 status: verified
 ---
 
-# ðŸ› ï¸ How to Calculate Net Revenue Retention and Unit Margins
+# 🛠️ï¸ How to Calculate Net Revenue Retention and Unit Margins
 
-## 1. Objetivo & FÃ³rmulas ContÃ¡beis
-Este guia fornece as instruÃ§Ãµes passo a passo para calcular a RetenÃ§Ã£o LÃ­quida de Receita (**NRR**) e a **Margem Bruta UnitÃ¡ria** em produtos SaaS e plataformas de IA.
+## 1. Objetivo & Fórmulas Contábeis
+Este guia fornece as instruções passo a passo para calcular a Retenção Líquida de Receita (**NRR**) e a **Margem Bruta Unitária** em produtos SaaS e plataformas de IA.
 
 ---
 
-## 2. Passo a Passo do CÃ¡lculo de NRR (Net Revenue Retention)
+## 2. Passo a Passo do Cálculo de NRR (Net Revenue Retention)
 
-### Dados NecessÃ¡rios para o PerÃ­odo (ex: 12 meses):
-1. **MRR Inicial ($R_0$)**: Receita mensal recorrente no inÃ­cio do perÃ­odo para a coorte selecionada.
-2. **Receita de ExpansÃ£o ($E$)**: Upgrades de plano, compra de crÃ©ditos adicionais de IA pela mesma base.
-3. **Receita de ContraÃ§Ã£o ($C$)**: Downgrades de plano feitos pela base existente.
+### Dados Necessários para o Período (ex: 12 meses):
+1. **MRR Inicial ($R_0$)**: Receita mensal recorrente no início do período para a coorte selecionada.
+2. **Receita de Expansão ($E$)**: Upgrades de plano, compra de créditos adicionais de IA pela mesma base.
+3. **Receita de Contração ($C$)**: Downgrades de plano feitos pela base existente.
 4. **Receita Perdida por Churn ($L$)**: Clientes que cancelaram integralmente.
 
-### FÃ³rmula:
+### Fórmula:
 $$\text{NRR \%} = \frac{R_0 + E - C - L}{R_0} \times 100\%$$
 
-### Exemplo NumÃ©rico:
+### Exemplo Numérico:
 - $R_0 = \$10,000$
 - $E = +\$2,500$ (clientes compraram mais uso de IA)
 - $C = -\$500$ (downgrade)
 - $L = -\$800$ (churn)
-- $\text{NRR} = \frac{10000 + 2500 - 500 - 800}{10000} = \frac{11200}{10000} \times 100\% = 112.0\%$ (Excelente retenÃ§Ã£o com expansÃ£o lÃ­quida).
+- $\text{NRR} = \frac{10000 + 2500 - 500 - 800}{10000} = \frac{11200}{10000} \times 100\% = 112.0\%$ (Excelente retenção com expansão líquida).
 
 ---
 
-## 3. Passo a Passo do CÃ¡lculo da Margem Bruta UnitÃ¡ria de IA (AI Gross Margin)
+## 3. Passo a Passo do Cálculo da Margem Bruta Unitária de IA (AI Gross Margin)
 
 Em produtos baseados em LLMs, os custos de bens vendidos (**COGS**) incluem:
-- Custos de inferÃªncia de API (OpenAI, Anthropic, Gemini);
-- Custos de GPU / servidores de inferÃªncia local (AWS EC2 / RunPod);
-- Custos de computaÃ§Ã£o da sandbox de execuÃ§Ã£o de cÃ³digo;
-- Custos de trÃ¡fego de rede e banco de dados vetorial.
+- Custos de inferência de API (OpenAI, Anthropic, Gemini);
+- Custos de GPU / servidores de inferência local (AWS EC2 / RunPod);
+- Custos de computação da sandbox de execução de código;
+- Custos de tráfego de rede e banco de dados vetorial.
 
-### FÃ³rmula:
-$$\text{Margem Bruta \%} = \frac{\text{PreÃ§o Cobrado do Cliente} - \text{COGS de IA}}{\text{PreÃ§o Cobrado do Cliente}} \times 100\%$$
-*(PadrÃ£o aceitÃ¡vel para SaaS de IA: $\ge 65\% - 75\%$).*
+### Fórmula:
+$$\text{Margem Bruta \%} = \frac{\text{Preço Cobrado do Cliente} - \text{COGS de IA}}{\text{Preço Cobrado do Cliente}} \times 100\%$$
+*(Padrão aceitável para SaaS de IA: $\ge 65\% - 75\%$).*
 
 ---
 
-## 4. ImplementaÃ§Ã£o em Python
+## 4. Implementação em Python
 
 ```python
 def audit_financial_health(mrr_start: float, expansion: float, contraction: float, churn: float, revenue_per_task: float, cogs_per_task: float) -> dict:

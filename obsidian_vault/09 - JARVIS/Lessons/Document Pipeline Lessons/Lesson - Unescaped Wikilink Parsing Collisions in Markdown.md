@@ -33,13 +33,13 @@ sources:
 # ðŸ“ Lesson - Unescaped Wikilink Parsing Collisions in Markdown
 
 ## Failure
-Durante a indexaÃ§Ã£o do grafo de conhecimento, referÃªncias a caminhos de arquivos de cÃ³digo colocados dentro de colchetes duplos no frontmatter YAML (ex: `[database.py]` ou `[agents/patch_engine.py]`) foram incorretamente interpretadas como notas Markdown inexistentes no cofre, gerando 11 falsos alertas de links quebrados.
+Durante a indexação do grafo de conhecimento, referências a caminhos de arquivos de código colocados dentro de colchetes duplos no frontmatter YAML (ex: `[database.py]` ou `[agents/patch_engine.py]`) foram incorretamente interpretadas como notas Markdown inexistentes no cofre, gerando 11 falsos alertas de links quebrados.
 
 ---
 
 ## Symptoms
 - O validador de integridade do grafo reportou links quebrados para arquivos Python do sistema.
-- Os visualizadores de grafos do Obsidian criaram nÃ³s fantasmas vazios na raiz do cofre.
+- Os visualizadores de grafos do Obsidian criaram nós fantasmas vazios na raiz do cofre.
 
 ---
 
@@ -49,37 +49,37 @@ Script de auditoria de grafos em PowerShell identificou targets sem arquivo `.md
 ---
 
 ## Root Cause
-ConfusÃ£o semÃ¢ntica entre caminhos fÃ­sicos de arquivos do repositÃ³rio (que devem ser formatados como markdown links normais `[database.py](file:///path)`) e nÃ³s conceituais do cofre Obsidian (que usam `[Nota Conceitual]`).
+Confusão semântica entre caminhos físicos de arquivos do repositório (que devem ser formatados como markdown links normais `[database.py](file:///path)`) e nós conceituais do cofre Obsidian (que usam `[Nota Conceitual]`).
 
 ---
 
 ## Why Existing Protection Failed
-O scanner de expressÃµes regulares buscava cegamente `\[\[(.*?)\]\]` em todo o conteÃºdo do documento sem distinguir blocos YAML de implementaÃ§Ãµes de referÃªncias conceituais.
+O scanner de expressões regulares buscava cegamente `\[\[(.*?)\]\]` em todo o conteúdo do documento sem distinguir blocos YAML de implementações de referências conceituais.
 
 ---
 
 ## Blast Radius
-PoluiÃ§Ã£o do grafo semÃ¢ntico e quebra na geraÃ§Ã£o de relatÃ³rios automatizados de qualidade.
+Poluição do grafo semântico e quebra na geração de relatórios automatizados de qualidade.
 
 ---
 
 ## Recovery
-Substituir todas as referÃªncias literais de cÃ³digo em `[...]` no frontmatter por referÃªncias aos nÃ³s arquiteturais correspondentes (ex: `[[JARVIS State Store and Persistence]]`).
+Substituir todas as referências literais de código em `[...]` no frontmatter por referências aos nós arquiteturais correspondentes (ex: `[[JARVIS State Store and Persistence]]`).
 
 ---
 
 ## Corrective Action
-Estabelecer regra de linter: `[...]` Ã© exclusivo para nÃ³s conceituais do cofre Obsidian; arquivos de cÃ³digo fonte do anfitriÃ£o usam links Markdown padrÃ£o com prefixo `file://`.
+Estabelecer regra de linter: `[...]` é exclusivo para nós conceituais do cofre Obsidian; arquivos de código fonte do anfitrião usam links Markdown padrão com prefixo `file://`.
 
 ---
 
 ## Preventive Control
-Adicionar validaÃ§Ã£o estrita no CI do cofre que rejeita extensÃµes `.py`, `.js` e barras `/` dentro de tags `[...]`.
+Adicionar validação estrita no CI do cofre que rejeita extensões `.py`, `.js` e barras `/` dentro de tags `[...]`.
 
 ---
 
 ## Generalizable Principle
-> *No design de grafos de conhecimento para agentes, os nÃ³s conceituais (ontologia de conhecimento) devem ser mantidos estritamente desacoplados dos descritores de arquivos de cÃ³digo fonte (Ã¡rvore de assets), evitando colisÃµes de namespace entre os dois universos.*
+> *No design de grafos de conhecimento para agentes, os nós conceituais (ontologia de conhecimento) devem ser mantidos estritamente desacoplados dos descritores de arquivos de código fonte (árvore de assets), evitando colisões de namespace entre os dois universos.*
 
 ---
 
@@ -101,5 +101,5 @@ Adicionar validaÃ§Ã£o estrita no CI do cofre que rejeita extensÃµes `.py`,
 ---
 
 ## Evidence
-- RelatÃ³rio de auditoria de grafo da Fase 3.
+- Relatório de auditoria de grafo da Fase 3.
 

@@ -3,61 +3,61 @@
     {
       "id": "I01",
       "prompt": "Verificar estado do enxame de agentes.",
-      "duration_seconds": 1.2343335151672363,
+      "duration_seconds": 1.2622778415679932,
       "status": "COMPLETED"
     },
     {
       "id": "I02",
       "prompt": "Listar ficheiros no projeto ativo.",
-      "duration_seconds": 1.2417669296264648,
+      "duration_seconds": 1.275803804397583,
       "status": "COMPLETED"
     },
     {
       "id": "I03",
       "prompt": "Apresentar sumário da arquitetura do sistema.",
-      "duration_seconds": 1.242823600769043,
+      "duration_seconds": 1.2738697528839111,
       "status": "COMPLETED"
     },
     {
       "id": "I04",
       "prompt": "Verificar tarefas no quadro Kanban.",
-      "duration_seconds": 1.2398760318756104,
+      "duration_seconds": 1.2670514583587646,
       "status": "COMPLETED"
     },
     {
       "id": "I05",
       "prompt": "Pesquisar referências à classe EvidenceGateway.",
-      "duration_seconds": 1.2333667278289795,
+      "duration_seconds": 1.265754222869873,
       "status": "COMPLETED"
     },
     {
       "id": "I06",
       "prompt": "Validar notas disponíveis no Obsidian Knowledge Vault.",
-      "duration_seconds": 1.2339978218078613,
+      "duration_seconds": 1.28131103515625,
       "status": "COMPLETED"
     },
     {
       "id": "I07",
       "prompt": "Inspecionar estado atual do Mission Planner.",
-      "duration_seconds": 1.239330530166626,
+      "duration_seconds": 1.280043363571167,
       "status": "COMPLETED"
     },
     {
       "id": "I08",
       "prompt": "Consultar regras de persistência e memória técnica.",
-      "duration_seconds": 1.2409915924072266,
+      "duration_seconds": 1.2677862644195557,
       "status": "COMPLETED"
     },
     {
       "id": "I09",
       "prompt": "Verificar diagnóstico de infraestrutura e sandbox.",
-      "duration_seconds": 1.2368035316467285,
+      "duration_seconds": 1.2897679805755615,
       "status": "COMPLETED"
     },
     {
       "id": "I10",
       "prompt": "Emitir relatório de prontidão operacional.",
-      "duration_seconds": 1.2383031845092773,
+      "duration_seconds": 1.299623727798462,
       "status": "COMPLETED"
     }
   ],

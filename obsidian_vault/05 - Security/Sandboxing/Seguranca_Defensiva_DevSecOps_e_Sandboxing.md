@@ -9,34 +9,34 @@ tags:
 status: verified
 ---
 
-# ðŸ›¡ï¸ Manual Completo de SeguranÃ§a Defensiva, DevSecOps & Sandboxing
+# 🛡️ï¸ Manual Completo de Segurança Defensiva, DevSecOps & Sandboxing
 
-## ðŸ“Œ 1. VisÃ£o Geral
-Este manual estabelece o **framework de seguranÃ§a e proteÃ§Ã£o em profundidade** aplicado em todas as operaÃ§Ãµes de execuÃ§Ã£o de cÃ³digo, automaÃ§Ã£o de ambiente de trabalho e serviÃ§os de API do **JARVIS OS**.
-
----
-
-## ðŸ”’ 2. PrincÃ­pios de SeguranÃ§a em Profundidade (Defense in Depth)
-
-### 2.1. PrincÃ­pio do Menor PrivilÃ©gio (Least Privilege)
-- Agentes de IA e subprocessos locais executam estritamente com as permissÃµes mÃ­nimas necessÃ¡rias.
-- OperaÃ§Ãµes no sistema de ficheiros ficam restritas Ã  diretoria do projeto e Ã  sandbox autorizada (`sandbox_dir/`).
-
-### 2.2. SanitizaÃ§Ã£o de Input e PrevenÃ§Ã£o de Injection
-- NUNCA executar strings nÃ£o higienizadas diretamente em `shell=True` no `subprocess.run` ou PowerShell.
-- **NormalizaÃ§Ã£o de Argumentos**: Argumentos fornecidos pelo LLM para ferramentas de SO devem ser validados contra dicionÃ¡rios rÃ­gidos de permissÃµes.
+## 📍 1. Visão Geral
+Este manual estabelece o **framework de segurança e proteção em profundidade** aplicado em todas as operações de execução de código, automação de ambiente de trabalho e serviços de API do **JARVIS OS**.
 
 ---
 
-## ðŸ³ 3. Sandbox de ExecuÃ§Ã£o & Isolamento de Processos
+## 🔒 2. Princípios de Segurança em Profundidade (Defense in Depth)
+
+### 2.1. Princípio do Menor Privilégio (Least Privilege)
+- Agentes de IA e subprocessos locais executam estritamente com as permissões mínimas necessárias.
+- Operações no sistema de ficheiros ficam restritas Ã  diretoria do projeto e Ã  sandbox autorizada (`sandbox_dir/`).
+
+### 2.2. Sanitização de Input e Prevenção de Injection
+- NUNCA executar strings não higienizadas diretamente em `shell=True` no `subprocess.run` ou PowerShell.
+- **Normalização de Argumentos**: Argumentos fornecidos pelo LLM para ferramentas de SO devem ser validados contra dicionários rígidos de permissões.
+
+---
+
+## ðŸ³ 3. Sandbox de Execução & Isolamento de Processos
 
 ### 3.1. Arquitetura de Sandbox Dual-Mode
-O JARVIS OS emprega uma arquitetura de sandbox de dois nÃ­veis:
-1. **Modo Contentorizado (Docker/Seccomp)**: ExecuÃ§Ã£o de previews web e scripts dentro de um contentor isolado sem acesso Ã  rede host ou ao sistema de ficheiros raiz.
-2. **Modo Fallback Local Seguro**: Em sistemas sem Docker ativo, a sandbox utiliza um servidor HTTP local estÃ¡tico limitado Ã  pasta `sandbox_dir/` com sanitizaÃ§Ã£o de caminhos (`os.path.commonpath`).
+O JARVIS OS emprega uma arquitetura de sandbox de dois níveis:
+1. **Modo Contentorizado (Docker/Seccomp)**: Execução de previews web e scripts dentro de um contentor isolado sem acesso Ã  rede host ou ao sistema de ficheiros raiz.
+2. **Modo Fallback Local Seguro**: Em sistemas sem Docker ativo, a sandbox utiliza um servidor HTTP local estático limitado Ã  pasta `sandbox_dir/` com sanitização de caminhos (`os.path.commonpath`).
 
-### 3.2. PrevenÃ§Ã£o de Path Traversal
-Todos os acessos a ficheiros recebem verificaÃ§Ã£o rigorosa contra ataques de navegaÃ§Ã£o relativa de diretÃ³rios (`../`):
+### 3.2. Prevenção de Path Traversal
+Todos os acessos a ficheiros recebem verificação rigorosa contra ataques de navegação relativa de diretórios (`../`):
 ```python
 import os
 
@@ -51,22 +51,22 @@ def is_safe_path(base_dir: str, target_path: str) -> bool:
 
 ---
 
-## ðŸ”‘ 4. GestÃ£o de Segredos & ProteÃ§Ã£o de Dados SensÃ­veis
+## 🔑 4. Gestão de Segredos & Proteção de Dados Sensíveis
 
-### 4.1. ProibiÃ§Ã£o de Hardcoding de Credenciais
-- Chaves de API (`GEMINI_API_KEY`, `OPENROUTER_API_KEY`), tokens WebSocket e passwords NUNCA devem ser gravados diretamente no cÃ³digo-fonte ou em notas pÃºblicas.
-- Utilizar exclusivamente variÃ¡veis de ambiente carregadas a partir de um ficheiro `.env` nÃ£o commitado.
+### 4.1. Proibição de Hardcoding de Credenciais
+- Chaves de API (`GEMINI_API_KEY`, `OPENROUTER_API_KEY`), tokens WebSocket e passwords NUNCA devem ser gravados diretamente no código-fonte ou em notas públicas.
+- Utilizar exclusivamente variáveis de ambiente carregadas a partir de um ficheiro `.env` não commitado.
 
-### 4.2. SanitizaÃ§Ã£o de Logs de Telemetria
-O motor de telemetria (`ModelTelemetry`) higieniza automaticamente os registos para garantir que os prompts do utilizador e dados pessoais nÃ£o sÃ£o expostos em mÃ©tricas pÃºblicas de APM.
+### 4.2. Sanitização de Logs de Telemetria
+O motor de telemetria (`ModelTelemetry`) higieniza automaticamente os registos para garantir que os prompts do utilizador e dados pessoais não são expostos em métricas públicas de APM.
 
 ---
 
-## âš¡ 5. ProteÃ§Ã£o contra NegaÃ§Ã£o de ServiÃ§o (Rate Limiting & Memory Bounds)
+## âš¡ 5. Proteção contra Negação de Serviço (Rate Limiting & Memory Bounds)
 
-### 5.1. Rate Limiting por IP/ConexÃ£o
-- O servidor de API e WebSockets aplica limites de taxa de pedidos por IP para prevenir exaustÃ£o de recursos ou ataques de forÃ§a bruta.
+### 5.1. Rate Limiting por IP/Conexão
+- O servidor de API e WebSockets aplica limites de taxa de pedidos por IP para prevenir exaustão de recursos ou ataques de força bruta.
 
-### 5.2. Limites de OrÃ§amento de Contexto e MemÃ³ria
-- O `ModelHarness` aplica limites estritos de `max_context_tokens` e `max_output_tokens` para impedir estouro de memÃ³ria GPU/RAM durante a geraÃ§Ã£o de respostas.
+### 5.2. Limites de Orçamento de Contexto e Memória
+- O `ModelHarness` aplica limites estritos de `max_context_tokens` e `max_output_tokens` para impedir estouro de memória GPU/RAM durante a geração de respostas.
 

@@ -29,18 +29,18 @@ sources:
     url: internal://server.py
 ---
 
-# ðŸ“¡ JARVIS WebSocket Telemetry and Dispatcher Protocol
+# 📡 JARVIS WebSocket Telemetry and Dispatcher Protocol
 
 ## 1. Purpose
-O protocolo de telemetria WebSocket (`/ws/telemetry`) Ã© o canal full-duplex de comunicaÃ§Ã£o assÃ­ncrona entre o backend Python do JARVIS OS e a interface desktop do utilizador, transmitindo eventos de missÃµes, saÃ­das de terminal em streaming, mÃ©tricas de hardware e respostas de voz.
+O protocolo de telemetria WebSocket (`/ws/telemetry`) é o canal full-duplex de comunicação assíncrona entre o backend Python do JARVIS OS e a interface desktop do utilizador, transmitindo eventos de missões, saídas de terminal em streaming, métricas de hardware e respostas de voz.
 
 ---
 
 ## 2. Responsibilities
-- Transmitir eventos de progresso de missÃµes (`MISSION_PROGRESS`, `STEP_STARTED`, `STEP_COMPLETED`).
-- Emitir telemetria de terminal em streaming com saÃ­da limpa de caracteres ANSI.
-- Aplicar o filtro de saÃ­da obrigatÃ³rio de redaÃ§Ã£o de segredos (ver [[Lesson - Accidental Secret Leaks in Telemetry Broadcast]] e [[ADR-004 - Strict Exit Barrier Secret Sanitization in WebSocket Telemetry]]).
-- Gerir conexÃµes concorrentes com heartbeats e reconexÃ£o automÃ¡tica.
+- Transmitir eventos de progresso de missões (`MISSION_PROGRESS`, `STEP_STARTED`, `STEP_COMPLETED`).
+- Emitir telemetria de terminal em streaming com saída limpa de caracteres ANSI.
+- Aplicar o filtro de saída obrigatório de redação de segredos (ver [[Lesson - Accidental Secret Leaks in Telemetry Broadcast]] e [[ADR-004 - Strict Exit Barrier Secret Sanitization in WebSocket Telemetry]]).
+- Gerir conexões concorrentes com heartbeats e reconexão automática.
 
 ---
 
@@ -51,7 +51,7 @@ O protocolo de telemetria WebSocket (`/ws/telemetry`) Ã© o canal full-duplex d
 ---
 
 ## 4. State Management & Invariants
-- O `ConnectionManager` mantÃ©m um registo de WebSockets ativos e remove sockets desconectados de forma thread-safe.
+- O `ConnectionManager` mantém um registo de WebSockets ativos e remove sockets desconectados de forma thread-safe.
 
 ---
 
@@ -62,13 +62,13 @@ O protocolo de telemetria WebSocket (`/ws/telemetry`) Ã© o canal full-duplex d
 ---
 
 ## 6. Failure Modes & Recovery
-- **Failure**: DesconexÃ£o abrupta do cliente ou sobrecarga de mensagens em buffer.
-- **Recovery**: Descarte de mensagens volÃ¡teis e reconexÃ£o com envio do snapshot de estado atual.
+- **Failure**: Desconexão abrupta do cliente ou sobrecarga de mensagens em buffer.
+- **Recovery**: Descarte de mensagens voláteis e reconexão com envio do snapshot de estado atual.
 
 ---
 
 ## 7. Security Boundaries
-- Exit Barrier de higienizaÃ§Ã£o de tokens aplicada em todo o broadcast.
+- Exit Barrier de higienização de tokens aplicada em todo o broadcast.
 
 ---
 

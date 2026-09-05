@@ -12,6 +12,15 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterator
 
+from agents.mission_persistence import (
+    HybridMissionPersistence,
+    MissionStatePersistence,
+    ShardedFilesystemPersistence,
+    SQLiteMissionPersistence,
+    StorageMigrationEngine,
+    StorageStats,
+)
+
 
 MISSION_STATUSES = {"DRAFT", "READY", "ACTIVE", "BLOCKED", "COMPLETED", "FAILED", "CANCELLED"}
 WORK_PACKAGE_TYPES = {"PROJECT_BUILD", "RESEARCH", "CODING", "DOCUMENT", "EXPERIMENT", "REVIEW", "GENERIC"}
@@ -152,11 +161,27 @@ def utc_now() -> str:
 class MissionStateStore:
     """Project-scoped Mission State. It persists state but never executes work."""
 
-    def __init__(self, workspace_root: str = ".", lock_timeout_seconds: float = 5.0):
+    def __init__(
+        self,
+        workspace_root: str = ".",
+        lock_timeout_seconds: float = 5.0,
+        storage_backend: str | None = None,
+    ):
         self.workspace_root = os.path.realpath(os.path.abspath(workspace_root))
         self.projects_root = os.path.join(self.workspace_root, "workspace", "projects")
         self.metadata_root = os.path.join(self.workspace_root, "workspace", ".jarvis", "projects")
         self.lock_timeout_seconds = lock_timeout_seconds
+
+        backend_name = (storage_backend or os.environ.get("JARVIS_STORAGE_BACKEND", "hybrid")).lower()
+        self.storage_backend = backend_name
+        if backend_name == "sqlite":
+            self.persistence: MissionStatePersistence = SQLiteMissionPersistence(self.workspace_root)
+        elif backend_name == "sharded":
+            self.persistence = ShardedFilesystemPersistence(self.workspace_root)
+        else:
+            self.persistence = HybridMissionPersistence(self.workspace_root)
+
+        self.migration_engine = StorageMigrationEngine(self.workspace_root)
 
     def create_mission(
         self,
@@ -173,9 +198,12 @@ class MissionStateStore:
         objective = self._required_text(objective, "objective")
         mission_id = self._validate_id(mission_id or uuid.uuid4().hex, "mission_id")
         mission_dir = self._mission_dir(project_id, mission_id)
-        if os.path.exists(mission_dir):
+        if os.path.exists(mission_dir) and (
+            os.path.isfile(os.path.join(mission_dir, "mission.json"))
+            or os.path.isfile(os.path.join(mission_dir, "state.db"))
+        ):
             raise MissionStateError(f"A missao '{mission_id}' ja existe.")
-        os.makedirs(mission_dir, exist_ok=False)
+        os.makedirs(mission_dir, exist_ok=True)
         for name in ("work_packages", "deliverables", "evidence", "criteria", "executions"):
             os.makedirs(os.path.join(mission_dir, name), exist_ok=True)
         now = utc_now()
@@ -191,6 +219,7 @@ class MissionStateStore:
             updated_at=now,
         )
         self._write_entity(self._mission_path(project_id, mission_id), mission)
+        self.persistence.save_mission(project_id, mission_id, asdict(mission))
         self._append_event(project_id, mission_id, "MISSION", mission_id, "MISSION_CREATED", 0, 1, {
             "title": title,
             "objective": objective,
@@ -199,6 +228,9 @@ class MissionStateStore:
 
     def list_missions(self, project_id: str) -> list[dict[str, Any]]:
         project_id = self._validate_project(project_id)
+        persisted = self.persistence.list_missions(project_id)
+        if persisted:
+            return persisted
         root = self._missions_root(project_id)
         if not os.path.isdir(root):
             return []
@@ -216,9 +248,29 @@ class MissionStateStore:
     def load_mission(self, project_id: str, mission_id: str) -> dict[str, Any]:
         project_id = self._validate_project(project_id)
         mission_id = self._validate_id(mission_id, "mission_id")
-        mission = Mission(**self._read_json(self._mission_path(project_id, mission_id)))
+
+        # Auto-migration if legacy storage format detected
+        format_detected = self.migration_engine.detect_format(project_id, mission_id)
+        if format_detected == "legacy" and self.storage_backend in {"hybrid", "sqlite", "sharded"}:
+            try:
+                self.migration_engine.migrate(project_id, mission_id, self.persistence)
+            except Exception:
+                pass
+
+        mission_data = self.persistence.load_mission(project_id, mission_id)
+        if not mission_data:
+            m_path = self._mission_path(project_id, mission_id)
+            if os.path.isfile(m_path):
+                mission = Mission(**self._read_json(m_path))
+                mission_data = asdict(mission)
+            else:
+                raise MissionStateError(f"Missao '{mission_id}' nao encontrada.")
+        else:
+            mission = Mission(**mission_data)
+
         if mission.project_id != project_id or mission.mission_id != mission_id:
             raise MissionStateError("A identidade persistida da missao nao corresponde ao caminho.")
+
         work_packages = self._load_entities(project_id, mission_id, "work_packages", WorkPackage)
         deliverables = self._load_entities(project_id, mission_id, "deliverables", Deliverable)
         evidence = self._load_entities(project_id, mission_id, "evidence", Evidence)
@@ -227,15 +279,19 @@ class MissionStateStore:
         self._validate_dag(work_packages)
         effective_packages = self._effective_work_packages(work_packages)
         progress = self._progress(effective_packages)
-        mission_data = asdict(mission)
-        mission_data["progress"] = progress
+        m_dict = asdict(mission)
+        m_dict["progress"] = progress
+        sorted_packages = sorted(
+            effective_packages.values(),
+            key=lambda item: (-item["priority"], item["created_at"], item["work_package_id"]),
+        )
         eligible = [
-            item["work_package_id"] for item in effective_packages.values()
+            item["work_package_id"] for item in sorted_packages
             if item["status"] == "READY"
         ]
         return {
-            "mission": mission_data,
-            "work_packages": sorted(effective_packages.values(), key=lambda item: (-item["priority"], item["created_at"])),
+            "mission": m_dict,
+            "work_packages": sorted_packages,
             "deliverables": [asdict(item) for item in deliverables.values()],
             "evidence": [asdict(item) for item in evidence.values()],
             "acceptance_criteria": [asdict(item) for item in criteria.values()],
@@ -268,10 +324,33 @@ class MissionStateStore:
                 mission.metadata = self._metadata(clean["metadata"])
             self._touch(mission)
             self._write_entity(self._mission_path(project_id, mission_id), mission)
+            self.persistence.save_mission(project_id, mission_id, asdict(mission))
             self._append_event(project_id, mission_id, "MISSION", mission_id, "MISSION_UPDATED", previous, mission.version, {
                 "fields": sorted(clean),
             })
         return self.load_mission(project_id, mission_id)
+
+    def update_mission_metadata(self, project_id: str, mission_id: str, updates: dict[str, Any]) -> dict[str, Any]:
+        with self._locked_mission(project_id, mission_id):
+            mission = self._load_mission_entity(project_id, mission_id)
+            previous = mission.version
+            current_meta = dict(mission.metadata or {})
+            current_meta.update(updates)
+            mission.metadata = self._metadata(current_meta)
+            self._touch(mission)
+            self._write_entity(self._mission_path(project_id, mission_id), mission)
+            self.persistence.save_mission(project_id, mission_id, asdict(mission))
+            self._append_event(project_id, mission_id, "MISSION", mission_id, "MISSION_METADATA_UPDATED", previous, mission.version, {
+                "updated_keys": sorted(updates.keys()),
+            })
+        return self.load_mission(project_id, mission_id)
+
+    def get_mission_metadata(self, project_id: str, mission_id: str) -> dict[str, Any]:
+        mission = self.persistence.load_mission(project_id, mission_id)
+        if mission:
+            return mission.get("metadata", {})
+        m = self._load_mission_entity(project_id, mission_id)
+        return m.metadata or {}
 
     def set_mission_status(self, project_id: str, mission_id: str, status: str, expected_version: int) -> dict[str, Any]:
         target = self._choice(status, MISSION_STATUSES, "status")
@@ -345,6 +424,7 @@ class MissionStateStore:
             candidate = dict(work_packages)
             candidate[work_package_id] = item
             self._validate_dag(candidate)
+            self.persistence.save_work_package(project_id, mission_id, asdict(item))
             self._write_entity(self._entity_path(project_id, mission_id, "work_packages", work_package_id), item)
             self._append_event(project_id, mission_id, "WORK_PACKAGE", work_package_id, "WORK_PACKAGE_CREATED", 0, 1, {
                 "title": item.title,
@@ -355,6 +435,108 @@ class MissionStateStore:
                     "dependency_id": dependency,
                 })
             self._touch_mission_after_child_change(project_id, mission)
+        return self.load_mission(project_id, mission_id)
+
+    def create_work_packages_batch(
+        self,
+        project_id: str,
+        mission_id: str,
+        packages: list[dict[str, Any]],
+        criteria: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        """Atomically creates multiple work packages and optional criteria in a single lock & touch operation."""
+        project_id = self._validate_project(project_id)
+        mission_id = self._validate_id(mission_id, "mission_id")
+        now = utc_now()
+
+        with self._locked_mission(project_id, mission_id):
+            mission = self._load_mission_entity(project_id, mission_id)
+            work_packages = self._load_entities(project_id, mission_id, "work_packages", WorkPackage)
+            candidate = dict(work_packages)
+
+            new_packages: list[WorkPackage] = []
+            for pkg in packages:
+                wpid = self._validate_id(pkg.get("work_package_id", ""), "work_package_id")
+                if wpid in candidate:
+                    raise MissionStateError(f"WorkPackage '{wpid}' ja existe.")
+                deps = [self._validate_id(d, "dependency") for d in pkg.get("dependencies", [])]
+                item = WorkPackage(
+                    work_package_id=wpid,
+                    mission_id=mission_id,
+                    title=self._required_text(pkg.get("title", ""), "title"),
+                    description=str(pkg.get("description") or "").strip(),
+                    type=self._choice(pkg.get("type", "GENERIC"), WORK_PACKAGE_TYPES, "type"),
+                    priority=int(pkg.get("priority", 0)),
+                    dependencies=deps,
+                    executor_kind=str(pkg.get("executor_kind") or "MANUAL").strip() or "MANUAL",
+                    executor_ref=str(pkg.get("executor_ref") or "").strip(),
+                    metadata=self._metadata(pkg.get("metadata", {})),
+                    required=bool(pkg.get("required", True)),
+                    created_at=now,
+                    updated_at=now,
+                )
+                candidate[wpid] = item
+                new_packages.append(item)
+
+            # Validate entire DAG once using unified iterative validator
+            self._validate_dag(candidate)
+
+            crit_items: list[AcceptanceCriterion] = []
+            if criteria:
+                for crit in criteria:
+                    c_id = self._validate_id(crit.get("criterion_id", ""), "criterion_id")
+                    c_item = AcceptanceCriterion(
+                        criterion_id=c_id,
+                        mission_id=mission_id,
+                        owner_type=crit.get("owner_type", "WORK_PACKAGE"),
+                        owner_id=crit.get("owner_id", ""),
+                        description=self._required_text(crit.get("description", ""), "description"),
+                        required=bool(crit.get("required", True)),
+                        created_at=now,
+                        updated_at=now,
+                    )
+                    crit_items.append(c_item)
+
+            # Atomically save entire batch to scalable persistence layer
+            self.persistence.save_work_packages_batch(
+                project_id,
+                mission_id,
+                [asdict(p) for p in new_packages],
+                [asdict(c) for c in crit_items] if crit_items else None,
+            )
+
+            # If legacy backend or small test mission, also write individual files
+            if self.storage_backend == "legacy" or len(new_packages) <= 50:
+                for item in new_packages:
+                    self._write_entity(self._entity_path(project_id, mission_id, "work_packages", item.work_package_id), item)
+                for c_item in crit_items:
+                    self._write_entity(self._entity_path(project_id, mission_id, "criteria", c_item.criterion_id), c_item)
+
+            # Append events: bulk event if large batch (> 100 items), otherwise individual events
+            if len(new_packages) > 100:
+                self._append_event(project_id, mission_id, "MISSION", mission_id, "WORK_PACKAGES_BATCH_CREATED", 0, len(new_packages), {
+                    "count": len(new_packages),
+                })
+            else:
+                for item in new_packages:
+                    self._append_event(project_id, mission_id, "WORK_PACKAGE", item.work_package_id, "WORK_PACKAGE_CREATED", 0, 1, {
+                        "title": item.title,
+                        "type": item.type,
+                    })
+                    for dependency in item.dependencies:
+                        self._append_event(project_id, mission_id, "WORK_PACKAGE", item.work_package_id, "DEPENDENCY_ADDED", 0, 1, {
+                            "dependency_id": dependency,
+                        })
+
+                for c_item in crit_items:
+                    self._append_event(project_id, mission_id, "CRITERION", c_item.criterion_id, "CRITERION_CREATED", 0, 1, {
+                        "owner_type": c_item.owner_type,
+                        "owner_id": c_item.owner_id,
+                    })
+
+            # Single touch after all entities are written
+            self._touch_mission_after_child_change(project_id, mission)
+
         return self.load_mission(project_id, mission_id)
 
     def update_work_package(self, project_id: str, mission_id: str, work_package_id: str, expected_version: int, changes: dict[str, Any]) -> dict[str, Any]:
@@ -386,6 +568,7 @@ class MissionStateStore:
             if "blocked_reason" in clean:
                 item.blocked_reason = str(clean["blocked_reason"] or "").strip()
             self._touch(item)
+            self.persistence.save_work_package(project_id, mission_id, asdict(item))
             self._write_entity(self._entity_path(project_id, mission_id, "work_packages", work_package_id), item)
             self._append_event(project_id, mission_id, "WORK_PACKAGE", work_package_id, "WORK_PACKAGE_UPDATED", previous, item.version, {
                 "fields": sorted(clean),
@@ -424,6 +607,7 @@ class MissionStateStore:
             elif target in {"READY", "IN_PROGRESS"}:
                 item.blocked_reason = ""
             self._touch(item, now)
+            self.persistence.save_work_package(project_id, mission_id, asdict(item))
             self._write_entity(self._entity_path(project_id, mission_id, "work_packages", work_package_id), item)
             self._append_event(project_id, mission_id, "WORK_PACKAGE", work_package_id, "WORK_PACKAGE_STATUS_CHANGED", previous, item.version, {
                 "previous_status": previous_status,
@@ -808,6 +992,13 @@ class MissionStateStore:
             data = asdict(item)
             data["stored_status"] = item.status
             data["status"] = self._effective_status(item, packages)
+            if item.metadata:
+                if "parent_task_id" in item.metadata:
+                    data["parent_task_id"] = item.metadata["parent_task_id"]
+                if "expansion_depth" in item.metadata:
+                    data["expansion_depth"] = item.metadata["expansion_depth"]
+                if "subdag_id" in item.metadata:
+                    data["subdag_id"] = item.metadata["subdag_id"]
             result[item_id] = data
         return result
 
@@ -834,34 +1025,37 @@ class MissionStateStore:
 
     @staticmethod
     def _validate_dag(packages: dict[str, WorkPackage]) -> None:
-        for item in packages.values():
-            for dependency in item.dependencies:
-                if dependency not in packages:
-                    raise MissionStateError(f"Dependencia inexistente: {dependency}.")
-                if dependency == item.work_package_id:
-                    raise MissionStateError("Um WorkPackage nao pode depender de si proprio.")
-        visiting: set[str] = set()
-        visited: set[str] = set()
-
-        def visit(node_id: str) -> None:
-            if node_id in visiting:
-                raise MissionStateError("A dependencia criaria um ciclo no DAG.")
-            if node_id in visited:
-                return
-            visiting.add(node_id)
-            for dependency in packages[node_id].dependencies:
-                visit(dependency)
-            visiting.remove(node_id)
-            visited.add(node_id)
-
-        for node_id in packages:
-            visit(node_id)
+        from agents.task_graph import (
+            TaskDependencyError,
+            TaskGraph,
+            TaskGraphCycleError,
+            TaskGraphError,
+            TaskNode,
+        )
+        nodes = [
+            TaskNode(
+                task_id=pkg.work_package_id,
+                title=pkg.title,
+                dependencies=list(pkg.dependencies),
+            )
+            for pkg in packages.values()
+        ]
+        try:
+            tg = TaskGraph(nodes=nodes)
+            tg.validate()
+        except TaskDependencyError as de:
+            raise MissionStateError(f"Dependencia inexistente: {de}") from de
+        except TaskGraphCycleError as ce:
+            raise MissionStateError(f"A dependencia criaria um ciclo no DAG: {ce}") from ce
+        except TaskGraphError as te:
+            raise MissionStateError(str(te)) from te
 
     def _touch_mission_after_child_change(self, project_id: str, mission: Mission) -> None:
         packages = self._load_entities(project_id, mission.mission_id, "work_packages", WorkPackage)
         mission.progress = self._progress(self._effective_work_packages(packages))
         self._touch(mission)
         self._write_entity(self._mission_path(project_id, mission.mission_id), mission)
+        self.persistence.save_mission(project_id, mission.mission_id, asdict(mission))
 
     def _load_mission_entity(self, project_id: str, mission_id: str) -> Mission:
         project_id = self._validate_project(project_id)
@@ -880,19 +1074,104 @@ class MissionStateStore:
     def _load_criterion(self, project_id: str, mission_id: str, item_id: str) -> AcceptanceCriterion:
         return self._load_entity(project_id, mission_id, "criteria", item_id, AcceptanceCriterion)
 
+    def has_work_package(self, project_id: str, mission_id: str, work_package_id: str) -> bool:
+        """Fast O(1) indexed check for existence of a work package."""
+        if self.persistence.get_work_package(project_id, mission_id, work_package_id) is not None:
+            return True
+        path = self._entity_path(project_id, mission_id, "work_packages", work_package_id)
+        return os.path.isfile(path)
+
+    def get_work_package(self, project_id: str, mission_id: str, work_package_id: str) -> dict[str, Any] | None:
+        """Fast O(1) indexed lookup of work package data."""
+        pdata = self.persistence.get_work_package(project_id, mission_id, work_package_id)
+        if pdata is not None:
+            return pdata
+        path = self._entity_path(project_id, mission_id, "work_packages", work_package_id)
+        if os.path.isfile(path):
+            try:
+                return self._read_json(path)
+            except Exception:
+                return None
+        return None
+
+    def load_work_package(self, project_id: str, mission_id: str, work_package_id: str) -> dict[str, Any]:
+        wp = self._load_work_package(project_id, mission_id, work_package_id)
+        return asdict(wp)
+
     def _load_entity(self, project_id: str, mission_id: str, directory: str, item_id: str, model):
         item_id = self._validate_id(item_id, f"{directory}_id")
+        if directory == "work_packages":
+            pdata = self.persistence.get_work_package(project_id, mission_id, item_id)
+            if pdata:
+                try:
+                    return model(**pdata)
+                except Exception:
+                    pass
+
         path = self._entity_path(project_id, mission_id, directory, item_id)
-        try:
-            return model(**self._read_json(path))
-        except TypeError as exc:
-            raise MissionStateError(f"Entidade invalida em {directory}/{item_id}: {exc}") from exc
+        if os.path.isfile(path):
+            try:
+                return model(**self._read_json(path))
+            except TypeError as exc:
+                raise MissionStateError(f"Entidade invalida em {directory}/{item_id}: {exc}") from exc
+
+        if directory == "deliverables":
+            delivs = self.persistence.load_all_deliverables(project_id, mission_id)
+            if item_id in delivs:
+                return model(**delivs[item_id])
+        elif directory == "criteria":
+            crits = self.persistence.load_all_criteria(project_id, mission_id)
+            if item_id in crits:
+                return model(**crits[item_id])
+        elif directory == "evidence":
+            evids = self.persistence.load_all_evidence(project_id, mission_id)
+            if item_id in evids:
+                return model(**evids[item_id])
+
+        raise MissionStateError(f"Entidade nao encontrada: {directory}/{item_id}")
 
     def _load_entities(self, project_id: str, mission_id: str, directory: str, model) -> dict[str, Any]:
+        result = {}
+        if directory == "work_packages":
+            persisted = self.persistence.load_all_work_packages(project_id, mission_id)
+            if persisted:
+                for wpid, pdata in persisted.items():
+                    try:
+                        result[wpid] = model(**pdata)
+                    except Exception:
+                        pass
+                return result
+        elif directory == "deliverables":
+            persisted = self.persistence.load_all_deliverables(project_id, mission_id)
+            if persisted:
+                for did, ddata in persisted.items():
+                    try:
+                        result[did] = model(**ddata)
+                    except Exception:
+                        pass
+                return result
+        elif directory == "evidence":
+            persisted = self.persistence.load_all_evidence(project_id, mission_id)
+            if persisted:
+                for eid, edata in persisted.items():
+                    try:
+                        result[eid] = model(**edata)
+                    except Exception:
+                        pass
+                return result
+        elif directory == "criteria":
+            persisted = self.persistence.load_all_criteria(project_id, mission_id)
+            if persisted:
+                for cid, cdata in persisted.items():
+                    try:
+                        result[cid] = model(**cdata)
+                    except Exception:
+                        pass
+                return result
+
         root = os.path.join(self._mission_dir(project_id, mission_id), directory)
         if not os.path.isdir(root):
             return {}
-        result = {}
         for path in sorted(Path(root).glob("*.json")):
             try:
                 item = model(**self._read_json(str(path)))
@@ -1078,7 +1357,33 @@ class MissionStateStore:
         return data
 
     def _write_entity(self, path: str, entity: Any) -> None:
-        self._atomic_write_json(path, asdict(entity))
+        data = asdict(entity)
+        # Sincroniza com persistence layer com base no path
+        parts = Path(path).parts
+        if "missions" in parts:
+            try:
+                idx = parts.index("missions")
+                if len(parts) >= idx + 3:
+                    mission_id = parts[idx + 1]
+                    project_id = parts[idx - 1] if idx >= 1 else "default"
+                    if parts[idx + 2] == "mission.json":
+                        self.persistence.save_mission(project_id, mission_id, data)
+                    elif len(parts) >= idx + 4:
+                        directory = parts[idx + 2]
+                        if directory == "work_packages":
+                            self.persistence.save_work_package(project_id, mission_id, data)
+                        elif directory == "deliverables":
+                            self.persistence.save_deliverable(project_id, mission_id, data)
+                        elif directory == "evidence":
+                            self.persistence.save_evidence(project_id, mission_id, data)
+                        elif directory == "criteria":
+                            self.persistence.save_criterion(project_id, mission_id, data)
+                        elif directory == "executions":
+                            exec_id = parts[idx + 3].replace(".json", "")
+                            self.persistence.save_execution(project_id, mission_id, exec_id, data)
+            except Exception:
+                pass
+        self._atomic_write_json(path, data)
 
     @staticmethod
     def _atomic_write_json(path: str, payload: dict[str, Any]) -> None:
@@ -1120,13 +1425,28 @@ class MissionStateStore:
             "new_version": new_version,
             "payload": payload,
         }
+        try:
+            self.persistence.append_event(project_id, mission_id, event)
+        except Exception:
+            pass
+
         path = os.path.join(self._mission_dir(project_id, mission_id), "events.jsonl")
-        with open(path, "a", encoding="utf-8", newline="\n") as handle:
-            handle.write(json.dumps(event, ensure_ascii=False, separators=(",", ":")) + "\n")
-            handle.flush()
-            os.fsync(handle.fileno())
+        try:
+            with open(path, "a", encoding="utf-8", newline="\n") as handle:
+                handle.write(json.dumps(event, ensure_ascii=False, separators=(",", ":")) + "\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+        except Exception:
+            pass
 
     def _read_events(self, project_id: str, mission_id: str, limit: int) -> list[dict[str, Any]]:
+        try:
+            events = self.persistence.read_events(project_id, mission_id, limit=limit)
+            if events:
+                return events
+        except Exception:
+            pass
+
         path = os.path.join(self._mission_dir(project_id, mission_id), "events.jsonl")
         if not os.path.isfile(path):
             return []
@@ -1139,3 +1459,65 @@ class MissionStateStore:
             if isinstance(value, dict):
                 events.append(value)
         return events[-limit:]
+
+    def record_adaptation(self, project_id: str, mission_id: str, record_data: dict[str, Any]) -> None:
+        """Persists an immutable adaptation audit record."""
+        try:
+            self.persistence.save_adaptation(project_id, mission_id, record_data)
+        except Exception:
+            pass
+
+        adaptations_dir = os.path.join(self._mission_dir(project_id, mission_id), "adaptations")
+        os.makedirs(adaptations_dir, exist_ok=True)
+        v_after = int(record_data.get("graph_version_after", 1))
+        filepath = os.path.join(adaptations_dir, f"adaptation_{v_after:04d}.json")
+        try:
+            with open(filepath, "w", encoding="utf-8") as f:
+                json.dump(record_data, f, indent=2, ensure_ascii=False)
+        except Exception:
+            pass
+
+    def load_adaptation_history(self, project_id: str, mission_id: str) -> list[dict[str, Any]]:
+        """Loads the chronological list of applied adaptations for a mission."""
+        try:
+            records = self.persistence.load_adaptation_history(project_id, mission_id)
+            if records:
+                return records
+        except Exception:
+            pass
+
+        adaptations_dir = os.path.join(self._mission_dir(project_id, mission_id), "adaptations")
+        if not os.path.isdir(adaptations_dir):
+            return []
+        records = []
+        for fname in sorted(os.listdir(adaptations_dir)):
+            if fname.endswith(".json"):
+                fpath = os.path.join(adaptations_dir, fname)
+                try:
+                    with open(fpath, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        if isinstance(data, dict):
+                            records.append(data)
+                except Exception:
+                    continue
+        return records
+
+    def save_checkpoint(self, project_id: str, mission_id: str, cp_data: dict[str, Any]) -> None:
+        """Persists a deterministic checkpoint."""
+        self.persistence.save_checkpoint(project_id, mission_id, cp_data)
+
+    def load_checkpoint(self, project_id: str, mission_id: str, sequence: int | None = None, checkpoint_id: str | None = None) -> dict[str, Any] | None:
+        """Loads a checkpoint by sequence or checkpoint_id."""
+        return self.persistence.load_checkpoint(project_id, mission_id, sequence=sequence, checkpoint_id=checkpoint_id)
+
+    def load_latest_checkpoint(self, project_id: str, mission_id: str) -> dict[str, Any] | None:
+        """Loads the latest checkpoint."""
+        return self.persistence.load_latest_checkpoint(project_id, mission_id)
+
+    def get_storage_stats(self, project_id: str, mission_id: str) -> StorageStats:
+        """Returns physical storage telemetry and metrics for a mission."""
+        return self.persistence.get_storage_stats(project_id, mission_id)
+
+    def migrate_mission(self, project_id: str, mission_id: str):
+        """Migrates a legacy mission to the active persistence layer."""
+        return self.migration_engine.migrate(project_id, mission_id, self.persistence)

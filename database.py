@@ -120,6 +120,11 @@ def init_db():
             timestamp TEXT NOT NULL
         )
     """)
+
+    # Migration: Normalize legacy OPENCLAW sender in messages table
+    cursor.execute("""
+        UPDATE messages SET sender = 'JARVIS' WHERE UPPER(sender) = 'OPENCLAW'
+    """)
     
     conn.commit()
     conn.close()
@@ -201,13 +206,15 @@ def create_session(name: str):
     return SessionObj()
 
 def add_message(session_id: int, sender: str, role: str, content: str):
+    from backend.message_protocol import normalize_canonical_sender
+    canonical_sender = normalize_canonical_sender(sender)
     conn = get_connection()
     cursor = conn.cursor()
     timestamp = utc_now_iso()
     cursor.execute("""
         INSERT INTO messages (session_id, sender, role, content, timestamp)
         VALUES (?, ?, ?, ?, ?)
-    """, (session_id, sender, role, content, timestamp))
+    """, (session_id, canonical_sender, role, content, timestamp))
     conn.commit()
     conn.close()
 

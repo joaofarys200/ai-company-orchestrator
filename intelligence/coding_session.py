@@ -110,6 +110,7 @@ class CodingSession:
     rollback_attempted: bool = False
     rollback_succeeded: bool = False
     change_plan: dict[str, Any] = field(default_factory=dict)
+    auto_repair_logs: list[str] = field(default_factory=list)
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
@@ -273,6 +274,11 @@ class CodingSessionService:
 
         session.validation_results = self._run_validations(session, root)
         mandatory_failed = any(result["required"] and result["exit_code"] != 0 for result in session.validation_results)
+        if mandatory_failed:
+            healed = self._attempt_auto_repair(session, root)
+            if healed:
+                mandatory_failed = False
+
         if mandatory_failed:
             session.status = "VALIDATION_FAILED"
             session.errors.append("Uma ou mais validacoes obrigatorias falharam. O rollback esta disponivel.")
@@ -762,6 +768,87 @@ class CodingSessionService:
                 "duration_seconds": round(time.perf_counter() - started, 3),
             })
         return results
+
+    def _attempt_auto_repair(self, session: CodingSession, root: str, max_retries: int = 3) -> bool:
+        """
+        Ciclo de Auto-Reparação / Self-Healing Determinístico para falhas de validação.
+        Tenta diagnosticar erros de sintaxe (node --check, py_compile) e corrigi-los
+        automaticamente antes de falhar a sessão.
+        """
+        from intelligence.ast_repair_v2 import ASTRepairEngineV2
+        repair_engine = ASTRepairEngineV2()
+
+        for retry in range(max_retries):
+            failed_validations = [
+                r for r in session.validation_results
+                if r.get("required") and r.get("exit_code") != 0
+            ]
+            if not failed_validations:
+                return True
+
+            step_repaired = False
+            for val in failed_validations:
+                cmd = str(val.get("command") or "")
+                stderr = str(val.get("stderr") or "")
+                stdout = str(val.get("stdout") or "")
+                diagnostics = (stderr + "\n" + stdout).strip()
+
+                # Localizar qual o ficheiro afetado associado ao comando com erro
+                target_rel_file = None
+                for change in session.proposed_changes:
+                    f = change.get("file")
+                    if f and (f in cmd or Path(f).name in cmd or (diagnostics and (f in diagnostics or Path(f).name in diagnostics))):
+                        target_rel_file = f
+                        break
+
+                if not target_rel_file:
+                    cmd_match = re.search(r'["\']([^"\']+\.(?:js|mjs|cjs|py|ts))["\']', cmd)
+                    if cmd_match:
+                        target_rel_file = cmd_match.group(1)
+
+                if not target_rel_file:
+                    continue
+
+                try:
+                    _, abs_path = self._safe_project_path(root, target_rel_file)
+                except Exception:
+                    continue
+
+                if not Path(abs_path).is_file():
+                    continue
+
+                try:
+                    content = Path(abs_path).read_text(encoding="utf-8")
+                except Exception:
+                    continue
+
+                res = None
+                ext = Path(abs_path).suffix.lower()
+                if ext in {".js", ".mjs", ".cjs", ".ts"}:
+                    res = repair_engine.repair_syntax_javascript(
+                        content, file_path=target_rel_file, diagnostics=diagnostics
+                    )
+                elif ext == ".py":
+                    res = repair_engine.repair_syntax_python(
+                        content, file_path=target_rel_file
+                    )
+
+                if res and res.success and res.repaired_content != content:
+                    Path(abs_path).write_text(res.repaired_content, encoding="utf-8")
+                    step_repaired = True
+                    if not hasattr(session, "auto_repair_logs") or session.auto_repair_logs is None:
+                        session.auto_repair_logs = []
+                    session.auto_repair_logs.extend(res.applied_changes)
+
+            if not step_repaired:
+                break
+
+            # Re-executa as validações após a intervenção de reparação
+            session.validation_results = self._run_validations(session, root)
+            if not any(r["required"] and r["exit_code"] != 0 for r in session.validation_results):
+                return True
+
+        return not any(r["required"] and r["exit_code"] != 0 for r in session.validation_results)
 
     @staticmethod
     def _affected_syntax_command(

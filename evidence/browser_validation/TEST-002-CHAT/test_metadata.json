@@ -1,7 +1,7 @@
 {
   "prompt": "Olá Jarvis, reporta o estado atual do sistema e a equipa de agentes.",
-  "first_response_time_seconds": 0.021061182022094727,
-  "total_response_time_seconds": 0.021062612533569336,
-  "response_text_sample": "[13:13:21]Conectado ao servidor Jarvis WebSocket na porta 8001! 13:13:24CLIENTEOlá Jarvis, reporta o estado atual do sistema e a equipa de agentes. 13:13:24CLIENTEOlá Jarvis, reporta o estado atual do sistema e a equipa de agentes. 13:13:24CLIENTE Olá Jarvis, reporta o estado atual do sistema e a eq",
+  "first_response_time_seconds": 0.05424976348876953,
+  "total_response_time_seconds": 0.05425071716308594,
+  "response_text_sample": "[20:25:35]Conectado ao servidor Jarvis WebSocket na porta 8001! 20:25:38CLIENTEOlá Jarvis, reporta o estado atual do sistema e a equipa de agentes. 20:25:38CLIENTEOlá Jarvis, reporta o estado atual do sistema e a equipa de agentes. 20:25:38CLIENTE Olá Jarvis, reporta o estado atual do sistema e a eq",
   "response_received": true
 }

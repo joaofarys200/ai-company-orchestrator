@@ -29,29 +29,29 @@ sources:
     url: internal://agents/mission_autonomy.py
 ---
 
-# ðŸ›°ï¸ JARVIS MissionRecoveryWatchdog and Crash Recovery
+# 🛰️ï¸ JARVIS MissionRecoveryWatchdog and Crash Recovery
 
 ## 1. Purpose
-O `MissionRecoveryWatchdog` Ã© o processo em segundo plano responsÃ¡vel por detetar interrupÃ§Ãµes inesperadas de processos, tarefas zumbis e falhas de energia do anfitriÃ£o, recuperando o estado consistente da missÃ£o a partir do Ãºltimo checkpoint.
+O `MissionRecoveryWatchdog` é o processo em segundo plano responsável por detetar interrupções inesperadas de processos, tarefas zumbis e falhas de energia do anfitrião, recuperando o estado consistente da missão a partir do último checkpoint.
 
 ---
 
 ## 2. Responsibilities
-- Monitorizar batimentos cardÃ­acos (*Heartbeats*) dos workers e agentes em execuÃ§Ã£o.
-- Identificar missÃµes que permaneceram no estado `IN_PROGRESS` sem atividade recente ($Heartbeat\_Age > 60\text{s}$).
-- Restaurar a Ã¡rvore de ficheiros da sandbox a partir do snapshot Git transacional mais recente.
-- Transitar a missÃ£o para o estado `PAUSED_RECOVERED` ou reiniciar o passo falhado de forma idempotente.
+- Monitorizar batimentos cardíacos (*Heartbeats*) dos workers e agentes em execução.
+- Identificar missões que permaneceram no estado `IN_PROGRESS` sem atividade recente ($Heartbeat\_Age > 60\text{s}$).
+- Restaurar a árvore de ficheiros da sandbox a partir do snapshot Git transacional mais recente.
+- Transitar a missão para o estado `PAUSED_RECOVERED` ou reiniciar o passo falhado de forma idempotente.
 
 ---
 
 ## 3. Inputs & Outputs
 - **Inputs**: Tabela `missions` e `steps` com status `IN_PROGRESS`, timestamps de heartbeat.
-- **Outputs**: ReversÃ£o da sandbox via `git reset --hard <checkpoint_hash>`, emissÃ£o de evento de recuperaÃ§Ã£o.
+- **Outputs**: Reversão da sandbox via `git reset --hard <checkpoint_hash>`, emissão de evento de recuperação.
 
 ---
 
 ## 4. State Management & Invariants
-- Nenhuma tarefa interrompida pode retomar a execuÃ§Ã£o sem antes validar a integridade dos ficheiros em disco contra o hash SHA-256 do checkpoint.
+- Nenhuma tarefa interrompida pode retomar a execução sem antes validar a integridade dos ficheiros em disco contra o hash SHA-256 do checkpoint.
 
 ---
 
@@ -63,13 +63,13 @@ O `MissionRecoveryWatchdog` Ã© o processo em segundo plano responsÃ¡vel por 
 ---
 
 ## 6. Failure Modes & Recovery
-- **Failure**: Snapshot corrompido ou banco de dados bloqueado durante o processo de recuperaÃ§Ã£o.
-- **Recovery**: ReversÃ£o para o commit inicial da missÃ£o e emissÃ£o de alerta sonoro via `voice_service.py`.
+- **Failure**: Snapshot corrompido ou banco de dados bloqueado durante o processo de recuperação.
+- **Recovery**: Reversão para o commit inicial da missão e emissão de alerta sonoro via `voice_service.py`.
 
 ---
 
 ## 7. Security Boundaries
-- A restauraÃ§Ã£o de ficheiros opera exclusivamente dentro de `sandbox_dir/` e nunca toca em ficheiros de configuraÃ§Ã£o fora do projeto.
+- A restauração de ficheiros opera exclusivamente dentro de `sandbox_dir/` e nunca toca em ficheiros de configuração fora do projeto.
 
 ---
 

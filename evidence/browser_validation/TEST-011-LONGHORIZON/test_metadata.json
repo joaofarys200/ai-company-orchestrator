@@ -3,61 +3,61 @@
     {
       "mission_id": "M01",
       "prompt": "Verificar estado do enxame de agentes.",
-      "duration_seconds": 1.2318811416625977,
+      "duration_seconds": 1.2736411094665527,
       "status": "COMPLETED"
     },
     {
       "mission_id": "M02",
       "prompt": "Listar ficheiros no projeto ativo.",
-      "duration_seconds": 1.2393107414245605,
+      "duration_seconds": 1.270613193511963,
       "status": "COMPLETED"
     },
     {
       "mission_id": "M03",
       "prompt": "Apresentar sumário da arquitetura do sistema.",
-      "duration_seconds": 1.2387239933013916,
+      "duration_seconds": 1.2686572074890137,
       "status": "COMPLETED"
     },
     {
       "mission_id": "M04",
       "prompt": "Verificar tarefas no quadro Kanban.",
-      "duration_seconds": 1.2393991947174072,
+      "duration_seconds": 1.2754058837890625,
       "status": "COMPLETED"
     },
     {
       "mission_id": "M05",
       "prompt": "Pesquisar referências à classe EvidenceGateway.",
-      "duration_seconds": 1.2402105331420898,
+      "duration_seconds": 1.299300193786621,
       "status": "COMPLETED"
     },
     {
       "mission_id": "M06",
       "prompt": "Validar notas disponíveis no Obsidian Knowledge Vault.",
-      "duration_seconds": 1.235525369644165,
+      "duration_seconds": 1.2713291645050049,
       "status": "COMPLETED"
     },
     {
       "mission_id": "M07",
       "prompt": "Inspecionar estado atual do Mission Planner.",
-      "duration_seconds": 1.2355048656463623,
+      "duration_seconds": 1.3105080127716064,
       "status": "COMPLETED"
     },
     {
       "mission_id": "M08",
       "prompt": "Consultar regras de persistência e memória técnica.",
-      "duration_seconds": 1.2462458610534668,
+      "duration_seconds": 1.2961876392364502,
       "status": "COMPLETED"
     },
     {
       "mission_id": "M09",
       "prompt": "Verificar diagnóstico de infraestrutura e sandbox.",
-      "duration_seconds": 1.237497091293335,
+      "duration_seconds": 1.3457858562469482,
       "status": "COMPLETED"
     },
     {
       "mission_id": "M10",
       "prompt": "Emitir relatório de prontidão operacional.",
-      "duration_seconds": 1.2265944480895996,
+      "duration_seconds": 1.3080518245697021,
       "status": "COMPLETED"
     }
   ],

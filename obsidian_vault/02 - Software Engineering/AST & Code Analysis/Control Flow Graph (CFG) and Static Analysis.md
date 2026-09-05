@@ -28,23 +28,23 @@ sources:
     url: https://cs.au.dk/~amoeller/spa/spa.pdf
 ---
 
-# ðŸ“Š Grafo de Fluxo de Controle CFG Analise Estatica e Deteccao de Dead Code
+# 📊 Grafo de Fluxo de Controle CFG Analise Estatica e Deteccao de Dead Code
 
 ## 1. Pergunta Central
-> *Como os analisadores estÃ¡ticos e agentes de qualidade inspecionam o grafo de fluxo de controle (CFG) para anÃ¡lise estÃ¡tica e deteÃ§Ã£o de dead code e cÃ³digo inalcanÃ§Ã¡vel sem executar o cÃ³digo?*
+> *Como os analisadores estáticos e agentes de qualidade inspecionam o grafo de fluxo de controle (CFG) para análise estática e deteção de dead code e código inalcançável sem executar o código?*
 
 ---
 
-## 2. Blocos BÃ¡sicos e Arestas de Fluxo
-Um **Control Flow Graph (CFG)** Ã© um grafo dirigido $G = (V, E)$ onde:
-- Cada vÃ©rtice $v \in V$ Ã© um **Bloco BÃ¡sico (Basic Block)**: uma sequÃªncia linear de instruÃ§Ãµes com exatamente um ponto de entrada e um ponto de saÃ­da (sem bifurcaÃ§Ãµes no meio).
-- Cada aresta $(u, v) \in E$ representa uma transiÃ§Ã£o de controlo (saltos condicionais `if`, laÃ§os `while`, `break`, `return`).
+## 2. Blocos Básicos e Arestas de Fluxo
+Um **Control Flow Graph (CFG)** é um grafo dirigido $G = (V, E)$ onde:
+- Cada vértice $v \in V$ é um **Bloco Básico (Basic Block)**: uma sequência linear de instruções com exatamente um ponto de entrada e um ponto de saída (sem bifurcações no meio).
+- Cada aresta $(u, v) \in E$ representa uma transição de controlo (saltos condicionais `if`, laços `while`, `break`, `return`).
 
 ```
-          [ Bloco 1: Entrada / InicializaÃ§Ã£o ]
+          [ Bloco 1: Entrada / Inicialização ]
                           |
                           v
-         [ Bloco 2: AvaliaÃ§Ã£o Condicional (x > 0) ]
+         [ Bloco 2: Avaliação Condicional (x > 0) ]
                      /                 \
           (True)    /                   \ (False)
                    v                     v
@@ -52,14 +52,14 @@ Um **Control Flow Graph (CFG)** Ã© um grafo dirigido $G = (V, E)$ onde:
                    \                     /
                     \                   /
                      v                 v
-                 [ Bloco 5: Retorno / SaÃ­da ]
+                 [ Bloco 5: Retorno / Saída ]
 ```
 
 ---
 
-## 3. AnÃ¡lise de Vivacidade de VariÃ¡veis e CÃ³digo Morto (Dead Code)
-- **Dead Code Detection**: Se um nÃ³ do grafo nÃ£o tiver caminho direcionado a partir do nÃ³ de entrada inicial, o compilador sinaliza o bloco como inalcanÃ§Ã¡vel.
-- **Def-Use Chains**: Rastreia onde cada variÃ¡vel foi definida e garante que toda a leitura seja precedida por uma definiÃ§Ã£o vÃ¡lida.
+## 3. Análise de Vivacidade de Variáveis e Código Morto (Dead Code)
+- **Dead Code Detection**: Se um nó do grafo não tiver caminho direcionado a partir do nó de entrada inicial, o compilador sinaliza o bloco como inalcançável.
+- **Def-Use Chains**: Rastreia onde cada variável foi definida e garante que toda a leitura seja precedida por uma definição válida.
 
 ---
 

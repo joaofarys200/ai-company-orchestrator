@@ -1,6 +1,6 @@
 # 🛡️ JARVIS OS — Phase 10.1: Real-Time Browser QA & Application Validation Report
 
-**Data de Auditoria**: 2026-08-31 13:14:03  
+**Data de Auditoria**: 2026-09-02 20:26:25  
 **Motor de Validação**: `RealTimeApplicationValidationAgent` (Playwright Chromium)  
 **Ambiente**: Windows 11 / Python 3.14.7 / Vite + React 19 / WebSocket 8001 / HTTP 8000  
 **Commit**: Head Repository  
@@ -34,10 +34,10 @@ $$\text{Browser} \rightarrow \text{UI} \rightarrow \text{Frontend} \rightarrow \
 
 ## 3. Application Startup
 
-- **Backend Command**: `C:\Users\joaor\Desktop\JarvisOS\venv\Scripts\python.exe server.py`
-- **PID**: `17316`
+- **Backend Command**: `server.py (pre-existing)`
+- **PID**: `Pre-existing`
 - **Portas Descobertas**: HTTP 8000, WebSocket 8001
-- **Tempo de Inicialização**: `2.54s`
+- **Tempo de Inicialização**: `0.00s`
 - **Status do Health Endpoint**: `OK (200 / 503)`
 
 ---
@@ -120,10 +120,10 @@ A extração dinâmica do DOM mapeou os seguintes elementos interativos da inter
 
 ## 13. Performance
 
-- **Page Load Latency**: `734.85 ms`
-- **Time to Interactive (TTI)**: `2947.28 ms`
-- **Tempo até 1ª Resposta (Chat)**: `21.06 ms`
-- **Tempo Total de Resposta**: `21.06 ms`
+- **Page Load Latency**: `711.27 ms`
+- **Time to Interactive (TTI)**: `3022.70 ms`
+- **Tempo até 1ª Resposta (Chat)**: `54.25 ms`
+- **Tempo Total de Resposta**: `54.25 ms`
 
 ---
 

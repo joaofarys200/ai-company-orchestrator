@@ -29,29 +29,29 @@ sources:
     url: internal://tests/test_model_harness_rho_she.py
 ---
 
-# ðŸ§  JARVIS RHO and SHE Self-Healing Architecture
+# 🧠 JARVIS RHO and SHE Self-Healing Architecture
 
 ## 1. Purpose
-O **RHO (Reflective Healing Orchestrator)** e o **SHE (Self-Healing Engine)** formam o subsistema de auto-correÃ§Ã£o reflexiva do JARVIS OS, permitindo que os agentes diagnosticam e corrijam erros de execuÃ§Ã£o de cÃ³digo e chamadas de ferramentas de forma autÃ´noma.
+O **RHO (Reflective Healing Orchestrator)** e o **SHE (Self-Healing Engine)** formam o subsistema de auto-correção reflexiva do JARVIS OS, permitindo que os agentes diagnosticam e corrijam erros de execução de código e chamadas de ferramentas de forma autÃ´noma.
 
 ---
 
 ## 2. Responsibilities
-- Interceptar exceÃ§Ãµes de execuÃ§Ã£o em sandbox e saÃ­das de erro de testes.
-- Gerar sumÃ¡rios semÃ¢nticos e hipÃ³teses explicativas (*Reflective Diagnosis*) sem inflar o contexto.
-- Injetar feedback corretivo direcionado no turno de reparaÃ§Ã£o do agente Devon.
-- Fiscalizar o limite de 3 tentativas para evitar custos e loops estÃ©reis.
+- Interceptar exceções de execução em sandbox e saídas de erro de testes.
+- Gerar sumários semânticos e hipóteses explicativas (*Reflective Diagnosis*) sem inflar o contexto.
+- Injetar feedback corretivo direcionado no turno de reparação do agente Devon.
+- Fiscalizar o limite de 3 tentativas para evitar custos e loops estéreis.
 
 ---
 
 ## 3. Inputs & Outputs
-- **Inputs**: Stacktraces, mensagens de erro do compilador/interpretador, asserÃ§Ãµes falhadas de testes.
-- **Outputs**: HipÃ³teses de diagnÃ³stico, prompts de auto-reparo estruturados, relatÃ³rios de resoluÃ§Ã£o.
+- **Inputs**: Stacktraces, mensagens de erro do compilador/interpretador, asserções falhadas de testes.
+- **Outputs**: Hipóteses de diagnóstico, prompts de auto-reparo estruturados, relatórios de resolução.
 
 ---
 
 ## 4. State Management & Invariants
-- Cada ciclo de reflexÃ£o incrementa o contador de auto-cura da tarefa; ao atingir o limiar mÃ¡ximo, o processo congela no estado `PAUSED_WAITING_HUMAN`.
+- Cada ciclo de reflexão incrementa o contador de auto-cura da tarefa; ao atingir o limiar máximo, o processo congela no estado `PAUSED_WAITING_HUMAN`.
 
 ---
 
@@ -62,18 +62,18 @@ O **RHO (Reflective Healing Orchestrator)** e o **SHE (Self-Healing Engine)** fo
 ---
 
 ## 6. Failure Modes & Recovery
-- **Failure**: HipÃ³tese de reflexÃ£o alucinada que sugere alteraÃ§Ãµes irrelevantes.
-- **Recovery**: O circuit breaker de hashing de patches detecta oscilaÃ§Ã£o e aciona fallback para modelo frontier ou intervenÃ§Ã£o do operador.
+- **Failure**: Hipótese de reflexão alucinada que sugere alterações irrelevantes.
+- **Recovery**: O circuit breaker de hashing de patches detecta oscilação e aciona fallback para modelo frontier ou intervenção do operador.
 
 ---
 
 ## 7. Security Boundaries
-- Todo o ciclo de auto-reparo Ã© restrito aos ficheiros sob a governanÃ§a da missÃ£o na sandbox.
+- Todo o ciclo de auto-reparo é restrito aos ficheiros sob a governança da missão na sandbox.
 
 ---
 
 ## 8. Evidence Produced & Tests
-- **Evidence**: Registos de reflexÃ£o em `telemetry_logs` com categoria `REFLECTIVE_HEALING`.
+- **Evidence**: Registos de reflexão em `telemetry_logs` com categoria `REFLECTIVE_HEALING`.
 - **Tests**: `tests/test_model_harness_rho_she.py`.
 
 ---

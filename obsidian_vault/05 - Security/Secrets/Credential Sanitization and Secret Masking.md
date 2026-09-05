@@ -11,28 +11,28 @@ tags:
 status: verified
 ---
 
-# ðŸ™ˆ Credential Sanitization and Secret Masking
+# 🙈 Credential Sanitization and Secret Masking
 
 ## 1. O Risco de Fuga de Credenciais em Agentes
-Agentes de IA operam com ficheiros `.env`, tokens de autenticaÃ§Ã£o (GitHub PATs, chaves OpenAI/Gemini, senhas de banco de dados) e variÃ¡veis de ambiente.
+Agentes de IA operam com ficheiros `.env`, tokens de autenticação (GitHub PATs, chaves OpenAI/Gemini, senhas de banco de dados) e variáveis de ambiente.
 
-Se esses segredos forem impressos em logs de terminal, enviados para provedores de modelos de terceiros no histÃ³rico do prompt ou persistidos em relatÃ³rios pÃºblicos Markdown, ocorre **vazamento de credenciais (Credential Leak)**.
+Se esses segredos forem impressos em logs de terminal, enviados para provedores de modelos de terceiros no histórico do prompt ou persistidos em relatórios públicos Markdown, ocorre **vazamento de credenciais (Credential Leak)**.
 
 ---
 
-## 2. PadrÃµes de DeteÃ§Ã£o de Segredos (Shannon Entropy & Regex)
+## 2. Padrões de Deteção de Segredos (Shannon Entropy & Regex)
 
 1. **Regex de Prefixo Conhecido**:
    - Chaves GitHub: `ghp_[a-zA-Z0-9]{36}`, `github_pat_[a-zA-Z0-9_]{82}`
    - Chaves OpenAI: `sk-[a-zA-Z0-9]{48}`, `sk-proj-[a-zA-Z0-9_-]{80,}`
    - Chaves AWS: `AKIA[0-9A-Z]{16}`
-   - Chaves GenÃ©ricas / JWTs: `Bearer\s+[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*`
-2. **Entropia de Shannon para Tokens AleatÃ³rios**:
-   - Strings com alta densidade de informaÃ§Ã£o aleatÃ³ria ($H \ge 3.5$) em blocos alfanumÃ©ricos sem palavras de dicionÃ¡rio.
+   - Chaves Genéricas / JWTs: `Bearer\s+[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*`
+2. **Entropia de Shannon para Tokens Aleatórios**:
+   - Strings com alta densidade de informação aleatória ($H \ge 3.5$) em blocos alfanuméricos sem palavras de dicionário.
 
 ---
 
-## 3. ImplementaÃ§Ã£o do Sanitizador de Segredos
+## 3. Implementação do Sanitizador de Segredos
 
 ```python
 import re
@@ -49,7 +49,7 @@ SECRET_REGEX_PATTERNS = [
 
 def mask_secrets_in_text(text: str) -> str:
     """
-    Substitui tokens sensÃ­veis por mÃ¡scaras de seguranÃ§a redigidas.
+    Substitui tokens sensíveis por máscaras de segurança redigidas.
     """
     if not text:
         return ""
@@ -71,9 +71,9 @@ def mask_secrets_in_text(text: str) -> str:
 
 ---
 
-## 4. IntegraÃ§Ã£o no Pipeline de Logging e Prompting
+## 4. Integração no Pipeline de Logging e Prompting
 - **No Logger (`logging.Formatter`)**: Toda a linha enviada para ficheiros de log passa pelo filtro `mask_secrets_in_text`.
-- **No Exportador de RelatÃ³rios / Walkthrough**: Antes de salvar qualquer ficheiro markdown, os tokens sÃ£o sanitizados.
+- **No Exportador de Relatórios / Walkthrough**: Antes de salvar qualquer ficheiro markdown, os tokens são sanitizados.
 
 ---
 

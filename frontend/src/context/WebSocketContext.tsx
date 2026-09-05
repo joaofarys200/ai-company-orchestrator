@@ -31,13 +31,15 @@ import {
   type SentinelStatusData,
   type SentinelSecurityEventData,
   type SentinelActionData,
+  type ExpansionRecord,
+  type AdaptationRecordData,
 } from '../protocol/websocket';
 
 declare global {
   interface Window {
     jarvisIPC?: {
-      send: (message: any) => void;
-      onMessage: (callback: (data: any) => void) => () => void;
+      send: (message: unknown) => void;
+      onMessage: (callback: (data: unknown) => void) => () => void;
       isNativeIPC: boolean;
     };
   }
@@ -125,6 +127,13 @@ interface WebSocketContextType {
   getMissions: () => void;
   openMission: (missionId: string) => void;
   sendMissionOperation: (operation: MissionClientOperation) => void;
+  subdagHistory: ExpansionRecord[];
+  getSubDagHistory: (missionId: string) => void;
+  adaptationHistory: AdaptationRecordData[];
+  planEvaluationResult: Record<string, unknown> | null;
+  evaluateMissionPlan: (missionId: string, options?: { observations?: unknown[]; requirement_change?: string; architecture_change?: unknown }) => void;
+  proposeMissionAdaptation: (missionId: string, proposal: unknown) => void;
+  getMissionAdaptationHistory: (missionId: string) => void;
   getAstState: () => void;
   sandboxStatus: { mode: 'docker' | 'local_fallback'; port: number; is_docker: boolean } | null;
   projects: ProjectSummary[];
@@ -219,6 +228,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [plannerState, setPlannerState] = useState<PlannerState | null>(null);
   const [missions, setMissions] = useState<MissionData[]>([]);
   const [missionSnapshot, setMissionSnapshot] = useState<MissionSnapshot | null>(null);
+  const [subdagHistory, setSubdagHistory] = useState<ExpansionRecord[]>([]);
+  const [adaptationHistory, setAdaptationHistory] = useState<AdaptationRecordData[]>([]);
+  const [planEvaluationResult, setPlanEvaluationResult] = useState<Record<string, unknown> | null>(null);
   const [astState, setAstState] = useState<AstState | null>(null);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [projectContext, setProjectContext] = useState<ProjectContextData | null>(null);
@@ -295,7 +307,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // Check if message is a specialist/subagent or contains multi-agent dialogue tags
     const agentTags = ['[DEVON]', '[QUINN]', '[SWARM]', '[CLARA]', '[ALEX]', '[MARTA]', '[GUSTAVO]', '[DUARTE]', '[INÊS]', '[INES]', '[PRODUCT]', '[QA]', '[DEV]', '[DESIGN]'];
     const hasAgentTag = agentTags.some((tag) => msg.content && msg.content.includes(tag));
-    const isSpecialistSender = !['OPENCLAW', 'JARVIS', 'SISTEMA', 'CLIENTE'].includes(msg.sender.toUpperCase());
+    const isSpecialistSender = !['JARVIS', 'SISTEMA', 'CLIENTE', 'USER', 'ASSISTANT'].includes(msg.sender.toUpperCase());
 
     if (isSpecialistSender || hasAgentTag || msg.role === 'Specialist' || msg.role === 'Debate') {
       if (hasAgentTag && msg.content) {
@@ -306,7 +318,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         while ((match = regex.exec(msg.content)) !== null) {
           const agentName = match[1].trim();
           const turnContent = match[2].trim();
-          if (turnContent && !['OPENCLAW', 'JARVIS'].includes(agentName)) {
+          if (turnContent && !['JARVIS', 'ASSISTANT', 'OPENCLAW'].includes(agentName.toUpperCase())) {
             foundAny = true;
             const debateMsg: ChatMessage = {
               id: Math.random().toString(),
@@ -447,6 +459,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleServerMessage = useCallback((msg: any) => {
     if (!msg || !msg.type) return;
 
@@ -551,6 +564,30 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         break;
       case 'mission_snapshot':
         setMissionSnapshot(msg.data);
+        break;
+      case 'mission_subdag_history':
+        setSubdagHistory(msg.history);
+        break;
+      case 'mission_subdag_proposal_result':
+        if (msg.success) {
+          addSystemMessage(`[SUB-DAG EXPANSÃO APLICADA] ${msg.message}`);
+        } else {
+          addSystemMessage(`[SUB-DAG EXPANSÃO REJEITADA] ${msg.message}`);
+        }
+        break;
+      case 'mission_adaptation_history':
+        setAdaptationHistory(msg.history);
+        break;
+      case 'mission_adaptation_proposal_result':
+        if (msg.success) {
+          addSystemMessage(`[PLANO ADAPTADO] ${msg.message}`);
+        } else {
+          addSystemMessage(`[ADAPTAÇÃO REJEITADA] ${msg.message}`);
+        }
+        break;
+      case 'mission_plan_evaluation_result':
+        setPlanEvaluationResult(msg.result);
+        addSystemMessage(`[AVALIAÇÃO DO PLANO: ${msg.result.decision}] ${msg.result.reason}`);
         break;
       case 'ast_state':
         setAstState(msg.data);
@@ -685,6 +722,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       default:
         break;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addChatMessage, addSystemMessage, handleArenaUpdate, handleKanbanUpdate, handleTemplateChanged, handleUiAction]);
 
   const handleServerMessageRef = useRef(handleServerMessage);
@@ -914,6 +952,52 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const openMission = useCallback((missionId: string) => {
     if (isReady() && projectContext?.project_id && missionId) {
       sendClientMessage({ type: 'mission_resume_snapshot', project_id: projectContext.project_id, mission_id: missionId });
+      sendClientMessage({ type: 'mission_subdag_get_history', project_id: projectContext.project_id, mission_id: missionId });
+      sendClientMessage({ type: 'mission_adaptation_get_history', project_id: projectContext.project_id, mission_id: missionId });
+    }
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
+
+  const getSubDagHistory = useCallback((missionId: string) => {
+    if (isReady() && projectContext?.project_id && missionId) {
+      sendClientMessage({
+        type: 'mission_subdag_get_history',
+        project_id: projectContext.project_id,
+        mission_id: missionId,
+      });
+    }
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
+
+  const getMissionAdaptationHistory = useCallback((missionId: string) => {
+    if (isReady() && projectContext?.project_id && missionId) {
+      sendClientMessage({
+        type: 'mission_adaptation_get_history',
+        project_id: projectContext.project_id,
+        mission_id: missionId,
+      });
+    }
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
+
+  const evaluateMissionPlan = useCallback((missionId: string, options?: { observations?: unknown[]; requirement_change?: string; architecture_change?: unknown }) => {
+    if (isReady() && projectContext?.project_id && missionId) {
+      sendClientMessage({
+        type: 'mission_plan_evaluate',
+        project_id: projectContext.project_id,
+        mission_id: missionId,
+        observations: options?.observations,
+        requirement_change: options?.requirement_change,
+        architecture_change: options?.architecture_change,
+      });
+    }
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
+
+  const proposeMissionAdaptation = useCallback((missionId: string, proposal: unknown) => {
+    if (isReady() && projectContext?.project_id && missionId) {
+      sendClientMessage({
+        type: 'mission_adaptation_propose',
+        project_id: projectContext.project_id,
+        mission_id: missionId,
+        proposal,
+      });
     }
   }, [isReady, projectContext?.project_id, sendClientMessage]);
 
@@ -1291,6 +1375,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         getMissions,
         openMission,
         sendMissionOperation,
+        subdagHistory,
+        getSubDagHistory,
+        adaptationHistory,
+        planEvaluationResult,
+        evaluateMissionPlan,
+        proposeMissionAdaptation,
+        getMissionAdaptationHistory,
         getAstState,
         sandboxStatus,
         projects,

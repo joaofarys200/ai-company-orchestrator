@@ -11,15 +11,15 @@ tags:
 status: verified
 ---
 
-# ðŸ› ï¸ How to Sanitize Secrets Before Logging or Ingestion
+# 🛠️ï¸ How to Sanitize Secrets Before Logging or Ingestion
 
-## 1. Sintomas & DiagnÃ³stico
-- Tokens de autenticaÃ§Ã£o (`ghp_...`, `sk-...`, `Bearer eyJ...`) aparecem visÃ­veis nos ficheiros de log (`.log`), traces do console ou histÃ³rico de conversas do Obsidian.
-- Alertas de seguranÃ§a emitidos por scanners automÃ¡ticos de repositÃ³rio (ex: GitHub Secret Scanning).
+## 1. Sintomas & Diagnóstico
+- Tokens de autenticação (`ghp_...`, `sk-...`, `Bearer eyJ...`) aparecem visíveis nos ficheiros de log (`.log`), traces do console ou histórico de conversas do Obsidian.
+- Alertas de segurança emitidos por scanners automáticos de repositório (ex: GitHub Secret Scanning).
 
 ---
 
-## 2. ImplementaÃ§Ã£o do Filtro de Logging Customizado (Python)
+## 2. Implementação do Filtro de Logging Customizado (Python)
 
 ```python
 import logging
@@ -49,7 +49,7 @@ class SensitiveDataRedactionFilter(logging.Filter):
             text = pattern.sub("[REDACTED_SECRET]", text)
         return text
 
-# ConfiguraÃ§Ã£o global no logger
+# Configuração global no logger
 logger = logging.getLogger("jarvis")
 redactor = SensitiveDataRedactionFilter()
 logger.addFilter(redactor)
@@ -57,11 +57,11 @@ logger.addFilter(redactor)
 
 ---
 
-## 3. VerificaÃ§Ã£o Automatizada em CI/CD
-Antes de qualquer merge, executar scanner de segredos no repositÃ³rio:
+## 3. Verificação Automatizada em CI/CD
+Antes de qualquer merge, executar scanner de segredos no repositório:
 
 ```powershell
-# Executar verificaÃ§Ã£o local de segredos
+# Executar verificação local de segredos
 git diff HEAD~1 | Select-String -Pattern "ghp_", "sk-", "AKIA"
 ```
 

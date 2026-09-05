@@ -208,7 +208,7 @@ class ChatCommandService:
         await self._chat(
             "OPENCLAW",
             "Orquestrador",
-            f"ðŸ› ï¸ **Comando Executado:** `{command}`",
+            f"🛠️ï¸ **Comando Executado:** `{command}`",
         )
         if name == "/review":
             await self._review()
@@ -313,7 +313,7 @@ class ChatCommandService:
                 "OPENCLAW",
                 "Orquestrador",
                 (
-                    "âš ï¸ Introduza um prompt para a Arena "
+                    "⚠️ï¸ Introduza um prompt para a Arena "
                     "(ex: `/arena Criar um botão pulsante neon`)"
                 ),
             )
@@ -328,11 +328,11 @@ class ChatCommandService:
         rules = self.services.database.get_compounding_rules()
         if not rules:
             text = (
-                "ðŸ§  **Compounding Memory:** Nenhuma regra ou "
+                "🧠 **Compounding Memory:** Nenhuma regra ou "
                 "lição aprendida guardada no SQLite."
             )
         else:
-            text = "ðŸ§  **Compounding Memory (Regras Ativas):**\n"
+            text = "🧠 **Compounding Memory (Regras Ativas):**\n"
             for rule in rules:
                 text += (
                     f"- `{rule['rule_key']}`: "
@@ -365,7 +365,7 @@ class ChatCommandService:
                 "OPENCLAW",
                 "Orquestrador",
                 (
-                    "âœ… Nova regra de memória "
+                    "✅ Nova regra de memória "
                     f"`{key}` gravada com sucesso!"
                 ),
             )
@@ -374,7 +374,7 @@ class ChatCommandService:
                 "OPENCLAW",
                 "Orquestrador",
                 (
-                    "âš ï¸ Formato inválido. Uso: "
+                    "⚠️ï¸ Formato inválido. Uso: "
                     "`/learn chave | descrição | correção` "
                     "(ex: `/learn python_venv | O utilizador usa "
                     "venv/Scripts/python | Sempre usar o caminho "
@@ -389,7 +389,7 @@ class ChatCommandService:
                 "OPENCLAW",
                 "Orquestrador",
                 (
-                    "âš ï¸ Introduza a chave da regra a apagar "
+                    "⚠️ï¸ Introduza a chave da regra a apagar "
                     "(ex: `/forget python_venv`)"
                 ),
             )
@@ -408,12 +408,12 @@ class ChatCommandService:
                 {"type": "rules_updated", "rules": rules}
             )
             text = (
-                f"âœ… Regra `{key}` esquecida/apagada "
+                f"✅ Regra `{key}` esquecida/apagada "
                 "com sucesso!"
             )
         else:
             text = (
-                f"âš ï¸ Regra `{key}` não encontrada "
+                f"⚠️ï¸ Regra `{key}` não encontrada "
                 "no SQLite."
             )
         await self._chat("OPENCLAW", "Orquestrador", text)
@@ -423,7 +423,7 @@ class ChatCommandService:
             "OPENCLAW",
             "Orquestrador",
             (
-                "ðŸ“– **Comandos de Barra Disponíveis:**\n"
+                "📖 **Comandos de Barra Disponíveis:**\n"
                 "- `/review` : Audita o código na sandbox "
                 "(QA Quinn)\n- `/refactor` : Otimiza e limpa "
                 "o código sandbox (Devon)\n"

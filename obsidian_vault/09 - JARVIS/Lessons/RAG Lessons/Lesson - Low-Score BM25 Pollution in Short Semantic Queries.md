@@ -33,53 +33,53 @@ sources:
 # ðŸ“ Lesson - Low-Score BM25 Pollution in Short Semantic Queries
 
 ## Failure
-Em queries RAG curtas (ex: "como tratar erros"), o algoritmo lÃ©xico BM25 recuperava notas genÃ©ricas com centenas de ocorrÃªncias da palavra "erros" (como grandes monografias de sistemas distribuÃ­dos) em detrimento do runbook especÃ­fico de tratamento de saÃ­das malformadas, poluindo o contexto do modelo.
+Em queries RAG curtas (ex: "como tratar erros"), o algoritmo léxico BM25 recuperava notas genéricas com centenas de ocorrências da palavra "erros" (como grandes monografias de sistemas distribuídos) em detrimento do runbook específico de tratamento de saídas malformadas, poluindo o contexto do modelo.
 
 ---
 
 ## Symptoms
 - O agente Devon recebia chunks de 10k tokens de teoria geral em vez do passo a passo do runbook.
-- DegradaÃ§Ã£o do tempo de resposta (TTFT) e respostas evasivas.
+- Degradação do tempo de resposta (TTFT) e respostas evasivas.
 
 ---
 
 ## Detection
-Auditoria de recuperaÃ§Ã£o RAG em `tests/test_obsidian_tools.py` revelou pontuaÃ§Ã£o artificialmente inflada por contagem bruta de termos.
+Auditoria de recuperação RAG em `tests/test_obsidian_tools.py` revelou pontuação artificialmente inflada por contagem bruta de termos.
 
 ---
 
 ## Root Cause
-O ranqueamento lÃ©xico puro sem peso especÃ­fico para correspondÃªncia no tÃ­tulo da nota ou no frontmatter favorecia arquivos com tamanho massivo de texto.
+O ranqueamento léxico puro sem peso específico para correspondência no título da nota ou no frontmatter favorecia arquivos com tamanho massivo de texto.
 
 ---
 
 ## Why Existing Protection Failed
-NÃ£o havia normalizaÃ§Ã£o por tamanho do documento nem ponderaÃ§Ã£o de bÃ´nus por casamento exato no tÃ­tulo da nota.
+Não havia normalização por tamanho do documento nem ponderação de bÃ´nus por casamento exato no título da nota.
 
 ---
 
 ## Blast Radius
-InjeÃ§Ã£o de contexto irrelevante em todos os agentes que consultavam o cofre Obsidian para resoluÃ§Ã£o rÃ¡pida de incidentes.
+Injeção de contexto irrelevante em todos os agentes que consultavam o cofre Obsidian para resolução rápida de incidentes.
 
 ---
 
 ## Recovery
-Ajustar o threshold de corte e priorizar correspondÃªncia de tags e tÃ­tulos no algoritmo de score em `agents/obsidian_tools.py`.
+Ajustar o threshold de corte e priorizar correspondência de tags e títulos no algoritmo de score em `agents/obsidian_tools.py`.
 
 ---
 
 ## Corrective Action
-Implementar bÃ´nus de $+15$ pontos para correspondÃªncia no tÃ­tulo do arquivo e $+10$ pontos para termos encontrados no bloco YAML de tags.
+Implementar bÃ´nus de $+15$ pontos para correspondência no título do arquivo e $+10$ pontos para termos encontrados no bloco YAML de tags.
 
 ---
 
 ## Preventive Control
-Adicionar testes de regressÃ£o de ranking semÃ¢ntico com queries curtas e polissÃªmicas no benchmark contÃ­nuo do RAG.
+Adicionar testes de regressão de ranking semântico com queries curtas e polissêmicas no benchmark contínuo do RAG.
 
 ---
 
 ## Generalizable Principle
-> *Em sistemas RAG hÃ­bridos para bases de engenharia, a correspondÃªncia no tÃ­tulo canÃ´nico da nota e nos metadados estruturados deve sempre sobrepujar a frequÃªncia pura de termos em monografias extensas.*
+> *Em sistemas RAG híbridos para bases de engenharia, a correspondência no título canÃ´nico da nota e nos metadados estruturados deve sempre sobrepujar a frequência pura de termos em monografias extensas.*
 
 ---
 
@@ -101,5 +101,5 @@ Adicionar testes de regressÃ£o de ranking semÃ¢ntico com queries curtas e po
 ---
 
 ## Evidence
-- MÃ©trica de score no script de benchmark do cofre.
+- Métrica de score no script de benchmark do cofre.
 

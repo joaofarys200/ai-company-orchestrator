@@ -30,24 +30,24 @@ sources:
     url: internal://agents/mission_state.py
 ---
 
-# ðŸ’° JARVIS Mission Cost and Token Accounting Engine
+# 💰 JARVIS Mission Cost and Token Accounting Engine
 
 ## 1. Purpose
-O motor de contabilidade de custos e tokens monitora e persiste o consumo exato de tokens de entrada (*Prompt Tokens*) e saÃ­da (*Completion Tokens*) de cada invocaÃ§Ã£o de modelo por agente em cada passo de uma missÃ£o, calculando o custo acumulado em dÃ³lares e aplicando limites orÃ§amentÃ¡rios (*Hard Budget Limits*).
+O motor de contabilidade de custos e tokens monitora e persiste o consumo exato de tokens de entrada (*Prompt Tokens*) e saída (*Completion Tokens*) de cada invocação de modelo por agente em cada passo de uma missão, calculando o custo acumulado em dólares e aplicando limites orçamentários (*Hard Budget Limits*).
 
 ---
 
 ## 2. Responsibilities
 - Extrair metadados de uso (`usage: {prompt_tokens, completion_tokens, total_tokens}`) em todas as respostas de LLM.
-- Multiplicar as contagens pelos preÃ§os unitÃ¡rios do modelo ativo (ex: $0.0015/1k tokens de entrada para modelos locais/cloud).
+- Multiplicar as contagens pelos preços unitários do modelo ativo (ex: $0.0015/1k tokens de entrada para modelos locais/cloud).
 - Atualizar incrementalmente os campos `tokens_used` e `cost_estimate_usd` no `StepState` e no `MissionState`.
-- Disparar alerta `BUDGET_THRESHOLD_REACHED` ao atingir 80% do orÃ§amento e congelar a missÃ£o se o limite de 100% for excedido.
+- Disparar alerta `BUDGET_THRESHOLD_REACHED` ao atingir 80% do orçamento e congelar a missão se o limite de 100% for excedido.
 
 ---
 
 ## 3. Inputs & Outputs
 - **Inputs**: Respostas brutas da API do modelo contendo objetos de usage.
-- **Outputs**: MÃ©tricas financeiras e de tokens persistidas na tabela `steps` e transmitidas via telemetria WebSocket.
+- **Outputs**: Métricas financeiras e de tokens persistidas na tabela `steps` e transmitidas via telemetria WebSocket.
 
 ---
 
@@ -58,7 +58,7 @@ O motor de contabilidade de custos e tokens monitora e persiste o consumo exato 
 ---
 
 ## 5. Failure Modes & Recovery
-- **Failure**: Provedor nÃ£o retorna contagem de tokens (ex: streaming chunks sem uso).
+- **Failure**: Provedor não retorna contagem de tokens (ex: streaming chunks sem uso).
 - **Recovery**: Fallback para contagem estimada por tokenizer local `tiktoken` / `cl100k_base`.
 
 ---

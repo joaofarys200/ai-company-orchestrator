@@ -80,6 +80,17 @@ SERVER_MESSAGE_TYPES = {
     "sentinel_action_proposed",
     "sentinel_action_result",
     "sentinel_actions_list",
+    "mission_subdag_proposal_result",
+    "mission_subdag_history",
+    "mission_subdag_proposed",
+    "mission_subdag_applied",
+    "mission_subdag_rejected",
+    "mission_plan_evaluation_result",
+    "mission_adaptation_proposal_result",
+    "mission_adaptation_history",
+    "mission_checkpoint_created",
+    "mission_checkpoint_restored",
+    "mission_plan_status",
 }
 
 
@@ -134,6 +145,16 @@ CLIENT_MESSAGE_TYPES = {
     "mission_cancel_execution",
     "mission_release_stale_lock",
     "mission_autonomy_run",
+    "mission_plan_decompose",
+    "mission_checkpoint_create",
+    "mission_checkpoint_restore",
+    "mission_subdag_propose",
+    "mission_subdag_get_history",
+    "mission_plan_evaluate",
+    "mission_adaptation_propose",
+    "mission_adaptation_get_history",
+    "mission_swarm_status",
+    "mission_swarm_reassign",
     "start_lecture_recording",
     "stop_lecture_recording",
     "get_lecture_status",
@@ -193,6 +214,36 @@ MISSION_CLIENT_REQUIRED_FIELDS = {
     ),
     "mission_autonomy_run": (
         "project_id", "mission_id", "expected_mission_version", "confirmed",
+    ),
+    "mission_plan_decompose": (
+        "project_id", "title", "objective",
+    ),
+    "mission_checkpoint_create": (
+        "project_id", "mission_id",
+    ),
+    "mission_checkpoint_restore": (
+        "project_id", "mission_id", "checkpoint_id",
+    ),
+    "mission_subdag_propose": (
+        "project_id", "mission_id", "parent_task_id", "reason", "trigger",
+    ),
+    "mission_subdag_get_history": (
+        "project_id", "mission_id",
+    ),
+    "mission_plan_evaluate": (
+        "project_id", "mission_id",
+    ),
+    "mission_adaptation_propose": (
+        "project_id", "mission_id", "proposal",
+    ),
+    "mission_adaptation_get_history": (
+        "project_id", "mission_id",
+    ),
+    "mission_swarm_status": (
+        "project_id", "mission_id",
+    ),
+    "mission_swarm_reassign": (
+        "project_id", "mission_id", "task_id",
     ),
 }
 
@@ -288,6 +339,20 @@ def _log_unknown_message_type(message_type: str) -> None:
         _logged_unknown_types.add(message_type)
 
 
+def normalize_canonical_sender(sender: Any) -> str:
+    raw = _as_str(sender, "SISTEMA").strip()
+    if not raw:
+        return "SISTEMA"
+    upper = raw.upper()
+    if upper in {"OPENCLAW", "OPEN_CLAW", "JARVIS", "ASSISTANT", "AI", "ORCHESTRATOR", "ORQUESTRADOR"}:
+        return "JARVIS"
+    if upper in {"CLIENTE", "USER", "UTILIZADOR", "CEO"}:
+        return "CLIENTE"
+    if upper in {"SISTEMA", "SYSTEM"}:
+        return "SISTEMA"
+    return raw
+
+
 def normalize_ws_message(message: Mapping[str, Any]) -> dict[str, Any]:
     message_type = _as_str(message.get("type"), "unknown")
     if message_type not in SERVER_MESSAGE_TYPES:
@@ -300,7 +365,7 @@ def normalize_ws_message(message: Mapping[str, Any]) -> dict[str, Any]:
     if message_type == "chat":
         normalized = {
             "type": "chat",
-            "sender": _as_str(message.get("sender"), "SISTEMA"),
+            "sender": normalize_canonical_sender(message.get("sender")),
             "role": _as_str(message.get("role"), "System"),
             "content": _as_str(message.get("content")),
         }

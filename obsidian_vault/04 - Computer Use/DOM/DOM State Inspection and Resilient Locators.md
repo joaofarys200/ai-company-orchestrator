@@ -33,33 +33,33 @@ sources:
     url: https://playwright.dev/docs/locators
 ---
 
-# ðŸŽ¯ DOM State Inspection e Seletores Resilientes Baseados em Papeis ARIA vs CSS Fragil
+# 🎯 DOM State Inspection e Seletores Resilientes Baseados em Papeis ARIA vs CSS Fragil
 
 ## 1. Pergunta Central
-> *Por que seletores CSS estruturais ou XPath absolutos quebram com facilidade durante refatoraÃ§Ãµes de frontend e como a Ã¡rvore de acessibilidade (ARIA roles) fornece seletores resilientes e Ã  prova de mudanÃ§as cosmÃ©ticas?*
+> *Por que seletores CSS estruturais ou XPath absolutos quebram com facilidade durante refatorações de frontend e como a árvore de acessibilidade (ARIA roles) fornece seletores resilientes e Ã  prova de mudanças cosméticas?*
 
 ---
 
-## 2. A Hierarquia de ResiliÃªncia de Seletores
+## 2. A Hierarquia de Resiliência de Seletores
 
 ```
 +-----------------------------------------------------------------------+
-|  MÃXIMA RESILIÃŠNCIA (Orientado a Acessibilidade / SemÃ¢ntica Humana)  |
+|  MÁXIMA RESILIÃŠNCIA (Orientado a Acessibilidade / Semântica Humana)  |
 |  - `page.get_by_role("button", name="Submeter Pedido")`              |
-|  - `page.get_by_label("EndereÃ§o de Email")`                          |
+|  - `page.get_by_label("Endereço de Email")`                          |
 |  - `page.get_by_test_id("submit-order-btn")`                         |
 +-----------------------------------+-----------------------------------+
                                     |
                                     v
 +-----------------------------------------------------------------------+
-|  MÃ‰DIA RESILIÃŠNCIA (Orientado a Texto e Placeholders)                 |
+|  MÉDIA RESILIÃŠNCIA (Orientado a Texto e Placeholders)                 |
 |  - `page.get_by_placeholder("nome@empresa.com")`                     |
 |  - `page.get_by_text("Confirmar Pagamento")`                          |
 +-----------------------------------+-----------------------------------+
                                     |
                                     v
 +-----------------------------------------------------------------------+
-|  FRÃGIL / ANTI-PATTERN (Orientado a Estrutura DOM e Classes CSS)      |
+|  FRÁGIL / ANTI-PATTERN (Orientado a Estrutura DOM e Classes CSS)      |
 |  - `page.locator("div.css-1234 > button.btn-primary")`                |
 |  - `page.locator("/html/body/div[2]/form/div[3]/button")`             |
 +-----------------------------------------------------------------------+
@@ -67,9 +67,9 @@ sources:
 
 ---
 
-## 3. Invariantes de InspeÃ§Ã£o do DOM no Playwright
-1. **Auto-Waiting em AÃ§Ãµes**: O Playwright aguarda automaticamente que o elemento esteja visÃ­vel, estÃ¡vel e habilitado.
-2. **Prioridade a PapÃ©is ARIA**: Agentes utilizam primordialmente `get_by_role` com atributos de acessibilidade.
+## 3. Invariantes de Inspeção do DOM no Playwright
+1. **Auto-Waiting em Ações**: O Playwright aguarda automaticamente que o elemento esteja visível, estável e habilitado.
+2. **Prioridade a Papéis ARIA**: Agentes utilizam primordialmente `get_by_role` com atributos de acessibilidade.
 
 ---
 

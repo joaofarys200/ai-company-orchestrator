@@ -139,15 +139,60 @@ class ASTRepairEngineV2:
             diagnostics=diagnostic,
         )
 
-    def repair_syntax_javascript(self, content: str, file_path: str = "") -> RepairResult:
+    def repair_syntax_javascript(
+        self,
+        content: str,
+        file_path: str = "",
+        diagnostics: Optional[str] = None,
+    ) -> RepairResult:
         """Tenta corrigir deterministicamente erros sintáticos comuns em JS/TS."""
         original = content
         changes: List[str] = []
 
-        # 1. Fechar chaves/parênteses/colchetes desbalanceados
+        # 0. Se existirem diagnósticos do compilador/Node.js, analisa a linha do erro
+        error_line_num: Optional[int] = None
+        if diagnostics:
+            line_match = re.search(r':(\d+)(?::\d+)?(?:\r?\n|\s)', diagnostics)
+            if line_match:
+                try:
+                    error_line_num = int(line_match.group(1))
+                except ValueError:
+                    pass
+
+        # 1. Tratar erro específico: "Unexpected token '}'" ou excesso de chavetas/parênteses (open_braces < 0)
+        lines = content.splitlines()
+        if error_line_num and 1 <= error_line_num <= len(lines):
+            target_line = lines[error_line_num - 1].strip()
+            if diagnostics and "Unexpected token '}'" in diagnostics:
+                if target_line in ("});", "}", "};", "});\n"):
+                    lines.pop(error_line_num - 1)
+                    content = "\n".join(lines)
+                    changes.append(f"Removido token inesperado '{target_line}' na linha {error_line_num}.")
+            elif diagnostics and "Unexpected token ')'" in diagnostics:
+                if target_line in (");", ")", ");\n"):
+                    lines.pop(error_line_num - 1)
+                    content = "\n".join(lines)
+                    changes.append(f"Removido parêntese inesperado '{target_line}' na linha {error_line_num}.")
+
+        # 2. Fechar ou remover chaves/parênteses/colchetes desbalanceados
         open_braces = content.count("{") - content.count("}")
         open_parens = content.count("(") - content.count(")")
         open_brackets = content.count("[") - content.count("]")
+
+        if open_braces < 0:
+            # Excesso de chavetas de fecho: remover fechos órfãos no final do ficheiro
+            lines = content.splitlines()
+            removed_count = 0
+            while lines and lines[-1].strip() in ("});", "}", "};", ");") and open_braces < 0:
+                discarded = lines.pop()
+                if "}" in discarded:
+                    open_braces += discarded.count("}")
+                if ")" in discarded:
+                    open_parens += discarded.count(")")
+                removed_count += 1
+            if removed_count > 0:
+                content = "\n".join(lines)
+                changes.append(f"Removidas {removed_count} chavetas de fecho órfãs no final do ficheiro JS.")
 
         if open_parens > 0:
             content += ")" * open_parens
@@ -159,7 +204,42 @@ class ASTRepairEngineV2:
             content += "\n" + ("}" * open_braces)
             changes.append(f"Fechadas {open_braces} chavetas no final do ficheiro JS.")
 
-        # 2. Corrigir vírgulas duplas ou trailing commas malformadas
+        # 3. Tratar erro específico: "await is only valid in async functions"
+        if diagnostics and "await is only valid in async functions" in diagnostics:
+            lines = content.splitlines()
+            # Se sabemos a linha do await com erro
+            if error_line_num and 1 <= error_line_num <= len(lines):
+                # Verificar se houve um fecho prematuro (ex: '});') pouco antes da linha do erro
+                premature_idx = None
+                for i in range(error_line_num - 2, max(-1, error_line_num - 35), -1):
+                    if lines[i].strip() in ("});", "}", "};"):
+                        premature_idx = i
+                        break
+                if premature_idx is not None:
+                    removed_delimiter = lines.pop(premature_idx)
+                    content = "\n".join(lines)
+                    changes.append(f"Removido fecho prematuro '{removed_delimiter.strip()}' na linha {premature_idx + 1} que isolava a chamada 'await'.")
+                else:
+                    # Verificar se a função anterior não tem a palavra-chave async
+                    for i in range(error_line_num - 1, -1, -1):
+                        cur_line = lines[i]
+                        if re.search(r'(?:function|\(.*?\)\s*=>|\bpost\(|\bget\(|\bput\()', cur_line) and "async" not in cur_line:
+                            lines[i] = re.sub(r'(\bfunction\b|\(.*?\)\s*=>|\b(?:post|get|put)\s*\()', r'async \1', cur_line, count=1)
+                            content = "\n".join(lines)
+                            changes.append(f"Adicionada palavra-chave 'async' na definição da função na linha {i + 1}.")
+                            break
+
+        # 4. Tratar blocos duplicados acidentais no final do ficheiro
+        lines = content.splitlines()
+        half = len(lines) // 2
+        for block_size in range(10, min(100, half)):
+            if lines[-block_size:] == lines[-2*block_size:-block_size]:
+                lines = lines[:-block_size]
+                content = "\n".join(lines)
+                changes.append(f"Removido bloco de código duplicado de {block_size} linhas no final do ficheiro.")
+                break
+
+        # 5. Corrigir vírgulas duplas ou trailing commas malformadas
         fixed_commas = re.sub(r",\s*,", ", ", content)
         if fixed_commas != content:
             content = fixed_commas
@@ -173,6 +253,7 @@ class ASTRepairEngineV2:
             issue_type="SYNTAX_ERROR",
             applied_changes=changes,
             success=len(changes) > 0,
+            diagnostics=diagnostics,
         )
 
     def repair_missing_import(

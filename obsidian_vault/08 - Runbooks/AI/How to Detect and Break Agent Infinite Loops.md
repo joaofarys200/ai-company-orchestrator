@@ -11,19 +11,19 @@ tags:
 status: verified
 ---
 
-# ðŸ› ï¸ How to Detect and Break Agent Infinite Loops
+# 🛠️ï¸ How to Detect and Break Agent Infinite Loops
 
-## 1. Sintomas & DiagnÃ³stico
-- O agente gera mais de 5 turnos consecutivos chamando a mesma ferramenta com argumentos idÃªnticos ou ligeiras variaÃ§Ãµes sem progresso.
-- O traceback de erro de teste unitÃ¡rio repete-se com a mesma mensagem de `AssertionError` por 3 tentativas seguidas.
-- A memÃ³ria de contexto atinge o limite mÃ¡ximo enquanto o agente oscila entre duas soluÃ§Ãµes mutuamente exclusivas.
+## 1. Sintomas & Diagnóstico
+- O agente gera mais de 5 turnos consecutivos chamando a mesma ferramenta com argumentos idênticos ou ligeiras variações sem progresso.
+- O traceback de erro de teste unitário repete-se com a mesma mensagem de `AssertionError` por 3 tentativas seguidas.
+- A memória de contexto atinge o limite máximo enquanto o agente oscila entre duas soluções mutuamente exclusivas.
 
 ---
 
-## 2. DiagnÃ³stico Passo a Passo
+## 2. Diagnóstico Passo a Passo
 
 ```bash
-# 1. Verificar histÃ³rico recente de aÃ§Ãµes do agente
+# 1. Verificar histórico recente de ações do agente
 # Observar se o tool_name e args_hash se repetem:
 [Step 12] Tool: read_file (path: "backend/server.py") -> Error: not found
 [Step 13] Tool: read_file (path: "backend/server.py") -> Error: not found
@@ -32,39 +32,39 @@ status: verified
 
 ---
 
-## 3. Procedimento de Quebra e RecuperaÃ§Ã£o (Runbook)
+## 3. Procedimento de Quebra e Recuperação (Runbook)
 
-### Passo 1: InterrupÃ§Ã£o Imediata do Runner (Circuit Breaker)
-Travar a execuÃ§Ã£o do loop antes que consuma mais tokens ou execute aÃ§Ãµes potencialmente destrutivas.
+### Passo 1: Interrupção Imediata do Runner (Circuit Breaker)
+Travar a execução do loop antes que consuma mais tokens ou execute ações potencialmente destrutivas.
 
-### Passo 2: InjeÃ§Ã£o de Contexto de ResoluÃ§Ã£o (Forced Pivot)
-Injetar no prompt do agente uma mensagem de sistema de prioridade mÃ¡xima com a seguinte estrutura:
+### Passo 2: Injeção de Contexto de Resolução (Forced Pivot)
+Injetar no prompt do agente uma mensagem de sistema de prioridade máxima com a seguinte estrutura:
 
 ```markdown
 <system_override_alert>
 ALERTA DO SISTEMA: A tua abordagem anterior falhou 3 vezes consecutivas.
-- AÃ§Ã£o repetida: read_file("backend/server.py")
-- Motivo da falha: O ficheiro nÃ£o existe nessa localizaÃ§Ã£o.
+- Ação repetida: read_file("backend/server.py")
+- Motivo da falha: O ficheiro não existe nessa localização.
 
-AÃ‡ÃƒO OBRIGATÃ“RIA:
+AÇÃƒO OBRIGATÃ“RIA:
 1. Executa 'list_dir' na raiz do workspace para localizar a estrutura real de pastas.
-2. NÃ£o tentes ler 'backend/server.py' novamente atÃ© confirmares a sua localizaÃ§Ã£o.
+2. Não tentes ler 'backend/server.py' novamente até confirmares a sua localização.
 </system_override_alert>
 ```
 
-### Passo 3: EscalaÃ§Ã£o para Modelo com Maior Capacidade Cognitiva
-Se o modelo em execuÃ§Ã£o for um modelo local (ex: Ollama 7B), o orquestrador deve escalar a requisiÃ§Ã£o para um modelo de raciocÃ­nio de ponta (ex: Claude 3.5 Sonnet / Gemini Pro) com instruÃ§Ã£o explÃ­cita para desbloquear o impasse.
+### Passo 3: Escalação para Modelo com Maior Capacidade Cognitiva
+Se o modelo em execução for um modelo local (ex: Ollama 7B), o orquestrador deve escalar a requisição para um modelo de raciocínio de ponta (ex: Claude 3.5 Sonnet / Gemini Pro) com instrução explícita para desbloquear o impasse.
 
 ### Passo 4: Se o Impasse Persistir $\rightarrow$ Human Gate
-Se apÃ³s a escalaÃ§Ã£o o agente nÃ£o conseguir progredir em 2 iteraÃ§Ãµes adicionais:
-1. Salvar o estado da missÃ£o na base de dados (`status = "PAUSED_WAITING_HUMAN"`).
-2. Emitir uma notificaÃ§Ã£o com o diagnÃ³stico detalhado para o operador.
+Se após a escalação o agente não conseguir progredir em 2 iterações adicionais:
+1. Salvar o estado da missão na base de dados (`status = "PAUSED_WAITING_HUMAN"`).
+2. Emitir uma notificação com o diagnóstico detalhado para o operador.
 
 ---
 
-## 4. PrevenÃ§Ã£o
+## 4. Prevenção
 - Implementar a classe `AgentLoopDetector` (ver [[Agent Loop Detection and Circuit Breaker]]) no loop principal do `SwarmOrchestrator`.
-- Definir limites estritos de iteraÃ§Ãµes por subtarefa ($MaxSteps \le 10$).
+- Definir limites estritos de iterações por subtarefa ($MaxSteps \le 10$).
 
 ---
 

@@ -31,12 +31,12 @@ sources:
 # â“ Gap - Real-Time WebRTC Audio Latency Bounds in Local Hardware
 
 ## Question
-*Quais sÃ£o os limites mÃ­nimos teÃ³ricos e prÃ¡ticos de latÃªncia ponta a ponta (Glass-to-Ear / Mic-to-Speaker) alcanÃ§Ã¡veis em hardware local de consumo para conversaÃ§Ã£o contÃ­nua por voz sem buffers de streaming audÃ­veis?*
+*Quais são os limites mínimos teóricos e práticos de latência ponta a ponta (Glass-to-Ear / Mic-to-Speaker) alcançáveis em hardware local de consumo para conversação contínua por voz sem buffers de streaming audíveis?*
 
 ---
 
 ## Why It Matters
-A percepÃ§Ã£o humana de conversa natural degrada quando a latÃªncia de resposta ultrapassa $300\text{ms}$. Para o JARVIS agir como um par de programaÃ§Ã£o verdadeiramente fluido via voz, os tempos de captura, VAD, STT, inferÃªncia e TTS devem ser otimizados conjuntamente.
+A percepção humana de conversa natural degrada quando a latência de resposta ultrapassa $300\text{ms}$. Para o JARVIS agir como um par de programação verdadeiramente fluido via voz, os tempos de captura, VAD, STT, inferência e TTS devem ser otimizados conjuntamente.
 
 ---
 
@@ -47,19 +47,19 @@ A percepÃ§Ã£o humana de conversa natural degrada quando a latÃªncia de res
 ---
 
 ## What Is Unknown
-- A variaÃ§Ã£o de jitter introduzida pelos drivers WASAPI / ALSA em diferentes interfaces de Ã¡udio USB.
-- O impacto do escalonamento de frequÃªncia de clock da GPU durante a alternÃ¢ncia rÃ¡pida entre STT e inferÃªncia de LLM.
+- A variação de jitter introduzida pelos drivers WASAPI / ALSA em diferentes interfaces de áudio USB.
+- O impacto do escalonamento de frequência de clock da GPU durante a alternância rápida entre STT e inferência de LLM.
 
 ---
 
 ## Evidence Required
-Benchmarks empÃ­ricos gravados em hardware real medindo o tempo exato com osciloscÃ³pio ou loopback de Ã¡udio calibrado entre a Ãºltima palavra falada pelo humano e o primeiro frame de Ã¡udio emitido pelo TTS.
+Benchmarks empíricos gravados em hardware real medindo o tempo exato com osciloscópio ou loopback de áudio calibrado entre a última palavra falada pelo humano e o primeiro frame de áudio emitido pelo TTS.
 
 ---
 
 ## Potential Sources
-- EspecificaÃ§Ãµes IETF WebRTC Data Channels and Audio Processing.
-- DocumentaÃ§Ã£o da biblioteca `sounddevice` e do backend PortAudio.
+- Especificações IETF WebRTC Data Channels and Audio Processing.
+- Documentação da biblioteca `sounddevice` e do backend PortAudio.
 
 ---
 
@@ -69,5 +69,5 @@ Benchmarks empÃ­ricos gravados em hardware real medindo o tempo exato com osci
 ---
 
 ## Priority
-`P2 (MÃ©dio-Alto)`
+`P2 (Médio-Alto)`
 
