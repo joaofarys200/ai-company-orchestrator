@@ -1,0 +1,1576 @@
+{
+  "provenance": {
+    "commit_sha": "348acdd",
+    "timestamp": "2026-09-07T14:34:15.628168+00:00",
+    "host": "BIGBALLSG",
+    "node_id": "global_coord_primary",
+    "OS": "Windows-11-10.0.26200-SP0",
+    "CPU": "16 cores",
+    "RAM": "15.7 GB",
+    "Python": "3.14.7",
+    "transport": "DistributedTransport (TCP, HTTP/2, gRPC)",
+    "workload_sha256": "fd1838ba3d253caf895850ed77222c5a0c728df65e8184a82e5dfcd184d9a1f9",
+    "execution_modes": [
+      "PROCESS_SIMULATION",
+      "LOCAL_MULTI_PROCESS",
+      "MULTI_NODE_REAL"
+    ]
+  },
+  "transport_comparison": {
+    "TCP": {
+      "1 KB": {
+        "size_bytes": 1024,
+        "latency_ms": {
+          "mean": 0.112,
+          "median": 0.082,
+          "stddev": 0.065,
+          "min": 0.068,
+          "max": 0.221,
+          "p50": 0.082,
+          "p95": 0.221,
+          "p99": 0.221
+        },
+        "throughput_mb_s": 8.72,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.03,
+        "connections": 1,
+        "retries": 0
+      },
+      "4 KB": {
+        "size_bytes": 4096,
+        "latency_ms": {
+          "mean": 0.085,
+          "median": 0.073,
+          "stddev": 0.028,
+          "min": 0.065,
+          "max": 0.132,
+          "p50": 0.073,
+          "p95": 0.132,
+          "p99": 0.132
+        },
+        "throughput_mb_s": 39.06,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.0,
+        "connections": 1,
+        "retries": 0
+      },
+      "16 KB": {
+        "size_bytes": 16384,
+        "latency_ms": {
+          "mean": 0.104,
+          "median": 0.105,
+          "stddev": 0.032,
+          "min": 0.072,
+          "max": 0.153,
+          "p50": 0.105,
+          "p95": 0.153,
+          "p99": 0.153
+        },
+        "throughput_mb_s": 150.24,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.08,
+        "connections": 1,
+        "retries": 0
+      },
+      "64 KB": {
+        "size_bytes": 65536,
+        "latency_ms": {
+          "mean": 0.164,
+          "median": 0.135,
+          "stddev": 0.058,
+          "min": 0.125,
+          "max": 0.264,
+          "p50": 0.135,
+          "p95": 0.264,
+          "p99": 0.264
+        },
+        "throughput_mb_s": 381.1,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.5,
+        "connections": 1,
+        "retries": 0
+      },
+      "256 KB": {
+        "size_bytes": 262144,
+        "latency_ms": {
+          "mean": 0.448,
+          "median": 0.392,
+          "stddev": 0.116,
+          "min": 0.346,
+          "max": 0.624,
+          "p50": 0.392,
+          "p95": 0.624,
+          "p99": 0.624
+        },
+        "throughput_mb_s": 558.04,
+        "cpu_percent": 586.4,
+        "memory_delta_mb": 1.81,
+        "connections": 1,
+        "retries": 0
+      },
+      "1 MB": {
+        "size_bytes": 1048576,
+        "latency_ms": {
+          "mean": 7.498,
+          "median": 4.309,
+          "stddev": 7.064,
+          "min": 4.081,
+          "max": 20.126,
+          "p50": 4.309,
+          "p95": 20.126,
+          "p99": 20.126
+        },
+        "throughput_mb_s": 133.37,
+        "cpu_percent": 35.4,
+        "memory_delta_mb": 3.86,
+        "connections": 1,
+        "retries": 0
+      }
+    },
+    "HTTP/2": {
+      "1 KB": {
+        "size_bytes": 1024,
+        "latency_ms": {
+          "mean": 0.145,
+          "median": 0.101,
+          "stddev": 0.094,
+          "min": 0.086,
+          "max": 0.308,
+          "p50": 0.101,
+          "p95": 0.308,
+          "p99": 0.308
+        },
+        "throughput_mb_s": 6.73,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": -2.0,
+        "connections": 1,
+        "retries": 0
+      },
+      "4 KB": {
+        "size_bytes": 4096,
+        "latency_ms": {
+          "mean": 0.118,
+          "median": 0.104,
+          "stddev": 0.044,
+          "min": 0.09,
+          "max": 0.195,
+          "p50": 0.104,
+          "p95": 0.195,
+          "p99": 0.195
+        },
+        "throughput_mb_s": 33.1,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.02,
+        "connections": 1,
+        "retries": 0
+      },
+      "16 KB": {
+        "size_bytes": 16384,
+        "latency_ms": {
+          "mean": 0.138,
+          "median": 0.111,
+          "stddev": 0.046,
+          "min": 0.107,
+          "max": 0.214,
+          "p50": 0.111,
+          "p95": 0.214,
+          "p99": 0.214
+        },
+        "throughput_mb_s": 113.22,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.07,
+        "connections": 1,
+        "retries": 0
+      },
+      "64 KB": {
+        "size_bytes": 65536,
+        "latency_ms": {
+          "mean": 0.191,
+          "median": 0.149,
+          "stddev": 0.09,
+          "min": 0.142,
+          "max": 0.35,
+          "p50": 0.149,
+          "p95": 0.35,
+          "p99": 0.35
+        },
+        "throughput_mb_s": 327.23,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.44,
+        "connections": 1,
+        "retries": 0
+      },
+      "256 KB": {
+        "size_bytes": 262144,
+        "latency_ms": {
+          "mean": 0.445,
+          "median": 0.392,
+          "stddev": 0.121,
+          "min": 0.35,
+          "max": 0.653,
+          "p50": 0.392,
+          "p95": 0.653,
+          "p99": 0.653
+        },
+        "throughput_mb_s": 561.8,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 1.04,
+        "connections": 1,
+        "retries": 0
+      },
+      "1 MB": {
+        "size_bytes": 1048576,
+        "latency_ms": {
+          "mean": 4.188,
+          "median": 4.369,
+          "stddev": 0.503,
+          "min": 3.571,
+          "max": 4.671,
+          "p50": 4.369,
+          "p95": 4.671,
+          "p99": 4.671
+        },
+        "throughput_mb_s": 238.78,
+        "cpu_percent": 115.5,
+        "memory_delta_mb": 4.12,
+        "connections": 1,
+        "retries": 0
+      }
+    },
+    "gRPC": {
+      "1 KB": {
+        "size_bytes": 1024,
+        "latency_ms": {
+          "mean": 0.124,
+          "median": 0.089,
+          "stddev": 0.074,
+          "min": 0.079,
+          "max": 0.252,
+          "p50": 0.089,
+          "p95": 0.252,
+          "p99": 0.252
+        },
+        "throughput_mb_s": 7.88,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": -2.01,
+        "connections": 1,
+        "retries": 0
+      },
+      "4 KB": {
+        "size_bytes": 4096,
+        "latency_ms": {
+          "mean": 0.111,
+          "median": 0.096,
+          "stddev": 0.033,
+          "min": 0.089,
+          "max": 0.168,
+          "p50": 0.096,
+          "p95": 0.168,
+          "p99": 0.168
+        },
+        "throughput_mb_s": 35.19,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.03,
+        "connections": 1,
+        "retries": 0
+      },
+      "16 KB": {
+        "size_bytes": 16384,
+        "latency_ms": {
+          "mean": 0.157,
+          "median": 0.16,
+          "stddev": 0.04,
+          "min": 0.113,
+          "max": 0.211,
+          "p50": 0.16,
+          "p95": 0.211,
+          "p99": 0.211
+        },
+        "throughput_mb_s": 99.52,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.0,
+        "connections": 1,
+        "retries": 0
+      },
+      "64 KB": {
+        "size_bytes": 65536,
+        "latency_ms": {
+          "mean": 0.195,
+          "median": 0.183,
+          "stddev": 0.031,
+          "min": 0.16,
+          "max": 0.229,
+          "p50": 0.183,
+          "p95": 0.229,
+          "p99": 0.229
+        },
+        "throughput_mb_s": 320.51,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.0,
+        "connections": 1,
+        "retries": 0
+      },
+      "256 KB": {
+        "size_bytes": 262144,
+        "latency_ms": {
+          "mean": 0.411,
+          "median": 0.385,
+          "stddev": 0.092,
+          "min": 0.339,
+          "max": 0.569,
+          "p50": 0.385,
+          "p95": 0.569,
+          "p99": 0.569
+        },
+        "throughput_mb_s": 608.27,
+        "cpu_percent": 0.0,
+        "memory_delta_mb": 0.93,
+        "connections": 1,
+        "retries": 0
+      },
+      "1 MB": {
+        "size_bytes": 1048576,
+        "latency_ms": {
+          "mean": 9.491,
+          "median": 6.647,
+          "stddev": 5.201,
+          "min": 5.297,
+          "max": 16.336,
+          "p50": 6.647,
+          "p95": 16.336,
+          "p99": 16.336
+        },
+        "throughput_mb_s": 105.36,
+        "cpu_percent": 99.1,
+        "memory_delta_mb": 3.05,
+        "connections": 1,
+        "retries": 0
+      }
+    }
+  },
+  "network_simulations": {
+    "message_delay": {
+      "10ms": {
+        "injected_delay_ms": 10.0,
+        "measured_duration_ms": 25.11,
+        "status": "PASS"
+      },
+      "50ms": {
+        "injected_delay_ms": 50.0,
+        "measured_duration_ms": 53.82,
+        "status": "PASS"
+      },
+      "100ms": {
+        "injected_delay_ms": 100.0,
+        "measured_duration_ms": 114.45,
+        "status": "PASS"
+      },
+      "500ms": {
+        "injected_delay_ms": 500.0,
+        "measured_duration_ms": 502.08,
+        "status": "PASS"
+      }
+    },
+    "message_loss": {
+      "1%": {
+        "loss_rate": 0.01,
+        "packets_sent": 20,
+        "packets_received": 20,
+        "recovery_rate": 1.0
+      },
+      "5%": {
+        "loss_rate": 0.05,
+        "packets_sent": 20,
+        "packets_received": 20,
+        "recovery_rate": 1.0
+      },
+      "10%": {
+        "loss_rate": 0.1,
+        "packets_sent": 20,
+        "packets_received": 20,
+        "recovery_rate": 1.0
+      },
+      "25%": {
+        "loss_rate": 0.25,
+        "packets_sent": 20,
+        "packets_received": 20,
+        "recovery_rate": 1.0
+      }
+    },
+    "message_duplication": {
+      "1%": {
+        "duplication_rate": 0.01,
+        "unique_messages_sent": 20,
+        "side_effects_executed": 20,
+        "duplicate_side_effects": 0,
+        "zero_duplicate_side_effects": true
+      },
+      "5%": {
+        "duplication_rate": 0.05,
+        "unique_messages_sent": 20,
+        "side_effects_executed": 20,
+        "duplicate_side_effects": 0,
+        "zero_duplicate_side_effects": true
+      },
+      "10%": {
+        "duplication_rate": 0.1,
+        "unique_messages_sent": 20,
+        "side_effects_executed": 20,
+        "duplicate_side_effects": 0,
+        "zero_duplicate_side_effects": true
+      }
+    },
+    "clock_skew": {
+      "0.01s": {
+        "clock_skew_seconds": 0.01,
+        "node_a_clock": 1,
+        "node_b_clock": 2,
+        "causally_ordered": true
+      },
+      "0.1s": {
+        "clock_skew_seconds": 0.1,
+        "node_a_clock": 2,
+        "node_b_clock": 3,
+        "causally_ordered": true
+      },
+      "1.0s": {
+        "clock_skew_seconds": 1.0,
+        "node_a_clock": 3,
+        "node_b_clock": 4,
+        "causally_ordered": true
+      },
+      "5.0s": {
+        "clock_skew_seconds": 5.0,
+        "node_a_clock": 4,
+        "node_b_clock": 5,
+        "causally_ordered": true
+      },
+      "30.0s": {
+        "clock_skew_seconds": 30.0,
+        "node_a_clock": 5,
+        "node_b_clock": 6,
+        "causally_ordered": true
+      }
+    }
+  },
+  "multi_node_scaling": {
+    "1_nodes": {
+      "256_agents": {
+        "nodes": 1,
+        "agents": 256,
+        "tasks": 256,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 998806.829,
+          "median": 1103924.012,
+          "stddev": 180145.658,
+          "min": 752277.593,
+          "max": 1158370.763,
+          "p50": 1103924.012,
+          "p95": 1158370.763,
+          "p99": 1158370.763
+        },
+        "duration_ms": {
+          "mean": 0.264,
+          "median": 0.232,
+          "stddev": 0.052,
+          "min": 0.221,
+          "max": 0.34,
+          "p50": 0.232,
+          "p95": 0.34,
+          "p99": 0.34
+        },
+        "execution_type": "PROCESS_SIMULATION",
+        "status": "SUPPORTED"
+      },
+      "512_agents": {
+        "nodes": 1,
+        "agents": 512,
+        "tasks": 512,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1083440.87,
+          "median": 1067556.46,
+          "stddev": 94804.297,
+          "min": 975052.512,
+          "max": 1197941.053,
+          "p50": 1067556.46,
+          "p95": 1197941.053,
+          "p99": 1197941.053
+        },
+        "duration_ms": {
+          "mean": 0.475,
+          "median": 0.48,
+          "stddev": 0.041,
+          "min": 0.427,
+          "max": 0.525,
+          "p50": 0.48,
+          "p95": 0.525,
+          "p99": 0.525
+        },
+        "execution_type": "PROCESS_SIMULATION",
+        "status": "SUPPORTED"
+      },
+      "1024_agents": {
+        "nodes": 1,
+        "agents": 1024,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1163988.694,
+          "median": 1178501.58,
+          "stddev": 75798.712,
+          "min": 1075630.217,
+          "max": 1243925.818,
+          "p50": 1178501.58,
+          "p95": 1243925.818,
+          "p99": 1243925.818
+        },
+        "duration_ms": {
+          "mean": 0.883,
+          "median": 0.869,
+          "stddev": 0.058,
+          "min": 0.823,
+          "max": 0.952,
+          "p50": 0.869,
+          "p95": 0.952,
+          "p99": 0.952
+        },
+        "execution_type": "PROCESS_SIMULATION",
+        "status": "SUPPORTED"
+      },
+      "2048_agents": {
+        "nodes": 1,
+        "agents": 2048,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1042123.172,
+          "median": 1105115.392,
+          "stddev": 156691.595,
+          "min": 818022.058,
+          "max": 1198501.892,
+          "p50": 1105115.392,
+          "p95": 1198501.892,
+          "p99": 1198501.892
+        },
+        "duration_ms": {
+          "mean": 1.002,
+          "median": 0.927,
+          "stddev": 0.164,
+          "min": 0.854,
+          "max": 1.252,
+          "p50": 0.927,
+          "p95": 1.252,
+          "p99": 1.252
+        },
+        "execution_type": "PROCESS_SIMULATION",
+        "status": "SUPPORTED"
+      },
+      "4096_agents": {
+        "nodes": 1,
+        "agents": 4096,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1003114.197,
+          "median": 1003233.103,
+          "stddev": 174144.253,
+          "min": 732370.224,
+          "max": 1178366.121,
+          "p50": 1003233.103,
+          "p95": 1178366.121,
+          "p99": 1178366.121
+        },
+        "duration_ms": {
+          "mean": 1.05,
+          "median": 1.021,
+          "stddev": 0.21,
+          "min": 0.869,
+          "max": 1.398,
+          "p50": 1.021,
+          "p95": 1.398,
+          "p99": 1.398
+        },
+        "execution_type": "PROCESS_SIMULATION",
+        "status": "SUPPORTED"
+      },
+      "8192_agents": {
+        "nodes": 1,
+        "agents": 8192,
+        "tasks": 1024,
+        "replicates": 10,
+        "throughput_tasks_s": {
+          "mean": 1159151.958,
+          "median": 1201611.718,
+          "stddev": 131515.924,
+          "min": 918962.589,
+          "max": 1292276.66,
+          "p50": 1226347.2,
+          "p95": 1292276.66,
+          "p99": 1292276.66
+        },
+        "duration_ms": {
+          "mean": 0.895,
+          "median": 0.853,
+          "stddev": 0.111,
+          "min": 0.792,
+          "max": 1.114,
+          "p50": 0.87,
+          "p95": 1.114,
+          "p99": 1.114
+        },
+        "execution_type": "PROCESS_SIMULATION",
+        "status": "SUPPORTED"
+      },
+      "16384_agents": {
+        "nodes": 1,
+        "agents": 16384,
+        "tasks": 1024,
+        "replicates": 10,
+        "throughput_tasks_s": {
+          "mean": 1163510.163,
+          "median": 1182516.642,
+          "stddev": 97470.45,
+          "min": 899586.97,
+          "max": 1241663.821,
+          "p50": 1182994.675,
+          "p95": 1241663.821,
+          "p99": 1241663.821
+        },
+        "duration_ms": {
+          "mean": 0.887,
+          "median": 0.866,
+          "stddev": 0.091,
+          "min": 0.825,
+          "max": 1.138,
+          "p50": 0.866,
+          "p95": 1.138,
+          "p99": 1.138
+        },
+        "execution_type": "PROCESS_SIMULATION",
+        "status": "ENVIRONMENT_LIMIT"
+      }
+    },
+    "2_nodes": {
+      "256_agents": {
+        "nodes": 2,
+        "agents": 256,
+        "tasks": 256,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1019141.511,
+          "median": 1109666.183,
+          "stddev": 223206.728,
+          "min": 623629.746,
+          "max": 1153673.12,
+          "p50": 1109666.183,
+          "p95": 1153673.12,
+          "p99": 1153673.12
+        },
+        "duration_ms": {
+          "mean": 0.265,
+          "median": 0.231,
+          "stddev": 0.081,
+          "min": 0.222,
+          "max": 0.41,
+          "p50": 0.231,
+          "p95": 0.41,
+          "p99": 0.41
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "512_agents": {
+        "nodes": 2,
+        "agents": 512,
+        "tasks": 512,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 576116.041,
+          "median": 579907.22,
+          "stddev": 45870.019,
+          "min": 516441.466,
+          "max": 636578.427,
+          "p50": 579907.22,
+          "p95": 636578.427,
+          "p99": 636578.427
+        },
+        "duration_ms": {
+          "mean": 0.893,
+          "median": 0.883,
+          "stddev": 0.072,
+          "min": 0.804,
+          "max": 0.991,
+          "p50": 0.883,
+          "p95": 0.991,
+          "p99": 0.991
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "1024_agents": {
+        "nodes": 2,
+        "agents": 1024,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1034296.185,
+          "median": 1169617.32,
+          "stddev": 255254.25,
+          "min": 610832.752,
+          "max": 1220500.786,
+          "p50": 1169617.32,
+          "p95": 1220500.786,
+          "p99": 1220500.786
+        },
+        "duration_ms": {
+          "mean": 1.059,
+          "median": 0.876,
+          "stddev": 0.355,
+          "min": 0.839,
+          "max": 1.676,
+          "p50": 0.876,
+          "p95": 1.676,
+          "p99": 1.676
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "2048_agents": {
+        "nodes": 2,
+        "agents": 2048,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1100365.987,
+          "median": 1168949.57,
+          "stddev": 158954.071,
+          "min": 846700.753,
+          "max": 1226935.3,
+          "p50": 1168949.57,
+          "p95": 1226935.3,
+          "p99": 1226935.3
+        },
+        "duration_ms": {
+          "mean": 0.949,
+          "median": 0.876,
+          "stddev": 0.157,
+          "min": 0.835,
+          "max": 1.209,
+          "p50": 0.876,
+          "p95": 1.209,
+          "p99": 1.209
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "4096_agents": {
+        "nodes": 2,
+        "agents": 4096,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1121069.416,
+          "median": 1177146.814,
+          "stddev": 130720.62,
+          "min": 957456.656,
+          "max": 1264041.479,
+          "p50": 1177146.814,
+          "p95": 1264041.479,
+          "p99": 1264041.479
+        },
+        "duration_ms": {
+          "mean": 0.924,
+          "median": 0.87,
+          "stddev": 0.112,
+          "min": 0.81,
+          "max": 1.07,
+          "p50": 0.87,
+          "p95": 1.07,
+          "p99": 1.07
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "8192_agents": {
+        "nodes": 2,
+        "agents": 8192,
+        "tasks": 1024,
+        "replicates": 10,
+        "throughput_tasks_s": {
+          "mean": 1086946.785,
+          "median": 1115955.877,
+          "stddev": 109284.054,
+          "min": 904194.347,
+          "max": 1225026.973,
+          "p50": 1117050.437,
+          "p95": 1225026.973,
+          "p99": 1225026.973
+        },
+        "duration_ms": {
+          "mean": 0.951,
+          "median": 0.918,
+          "stddev": 0.102,
+          "min": 0.836,
+          "max": 1.132,
+          "p50": 0.918,
+          "p95": 1.132,
+          "p99": 1.132
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "16384_agents": {
+        "nodes": 2,
+        "agents": 16384,
+        "tasks": 1024,
+        "replicates": 10,
+        "throughput_tasks_s": {
+          "mean": 1159182.809,
+          "median": 1185408.649,
+          "stddev": 73694.943,
+          "min": 973383.943,
+          "max": 1228554.372,
+          "p50": 1190005.604,
+          "p95": 1228554.372,
+          "p99": 1228554.372
+        },
+        "duration_ms": {
+          "mean": 0.887,
+          "median": 0.864,
+          "stddev": 0.064,
+          "min": 0.833,
+          "max": 1.052,
+          "p50": 0.867,
+          "p95": 1.052,
+          "p99": 1.052
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "ENVIRONMENT_LIMIT"
+      }
+    },
+    "4_nodes": {
+      "256_agents": {
+        "nodes": 4,
+        "agents": 256,
+        "tasks": 256,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 944186.765,
+          "median": 1042345.245,
+          "stddev": 202310.884,
+          "min": 597293.508,
+          "max": 1076988.566,
+          "p50": 1042345.245,
+          "p95": 1076988.566,
+          "p99": 1076988.566
+        },
+        "duration_ms": {
+          "mean": 0.285,
+          "median": 0.246,
+          "stddev": 0.082,
+          "min": 0.238,
+          "max": 0.429,
+          "p50": 0.246,
+          "p95": 0.429,
+          "p99": 0.429
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "512_agents": {
+        "nodes": 4,
+        "agents": 512,
+        "tasks": 512,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1033714.052,
+          "median": 1023590.869,
+          "stddev": 95236.522,
+          "min": 904273.916,
+          "max": 1152115.493,
+          "p50": 1023590.869,
+          "p95": 1152115.493,
+          "p99": 1152115.493
+        },
+        "duration_ms": {
+          "mean": 0.499,
+          "median": 0.5,
+          "stddev": 0.047,
+          "min": 0.444,
+          "max": 0.566,
+          "p50": 0.5,
+          "p95": 0.566,
+          "p99": 0.566
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "1024_agents": {
+        "nodes": 4,
+        "agents": 1024,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1055397.103,
+          "median": 1135003.47,
+          "stddev": 131419.283,
+          "min": 863260.868,
+          "max": 1155625.63,
+          "p50": 1135003.47,
+          "p95": 1155625.63,
+          "p99": 1155625.63
+        },
+        "duration_ms": {
+          "mean": 0.983,
+          "median": 0.902,
+          "stddev": 0.133,
+          "min": 0.886,
+          "max": 1.186,
+          "p50": 0.902,
+          "p95": 1.186,
+          "p99": 1.186
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "2048_agents": {
+        "nodes": 4,
+        "agents": 2048,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 940007.092,
+          "median": 975795.84,
+          "stddev": 121759.873,
+          "min": 772072.7,
+          "max": 1092149.991,
+          "p50": 975795.84,
+          "p95": 1092149.991,
+          "p99": 1092149.991
+        },
+        "duration_ms": {
+          "mean": 1.105,
+          "median": 1.049,
+          "stddev": 0.149,
+          "min": 0.938,
+          "max": 1.326,
+          "p50": 1.049,
+          "p95": 1.326,
+          "p99": 1.326
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "4096_agents": {
+        "nodes": 4,
+        "agents": 4096,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1025450.197,
+          "median": 1059822.086,
+          "stddev": 83724.343,
+          "min": 880632.95,
+          "max": 1089361.502,
+          "p50": 1059822.086,
+          "p95": 1089361.502,
+          "p99": 1089361.502
+        },
+        "duration_ms": {
+          "mean": 1.004,
+          "median": 0.966,
+          "stddev": 0.091,
+          "min": 0.94,
+          "max": 1.163,
+          "p50": 0.966,
+          "p95": 1.163,
+          "p99": 1.163
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "8192_agents": {
+        "nodes": 4,
+        "agents": 8192,
+        "tasks": 1024,
+        "replicates": 10,
+        "throughput_tasks_s": {
+          "mean": 1096363.7,
+          "median": 1132706.594,
+          "stddev": 102227.161,
+          "min": 825141.079,
+          "max": 1172026.989,
+          "p50": 1142729.367,
+          "p95": 1172026.989,
+          "p99": 1172026.989
+        },
+        "duration_ms": {
+          "mean": 0.943,
+          "median": 0.904,
+          "stddev": 0.109,
+          "min": 0.874,
+          "max": 1.241,
+          "p50": 0.912,
+          "p95": 1.241,
+          "p99": 1.241
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "16384_agents": {
+        "nodes": 4,
+        "agents": 16384,
+        "tasks": 1024,
+        "replicates": 10,
+        "throughput_tasks_s": {
+          "mean": 1115591.443,
+          "median": 1145170.5,
+          "stddev": 84227.886,
+          "min": 885813.005,
+          "max": 1172832.419,
+          "p50": 1149012.524,
+          "p95": 1172832.419,
+          "p99": 1172832.419
+        },
+        "duration_ms": {
+          "mean": 0.924,
+          "median": 0.894,
+          "stddev": 0.084,
+          "min": 0.873,
+          "max": 1.156,
+          "p50": 0.897,
+          "p95": 1.156,
+          "p99": 1.156
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "ENVIRONMENT_LIMIT"
+      }
+    },
+    "8_nodes": {
+      "256_agents": {
+        "nodes": 8,
+        "agents": 256,
+        "tasks": 256,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 806121.818,
+          "median": 838794.245,
+          "stddev": 156048.193,
+          "min": 556763.8,
+          "max": 953445.66,
+          "p50": 838794.245,
+          "p95": 953445.66,
+          "p99": 953445.66
+        },
+        "duration_ms": {
+          "mean": 0.329,
+          "median": 0.305,
+          "stddev": 0.077,
+          "min": 0.268,
+          "max": 0.46,
+          "p50": 0.305,
+          "p95": 0.46,
+          "p99": 0.46
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "512_agents": {
+        "nodes": 8,
+        "agents": 512,
+        "tasks": 512,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1016677.786,
+          "median": 1024000.309,
+          "stddev": 62189.665,
+          "min": 930063.38,
+          "max": 1089361.502,
+          "p50": 1024000.309,
+          "p95": 1089361.502,
+          "p99": 1089361.502
+        },
+        "duration_ms": {
+          "mean": 0.505,
+          "median": 0.5,
+          "stddev": 0.031,
+          "min": 0.47,
+          "max": 0.551,
+          "p50": 0.5,
+          "p95": 0.551,
+          "p99": 0.551
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "1024_agents": {
+        "nodes": 8,
+        "agents": 1024,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 1032397.758,
+          "median": 1045644.966,
+          "stddev": 45280.61,
+          "min": 953178.683,
+          "max": 1065335.144,
+          "p50": 1045644.966,
+          "p95": 1065335.144,
+          "p99": 1065335.144
+        },
+        "duration_ms": {
+          "mean": 0.993,
+          "median": 0.979,
+          "stddev": 0.046,
+          "min": 0.961,
+          "max": 1.074,
+          "p50": 0.979,
+          "p95": 1.074,
+          "p99": 1.074
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "2048_agents": {
+        "nodes": 8,
+        "agents": 2048,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 976770.346,
+          "median": 921360.379,
+          "stddev": 81878.755,
+          "min": 912737.474,
+          "max": 1082337.902,
+          "p50": 921360.379,
+          "p95": 1082337.902,
+          "p99": 1082337.902
+        },
+        "duration_ms": {
+          "mean": 1.054,
+          "median": 1.111,
+          "stddev": 0.085,
+          "min": 0.946,
+          "max": 1.122,
+          "p50": 1.111,
+          "p95": 1.122,
+          "p99": 1.122
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "4096_agents": {
+        "nodes": 8,
+        "agents": 4096,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 955202.059,
+          "median": 946657.86,
+          "stddev": 129415.102,
+          "min": 776286.912,
+          "max": 1098123.325,
+          "p50": 946657.86,
+          "p95": 1098123.325,
+          "p99": 1098123.325
+        },
+        "duration_ms": {
+          "mean": 1.089,
+          "median": 1.082,
+          "stddev": 0.155,
+          "min": 0.932,
+          "max": 1.319,
+          "p50": 1.082,
+          "p95": 1.319,
+          "p99": 1.319
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "8192_agents": {
+        "nodes": 8,
+        "agents": 8192,
+        "tasks": 1024,
+        "replicates": 10,
+        "throughput_tasks_s": {
+          "mean": 1009600.57,
+          "median": 1049403.904,
+          "stddev": 97954.671,
+          "min": 752996.547,
+          "max": 1072700.812,
+          "p50": 1052415.004,
+          "p95": 1072700.812,
+          "p99": 1072700.812
+        },
+        "duration_ms": {
+          "mean": 1.025,
+          "median": 0.976,
+          "stddev": 0.124,
+          "min": 0.955,
+          "max": 1.36,
+          "p50": 0.979,
+          "p95": 1.36,
+          "p99": 1.36
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "16384_agents": {
+        "nodes": 8,
+        "agents": 16384,
+        "tasks": 1024,
+        "replicates": 10,
+        "throughput_tasks_s": {
+          "mean": 970285.175,
+          "median": 1014033.604,
+          "stddev": 135401.647,
+          "min": 718848.709,
+          "max": 1107745.779,
+          "p50": 1022568.226,
+          "p95": 1107745.779,
+          "p99": 1107745.779
+        },
+        "duration_ms": {
+          "mean": 1.077,
+          "median": 1.01,
+          "stddev": 0.171,
+          "min": 0.924,
+          "max": 1.425,
+          "p50": 1.018,
+          "p95": 1.425,
+          "p99": 1.425
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "ENVIRONMENT_LIMIT"
+      }
+    },
+    "16_nodes": {
+      "256_agents": {
+        "nodes": 16,
+        "agents": 256,
+        "tasks": 256,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 575993.718,
+          "median": 607498.551,
+          "stddev": 86037.228,
+          "min": 427521.779,
+          "max": 636341.165,
+          "p50": 607498.551,
+          "p95": 636341.165,
+          "p99": 636341.165
+        },
+        "duration_ms": {
+          "mean": 0.454,
+          "median": 0.421,
+          "stddev": 0.082,
+          "min": 0.402,
+          "max": 0.599,
+          "p50": 0.421,
+          "p95": 0.599,
+          "p99": 0.599
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "512_agents": {
+        "nodes": 16,
+        "agents": 512,
+        "tasks": 512,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 789312.445,
+          "median": 812053.89,
+          "stddev": 46257.962,
+          "min": 715883.811,
+          "max": 829687.346,
+          "p50": 812053.89,
+          "p95": 829687.346,
+          "p99": 829687.346
+        },
+        "duration_ms": {
+          "mean": 0.651,
+          "median": 0.631,
+          "stddev": 0.04,
+          "min": 0.617,
+          "max": 0.715,
+          "p50": 0.631,
+          "p95": 0.715,
+          "p99": 0.715
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "1024_agents": {
+        "nodes": 16,
+        "agents": 1024,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 874851.554,
+          "median": 890202.534,
+          "stddev": 47817.676,
+          "min": 793490.937,
+          "max": 915921.371,
+          "p50": 890202.534,
+          "p95": 915921.371,
+          "p99": 915921.371
+        },
+        "duration_ms": {
+          "mean": 1.173,
+          "median": 1.15,
+          "stddev": 0.068,
+          "min": 1.118,
+          "max": 1.29,
+          "p50": 1.15,
+          "p95": 1.29,
+          "p99": 1.29
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "2048_agents": {
+        "nodes": 16,
+        "agents": 2048,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 860381.652,
+          "median": 916659.2,
+          "stddev": 89918.679,
+          "min": 719960.625,
+          "max": 923854.156,
+          "p50": 916659.2,
+          "p95": 923854.156,
+          "p99": 923854.156
+        },
+        "duration_ms": {
+          "mean": 1.202,
+          "median": 1.117,
+          "stddev": 0.137,
+          "min": 1.108,
+          "max": 1.422,
+          "p50": 1.117,
+          "p95": 1.422,
+          "p99": 1.422
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "4096_agents": {
+        "nodes": 16,
+        "agents": 4096,
+        "tasks": 1024,
+        "replicates": 5,
+        "throughput_tasks_s": {
+          "mean": 885175.897,
+          "median": 920201.218,
+          "stddev": 71923.717,
+          "min": 761564.781,
+          "max": 933029.535,
+          "p50": 920201.218,
+          "p95": 933029.535,
+          "p99": 933029.535
+        },
+        "duration_ms": {
+          "mean": 1.164,
+          "median": 1.113,
+          "stddev": 0.104,
+          "min": 1.098,
+          "max": 1.345,
+          "p50": 1.113,
+          "p95": 1.345,
+          "p99": 1.345
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "8192_agents": {
+        "nodes": 16,
+        "agents": 8192,
+        "tasks": 1024,
+        "replicates": 10,
+        "throughput_tasks_s": {
+          "mean": 896113.967,
+          "median": 911736.931,
+          "stddev": 74992.946,
+          "min": 761508.08,
+          "max": 974773.948,
+          "p50": 935586.967,
+          "p95": 974773.948,
+          "p99": 974773.948
+        },
+        "duration_ms": {
+          "mean": 1.15,
+          "median": 1.124,
+          "stddev": 0.101,
+          "min": 1.05,
+          "max": 1.345,
+          "p50": 1.153,
+          "p95": 1.345,
+          "p99": 1.345
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "SUPPORTED"
+      },
+      "16384_agents": {
+        "nodes": 16,
+        "agents": 16384,
+        "tasks": 1024,
+        "replicates": 10,
+        "throughput_tasks_s": {
+          "mean": 909962.257,
+          "median": 929040.439,
+          "stddev": 69141.612,
+          "min": 752553.833,
+          "max": 981783.293,
+          "p50": 944039.832,
+          "p95": 981783.293,
+          "p99": 981783.293
+        },
+        "duration_ms": {
+          "mean": 1.132,
+          "median": 1.102,
+          "stddev": 0.095,
+          "min": 1.043,
+          "max": 1.361,
+          "p50": 1.12,
+          "p95": 1.361,
+          "p99": 1.361
+        },
+        "execution_type": "LOCAL_MULTI_PROCESS",
+        "status": "ENVIRONMENT_LIMIT"
+      }
+    }
+  },
+  "architecture_comparison": {
+    "Centralized": {
+      "stats_ms": {
+        "mean": 5.007,
+        "median": 4.852,
+        "stddev": 0.507,
+        "min": 4.628,
+        "max": 5.874,
+        "p50": 4.852,
+        "p95": 5.874,
+        "p99": 5.874
+      },
+      "throughput_tasks_s": 51128.42
+    },
+    "LocalFederated": {
+      "stats_ms": {
+        "mean": 0.078,
+        "median": 0.088,
+        "stddev": 0.029,
+        "min": 0.027,
+        "max": 0.097,
+        "p50": 0.088,
+        "p95": 0.097,
+        "p99": 0.097
+      },
+      "throughput_tasks_s": 2560000.0
+    },
+    "DistributedFederated": {
+      "stats_ms": {
+        "mean": 5.223,
+        "median": 5.168,
+        "stddev": 0.19,
+        "min": 5.003,
+        "max": 5.502,
+        "p50": 5.168,
+        "p95": 5.502,
+        "p99": 5.502
+      },
+      "throughput_tasks_s": 49013.98
+    },
+    "correctness_equivalence": {
+      "is_valid": true,
+      "violations_count": 0,
+      "violations": [],
+      "false_negative": 0,
+      "duplicate_execution": 0,
+      "duplicate_side_effect": 0,
+      "ownership_conflict": 0,
+      "invalid_transition": 0,
+      "false_completion": 0,
+      "split_brain": 0
+    }
+  },
+  "resource_fairness": {
+    "node_allocations": {
+      "fair_node_0": 4,
+      "fair_node_1": 4,
+      "fair_node_2": 4,
+      "fair_node_3": 4
+    },
+    "jain_fairness_index": 1.0,
+    "perfect_fairness_target": 1.0,
+    "fairness_rating": "EXCELLENT"
+  },
+  "long_horizon_stability": {
+    "cycle_50": {
+      "cycles_completed": 50,
+      "rss_mb": 75.46,
+      "memory_drift_mb": 0.0,
+      "checkpoint_size_bytes": 837,
+      "checkpoint_generation": 50,
+      "status": "STABLE"
+    },
+    "cycle_100": {
+      "cycles_completed": 100,
+      "rss_mb": 75.46,
+      "memory_drift_mb": 0.0,
+      "checkpoint_size_bytes": 840,
+      "checkpoint_generation": 100,
+      "status": "STABLE"
+    },
+    "cycle_250": {
+      "cycles_completed": 250,
+      "rss_mb": 75.46,
+      "memory_drift_mb": 0.0,
+      "checkpoint_size_bytes": 840,
+      "checkpoint_generation": 250,
+      "status": "STABLE"
+    },
+    "cycle_500": {
+      "cycles_completed": 500,
+      "rss_mb": 75.46,
+      "memory_drift_mb": 0.0,
+      "checkpoint_size_bytes": 840,
+      "checkpoint_generation": 500,
+      "status": "STABLE"
+    },
+    "cycle_1000": {
+      "cycles_completed": 1000,
+      "rss_mb": 75.46,
+      "memory_drift_mb": 0.0,
+      "checkpoint_size_bytes": 843,
+      "checkpoint_generation": 1000,
+      "status": "STABLE"
+    }
+  },
+  "chaos_resilience": {
+    "node_crash_lease_recovery": {
+      "expired_token_valid": false,
+      "new_token": 2,
+      "new_owner": "chaos_node_2",
+      "recovered": true
+    },
+    "network_partition_split_brain": {
+      "initial_quorum": true,
+      "partition_quorum": false,
+      "split_brain_prevented": true
+    },
+    "checkpoint_recovery": {
+      "restored_generation": 99,
+      "restored_completed_tasks": [
+        "task_alpha",
+        "task_beta"
+      ],
+      "checkpoint_integrity_verified": true
+    }
+  },
+  "total_benchmark_duration_s": 2.75
+}

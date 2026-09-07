@@ -1,0 +1,300 @@
+{
+  "provenance": {
+    "commit_sha": "348acdd",
+    "timestamp": "2026-09-07T18:44:44.252607+00:00",
+    "host": "BIGBALLSG",
+    "node": "node_phase19_1_primary",
+    "os": "Windows 11 (10.0.26200)",
+    "python": "3.14.7",
+    "cpu_count_logical": 16,
+    "cpu_count_physical": 10,
+    "total_memory_gb": 15.71,
+    "initial_rss_mb": 199.36,
+    "execution_mode": "LOCAL_PROCESS",
+    "workload_sha256": "b4a0391985455bb60e03a0fd016de9540cad48a115c0e63f81f5080ad2907588"
+  },
+  "transport": "TCP",
+  "description": "Baseline benchmarks of unfragmented protocol before streaming pipelining",
+  "results": {
+    "256 KB": {
+      "payload_bytes": 262144,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 369.72,
+        "median": 387.06,
+        "stddev": 62.451,
+        "min": 227.211,
+        "max": 432.302,
+        "p50": 390.625,
+        "p95": 432.302,
+        "p99": 432.302
+      },
+      "duration_ms": {
+        "mean": 0.7,
+        "median": 0.646,
+        "stddev": 0.156,
+        "min": 0.578,
+        "max": 1.1,
+        "p50": 0.652,
+        "p95": 1.1,
+        "p99": 1.1
+      },
+      "memory_peak_mb": {
+        "mean": 72.746,
+        "median": 72.793,
+        "stddev": 0.087,
+        "min": 72.535,
+        "max": 72.793,
+        "p50": 72.793,
+        "p95": 72.793,
+        "p99": 72.793
+      },
+      "mean_cpu_percent": 306.92
+    },
+    "512 KB": {
+      "payload_bytes": 524288,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 290.991,
+        "median": 292.878,
+        "stddev": 70.681,
+        "min": 133.697,
+        "max": 380.373,
+        "p50": 293.376,
+        "p95": 380.373,
+        "p99": 380.373
+      },
+      "duration_ms": {
+        "mean": 1.863,
+        "median": 1.707,
+        "stddev": 0.701,
+        "min": 1.315,
+        "max": 3.74,
+        "p50": 1.71,
+        "p95": 3.74,
+        "p99": 3.74
+      },
+      "memory_peak_mb": {
+        "mean": 72.745,
+        "median": 72.682,
+        "stddev": 0.236,
+        "min": 72.527,
+        "max": 73.031,
+        "p50": 72.832,
+        "p95": 73.031,
+        "p99": 73.031
+      },
+      "mean_cpu_percent": 179.27
+    },
+    "1 MB": {
+      "payload_bytes": 1048576,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 214.324,
+        "median": 214.178,
+        "stddev": 16.562,
+        "min": 193.671,
+        "max": 236.39,
+        "p50": 219.674,
+        "p95": 236.39,
+        "p99": 236.39
+      },
+      "duration_ms": {
+        "mean": 4.691,
+        "median": 4.672,
+        "stddev": 0.363,
+        "min": 4.23,
+        "max": 5.163,
+        "p50": 4.792,
+        "p95": 5.163,
+        "p99": 5.163
+      },
+      "memory_peak_mb": {
+        "mean": 75.716,
+        "median": 75.906,
+        "stddev": 0.446,
+        "min": 74.539,
+        "max": 75.906,
+        "p50": 75.906,
+        "p95": 75.906,
+        "p99": 75.906
+      },
+      "mean_cpu_percent": 129.5
+    },
+    "2 MB": {
+      "payload_bytes": 2097152,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 230.393,
+        "median": 244.93,
+        "stddev": 54.64,
+        "min": 83.039,
+        "max": 282.57,
+        "p50": 245.08,
+        "p95": 282.57,
+        "p99": 282.57
+      },
+      "duration_ms": {
+        "mean": 9.738,
+        "median": 8.166,
+        "stddev": 5.072,
+        "min": 7.078,
+        "max": 24.085,
+        "p50": 8.171,
+        "p95": 24.085,
+        "p99": 24.085
+      },
+      "memory_peak_mb": {
+        "mean": 79.33,
+        "median": 79.348,
+        "stddev": 0.057,
+        "min": 79.168,
+        "max": 79.348,
+        "p50": 79.348,
+        "p95": 79.348,
+        "p99": 79.348
+      },
+      "mean_cpu_percent": 160.12
+    },
+    "4 MB": {
+      "payload_bytes": 4194304,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 196.736,
+        "median": 202.745,
+        "stddev": 29.084,
+        "min": 117.726,
+        "max": 215.524,
+        "p50": 203.771,
+        "p95": 215.524,
+        "p99": 215.524
+      },
+      "duration_ms": {
+        "mean": 20.947,
+        "median": 19.73,
+        "stddev": 4.656,
+        "min": 18.559,
+        "max": 33.977,
+        "p50": 19.83,
+        "p95": 33.977,
+        "p99": 33.977
+      },
+      "memory_peak_mb": {
+        "mean": 87.348,
+        "median": 87.348,
+        "stddev": 0.0,
+        "min": 87.348,
+        "max": 87.348,
+        "p50": 87.348,
+        "p95": 87.348,
+        "p99": 87.348
+      },
+      "mean_cpu_percent": 131.61
+    },
+    "8 MB": {
+      "payload_bytes": 8388608,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 207.594,
+        "median": 209.378,
+        "stddev": 8.923,
+        "min": 191.461,
+        "max": 219.653,
+        "p50": 211.044,
+        "p95": 219.653,
+        "p99": 219.653
+      },
+      "duration_ms": {
+        "mean": 38.602,
+        "median": 38.211,
+        "stddev": 1.699,
+        "min": 36.421,
+        "max": 41.784,
+        "p50": 38.515,
+        "p95": 41.784,
+        "p99": 41.784
+      },
+      "memory_peak_mb": {
+        "mean": 103.352,
+        "median": 103.352,
+        "stddev": 0.0,
+        "min": 103.352,
+        "max": 103.352,
+        "p50": 103.352,
+        "p95": 103.352,
+        "p99": 103.352
+      },
+      "mean_cpu_percent": 132.91
+    },
+    "16 MB": {
+      "payload_bytes": 16777216,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 196.565,
+        "median": 203.286,
+        "stddev": 13.724,
+        "min": 165.728,
+        "max": 207.483,
+        "p50": 203.828,
+        "p95": 207.483,
+        "p99": 207.483
+      },
+      "duration_ms": {
+        "mean": 81.795,
+        "median": 78.707,
+        "stddev": 6.334,
+        "min": 77.115,
+        "max": 96.544,
+        "p50": 78.917,
+        "p95": 96.544,
+        "p99": 96.544
+      },
+      "memory_peak_mb": {
+        "mean": 135.352,
+        "median": 135.352,
+        "stddev": 0.0,
+        "min": 135.352,
+        "max": 135.352,
+        "p50": 135.352,
+        "p95": 135.352,
+        "p99": 135.352
+      },
+      "mean_cpu_percent": 121.59
+    },
+    "64 MB": {
+      "payload_bytes": 67108864,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 189.492,
+        "median": 188.477,
+        "stddev": 7.55,
+        "min": 179.206,
+        "max": 202.306,
+        "p50": 189.691,
+        "p95": 202.306,
+        "p99": 202.306
+      },
+      "duration_ms": {
+        "mean": 338.224,
+        "median": 339.578,
+        "stddev": 13.353,
+        "min": 316.352,
+        "max": 357.131,
+        "p50": 341.767,
+        "p95": 357.131,
+        "p99": 357.131
+      },
+      "memory_peak_mb": {
+        "mean": 327.352,
+        "median": 327.352,
+        "stddev": 0.0,
+        "min": 327.352,
+        "max": 327.352,
+        "p50": 327.352,
+        "p95": 327.352,
+        "p99": 327.352
+      },
+      "mean_cpu_percent": 122.45
+    }
+  }
+}

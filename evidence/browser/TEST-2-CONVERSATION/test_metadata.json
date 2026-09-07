@@ -1,6 +1,6 @@
 {
   "prompt": "Olá JARVIS. Explica-me em duas frases o que consegues fazer.",
   "response_received": true,
-  "response_time_seconds": 0.08115124702453613,
-  "response_sample": "[20:24:22]Conectado ao servidor Jarvis WebSocket na porta 8001! 20:24:25CLIENTEOlá JARVIS. Explica-me em duas frases o que consegues fazer. 20:24:25CLIENTEOlá JARVIS. Explica-me em duas frases o que consegues fazer. 20:24:25CLIENTE Olá JARVIS. Explica-me em duas frases o que consegues fazer. [20:24:"
+  "response_time_seconds": 0.025407791137695312,
+  "response_sample": "[20:06:57]Conectado ao servidor Jarvis WebSocket na porta 8001! 20:06:59CLIENTEOlá JARVIS. Explica-me em duas frases o que consegues fazer. 20:06:59CLIENTEOlá JARVIS. Explica-me em duas frases o que consegues fazer. 20:06:59CLIENTE Olá JARVIS. Explica-me em duas frases o que consegues fazer. Marta /"
 }

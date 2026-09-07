@@ -71,6 +71,18 @@ from agents.swarm_agents import (
     TestingAgent,
     create_default_swarm_pool,
 )
+from agents.collaboration_engine import (
+    AgentProposal,
+    ArbitrationDecision,
+    ArbitrationRecord,
+    CollaborationCoordinator,
+    CollaborationSession,
+    CollaborationStatus,
+    ConflictDetails,
+    ConflictType,
+    PatchMergeEngine,
+    ResultKind,
+)
 from backend.logging_config import get_logger, log_event
 from backend.message_protocol import (
     chat_message,
@@ -117,6 +129,7 @@ class Checkpoint:
     current_strategy: str = ""
     plan_churn_count: int = 0
     swarm_state: dict[str, Any] = field(default_factory=dict)
+    federation_state: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -146,6 +159,7 @@ class Checkpoint:
             current_strategy=str(data.get("current_strategy", "")),
             plan_churn_count=int(data.get("plan_churn_count", 0)),
             swarm_state=dict(data.get("swarm_state", {})),
+            federation_state=dict(data.get("federation_state", {})),
         )
 
 
@@ -188,6 +202,7 @@ class MissionLifecycleOrchestrator:
         callbacks: Any = None,
         logger: Any = None,
         use_swarm: bool = True,
+        use_federation: bool = False,
         swarm_agents: Sequence[SwarmAgent] | None = None,
     ) -> None:
         self.project_id = project_id
@@ -267,6 +282,7 @@ class MissionLifecycleOrchestrator:
                 pass
 
         self.use_swarm = use_swarm
+        self.use_federation = use_federation
         self.swarm_agents: dict[str, SwarmAgent] = {}
         self.swarm_coordinator = SwarmCoordinator(
             project_id=project_id,
@@ -276,6 +292,14 @@ class MissionLifecycleOrchestrator:
             global_max_concurrency=self.concurrency_limit,
             callbacks=self.callbacks,
         )
+        from agents.swarm_federation import SwarmFederation
+        self.swarm_federation = SwarmFederation(
+            project_id=project_id,
+            mission_id=mission_id,
+            task_graph=self.task_graph,
+            max_agents_per_subswarm=32,
+            emit_callback=getattr(self.callbacks, "emit", None),
+        ) if self.use_federation else None
         if swarm_agents is not None:
             for ag in swarm_agents:
                 self.register_swarm_agent(ag)
@@ -286,6 +310,9 @@ class MissionLifecycleOrchestrator:
     def register_swarm_agent(self, agent: SwarmAgent) -> None:
         self.swarm_agents[agent.agent_id] = agent
         self.swarm_coordinator.register_agent(agent.instance)
+        if self.swarm_federation:
+            # Register into active federation if initialized
+            pass
 
     # ── CHECKPOINTING & CRASH RECOVERY ────────────────────────────────────────
 
@@ -316,6 +343,7 @@ class MissionLifecycleOrchestrator:
             current_strategy=self.current_strategy,
             plan_churn_count=self.plan_churn_count,
             swarm_state=self.swarm_coordinator.export_state() if self.use_swarm else {},
+            federation_state=self.swarm_federation.save_checkpoint().to_dict() if self.swarm_federation else {},
         )
 
         # Persist through unified mission_state persistence layer
@@ -734,6 +762,34 @@ class MissionLifecycleOrchestrator:
                 for node in ordered_ready:
                     if node.task_id in self._running_tasks:
                         continue
+
+                    # Multi-agent collaboration dispatch check
+                    collaborating_ids = node.metadata.get("collaborating_agents", [])
+                    if node.metadata.get("collaborative") and len(collaborating_ids) > 1:
+                        agents_to_run = []
+                        for aid in collaborating_ids:
+                            aw = self.swarm_agents.get(aid)
+                            ai = self.swarm_coordinator.registry.get(aid)
+                            if aw and ai and ai.is_available:
+                                agents_to_run.append((aw, ai))
+                        if len(agents_to_run) >= 2:
+                            lead_agent = agents_to_run[0][1]
+                            try:
+                                lease = self.swarm_coordinator.acquire_task_lease(node, lead_agent)
+                            except ValueError:
+                                continue
+                            node.status = TaskStatus.RUNNING
+                            node.started_at = utc_now()
+                            node.metadata["assigned_agent"] = "COLLABORATIVE_GROUP"
+                            node.metadata["lease_id"] = lease.lease_id
+                            self._running_tasks.add(node.task_id)
+
+                            fut = asyncio.create_task(
+                                self._execute_collaborative_swarm_task_guarded(node, agents_to_run, lease)
+                            )
+                            active_futures.add(fut)
+                            continue
+
                     selection = self.swarm_coordinator.select_agent_for_task(node)
                     if not selection:
                         continue
@@ -871,6 +927,212 @@ class MissionLifecycleOrchestrator:
 
         finally:
             self._running_tasks.discard(node.task_id)
+
+    async def _execute_collaborative_swarm_task_guarded(
+        self,
+        node: TaskNode,
+        agents_to_run: list[tuple[SwarmAgent, Any]],
+        lease: TaskLease,
+    ) -> None:
+        node.attempt_count += 1
+        attempt = node.attempt_count
+        agent_ids = [ag.agent_id for ag, _ in agents_to_run]
+
+        # 1. Create or retrieve CollaborationSession
+        session = self.swarm_coordinator.collaboration.create_session(
+            task_id=node.task_id,
+            participant_agents=agent_ids,
+            max_rounds=node.metadata.get("max_collaboration_rounds", 3),
+        )
+
+        await self._emit_event("collaboration_started", {
+            "task_id": node.task_id,
+            "collaboration_id": session.collaboration_id,
+            "participant_agents": agent_ids,
+            "attempt": attempt,
+        })
+
+        try:
+            # 2. Parallel agent execution to gather proposals
+            async def _run_agent(ag_worker: SwarmAgent, ag_inst: Any) -> AgentProposal | None:
+                def _hb():
+                    self.swarm_coordinator.record_heartbeat(lease.lease_id, ag_worker.agent_id)
+
+                context = CrossAgentHandoffManager.build_task_context(
+                    node, self.task_graph.nodes, self._task_outputs
+                )
+                context["is_collaborative"] = True
+                context["collaboration_id"] = session.collaboration_id
+                context["other_participants"] = [aid for aid in agent_ids if aid != ag_worker.agent_id]
+
+                # Check if predefined proposal in metadata
+                prop_meta = node.metadata.get(f"proposal_{ag_worker.agent_id}") or node.metadata.get("proposals", {}).get(ag_worker.agent_id)
+                if prop_meta:
+                    return AgentProposal(
+                        proposal_id=f"prop_{ag_worker.agent_id}_{uuid.uuid4().hex[:6]}",
+                        task_id=node.task_id,
+                        agent_id=ag_worker.agent_id,
+                        collaboration_id=session.collaboration_id,
+                        agent_type=ag_worker.agent_type,
+                        result_kind=ResultKind(prop_meta.get("result_kind", "PROPOSAL")),
+                        description=prop_meta.get("description", f"Proposal by {ag_worker.agent_id}"),
+                        diff_content=prop_meta.get("diff_content", ""),
+                        content_by_file=prop_meta.get("content_by_file", {}),
+                        affected_files=prop_meta.get("affected_files", []),
+                        affected_symbols=prop_meta.get("affected_symbols", []),
+                        evidence=prop_meta.get("evidence", []),
+                        confidence_score=prop_meta.get("confidence", 0.85),
+                        rationale=prop_meta.get("rationale", ""),
+                        metadata=dict(prop_meta),
+                    )
+
+                res = await ag_worker.execute(node, context, lease, _hb)
+                if res.status == ResultStatus.SUCCESS:
+                    p_data = res.output.get("proposal") if isinstance(res.output, dict) else None
+                    if isinstance(p_data, dict):
+                        return AgentProposal.from_dict(p_data)
+                    return AgentProposal(
+                        proposal_id=f"prop_{ag_worker.agent_id}_{uuid.uuid4().hex[:6]}",
+                        task_id=node.task_id,
+                        agent_id=ag_worker.agent_id,
+                        collaboration_id=session.collaboration_id,
+                        agent_type=ag_worker.agent_type,
+                        result_kind=ResultKind.PROPOSAL,
+                        description=str(res.output.get("diff_summary") or res.output.get("summary") or f"Output from {ag_worker.agent_id}"),
+                        diff_content=res.output.get("diff_content", ""),
+                        content_by_file=res.output.get("content_by_file", {}),
+                        affected_files=res.produced_artifacts or res.output.get("files_modified", []),
+                        affected_symbols=res.output.get("affected_symbols", []),
+                        confidence_score=0.85,
+                        rationale=f"Result generated by {ag_worker.agent_id}",
+                        evidence=res.evidence,
+                        metadata=dict(res.output),
+                    )
+                return None
+
+            gathered = await asyncio.gather(
+                *[_run_agent(w, i) for w, i in agents_to_run],
+                return_exceptions=True,
+            )
+
+            for item in gathered:
+                if isinstance(item, AgentProposal):
+                    self.swarm_coordinator.collaboration.add_proposal(session.collaboration_id, item)
+                    await self._emit_event("collaboration_proposal_received", {
+                        "collaboration_id": session.collaboration_id,
+                        "proposal_id": item.proposal_id,
+                        "agent_id": item.agent_id,
+                    })
+
+            # 3. Conflict Detection & Arbitration
+            base_files = node.metadata.get("base_files", {})
+            arch_context = node.metadata.get("architecture_context", {})
+            review_input = node.metadata.get("review_input", {})
+
+            review_agent = self.swarm_agents.get("review_01") or next((w for w, _ in agents_to_run if w.agent_type == "REVIEW"), None)
+            if review_agent and hasattr(review_agent, "evaluate_conflict"):
+                temp_conflicts = self.swarm_coordinator.collaboration.detector.detect_conflicts(
+                    self.project_id, node, session.proposals, arch_context
+                )
+                if temp_conflicts:
+                    review_input = review_agent.evaluate_conflict(temp_conflicts[0], session.proposals, context={})
+
+            status, conflicts, arbitrations = self.swarm_coordinator.collaboration.evaluate_collaboration(
+                session.collaboration_id,
+                task=node,
+                architecture_context=arch_context,
+                base_files=base_files,
+                review_input=review_input,
+            )
+
+            await self._emit_event("collaboration_evaluated", {
+                "collaboration_id": session.collaboration_id,
+                "status": status.value,
+                "conflicts_count": len(conflicts),
+                "arbitrations_count": len(arbitrations),
+            })
+
+            # 4. Handle Decisions
+            if status == CollaborationStatus.BLOCKED:
+                node.status = TaskStatus.BLOCKED
+                node.failure_info = FailureInfo(
+                    category=FailureCategory.PERMANENT_POLICY_VIOLATION,
+                    message=f"Colaboração bloqueada: {len(conflicts)} conflitos sem resolução.",
+                    timestamp=utc_now(),
+                    attempt=attempt,
+                )
+            elif any(a.decision == ArbitrationDecision.REPLAN for a in arbitrations):
+                log_event(self.logger, "collaboration.triggering_replan", task_id=node.task_id)
+                await self.evaluate_plan(architecture_change={"conflict": "COLLABORATION_REPLAN"})
+                node.status = TaskStatus.COMPLETED
+            elif any(a.decision == ArbitrationDecision.REGENERATE for a in arbitrations):
+                if session.round_count < session.max_rounds:
+                    self.swarm_coordinator.collaboration.advance_round(session.collaboration_id)
+                    node.status = TaskStatus.READY
+                else:
+                    node.status = TaskStatus.BLOCKED
+            else:
+                # MERGE or ACCEPT
+                applied_files = {}
+                if session.merged_content:
+                    applied_files = dict(session.merged_content)
+                elif session.proposals:
+                    winning_prop = session.proposals[0]
+                    for a in arbitrations:
+                        if a.selected_proposal_id:
+                            p = next((p for p in session.proposals if p.proposal_id == a.selected_proposal_id), None)
+                            if p:
+                                winning_prop = p
+                                break
+                    applied_files = dict(winning_prop.content_by_file)
+
+                # AST Validation & Self-Healing
+                syntax_errors = []
+                for fname, content in applied_files.items():
+                    if fname.endswith(".py") and content:
+                        try:
+                            import ast
+                            ast.parse(content)
+                        except SyntaxError as e:
+                            syntax_errors.append((fname, str(e)))
+
+                if syntax_errors:
+                    log_event(self.logger, "collaboration.self_healing_triggered", errors=syntax_errors)
+                    try:
+                        from intelligence.ast_repair_v2 import ASTRepairEngineV2
+                        repairer = ASTRepairEngineV2()
+                        for fname, _ in syntax_errors:
+                            try:
+                                repaired = repairer.repair_syntax(applied_files[fname])
+                                applied_files[fname] = repaired
+                                log_event(self.logger, "collaboration.self_healing_succeeded", file=fname)
+                            except Exception as rep_err:
+                                log_event(self.logger, "collaboration.self_healing_failed", error=str(rep_err))
+                    except Exception:
+                        pass
+
+                node.status = TaskStatus.COMPLETED
+                node.completed_at = utc_now()
+                node.output_data = {
+                    "collaboration_id": session.collaboration_id,
+                    "applied_files": applied_files,
+                    "conflicts": [c.to_dict() for c in conflicts],
+                    "arbitrations": [a.to_dict() for a in arbitrations],
+                }
+                self._task_outputs[node.task_id] = node.output_data
+
+                for prop in session.proposals:
+                    for ev in prop.evidence:
+                        if isinstance(ev, dict) and "evidence_id" in ev:
+                            self._evidence_collected.append(ev["evidence_id"])
+
+                ev_collab = f"ev_collab_{node.task_id}_{uuid.uuid4().hex[:6]}"
+                self._evidence_collected.append(ev_collab)
+
+        finally:
+            self._running_tasks.discard(node.task_id)
+            if lease:
+                self.swarm_coordinator.release_task_lease(node.task_id, lease.agent_id, lease.lease_id)
 
     async def _execute_single_task_guarded(
         self, node: TaskNode, semaphore: asyncio.Semaphore

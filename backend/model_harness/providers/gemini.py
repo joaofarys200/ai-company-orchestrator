@@ -1,10 +1,13 @@
-from __future__ import annotations
-
+import asyncio
 import json
+import logging
 import os
+import re
 from typing import Any, Mapping
 
 import httpx
+
+logger = logging.getLogger(__name__)
 
 from backend.model_harness.contracts import (
     ModelRequest,
@@ -57,25 +60,49 @@ class GeminiOpenAIProvider:
             raise GeminiProviderError("GEMINI_API_KEY nao esta configurada.")
         payload = self._payload(request, route)
         timeout = request.execution_constraints.timeout_seconds or 60.0
-        async with httpx.AsyncClient(
-            base_url=self.base_url,
-            timeout=httpx.Timeout(timeout),
-            transport=self.transport,
-        ) as client:
-            response = await client.post(
-                "/chat/completions",
-                json=payload,
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json",
-                },
-            )
-        if response.status_code >= 400:
-            raise GeminiProviderError(
-                f"Gemini devolveu HTTP {response.status_code}: "
-                f"{response.text[:500]}"
-            )
-        return self._provider_result(response.json())
+        max_retries = 3
+        for attempt in range(max_retries + 1):
+            async with httpx.AsyncClient(
+                base_url=self.base_url,
+                timeout=httpx.Timeout(timeout),
+                transport=self.transport,
+            ) as client:
+                response = await client.post(
+                    "/chat/completions",
+                    json=payload,
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json",
+                    },
+                )
+            if response.status_code == 429 and attempt < max_retries:
+                wait_time = 3.0
+                try:
+                    match = re.search(r"retry in ([\d\.]+)s", response.text, re.IGNORECASE)
+                    if match:
+                        wait_time = float(match.group(1)) + 0.5
+                    else:
+                        ms_match = re.search(r"retry in ([\d\.]+)ms", response.text, re.IGNORECASE)
+                        if ms_match:
+                            wait_time = (float(ms_match.group(1)) / 1000.0) + 0.5
+                except Exception:
+                    wait_time = 2.0 * (attempt + 1)
+                wait_time = max(1.0, min(wait_time, 15.0))
+                logger.warning(
+                    "Gemini 429 rate limit hit. Aguardar %.1fs antes de retentar (%d/%d)...",
+                    wait_time,
+                    attempt + 1,
+                    max_retries,
+                )
+                await asyncio.sleep(wait_time)
+                continue
+
+            if response.status_code >= 400:
+                raise GeminiProviderError(
+                    f"Gemini devolveu HTTP {response.status_code}: "
+                    f"{response.text[:500]}"
+                )
+            return self._provider_result(response.json())
 
     def _payload(
         self,

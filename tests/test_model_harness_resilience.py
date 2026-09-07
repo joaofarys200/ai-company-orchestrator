@@ -97,6 +97,25 @@ class TestModelHarnessResilience(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status, ModelResponseStatus.SUCCEEDED)
         self.assertEqual(response.provider, "ollama")
 
+    async def test_provider_failover_even_when_allow_recovery_false_and_single_attempt(self):
+        gemini = MockFailingProvider("gemini", should_fail=True)
+        ollama = MockFailingProvider("ollama", should_fail=False)
+        providers = ProviderRegistry([gemini, ollama])
+        harness = ModelHarness(providers)
+
+        # Primary route is Gemini (e.g. ORCHESTRATOR_MODE=gemini)
+        from backend.model_harness.contracts import ModelPreferences
+        request = ModelRequest(
+            task_profile="STRUCTURED_EXTRACTION",
+            system_prompt="System prompt",
+            user_prompt="Extract data",
+            model_preferences=ModelPreferences(providers=("gemini",)),
+            execution_constraints=ExecutionConstraints(max_attempts=1, allow_recovery=False),
+        )
+        response = await harness.execute(request)
+        self.assertEqual(response.status, ModelResponseStatus.SUCCEEDED)
+        self.assertEqual(response.provider, "ollama")
+
 
 if __name__ == "__main__":
     unittest.main()

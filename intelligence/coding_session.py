@@ -212,27 +212,28 @@ class CodingSessionService:
             or self.plan_requester
             or request_edit_plan_from_model_harness
         )
+
+        async def _plan_and_build(raw_input: Any) -> CodingSession:
+            plan_data = _extract_json(raw_input)
+            changes, risks = self._validate_llm_plan(plan_data)
+            changes = self._repair_missing_artifacts_in_changes(
+                project_id=project_id,
+                objective=objective,
+                changes=changes,
+            )
+            return self.create_session(project_id, objective, changes, risks)
+
         first_raw = await _maybe_await(selected_requester, request_payload, None)
         try:
-            plan_data = _extract_json(first_raw)
-            changes, risks = self._validate_llm_plan(plan_data)
+            return await _plan_and_build(first_raw)
         except Exception as first_error:
             corrected_raw = await _maybe_await(selected_requester, request_payload, str(first_error))
             try:
-                plan_data = _extract_json(corrected_raw)
-                changes, risks = self._validate_llm_plan(plan_data)
+                return await _plan_and_build(corrected_raw)
             except Exception as second_error:
                 raise CodingSessionError(
                     f"Plano de alteracao invalido depois de uma correcao: {second_error}"
                 ) from second_error
-
-        # Deterministic Artifact Repair for CodingSession
-        changes = self._repair_missing_artifacts_in_changes(
-            project_id=project_id,
-            objective=objective,
-            changes=changes,
-        )
-        return self.create_session(project_id, objective, changes, risks)
 
     def apply_session(self, project_id: str, session_id: str) -> CodingSession:
         session = self.load(project_id, session_id)
@@ -352,9 +353,9 @@ class CodingSessionService:
         if operation not in {"replace_symbol", "replace_text", "create_file"}:
             raise CodingSessionError(f"Operacao de alteracao desconhecida: {operation}")
         if operation == "create_file" and exists:
-            raise CodingSessionError(f"O ficheiro {relative_path} ja existe; create_file foi recusado.")
+            operation = "replace_text"
         if operation != "create_file" and not exists:
-            raise CodingSessionError(f"O ficheiro {relative_path} nao existe.")
+            operation = "create_file"
 
         new_text = raw.get("new_code", raw.get("new_text", raw.get("content")))
         if not isinstance(new_text, str) or not new_text:
@@ -363,27 +364,47 @@ class CodingSessionService:
             raise CodingSessionError(f"A alteracao de {relative_path} excede o limite permitido.")
         new_text = new_text.replace("\r\n", "\n")
         symbol = str(raw.get("symbol") or "").strip() or None
-        current_content = Path(absolute_path).read_text(encoding="utf-8") if exists else ""
+        current_content = (Path(absolute_path).read_text(encoding="utf-8") if exists else "").replace("\r\n", "\n")
 
         if operation == "replace_symbol":
             if not symbol:
-                raise CodingSessionError("replace_symbol requer um simbolo.")
-            old_text = self._symbol_code(graph, relative_path, symbol)
-            if old_text is None:
+                match = re.search(r"(?:function|def|class|const|let|var)\s+([a-zA-Z0-9_$]+)", new_text)
+                if match and (self._symbol_code(graph, relative_path, match.group(1)) or match.group(1) in current_content):
+                    symbol = match.group(1)
+
+            if not symbol:
                 raw_old = raw.get("old_text")
                 if isinstance(raw_old, str) and raw_old in current_content:
                     old_text = raw_old
                     operation = "replace_text"
-                elif symbol in current_content:
-                    old_text = symbol
+                elif current_content:
+                    old_text = current_content
                     operation = "replace_text"
                 else:
-                    raise CodingSessionError(f"O simbolo {symbol} nao existe no indice de {relative_path}.")
+                    raise CodingSessionError("replace_symbol requer um simbolo ou old_text.")
+            else:
+                old_text = self._symbol_code(graph, relative_path, symbol)
+                if old_text is None:
+                    raw_old = raw.get("old_text")
+                    if isinstance(raw_old, str) and raw_old in current_content:
+                        old_text = raw_old
+                        operation = "replace_text"
+                    elif symbol in current_content:
+                        old_text = symbol
+                        operation = "replace_text"
+                    elif current_content:
+                        old_text = current_content
+                        operation = "replace_text"
+                    else:
+                        raise CodingSessionError(f"O simbolo {symbol} nao existe no indice de {relative_path}.")
             old_text = old_text.replace("\r\n", "\n")
         elif operation == "replace_text":
             old_text = raw.get("old_text")
-            if not isinstance(old_text, str) or not old_text:
-                raise CodingSessionError("replace_text requer old_text explicito.")
+            if not isinstance(old_text, str) or not old_text or (old_text not in current_content):
+                if current_content:
+                    old_text = current_content
+                else:
+                    raise CodingSessionError("replace_text requer old_text explicito ou conteudo existente.")
             old_text = old_text.replace("\r\n", "\n")
         else:
             old_text = ""
@@ -1082,7 +1103,18 @@ class CodingSessionService:
     def _limited_files(files: dict[str, str], limit: int = 60_000) -> dict[str, str]:
         selected: dict[str, str] = {}
         used = 0
+        ignored_names = {
+            "package-lock.json",
+            "yarn.lock",
+            "pnpm-lock.yaml",
+            "poetry.lock",
+            "cargo.lock",
+            "composer.lock",
+        }
         for path, content in files.items():
+            base_name = Path(path).name.lower()
+            if base_name in ignored_names or base_name.endswith(".map") or base_name.endswith(".min.js"):
+                continue
             remaining = limit - used
             if remaining <= 0:
                 break
@@ -1252,11 +1284,11 @@ class ModelHarnessPlanRequester:
                     "contract": "coding_session_edit_plan_v1",
                 },
                 execution_constraints=ExecutionConstraints(
-                    max_attempts=1,
+                    max_attempts=2,
                     timeout_seconds=120.0,
                     streaming=False,
                     thinking=False,
-                    allow_recovery=False,
+                    allow_recovery=True,
                 ),
             )
         )

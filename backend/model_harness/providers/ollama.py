@@ -91,11 +91,14 @@ class OllamaChatProvider:
         transport: httpx.AsyncBaseTransport | None = None,
         keep_alive: str | None = None,
     ):
-        self.base_url = (
+        raw_url = (
             base_url
             or os.getenv("OLLAMA_BASE_URL")
             or "http://127.0.0.1:11434"
         ).rstrip("/")
+        if "://localhost:" in raw_url:
+            raw_url = raw_url.replace("://localhost:", "://127.0.0.1:")
+        self.base_url = raw_url
         self.default_model = (
             default_model
             or os.getenv("OLLAMA_MODEL")
@@ -269,10 +272,10 @@ class OllamaChatProvider:
             or 120.0
         )
         return httpx.Timeout(
-            connect=options.connect_timeout or min(15.0, total),
+            connect=options.connect_timeout or min(4.0, total),
             read=total,
             write=options.write_timeout or min(30.0, total),
-            pool=options.pool_timeout or min(15.0, total),
+            pool=options.pool_timeout or min(5.0, total),
         )
 
     async def _generate_buffered(

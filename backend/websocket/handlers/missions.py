@@ -47,6 +47,12 @@ MISSION_HANDLERS = {
     "mission_adaptation_get_history": "handle",
     "mission_swarm_status": "handle",
     "mission_swarm_reassign": "handle",
+    "mission_collaboration_status": "handle",
+    "mission_collaboration_arbitrate": "handle",
+    "mission_federation_status": "handle",
+    "mission_federation_scale": "handle",
+    "mission_federation_rebalance": "handle",
+    "mission_federation_switch_mode": "handle",
 }
 
 
@@ -646,6 +652,156 @@ class MissionWebSocketHandler:
                         "task_id": task_id,
                         "success": success,
                         "message": msg,
+                    },
+                )
+                return
+            elif operation == "mission_collaboration_status":
+                from agents.mission_orchestrator import MissionLifecycleOrchestrator
+                store = getattr(planner, "mission_state", planner)
+                orch = getattr(self.mission_autonomy, "active_orchestrators", {}).get(message["mission_id"])
+                if orch is None:
+                    orch = MissionLifecycleOrchestrator(
+                        project_id=project_id,
+                        mission_id=message["mission_id"],
+                        mission_state=store,
+                        use_swarm=True,
+                    )
+                collab_data = orch.swarm_coordinator.collaboration.export_state()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_collaboration_status_response",
+                        "mission_id": message["mission_id"],
+                        "collaboration_status": collab_data,
+                    },
+                )
+                return
+            elif operation == "mission_collaboration_arbitrate":
+                from agents.mission_orchestrator import MissionLifecycleOrchestrator
+                store = getattr(planner, "mission_state", planner)
+                orch = getattr(self.mission_autonomy, "active_orchestrators", {}).get(message["mission_id"])
+                if orch is None:
+                    orch = MissionLifecycleOrchestrator(
+                        project_id=project_id,
+                        mission_id=message["mission_id"],
+                        mission_state=store,
+                        use_swarm=True,
+                    )
+                collab_id = message["collaboration_id"]
+                session = orch.swarm_coordinator.collaboration.get_session(collab_id)
+                success = False
+                msg = ""
+                arbitrations_data = []
+                if session:
+                    orch.swarm_coordinator.collaboration.metrics.human_interventions += 1
+                    task_node = orch.task_graph.get_node(session.task_id)
+                    if task_node:
+                        status, conflicts, arbs = orch.swarm_coordinator.collaboration.evaluate_collaboration(
+                            collab_id, task_node
+                        )
+                        arbitrations_data = [a.to_dict() for a in arbs]
+                        success = True
+                        msg = f"Arbitration completed: status={status.value}"
+                    else:
+                        success = False
+                        msg = "Associated task node not found"
+                else:
+                    success = False
+                    msg = f"Collaboration session '{collab_id}' not found"
+
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_collaboration_arbitrate_response",
+                        "mission_id": message["mission_id"],
+                        "collaboration_id": collab_id,
+                        "success": success,
+                        "message": msg,
+                        "arbitrations": arbitrations_data,
+                    },
+                )
+                return
+            elif operation == "mission_federation_status":
+                orch = getattr(self.mission_autonomy, "active_orchestrators", {}).get(message.get("mission_id", ""))
+                fed_status = {}
+                if orch and hasattr(orch, "swarm_federation") and orch.swarm_federation:
+                    fed = orch.swarm_federation
+                    telemetry = fed.get_telemetry_snapshot() if hasattr(fed, "get_telemetry_snapshot") else {}
+                    fed_status = {
+                        "subswarms": {s_id: coord.status.value for s_id, coord in fed.subswarms.items()},
+                        "partition_quality": fed.partition_quality.to_dict(),
+                        "cross_swarm_conflicts": fed.arbitrator.cross_swarm_conflicts_count,
+                        "arbitrations_count": fed.arbitrator.arbitrations_count,
+                        **telemetry,
+                    }
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_federation_status_response",
+                        "mission_id": message.get("mission_id"),
+                        "federation_status": fed_status,
+                    },
+                )
+                return
+            elif operation == "mission_federation_scale":
+                orch = getattr(self.mission_autonomy, "active_orchestrators", {}).get(message.get("mission_id", ""))
+                success = False
+                action = message.get("action", "spawn")
+                new_subswarm_id = None
+                if orch and hasattr(orch, "swarm_federation") and orch.swarm_federation:
+                    fed = orch.swarm_federation
+                    if action == "spawn":
+                        new_c = fed.spawn_subswarm()
+                        new_subswarm_id = new_c.subswarm_id
+                        success = True
+                    elif action == "drain" and "subswarm_id" in message:
+                        fed.drain_subswarm(message["subswarm_id"])
+                        success = True
+                    elif action == "split" and "source_id" in message and "new_id" in message:
+                        fed.split_subswarm(message["source_id"], message["new_id"])
+                        success = True
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_federation_scale_response",
+                        "mission_id": message.get("mission_id"),
+                        "success": success,
+                        "action": action,
+                        "subswarm_id": new_subswarm_id,
+                    },
+                )
+                return
+            elif operation == "mission_federation_rebalance":
+                orch = getattr(self.mission_autonomy, "active_orchestrators", {}).get(message.get("mission_id", ""))
+                rebalanced = 0
+                if orch and hasattr(orch, "swarm_federation") and orch.swarm_federation:
+                    rebalanced = orch.swarm_federation.rebalance_hotspots()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_federation_rebalance_response",
+                        "mission_id": message.get("mission_id"),
+                        "rebalanced_tasks": rebalanced,
+                    },
+                )
+                return
+            elif operation == "mission_federation_switch_mode":
+                orch = getattr(self.mission_autonomy, "active_orchestrators", {}).get(message.get("mission_id", ""))
+                success = False
+                target_mode = message.get("mode", "ADAPTIVE")
+                reason = message.get("reason", "websocket_client_request")
+                current_mode = None
+                if orch and hasattr(orch, "swarm_federation") and orch.swarm_federation:
+                    fed = orch.swarm_federation
+                    success = fed.switch_execution_mode(target_mode, reason=reason)
+                    current_mode = fed.isolation_mode.value
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_federation_switch_mode_response",
+                        "mission_id": message.get("mission_id"),
+                        "success": success,
+                        "mode": current_mode,
                     },
                 )
                 return

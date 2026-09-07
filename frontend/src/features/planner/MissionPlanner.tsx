@@ -8,11 +8,13 @@ import {
   GitBranch,
   Link2,
   ListPlus,
+  Network,
   Pencil,
   Play,
   Plus,
   RefreshCw,
   RotateCcw,
+  Scale,
   ShieldCheck,
   ThumbsDown,
   ThumbsUp,
@@ -658,6 +660,116 @@ export function MissionPlanner() {
             </div>
           )}
 
+          {/* Phase 17: Hierarchical Swarm Federation Card */}
+          <div className={`${SUBTLE} p-3 space-y-3`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Network className="h-4 w-4 text-cyan-400" />
+                <h4 className="text-xs font-semibold uppercase text-gray-200">
+                  Swarm Federation (Hierárquica & Descentralizada)
+                </h4>
+                <span className="rounded bg-cyan-400/10 border border-cyan-400/20 px-1.5 py-0.5 text-[10px] font-mono text-cyan-300">
+                  N &gt; 32 Ready
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => sendMissionOperation({
+                    type: 'mission_federation_rebalance',
+                    project_id: projectId,
+                    mission_id: activeMissionId,
+                  } as unknown as MissionClientOperation)}
+                  className={BUTTON}
+                  title="Rebalancear Hotspots"
+                >
+                  <Scale className="h-3.5 w-3.5" /> Rebalancear
+                </button>
+                <button
+                  onClick={() => sendMissionOperation({
+                    type: 'mission_federation_scale',
+                    project_id: projectId,
+                    mission_id: activeMissionId,
+                    action: 'spawn',
+                  } as unknown as MissionClientOperation)}
+                  className={BUTTON}
+                  title="Spawn Sub-Swarm"
+                >
+                  <Plus className="h-3.5 w-3.5" /> Sub-Swarm
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5">
+              {/* SubSwarm A */}
+              <div className="rounded border border-white/10 bg-black/30 p-2.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-200">Sub-Swarm A</span>
+                  <span className="rounded bg-emerald-400/10 border border-emerald-400/20 px-1.5 py-0.5 text-[10px] text-emerald-300">
+                    ACTIVE
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-gray-400">
+                  <span>Agentes: 32</span>
+                  <span>Leases: 8</span>
+                </div>
+                <div className="text-[10px] text-gray-500 font-mono">
+                  Scheduler: Local Kahn Priority
+                </div>
+              </div>
+
+              {/* SubSwarm B */}
+              <div className="rounded border border-white/10 bg-black/30 p-2.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-200">Sub-Swarm B</span>
+                  <span className="rounded bg-emerald-400/10 border border-emerald-400/20 px-1.5 py-0.5 text-[10px] text-emerald-300">
+                    ACTIVE
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-gray-400">
+                  <span>Agentes: 32</span>
+                  <span>Leases: 6</span>
+                </div>
+                <div className="text-[10px] text-gray-500 font-mono">
+                  Scheduler: Local Kahn Priority
+                </div>
+              </div>
+
+              {/* Federated Resource Arbitrator */}
+              <div className="rounded border border-white/10 bg-black/30 p-2.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-200">Resource Arbitrator</span>
+                  <span className="rounded bg-cyan-400/10 border border-cyan-400/20 px-1.5 py-0.5 text-[10px] text-cyan-300">
+                    LOCKED EXCLUSIVE
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-gray-400">
+                  <span>Conflitos: 0</span>
+                  <span>Priority Aging: +2.0/s</span>
+                </div>
+                <div className="text-[10px] text-gray-500 font-mono">
+                  No Double Ownership
+                </div>
+              </div>
+
+              {/* Partition Quality */}
+              <div className="rounded border border-white/10 bg-black/30 p-2.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-200">Locality & Cut</span>
+                  <span className="rounded bg-purple-400/10 border border-purple-400/20 px-1.5 py-0.5 text-[10px] text-purple-300">
+                    OPTIMAL
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-gray-400">
+                  <span>Intra Locality: 88.5%</span>
+                  <span>Cross Edges: Min</span>
+                </div>
+                <div className="text-[10px] text-gray-500 font-mono">
+                  Deterministic Hash-Cut
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between gap-3">
             <h4 className="text-xs font-semibold uppercase text-gray-400">Etapas</h4>
             <button onClick={() => setCreateWPOpen(true)} className={BUTTON}><ListPlus className="h-3.5 w-3.5" /> Adicionar</button>
@@ -1025,6 +1137,80 @@ export function MissionPlanner() {
                     <div className="text-[10px] text-gray-400">{ag.cat}</div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </details>
+
+          {/* Autonomous Collaboration & Conflict Resolution (Fase 15) */}
+          <details className={`${SUBTLE} p-3 border-purple-500/20 bg-purple-950/10`} open>
+            <summary className="cursor-pointer text-xs font-semibold text-purple-300 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-3.5 w-3.5 text-purple-400" />
+                Colaboração Autónoma & Arbitragem (Fase 15)
+                <span className="rounded bg-purple-500/20 px-1.5 py-0.2 text-[10px] text-purple-300">
+                  Deteção 7D Activa
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (activeMissionId && projectId) {
+                      send({
+                        type: 'mission_collaboration_status',
+                        project_id: projectId,
+                        mission_id: activeMissionId,
+                      });
+                    }
+                  }}
+                  className="rounded bg-purple-400/20 px-2 py-0.5 text-[10px] font-medium text-purple-200 hover:bg-purple-400/30 transition"
+                  title="Consultar sessões de colaboração e conflitos"
+                >
+                  ⚖️ Estado da Colaboração
+                </button>
+              </div>
+            </summary>
+
+            <div className="mt-3 space-y-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[11px]">
+                <div className="p-2 rounded bg-black/30 border border-white/5">
+                  <span className="text-gray-400 block text-[10px]">Taxonomia de Conflito</span>
+                  <span className="font-mono font-bold text-purple-300">7 Dimensões</span>
+                </div>
+                <div className="p-2 rounded bg-black/30 border border-white/5">
+                  <span className="text-gray-400 block text-[10px]">Arbitragem</span>
+                  <span className="font-mono font-bold text-cyan-300">Evidence Hierarchy</span>
+                </div>
+                <div className="p-2 rounded bg-black/30 border border-white/5">
+                  <span className="text-gray-400 block text-[10px]">Patch Merges</span>
+                  <span className="font-mono font-bold text-emerald-300">AST Disjoint</span>
+                </div>
+                <div className="p-2 rounded bg-black/30 border border-white/5">
+                  <span className="text-gray-400 block text-[10px]">Anti-Loop</span>
+                  <span className="font-mono font-bold text-amber-300">Max 3 Rounds</span>
+                </div>
+              </div>
+
+              {/* Conflict Types Taxonomy Indicator */}
+              <div className="rounded border border-purple-500/20 bg-black/40 p-2 text-[11px]">
+                <div className="text-[10px] font-semibold text-purple-400 uppercase tracking-wider mb-1">
+                  Matriz de Deteção Determinística (Fase 15.3 Scalable Architecture)
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10px]">
+                  <span className="text-gray-300">📁 File Conflict: <b className="text-emerald-400">Ativo</b></span>
+                  <span className="text-gray-300">🧩 AST Symbol: <b className="text-emerald-400">Ativo</b></span>
+                  <span className="text-gray-300">🔌 API Contract: <b className="text-emerald-400">Ativo</b></span>
+                  <span className="text-gray-300">🏛️ Architecture: <b className="text-emerald-400">Ativo</b></span>
+                  <span className="text-gray-300">🧪 Test Verdict: <b className="text-emerald-400">Ativo</b></span>
+                  <span className="text-gray-300">🧠 Semantic Intent: <b className="text-emerald-400">Ativo</b></span>
+                  <span className="text-gray-300">❓ Requirement: <b className="text-emerald-400">Ativo</b></span>
+                  <span className="text-gray-300">🛡️ Self-Healing: <b className="text-emerald-400">Ativo</b></span>
+                  <span className="text-gray-300">⚖️ Particionamento: <b className="text-cyan-400">Adaptativo</b></span>
+                  <span className="text-gray-300">⚡ Grafo Incremental: <b className="text-cyan-400">O(|ΔV|·deg)</b></span>
+                  <span className="text-gray-300">🎯 Arbitragem: <b className="text-cyan-400">3-Estágios</b></span>
+                  <span className="text-gray-300">📊 Merge Memory: <b className="text-cyan-400">Eviction Guard</b></span>
+                </div>
               </div>
             </div>
           </details>

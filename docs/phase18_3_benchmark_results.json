@@ -1,0 +1,533 @@
+{
+  "provenance": {
+    "commit_sha": "348acdd",
+    "timestamp": "2026-09-07T14:12:25.616042+00:00",
+    "environment": "Windows 11 / PowerShell",
+    "python_version": "3.14.7",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu": "16 cores",
+    "memory": "15.7 GB",
+    "workload_sha256": "d9c1a030188db365076c34ef725d823bd9db113895427c7106e85714ac2c6a94"
+  },
+  "small_task_benchmark": {
+    "PIPE": {
+      "100": {
+        "count": 100,
+        "send_ms": 1.44,
+        "receive_ms": 2.48,
+        "total_ms": 3.92,
+        "throughput_tasks_sec": 40316.08
+      },
+      "500": {
+        "count": 500,
+        "send_ms": 14.65,
+        "receive_ms": 17.35,
+        "total_ms": 32.0,
+        "throughput_tasks_sec": 28810.47
+      },
+      "1000": {
+        "count": 1000,
+        "send_ms": 36.0,
+        "receive_ms": 38.85,
+        "total_ms": 74.84,
+        "throughput_tasks_sec": 25741.35
+      },
+      "5000": {
+        "count": 5000,
+        "send_ms": 210.7,
+        "receive_ms": 214.03,
+        "total_ms": 424.73,
+        "throughput_tasks_sec": 23360.93
+      }
+    },
+    "QUEUE": {
+      "100": {
+        "count": 100,
+        "send_ms": 0.53,
+        "receive_ms": 2.95,
+        "total_ms": 3.49,
+        "throughput_tasks_sec": 33843.24
+      },
+      "500": {
+        "count": 500,
+        "send_ms": 2.04,
+        "receive_ms": 17.5,
+        "total_ms": 19.54,
+        "throughput_tasks_sec": 28567.02
+      },
+      "1000": {
+        "count": 1000,
+        "send_ms": 3.77,
+        "receive_ms": 39.03,
+        "total_ms": 42.8,
+        "throughput_tasks_sec": 25619.94
+      },
+      "5000": {
+        "count": 5000,
+        "send_ms": 18.66,
+        "receive_ms": 212.59,
+        "total_ms": 231.25,
+        "throughput_tasks_sec": 23519.56
+      }
+    },
+    "RING_BUFFER": {
+      "100": {
+        "count": 100,
+        "send_ms": 2.71,
+        "receive_ms": 2.75,
+        "total_ms": 5.47,
+        "throughput_tasks_sec": 36338.53
+      },
+      "500": {
+        "count": 500,
+        "send_ms": 13.5,
+        "receive_ms": 13.34,
+        "total_ms": 26.84,
+        "throughput_tasks_sec": 37034.57
+      },
+      "1000": {
+        "count": 1000,
+        "send_ms": 25.84,
+        "receive_ms": 25.8,
+        "total_ms": 51.64,
+        "throughput_tasks_sec": 38698.79
+      },
+      "5000": {
+        "count": 5000,
+        "send_ms": 135.59,
+        "receive_ms": 135.89,
+        "total_ms": 271.48,
+        "throughput_tasks_sec": 36794.25
+      }
+    }
+  },
+  "large_payload_benchmark": {
+    "1": {
+      "PIPE": {
+        "send_ms": 0.101,
+        "receive_ms": 0.4,
+        "total_ms": 0.501
+      },
+      "QUEUE": {
+        "send_ms": 0.149,
+        "receive_ms": 0.243,
+        "total_ms": 0.392
+      },
+      "SHARED_MEMORY": {
+        "send_ms": 0.167,
+        "receive_ms": 0.154,
+        "total_ms": 0.321
+      },
+      "RING_BUFFER": {
+        "send_ms": 0.045,
+        "receive_ms": 0.086,
+        "total_ms": 0.131
+      }
+    },
+    "4": {
+      "PIPE": {
+        "send_ms": 0.09,
+        "receive_ms": 0.128,
+        "total_ms": 0.218
+      },
+      "QUEUE": {
+        "send_ms": 0.128,
+        "receive_ms": 0.221,
+        "total_ms": 0.349
+      },
+      "SHARED_MEMORY": {
+        "send_ms": 0.118,
+        "receive_ms": 0.105,
+        "total_ms": 0.223
+      },
+      "RING_BUFFER": {
+        "send_ms": 0.039,
+        "receive_ms": 0.088,
+        "total_ms": 0.127
+      }
+    },
+    "16": {
+      "PIPE": {
+        "send_ms": 0.097,
+        "receive_ms": 0.137,
+        "total_ms": 0.234
+      },
+      "QUEUE": {
+        "send_ms": 0.133,
+        "receive_ms": 0.235,
+        "total_ms": 0.368
+      },
+      "SHARED_MEMORY": {
+        "send_ms": 0.189,
+        "receive_ms": 0.175,
+        "total_ms": 0.364
+      },
+      "RING_BUFFER": {
+        "send_ms": 0.054,
+        "receive_ms": 0.092,
+        "total_ms": 0.145
+      }
+    },
+    "64": {
+      "PIPE": {
+        "send_ms": 0.165,
+        "receive_ms": 0.135,
+        "total_ms": 0.3
+      },
+      "QUEUE": {
+        "send_ms": 0.127,
+        "receive_ms": 0.249,
+        "total_ms": 0.376
+      },
+      "SHARED_MEMORY": {
+        "send_ms": 0.166,
+        "receive_ms": 0.152,
+        "total_ms": 0.317
+      },
+      "RING_BUFFER": {
+        "send_ms": 0.067,
+        "receive_ms": 0.123,
+        "total_ms": 0.19
+      }
+    },
+    "256": {
+      "PIPE": {
+        "send_ms": 0.451,
+        "receive_ms": 0.448,
+        "total_ms": 0.899
+      },
+      "QUEUE": {
+        "send_ms": 0.215,
+        "receive_ms": 0.58,
+        "total_ms": 0.796
+      },
+      "SHARED_MEMORY": {
+        "send_ms": 0.456,
+        "receive_ms": 0.439,
+        "total_ms": 0.895
+      },
+      "RING_BUFFER": {
+        "send_ms": 0.196,
+        "receive_ms": 0.377,
+        "total_ms": 0.572
+      }
+    },
+    "1024": {
+      "PIPE": {
+        "send_ms": 1.856,
+        "receive_ms": 1.733,
+        "total_ms": 3.589
+      },
+      "QUEUE": {
+        "send_ms": 0.436,
+        "receive_ms": 1.978,
+        "total_ms": 2.415
+      },
+      "SHARED_MEMORY": {
+        "send_ms": 1.406,
+        "receive_ms": 1.347,
+        "total_ms": 2.753
+      },
+      "RING_BUFFER": {
+        "send_ms": 0.717,
+        "receive_ms": 1.47,
+        "total_ms": 2.187
+      }
+    },
+    "4096": {
+      "PIPE": {
+        "send_ms": 6.464,
+        "receive_ms": 6.206,
+        "total_ms": 12.67
+      },
+      "QUEUE": {
+        "send_ms": 1.212,
+        "receive_ms": 6.697,
+        "total_ms": 7.909
+      },
+      "SHARED_MEMORY": {
+        "send_ms": 5.841,
+        "receive_ms": 5.543,
+        "total_ms": 11.384
+      }
+    }
+  },
+  "batch_size_matrix": {
+    "1": {
+      "PIPE": {
+        "latency_ms": 0.21,
+        "tps": 4830.92
+      },
+      "RING_BUFFER": {
+        "latency_ms": 0.14,
+        "tps": 7158.18
+      }
+    },
+    "2": {
+      "PIPE": {
+        "latency_ms": 0.19,
+        "tps": 10712.38
+      },
+      "RING_BUFFER": {
+        "latency_ms": 0.13,
+        "tps": 15290.54
+      }
+    },
+    "4": {
+      "PIPE": {
+        "latency_ms": 0.16,
+        "tps": 24798.52
+      },
+      "RING_BUFFER": {
+        "latency_ms": 0.14,
+        "tps": 28571.45
+      }
+    },
+    "8": {
+      "PIPE": {
+        "latency_ms": 0.15,
+        "tps": 53440.18
+      },
+      "RING_BUFFER": {
+        "latency_ms": 0.13,
+        "tps": 61022.04
+      }
+    },
+    "16": {
+      "PIPE": {
+        "latency_ms": 0.19,
+        "tps": 83376.68
+      },
+      "RING_BUFFER": {
+        "latency_ms": 0.14,
+        "tps": 111420.85
+      }
+    },
+    "32": {
+      "PIPE": {
+        "latency_ms": 0.17,
+        "tps": 193353.5
+      },
+      "RING_BUFFER": {
+        "latency_ms": 0.18,
+        "tps": 179372.24
+      }
+    },
+    "64": {
+      "PIPE": {
+        "latency_ms": 0.26,
+        "tps": 246818.36
+      },
+      "RING_BUFFER": {
+        "latency_ms": 0.16,
+        "tps": 400751.57
+      }
+    },
+    "128": {
+      "PIPE": {
+        "latency_ms": 0.18,
+        "tps": 703682.94
+      },
+      "RING_BUFFER": {
+        "latency_ms": 0.19,
+        "tps": 679767.46
+      }
+    },
+    "256": {
+      "PIPE": {
+        "latency_ms": 0.28,
+        "tps": 912655.46
+      },
+      "RING_BUFFER": {
+        "latency_ms": 0.27,
+        "tps": 943952.91
+      }
+    },
+    "512": {
+      "PIPE": {
+        "latency_ms": 0.34,
+        "tps": 1491841.27
+      },
+      "RING_BUFFER": {
+        "latency_ms": 0.35,
+        "tps": 1473380.44
+      }
+    }
+  },
+  "multi_scale_empirical_10_runs": {
+    "phase18_static": {
+      "32": 71.4,
+      "64": 117.61,
+      "128": 177.81,
+      "256": 334.9,
+      "512": 398.01,
+      "1024": 201.35,
+      "2048": 186.87
+    },
+    "phase18_1_adaptive": {
+      "32": 11161.78,
+      "64": 8538.39,
+      "128": 177.19,
+      "256": 332.39,
+      "512": 394.25,
+      "1024": 194.73,
+      "2048": 178.56
+    },
+    "phase18_2_calibrated": {
+      "32": 10296.73,
+      "64": 7925.54,
+      "128": 174.33,
+      "256": 336.72,
+      "512": 404.75,
+      "1024": 198.04,
+      "2048": 181.18
+    },
+    "phase18_3_high_perf_ipc": {
+      "32": {
+        "mean": 8444.98,
+        "median": 8699.44,
+        "stddev": 970.49,
+        "min": 5990.04,
+        "max": 9473.06,
+        "p50": 8699.44,
+        "p95": 9473.06,
+        "p99": 9473.06,
+        "speedup_vs_p18_static": 118.28
+      },
+      "64": {
+        "mean": 3997.27,
+        "median": 4052.1,
+        "stddev": 364.14,
+        "min": 3192.92,
+        "max": 4396.55,
+        "p50": 4052.1,
+        "p95": 4396.55,
+        "p99": 4396.55,
+        "speedup_vs_p18_static": 33.99
+      },
+      "128": {
+        "mean": 162.66,
+        "median": 162.85,
+        "stddev": 1.66,
+        "min": 160.1,
+        "max": 164.83,
+        "p50": 162.85,
+        "p95": 164.83,
+        "p99": 164.83,
+        "speedup_vs_p18_static": 0.91
+      },
+      "256": {
+        "mean": 305.07,
+        "median": 304.68,
+        "stddev": 10.05,
+        "min": 282.09,
+        "max": 318.82,
+        "p50": 304.68,
+        "p95": 318.82,
+        "p99": 318.82,
+        "speedup_vs_p18_static": 0.91
+      },
+      "512": {
+        "mean": 358.14,
+        "median": 360.24,
+        "stddev": 9.38,
+        "min": 339.71,
+        "max": 370.13,
+        "p50": 360.24,
+        "p95": 370.13,
+        "p99": 370.13,
+        "speedup_vs_p18_static": 0.9
+      },
+      "1024": {
+        "mean": 177.28,
+        "median": 177.87,
+        "stddev": 5.54,
+        "min": 168.68,
+        "max": 184.18,
+        "p50": 177.87,
+        "p95": 184.18,
+        "p99": 184.18,
+        "speedup_vs_p18_static": 0.88
+      },
+      "2048": {
+        "mean": 179.21,
+        "median": 180.45,
+        "stddev": 4.04,
+        "min": 173.11,
+        "max": 185.52,
+        "p50": 180.45,
+        "p95": 185.52,
+        "p99": 185.52,
+        "speedup_vs_p18_static": 0.96
+      }
+    }
+  },
+  "single_host_ceiling_probes": {
+    "4096": {
+      "status": "SUPPORTED",
+      "completed_tasks": 64,
+      "duration_s": 0.75,
+      "handles": 348,
+      "threads": 26,
+      "total_rss_mb": 79.18
+    },
+    "8192": {
+      "status": "SUPPORTED",
+      "completed_tasks": 64,
+      "duration_s": 0.81,
+      "handles": 348,
+      "threads": 26,
+      "total_rss_mb": 87.61
+    }
+  },
+  "long_horizon_stability": {
+    "50": {
+      "cycles": 50,
+      "duration_ms": 498.66,
+      "current_rss_mb": 79.63,
+      "rss_drift_mb": 0.05,
+      "orphan_shared_memory": 0,
+      "status": "STABLE"
+    },
+    "100": {
+      "cycles": 100,
+      "duration_ms": 21.63,
+      "current_rss_mb": 79.63,
+      "rss_drift_mb": 0.05,
+      "orphan_shared_memory": 0,
+      "status": "STABLE"
+    },
+    "250": {
+      "cycles": 250,
+      "duration_ms": 37.63,
+      "current_rss_mb": 79.63,
+      "rss_drift_mb": 0.05,
+      "orphan_shared_memory": 0,
+      "status": "STABLE"
+    },
+    "500": {
+      "cycles": 500,
+      "duration_ms": 97.51,
+      "current_rss_mb": 79.63,
+      "rss_drift_mb": 0.05,
+      "orphan_shared_memory": 0,
+      "status": "STABLE"
+    },
+    "1000": {
+      "cycles": 1000,
+      "duration_ms": 185.14,
+      "current_rss_mb": 79.63,
+      "rss_drift_mb": 0.05,
+      "orphan_shared_memory": 0,
+      "status": "STABLE"
+    }
+  },
+  "telemetry_overhead": {
+    "telemetry_on_ms": 512.34,
+    "telemetry_off_ms": 523.01,
+    "overhead_percent": 0.0,
+    "within_1_percent": true
+  },
+  "orphan_shared_memory_check": 0,
+  "total_benchmark_duration_s": 46.26
+}

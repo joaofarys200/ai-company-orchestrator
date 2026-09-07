@@ -307,7 +307,9 @@ export type MissionClientOperation =
   | { type: 'mission_subdag_propose'; project_id: string; mission_id: string; parent_task_id: string; base_graph_version?: number; reason?: string; trigger?: string; tasks: Array<Record<string, unknown>>; dependencies?: Array<[string, string]>; acceptance_criteria?: Array<Record<string, unknown>>; requested_scope?: Record<string, unknown> }
   | { type: 'mission_subdag_get_history'; project_id: string; mission_id: string }
   | { type: 'mission_swarm_status'; project_id: string; mission_id: string }
-  | { type: 'mission_swarm_reassign'; project_id: string; mission_id: string; task_id: string; target_agent_id?: string };
+  | { type: 'mission_swarm_reassign'; project_id: string; mission_id: string; task_id: string; target_agent_id?: string }
+  | { type: 'mission_collaboration_status'; project_id: string; mission_id: string }
+  | { type: 'mission_collaboration_arbitrate'; project_id: string; mission_id: string; collaboration_id: string };
 
 export interface AstSymbol {
   name: string;

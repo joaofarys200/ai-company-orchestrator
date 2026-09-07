@@ -1,0 +1,75 @@
+{
+  "provenance": {
+    "commit_sha": "348acdd",
+    "timestamp": "2026-09-07T13:42:59.596093+00:00",
+    "python_version": "3.14.7",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu": "16 cores",
+    "memory": "15.7 GB",
+    "workload_sha256": "1e7d62e486782b514ae3597649484d72ef5023c49ad126a8a101271874994321"
+  },
+  "backend": {
+    "name": "SubSwarmWorkerPool + ProcessPoolExecutor",
+    "transport": "multiprocessing.Pipe",
+    "optimal_worker_count": 4,
+    "optimal_batch_size": 64
+  },
+  "multi_scale_baseline": {
+    "32": {
+      "mode": "INPROCESS",
+      "throughput_mean": 10296.73,
+      "throughput_median": 10317.26,
+      "stddev": 265.94,
+      "total_rss_mb": 81.2
+    },
+    "64": {
+      "mode": "INPROCESS",
+      "throughput_mean": 7925.54,
+      "throughput_median": 7982.93,
+      "stddev": 389.08,
+      "total_rss_mb": 81.2
+    },
+    "128": {
+      "mode": "PROCESS",
+      "throughput_mean": 174.33,
+      "throughput_median": 176.71,
+      "stddev": 7.27,
+      "total_rss_mb": 349.39
+    },
+    "256": {
+      "mode": "PROCESS",
+      "throughput_mean": 336.72,
+      "throughput_median": 338.45,
+      "stddev": 14.18,
+      "total_rss_mb": 351.0
+    },
+    "512": {
+      "mode": "PROCESS",
+      "throughput_mean": 404.75,
+      "throughput_median": 407.1,
+      "stddev": 7.58,
+      "total_rss_mb": 357.78
+    },
+    "1024": {
+      "mode": "PROCESS",
+      "throughput_mean": 198.04,
+      "throughput_median": 196.89,
+      "stddev": 6.93,
+      "total_rss_mb": 357.5
+    },
+    "2048": {
+      "mode": "PROCESS",
+      "throughput_mean": 181.18,
+      "throughput_median": 182.31,
+      "stddev": 4.79,
+      "total_rss_mb": 357.57
+    }
+  },
+  "handles_and_memory_scaling": {
+    "handles": 344,
+    "threads": 23,
+    "max_verified_scale": 4096,
+    "peak_rss_mb": 359.12
+  },
+  "current_limit_rationale": "Throughput degrades at N >= 1024 in PROCESS mode due to Windows named pipe blocking synchronous I/O buffer lock contention and multi-process context switching."
+}

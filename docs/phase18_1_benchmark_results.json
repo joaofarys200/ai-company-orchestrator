@@ -1,0 +1,1491 @@
+{
+  "phase": "Phase 18.1 \u2014 Adaptive Execution Mode, IPC Optimization & Unified Swarm Runtime",
+  "commit_sha": "348acdd",
+  "timestamp": "2026-09-07T13:13:06.257703+00:00",
+  "total_benchmark_duration_s": 89.89,
+  "scale_benchmarks": {
+    "32": {
+      "INPROCESS": {
+        "throughput": {
+          "mean": 9602.85,
+          "median": 9724.67,
+          "stddev": 318.45,
+          "min": 9138.16,
+          "max": 9922.79,
+          "p50": 9724.67,
+          "p95": 9920.02,
+          "p99": 9922.24
+        },
+        "wall_clock_s": {
+          "mean": 0.01,
+          "median": 0.01,
+          "stddev": 0.0,
+          "min": 0.01,
+          "max": 0.01,
+          "p50": 0.01,
+          "p95": 0.01,
+          "p99": 0.01
+        },
+        "memory_mb": {
+          "mean": 139.06,
+          "median": 139.11,
+          "stddev": 0.24,
+          "min": 138.66,
+          "max": 139.35,
+          "p50": 139.11,
+          "p95": 139.32,
+          "p99": 139.35
+        },
+        "ipc_latency_ms": {
+          "mean": 0.28,
+          "median": 0.28,
+          "stddev": 0.01,
+          "min": 0.27,
+          "max": 0.29,
+          "p50": 0.28,
+          "p95": 0.29,
+          "p99": 0.29
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 64
+      },
+      "THREAD": {
+        "throughput": {
+          "mean": 4915.48,
+          "median": 5538.58,
+          "stddev": 1405.11,
+          "min": 2120.46,
+          "max": 5889.66,
+          "p50": 5538.58,
+          "p95": 5824.61,
+          "p99": 5876.65
+        },
+        "wall_clock_s": {
+          "mean": 0.02,
+          "median": 0.01,
+          "stddev": 0.01,
+          "min": 0.01,
+          "max": 0.03,
+          "p50": 0.01,
+          "p95": 0.03,
+          "p99": 0.03
+        },
+        "memory_mb": {
+          "mean": 139.97,
+          "median": 140.01,
+          "stddev": 0.05,
+          "min": 139.88,
+          "max": 140.01,
+          "p50": 140.01,
+          "p95": 140.01,
+          "p99": 140.01
+        },
+        "ipc_latency_ms": {
+          "mean": 0.64,
+          "median": 0.42,
+          "stddev": 0.43,
+          "min": 0.4,
+          "max": 1.49,
+          "p50": 0.42,
+          "p95": 1.28,
+          "p99": 1.45
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 64
+      },
+      "PROCESS": {
+        "throughput": {
+          "mean": 133.33,
+          "median": 133.32,
+          "stddev": 1.26,
+          "min": 131.59,
+          "max": 135.11,
+          "p50": 133.32,
+          "p95": 134.93,
+          "p99": 135.07
+        },
+        "wall_clock_s": {
+          "mean": 0.48,
+          "median": 0.48,
+          "stddev": 0.0,
+          "min": 0.47,
+          "max": 0.49,
+          "p50": 0.48,
+          "p95": 0.49,
+          "p99": 0.49
+        },
+        "memory_mb": {
+          "mean": 139.15,
+          "median": 139.17,
+          "stddev": 0.17,
+          "min": 138.87,
+          "max": 139.38,
+          "p50": 139.17,
+          "p95": 139.35,
+          "p99": 139.37
+        },
+        "ipc_latency_ms": {
+          "mean": 82.69,
+          "median": 82.75,
+          "stddev": 0.72,
+          "min": 81.72,
+          "max": 83.88,
+          "p50": 82.75,
+          "p95": 83.67,
+          "p99": 83.83
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 64
+      },
+      "ADAPTIVE": {
+        "throughput": {
+          "mean": 8899.03,
+          "median": 8770.49,
+          "stddev": 298.92,
+          "min": 8607.47,
+          "max": 9441.76,
+          "p50": 8770.49,
+          "p95": 9350.32,
+          "p99": 9423.47
+        },
+        "wall_clock_s": {
+          "mean": 0.01,
+          "median": 0.01,
+          "stddev": 0.0,
+          "min": 0.01,
+          "max": 0.01,
+          "p50": 0.01,
+          "p95": 0.01,
+          "p99": 0.01
+        },
+        "memory_mb": {
+          "mean": 141.14,
+          "median": 141.13,
+          "stddev": 0.14,
+          "min": 140.95,
+          "max": 141.36,
+          "p50": 141.13,
+          "p95": 141.33,
+          "p99": 141.35
+        },
+        "ipc_latency_ms": {
+          "mean": 0.31,
+          "median": 0.31,
+          "stddev": 0.01,
+          "min": 0.29,
+          "max": 0.32,
+          "p50": 0.31,
+          "p95": 0.31,
+          "p99": 0.32
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 64
+      }
+    },
+    "64": {
+      "INPROCESS": {
+        "throughput": {
+          "mean": 8976.89,
+          "median": 9004.0,
+          "stddev": 168.17,
+          "min": 8671.03,
+          "max": 9164.33,
+          "p50": 9004.0,
+          "p95": 9148.47,
+          "p99": 9161.16
+        },
+        "wall_clock_s": {
+          "mean": 0.01,
+          "median": 0.01,
+          "stddev": 0.0,
+          "min": 0.01,
+          "max": 0.01,
+          "p50": 0.01,
+          "p95": 0.01,
+          "p99": 0.01
+        },
+        "memory_mb": {
+          "mean": 142.64,
+          "median": 142.68,
+          "stddev": 0.4,
+          "min": 142.01,
+          "max": 143.16,
+          "p50": 142.68,
+          "p95": 143.11,
+          "p99": 143.15
+        },
+        "ipc_latency_ms": {
+          "mean": 0.28,
+          "median": 0.28,
+          "stddev": 0.0,
+          "min": 0.28,
+          "max": 0.29,
+          "p50": 0.28,
+          "p95": 0.29,
+          "p99": 0.29
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 128
+      },
+      "THREAD": {
+        "throughput": {
+          "mean": 4315.28,
+          "median": 3970.74,
+          "stddev": 1294.41,
+          "min": 2877.04,
+          "max": 6084.08,
+          "p50": 3970.74,
+          "p95": 5979.17,
+          "p99": 6063.1
+        },
+        "wall_clock_s": {
+          "mean": 0.03,
+          "median": 0.03,
+          "stddev": 0.01,
+          "min": 0.02,
+          "max": 0.04,
+          "p50": 0.03,
+          "p95": 0.04,
+          "p99": 0.04
+        },
+        "memory_mb": {
+          "mean": 143.67,
+          "median": 143.66,
+          "stddev": 0.03,
+          "min": 143.64,
+          "max": 143.71,
+          "p50": 143.66,
+          "p95": 143.71,
+          "p99": 143.71
+        },
+        "ipc_latency_ms": {
+          "mean": 0.67,
+          "median": 0.67,
+          "stddev": 0.26,
+          "min": 0.37,
+          "max": 1.0,
+          "p50": 0.67,
+          "p95": 0.99,
+          "p99": 1.0
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 128
+      },
+      "PROCESS": {
+        "throughput": {
+          "mean": 255.13,
+          "median": 256.01,
+          "stddev": 8.52,
+          "min": 239.19,
+          "max": 263.2,
+          "p50": 256.01,
+          "p95": 262.89,
+          "p99": 263.14
+        },
+        "wall_clock_s": {
+          "mean": 0.5,
+          "median": 0.5,
+          "stddev": 0.02,
+          "min": 0.49,
+          "max": 0.54,
+          "p50": 0.5,
+          "p95": 0.53,
+          "p99": 0.53
+        },
+        "memory_mb": {
+          "mean": 140.52,
+          "median": 140.48,
+          "stddev": 0.11,
+          "min": 140.4,
+          "max": 140.71,
+          "p50": 140.48,
+          "p95": 140.68,
+          "p99": 140.7
+        },
+        "ipc_latency_ms": {
+          "mean": 41.11,
+          "median": 40.81,
+          "stddev": 1.55,
+          "min": 39.84,
+          "max": 44.05,
+          "p50": 40.81,
+          "p95": 43.44,
+          "p99": 43.93
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 128
+      },
+      "ADAPTIVE": {
+        "throughput": {
+          "mean": 5049.39,
+          "median": 5449.61,
+          "stddev": 976.64,
+          "min": 3103.53,
+          "max": 5639.86,
+          "p50": 5449.61,
+          "p95": 5636.13,
+          "p99": 5639.11
+        },
+        "wall_clock_s": {
+          "mean": 0.03,
+          "median": 0.02,
+          "stddev": 0.01,
+          "min": 0.02,
+          "max": 0.04,
+          "p50": 0.02,
+          "p95": 0.04,
+          "p99": 0.04
+        },
+        "memory_mb": {
+          "mean": 143.9,
+          "median": 143.9,
+          "stddev": 0.03,
+          "min": 143.88,
+          "max": 143.96,
+          "p50": 143.9,
+          "p95": 143.95,
+          "p99": 143.96
+        },
+        "ipc_latency_ms": {
+          "mean": 0.5,
+          "median": 0.4,
+          "stddev": 0.21,
+          "min": 0.39,
+          "max": 0.92,
+          "p50": 0.4,
+          "p95": 0.82,
+          "p99": 0.9
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 128
+      }
+    },
+    "128": {
+      "INPROCESS": {
+        "throughput": {
+          "mean": 9327.01,
+          "median": 9378.08,
+          "stddev": 248.39,
+          "min": 8929.19,
+          "max": 9685.78,
+          "p50": 9378.08,
+          "p95": 9632.23,
+          "p99": 9675.07
+        },
+        "wall_clock_s": {
+          "mean": 0.03,
+          "median": 0.03,
+          "stddev": 0.0,
+          "min": 0.03,
+          "max": 0.03,
+          "p50": 0.03,
+          "p95": 0.03,
+          "p99": 0.03
+        },
+        "memory_mb": {
+          "mean": 145.79,
+          "median": 145.88,
+          "stddev": 0.74,
+          "min": 144.61,
+          "max": 146.76,
+          "p50": 145.88,
+          "p95": 146.67,
+          "p99": 146.74
+        },
+        "ipc_latency_ms": {
+          "mean": 0.48,
+          "median": 0.48,
+          "stddev": 0.01,
+          "min": 0.46,
+          "max": 0.5,
+          "p50": 0.48,
+          "p95": 0.49,
+          "p99": 0.49
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 256
+      },
+      "THREAD": {
+        "throughput": {
+          "mean": 6031.83,
+          "median": 6461.99,
+          "stddev": 1193.86,
+          "min": 3796.54,
+          "max": 7088.19,
+          "p50": 6461.99,
+          "p95": 7056.56,
+          "p99": 7081.87
+        },
+        "wall_clock_s": {
+          "mean": 0.04,
+          "median": 0.04,
+          "stddev": 0.01,
+          "min": 0.04,
+          "max": 0.07,
+          "p50": 0.04,
+          "p95": 0.06,
+          "p99": 0.07
+        },
+        "memory_mb": {
+          "mean": 147.62,
+          "median": 147.66,
+          "stddev": 0.1,
+          "min": 147.42,
+          "max": 147.7,
+          "p50": 147.66,
+          "p95": 147.69,
+          "p99": 147.69
+        },
+        "ipc_latency_ms": {
+          "mean": 0.75,
+          "median": 0.61,
+          "stddev": 0.28,
+          "min": 0.56,
+          "max": 1.29,
+          "p50": 0.61,
+          "p95": 1.18,
+          "p99": 1.27
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 256
+      },
+      "PROCESS": {
+        "throughput": {
+          "mean": 488.45,
+          "median": 490.53,
+          "stddev": 6.94,
+          "min": 478.53,
+          "max": 496.05,
+          "p50": 490.53,
+          "p95": 495.82,
+          "p99": 496.0
+        },
+        "wall_clock_s": {
+          "mean": 0.52,
+          "median": 0.52,
+          "stddev": 0.01,
+          "min": 0.52,
+          "max": 0.53,
+          "p50": 0.52,
+          "p95": 0.53,
+          "p99": 0.53
+        },
+        "memory_mb": {
+          "mean": 142.68,
+          "median": 142.66,
+          "stddev": 0.03,
+          "min": 142.66,
+          "max": 142.73,
+          "p50": 142.66,
+          "p95": 142.72,
+          "p99": 142.73
+        },
+        "ipc_latency_ms": {
+          "mean": 35.62,
+          "median": 35.6,
+          "stddev": 0.48,
+          "min": 35.03,
+          "max": 36.2,
+          "p50": 35.6,
+          "p95": 36.18,
+          "p99": 36.2
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 256
+      },
+      "ADAPTIVE": {
+        "throughput": {
+          "mean": 496.73,
+          "median": 496.98,
+          "stddev": 10.61,
+          "min": 477.48,
+          "max": 506.7,
+          "p50": 496.98,
+          "p95": 506.63,
+          "p99": 506.69
+        },
+        "wall_clock_s": {
+          "mean": 0.52,
+          "median": 0.52,
+          "stddev": 0.01,
+          "min": 0.51,
+          "max": 0.54,
+          "p50": 0.52,
+          "p95": 0.53,
+          "p99": 0.54
+        },
+        "memory_mb": {
+          "mean": 142.67,
+          "median": 142.65,
+          "stddev": 0.12,
+          "min": 142.52,
+          "max": 142.87,
+          "p50": 142.65,
+          "p95": 142.84,
+          "p99": 142.86
+        },
+        "ipc_latency_ms": {
+          "mean": 35.08,
+          "median": 34.91,
+          "stddev": 0.73,
+          "min": 34.49,
+          "max": 36.47,
+          "p50": 34.91,
+          "p95": 36.18,
+          "p99": 36.41
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 256
+      }
+    },
+    "256": {
+      "INPROCESS": {
+        "throughput": {
+          "mean": 8971.93,
+          "median": 8981.65,
+          "stddev": 280.84,
+          "min": 8468.07,
+          "max": 9273.21,
+          "p50": 8981.65,
+          "p95": 9257.15,
+          "p99": 9270.0
+        },
+        "wall_clock_s": {
+          "mean": 0.06,
+          "median": 0.06,
+          "stddev": 0.0,
+          "min": 0.06,
+          "max": 0.06,
+          "p50": 0.06,
+          "p95": 0.06,
+          "p99": 0.06
+        },
+        "memory_mb": {
+          "mean": 151.85,
+          "median": 152.04,
+          "stddev": 1.55,
+          "min": 149.44,
+          "max": 153.88,
+          "p50": 152.04,
+          "p95": 153.7,
+          "p99": 153.85
+        },
+        "ipc_latency_ms": {
+          "mean": 0.61,
+          "median": 0.6,
+          "stddev": 0.03,
+          "min": 0.58,
+          "max": 0.65,
+          "p50": 0.6,
+          "p95": 0.64,
+          "p99": 0.65
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 512
+      },
+      "THREAD": {
+        "throughput": {
+          "mean": 6610.63,
+          "median": 7035.67,
+          "stddev": 627.34,
+          "min": 5814.09,
+          "max": 7171.73,
+          "p50": 7035.67,
+          "p95": 7168.6,
+          "p99": 7171.11
+        },
+        "wall_clock_s": {
+          "mean": 0.08,
+          "median": 0.07,
+          "stddev": 0.01,
+          "min": 0.07,
+          "max": 0.09,
+          "p50": 0.07,
+          "p95": 0.09,
+          "p99": 0.09
+        },
+        "memory_mb": {
+          "mean": 155.51,
+          "median": 155.69,
+          "stddev": 0.31,
+          "min": 154.93,
+          "max": 155.77,
+          "p50": 155.69,
+          "p95": 155.76,
+          "p99": 155.76
+        },
+        "ipc_latency_ms": {
+          "mean": 0.79,
+          "median": 0.7,
+          "stddev": 0.12,
+          "min": 0.69,
+          "max": 0.94,
+          "p50": 0.7,
+          "p95": 0.93,
+          "p99": 0.93
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 512
+      },
+      "PROCESS": {
+        "throughput": {
+          "mean": 919.56,
+          "median": 918.64,
+          "stddev": 18.46,
+          "min": 891.23,
+          "max": 944.76,
+          "p50": 918.64,
+          "p95": 942.39,
+          "p99": 944.29
+        },
+        "wall_clock_s": {
+          "mean": 0.56,
+          "median": 0.56,
+          "stddev": 0.01,
+          "min": 0.54,
+          "max": 0.57,
+          "p50": 0.56,
+          "p95": 0.57,
+          "p99": 0.57
+        },
+        "memory_mb": {
+          "mean": 146.87,
+          "median": 146.86,
+          "stddev": 0.11,
+          "min": 146.72,
+          "max": 147.04,
+          "p50": 146.86,
+          "p95": 147.02,
+          "p99": 147.04
+        },
+        "ipc_latency_ms": {
+          "mean": 22.58,
+          "median": 22.54,
+          "stddev": 0.5,
+          "min": 21.93,
+          "max": 23.36,
+          "p50": 22.54,
+          "p95": 23.26,
+          "p99": 23.34
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 512
+      },
+      "ADAPTIVE": {
+        "throughput": {
+          "mean": 914.21,
+          "median": 917.14,
+          "stddev": 7.47,
+          "min": 900.19,
+          "max": 920.88,
+          "p50": 917.14,
+          "p95": 920.62,
+          "p99": 920.83
+        },
+        "wall_clock_s": {
+          "mean": 0.56,
+          "median": 0.56,
+          "stddev": 0.0,
+          "min": 0.56,
+          "max": 0.57,
+          "p50": 0.56,
+          "p95": 0.57,
+          "p99": 0.57
+        },
+        "memory_mb": {
+          "mean": 147.04,
+          "median": 146.99,
+          "stddev": 0.15,
+          "min": 146.87,
+          "max": 147.32,
+          "p50": 146.99,
+          "p95": 147.27,
+          "p99": 147.31
+        },
+        "ipc_latency_ms": {
+          "mean": 22.67,
+          "median": 22.54,
+          "stddev": 0.3,
+          "min": 22.33,
+          "max": 23.2,
+          "p50": 22.54,
+          "p95": 23.11,
+          "p99": 23.18
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 512
+      }
+    },
+    "512": {
+      "INPROCESS": {
+        "throughput": {
+          "mean": 7592.29,
+          "median": 7577.75,
+          "stddev": 36.93,
+          "min": 7542.41,
+          "max": 7651.01,
+          "p50": 7577.75,
+          "p95": 7643.45,
+          "p99": 7649.5
+        },
+        "wall_clock_s": {
+          "mean": 0.11,
+          "median": 0.11,
+          "stddev": 0.0,
+          "min": 0.1,
+          "max": 0.11,
+          "p50": 0.11,
+          "p95": 0.11,
+          "p99": 0.11
+        },
+        "memory_mb": {
+          "mean": 163.16,
+          "median": 163.97,
+          "stddev": 2.77,
+          "min": 158.71,
+          "max": 166.53,
+          "p50": 163.97,
+          "p95": 166.25,
+          "p99": 166.47
+        },
+        "ipc_latency_ms": {
+          "mean": 0.63,
+          "median": 0.63,
+          "stddev": 0.0,
+          "min": 0.62,
+          "max": 0.63,
+          "p50": 0.63,
+          "p95": 0.63,
+          "p99": 0.63
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 800
+      },
+      "THREAD": {
+        "throughput": {
+          "mean": 5831.45,
+          "median": 6055.87,
+          "stddev": 282.36,
+          "min": 5471.6,
+          "max": 6067.08,
+          "p50": 6055.87,
+          "p95": 6066.19,
+          "p99": 6066.9
+        },
+        "wall_clock_s": {
+          "mean": 0.14,
+          "median": 0.13,
+          "stddev": 0.01,
+          "min": 0.13,
+          "max": 0.15,
+          "p50": 0.13,
+          "p95": 0.15,
+          "p99": 0.15
+        },
+        "memory_mb": {
+          "mean": 168.83,
+          "median": 168.89,
+          "stddev": 0.33,
+          "min": 168.2,
+          "max": 169.12,
+          "p50": 168.89,
+          "p95": 169.12,
+          "p99": 169.12
+        },
+        "ipc_latency_ms": {
+          "mean": 0.8,
+          "median": 0.75,
+          "stddev": 0.07,
+          "min": 0.73,
+          "max": 0.88,
+          "p50": 0.75,
+          "p95": 0.88,
+          "p99": 0.88
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 800
+      },
+      "PROCESS": {
+        "throughput": {
+          "mean": 1272.68,
+          "median": 1272.24,
+          "stddev": 33.21,
+          "min": 1226.5,
+          "max": 1311.11,
+          "p50": 1272.24,
+          "p95": 1310.36,
+          "p99": 1310.96
+        },
+        "wall_clock_s": {
+          "mean": 0.63,
+          "median": 0.63,
+          "stddev": 0.02,
+          "min": 0.61,
+          "max": 0.65,
+          "p50": 0.63,
+          "p95": 0.65,
+          "p99": 0.65
+        },
+        "memory_mb": {
+          "mean": 153.99,
+          "median": 153.97,
+          "stddev": 0.14,
+          "min": 153.83,
+          "max": 154.23,
+          "p50": 153.97,
+          "p95": 154.19,
+          "p99": 154.23
+        },
+        "ipc_latency_ms": {
+          "mean": 15.32,
+          "median": 15.26,
+          "stddev": 0.44,
+          "min": 14.84,
+          "max": 15.98,
+          "p50": 15.26,
+          "p95": 15.91,
+          "p99": 15.96
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 800
+      },
+      "ADAPTIVE": {
+        "throughput": {
+          "mean": 1274.26,
+          "median": 1277.54,
+          "stddev": 10.6,
+          "min": 1255.17,
+          "max": 1286.19,
+          "p50": 1277.54,
+          "p95": 1285.05,
+          "p99": 1285.96
+        },
+        "wall_clock_s": {
+          "mean": 0.63,
+          "median": 0.63,
+          "stddev": 0.01,
+          "min": 0.62,
+          "max": 0.64,
+          "p50": 0.63,
+          "p95": 0.64,
+          "p99": 0.64
+        },
+        "memory_mb": {
+          "mean": 154.03,
+          "median": 154.02,
+          "stddev": 0.15,
+          "min": 153.87,
+          "max": 154.29,
+          "p50": 154.02,
+          "p95": 154.25,
+          "p99": 154.28
+        },
+        "ipc_latency_ms": {
+          "mean": 15.18,
+          "median": 15.15,
+          "stddev": 0.14,
+          "min": 14.98,
+          "max": 15.42,
+          "p50": 15.15,
+          "p95": 15.38,
+          "p99": 15.41
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 800
+      }
+    },
+    "1024": {
+      "THREAD": {
+        "throughput": {
+          "mean": 4661.24,
+          "median": 4740.88,
+          "stddev": 186.08,
+          "min": 4295.01,
+          "max": 4789.64,
+          "p50": 4740.88,
+          "p95": 4788.33,
+          "p99": 4789.38
+        },
+        "wall_clock_s": {
+          "mean": 0.17,
+          "median": 0.17,
+          "stddev": 0.01,
+          "min": 0.17,
+          "max": 0.19,
+          "p50": 0.17,
+          "p95": 0.18,
+          "p99": 0.19
+        },
+        "memory_mb": {
+          "mean": 177.49,
+          "median": 178.75,
+          "stddev": 2.25,
+          "min": 173.12,
+          "max": 179.01,
+          "p50": 178.75,
+          "p95": 179.0,
+          "p99": 179.01
+        },
+        "ipc_latency_ms": {
+          "mean": 0.76,
+          "median": 0.73,
+          "stddev": 0.06,
+          "min": 0.72,
+          "max": 0.89,
+          "p50": 0.73,
+          "p95": 0.86,
+          "p99": 0.88
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 800
+      },
+      "PROCESS": {
+        "throughput": {
+          "mean": 1188.0,
+          "median": 1183.08,
+          "stddev": 22.21,
+          "min": 1158.84,
+          "max": 1222.77,
+          "p50": 1183.08,
+          "p95": 1218.51,
+          "p99": 1221.92
+        },
+        "wall_clock_s": {
+          "mean": 0.67,
+          "median": 0.68,
+          "stddev": 0.01,
+          "min": 0.65,
+          "max": 0.69,
+          "p50": 0.68,
+          "p95": 0.69,
+          "p99": 0.69
+        },
+        "memory_mb": {
+          "mean": 158.8,
+          "median": 158.85,
+          "stddev": 0.11,
+          "min": 158.66,
+          "max": 158.92,
+          "p50": 158.85,
+          "p95": 158.91,
+          "p99": 158.92
+        },
+        "ipc_latency_ms": {
+          "mean": 15.34,
+          "median": 15.35,
+          "stddev": 0.29,
+          "min": 14.9,
+          "max": 15.77,
+          "p50": 15.35,
+          "p95": 15.71,
+          "p99": 15.76
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 800
+      },
+      "ADAPTIVE": {
+        "throughput": {
+          "mean": 1171.99,
+          "median": 1180.03,
+          "stddev": 13.76,
+          "min": 1145.15,
+          "max": 1181.14,
+          "p50": 1180.03,
+          "p95": 1181.07,
+          "p99": 1181.12
+        },
+        "wall_clock_s": {
+          "mean": 0.68,
+          "median": 0.68,
+          "stddev": 0.01,
+          "min": 0.68,
+          "max": 0.7,
+          "p50": 0.68,
+          "p95": 0.7,
+          "p99": 0.7
+        },
+        "memory_mb": {
+          "mean": 158.87,
+          "median": 158.84,
+          "stddev": 0.11,
+          "min": 158.7,
+          "max": 159.02,
+          "p50": 158.84,
+          "p95": 159.01,
+          "p99": 159.02
+        },
+        "ipc_latency_ms": {
+          "mean": 15.45,
+          "median": 15.4,
+          "stddev": 0.26,
+          "min": 15.16,
+          "max": 15.91,
+          "p50": 15.4,
+          "p95": 15.83,
+          "p99": 15.89
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 800
+      }
+    },
+    "2048": {
+      "THREAD": {
+        "throughput": {
+          "mean": 3103.33,
+          "median": 3107.16,
+          "stddev": 61.33,
+          "min": 2991.9,
+          "max": 3170.31,
+          "p50": 3107.16,
+          "p95": 3165.58,
+          "p99": 3169.36
+        },
+        "wall_clock_s": {
+          "mean": 0.26,
+          "median": 0.26,
+          "stddev": 0.01,
+          "min": 0.25,
+          "max": 0.27,
+          "p50": 0.26,
+          "p95": 0.27,
+          "p99": 0.27
+        },
+        "memory_mb": {
+          "mean": 194.36,
+          "median": 196.18,
+          "stddev": 4.06,
+          "min": 186.24,
+          "max": 196.73,
+          "p50": 196.18,
+          "p95": 196.7,
+          "p99": 196.73
+        },
+        "ipc_latency_ms": {
+          "mean": 0.77,
+          "median": 0.75,
+          "stddev": 0.04,
+          "min": 0.74,
+          "max": 0.85,
+          "p50": 0.75,
+          "p95": 0.83,
+          "p99": 0.85
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 800
+      },
+      "PROCESS": {
+        "throughput": {
+          "mean": 1024.94,
+          "median": 1038.83,
+          "stddev": 18.54,
+          "min": 999.38,
+          "max": 1041.89,
+          "p50": 1038.83,
+          "p95": 1041.35,
+          "p99": 1041.78
+        },
+        "wall_clock_s": {
+          "mean": 0.78,
+          "median": 0.77,
+          "stddev": 0.01,
+          "min": 0.77,
+          "max": 0.8,
+          "p50": 0.77,
+          "p95": 0.8,
+          "p99": 0.8
+        },
+        "memory_mb": {
+          "mean": 167.9,
+          "median": 167.92,
+          "stddev": 0.19,
+          "min": 167.61,
+          "max": 168.2,
+          "p50": 167.92,
+          "p95": 168.15,
+          "p99": 168.19
+        },
+        "ipc_latency_ms": {
+          "mean": 15.41,
+          "median": 15.32,
+          "stddev": 0.25,
+          "min": 15.09,
+          "max": 15.84,
+          "p50": 15.32,
+          "p95": 15.77,
+          "p99": 15.82
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 800
+      },
+      "ADAPTIVE": {
+        "throughput": {
+          "mean": 1005.53,
+          "median": 1006.96,
+          "stddev": 18.28,
+          "min": 976.82,
+          "max": 1034.18,
+          "p50": 1006.96,
+          "p95": 1028.99,
+          "p99": 1033.14
+        },
+        "wall_clock_s": {
+          "mean": 0.8,
+          "median": 0.79,
+          "stddev": 0.01,
+          "min": 0.77,
+          "max": 0.82,
+          "p50": 0.79,
+          "p95": 0.81,
+          "p99": 0.82
+        },
+        "memory_mb": {
+          "mean": 167.97,
+          "median": 167.98,
+          "stddev": 0.16,
+          "min": 167.76,
+          "max": 168.21,
+          "p50": 167.98,
+          "p95": 168.18,
+          "p99": 168.21
+        },
+        "ipc_latency_ms": {
+          "mean": 15.46,
+          "median": 15.61,
+          "stddev": 0.29,
+          "min": 14.98,
+          "max": 15.76,
+          "p50": 15.61,
+          "p95": 15.74,
+          "p99": 15.75
+        },
+        "mean_workers": 1.0,
+        "tasks_completed": 800
+      }
+    }
+  },
+  "ipc_profiling_breakdown": {
+    "serialization_ms": {
+      "mean": 0.04,
+      "median": 0.03,
+      "stddev": 0.01,
+      "min": 0.03,
+      "max": 0.06,
+      "p50": 0.03,
+      "p95": 0.06,
+      "p99": 0.06
+    },
+    "pickle_ms": {
+      "mean": 0.04,
+      "median": 0.03,
+      "stddev": 0.01,
+      "min": 0.03,
+      "max": 0.06,
+      "p50": 0.03,
+      "p95": 0.06,
+      "p99": 0.06
+    },
+    "pipe_send_ms": {
+      "mean": 54.31,
+      "median": 0.17,
+      "stddev": 108.17,
+      "min": 0.14,
+      "max": 270.65,
+      "p50": 0.17,
+      "p95": 216.61,
+      "p99": 259.84
+    },
+    "pipe_receive_ms": {
+      "mean": 90.9,
+      "median": 0.63,
+      "stddev": 180.36,
+      "min": 0.56,
+      "max": 451.63,
+      "p50": 0.63,
+      "p95": 361.52,
+      "p99": 433.61
+    },
+    "queue_wait_ms": {
+      "mean": 36.21,
+      "median": 0.11,
+      "stddev": 72.11,
+      "min": 0.09,
+      "max": 180.44,
+      "p50": 0.11,
+      "p95": 144.41,
+      "p99": 173.23
+    },
+    "worker_dispatch_ms": {
+      "mean": 90.56,
+      "median": 0.31,
+      "stddev": 180.3,
+      "min": 0.27,
+      "max": 451.15,
+      "p50": 0.31,
+      "p95": 361.08,
+      "p99": 433.14
+    },
+    "worker_execution_ms": {
+      "mean": 0.49,
+      "median": 0.54,
+      "stddev": 0.2,
+      "min": 0.26,
+      "max": 0.74,
+      "p50": 0.54,
+      "p95": 0.72,
+      "p99": 0.73
+    },
+    "result_deserialization_ms": {
+      "mean": 0.02,
+      "median": 0.02,
+      "stddev": 0.0,
+      "min": 0.01,
+      "max": 0.03,
+      "p50": 0.02,
+      "p95": 0.03,
+      "p99": 0.03
+    },
+    "total_process_latency_ms": {
+      "mean": 272.52,
+      "median": 1.82,
+      "stddev": 541.09,
+      "min": 1.36,
+      "max": 1354.69,
+      "p50": 1.82,
+      "p95": 1084.41,
+      "p99": 1300.64
+    }
+  },
+  "batch_ipc_sensitivity": {
+    "1": {
+      "mean": 101.66,
+      "median": 101.28,
+      "stddev": 0.88,
+      "min": 100.82,
+      "max": 102.87,
+      "p50": 101.28,
+      "p95": 102.71,
+      "p99": 102.84
+    },
+    "4": {
+      "mean": 260.5,
+      "median": 257.69,
+      "stddev": 4.74,
+      "min": 256.64,
+      "max": 267.17,
+      "p50": 257.69,
+      "p95": 266.23,
+      "p99": 266.98
+    },
+    "8": {
+      "mean": 265.02,
+      "median": 266.08,
+      "stddev": 1.97,
+      "min": 262.26,
+      "max": 266.73,
+      "p50": 266.08,
+      "p95": 266.67,
+      "p99": 266.72
+    },
+    "16": {
+      "mean": 265.92,
+      "median": 265.22,
+      "stddev": 3.63,
+      "min": 261.86,
+      "max": 270.67,
+      "p50": 265.22,
+      "p95": 270.13,
+      "p99": 270.56
+    },
+    "32": {
+      "mean": 266.2,
+      "median": 266.09,
+      "stddev": 0.66,
+      "min": 265.45,
+      "max": 267.06,
+      "p50": 266.09,
+      "p95": 266.97,
+      "p99": 267.05
+    },
+    "64": {
+      "mean": 267.95,
+      "median": 266.47,
+      "stddev": 5.1,
+      "min": 262.57,
+      "max": 274.81,
+      "p50": 266.47,
+      "p95": 273.98,
+      "p99": 274.64
+    },
+    "128": {
+      "mean": 267.29,
+      "median": 267.79,
+      "stddev": 4.13,
+      "min": 262.0,
+      "max": 272.07,
+      "p50": 267.79,
+      "p95": 271.64,
+      "p99": 271.98
+    }
+  },
+  "cold_vs_warm_startup": {
+    "cold_round_ms": {
+      "mean": 447.69,
+      "median": 439.94,
+      "stddev": 13.84,
+      "min": 435.56,
+      "max": 471.7,
+      "p50": 439.94,
+      "p95": 468.3,
+      "p99": 471.02
+    },
+    "warm_round_ms": {
+      "mean": 1.1,
+      "median": 1.09,
+      "stddev": 0.07,
+      "min": 1.0,
+      "max": 1.23,
+      "p50": 1.09,
+      "p95": 1.21,
+      "p99": 1.23
+    },
+    "speedup": 406.99
+  },
+  "long_horizon_stability": {
+    "50": {
+      "cycles": 50,
+      "total_duration_s": 0.48,
+      "round_latency_ms": {
+        "mean": 9.61,
+        "median": 0.63,
+        "stddev": 61.98,
+        "min": 0.55,
+        "max": 443.42,
+        "p50": 0.63,
+        "p95": 1.1,
+        "p99": 228.49
+      },
+      "unique_pids_count": 1,
+      "initial_mem_mb": 167.6,
+      "final_mem_mb": 167.6,
+      "memory_drift_mb": 0.0
+    },
+    "100": {
+      "cycles": 100,
+      "total_duration_s": 0.52,
+      "round_latency_ms": {
+        "mean": 5.21,
+        "median": 0.64,
+        "stddev": 44.74,
+        "min": 0.53,
+        "max": 450.36,
+        "p50": 0.64,
+        "p95": 0.98,
+        "p99": 9.35
+      },
+      "unique_pids_count": 1,
+      "initial_mem_mb": 167.2,
+      "final_mem_mb": 167.3,
+      "memory_drift_mb": 0.14
+    },
+    "250": {
+      "cycles": 250,
+      "total_duration_s": 0.6,
+      "round_latency_ms": {
+        "mean": 2.4,
+        "median": 0.64,
+        "stddev": 27.5,
+        "min": 0.51,
+        "max": 436.39,
+        "p50": 0.64,
+        "p95": 0.89,
+        "p99": 1.13
+      },
+      "unique_pids_count": 1,
+      "initial_mem_mb": 167.2,
+      "final_mem_mb": 167.6,
+      "memory_drift_mb": 0.43
+    },
+    "500": {
+      "cycles": 500,
+      "total_duration_s": 0.78,
+      "round_latency_ms": {
+        "mean": 1.55,
+        "median": 0.66,
+        "stddev": 19.43,
+        "min": 0.51,
+        "max": 435.61,
+        "p50": 0.66,
+        "p95": 0.9,
+        "p99": 1.17
+      },
+      "unique_pids_count": 1,
+      "initial_mem_mb": 167.5,
+      "final_mem_mb": 168.4,
+      "memory_drift_mb": 0.87
+    }
+  },
+  "telemetry_overhead": {
+    "telemetry_off_tp": {
+      "mean": 9822.33,
+      "median": 10108.03,
+      "stddev": 462.37,
+      "min": 9145.86,
+      "max": 10253.62,
+      "p50": 10108.03,
+      "p95": 10246.12,
+      "p99": 10252.12
+    },
+    "telemetry_on_tp": {
+      "mean": 9526.33,
+      "median": 9660.38,
+      "stddev": 578.18,
+      "min": 8625.22,
+      "max": 10336.25,
+      "p50": 9660.38,
+      "p95": 10230.75,
+      "p99": 10315.15
+    },
+    "overhead_percent": 3.01
+  },
+  "real_mission": {
+    "fixed_process": {
+      "completed": 120,
+      "wall_clock_s": 0.48,
+      "throughput": 250.0,
+      "fairness": 0.5
+    },
+    "adaptive": {
+      "completed": 120,
+      "wall_clock_s": 0.012,
+      "throughput": 10055.05,
+      "fairness": 0.5
+    },
+    "speedup": 40.22
+  },
+  "os_boundary_probe": {
+    "512": {
+      "status": "PASS",
+      "agents": 512,
+      "subswarms": 16,
+      "tasks_in_round": 8,
+      "round_duration_ms": 446.82,
+      "memory_total_rss_mb": 167.5
+    },
+    "1024": {
+      "status": "PASS",
+      "agents": 1024,
+      "subswarms": 32,
+      "tasks_in_round": 8,
+      "round_duration_ms": 474.72,
+      "memory_total_rss_mb": 167.4
+    },
+    "2048": {
+      "status": "PASS",
+      "agents": 2048,
+      "subswarms": 64,
+      "tasks_in_round": 8,
+      "round_duration_ms": 447.16,
+      "memory_total_rss_mb": 167.3
+    }
+  }
+}

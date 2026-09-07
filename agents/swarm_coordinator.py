@@ -753,6 +753,12 @@ class SwarmCoordinator:
         self.selector = AgentSelector()
         self.scheduler = TaskScheduler()
         self.validator = ResultValidator()
+        from agents.collaboration_engine import CollaborationCoordinator
+        self.collaboration = CollaborationCoordinator(
+            project_id=self.project_id,
+            mission_id=self.mission_id,
+            callbacks=self.callbacks,
+        )
 
         # State tracking
         self.active_leases: dict[str, TaskLease] = {}  # task_id -> TaskLease
@@ -947,6 +953,7 @@ class SwarmCoordinator:
                 "global_max": self.quotas.global_max_concurrency,
                 "category_limits": self.quotas.category_limits,
             },
+            "collaborations": self.collaboration.export_state(),
         }
 
     def restore_state(self, state_data: dict[str, Any]) -> None:
@@ -967,3 +974,5 @@ class SwarmCoordinator:
         # Clear stale active leases so tasks can be cleanly re-leased post-crash
         self.active_leases.clear()
         self.file_ownership = FileOwnershipRegistry()
+        if "collaborations" in state_data:
+            self.collaboration.restore_state(state_data["collaborations"])

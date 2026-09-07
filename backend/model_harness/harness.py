@@ -167,7 +167,15 @@ class ModelHarness:
                 decision.action.value,
             )
 
-            can_transform = (
+            is_provider_failover = (
+                response.status == ModelResponseStatus.PROVIDER_FAILED
+                and route is not None
+                and route.provider == "gemini"
+                and self.providers.has("ollama")
+                and attempt < max(current.execution_constraints.max_attempts, 2)
+            )
+
+            can_transform = is_provider_failover or (
                 current.execution_constraints.allow_recovery
                 and decision.retry_requested
                 and attempt < current.execution_constraints.max_attempts
@@ -180,14 +188,27 @@ class ModelHarness:
                 return response
 
             # --- Automatic Failover Chain ---
-            if response.status == ModelResponseStatus.PROVIDER_FAILED and route and route.provider == "gemini" and self.providers.has("ollama"):
-                from backend.model_harness.contracts import ModelPreferences
+            if (
+                is_provider_failover
+                or (
+                    response.status == ModelResponseStatus.PROVIDER_FAILED
+                    and route
+                    and route.provider == "gemini"
+                    and self.providers.has("ollama")
+                )
+            ):
+                from backend.model_harness.contracts import ModelPreferences, ExecutionConstraints
                 current = replace(
                     current,
                     model_preferences=ModelPreferences(
                         providers=("ollama",),
                         models=(),
                         mode=current.model_preferences.mode,
+                    ),
+                    execution_constraints=replace(
+                        current.execution_constraints,
+                        max_attempts=max(current.execution_constraints.max_attempts, attempt + 1),
+                        allow_recovery=True,
                     ),
                 )
 

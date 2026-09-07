@@ -1,0 +1,2212 @@
+{
+  "timestamp": "2026-09-06 20:07:48",
+  "audit_version": "17.1",
+  "benchmark_environment": {
+    "os": "Windows",
+    "python": "3.14.7",
+    "cpu_cores": 16,
+    "total_ram_gb": 15.71,
+    "pid": 17512
+  },
+  "throughput_definition": "completed_real_tasks / wall_clock_seconds",
+  "cold_runs": {
+    "32": {
+      "centralized": {
+        "architecture": "CENTRALIZED",
+        "agents": 32,
+        "sub_swarms": 1,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 15.28,
+        "duration_s": 0.0153,
+        "throughput": 9817.78,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 18.7,
+          "scheduling": 8.17,
+          "lease": 0.91,
+          "execution": 0.28,
+          "reconciliation": 0.12,
+          "coordination_overhead_total": 9.19
+        },
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0519,
+            "p95": 0.0708,
+            "p99": 0.1033,
+            "max": 0.1162
+          },
+          "lease": {
+            "p50": 0.0053,
+            "p95": 0.0088,
+            "p99": 0.0217,
+            "max": 0.0307
+          },
+          "execution": {
+            "p50": 0.0013,
+            "p95": 0.0031,
+            "p99": 0.0095,
+            "max": 0.0374
+          },
+          "coordination": {
+            "p50": 0.0572,
+            "p95": 0.0779,
+            "p99": 0.134,
+            "max": 0.1379
+          },
+          "federation": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "max": 0.0
+          },
+          "end_to_end": {
+            "p50": 0.0693,
+            "p95": 0.1073,
+            "p99": 0.2085,
+            "max": 0.228
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 70.88,
+          "rss_delta_mb": 1.7,
+          "cpu_percent": 89.5,
+          "threads": 24
+        },
+        "agents_executed_sample": [
+          {
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          }
+        ]
+      },
+      "federated": {
+        "architecture": "FEDERATED",
+        "agents": 32,
+        "sub_swarms": 1,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 18.74,
+        "duration_s": 0.0187,
+        "throughput": 8006.19,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 3.21,
+          "global_coordination": 0.69,
+          "local_coordination": 8.11,
+          "cross_swarm_coordination": 3.0,
+          "lease_overhead": 1.01,
+          "event_aggregation": 0.15,
+          "checkpoint_overhead": 0.11,
+          "coordination_overhead_total": 9.92
+        },
+        "cross_swarm_communication": {
+          "messages_sent": 15,
+          "messages_received": 15,
+          "duplicates": 0,
+          "dropped": 0,
+          "reordered": 0,
+          "retries": 0
+        },
+        "cross_swarm_conflicts": 0,
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0526,
+            "p95": 0.0571,
+            "p99": 0.0593,
+            "max": 0.0793
+          },
+          "lease": {
+            "p50": 0.0062,
+            "p95": 0.0082,
+            "p99": 0.0128,
+            "max": 0.0328
+          },
+          "execution": {
+            "p50": 0.0013,
+            "p95": 0.0019,
+            "p99": 0.0028,
+            "max": 0.0139
+          },
+          "coordination": {
+            "p50": 0.0588,
+            "p95": 0.0655,
+            "p99": 0.0691,
+            "max": 0.1121
+          },
+          "federation": {
+            "p50": 0.0277,
+            "p95": 0.0331,
+            "p99": 0.0491,
+            "max": 0.0491
+          },
+          "end_to_end": {
+            "p50": 0.071,
+            "p95": 0.0805,
+            "p99": 0.0886,
+            "max": 0.1562
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 71.82,
+          "rss_delta_mb": 0.32,
+          "cpu_percent": 138.5,
+          "threads": 24
+        },
+        "partition_quality": {
+          "cross_swarm_edges": 0,
+          "intra_swarm_edges": 106,
+          "cross_swarm_conflicts": 0,
+          "resource_overlap": 0,
+          "dependency_cut": 0.0,
+          "intra_locality_ratio": 1.0
+        },
+        "agents_executed_sample": [
+          {
+            "agent_id": "ag_0000",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "agent_id": "ag_0001",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "agent_id": "ag_0002",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0003",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0004",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          }
+        ]
+      },
+      "speedup": 0.82
+    },
+    "64": {
+      "centralized": {
+        "architecture": "CENTRALIZED",
+        "agents": 64,
+        "sub_swarms": 1,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 22.16,
+        "duration_s": 0.0222,
+        "throughput": 6767.95,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 0.29,
+          "scheduling": 15.21,
+          "lease": 0.89,
+          "execution": 0.31,
+          "reconciliation": 0.18,
+          "coordination_overhead_total": 16.29
+        },
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0983,
+            "p95": 0.1224,
+            "p99": 0.1585,
+            "max": 0.1596
+          },
+          "lease": {
+            "p50": 0.0054,
+            "p95": 0.0098,
+            "p99": 0.0207,
+            "max": 0.0253
+          },
+          "execution": {
+            "p50": 0.0014,
+            "p95": 0.0039,
+            "p99": 0.015,
+            "max": 0.046
+          },
+          "coordination": {
+            "p50": 0.1038,
+            "p95": 0.1299,
+            "p99": 0.1694,
+            "max": 0.1735
+          },
+          "federation": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "max": 0.0
+          },
+          "end_to_end": {
+            "p50": 0.1158,
+            "p95": 0.165,
+            "p99": 0.1926,
+            "max": 0.2041
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 71.84,
+          "rss_delta_mb": 0.01,
+          "cpu_percent": 66.9,
+          "threads": 24
+        },
+        "agents_executed_sample": [
+          {
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          }
+        ]
+      },
+      "federated": {
+        "architecture": "FEDERATED",
+        "agents": 64,
+        "sub_swarms": 2,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 20.11,
+        "duration_s": 0.0201,
+        "throughput": 7457.57,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 3.04,
+          "global_coordination": 0.76,
+          "local_coordination": 8.53,
+          "cross_swarm_coordination": 3.0,
+          "lease_overhead": 1.14,
+          "event_aggregation": 0.15,
+          "checkpoint_overhead": 0.15,
+          "coordination_overhead_total": 10.59
+        },
+        "cross_swarm_communication": {
+          "messages_sent": 15,
+          "messages_received": 15,
+          "duplicates": 0,
+          "dropped": 0,
+          "reordered": 0,
+          "retries": 0
+        },
+        "cross_swarm_conflicts": 0,
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0507,
+            "p95": 0.0736,
+            "p99": 0.1306,
+            "max": 0.2815
+          },
+          "lease": {
+            "p50": 0.0065,
+            "p95": 0.0145,
+            "p99": 0.024,
+            "max": 0.0309
+          },
+          "execution": {
+            "p50": 0.0013,
+            "p95": 0.0041,
+            "p99": 0.0295,
+            "max": 0.0418
+          },
+          "coordination": {
+            "p50": 0.0571,
+            "p95": 0.097,
+            "p99": 0.1471,
+            "max": 0.3124
+          },
+          "federation": {
+            "p50": 0.0295,
+            "p95": 0.0377,
+            "p99": 0.0469,
+            "max": 0.0469
+          },
+          "end_to_end": {
+            "p50": 0.0694,
+            "p95": 0.1278,
+            "p99": 0.2279,
+            "max": 0.3568
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 71.99,
+          "rss_delta_mb": 0.15,
+          "cpu_percent": 130.9,
+          "threads": 24
+        },
+        "partition_quality": {
+          "cross_swarm_edges": 0,
+          "intra_swarm_edges": 106,
+          "cross_swarm_conflicts": 0,
+          "resource_overlap": 0,
+          "dependency_cut": 0.0,
+          "intra_locality_ratio": 1.0
+        },
+        "agents_executed_sample": [
+          {
+            "agent_id": "ag_0000",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "agent_id": "ag_0001",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "agent_id": "ag_0002",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0003",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0004",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          }
+        ]
+      },
+      "speedup": 1.1
+    },
+    "128": {
+      "centralized": {
+        "architecture": "CENTRALIZED",
+        "agents": 128,
+        "sub_swarms": 1,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 34.64,
+        "duration_s": 0.0346,
+        "throughput": 4330.03,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 0.38,
+          "scheduling": 27.92,
+          "lease": 0.81,
+          "execution": 0.24,
+          "reconciliation": 0.29,
+          "coordination_overhead_total": 29.02
+        },
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.1842,
+            "p95": 0.1949,
+            "p99": 0.2414,
+            "max": 0.2852
+          },
+          "lease": {
+            "p50": 0.0049,
+            "p95": 0.0076,
+            "p99": 0.0116,
+            "max": 0.019
+          },
+          "execution": {
+            "p50": 0.0014,
+            "p95": 0.0025,
+            "p99": 0.0056,
+            "max": 0.0142
+          },
+          "coordination": {
+            "p50": 0.1894,
+            "p95": 0.201,
+            "p99": 0.2502,
+            "max": 0.2952
+          },
+          "federation": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "max": 0.0
+          },
+          "end_to_end": {
+            "p50": 0.2012,
+            "p95": 0.2141,
+            "p99": 0.2694,
+            "max": 0.3121
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 72.0,
+          "rss_delta_mb": 0.0,
+          "cpu_percent": 87.1,
+          "threads": 24
+        },
+        "agents_executed_sample": [
+          {
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          }
+        ]
+      },
+      "federated": {
+        "architecture": "FEDERATED",
+        "agents": 128,
+        "sub_swarms": 4,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 18.83,
+        "duration_s": 0.0188,
+        "throughput": 7966.86,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 3.16,
+          "global_coordination": 0.78,
+          "local_coordination": 8.1,
+          "cross_swarm_coordination": 3.0,
+          "lease_overhead": 1.02,
+          "event_aggregation": 0.15,
+          "checkpoint_overhead": 0.27,
+          "coordination_overhead_total": 10.16
+        },
+        "cross_swarm_communication": {
+          "messages_sent": 15,
+          "messages_received": 15,
+          "duplicates": 0,
+          "dropped": 0,
+          "reordered": 0,
+          "retries": 0
+        },
+        "cross_swarm_conflicts": 0,
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0503,
+            "p95": 0.0554,
+            "p99": 0.0678,
+            "max": 0.0766
+          },
+          "lease": {
+            "p50": 0.0061,
+            "p95": 0.0084,
+            "p99": 0.0258,
+            "max": 0.05
+          },
+          "execution": {
+            "p50": 0.0013,
+            "p95": 0.0021,
+            "p99": 0.0061,
+            "max": 0.0125
+          },
+          "coordination": {
+            "p50": 0.0564,
+            "p95": 0.0636,
+            "p99": 0.1013,
+            "max": 0.1024
+          },
+          "federation": {
+            "p50": 0.0315,
+            "p95": 0.0367,
+            "p99": 0.0422,
+            "max": 0.0422
+          },
+          "end_to_end": {
+            "p50": 0.0681,
+            "p95": 0.0783,
+            "p99": 0.1283,
+            "max": 0.137
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 72.12,
+          "rss_delta_mb": 0.13,
+          "cpu_percent": 68.4,
+          "threads": 24
+        },
+        "partition_quality": {
+          "cross_swarm_edges": 0,
+          "intra_swarm_edges": 106,
+          "cross_swarm_conflicts": 0,
+          "resource_overlap": 0,
+          "dependency_cut": 0.0,
+          "intra_locality_ratio": 1.0
+        },
+        "agents_executed_sample": [
+          {
+            "agent_id": "ag_0000",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0001",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0002",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0003",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0004",
+            "subswarm_id": "subswarm_02",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          }
+        ]
+      },
+      "speedup": 1.84
+    },
+    "256": {
+      "centralized": {
+        "architecture": "CENTRALIZED",
+        "agents": 256,
+        "sub_swarms": 1,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 66.43,
+        "duration_s": 0.0664,
+        "throughput": 2258.01,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 0.61,
+          "scheduling": 58.41,
+          "lease": 1.18,
+          "execution": 0.37,
+          "reconciliation": 0.55,
+          "coordination_overhead_total": 60.14
+        },
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.377,
+            "p95": 0.4472,
+            "p99": 0.6718,
+            "max": 0.7362
+          },
+          "lease": {
+            "p50": 0.0062,
+            "p95": 0.018,
+            "p99": 0.0428,
+            "max": 0.0475
+          },
+          "execution": {
+            "p50": 0.0018,
+            "p95": 0.007,
+            "p99": 0.0183,
+            "max": 0.0219
+          },
+          "coordination": {
+            "p50": 0.3831,
+            "p95": 0.4659,
+            "p99": 0.6986,
+            "max": 0.745
+          },
+          "federation": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "max": 0.0
+          },
+          "end_to_end": {
+            "p50": 0.396,
+            "p95": 0.4912,
+            "p99": 0.7388,
+            "max": 0.7647
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 72.13,
+          "rss_delta_mb": 0.01,
+          "cpu_percent": 114.9,
+          "threads": 24
+        },
+        "agents_executed_sample": [
+          {
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          }
+        ]
+      },
+      "federated": {
+        "architecture": "FEDERATED",
+        "agents": 256,
+        "sub_swarms": 8,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 20.22,
+        "duration_s": 0.0202,
+        "throughput": 7417.41,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 3.26,
+          "global_coordination": 0.86,
+          "local_coordination": 8.73,
+          "cross_swarm_coordination": 3.0,
+          "lease_overhead": 1.04,
+          "event_aggregation": 0.15,
+          "checkpoint_overhead": 0.55,
+          "coordination_overhead_total": 11.19
+        },
+        "cross_swarm_communication": {
+          "messages_sent": 15,
+          "messages_received": 15,
+          "duplicates": 0,
+          "dropped": 0,
+          "reordered": 0,
+          "retries": 0
+        },
+        "cross_swarm_conflicts": 0,
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0507,
+            "p95": 0.0594,
+            "p99": 0.0848,
+            "max": 0.122
+          },
+          "lease": {
+            "p50": 0.0062,
+            "p95": 0.0103,
+            "p99": 0.0219,
+            "max": 0.0271
+          },
+          "execution": {
+            "p50": 0.0013,
+            "p95": 0.0032,
+            "p99": 0.0081,
+            "max": 0.0101
+          },
+          "coordination": {
+            "p50": 0.0569,
+            "p95": 0.068,
+            "p99": 0.1042,
+            "max": 0.1317
+          },
+          "federation": {
+            "p50": 0.0335,
+            "p95": 0.0447,
+            "p99": 0.0609,
+            "max": 0.0609
+          },
+          "end_to_end": {
+            "p50": 0.0693,
+            "p95": 0.0847,
+            "p99": 0.1325,
+            "max": 0.1471
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 72.43,
+          "rss_delta_mb": 0.29,
+          "cpu_percent": 63.7,
+          "threads": 24
+        },
+        "partition_quality": {
+          "cross_swarm_edges": 0,
+          "intra_swarm_edges": 106,
+          "cross_swarm_conflicts": 0,
+          "resource_overlap": 0,
+          "dependency_cut": 0.0,
+          "intra_locality_ratio": 1.0
+        },
+        "agents_executed_sample": [
+          {
+            "agent_id": "ag_0000",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0001",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0002",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0003",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0004",
+            "subswarm_id": "subswarm_02",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          }
+        ]
+      },
+      "speedup": 3.28
+    },
+    "512": {
+      "centralized": {
+        "architecture": "CENTRALIZED",
+        "agents": 512,
+        "sub_swarms": 1,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 127.03,
+        "duration_s": 0.127,
+        "throughput": 1180.83,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 1.16,
+          "scheduling": 117.21,
+          "lease": 1.53,
+          "execution": 0.54,
+          "reconciliation": 1.12,
+          "coordination_overhead_total": 119.87
+        },
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.7635,
+            "p95": 0.894,
+            "p99": 1.0033,
+            "max": 1.1643
+          },
+          "lease": {
+            "p50": 0.0084,
+            "p95": 0.0197,
+            "p99": 0.0281,
+            "max": 0.0295
+          },
+          "execution": {
+            "p50": 0.0025,
+            "p95": 0.009,
+            "p99": 0.0141,
+            "max": 0.0164
+          },
+          "coordination": {
+            "p50": 0.7711,
+            "p95": 0.9107,
+            "p99": 1.0192,
+            "max": 1.1847
+          },
+          "federation": {
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "max": 0.0
+          },
+          "end_to_end": {
+            "p50": 0.7879,
+            "p95": 0.9383,
+            "p99": 1.047,
+            "max": 1.2176
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 72.46,
+          "rss_delta_mb": 0.04,
+          "cpu_percent": 109.0,
+          "threads": 24
+        },
+        "agents_executed_sample": [
+          {
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          }
+        ]
+      },
+      "federated": {
+        "architecture": "FEDERATED",
+        "agents": 512,
+        "sub_swarms": 16,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 24.17,
+        "duration_s": 0.0242,
+        "throughput": 6207.25,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 3.78,
+          "global_coordination": 0.98,
+          "local_coordination": 10.65,
+          "cross_swarm_coordination": 3.0,
+          "lease_overhead": 1.26,
+          "event_aggregation": 0.15,
+          "checkpoint_overhead": 1.2,
+          "coordination_overhead_total": 14.08
+        },
+        "cross_swarm_communication": {
+          "messages_sent": 15,
+          "messages_received": 15,
+          "duplicates": 0,
+          "dropped": 0,
+          "reordered": 0,
+          "retries": 0
+        },
+        "cross_swarm_conflicts": 0,
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0545,
+            "p95": 0.0837,
+            "p99": 0.1328,
+            "max": 0.1754
+          },
+          "lease": {
+            "p50": 0.0071,
+            "p95": 0.0162,
+            "p99": 0.0253,
+            "max": 0.0472
+          },
+          "execution": {
+            "p50": 0.0015,
+            "p95": 0.0061,
+            "p99": 0.009,
+            "max": 0.011
+          },
+          "coordination": {
+            "p50": 0.0615,
+            "p95": 0.0997,
+            "p99": 0.1501,
+            "max": 0.186
+          },
+          "federation": {
+            "p50": 0.0388,
+            "p95": 0.0482,
+            "p99": 0.0494,
+            "max": 0.0494
+          },
+          "end_to_end": {
+            "p50": 0.0753,
+            "p95": 0.1305,
+            "p99": 0.1736,
+            "max": 0.2024
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 73.11,
+          "rss_delta_mb": 0.64,
+          "cpu_percent": 104.5,
+          "threads": 24
+        },
+        "partition_quality": {
+          "cross_swarm_edges": 0,
+          "intra_swarm_edges": 106,
+          "cross_swarm_conflicts": 0,
+          "resource_overlap": 0,
+          "dependency_cut": 0.0,
+          "intra_locality_ratio": 1.0
+        },
+        "agents_executed_sample": [
+          {
+            "agent_id": "ag_0000",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0001",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0002",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0003",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0004",
+            "subswarm_id": "subswarm_02",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          }
+        ]
+      },
+      "speedup": 5.26
+    }
+  },
+  "warm_runs": {
+    "32": {
+      "replicates": 5,
+      "centralized_runs": [
+        10020.11,
+        10668.72,
+        10153.73,
+        9868.62,
+        10010.08
+      ],
+      "federated_runs": [
+        7957.14,
+        7581.0,
+        7507.32,
+        7731.56,
+        7390.84
+      ],
+      "representative_federated": {
+        "architecture": "FEDERATED",
+        "agents": 32,
+        "sub_swarms": 1,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 18.85,
+        "duration_s": 0.0189,
+        "throughput": 7957.14,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 3.13,
+          "global_coordination": 0.75,
+          "local_coordination": 8.17,
+          "cross_swarm_coordination": 3.0,
+          "lease_overhead": 1.04,
+          "event_aggregation": 0.15,
+          "checkpoint_overhead": 0.08,
+          "coordination_overhead_total": 10.03
+        },
+        "cross_swarm_communication": {
+          "messages_sent": 15,
+          "messages_received": 15,
+          "duplicates": 0,
+          "dropped": 0,
+          "reordered": 0,
+          "retries": 0
+        },
+        "cross_swarm_conflicts": 0,
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0518,
+            "p95": 0.0603,
+            "p99": 0.0821,
+            "max": 0.1604
+          },
+          "lease": {
+            "p50": 0.0063,
+            "p95": 0.0087,
+            "p99": 0.026,
+            "max": 0.0279
+          },
+          "execution": {
+            "p50": 0.0013,
+            "p95": 0.0027,
+            "p99": 0.0086,
+            "max": 0.0089
+          },
+          "coordination": {
+            "p50": 0.058,
+            "p95": 0.0688,
+            "p99": 0.11,
+            "max": 0.1841
+          },
+          "federation": {
+            "p50": 0.0284,
+            "p95": 0.0411,
+            "p99": 0.0657,
+            "max": 0.0657
+          },
+          "end_to_end": {
+            "p50": 0.0699,
+            "p95": 0.0845,
+            "p99": 0.1404,
+            "max": 0.2113
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 73.11,
+          "rss_delta_mb": 0.0,
+          "cpu_percent": 138.4,
+          "threads": 24
+        },
+        "partition_quality": {
+          "cross_swarm_edges": 0,
+          "intra_swarm_edges": 106,
+          "cross_swarm_conflicts": 0,
+          "resource_overlap": 0,
+          "dependency_cut": 0.0,
+          "intra_locality_ratio": 1.0
+        },
+        "agents_executed_sample": [
+          {
+            "agent_id": "ag_0000",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "agent_id": "ag_0001",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "agent_id": "ag_0002",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0003",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0004",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          }
+        ]
+      }
+    },
+    "64": {
+      "replicates": 5,
+      "centralized_runs": [
+        7142.07,
+        6795.11,
+        7251.39,
+        7252.58,
+        6872.85
+      ],
+      "federated_runs": [
+        8195.56,
+        7502.06,
+        7857.35,
+        7734.79,
+        8007.13
+      ],
+      "representative_federated": {
+        "architecture": "FEDERATED",
+        "agents": 64,
+        "sub_swarms": 2,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 18.3,
+        "duration_s": 0.0183,
+        "throughput": 8195.56,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 3.05,
+          "global_coordination": 0.67,
+          "local_coordination": 7.91,
+          "cross_swarm_coordination": 3.0,
+          "lease_overhead": 0.98,
+          "event_aggregation": 0.15,
+          "checkpoint_overhead": 0.13,
+          "coordination_overhead_total": 9.68
+        },
+        "cross_swarm_communication": {
+          "messages_sent": 15,
+          "messages_received": 15,
+          "duplicates": 0,
+          "dropped": 0,
+          "reordered": 0,
+          "retries": 0
+        },
+        "cross_swarm_conflicts": 0,
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0502,
+            "p95": 0.0563,
+            "p99": 0.0703,
+            "max": 0.0757
+          },
+          "lease": {
+            "p50": 0.006,
+            "p95": 0.0084,
+            "p99": 0.0114,
+            "max": 0.0264
+          },
+          "execution": {
+            "p50": 0.0013,
+            "p95": 0.0021,
+            "p99": 0.0033,
+            "max": 0.0108
+          },
+          "coordination": {
+            "p50": 0.0562,
+            "p95": 0.0643,
+            "p99": 0.0817,
+            "max": 0.1021
+          },
+          "federation": {
+            "p50": 0.027,
+            "p95": 0.0366,
+            "p99": 0.0392,
+            "max": 0.0392
+          },
+          "end_to_end": {
+            "p50": 0.0679,
+            "p95": 0.0783,
+            "p99": 0.1012,
+            "max": 0.1354
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 73.11,
+          "rss_delta_mb": 0.0,
+          "cpu_percent": 70.6,
+          "threads": 24
+        },
+        "partition_quality": {
+          "cross_swarm_edges": 0,
+          "intra_swarm_edges": 106,
+          "cross_swarm_conflicts": 0,
+          "resource_overlap": 0,
+          "dependency_cut": 0.0,
+          "intra_locality_ratio": 1.0
+        },
+        "agents_executed_sample": [
+          {
+            "agent_id": "ag_0000",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "agent_id": "ag_0001",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          },
+          {
+            "agent_id": "ag_0002",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0003",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0004",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          }
+        ]
+      }
+    },
+    "128": {
+      "replicates": 5,
+      "centralized_runs": [
+        4209.7,
+        3395.98,
+        4159.04,
+        4149.45,
+        3931.25
+      ],
+      "federated_runs": [
+        7606.92,
+        7737.7,
+        7876.33,
+        7710.85,
+        7790.22
+      ],
+      "representative_federated": {
+        "architecture": "FEDERATED",
+        "agents": 128,
+        "sub_swarms": 4,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 19.72,
+        "duration_s": 0.0197,
+        "throughput": 7606.92,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 3.04,
+          "global_coordination": 0.91,
+          "local_coordination": 8.29,
+          "cross_swarm_coordination": 3.0,
+          "lease_overhead": 1.09,
+          "event_aggregation": 0.15,
+          "checkpoint_overhead": 0.23,
+          "coordination_overhead_total": 10.51
+        },
+        "cross_swarm_communication": {
+          "messages_sent": 15,
+          "messages_received": 15,
+          "duplicates": 0,
+          "dropped": 0,
+          "reordered": 0,
+          "retries": 0
+        },
+        "cross_swarm_conflicts": 0,
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0506,
+            "p95": 0.065,
+            "p99": 0.0845,
+            "max": 0.085
+          },
+          "lease": {
+            "p50": 0.0063,
+            "p95": 0.0121,
+            "p99": 0.0186,
+            "max": 0.0279
+          },
+          "execution": {
+            "p50": 0.0013,
+            "p95": 0.0039,
+            "p99": 0.0093,
+            "max": 0.0112
+          },
+          "coordination": {
+            "p50": 0.0568,
+            "p95": 0.0787,
+            "p99": 0.1036,
+            "max": 0.1123
+          },
+          "federation": {
+            "p50": 0.0334,
+            "p95": 0.0398,
+            "p99": 0.1094,
+            "max": 0.1094
+          },
+          "end_to_end": {
+            "p50": 0.0692,
+            "p95": 0.1003,
+            "p99": 0.1312,
+            "max": 0.1517
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 73.11,
+          "rss_delta_mb": 0.0,
+          "cpu_percent": 132.1,
+          "threads": 24
+        },
+        "partition_quality": {
+          "cross_swarm_edges": 0,
+          "intra_swarm_edges": 106,
+          "cross_swarm_conflicts": 0,
+          "resource_overlap": 0,
+          "dependency_cut": 0.0,
+          "intra_locality_ratio": 1.0
+        },
+        "agents_executed_sample": [
+          {
+            "agent_id": "ag_0000",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0001",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0002",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0003",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0004",
+            "subswarm_id": "subswarm_02",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          }
+        ]
+      }
+    },
+    "256": {
+      "replicates": 5,
+      "centralized_runs": [
+        2305.96,
+        2374.78,
+        2306.97,
+        2247.2,
+        2259.52
+      ],
+      "federated_runs": [
+        7799.46,
+        7136.33,
+        7454.6,
+        7152.84,
+        7402.07
+      ],
+      "representative_federated": {
+        "architecture": "FEDERATED",
+        "agents": 256,
+        "sub_swarms": 8,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 19.23,
+        "duration_s": 0.0192,
+        "throughput": 7799.46,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 3.21,
+          "global_coordination": 0.79,
+          "local_coordination": 8.37,
+          "cross_swarm_coordination": 3.0,
+          "lease_overhead": 0.96,
+          "event_aggregation": 0.15,
+          "checkpoint_overhead": 0.52,
+          "coordination_overhead_total": 10.64
+        },
+        "cross_swarm_communication": {
+          "messages_sent": 15,
+          "messages_received": 15,
+          "duplicates": 0,
+          "dropped": 0,
+          "reordered": 0,
+          "retries": 0
+        },
+        "cross_swarm_conflicts": 0,
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0495,
+            "p95": 0.056,
+            "p99": 0.0679,
+            "max": 0.0845
+          },
+          "lease": {
+            "p50": 0.0061,
+            "p95": 0.0077,
+            "p99": 0.012,
+            "max": 0.0222
+          },
+          "execution": {
+            "p50": 0.0013,
+            "p95": 0.002,
+            "p99": 0.0046,
+            "max": 0.0056
+          },
+          "coordination": {
+            "p50": 0.0557,
+            "p95": 0.0637,
+            "p99": 0.0901,
+            "max": 0.0931
+          },
+          "federation": {
+            "p50": 0.032,
+            "p95": 0.0422,
+            "p99": 0.0449,
+            "max": 0.0449
+          },
+          "end_to_end": {
+            "p50": 0.0673,
+            "p95": 0.0785,
+            "p99": 0.115,
+            "max": 0.2035
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 73.11,
+          "rss_delta_mb": 0.0,
+          "cpu_percent": 66.5,
+          "threads": 24
+        },
+        "partition_quality": {
+          "cross_swarm_edges": 0,
+          "intra_swarm_edges": 106,
+          "cross_swarm_conflicts": 0,
+          "resource_overlap": 0,
+          "dependency_cut": 0.0,
+          "intra_locality_ratio": 1.0
+        },
+        "agents_executed_sample": [
+          {
+            "agent_id": "ag_0000",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0001",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0002",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0003",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0004",
+            "subswarm_id": "subswarm_02",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          }
+        ]
+      }
+    },
+    "512": {
+      "replicates": 5,
+      "centralized_runs": [
+        1219.31,
+        1163.25,
+        1239.56,
+        1215.87,
+        1239.37
+      ],
+      "federated_runs": [
+        6697.95,
+        6902.9,
+        6813.32,
+        5926.65,
+        6864.71
+      ],
+      "representative_federated": {
+        "architecture": "FEDERATED",
+        "agents": 512,
+        "sub_swarms": 16,
+        "real_tasks": 150,
+        "completed_tasks": 150,
+        "failed_tasks": 0,
+        "wall_clock_ms": 22.39,
+        "duration_s": 0.0224,
+        "throughput": 6697.95,
+        "throughput_provenance": "MEASURED (completed_real_tasks / wall_clock_seconds)",
+        "overhead_breakdown_ms": {
+          "setup": 3.59,
+          "global_coordination": 0.91,
+          "local_coordination": 9.84,
+          "cross_swarm_coordination": 3.0,
+          "lease_overhead": 1.14,
+          "event_aggregation": 0.15,
+          "checkpoint_overhead": 1.27,
+          "coordination_overhead_total": 13.15
+        },
+        "cross_swarm_communication": {
+          "messages_sent": 15,
+          "messages_received": 15,
+          "duplicates": 0,
+          "dropped": 0,
+          "reordered": 0,
+          "retries": 0
+        },
+        "cross_swarm_conflicts": 0,
+        "latencies_ms": {
+          "scheduling": {
+            "p50": 0.0502,
+            "p95": 0.0775,
+            "p99": 0.1686,
+            "max": 0.1969
+          },
+          "lease": {
+            "p50": 0.0062,
+            "p95": 0.0168,
+            "p99": 0.0356,
+            "max": 0.0368
+          },
+          "execution": {
+            "p50": 0.0013,
+            "p95": 0.006,
+            "p99": 0.0128,
+            "max": 0.0158
+          },
+          "coordination": {
+            "p50": 0.0566,
+            "p95": 0.0918,
+            "p99": 0.1955,
+            "max": 0.2137
+          },
+          "federation": {
+            "p50": 0.035,
+            "p95": 0.0501,
+            "p99": 0.0632,
+            "max": 0.0632
+          },
+          "end_to_end": {
+            "p50": 0.0685,
+            "p95": 0.1239,
+            "p99": 0.2389,
+            "max": 0.2521
+          }
+        },
+        "resource_profile": {
+          "rss_mb": 73.18,
+          "rss_delta_mb": 0.07,
+          "cpu_percent": 112.2,
+          "threads": 24
+        },
+        "partition_quality": {
+          "cross_swarm_edges": 0,
+          "intra_swarm_edges": 106,
+          "cross_swarm_conflicts": 0,
+          "resource_overlap": 0,
+          "dependency_cut": 0.0,
+          "intra_locality_ratio": 1.0
+        },
+        "agents_executed_sample": [
+          {
+            "agent_id": "ag_0000",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0001",
+            "subswarm_id": "subswarm_00",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0002",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0003",
+            "subswarm_id": "subswarm_01",
+            "tasks_assigned": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "lease_count": 0,
+            "execution_count": 0
+          },
+          {
+            "agent_id": "ag_0004",
+            "subswarm_id": "subswarm_02",
+            "tasks_assigned": 75,
+            "tasks_completed": 75,
+            "tasks_failed": 0,
+            "lease_count": 75,
+            "execution_count": 75
+          }
+        ]
+      }
+    }
+  },
+  "statistical_analysis": {
+    "32": {
+      "centralized_throughput": {
+        "mean": 10144.25,
+        "median": 10020.11,
+        "stddev": 277.32,
+        "min": 9868.62,
+        "max": 10668.72
+      },
+      "federated_throughput": {
+        "mean": 7633.57,
+        "median": 7581.0,
+        "stddev": 195.92,
+        "min": 7390.84,
+        "max": 7957.14
+      },
+      "p95_latency_ms": {
+        "centralized_mean": 0.0931,
+        "federated_mean": 0.1127
+      },
+      "coordination_overhead_ms": {
+        "centralized_mean": 8.98,
+        "federated_mean": 10.48
+      },
+      "speedup_mean": 0.75,
+      "efficiency_mean": 0.75
+    },
+    "64": {
+      "centralized_throughput": {
+        "mean": 7062.8,
+        "median": 7142.07,
+        "stddev": 192.67,
+        "min": 6795.11,
+        "max": 7252.58
+      },
+      "federated_throughput": {
+        "mean": 7859.38,
+        "median": 7857.35,
+        "stddev": 235.82,
+        "min": 7502.06,
+        "max": 8195.56
+      },
+      "p95_latency_ms": {
+        "centralized_mean": 0.1454,
+        "federated_mean": 0.0983
+      },
+      "coordination_overhead_ms": {
+        "centralized_mean": 15.73,
+        "federated_mean": 10.1
+      },
+      "speedup_mean": 1.11,
+      "efficiency_mean": 0.56
+    },
+    "128": {
+      "centralized_throughput": {
+        "mean": 3969.08,
+        "median": 4149.45,
+        "stddev": 302.12,
+        "min": 3395.98,
+        "max": 4209.7
+      },
+      "federated_throughput": {
+        "mean": 7744.4,
+        "median": 7737.7,
+        "stddev": 88.97,
+        "min": 7606.92,
+        "max": 7876.33
+      },
+      "p95_latency_ms": {
+        "centralized_mean": 0.3216,
+        "federated_mean": 0.0913
+      },
+      "coordination_overhead_ms": {
+        "centralized_mean": 31.57,
+        "federated_mean": 10.42
+      },
+      "speedup_mean": 1.95,
+      "efficiency_mean": 0.49
+    },
+    "256": {
+      "centralized_throughput": {
+        "mean": 2298.89,
+        "median": 2305.96,
+        "stddev": 44.94,
+        "min": 2247.2,
+        "max": 2374.78
+      },
+      "federated_throughput": {
+        "mean": 7389.06,
+        "median": 7402.07,
+        "stddev": 241.89,
+        "min": 7136.33,
+        "max": 7799.46
+      },
+      "p95_latency_ms": {
+        "centralized_mean": 0.507,
+        "federated_mean": 0.1029
+      },
+      "coordination_overhead_ms": {
+        "centralized_mean": 59.0,
+        "federated_mean": 11.31
+      },
+      "speedup_mean": 3.21,
+      "efficiency_mean": 0.4
+    },
+    "512": {
+      "centralized_throughput": {
+        "mean": 1215.47,
+        "median": 1219.31,
+        "stddev": 27.9,
+        "min": 1163.25,
+        "max": 1239.56
+      },
+      "federated_throughput": {
+        "mean": 6641.11,
+        "median": 6813.32,
+        "stddev": 363.83,
+        "min": 5926.65,
+        "max": 6902.9
+      },
+      "p95_latency_ms": {
+        "centralized_mean": 0.9729,
+        "federated_mean": 0.1145
+      },
+      "coordination_overhead_ms": {
+        "centralized_mean": 116.4,
+        "federated_mean": 13.15
+      },
+      "speedup_mean": 5.46,
+      "efficiency_mean": 0.34
+    }
+  },
+  "comparative_analysis": {
+    "32": {
+      "agents": 32,
+      "sub_swarms": 1,
+      "centralized_throughput_mean": 10144.25,
+      "federated_throughput_mean": 7633.57,
+      "speedup": 0.75,
+      "efficiency": 0.75,
+      "coordination_reduction_pct": 0.0
+    },
+    "64": {
+      "agents": 64,
+      "sub_swarms": 2,
+      "centralized_throughput_mean": 7062.8,
+      "federated_throughput_mean": 7859.38,
+      "speedup": 1.11,
+      "efficiency": 0.56,
+      "coordination_reduction_pct": 35.8
+    },
+    "128": {
+      "agents": 128,
+      "sub_swarms": 4,
+      "centralized_throughput_mean": 3969.08,
+      "federated_throughput_mean": 7744.4,
+      "speedup": 1.95,
+      "efficiency": 0.49,
+      "coordination_reduction_pct": 66.98
+    },
+    "256": {
+      "agents": 256,
+      "sub_swarms": 8,
+      "centralized_throughput_mean": 2298.89,
+      "federated_throughput_mean": 7389.06,
+      "speedup": 3.21,
+      "efficiency": 0.4,
+      "coordination_reduction_pct": 80.83
+    },
+    "512": {
+      "agents": 512,
+      "sub_swarms": 16,
+      "centralized_throughput_mean": 1215.47,
+      "federated_throughput_mean": 6641.11,
+      "speedup": 5.46,
+      "efficiency": 0.34,
+      "coordination_reduction_pct": 88.7
+    }
+  },
+  "long_horizon_drift": [
+    {
+      "cycles": 50,
+      "completed": 50,
+      "duration_s": 0.007,
+      "memory_drift_mb": 0.0,
+      "latency_p50_ms": 0.0663,
+      "latency_p95_ms": 0.1248,
+      "queue_drift": 0,
+      "lease_drift": 0
+    },
+    {
+      "cycles": 100,
+      "completed": 100,
+      "duration_s": 0.015,
+      "memory_drift_mb": 0.0,
+      "latency_p50_ms": 0.0666,
+      "latency_p95_ms": 0.1016,
+      "queue_drift": 0,
+      "lease_drift": 0
+    },
+    {
+      "cycles": 250,
+      "completed": 250,
+      "duration_s": 0.062,
+      "memory_drift_mb": 0.0,
+      "latency_p50_ms": 0.0681,
+      "latency_p95_ms": 0.1224,
+      "queue_drift": 0,
+      "lease_drift": 0
+    },
+    {
+      "cycles": 500,
+      "completed": 500,
+      "duration_s": 0.185,
+      "memory_drift_mb": 1.773,
+      "latency_p50_ms": 0.0682,
+      "latency_p95_ms": 0.1009,
+      "queue_drift": 0,
+      "lease_drift": 0
+    }
+  ],
+  "failure_recovery": {
+    "subswarm_crash_recovery": {
+      "status": "RECOVERED",
+      "subswarm_status": "ACTIVE"
+    },
+    "agent_crash_detection": {
+      "detected_unhealthy": true,
+      "agent_status": "UNHEALTHY"
+    },
+    "cross_swarm_conflict_arbitration": {
+      "conflict_prevented": true,
+      "error_message": "Resource 'src/core.py' held by subswarm 'subswarm_00' (task 'task_x')",
+      "arbitrations_recorded": 1
+    },
+    "checkpoint_restore": {
+      "sequence": 1,
+      "topology_verified": true,
+      "status": "RESTORED"
+    }
+  },
+  "os_limit_probe": {
+    "probes": {
+      "512": {
+        "status": "SUPPORTED",
+        "agents": 512,
+        "sub_swarms": 16,
+        "duration_ms": 3.03,
+        "rss_mb": 75.46,
+        "handles": 300,
+        "threads": 24
+      },
+      "768": {
+        "status": "SUPPORTED",
+        "agents": 768,
+        "sub_swarms": 24,
+        "duration_ms": 3.15,
+        "rss_mb": 75.47,
+        "handles": 300,
+        "threads": 24
+      },
+      "1024": {
+        "status": "SUPPORTED",
+        "agents": 1024,
+        "sub_swarms": 32,
+        "duration_ms": 3.35,
+        "rss_mb": 75.48,
+        "handles": 300,
+        "threads": 24
+      },
+      "1536": {
+        "status": "SUPPORTED",
+        "agents": 1536,
+        "sub_swarms": 48,
+        "duration_ms": 3.98,
+        "rss_mb": 75.95,
+        "handles": 300,
+        "threads": 24
+      },
+      "2048": {
+        "status": "SUPPORTED",
+        "agents": 2048,
+        "sub_swarms": 64,
+        "duration_ms": 4.96,
+        "rss_mb": 76.48,
+        "handles": 300,
+        "threads": 24
+      }
+    },
+    "first_real_limit": "NO_FAILURE_OBSERVED_UP_TO_2048"
+  }
+}

@@ -6,6 +6,7 @@ import asyncio
 import os
 import sys
 from pathlib import Path
+import pytest
 
 FRONTEND_URL = "http://localhost:8000"
 EVIDENCE_DIR = Path("evidence/browser/TEST-14-SWARM")
@@ -60,6 +61,13 @@ async def run_swarm_browser_qa():
         return True
 
 
+@pytest.mark.anyio
+async def test_swarm_browser():
+    success = await run_swarm_browser_qa()
+    assert success is True
+
+
 if __name__ == "__main__":
     success = asyncio.run(run_swarm_browser_qa())
     sys.exit(0 if success else 1)
+

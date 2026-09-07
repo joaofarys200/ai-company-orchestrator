@@ -1,427 +1,447 @@
 [
   {
-    "timestamp": 1788377062.6073766,
+    "timestamp": 1788721617.5142198,
     "event": "websocket_created",
     "url": "ws://127.0.0.1:8001/?token=local-dev-token"
   },
   {
-    "timestamp": 1788377062.6119153,
+    "timestamp": 1788721617.5369267,
     "direction": "received",
     "payload": "{\"type\": \"system\", \"content\": \"Conectado ao servidor Jarvis WebSocket na porta 8001!\"}"
   },
   {
-    "timestamp": 1788377062.6430717,
+    "timestamp": 1788721617.5578983,
     "direction": "received",
     "payload": "{\"type\": \"sandbox_status\", \"status\": {\"mode\": \"local_fallback\", \"port\": 8080, \"is_docker\": false}}"
   },
   {
-    "timestamp": 1788377062.6443295,
-    "direction": "received",
-    "payload": "{\"type\": \"template_changed\", \"template_name\": \"builder_swarm\", \"name\": \"Builder Swarm (Construção e Código)\", \"description\": \"Responsável pela engenharia de software: criação de websites, web apps, APIs, automações, scripts e bases de dados.\", \"agents\": [{\"id\": \"dev_lead\", \"name\": \"Dev Lead\", \"role\": \"Líder de Engenharia\", \"icon\": \"briefcase\"}, {\"id\": \"coder\", \"name\": \"Coder\", \"role\": \"Programador Principal\", \"icon\": \"code\"}, {\"id\": \"tester\", \"name\": \"Tester\", \"role\": \"Auditor de Software (QA)\","
-  },
-  {
-    "timestamp": 1788377062.6447642,
-    "direction": "received",
-    "payload": "{\"type\": \"rules_list\", \"rules\": []}"
-  },
-  {
-    "timestamp": 1788377062.645184,
-    "direction": "received",
-    "payload": "{\"type\": \"architecture_list\", \"architecture\": []}"
-  },
-  {
-    "timestamp": 1788377062.6456933,
-    "direction": "received",
-    "payload": "{\"type\": \"decisions_list\", \"decisions\": []}"
-  },
-  {
-    "timestamp": 1788377062.6463704,
-    "direction": "received",
-    "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
-  },
-  {
-    "timestamp": 1788377062.6475358,
-    "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
-  },
-  {
-    "timestamp": 1788377062.6608493,
-    "direction": "sent",
-    "payload": "{\"type\":\"list_projects\"}"
-  },
-  {
-    "timestamp": 1788377062.6610012,
-    "direction": "sent",
-    "payload": "{\"type\":\"get_notes\"}"
-  },
-  {
-    "timestamp": 1788377062.661085,
-    "direction": "sent",
-    "payload": "{\"type\":\"get_rules\"}"
-  },
-  {
-    "timestamp": 1788377062.6611514,
-    "direction": "sent",
-    "payload": "{\"type\":\"get_planner_state\"}"
-  },
-  {
-    "timestamp": 1788377062.882615,
-    "direction": "received",
-    "payload": "{\"type\": \"project_context\", \"context\": {\"project_id\": \"task-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\task-app\", \"project_name\": \"task-app\", \"python_executable\": null, \"runtime_source\": \"unavailable\", \"runtime_version\": null, \"stack\": [\"HTML/JavaScript\"], \"frameworks\": [], \"package_managers\": [], \"entrypoints\": [\"index.html\", \"app.js\"], \"source_roots\": [\".\"], \"package_scripts\": {}, \"suggested_commands\": [{\"kind\": \"syntax\", \"command\": \"node --check \\\"app.js\\\"\","
-  },
-  {
-    "timestamp": 1788377062.8847795,
-    "direction": "received",
-    "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
-  },
-  {
-    "timestamp": 1788377062.8857133,
-    "direction": "received",
-    "payload": "{\"type\": \"architecture_snapshot\", \"project_id\": \"task-app\", \"data\": {\"project\": {\"project_id\": \"task-app\", \"project_name\": \"task-app\", \"root_path\": \"C:/Users/joaor/Desktop/JarvisOS/workspace/projects/task-app\"}, \"stack\": {\"languages\": [\"JavaScript\"], \"frameworks\": [], \"package_managers\": [], \"build_tools\": [], \"test_frameworks\": [], \"containerization\": [], \"evidence\": {\"JavaScript\": {\"source\": \"source_file: app.js\", \"confidence\": 0.8, \"resolution_method\": \"file_extension_scan\", \"status\": \"INFERR"
-  },
-  {
-    "timestamp": 1788377062.8861778,
-    "direction": "received",
-    "payload": "{\"type\": \"coding_session\", \"data\": null}"
-  },
-  {
-    "timestamp": 1788377062.905413,
-    "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_18af0757801b\", \"project_id\": \"task-app\", \"title\": \"Consultar regras de persistência e memória técnica\", \"objective\": \"Consultar regras de persistência e memória técnica.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 18af0757801b]:\\nConsultar regras de persistência e memória técnica.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T13:29:02.206322+00:00\", \"updated_at\": \"2026-09-02T13:29:05.432322+00:0"
-  },
-  {
-    "timestamp": 1788377062.9070673,
-    "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
-  },
-  {
-    "timestamp": 1788377062.9118834,
-    "direction": "received",
-    "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
-  },
-  {
-    "timestamp": 1788377062.912632,
-    "direction": "received",
-    "payload": "{\"type\": \"rules_list\", \"rules\": []}"
-  },
-  {
-    "timestamp": 1788377062.9128683,
-    "direction": "received",
-    "payload": "{\"type\": \"planner_state\", \"data\": null}"
-  },
-  {
-    "timestamp": 1788377065.5418282,
-    "direction": "sent",
-    "payload": "{\"type\":\"directive\",\"text\":\"Olá JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
-  },
-  {
-    "timestamp": 1788377065.5456154,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
-  },
-  {
-    "timestamp": 1788377065.5505054,
-    "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Olá JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
-  },
-  {
-    "timestamp": 1788377067.778877,
-    "direction": "sent",
-    "payload": "{\"type\":\"directive\",\"text\":\"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\"}"
-  },
-  {
-    "timestamp": 1788377067.8451335,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
-  },
-  {
-    "timestamp": 1788377067.845814,
-    "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\"}"
-  },
-  {
-    "timestamp": 1788377067.9388108,
-    "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_45a9caf97928\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 45a9caf97928]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"READY\", \"created_at\": \"2026-09-02T19:24:27.796583+00:00\", \"updated_at"
-  },
-  {
-    "timestamp": 1788377067.9394078,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"🚀 Missão criada: **Guarda esta informação para esta missão: o...** (ID: `m_45a9caf97928`). A submeter ao Mission Gate e iniciar execução...\"}"
-  },
-  {
-    "timestamp": 1788377068.017394,
-    "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_45a9caf97928\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 45a9caf97928]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-02T19:24:27.796583+00:00\", \"updated_a"
-  },
-  {
-    "timestamp": 1788377068.3623414,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"running\"}"
-  },
-  {
-    "timestamp": 1788377068.3634398,
+    "timestamp": 1788721617.5664213,
     "direction": "received",
     "payload": "{\"type\": \"template_changed\", \"template_name\": \"research_swarm\", \"name\": \"Research Swarm (Investigação e Conhecimento)\", \"description\": \"Responsável pela pesquisa na web, indexação de RAG e gestão de notas no cofre do Obsidian.\", \"agents\": [{\"id\": \"researcher\", \"name\": \"Researcher\", \"role\": \"Pesquisador de Informação\", \"icon\": \"code\"}, {\"id\": \"knowledge_manager\", \"name\": \"Knowledge Manager\", \"role\": \"Gestor de Conhecimento\", \"icon\": \"code\"}], \"tasks\": [{\"id\": \"task_research_query\", \"title\": \"Inve"
   },
   {
-    "timestamp": 1788377068.3661494,
+    "timestamp": 1788721617.5668252,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Processando pedido: 'Guarda esta informação para esta missão: o código de teste é JARVIS-8472.'\"}"
+    "payload": "{\"type\": \"rules_list\", \"rules\": []}"
   },
   {
-    "timestamp": 1788377068.3716323,
+    "timestamp": 1788721617.5669801,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"👑 *Analisando complexidade do pedido e determinando rota do Swarm...*\"}"
+    "payload": "{\"type\": \"architecture_list\", \"architecture\": []}"
   },
   {
-    "timestamp": 1788377068.3775487,
+    "timestamp": 1788721617.567119,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"Rota determinada: SIMPLE (diretamente com ferramentas rapidas).\"}"
+    "payload": "{\"type\": \"decisions_list\", \"decisions\": []}"
   },
   {
-    "timestamp": 1788377068.3782353,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
-  },
-  {
-    "timestamp": 1788377068.3991182,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Sir, eu coordeno a nossa equipa de especialistas para gerir e executar todos os projetos da agência. O meu objetivo é assegurar que as suas diretrizes são implementadas de forma eficiente e com a máxima qualidade.\"}"
-  },
-  {
-    "timestamp": 1788377068.406154,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
-  },
-  {
-    "timestamp": 1788377069.8274934,
-    "direction": "sent",
-    "payload": "{\"type\":\"directive\",\"text\":\"Qual era o código que te pedi para guardar?\"}"
-  },
-  {
-    "timestamp": 1788377069.8450236,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
-  },
-  {
-    "timestamp": 1788377069.845738,
-    "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Qual era o código que te pedi para guardar?\"}"
-  },
-  {
-    "timestamp": 1788377069.937807,
-    "direction": "received",
-    "payload": "{\"type\": \"kanban\", \"card_id\": \"start\", \"status\": \"orchestration\"}"
-  },
-  {
-    "timestamp": 1788377069.943351,
-    "direction": "received",
-    "payload": "{\"type\": \"kanban\", \"card_id\": \"task_research_query\", \"status\": \"progress\"}"
-  },
-  {
-    "timestamp": 1788377069.9439788,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"A executar: list_directory...\"}"
-  },
-  {
-    "timestamp": 1788377069.9543266,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
-  },
-  {
-    "timestamp": 1788377069.9555755,
-    "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestração concluída com sucesso!\"}"
-  },
-  {
-    "timestamp": 1788377069.9561574,
-    "direction": "received",
-    "payload": "{\"type\": \"complete\", \"result\": \"[OK] Tarefa concluida com evidencia no TaskState.\"}"
-  },
-  {
-    "timestamp": 1788377069.960429,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"[OK] Quality Gate passou com evidencia no TaskState.\"}"
-  },
-  {
-    "timestamp": 1788377070.0305312,
-    "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_45a9caf97928\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 45a9caf97928]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-02T19:24:27.796583+00:00\", \"updated_a"
-  },
-  {
-    "timestamp": 1788377070.0347106,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"🚀 Missão criada: **Qual era o código que te pedi...** (ID: `m_4d59eb565460`). A submeter ao Mission Gate e iniciar execução...\"}"
-  },
-  {
-    "timestamp": 1788377070.1425471,
-    "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_45a9caf97928\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 45a9caf97928]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-02T19:24:27.796583+00:00\", \"updated_a"
-  },
-  {
-    "timestamp": 1788377070.2875452,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"running\"}"
-  },
-  {
-    "timestamp": 1788377070.2884467,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Processando pedido: 'Qual era o código que te pedi para guardar?'\"}"
-  },
-  {
-    "timestamp": 1788377070.2927825,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"👑 *Analisando complexidade do pedido e determinando rota do Swarm...*\"}"
-  },
-  {
-    "timestamp": 1788377070.3013332,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"Rota determinada: SIMPLE (diretamente com ferramentas rapidas).\"}"
-  },
-  {
-    "timestamp": 1788377070.3138926,
-    "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_45a9caf97928\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 45a9caf97928]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:27.796583+00:00\", \"update"
-  },
-  {
-    "timestamp": 1788377070.3148909,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"✅ Missão **Guarda esta informação para esta missão: o...** concluída com sucesso!\\n\\nTrabalho concluído pelos agentes especialistas para a missão 'm_45a9caf97928'.\"}"
-  },
-  {
-    "timestamp": 1788377070.31536,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
-  },
-  {
-    "timestamp": 1788377072.7317898,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
-  },
-  {
-    "timestamp": 1788377073.4334,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"A utilizar modelo local qwen3.5:9b via Ollama...\"}"
-  },
-  {
-    "timestamp": 1788377074.221892,
-    "direction": "sent",
-    "payload": "{\"type\":\"list_projects\"}"
-  },
-  {
-    "timestamp": 1788377074.229891,
-    "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
-  },
-  {
-    "timestamp": 1788377075.7475047,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
-  },
-  {
-    "timestamp": 1788377075.750321,
-    "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestração concluída com sucesso!\"}"
-  },
-  {
-    "timestamp": 1788377075.751854,
-    "direction": "received",
-    "payload": "{\"type\": \"complete\", \"result\": \"Erro no provider local: All connection attempts failed. Confirma que o serviço Ollama está ativo e que o modelo qwen3.5:9b está instalado.\"}"
-  },
-  {
-    "timestamp": 1788377075.7527022,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Erro no provider local: All connection attempts failed. Confirma que o serviço Ollama está ativo e que o modelo qwen3.5:9b está instalado.\"}"
-  },
-  {
-    "timestamp": 1788377075.8924236,
-    "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_4d59eb565460\", \"project_id\": \"task-app\", \"title\": \"Qual era o código que te pedi...\", \"objective\": \"Qual era o código que te pedi para guardar?\", \"description\": \"Diretiva iniciada via Chat [Correlation: 4d59eb565460]:\\nQual era o código que te pedi para guardar?\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-02T19:24:29.851551+00:00\", \"updated_at\": \"2026-09-02T19:24:35.865129+00:00\", \"started_at\": \"2026-09-02T19:2"
-  },
-  {
-    "timestamp": 1788377075.8932178,
-    "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"✅ Missão **Qual era o código que te pedi...** concluída com sucesso!\\n\\nTrabalho concluído pelos agentes especialistas para a missão 'm_4d59eb565460'.\"}"
-  },
-  {
-    "timestamp": 1788377075.8935375,
-    "direction": "received",
-    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
-  },
-  {
-    "timestamp": 1788377078.880456,
-    "direction": "sent",
-    "payload": "{\"type\":\"list_projects\"}"
-  },
-  {
-    "timestamp": 1788377078.8903022,
-    "direction": "received",
-    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
-  },
-  {
-    "timestamp": 1788377080.0495613,
-    "direction": "sent",
-    "payload": "{\"type\":\"get_notes\"}"
-  },
-  {
-    "timestamp": 1788377080.108396,
+    "timestamp": 1788721617.5677903,
     "direction": "received",
     "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
   },
   {
-    "timestamp": 1788377083.6072228,
-    "direction": "sent",
-    "payload": "{\"type\":\"directive\",\"text\":\"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
+    "timestamp": 1788721617.5680535,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
   },
   {
-    "timestamp": 1788377083.666996,
+    "timestamp": 1788721617.5844488,
+    "direction": "sent",
+    "payload": "{\"type\":\"list_projects\"}"
+  },
+  {
+    "timestamp": 1788721617.584535,
+    "direction": "sent",
+    "payload": "{\"type\":\"get_notes\"}"
+  },
+  {
+    "timestamp": 1788721617.5845673,
+    "direction": "sent",
+    "payload": "{\"type\":\"get_rules\"}"
+  },
+  {
+    "timestamp": 1788721617.584595,
+    "direction": "sent",
+    "payload": "{\"type\":\"get_planner_state\"}"
+  },
+  {
+    "timestamp": 1788721617.6740134,
+    "direction": "received",
+    "payload": "{\"type\": \"project_context\", \"context\": {\"project_id\": \"task-app\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\task-app\", \"project_name\": \"task-app\", \"python_executable\": null, \"runtime_source\": \"unavailable\", \"runtime_version\": null, \"stack\": [\"HTML/JavaScript\"], \"frameworks\": [], \"package_managers\": [], \"entrypoints\": [\"index.html\", \"app.js\"], \"source_roots\": [\".\"], \"package_scripts\": {}, \"suggested_commands\": [{\"kind\": \"syntax\", \"command\": \"node --check \\\"app.js\\\"\","
+  },
+  {
+    "timestamp": 1788721617.6748435,
+    "direction": "received",
+    "payload": "{\"type\": \"ast_state\", \"data\": {\"app.js\": {\"type\": \"javascript/typescript\", \"classes\": [], \"functions\": [{\"name\": \"addTask\", \"line\": 1, \"end_line\": 10, \"code\": \"function addTask() {\\r\\n  const input = document.getElementById('taskInput');\\r\\n  const list = document.getElementById('taskList');\\r\\n  if (input.value) {\\r\\n    const li = document.createElement('li');\\r\\n    li.textContent = input.value;\\r\\n    list.appendChild(li);\\r\\n    input.value = '';\\r\\n  }\\r\\n}\"}], \"imports\": [], \"exports\": []"
+  },
+  {
+    "timestamp": 1788721617.675093,
+    "direction": "received",
+    "payload": "{\"type\": \"architecture_snapshot\", \"project_id\": \"task-app\", \"data\": {\"project\": {\"project_id\": \"task-app\", \"project_name\": \"task-app\", \"root_path\": \"C:/Users/joaor/Desktop/JarvisOS/workspace/projects/task-app\"}, \"stack\": {\"languages\": [\"JavaScript\"], \"frameworks\": [], \"package_managers\": [], \"build_tools\": [], \"test_frameworks\": [], \"containerization\": [], \"evidence\": {\"JavaScript\": {\"source\": \"source_file: app.js\", \"confidence\": 0.8, \"resolution_method\": \"file_extension_scan\", \"status\": \"INFERR"
+  },
+  {
+    "timestamp": 1788721617.6759012,
+    "direction": "received",
+    "payload": "{\"type\": \"coding_session\", \"data\": null}"
+  },
+  {
+    "timestamp": 1788721617.6860905,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_9a8fabc1e326\", \"project_id\": \"task-app\", \"title\": \"Qual a taxa de imposto sobre extraterrestres...\", \"objective\": \"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"description\": \"Diretiva iniciada via Chat [Correlation: 9a8fabc1e326]:\\nQual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-06T19:05:26.316562+00:00\", \"updated_at\": \"2026"
+  },
+  {
+    "timestamp": 1788721617.6901698,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
+  },
+  {
+    "timestamp": 1788721617.7003856,
+    "direction": "received",
+    "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
+  },
+  {
+    "timestamp": 1788721617.700736,
+    "direction": "received",
+    "payload": "{\"type\": \"rules_list\", \"rules\": []}"
+  },
+  {
+    "timestamp": 1788721617.7010403,
+    "direction": "received",
+    "payload": "{\"type\": \"planner_state\", \"data\": null}"
+  },
+  {
+    "timestamp": 1788721619.996279,
+    "direction": "sent",
+    "payload": "{\"type\":\"directive\",\"text\":\"Olá JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
+  },
+  {
+    "timestamp": 1788721620.0237494,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
   },
   {
-    "timestamp": 1788377083.6717317,
+    "timestamp": 1788721620.0258126,
     "direction": "received",
-    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Olá JARVIS. Explica-me em duas frases o que consegues fazer.\"}"
   },
   {
-    "timestamp": 1788377083.7649872,
+    "timestamp": 1788721621.0039635,
     "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_7ade60e08fe9\", \"project_id\": \"task-app\", \"title\": \"Qual a taxa de imposto sobre extraterrestres...\", \"objective\": \"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"description\": \"Diretiva iniciada via Chat [Correlation: 7ade60e08fe9]:\\nQual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"status\": \"READY\", \"created_at\": \"2026-09-02T19:24:43.630345+00:00\", \"updated_at\": \"2026-09-"
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Sir, coordeno a nossa equipa de especialistas para gerir e executar os projetos da agência. Asseguro que tudo corre de forma eficiente e que tem sempre a informação necessária.\"}"
   },
   {
-    "timestamp": 1788377083.7675653,
+    "timestamp": 1788721621.0047116,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"🚀 Missão criada: **Qual a taxa de imposto sobre extraterrestres...** (ID: `m_7ade60e08fe9`). A submeter ao Mission Gate e iniciar execução...\"}"
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
   },
   {
-    "timestamp": 1788377083.8399267,
-    "direction": "received",
-    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_7ade60e08fe9\", \"project_id\": \"task-app\", \"title\": \"Qual a taxa de imposto sobre extraterrestres...\", \"objective\": \"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"description\": \"Diretiva iniciada via Chat [Correlation: 7ade60e08fe9]:\\nQual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-02T19:24:43.630345+00:00\", \"updated_at\": \"2026-09"
+    "timestamp": 1788721621.90426,
+    "direction": "sent",
+    "payload": "{\"type\":\"directive\",\"text\":\"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\"}"
   },
   {
-    "timestamp": 1788377084.0519426,
+    "timestamp": 1788721621.9254224,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
+  },
+  {
+    "timestamp": 1788721621.9261951,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\"}"
+  },
+  {
+    "timestamp": 1788721622.366371,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_2c99c4f66fb3\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 2c99c4f66fb3]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"READY\", \"created_at\": \"2026-09-06T19:07:01.923613+00:00\", \"updated_at"
+  },
+  {
+    "timestamp": 1788721622.3666832,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"🚀 Missão criada: **Guarda esta informação para esta missão: o...** (ID: `m_2c99c4f66fb3`). A submeter ao Mission Gate e iniciar execução...\"}"
+  },
+  {
+    "timestamp": 1788721622.5806983,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_2c99c4f66fb3\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 2c99c4f66fb3]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-06T19:07:01.923613+00:00\", \"updated_a"
+  },
+  {
+    "timestamp": 1788721622.7970853,
     "direction": "received",
     "payload": "{\"type\": \"state\", \"value\": \"running\"}"
   },
   {
-    "timestamp": 1788377084.0526028,
+    "timestamp": 1788721622.797512,
     "direction": "received",
-    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Processando pedido: 'Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?'\"}"
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Processando pedido: 'Guarda esta informação para esta missão: o código de teste é JARVIS-8472.'\"}"
   },
   {
-    "timestamp": 1788377084.0572522,
+    "timestamp": 1788721622.8007936,
     "direction": "received",
     "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"👑 *Analisando complexidade do pedido e determinando rota do Swarm...*\"}"
   },
   {
-    "timestamp": 1788377084.0652273,
+    "timestamp": 1788721622.8013475,
     "direction": "received",
     "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"Rota determinada: SIMPLE (diretamente com ferramentas rapidas).\"}"
   },
   {
-    "timestamp": 1788377084.0657856,
+    "timestamp": 1788721622.8017147,
     "direction": "received",
     "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
+  },
+  {
+    "timestamp": 1788721623.9279222,
+    "direction": "sent",
+    "payload": "{\"type\":\"directive\",\"text\":\"Qual era o código que te pedi para guardar?\"}"
+  },
+  {
+    "timestamp": 1788721623.9428644,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
+  },
+  {
+    "timestamp": 1788721623.94349,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Qual era o código que te pedi para guardar?\"}"
+  },
+  {
+    "timestamp": 1788721624.3420064,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_d77f4e72bb84\", \"project_id\": \"task-app\", \"title\": \"Qual era o código que te pedi...\", \"objective\": \"Qual era o código que te pedi para guardar?\", \"description\": \"Diretiva iniciada via Chat [Correlation: d77f4e72bb84]:\\nQual era o código que te pedi para guardar?\", \"status\": \"READY\", \"created_at\": \"2026-09-06T19:07:03.949754+00:00\", \"updated_at\": \"2026-09-06T19:07:04.270745+00:00\", \"started_at\": null, \"completed_at\""
+  },
+  {
+    "timestamp": 1788721624.3423636,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"🚀 Missão criada: **Qual era o código que te pedi...** (ID: `m_d77f4e72bb84`). A submeter ao Mission Gate e iniciar execução...\"}"
+  },
+  {
+    "timestamp": 1788721624.5600548,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_d77f4e72bb84\", \"project_id\": \"task-app\", \"title\": \"Qual era o código que te pedi...\", \"objective\": \"Qual era o código que te pedi para guardar?\", \"description\": \"Diretiva iniciada via Chat [Correlation: d77f4e72bb84]:\\nQual era o código que te pedi para guardar?\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-06T19:07:03.949754+00:00\", \"updated_at\": \"2026-09-06T19:07:04.501524+00:00\", \"started_at\": \"2026-09-06T19:07:0"
+  },
+  {
+    "timestamp": 1788721624.6531913,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"running\"}"
+  },
+  {
+    "timestamp": 1788721624.6538746,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Processando pedido: 'Qual era o código que te pedi para guardar?'\"}"
+  },
+  {
+    "timestamp": 1788721624.657988,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"👑 *Analisando complexidade do pedido e determinando rota do Swarm...*\"}"
+  },
+  {
+    "timestamp": 1788721624.6607933,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"Rota determinada: SIMPLE (diretamente com ferramentas rapidas).\"}"
+  },
+  {
+    "timestamp": 1788721626.7818077,
+    "direction": "received",
+    "payload": "{\"type\": \"kanban\", \"card_id\": \"start\", \"status\": \"orchestration\"}"
+  },
+  {
+    "timestamp": 1788721626.7848353,
+    "direction": "received",
+    "payload": "{\"type\": \"kanban\", \"card_id\": \"task_research_query\", \"status\": \"progress\"}"
+  },
+  {
+    "timestamp": 1788721626.785164,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
+  },
+  {
+    "timestamp": 1788721627.0975313,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
+  },
+  {
+    "timestamp": 1788721627.8175309,
+    "direction": "sent",
+    "payload": "{\"type\":\"list_projects\"}"
+  },
+  {
+    "timestamp": 1788721627.8199542,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
+  },
+  {
+    "timestamp": 1788721630.854374,
+    "direction": "received",
+    "payload": "{\"type\": \"kanban\", \"card_id\": \"start\", \"status\": \"orchestration\"}"
+  },
+  {
+    "timestamp": 1788721630.8553252,
+    "direction": "received",
+    "payload": "{\"type\": \"kanban\", \"card_id\": \"task_research_query\", \"status\": \"progress\"}"
+  },
+  {
+    "timestamp": 1788721630.8555145,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"A executar: read_file...\"}"
+  },
+  {
+    "timestamp": 1788721630.9737954,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
+  },
+  {
+    "timestamp": 1788721632.0565193,
+    "direction": "sent",
+    "payload": "{\"type\":\"list_projects\"}"
+  },
+  {
+    "timestamp": 1788721632.0753927,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"A utilizar modelo local qwen3.5:9b via Ollama...\"}"
+  },
+  {
+    "timestamp": 1788721632.0802224,
+    "direction": "received",
+    "payload": "{\"type\": \"projects_list\", \"projects\": [{\"project_id\": \"compliance-auditor\", \"project_name\": \"compliance-auditor\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\compliance-auditor\"}, {\"project_id\": \"default\", \"project_name\": \"default\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\default\"}, {\"project_id\": \"dina\", \"project_name\": \"dina\", \"root_path\": \"C:\\\\Users\\\\joaor\\\\Desktop\\\\JarvisOS\\\\workspace\\\\projects\\\\dina\"}, {\"project_id\": \"live-tasks-ap"
+  },
+  {
+    "timestamp": 1788721633.196999,
+    "direction": "sent",
+    "payload": "{\"type\":\"get_notes\"}"
+  },
+  {
+    "timestamp": 1788721633.225821,
+    "direction": "received",
+    "payload": "{\"type\": \"notes_list\", \"notes\": [\"00 - MOC/00 - Knowledge Index.md\", \"00 - MOC/AI Index.md\", \"00 - MOC/Backend Index.md\", \"00 - MOC/Business Index.md\", \"00 - MOC/Computer Use Index.md\", \"00 - MOC/DevOps Index.md\", \"00 - MOC/JARVIS Index.md\", \"00 - MOC/Operational Guides Index.md\", \"00 - MOC/Security Index.md\", \"00 - MOC/Software Engineering Index.md\", \"01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md\", \"01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md\", \"01 - "
+  },
+  {
+    "timestamp": 1788721634.4195874,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1788721634.4248884,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração concluída com sucesso!\"}"
+  },
+  {
+    "timestamp": 1788721634.4300401,
+    "direction": "received",
+    "payload": "{\"type\": \"complete\", \"result\": \"Erro no provider local: All connection attempts failed. Confirma que o serviço Ollama está ativo e que o modelo qwen3.5:9b está instalado.\"}"
+  },
+  {
+    "timestamp": 1788721634.4306428,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Erro no provider local: All connection attempts failed. Confirma que o serviço Ollama está ativo e que o modelo qwen3.5:9b está instalado.\"}"
+  },
+  {
+    "timestamp": 1788721634.9349902,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_2c99c4f66fb3\", \"project_id\": \"task-app\", \"title\": \"Guarda esta informação para esta missão: o...\", \"objective\": \"Guarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"description\": \"Diretiva iniciada via Chat [Correlation: 2c99c4f66fb3]:\\nGuarda esta informação para esta missão: o código de teste é JARVIS-8472.\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-06T19:07:01.923613+00:00\", \"update"
+  },
+  {
+    "timestamp": 1788721634.9373033,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"✅ Missão **Guarda esta informação para esta missão: o...** concluída com sucesso!\\n\\nTrabalho concluído pelos agentes especialistas para a missão 'm_2c99c4f66fb3'.\"}"
+  },
+  {
+    "timestamp": 1788721634.9400628,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1788721636.1383574,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"A utilizar modelo local qwen3.5:9b via Ollama...\"}"
+  },
+  {
+    "timestamp": 1788721636.9485068,
+    "direction": "sent",
+    "payload": "{\"type\":\"directive\",\"text\":\"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
+  },
+  {
+    "timestamp": 1788721637.0072577,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"processing\"}"
+  },
+  {
+    "timestamp": 1788721637.0092816,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração iniciada: Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\"}"
+  },
+  {
+    "timestamp": 1788721637.4698002,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_f42842d96785\", \"project_id\": \"task-app\", \"title\": \"Qual a taxa de imposto sobre extraterrestres...\", \"objective\": \"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"description\": \"Diretiva iniciada via Chat [Correlation: f42842d96785]:\\nQual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"status\": \"READY\", \"created_at\": \"2026-09-06T19:07:16.977948+00:00\", \"updated_at\": \"2026-09-"
+  },
+  {
+    "timestamp": 1788721637.4703069,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"🚀 Missão criada: **Qual a taxa de imposto sobre extraterrestres...** (ID: `m_f42842d96785`). A submeter ao Mission Gate e iniciar execução...\"}"
+  },
+  {
+    "timestamp": 1788721637.7271388,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_f42842d96785\", \"project_id\": \"task-app\", \"title\": \"Qual a taxa de imposto sobre extraterrestres...\", \"objective\": \"Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"description\": \"Diretiva iniciada via Chat [Correlation: f42842d96785]:\\nQual a taxa de imposto sobre extraterrestres em Marte no ano 1840?\", \"status\": \"ACTIVE\", \"created_at\": \"2026-09-06T19:07:16.977948+00:00\", \"updated_at\": \"2026-09"
+  },
+  {
+    "timestamp": 1788721637.9232574,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"running\"}"
+  },
+  {
+    "timestamp": 1788721637.9235513,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Processando pedido: 'Qual a taxa de imposto sobre extraterrestres em Marte no ano 1840?'\"}"
+  },
+  {
+    "timestamp": 1788721637.9236894,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"👑 *Analisando complexidade do pedido e determinando rota do Swarm...*\"}"
+  },
+  {
+    "timestamp": 1788721637.9257762,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador (Queen)\", \"content\": \"Rota determinada: SIMPLE (diretamente com ferramentas rapidas).\"}"
+  },
+  {
+    "timestamp": 1788721637.9259596,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Fallback cloud ativo: a utilizar Gemini 2.5 Pro via Google AI Studio...\"}"
+  },
+  {
+    "timestamp": 1788721638.4700384,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
+  },
+  {
+    "timestamp": 1788721638.4708688,
+    "direction": "received",
+    "payload": "{\"type\": \"system\", \"content\": \"Orquestração concluída com sucesso!\"}"
+  },
+  {
+    "timestamp": 1788721638.47135,
+    "direction": "received",
+    "payload": "{\"type\": \"complete\", \"result\": \"Erro no provider local: All connection attempts failed. Confirma que o serviço Ollama está ativo e que o modelo qwen3.5:9b está instalado.\"}"
+  },
+  {
+    "timestamp": 1788721638.4737473,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Orquestrador\", \"content\": \"Erro no provider local: All connection attempts failed. Confirma que o serviço Ollama está ativo e que o modelo qwen3.5:9b está instalado.\"}"
+  },
+  {
+    "timestamp": 1788721638.989819,
+    "direction": "received",
+    "payload": "{\"type\": \"mission_list\", \"project_id\": \"task-app\", \"missions\": [{\"mission_id\": \"m_d77f4e72bb84\", \"project_id\": \"task-app\", \"title\": \"Qual era o código que te pedi...\", \"objective\": \"Qual era o código que te pedi para guardar?\", \"description\": \"Diretiva iniciada via Chat [Correlation: d77f4e72bb84]:\\nQual era o código que te pedi para guardar?\", \"status\": \"COMPLETED\", \"created_at\": \"2026-09-06T19:07:03.949754+00:00\", \"updated_at\": \"2026-09-06T19:07:18.891950+00:00\", \"started_at\": \"2026-09-06T19:0"
+  },
+  {
+    "timestamp": 1788721638.9908693,
+    "direction": "received",
+    "payload": "{\"type\": \"chat\", \"sender\": \"JARVIS\", \"role\": \"Missão\", \"content\": \"✅ Missão **Qual era o código que te pedi...** concluída com sucesso!\\n\\nTrabalho concluído pelos agentes especialistas para a missão 'm_d77f4e72bb84'.\"}"
+  },
+  {
+    "timestamp": 1788721638.993574,
+    "direction": "received",
+    "payload": "{\"type\": \"state\", \"value\": \"idle\"}"
   }
 ]

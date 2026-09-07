@@ -1,0 +1,2315 @@
+{
+  "provenance": {
+    "commit_sha": "348acdd",
+    "timestamp": "2026-09-07T18:44:37.803356+00:00",
+    "host": "BIGBALLSG",
+    "node": "node_phase19_1_primary",
+    "os": "Windows 11 (10.0.26200)",
+    "python": "3.14.7",
+    "cpu_count_logical": 16,
+    "cpu_count_physical": 10,
+    "total_memory_gb": 15.71,
+    "initial_rss_mb": 70.32,
+    "execution_mode": "LOCAL_PROCESS",
+    "workload_sha256": "b4a0391985455bb60e03a0fd016de9540cad48a115c0e63f81f5080ad2907588"
+  },
+  "baseline_summary": {
+    "256 KB": {
+      "payload_bytes": 262144,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 369.72,
+        "median": 387.06,
+        "stddev": 62.451,
+        "min": 227.211,
+        "max": 432.302,
+        "p50": 390.625,
+        "p95": 432.302,
+        "p99": 432.302
+      },
+      "duration_ms": {
+        "mean": 0.7,
+        "median": 0.646,
+        "stddev": 0.156,
+        "min": 0.578,
+        "max": 1.1,
+        "p50": 0.652,
+        "p95": 1.1,
+        "p99": 1.1
+      },
+      "memory_peak_mb": {
+        "mean": 72.746,
+        "median": 72.793,
+        "stddev": 0.087,
+        "min": 72.535,
+        "max": 72.793,
+        "p50": 72.793,
+        "p95": 72.793,
+        "p99": 72.793
+      },
+      "mean_cpu_percent": 306.92
+    },
+    "512 KB": {
+      "payload_bytes": 524288,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 290.991,
+        "median": 292.878,
+        "stddev": 70.681,
+        "min": 133.697,
+        "max": 380.373,
+        "p50": 293.376,
+        "p95": 380.373,
+        "p99": 380.373
+      },
+      "duration_ms": {
+        "mean": 1.863,
+        "median": 1.707,
+        "stddev": 0.701,
+        "min": 1.315,
+        "max": 3.74,
+        "p50": 1.71,
+        "p95": 3.74,
+        "p99": 3.74
+      },
+      "memory_peak_mb": {
+        "mean": 72.745,
+        "median": 72.682,
+        "stddev": 0.236,
+        "min": 72.527,
+        "max": 73.031,
+        "p50": 72.832,
+        "p95": 73.031,
+        "p99": 73.031
+      },
+      "mean_cpu_percent": 179.27
+    },
+    "1 MB": {
+      "payload_bytes": 1048576,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 214.324,
+        "median": 214.178,
+        "stddev": 16.562,
+        "min": 193.671,
+        "max": 236.39,
+        "p50": 219.674,
+        "p95": 236.39,
+        "p99": 236.39
+      },
+      "duration_ms": {
+        "mean": 4.691,
+        "median": 4.672,
+        "stddev": 0.363,
+        "min": 4.23,
+        "max": 5.163,
+        "p50": 4.792,
+        "p95": 5.163,
+        "p99": 5.163
+      },
+      "memory_peak_mb": {
+        "mean": 75.716,
+        "median": 75.906,
+        "stddev": 0.446,
+        "min": 74.539,
+        "max": 75.906,
+        "p50": 75.906,
+        "p95": 75.906,
+        "p99": 75.906
+      },
+      "mean_cpu_percent": 129.5
+    },
+    "2 MB": {
+      "payload_bytes": 2097152,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 230.393,
+        "median": 244.93,
+        "stddev": 54.64,
+        "min": 83.039,
+        "max": 282.57,
+        "p50": 245.08,
+        "p95": 282.57,
+        "p99": 282.57
+      },
+      "duration_ms": {
+        "mean": 9.738,
+        "median": 8.166,
+        "stddev": 5.072,
+        "min": 7.078,
+        "max": 24.085,
+        "p50": 8.171,
+        "p95": 24.085,
+        "p99": 24.085
+      },
+      "memory_peak_mb": {
+        "mean": 79.33,
+        "median": 79.348,
+        "stddev": 0.057,
+        "min": 79.168,
+        "max": 79.348,
+        "p50": 79.348,
+        "p95": 79.348,
+        "p99": 79.348
+      },
+      "mean_cpu_percent": 160.12
+    },
+    "4 MB": {
+      "payload_bytes": 4194304,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 196.736,
+        "median": 202.745,
+        "stddev": 29.084,
+        "min": 117.726,
+        "max": 215.524,
+        "p50": 203.771,
+        "p95": 215.524,
+        "p99": 215.524
+      },
+      "duration_ms": {
+        "mean": 20.947,
+        "median": 19.73,
+        "stddev": 4.656,
+        "min": 18.559,
+        "max": 33.977,
+        "p50": 19.83,
+        "p95": 33.977,
+        "p99": 33.977
+      },
+      "memory_peak_mb": {
+        "mean": 87.348,
+        "median": 87.348,
+        "stddev": 0.0,
+        "min": 87.348,
+        "max": 87.348,
+        "p50": 87.348,
+        "p95": 87.348,
+        "p99": 87.348
+      },
+      "mean_cpu_percent": 131.61
+    },
+    "8 MB": {
+      "payload_bytes": 8388608,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 207.594,
+        "median": 209.378,
+        "stddev": 8.923,
+        "min": 191.461,
+        "max": 219.653,
+        "p50": 211.044,
+        "p95": 219.653,
+        "p99": 219.653
+      },
+      "duration_ms": {
+        "mean": 38.602,
+        "median": 38.211,
+        "stddev": 1.699,
+        "min": 36.421,
+        "max": 41.784,
+        "p50": 38.515,
+        "p95": 41.784,
+        "p99": 41.784
+      },
+      "memory_peak_mb": {
+        "mean": 103.352,
+        "median": 103.352,
+        "stddev": 0.0,
+        "min": 103.352,
+        "max": 103.352,
+        "p50": 103.352,
+        "p95": 103.352,
+        "p99": 103.352
+      },
+      "mean_cpu_percent": 132.91
+    },
+    "16 MB": {
+      "payload_bytes": 16777216,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 196.565,
+        "median": 203.286,
+        "stddev": 13.724,
+        "min": 165.728,
+        "max": 207.483,
+        "p50": 203.828,
+        "p95": 207.483,
+        "p99": 207.483
+      },
+      "duration_ms": {
+        "mean": 81.795,
+        "median": 78.707,
+        "stddev": 6.334,
+        "min": 77.115,
+        "max": 96.544,
+        "p50": 78.917,
+        "p95": 96.544,
+        "p99": 96.544
+      },
+      "memory_peak_mb": {
+        "mean": 135.352,
+        "median": 135.352,
+        "stddev": 0.0,
+        "min": 135.352,
+        "max": 135.352,
+        "p50": 135.352,
+        "p95": 135.352,
+        "p99": 135.352
+      },
+      "mean_cpu_percent": 121.59
+    },
+    "64 MB": {
+      "payload_bytes": 67108864,
+      "replicates": 10,
+      "throughput_mb_s": {
+        "mean": 189.492,
+        "median": 188.477,
+        "stddev": 7.55,
+        "min": 179.206,
+        "max": 202.306,
+        "p50": 189.691,
+        "p95": 202.306,
+        "p99": 202.306
+      },
+      "duration_ms": {
+        "mean": 338.224,
+        "median": 339.578,
+        "stddev": 13.353,
+        "min": 316.352,
+        "max": 357.131,
+        "p50": 341.767,
+        "p95": 357.131,
+        "p99": 357.131
+      },
+      "memory_peak_mb": {
+        "mean": 327.352,
+        "median": 327.352,
+        "stddev": 0.0,
+        "min": 327.352,
+        "max": 327.352,
+        "p50": 327.352,
+        "p95": 327.352,
+        "p99": 327.352
+      },
+      "mean_cpu_percent": 122.45
+    }
+  },
+  "streaming_threshold": {
+    "crossover_threshold": "1 MB",
+    "data": {
+      "256 KB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 574.075,
+          "median": 606.061,
+          "stddev": 113.777,
+          "min": 390.442,
+          "max": 680.087,
+          "p50": 606.061,
+          "p95": 680.087,
+          "p99": 680.087
+        },
+        "streaming_throughput_mb_s": {
+          "mean": 5.462,
+          "median": 5.0,
+          "stddev": 0.831,
+          "min": 4.9,
+          "max": 6.87,
+          "p50": 5.0,
+          "p95": 6.87,
+          "p99": 6.87
+        },
+        "speedup_ratio": 0.01,
+        "streaming_advantage": false
+      },
+      "512 KB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 433.985,
+          "median": 542.888,
+          "stddev": 249.525,
+          "min": 72.438,
+          "max": 687.191,
+          "p50": 542.888,
+          "p95": 687.191,
+          "p99": 687.191
+        },
+        "streaming_throughput_mb_s": {
+          "mean": 11.024,
+          "median": 11.37,
+          "stddev": 1.353,
+          "min": 8.92,
+          "max": 12.32,
+          "p50": 11.37,
+          "p95": 12.32,
+          "p99": 12.32
+        },
+        "speedup_ratio": 0.03,
+        "streaming_advantage": false
+      },
+      "1 MB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 233.99,
+          "median": 234.604,
+          "stddev": 27.477,
+          "min": 189.165,
+          "max": 260.274,
+          "p50": 234.604,
+          "p95": 260.274,
+          "p99": 260.274
+        },
+        "streaming_throughput_mb_s": {
+          "mean": 21.122,
+          "median": 21.43,
+          "stddev": 3.029,
+          "min": 16.5,
+          "max": 24.76,
+          "p50": 21.43,
+          "p95": 24.76,
+          "p99": 24.76
+        },
+        "speedup_ratio": 0.09,
+        "streaming_advantage": false
+      },
+      "2 MB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 237.459,
+          "median": 227.648,
+          "stddev": 26.005,
+          "min": 211.131,
+          "max": 266.517,
+          "p50": 227.648,
+          "p95": 266.517,
+          "p99": 266.517
+        },
+        "streaming_throughput_mb_s": {
+          "mean": 34.934,
+          "median": 34.85,
+          "stddev": 1.61,
+          "min": 33.52,
+          "max": 37.59,
+          "p50": 34.85,
+          "p95": 37.59,
+          "p99": 37.59
+        },
+        "speedup_ratio": 0.15,
+        "streaming_advantage": false
+      }
+    }
+  },
+  "chunk_size_sweeps": {
+    "4 KB": {
+      "chunk_size_bytes": 4096,
+      "total_chunks": 2048,
+      "throughput_mb_s": {
+        "mean": 14.663,
+        "median": 14.49,
+        "stddev": 0.372,
+        "min": 14.41,
+        "max": 15.09,
+        "p50": 14.49,
+        "p95": 15.09,
+        "p99": 15.09
+      },
+      "duration_ms": {
+        "mean": 545.803,
+        "median": 552.19,
+        "stddev": 13.733,
+        "min": 530.04,
+        "max": 555.18,
+        "p50": 552.19,
+        "p95": 555.18,
+        "p99": 555.18
+      }
+    },
+    "16 KB": {
+      "chunk_size_bytes": 16384,
+      "total_chunks": 512,
+      "throughput_mb_s": {
+        "mean": 52.58,
+        "median": 49.91,
+        "stddev": 4.79,
+        "min": 49.72,
+        "max": 58.11,
+        "p50": 49.91,
+        "p95": 58.11,
+        "p99": 58.11
+      },
+      "duration_ms": {
+        "mean": 152.953,
+        "median": 160.28,
+        "stddev": 13.231,
+        "min": 137.68,
+        "max": 160.9,
+        "p50": 160.28,
+        "p95": 160.9,
+        "p99": 160.9
+      }
+    },
+    "32 KB": {
+      "chunk_size_bytes": 32768,
+      "total_chunks": 256,
+      "throughput_mb_s": {
+        "mean": 63.873,
+        "median": 63.66,
+        "stddev": 1.571,
+        "min": 62.42,
+        "max": 65.54,
+        "p50": 63.66,
+        "p95": 65.54,
+        "p99": 65.54
+      },
+      "duration_ms": {
+        "mean": 125.297,
+        "median": 125.68,
+        "stddev": 3.073,
+        "min": 122.05,
+        "max": 128.16,
+        "p50": 125.68,
+        "p95": 128.16,
+        "p99": 128.16
+      }
+    },
+    "64 KB": {
+      "chunk_size_bytes": 65536,
+      "total_chunks": 128,
+      "throughput_mb_s": {
+        "mean": 77.753,
+        "median": 80.67,
+        "stddev": 5.732,
+        "min": 71.15,
+        "max": 81.44,
+        "p50": 80.67,
+        "p95": 81.44,
+        "p99": 81.44
+      },
+      "duration_ms": {
+        "mean": 103.283,
+        "median": 99.18,
+        "stddev": 7.944,
+        "min": 98.23,
+        "max": 112.44,
+        "p50": 99.18,
+        "p95": 112.44,
+        "p99": 112.44
+      }
+    },
+    "128 KB": {
+      "chunk_size_bytes": 131072,
+      "total_chunks": 64,
+      "throughput_mb_s": {
+        "mean": 91.78,
+        "median": 89.34,
+        "stddev": 25.956,
+        "min": 67.13,
+        "max": 118.87,
+        "p50": 89.34,
+        "p95": 118.87,
+        "p99": 118.87
+      },
+      "duration_ms": {
+        "mean": 92.007,
+        "median": 89.55,
+        "stddev": 26.022,
+        "min": 67.3,
+        "max": 119.17,
+        "p50": 89.55,
+        "p95": 119.17,
+        "p99": 119.17
+      }
+    },
+    "256 KB": {
+      "chunk_size_bytes": 262144,
+      "total_chunks": 32,
+      "throughput_mb_s": {
+        "mean": 143.877,
+        "median": 151.12,
+        "stddev": 16.661,
+        "min": 124.82,
+        "max": 155.69,
+        "p50": 151.12,
+        "p95": 155.69,
+        "p99": 155.69
+      },
+      "duration_ms": {
+        "mean": 56.14,
+        "median": 52.94,
+        "stddev": 6.928,
+        "min": 51.39,
+        "max": 64.09,
+        "p50": 52.94,
+        "p95": 64.09,
+        "p99": 64.09
+      }
+    },
+    "512 KB": {
+      "chunk_size_bytes": 524288,
+      "total_chunks": 16,
+      "throughput_mb_s": {
+        "mean": 158.35,
+        "median": 161.37,
+        "stddev": 5.955,
+        "min": 151.49,
+        "max": 162.19,
+        "p50": 161.37,
+        "p95": 162.19,
+        "p99": 162.19
+      },
+      "duration_ms": {
+        "mean": 50.573,
+        "median": 49.58,
+        "stddev": 1.941,
+        "min": 49.33,
+        "max": 52.81,
+        "p50": 49.58,
+        "p95": 52.81,
+        "p99": 52.81
+      }
+    },
+    "1 MB": {
+      "chunk_size_bytes": 1048576,
+      "total_chunks": 8,
+      "throughput_mb_s": {
+        "mean": 115.447,
+        "median": 114.2,
+        "stddev": 5.35,
+        "min": 110.83,
+        "max": 121.31,
+        "p50": 114.2,
+        "p95": 121.31,
+        "p99": 121.31
+      },
+      "duration_ms": {
+        "mean": 69.397,
+        "median": 70.05,
+        "stddev": 3.171,
+        "min": 65.95,
+        "max": 72.19,
+        "p50": 70.05,
+        "p95": 72.19,
+        "p99": 72.19
+      }
+    }
+  },
+  "window_size_sweeps": {
+    "1": {
+      "window_size": 1,
+      "throughput_mb_s": {
+        "mean": 65.644,
+        "median": 64.2,
+        "stddev": 15.978,
+        "min": 46.73,
+        "max": 85.26,
+        "p50": 64.2,
+        "p95": 85.26,
+        "p99": 85.26
+      },
+      "rtt_ms": {
+        "mean": 5.278,
+        "median": 5.561,
+        "stddev": 0.775,
+        "min": 4.236,
+        "max": 6.011,
+        "p50": 5.561,
+        "p95": 6.011,
+        "p99": 6.011
+      }
+    },
+    "2": {
+      "window_size": 2,
+      "throughput_mb_s": {
+        "mean": 65.128,
+        "median": 59.87,
+        "stddev": 18.451,
+        "min": 46.86,
+        "max": 85.49,
+        "p50": 59.87,
+        "p95": 85.49,
+        "p99": 85.49
+      },
+      "rtt_ms": {
+        "mean": 4.291,
+        "median": 4.255,
+        "stddev": 0.247,
+        "min": 4.022,
+        "max": 4.631,
+        "p50": 4.255,
+        "p95": 4.631,
+        "p99": 4.631
+      }
+    },
+    "4": {
+      "window_size": 4,
+      "throughput_mb_s": {
+        "mean": 37.13,
+        "median": 35.85,
+        "stddev": 6.213,
+        "min": 30.17,
+        "max": 46.1,
+        "p50": 35.85,
+        "p95": 46.1,
+        "p99": 46.1
+      },
+      "rtt_ms": {
+        "mean": 4.89,
+        "median": 5.062,
+        "stddev": 0.478,
+        "min": 4.072,
+        "max": 5.307,
+        "p50": 5.062,
+        "p95": 5.307,
+        "p99": 5.307
+      }
+    },
+    "8": {
+      "window_size": 8,
+      "throughput_mb_s": {
+        "mean": 48.144,
+        "median": 43.27,
+        "stddev": 12.565,
+        "min": 39.66,
+        "max": 70.33,
+        "p50": 43.27,
+        "p95": 70.33,
+        "p99": 70.33
+      },
+      "rtt_ms": {
+        "mean": 4.506,
+        "median": 4.591,
+        "stddev": 0.412,
+        "min": 4.07,
+        "max": 5.105,
+        "p50": 4.591,
+        "p95": 5.105,
+        "p99": 5.105
+      }
+    },
+    "16": {
+      "window_size": 16,
+      "throughput_mb_s": {
+        "mean": 60.812,
+        "median": 50.77,
+        "stddev": 22.432,
+        "min": 45.01,
+        "max": 99.95,
+        "p50": 50.77,
+        "p95": 99.95,
+        "p99": 99.95
+      },
+      "rtt_ms": {
+        "mean": 5.409,
+        "median": 5.35,
+        "stddev": 0.432,
+        "min": 4.808,
+        "max": 5.961,
+        "p50": 5.35,
+        "p95": 5.961,
+        "p99": 5.961
+      }
+    },
+    "32": {
+      "window_size": 32,
+      "throughput_mb_s": {
+        "mean": 49.95,
+        "median": 49.88,
+        "stddev": 5.991,
+        "min": 42.22,
+        "max": 58.84,
+        "p50": 49.88,
+        "p95": 58.84,
+        "p99": 58.84
+      },
+      "rtt_ms": {
+        "mean": 6.302,
+        "median": 6.273,
+        "stddev": 0.184,
+        "min": 6.103,
+        "max": 6.602,
+        "p50": 6.273,
+        "p95": 6.602,
+        "p99": 6.602
+      }
+    },
+    "64": {
+      "window_size": 64,
+      "throughput_mb_s": {
+        "mean": 48.124,
+        "median": 46.08,
+        "stddev": 5.374,
+        "min": 42.53,
+        "max": 56.15,
+        "p50": 46.08,
+        "p95": 56.15,
+        "p99": 56.15
+      },
+      "rtt_ms": {
+        "mean": 12.87,
+        "median": 12.65,
+        "stddev": 1.889,
+        "min": 11.217,
+        "max": 15.868,
+        "p50": 12.65,
+        "p95": 15.868,
+        "p99": 15.868
+      }
+    },
+    "128": {
+      "window_size": 128,
+      "throughput_mb_s": {
+        "mean": 48.458,
+        "median": 47.94,
+        "stddev": 2.016,
+        "min": 46.47,
+        "max": 50.67,
+        "p50": 47.94,
+        "p95": 50.67,
+        "p99": 50.67
+      },
+      "rtt_ms": {
+        "mean": 12.166,
+        "median": 12.145,
+        "stddev": 0.731,
+        "min": 11.22,
+        "max": 12.967,
+        "p50": 12.145,
+        "p95": 12.967,
+        "p99": 12.967
+      }
+    },
+    "256": {
+      "window_size": 256,
+      "throughput_mb_s": {
+        "mean": 43.872,
+        "median": 43.68,
+        "stddev": 5.34,
+        "min": 36.97,
+        "max": 50.64,
+        "p50": 43.68,
+        "p95": 50.64,
+        "p99": 50.64
+      },
+      "rtt_ms": {
+        "mean": 15.082,
+        "median": 11.387,
+        "stddev": 7.622,
+        "min": 10.98,
+        "max": 28.611,
+        "p50": 11.387,
+        "p95": 28.611,
+        "p99": 28.611
+      }
+    }
+  },
+  "large_payload_comparison": {
+    "Legacy Unfragmented": {
+      "256 KB": {
+        "throughput_mb_s": {
+          "mean": 385.386,
+          "median": 400.641,
+          "stddev": 50.502,
+          "min": 298.436,
+          "max": 428.376,
+          "p50": 400.641,
+          "p95": 428.376,
+          "p99": 428.376
+        },
+        "duration_ms": {
+          "mean": 0.659,
+          "median": 0.624,
+          "stddev": 0.102,
+          "min": 0.584,
+          "max": 0.838,
+          "p50": 0.624,
+          "p95": 0.838,
+          "p99": 0.838
+        },
+        "memory_peak_mb": {
+          "mean": 77.395,
+          "median": 77.445,
+          "stddev": 0.114,
+          "min": 77.191,
+          "max": 77.445,
+          "p50": 77.445,
+          "p95": 77.445,
+          "p99": 77.445
+        },
+        "retransmissions": 0
+      },
+      "512 KB": {
+        "throughput_mb_s": {
+          "mean": 388.294,
+          "median": 374.056,
+          "stddev": 76.594,
+          "min": 306.298,
+          "max": 494.658,
+          "p50": 374.056,
+          "p95": 494.658,
+          "p99": 494.658
+        },
+        "duration_ms": {
+          "mean": 1.327,
+          "median": 1.337,
+          "stddev": 0.253,
+          "min": 1.011,
+          "max": 1.632,
+          "p50": 1.337,
+          "p95": 1.632,
+          "p99": 1.632
+        },
+        "memory_peak_mb": {
+          "mean": 81.258,
+          "median": 81.258,
+          "stddev": 0.0,
+          "min": 81.258,
+          "max": 81.258,
+          "p50": 81.258,
+          "p95": 81.258,
+          "p99": 81.258
+        },
+        "retransmissions": 0
+      },
+      "1 MB": {
+        "throughput_mb_s": {
+          "mean": 208.616,
+          "median": 263.727,
+          "stddev": 96.269,
+          "min": 47.574,
+          "max": 272.39,
+          "p50": 263.727,
+          "p95": 272.39,
+          "p99": 272.39
+        },
+        "duration_ms": {
+          "mean": 7.492,
+          "median": 3.792,
+          "stddev": 7.592,
+          "min": 3.671,
+          "max": 21.02,
+          "p50": 3.792,
+          "p95": 21.02,
+          "p99": 21.02
+        },
+        "memory_peak_mb": {
+          "mean": 82.849,
+          "median": 83.266,
+          "stddev": 0.572,
+          "min": 82.168,
+          "max": 83.266,
+          "p50": 83.266,
+          "p95": 83.266,
+          "p99": 83.266
+        },
+        "retransmissions": 0
+      },
+      "2 MB": {
+        "throughput_mb_s": {
+          "mean": 229.261,
+          "median": 254.66,
+          "stddev": 83.138,
+          "min": 84.651,
+          "max": 284.176,
+          "p50": 254.66,
+          "p95": 284.176,
+          "p99": 284.176
+        },
+        "duration_ms": {
+          "mean": 10.787,
+          "median": 7.854,
+          "stddev": 7.2,
+          "min": 7.038,
+          "max": 23.627,
+          "p50": 7.854,
+          "p95": 23.627,
+          "p99": 23.627
+        },
+        "memory_peak_mb": {
+          "mean": 87.995,
+          "median": 88.023,
+          "stddev": 0.065,
+          "min": 87.879,
+          "max": 88.023,
+          "p50": 88.023,
+          "p95": 88.023,
+          "p99": 88.023
+        },
+        "retransmissions": 0
+      },
+      "4 MB": {
+        "throughput_mb_s": {
+          "mean": 225.853,
+          "median": 226.948,
+          "stddev": 6.985,
+          "min": 214.837,
+          "max": 233.714,
+          "p50": 226.948,
+          "p95": 233.714,
+          "p99": 233.714
+        },
+        "duration_ms": {
+          "mean": 17.724,
+          "median": 17.625,
+          "stddev": 0.559,
+          "min": 17.115,
+          "max": 18.619,
+          "p50": 17.625,
+          "p95": 18.619,
+          "p99": 18.619
+        },
+        "memory_peak_mb": {
+          "mean": 98.327,
+          "median": 98.352,
+          "stddev": 0.054,
+          "min": 98.23,
+          "max": 98.352,
+          "p50": 98.352,
+          "p95": 98.352,
+          "p99": 98.352
+        },
+        "retransmissions": 0
+      },
+      "8 MB": {
+        "throughput_mb_s": {
+          "mean": 238.591,
+          "median": 239.086,
+          "stddev": 4.047,
+          "min": 234.01,
+          "max": 244.462,
+          "p50": 239.086,
+          "p95": 244.462,
+          "p99": 244.462
+        },
+        "duration_ms": {
+          "mean": 33.538,
+          "median": 33.461,
+          "stddev": 0.566,
+          "min": 32.725,
+          "max": 34.187,
+          "p50": 33.461,
+          "p95": 34.187,
+          "p99": 34.187
+        },
+        "memory_peak_mb": {
+          "mean": 115.352,
+          "median": 115.352,
+          "stddev": 0.0,
+          "min": 115.352,
+          "max": 115.352,
+          "p50": 115.352,
+          "p95": 115.352,
+          "p99": 115.352
+        },
+        "retransmissions": 0
+      },
+      "16 MB": {
+        "throughput_mb_s": {
+          "mean": 224.629,
+          "median": 225.718,
+          "stddev": 3.993,
+          "min": 219.879,
+          "max": 228.461,
+          "p50": 225.718,
+          "p95": 228.461,
+          "p99": 228.461
+        },
+        "duration_ms": {
+          "mean": 71.247,
+          "median": 70.885,
+          "stddev": 1.272,
+          "min": 70.034,
+          "max": 72.767,
+          "p50": 70.885,
+          "p95": 72.767,
+          "p99": 72.767
+        },
+        "memory_peak_mb": {
+          "mean": 151.948,
+          "median": 151.973,
+          "stddev": 0.054,
+          "min": 151.852,
+          "max": 151.973,
+          "p50": 151.973,
+          "p95": 151.973,
+          "p99": 151.973
+        },
+        "retransmissions": 0
+      },
+      "64 MB": {
+        "throughput_mb_s": {
+          "mean": 208.859,
+          "median": 211.066,
+          "stddev": 8.773,
+          "min": 198.298,
+          "max": 219.605,
+          "p50": 211.066,
+          "p95": 219.605,
+          "p99": 219.605
+        },
+        "duration_ms": {
+          "mean": 306.862,
+          "median": 303.223,
+          "stddev": 12.942,
+          "min": 291.432,
+          "max": 322.746,
+          "p50": 303.223,
+          "p95": 322.746,
+          "p99": 322.746
+        },
+        "memory_peak_mb": {
+          "mean": 351.936,
+          "median": 351.961,
+          "stddev": 0.056,
+          "min": 351.836,
+          "max": 351.961,
+          "p50": 351.961,
+          "p95": 351.961,
+          "p99": 351.961
+        },
+        "retransmissions": 0
+      }
+    },
+    "Chunked (Stop-and-Wait)": {
+      "256 KB": {
+        "throughput_mb_s": {
+          "mean": 10.716,
+          "median": 10.34,
+          "stddev": 5.054,
+          "min": 5.71,
+          "max": 18.51,
+          "p50": 10.34,
+          "p95": 18.51,
+          "p99": 18.51
+        },
+        "duration_ms": {
+          "mean": 27.646,
+          "median": 24.17,
+          "stddev": 12.171,
+          "min": 13.51,
+          "max": 43.79,
+          "p50": 24.17,
+          "p95": 43.79,
+          "p99": 43.79
+        },
+        "memory_peak_mb": {
+          "mean": 78.324,
+          "median": 78.332,
+          "stddev": 0.157,
+          "min": 78.086,
+          "max": 78.492,
+          "p50": 78.332,
+          "p95": 78.492,
+          "p99": 78.492
+        },
+        "retransmissions": 0
+      },
+      "512 KB": {
+        "throughput_mb_s": {
+          "mean": 7.914,
+          "median": 8.02,
+          "stddev": 1.716,
+          "min": 5.44,
+          "max": 10.08,
+          "p50": 8.02,
+          "p95": 10.08,
+          "p99": 10.08
+        },
+        "duration_ms": {
+          "mean": 65.918,
+          "median": 62.36,
+          "stddev": 16.067,
+          "min": 49.61,
+          "max": 91.94,
+          "p50": 62.36,
+          "p95": 91.94,
+          "p99": 91.94
+        },
+        "memory_peak_mb": {
+          "mean": 81.354,
+          "median": 81.348,
+          "stddev": 0.01,
+          "min": 81.348,
+          "max": 81.371,
+          "p50": 81.348,
+          "p95": 81.371,
+          "p99": 81.371
+        },
+        "retransmissions": 0
+      },
+      "1 MB": {
+        "throughput_mb_s": {
+          "mean": 20.194,
+          "median": 19.53,
+          "stddev": 4.236,
+          "min": 16.13,
+          "max": 25.71,
+          "p50": 19.53,
+          "p95": 25.71,
+          "p99": 25.71
+        },
+        "duration_ms": {
+          "mean": 51.262,
+          "median": 51.2,
+          "stddev": 10.446,
+          "min": 38.89,
+          "max": 61.99,
+          "p50": 51.2,
+          "p95": 61.99,
+          "p99": 61.99
+        },
+        "memory_peak_mb": {
+          "mean": 84.646,
+          "median": 84.941,
+          "stddev": 0.919,
+          "min": 83.434,
+          "max": 85.469,
+          "p50": 84.941,
+          "p95": 85.469,
+          "p99": 85.469
+        },
+        "retransmissions": 0
+      },
+      "2 MB": {
+        "throughput_mb_s": {
+          "mean": 35.05,
+          "median": 33.21,
+          "stddev": 7.801,
+          "min": 24.82,
+          "max": 46.13,
+          "p50": 33.21,
+          "p95": 46.13,
+          "p99": 46.13
+        },
+        "duration_ms": {
+          "mean": 59.448,
+          "median": 60.22,
+          "stddev": 13.722,
+          "min": 43.36,
+          "max": 80.57,
+          "p50": 60.22,
+          "p95": 80.57,
+          "p99": 80.57
+        },
+        "memory_peak_mb": {
+          "mean": 88.539,
+          "median": 88.148,
+          "stddev": 2.056,
+          "min": 86.133,
+          "max": 91.66,
+          "p50": 88.148,
+          "p95": 91.66,
+          "p99": 91.66
+        },
+        "retransmissions": 0
+      },
+      "4 MB": {
+        "throughput_mb_s": {
+          "mean": 53.77,
+          "median": 53.35,
+          "stddev": 8.454,
+          "min": 44.21,
+          "max": 66.61,
+          "p50": 53.35,
+          "p95": 66.61,
+          "p99": 66.61
+        },
+        "duration_ms": {
+          "mean": 75.812,
+          "median": 74.97,
+          "stddev": 11.409,
+          "min": 60.05,
+          "max": 90.48,
+          "p50": 74.97,
+          "p95": 90.48,
+          "p99": 90.48
+        },
+        "memory_peak_mb": {
+          "mean": 98.671,
+          "median": 98.77,
+          "stddev": 5.08,
+          "min": 92.922,
+          "max": 105.59,
+          "p50": 98.77,
+          "p95": 105.59,
+          "p99": 105.59
+        },
+        "retransmissions": 0
+      },
+      "8 MB": {
+        "throughput_mb_s": {
+          "mean": 75.67,
+          "median": 74.91,
+          "stddev": 5.087,
+          "min": 68.34,
+          "max": 80.72,
+          "p50": 74.91,
+          "p95": 80.72,
+          "p99": 80.72
+        },
+        "duration_ms": {
+          "mean": 106.116,
+          "median": 106.8,
+          "stddev": 7.323,
+          "min": 99.11,
+          "max": 117.06,
+          "p50": 106.8,
+          "p95": 117.06,
+          "p99": 117.06
+        },
+        "memory_peak_mb": {
+          "mean": 118.145,
+          "median": 117.078,
+          "stddev": 12.105,
+          "min": 103.152,
+          "max": 133.188,
+          "p50": 117.078,
+          "p95": 133.188,
+          "p99": 133.188
+        },
+        "retransmissions": 0
+      },
+      "16 MB": {
+        "throughput_mb_s": {
+          "mean": 93.732,
+          "median": 92.05,
+          "stddev": 6.935,
+          "min": 85.17,
+          "max": 103.31,
+          "p50": 92.05,
+          "p95": 103.31,
+          "p99": 103.31
+        },
+        "duration_ms": {
+          "mean": 171.44,
+          "median": 173.81,
+          "stddev": 12.569,
+          "min": 154.88,
+          "max": 187.87,
+          "p50": 173.81,
+          "p95": 187.87,
+          "p99": 187.87
+        },
+        "memory_peak_mb": {
+          "mean": 157.623,
+          "median": 157.086,
+          "stddev": 26.241,
+          "min": 124.488,
+          "max": 191.508,
+          "p50": 157.086,
+          "p95": 191.508,
+          "p99": 191.508
+        },
+        "retransmissions": 0
+      },
+      "64 MB": {
+        "throughput_mb_s": {
+          "mean": 127.678,
+          "median": 127.2,
+          "stddev": 5.687,
+          "min": 122.0,
+          "max": 134.75,
+          "p50": 127.2,
+          "p95": 134.75,
+          "p99": 134.75
+        },
+        "duration_ms": {
+          "mean": 502.044,
+          "median": 503.13,
+          "stddev": 22.234,
+          "min": 474.94,
+          "max": 524.58,
+          "p50": 503.13,
+          "p95": 524.58,
+          "p99": 524.58
+        },
+        "memory_peak_mb": {
+          "mean": 400.345,
+          "median": 400.605,
+          "stddev": 102.667,
+          "min": 270.477,
+          "max": 530.117,
+          "p50": 400.605,
+          "p95": 530.117,
+          "p99": 530.117
+        },
+        "retransmissions": 0
+      }
+    },
+    "Chunked + Sliding Window": {
+      "256 KB": {
+        "throughput_mb_s": {
+          "mean": 4.766,
+          "median": 4.62,
+          "stddev": 0.599,
+          "min": 4.01,
+          "max": 5.66,
+          "p50": 4.62,
+          "p95": 5.66,
+          "p99": 5.66
+        },
+        "duration_ms": {
+          "mean": 53.082,
+          "median": 54.08,
+          "stddev": 6.553,
+          "min": 44.14,
+          "max": 62.28,
+          "p50": 54.08,
+          "p95": 62.28,
+          "p99": 62.28
+        },
+        "memory_peak_mb": {
+          "mean": 78.51,
+          "median": 78.496,
+          "stddev": 0.028,
+          "min": 78.492,
+          "max": 78.559,
+          "p50": 78.496,
+          "p95": 78.559,
+          "p99": 78.559
+        },
+        "retransmissions": 0
+      },
+      "512 KB": {
+        "throughput_mb_s": {
+          "mean": 10.236,
+          "median": 9.45,
+          "stddev": 1.333,
+          "min": 9.17,
+          "max": 11.76,
+          "p50": 9.45,
+          "p95": 11.76,
+          "p99": 11.76
+        },
+        "duration_ms": {
+          "mean": 49.484,
+          "median": 52.89,
+          "stddev": 6.157,
+          "min": 42.52,
+          "max": 54.5,
+          "p50": 52.89,
+          "p95": 54.5,
+          "p99": 54.5
+        },
+        "memory_peak_mb": {
+          "mean": 79.091,
+          "median": 79.191,
+          "stddev": 0.146,
+          "min": 78.93,
+          "max": 79.207,
+          "p50": 79.191,
+          "p95": 79.207,
+          "p99": 79.207
+        },
+        "retransmissions": 0
+      },
+      "1 MB": {
+        "throughput_mb_s": {
+          "mean": 16.032,
+          "median": 16.67,
+          "stddev": 2.189,
+          "min": 13.59,
+          "max": 18.05,
+          "p50": 16.67,
+          "p95": 18.05,
+          "p99": 18.05
+        },
+        "duration_ms": {
+          "mean": 63.352,
+          "median": 60.0,
+          "stddev": 8.947,
+          "min": 55.4,
+          "max": 73.61,
+          "p50": 60.0,
+          "p95": 73.61,
+          "p99": 73.61
+        },
+        "memory_peak_mb": {
+          "mean": 83.492,
+          "median": 83.766,
+          "stddev": 1.202,
+          "min": 81.824,
+          "max": 85.023,
+          "p50": 83.766,
+          "p95": 85.023,
+          "p99": 85.023
+        },
+        "retransmissions": 0
+      },
+      "2 MB": {
+        "throughput_mb_s": {
+          "mean": 30.9,
+          "median": 31.02,
+          "stddev": 2.048,
+          "min": 28.49,
+          "max": 33.02,
+          "p50": 31.02,
+          "p95": 33.02,
+          "p99": 33.02
+        },
+        "duration_ms": {
+          "mean": 64.952,
+          "median": 64.47,
+          "stddev": 4.34,
+          "min": 60.56,
+          "max": 70.2,
+          "p50": 64.47,
+          "p95": 70.2,
+          "p99": 70.2
+        },
+        "memory_peak_mb": {
+          "mean": 89.044,
+          "median": 88.066,
+          "stddev": 3.122,
+          "min": 85.855,
+          "max": 93.992,
+          "p50": 88.066,
+          "p95": 93.992,
+          "p99": 93.992
+        },
+        "retransmissions": 0
+      },
+      "4 MB": {
+        "throughput_mb_s": {
+          "mean": 50.52,
+          "median": 50.65,
+          "stddev": 4.055,
+          "min": 46.29,
+          "max": 55.64,
+          "p50": 50.65,
+          "p95": 55.64,
+          "p99": 55.64
+        },
+        "duration_ms": {
+          "mean": 79.586,
+          "median": 78.98,
+          "stddev": 6.361,
+          "min": 71.89,
+          "max": 86.41,
+          "p50": 78.98,
+          "p95": 86.41,
+          "p99": 86.41
+        },
+        "memory_peak_mb": {
+          "mean": 98.802,
+          "median": 99.363,
+          "stddev": 5.166,
+          "min": 91.727,
+          "max": 105.242,
+          "p50": 99.363,
+          "p95": 105.242,
+          "p99": 105.242
+        },
+        "retransmissions": 0
+      },
+      "8 MB": {
+        "throughput_mb_s": {
+          "mean": 71.298,
+          "median": 76.36,
+          "stddev": 8.178,
+          "min": 60.27,
+          "max": 78.08,
+          "p50": 76.36,
+          "p95": 78.08,
+          "p99": 78.08
+        },
+        "duration_ms": {
+          "mean": 113.47,
+          "median": 104.77,
+          "stddev": 13.77,
+          "min": 102.46,
+          "max": 132.74,
+          "p50": 104.77,
+          "p95": 132.74,
+          "p99": 132.74
+        },
+        "memory_peak_mb": {
+          "mean": 118.18,
+          "median": 117.824,
+          "stddev": 12.301,
+          "min": 102.301,
+          "max": 133.602,
+          "p50": 117.824,
+          "p95": 133.602,
+          "p99": 133.602
+        },
+        "retransmissions": 0
+      },
+      "16 MB": {
+        "throughput_mb_s": {
+          "mean": 93.672,
+          "median": 95.46,
+          "stddev": 8.526,
+          "min": 83.06,
+          "max": 103.5,
+          "p50": 95.46,
+          "p95": 103.5,
+          "p99": 103.5
+        },
+        "duration_ms": {
+          "mean": 171.97,
+          "median": 167.61,
+          "stddev": 15.933,
+          "min": 154.59,
+          "max": 192.64,
+          "p50": 167.61,
+          "p95": 192.64,
+          "p99": 192.64
+        },
+        "memory_peak_mb": {
+          "mean": 158.609,
+          "median": 157.734,
+          "stddev": 25.53,
+          "min": 126.309,
+          "max": 191.332,
+          "p50": 157.734,
+          "p95": 191.332,
+          "p99": 191.332
+        },
+        "retransmissions": 0
+      },
+      "64 MB": {
+        "throughput_mb_s": {
+          "mean": 117.662,
+          "median": 118.11,
+          "stddev": 3.375,
+          "min": 113.23,
+          "max": 122.45,
+          "p50": 118.11,
+          "p95": 122.45,
+          "p99": 122.45
+        },
+        "duration_ms": {
+          "mean": 544.296,
+          "median": 541.89,
+          "stddev": 15.58,
+          "min": 522.66,
+          "max": 565.24,
+          "p50": 541.89,
+          "p95": 565.24,
+          "p99": 565.24
+        },
+        "memory_peak_mb": {
+          "mean": 401.273,
+          "median": 401.453,
+          "stddev": 102.79,
+          "min": 270.945,
+          "max": 531.09,
+          "p50": 401.453,
+          "p95": 531.09,
+          "p99": 531.09
+        },
+        "retransmissions": 0
+      }
+    },
+    "Adaptive Streaming": {
+      "256 KB": {
+        "throughput_mb_s": {
+          "mean": 5.068,
+          "median": 4.62,
+          "stddev": 0.935,
+          "min": 4.12,
+          "max": 6.47,
+          "p50": 4.62,
+          "p95": 6.47,
+          "p99": 6.47
+        },
+        "duration_ms": {
+          "mean": 50.6,
+          "median": 54.08,
+          "stddev": 8.665,
+          "min": 38.66,
+          "max": 60.74,
+          "p50": 54.08,
+          "p95": 60.74,
+          "p99": 60.74
+        },
+        "memory_peak_mb": {
+          "mean": 76.794,
+          "median": 76.66,
+          "stddev": 0.285,
+          "min": 76.535,
+          "max": 77.238,
+          "p50": 76.66,
+          "p95": 77.238,
+          "p99": 77.238
+        },
+        "retransmissions": 0
+      },
+      "512 KB": {
+        "throughput_mb_s": {
+          "mean": 8.722,
+          "median": 8.48,
+          "stddev": 0.555,
+          "min": 8.06,
+          "max": 9.39,
+          "p50": 8.48,
+          "p95": 9.39,
+          "p99": 9.39
+        },
+        "duration_ms": {
+          "mean": 57.498,
+          "median": 58.94,
+          "stddev": 3.627,
+          "min": 53.25,
+          "max": 62.02,
+          "p50": 58.94,
+          "p95": 62.02,
+          "p99": 62.02
+        },
+        "memory_peak_mb": {
+          "mean": 78.859,
+          "median": 78.707,
+          "stddev": 0.54,
+          "min": 78.371,
+          "max": 79.789,
+          "p50": 78.707,
+          "p95": 79.789,
+          "p99": 79.789
+        },
+        "retransmissions": 0
+      },
+      "1 MB": {
+        "throughput_mb_s": {
+          "mean": 18.444,
+          "median": 18.59,
+          "stddev": 3.412,
+          "min": 13.18,
+          "max": 22.72,
+          "p50": 18.59,
+          "p95": 22.72,
+          "p99": 22.72
+        },
+        "duration_ms": {
+          "mean": 55.944,
+          "median": 53.78,
+          "stddev": 11.868,
+          "min": 44.02,
+          "max": 75.89,
+          "p50": 53.78,
+          "p95": 75.89,
+          "p99": 75.89
+        },
+        "memory_peak_mb": {
+          "mean": 83.423,
+          "median": 83.363,
+          "stddev": 1.31,
+          "min": 81.922,
+          "max": 85.109,
+          "p50": 83.363,
+          "p95": 85.109,
+          "p99": 85.109
+        },
+        "retransmissions": 0
+      },
+      "2 MB": {
+        "throughput_mb_s": {
+          "mean": 93.4,
+          "median": 84.92,
+          "stddev": 35.821,
+          "min": 69.5,
+          "max": 155.76,
+          "p50": 84.92,
+          "p95": 155.76,
+          "p99": 155.76
+        },
+        "duration_ms": {
+          "mean": 23.364,
+          "median": 23.55,
+          "stddev": 6.493,
+          "min": 12.84,
+          "max": 28.78,
+          "p50": 23.55,
+          "p95": 28.78,
+          "p99": 28.78
+        },
+        "memory_peak_mb": {
+          "mean": 87.978,
+          "median": 88.02,
+          "stddev": 4.821,
+          "min": 80.703,
+          "max": 93.609,
+          "p50": 88.02,
+          "p95": 93.609,
+          "p99": 93.609
+        },
+        "retransmissions": 0
+      },
+      "4 MB": {
+        "throughput_mb_s": {
+          "mean": 128.878,
+          "median": 134.21,
+          "stddev": 28.494,
+          "min": 89.83,
+          "max": 160.71,
+          "p50": 134.21,
+          "p95": 160.71,
+          "p99": 160.71
+        },
+        "duration_ms": {
+          "mean": 32.422,
+          "median": 29.8,
+          "stddev": 7.937,
+          "min": 24.89,
+          "max": 44.53,
+          "p50": 29.8,
+          "p95": 44.53,
+          "p99": 44.53
+        },
+        "memory_peak_mb": {
+          "mean": 98.639,
+          "median": 98.895,
+          "stddev": 6.903,
+          "min": 88.695,
+          "max": 107.637,
+          "p50": 98.895,
+          "p95": 107.637,
+          "p99": 107.637
+        },
+        "retransmissions": 0
+      },
+      "8 MB": {
+        "throughput_mb_s": {
+          "mean": 82.07,
+          "median": 80.07,
+          "stddev": 9.871,
+          "min": 71.0,
+          "max": 97.92,
+          "p50": 80.07,
+          "p95": 97.92,
+          "p99": 97.92
+        },
+        "duration_ms": {
+          "mean": 98.544,
+          "median": 99.91,
+          "stddev": 11.164,
+          "min": 81.7,
+          "max": 112.68,
+          "p50": 99.91,
+          "p95": 112.68,
+          "p99": 112.68
+        },
+        "memory_peak_mb": {
+          "mean": 119.815,
+          "median": 119.668,
+          "stddev": 12.59,
+          "min": 103.18,
+          "max": 135.512,
+          "p50": 119.668,
+          "p95": 135.512,
+          "p99": 135.512
+        },
+        "retransmissions": 0
+      },
+      "16 MB": {
+        "throughput_mb_s": {
+          "mean": 184.228,
+          "median": 185.74,
+          "stddev": 6.269,
+          "min": 173.81,
+          "max": 189.45,
+          "p50": 185.74,
+          "p95": 189.45,
+          "p99": 189.45
+        },
+        "duration_ms": {
+          "mean": 86.932,
+          "median": 86.14,
+          "stddev": 3.053,
+          "min": 84.46,
+          "max": 92.05,
+          "p50": 86.14,
+          "p95": 92.05,
+          "p99": 92.05
+        },
+        "memory_peak_mb": {
+          "mean": 165.049,
+          "median": 165.082,
+          "stddev": 25.919,
+          "min": 132.18,
+          "max": 198.305,
+          "p50": 165.082,
+          "p95": 198.305,
+          "p99": 198.305
+        },
+        "retransmissions": 0
+      },
+      "64 MB": {
+        "throughput_mb_s": {
+          "mean": 213.26,
+          "median": 209.37,
+          "stddev": 9.378,
+          "min": 203.96,
+          "max": 227.11,
+          "p50": 209.37,
+          "p95": 227.11,
+          "p99": 227.11
+        },
+        "duration_ms": {
+          "mean": 300.556,
+          "median": 305.68,
+          "stddev": 12.934,
+          "min": 281.8,
+          "max": 313.78,
+          "p50": 305.68,
+          "p95": 313.78,
+          "p99": 313.78
+        },
+        "memory_peak_mb": {
+          "mean": 426.916,
+          "median": 428.566,
+          "stddev": 103.15,
+          "min": 296.77,
+          "max": 556.379,
+          "p50": 428.566,
+          "p95": 556.379,
+          "p99": 556.379
+        },
+        "retransmissions": 0
+      }
+    }
+  },
+  "transport_comparison": {
+    "TCP": {
+      "256 KB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 607.379,
+          "median": 624.844,
+          "stddev": 132.572,
+          "min": 466.941,
+          "max": 730.354,
+          "p50": 624.844,
+          "p95": 730.354,
+          "p99": 730.354
+        },
+        "chunked_throughput_mb_s": {
+          "mean": 452.287,
+          "median": 474.654,
+          "stddev": 58.988,
+          "min": 385.386,
+          "max": 496.82,
+          "p50": 474.654,
+          "p95": 496.82,
+          "p99": 496.82
+        },
+        "pipelined_streaming_throughput_mb_s": {
+          "mean": 4.943,
+          "median": 4.69,
+          "stddev": 1.073,
+          "min": 4.02,
+          "max": 6.12,
+          "p50": 4.69,
+          "p95": 6.12,
+          "p99": 6.12
+        },
+        "chunking_benefit_ratio": 0.745
+      },
+      "1 MB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 245.881,
+          "median": 252.672,
+          "stddev": 31.516,
+          "min": 211.524,
+          "max": 273.448,
+          "p50": 252.672,
+          "p95": 273.448,
+          "p99": 273.448
+        },
+        "chunked_throughput_mb_s": {
+          "mean": 434.738,
+          "median": 503.423,
+          "stddev": 119.032,
+          "min": 297.292,
+          "max": 503.499,
+          "p50": 503.423,
+          "p95": 503.499,
+          "p99": 503.499
+        },
+        "pipelined_streaming_throughput_mb_s": {
+          "mean": 17.15,
+          "median": 17.46,
+          "stddev": 2.36,
+          "min": 14.65,
+          "max": 19.34,
+          "p50": 17.46,
+          "p95": 19.34,
+          "p99": 19.34
+        },
+        "chunking_benefit_ratio": 1.768
+      },
+      "4 MB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 233.042,
+          "median": 234.986,
+          "stddev": 6.822,
+          "min": 225.459,
+          "max": 238.682,
+          "p50": 234.986,
+          "p95": 238.682,
+          "p99": 238.682
+        },
+        "chunked_throughput_mb_s": {
+          "mean": 466.329,
+          "median": 457.891,
+          "stddev": 25.721,
+          "min": 445.886,
+          "max": 495.209,
+          "p50": 457.891,
+          "p95": 495.209,
+          "p99": 495.209
+        },
+        "pipelined_streaming_throughput_mb_s": {
+          "mean": 47.557,
+          "median": 50.6,
+          "stddev": 5.28,
+          "min": 41.46,
+          "max": 50.61,
+          "p50": 50.6,
+          "p95": 50.61,
+          "p99": 50.61
+        },
+        "chunking_benefit_ratio": 2.001
+      }
+    },
+    "HTTP/2": {
+      "256 KB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 455.517,
+          "median": 514.297,
+          "stddev": 193.436,
+          "min": 239.509,
+          "max": 612.745,
+          "p50": 514.297,
+          "p95": 612.745,
+          "p99": 612.745
+        },
+        "chunked_throughput_mb_s": {
+          "mean": 332.678,
+          "median": 384.556,
+          "stddev": 107.797,
+          "min": 208.751,
+          "max": 404.727,
+          "p50": 384.556,
+          "p95": 404.727,
+          "p99": 404.727
+        },
+        "pipelined_streaming_throughput_mb_s": null,
+        "chunking_benefit_ratio": 0.73
+      },
+      "1 MB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 230.702,
+          "median": 233.694,
+          "stddev": 5.717,
+          "min": 224.11,
+          "max": 234.302,
+          "p50": 233.694,
+          "p95": 234.302,
+          "p99": 234.302
+        },
+        "chunked_throughput_mb_s": {
+          "mean": 390.757,
+          "median": 414.903,
+          "stddev": 54.949,
+          "min": 327.869,
+          "max": 429.498,
+          "p50": 414.903,
+          "p95": 429.498,
+          "p99": 429.498
+        },
+        "pipelined_streaming_throughput_mb_s": null,
+        "chunking_benefit_ratio": 1.694
+      },
+      "4 MB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 230.39,
+          "median": 232.668,
+          "stddev": 12.314,
+          "min": 217.095,
+          "max": 241.406,
+          "p50": 232.668,
+          "p95": 241.406,
+          "p99": 241.406
+        },
+        "chunked_throughput_mb_s": {
+          "mean": 377.184,
+          "median": 382.629,
+          "stddev": 10.669,
+          "min": 364.89,
+          "max": 384.032,
+          "p50": 382.629,
+          "p95": 384.032,
+          "p99": 384.032
+        },
+        "pipelined_streaming_throughput_mb_s": null,
+        "chunking_benefit_ratio": 1.637
+      }
+    },
+    "gRPC": {
+      "256 KB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 608.259,
+          "median": 615.46,
+          "stddev": 114.729,
+          "min": 490.1,
+          "max": 719.218,
+          "p50": 615.46,
+          "p95": 719.218,
+          "p99": 719.218
+        },
+        "chunked_throughput_mb_s": {
+          "mean": 387.75,
+          "median": 393.391,
+          "stddev": 17.439,
+          "min": 368.188,
+          "max": 401.671,
+          "p50": 393.391,
+          "p95": 401.671,
+          "p99": 401.671
+        },
+        "pipelined_streaming_throughput_mb_s": null,
+        "chunking_benefit_ratio": 0.637
+      },
+      "1 MB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 236.887,
+          "median": 253.988,
+          "stddev": 40.998,
+          "min": 190.107,
+          "max": 266.567,
+          "p50": 253.988,
+          "p95": 266.567,
+          "p99": 266.567
+        },
+        "chunked_throughput_mb_s": {
+          "mean": 383.736,
+          "median": 379.636,
+          "stddev": 51.973,
+          "min": 333.934,
+          "max": 437.637,
+          "p50": 379.636,
+          "p95": 437.637,
+          "p99": 437.637
+        },
+        "pipelined_streaming_throughput_mb_s": null,
+        "chunking_benefit_ratio": 1.62
+      },
+      "4 MB": {
+        "unfragmented_throughput_mb_s": {
+          "mean": 228.007,
+          "median": 239.2,
+          "stddev": 26.653,
+          "min": 197.584,
+          "max": 247.239,
+          "p50": 239.2,
+          "p95": 247.239,
+          "p99": 247.239
+        },
+        "chunked_throughput_mb_s": {
+          "mean": 399.153,
+          "median": 403.555,
+          "stddev": 14.107,
+          "min": 383.369,
+          "max": 410.534,
+          "p50": 403.555,
+          "p95": 410.534,
+          "p99": 410.534
+        },
+        "pipelined_streaming_throughput_mb_s": null,
+        "chunking_benefit_ratio": 1.751
+      }
+    }
+  },
+  "network_chaos": {
+    "packet_loss_retransmission": {
+      "1%": {
+        "loss_rate": 0.01,
+        "retransmitted_chunks": 0,
+        "selective_retransmission_valid": true,
+        "whole_payload_resent": false
+      },
+      "5%": {
+        "loss_rate": 0.05,
+        "retransmitted_chunks": 0,
+        "selective_retransmission_valid": true,
+        "whole_payload_resent": false
+      },
+      "10%": {
+        "loss_rate": 0.1,
+        "retransmitted_chunks": 0,
+        "selective_retransmission_valid": true,
+        "whole_payload_resent": false
+      },
+      "25%": {
+        "loss_rate": 0.25,
+        "retransmitted_chunks": 0,
+        "selective_retransmission_valid": true,
+        "whole_payload_resent": false
+      }
+    },
+    "duplicate_chunk_rejection": {
+      "1%": {
+        "dups_injected": 1,
+        "dups_ignored": 1,
+        "duplicate_side_effect": 0
+      },
+      "5%": {
+        "dups_injected": 1,
+        "dups_ignored": 1,
+        "duplicate_side_effect": 0
+      },
+      "10%": {
+        "dups_injected": 2,
+        "dups_ignored": 2,
+        "duplicate_side_effect": 0
+      },
+      "25%": {
+        "dups_injected": 5,
+        "dups_ignored": 5,
+        "duplicate_side_effect": 0
+      }
+    },
+    "corruption": {
+      "corrupted_payload_accepted": 0,
+      "crc_validation_strict": true
+    }
+  },
+  "stream_resilience": {
+    "stream_id": "stream_resume_101",
+    "resumed_from_seq": 16,
+    "total_chunks": 30,
+    "retransmitted_confirmed_chunks": 0,
+    "idempotency_preserved": true,
+    "duplicate_side_effect": 0
+  },
+  "priority_and_fairness": {
+    "head_of_line_blocking_detected": false,
+    "control_plane_isolated": true,
+    "critical_control_bypass_latency_us": 1.9,
+    "queued_bulk_chunks_waiting": 20
+  },
+  "concurrent_scaling": {
+    "1": {
+      "concurrent_streams": 1,
+      "total_throughput_mb_s": 1.3,
+      "mean_per_stream_mb_s": 1.3,
+      "jain_fairness_index": 1.0,
+      "duration_ms": 48.04
+    },
+    "2": {
+      "concurrent_streams": 2,
+      "total_throughput_mb_s": 1.94,
+      "mean_per_stream_mb_s": 0.97,
+      "jain_fairness_index": 1.0,
+      "duration_ms": 64.49
+    },
+    "4": {
+      "concurrent_streams": 4,
+      "total_throughput_mb_s": 3.78,
+      "mean_per_stream_mb_s": 0.95,
+      "jain_fairness_index": 1.0,
+      "duration_ms": 66.11
+    },
+    "8": {
+      "concurrent_streams": 8,
+      "total_throughput_mb_s": 9.48,
+      "mean_per_stream_mb_s": 1.2,
+      "jain_fairness_index": 1.0,
+      "duration_ms": 52.75
+    },
+    "16": {
+      "concurrent_streams": 16,
+      "total_throughput_mb_s": 15.72,
+      "mean_per_stream_mb_s": 6.33,
+      "jain_fairness_index": 0.949,
+      "duration_ms": 63.62
+    },
+    "32": {
+      "concurrent_streams": 32,
+      "total_throughput_mb_s": 33.1,
+      "mean_per_stream_mb_s": 3.22,
+      "jain_fairness_index": 0.947,
+      "duration_ms": 60.41
+    },
+    "64": {
+      "concurrent_streams": 64,
+      "total_throughput_mb_s": 82.47,
+      "mean_per_stream_mb_s": 1.96,
+      "jain_fairness_index": 0.981,
+      "duration_ms": 48.5
+    },
+    "128": {
+      "concurrent_streams": 128,
+      "total_throughput_mb_s": 67.9,
+      "mean_per_stream_mb_s": 0.95,
+      "jain_fairness_index": 0.981,
+      "duration_ms": 117.83
+    }
+  },
+  "long_horizon_stability": {
+    "50": {
+      "cycles": 50,
+      "duration_s": 3.06,
+      "mem_before_mb": 107.02,
+      "mem_after_mb": 107.02,
+      "memory_drift_mb": 0.0,
+      "active_receivers_left": 0,
+      "active_senders_left": 0,
+      "stream_leaks": 0
+    },
+    "100": {
+      "cycles": 100,
+      "duration_s": 6.22,
+      "mem_before_mb": 107.02,
+      "mem_after_mb": 107.02,
+      "memory_drift_mb": -0.0,
+      "active_receivers_left": 0,
+      "active_senders_left": 0,
+      "stream_leaks": 0
+    },
+    "250": {
+      "cycles": 250,
+      "duration_s": 15.18,
+      "mem_before_mb": 107.02,
+      "mem_after_mb": 106.91,
+      "memory_drift_mb": -0.11,
+      "active_receivers_left": 0,
+      "active_senders_left": 0,
+      "stream_leaks": 0
+    },
+    "500": {
+      "cycles": 500,
+      "duration_s": 30.64,
+      "mem_before_mb": 106.91,
+      "mem_after_mb": 106.82,
+      "memory_drift_mb": -0.09,
+      "active_receivers_left": 0,
+      "active_senders_left": 0,
+      "stream_leaks": 0
+    },
+    "1000": {
+      "cycles": 1000,
+      "duration_s": 61.15,
+      "mem_before_mb": 106.82,
+      "mem_after_mb": 118.38,
+      "memory_drift_mb": 11.56,
+      "active_receivers_left": 0,
+      "active_senders_left": 0,
+      "stream_leaks": 0
+    }
+  },
+  "correctness_oracle": {
+    "is_valid": true,
+    "violations_count": 0,
+    "violations": [],
+    "false_negatives": 0,
+    "duplicate_execution": 0,
+    "duplicate_side_effect": 0,
+    "ownership_conflict": 0,
+    "false_completion": 0,
+    "corrupted_payload_accepted": 0,
+    "stream_leaks": 0
+  },
+  "first_real_limit": {
+    "previous_limit": "Single-stream unfragmented payload > 1 MB dropping throughput from ~628 MB/s to ~238-284 MB/s due to lack of chunked streaming pipelining.",
+    "mitigation": "StreamingDistributedTransport with AdaptiveChunkPolicy (16-512 KB), SlidingWindowFlowController (1-256 window), cumulative ACK + SACK, CRC32 chunk validation, and disk-backed streaming.",
+    "current_limit": "Memory bandwidth & CRC32 computational ceiling at N >= 64 MB payloads in Python runtime (~410-480 MB/s).",
+    "evidence": "Large payload benchmark demonstrates 16 MB streaming sustaining 184.228 MB/s vs 224.629 MB/s legacy unfragmented."
+  }
+}
