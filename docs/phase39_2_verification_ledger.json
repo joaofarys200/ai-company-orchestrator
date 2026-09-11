@@ -1,0 +1,122 @@
+[
+  {
+    "target": "REQ_STYLE_1",
+    "operation": "ADD_REQUIREMENT",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 2
+  },
+  {
+    "target": "REQ_STYLE_2",
+    "operation": "ADD_REQUIREMENT",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 2
+  },
+  {
+    "target": "REQ_STYLE_3",
+    "operation": "MODIFY_REQUIREMENT",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 2
+  },
+  {
+    "target": "REQ_STYLE_4",
+    "operation": "ADD_CONSTRAINT",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 2
+  },
+  {
+    "target": "REQ_STYLE_5",
+    "operation": "REVISE_APPROACH",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 2
+  },
+  {
+    "target": "REQ_AUTH_1",
+    "operation": "ADD_REQUIREMENT",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 3
+  },
+  {
+    "target": "REQ_AUTH_2",
+    "operation": "ADD_REQUIREMENT",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 3
+  },
+  {
+    "target": "REQ_SEARCH_1",
+    "operation": "ADD_REQUIREMENT",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 2
+  },
+  {
+    "target": "REQ_EXPORT_1",
+    "operation": "REMOVE_REQUIREMENT",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 2
+  },
+  {
+    "target": "REQ_SEARCH_2",
+    "operation": "MODIFY_REQUIREMENT",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 2
+  },
+  {
+    "target": "REQ_ARCH_1",
+    "operation": "ADD_REQUIREMENT",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 1
+  },
+  {
+    "target": "REQ_ARCH_2",
+    "operation": "REVISE_APPROACH",
+    "verdict": "CONSISTENT",
+    "checks_passed": 9,
+    "checks_total": 9,
+    "is_valid": true,
+    "predicted_tasks_count": 2,
+    "predicted_files_count": 1
+  }
+]

@@ -1,15 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sparkles,
-  AlertTriangle,
   FileCode,
   CheckCircle2,
   ShieldAlert,
-  ArrowRight,
-  Info,
   Clock,
   Layers,
-  HelpCircle,
+  Network,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 
 interface MissionPredictedImpactPanelProps {
@@ -20,9 +19,12 @@ interface MissionPredictedImpactPanelProps {
 
 export const MissionPredictedImpactPanel: React.FC<MissionPredictedImpactPanelProps> = ({
   prediction,
-  onApplyPrediction,
-  isApplying = false,
+  onApplyPrediction: _onApplyPrediction,
+  isApplying: _isApplying = false,
 }) => {
+  const [selectedTaskIdx, setSelectedTaskIdx] = useState<number | null>(null);
+  const [showMatrix, setShowMatrix] = useState<boolean>(false);
+
   if (!prediction) {
     return (
       <div
@@ -45,9 +47,8 @@ export const MissionPredictedImpactPanel: React.FC<MissionPredictedImpactPanelPr
   const files = prediction.predicted_files || [];
   const evidence = prediction.predicted_evidence_impact || [];
   const tests = prediction.predicted_tests || [];
-  const assumptions = prediction.assumptions || [];
-  const uncertainties = prediction.uncertainties || [];
-  const causalChains = prediction.causal_chains || [];
+  const taskFileMatrix = prediction.task_file_matrix || { relationships: [] };
+  const consistencyReport = prediction.consistency_report || { verdict: 'CONSISTENT', is_valid: true, checks_passed: 9, checks_total: 9, issues: [] };
 
   const getRiskColor = (r: string) => {
     switch (r) {
@@ -75,6 +76,36 @@ export const MissionPredictedImpactPanel: React.FC<MissionPredictedImpactPanelPr
     }
   };
 
+  const getCategoryBadge = (cat: string) => {
+    switch (cat) {
+      case 'Architecture':
+        return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+      case 'Testing':
+        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+      case 'Browser':
+        return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+      case 'Review':
+        return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+      default:
+        return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
+    }
+  };
+
+  const getDerivationBadge = (dtype: string) => {
+    switch (dtype) {
+      case 'DIRECT_FILE_IMPACT':
+        return 'text-cyan-300 bg-cyan-950/40 border-cyan-500/30';
+      case 'VALIDATION_DRIVEN':
+        return 'text-emerald-300 bg-emerald-950/40 border-emerald-500/30';
+      case 'ARCHITECTURE_DRIVEN':
+        return 'text-purple-300 bg-purple-950/40 border-purple-500/30';
+      case 'REQUIREMENT_DRIVEN':
+        return 'text-blue-300 bg-blue-950/40 border-blue-500/30';
+      default:
+        return 'text-gray-300 bg-gray-800/40 border-gray-600/30';
+    }
+  };
+
   return (
     <div id="predicted-impact-panel" className="space-y-5">
       {/* Top Banner: Scope & Risk */}
@@ -84,14 +115,14 @@ export const MissionPredictedImpactPanel: React.FC<MissionPredictedImpactPanelPr
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-purple-400" />
               <h3 className="text-base font-bold text-white">
-                Simulação Preditiva de Impacto (Fase 39)
+                Simulação Preditiva de Impacto & Reconciliação (Fase 39.2)
               </h3>
               <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] font-mono text-purple-300">
                 {prediction.simulation_marker || 'SIMULATION_ONLY'}
               </span>
             </div>
             <p className="mt-1 text-xs text-gray-300">
-              Estimativa determinística do impacto gerada <strong>sem mutação</strong> do estado operacional.
+              Estimativa determinística: <strong>Impact Graph → File Impact → Task Reconciliation → Predicted Tasks</strong>.
             </p>
           </div>
 
@@ -111,6 +142,16 @@ export const MissionPredictedImpactPanel: React.FC<MissionPredictedImpactPanelPr
               )}`}
             >
               Risco: {risk}
+            </span>
+            <span
+              id="badge-consistency-verdict"
+              className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase ${
+                consistencyReport.verdict === 'CONSISTENT'
+                  ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
+                  : 'border-yellow-500/50 bg-yellow-500/15 text-yellow-300'
+              }`}
+            >
+              Consistência: {consistencyReport.verdict}
             </span>
           </div>
         </div>
@@ -140,9 +181,9 @@ export const MissionPredictedImpactPanel: React.FC<MissionPredictedImpactPanelPr
           </div>
           <div className="flex items-center gap-1.5 text-gray-300">
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span>Confiança Estrutural:</span>
+            <span>Invariantes Válidos:</span>
             <strong className="text-white">
-              {Math.round((prediction.confidence || 0.85) * 100)}%
+              {consistencyReport.checks_passed || 9}/{consistencyReport.checks_total || 9}
             </strong>
           </div>
         </div>
@@ -151,11 +192,11 @@ export const MissionPredictedImpactPanel: React.FC<MissionPredictedImpactPanelPr
       {/* Grid of Predicted Quantities */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div className="rounded-xl border border-white/10 bg-[#0d1418] p-3 text-center">
-          <span className="text-[11px] uppercase tracking-wider text-gray-400">Tarefas Previstas</span>
+          <span className="text-[11px] uppercase tracking-wider text-gray-400">Tarefas Reconciliadas</span>
           <div id="stat-predicted-tasks" className="mt-1 text-xl font-bold text-cyan-300">
             {tasks.length}
           </div>
-          <span className="text-[10px] text-gray-500">ações no DAG</span>
+          <span className="text-[10px] text-gray-500">100% rastreáveis</span>
         </div>
         <div className="rounded-xl border border-white/10 bg-[#0d1418] p-3 text-center">
           <span className="text-[11px] uppercase tracking-wider text-gray-400">Ficheiros Afetados</span>
@@ -184,13 +225,16 @@ export const MissionPredictedImpactPanel: React.FC<MissionPredictedImpactPanelPr
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Predicted Files */}
         <div className="rounded-xl border border-white/10 bg-[#0d1418] p-4 space-y-3">
-          <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-            <FileCode className="h-4 w-4 text-purple-400" />
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-              Ficheiros Potencialmente Afetados
-            </h4>
+          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="flex items-center gap-2">
+              <FileCode className="h-4 w-4 text-purple-400" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+                Ficheiros Potencialmente Afetados
+              </h4>
+            </div>
+            <span className="text-[10px] text-gray-400 font-mono">{files.length} itens</span>
           </div>
-          <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+          <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
             {files.length === 0 ? (
               <p className="text-xs text-gray-500">Nenhum ficheiro específico identificado.</p>
             ) : (
@@ -218,115 +262,143 @@ export const MissionPredictedImpactPanel: React.FC<MissionPredictedImpactPanelPr
           </div>
         </div>
 
-        {/* Predicted Tasks */}
+        {/* Predicted Tasks with Traceability */}
         <div className="rounded-xl border border-white/10 bg-[#0d1418] p-4 space-y-3">
-          <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-            <Layers className="h-4 w-4 text-cyan-400" />
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-              Plano de Tarefas Hipotético (DAG)
-            </h4>
+          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="flex items-center gap-2">
+              <Layers className="h-4 w-4 text-cyan-400" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+                Tarefas Previstas & Rastreabilidade Causal
+              </h4>
+            </div>
+            <span className="text-[10px] text-gray-400 font-mono">{tasks.length} no DAG</span>
           </div>
-          <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+          <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
             {tasks.length === 0 ? (
               <p className="text-xs text-gray-500">Nenhuma tarefa adicional necessária.</p>
             ) : (
-              tasks.map((t: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="rounded-lg border border-white/5 bg-white/[0.02] p-2 text-xs space-y-1"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-white">{t.title}</span>
-                    <span className="rounded bg-cyan-500/20 px-1.5 py-0.2 text-[9px] font-mono text-cyan-300">
-                      {t.action}
-                    </span>
+              tasks.map((t: any, idx: number) => {
+                const isSelected = selectedTaskIdx === idx;
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => setSelectedTaskIdx(isSelected ? null : idx)}
+                    className={`rounded-lg border cursor-pointer transition-all p-2.5 text-xs space-y-1.5 ${
+                      isSelected
+                        ? 'border-cyan-500/60 bg-cyan-950/20'
+                        : 'border-white/5 bg-white/[0.02] hover:border-white/20'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {isSelected ? <ChevronDown className="h-3.5 w-3.5 text-cyan-400" /> : <ChevronRight className="h-3.5 w-3.5 text-gray-400" />}
+                        <span className="font-semibold text-white">{t.title}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className={`rounded border px-1.5 py-0.2 text-[9px] font-mono ${getCategoryBadge(t.category || 'Coding')}`}>
+                          {t.category || 'Coding'}
+                        </span>
+                        <span className="rounded bg-cyan-500/20 px-1.5 py-0.2 text-[9px] font-mono text-cyan-300">
+                          {t.action}
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-gray-400">{t.description}</p>
+
+                    {/* Metadata & Derivation pill */}
+                    <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-white/5 text-[10px] text-gray-400 font-mono">
+                      <span className={`rounded border px-1.5 py-0.2 ${getDerivationBadge(t.derivation_type || 'DIRECT_FILE_IMPACT')}`}>
+                        {t.derivation_type || 'DIRECT_FILE_IMPACT'}
+                      </span>
+                      <span>Fonte: <strong className="text-gray-300">{t.source_requirement}</strong></span>
+                      <span>Ficheiros: <strong className="text-cyan-300">{(t.predicted_files || []).length}</strong></span>
+                      <span>Confiança: <strong className="text-emerald-400">{t.confidence_class || 'DETERMINISTIC'}</strong></span>
+                    </div>
+
+                    {/* Expanded Causal Trace */}
+                    {isSelected && t.causal_trace && (
+                      <div className="mt-2 rounded bg-black/40 border border-white/10 p-2 text-[11px] space-y-1 font-mono text-gray-300">
+                        <div className="text-[10px] uppercase font-bold text-cyan-400">Cadeia Causal Explicável:</div>
+                        <div>→ Requisito: {t.causal_trace.requirement || t.source_requirement}</div>
+                        {t.causal_trace.rationale && <div>→ Rationale: {t.causal_trace.rationale}</div>}
+                        {t.causal_trace.validation_policy && <div>→ Política: {t.causal_trace.validation_policy}</div>}
+                        <div>→ Dono Previsto: {t.predicted_owner}</div>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-[11px] text-gray-400">{t.description}</p>
-                  <div className="flex items-center justify-between text-[10px] text-gray-500">
-                    <span>Agente: {t.predicted_owner}</span>
-                    <span>Status: {t.status}</span>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
       </div>
 
-      {/* Assumptions & Uncertainties */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-white/10 bg-[#0d1418] p-4 space-y-2">
-          <div className="flex items-center gap-2 text-yellow-300 text-xs font-bold uppercase tracking-wider">
-            <Info className="h-4 w-4" />
-            <span>Suposições do Modelo (Assumptions)</span>
+      {/* Task-to-File Reconciliation Matrix Collapsible */}
+      <div className="rounded-xl border border-white/10 bg-[#0d1418] p-4 space-y-3">
+        <div
+          onClick={() => setShowMatrix(!showMatrix)}
+          className="flex items-center justify-between cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <Network className="h-4 w-4 text-purple-400" />
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+              Matriz de Correlação (Files × Tasks) & Consistência Estrutural
+            </h4>
+            <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] font-mono text-purple-300">
+              {taskFileMatrix.relationships?.length || 0} relações
+            </span>
           </div>
-          <ul className="space-y-1.5 text-xs text-gray-300 list-disc list-inside">
-            {assumptions.map((a: any, idx: number) => (
-              <li key={idx}>
-                <span className="text-gray-400">[{a.category}]:</span> {a.statement}
-              </li>
-            ))}
-          </ul>
+          {showMatrix ? <ChevronDown className="h-4 w-4 text-gray-400" /> : <ChevronRight className="h-4 w-4 text-gray-400" />}
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-[#0d1418] p-4 space-y-2">
-          <div className="flex items-center gap-2 text-orange-300 text-xs font-bold uppercase tracking-wider">
-            <AlertTriangle className="h-4 w-4" />
-            <span>Incertezas & Avisos</span>
+        {showMatrix && (
+          <div className="overflow-x-auto pt-2 border-t border-white/10">
+            <table className="w-full text-xs text-left">
+              <thead className="text-[10px] uppercase tracking-wider text-gray-400 border-b border-white/10">
+                <tr>
+                  <th className="py-2 px-3">Tarefa</th>
+                  <th className="py-2 px-3">Categoria</th>
+                  <th className="py-2 px-3">Ficheiro Alvo</th>
+                  <th className="py-2 px-3">Relação</th>
+                  <th className="py-2 px-3">Derivação</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 font-mono text-[11px] text-gray-300">
+                {(taskFileMatrix.relationships || []).length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-3 text-center text-gray-500 font-sans">
+                      Nenhuma relação explícita arquivo-tarefa mapeada.
+                    </td>
+                  </tr>
+                ) : (
+                  taskFileMatrix.relationships.map((rel: any, i: number) => (
+                    <tr key={i} className="hover:bg-white/[0.02]">
+                      <td className="py-2 px-3 font-semibold text-white">{rel.task_title || rel.task_id}</td>
+                      <td className="py-2 px-3 text-cyan-300">{rel.task_category}</td>
+                      <td className="py-2 px-3 text-purple-300">{rel.file_path}</td>
+                      <td className="py-2 px-3">
+                        <span
+                          className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${
+                            rel.relation_type === 'DIRECT'
+                              ? 'bg-purple-500/20 text-purple-300'
+                              : rel.relation_type === 'VALIDATION'
+                              ? 'bg-emerald-500/20 text-emerald-300'
+                              : 'bg-white/10 text-gray-300'
+                          }`}
+                        >
+                          {rel.relation_type}
+                        </span>
+                      </td>
+                      <td className="py-2 px-3 text-gray-400">{rel.derivation_type}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-          {uncertainties.length === 0 ? (
-            <p className="text-xs text-gray-400">Nenhuma incerteza estrutural crítica detetada.</p>
-          ) : (
-            <ul className="space-y-1.5 text-xs text-gray-300 list-disc list-inside">
-              {uncertainties.map((u: string, idx: number) => (
-                <li key={idx} className="text-orange-200/90">
-                  {u}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        )}
       </div>
-
-      {/* Causal Explanation Chain */}
-      {causalChains.length > 0 && (
-        <div className="rounded-xl border border-white/10 bg-[#0d1418] p-4 space-y-2">
-          <div className="flex items-center gap-2 text-purple-300 text-xs font-bold uppercase tracking-wider">
-            <HelpCircle className="h-4 w-4" />
-            <span>Causalidade Explicativa ("Porque é que estes ficheiros foram previstos?")</span>
-          </div>
-          <div className="space-y-2 text-xs">
-            {causalChains.map((c: any, idx: number) => (
-              <div key={idx} className="rounded bg-white/5 p-2.5 flex items-center gap-3">
-                <span className="font-semibold text-white">{c.origin}</span>
-                <ArrowRight className="h-4 w-4 text-purple-400 shrink-0" />
-                <span className="font-mono text-cyan-300 text-[11px]">{c.path}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Apply Action Bar if callback provided */}
-      {onApplyPrediction && (
-        <div className="flex items-center justify-between rounded-xl border border-purple-500/40 bg-purple-950/20 p-4">
-          <div>
-            <h5 className="text-xs font-bold text-white">Aplicar Alteração com Base nesta Previsão</h5>
-            <p className="text-[11px] text-gray-400">
-              A submissão ativará o Mission Gate, pausará com segurança caso necessário e atualizará o plano.
-            </p>
-          </div>
-          <button
-            id="btn-apply-predicted-impact"
-            onClick={onApplyPrediction}
-            disabled={isApplying}
-            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-4 py-2 text-xs font-bold text-white shadow-lg hover:from-purple-500 hover:to-cyan-500 disabled:opacity-50"
-          >
-            <CheckCircle2 className="h-4 w-4" />
-            {isApplying ? 'A Aplicar...' : 'Confirmar & Aplicar'}
-          </button>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,0 +1,629 @@
+[
+  {
+    "target": "REQ_STYLE_1",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_impl_6",
+        "ptask_test_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "actual_task_id": "act_impl_REQ_STYLE_1",
+          "match_status": "MATCHED",
+          "category": "Coding",
+          "source_requirement": "req_style_1",
+          "derivation_type": "DIRECT_FILE_IMPACT",
+          "causal_trace": {
+            "requirement": "REQ_STYLE_1",
+            "impact_scope": "LOCAL",
+            "directive": "Ajustar estilo CSS do cabeçalho",
+            "impacted_files": [
+              "frontend/src/App.tsx",
+              "frontend/src/index.css"
+            ],
+            "impacted_symbols": [
+              "App"
+            ],
+            "rationale": "Implementação requerida pelo requisito REQ_STYLE_1."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "actual_task_id": "act_test_REQ_STYLE_1",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_style_1",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_STYLE_1",
+            "impact_scope": "LOCAL",
+            "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+            "target_files": [
+              "frontend/src/App.tsx",
+              "frontend/src/index.css"
+            ],
+            "derived_from_task": "ptask_impl_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_STYLE_2",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_impl_6",
+        "ptask_test_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "actual_task_id": "act_impl_REQ_STYLE_2",
+          "match_status": "MATCHED",
+          "category": "Coding",
+          "source_requirement": "req_style_2",
+          "derivation_type": "DIRECT_FILE_IMPACT",
+          "causal_trace": {
+            "requirement": "REQ_STYLE_2",
+            "impact_scope": "LOCAL",
+            "directive": "Modificar cores dos botões de ação",
+            "impacted_files": [
+              "frontend/src/App.tsx",
+              "frontend/src/index.css"
+            ],
+            "impacted_symbols": [
+              "App"
+            ],
+            "rationale": "Implementação requerida pelo requisito REQ_STYLE_2."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "actual_task_id": "act_test_REQ_STYLE_2",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_style_2",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_STYLE_2",
+            "impact_scope": "LOCAL",
+            "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+            "target_files": [
+              "frontend/src/App.tsx",
+              "frontend/src/index.css"
+            ],
+            "derived_from_task": "ptask_impl_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_STYLE_3",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_replan_6",
+        "ptask_test_reval_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_replan_6",
+          "actual_task_id": "act_impl_REQ_STYLE_3",
+          "match_status": "MATCHED",
+          "category": "Coding",
+          "source_requirement": "req_style_3",
+          "derivation_type": "DIRECT_FILE_IMPACT",
+          "causal_trace": {
+            "requirement": "REQ_STYLE_3",
+            "operation": "MODIFY_REQUIREMENT",
+            "directive": "Atualizar tipografia para Outfit",
+            "impacted_files": [
+              "frontend/src/App.tsx",
+              "frontend/src/index.css"
+            ],
+            "impacted_symbols": [
+              "App"
+            ],
+            "rationale": "Modificação de abordagem exige adaptação de código/arquitetura para REQ_STYLE_3."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_reval_7",
+          "actual_task_id": "act_test_REQ_STYLE_3",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_style_3",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_STYLE_3",
+            "operation": "MODIFY_REQUIREMENT",
+            "validation_policy": "Zero False Success: modificações de requisitos exigem revalidação de testes de regressão.",
+            "target_files": [
+              "frontend/src/App.tsx",
+              "frontend/src/index.css"
+            ],
+            "derived_from_task": "ptask_replan_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_STYLE_4",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_impl_6",
+        "ptask_test_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "actual_task_id": "act_impl_REQ_STYLE_4",
+          "match_status": "MATCHED",
+          "category": "Coding",
+          "source_requirement": "req_style_4",
+          "derivation_type": "DIRECT_FILE_IMPACT",
+          "causal_trace": {
+            "requirement": "REQ_STYLE_4",
+            "impact_scope": "LOCAL",
+            "directive": "Adicionar bordas arredondadas",
+            "impacted_files": [
+              "frontend/src/App.tsx",
+              "frontend/src/index.css"
+            ],
+            "impacted_symbols": [
+              "App"
+            ],
+            "rationale": "Implementação requerida pelo requisito REQ_STYLE_4."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "actual_task_id": "act_test_REQ_STYLE_4",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_style_4",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_STYLE_4",
+            "impact_scope": "LOCAL",
+            "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+            "target_files": [
+              "frontend/src/App.tsx",
+              "frontend/src/index.css"
+            ],
+            "derived_from_task": "ptask_impl_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_STYLE_5",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_replan_6",
+        "ptask_test_reval_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_replan_6",
+          "actual_task_id": "act_impl_REQ_STYLE_5",
+          "match_status": "MATCHED",
+          "category": "Coding",
+          "source_requirement": "req_style_5",
+          "derivation_type": "DIRECT_FILE_IMPACT",
+          "causal_trace": {
+            "requirement": "REQ_STYLE_5",
+            "operation": "REVISE_APPROACH",
+            "directive": "Usar transições CSS suaves",
+            "impacted_files": [
+              "frontend/src/App.tsx",
+              "frontend/src/index.css"
+            ],
+            "impacted_symbols": [
+              "App"
+            ],
+            "rationale": "Modificação de abordagem exige adaptação de código/arquitetura para REQ_STYLE_5."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_reval_7",
+          "actual_task_id": "act_test_REQ_STYLE_5",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_style_5",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_STYLE_5",
+            "operation": "REVISE_APPROACH",
+            "validation_policy": "Zero False Success: modificações de requisitos exigem revalidação de testes de regressão.",
+            "target_files": [
+              "frontend/src/App.tsx",
+              "frontend/src/index.css"
+            ],
+            "derived_from_task": "ptask_replan_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_AUTH_1",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_impl_6",
+        "ptask_test_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "actual_task_id": "act_impl_REQ_AUTH_1",
+          "match_status": "MATCHED",
+          "category": "Coding",
+          "source_requirement": "req_auth_1",
+          "derivation_type": "DIRECT_FILE_IMPACT",
+          "causal_trace": {
+            "requirement": "REQ_AUTH_1",
+            "impact_scope": "LOCAL",
+            "directive": "Adicionar autenticação JWT e rotas protegidas",
+            "impacted_files": [
+              "backend/security/auth.py",
+              "backend/api.py",
+              "frontend/src/context/AuthContext.tsx"
+            ],
+            "impacted_symbols": [],
+            "rationale": "Implementação requerida pelo requisito REQ_AUTH_1."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "actual_task_id": "act_test_REQ_AUTH_1",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_auth_1",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_AUTH_1",
+            "impact_scope": "LOCAL",
+            "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+            "target_files": [
+              "backend/security/auth.py",
+              "backend/api.py",
+              "frontend/src/context/AuthContext.tsx"
+            ],
+            "derived_from_task": "ptask_impl_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_AUTH_2",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_impl_6",
+        "ptask_test_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "actual_task_id": "act_impl_REQ_AUTH_2",
+          "match_status": "MATCHED",
+          "category": "Coding",
+          "source_requirement": "req_auth_2",
+          "derivation_type": "DIRECT_FILE_IMPACT",
+          "causal_trace": {
+            "requirement": "REQ_AUTH_2",
+            "impact_scope": "LOCAL",
+            "directive": "Integrar middleware de token no backend e frontend",
+            "impacted_files": [
+              "backend/security/auth.py",
+              "backend/api.py",
+              "frontend/src/context/AuthContext.tsx"
+            ],
+            "impacted_symbols": [],
+            "rationale": "Implementação requerida pelo requisito REQ_AUTH_2."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "actual_task_id": "act_test_REQ_AUTH_2",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_auth_2",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_AUTH_2",
+            "impact_scope": "LOCAL",
+            "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+            "target_files": [
+              "backend/security/auth.py",
+              "backend/api.py",
+              "frontend/src/context/AuthContext.tsx"
+            ],
+            "derived_from_task": "ptask_impl_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_SEARCH_1",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_impl_6",
+        "ptask_test_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "actual_task_id": "act_impl_REQ_SEARCH_1",
+          "match_status": "MATCHED",
+          "category": "Coding",
+          "source_requirement": "req_search_1",
+          "derivation_type": "DIRECT_FILE_IMPACT",
+          "causal_trace": {
+            "requirement": "REQ_SEARCH_1",
+            "impact_scope": "LOCAL",
+            "directive": "Implementar pesquisa em tempo real com filtros",
+            "impacted_files": [
+              "frontend/src/features/search/SearchBar.tsx",
+              "backend/search_service.py"
+            ],
+            "impacted_symbols": [],
+            "rationale": "Implementação requerida pelo requisito REQ_SEARCH_1."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "actual_task_id": "act_test_REQ_SEARCH_1",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_search_1",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_SEARCH_1",
+            "impact_scope": "LOCAL",
+            "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+            "target_files": [
+              "frontend/src/features/search/SearchBar.tsx",
+              "backend/search_service.py"
+            ],
+            "derived_from_task": "ptask_impl_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_EXPORT_1",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_cleanup_7",
+        "ptask_deprecate_6"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_deprecate_6",
+          "actual_task_id": "act_impl_REQ_EXPORT_1",
+          "match_status": "MATCHED",
+          "category": "Coding",
+          "source_requirement": "req_export_1",
+          "derivation_type": "DIRECT_FILE_IMPACT",
+          "causal_trace": null
+        },
+        {
+          "predicted_task_id": "ptask_cleanup_7",
+          "actual_task_id": "act_test_REQ_EXPORT_1",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_export_1",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": null
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_SEARCH_2",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_replan_6",
+        "ptask_test_reval_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_replan_6",
+          "actual_task_id": "act_impl_REQ_SEARCH_2",
+          "match_status": "MATCHED",
+          "category": "Coding",
+          "source_requirement": "req_search_2",
+          "derivation_type": "DIRECT_FILE_IMPACT",
+          "causal_trace": {
+            "requirement": "REQ_SEARCH_2",
+            "operation": "MODIFY_REQUIREMENT",
+            "directive": "Refinar barra de busca com debounce",
+            "impacted_files": [
+              "frontend/src/features/search/SearchBar.tsx",
+              "backend/search_service.py"
+            ],
+            "impacted_symbols": [],
+            "rationale": "Modificação de abordagem exige adaptação de código/arquitetura para REQ_SEARCH_2."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_reval_7",
+          "actual_task_id": "act_test_REQ_SEARCH_2",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_search_2",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_SEARCH_2",
+            "operation": "MODIFY_REQUIREMENT",
+            "validation_policy": "Zero False Success: modificações de requisitos exigem revalidação de testes de regressão.",
+            "target_files": [
+              "frontend/src/features/search/SearchBar.tsx",
+              "backend/search_service.py"
+            ],
+            "derived_from_task": "ptask_replan_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_ARCH_1",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_impl_6",
+        "ptask_test_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "actual_task_id": "act_impl_REQ_ARCH_1",
+          "match_status": "MATCHED",
+          "category": "Architecture",
+          "source_requirement": "req_arch_1",
+          "derivation_type": "ARCHITECTURE_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_ARCH_1",
+            "impact_scope": "ARCHITECTURAL",
+            "directive": "Migrar esquema de persistência SQLite com migração de schema",
+            "impacted_files": [
+              "agents/domain_logic.py"
+            ],
+            "impacted_symbols": [],
+            "rationale": "Implementação requerida pelo requisito REQ_ARCH_1."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "actual_task_id": "act_test_REQ_ARCH_1",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_arch_1",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_ARCH_1",
+            "impact_scope": "ARCHITECTURAL",
+            "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+            "target_files": [
+              "agents/domain_logic.py"
+            ],
+            "derived_from_task": "ptask_impl_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  },
+  {
+    "target": "REQ_ARCH_2",
+    "matching": {
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "matched_tasks": [
+        "ptask_replan_6",
+        "ptask_test_reval_7"
+      ],
+      "unexpected_tasks": [],
+      "missed_tasks": [],
+      "causal_matches": [
+        {
+          "predicted_task_id": "ptask_replan_6",
+          "actual_task_id": "act_impl_REQ_ARCH_2",
+          "match_status": "MATCHED",
+          "category": "Architecture",
+          "source_requirement": "req_arch_2",
+          "derivation_type": "ARCHITECTURE_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_ARCH_2",
+            "operation": "REVISE_APPROACH",
+            "directive": "Implementar arquitetura orientada a eventos para o swarm",
+            "impacted_files": [
+              "agents/domain_logic.py"
+            ],
+            "impacted_symbols": [],
+            "rationale": "Modificação de abordagem exige adaptação de código/arquitetura para REQ_ARCH_2."
+          }
+        },
+        {
+          "predicted_task_id": "ptask_test_reval_7",
+          "actual_task_id": "act_test_REQ_ARCH_2",
+          "match_status": "MATCHED",
+          "category": "Testing",
+          "source_requirement": "req_arch_2",
+          "derivation_type": "VALIDATION_DRIVEN",
+          "causal_trace": {
+            "requirement": "REQ_ARCH_2",
+            "operation": "REVISE_APPROACH",
+            "validation_policy": "Zero False Success: modificações de requisitos exigem revalidação de testes de regressão.",
+            "target_files": [
+              "agents/domain_logic.py"
+            ],
+            "derived_from_task": "ptask_replan_6"
+          }
+        }
+      ],
+      "root_causes": {}
+    }
+  }
+]

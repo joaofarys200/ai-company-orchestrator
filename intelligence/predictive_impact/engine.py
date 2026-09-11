@@ -191,6 +191,8 @@ class PredictiveImpactEngine:
             causal_chains=causal_chains,
             status=status,
             simulation_marker="SIMULATION_ONLY",
+            task_file_matrix=graph_data.get("task_file_matrix", {}),
+            consistency_report=graph_data.get("consistency_report", {}),
         )
 
         cls._predictions[report.prediction_id] = report

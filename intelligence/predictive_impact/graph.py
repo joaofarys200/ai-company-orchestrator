@@ -293,60 +293,25 @@ class ImpactGraphEngine:
         except Exception as e:
             uncertainties.append(f"TS graph enrichment fallback: {e}")
 
-        # 2. Predicted Tasks generation
-        predicted_tasks: list[PredictedTask] = []
-        if operation in ("ADD_REQUIREMENT", "ADD_CONSTRAINT"):
-            predicted_tasks.append(
-                PredictedTask(
-                    predicted_task_id=f"ptask_impl_{len(current_tasks) + 1}",
-                    action="ADD_TASK",
-                    title=f"Implementar {target_name}",
-                    description=f"Desenvolver componentes e lógica associada à diretiva: {directive_text}",
-                    source_requirement=target_name,
-                    dependencies=[t["id"] for t in current_tasks if t.get("status") == "COMPLETED"][:1],
-                    predicted_owner="coder",
-                    confidence=0.90,
-                )
-            )
-            predicted_tasks.append(
-                PredictedTask(
-                    predicted_task_id=f"ptask_test_{len(current_tasks) + 2}",
-                    action="ADD_TASK",
-                    title=f"Validar testes para {target_name}",
-                    description=f"Executar suite de testes unitários e de integração para {target_name}",
-                    source_requirement=target_name,
-                    dependencies=[f"ptask_impl_{len(current_tasks) + 1}"],
-                    predicted_owner="test_engineer",
-                    confidence=0.88,
-                )
-            )
-        elif operation == "REMOVE_REQUIREMENT":
-            # Identify existing tasks that reference target
-            for t in current_tasks:
-                if target_name.lower() in t.get("title", "").lower() or target_name.lower() in t.get("id", "").lower():
-                    predicted_tasks.append(
-                        PredictedTask(
-                            predicted_task_id=t["id"],
-                            action="REMOVE_TASK",
-                            title=t.get("title", t["id"]),
-                            description=f"Cancelar tarefa associada ao requisito removido: {target_name}",
-                            source_requirement=target_name,
-                            predicted_owner=t.get("owner", "coder"),
-                            confidence=0.95,
-                        )
-                    )
-        elif operation in ("MODIFY_REQUIREMENT", "REVISE_APPROACH"):
-            predicted_tasks.append(
-                PredictedTask(
-                    predicted_task_id=f"ptask_replan_{len(current_tasks) + 1}",
-                    action="MODIFY_TASK",
-                    title=f"Adaptar abordagem para {target_name}",
-                    description=f"Reconfigurar implementação existente para alinhar com: {directive_text}",
-                    source_requirement=target_name,
-                    predicted_owner="architect",
-                    confidence=0.85,
-                )
-            )
+        # 2. Predicted Tasks generation via TaskDerivationEngine (Phase 39.2 Reconciliation)
+        from intelligence.predictive_impact.task_derivation import TaskDerivationEngine
+        from intelligence.predictive_impact.task_validator import TaskImpactConsistencyValidator
+
+        predicted_tasks = TaskDerivationEngine.derive_tasks(
+            operation=operation,
+            target_name=target_name,
+            directive_text=directive_text,
+            predicted_files=predicted_files,
+            predicted_symbols=predicted_symbols,
+            current_tasks=current_tasks,
+            requirements=current_requirements,
+            constraints=[],
+            scope="ARCHITECTURAL" if any(kw in directive_text.lower() for kw in ["arquitetura", "sqlite", "schema", "swarm", "eventos"]) else "LOCAL",
+        )
+
+        # Build correlation matrix & validate consistency
+        task_file_matrix = TaskDerivationEngine.build_task_file_matrix(predicted_tasks, predicted_files)
+        consistency_report = TaskImpactConsistencyValidator.validate(predicted_tasks, predicted_files, current_tasks)
 
         # 3. Predicted Tests & Evidence Impact (Zero False Success)
         predicted_tests: list[dict[str, Any]] = []
@@ -384,4 +349,6 @@ class ImpactGraphEngine:
             "predicted_tests": predicted_tests,
             "causal_chains": causal_chains,
             "uncertainties": uncertainties,
+            "task_file_matrix": task_file_matrix,
+            "consistency_report": consistency_report,
         }

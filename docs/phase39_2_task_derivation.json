@@ -1,0 +1,1032 @@
+[
+  {
+    "target": "REQ_STYLE_1",
+    "operation": "ADD_REQUIREMENT",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_impl_6",
+        "action": "ADD_TASK",
+        "title": "Implementar REQ_STYLE_1",
+        "description": "Desenvolver componentes e lógica associada à diretiva: Ajustar estilo CSS do cabeçalho",
+        "source_requirement": "REQ_STYLE_1",
+        "dependencies": [],
+        "predicted_owner": "coder",
+        "confidence": 0.92,
+        "status": "PREDICTED_ONLY",
+        "category": "Coding",
+        "derivation_type": "DIRECT_FILE_IMPACT",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ],
+        "impacted_symbols": [
+          "App"
+        ],
+        "source_requirements": [
+          "REQ_STYLE_1"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "IMPACT_GRAPH"
+        ],
+        "reason": "Implementação associada à diretiva 'Ajustar estilo CSS do cabeçalho'",
+        "causal_trace": {
+          "requirement": "REQ_STYLE_1",
+          "impact_scope": "LOCAL",
+          "directive": "Ajustar estilo CSS do cabeçalho",
+          "impacted_files": [
+            "frontend/src/App.tsx",
+            "frontend/src/index.css"
+          ],
+          "impacted_symbols": [
+            "App"
+          ],
+          "rationale": "Implementação requerida pelo requisito REQ_STYLE_1."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_7",
+        "action": "ADD_TASK",
+        "title": "Validar testes para REQ_STYLE_1",
+        "description": "Executar suite de testes unitários e de integração para REQ_STYLE_1",
+        "source_requirement": "REQ_STYLE_1",
+        "dependencies": [
+          "ptask_impl_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.9,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ],
+        "impacted_symbols": [
+          "App"
+        ],
+        "source_requirements": [
+          "REQ_STYLE_1"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_impl_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_STYLE_1",
+        "causal_trace": {
+          "requirement": "REQ_STYLE_1",
+          "impact_scope": "LOCAL",
+          "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+          "target_files": [
+            "frontend/src/App.tsx",
+            "frontend/src/index.css"
+          ],
+          "derived_from_task": "ptask_impl_6"
+        }
+      }
+    ]
+  },
+  {
+    "target": "REQ_STYLE_2",
+    "operation": "ADD_REQUIREMENT",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_impl_6",
+        "action": "ADD_TASK",
+        "title": "Implementar REQ_STYLE_2",
+        "description": "Desenvolver componentes e lógica associada à diretiva: Modificar cores dos botões de ação",
+        "source_requirement": "REQ_STYLE_2",
+        "dependencies": [],
+        "predicted_owner": "coder",
+        "confidence": 0.92,
+        "status": "PREDICTED_ONLY",
+        "category": "Coding",
+        "derivation_type": "DIRECT_FILE_IMPACT",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ],
+        "impacted_symbols": [
+          "App"
+        ],
+        "source_requirements": [
+          "REQ_STYLE_2"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "IMPACT_GRAPH"
+        ],
+        "reason": "Implementação associada à diretiva 'Modificar cores dos botões de ação'",
+        "causal_trace": {
+          "requirement": "REQ_STYLE_2",
+          "impact_scope": "LOCAL",
+          "directive": "Modificar cores dos botões de ação",
+          "impacted_files": [
+            "frontend/src/App.tsx",
+            "frontend/src/index.css"
+          ],
+          "impacted_symbols": [
+            "App"
+          ],
+          "rationale": "Implementação requerida pelo requisito REQ_STYLE_2."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_7",
+        "action": "ADD_TASK",
+        "title": "Validar testes para REQ_STYLE_2",
+        "description": "Executar suite de testes unitários e de integração para REQ_STYLE_2",
+        "source_requirement": "REQ_STYLE_2",
+        "dependencies": [
+          "ptask_impl_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.9,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ],
+        "impacted_symbols": [
+          "App"
+        ],
+        "source_requirements": [
+          "REQ_STYLE_2"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_impl_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_STYLE_2",
+        "causal_trace": {
+          "requirement": "REQ_STYLE_2",
+          "impact_scope": "LOCAL",
+          "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+          "target_files": [
+            "frontend/src/App.tsx",
+            "frontend/src/index.css"
+          ],
+          "derived_from_task": "ptask_impl_6"
+        }
+      }
+    ]
+  },
+  {
+    "target": "REQ_STYLE_3",
+    "operation": "MODIFY_REQUIREMENT",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_replan_6",
+        "action": "MODIFY_TASK",
+        "title": "Adaptar abordagem para REQ_STYLE_3",
+        "description": "Reconfigurar implementação existente para alinhar com: Atualizar tipografia para Outfit",
+        "source_requirement": "REQ_STYLE_3",
+        "dependencies": [],
+        "predicted_owner": "coder",
+        "confidence": 0.88,
+        "status": "PREDICTED_ONLY",
+        "category": "Coding",
+        "derivation_type": "DIRECT_FILE_IMPACT",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ],
+        "impacted_symbols": [
+          "App"
+        ],
+        "source_requirements": [
+          "REQ_STYLE_3"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "EXISTING_IMPLEMENTATION"
+        ],
+        "reason": "Adaptação de implementação para REQ_STYLE_3: Atualizar tipografia para Outfit",
+        "causal_trace": {
+          "requirement": "REQ_STYLE_3",
+          "operation": "MODIFY_REQUIREMENT",
+          "directive": "Atualizar tipografia para Outfit",
+          "impacted_files": [
+            "frontend/src/App.tsx",
+            "frontend/src/index.css"
+          ],
+          "impacted_symbols": [
+            "App"
+          ],
+          "rationale": "Modificação de abordagem exige adaptação de código/arquitetura para REQ_STYLE_3."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_reval_7",
+        "action": "ADD_TASK",
+        "title": "Revalidar testes de regressão para REQ_STYLE_3",
+        "description": "Executar testes de regressão e verificar compatibilidade após alteração de REQ_STYLE_3",
+        "source_requirement": "REQ_STYLE_3",
+        "dependencies": [
+          "ptask_replan_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.88,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ],
+        "impacted_symbols": [
+          "App"
+        ],
+        "source_requirements": [
+          "REQ_STYLE_3"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_replan_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Revalidação de regressão necessária para modificação em REQ_STYLE_3",
+        "causal_trace": {
+          "requirement": "REQ_STYLE_3",
+          "operation": "MODIFY_REQUIREMENT",
+          "validation_policy": "Zero False Success: modificações de requisitos exigem revalidação de testes de regressão.",
+          "target_files": [
+            "frontend/src/App.tsx",
+            "frontend/src/index.css"
+          ],
+          "derived_from_task": "ptask_replan_6"
+        }
+      }
+    ]
+  },
+  {
+    "target": "REQ_STYLE_4",
+    "operation": "ADD_CONSTRAINT",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_impl_6",
+        "action": "ADD_TASK",
+        "title": "Implementar REQ_STYLE_4",
+        "description": "Desenvolver componentes e lógica associada à diretiva: Adicionar bordas arredondadas",
+        "source_requirement": "REQ_STYLE_4",
+        "dependencies": [],
+        "predicted_owner": "coder",
+        "confidence": 0.92,
+        "status": "PREDICTED_ONLY",
+        "category": "Coding",
+        "derivation_type": "DIRECT_FILE_IMPACT",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ],
+        "impacted_symbols": [
+          "App"
+        ],
+        "source_requirements": [
+          "REQ_STYLE_4"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "IMPACT_GRAPH"
+        ],
+        "reason": "Implementação associada à diretiva 'Adicionar bordas arredondadas'",
+        "causal_trace": {
+          "requirement": "REQ_STYLE_4",
+          "impact_scope": "LOCAL",
+          "directive": "Adicionar bordas arredondadas",
+          "impacted_files": [
+            "frontend/src/App.tsx",
+            "frontend/src/index.css"
+          ],
+          "impacted_symbols": [
+            "App"
+          ],
+          "rationale": "Implementação requerida pelo requisito REQ_STYLE_4."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_7",
+        "action": "ADD_TASK",
+        "title": "Validar testes para REQ_STYLE_4",
+        "description": "Executar suite de testes unitários e de integração para REQ_STYLE_4",
+        "source_requirement": "REQ_STYLE_4",
+        "dependencies": [
+          "ptask_impl_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.9,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ],
+        "impacted_symbols": [
+          "App"
+        ],
+        "source_requirements": [
+          "REQ_STYLE_4"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_impl_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_STYLE_4",
+        "causal_trace": {
+          "requirement": "REQ_STYLE_4",
+          "impact_scope": "LOCAL",
+          "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+          "target_files": [
+            "frontend/src/App.tsx",
+            "frontend/src/index.css"
+          ],
+          "derived_from_task": "ptask_impl_6"
+        }
+      }
+    ]
+  },
+  {
+    "target": "REQ_STYLE_5",
+    "operation": "REVISE_APPROACH",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_replan_6",
+        "action": "MODIFY_TASK",
+        "title": "Adaptar abordagem para REQ_STYLE_5",
+        "description": "Reconfigurar implementação existente para alinhar com: Usar transições CSS suaves",
+        "source_requirement": "REQ_STYLE_5",
+        "dependencies": [],
+        "predicted_owner": "coder",
+        "confidence": 0.88,
+        "status": "PREDICTED_ONLY",
+        "category": "Coding",
+        "derivation_type": "DIRECT_FILE_IMPACT",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ],
+        "impacted_symbols": [
+          "App"
+        ],
+        "source_requirements": [
+          "REQ_STYLE_5"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "EXISTING_IMPLEMENTATION"
+        ],
+        "reason": "Adaptação de implementação para REQ_STYLE_5: Usar transições CSS suaves",
+        "causal_trace": {
+          "requirement": "REQ_STYLE_5",
+          "operation": "REVISE_APPROACH",
+          "directive": "Usar transições CSS suaves",
+          "impacted_files": [
+            "frontend/src/App.tsx",
+            "frontend/src/index.css"
+          ],
+          "impacted_symbols": [
+            "App"
+          ],
+          "rationale": "Modificação de abordagem exige adaptação de código/arquitetura para REQ_STYLE_5."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_reval_7",
+        "action": "ADD_TASK",
+        "title": "Revalidar testes de regressão para REQ_STYLE_5",
+        "description": "Executar testes de regressão e verificar compatibilidade após alteração de REQ_STYLE_5",
+        "source_requirement": "REQ_STYLE_5",
+        "dependencies": [
+          "ptask_replan_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.88,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ],
+        "impacted_symbols": [
+          "App"
+        ],
+        "source_requirements": [
+          "REQ_STYLE_5"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_replan_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Revalidação de regressão necessária para modificação em REQ_STYLE_5",
+        "causal_trace": {
+          "requirement": "REQ_STYLE_5",
+          "operation": "REVISE_APPROACH",
+          "validation_policy": "Zero False Success: modificações de requisitos exigem revalidação de testes de regressão.",
+          "target_files": [
+            "frontend/src/App.tsx",
+            "frontend/src/index.css"
+          ],
+          "derived_from_task": "ptask_replan_6"
+        }
+      }
+    ]
+  },
+  {
+    "target": "REQ_AUTH_1",
+    "operation": "ADD_REQUIREMENT",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_impl_6",
+        "action": "ADD_TASK",
+        "title": "Implementar REQ_AUTH_1",
+        "description": "Desenvolver componentes e lógica associada à diretiva: Adicionar autenticação JWT e rotas protegidas",
+        "source_requirement": "REQ_AUTH_1",
+        "dependencies": [],
+        "predicted_owner": "coder",
+        "confidence": 0.92,
+        "status": "PREDICTED_ONLY",
+        "category": "Coding",
+        "derivation_type": "DIRECT_FILE_IMPACT",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "backend/security/auth.py",
+          "backend/api.py",
+          "frontend/src/context/AuthContext.tsx"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_AUTH_1"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "IMPACT_GRAPH"
+        ],
+        "reason": "Implementação associada à diretiva 'Adicionar autenticação JWT e rotas protegidas'",
+        "causal_trace": {
+          "requirement": "REQ_AUTH_1",
+          "impact_scope": "LOCAL",
+          "directive": "Adicionar autenticação JWT e rotas protegidas",
+          "impacted_files": [
+            "backend/security/auth.py",
+            "backend/api.py",
+            "frontend/src/context/AuthContext.tsx"
+          ],
+          "impacted_symbols": [],
+          "rationale": "Implementação requerida pelo requisito REQ_AUTH_1."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_7",
+        "action": "ADD_TASK",
+        "title": "Validar testes para REQ_AUTH_1",
+        "description": "Executar suite de testes unitários e de integração para REQ_AUTH_1",
+        "source_requirement": "REQ_AUTH_1",
+        "dependencies": [
+          "ptask_impl_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.9,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "backend/security/auth.py",
+          "backend/api.py",
+          "frontend/src/context/AuthContext.tsx"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_AUTH_1"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_impl_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_AUTH_1",
+        "causal_trace": {
+          "requirement": "REQ_AUTH_1",
+          "impact_scope": "LOCAL",
+          "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+          "target_files": [
+            "backend/security/auth.py",
+            "backend/api.py",
+            "frontend/src/context/AuthContext.tsx"
+          ],
+          "derived_from_task": "ptask_impl_6"
+        }
+      }
+    ]
+  },
+  {
+    "target": "REQ_AUTH_2",
+    "operation": "ADD_REQUIREMENT",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_impl_6",
+        "action": "ADD_TASK",
+        "title": "Implementar REQ_AUTH_2",
+        "description": "Desenvolver componentes e lógica associada à diretiva: Integrar middleware de token no backend e frontend",
+        "source_requirement": "REQ_AUTH_2",
+        "dependencies": [],
+        "predicted_owner": "coder",
+        "confidence": 0.92,
+        "status": "PREDICTED_ONLY",
+        "category": "Coding",
+        "derivation_type": "DIRECT_FILE_IMPACT",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "backend/security/auth.py",
+          "backend/api.py",
+          "frontend/src/context/AuthContext.tsx"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_AUTH_2"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "IMPACT_GRAPH"
+        ],
+        "reason": "Implementação associada à diretiva 'Integrar middleware de token no backend e frontend'",
+        "causal_trace": {
+          "requirement": "REQ_AUTH_2",
+          "impact_scope": "LOCAL",
+          "directive": "Integrar middleware de token no backend e frontend",
+          "impacted_files": [
+            "backend/security/auth.py",
+            "backend/api.py",
+            "frontend/src/context/AuthContext.tsx"
+          ],
+          "impacted_symbols": [],
+          "rationale": "Implementação requerida pelo requisito REQ_AUTH_2."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_7",
+        "action": "ADD_TASK",
+        "title": "Validar testes para REQ_AUTH_2",
+        "description": "Executar suite de testes unitários e de integração para REQ_AUTH_2",
+        "source_requirement": "REQ_AUTH_2",
+        "dependencies": [
+          "ptask_impl_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.9,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "backend/security/auth.py",
+          "backend/api.py",
+          "frontend/src/context/AuthContext.tsx"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_AUTH_2"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_impl_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_AUTH_2",
+        "causal_trace": {
+          "requirement": "REQ_AUTH_2",
+          "impact_scope": "LOCAL",
+          "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+          "target_files": [
+            "backend/security/auth.py",
+            "backend/api.py",
+            "frontend/src/context/AuthContext.tsx"
+          ],
+          "derived_from_task": "ptask_impl_6"
+        }
+      }
+    ]
+  },
+  {
+    "target": "REQ_SEARCH_1",
+    "operation": "ADD_REQUIREMENT",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_impl_6",
+        "action": "ADD_TASK",
+        "title": "Implementar REQ_SEARCH_1",
+        "description": "Desenvolver componentes e lógica associada à diretiva: Implementar pesquisa em tempo real com filtros",
+        "source_requirement": "REQ_SEARCH_1",
+        "dependencies": [],
+        "predicted_owner": "coder",
+        "confidence": 0.92,
+        "status": "PREDICTED_ONLY",
+        "category": "Coding",
+        "derivation_type": "DIRECT_FILE_IMPACT",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/features/search/SearchBar.tsx",
+          "backend/search_service.py"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_SEARCH_1"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "IMPACT_GRAPH"
+        ],
+        "reason": "Implementação associada à diretiva 'Implementar pesquisa em tempo real com filtros'",
+        "causal_trace": {
+          "requirement": "REQ_SEARCH_1",
+          "impact_scope": "LOCAL",
+          "directive": "Implementar pesquisa em tempo real com filtros",
+          "impacted_files": [
+            "frontend/src/features/search/SearchBar.tsx",
+            "backend/search_service.py"
+          ],
+          "impacted_symbols": [],
+          "rationale": "Implementação requerida pelo requisito REQ_SEARCH_1."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_7",
+        "action": "ADD_TASK",
+        "title": "Validar testes para REQ_SEARCH_1",
+        "description": "Executar suite de testes unitários e de integração para REQ_SEARCH_1",
+        "source_requirement": "REQ_SEARCH_1",
+        "dependencies": [
+          "ptask_impl_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.9,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/features/search/SearchBar.tsx",
+          "backend/search_service.py"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_SEARCH_1"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_impl_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_SEARCH_1",
+        "causal_trace": {
+          "requirement": "REQ_SEARCH_1",
+          "impact_scope": "LOCAL",
+          "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+          "target_files": [
+            "frontend/src/features/search/SearchBar.tsx",
+            "backend/search_service.py"
+          ],
+          "derived_from_task": "ptask_impl_6"
+        }
+      }
+    ]
+  },
+  {
+    "target": "REQ_EXPORT_1",
+    "operation": "REMOVE_REQUIREMENT",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_deprecate_6",
+        "action": "REMOVE_TASK",
+        "title": "Depreciar e remover código de REQ_EXPORT_1",
+        "description": "Remover ou desativar endpoints, componentes e dependências do requisito removido: REQ_EXPORT_1",
+        "source_requirement": "REQ_EXPORT_1",
+        "dependencies": [],
+        "predicted_owner": "coder",
+        "confidence": 0.92,
+        "status": "PREDICTED_ONLY",
+        "category": "Coding",
+        "derivation_type": "DIRECT_FILE_IMPACT",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/features/export/ExportPanel.tsx",
+          "backend/export_service.py"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_EXPORT_1"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "IMPACT_GRAPH"
+        ],
+        "reason": "Remoção do requisito REQ_EXPORT_1 requer limpeza do código associado",
+        "causal_trace": null
+      },
+      {
+        "predicted_task_id": "ptask_cleanup_7",
+        "action": "ADD_TASK",
+        "title": "Limpeza de testes e evidências de REQ_EXPORT_1",
+        "description": "Atualizar suites de teste e invalidar evidências obsoletas ligadas a REQ_EXPORT_1",
+        "source_requirement": "REQ_EXPORT_1",
+        "dependencies": [
+          "ptask_deprecate_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.9,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/features/export/ExportPanel.tsx",
+          "backend/export_service.py"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_EXPORT_1"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Limpeza de evidências e suites de teste obsoletas para REQ_EXPORT_1",
+        "causal_trace": null
+      }
+    ]
+  },
+  {
+    "target": "REQ_SEARCH_2",
+    "operation": "MODIFY_REQUIREMENT",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_replan_6",
+        "action": "MODIFY_TASK",
+        "title": "Adaptar abordagem para REQ_SEARCH_2",
+        "description": "Reconfigurar implementação existente para alinhar com: Refinar barra de busca com debounce",
+        "source_requirement": "REQ_SEARCH_2",
+        "dependencies": [],
+        "predicted_owner": "coder",
+        "confidence": 0.88,
+        "status": "PREDICTED_ONLY",
+        "category": "Coding",
+        "derivation_type": "DIRECT_FILE_IMPACT",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/features/search/SearchBar.tsx",
+          "backend/search_service.py"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_SEARCH_2"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "EXISTING_IMPLEMENTATION"
+        ],
+        "reason": "Adaptação de implementação para REQ_SEARCH_2: Refinar barra de busca com debounce",
+        "causal_trace": {
+          "requirement": "REQ_SEARCH_2",
+          "operation": "MODIFY_REQUIREMENT",
+          "directive": "Refinar barra de busca com debounce",
+          "impacted_files": [
+            "frontend/src/features/search/SearchBar.tsx",
+            "backend/search_service.py"
+          ],
+          "impacted_symbols": [],
+          "rationale": "Modificação de abordagem exige adaptação de código/arquitetura para REQ_SEARCH_2."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_reval_7",
+        "action": "ADD_TASK",
+        "title": "Revalidar testes de regressão para REQ_SEARCH_2",
+        "description": "Executar testes de regressão e verificar compatibilidade após alteração de REQ_SEARCH_2",
+        "source_requirement": "REQ_SEARCH_2",
+        "dependencies": [
+          "ptask_replan_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.88,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "frontend/src/features/search/SearchBar.tsx",
+          "backend/search_service.py"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_SEARCH_2"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_replan_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Revalidação de regressão necessária para modificação em REQ_SEARCH_2",
+        "causal_trace": {
+          "requirement": "REQ_SEARCH_2",
+          "operation": "MODIFY_REQUIREMENT",
+          "validation_policy": "Zero False Success: modificações de requisitos exigem revalidação de testes de regressão.",
+          "target_files": [
+            "frontend/src/features/search/SearchBar.tsx",
+            "backend/search_service.py"
+          ],
+          "derived_from_task": "ptask_replan_6"
+        }
+      }
+    ]
+  },
+  {
+    "target": "REQ_ARCH_1",
+    "operation": "ADD_REQUIREMENT",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_impl_6",
+        "action": "ADD_TASK",
+        "title": "Desenhar e implementar arquitetura para REQ_ARCH_1",
+        "description": "Estruturar arquitetura e componentes para: Migrar esquema de persistência SQLite com migração de schema",
+        "source_requirement": "REQ_ARCH_1",
+        "dependencies": [],
+        "predicted_owner": "architect",
+        "confidence": 0.92,
+        "status": "PREDICTED_ONLY",
+        "category": "Architecture",
+        "derivation_type": "ARCHITECTURE_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "agents/domain_logic.py"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_ARCH_1"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "IMPACT_GRAPH"
+        ],
+        "reason": "Implementação associada à diretiva 'Migrar esquema de persistência SQLite com migração de schema'",
+        "causal_trace": {
+          "requirement": "REQ_ARCH_1",
+          "impact_scope": "ARCHITECTURAL",
+          "directive": "Migrar esquema de persistência SQLite com migração de schema",
+          "impacted_files": [
+            "agents/domain_logic.py"
+          ],
+          "impacted_symbols": [],
+          "rationale": "Implementação requerida pelo requisito REQ_ARCH_1."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_7",
+        "action": "ADD_TASK",
+        "title": "Validar testes para REQ_ARCH_1",
+        "description": "Executar suite de testes unitários e de integração para REQ_ARCH_1",
+        "source_requirement": "REQ_ARCH_1",
+        "dependencies": [
+          "ptask_impl_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.9,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "agents/domain_logic.py"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_ARCH_1"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_impl_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_ARCH_1",
+        "causal_trace": {
+          "requirement": "REQ_ARCH_1",
+          "impact_scope": "ARCHITECTURAL",
+          "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
+          "target_files": [
+            "agents/domain_logic.py"
+          ],
+          "derived_from_task": "ptask_impl_6"
+        }
+      }
+    ]
+  },
+  {
+    "target": "REQ_ARCH_2",
+    "operation": "REVISE_APPROACH",
+    "tasks": [
+      {
+        "predicted_task_id": "ptask_replan_6",
+        "action": "MODIFY_TASK",
+        "title": "Adaptar abordagem para REQ_ARCH_2",
+        "description": "Reconfigurar implementação existente para alinhar com: Implementar arquitetura orientada a eventos para o swarm",
+        "source_requirement": "REQ_ARCH_2",
+        "dependencies": [],
+        "predicted_owner": "architect",
+        "confidence": 0.88,
+        "status": "PREDICTED_ONLY",
+        "category": "Architecture",
+        "derivation_type": "ARCHITECTURE_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "agents/domain_logic.py"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_ARCH_2"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "INTENT_DELTA",
+          "EXISTING_IMPLEMENTATION"
+        ],
+        "reason": "Adaptação de implementação para REQ_ARCH_2: Implementar arquitetura orientada a eventos para o swarm",
+        "causal_trace": {
+          "requirement": "REQ_ARCH_2",
+          "operation": "REVISE_APPROACH",
+          "directive": "Implementar arquitetura orientada a eventos para o swarm",
+          "impacted_files": [
+            "agents/domain_logic.py"
+          ],
+          "impacted_symbols": [],
+          "rationale": "Modificação de abordagem exige adaptação de código/arquitetura para REQ_ARCH_2."
+        }
+      },
+      {
+        "predicted_task_id": "ptask_test_reval_7",
+        "action": "ADD_TASK",
+        "title": "Revalidar testes de regressão para REQ_ARCH_2",
+        "description": "Executar testes de regressão e verificar compatibilidade após alteração de REQ_ARCH_2",
+        "source_requirement": "REQ_ARCH_2",
+        "dependencies": [
+          "ptask_replan_6"
+        ],
+        "predicted_owner": "test_engineer",
+        "confidence": 0.88,
+        "status": "PREDICTED_ONLY",
+        "category": "Testing",
+        "derivation_type": "VALIDATION_DRIVEN",
+        "confidence_class": "DETERMINISTIC",
+        "predicted_files": [
+          "agents/domain_logic.py"
+        ],
+        "impacted_symbols": [],
+        "source_requirements": [
+          "REQ_ARCH_2"
+        ],
+        "source_constraints": [],
+        "derived_from": [
+          "ptask_replan_6",
+          "VALIDATION_POLICY"
+        ],
+        "reason": "Revalidação de regressão necessária para modificação em REQ_ARCH_2",
+        "causal_trace": {
+          "requirement": "REQ_ARCH_2",
+          "operation": "REVISE_APPROACH",
+          "validation_policy": "Zero False Success: modificações de requisitos exigem revalidação de testes de regressão.",
+          "target_files": [
+            "agents/domain_logic.py"
+          ],
+          "derived_from_task": "ptask_replan_6"
+        }
+      }
+    ]
+  }
+]

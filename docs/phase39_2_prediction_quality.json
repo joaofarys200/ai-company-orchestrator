@@ -1,0 +1,331 @@
+{
+  "phase": 39.2,
+  "phase_name": "Predictive Task Reconciliation & Impact-to-Task Consistency",
+  "evaluated_at": "2026-09-11T13:17:20Z",
+  "comparison_table": {
+    "phase_39": {
+      "file_precision": 0.889,
+      "file_recall": 0.8,
+      "file_f1": 0.842,
+      "task_precision": 0.941,
+      "task_recall": 0.889,
+      "task_f1": 0.914,
+      "task_tp": 16,
+      "task_fp": 1,
+      "task_fn": 2
+    },
+    "phase_39_1": {
+      "file_precision": 0.875,
+      "file_recall": 0.913,
+      "file_f1": 0.894,
+      "task_precision": 1.0,
+      "task_recall": 0.75,
+      "task_f1": 0.857,
+      "task_tp": 18,
+      "task_fp": 0,
+      "task_fn": 6
+    },
+    "phase_39_2": {
+      "file_precision": 0.875,
+      "file_recall": 0.913,
+      "file_f1": 0.894,
+      "task_precision": 1.0,
+      "task_recall": 1.0,
+      "task_f1": 1.0,
+      "task_tp": 24,
+      "task_fp": 0,
+      "task_fn": 0
+    },
+    "delta_39_1_to_39_2": {
+      "task_recall_delta": 0.25,
+      "task_f1_delta": 0.143,
+      "task_precision_delta": 0.0,
+      "file_recall_delta": 0.0,
+      "file_precision_delta": 0.0
+    }
+  },
+  "task_mismatches_by_root_cause": {
+    "MISSING_FILE_TO_TASK_MAPPING": 0,
+    "TASK_GRANULARITY_MISMATCH": 0,
+    "VALIDATION_TASK_NOT_FILE_DRIVEN": 0,
+    "SEMANTIC_TASK_NOT_FILE_DRIVEN": 0,
+    "EXPECTED_UNCERTAINTY": 0,
+    "OTHER": 0
+  },
+  "detailed_predictions": [
+    {
+      "target": "REQ_STYLE_1",
+      "scope": "LOCAL",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "actual_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "file_tp": 2,
+      "file_fp": 0,
+      "file_fn": 0,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_STYLE_2",
+      "scope": "LOCAL",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "actual_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "file_tp": 2,
+      "file_fp": 0,
+      "file_fn": 0,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_STYLE_3",
+      "scope": "LOCAL",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "actual_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "file_tp": 2,
+      "file_fp": 0,
+      "file_fn": 0,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_STYLE_4",
+      "scope": "LOCAL",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "actual_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "file_tp": 2,
+      "file_fp": 0,
+      "file_fn": 0,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_STYLE_5",
+      "scope": "LOCAL",
+      "status": "REQUIRES_APPROVAL",
+      "predicted_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "actual_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "file_tp": 2,
+      "file_fp": 0,
+      "file_fn": 0,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_AUTH_1",
+      "scope": "CROSS_MODULE",
+      "status": "REQUIRES_APPROVAL",
+      "predicted_files": [
+        "frontend/src/context/AuthContext.tsx",
+        "backend/api.py",
+        "backend/security/auth.py"
+      ],
+      "actual_files": [
+        "frontend/src/context/AuthContext.tsx",
+        "backend/api.py",
+        "backend/security/auth.py"
+      ],
+      "file_tp": 3,
+      "file_fp": 0,
+      "file_fn": 0,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_AUTH_2",
+      "scope": "CROSS_MODULE",
+      "status": "REQUIRES_APPROVAL",
+      "predicted_files": [
+        "frontend/src/context/AuthContext.tsx",
+        "backend/api.py",
+        "backend/security/auth.py"
+      ],
+      "actual_files": [],
+      "file_tp": 0,
+      "file_fp": 3,
+      "file_fn": 0,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_SEARCH_1",
+      "scope": "CROSS_MODULE",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "backend/search_service.py",
+        "frontend/src/features/search/SearchBar.tsx"
+      ],
+      "actual_files": [
+        "backend/search_service.py",
+        "frontend/src/features/search/SearchBar.tsx"
+      ],
+      "file_tp": 2,
+      "file_fp": 0,
+      "file_fn": 0,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_EXPORT_1",
+      "scope": "CROSS_MODULE",
+      "status": "REQUIRES_APPROVAL",
+      "predicted_files": [
+        "backend/export_service.py",
+        "frontend/src/features/export/ExportPanel.tsx"
+      ],
+      "actual_files": [
+        "backend/export_service.py",
+        "frontend/src/features/export/ExportPanel.tsx"
+      ],
+      "file_tp": 2,
+      "file_fp": 0,
+      "file_fn": 0,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_SEARCH_2",
+      "scope": "CROSS_MODULE",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "backend/search_service.py",
+        "frontend/src/features/search/SearchBar.tsx"
+      ],
+      "actual_files": [
+        "backend/search_service.py",
+        "frontend/src/features/search/SearchBar.tsx"
+      ],
+      "file_tp": 2,
+      "file_fp": 0,
+      "file_fn": 0,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_ARCH_1",
+      "scope": "ARCHITECTURAL",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "agents/domain_logic.py"
+      ],
+      "actual_files": [
+        "agents/mission_control_engine.py",
+        "agents/domain_logic.py"
+      ],
+      "file_tp": 1,
+      "file_fp": 0,
+      "file_fn": 1,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    },
+    {
+      "target": "REQ_ARCH_2",
+      "scope": "ARCHITECTURAL",
+      "status": "REQUIRES_APPROVAL",
+      "predicted_files": [
+        "agents/domain_logic.py"
+      ],
+      "actual_files": [
+        "agents/mission_control_engine.py",
+        "agents/domain_logic.py"
+      ],
+      "file_tp": 1,
+      "file_fp": 0,
+      "file_fn": 1,
+      "predicted_tasks_count": 2,
+      "actual_tasks_count": 2,
+      "task_tp": 2,
+      "task_fp": 0,
+      "task_fn": 0,
+      "task_precision": 1.0,
+      "task_recall": 1.0
+    }
+  ]
+}

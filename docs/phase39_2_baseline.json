@@ -1,0 +1,40 @@
+{
+  "benchmark": "Phase 39.2 Baseline - Task & File Prediction Across Exact 12 Workload",
+  "created_at": "2026-09-11T13:15:00Z",
+  "phase_39": {
+    "file_precision": 0.889,
+    "file_recall": 0.800,
+    "file_f1": 0.842,
+    "task_precision": 0.941,
+    "task_recall": 0.889,
+    "task_f1": 0.914,
+    "task_tp": 16,
+    "task_fp": 1,
+    "task_fn": 2,
+    "file_tp": 16,
+    "file_fp": 2,
+    "file_fn": 4
+  },
+  "phase_39_1": {
+    "file_precision": 0.875,
+    "file_recall": 0.913,
+    "file_f1": 0.894,
+    "task_precision": 1.000,
+    "task_recall": 0.750,
+    "task_f1": 0.857,
+    "task_tp": 18,
+    "task_fp": 0,
+    "task_fn": 6,
+    "file_tp": 21,
+    "file_fp": 3,
+    "file_fn": 2,
+    "ts_specific_recall": 1.000,
+    "ts_specific_precision": 0.900
+  },
+  "identified_discrepancy": {
+    "cause_1": "MODIFY_REQUIREMENT and REVISE_APPROACH only produced 1 task (architecture/adaptation) and omitted validation/testing task (4 FN)",
+    "cause_2": "REMOVE_REQUIREMENT matched zero tasks when current_tasks had generic IDs like TSK_01..05, yielding 0 predicted tasks (2 FN)",
+    "cause_3": "PredictedTask model lacked metadata (predicted_files, impacted_symbols, derivation_type, confidence_class, causal_trace)",
+    "cause_4": "Lack of deterministic FILES x TASKS correlation matrix and consistency validator"
+  }
+}
