@@ -1,0 +1,61 @@
+{
+  "conflict_matrix_name": "Phase 37 Deterministic Conflict Detection Matrix",
+  "evaluated_dimensions": [
+    "SECURITY_SENTINEL",
+    "TERMINAL_STATES",
+    "CONTRADICTORY_CONSTRAINTS",
+    "ECONOMIC_INVARIANTS",
+    "DAG_TOPOLOGY_CYCLES",
+    "STALE_VERSIONING"
+  ],
+  "rules": [
+    {
+      "conflict_type": "SECURITY_CONFLICT",
+      "trigger_pattern": "bypass_sentinel | disable_security | rm -rf | override_policy | drop database",
+      "action": "SECURITY_BLOCK",
+      "severity": "CRITICAL",
+      "resolution": "Bloqueio estrito e incondicional conforme Security Sentinel Policy. Nenhuma mutação permitida.",
+      "tested_and_verified": true
+    },
+    {
+      "conflict_type": "STATE_CONFLICT",
+      "trigger_pattern": "state.status in (COMPLETED, CANCELLED, FAILED)",
+      "action": "INVALID_STATE",
+      "severity": "CRITICAL",
+      "resolution": "Rejeição imediata. Missões em estado terminal não podem sofrer mutação de intenção retroativa. Sugerido criar nova missão.",
+      "tested_and_verified": true
+    },
+    {
+      "conflict_type": "CONSTRAINT_CONFLICT",
+      "trigger_pattern": "CST_API_IMMUTABLE active AND (MODIFY_REQUIREMENT API | replace with GraphQL | delete REST routes)",
+      "action": "CONFLICT",
+      "severity": "HIGH",
+      "resolution": "Apresentar conflito explícito ao operador com PROPOSED RESOLUTION: esclarecer se restrição deve ser revogada antes de mutar o endpoint.",
+      "tested_and_verified": true
+    },
+    {
+      "conflict_type": "ECONOMIC_CONFLICT",
+      "trigger_pattern": "payload contains money | arbitragem | faturação WITHOUT operator_financial_auth",
+      "action": "ECONOMIC_BLOCK",
+      "severity": "CRITICAL",
+      "resolution": "Bloqueio por invariante económico. Requer assinatura de autorização financeira explícita de operador autenticado.",
+      "tested_and_verified": true
+    },
+    {
+      "conflict_type": "DAG_CONFLICT",
+      "trigger_pattern": "cyclic dependency introduced | duplicate task id | missing dependency",
+      "action": "REJECT_DAG_MUTATION",
+      "severity": "CRITICAL",
+      "resolution": "Reversão para DAG anterior via validação de algoritmo de Kahn. Nenhuma tarefa adicionada.",
+      "tested_and_verified": true
+    },
+    {
+      "conflict_type": "STALE_VERSIONING",
+      "trigger_pattern": "delta.base_intent_version != current_intent_version",
+      "action": "STALE",
+      "severity": "MEDIUM",
+      "resolution": "Rejeição com STALE_INTENT_DELTA. Operador deve re-sincronizar intenção sobre a versão mais recente.",
+      "tested_and_verified": true
+    }
+  ]
+}

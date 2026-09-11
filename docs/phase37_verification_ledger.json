@@ -1,0 +1,157 @@
+{
+  "phase": "Phase 37 — Dynamic Mission Intent & Runtime Goal Editing",
+  "verification_timestamp": 1789077650.0,
+  "verdict": "DYNAMIC_INTENT_READY",
+  "test_suites": {
+    "unit_and_integration": {
+      "file": "tests/test_mission_intent_phase37.py",
+      "total": 23,
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 1.42
+    },
+    "phase35_regression": {
+      "file": "tests/test_mission_control_phase35.py",
+      "total": 13,
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.88
+    },
+    "phase36_regression": {
+      "file": "tests/test_mission_control_bidirectional_phase36.py",
+      "total": 12,
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.94
+    },
+    "total_tests_passed": 48,
+    "total_tests_failed": 0
+  },
+  "browser_qa": {
+    "engine": "Microsoft Edge (Chromium)",
+    "viewport": "1440x900",
+    "assertions_passed": 18,
+    "assertions_total": 18,
+    "console_errors": 0,
+    "network_errors": 0,
+    "screenshots_captured": 10,
+    "verdict": "DYNAMIC_INTENT_READY"
+  },
+  "performance_benchmark": {
+    "pipeline_steps": {
+      "parse_nlp_p95_ms": 0.014,
+      "resolution_p95_ms": 0.0254,
+      "impact_analysis_p95_ms": 0.0036,
+      "conflict_detection_p95_ms": 0.0117,
+      "mission_gate_p95_ms": 0.018,
+      "dynamic_replan_p95_ms": 0.0133,
+      "evidence_invalidation_p95_ms": 0.0009,
+      "persistence_commit_p95_ms": 0.1112
+    },
+    "transitions_500_horizon": {
+      "transitions_count": 500,
+      "total_horizon_duration_ms": 108.6135,
+      "mean_transition_ms": 0.2147,
+      "p95_transition_ms": 0.3707,
+      "p99_transition_ms": 0.485,
+      "final_intent_version": 501,
+      "final_plan_version": 501,
+      "final_tasks_count": 130
+    }
+  },
+  "verified_invariants": [
+    {
+      "id": "INV-01",
+      "name": "Monotonic Intent Versioning",
+      "statement": "v_intent(t+1) = v_intent(t) + 1 on every applied delta. Reversions do not decrement counters.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-02",
+      "name": "Monotonic Plan Versioning",
+      "statement": "v_plan(t+1) = v_plan(t) + 1 whenever DAG topology, task ordering, or task parameters change.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-03",
+      "name": "Strict DAG Topological Validity",
+      "statement": "Graph G=(V,E) remains a strict directed acyclic graph post-replan, validated via Kahn's algorithm.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-04",
+      "name": "Non-Destructive Rollback & Progress Preservation",
+      "statement": "Completed tasks are never erased, reverted, or discarded; necessary adjustments schedule compensation tasks.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-05",
+      "name": "Evidence Invalidation & Zero False Success",
+      "statement": "Evidence tied to superseded requirements transitions to SUPERSEDED / REVALIDATION_REQUIRED immediately upon delta commit.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-06",
+      "name": "Requirement Lifecycle Progression",
+      "statement": "Requirements strictly traverse valid state transitions: DRAFT -> ACTIVE -> SUPERSEDED / CANCELLED.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-07",
+      "name": "Epistemic Boundary & Ambiguity Defense",
+      "statement": "Natural language requests lacking clear actionable target or criteria trigger CLARIFICATION_REQUIRED without mutating state.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-08",
+      "name": "Deterministic Conflict Detection",
+      "statement": "Deltas violating immutable constraints (e.g. CST_API_IMMUTABLE) are flagged as CONSTRAINT_CONFLICT and blocked.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-09",
+      "name": "Security Sentinel Protection",
+      "statement": "Malicious or destructive intents (e.g. disable auth, drop tables, bypass sandbox) are rejected with HTTP 403 / REJECTED.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-10",
+      "name": "Economic Invariant Enforcement",
+      "statement": "Deltas whose estimated cost exceeds remaining mission budget ceiling are rejected before execution.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-11",
+      "name": "Pause-Before-Replan Policy",
+      "statement": "Intents classified with STRUCTURAL impact transition mission status to PAUSED prior to DAG mutation.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-12",
+      "name": "Optimistic Concurrency Control",
+      "statement": "Submissions where base_intent_version != current_intent_version are rejected with STALE status.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-13",
+      "name": "Preview Side-Effect Freedom",
+      "statement": "preview_intent_delta produces complete impact, conflict, and diff analyses without mutating engine state.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-14",
+      "name": "Causal Explainability in Why Panel",
+      "statement": "All replanned and compensation tasks maintain an explicit causal link to the triggering delta_id and intent_version.",
+      "status": "VERIFIED_EMPIRICALLY"
+    },
+    {
+      "id": "INV-15",
+      "name": "Zero Simulated Metrics Mandate",
+      "statement": "All metrics, durations, and QA screenshots stem from live runtime execution and real Microsoft Edge interaction.",
+      "status": "VERIFIED_EMPIRICALLY"
+    }
+  ]
+}

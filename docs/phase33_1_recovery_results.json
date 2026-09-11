@@ -1,0 +1,75 @@
+{
+  "metadata": {
+    "phase": "33.1",
+    "timestamp": "2026-09-08T20:56:53.428331+00:00",
+    "simulated": 0,
+    "total_recovery_tests": 7,
+    "passed": 7,
+    "failed": 0
+  },
+  "interruption_points": [
+    {
+      "point": 1,
+      "name": "before_write",
+      "interruption_state": "Process terminated before delta file opened",
+      "action": "DETECT_AND_FALLBACK",
+      "result": "RECOVERED_TO_PREVIOUS_SEQUENCE",
+      "status": "PASS",
+      "recovery_latency_ms": 0.42
+    },
+    {
+      "point": 2,
+      "name": "during_write",
+      "interruption_state": "Process terminated mid-write, partial delta.tmp left",
+      "action": "IGNORE_TMP_AND_RECOVER",
+      "result": "RECOVERED_TO_LAST_COMMITTED",
+      "status": "PASS",
+      "recovery_latency_ms": 0.58
+    },
+    {
+      "point": 3,
+      "name": "after_write_before_fsync",
+      "interruption_state": "Unflushed buffers on disk, system crash",
+      "action": "REJECT_UNSYNCED_TMP",
+      "result": "RECOVERED_TO_LAST_COMMITTED",
+      "status": "PASS",
+      "recovery_latency_ms": 0.49
+    },
+    {
+      "point": 4,
+      "name": "during_fsync",
+      "interruption_state": "I/O error during fsync, rename skipped",
+      "action": "BLOCK_CORRUPTION",
+      "result": "NO_STATE_POLLUTION",
+      "status": "PASS",
+      "recovery_latency_ms": 0.51
+    },
+    {
+      "point": 5,
+      "name": "after_fsync_before_manifest",
+      "interruption_state": "Delta file finalized on disk, manifest not committed",
+      "action": "RECONCILE_FROM_MANIFEST",
+      "result": "CONSISTENT_VIEW_RESTORED",
+      "status": "PASS",
+      "recovery_latency_ms": 0.63
+    },
+    {
+      "point": 6,
+      "name": "during_compaction",
+      "interruption_state": "Crash while writing compacted base snapshot",
+      "action": "DISCARD_PARTIAL_SNAPSHOT",
+      "result": "ORIGINAL_DELTA_CHAIN_INTACT",
+      "status": "PASS",
+      "recovery_latency_ms": 0.82
+    },
+    {
+      "point": 7,
+      "name": "after_manifest_update",
+      "interruption_state": "Crash after manifest atomic rename",
+      "action": "VALIDATE_AND_LOAD",
+      "result": "FULL_RESTORE_LATEST_SEQUENCE",
+      "status": "PASS",
+      "recovery_latency_ms": 0.95
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "plan_diff_tracker": "Phase 37 Dynamic Plan Diff Ledger",
+  "snapshots": [
+    {
+      "plan_transition": "v1 -> v2",
+      "reason": "Replanning por delta de intenção: ADD_REQUIREMENT (REQ_AUTH)",
+      "added_tasks": [
+        {
+          "id": "TSK_AUTH_01",
+          "title": "Implementar Middleware de Autenticação & Sessão",
+          "agent": "CODING",
+          "priority": "HIGH",
+          "dependencies": ["TSK_01"],
+          "status": "READY",
+          "intent_version": 2
+        },
+        {
+          "id": "TSK_AUTH_02",
+          "title": "Bateria de Testes de Autenticação & RBAC",
+          "agent": "TESTING",
+          "priority": "HIGH",
+          "dependencies": ["TSK_AUTH_01"],
+          "status": "PENDING",
+          "intent_version": 2
+        }
+      ],
+      "modified_tasks": [
+        {
+          "task_id": "TSK_05",
+          "change": "added dependency TSK_AUTH_02"
+        }
+      ],
+      "removed_tasks": [],
+      "dependencies_changed": [
+        {
+          "task_id": "TSK_05",
+          "added_dep": "TSK_AUTH_02"
+        }
+      ],
+      "dag_topological_validation": {
+        "algorithm": "Kahn's Topological Sort",
+        "acyclic": true,
+        "duplicate_task_ids_detected": 0,
+        "missing_dependencies_detected": 0,
+        "status": "DAG_SAFE"
+      }
+    },
+    {
+      "plan_transition": "v2 -> v3",
+      "reason": "Replanning por delta de intenção: ADD_CONSTRAINT (CST_API_IMMUTABLE)",
+      "added_tasks": [],
+      "modified_tasks": [],
+      "removed_tasks": [],
+      "dependencies_changed": [],
+      "dag_topological_validation": {
+        "algorithm": "Kahn's Topological Sort",
+        "acyclic": true,
+        "status": "DAG_SAFE"
+      }
+    },
+    {
+      "plan_transition": "v3 -> v4",
+      "reason": "Replanning por delta de intenção: REVISE_APPROACH (ARCH_FRAMEWORK)",
+      "added_tasks": [
+        {
+          "id": "TSK_REACT_SETUP",
+          "title": "Configuração de Ambiente React & JSX Runtime",
+          "agent": "CODING",
+          "priority": "HIGH",
+          "dependencies": ["TSK_01"],
+          "status": "DONE",
+          "intent_version": 4
+        }
+      ],
+      "modified_tasks": [
+        {
+          "task_id": "TSK_02",
+          "change": "converted to React architecture and wired dependency TSK_REACT_SETUP"
+        }
+      ],
+      "removed_tasks": [],
+      "dependencies_changed": [
+        {
+          "task_id": "TSK_02",
+          "added_dep": "TSK_REACT_SETUP"
+        }
+      ],
+      "dag_topological_validation": {
+        "algorithm": "Kahn's Topological Sort",
+        "acyclic": true,
+        "status": "DAG_SAFE"
+      }
+    }
+  ]
+}

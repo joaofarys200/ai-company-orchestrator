@@ -1,0 +1,798 @@
+{
+  "phase": 30,
+  "title": "Phase 30 Autonomous Mission Productization Verification Ledger",
+  "generated_at": "2026-09-08T12:58:24.774751+00:00",
+  "git_commit": "172831a",
+  "total_suites_evaluated": 50,
+  "total_tests_passed": 437,
+  "total_execution_duration_seconds": 111.648,
+  "all_suites_passed": true,
+  "evidence_discipline": {
+    "MEASURED": 50,
+    "CALCULATED": 0,
+    "DERIVED": 0,
+    "SIMULATED": 0
+  },
+  "verdict": "PASS",
+  "suites": [
+    {
+      "test_name": "Phase 30 Autonomous Mission Productization",
+      "command": "pytest tests/test_autonomous_mission_productization_phase30.py -q",
+      "timestamp_start": "2026-09-08T12:56:33.124994+00:00",
+      "duration_seconds": 3.965,
+      "exit_code": 0,
+      "passed_tests": 9,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 30 Autonomous Recovery and Chaos",
+      "command": "pytest tests/test_autonomous_recovery_and_chaos_phase30.py -q",
+      "timestamp_start": "2026-09-08T12:56:37.089722+00:00",
+      "duration_seconds": 0.937,
+      "exit_code": 0,
+      "passed_tests": 5,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 29 Transport Productionization",
+      "command": "pytest tests/test_transport_productionization_phase29.py -q",
+      "timestamp_start": "2026-09-08T12:56:38.026418+00:00",
+      "duration_seconds": 0.735,
+      "exit_code": 0,
+      "passed_tests": 11,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 29 Transport Failure & Fallback",
+      "command": "pytest tests/test_transport_failure_and_fallback_phase29.py -q",
+      "timestamp_start": "2026-09-08T12:56:38.761275+00:00",
+      "duration_seconds": 0.749,
+      "exit_code": 0,
+      "passed_tests": 5,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 28 Physical NIC Qualification",
+      "command": "pytest tests/test_physical_nic_qualification_phase28.py -q",
+      "timestamp_start": "2026-09-08T12:56:39.509941+00:00",
+      "duration_seconds": 0.71,
+      "exit_code": 0,
+      "passed_tests": 10,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 28 Physical NIC Failure Injection",
+      "command": "pytest tests/test_physical_nic_failure_injection_phase28.py -q",
+      "timestamp_start": "2026-09-08T12:56:40.219644+00:00",
+      "duration_seconds": 0.705,
+      "exit_code": 0,
+      "passed_tests": 5,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 27 Multi-Socket Sharding Unit",
+      "command": "pytest tests/test_multi_socket_sharding_phase27.py -q",
+      "timestamp_start": "2026-09-08T12:56:40.924304+00:00",
+      "duration_seconds": 0.696,
+      "exit_code": 0,
+      "passed_tests": 9,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 27 Multi-Socket Failure Injection",
+      "command": "pytest tests/test_multi_socket_failure_injection_phase27.py -q",
+      "timestamp_start": "2026-09-08T12:56:41.620108+00:00",
+      "duration_seconds": 0.709,
+      "exit_code": 0,
+      "passed_tests": 5,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 26 Kernel Stack Invariants",
+      "command": "pytest tests/test_kernel_stack_phase26.py -q",
+      "timestamp_start": "2026-09-08T12:56:42.329366+00:00",
+      "duration_seconds": 0.732,
+      "exit_code": 0,
+      "passed_tests": 10,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 26 Kernel Failure Injection",
+      "command": "pytest tests/test_kernel_failure_injection_phase26.py -q",
+      "timestamp_start": "2026-09-08T12:56:43.061871+00:00",
+      "duration_seconds": 0.709,
+      "exit_code": 0,
+      "passed_tests": 5,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 25 Kernel Profiling Unit",
+      "command": "pytest tests/test_kernel_profiling_phase25.py -q",
+      "timestamp_start": "2026-09-08T12:56:43.770621+00:00",
+      "duration_seconds": 0.711,
+      "exit_code": 0,
+      "passed_tests": 5,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 25 Kernel Failure Injection",
+      "command": "pytest tests/test_kernel_failure_injection_phase25.py -q",
+      "timestamp_start": "2026-09-08T12:56:44.481443+00:00",
+      "duration_seconds": 0.828,
+      "exit_code": 0,
+      "passed_tests": 8,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 24 Kernel Datapath Unit",
+      "command": "pytest tests/test_kernel_datapath_phase24.py -q",
+      "timestamp_start": "2026-09-08T12:56:45.309951+00:00",
+      "duration_seconds": 0.716,
+      "exit_code": 0,
+      "passed_tests": 5,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 24 Kernel Failure Injection",
+      "command": "pytest tests/test_kernel_failure_injection_phase24.py -q",
+      "timestamp_start": "2026-09-08T12:56:46.026235+00:00",
+      "duration_seconds": 0.811,
+      "exit_code": 0,
+      "passed_tests": 13,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 23 RIO Transport Unit",
+      "command": "pytest tests/test_rio_transport_phase23.py -q",
+      "timestamp_start": "2026-09-08T12:56:46.837560+00:00",
+      "duration_seconds": 0.871,
+      "exit_code": 0,
+      "passed_tests": 9,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 23 RIO Failure Injection",
+      "command": "pytest tests/test_rio_failure_injection_phase23.py -q",
+      "timestamp_start": "2026-09-08T12:56:47.708220+00:00",
+      "duration_seconds": 0.951,
+      "exit_code": 0,
+      "passed_tests": 7,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 22 QUIC Native Dataplane",
+      "command": "pytest tests/test_quic_dataplane_phase22.py -q",
+      "timestamp_start": "2026-09-08T12:56:48.659506+00:00",
+      "duration_seconds": 1.077,
+      "exit_code": 0,
+      "passed_tests": 9,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 22 QUIC Failure Injection",
+      "command": "pytest tests/test_quic_failure_injection_phase22.py -q",
+      "timestamp_start": "2026-09-08T12:56:49.736676+00:00",
+      "duration_seconds": 1.273,
+      "exit_code": 0,
+      "passed_tests": 7,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 21 QUIC Transport Unit",
+      "command": "pytest tests/test_quic_transport_phase21.py -q",
+      "timestamp_start": "2026-09-08T12:56:51.009426+00:00",
+      "duration_seconds": 2.036,
+      "exit_code": 0,
+      "passed_tests": 16,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 21 Real Mission QUIC",
+      "command": "pytest tests/test_mission_quic_phase21.py -q",
+      "timestamp_start": "2026-09-08T12:56:53.045920+00:00",
+      "duration_seconds": 0.902,
+      "exit_code": 0,
+      "passed_tests": 2,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 20 I/O Dispatch Unit",
+      "command": "pytest tests/test_io_dispatch_phase20.py -q",
+      "timestamp_start": "2026-09-08T12:56:53.947774+00:00",
+      "duration_seconds": 1.045,
+      "exit_code": 0,
+      "passed_tests": 16,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 20 Real Mission Parallel Streaming",
+      "command": "pytest tests/test_mission_parallel_streaming_phase20.py -q",
+      "timestamp_start": "2026-09-08T12:56:54.993292+00:00",
+      "duration_seconds": 0.762,
+      "exit_code": 0,
+      "passed_tests": 1,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 19.1 Streaming Transport",
+      "command": "pytest tests/test_streaming_transport_phase19_1.py -q",
+      "timestamp_start": "2026-09-08T12:56:55.755087+00:00",
+      "duration_seconds": 0.823,
+      "exit_code": 0,
+      "passed_tests": 12,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 19.1 Real Mission Streaming",
+      "command": "pytest tests/test_mission_streaming_phase19_1.py -q",
+      "timestamp_start": "2026-09-08T12:56:56.578497+00:00",
+      "duration_seconds": 0.747,
+      "exit_code": 0,
+      "passed_tests": 1,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 19 Distributed Federation",
+      "command": "pytest tests/test_distributed_federation_phase19.py -q",
+      "timestamp_start": "2026-09-08T12:56:57.325699+00:00",
+      "duration_seconds": 0.923,
+      "exit_code": 0,
+      "passed_tests": 12,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 18.3 High-Performance IPC",
+      "command": "pytest tests/test_swarm_federation_phase18_3.py -q",
+      "timestamp_start": "2026-09-08T12:56:58.248876+00:00",
+      "duration_seconds": 1.345,
+      "exit_code": 0,
+      "passed_tests": 10,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 18.2 Swarm Federation",
+      "command": "pytest tests/test_swarm_federation_phase18_2.py -q",
+      "timestamp_start": "2026-09-08T12:56:59.593624+00:00",
+      "duration_seconds": 3.449,
+      "exit_code": 0,
+      "passed_tests": 10,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 18.1 Swarm Federation",
+      "command": "pytest tests/test_swarm_federation_phase18_1.py -q",
+      "timestamp_start": "2026-09-08T12:57:03.042347+00:00",
+      "duration_seconds": 7.815,
+      "exit_code": 0,
+      "passed_tests": 16,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 18 Process Isolation",
+      "command": "pytest tests/test_swarm_federation_phase18.py -q",
+      "timestamp_start": "2026-09-08T12:57:10.857340+00:00",
+      "duration_seconds": 3.229,
+      "exit_code": 0,
+      "passed_tests": 8,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 17 Swarm Federation",
+      "command": "pytest tests/test_swarm_federation_phase17.py -q",
+      "timestamp_start": "2026-09-08T12:57:14.085999+00:00",
+      "duration_seconds": 0.873,
+      "exit_code": 0,
+      "passed_tests": 13,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 16 Autonomous Mission",
+      "command": "pytest tests/test_autonomous_mission_phase16.py -q",
+      "timestamp_start": "2026-09-08T12:57:14.958615+00:00",
+      "duration_seconds": 0.793,
+      "exit_code": 0,
+      "passed_tests": 14,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 15.3 Collaboration",
+      "command": "pytest tests/test_collaboration_phase15_3.py -q",
+      "timestamp_start": "2026-09-08T12:57:15.751253+00:00",
+      "duration_seconds": 0.816,
+      "exit_code": 0,
+      "passed_tests": 12,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 15.2 Collaboration",
+      "command": "pytest tests/test_collaboration_phase15_2.py -q",
+      "timestamp_start": "2026-09-08T12:57:16.567475+00:00",
+      "duration_seconds": 0.762,
+      "exit_code": 0,
+      "passed_tests": 9,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 15.1 Collaboration Chaos",
+      "command": "pytest tests/test_collaboration_chaos.py -q",
+      "timestamp_start": "2026-09-08T12:57:17.329273+00:00",
+      "duration_seconds": 1.315,
+      "exit_code": 0,
+      "passed_tests": 9,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 15.1 Scalability",
+      "command": "pytest tests/test_collaboration_scalability.py -q",
+      "timestamp_start": "2026-09-08T12:57:18.644523+00:00",
+      "duration_seconds": 1.86,
+      "exit_code": 0,
+      "passed_tests": 13,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 15 Collaboration Unit",
+      "command": "pytest tests/test_collaboration_unit.py -q",
+      "timestamp_start": "2026-09-08T12:57:20.504507+00:00",
+      "duration_seconds": 1.718,
+      "exit_code": 0,
+      "passed_tests": 15,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 14 Swarm Unit",
+      "command": "pytest tests/test_swarm_unit.py -q",
+      "timestamp_start": "2026-09-08T12:57:22.223002+00:00",
+      "duration_seconds": 2.718,
+      "exit_code": 0,
+      "passed_tests": 26,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Phase 14 Swarm Chaos",
+      "command": "pytest tests/test_swarm_chaos.py -q",
+      "timestamp_start": "2026-09-08T12:57:24.940826+00:00",
+      "duration_seconds": 1.09,
+      "exit_code": 0,
+      "passed_tests": 5,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Mission Executor",
+      "command": "pytest tests/test_mission_executor.py -q",
+      "timestamp_start": "2026-09-08T12:57:26.030443+00:00",
+      "duration_seconds": 8.977,
+      "exit_code": 0,
+      "passed_tests": 11,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Sentinel Security",
+      "command": "pytest tests/test_sentinel.py -q",
+      "timestamp_start": "2026-09-08T12:57:35.007744+00:00",
+      "duration_seconds": 20.309,
+      "exit_code": 0,
+      "passed_tests": 10,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Core Lifecycle",
+      "command": "pytest tests/test_application_lifecycle.py -q",
+      "timestamp_start": "2026-09-08T12:57:55.317123+00:00",
+      "duration_seconds": 0.312,
+      "exit_code": 0,
+      "passed_tests": 2,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Mission Persistence",
+      "command": "pytest tests/test_mission_checkpoints_and_restart.py -q",
+      "timestamp_start": "2026-09-08T12:57:55.629494+00:00",
+      "duration_seconds": 1.111,
+      "exit_code": 0,
+      "passed_tests": 2,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "DAG Task Graph",
+      "command": "pytest tests/test_mission_task_graph.py -q",
+      "timestamp_start": "2026-09-08T12:57:56.740105+00:00",
+      "duration_seconds": 0.714,
+      "exit_code": 0,
+      "passed_tests": 8,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Adaptive Planning",
+      "command": "pytest tests/test_adaptive_planning_models_and_validation.py -q",
+      "timestamp_start": "2026-09-08T12:57:57.454257+00:00",
+      "duration_seconds": 0.738,
+      "exit_code": 0,
+      "passed_tests": 24,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Coding Agent",
+      "command": "pytest tests/test_coding_session.py -q",
+      "timestamp_start": "2026-09-08T12:57:58.192285+00:00",
+      "duration_seconds": 5.794,
+      "exit_code": 0,
+      "passed_tests": 15,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "WebSocket Schema",
+      "command": "pytest tests/test_mission_websocket_schema.py -q",
+      "timestamp_start": "2026-09-08T12:58:03.986840+00:00",
+      "duration_seconds": 1.652,
+      "exit_code": 0,
+      "passed_tests": 7,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Browser Swarm QA",
+      "command": "pytest tests/browser/test_swarm_browser.py -q",
+      "timestamp_start": "2026-09-08T12:58:05.638585+00:00",
+      "duration_seconds": 3.105,
+      "exit_code": 0,
+      "passed_tests": 1,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a",
+      "environment": {
+        "python": "3.14.7",
+        "platform": "win32",
+        "cwd": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+      }
+    },
+    {
+      "test_name": "Frontend Lint",
+      "command": "npm run lint",
+      "duration_seconds": 4.312,
+      "exit_code": 0,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a"
+    },
+    {
+      "test_name": "Frontend Build",
+      "command": "npm run build",
+      "duration_seconds": 6.144,
+      "exit_code": 0,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a"
+    },
+    {
+      "test_name": "Phase 30 Browser QA",
+      "command": "python scripts/run_browser_qa_phase30.py",
+      "duration_seconds": 5.574,
+      "exit_code": 0,
+      "verdict": "PASS",
+      "evidence_classification": "MEASURED",
+      "git_commit": "172831a"
+    }
+  ]
+}

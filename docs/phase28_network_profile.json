@@ -1,0 +1,185 @@
+{
+  "timestamp": "2026-09-08T12:18:15.725373+00:00",
+  "metadata": {
+    "phase": "Phase 28",
+    "title": "Physical NIC Qualification & Hardware Discovery",
+    "physical_nic_test": "NOT_AVAILABLE",
+    "decision_gate_verdict": "OPTION C: PHYSICAL NIC TEST NOT AVAILABLE",
+    "evidence_classification": {
+      "hardware_adapters": "MEASURED",
+      "offload_properties": "MEASURED",
+      "ip_configuration": "MEASURED",
+      "peer_availability": "MEASURED",
+      "simulated_entries": 0
+    }
+  },
+  "adapters": [
+    {
+      "name": "Liga\u2021\u00c6o de Rede Bluetooth",
+      "description": "Bluetooth Device (Personal Area Network)",
+      "status": "Disconnected",
+      "link_speed": "3 Mbps",
+      "media_type": "802.3",
+      "mac_address": "9C-65-EB-91-23-EA",
+      "driver_version": "10.0.26100.8972",
+      "ndis_version": "6.30",
+      "rss_capabilities": {
+        "rss_supported": false,
+        "enabled": false,
+        "num_receive_queues": 1,
+        "profile": "Not Supported by Miniport Driver"
+      },
+      "ip_addresses": [],
+      "advanced_offloads": {}
+    },
+    {
+      "name": "Wi-Fi",
+      "description": "Intel(R) Wi-Fi 6E AX211 160MHz",
+      "status": "Up",
+      "link_speed": "866.7 Mbps",
+      "media_type": "Native 802.11",
+      "mac_address": "9C-65-EB-91-23-E6",
+      "driver_version": "24.50.0.4",
+      "ndis_version": "6.60",
+      "rss_capabilities": {
+        "rss_supported": false,
+        "enabled": false,
+        "num_receive_queues": 1,
+        "profile": "Not Supported by Miniport Driver"
+      },
+      "ip_addresses": [
+        {
+          "IPAddress": "fe80::f3e9:4957:e6c0:632a%12",
+          "AddressFamily": 23,
+          "PrefixLength": 64
+        },
+        {
+          "IPAddress": "2a01:11:1010:ffa0:f9be:c98a:80b9:608b",
+          "AddressFamily": 23,
+          "PrefixLength": 128
+        },
+        {
+          "IPAddress": "2a01:11:1010:ffa0:bb3:6965:ef35:e90d",
+          "AddressFamily": 23,
+          "PrefixLength": 64
+        },
+        {
+          "IPAddress": "192.168.1.196",
+          "AddressFamily": 2,
+          "PrefixLength": 24
+        }
+      ],
+      "advanced_offloads": {
+        "Suspender quando a WoWLAN estiver desligada": "Desactivado",
+        "Uni\u00c6o de pacote": "Activado",
+        "Descarga ARP para WoWLAN": "Activado",
+        "Descarga NS para WoWLAN": "Activado",
+        "Regera\u2021\u00c6o de chaves GTK para WoWLAN": "Activado",
+        "Reactiva\u2021\u00c6o por Magic Packet": "Activado",
+        "Correspond\u02c6ncia de padr\u00c6o do Wake on": "Activado",
+        "Largura do canal para 2,4 GHz": "Auto",
+        "Largura do canal para 5 GHz": "Auto",
+        "Largura do canal para 6 GHz": "Auto",
+        "Protec\u2021\u00c6o do modo misto": "RTS/CTS Activado",
+        "Utiliza\u2021\u00c6o de carga do canal para sele\u2021\u00c6o de ponto de acesso": null,
+        "Canal de grandes volumes incompat\u00a1vel": "Desactivado",
+        "Dete\u2021\u00c6o de Presen\u2021a Humana": "Auto",
+        "Pot\u02c6ncia de transmiss\u00c6o": "5. Maior",
+        "Modo sem fios 802.11n/ac/ax": "4. 802.11ax",
+        "Banda ultra-alta (6GHz)": "Activado",
+        "Modo de poupan\u2021a de energia MIMO": "SMPS autom\u00a0tico",
+        "Agressividade do roaming": "3. M\u201adia",
+        "Banda preferida": "1. Sem Prefer\u02c6ncia",
+        "Otimizador do rendimento": "Desactivado",
+        "Suporte de U-APSD": "Desactivado",
+        "Modo sem fios 802.11a/b/g": "6. Banda dupla de 802.11a/b/g"
+      }
+    },
+    {
+      "name": "Ethernet",
+      "description": "Realtek PCIe GbE Family Controller",
+      "status": "Disconnected",
+      "link_speed": "0 bps",
+      "media_type": "802.3",
+      "mac_address": "34-5A-60-9C-37-3E",
+      "driver_version": "1168.29.202.2026",
+      "ndis_version": "6.89",
+      "rss_capabilities": {
+        "rss_supported": false,
+        "enabled": false,
+        "num_receive_queues": 1,
+        "profile": "Not Supported by Miniport Driver"
+      },
+      "ip_addresses": [
+        {
+          "IPAddress": "fe80::984b:d579:b4fd:1a96%6",
+          "AddressFamily": 23,
+          "PrefixLength": 64
+        },
+        {
+          "IPAddress": "169.254.106.150",
+          "AddressFamily": 2,
+          "PrefixLength": 16
+        }
+      ],
+      "advanced_offloads": {
+        "Ethernet de Consumo de Energia Eficiente": "Activado",
+        "Controlo do fluxo": "Recep\u2021\u00c6o e transmiss\u00c6o activada",
+        "Modera\u2021\u00c6o de interrup\u2021\u00c6o": "Enabled",
+        "Soma de verifica\u2021\u00c6o offload IPv4": "Recep\u2021\u00c6o e transmiss\u00c6o activada",
+        "Estrutura jumbo": "Desactivado",
+        "Envio grande de offload v2 (IPv4)": "Activado",
+        "Envio grande de offload v2 (IPv6)": "Activado",
+        "Descarga de ARP": "Activado",
+        "Descarga de NS": "Activado",
+        "Prioridade e VLAN": "Prioridade e VLAN activada",
+        "Mem\u00a2ria de recep\u2021\u00c6o": "512",
+        "Recv Segment Coalescing (IPv4)": "Activado",
+        "Recv Segment Coalescing (IPv6)": "Activado",
+        "Velocidade e modo duplex": "Auto negocia\u2021\u00c6o",
+        "Soma de verifica\u2021\u00c6o offload TCP (IPv4)": "Recep\u2021\u00c6o e transmiss\u00c6o activada",
+        "Soma de verifica\u2021\u00c6o offload TCP (IPv6)": "Recep\u2021\u00c6o e transmiss\u00c6o activada",
+        "Mem\u00a2ria de transmiss\u00c6o": "128",
+        "Soma de verifica\u2021\u00c6o offload UDP (IPv4)": "Recep\u2021\u00c6o e transmiss\u00c6o activada",
+        "Soma de verifica\u2021\u00c6o offload UDP (IPv6)": "Recep\u2021\u00c6o e transmiss\u00c6o activada",
+        "Reactiva\u2021\u00c6o por Magic Packet": "Activado",
+        "Reactiva\u2021\u00c6o por correspond\u02c6ncia de padr\u00e4es": "Activado",
+        "Advanced EEE": "Desactivado",
+        "Ethernet verde": "Activado",
+        "Gigabit Lite": "Activado",
+        "Endere\u2021o de rede": null,
+        "Power Saving Mode": "Activado",
+        "VLAN ID": "0",
+        "Encerrar Wake-On-Lan": "Activado",
+        "WOL e encerrar velocidade de liga\u2021\u00c6o": "10 Mbps primeiro"
+      }
+    }
+  ],
+  "peer_discovery": {
+    "remote_peers_found": 3,
+    "lan_devices": [
+      {
+        "ip": "192.168.1.1",
+        "mac": "74-9b-e8-a1-ff-e2",
+        "type": "dynamic"
+      },
+      {
+        "ip": "192.168.1.98",
+        "mac": "2e-fe-52-ae-e0-3a",
+        "type": "dynamic"
+      },
+      {
+        "ip": "192.168.1.139",
+        "mac": "2e-fe-52-ae-e0-3a",
+        "type": "dynamic"
+      }
+    ],
+    "jarvis_peer_node_available": false,
+    "physical_nic_test_status": "NOT_AVAILABLE",
+    "rationale": "No secondary physical host on the LAN is configured with a JARVIS transport listener."
+  },
+  "decision_gate": {
+    "verdict": "OPTION C: PHYSICAL NIC TEST NOT AVAILABLE",
+    "justification": "Hardware discovery confirms Intel Wi-Fi 6E AX211 is operational at 866.7 Mbps and Realtek GbE is disconnected, but no secondary physical machine running JARVIS transport is available on the LAN. Per specification rule, multi-host physical benchmark is marked NOT_AVAILABLE with zero simulated data."
+  }
+}

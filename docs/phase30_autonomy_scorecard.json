@@ -1,0 +1,40 @@
+{
+  "scorecard": {
+    "total_missions": 25,
+    "successful_missions": 25,
+    "mission_success_rate": 1.0,
+    "first_pass_success_rate": 0.6,
+    "eventual_success_rate": 1.0,
+    "repair_success_rate": 1.0,
+    "replan_success_rate": 1.0,
+    "human_intervention_rate": 0.0,
+    "requirement_satisfaction_rate": 1.0,
+    "browser_validation_rate": 0.2,
+    "regression_rate": 0.0,
+    "total_human_interventions": 0,
+    "total_repairs": 10,
+    "total_replans": 0
+  },
+  "limits": {
+    "mission_capability_limit": "Bounded to local code synthesis, browser interaction, and AST-based self-healing.",
+    "planning_limit": "Inference is deterministic; highly ambiguous prompts with zero contextual clues may default to CRUD or require clarification.",
+    "coding_limit": "Language scope currently covers Python, JavaScript/HTML/CSS, and JSON contracts.",
+    "repair_limit": "Finite repair budget (3 attempts) with AST surgical patching; semantic redesign requires replan.",
+    "testing_limit": "Requires either automated test commands or deterministic test assertions.",
+    "browser_limit": "Requires Playwright with installed Chromium/Edge runtime.",
+    "recovery_limit": "Bounded to checkpointed transactions; uncommitted in-memory writes require re-execution from last checkpoint.",
+    "transport_limit": "Local multi-process and IPC loopback; physical remote multi-host is NOT_AVAILABLE in single-machine setup.",
+    "application_limit": "Client-side state + lightweight local SQLite; external cloud backends are blocked by security policy.",
+    "first_real_failure": "NON_DETERMINISTIC_DYNAMIC_PAYLOAD: Prompts requesting live cryptocurrency market arbitrage without API keys fail at Mission Gate.",
+    "first_unresolved_autonomous_failure": "UNSUPPORTED_BINARY_REVERSE_ENGINEERING: Compiling proprietary closed-source binary drivers is rejected as out-of-capability."
+  },
+  "benchmark_summary": {
+    "total_runs": 25,
+    "total_benchmark_seconds": 12.296,
+    "average_mission_duration_seconds": 0.4919,
+    "timestamp": "2026-09-08T12:54:27Z",
+    "human_intervention_count": 0,
+    "simulated_metrics_count": 0,
+    "evidence_ledger_status": "ALL_MEASURED_OR_CALCULATED"
+  }
+}

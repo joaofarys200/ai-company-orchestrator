@@ -1,0 +1,101 @@
+{
+  "phase": 39.1,
+  "phase_name": "TypeScript Dependency Intelligence & Predictive Graph Accuracy",
+  "timestamp_iso": "2026-09-11T12:43:41Z",
+  "environment": {
+    "platform": "win32",
+    "python_version": "3.14.7",
+    "os_release": "11"
+  },
+  "latencies": {
+    "cold_parse": {
+      "mean_ms": 607.06,
+      "median_ms": 606.48,
+      "p95_ms": 612.889,
+      "p99_ms": 612.889,
+      "min_ms": 601.811,
+      "max_ms": 612.889,
+      "sample_count": 3
+    },
+    "warm_cache": {
+      "mean_ms": 126.416,
+      "median_ms": 126.278,
+      "p95_ms": 130.059,
+      "p99_ms": 130.059,
+      "min_ms": 122.848,
+      "max_ms": 130.059,
+      "sample_count": 15
+    },
+    "incremental_single_file": {
+      "mean_ms": 134.499,
+      "median_ms": 133.108,
+      "p95_ms": 145.402,
+      "p99_ms": 145.402,
+      "min_ms": 129.212,
+      "max_ms": 145.402,
+      "sample_count": 10
+    },
+    "incremental_multi_file": {
+      "mean_ms": 131.408,
+      "median_ms": 131.373,
+      "p95_ms": 133.46,
+      "p99_ms": 133.46,
+      "min_ms": 129.764,
+      "max_ms": 133.46,
+      "sample_count": 10
+    },
+    "incremental_tsconfig": {
+      "mean_ms": 481.851,
+      "median_ms": 474.723,
+      "p95_ms": 498.084,
+      "p99_ms": 498.084,
+      "min_ms": 472.745,
+      "max_ms": 498.084,
+      "sample_count": 3
+    },
+    "graph_generation": {
+      "mean_ms": 1.704,
+      "median_ms": 1.679,
+      "p95_ms": 1.916,
+      "p99_ms": 1.916,
+      "min_ms": 1.598,
+      "max_ms": 1.916,
+      "sample_count": 15
+    },
+    "alias_resolution": {
+      "mean_ms": 0.008,
+      "median_ms": 0.007,
+      "p95_ms": 0.01,
+      "p99_ms": 0.042,
+      "min_ms": 0.006,
+      "max_ms": 0.042,
+      "sample_count": 50
+    },
+    "barrel_resolution": {
+      "mean_ms": 0.013,
+      "median_ms": 0.01,
+      "p95_ms": 0.017,
+      "p99_ms": 0.096,
+      "min_ms": 0.01,
+      "max_ms": 0.096,
+      "sample_count": 50
+    },
+    "prediction_traversal": {
+      "mean_ms": 20.085,
+      "median_ms": 0.067,
+      "p95_ms": 0.111,
+      "p99_ms": 500.432,
+      "min_ms": 0.065,
+      "max_ms": 500.432,
+      "sample_count": 25
+    }
+  },
+  "memory_profile_mb": {
+    "baseline_memory": 68.71,
+    "index_memory": 75.66,
+    "graph_memory": 76.27,
+    "prediction_memory": 77.38,
+    "index_delta_mb": 6.95,
+    "graph_delta_mb": 0.21
+  }
+}

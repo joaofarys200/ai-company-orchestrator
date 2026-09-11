@@ -1,0 +1,24 @@
+{
+  "phase": "Phase 25 \u2014 Windows Network Stack Observability & Causal Kernel Profiling Browser QA",
+  "timestamp": "2026-09-07T20:43:18Z",
+  "browser_engine": "Chromium 152.0.4191.66",
+  "playwright_version": "1.62.0",
+  "screenshot_path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase25_browser_qa.png",
+  "screenshot_size_kb": 156.63,
+  "duration_seconds": 1.859,
+  "console_errors_count": 0,
+  "console_errors": [],
+  "network_errors_count": 0,
+  "network_errors": [],
+  "dom_validations": {
+    "badge_transport": "OBSERVABILITY ACTIVE",
+    "badge_mission": "AUDIT PASS",
+    "badge_nic": "PHYSICAL NIC: NOT_AVAILABLE",
+    "val_plateau_tp": "480.55 MB/s",
+    "val_generator_capacity": "3,954.46 MB/s",
+    "val_kernel_cpu": "72.06%",
+    "val_dpc_core": "Core 4",
+    "val_hot_path": "Windows Kernel Socket Subsystem (AFD.sys & winsock DPC dispatch)"
+  },
+  "browser_qa_verdict": "PASS"
+}

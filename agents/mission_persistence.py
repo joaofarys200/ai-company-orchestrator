@@ -324,6 +324,26 @@ class SQLiteMissionPersistence(MissionStatePersistence):
                     created_at TEXT
                 );
 
+                CREATE TABLE IF NOT EXISTS checkpoint_base_snapshots (
+                    sequence INTEGER PRIMARY KEY,
+                    snapshot_id TEXT UNIQUE NOT NULL,
+                    mission_id TEXT NOT NULL,
+                    parent_hash TEXT NOT NULL,
+                    content_hash TEXT NOT NULL,
+                    data_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS checkpoint_deltas (
+                    sequence INTEGER PRIMARY KEY,
+                    delta_id TEXT UNIQUE NOT NULL,
+                    mission_id TEXT NOT NULL,
+                    parent_hash TEXT NOT NULL,
+                    content_hash TEXT NOT NULL,
+                    delta_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS storage_metadata (
                     key TEXT PRIMARY KEY,
                     value TEXT
@@ -856,6 +876,78 @@ class SQLiteMissionPersistence(MissionStatePersistence):
             if not row:
                 return None
             return json.loads(row["data_json"])
+
+    def save_base_snapshot(self, project_id: str, mission_id: str, snap_data: dict[str, Any]) -> None:
+        seq = int(snap_data["sequence"])
+        sid = snap_data["snapshot_id"]
+        with self._connection(project_id, mission_id) as conn:
+            with conn:
+                conn.execute("""
+                    INSERT INTO checkpoint_base_snapshots (sequence, snapshot_id, mission_id, parent_hash, content_hash, data_json, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(sequence) DO UPDATE SET
+                        snapshot_id=excluded.snapshot_id,
+                        parent_hash=excluded.parent_hash,
+                        content_hash=excluded.content_hash,
+                        data_json=excluded.data_json
+                """, (
+                    seq,
+                    sid,
+                    mission_id,
+                    snap_data.get("parent_hash", ""),
+                    snap_data.get("content_hash", ""),
+                    json.dumps(snap_data.get("checkpoint_data", {}), ensure_ascii=False),
+                    snap_data.get("created_at", ""),
+                ))
+
+    def load_base_snapshot(self, project_id: str, mission_id: str, sequence: int | None = None) -> dict[str, Any] | None:
+        with self._connection(project_id, mission_id) as conn:
+            if sequence is not None:
+                row = conn.execute("SELECT * FROM checkpoint_base_snapshots WHERE sequence = ?", (sequence,)).fetchone()
+            else:
+                row = conn.execute("SELECT * FROM checkpoint_base_snapshots ORDER BY sequence DESC LIMIT 1").fetchone()
+            if not row:
+                return None
+            return {
+                "snapshot_id": row["snapshot_id"],
+                "sequence": row["sequence"],
+                "mission_id": row["mission_id"],
+                "parent_hash": row["parent_hash"],
+                "content_hash": row["content_hash"],
+                "checkpoint_data": json.loads(row["data_json"]),
+                "created_at": row["created_at"],
+            }
+
+    def save_checkpoint_delta(self, project_id: str, mission_id: str, delta_data: dict[str, Any]) -> None:
+        seq = int(delta_data["sequence"])
+        did = delta_data["delta_id"]
+        with self._connection(project_id, mission_id) as conn:
+            with conn:
+                conn.execute("""
+                    INSERT INTO checkpoint_deltas (sequence, delta_id, mission_id, parent_hash, content_hash, delta_json, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(sequence) DO UPDATE SET
+                        delta_id=excluded.delta_id,
+                        parent_hash=excluded.parent_hash,
+                        content_hash=excluded.content_hash,
+                        delta_json=excluded.delta_json
+                """, (
+                    seq,
+                    did,
+                    mission_id,
+                    delta_data.get("parent_hash", ""),
+                    delta_data.get("content_hash", ""),
+                    json.dumps(delta_data, ensure_ascii=False),
+                    delta_data.get("created_at", ""),
+                ))
+
+    def load_checkpoint_deltas(self, project_id: str, mission_id: str, since_sequence: int = 0) -> list[dict[str, Any]]:
+        with self._connection(project_id, mission_id) as conn:
+            rows = conn.execute(
+                "SELECT delta_json FROM checkpoint_deltas WHERE sequence > ? ORDER BY sequence ASC",
+                (since_sequence,)
+            ).fetchall()
+            return [json.loads(r["delta_json"]) for r in rows]
 
     def get_storage_stats(self, project_id: str, mission_id: str) -> StorageStats:
         db_path = self._db_path(project_id, mission_id)

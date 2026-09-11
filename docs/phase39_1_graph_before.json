@@ -1,0 +1,19 @@
+{
+  "phase": 39,
+  "phase_name": "Phase 39 Baseline (Textual Heuristics)",
+  "timestamp_iso": "2026-09-11T12:30:00Z",
+  "nodes": 435,
+  "edges": 162,
+  "resolved_edges": 130,
+  "unresolved_edges": 32,
+  "aliases_resolved": 48,
+  "symbol_edges": 0,
+  "cycles": 0,
+  "package_boundaries": {
+    "INTRA_PACKAGE": 130,
+    "INTER_PACKAGE": 0,
+    "EXTERNAL_PACKAGE": 32
+  },
+  "ts_dependency_recall": 0.8,
+  "ts_dependency_precision": 0.889
+}

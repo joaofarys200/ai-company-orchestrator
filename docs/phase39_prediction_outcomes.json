@@ -1,0 +1,1611 @@
+{
+  "predictions": [
+    {
+      "prediction_id": "pred_8c8e9b59",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130615.6432166,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "CROSS_FILE",
+      "predicted_risk": "MEDIUM",
+      "risk_factors": {
+        "total_score": 33.0,
+        "breakdown": {
+          "scope_score": 12.0,
+          "coupling_score": 6.0,
+          "security_score": 0.0,
+          "architecture_score": 2.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como MEDIUM: Alteração de escopo CROSS_FILE com baixo acoplamento e sem impacto em segurança."
+      },
+      "affected_requirements": [
+        "REQ_STYLE_1"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "action": "ADD_TASK",
+          "title": "Implementar REQ_STYLE_1",
+          "description": "Desenvolver componentes e lógica associada à diretiva: Ajustar estilo CSS do cabeçalho",
+          "source_requirement": "REQ_STYLE_1",
+          "dependencies": [],
+          "predicted_owner": "coder",
+          "confidence": 0.9,
+          "status": "PREDICTED_ONLY"
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "action": "ADD_TASK",
+          "title": "Validar testes para REQ_STYLE_1",
+          "description": "Executar suite de testes unitários e de integração para REQ_STYLE_1",
+          "source_requirement": "REQ_STYLE_1",
+          "dependencies": [
+            "ptask_impl_6"
+          ],
+          "predicted_owner": "test_engineer",
+          "confidence": 0.88,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "frontend/src/App.tsx",
+          "classification": "DIRECT",
+          "reason": "Atualização de layout ou inclusão de componente React no core da aplicação",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.9
+        },
+        {
+          "file_path": "frontend/src/index.css",
+          "classification": "INDIRECT",
+          "reason": "Ajuste de estilos e tokens de design",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.8
+        }
+      ],
+      "predicted_symbols": [
+        {
+          "name": "App",
+          "file_path": "frontend/src/App.tsx",
+          "symbol_type": "FUNCTION",
+          "change_nature": "MODIFY",
+          "reason": "Símbolo exportado em frontend/src/App.tsx"
+        }
+      ],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'UI / React'",
+          "path": "Directive -> Main App View -> Stylesheet / Design System",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_App.py",
+          "target_module": "frontend/src/App.tsx",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/App.tsx"
+        },
+        {
+          "test_file": "tests/test_index.py",
+          "target_module": "frontend/src/index.css",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/index.css"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": true,
+      "predicted_pause_required": false,
+      "predicted_approval_required": false,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'UI / React'",
+          "path": "Directive -> Main App View -> Stylesheet / Design System",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_fdc0cac7",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130616.1448364,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "CROSS_FILE",
+      "predicted_risk": "MEDIUM",
+      "risk_factors": {
+        "total_score": 33.0,
+        "breakdown": {
+          "scope_score": 12.0,
+          "coupling_score": 6.0,
+          "security_score": 0.0,
+          "architecture_score": 2.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como MEDIUM: Alteração de escopo CROSS_FILE com baixo acoplamento e sem impacto em segurança."
+      },
+      "affected_requirements": [
+        "REQ_STYLE_2"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "action": "ADD_TASK",
+          "title": "Implementar REQ_STYLE_2",
+          "description": "Desenvolver componentes e lógica associada à diretiva: Modificar cores dos botões de ação",
+          "source_requirement": "REQ_STYLE_2",
+          "dependencies": [],
+          "predicted_owner": "coder",
+          "confidence": 0.9,
+          "status": "PREDICTED_ONLY"
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "action": "ADD_TASK",
+          "title": "Validar testes para REQ_STYLE_2",
+          "description": "Executar suite de testes unitários e de integração para REQ_STYLE_2",
+          "source_requirement": "REQ_STYLE_2",
+          "dependencies": [
+            "ptask_impl_6"
+          ],
+          "predicted_owner": "test_engineer",
+          "confidence": 0.88,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "frontend/src/App.tsx",
+          "classification": "DIRECT",
+          "reason": "Atualização de layout ou inclusão de componente React no core da aplicação",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.9
+        },
+        {
+          "file_path": "frontend/src/index.css",
+          "classification": "INDIRECT",
+          "reason": "Ajuste de estilos e tokens de design",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.8
+        }
+      ],
+      "predicted_symbols": [
+        {
+          "name": "App",
+          "file_path": "frontend/src/App.tsx",
+          "symbol_type": "FUNCTION",
+          "change_nature": "MODIFY",
+          "reason": "Símbolo exportado em frontend/src/App.tsx"
+        }
+      ],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'UI / React'",
+          "path": "Directive -> Main App View -> Stylesheet / Design System",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_App.py",
+          "target_module": "frontend/src/App.tsx",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/App.tsx"
+        },
+        {
+          "test_file": "tests/test_index.py",
+          "target_module": "frontend/src/index.css",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/index.css"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": true,
+      "predicted_pause_required": false,
+      "predicted_approval_required": false,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'UI / React'",
+          "path": "Directive -> Main App View -> Stylesheet / Design System",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_17792271",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130616.6328459,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "CROSS_FILE",
+      "predicted_risk": "MEDIUM",
+      "risk_factors": {
+        "total_score": 33.0,
+        "breakdown": {
+          "scope_score": 12.0,
+          "coupling_score": 6.0,
+          "security_score": 0.0,
+          "architecture_score": 2.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como MEDIUM: Alteração de escopo CROSS_FILE com baixo acoplamento e sem impacto em segurança."
+      },
+      "affected_requirements": [
+        "REQ_STYLE_3"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_replan_6",
+          "action": "MODIFY_TASK",
+          "title": "Adaptar abordagem para REQ_STYLE_3",
+          "description": "Reconfigurar implementação existente para alinhar com: Atualizar tipografia para Outfit",
+          "source_requirement": "REQ_STYLE_3",
+          "dependencies": [],
+          "predicted_owner": "architect",
+          "confidence": 0.85,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "frontend/src/App.tsx",
+          "classification": "DIRECT",
+          "reason": "Atualização de layout ou inclusão de componente React no core da aplicação",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.9
+        },
+        {
+          "file_path": "frontend/src/index.css",
+          "classification": "INDIRECT",
+          "reason": "Ajuste de estilos e tokens de design",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.8
+        }
+      ],
+      "predicted_symbols": [
+        {
+          "name": "App",
+          "file_path": "frontend/src/App.tsx",
+          "symbol_type": "FUNCTION",
+          "change_nature": "MODIFY",
+          "reason": "Símbolo exportado em frontend/src/App.tsx"
+        }
+      ],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'UI / React'",
+          "path": "Directive -> Main App View -> Stylesheet / Design System",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_App.py",
+          "target_module": "frontend/src/App.tsx",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/App.tsx"
+        },
+        {
+          "test_file": "tests/test_index.py",
+          "target_module": "frontend/src/index.css",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/index.css"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": true,
+      "predicted_pause_required": false,
+      "predicted_approval_required": false,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'UI / React'",
+          "path": "Directive -> Main App View -> Stylesheet / Design System",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_acdd2362",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130617.127123,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "CROSS_FILE",
+      "predicted_risk": "MEDIUM",
+      "risk_factors": {
+        "total_score": 33.0,
+        "breakdown": {
+          "scope_score": 12.0,
+          "coupling_score": 6.0,
+          "security_score": 0.0,
+          "architecture_score": 2.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como MEDIUM: Alteração de escopo CROSS_FILE com baixo acoplamento e sem impacto em segurança."
+      },
+      "affected_requirements": [
+        "REQ_STYLE_4"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "action": "ADD_TASK",
+          "title": "Implementar REQ_STYLE_4",
+          "description": "Desenvolver componentes e lógica associada à diretiva: Adicionar bordas arredondadas",
+          "source_requirement": "REQ_STYLE_4",
+          "dependencies": [],
+          "predicted_owner": "coder",
+          "confidence": 0.9,
+          "status": "PREDICTED_ONLY"
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "action": "ADD_TASK",
+          "title": "Validar testes para REQ_STYLE_4",
+          "description": "Executar suite de testes unitários e de integração para REQ_STYLE_4",
+          "source_requirement": "REQ_STYLE_4",
+          "dependencies": [
+            "ptask_impl_6"
+          ],
+          "predicted_owner": "test_engineer",
+          "confidence": 0.88,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "frontend/src/App.tsx",
+          "classification": "DIRECT",
+          "reason": "Atualização de layout ou inclusão de componente React no core da aplicação",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.9
+        },
+        {
+          "file_path": "frontend/src/index.css",
+          "classification": "INDIRECT",
+          "reason": "Ajuste de estilos e tokens de design",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.8
+        }
+      ],
+      "predicted_symbols": [
+        {
+          "name": "App",
+          "file_path": "frontend/src/App.tsx",
+          "symbol_type": "FUNCTION",
+          "change_nature": "MODIFY",
+          "reason": "Símbolo exportado em frontend/src/App.tsx"
+        }
+      ],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'UI / React'",
+          "path": "Directive -> Main App View -> Stylesheet / Design System",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_App.py",
+          "target_module": "frontend/src/App.tsx",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/App.tsx"
+        },
+        {
+          "test_file": "tests/test_index.py",
+          "target_module": "frontend/src/index.css",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/index.css"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": true,
+      "predicted_pause_required": false,
+      "predicted_approval_required": false,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'UI / React'",
+          "path": "Directive -> Main App View -> Stylesheet / Design System",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_758fbe40",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130617.617682,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "ARCHITECTURAL",
+      "predicted_risk": "HIGH",
+      "risk_factors": {
+        "total_score": 61.0,
+        "breakdown": {
+          "scope_score": 28.0,
+          "coupling_score": 6.0,
+          "security_score": 0.0,
+          "architecture_score": 14.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como HIGH: Impacto arquitetural em contratos ou serviços centrais."
+      },
+      "affected_requirements": [
+        "REQ_STYLE_5"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_replan_6",
+          "action": "MODIFY_TASK",
+          "title": "Adaptar abordagem para REQ_STYLE_5",
+          "description": "Reconfigurar implementação existente para alinhar com: Usar transições CSS suaves",
+          "source_requirement": "REQ_STYLE_5",
+          "dependencies": [],
+          "predicted_owner": "architect",
+          "confidence": 0.85,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "frontend/src/App.tsx",
+          "classification": "DIRECT",
+          "reason": "Atualização de layout ou inclusão de componente React no core da aplicação",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.9
+        },
+        {
+          "file_path": "frontend/src/index.css",
+          "classification": "INDIRECT",
+          "reason": "Ajuste de estilos e tokens de design",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.8
+        }
+      ],
+      "predicted_symbols": [
+        {
+          "name": "App",
+          "file_path": "frontend/src/App.tsx",
+          "symbol_type": "FUNCTION",
+          "change_nature": "MODIFY",
+          "reason": "Símbolo exportado em frontend/src/App.tsx"
+        }
+      ],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'UI / React'",
+          "path": "Directive -> Main App View -> Stylesheet / Design System",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_App.py",
+          "target_module": "frontend/src/App.tsx",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/App.tsx"
+        },
+        {
+          "test_file": "tests/test_index.py",
+          "target_module": "frontend/src/index.css",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/index.css"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": true,
+      "predicted_pause_required": true,
+      "predicted_approval_required": true,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'UI / React'",
+          "path": "Directive -> Main App View -> Stylesheet / Design System",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_2eceb619",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130618.107162,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "CROSS_MODULE",
+      "predicted_risk": "HIGH",
+      "risk_factors": {
+        "total_score": 66.0,
+        "breakdown": {
+          "scope_score": 20.0,
+          "coupling_score": 9.0,
+          "security_score": 22.0,
+          "architecture_score": 2.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como HIGH: Toca em domínio de segurança/autenticação; Acoplamento elevado com múltiplos ficheiros afetados."
+      },
+      "affected_requirements": [
+        "REQ_AUTH_1"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "action": "ADD_TASK",
+          "title": "Implementar REQ_AUTH_1",
+          "description": "Desenvolver componentes e lógica associada à diretiva: Adicionar autenticação JWT e rotas protegidas",
+          "source_requirement": "REQ_AUTH_1",
+          "dependencies": [],
+          "predicted_owner": "coder",
+          "confidence": 0.9,
+          "status": "PREDICTED_ONLY"
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "action": "ADD_TASK",
+          "title": "Validar testes para REQ_AUTH_1",
+          "description": "Executar suite de testes unitários e de integração para REQ_AUTH_1",
+          "source_requirement": "REQ_AUTH_1",
+          "dependencies": [
+            "ptask_impl_6"
+          ],
+          "predicted_owner": "test_engineer",
+          "confidence": 0.88,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "backend/security/auth.py",
+          "classification": "DIRECT",
+          "reason": "Implementação de autenticação JWT e validação de credenciais",
+          "estimated_change_type": "CREATE",
+          "related_symbol": "authenticate_user",
+          "confidence": 0.92
+        },
+        {
+          "file_path": "backend/api.py",
+          "classification": "INDIRECT",
+          "reason": "Injeção de middleware de autenticação nas rotas protegidas",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": "auth_middleware",
+          "confidence": 0.88
+        },
+        {
+          "file_path": "frontend/src/context/AuthContext.tsx",
+          "classification": "POSSIBLE",
+          "reason": "Gestão de token de sessão e estado de autenticação no frontend",
+          "estimated_change_type": "CREATE",
+          "related_symbol": null,
+          "confidence": 0.75
+        }
+      ],
+      "predicted_symbols": [],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'auth/jwt'",
+          "path": "Directive -> Security Module (auth.py) -> API Endpoints (api.py) -> Client AuthContext",
+          "impact_type": "CROSS_MODULE"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_auth.py",
+          "target_module": "backend/security/auth.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de backend/security/auth.py"
+        },
+        {
+          "test_file": "tests/test_api.py",
+          "target_module": "backend/api.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de backend/api.py"
+        },
+        {
+          "test_file": "tests/test_AuthContext.py",
+          "target_module": "frontend/src/context/AuthContext.tsx",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/context/AuthContext.tsx"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": true,
+      "predicted_pause_required": true,
+      "predicted_approval_required": true,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'auth/jwt'",
+          "path": "Directive -> Security Module (auth.py) -> API Endpoints (api.py) -> Client AuthContext",
+          "impact_type": "CROSS_MODULE"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_66004ce0",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130618.604874,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "CROSS_MODULE",
+      "predicted_risk": "HIGH",
+      "risk_factors": {
+        "total_score": 66.0,
+        "breakdown": {
+          "scope_score": 20.0,
+          "coupling_score": 9.0,
+          "security_score": 22.0,
+          "architecture_score": 2.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como HIGH: Toca em domínio de segurança/autenticação; Acoplamento elevado com múltiplos ficheiros afetados."
+      },
+      "affected_requirements": [
+        "REQ_AUTH_2"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "action": "ADD_TASK",
+          "title": "Implementar REQ_AUTH_2",
+          "description": "Desenvolver componentes e lógica associada à diretiva: Integrar middleware de token no backend e frontend",
+          "source_requirement": "REQ_AUTH_2",
+          "dependencies": [],
+          "predicted_owner": "coder",
+          "confidence": 0.9,
+          "status": "PREDICTED_ONLY"
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "action": "ADD_TASK",
+          "title": "Validar testes para REQ_AUTH_2",
+          "description": "Executar suite de testes unitários e de integração para REQ_AUTH_2",
+          "source_requirement": "REQ_AUTH_2",
+          "dependencies": [
+            "ptask_impl_6"
+          ],
+          "predicted_owner": "test_engineer",
+          "confidence": 0.88,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "backend/security/auth.py",
+          "classification": "DIRECT",
+          "reason": "Implementação de autenticação JWT e validação de credenciais",
+          "estimated_change_type": "CREATE",
+          "related_symbol": "authenticate_user",
+          "confidence": 0.92
+        },
+        {
+          "file_path": "backend/api.py",
+          "classification": "INDIRECT",
+          "reason": "Injeção de middleware de autenticação nas rotas protegidas",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": "auth_middleware",
+          "confidence": 0.88
+        },
+        {
+          "file_path": "frontend/src/context/AuthContext.tsx",
+          "classification": "POSSIBLE",
+          "reason": "Gestão de token de sessão e estado de autenticação no frontend",
+          "estimated_change_type": "CREATE",
+          "related_symbol": null,
+          "confidence": 0.75
+        }
+      ],
+      "predicted_symbols": [],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'auth/jwt'",
+          "path": "Directive -> Security Module (auth.py) -> API Endpoints (api.py) -> Client AuthContext",
+          "impact_type": "CROSS_MODULE"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_auth.py",
+          "target_module": "backend/security/auth.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de backend/security/auth.py"
+        },
+        {
+          "test_file": "tests/test_api.py",
+          "target_module": "backend/api.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de backend/api.py"
+        },
+        {
+          "test_file": "tests/test_AuthContext.py",
+          "target_module": "frontend/src/context/AuthContext.tsx",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/context/AuthContext.tsx"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": true,
+      "predicted_pause_required": true,
+      "predicted_approval_required": true,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'auth/jwt'",
+          "path": "Directive -> Security Module (auth.py) -> API Endpoints (api.py) -> Client AuthContext",
+          "impact_type": "CROSS_MODULE"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_64d82727",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130619.0988228,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "CROSS_MODULE",
+      "predicted_risk": "MEDIUM",
+      "risk_factors": {
+        "total_score": 41.0,
+        "breakdown": {
+          "scope_score": 20.0,
+          "coupling_score": 6.0,
+          "security_score": 0.0,
+          "architecture_score": 2.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como MEDIUM: Alteração de escopo CROSS_MODULE com baixo acoplamento e sem impacto em segurança."
+      },
+      "affected_requirements": [
+        "REQ_SEARCH_1"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "action": "ADD_TASK",
+          "title": "Implementar REQ_SEARCH_1",
+          "description": "Desenvolver componentes e lógica associada à diretiva: Implementar pesquisa em tempo real com filtros",
+          "source_requirement": "REQ_SEARCH_1",
+          "dependencies": [],
+          "predicted_owner": "coder",
+          "confidence": 0.9,
+          "status": "PREDICTED_ONLY"
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "action": "ADD_TASK",
+          "title": "Validar testes para REQ_SEARCH_1",
+          "description": "Executar suite de testes unitários e de integração para REQ_SEARCH_1",
+          "source_requirement": "REQ_SEARCH_1",
+          "dependencies": [
+            "ptask_impl_6"
+          ],
+          "predicted_owner": "test_engineer",
+          "confidence": 0.88,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "frontend/src/features/search/SearchBar.tsx",
+          "classification": "DIRECT",
+          "reason": "Componente de entrada e filtragem de pesquisa em tempo real",
+          "estimated_change_type": "CREATE",
+          "related_symbol": null,
+          "confidence": 0.92
+        },
+        {
+          "file_path": "backend/search_service.py",
+          "classification": "INDIRECT",
+          "reason": "Query builder e indexador para pesquisa de utilizadores/entidades",
+          "estimated_change_type": "CREATE",
+          "related_symbol": null,
+          "confidence": 0.85
+        }
+      ],
+      "predicted_symbols": [],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'search'",
+          "path": "Directive -> Search UI Component -> Backend Query Builder",
+          "impact_type": "CROSS_MODULE"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_SearchBar.py",
+          "target_module": "frontend/src/features/search/SearchBar.tsx",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/features/search/SearchBar.tsx"
+        },
+        {
+          "test_file": "tests/test_search_service.py",
+          "target_module": "backend/search_service.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de backend/search_service.py"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": true,
+      "predicted_pause_required": true,
+      "predicted_approval_required": false,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'search'",
+          "path": "Directive -> Search UI Component -> Backend Query Builder",
+          "impact_type": "CROSS_MODULE"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_c193e678",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130619.6181028,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "ARCHITECTURAL",
+      "predicted_risk": "HIGH",
+      "risk_factors": {
+        "total_score": 68.0,
+        "breakdown": {
+          "scope_score": 28.0,
+          "coupling_score": 6.0,
+          "security_score": 0.0,
+          "architecture_score": 14.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 7.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como HIGH: Invalida evidências ativas exigindo revalidação (Zero False Success); Impacto arquitetural em contratos ou serviços centrais."
+      },
+      "affected_requirements": [
+        "REQ_EXPORT_1"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "frontend/src/features/export/ExportPanel.tsx",
+          "classification": "DIRECT",
+          "reason": "Remoção do painel de exportação CSV da interface",
+          "estimated_change_type": "DELETE",
+          "related_symbol": null,
+          "confidence": 0.95
+        },
+        {
+          "file_path": "backend/export_service.py",
+          "classification": "INDIRECT",
+          "reason": "Desativação de endpoints e serializadores de exportação",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.85
+        }
+      ],
+      "predicted_symbols": [],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'remove export'",
+          "path": "Directive -> UI Component Deprecation -> Backend Service Cleanup",
+          "impact_type": "CROSS_MODULE"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_ExportPanel.py",
+          "target_module": "frontend/src/features/export/ExportPanel.tsx",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/features/export/ExportPanel.tsx"
+        },
+        {
+          "test_file": "tests/test_export_service.py",
+          "target_module": "backend/export_service.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de backend/export_service.py"
+        }
+      ],
+      "predicted_evidence_impact": [
+        {
+          "evidence_id": "ev_unknown",
+          "requirement_id": "",
+          "title": "Evidence Item",
+          "predicted_status": "SUPERSEDED",
+          "reason": "Requisito  afetado pela diretiva 'Remover exportação CSV do painel'. Princípio Zero False Success exige revalidação."
+        },
+        {
+          "evidence_id": "ev_unknown",
+          "requirement_id": "",
+          "title": "Evidence Item",
+          "predicted_status": "SUPERSEDED",
+          "reason": "Requisito  afetado pela diretiva 'Remover exportação CSV do painel'. Princípio Zero False Success exige revalidação."
+        }
+      ],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": true,
+      "predicted_pause_required": true,
+      "predicted_approval_required": true,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [
+        "Evidência prevista 'ev_unknown' não existe no Evidence Ledger atual",
+        "Evidência prevista 'ev_unknown' não existe no Evidence Ledger atual"
+      ],
+      "confidence": 0.4,
+      "causal_chains": [
+        {
+          "origin": "Directive 'remove export'",
+          "path": "Directive -> UI Component Deprecation -> Backend Service Cleanup",
+          "impact_type": "CROSS_MODULE"
+        }
+      ],
+      "status": "INVALIDATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_7e5634d4",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130620.1070921,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "CROSS_MODULE",
+      "predicted_risk": "MEDIUM",
+      "risk_factors": {
+        "total_score": 41.0,
+        "breakdown": {
+          "scope_score": 20.0,
+          "coupling_score": 6.0,
+          "security_score": 0.0,
+          "architecture_score": 2.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como MEDIUM: Alteração de escopo CROSS_MODULE com baixo acoplamento e sem impacto em segurança."
+      },
+      "affected_requirements": [
+        "REQ_SEARCH_2"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_replan_6",
+          "action": "MODIFY_TASK",
+          "title": "Adaptar abordagem para REQ_SEARCH_2",
+          "description": "Reconfigurar implementação existente para alinhar com: Refinar barra de busca com debounce",
+          "source_requirement": "REQ_SEARCH_2",
+          "dependencies": [],
+          "predicted_owner": "architect",
+          "confidence": 0.85,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "frontend/src/features/search/SearchBar.tsx",
+          "classification": "DIRECT",
+          "reason": "Componente de entrada e filtragem de pesquisa em tempo real",
+          "estimated_change_type": "CREATE",
+          "related_symbol": null,
+          "confidence": 0.92
+        },
+        {
+          "file_path": "backend/search_service.py",
+          "classification": "INDIRECT",
+          "reason": "Query builder e indexador para pesquisa de utilizadores/entidades",
+          "estimated_change_type": "CREATE",
+          "related_symbol": null,
+          "confidence": 0.85
+        }
+      ],
+      "predicted_symbols": [],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'search'",
+          "path": "Directive -> Search UI Component -> Backend Query Builder",
+          "impact_type": "CROSS_MODULE"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_SearchBar.py",
+          "target_module": "frontend/src/features/search/SearchBar.tsx",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de frontend/src/features/search/SearchBar.tsx"
+        },
+        {
+          "test_file": "tests/test_search_service.py",
+          "target_module": "backend/search_service.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de backend/search_service.py"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": true,
+      "predicted_pause_required": true,
+      "predicted_approval_required": false,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'search'",
+          "path": "Directive -> Search UI Component -> Backend Query Builder",
+          "impact_type": "CROSS_MODULE"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_ef4e1808",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130620.6093633,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "LOCAL",
+      "predicted_risk": "MEDIUM",
+      "risk_factors": {
+        "total_score": 31.0,
+        "breakdown": {
+          "scope_score": 5.0,
+          "coupling_score": 3.0,
+          "security_score": 0.0,
+          "architecture_score": 2.0,
+          "state_score": 9.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como MEDIUM: Alteração de escopo LOCAL com baixo acoplamento e sem impacto em segurança."
+      },
+      "affected_requirements": [
+        "REQ_ARCH_1"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_impl_6",
+          "action": "ADD_TASK",
+          "title": "Implementar REQ_ARCH_1",
+          "description": "Desenvolver componentes e lógica associada à diretiva: Migrar esquema de persistência SQLite com migração de schema",
+          "source_requirement": "REQ_ARCH_1",
+          "dependencies": [],
+          "predicted_owner": "coder",
+          "confidence": 0.9,
+          "status": "PREDICTED_ONLY"
+        },
+        {
+          "predicted_task_id": "ptask_test_7",
+          "action": "ADD_TASK",
+          "title": "Validar testes para REQ_ARCH_1",
+          "description": "Executar suite de testes unitários e de integração para REQ_ARCH_1",
+          "source_requirement": "REQ_ARCH_1",
+          "dependencies": [
+            "ptask_impl_6"
+          ],
+          "predicted_owner": "test_engineer",
+          "confidence": 0.88,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "agents/domain_logic.py",
+          "classification": "DIRECT",
+          "reason": "Implementação das regras de negócio associadas a: REQ_ARCH_1",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.75
+        }
+      ],
+      "predicted_symbols": [],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'REQ_ARCH_1'",
+          "path": "Directive -> Domain Business Logic",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_domain_logic.py",
+          "target_module": "agents/domain_logic.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de agents/domain_logic.py"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": false,
+      "predicted_pause_required": false,
+      "predicted_approval_required": false,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [
+        "O grafo estático não determinou ficheiro unívoco para 'REQ_ARCH_1'. Mapeado heuristicamente para domain_logic.py."
+      ],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'REQ_ARCH_1'",
+          "path": "Directive -> Domain Business Logic",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    {
+      "prediction_id": "pred_b7f25835",
+      "mission_id": "m_p36_interactive",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789130621.0963635,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "ARCHITECTURAL",
+      "predicted_risk": "MEDIUM",
+      "risk_factors": {
+        "total_score": 58.0,
+        "breakdown": {
+          "scope_score": 28.0,
+          "coupling_score": 3.0,
+          "security_score": 0.0,
+          "architecture_score": 14.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como MEDIUM: Impacto arquitetural em contratos ou serviços centrais."
+      },
+      "affected_requirements": [
+        "REQ_ARCH_2"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [
+        {
+          "predicted_task_id": "ptask_replan_6",
+          "action": "MODIFY_TASK",
+          "title": "Adaptar abordagem para REQ_ARCH_2",
+          "description": "Reconfigurar implementação existente para alinhar com: Implementar arquitetura orientada a eventos para o swarm",
+          "source_requirement": "REQ_ARCH_2",
+          "dependencies": [],
+          "predicted_owner": "architect",
+          "confidence": 0.85,
+          "status": "PREDICTED_ONLY"
+        }
+      ],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "agents/domain_logic.py",
+          "classification": "DIRECT",
+          "reason": "Implementação das regras de negócio associadas a: REQ_ARCH_2",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.75
+        }
+      ],
+      "predicted_symbols": [],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'REQ_ARCH_2'",
+          "path": "Directive -> Domain Business Logic",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_domain_logic.py",
+          "target_module": "agents/domain_logic.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de agents/domain_logic.py"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": false,
+      "predicted_pause_required": true,
+      "predicted_approval_required": true,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [
+        "O grafo estático não determinou ficheiro unívoco para 'REQ_ARCH_2'. Mapeado heuristicamente para domain_logic.py."
+      ],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'REQ_ARCH_2'",
+          "path": "Directive -> Domain Business Logic",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY"
+    }
+  ],
+  "outcomes": [],
+  "timestamp": 1789130621.0968947
+}

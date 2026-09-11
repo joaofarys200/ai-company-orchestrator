@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-09-08T12:33:22.322751+00:00",
+  "metadata": {
+    "phase": "Phase 29",
+    "title": "Production Transport Health & Telemetry State",
+    "physical_multi_host_test": "NOT_AVAILABLE",
+    "evidence_classification": {
+      "telemetry": "MEASURED",
+      "simulated_entries": 0
+    }
+  },
+  "telemetry": {
+    "transport_selected": "QUIC_RIO",
+    "transport_switches": 0,
+    "transport_failures": 0,
+    "fallback_count": 0,
+    "active_connections": 1,
+    "active_streams": 64,
+    "control_latency_p95_ms": 0.0041,
+    "control_latency_p99_ms": 0.0041,
+    "bulk_throughput_mb_s": 337.17,
+    "retransmissions": 0,
+    "packet_loss": 0.0,
+    "queue_depth": 0,
+    "health_status": "HEALTHY"
+  },
+  "monitor_snapshot": {
+    "health_status": "HEALTHY",
+    "connection_state": "CONNECTED",
+    "stream_count": 0,
+    "packet_loss": 0.0,
+    "retransmissions": 0,
+    "queue_depth": 0,
+    "latency_p95_ms": 0.0041,
+    "latency_p99_ms": 0.0041,
+    "backend_errors": 0,
+    "consecutive_errors": 0,
+    "total_bytes_transferred": 72000,
+    "cpu_pressure": 0.0,
+    "memory_pressure": 0.0
+  }
+}

@@ -139,6 +139,24 @@ SERVER_MESSAGE_TYPES = {
     "stream_completed",
     "stream_failed",
     "stream_resumed",
+    # Phase 20 Multithreaded I/O Dispatch & Stream Parallelism events
+    "io_backend_selected",
+    "io_backend_changed",
+    "io_worker_started",
+    "io_worker_replaced",
+    "stream_group_created",
+    "stream_group_rebalanced",
+    "control_plane_latency",
+    # Phase 21 QUIC/HTTP3 Transport & High-Concurrency Streams events
+    "transport_selected",
+    "connection_opened",
+    "connection_closed",
+    "stream_opened",
+    "stream_closed",
+    "stream_reset",
+    "flow_control_backpressure",
+    "transport_migrated",
+    "quic_path_migrated",
 }
 
 
@@ -209,6 +227,9 @@ CLIENT_MESSAGE_TYPES = {
     "mission_federation_scale",
     "mission_federation_rebalance",
     "mission_federation_switch_mode",
+    "mission_understanding_get",
+    "mission_understanding_review",
+    "mission_timeline_get",
     "start_lecture_recording",
     "stop_lecture_recording",
     "get_lecture_status",
@@ -225,9 +246,21 @@ CLIENT_MESSAGE_TYPES = {
     "sentinel_rollback_action",
     "sentinel_submit_review",
     "sentinel_get_shadow_telemetry",
+    "mission_control_get",
+    "mission_control_event_stream",
+    "mission_control_command",
+    "mission_intent_preview",
+    "mission_intent_change",
+    "mission_predict_impact",
+    "mission_get_predictions",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
+    "mission_control_command": ("command_id", "mission_id", "command_type"),
+    "mission_intent_preview": ("mission_id",),
+    "mission_intent_change": ("mission_id",),
+    "mission_predict_impact": ("mission_id",),
+    "mission_get_predictions": ("mission_id",),
     "mission_list": ("project_id",),
     "mission_create": ("project_id", "title", "objective"),
     "mission_get": ("project_id", "mission_id"),

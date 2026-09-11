@@ -1,0 +1,275 @@
+{
+  "timestamp": "2026-09-08T12:33:22.322751+00:00",
+  "metadata": {
+    "phase": "Phase 29",
+    "title": "Adaptive Distributed Transport Policy Qualification",
+    "policy_version": "29.1.0",
+    "decision_engine": "Deterministic Algorithmic Evaluation (Zero Stochastic, Zero LLM)",
+    "physical_multi_host_test": "NOT_AVAILABLE",
+    "evidence_classification": {
+      "policy_evaluations": "MEASURED",
+      "decision_latency": "MEASURED",
+      "simulated_entries": 0
+    }
+  },
+  "performance": {
+    "iterations_tested": 10000,
+    "total_benchmark_time_ms": 18.57,
+    "average_decision_latency_ms": 0.00186,
+    "latency_threshold_ms": 0.05,
+    "status": "PASS"
+  },
+  "backend_registry": [
+    {
+      "backend_name": "QUIC_RIO",
+      "availability": true,
+      "capabilities": [
+        "streaming",
+        "multiplexing",
+        "native_vectorized_io",
+        "priority_streams",
+        "mtls",
+        "zero_copy"
+      ],
+      "health": "HEALTHY",
+      "platform": [
+        "Windows"
+      ],
+      "maximum_tested_streams": 8192,
+      "native_acceleration_available": true,
+      "fallback_priority": 1,
+      "rejection_reason": null
+    },
+    {
+      "backend_name": "QUIC_PYTHON",
+      "availability": true,
+      "capabilities": [
+        "streaming",
+        "multiplexing",
+        "priority_streams",
+        "mtls",
+        "connection_migration"
+      ],
+      "health": "HEALTHY",
+      "platform": [
+        "Windows",
+        "Linux",
+        "Darwin"
+      ],
+      "maximum_tested_streams": 8192,
+      "native_acceleration_available": false,
+      "fallback_priority": 2,
+      "rejection_reason": null
+    },
+    {
+      "backend_name": "GRPC",
+      "availability": true,
+      "capabilities": [
+        "rpc",
+        "status_trailers",
+        "unary_and_streaming",
+        "method_routing"
+      ],
+      "health": "HEALTHY",
+      "platform": [
+        "Windows",
+        "Linux",
+        "Darwin"
+      ],
+      "maximum_tested_streams": 1024,
+      "native_acceleration_available": false,
+      "fallback_priority": 3,
+      "rejection_reason": null
+    },
+    {
+      "backend_name": "HTTP2",
+      "availability": true,
+      "capabilities": [
+        "streaming",
+        "chunked_framing",
+        "multiplexing"
+      ],
+      "health": "HEALTHY",
+      "platform": [
+        "Windows",
+        "Linux",
+        "Darwin"
+      ],
+      "maximum_tested_streams": 1024,
+      "native_acceleration_available": false,
+      "fallback_priority": 4,
+      "rejection_reason": null
+    },
+    {
+      "backend_name": "TCP",
+      "availability": true,
+      "capabilities": [
+        "binary_framing",
+        "stream_oriented",
+        "low_latency_small_payload"
+      ],
+      "health": "HEALTHY",
+      "platform": [
+        "Windows",
+        "Linux",
+        "Darwin"
+      ],
+      "maximum_tested_streams": 1024,
+      "native_acceleration_available": false,
+      "fallback_priority": 5,
+      "rejection_reason": null
+    },
+    {
+      "backend_name": "MULTI_SOCKET_SHARD",
+      "availability": false,
+      "capabilities": [
+        "multi_socket_sharding"
+      ],
+      "health": "FAILED",
+      "platform": [
+        "Windows"
+      ],
+      "maximum_tested_streams": 16,
+      "native_acceleration_available": false,
+      "fallback_priority": 99,
+      "rejection_reason": "NO_MEASURABLE_SCALING_IN_WINDOWS_LOOPBACK"
+    }
+  ],
+  "decision_matrix": [
+    {
+      "scenario_id": "WIN_LOCAL_HEAVY_RIO",
+      "description": "Windows localhost heavy load (128 streams, 100KB) with RIO available",
+      "inputs": {
+        "operating_system": "Windows",
+        "localhost_or_remote": "localhost",
+        "concurrency": 128,
+        "payload_size": 100000,
+        "packet_loss_estimate": 0.0,
+        "native_RIO_available": true
+      },
+      "selected_backend": "QUIC_RIO",
+      "selected_reason": "Windows localhost with high workload (concurrency=128, payload=100000B) justifies native RIO batching",
+      "fallback_order": [
+        "QUIC_PYTHON",
+        "GRPC",
+        "HTTP2",
+        "TCP"
+      ]
+    },
+    {
+      "scenario_id": "WIN_LOCAL_LIGHT_RIO",
+      "description": "Windows localhost small load (4 streams, 1KB) with RIO available",
+      "inputs": {
+        "operating_system": "Windows",
+        "localhost_or_remote": "localhost",
+        "concurrency": 4,
+        "payload_size": 1024,
+        "packet_loss_estimate": 0.0,
+        "native_RIO_available": true
+      },
+      "selected_backend": "QUIC_PYTHON",
+      "selected_reason": "Small local workload (concurrency=4, payload=1024B) favors lightweight QUIC Python without RIO batch overhead",
+      "fallback_order": [
+        "QUIC_RIO",
+        "GRPC",
+        "HTTP2",
+        "TCP"
+      ]
+    },
+    {
+      "scenario_id": "WIN_LOCAL_NO_RIO",
+      "description": "Windows localhost heavy load with RIO unavailable",
+      "inputs": {
+        "operating_system": "Windows",
+        "localhost_or_remote": "localhost",
+        "concurrency": 256,
+        "payload_size": 100000,
+        "packet_loss_estimate": 0.0,
+        "native_RIO_available": false
+      },
+      "selected_backend": "QUIC_PYTHON",
+      "selected_reason": "High concurrency/loss (concurrency=256, loss=0.0) selects QUIC Python to prevent HoL blocking",
+      "fallback_order": [
+        "GRPC",
+        "HTTP2",
+        "TCP"
+      ]
+    },
+    {
+      "scenario_id": "LINUX_REMOTE_LOSS",
+      "description": "Linux remote host with 2% packet loss",
+      "inputs": {
+        "operating_system": "Linux",
+        "localhost_or_remote": "remote",
+        "concurrency": 64,
+        "payload_size": 65536,
+        "packet_loss_estimate": 0.02,
+        "native_RIO_available": false
+      },
+      "selected_backend": "QUIC_PYTHON",
+      "selected_reason": "High concurrency/loss (concurrency=64, loss=0.02) selects QUIC Python to prevent HoL blocking",
+      "fallback_order": [
+        "GRPC",
+        "HTTP2",
+        "TCP"
+      ]
+    },
+    {
+      "scenario_id": "RPC_ZERO_LOSS",
+      "description": "RPC request semantics with 0% packet loss",
+      "inputs": {
+        "operating_system": "Windows",
+        "localhost_or_remote": "localhost",
+        "concurrency": 1,
+        "payload_size": 2048,
+        "is_rpc": true,
+        "packet_loss_estimate": 0.0
+      },
+      "selected_backend": "GRPC",
+      "selected_reason": "RPC-style semantics with zero packet loss favor gRPC wire protocol",
+      "fallback_order": [
+        "QUIC_RIO",
+        "QUIC_PYTHON",
+        "HTTP2",
+        "TCP"
+      ]
+    },
+    {
+      "scenario_id": "QUIC_FAILED_FALLBACK",
+      "description": "QUIC backends failed, testing deterministic fallback",
+      "inputs": {
+        "operating_system": "Windows",
+        "backend_availability": {
+          "QUIC_RIO": false,
+          "QUIC_PYTHON": false,
+          "GRPC": true,
+          "HTTP2": true,
+          "TCP": true
+        }
+      },
+      "selected_backend": "TCP",
+      "selected_reason": "Low concurrency (1) and small payload (1024B) with 0% loss selects standard TCP",
+      "fallback_order": [
+        "GRPC",
+        "HTTP2"
+      ]
+    },
+    {
+      "scenario_id": "SMALL_SINGLE_STREAM_TCP",
+      "description": "Single stream small payload zero loss",
+      "inputs": {
+        "concurrency": 1,
+        "payload_size": 512,
+        "packet_loss_estimate": 0.0
+      },
+      "selected_backend": "QUIC_PYTHON",
+      "selected_reason": "Small local workload (concurrency=1, payload=512B) favors lightweight QUIC Python without RIO batch overhead",
+      "fallback_order": [
+        "QUIC_RIO",
+        "GRPC",
+        "HTTP2",
+        "TCP"
+      ]
+    }
+  ]
+}

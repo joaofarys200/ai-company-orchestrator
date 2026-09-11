@@ -233,3 +233,22 @@
   border-left: 3px solid #10b981;
   background: rgba(16, 185, 129, 0.03);
 }
+
+/* Monaco symbol navigation line highlight */
+.monaco-symbol-highlight {
+  background: rgba(34, 211, 238, 0.18) !important;
+  border-left: 3px solid #22d3ee !important;
+  animation: monaco-line-pulse 2.5s ease-out forwards;
+}
+
+@keyframes monaco-line-pulse {
+  0% {
+    background: rgba(34, 211, 238, 0.38);
+  }
+  60% {
+    background: rgba(34, 211, 238, 0.18);
+  }
+  100% {
+    background: rgba(34, 211, 238, 0.04);
+  }
+}

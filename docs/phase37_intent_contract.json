@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Phase 37 Dynamic Mission Intent & Runtime Goal Editing Contract",
+  "version": "37.0.0",
+  "author": "JARVIS Dynamic Intent Core",
+  "epistemic_classification": {
+    "USER_REQUIREMENT": "VERIFIED",
+    "SYSTEM_ASSUMPTION": "INFERRED",
+    "USER_INTENT_DELTA": "VERIFIED",
+    "AUTONOMOUS_PROPOSAL": "INFERRED"
+  },
+  "intent_operations": [
+    "ADD_REQUIREMENT",
+    "REMOVE_REQUIREMENT",
+    "MODIFY_REQUIREMENT",
+    "ADD_CONSTRAINT",
+    "REMOVE_CONSTRAINT",
+    "MODIFY_CONSTRAINT",
+    "ADD_PREFERENCE",
+    "REMOVE_PREFERENCE",
+    "ADD_EXCLUSION",
+    "REMOVE_EXCLUSION",
+    "MODIFY_PRIORITY",
+    "MODIFY_ACCEPTANCE_CRITERIA",
+    "REVISE_APPROACH"
+  ],
+  "intent_statuses": [
+    "ACTIVE",
+    "SUPERSEDED",
+    "REJECTED",
+    "CONFLICTED",
+    "PENDING_APPROVAL"
+  ],
+  "requirement_lifecycle_statuses": [
+    "IDENTIFIED",
+    "PLANNED",
+    "IMPLEMENTED",
+    "VALIDATED",
+    "MODIFIED",
+    "SUPERSEDED",
+    "REMOVED",
+    "BLOCKED",
+    "REQUIRES_REVALIDATION"
+  ],
+  "evidence_statuses": [
+    "VALID",
+    "SUPERSEDED",
+    "INVALIDATED",
+    "PENDING_REVALIDATION"
+  ],
+  "impact_levels": [
+    "NONE",
+    "LOCAL",
+    "PARTIAL",
+    "STRUCTURAL",
+    "MISSION_WIDE"
+  ],
+  "conflict_types": [
+    "REQUIREMENT_CONFLICT",
+    "CONSTRAINT_CONFLICT",
+    "ARCHITECTURE_CONFLICT",
+    "DAG_CONFLICT",
+    "STATE_CONFLICT",
+    "EVIDENCE_CONFLICT",
+    "SECURITY_CONFLICT",
+    "RESOURCE_CONFLICT",
+    "ECONOMIC_CONFLICT"
+  ],
+  "websocket_event_types": [
+    "INTENT_CHANGE_REQUESTED",
+    "INTENT_PARSED",
+    "INTENT_RESOLVED",
+    "INTENT_CONFLICT_DETECTED",
+    "INTENT_IMPACT_ANALYZED",
+    "INTENT_APPROVAL_REQUIRED",
+    "INTENT_APPROVED",
+    "INTENT_REJECTED",
+    "INTENT_APPLIED",
+    "INTENT_VERSION_CHANGED",
+    "PLAN_REPLAN_STARTED",
+    "PLAN_REPLAN_COMPLETED",
+    "EVIDENCE_INVALIDATED",
+    "REVALIDATION_REQUIRED"
+  ],
+  "invariants": {
+    "historical_audit_immutability": true,
+    "version_validation_mandatory": true,
+    "stale_delta_rejection": true,
+    "zero_silent_conflicts": true,
+    "zero_arbitrary_regression_completed_tasks": true,
+    "historical_evidence_retention_guarantee": true,
+    "zero_false_success_on_invalidated_evidence": true,
+    "model_state_mutation_strict_refusal": true,
+    "safe_pause_before_replan_structural_policy": true,
+    "monotonic_intent_versioning": true,
+    "monotonic_plan_versioning": true,
+    "idempotent_duplicate_deltas": true,
+    "security_sentinel_tampering_refusal": true,
+    "human_approval_gate_preservation": true,
+    "economic_invariant_protection": true
+  }
+}

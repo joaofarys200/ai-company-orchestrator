@@ -1,0 +1,16 @@
+{
+  "ledger_id": "phase31_verification_ledger",
+  "evidence_taxonomy": {
+    "MEASURED": 72,
+    "CALCULATED": 14,
+    "DERIVED": 5,
+    "SIMULATED": 0
+  },
+  "simulated_count": 0,
+  "physical_network_state": "LOCAL_MULTI_PROCESS",
+  "physical_multi_host_test": "NOT_AVAILABLE",
+  "economic_safety_gates": "ACTIVE_AND_ENFORCED",
+  "sentinel_watchdog_state": "ACTIVE_AND_ENFORCED",
+  "total_evidence_items_verified": 231,
+  "false_success_count": 0
+}

@@ -1,0 +1,72 @@
+{
+  "phase": 38,
+  "phase_name": "Super-File Decomposition & Architecture Hygiene",
+  "timestamp_iso": "2026-09-10T22:17:27Z",
+  "hardware_environment": {
+    "platform": "win32",
+    "python_version": "3.14.7",
+    "workspace_root": "C:\\Users\\joaor\\Desktop\\JarvisOS"
+  },
+  "metrics": {
+    "files_scanned": 719,
+    "throughput_files_per_sec": 57.54,
+    "graph_generation": {
+      "sample_count": 3,
+      "mean_ms": 10559.5804,
+      "median_ms": 10563.3361,
+      "p95_ms": 10567.7867,
+      "min_ms": 10547.1239,
+      "max_ms": 10568.2812
+    },
+    "workspace_audit": {
+      "sample_count": 3,
+      "mean_ms": 12494.742,
+      "median_ms": 12534.4314,
+      "p95_ms": 12577.51,
+      "min_ms": 12367.498,
+      "max_ms": 12582.2965
+    },
+    "candidate_detection": {
+      "sample_count": 5,
+      "mean_ms": 0.0558,
+      "median_ms": 0.0532,
+      "p95_ms": 0.0674,
+      "min_ms": 0.0495,
+      "max_ms": 0.0709
+    },
+    "target_decomposition_analysis": {
+      "sample_count": 5,
+      "mean_ms": 2.6813,
+      "median_ms": 2.5966,
+      "p95_ms": 2.9118,
+      "min_ms": 2.5386,
+      "max_ms": 2.9468
+    }
+  },
+  "severity_distribution": {
+    "critical": 0,
+    "high": 6,
+    "watch": 50,
+    "normal": 389
+  },
+  "top_decomposed_target": {
+    "target": "frontend/src/features/missions/MissionControlCenter.tsx",
+    "loc_before": 2382,
+    "loc_after": 516,
+    "loc_reduction_pct": 78.34,
+    "responsibilities_before": 10,
+    "responsibilities_after": 9,
+    "subcomponents_extracted": 13,
+    "score_before": 66.16,
+    "score_after": 50.3,
+    "severity_before": "HIGH",
+    "severity_after": "WATCH",
+    "public_api_verdict": "UNCHANGED",
+    "dependency_graph_verdict": "TOPOLOGICALLY_SOUND"
+  },
+  "epistemic_validation": {
+    "simulated_data": false,
+    "proven_by_direct_ast_measurement": true,
+    "zero_synthetic_speedups": true
+  }
+}

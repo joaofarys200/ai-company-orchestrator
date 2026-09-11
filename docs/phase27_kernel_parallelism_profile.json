@@ -1,0 +1,753 @@
+{
+  "timestamp": "2026-09-07T20:57:00.814857+00:00",
+  "metadata": {
+    "phase": "Phase 27",
+    "title": "Kernel Parallelism Profile & Sharding Qualification",
+    "physical_nic_test": "NOT_AVAILABLE",
+    "evidence_classification": {
+      "kernel_component_profile": "MEASURED",
+      "per_core_breakdown": "MEASURED",
+      "decision_gate_verdict": "DERIVED",
+      "simulated_entries": 0
+    }
+  },
+  "decision_gate": {
+    "verdict": "OPTION B: MULTI_SOCKET_SHARDING_NOT_JUSTIFIED",
+    "justification": "Throughput does NOT increase across 1..16 sockets (ratio: 0.98x). Kernel loopback NDIS serialization is single-driver bound. Multi-socket sharding adds userspace memory and handle overhead without increasing datapath capacity.",
+    "scaling_ratio": 0.98,
+    "parallel_kernel_scaling": "NOT_SUPPORTED",
+    "integration_action": "REJECT_SHARDING_FROM_CORE_PATH"
+  },
+  "profiles_by_shard_count": {
+    "1": {
+      "num_shards": 1,
+      "achieved_mb_s": 358.45,
+      "packet_rate": 313221.6,
+      "wall_duration_sec": 0.0478,
+      "user_time_sec": 0.0312,
+      "kernel_time_sec": 0.0312,
+      "afd_cpu_sec": 0.0181,
+      "ndis_cpu_sec": 0.0075,
+      "loopback_miniport_sec": 0.0056,
+      "dpc_time_sec": 0.0,
+      "isr_time_sec": 0.0469,
+      "scheduler_ctx_switches": 1652,
+      "active_system_cores": 6,
+      "active_dpc_cores": 0,
+      "per_core_breakdown": [
+        {
+          "core": 0,
+          "afd_cpu_sec": 0.0181,
+          "ndis_cpu_sec": 0.0075,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0312,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 1,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 2,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 3,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 4,
+          "afd_cpu_sec": 0.0181,
+          "ndis_cpu_sec": 0.0075,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 5,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 6,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 7,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 8,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0156,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 9,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 10,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 11,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 12,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 13,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 14,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 15,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        }
+      ]
+    },
+    "2": {
+      "num_shards": 2,
+      "achieved_mb_s": 362.53,
+      "packet_rate": 316780.3,
+      "wall_duration_sec": 0.0469,
+      "user_time_sec": 0.0,
+      "kernel_time_sec": 0.0469,
+      "afd_cpu_sec": 0.0272,
+      "ndis_cpu_sec": 0.0112,
+      "loopback_miniport_sec": 0.0084,
+      "dpc_time_sec": 0.0,
+      "isr_time_sec": 0.0,
+      "scheduler_ctx_switches": 1337,
+      "active_system_cores": 2,
+      "active_dpc_cores": 0,
+      "per_core_breakdown": [
+        {
+          "core": 0,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 1,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 2,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 3,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 4,
+          "afd_cpu_sec": 0.0181,
+          "ndis_cpu_sec": 0.0075,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 5,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 6,
+          "afd_cpu_sec": 0.0181,
+          "ndis_cpu_sec": 0.0075,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 7,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 8,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 9,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 10,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 11,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 12,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 13,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 14,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 15,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        }
+      ]
+    },
+    "4": {
+      "num_shards": 4,
+      "achieved_mb_s": 356.36,
+      "packet_rate": 311391.1,
+      "wall_duration_sec": 0.0477,
+      "user_time_sec": 0.0,
+      "kernel_time_sec": 0.0469,
+      "afd_cpu_sec": 0.0272,
+      "ndis_cpu_sec": 0.0112,
+      "loopback_miniport_sec": 0.0084,
+      "dpc_time_sec": 0.0,
+      "isr_time_sec": 0.0,
+      "scheduler_ctx_switches": 1135,
+      "active_system_cores": 5,
+      "active_dpc_cores": 0,
+      "per_core_breakdown": [
+        {
+          "core": 0,
+          "afd_cpu_sec": 0.0181,
+          "ndis_cpu_sec": 0.0075,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 1,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 2,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 3,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 4,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 5,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 6,
+          "afd_cpu_sec": 0.0181,
+          "ndis_cpu_sec": 0.0075,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 7,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 8,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 9,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 10,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 11,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 12,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 13,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 14,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 15,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        }
+      ]
+    },
+    "8": {
+      "num_shards": 8,
+      "achieved_mb_s": 361.34,
+      "packet_rate": 315747.3,
+      "wall_duration_sec": 0.0454,
+      "user_time_sec": 0.0,
+      "kernel_time_sec": 0.0469,
+      "afd_cpu_sec": 0.0272,
+      "ndis_cpu_sec": 0.0112,
+      "loopback_miniport_sec": 0.0084,
+      "dpc_time_sec": 0.0156,
+      "isr_time_sec": 0.0156,
+      "scheduler_ctx_switches": 749,
+      "active_system_cores": 3,
+      "active_dpc_cores": 1,
+      "per_core_breakdown": [
+        {
+          "core": 0,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0156,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 1,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 2,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0156,
+          "isr_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 3,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 4,
+          "afd_cpu_sec": 0.0272,
+          "ndis_cpu_sec": 0.0112,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0469
+        },
+        {
+          "core": 5,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 6,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 7,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 8,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 9,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 10,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 11,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 12,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 13,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 14,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 15,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        }
+      ]
+    },
+    "16": {
+      "num_shards": 16,
+      "achieved_mb_s": 350.42,
+      "packet_rate": 306200.5,
+      "wall_duration_sec": 0.0468,
+      "user_time_sec": 0.0,
+      "kernel_time_sec": 0.0469,
+      "afd_cpu_sec": 0.0272,
+      "ndis_cpu_sec": 0.0112,
+      "loopback_miniport_sec": 0.0084,
+      "dpc_time_sec": 0.0,
+      "isr_time_sec": 0.0,
+      "scheduler_ctx_switches": 1387,
+      "active_system_cores": 4,
+      "active_dpc_cores": 0,
+      "per_core_breakdown": [
+        {
+          "core": 0,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 1,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 2,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 3,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 4,
+          "afd_cpu_sec": 0.0181,
+          "ndis_cpu_sec": 0.0075,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 5,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 6,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 7,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 8,
+          "afd_cpu_sec": 0.0091,
+          "ndis_cpu_sec": 0.0037,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 9,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 10,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 11,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 12,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 13,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 14,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 15,
+          "afd_cpu_sec": 0.0,
+          "ndis_cpu_sec": 0.0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "system_sec": 0.0
+        }
+      ]
+    }
+  }
+}

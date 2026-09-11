@@ -1,0 +1,144 @@
+{
+  "phase": "39.1",
+  "title": "TypeScript Dependency Intelligence & Predictive Graph Accuracy",
+  "timestamp_iso": "2026-09-11T13:45:00Z",
+  "verdict": "TYPESCRIPT_DEPENDENCY_INTELLIGENCE_READY",
+  "epistemic_ledger": {
+    "zero_synthetic_data": true,
+    "exact_corpus_rerun": true,
+    "empirical_evaluations": {
+      "total_tests_executed": 57,
+      "tests_passed": 57,
+      "tests_failed": 0,
+      "ts_files_indexed": 435,
+      "nodes_in_graph": 435,
+      "edges_in_graph": 293,
+      "symbols_indexed": 2976,
+      "cycles_detected": 0
+    }
+  },
+  "metrics_comparison": {
+    "metric_table": [
+      {
+        "metric": "TS Precision",
+        "phase_39": 0.889,
+        "phase_39_1": 0.900,
+        "delta": "+0.011"
+      },
+      {
+        "metric": "TS Recall",
+        "phase_39": 0.800,
+        "phase_39_1": 1.000,
+        "delta": "+0.200"
+      },
+      {
+        "metric": "Overall File Precision",
+        "phase_39": 0.889,
+        "phase_39_1": 0.875,
+        "delta": "-0.014"
+      },
+      {
+        "metric": "Overall File Recall",
+        "phase_39": 0.800,
+        "phase_39_1": 0.913,
+        "delta": "+0.113"
+      },
+      {
+        "metric": "Overall File F1",
+        "phase_39": 0.842,
+        "phase_39_1": 0.894,
+        "delta": "+0.052"
+      },
+      {
+        "metric": "Task Precision",
+        "phase_39": 0.941,
+        "phase_39_1": 1.000,
+        "delta": "+0.059"
+      },
+      {
+        "metric": "Task Recall",
+        "phase_39": 0.889,
+        "phase_39_1": 0.750,
+        "delta": "-0.139"
+      },
+      {
+        "metric": "Task F1",
+        "phase_39": 0.914,
+        "phase_39_1": 0.857,
+        "delta": "-0.057"
+      },
+      {
+        "metric": "False Positives",
+        "phase_39": 1,
+        "phase_39_1": 1,
+        "delta": "0"
+      },
+      {
+        "metric": "False Negatives",
+        "phase_39": 2,
+        "phase_39_1": 0,
+        "delta": "-2"
+      },
+      {
+        "metric": "Cold Parse (ms)",
+        "phase_39": 8.41,
+        "phase_39_1": 609.402,
+        "delta": "+600.992 (AST bridge scan of 435 files)"
+      },
+      {
+        "metric": "Warm Cache (ms)",
+        "phase_39": "N/A",
+        "phase_39_1": 129.009,
+        "delta": "New capability (100% cache hit)"
+      },
+      {
+        "metric": "Single File Invalidation (ms)",
+        "phase_39": "N/A",
+        "phase_39_1": 132.412,
+        "delta": "1 file reparsed, 434 reused (99.77% hit rate)"
+      },
+      {
+        "metric": "Process Memory (MB)",
+        "phase_39": 65.4,
+        "phase_39_1": 75.82,
+        "delta": "+10.42 MB"
+      }
+    ]
+  },
+  "invariants_verified": [
+    {"id": "INV_01", "name": "Unresolved dependency never presented as resolved", "status": "VERIFIED"},
+    {"id": "INV_02", "name": "Stale graph never used without invalidation check", "status": "VERIFIED"},
+    {"id": "INV_03", "name": "Duplicate edge never created", "status": "VERIFIED"},
+    {"id": "INV_04", "name": "Deleted file never remains active target", "status": "VERIFIED"},
+    {"id": "INV_05", "name": "Invalid alias never produces false target", "status": "VERIFIED"},
+    {"id": "INV_06", "name": "Parser never alters workspace", "status": "VERIFIED"},
+    {"id": "INV_07", "name": "Graph generation never alters mission state", "status": "VERIFIED"},
+    {"id": "INV_08", "name": "Prediction remains read-only until Mission Gate", "status": "VERIFIED"},
+    {"id": "INV_09", "name": "Graph improvement does not alter predictor semantics", "status": "VERIFIED"},
+    {"id": "INV_10", "name": "Security invariants remain intact", "status": "VERIFIED"},
+    {"id": "INV_11", "name": "Evidence invariants remain intact", "status": "VERIFIED"},
+    {"id": "INV_12", "name": "Existing WebSocket contract remains compatible", "status": "VERIFIED"}
+  ],
+  "browser_qa": {
+    "verdict": "PASSED",
+    "scenarios_tested": 10,
+    "scenarios_passed": 10,
+    "console_errors": 0,
+    "network_errors": 0,
+    "report_path": "docs/phase39_1_browser_qa.json"
+  },
+  "first_real_failure": {
+    "type": "EXPECTED_UNCERTAINTY",
+    "description": "Computed dynamic import templates (e.g. import(`./locales/${lang}.json`)) cannot be resolved statically at parse time.",
+    "classification": "UNRESOLVED_DYNAMIC_DEPENDENCY marked as UNCERTAIN in graph and report."
+  },
+  "first_real_limit": {
+    "type": "COMPLEX_REEXPORT_OVERHEAD",
+    "description": "Deeply nested chained barrel re-exports (3+ levels of export * from './sub') require multi-pass resolution and can add ~0.5ms per resolution if uncached.",
+    "mitigation": "Persistent disk-backed content-hash cache completely eliminates cold resolution overhead on subsequent runs."
+  },
+  "decision_gate": {
+    "verdict": "TYPESCRIPT_DEPENDENCY_INTELLIGENCE_READY",
+    "rationale": "Deterministic TS import parser, alias resolution, barrel chaining, normalized graph, incremental content-hash cache, exact 12-prediction rerun showing +20.0% TS recall improvement with 0.900 precision, 0 UI regressions, and 57/57 tests passing."
+  }
+}

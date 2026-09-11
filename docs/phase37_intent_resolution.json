@@ -1,0 +1,89 @@
+{
+  "resolver_name": "IntentResolver Deterministic Semantic Parser",
+  "resolution_pipeline": "USER INTENT CHANGE -> PARSE -> CLASSIFY -> RESOLVE TARGET -> IMPACT ANALYSIS -> CONFLICT ANALYSIS -> PLAN DELTA -> VALIDATE -> MISSION GATE -> APPLY ATOMICALLY -> REPLAN -> EXECUTE -> EVIDENCE -> UI UPDATE",
+  "mappings": [
+    {
+      "input": "Adiciona autenticação.",
+      "epistemic_class": "USER_INTENT_DELTA (VERIFIED)",
+      "operation": "ADD_REQUIREMENT",
+      "target": "REQ_AUTH",
+      "impact": "STRUCTURAL",
+      "confidence": 0.98,
+      "requires_pause": true,
+      "requires_approval": true,
+      "payload": {
+        "title": "Autenticação & Controlo de Acesso",
+        "desc": "Autenticação segura de utilizadores com tokens de sessão e RBAC.",
+        "type": "SECURITY"
+      }
+    },
+    {
+      "input": "Não alteres a API existente.",
+      "epistemic_class": "USER_CONSTRAINT (VERIFIED)",
+      "operation": "ADD_CONSTRAINT",
+      "target": "CST_API_IMMUTABLE",
+      "impact": "PARTIAL",
+      "confidence": 0.99,
+      "requires_pause": false,
+      "requires_approval": false,
+      "payload": {
+        "id": "CST_API_IMMUTABLE",
+        "desc": "API REST não pode ser alterada nem sofrer breaking changes."
+      }
+    },
+    {
+      "input": "Remove a funcionalidade de exportação CSV.",
+      "epistemic_class": "USER_INTENT_DELTA (VERIFIED)",
+      "operation": "REMOVE_REQUIREMENT",
+      "target": "REQ_EXPORT_CSV",
+      "impact": "PARTIAL",
+      "confidence": 0.95,
+      "requires_pause": false,
+      "requires_approval": true,
+      "payload": {
+        "target_id": "REQ_EXPORT_CSV"
+      }
+    },
+    {
+      "input": "Faz isto com React em vez de vanilla JS.",
+      "epistemic_class": "USER_INTENT_DELTA (VERIFIED)",
+      "operation": "REVISE_APPROACH",
+      "target": "ARCH_FRAMEWORK",
+      "impact": "STRUCTURAL",
+      "confidence": 0.96,
+      "requires_pause": true,
+      "requires_approval": true,
+      "payload": {
+        "framework": "React",
+        "bundler": "Vite",
+        "language": "TypeScript (TSX)"
+      }
+    },
+    {
+      "input": "Dá prioridade ao backend.",
+      "epistemic_class": "USER_PREFERENCE (VERIFIED)",
+      "operation": "MODIFY_PRIORITY",
+      "target": "TSK_01",
+      "impact": "LOCAL",
+      "confidence": 0.94,
+      "requires_pause": false,
+      "requires_approval": false,
+      "payload": {
+        "target_task": "TSK_01",
+        "new_priority": "CRITICAL"
+      }
+    },
+    {
+      "input": "Muda algo no sistema.",
+      "epistemic_class": "SUB_SPECIFIED (AMBIGUOUS)",
+      "operation": null,
+      "target": null,
+      "impact": "NONE",
+      "confidence": 0.45,
+      "requires_pause": false,
+      "requires_approval": false,
+      "clarification_required": true,
+      "clarification_prompt": "Poderia especificar quais os requisitos concretos ou restrições que pretende alterar na missão?"
+    }
+  ]
+}

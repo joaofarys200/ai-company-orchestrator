@@ -327,109 +327,80 @@ class RepositoryGraph:
         self.file_symbols[rel_path] = []
         self.imports[rel_path] = []
         self.barrel_exports[rel_path] = []
+
+        from intelligence.typescript_dependency.parser import TypeScriptSyntaxParser
+        from intelligence.typescript_dependency.models import TypeScriptSymbolType
+
+        parsed_imports, parsed_exports, parsed_symbols, _ = TypeScriptSyntaxParser.parse_file(
+            abs_path, self.workspace_root, content=content
+        )
+
+        # 1. Map symbols
+        for sym in parsed_symbols:
+            st = SymbolType.FUNCTION.value if sym.symbol_type in (TypeScriptSymbolType.FUNCTION, TypeScriptSymbolType.REACT_COMPONENT) else (
+                SymbolType.CLASS.value if sym.symbol_type == TypeScriptSymbolType.CLASS else (
+                    SymbolType.TYPE_ALIAS.value if sym.symbol_type in (TypeScriptSymbolType.INTERFACE, TypeScriptSymbolType.TYPE_ALIAS) else (
+                        SymbolType.CONSTANT.value
+                    )
+                )
+            )
+            self._add_symbol(SymbolDefinition(
+                name=sym.name,
+                file_path=rel_path,
+                line_number=sym.line_number,
+                end_line=sym.line_number,
+                symbol_type=st,
+                signature=sym.signature,
+                is_exported=sym.is_exported,
+            ))
+            if sym.name.upper() in ("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD") and sym.is_exported:
+                derived_route = self._derive_route_from_filepath(rel_path)
+                if derived_route:
+                    self.endpoints.append(ApiEndpoint(
+                        file_path=rel_path,
+                        line_number=sym.line_number,
+                        http_method=sym.name.upper(),
+                        route_path=self._normalize_route(derived_route),
+                        handler_name=sym.name,
+                        framework="nextjs",
+                    ))
+
+        # 2. Map imports
+        for imp in parsed_imports:
+            self.imports[rel_path].append(ModuleImport(
+                source_file=rel_path,
+                module_name=imp.module_specifier,
+                imported_symbols=list(imp.imported_symbols) if imp.imported_symbols else ([imp.default_import] if imp.default_import else []),
+                is_relative=imp.is_relative,
+                line_number=imp.line_number,
+            ))
+
+        # 3. Map barrel re-exports
+        for exp in parsed_exports:
+            if exp.is_re_export and exp.re_export_source:
+                self.barrel_exports[rel_path].append({
+                    "source": exp.re_export_source,
+                    "symbols": "*" if exp.is_star_export else list(exp.exported_symbols),
+                    "line": exp.line_number,
+                })
+
+        # 4. Chamadas de API do Frontend
         lines = content.splitlines()
-
-        # 1. Regex de Funções, Classes, Constantes e Tipos JS/TS
-        fn_pattern = re.compile(r"(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z0-9_$]+)\s*\(")
-        arrow_pattern = re.compile(r"(?:export\s+)?(?:const|let|var)\s+([a-zA-Z0-9_$]+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>")
-        class_pattern = re.compile(r"(?:export\s+)?class\s+([a-zA-Z0-9_$]+)")
-        type_pattern = re.compile(r"(?:export\s+)?(?:type|interface)\s+([a-zA-Z0-9_$]+)")
+        fetch_pattern = re.compile(r"fetch\s*\(\s*['\"`](/api/[^'\"`]+)['\"`]\s*(?:,\s*\{[^}]*method\s*:\s*['\"]([A-Z]+)['\"])?")
+        axios_pattern = re.compile(r"axios\.(get|post|put|delete|patch)\s*\(\s*['\"`](/api/[^'\"`]+)['\"`]")
 
         for idx, line in enumerate(lines, start=1):
-            fn_match = fn_pattern.search(line)
-            if fn_match:
-                name = fn_match.group(1)
-                self._add_symbol(SymbolDefinition(
-                    name=name,
+            f_match = fetch_pattern.search(line)
+            if f_match:
+                route = f_match.group(1)
+                method = (f_match.group(2) or "GET").upper()
+                self.api_calls.append(ApiClientCall(
                     file_path=rel_path,
                     line_number=idx,
-                    end_line=idx,
-                    symbol_type=SymbolType.FUNCTION.value,
-                    signature=line.strip(),
+                    http_method=method,
+                    route_path=self._normalize_route(route),
+                    client_library="fetch",
                 ))
-                if name.upper() in ("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD") and "export" in line:
-                    derived_route = self._derive_route_from_filepath(rel_path)
-                    if derived_route:
-                        self.endpoints.append(ApiEndpoint(
-                            file_path=rel_path,
-                            line_number=idx,
-                            http_method=name.upper(),
-                            route_path=self._normalize_route(derived_route),
-                            handler_name=name,
-                            framework="nextjs",
-                        ))
-
-            arrow_match = arrow_pattern.search(line)
-            if arrow_match:
-                name = arrow_match.group(1)
-                self._add_symbol(SymbolDefinition(
-                    name=name,
-                    file_path=rel_path,
-                    line_number=idx,
-                    end_line=idx,
-                    symbol_type=SymbolType.FUNCTION.value,
-                    signature=line.strip(),
-                ))
-
-            class_match = class_pattern.search(line)
-            if class_match:
-                name = class_match.group(1)
-                self._add_symbol(SymbolDefinition(
-                    name=name,
-                    file_path=rel_path,
-                    line_number=idx,
-                    end_line=idx,
-                    symbol_type=SymbolType.CLASS.value,
-                ))
-
-            type_match = type_pattern.search(line)
-            if type_match:
-                name = type_match.group(1)
-                self._add_symbol(SymbolDefinition(
-                    name=name,
-                    file_path=rel_path,
-                    line_number=idx,
-                    end_line=idx,
-                    symbol_type=SymbolType.TYPE_ALIAS.value,
-                ))
-
-        # 2. Imports JS/TS
-        import_pattern = re.compile(r"import\s+(?:\{([^}]+)\}|([a-zA-Z0-9_$]+)|\*\s+as\s+([a-zA-Z0-9_$]+))\s+from\s+['\"]([^'\"]+)['\"]")
-        for idx, line in enumerate(lines, start=1):
-            m = import_pattern.search(line)
-            if m:
-                syms_group = m.group(1) or m.group(2) or m.group(3) or ""
-                symbols = [s.strip().split(" as ")[0] for s in syms_group.split(",") if s.strip()]
-                mod_path = m.group(4)
-                self.imports[rel_path].append(ModuleImport(
-                    source_file=rel_path,
-                    module_name=mod_path,
-                    imported_symbols=symbols,
-                    is_relative=mod_path.startswith("."),
-                    line_number=idx,
-                ))
-
-        # 3. Re-exports & Barrel Files: export * from './...' ou export { a, b } from './...'
-        re_export_star = re.compile(r"export\s+\*\s+from\s+['\"]([^'\"]+)['\"]")
-        re_export_named = re.compile(r"export\s+\{([^}]+)\}\s+from\s+['\"]([^'\"]+)['\"]")
-
-        for idx, line in enumerate(lines, start=1):
-            m_star = re_export_star.search(line)
-            if m_star:
-                self.barrel_exports[rel_path].append({
-                    "source": m_star.group(1),
-                    "symbols": "*",
-                    "line": idx,
-                })
-
-            m_named = re_export_named.search(line)
-            if m_named:
-                syms = [s.strip().split(" as ")[0] for s in m_named.group(1).split(",") if s.strip()]
-                self.barrel_exports[rel_path].append({
-                    "source": m_named.group(2),
-                    "symbols": syms,
-                    "line": idx,
-                })
 
         # 4. Chamadas de API do Frontend
         fetch_pattern = re.compile(r"fetch\s*\(\s*['\"`](/api/[^'\"`]+)['\"`]\s*(?:,\s*\{[^}]*method\s*:\s*['\"]([A-Z]+)['\"])?")

@@ -1,0 +1,105 @@
+{
+  "metric": "MISSION_OBSERVABILITY_SCORE",
+  "timestamp": 1788978830.3408594,
+  "average_observability_score": 1.0,
+  "target": ">= 0.95 (95%)",
+  "status": "PASS",
+  "scenarios": {
+    "NORMAL": {
+      "observability_score": 1.0,
+      "score_pct": 100.0,
+      "missing_count": 0,
+      "dimensions": {
+        "goal_visible": true,
+        "requirements_separated": true,
+        "plan_observable": true,
+        "execution_tracked": true,
+        "agents_visible": true,
+        "why_explained": true,
+        "validation_traceable": true,
+        "result_transparent": true,
+        "code_intel_linked": true
+      },
+      "status": "PASS"
+    },
+    "REPAIR": {
+      "observability_score": 1.0,
+      "score_pct": 100.0,
+      "missing_count": 0,
+      "dimensions": {
+        "goal_visible": true,
+        "requirements_separated": true,
+        "plan_observable": true,
+        "execution_tracked": true,
+        "agents_visible": true,
+        "why_explained": true,
+        "validation_traceable": true,
+        "result_transparent": true,
+        "code_intel_linked": true
+      },
+      "status": "PASS"
+    },
+    "REPLAN": {
+      "observability_score": 1.0,
+      "score_pct": 100.0,
+      "missing_count": 0,
+      "dimensions": {
+        "goal_visible": true,
+        "requirements_separated": true,
+        "plan_observable": true,
+        "execution_tracked": true,
+        "agents_visible": true,
+        "why_explained": true,
+        "validation_traceable": true,
+        "result_transparent": true,
+        "code_intel_linked": true
+      },
+      "status": "PASS"
+    },
+    "RECOVERY": {
+      "observability_score": 1.0,
+      "score_pct": 100.0,
+      "missing_count": 0,
+      "dimensions": {
+        "goal_visible": true,
+        "requirements_separated": true,
+        "plan_observable": true,
+        "execution_tracked": true,
+        "agents_visible": true,
+        "why_explained": true,
+        "validation_traceable": true,
+        "result_transparent": true,
+        "code_intel_linked": true
+      },
+      "status": "PASS"
+    },
+    "BLOCKED": {
+      "observability_score": 1.0,
+      "score_pct": 100.0,
+      "missing_count": 0,
+      "dimensions": {
+        "goal_visible": true,
+        "requirements_separated": true,
+        "plan_observable": true,
+        "execution_tracked": true,
+        "agents_visible": true,
+        "why_explained": true,
+        "validation_traceable": true,
+        "result_transparent": true,
+        "code_intel_linked": true
+      },
+      "status": "PASS"
+    }
+  },
+  "dimensions_evaluated": [
+    "goal_visible",
+    "requirements_separated",
+    "plan_observable",
+    "execution_tracked",
+    "agents_visible",
+    "why_explained",
+    "validation_traceable",
+    "result_transparent",
+    "code_intel_linked"
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "suite": "Phase 37 Dynamic Mission Intent & Runtime Goal Editing Browser QA",
+  "browser": "Microsoft Edge (Chromium)",
+  "viewport": "1440x900",
+  "locale": "pt-PT",
+  "timestamp": 1789077570.6365054,
+  "assertions_passed": 18,
+  "assertions_total": 18,
+  "console_errors_count": 0,
+  "console_errors": [],
+  "network_errors_count": 0,
+  "network_errors": [],
+  "scenarios_evaluated": [
+    "1. Initial state & version badges",
+    "2. Intent preview & structural impact analysis",
+    "3. Apply intent delta & monotonic version bump",
+    "4. Requirement diff view (ADDED/MODIFIED/REMOVED)",
+    "5. Plan diff view & DAG topological invariants",
+    "6. Evidence invalidation & Zero False Success tracker",
+    "7. Why Panel causal explainability",
+    "8. Conflict detector & contradictory constraint alert",
+    "9. Security Sentinel block on malicious intent",
+    "10. Multi-intent progression & approach revision"
+  ],
+  "screenshots_captured": [
+    {
+      "id": "01_initial",
+      "path": "docs/screenshots/phase37/01_initial_mission_control.png",
+      "artifact_path": "C:/Users/joaor/.gemini/antigravity-ide/brain/9db96228-3181-488a-a942-c45a668d65d5/01_initial_mission_control.png"
+    },
+    {
+      "id": "02_preview",
+      "path": "docs/screenshots/phase37/02_intent_preview_modal.png",
+      "artifact_path": "C:/Users/joaor/.gemini/antigravity-ide/brain/9db96228-3181-488a-a942-c45a668d65d5/02_intent_preview_modal.png"
+    },
+    {
+      "id": "03_applied",
+      "path": "docs/screenshots/phase37/03_intent_applied_and_replan.png",
+      "artifact_path": "C:/Users/joaor/.gemini/antigravity-ide/brain/9db96228-3181-488a-a942-c45a668d65d5/03_intent_applied_and_replan.png"
+    },
+    {
+      "id": "04_req_diff",
+      "path": "docs/screenshots/phase37/04_requirement_diff_view.png",
+      "artifact_path": "C:/Users/joaor/.gemini/antigravity-ide/brain/9db96228-3181-488a-a942-c45a668d65d5/04_requirement_diff_view.png"
+    },
+    {
+      "id": "05_plan_diff",
+      "path": "docs/screenshots/phase37/05_plan_diff_view.png",
+      "artifact_path": "C:/Users/joaor/.gemini/antigravity-ide/brain/9db96228-3181-488a-a942-c45a668d65d5/05_plan_diff_view.png"
+    },
+    {
+      "id": "06_ev_impact",
+      "path": "docs/screenshots/phase37/06_evidence_invalidation_tracker.png",
+      "artifact_path": "C:/Users/joaor/.gemini/antigravity-ide/brain/9db96228-3181-488a-a942-c45a668d65d5/06_evidence_invalidation_tracker.png"
+    },
+    {
+      "id": "07_why_panel",
+      "path": "docs/screenshots/phase37/07_why_panel_intent_causality.png",
+      "artifact_path": "C:/Users/joaor/.gemini/antigravity-ide/brain/9db96228-3181-488a-a942-c45a668d65d5/07_why_panel_intent_causality.png"
+    },
+    {
+      "id": "08_conflict",
+      "path": "docs/screenshots/phase37/08_conflict_detection_modal.png",
+      "artifact_path": "C:/Users/joaor/.gemini/antigravity-ide/brain/9db96228-3181-488a-a942-c45a668d65d5/08_conflict_detection_modal.png"
+    },
+    {
+      "id": "09_sentinel",
+      "path": "docs/screenshots/phase37/09_security_sentinel_block.png",
+      "artifact_path": "C:/Users/joaor/.gemini/antigravity-ide/brain/9db96228-3181-488a-a942-c45a668d65d5/09_security_sentinel_block.png"
+    },
+    {
+      "id": "10_horizon",
+      "path": "docs/screenshots/phase37/10_multi_intent_long_horizon.png",
+      "artifact_path": "C:/Users/joaor/.gemini/antigravity-ide/brain/9db96228-3181-488a-a942-c45a668d65d5/10_multi_intent_long_horizon.png"
+    }
+  ],
+  "verdict": "DYNAMIC_INTENT_READY"
+}

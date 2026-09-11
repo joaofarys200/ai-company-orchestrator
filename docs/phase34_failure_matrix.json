@@ -1,0 +1,86 @@
+[
+  {
+    "mission_id": "m_p34_01_analysis",
+    "category": "EXISTING_PROJECT_ANALYSIS",
+    "fault_injected": false,
+    "fault_types": [],
+    "escalation_path": "DIRECT_VALIDATED_SUCCESS",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "m_p34_02_bugfix",
+    "category": "BUG_FIX",
+    "fault_injected": true,
+    "fault_types": [
+      "SYNTAX_ERROR"
+    ],
+    "escalation_path": "FAIL -> DIAGNOSE -> REPAIR -> REVALIDATE -> CONTINUE",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "m_p34_03_feature",
+    "category": "FEATURE_IMPLEMENTATION",
+    "fault_injected": false,
+    "fault_types": [],
+    "escalation_path": "DIRECT_VALIDATED_SUCCESS",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "m_p34_04_ui",
+    "category": "UI_IMPROVEMENT",
+    "fault_injected": false,
+    "fault_types": [],
+    "escalation_path": "DIRECT_VALIDATED_SUCCESS",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "m_p34_05_new_app",
+    "category": "NEW_SMALL_APPLICATION",
+    "fault_injected": false,
+    "fault_types": [],
+    "escalation_path": "DIRECT_VALIDATED_SUCCESS",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "m_p34_06_refactor",
+    "category": "REFACTORING",
+    "fault_injected": false,
+    "fault_types": [],
+    "escalation_path": "DIRECT_VALIDATED_SUCCESS",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "m_p34_07_test_quality",
+    "category": "TESTING_QUALITY",
+    "fault_injected": true,
+    "fault_types": [
+      "CONTRACT_ERROR"
+    ],
+    "escalation_path": "FAIL -> DIAGNOSE -> REPAIR -> REVALIDATE -> CONTINUE",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "m_p34_08_e2e_product",
+    "category": "END_TO_END_PRODUCT_TASK",
+    "fault_injected": false,
+    "fault_types": [],
+    "escalation_path": "DIRECT_VALIDATED_SUCCESS",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  }
+]

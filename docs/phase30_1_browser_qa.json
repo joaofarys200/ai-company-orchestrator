@@ -1,0 +1,120 @@
+{
+  "phase": "30.1",
+  "title": "Code Intelligence UX Consolidation & Explainable Project Explorer",
+  "timestamp": "2026-09-08 20:16:20",
+  "total_scenarios": 18,
+  "passed_scenarios": 18,
+  "failed_scenarios": 0,
+  "console_errors": [],
+  "network_errors": [],
+  "scenarios": [
+    {
+      "scenario": 1,
+      "name": "Open Code Section",
+      "status": "PASS",
+      "evidence": "Clicked primary navigation 'Código'"
+    },
+    {
+      "scenario": 2,
+      "name": "Code Intelligence HUD Appears",
+      "status": "PASS",
+      "evidence": "Code Intelligence HUD rendered with metrics and FRESH status"
+    },
+    {
+      "scenario": 3,
+      "name": "Detected Stack Appears with Evidence",
+      "status": "PASS",
+      "evidence": "Stack tags with VERIF badges"
+    },
+    {
+      "scenario": 4,
+      "name": "Primary Entrypoint Appears",
+      "status": "PASS",
+      "evidence": "Primary entrypoint visible with confidence"
+    },
+    {
+      "scenario": 5,
+      "name": "Smart File Tree Appears",
+      "status": "PASS",
+      "evidence": "Files listed with AST symbol counts and icons"
+    },
+    {
+      "scenario": 6,
+      "name": "Expand / Select File",
+      "status": "PASS",
+      "evidence": "Selected app.js in tree and editor loaded"
+    },
+    {
+      "scenario": 7,
+      "name": "Expand Nested AST Symbols",
+      "status": "PASS",
+      "evidence": "Functions/classes visible under file"
+    },
+    {
+      "scenario": 8,
+      "name": "Click AST Function",
+      "status": "PASS",
+      "evidence": "Clicked nested AST function addTask()"
+    },
+    {
+      "scenario": 9,
+      "name": "Monaco Navigation & Pulse Highlight",
+      "status": "PASS",
+      "evidence": "Cursor moved, line centered and pulse class active"
+    },
+    {
+      "scenario": 10,
+      "name": "Open Architecture & AST View",
+      "status": "PASS",
+      "evidence": "Switched to Architecture view"
+    },
+    {
+      "scenario": 11,
+      "name": "Search AST Symbol",
+      "status": "PASS",
+      "evidence": "Filtered symbols matching 'add'"
+    },
+    {
+      "scenario": 12,
+      "name": "Filter Functions Only",
+      "status": "PASS",
+      "evidence": "Active filter: Funções"
+    },
+    {
+      "scenario": 13,
+      "name": "Filter Classes Only",
+      "status": "PASS",
+      "evidence": "Active filter: Classes"
+    },
+    {
+      "scenario": 14,
+      "name": "Entrypoint Explanation Modal",
+      "status": "PASS",
+      "evidence": "Modal rendered with layer, confidence, and reason"
+    },
+    {
+      "scenario": 15,
+      "name": "Refresh Architecture / Reindex",
+      "status": "PASS",
+      "evidence": "Reindex triggered and snapshot updated"
+    },
+    {
+      "scenario": 16,
+      "name": "Stale Architecture State",
+      "status": "PASS",
+      "evidence": "Stale warning and modified files badge verified"
+    },
+    {
+      "scenario": 17,
+      "name": "Empty State Validation",
+      "status": "PASS",
+      "evidence": "Empty state card displayed when no symbols match"
+    },
+    {
+      "scenario": 18,
+      "name": "Error State Robustness",
+      "status": "PASS",
+      "evidence": "0 uncaught console errors (0 found)"
+    }
+  ]
+}

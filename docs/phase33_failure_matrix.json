@@ -1,0 +1,94 @@
+{
+  "timestamp": "2026-09-08T20:29:31.927645+00:00",
+  "phase": 33,
+  "taxonomy": "MEASURED",
+  "simulated": 0,
+  "total_failure_scenarios": 12,
+  "passed_scenarios": 12,
+  "matrix": [
+    {
+      "failure_mode": "crash_during_delta_write",
+      "description": "Partial/truncated JSON on disk",
+      "system_response": "DETECT & BLOCK",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "crash_during_compaction",
+      "description": "Aborted compaction with leftover .tmp file",
+      "system_response": "DETECT & RECOVER",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "incomplete_delta",
+      "description": "Delta missing mandatory parent/content hash",
+      "system_response": "DETECT & BLOCK",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "corrupted_delta_payload",
+      "description": "Payload bitflip / status tampering",
+      "system_response": "DETECT & BLOCK",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "missing_delta_in_chain",
+      "description": "Sequence gap (D1, D3 without D2)",
+      "system_response": "DETECT & BLOCK",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "duplicated_delta",
+      "description": "Replaying identical delta sequence",
+      "system_response": "DETECT & IDEMPOTENT NOOP",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "reordered_delta",
+      "description": "Applying deltas out of order [D2, D1]",
+      "system_response": "DETECT & BLOCK",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "corrupted_base_snapshot",
+      "description": "Base snapshot content hash violation",
+      "system_response": "DETECT & BLOCK",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "interrupted_fsync",
+      "description": "Atomic temp file swap prevents partial clobber",
+      "system_response": "DETECT & PRESERVE",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "permission_error",
+      "description": "EACCES during write",
+      "system_response": "DETECT & BLOCK",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "disk_full",
+      "description": "ENOSPC during write",
+      "system_response": "DETECT & BLOCK",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    },
+    {
+      "failure_mode": "process_termination",
+      "description": "Sudden exit mid-flight with resume",
+      "system_response": "DETECT & RECOVER",
+      "outcome": "PASS",
+      "silent_corruption_detected": false
+    }
+  ]
+}

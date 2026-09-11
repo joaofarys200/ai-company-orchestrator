@@ -148,7 +148,12 @@ class CodingSessionService:
             pass
         context = self.projects.open_project(project_id)
         graph = self.projects.load_index(project_id)
-        prepared = [self._prepare_change(context.root_path, graph, item) for item in changes]
+        changes = self._consolidate_file_changes(context.root_path, graph, changes)
+        working_contents: dict[str, str] = {}
+        prepared = [
+            self._prepare_change(context.root_path, graph, item, working_contents=working_contents)
+            for item in changes
+        ]
         affected_files = list(dict.fromkeys(item["file"] for item in prepared))
         self._assert_index_current(context.to_dict(), context.root_path, prepared)
         validations = self._select_validations(context.to_dict(), prepared)
@@ -339,7 +344,140 @@ class CodingSessionService:
         data = json.loads(candidates[0].read_text(encoding="utf-8"))
         return CodingSession(**data)
 
-    def _prepare_change(self, root: str, graph: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
+    def _consolidate_file_changes(
+        self,
+        root: str,
+        graph: dict[str, Any] | None,
+        changes: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        if len(changes) <= 1:
+            return changes
+        by_file: dict[str, list[dict[str, Any]]] = {}
+        file_order: list[str] = []
+        for ch in changes:
+            target = str(ch.get("file") or ch.get("path") or "").strip().replace("\\", "/")
+            if not target:
+                continue
+            if target not in by_file:
+                by_file[target] = []
+                file_order.append(target)
+            by_file[target].append(ch)
+
+        consolidated: list[dict[str, Any]] = []
+        for target in file_order:
+            file_changes = by_file[target]
+            if len(file_changes) == 1:
+                consolidated.append(file_changes[0])
+                continue
+
+            try:
+                _, absolute_path = self._safe_project_path(root, target)
+                exists = os.path.isfile(absolute_path)
+            except Exception:
+                exists = False
+                absolute_path = os.path.join(root, target)
+
+            initial_content = ""
+            if exists:
+                try:
+                    initial_content = Path(absolute_path).read_text(encoding="utf-8").replace("\r\n", "\n")
+                except Exception:
+                    initial_content = ""
+
+            current_content = initial_content
+            reasons: list[str] = []
+
+            for ch in file_changes:
+                reason = str(ch.get("reason") or "").strip()
+                if reason:
+                    reasons.append(reason)
+                new_code = str(ch.get("new_code") or ch.get("new_text") or ch.get("content") or "").replace("\r\n", "\n")
+                if not new_code:
+                    continue
+
+                operation = str(ch.get("operation") or ("replace_symbol" if ch.get("symbol") else "replace_text" if exists else "create_file"))
+                old_text = ch.get("old_text")
+                if isinstance(old_text, str):
+                    old_text = old_text.replace("\r\n", "\n")
+                symbol = str(ch.get("symbol") or "").strip() or None
+
+                if not current_content and not exists:
+                    current_content = new_code
+                    continue
+
+                applied = False
+
+                # 1. If old_text is given and matches uniquely in current_content
+                if isinstance(old_text, str) and old_text and old_text in current_content:
+                    first_sig = next((line.strip() for line in new_code.splitlines() if line.strip()), "")
+                    if (
+                        len(old_text) > 2 * len(new_code)
+                        and first_sig
+                        and first_sig in old_text
+                        and first_sig in current_content
+                    ):
+                        expanded = self._expand_balanced_block(current_content, first_sig)
+                        if expanded and expanded != first_sig and expanded in current_content:
+                            current_content = current_content.replace(expanded, new_code, 1)
+                            applied = True
+
+                    if not applied:
+                        current_content = current_content.replace(old_text, new_code, 1)
+                        applied = True
+
+                # 2. Try symbol replacement
+                if not applied and (symbol or operation == "replace_symbol"):
+                    sym_name = symbol
+                    if not sym_name:
+                        match = re.search(r"(?:function|def|class|const|let|var)\s+([a-zA-Z0-9_$]+)", new_code)
+                        if match:
+                            sym_name = match.group(1)
+                    if sym_name:
+                        sym_code = self._symbol_code(graph or {}, target, sym_name) if graph else None
+                        if sym_code:
+                            norm_sym = sym_code.replace("\r\n", "\n")
+                            if norm_sym in current_content:
+                                current_content = current_content.replace(norm_sym, new_code, 1)
+                                applied = True
+                        if not applied and sym_name in current_content:
+                            expanded = self._expand_balanced_block(current_content, sym_name)
+                            if expanded and expanded != sym_name and expanded in current_content:
+                                current_content = current_content.replace(expanded, new_code, 1)
+                                applied = True
+
+                # 3. Try signature matching from new_code
+                if not applied:
+                    first_sig = next((line.strip() for line in new_code.splitlines() if line.strip()), "")
+                    if first_sig and first_sig in current_content:
+                        expanded = self._expand_balanced_block(current_content, first_sig)
+                        if expanded and expanded != first_sig and expanded in current_content:
+                            current_content = current_content.replace(expanded, new_code, 1)
+                            applied = True
+
+                # 4. Fallback: if new_code is a full-file rewrite
+                if not applied:
+                    if not old_text or len(new_code) > 0.6 * max(len(current_content), 1):
+                        current_content = new_code
+                        applied = True
+
+            combined_reason = "; ".join(dict.fromkeys(r for r in reasons if r)) or "Alteracoes consolidadas no ficheiro."
+            consolidated.append({
+                "file": target,
+                "operation": "replace_text" if exists else "create_file",
+                "symbol": None,
+                "old_text": initial_content if exists else "",
+                "new_code": current_content,
+                "reason": combined_reason,
+            })
+        return consolidated
+
+    def _prepare_change(
+        self,
+        root: str,
+        graph: dict[str, Any],
+        raw: dict[str, Any],
+        working_contents: dict[str, str] | None = None,
+    ) -> dict[str, Any]:
         if not isinstance(raw, dict):
             raise CodingSessionError("Cada alteracao deve ser um objeto.")
         relative_path, absolute_path = self._safe_project_path(root, raw.get("file") or raw.get("path"))
@@ -364,7 +502,10 @@ class CodingSessionService:
             raise CodingSessionError(f"A alteracao de {relative_path} excede o limite permitido.")
         new_text = new_text.replace("\r\n", "\n")
         symbol = str(raw.get("symbol") or "").strip() or None
-        current_content = (Path(absolute_path).read_text(encoding="utf-8") if exists else "").replace("\r\n", "\n")
+        if working_contents is not None and relative_path in working_contents:
+            current_content = working_contents[relative_path]
+        else:
+            current_content = (Path(absolute_path).read_text(encoding="utf-8") if exists else "").replace("\r\n", "\n")
 
         if operation == "replace_symbol":
             if not symbol:
@@ -390,7 +531,10 @@ class CodingSessionService:
                         old_text = raw_old
                         operation = "replace_text"
                     elif symbol in current_content:
-                        old_text = symbol
+                        if "{" in symbol:
+                            old_text = self._expand_balanced_block(current_content, symbol)
+                        else:
+                            old_text = symbol
                         operation = "replace_text"
                     elif current_content:
                         old_text = current_content
@@ -412,6 +556,8 @@ class CodingSessionService:
         proposed_content = self._replace_once(current_content, old_text, new_text, relative_path) if exists else new_text
         if proposed_content == current_content:
             raise CodingSessionError(f"A alteracao de {relative_path} nao muda o ficheiro.")
+        if working_contents is not None:
+            working_contents[relative_path] = proposed_content
         reason = str(raw.get("reason") or "Alteracao solicitada pelo utilizador.").strip()
         return {
             "file": relative_path,
@@ -1057,6 +1203,42 @@ class CodingSessionService:
         except ValueError as exc:
             raise CodingSessionError("Tentativa de alterar ficheiro fora do projeto.") from exc
         return raw, absolute
+
+    @staticmethod
+    def _expand_balanced_block(content: str, symbol: str) -> str:
+        idx = content.find(symbol)
+        if idx == -1:
+            return symbol
+        brace_idx = content.find("{", idx)
+        if brace_idx == -1:
+            return symbol
+        depth = 0
+        in_string: str | None = None
+        i = brace_idx
+        while i < len(content):
+            char = content[i]
+            if in_string:
+                if char == "\\":
+                    i += 2
+                    continue
+                elif char == in_string:
+                    in_string = None
+            else:
+                if char in ('"', "'", "`"):
+                    in_string = char
+                elif char == "{":
+                    depth += 1
+                elif char == "}":
+                    depth -= 1
+                    if depth == 0:
+                        end_idx = i + 1
+                        for suffix in (");", ";", ")"):
+                            if content[end_idx:].startswith(suffix):
+                                end_idx += len(suffix)
+                                break
+                        return content[idx:end_idx]
+            i += 1
+        return symbol
 
     @staticmethod
     def _symbol_code(graph: dict[str, Any], relative_path: str, symbol_name: str) -> str | None:

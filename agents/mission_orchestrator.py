@@ -204,10 +204,14 @@ class MissionLifecycleOrchestrator:
         use_swarm: bool = True,
         use_federation: bool = False,
         swarm_agents: Sequence[SwarmAgent] | None = None,
+        checkpoint_mode: str = "INCREMENTAL",
+        compaction_interval: int = 25,
     ) -> None:
         self.project_id = project_id
         self.mission_id = mission_id
         self.mission_state = mission_state
+        self.checkpoint_mode = checkpoint_mode
+        self.compaction_interval = compaction_interval
         self.concurrency_limit = max(1, min(concurrency_limit, 8))
         self.expansion_limits = expansion_limits or ExpansionLimits()
         self.subdag_engine = DynamicSubDagEngine(limits=self.expansion_limits)
@@ -240,6 +244,14 @@ class MissionLifecycleOrchestrator:
             self.mission_state._mission_dir(project_id, mission_id), "checkpoints"
         )
         os.makedirs(self.checkpoints_dir, exist_ok=True)
+
+        from agents.incremental_checkpoint_engine import IncrementalPersistenceAdapter
+        self.incremental_adapter = IncrementalPersistenceAdapter(
+            base_dir=self.mission_state.projects_root,
+            mission_id=mission_id,
+            project_id=project_id,
+            compaction_interval=self.compaction_interval,
+        )
 
         if task_graph is not None:
             self.task_graph = task_graph
@@ -317,7 +329,7 @@ class MissionLifecycleOrchestrator:
     # ── CHECKPOINTING & CRASH RECOVERY ────────────────────────────────────────
 
     def save_checkpoint(self, description: str = "") -> Checkpoint:
-        """Persists deterministic snapshot to disk."""
+        """Persists deterministic snapshot or incremental delta to disk."""
         self.checkpoint_seq += 1
         now = utc_now()
         cp = Checkpoint(
@@ -346,31 +358,50 @@ class MissionLifecycleOrchestrator:
             federation_state=self.swarm_federation.save_checkpoint().to_dict() if self.swarm_federation else {},
         )
 
-        # Persist through unified mission_state persistence layer
-        if hasattr(self.mission_state, "save_checkpoint"):
-            try:
-                self.mission_state.save_checkpoint(self.project_id, self.mission_id, cp.to_dict())
-            except Exception as e:
-                log_event(self.logger, "mission_orchestrator.checkpoint_persistence_error", error=str(e))
+        cp_dict = cp.to_dict()
 
-        # Also maintain local file for backward compatibility
-        path = os.path.join(self.checkpoints_dir, f"checkpoint_{self.checkpoint_seq:04d}.json")
-        try:
-            with open(path, "w", encoding="utf-8") as f:
-                f.write(json.dumps(cp.to_dict(), indent=2, ensure_ascii=False))
-        except Exception:
-            pass
+        if getattr(self, "checkpoint_mode", "INCREMENTAL") == "INCREMENTAL" and hasattr(self, "incremental_adapter"):
+            try:
+                self.incremental_adapter.save_checkpoint(cp_dict)
+            except Exception as e:
+                log_event(self.logger, "mission_orchestrator.incremental_save_error", error=str(e))
+                if hasattr(self.mission_state, "save_checkpoint"):
+                    self.mission_state.save_checkpoint(self.project_id, self.mission_id, cp_dict)
+        else:
+            # Full checkpoint mode
+            if hasattr(self.mission_state, "save_checkpoint"):
+                try:
+                    self.mission_state.save_checkpoint(self.project_id, self.mission_id, cp_dict)
+                except Exception as e:
+                    log_event(self.logger, "mission_orchestrator.checkpoint_persistence_error", error=str(e))
+
+            # Maintain local file in full mode
+            path = os.path.join(self.checkpoints_dir, f"checkpoint_{self.checkpoint_seq:04d}.json")
+            try:
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(json.dumps(cp_dict, indent=2, ensure_ascii=False))
+            except Exception:
+                pass
 
         log_event(
             self.logger,
             "mission_orchestrator.checkpoint_saved",
             sequence=self.checkpoint_seq,
             description=description,
+            mode=getattr(self, "checkpoint_mode", "INCREMENTAL"),
         )
         return cp
 
     def load_latest_checkpoint(self) -> Checkpoint | None:
-        """Loads and returns the latest persistent checkpoint if available."""
+        """Loads and returns the latest persistent checkpoint (incremental or full)."""
+        if hasattr(self, "incremental_adapter"):
+            try:
+                data = self.incremental_adapter.load_latest_checkpoint()
+                if data:
+                    return Checkpoint.from_dict(data)
+            except Exception as e:
+                log_event(self.logger, "mission_orchestrator.incremental_load_error", error=str(e))
+
         if hasattr(self.mission_state, "load_latest_checkpoint"):
             try:
                 data = self.mission_state.load_latest_checkpoint(self.project_id, self.mission_id)
@@ -393,6 +424,14 @@ class MissionLifecycleOrchestrator:
 
     def load_checkpoint(self, sequence: int | None = None, checkpoint_id: str | None = None) -> Checkpoint | None:
         """Loads and returns checkpoint by sequence number or checkpoint_id, or latest if both None."""
+        if hasattr(self, "incremental_adapter") and sequence is not None:
+            try:
+                data = self.incremental_adapter.load_checkpoint_by_sequence(sequence)
+                if data:
+                    return Checkpoint.from_dict(data)
+            except Exception:
+                pass
+
         if hasattr(self.mission_state, "load_checkpoint"):
             try:
                 data = self.mission_state.load_checkpoint(self.project_id, self.mission_id, sequence=sequence, checkpoint_id=checkpoint_id)

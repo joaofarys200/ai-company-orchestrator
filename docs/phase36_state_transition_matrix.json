@@ -1,0 +1,304 @@
+{
+  "phase": "Fase 36",
+  "name": "Mission Control Formal State Transition Matrix",
+  "version": "1.0.0",
+  "generated_at": "2026-09-10T21:45:30Z",
+  "states": [
+    "PLANNING",
+    "READY",
+    "RUNNING",
+    "PAUSED",
+    "REPAIRING",
+    "REPLANNING",
+    "VALIDATING",
+    "BLOCKED",
+    "CANCELLING",
+    "CANCELLED",
+    "COMPLETED",
+    "FAILED",
+    "RECOVERING"
+  ],
+  "terminal_states": ["CANCELLED", "COMPLETED", "FAILED"],
+  "non_terminal_states": [
+    "PLANNING",
+    "READY",
+    "RUNNING",
+    "PAUSED",
+    "REPAIRING",
+    "REPLANNING",
+    "VALIDATING",
+    "BLOCKED",
+    "CANCELLING",
+    "RECOVERING"
+  ],
+  "matrix": {
+    "PLANNING": {
+      "allowed_transitions": ["RUNNING", "CANCELLING", "BLOCKED", "FAILED"],
+      "disallowed_transitions": [
+        "PLANNING",
+        "READY",
+        "PAUSED",
+        "REPAIRING",
+        "REPLANNING",
+        "VALIDATING",
+        "CANCELLED",
+        "COMPLETED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "CANCEL": { "valid": true, "target_state": "CANCELLING" },
+        "PAUSE": { "valid": false, "reason": "Cannot pause while still in planning phase" },
+        "RESUME": { "valid": false, "reason": "Mission is not paused" }
+      }
+    },
+    "READY": {
+      "allowed_transitions": ["RUNNING", "CANCELLING", "BLOCKED"],
+      "disallowed_transitions": [
+        "READY",
+        "PLANNING",
+        "PAUSED",
+        "REPAIRING",
+        "REPLANNING",
+        "VALIDATING",
+        "CANCELLED",
+        "COMPLETED",
+        "FAILED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "CANCEL": { "valid": true, "target_state": "CANCELLING" },
+        "PAUSE": { "valid": false, "reason": "Cannot pause before execution starts" },
+        "RESUME": { "valid": false, "reason": "Mission is not paused" }
+      }
+    },
+    "RUNNING": {
+      "allowed_transitions": [
+        "PAUSED",
+        "REPAIRING",
+        "REPLANNING",
+        "VALIDATING",
+        "CANCELLING",
+        "BLOCKED",
+        "COMPLETED",
+        "FAILED"
+      ],
+      "disallowed_transitions": ["RUNNING", "PLANNING", "READY", "CANCELLED", "RECOVERING"],
+      "operator_interventions": {
+        "PAUSE": { "valid": true, "target_state": "PAUSED" },
+        "CANCEL": { "valid": true, "target_state": "CANCELLING" },
+        "RESUME": { "valid": false, "reason": "Mission is already running" },
+        "APPROVE": { "valid": true, "target": "task", "condition": "task status must be PENDING_APPROVAL" },
+        "CHANGE_PRIORITY": { "valid": true, "target": "task", "condition": "task non-terminal" },
+        "REORDER": { "valid": true, "target": "task", "condition": "respects topological causal order" }
+      }
+    },
+    "PAUSED": {
+      "allowed_transitions": ["RUNNING", "CANCELLING"],
+      "disallowed_transitions": [
+        "PAUSED",
+        "PLANNING",
+        "READY",
+        "REPAIRING",
+        "REPLANNING",
+        "VALIDATING",
+        "BLOCKED",
+        "CANCELLED",
+        "COMPLETED",
+        "FAILED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "RESUME": { "valid": true, "target_state": "RUNNING" },
+        "CANCEL": { "valid": true, "target_state": "CANCELLING" },
+        "PAUSE": { "valid": false, "reason": "Mission is already paused" },
+        "APPROVE": { "valid": true, "target": "task", "condition": "task status must be PENDING_APPROVAL" },
+        "CHANGE_PRIORITY": { "valid": true, "target": "task", "condition": "task non-terminal" },
+        "REORDER": { "valid": true, "target": "task", "condition": "respects topological causal order" }
+      }
+    },
+    "REPAIRING": {
+      "allowed_transitions": ["PAUSED", "RUNNING", "CANCELLING", "FAILED"],
+      "disallowed_transitions": [
+        "REPAIRING",
+        "PLANNING",
+        "READY",
+        "REPLANNING",
+        "VALIDATING",
+        "BLOCKED",
+        "CANCELLED",
+        "COMPLETED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "PAUSE": { "valid": true, "target_state": "PAUSED" },
+        "CANCEL": { "valid": true, "target_state": "CANCELLING" },
+        "RESUME": { "valid": false, "reason": "Mission is not paused" }
+      }
+    },
+    "REPLANNING": {
+      "allowed_transitions": ["RUNNING", "PAUSED", "CANCELLING", "FAILED"],
+      "disallowed_transitions": [
+        "REPLANNING",
+        "PLANNING",
+        "READY",
+        "REPAIRING",
+        "VALIDATING",
+        "BLOCKED",
+        "CANCELLED",
+        "COMPLETED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "PAUSE": { "valid": true, "target_state": "PAUSED" },
+        "CANCEL": { "valid": true, "target_state": "CANCELLING" },
+        "RESUME": { "valid": false, "reason": "Mission is not paused" }
+      }
+    },
+    "VALIDATING": {
+      "allowed_transitions": ["COMPLETED", "REPAIRING", "FAILED", "CANCELLING"],
+      "disallowed_transitions": [
+        "VALIDATING",
+        "PLANNING",
+        "READY",
+        "RUNNING",
+        "PAUSED",
+        "REPLANNING",
+        "BLOCKED",
+        "CANCELLED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "CANCEL": { "valid": true, "target_state": "CANCELLING" },
+        "PAUSE": { "valid": false, "reason": "Validation cannot be paused midway; must cancel or await result" }
+      }
+    },
+    "RECOVERING": {
+      "allowed_transitions": ["RUNNING", "PAUSED", "FAILED", "CANCELLING"],
+      "disallowed_transitions": [
+        "RECOVERING",
+        "PLANNING",
+        "READY",
+        "REPAIRING",
+        "REPLANNING",
+        "VALIDATING",
+        "BLOCKED",
+        "CANCELLED",
+        "COMPLETED"
+      ],
+      "operator_interventions": {
+        "CANCEL": { "valid": true, "target_state": "CANCELLING" },
+        "PAUSE": { "valid": true, "target_state": "PAUSED" }
+      }
+    },
+    "BLOCKED": {
+      "allowed_transitions": ["RUNNING", "CANCELLING"],
+      "disallowed_transitions": [
+        "BLOCKED",
+        "PLANNING",
+        "READY",
+        "PAUSED",
+        "REPAIRING",
+        "REPLANNING",
+        "VALIDATING",
+        "CANCELLED",
+        "COMPLETED",
+        "FAILED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "CANCEL": { "valid": true, "target_state": "CANCELLING" },
+        "RESUME": { "valid": true, "target_state": "RUNNING" }
+      }
+    },
+    "CANCELLING": {
+      "allowed_transitions": ["CANCELLED"],
+      "disallowed_transitions": [
+        "CANCELLING",
+        "PLANNING",
+        "READY",
+        "RUNNING",
+        "PAUSED",
+        "REPAIRING",
+        "REPLANNING",
+        "VALIDATING",
+        "BLOCKED",
+        "COMPLETED",
+        "FAILED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "ANY": { "valid": false, "reason": "Mission is undergoing cancellation draining; no further intervention allowed" }
+      }
+    },
+    "CANCELLED": {
+      "allowed_transitions": [],
+      "disallowed_transitions": [
+        "PLANNING",
+        "READY",
+        "RUNNING",
+        "PAUSED",
+        "REPAIRING",
+        "REPLANNING",
+        "VALIDATING",
+        "BLOCKED",
+        "CANCELLING",
+        "CANCELLED",
+        "COMPLETED",
+        "FAILED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "ANY": { "valid": false, "reason": "Terminal state: CANCELLED is irreversible" }
+      }
+    },
+    "COMPLETED": {
+      "allowed_transitions": [],
+      "disallowed_transitions": [
+        "PLANNING",
+        "READY",
+        "RUNNING",
+        "PAUSED",
+        "REPAIRING",
+        "REPLANNING",
+        "VALIDATING",
+        "BLOCKED",
+        "CANCELLING",
+        "CANCELLED",
+        "COMPLETED",
+        "FAILED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "ANY": { "valid": false, "reason": "Terminal state: COMPLETED is irreversible" }
+      }
+    },
+    "FAILED": {
+      "allowed_transitions": [],
+      "disallowed_transitions": [
+        "PLANNING",
+        "READY",
+        "RUNNING",
+        "PAUSED",
+        "REPAIRING",
+        "REPLANNING",
+        "VALIDATING",
+        "BLOCKED",
+        "CANCELLING",
+        "CANCELLED",
+        "COMPLETED",
+        "FAILED",
+        "RECOVERING"
+      ],
+      "operator_interventions": {
+        "ANY": { "valid": false, "reason": "Terminal state: FAILED is irreversible" }
+      }
+    }
+  },
+  "invariants": [
+    "No transition is permitted from any terminal state (CANCELLED, COMPLETED, FAILED)",
+    "Self-transitions (state -> same state) are strictly refused with INVALID_STATE",
+    "CANCEL is universally available in all non-terminal states and leads deterministically to CANCELLED",
+    "PAUSE is only available in active execution/repair states (RUNNING, REPAIRING, REPLANNING, RECOVERING)",
+    "RESUME is exclusively valid from PAUSED (or unblocking BLOCKED)"
+  ]
+}

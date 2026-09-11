@@ -1,0 +1,101 @@
+{
+  "phase": "Phase 38 — Post-Decomposition Architectural Snapshot",
+  "timestamp": 1789078380.0,
+  "files_scanned": 717,
+  "metrics": {
+    "total_super_files": 443,
+    "critical_count": 0,
+    "high_count": 6,
+    "watch_count": 50,
+    "normal_count": 387,
+    "average_loc": 272.1,
+    "max_loc": 3342,
+    "circular_dependencies_detected": 0
+  },
+  "decomposed_target": {
+    "path": "frontend/src/features/missions/MissionControlCenter.tsx",
+    "loc_before": 2382,
+    "loc_after": 516,
+    "loc_delta": -1866,
+    "loc_reduction_percentage": 78.34,
+    "score_before": 66.16,
+    "score_after": 50.3,
+    "score_delta": -15.86,
+    "severity_before": "HIGH",
+    "severity_after": "WATCH",
+    "role": "Mission Control Orchestrator & Composer",
+    "new_extracted_components_count": 13,
+    "extracted_modules": [
+      {
+        "path": "frontend/src/features/missions/components/MissionHeader.tsx",
+        "loc": 195,
+        "role": "Mission Header & Scenario Bar"
+      },
+      {
+        "path": "frontend/src/features/missions/components/MissionControlActions.tsx",
+        "loc": 65,
+        "role": "Operator Action Buttons"
+      },
+      {
+        "path": "frontend/src/features/missions/components/CancelConfirmModal.tsx",
+        "loc": 55,
+        "role": "Cancellation Dialog"
+      },
+      {
+        "path": "frontend/src/features/missions/components/IntentPreviewModal.tsx",
+        "loc": 182,
+        "role": "Dynamic Intent Preview & Analysis"
+      },
+      {
+        "path": "frontend/src/features/missions/components/MissionOverviewPanel.tsx",
+        "loc": 322,
+        "role": "Overview, Swarm, Understanding & Audit Ledger"
+      },
+      {
+        "path": "frontend/src/features/missions/components/MissionTaskGraphPanel.tsx",
+        "loc": 238,
+        "role": "Task DAG, Priorities & Execution Timeline"
+      },
+      {
+        "path": "frontend/src/features/missions/components/MissionRequirementsDiffPanel.tsx",
+        "loc": 134,
+        "role": "Requirement Lifecycle Diff"
+      },
+      {
+        "path": "frontend/src/features/missions/components/MissionPlanDiffPanel.tsx",
+        "loc": 76,
+        "role": "Plan Structural Diff & DAG Validation"
+      },
+      {
+        "path": "frontend/src/features/missions/components/MissionEvidenceImpactPanel.tsx",
+        "loc": 82,
+        "role": "Evidence Invalidation Tracker"
+      },
+      {
+        "path": "frontend/src/features/missions/components/MissionWhyCausalPanel.tsx",
+        "loc": 68,
+        "role": "Why Panel Causal Explainability"
+      },
+      {
+        "path": "frontend/src/features/missions/components/MissionRepairPanel.tsx",
+        "loc": 154,
+        "role": "Auto-Cura, Replans & Crash Recovery"
+      },
+      {
+        "path": "frontend/src/features/missions/components/MissionEvidenceLedgerPanel.tsx",
+        "loc": 84,
+        "role": "Physical Evidence Ledger"
+      },
+      {
+        "path": "frontend/src/features/missions/components/MissionAppPreviewPanel.tsx",
+        "loc": 145,
+        "role": "Interactive Web App Live Demo"
+      },
+      {
+        "path": "frontend/src/features/missions/components/index.ts",
+        "loc": 14,
+        "role": "Barrel Export"
+      }
+    ]
+  }
+}

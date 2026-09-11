@@ -1,0 +1,112 @@
+{
+  "phase": "Fase 36",
+  "title": "Phase 36 Automated Test Suite & Command QA Results",
+  "version": "1.0.0",
+  "timestamp": "2026-09-10T21:48:10Z",
+  "summary": {
+    "total_tests": 16,
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0,
+    "pass_rate_pct": 100.0,
+    "execution_time_seconds": 0.55
+  },
+  "test_cases": [
+    {
+      "test_name": "test_allowed_state_transitions",
+      "category": "State Machine",
+      "status": "PASS",
+      "description": "Verifies all valid state transitions defined in ALLOWED_STATE_TRANSITIONS succeed deterministically"
+    },
+    {
+      "test_name": "test_invalid_state_transitions",
+      "category": "State Machine",
+      "status": "PASS",
+      "description": "Ensures invalid transitions (e.g., PLANNING to COMPLETED, PAUSED to PLANNING) are rejected with INVALID_STATE"
+    },
+    {
+      "test_name": "test_pause_and_resume_lifecycle",
+      "category": "Mission Lifecycle",
+      "status": "PASS",
+      "description": "Validates full pause/resume cycle: RUNNING -> PAUSED -> RUNNING with version incrementing"
+    },
+    {
+      "test_name": "test_pause_when_already_paused_fails",
+      "category": "Mission Lifecycle",
+      "status": "PASS",
+      "description": "Guarantees that invoking PAUSE on an already PAUSED mission fails with INVALID_STATE"
+    },
+    {
+      "test_name": "test_resume_when_not_paused_fails",
+      "category": "Mission Lifecycle",
+      "status": "PASS",
+      "description": "Ensures RESUME on a RUNNING or PLANNING mission is rejected"
+    },
+    {
+      "test_name": "test_cancel_irreversibility_from_any_state",
+      "category": "Mission Lifecycle",
+      "status": "PASS",
+      "description": "Validates that CANCEL transitions to CANCELLED and that CANCELLED is an immutable terminal state"
+    },
+    {
+      "test_name": "test_human_approval_command",
+      "category": "Human Intervention",
+      "status": "PASS",
+      "description": "Validates APPROVE command on PENDING_APPROVAL task, transitioning it to DONE and unblocking pipeline"
+    },
+    {
+      "test_name": "test_human_rejection_command",
+      "category": "Human Intervention",
+      "status": "PASS",
+      "description": "Validates REJECT decision on PENDING_APPROVAL task, transitioning to FAILED/REJECTED"
+    },
+    {
+      "test_name": "test_approval_fails_on_non_pending_task",
+      "category": "Human Intervention",
+      "status": "PASS",
+      "description": "Ensures human approval commands fail with INVALID_STATE if target task is not PENDING_APPROVAL"
+    },
+    {
+      "test_name": "test_change_task_priority",
+      "category": "Scheduler Dynamics",
+      "status": "PASS",
+      "description": "Confirms priority modifications (CRITICAL, HIGH, NORMAL, LOW) take effect without violating DAG structure"
+    },
+    {
+      "test_name": "test_reorder_tasks_valid_and_causal_violation",
+      "category": "DAG Topologic Invariance",
+      "status": "PASS",
+      "description": "Verifies valid swaps succeed and invalid swaps violating causal dependencies return CONFLICT"
+    },
+    {
+      "test_name": "test_optimistic_locking_stale_version_rejected",
+      "category": "Concurrency & Consistency",
+      "status": "PASS",
+      "description": "Ensures commands presenting an outdated expected_mission_version return STALE status"
+    },
+    {
+      "test_name": "test_idempotency_cache_deduplication",
+      "category": "Idempotency",
+      "status": "PASS",
+      "description": "Ensures repeated commands with identical idempotency_key return cached results without re-execution"
+    },
+    {
+      "test_name": "test_idempotency_burst_deduplication",
+      "category": "Idempotency",
+      "status": "PASS",
+      "description": "Confirms a burst of 10 identical commands produces exactly 1 execution and 9 cache hits"
+    },
+    {
+      "test_name": "test_sentinel_security_refusal_on_malicious_payload",
+      "category": "Security & Governance",
+      "status": "PASS",
+      "description": "Proves malicious commands containing exploit patterns are blocked by Sentinel with SECURITY_BLOCK"
+    },
+    {
+      "test_name": "test_websocket_dispatcher_human_command",
+      "category": "WebSocket Integration",
+      "status": "PASS",
+      "description": "Verifies end-to-end WebSocket message routing, payload dispatch, and response generation"
+    }
+  ]
+}

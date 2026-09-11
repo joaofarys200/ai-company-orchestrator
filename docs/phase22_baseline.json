@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "phase": "Phase 22 \u2014 Baseline Reproduction (Phase 21 Architecture)",
+    "timestamp": "2026-09-07T19:17:48.983635+00:00",
+    "host": "BIGBALLSG",
+    "os": "Windows 11",
+    "logical_cores": 16,
+    "transport": "QUIC_OVER_UDP_BASELINE"
+  },
+  "scenarios": {
+    "64_streams": {
+      "classification": "MEASURED",
+      "active_streams": 64,
+      "throughput_mb_s": 2.15,
+      "cpu_percent": 0.0,
+      "cpu_per_core": 0.0,
+      "p50_latency_ms": 0.009,
+      "p95_latency_ms": 0.019,
+      "control_stream_latency_ms": 0.197,
+      "memory_rss_mb": 78.99,
+      "packet_loss_rate": 0.0,
+      "retransmissions": 0,
+      "stream_errors": 0
+    },
+    "128_streams": {
+      "classification": "MEASURED",
+      "active_streams": 128,
+      "throughput_mb_s": 4.7,
+      "cpu_percent": 58.6,
+      "cpu_per_core": 3.66,
+      "p50_latency_ms": 0.009,
+      "p95_latency_ms": 0.014,
+      "control_stream_latency_ms": 0.191,
+      "memory_rss_mb": 79.1,
+      "packet_loss_rate": 0.0,
+      "retransmissions": 0,
+      "stream_errors": 0
+    },
+    "256_streams": {
+      "classification": "MEASURED",
+      "active_streams": 256,
+      "throughput_mb_s": 7.43,
+      "cpu_percent": 46.4,
+      "cpu_per_core": 2.9,
+      "p50_latency_ms": 0.009,
+      "p95_latency_ms": 0.015,
+      "control_stream_latency_ms": 0.279,
+      "memory_rss_mb": 79.81,
+      "packet_loss_rate": 0.0,
+      "retransmissions": 0,
+      "stream_errors": 0
+    },
+    "512_streams": {
+      "classification": "MEASURED",
+      "active_streams": 512,
+      "throughput_mb_s": 9.87,
+      "cpu_percent": 61.5,
+      "cpu_per_core": 3.84,
+      "p50_latency_ms": 0.008,
+      "p95_latency_ms": 0.01,
+      "control_stream_latency_ms": 0.17,
+      "memory_rss_mb": 79.99,
+      "packet_loss_rate": 0.0,
+      "retransmissions": 0,
+      "stream_errors": 0
+    },
+    "1024_streams": {
+      "classification": "MEASURED",
+      "active_streams": 1024,
+      "throughput_mb_s": 7.79,
+      "cpu_percent": 48.6,
+      "cpu_per_core": 3.04,
+      "p50_latency_ms": 0.009,
+      "p95_latency_ms": 0.024,
+      "control_stream_latency_ms": 0.165,
+      "memory_rss_mb": 80.02,
+      "packet_loss_rate": 0.0,
+      "retransmissions": 0,
+      "stream_errors": 0
+    },
+    "2048_streams": {
+      "classification": "MEASURED",
+      "active_streams": 2048,
+      "throughput_mb_s": 7.44,
+      "cpu_percent": 46.4,
+      "cpu_per_core": 2.9,
+      "p50_latency_ms": 0.008,
+      "p95_latency_ms": 0.013,
+      "control_stream_latency_ms": 0.19,
+      "memory_rss_mb": 80.03,
+      "packet_loss_rate": 0.0,
+      "retransmissions": 0,
+      "stream_errors": 0
+    },
+    "4096_streams": {
+      "classification": "MEASURED",
+      "active_streams": 4096,
+      "throughput_mb_s": 7.51,
+      "cpu_percent": 46.8,
+      "cpu_per_core": 2.92,
+      "p50_latency_ms": 0.009,
+      "p95_latency_ms": 0.016,
+      "control_stream_latency_ms": 0.275,
+      "memory_rss_mb": 79.48,
+      "packet_loss_rate": 0.0,
+      "retransmissions": 0,
+      "stream_errors": 0
+    }
+  }
+}

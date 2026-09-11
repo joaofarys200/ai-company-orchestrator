@@ -1,0 +1,20 @@
+{
+  "phase": 39.1,
+  "phase_name": "Phase 39.1 Deterministic TypeScript Graph",
+  "timestamp_iso": "2026-09-11T12:43:35Z",
+  "nodes": 435,
+  "edges": 293,
+  "resolved_edges": 293,
+  "unresolved_edges": 0,
+  "aliases_resolved": 0,
+  "symbol_edges": 30,
+  "cycles": 0,
+  "package_boundaries": {
+    "INTRA_PACKAGE": 0,
+    "INTER_PACKAGE": 0,
+    "EXTERNAL_PACKAGE": 0
+  },
+  "ts_dependency_recall": 1.0,
+  "ts_dependency_precision": 0.9,
+  "symbol_count": 2976
+}

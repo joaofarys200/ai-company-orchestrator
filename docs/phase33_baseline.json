@@ -1,0 +1,797 @@
+{
+  "report_id": "phase33_baseline",
+  "timestamp": 1788898823.5533428,
+  "total_executions": 35,
+  "strategy": "FULL_CHECKPOINT",
+  "tested_horizons": [
+    20,
+    50,
+    100,
+    150,
+    200,
+    250,
+    300
+  ],
+  "first_checkpoint_hot_path": "2_state_serialization",
+  "scaling_summary": {
+    "20": {
+      "task_transitions": 20,
+      "sample_size": 5,
+      "checkpoint_save_duration_ms": {
+        "mean": 5.1261,
+        "median": 5.1542,
+        "std": 0.7654,
+        "min": 3.9362,
+        "max": 6.0146
+      },
+      "checkpoint_load_duration_ms": {
+        "mean": 0.5622,
+        "median": 0.5833,
+        "std": 0.0668,
+        "min": 0.4604,
+        "max": 0.6409
+      },
+      "serialization_size_bytes": {
+        "mean": 26420.0,
+        "median": 26420.0,
+        "std": 0.0,
+        "min": 26420.0,
+        "max": 26420.0
+      },
+      "cpu_time_ms": {
+        "mean": 0.0,
+        "median": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "level_hot_path": "6_fsync_durability",
+      "subcomponents": {
+        "1_state_construction": {
+          "mean": 0.0357,
+          "median": 0.0362,
+          "std": 0.0066,
+          "min": 0.0278,
+          "max": 0.0457
+        },
+        "2_state_serialization": {
+          "mean": 0.5212,
+          "median": 0.5025,
+          "std": 0.0673,
+          "min": 0.4555,
+          "max": 0.634
+        },
+        "3_json_encoding": {
+          "mean": 0.3116,
+          "median": 0.3182,
+          "std": 0.0312,
+          "min": 0.268,
+          "max": 0.3531
+        },
+        "4_compression": {
+          "mean": 0.0003,
+          "median": 0.0003,
+          "std": 0.0,
+          "min": 0.0003,
+          "max": 0.0004
+        },
+        "5_disk_write": {
+          "mean": 1.3342,
+          "median": 1.3008,
+          "std": 0.148,
+          "min": 1.1774,
+          "max": 1.5618
+        },
+        "6_fsync_durability": {
+          "mean": 2.0322,
+          "median": 2.1153,
+          "std": 0.5678,
+          "min": 1.1382,
+          "max": 2.5368
+        },
+        "7_hash_calculation": {
+          "mean": 0.0548,
+          "median": 0.0404,
+          "std": 0.0303,
+          "min": 0.0378,
+          "max": 0.1087
+        },
+        "8_manifest_update": {
+          "mean": 0.714,
+          "median": 0.7685,
+          "std": 0.1462,
+          "min": 0.4557,
+          "max": 0.8012
+        },
+        "9_checkpoint_validation": {
+          "mean": 0.0027,
+          "median": 0.0027,
+          "std": 0.0008,
+          "min": 0.0016,
+          "max": 0.0039
+        },
+        "10_recovery_metadata": {
+          "mean": 0.0011,
+          "median": 0.0011,
+          "std": 0.0002,
+          "min": 0.0007,
+          "max": 0.0013
+        }
+      }
+    },
+    "50": {
+      "task_transitions": 50,
+      "sample_size": 5,
+      "checkpoint_save_duration_ms": {
+        "mean": 8.3122,
+        "median": 7.4991,
+        "std": 2.357,
+        "min": 5.3458,
+        "max": 10.8233
+      },
+      "checkpoint_load_duration_ms": {
+        "mean": 1.4198,
+        "median": 1.3026,
+        "std": 0.6978,
+        "min": 0.721,
+        "max": 2.5401
+      },
+      "serialization_size_bytes": {
+        "mean": 65128.0,
+        "median": 65128.0,
+        "std": 0.0,
+        "min": 65128.0,
+        "max": 65128.0
+      },
+      "cpu_time_ms": {
+        "mean": 3.125,
+        "median": 0.0,
+        "std": 6.9877,
+        "min": 0.0,
+        "max": 15.625
+      },
+      "level_hot_path": "6_fsync_durability",
+      "subcomponents": {
+        "1_state_construction": {
+          "mean": 0.1286,
+          "median": 0.1032,
+          "std": 0.0696,
+          "min": 0.0613,
+          "max": 0.2264
+        },
+        "2_state_serialization": {
+          "mean": 1.8355,
+          "median": 1.5201,
+          "std": 1.0815,
+          "min": 0.7833,
+          "max": 3.055
+        },
+        "3_json_encoding": {
+          "mean": 0.8183,
+          "median": 0.6872,
+          "std": 0.3567,
+          "min": 0.411,
+          "max": 1.2295
+        },
+        "4_compression": {
+          "mean": 0.0003,
+          "median": 0.0003,
+          "std": 0.0001,
+          "min": 0.0002,
+          "max": 0.0005
+        },
+        "5_disk_write": {
+          "mean": 1.904,
+          "median": 1.8709,
+          "std": 0.6372,
+          "min": 1.137,
+          "max": 2.8437
+        },
+        "6_fsync_durability": {
+          "mean": 2.6725,
+          "median": 2.4956,
+          "std": 0.6656,
+          "min": 2.0496,
+          "max": 3.6619
+        },
+        "7_hash_calculation": {
+          "mean": 0.061,
+          "median": 0.0619,
+          "std": 0.0024,
+          "min": 0.0581,
+          "max": 0.0634
+        },
+        "8_manifest_update": {
+          "mean": 0.7533,
+          "median": 0.73,
+          "std": 0.1578,
+          "min": 0.5843,
+          "max": 0.9236
+        },
+        "9_checkpoint_validation": {
+          "mean": 0.0025,
+          "median": 0.0021,
+          "std": 0.001,
+          "min": 0.0017,
+          "max": 0.0042
+        },
+        "10_recovery_metadata": {
+          "mean": 0.0012,
+          "median": 0.0012,
+          "std": 0.0004,
+          "min": 0.0008,
+          "max": 0.0018
+        }
+      }
+    },
+    "100": {
+      "task_transitions": 100,
+      "sample_size": 5,
+      "checkpoint_save_duration_ms": {
+        "mean": 9.7741,
+        "median": 9.6199,
+        "std": 2.367,
+        "min": 7.5985,
+        "max": 13.3544
+      },
+      "checkpoint_load_duration_ms": {
+        "mean": 1.9568,
+        "median": 1.8925,
+        "std": 0.5926,
+        "min": 1.4564,
+        "max": 2.9075
+      },
+      "serialization_size_bytes": {
+        "mean": 129637.0,
+        "median": 129637.0,
+        "std": 0.0,
+        "min": 129637.0,
+        "max": 129637.0
+      },
+      "cpu_time_ms": {
+        "mean": 6.25,
+        "median": 0.0,
+        "std": 8.5582,
+        "min": 0.0,
+        "max": 15.625
+      },
+      "level_hot_path": "6_fsync_durability",
+      "subcomponents": {
+        "1_state_construction": {
+          "mean": 0.1639,
+          "median": 0.1171,
+          "std": 0.1179,
+          "min": 0.0834,
+          "max": 0.3694
+        },
+        "2_state_serialization": {
+          "mean": 2.4589,
+          "median": 2.063,
+          "std": 0.9178,
+          "min": 1.5467,
+          "max": 3.8741
+        },
+        "3_json_encoding": {
+          "mean": 1.1083,
+          "median": 1.1621,
+          "std": 0.3612,
+          "min": 0.7089,
+          "max": 1.5986
+        },
+        "4_compression": {
+          "mean": 0.0003,
+          "median": 0.0003,
+          "std": 0.0001,
+          "min": 0.0002,
+          "max": 0.0004
+        },
+        "5_disk_write": {
+          "mean": 2.329,
+          "median": 1.9932,
+          "std": 1.1324,
+          "min": 1.2001,
+          "max": 3.7182
+        },
+        "6_fsync_durability": {
+          "mean": 2.8272,
+          "median": 2.9519,
+          "std": 0.3801,
+          "min": 2.1868,
+          "max": 3.1955
+        },
+        "7_hash_calculation": {
+          "mean": 0.1061,
+          "median": 0.0999,
+          "std": 0.0178,
+          "min": 0.0925,
+          "max": 0.1369
+        },
+        "8_manifest_update": {
+          "mean": 0.6647,
+          "median": 0.6841,
+          "std": 0.094,
+          "min": 0.5314,
+          "max": 0.7883
+        },
+        "9_checkpoint_validation": {
+          "mean": 0.0019,
+          "median": 0.0019,
+          "std": 0.0002,
+          "min": 0.0016,
+          "max": 0.002
+        },
+        "10_recovery_metadata": {
+          "mean": 0.001,
+          "median": 0.0011,
+          "std": 0.0001,
+          "min": 0.0009,
+          "max": 0.0011
+        }
+      }
+    },
+    "150": {
+      "task_transitions": 150,
+      "sample_size": 5,
+      "checkpoint_save_duration_ms": {
+        "mean": 12.6114,
+        "median": 11.9274,
+        "std": 2.3691,
+        "min": 9.9052,
+        "max": 15.3467
+      },
+      "checkpoint_load_duration_ms": {
+        "mean": 2.9072,
+        "median": 2.6516,
+        "std": 0.7875,
+        "min": 2.4141,
+        "max": 4.2911
+      },
+      "serialization_size_bytes": {
+        "mean": 194316.0,
+        "median": 194316.0,
+        "std": 0.0,
+        "min": 194316.0,
+        "max": 194316.0
+      },
+      "cpu_time_ms": {
+        "mean": 6.25,
+        "median": 0.0,
+        "std": 8.5582,
+        "min": 0.0,
+        "max": 15.625
+      },
+      "level_hot_path": "2_state_serialization",
+      "subcomponents": {
+        "1_state_construction": {
+          "mean": 0.1988,
+          "median": 0.1889,
+          "std": 0.09,
+          "min": 0.1136,
+          "max": 0.338
+        },
+        "2_state_serialization": {
+          "mean": 3.7978,
+          "median": 3.5502,
+          "std": 1.4609,
+          "min": 2.1013,
+          "max": 5.4409
+        },
+        "3_json_encoding": {
+          "mean": 1.8033,
+          "median": 1.8543,
+          "std": 0.4715,
+          "min": 1.234,
+          "max": 2.323
+        },
+        "4_compression": {
+          "mean": 0.0004,
+          "median": 0.0005,
+          "std": 0.0001,
+          "min": 0.0002,
+          "max": 0.0005
+        },
+        "5_disk_write": {
+          "mean": 2.6283,
+          "median": 2.7586,
+          "std": 0.7477,
+          "min": 1.5549,
+          "max": 3.6307
+        },
+        "6_fsync_durability": {
+          "mean": 3.0875,
+          "median": 2.7997,
+          "std": 0.6502,
+          "min": 2.5749,
+          "max": 4.128
+        },
+        "7_hash_calculation": {
+          "mean": 0.1391,
+          "median": 0.1413,
+          "std": 0.0135,
+          "min": 0.1236,
+          "max": 0.1587
+        },
+        "8_manifest_update": {
+          "mean": 0.8105,
+          "median": 0.8902,
+          "std": 0.2073,
+          "min": 0.5716,
+          "max": 1.0199
+        },
+        "9_checkpoint_validation": {
+          "mean": 0.0022,
+          "median": 0.0019,
+          "std": 0.0005,
+          "min": 0.0018,
+          "max": 0.003
+        },
+        "10_recovery_metadata": {
+          "mean": 0.001,
+          "median": 0.0009,
+          "std": 0.0002,
+          "min": 0.0008,
+          "max": 0.0013
+        }
+      }
+    },
+    "200": {
+      "task_transitions": 200,
+      "sample_size": 5,
+      "checkpoint_save_duration_ms": {
+        "mean": 16.1592,
+        "median": 14.7552,
+        "std": 3.134,
+        "min": 12.5977,
+        "max": 20.2507
+      },
+      "checkpoint_load_duration_ms": {
+        "mean": 4.1497,
+        "median": 3.2795,
+        "std": 1.9934,
+        "min": 2.2546,
+        "max": 6.7225
+      },
+      "serialization_size_bytes": {
+        "mean": 258970.0,
+        "median": 258970.0,
+        "std": 0.0,
+        "min": 258970.0,
+        "max": 258970.0
+      },
+      "cpu_time_ms": {
+        "mean": 15.625,
+        "median": 15.625,
+        "std": 0.0,
+        "min": 15.625,
+        "max": 15.625
+      },
+      "level_hot_path": "2_state_serialization",
+      "subcomponents": {
+        "1_state_construction": {
+          "mean": 0.317,
+          "median": 0.2287,
+          "std": 0.1681,
+          "min": 0.1702,
+          "max": 0.5215
+        },
+        "2_state_serialization": {
+          "mean": 4.9613,
+          "median": 4.5272,
+          "std": 1.4603,
+          "min": 3.3934,
+          "max": 6.9339
+        },
+        "3_json_encoding": {
+          "mean": 3.7947,
+          "median": 3.6642,
+          "std": 1.1928,
+          "min": 2.2406,
+          "max": 5.0113
+        },
+        "4_compression": {
+          "mean": 0.0004,
+          "median": 0.0004,
+          "std": 0.0001,
+          "min": 0.0003,
+          "max": 0.0005
+        },
+        "5_disk_write": {
+          "mean": 2.9354,
+          "median": 2.4734,
+          "std": 1.0232,
+          "min": 2.1397,
+          "max": 4.67
+        },
+        "6_fsync_durability": {
+          "mean": 2.9448,
+          "median": 2.9425,
+          "std": 0.2153,
+          "min": 2.6365,
+          "max": 3.2431
+        },
+        "7_hash_calculation": {
+          "mean": 0.1927,
+          "median": 0.1744,
+          "std": 0.0272,
+          "min": 0.1708,
+          "max": 0.2285
+        },
+        "8_manifest_update": {
+          "mean": 0.8629,
+          "median": 0.8022,
+          "std": 0.1508,
+          "min": 0.7405,
+          "max": 1.1226
+        },
+        "9_checkpoint_validation": {
+          "mean": 0.0022,
+          "median": 0.0023,
+          "std": 0.0004,
+          "min": 0.0016,
+          "max": 0.0026
+        },
+        "10_recovery_metadata": {
+          "mean": 0.0009,
+          "median": 0.0009,
+          "std": 0.0002,
+          "min": 0.0007,
+          "max": 0.0011
+        }
+      }
+    },
+    "250": {
+      "task_transitions": 250,
+      "sample_size": 5,
+      "checkpoint_save_duration_ms": {
+        "mean": 19.1011,
+        "median": 18.5029,
+        "std": 2.0096,
+        "min": 16.9741,
+        "max": 21.8055
+      },
+      "checkpoint_load_duration_ms": {
+        "mean": 5.1673,
+        "median": 4.6075,
+        "std": 1.7264,
+        "min": 4.1326,
+        "max": 8.2286
+      },
+      "serialization_size_bytes": {
+        "mean": 323625.0,
+        "median": 323625.0,
+        "std": 0.0,
+        "min": 323625.0,
+        "max": 323625.0
+      },
+      "cpu_time_ms": {
+        "mean": 15.625,
+        "median": 15.625,
+        "std": 0.0,
+        "min": 15.625,
+        "max": 15.625
+      },
+      "level_hot_path": "2_state_serialization",
+      "subcomponents": {
+        "1_state_construction": {
+          "mean": 0.3161,
+          "median": 0.3129,
+          "std": 0.1374,
+          "min": 0.1822,
+          "max": 0.5355
+        },
+        "2_state_serialization": {
+          "mean": 6.684,
+          "median": 6.7489,
+          "std": 0.6923,
+          "min": 5.7133,
+          "max": 7.5635
+        },
+        "3_json_encoding": {
+          "mean": 4.8934,
+          "median": 3.8284,
+          "std": 1.6953,
+          "min": 3.4538,
+          "max": 6.9776
+        },
+        "4_compression": {
+          "mean": 0.0005,
+          "median": 0.0006,
+          "std": 0.0002,
+          "min": 0.0002,
+          "max": 0.0007
+        },
+        "5_disk_write": {
+          "mean": 3.0295,
+          "median": 2.762,
+          "std": 1.1894,
+          "min": 1.985,
+          "max": 5.0305
+        },
+        "6_fsync_durability": {
+          "mean": 3.1266,
+          "median": 3.0516,
+          "std": 0.5408,
+          "min": 2.4203,
+          "max": 3.7036
+        },
+        "7_hash_calculation": {
+          "mean": 0.2034,
+          "median": 0.2064,
+          "std": 0.0088,
+          "min": 0.1903,
+          "max": 0.2126
+        },
+        "8_manifest_update": {
+          "mean": 0.7003,
+          "median": 0.7494,
+          "std": 0.2107,
+          "min": 0.4265,
+          "max": 0.9488
+        },
+        "9_checkpoint_validation": {
+          "mean": 0.0022,
+          "median": 0.0022,
+          "std": 0.0004,
+          "min": 0.0016,
+          "max": 0.0028
+        },
+        "10_recovery_metadata": {
+          "mean": 0.0009,
+          "median": 0.0009,
+          "std": 0.0002,
+          "min": 0.0006,
+          "max": 0.001
+        }
+      }
+    },
+    "300": {
+      "task_transitions": 300,
+      "sample_size": 5,
+      "checkpoint_save_duration_ms": {
+        "mean": 18.2937,
+        "median": 17.4661,
+        "std": 2.2112,
+        "min": 16.3326,
+        "max": 22.0324
+      },
+      "checkpoint_load_duration_ms": {
+        "mean": 4.9628,
+        "median": 5.3366,
+        "std": 1.1922,
+        "min": 3.3732,
+        "max": 6.5024
+      },
+      "serialization_size_bytes": {
+        "mean": 388303.0,
+        "median": 388303.0,
+        "std": 0.0,
+        "min": 388303.0,
+        "max": 388303.0
+      },
+      "cpu_time_ms": {
+        "mean": 9.375,
+        "median": 15.625,
+        "std": 8.5582,
+        "min": 0.0,
+        "max": 15.625
+      },
+      "level_hot_path": "2_state_serialization",
+      "subcomponents": {
+        "1_state_construction": {
+          "mean": 0.3671,
+          "median": 0.3047,
+          "std": 0.1676,
+          "min": 0.2629,
+          "max": 0.6651
+        },
+        "2_state_serialization": {
+          "mean": 6.7749,
+          "median": 7.2575,
+          "std": 1.6392,
+          "min": 4.5757,
+          "max": 8.4499
+        },
+        "3_json_encoding": {
+          "mean": 3.8171,
+          "median": 3.2126,
+          "std": 1.5329,
+          "min": 2.985,
+          "max": 6.5492
+        },
+        "4_compression": {
+          "mean": 0.0004,
+          "median": 0.0004,
+          "std": 0.0001,
+          "min": 0.0003,
+          "max": 0.0005
+        },
+        "5_disk_write": {
+          "mean": 2.3796,
+          "median": 2.2578,
+          "std": 0.4782,
+          "min": 1.7216,
+          "max": 2.9663
+        },
+        "6_fsync_durability": {
+          "mean": 3.9209,
+          "median": 3.4467,
+          "std": 1.3673,
+          "min": 2.6112,
+          "max": 6.0108
+        },
+        "7_hash_calculation": {
+          "mean": 0.2361,
+          "median": 0.23,
+          "std": 0.0111,
+          "min": 0.2264,
+          "max": 0.2534
+        },
+        "8_manifest_update": {
+          "mean": 0.6613,
+          "median": 0.639,
+          "std": 0.172,
+          "min": 0.453,
+          "max": 0.8747
+        },
+        "9_checkpoint_validation": {
+          "mean": 0.002,
+          "median": 0.002,
+          "std": 0.0002,
+          "min": 0.0017,
+          "max": 0.0022
+        },
+        "10_recovery_metadata": {
+          "mean": 0.0008,
+          "median": 0.0008,
+          "std": 0.0001,
+          "min": 0.0006,
+          "max": 0.0009
+        }
+      }
+    }
+  },
+  "full_checkpoint_latency_curve": [
+    {
+      "transitions": 20,
+      "save_latency_ms": 5.1261,
+      "load_latency_ms": 0.5622,
+      "size_bytes": 26420.0
+    },
+    {
+      "transitions": 50,
+      "save_latency_ms": 8.3122,
+      "load_latency_ms": 1.4198,
+      "size_bytes": 65128.0
+    },
+    {
+      "transitions": 100,
+      "save_latency_ms": 9.7741,
+      "load_latency_ms": 1.9568,
+      "size_bytes": 129637.0
+    },
+    {
+      "transitions": 150,
+      "save_latency_ms": 12.6114,
+      "load_latency_ms": 2.9072,
+      "size_bytes": 194316.0
+    },
+    {
+      "transitions": 200,
+      "save_latency_ms": 16.1592,
+      "load_latency_ms": 4.1497,
+      "size_bytes": 258970.0
+    },
+    {
+      "transitions": 250,
+      "save_latency_ms": 19.1011,
+      "load_latency_ms": 5.1673,
+      "size_bytes": 323625.0
+    },
+    {
+      "transitions": 300,
+      "save_latency_ms": 18.2937,
+      "load_latency_ms": 4.9628,
+      "size_bytes": 388303.0
+    }
+  ]
+}

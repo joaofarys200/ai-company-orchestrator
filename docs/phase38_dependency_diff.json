@@ -1,0 +1,32 @@
+{
+  "phase": "Phase 38 — Dependency Graph Diff",
+  "timestamp": 1789078420.0,
+  "comparison": {
+    "target": "frontend/src/features/missions/MissionControlCenter.tsx",
+    "fan_in_before": 1,
+    "fan_in_after": 1,
+    "fan_out_external_before": 4,
+    "fan_out_external_after": 3,
+    "internal_component_fan_out": 13,
+    "circular_dependencies_before": 0,
+    "circular_dependencies_after": 0,
+    "orphan_modules_detected": 0,
+    "cross_domain_import_violations": 0
+  },
+  "extracted_components_topology": {
+    "MissionHeader": { "dependencies": ["lucide-react", "protocol/websocket"] },
+    "MissionControlActions": { "dependencies": ["lucide-react", "protocol/websocket"] },
+    "CancelConfirmModal": { "dependencies": ["lucide-react"] },
+    "IntentPreviewModal": { "dependencies": ["lucide-react"] },
+    "MissionOverviewPanel": { "dependencies": ["lucide-react", "protocol/websocket"] },
+    "MissionTaskGraphPanel": { "dependencies": ["lucide-react", "protocol/websocket"] },
+    "MissionRequirementsDiffPanel": { "dependencies": ["lucide-react", "protocol/websocket"] },
+    "MissionPlanDiffPanel": { "dependencies": ["lucide-react", "protocol/websocket"] },
+    "MissionEvidenceImpactPanel": { "dependencies": ["lucide-react", "protocol/websocket"] },
+    "MissionWhyCausalPanel": { "dependencies": ["lucide-react", "protocol/websocket"] },
+    "MissionRepairPanel": { "dependencies": ["lucide-react", "protocol/websocket"] },
+    "MissionEvidenceLedgerPanel": { "dependencies": ["lucide-react", "protocol/websocket"] },
+    "MissionAppPreviewPanel": { "dependencies": ["lucide-react"] }
+  },
+  "verdict": "TOPOLOGICALLY_SOUND"
+}

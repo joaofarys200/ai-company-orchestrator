@@ -75,6 +75,9 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "mission_federation_scale",
         "mission_federation_rebalance",
         "mission_federation_switch_mode",
+        "mission_understanding_get",
+        "mission_understanding_review",
+        "mission_timeline_get",
         "start_lecture_recording",
         "stop_lecture_recording",
         "get_lecture_status",
@@ -91,6 +94,13 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "sentinel_rollback_action",
         "sentinel_submit_review",
         "sentinel_get_shadow_telemetry",
+        "mission_control_get",
+        "mission_control_event_stream",
+        "mission_control_command",
+        "mission_intent_preview",
+        "mission_intent_change",
+        "mission_predict_impact",
+        "mission_get_predictions",
     }
 )
 

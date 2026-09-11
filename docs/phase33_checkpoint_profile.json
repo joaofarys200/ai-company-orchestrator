@@ -1,0 +1,3799 @@
+{
+  "report_id": "phase33_checkpoint_profile",
+  "timestamp": 1788898823.5533767,
+  "total_runs": 35,
+  "first_checkpoint_hot_path": "2_state_serialization",
+  "component_breakdown_overall": {
+    "1_state_construction": {
+      "stats": {
+        "mean": 0.2182,
+        "median": 0.1884,
+        "std": 0.1571,
+        "min": 0.0278,
+        "max": 0.6651
+      },
+      "mean_percentage": 1.73
+    },
+    "2_state_serialization": {
+      "stats": {
+        "mean": 3.862,
+        "median": 3.5502,
+        "std": 2.4987,
+        "min": 0.4555,
+        "max": 8.4499
+      },
+      "mean_percentage": 30.57
+    },
+    "3_json_encoding": {
+      "stats": {
+        "mean": 2.3638,
+        "median": 1.8543,
+        "std": 1.9079,
+        "min": 0.268,
+        "max": 6.9776
+      },
+      "mean_percentage": 18.71
+    },
+    "4_compression": {
+      "stats": {
+        "mean": 0.0004,
+        "median": 0.0003,
+        "std": 0.0001,
+        "min": 0.0002,
+        "max": 0.0007
+      },
+      "mean_percentage": 0.0
+    },
+    "5_disk_write": {
+      "stats": {
+        "mean": 2.3628,
+        "median": 2.2578,
+        "std": 0.9456,
+        "min": 1.137,
+        "max": 5.0305
+      },
+      "mean_percentage": 18.7
+    },
+    "6_fsync_durability": {
+      "stats": {
+        "mean": 2.9445,
+        "median": 2.9259,
+        "std": 0.8366,
+        "min": 1.1382,
+        "max": 6.0108
+      },
+      "mean_percentage": 23.3
+    },
+    "7_hash_calculation": {
+      "stats": {
+        "mean": 0.1419,
+        "median": 0.1413,
+        "std": 0.0692,
+        "min": 0.0378,
+        "max": 0.2534
+      },
+      "mean_percentage": 1.12
+    },
+    "8_manifest_update": {
+      "stats": {
+        "mean": 0.7381,
+        "median": 0.7494,
+        "std": 0.1673,
+        "min": 0.4265,
+        "max": 1.1226
+      },
+      "mean_percentage": 5.84
+    },
+    "9_checkpoint_validation": {
+      "stats": {
+        "mean": 0.0022,
+        "median": 0.0021,
+        "std": 0.0006,
+        "min": 0.0016,
+        "max": 0.0042
+      },
+      "mean_percentage": 0.02
+    },
+    "10_recovery_metadata": {
+      "stats": {
+        "mean": 0.001,
+        "median": 0.001,
+        "std": 0.0002,
+        "min": 0.0006,
+        "max": 0.0018
+      },
+      "mean_percentage": 0.01
+    }
+  },
+  "raw_runs": {
+    "20": [
+      {
+        "checkpoint_id": "cp_0001_mission_",
+        "sequence": 1,
+        "task_count": 20,
+        "total_duration_ms": 5.1542,
+        "load_duration_ms": 0.5425,
+        "total_bytes_written": 26420,
+        "serialization_size_bytes": 26420,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.0278,
+            "percentage_of_total": 0.54,
+            "bytes_processed": 1280,
+            "details": {
+              "node_count": 20
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 0.4555,
+            "percentage_of_total": 8.84,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 0.3531,
+            "percentage_of_total": 6.85,
+            "bytes_processed": 26420,
+            "details": {
+              "json_chars": 26340
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 26420,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.1774,
+            "percentage_of_total": 22.84,
+            "bytes_processed": 26420,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_20_run_1\\checkpoint_0001.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.1153,
+            "percentage_of_total": 41.04,
+            "bytes_processed": 26420,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1087,
+            "percentage_of_total": 2.11,
+            "bytes_processed": 26420,
+            "details": {
+              "sha256": "d5b6b262d64a6347"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.7989,
+            "percentage_of_total": 15.5,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_20_run_1\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0029,
+            "percentage_of_total": 0.06,
+            "bytes_processed": 20,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.001,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0002_mission_",
+        "sequence": 2,
+        "task_count": 20,
+        "total_duration_ms": 5.039,
+        "load_duration_ms": 0.5833,
+        "total_bytes_written": 26420,
+        "serialization_size_bytes": 26420,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.0457,
+            "percentage_of_total": 0.91,
+            "bytes_processed": 1280,
+            "details": {
+              "node_count": 20
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 0.52,
+            "percentage_of_total": 10.32,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 0.3194,
+            "percentage_of_total": 6.34,
+            "bytes_processed": 26420,
+            "details": {
+              "json_chars": 26340
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0004,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 26420,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.3008,
+            "percentage_of_total": 25.81,
+            "bytes_processed": 26420,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_20_run_2\\checkpoint_0002.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 1.8839,
+            "percentage_of_total": 37.39,
+            "bytes_processed": 26420,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0404,
+            "percentage_of_total": 0.8,
+            "bytes_processed": 26420,
+            "details": {
+              "sha256": "3836dbd0066a982c"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.8012,
+            "percentage_of_total": 15.9,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_20_run_2\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0039,
+            "percentage_of_total": 0.08,
+            "bytes_processed": 20,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0011,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0003_mission_",
+        "sequence": 3,
+        "task_count": 20,
+        "total_duration_ms": 3.9362,
+        "load_duration_ms": 0.4604,
+        "total_bytes_written": 26420,
+        "serialization_size_bytes": 26420,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "disk_write",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.0362,
+            "percentage_of_total": 0.92,
+            "bytes_processed": 1280,
+            "details": {
+              "node_count": 20
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 0.5025,
+            "percentage_of_total": 12.77,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 0.2991,
+            "percentage_of_total": 7.6,
+            "bytes_processed": 26420,
+            "details": {
+              "json_chars": 26340
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 26420,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.3839,
+            "percentage_of_total": 35.16,
+            "bytes_processed": 26420,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_20_run_3\\checkpoint_0003.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 1.1382,
+            "percentage_of_total": 28.92,
+            "bytes_processed": 26420,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0378,
+            "percentage_of_total": 0.96,
+            "bytes_processed": 26420,
+            "details": {
+              "sha256": "5d4c056d168e1ef5"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.4557,
+            "percentage_of_total": 11.58,
+            "bytes_processed": 197,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_20_run_3\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0016,
+            "percentage_of_total": 0.04,
+            "bytes_processed": 20,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0007,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0004_mission_",
+        "sequence": 4,
+        "task_count": 20,
+        "total_duration_ms": 5.4865,
+        "load_duration_ms": 0.6409,
+        "total_bytes_written": 26420,
+        "serialization_size_bytes": 26420,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.0325,
+            "percentage_of_total": 0.59,
+            "bytes_processed": 1280,
+            "details": {
+              "node_count": 20
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 0.4938,
+            "percentage_of_total": 9.0,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 0.268,
+            "percentage_of_total": 4.88,
+            "bytes_processed": 26420,
+            "details": {
+              "json_chars": 26340
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 26420,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.2469,
+            "percentage_of_total": 22.73,
+            "bytes_processed": 26420,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_20_run_4\\checkpoint_0004.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.487,
+            "percentage_of_total": 45.33,
+            "bytes_processed": 26420,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0472,
+            "percentage_of_total": 0.86,
+            "bytes_processed": 26420,
+            "details": {
+              "sha256": "c819f9ad1de5cdad"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.7685,
+            "percentage_of_total": 14.01,
+            "bytes_processed": 197,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_20_run_4\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0026,
+            "percentage_of_total": 0.05,
+            "bytes_processed": 20,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0012,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0005_mission_",
+        "sequence": 5,
+        "task_count": 20,
+        "total_duration_ms": 6.0146,
+        "load_duration_ms": 0.584,
+        "total_bytes_written": 26420,
+        "serialization_size_bytes": 26420,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.0363,
+            "percentage_of_total": 0.6,
+            "bytes_processed": 1280,
+            "details": {
+              "node_count": 20
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 0.634,
+            "percentage_of_total": 10.54,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 0.3182,
+            "percentage_of_total": 5.29,
+            "bytes_processed": 26420,
+            "details": {
+              "json_chars": 26340
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 26420,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.5618,
+            "percentage_of_total": 25.97,
+            "bytes_processed": 26420,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_20_run_5\\checkpoint_0005.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.5368,
+            "percentage_of_total": 42.18,
+            "bytes_processed": 26420,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.04,
+            "percentage_of_total": 0.67,
+            "bytes_processed": 26420,
+            "details": {
+              "sha256": "2ee60212f9e45d58"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.7457,
+            "percentage_of_total": 12.4,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_20_run_5\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0027,
+            "percentage_of_total": 0.04,
+            "bytes_processed": 20,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0013,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      }
+    ],
+    "50": [
+      {
+        "checkpoint_id": "cp_0001_mission_",
+        "sequence": 1,
+        "task_count": 50,
+        "total_duration_ms": 10.8233,
+        "load_duration_ms": 1.5362,
+        "total_bytes_written": 65128,
+        "serialization_size_bytes": 65128,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.0778,
+            "percentage_of_total": 0.72,
+            "bytes_processed": 3200,
+            "details": {
+              "node_count": 50
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 2.903,
+            "percentage_of_total": 26.82,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 1.1545,
+            "percentage_of_total": 10.67,
+            "bytes_processed": 65128,
+            "details": {
+              "json_chars": 64928
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0005,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 65128,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.1006,
+            "percentage_of_total": 19.41,
+            "bytes_processed": 65128,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_50_run_1\\checkpoint_0001.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 3.6619,
+            "percentage_of_total": 33.83,
+            "bytes_processed": 65128,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0634,
+            "percentage_of_total": 0.59,
+            "bytes_processed": 65128,
+            "details": {
+              "sha256": "0788d4e7dab473d2"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.73,
+            "percentage_of_total": 6.74,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_50_run_1\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0021,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 50,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0013,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0002_mission_",
+        "sequence": 2,
+        "task_count": 50,
+        "total_duration_ms": 10.6275,
+        "load_duration_ms": 0.999,
+        "total_bytes_written": 65128,
+        "serialization_size_bytes": 65128,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.1741,
+            "percentage_of_total": 1.64,
+            "bytes_processed": 3200,
+            "details": {
+              "node_count": 50
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 3.055,
+            "percentage_of_total": 28.75,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 1.2295,
+            "percentage_of_total": 11.57,
+            "bytes_processed": 65128,
+            "details": {
+              "json_chars": 64928
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 65128,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.8437,
+            "percentage_of_total": 26.76,
+            "bytes_processed": 65128,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_50_run_2\\checkpoint_0002.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.4956,
+            "percentage_of_total": 23.48,
+            "bytes_processed": 65128,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0619,
+            "percentage_of_total": 0.58,
+            "bytes_processed": 65128,
+            "details": {
+              "sha256": "2a1b49a24cbaf557"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.6205,
+            "percentage_of_total": 5.84,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_50_run_2\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0026,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 50,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0012,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0003_mission_",
+        "sequence": 3,
+        "task_count": 50,
+        "total_duration_ms": 7.2655,
+        "load_duration_ms": 0.721,
+        "total_bytes_written": 65128,
+        "serialization_size_bytes": 65128,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.0613,
+            "percentage_of_total": 0.84,
+            "bytes_processed": 3200,
+            "details": {
+              "node_count": 50
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 0.9163,
+            "percentage_of_total": 12.61,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 0.6091,
+            "percentage_of_total": 8.38,
+            "bytes_processed": 65128,
+            "details": {
+              "json_chars": 64928
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0002,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 65128,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.5678,
+            "percentage_of_total": 21.58,
+            "bytes_processed": 65128,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_50_run_3\\checkpoint_0003.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.9996,
+            "percentage_of_total": 41.29,
+            "bytes_processed": 65128,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0627,
+            "percentage_of_total": 0.86,
+            "bytes_processed": 65128,
+            "details": {
+              "sha256": "cc62ef0d6eb0357f"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.9236,
+            "percentage_of_total": 12.71,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_50_run_3\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0017,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 50,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0008,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0004_mission_",
+        "sequence": 4,
+        "task_count": 50,
+        "total_duration_ms": 5.3458,
+        "load_duration_ms": 1.3026,
+        "total_bytes_written": 65128,
+        "serialization_size_bytes": 65128,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.1032,
+            "percentage_of_total": 1.93,
+            "bytes_processed": 3200,
+            "details": {
+              "node_count": 50
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 0.7833,
+            "percentage_of_total": 14.65,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 0.411,
+            "percentage_of_total": 7.69,
+            "bytes_processed": 65128,
+            "details": {
+              "json_chars": 64928
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0002,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 65128,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.137,
+            "percentage_of_total": 21.27,
+            "bytes_processed": 65128,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_50_run_4\\checkpoint_0004.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.1557,
+            "percentage_of_total": 40.33,
+            "bytes_processed": 65128,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0588,
+            "percentage_of_total": 1.1,
+            "bytes_processed": 65128,
+            "details": {
+              "sha256": "1c3bd873ac289ae8"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.5843,
+            "percentage_of_total": 10.93,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_50_run_4\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0018,
+            "percentage_of_total": 0.03,
+            "bytes_processed": 50,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0011,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0005_mission_",
+        "sequence": 5,
+        "task_count": 50,
+        "total_duration_ms": 7.4991,
+        "load_duration_ms": 2.5401,
+        "total_bytes_written": 65128,
+        "serialization_size_bytes": 65128,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.2264,
+            "percentage_of_total": 3.02,
+            "bytes_processed": 3200,
+            "details": {
+              "node_count": 50
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 1.5201,
+            "percentage_of_total": 20.27,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 0.6872,
+            "percentage_of_total": 9.16,
+            "bytes_processed": 65128,
+            "details": {
+              "json_chars": 64928
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 65128,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.8709,
+            "percentage_of_total": 24.95,
+            "bytes_processed": 65128,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_50_run_5\\checkpoint_0005.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.0496,
+            "percentage_of_total": 27.33,
+            "bytes_processed": 65128,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0581,
+            "percentage_of_total": 0.77,
+            "bytes_processed": 65128,
+            "details": {
+              "sha256": "c12b85f01d3b2091"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.9079,
+            "percentage_of_total": 12.11,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_50_run_5\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0042,
+            "percentage_of_total": 0.06,
+            "bytes_processed": 50,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0018,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      }
+    ],
+    "100": [
+      {
+        "checkpoint_id": "cp_0001_mission_",
+        "sequence": 1,
+        "task_count": 100,
+        "total_duration_ms": 7.5985,
+        "load_duration_ms": 2.9075,
+        "total_bytes_written": 129637,
+        "serialization_size_bytes": 129637,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.0834,
+            "percentage_of_total": 1.1,
+            "bytes_processed": 6400,
+            "details": {
+              "node_count": 100
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 1.5467,
+            "percentage_of_total": 20.36,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 0.8029,
+            "percentage_of_total": 10.57,
+            "bytes_processed": 129637,
+            "details": {
+              "json_chars": 129237
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0002,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 129637,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.4156,
+            "percentage_of_total": 18.63,
+            "bytes_processed": 129637,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_100_run_1\\checkpoint_0001.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.847,
+            "percentage_of_total": 37.47,
+            "bytes_processed": 129637,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1047,
+            "percentage_of_total": 1.38,
+            "bytes_processed": 129637,
+            "details": {
+              "sha256": "e47fde24134d9f9e"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.6841,
+            "percentage_of_total": 9.0,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_100_run_1\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.002,
+            "percentage_of_total": 0.03,
+            "bytes_processed": 100,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0011,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0002_mission_",
+        "sequence": 2,
+        "task_count": 100,
+        "total_duration_ms": 13.3544,
+        "load_duration_ms": 1.8925,
+        "total_bytes_written": 129637,
+        "serialization_size_bytes": 129637,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.3694,
+            "percentage_of_total": 2.77,
+            "bytes_processed": 6400,
+            "details": {
+              "node_count": 100
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 3.8741,
+            "percentage_of_total": 29.01,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 1.1621,
+            "percentage_of_total": 8.7,
+            "bytes_processed": 129637,
+            "details": {
+              "json_chars": 129237
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 129637,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 3.7182,
+            "percentage_of_total": 27.84,
+            "bytes_processed": 129637,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_100_run_2\\checkpoint_0002.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 3.1955,
+            "percentage_of_total": 23.93,
+            "bytes_processed": 129637,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0964,
+            "percentage_of_total": 0.72,
+            "bytes_processed": 129637,
+            "details": {
+              "sha256": "86f64c4337ceb025"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.7883,
+            "percentage_of_total": 5.9,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_100_run_2\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.002,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 100,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.001,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0003_mission_",
+        "sequence": 3,
+        "task_count": 100,
+        "total_duration_ms": 9.6199,
+        "load_duration_ms": 1.4705,
+        "total_bytes_written": 129637,
+        "serialization_size_bytes": 129637,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.1171,
+            "percentage_of_total": 1.22,
+            "bytes_processed": 6400,
+            "details": {
+              "node_count": 100
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 2.8366,
+            "percentage_of_total": 29.49,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 1.5986,
+            "percentage_of_total": 16.62,
+            "bytes_processed": 129637,
+            "details": {
+              "json_chars": 129237
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 129637,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.9932,
+            "percentage_of_total": 20.72,
+            "bytes_processed": 129637,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_100_run_3\\checkpoint_0003.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.1868,
+            "percentage_of_total": 22.73,
+            "bytes_processed": 129637,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0925,
+            "percentage_of_total": 0.96,
+            "bytes_processed": 129637,
+            "details": {
+              "sha256": "1f9b97399e84d632"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.6907,
+            "percentage_of_total": 7.18,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_100_run_3\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0016,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 100,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0009,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0004_mission_",
+        "sequence": 4,
+        "task_count": 100,
+        "total_duration_ms": 7.7252,
+        "load_duration_ms": 1.4564,
+        "total_bytes_written": 129637,
+        "serialization_size_bytes": 129637,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.1533,
+            "percentage_of_total": 1.98,
+            "bytes_processed": 6400,
+            "details": {
+              "node_count": 100
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 1.9743,
+            "percentage_of_total": 25.56,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 0.7089,
+            "percentage_of_total": 9.18,
+            "bytes_processed": 129637,
+            "details": {
+              "json_chars": 129237
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0002,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 129637,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.2001,
+            "percentage_of_total": 15.53,
+            "bytes_processed": 129637,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_100_run_4\\checkpoint_0004.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.9548,
+            "percentage_of_total": 38.25,
+            "bytes_processed": 129637,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.0999,
+            "percentage_of_total": 1.29,
+            "bytes_processed": 129637,
+            "details": {
+              "sha256": "de2a9791703413ed"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.5314,
+            "percentage_of_total": 6.88,
+            "bytes_processed": 197,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_100_run_4\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0018,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 100,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0011,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0005_mission_",
+        "sequence": 5,
+        "task_count": 100,
+        "total_duration_ms": 10.5727,
+        "load_duration_ms": 2.0572,
+        "total_bytes_written": 129637,
+        "serialization_size_bytes": 129637,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "disk_write",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.0962,
+            "percentage_of_total": 0.91,
+            "bytes_processed": 6400,
+            "details": {
+              "node_count": 100
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 2.063,
+            "percentage_of_total": 19.51,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 1.2692,
+            "percentage_of_total": 12.0,
+            "bytes_processed": 129637,
+            "details": {
+              "json_chars": 129237
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0004,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 129637,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 3.3181,
+            "percentage_of_total": 31.38,
+            "bytes_processed": 129637,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_100_run_5\\checkpoint_0005.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.9519,
+            "percentage_of_total": 27.92,
+            "bytes_processed": 129637,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1369,
+            "percentage_of_total": 1.29,
+            "bytes_processed": 129637,
+            "details": {
+              "sha256": "8e239873ededb31c"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.629,
+            "percentage_of_total": 5.95,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_100_run_5\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0019,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 100,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0011,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      }
+    ],
+    "150": [
+      {
+        "checkpoint_id": "cp_0001_mission_",
+        "sequence": 1,
+        "task_count": 150,
+        "total_duration_ms": 15.3467,
+        "load_duration_ms": 2.4234,
+        "total_bytes_written": 194316,
+        "serialization_size_bytes": 194316,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.1136,
+            "percentage_of_total": 0.74,
+            "bytes_processed": 9600,
+            "details": {
+              "node_count": 150
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 5.4409,
+            "percentage_of_total": 35.45,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 2.185,
+            "percentage_of_total": 14.24,
+            "bytes_processed": 194316,
+            "details": {
+              "json_chars": 193716
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0005,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 194316,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 3.6307,
+            "percentage_of_total": 23.66,
+            "bytes_processed": 194316,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_150_run_1\\checkpoint_0001.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.7997,
+            "percentage_of_total": 18.24,
+            "bytes_processed": 194316,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1297,
+            "percentage_of_total": 0.85,
+            "bytes_processed": 194316,
+            "details": {
+              "sha256": "3eae28b8c3d7b803"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.8902,
+            "percentage_of_total": 5.8,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_150_run_1\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0019,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 150,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0011,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0002_mission_",
+        "sequence": 2,
+        "task_count": 150,
+        "total_duration_ms": 14.8047,
+        "load_duration_ms": 4.2911,
+        "total_bytes_written": 194316,
+        "serialization_size_bytes": 194316,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.338,
+            "percentage_of_total": 2.28,
+            "bytes_processed": 9600,
+            "details": {
+              "node_count": 150
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 5.1425,
+            "percentage_of_total": 34.74,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 2.323,
+            "percentage_of_total": 15.69,
+            "bytes_processed": 194316,
+            "details": {
+              "json_chars": 193716
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0005,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 194316,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.5549,
+            "percentage_of_total": 10.5,
+            "bytes_processed": 194316,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_150_run_2\\checkpoint_0002.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 4.128,
+            "percentage_of_total": 27.88,
+            "bytes_processed": 194316,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1236,
+            "percentage_of_total": 0.83,
+            "bytes_processed": 194316,
+            "details": {
+              "sha256": "13459359edab3402"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 1.0199,
+            "percentage_of_total": 6.89,
+            "bytes_processed": 197,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_150_run_2\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.003,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 150,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0013,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0003_mission_",
+        "sequence": 3,
+        "task_count": 150,
+        "total_duration_ms": 9.9052,
+        "load_duration_ms": 2.6516,
+        "total_bytes_written": 194316,
+        "serialization_size_bytes": 194316,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.1283,
+            "percentage_of_total": 1.3,
+            "bytes_processed": 9600,
+            "details": {
+              "node_count": 150
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 2.1013,
+            "percentage_of_total": 21.21,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 1.4202,
+            "percentage_of_total": 14.34,
+            "bytes_processed": 194316,
+            "details": {
+              "json_chars": 193716
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0002,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 194316,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.4247,
+            "percentage_of_total": 24.48,
+            "bytes_processed": 194316,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_150_run_3\\checkpoint_0003.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.5749,
+            "percentage_of_total": 26.0,
+            "bytes_processed": 194316,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1413,
+            "percentage_of_total": 1.43,
+            "bytes_processed": 194316,
+            "details": {
+              "sha256": "18eca3686df75214"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.9636,
+            "percentage_of_total": 9.73,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_150_run_3\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0025,
+            "percentage_of_total": 0.03,
+            "bytes_processed": 150,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0009,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0004_mission_",
+        "sequence": 4,
+        "task_count": 150,
+        "total_duration_ms": 11.0731,
+        "load_duration_ms": 2.4141,
+        "total_bytes_written": 194316,
+        "serialization_size_bytes": 194316,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.1889,
+            "percentage_of_total": 1.71,
+            "bytes_processed": 9600,
+            "details": {
+              "node_count": 150
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 2.7539,
+            "percentage_of_total": 24.87,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 1.234,
+            "percentage_of_total": 11.14,
+            "bytes_processed": 194316,
+            "details": {
+              "json_chars": 193716
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 194316,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.7586,
+            "percentage_of_total": 24.91,
+            "bytes_processed": 194316,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_150_run_4\\checkpoint_0004.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 3.3095,
+            "percentage_of_total": 29.89,
+            "bytes_processed": 194316,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1421,
+            "percentage_of_total": 1.28,
+            "bytes_processed": 194316,
+            "details": {
+              "sha256": "f2303f8417f6a8ae"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.5716,
+            "percentage_of_total": 5.16,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_150_run_4\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0019,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 150,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0009,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0005_mission_",
+        "sequence": 5,
+        "task_count": 150,
+        "total_duration_ms": 11.9274,
+        "load_duration_ms": 2.7558,
+        "total_bytes_written": 194316,
+        "serialization_size_bytes": 194316,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.225,
+            "percentage_of_total": 1.89,
+            "bytes_processed": 9600,
+            "details": {
+              "node_count": 150
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 3.5502,
+            "percentage_of_total": 29.77,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 1.8543,
+            "percentage_of_total": 15.55,
+            "bytes_processed": 194316,
+            "details": {
+              "json_chars": 193716
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0005,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 194316,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.7724,
+            "percentage_of_total": 23.24,
+            "bytes_processed": 194316,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_150_run_5\\checkpoint_0005.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.6254,
+            "percentage_of_total": 22.01,
+            "bytes_processed": 194316,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1587,
+            "percentage_of_total": 1.33,
+            "bytes_processed": 194316,
+            "details": {
+              "sha256": "b6a49de781bb59e5"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.6074,
+            "percentage_of_total": 5.09,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_150_run_5\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0018,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 150,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0008,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      }
+    ],
+    "200": [
+      {
+        "checkpoint_id": "cp_0001_mission_",
+        "sequence": 1,
+        "task_count": 200,
+        "total_duration_ms": 20.2507,
+        "load_duration_ms": 5.8125,
+        "total_bytes_written": 258970,
+        "serialization_size_bytes": 258970,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.5215,
+            "percentage_of_total": 2.58,
+            "bytes_processed": 12800,
+            "details": {
+              "node_count": 200
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 5.9739,
+            "percentage_of_total": 29.5,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 5.0113,
+            "percentage_of_total": 24.75,
+            "bytes_processed": 258970,
+            "details": {
+              "json_chars": 258170
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 258970,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 4.67,
+            "percentage_of_total": 23.06,
+            "bytes_processed": 258970,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_200_run_1\\checkpoint_0001.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.9259,
+            "percentage_of_total": 14.45,
+            "bytes_processed": 258970,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1708,
+            "percentage_of_total": 0.84,
+            "bytes_processed": 258970,
+            "details": {
+              "sha256": "8b329fa2310de94c"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.8022,
+            "percentage_of_total": 3.96,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_200_run_1\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0023,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 200,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0009,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0002_mission_",
+        "sequence": 2,
+        "task_count": 200,
+        "total_duration_ms": 12.5977,
+        "load_duration_ms": 2.2546,
+        "total_bytes_written": 258970,
+        "serialization_size_bytes": 258970,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.2287,
+            "percentage_of_total": 1.82,
+            "bytes_processed": 12800,
+            "details": {
+              "node_count": 200
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 3.9783,
+            "percentage_of_total": 31.58,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 2.2406,
+            "percentage_of_total": 17.79,
+            "bytes_processed": 258970,
+            "details": {
+              "json_chars": 258170
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 258970,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.1397,
+            "percentage_of_total": 16.98,
+            "bytes_processed": 258970,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_200_run_2\\checkpoint_0002.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.9761,
+            "percentage_of_total": 23.62,
+            "bytes_processed": 258970,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1744,
+            "percentage_of_total": 1.38,
+            "bytes_processed": 258970,
+            "details": {
+              "sha256": "15d75786708bdd9c"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.7405,
+            "percentage_of_total": 5.88,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_200_run_2\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0016,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 200,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0007,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0003_mission_",
+        "sequence": 3,
+        "task_count": 200,
+        "total_duration_ms": 18.5341,
+        "load_duration_ms": 2.6795,
+        "total_bytes_written": 258970,
+        "serialization_size_bytes": 258970,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.1884,
+            "percentage_of_total": 1.02,
+            "bytes_processed": 12800,
+            "details": {
+              "node_count": 200
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 6.9339,
+            "percentage_of_total": 37.41,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 4.9424,
+            "percentage_of_total": 26.67,
+            "bytes_processed": 258970,
+            "details": {
+              "json_chars": 258170
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0004,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 258970,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.3666,
+            "percentage_of_total": 12.77,
+            "bytes_processed": 258970,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_200_run_3\\checkpoint_0003.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.9425,
+            "percentage_of_total": 15.88,
+            "bytes_processed": 258970,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.2285,
+            "percentage_of_total": 1.23,
+            "bytes_processed": 258970,
+            "details": {
+              "sha256": "9006a656d8e8e350"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.7933,
+            "percentage_of_total": 4.28,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_200_run_3\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0018,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 200,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0008,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0004_mission_",
+        "sequence": 4,
+        "task_count": 200,
+        "total_duration_ms": 14.7552,
+        "load_duration_ms": 3.2795,
+        "total_bytes_written": 258970,
+        "serialization_size_bytes": 258970,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "json_encoding",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.4761,
+            "percentage_of_total": 3.23,
+            "bytes_processed": 12800,
+            "details": {
+              "node_count": 200
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 3.3934,
+            "percentage_of_total": 23.0,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 3.6642,
+            "percentage_of_total": 24.83,
+            "bytes_processed": 258970,
+            "details": {
+              "json_chars": 258170
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0005,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 258970,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.4734,
+            "percentage_of_total": 16.76,
+            "bytes_processed": 258970,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_200_run_4\\checkpoint_0004.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 3.2431,
+            "percentage_of_total": 21.98,
+            "bytes_processed": 258970,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.2157,
+            "percentage_of_total": 1.46,
+            "bytes_processed": 258970,
+            "details": {
+              "sha256": "e3073f66f175142e"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 1.1226,
+            "percentage_of_total": 7.61,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_200_run_4\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0026,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 200,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0011,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0005_mission_",
+        "sequence": 5,
+        "task_count": 200,
+        "total_duration_ms": 14.6582,
+        "load_duration_ms": 6.7225,
+        "total_bytes_written": 258970,
+        "serialization_size_bytes": 258970,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.1702,
+            "percentage_of_total": 1.16,
+            "bytes_processed": 12800,
+            "details": {
+              "node_count": 200
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 4.5272,
+            "percentage_of_total": 30.89,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 3.1151,
+            "percentage_of_total": 21.25,
+            "bytes_processed": 258970,
+            "details": {
+              "json_chars": 258170
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0004,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 258970,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 3.0272,
+            "percentage_of_total": 20.65,
+            "bytes_processed": 258970,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_200_run_5\\checkpoint_0005.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.6365,
+            "percentage_of_total": 17.99,
+            "bytes_processed": 258970,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1742,
+            "percentage_of_total": 1.19,
+            "bytes_processed": 258970,
+            "details": {
+              "sha256": "4d4575fa35d74486"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.8558,
+            "percentage_of_total": 5.84,
+            "bytes_processed": 197,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_200_run_5\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0025,
+            "percentage_of_total": 0.02,
+            "bytes_processed": 200,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.001,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      }
+    ],
+    "250": [
+      {
+        "checkpoint_id": "cp_0001_mission_",
+        "sequence": 1,
+        "task_count": 250,
+        "total_duration_ms": 21.8055,
+        "load_duration_ms": 8.2286,
+        "total_bytes_written": 323625,
+        "serialization_size_bytes": 323625,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "json_encoding",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.1822,
+            "percentage_of_total": 0.84,
+            "bytes_processed": 16000,
+            "details": {
+              "node_count": 250
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 5.7133,
+            "percentage_of_total": 26.2,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 6.4925,
+            "percentage_of_total": 29.77,
+            "bytes_processed": 323625,
+            "details": {
+              "json_chars": 322625
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0007,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 323625,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 5.0305,
+            "percentage_of_total": 23.07,
+            "bytes_processed": 323625,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_250_run_1\\checkpoint_0001.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 3.0516,
+            "percentage_of_total": 13.99,
+            "bytes_processed": 323625,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.2126,
+            "percentage_of_total": 0.97,
+            "bytes_processed": 323625,
+            "details": {
+              "sha256": "b11f22901e84463c"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.9488,
+            "percentage_of_total": 4.35,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_250_run_1\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0028,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 250,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.001,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0002_mission_",
+        "sequence": 2,
+        "task_count": 250,
+        "total_duration_ms": 18.5029,
+        "load_duration_ms": 4.6462,
+        "total_bytes_written": 323625,
+        "serialization_size_bytes": 323625,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.3302,
+            "percentage_of_total": 1.78,
+            "bytes_processed": 16000,
+            "details": {
+              "node_count": 250
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 7.5635,
+            "percentage_of_total": 40.88,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 3.8284,
+            "percentage_of_total": 20.69,
+            "bytes_processed": 323625,
+            "details": {
+              "json_chars": 322625
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 323625,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.762,
+            "percentage_of_total": 14.93,
+            "bytes_processed": 323625,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_250_run_2\\checkpoint_0002.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.834,
+            "percentage_of_total": 15.32,
+            "bytes_processed": 323625,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.2064,
+            "percentage_of_total": 1.12,
+            "bytes_processed": 323625,
+            "details": {
+              "sha256": "3c0b10c1c396e7fa"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.8265,
+            "percentage_of_total": 4.47,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_250_run_2\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0022,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 250,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0009,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0003_mission_",
+        "sequence": 3,
+        "task_count": 250,
+        "total_duration_ms": 16.9741,
+        "load_duration_ms": 4.6075,
+        "total_bytes_written": 323625,
+        "serialization_size_bytes": 323625,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.3129,
+            "percentage_of_total": 1.84,
+            "bytes_processed": 16000,
+            "details": {
+              "node_count": 250
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 6.3833,
+            "percentage_of_total": 37.61,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 3.4538,
+            "percentage_of_total": 20.35,
+            "bytes_processed": 323625,
+            "details": {
+              "json_chars": 322625
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0006,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 323625,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.3281,
+            "percentage_of_total": 13.72,
+            "bytes_processed": 323625,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_250_run_3\\checkpoint_0003.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 3.6233,
+            "percentage_of_total": 21.35,
+            "bytes_processed": 323625,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1992,
+            "percentage_of_total": 1.17,
+            "bytes_processed": 323625,
+            "details": {
+              "sha256": "efaf949ce4378a92"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.5503,
+            "percentage_of_total": 3.24,
+            "bytes_processed": 197,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_250_run_3\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0022,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 250,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0006,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0004_mission_",
+        "sequence": 4,
+        "task_count": 250,
+        "total_duration_ms": 17.7049,
+        "load_duration_ms": 4.2215,
+        "total_bytes_written": 323625,
+        "serialization_size_bytes": 323625,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.5355,
+            "percentage_of_total": 3.02,
+            "bytes_processed": 16000,
+            "details": {
+              "node_count": 250
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 7.011,
+            "percentage_of_total": 39.6,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 3.7149,
+            "percentage_of_total": 20.98,
+            "bytes_processed": 323625,
+            "details": {
+              "json_chars": 322625
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0002,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 323625,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.985,
+            "percentage_of_total": 11.21,
+            "bytes_processed": 323625,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_250_run_4\\checkpoint_0004.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 3.7036,
+            "percentage_of_total": 20.92,
+            "bytes_processed": 323625,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.2087,
+            "percentage_of_total": 1.18,
+            "bytes_processed": 323625,
+            "details": {
+              "sha256": "6a0f6ad4aba8ff7b"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.4265,
+            "percentage_of_total": 2.41,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_250_run_4\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0016,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 250,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0009,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0005_mission_",
+        "sequence": 5,
+        "task_count": 250,
+        "total_duration_ms": 20.5183,
+        "load_duration_ms": 4.1326,
+        "total_bytes_written": 323625,
+        "serialization_size_bytes": 323625,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "json_encoding",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.2197,
+            "percentage_of_total": 1.07,
+            "bytes_processed": 16000,
+            "details": {
+              "node_count": 250
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 6.7489,
+            "percentage_of_total": 32.89,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 6.9776,
+            "percentage_of_total": 34.01,
+            "bytes_processed": 323625,
+            "details": {
+              "json_chars": 322625
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0006,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 323625,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 3.0421,
+            "percentage_of_total": 14.83,
+            "bytes_processed": 323625,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_250_run_5\\checkpoint_0005.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.4203,
+            "percentage_of_total": 11.8,
+            "bytes_processed": 323625,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.1903,
+            "percentage_of_total": 0.93,
+            "bytes_processed": 323625,
+            "details": {
+              "sha256": "e4e4321ee3f269ef"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.7494,
+            "percentage_of_total": 3.65,
+            "bytes_processed": 197,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_250_run_5\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0023,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 250,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.001,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      }
+    ],
+    "300": [
+      {
+        "checkpoint_id": "cp_0001_mission_",
+        "sequence": 1,
+        "task_count": 300,
+        "total_duration_ms": 17.272,
+        "load_duration_ms": 5.3468,
+        "total_bytes_written": 388303,
+        "serialization_size_bytes": 388303,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.2919,
+            "percentage_of_total": 1.69,
+            "bytes_processed": 19200,
+            "details": {
+              "node_count": 300
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 7.2575,
+            "percentage_of_total": 42.02,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 2.985,
+            "percentage_of_total": 17.28,
+            "bytes_processed": 388303,
+            "details": {
+              "json_chars": 387103
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0005,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 388303,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.2578,
+            "percentage_of_total": 13.07,
+            "bytes_processed": 388303,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_300_run_1\\checkpoint_0001.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 3.4467,
+            "percentage_of_total": 19.96,
+            "bytes_processed": 388303,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.2408,
+            "percentage_of_total": 1.39,
+            "bytes_processed": 388303,
+            "details": {
+              "sha256": "1493bc2012849cc9"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.639,
+            "percentage_of_total": 3.7,
+            "bytes_processed": 197,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_300_run_1\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0019,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 300,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0006,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0002_mission_",
+        "sequence": 2,
+        "task_count": 300,
+        "total_duration_ms": 17.4661,
+        "load_duration_ms": 5.3366,
+        "total_bytes_written": 388303,
+        "serialization_size_bytes": 388303,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "fsync_durability",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.311,
+            "percentage_of_total": 1.78,
+            "bytes_processed": 19200,
+            "details": {
+              "node_count": 300
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 5.5975,
+            "percentage_of_total": 32.05,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 3.031,
+            "percentage_of_total": 17.35,
+            "bytes_processed": 388303,
+            "details": {
+              "json_chars": 387103
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0004,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 388303,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 1.7216,
+            "percentage_of_total": 9.86,
+            "bytes_processed": 388303,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_300_run_2\\checkpoint_0002.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 6.0108,
+            "percentage_of_total": 34.41,
+            "bytes_processed": 388303,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.2299,
+            "percentage_of_total": 1.32,
+            "bytes_processed": 388303,
+            "details": {
+              "sha256": "928b839013701156"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.453,
+            "percentage_of_total": 2.59,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_300_run_2\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0017,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 300,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0008,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0003_mission_",
+        "sequence": 3,
+        "task_count": 300,
+        "total_duration_ms": 18.3654,
+        "load_duration_ms": 6.5024,
+        "total_bytes_written": 388303,
+        "serialization_size_bytes": 388303,
+        "cpu_time_ms": 15.625,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.6651,
+            "percentage_of_total": 3.62,
+            "bytes_processed": 19200,
+            "details": {
+              "node_count": 300
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 8.4499,
+            "percentage_of_total": 46.01,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 3.2126,
+            "percentage_of_total": 17.49,
+            "bytes_processed": 388303,
+            "details": {
+              "json_chars": 387103
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0003,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 388303,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.248,
+            "percentage_of_total": 12.24,
+            "bytes_processed": 388303,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_300_run_3\\checkpoint_0003.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 2.6112,
+            "percentage_of_total": 14.22,
+            "bytes_processed": 388303,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.2264,
+            "percentage_of_total": 1.23,
+            "bytes_processed": 388303,
+            "details": {
+              "sha256": "c3201096795c3aa1"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.7899,
+            "percentage_of_total": 4.3,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_300_run_3\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.002,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 300,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0008,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0004_mission_",
+        "sequence": 4,
+        "task_count": 300,
+        "total_duration_ms": 16.3326,
+        "load_duration_ms": 3.3732,
+        "total_bytes_written": 388303,
+        "serialization_size_bytes": 388303,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.3047,
+            "percentage_of_total": 1.87,
+            "bytes_processed": 19200,
+            "details": {
+              "node_count": 300
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 4.5757,
+            "percentage_of_total": 28.02,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 3.3078,
+            "percentage_of_total": 20.25,
+            "bytes_processed": 388303,
+            "details": {
+              "json_chars": 387103
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0004,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 388303,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.7041,
+            "percentage_of_total": 16.56,
+            "bytes_processed": 388303,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_300_run_4\\checkpoint_0004.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 4.5174,
+            "percentage_of_total": 27.66,
+            "bytes_processed": 388303,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.2534,
+            "percentage_of_total": 1.55,
+            "bytes_processed": 388303,
+            "details": {
+              "sha256": "27ff0149b9e63d5c"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.5498,
+            "percentage_of_total": 3.37,
+            "bytes_processed": 197,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_300_run_4\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0022,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 300,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0008,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      },
+      {
+        "checkpoint_id": "cp_0005_mission_",
+        "sequence": 5,
+        "task_count": 300,
+        "total_duration_ms": 22.0324,
+        "load_duration_ms": 4.2548,
+        "total_bytes_written": 388303,
+        "serialization_size_bytes": 388303,
+        "cpu_time_ms": 0.0,
+        "hot_path_component": "state_serialization",
+        "components": {
+          "1_state_construction": {
+            "name": "state_construction",
+            "duration_ms": 0.2629,
+            "percentage_of_total": 1.19,
+            "bytes_processed": 19200,
+            "details": {
+              "node_count": 300
+            }
+          },
+          "2_state_serialization": {
+            "name": "state_serialization",
+            "duration_ms": 7.994,
+            "percentage_of_total": 36.28,
+            "bytes_processed": 832,
+            "details": {
+              "dict_keys": 23
+            }
+          },
+          "3_json_encoding": {
+            "name": "json_encoding",
+            "duration_ms": 6.5492,
+            "percentage_of_total": 29.73,
+            "bytes_processed": 388303,
+            "details": {
+              "json_chars": 387103
+            }
+          },
+          "4_compression": {
+            "name": "compression",
+            "duration_ms": 0.0005,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 388303,
+            "details": {
+              "compressed": false,
+              "ratio": 1.0
+            }
+          },
+          "5_disk_write": {
+            "name": "disk_write",
+            "duration_ms": 2.9663,
+            "percentage_of_total": 13.46,
+            "bytes_processed": 388303,
+            "details": {
+              "path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_300_run_5\\checkpoint_0005.json"
+            }
+          },
+          "6_fsync_durability": {
+            "name": "fsync_durability",
+            "duration_ms": 3.0185,
+            "percentage_of_total": 13.7,
+            "bytes_processed": 388303,
+            "details": {
+              "fsync_enabled": true
+            }
+          },
+          "7_hash_calculation": {
+            "name": "hash_calculation",
+            "duration_ms": 0.23,
+            "percentage_of_total": 1.04,
+            "bytes_processed": 388303,
+            "details": {
+              "sha256": "104aed07228e7b40"
+            }
+          },
+          "8_manifest_update": {
+            "name": "manifest_update",
+            "duration_ms": 0.8747,
+            "percentage_of_total": 3.97,
+            "bytes_processed": 198,
+            "details": {
+              "manifest_file": "C:\\Users\\joaor\\AppData\\Local\\Temp\\phase33_baseline_scratch_egsa0s8f\\level_300_run_5\\manifest.json"
+            }
+          },
+          "9_checkpoint_validation": {
+            "name": "checkpoint_validation",
+            "duration_ms": 0.0021,
+            "percentage_of_total": 0.01,
+            "bytes_processed": 300,
+            "details": {
+              "is_valid": true
+            }
+          },
+          "10_recovery_metadata": {
+            "name": "recovery_metadata",
+            "duration_ms": 0.0009,
+            "percentage_of_total": 0.0,
+            "bytes_processed": 32,
+            "details": {
+              "interrupted_count": 1
+            }
+          }
+        },
+        "memory_rss_bytes": 0
+      }
+    ]
+  }
+}

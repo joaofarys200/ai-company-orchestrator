@@ -41,6 +41,12 @@ def start_frontend_http_server(
 
     class FrontendHTTPRequestHandler(NoCacheHTTPRequestHandler):
         def do_GET(self):
+            if self.path in {"/favicon.ico", "favicon.ico"}:
+                self.send_response(200)
+                self.send_header("Content-Type", "image/x-icon")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
             if self.path in {"/healthz", "/health.json"}:
                 payload = check_frontend_static(project_root, port)
                 body = json.dumps(payload, ensure_ascii=False).encode("utf-8")

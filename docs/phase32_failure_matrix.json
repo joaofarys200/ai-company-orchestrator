@@ -1,0 +1,79 @@
+{
+  "matrix_id": "phase32_failure_taxonomy_matrix",
+  "timestamp": 1788897906.7027986,
+  "total_executions": 50,
+  "first_real_limit": "STATE_SERIALIZATION_LATENCY_GROWTH",
+  "first_real_failure": "NONE",
+  "categories": {
+    "PLANNING_LIMIT": {
+      "count": 0,
+      "status": "RESOLVED_BY_ADAPTIVE_REPLAN",
+      "impact": "NONE"
+    },
+    "CONTEXT_LIMIT": {
+      "count": 0,
+      "status": "CONTROLLED",
+      "impact": "NONE"
+    },
+    "STATE_LIMIT": {
+      "count": 5,
+      "status": "MONITORED",
+      "impact": "Latency growth at Level 5 (>200 transitions)"
+    },
+    "GRAPH_LIMIT": {
+      "count": 0,
+      "status": "VERIFIED_ACYCLIC",
+      "impact": "NONE"
+    },
+    "AGENT_LIMIT": {
+      "count": 0,
+      "status": "BALANCED",
+      "impact": "NONE"
+    },
+    "COLLABORATION_LIMIT": {
+      "count": 0,
+      "status": "ARBITRATED",
+      "impact": "NONE"
+    },
+    "REPAIR_LIMIT": {
+      "count": 0,
+      "status": "RESOLVED_BY_SELF_HEALING",
+      "impact": "NONE"
+    },
+    "REQUIREMENT_LIMIT": {
+      "count": 0,
+      "status": "100%_PERSISTENT",
+      "impact": "NONE"
+    },
+    "RECOVERY_LIMIT": {
+      "count": 0,
+      "status": "100%_RESUMED",
+      "impact": "NONE"
+    },
+    "BROWSER_LIMIT": {
+      "count": 0,
+      "status": "BROWSER_QA_VALIDATED",
+      "impact": "NONE"
+    },
+    "TRANSPORT_LIMIT": {
+      "count": 20,
+      "status": "AUTOMATIC_FALLBACK_OK",
+      "impact": "QUIC_RIO fallback to Python QUIC"
+    },
+    "MODEL_LIMIT": {
+      "count": 0,
+      "status": "NOT_ENCOUNTERED",
+      "impact": "NONE"
+    },
+    "ENVIRONMENT_LIMIT": {
+      "count": 0,
+      "status": "ISOLATED",
+      "impact": "NONE"
+    },
+    "TIME_LIMIT": {
+      "count": 0,
+      "status": "WITHIN_BUDGET",
+      "impact": "NONE"
+    }
+  }
+}

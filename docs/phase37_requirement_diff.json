@@ -1,0 +1,83 @@
+{
+  "diff_tracker": "Phase 37 Requirement Diff Ledger",
+  "snapshots": [
+    {
+      "transition": "v1 -> v2",
+      "operation": "ADD_REQUIREMENT",
+      "target": "REQ_AUTH",
+      "diff": {
+        "intent_version_before": 1,
+        "intent_version_after": 2,
+        "added": [
+          {
+            "id": "REQ_AUTH",
+            "desc": "Autenticação segura de utilizadores com tokens de sessão e RBAC.",
+            "source": "USER_INTENT_DELTA",
+            "lifecycle": "IDENTIFIED",
+            "verification_status": "VERIFIED"
+          }
+        ],
+        "modified": [],
+        "removed": [],
+        "unchanged": [
+          "REQ_01",
+          "REQ_02",
+          "REQ_03",
+          "REQ_04"
+        ]
+      }
+    },
+    {
+      "transition": "v2 -> v3",
+      "operation": "ADD_CONSTRAINT",
+      "target": "CST_API_IMMUTABLE",
+      "diff": {
+        "intent_version_before": 2,
+        "intent_version_after": 3,
+        "added": [],
+        "modified": [],
+        "removed": [],
+        "constraints_added": [
+          {
+            "id": "CST_API_IMMUTABLE",
+            "desc": "API REST não pode ser alterada"
+          }
+        ],
+        "unchanged": [
+          "REQ_01",
+          "REQ_02",
+          "REQ_03",
+          "REQ_04",
+          "REQ_AUTH"
+        ]
+      }
+    },
+    {
+      "transition": "v3 -> v4",
+      "operation": "REVISE_APPROACH",
+      "target": "ARCH_FRAMEWORK",
+      "diff": {
+        "intent_version_before": 3,
+        "intent_version_after": 4,
+        "added": [],
+        "modified": [
+          {
+            "id": "REQ_02",
+            "status": "MODIFIED",
+            "lifecycle": "MODIFIED",
+            "verification_status": "REQUIRES_REVALIDATION",
+            "modified_at_intent_version": 4,
+            "desc": "Migração para componentes React com hooks e bundling Vite."
+          }
+        ],
+        "removed": [],
+        "unchanged": [
+          "REQ_01",
+          "REQ_03",
+          "REQ_04",
+          "REQ_AUTH"
+        ]
+      }
+    }
+  ]
+}

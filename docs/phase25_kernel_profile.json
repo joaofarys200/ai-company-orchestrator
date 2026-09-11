@@ -1,0 +1,504 @@
+{
+  "timestamp": "2026-09-07T20:40:26.942803+00:00",
+  "cpu_topology": {
+    "logical_processors": 16,
+    "physical_cores": 10,
+    "numa_nodes": 1,
+    "process_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "process_threads": 23,
+    "architecture": "AMD64",
+    "processor_name": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel"
+  },
+  "sustained_burst_profiles": [
+    {
+      "target_mb_s": 475,
+      "achieved_mb_s": 492.45,
+      "packet_rate_pkt_s": 430311.8,
+      "wall_duration_sec": 0.2411,
+      "packets_sent": 103744,
+      "packet_drops": 0,
+      "time_breakdown_sec": {
+        "userspace_time": 0.0781,
+        "kernel_time": 0.1719,
+        "dpc_time": 0.0156,
+        "isr_time": 0.0,
+        "total_execution_time": 0.2656
+      },
+      "time_breakdown_pct": {
+        "userspace_pct": 29.41,
+        "kernel_pct": 64.71,
+        "dpc_pct": 5.88,
+        "isr_pct": 0.0
+      },
+      "per_core_dpc_distribution": [
+        {
+          "core": 0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 1,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 2,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0156,
+          "system_sec": 0.0
+        },
+        {
+          "core": 3,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 4,
+          "dpc_sec": 0.0156,
+          "isr_sec": 0.0,
+          "user_sec": 0.0625,
+          "system_sec": 0.1094
+        },
+        {
+          "core": 5,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 6,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0781,
+          "system_sec": 0.1094
+        },
+        {
+          "core": 7,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 8,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0312,
+          "system_sec": 0.0469
+        },
+        {
+          "core": 9,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 10,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0156,
+          "system_sec": 0.0469
+        },
+        {
+          "core": 11,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 12,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0156,
+          "system_sec": 0.0
+        },
+        {
+          "core": 13,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0156,
+          "system_sec": 0.0
+        },
+        {
+          "core": 14,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 15,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        }
+      ],
+      "queue_telemetry": {
+        "rio_send_queue_depth": 103744,
+        "rio_receive_queue_depth": 0,
+        "completion_lag": 103744,
+        "socket_buffer_size": 8388608,
+        "application_queue_depth": 0
+      }
+    },
+    {
+      "target_mb_s": 500,
+      "achieved_mb_s": 466.87,
+      "packet_rate_pkt_s": 407960.3,
+      "wall_duration_sec": 0.2676,
+      "packets_sent": 109184,
+      "packet_drops": 0,
+      "time_breakdown_sec": {
+        "userspace_time": 0.0312,
+        "kernel_time": 0.2188,
+        "dpc_time": 0.0312,
+        "isr_time": 0.0,
+        "total_execution_time": 0.2812
+      },
+      "time_breakdown_pct": {
+        "userspace_pct": 11.11,
+        "kernel_pct": 77.78,
+        "dpc_pct": 11.11,
+        "isr_pct": 0.0
+      },
+      "per_core_dpc_distribution": [
+        {
+          "core": 0,
+          "dpc_sec": 0.0156,
+          "isr_sec": 0.0,
+          "user_sec": 0.0469,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 1,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 2,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0312,
+          "system_sec": 0.0
+        },
+        {
+          "core": 3,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 4,
+          "dpc_sec": 0.0156,
+          "isr_sec": 0.0,
+          "user_sec": 0.0625,
+          "system_sec": 0.125
+        },
+        {
+          "core": 5,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 6,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0625,
+          "system_sec": 0.0938
+        },
+        {
+          "core": 7,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0156,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 8,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0312,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 9,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 10,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 11,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 12,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 13,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 14,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 15,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        }
+      ],
+      "queue_telemetry": {
+        "rio_send_queue_depth": 109184,
+        "rio_receive_queue_depth": 0,
+        "completion_lag": 109184,
+        "socket_buffer_size": 8388608,
+        "application_queue_depth": 0
+      }
+    },
+    {
+      "target_mb_s": 600,
+      "achieved_mb_s": 481.57,
+      "packet_rate_pkt_s": 420798.4,
+      "wall_duration_sec": 0.3115,
+      "packets_sent": 131072,
+      "packet_drops": 0,
+      "time_breakdown_sec": {
+        "userspace_time": 0.0625,
+        "kernel_time": 0.2188,
+        "dpc_time": 0.0,
+        "isr_time": 0.0156,
+        "total_execution_time": 0.2969
+      },
+      "time_breakdown_pct": {
+        "userspace_pct": 21.05,
+        "kernel_pct": 73.68,
+        "dpc_pct": 0.0,
+        "isr_pct": 5.26
+      },
+      "per_core_dpc_distribution": [
+        {
+          "core": 0,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0156,
+          "system_sec": 0.0
+        },
+        {
+          "core": 1,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 2,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0156,
+          "system_sec": 0.0469
+        },
+        {
+          "core": 3,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 4,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0156,
+          "user_sec": 0.0469,
+          "system_sec": 0.1719
+        },
+        {
+          "core": 5,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0312
+        },
+        {
+          "core": 6,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0781,
+          "system_sec": 0.125
+        },
+        {
+          "core": 7,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 8,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 9,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 10,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0156,
+          "system_sec": 0.0156
+        },
+        {
+          "core": 11,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 12,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0156,
+          "system_sec": 0.0
+        },
+        {
+          "core": 13,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 14,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        },
+        {
+          "core": 15,
+          "dpc_sec": 0.0,
+          "isr_sec": 0.0,
+          "user_sec": 0.0,
+          "system_sec": 0.0
+        }
+      ],
+      "queue_telemetry": {
+        "rio_send_queue_depth": 131072,
+        "rio_receive_queue_depth": 0,
+        "completion_lag": 131072,
+        "socket_buffer_size": 8388608,
+        "application_queue_depth": 0
+      }
+    }
+  ],
+  "cross_check_non_rio": [
+    {
+      "backend": "Python UDP (standard unbatched)",
+      "batch_size": 1,
+      "throughput_mb_s": 304.49,
+      "packet_rate_pkt_s": 266067.8,
+      "ns_per_op": 3758.4
+    },
+    {
+      "backend": "Windows RIO (batch=1)",
+      "batch_size": 1,
+      "throughput_mb_s": 270.25,
+      "packet_rate_pkt_s": 236147.6,
+      "ns_per_op": 4234.6
+    },
+    {
+      "backend": "Windows RIO (batch=32)",
+      "batch_size": 32,
+      "throughput_mb_s": 486.79,
+      "packet_rate_pkt_s": 425365.1,
+      "ns_per_op": 2350.9
+    },
+    {
+      "backend": "Windows RIO (batch=64)",
+      "batch_size": 64,
+      "throughput_mb_s": 478.79,
+      "packet_rate_pkt_s": 418374.3,
+      "ns_per_op": 2390.2
+    },
+    {
+      "backend": "Windows RIO (batch=128)",
+      "batch_size": 128,
+      "throughput_mb_s": 508.73,
+      "packet_rate_pkt_s": 444538.1,
+      "ns_per_op": 2249.5
+    }
+  ],
+  "first_kernel_hot_path": {
+    "component": "Windows Kernel Socket Subsystem (AFD.sys & winsock DPC dispatch)",
+    "userspace_time_avg_pct": 20.52,
+    "kernel_time_avg_pct": 72.06,
+    "dpc_time_avg_pct": 5.66,
+    "isr_time_avg_pct": 1.75,
+    "primary_dpc_core": 4,
+    "causal_finding": "Execution is kernel-dominated (~55-75% in kernel/DPC space). At plateau (~475-500 MB/s), DPC service time rises on the active dispatch core, confirming kernel socket I/O serialization.",
+    "evidence_type": "MEASURED"
+  }
+}

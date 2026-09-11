@@ -587,11 +587,19 @@ class StreamingDistributedTransport:
         underlying_transport: Any,  # Instance of DistributedTransport (TCP, HTTP2, gRPC)
         emit_callback: Callable[[str, dict[str, Any]], Any] | None = None,
         disk_threshold_bytes: int = DEFAULT_DISK_STREAMING_THRESHOLD,
+        io_backend: Any | None = None,
     ):
         self.node_id = node_id
         self.transport = underlying_transport
         self.emit_callback = emit_callback
         self.disk_threshold_bytes = disk_threshold_bytes
+
+        # Phase 20 I/O Dispatch Backend (Asyncio, Threaded, or Adaptive)
+        if io_backend is None:
+            from agents.io_dispatch import AdaptiveIoBackend
+            self.io_backend = AdaptiveIoBackend(emit_callback=self.emit_callback)
+        else:
+            self.io_backend = io_backend
 
         # Active stream controllers
         self.senders: dict[str, SlidingWindowFlowController] = {}
@@ -613,10 +621,14 @@ class StreamingDistributedTransport:
 
     async def start(self) -> None:
         self._running = True
+        if hasattr(self.io_backend, "start"):
+            self.io_backend.start()
         self._listener_task = asyncio.create_task(self._transport_listen_loop())
 
     async def stop(self) -> None:
         self._running = False
+        if hasattr(self.io_backend, "stop"):
+            self.io_backend.stop()
         if self._listener_task:
             self._listener_task.cancel()
         for r in list(self.receivers.values()):
@@ -720,21 +732,48 @@ class StreamingDistributedTransport:
                 if priority in {StreamPriority.CRITICAL_CONTROL, StreamPriority.CONTROL}:
                     flags |= StreamFlags.CONTROL
 
-                chunk = StreamChunk(
-                    message_id=uuid.uuid4().hex,
-                    stream_id=stream_id,
-                    sequence=curr_seq,
-                    total_chunks=total_chunks,
-                    chunk_size=c_size,
-                    payload_length=len(chunk_slice),
-                    crc32=0,
-                    flags=int(flags),
-                    data=chunk_slice,
-                    priority=priority,
-                    window_advertisement=flow.receive_window,
-                    sender_node_id=self.node_id,
-                )
-                chunk.crc32 = chunk.compute_crc32()
+                if hasattr(self.io_backend, "process_send_chunk"):
+                    chunk_meta = self.io_backend.process_send_chunk(
+                        stream_id=stream_id,
+                        sequence=curr_seq,
+                        total_chunks=total_chunks,
+                        payload_slice=chunk_slice,
+                        priority=priority,
+                        flags=int(flags),
+                        chunk_size=c_size,
+                        window_adv=flow.receive_window,
+                        sender_node_id=self.node_id,
+                    )
+                    chunk = StreamChunk(
+                        message_id=chunk_meta["message_id"],
+                        stream_id=chunk_meta["stream_id"],
+                        sequence=chunk_meta["sequence"],
+                        total_chunks=chunk_meta["total_chunks"],
+                        chunk_size=chunk_meta["chunk_size"],
+                        payload_length=chunk_meta["payload_length"],
+                        crc32=chunk_meta["crc32"],
+                        flags=chunk_meta["flags"],
+                        data=chunk_meta["data"],
+                        priority=chunk_meta["priority"],
+                        window_advertisement=chunk_meta["window_advertisement"],
+                        sender_node_id=chunk_meta["sender_node_id"],
+                    )
+                else:
+                    chunk = StreamChunk(
+                        message_id=uuid.uuid4().hex,
+                        stream_id=stream_id,
+                        sequence=curr_seq,
+                        total_chunks=total_chunks,
+                        chunk_size=c_size,
+                        payload_length=len(chunk_slice),
+                        crc32=0,
+                        flags=int(flags),
+                        data=chunk_slice,
+                        priority=priority,
+                        window_advertisement=flow.receive_window,
+                        sender_node_id=self.node_id,
+                    )
+                    chunk.crc32 = chunk.compute_crc32()
 
                 flow.record_chunk_sent(chunk)
                 await self._dispatch_chunk(target_node_id, chunk)
@@ -1008,3 +1047,20 @@ class ReferenceStreamingModel:
             "corrupted_payload_accepted": corrupted,
             "stream_leaks": 0,
         }
+
+
+# ── PHASE 20 COMPONENT RE-EXPORTS ─────────────────────────────────────────────
+from agents.io_dispatch import (
+    IoDispatchMode,
+    IoDispatchBackend,
+    AsyncioBackend,
+    ThreadedIoBackend,
+    AdaptiveIoBackend,
+    IoWorkerPool,
+    StreamGroup,
+    AdaptiveStreamGroupingPolicy,
+    ChunkBufferPool,
+    AdaptiveBufferPolicy,
+    ControlPlaneIsolation,
+    ReferenceIoModel,
+)

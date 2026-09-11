@@ -1,0 +1,39 @@
+{
+  "phase": 38,
+  "phase_name": "Super-File Decomposition & Architecture Hygiene Browser QA",
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "timestamp_iso": "2026-09-10T22:30:11Z",
+  "url": "http://127.0.0.1:8000",
+  "total_assertions_passed": 22,
+  "total_scenarios_tested": 10,
+  "scenarios": [
+    "1. MissionHeader & OverviewPanel render cleanly",
+    "2. MissionControlActions bidirectional command dispatch",
+    "3. MissionTaskGraphPanel Kahn DAG visualization",
+    "4. IntentPreviewModal NLP parsing & impact analysis",
+    "5. Intent apply triggers atomic replan & version bump",
+    "6. MissionRequirementsDiffPanel lifecycle diff",
+    "7. MissionPlanDiffPanel DAG invariant validation",
+    "8. MissionEvidenceImpactPanel Zero False Success ledger",
+    "9. MissionWhyCausalPanel causal explainability chains",
+    "10. MissionRepairPanel & EvidenceLedgerPanel"
+  ],
+  "console_errors_count": 0,
+  "console_errors": [],
+  "network_errors_count": 0,
+  "network_errors": [],
+  "screenshots_captured": [
+    "01_mission_control_overview.png",
+    "02_controls_pause_resume.png",
+    "03_task_graph_dag_view.png",
+    "04_intent_editor_modal.png",
+    "05_intent_applied_replan.png",
+    "06_requirements_diff_panel.png",
+    "07_plan_diff_panel.png",
+    "08_evidence_impact_tracker.png",
+    "09_why_panel_causality.png",
+    "10_repair_and_ledger_view.png"
+  ],
+  "verdict": "PASSED"
+}

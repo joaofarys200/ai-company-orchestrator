@@ -1,0 +1,48 @@
+{
+  "benchmark_timestamp": 1789072982.188245,
+  "phase": 36,
+  "phase_title": "Bidirectional Mission Control & Human Intervention",
+  "individual_latencies": {
+    "PAUSE_ms": 0.0648,
+    "RESUME_ms": 0.0412,
+    "CHANGE_PRIORITY_ms": 0.0334,
+    "REORDER_ms": 0.0305,
+    "APPROVE_ms": 0.027,
+    "CANCEL_ms": 0.0241
+  },
+  "idempotency_cache_lookup_latency_ms": 0.0026,
+  "security_sentinel_refusal_latency_ms": 0.019,
+  "batch_scalability": {
+    "batch_1": {
+      "commands_count": 1,
+      "total_duration_seconds": 0.0,
+      "average_latency_ms": 0.0292,
+      "throughput_commands_per_sec": 34246.58
+    },
+    "batch_10": {
+      "commands_count": 10,
+      "total_duration_seconds": 0.0002,
+      "average_latency_ms": 0.0232,
+      "throughput_commands_per_sec": 43029.26
+    },
+    "batch_100": {
+      "commands_count": 100,
+      "total_duration_seconds": 0.0047,
+      "average_latency_ms": 0.0474,
+      "throughput_commands_per_sec": 21090.37
+    },
+    "batch_1000": {
+      "commands_count": 1000,
+      "total_duration_seconds": 0.5801,
+      "average_latency_ms": 0.5801,
+      "throughput_commands_per_sec": 1723.74
+    }
+  },
+  "summary": {
+    "p50_latency_ms": 0.0368,
+    "max_measured_throughput_ops_sec": 43029.26,
+    "idempotency_overhead_ratio": 0.0401,
+    "invariants_satisfied": true,
+    "zero_simulated_numbers": true
+  }
+}

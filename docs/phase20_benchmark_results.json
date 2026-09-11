@@ -1,0 +1,857 @@
+{
+  "metadata": {
+    "phase": "20",
+    "title": "Multithreaded I/O Dispatch, Stream Parallelism & Event-Loop Bottleneck Elimination",
+    "timestamp": "2026-09-07T19:00:42Z",
+    "python_version": "3.14.7",
+    "platform": "win32"
+  },
+  "stages": {
+    "stage1_worker_count_scaling": {
+      "classification": "MEASURED",
+      "results": {
+        "1_threads": {
+          "64_streams": {
+            "duration_ms": 0.61,
+            "throughput_mb_s": 1631.06
+          },
+          "128_streams": {
+            "duration_ms": 1.19,
+            "throughput_mb_s": 1681.38
+          },
+          "256_streams": {
+            "duration_ms": 2.14,
+            "throughput_mb_s": 1871.96
+          },
+          "512_streams": {
+            "duration_ms": 4.23,
+            "throughput_mb_s": 1891.03
+          },
+          "1024_streams": {
+            "duration_ms": 9.35,
+            "throughput_mb_s": 1711.41
+          }
+        },
+        "2_threads": {
+          "64_streams": {
+            "duration_ms": 0.85,
+            "throughput_mb_s": 1173.98
+          },
+          "128_streams": {
+            "duration_ms": 1.16,
+            "throughput_mb_s": 1717.33
+          },
+          "256_streams": {
+            "duration_ms": 2.54,
+            "throughput_mb_s": 1577.22
+          },
+          "512_streams": {
+            "duration_ms": 7.03,
+            "throughput_mb_s": 1137.74
+          },
+          "1024_streams": {
+            "duration_ms": 10.23,
+            "throughput_mb_s": 1564.0
+          }
+        },
+        "4_threads": {
+          "64_streams": {
+            "duration_ms": 0.85,
+            "throughput_mb_s": 1171.65
+          },
+          "128_streams": {
+            "duration_ms": 1.23,
+            "throughput_mb_s": 1627.6
+          },
+          "256_streams": {
+            "duration_ms": 1.98,
+            "throughput_mb_s": 2022.65
+          },
+          "512_streams": {
+            "duration_ms": 4.78,
+            "throughput_mb_s": 1673.92
+          },
+          "1024_streams": {
+            "duration_ms": 9.5,
+            "throughput_mb_s": 1683.45
+          }
+        },
+        "8_threads": {
+          "64_streams": {
+            "duration_ms": 0.84,
+            "throughput_mb_s": 1191.04
+          },
+          "128_streams": {
+            "duration_ms": 1.14,
+            "throughput_mb_s": 1747.03
+          },
+          "256_streams": {
+            "duration_ms": 2.32,
+            "throughput_mb_s": 1724.44
+          },
+          "512_streams": {
+            "duration_ms": 4.58,
+            "throughput_mb_s": 1747.26
+          },
+          "1024_streams": {
+            "duration_ms": 9.1,
+            "throughput_mb_s": 1758.36
+          }
+        },
+        "16_threads": {
+          "64_streams": {
+            "duration_ms": 1.13,
+            "throughput_mb_s": 882.92
+          },
+          "128_streams": {
+            "duration_ms": 1.19,
+            "throughput_mb_s": 1676.59
+          },
+          "256_streams": {
+            "duration_ms": 2.14,
+            "throughput_mb_s": 1872.22
+          },
+          "512_streams": {
+            "duration_ms": 4.3,
+            "throughput_mb_s": 1862.02
+          },
+          "1024_streams": {
+            "duration_ms": 9.42,
+            "throughput_mb_s": 1697.68
+          }
+        },
+        "32_threads": {
+          "64_streams": {
+            "duration_ms": 1.09,
+            "throughput_mb_s": 918.78
+          },
+          "128_streams": {
+            "duration_ms": 1.33,
+            "throughput_mb_s": 1501.84
+          },
+          "256_streams": {
+            "duration_ms": 2.42,
+            "throughput_mb_s": 1650.64
+          },
+          "512_streams": {
+            "duration_ms": 5.35,
+            "throughput_mb_s": 1496.42
+          },
+          "1024_streams": {
+            "duration_ms": 8.32,
+            "throughput_mb_s": 1922.96
+          }
+        },
+        "64_threads": {
+          "64_streams": {
+            "duration_ms": 1.46,
+            "throughput_mb_s": 682.69
+          },
+          "128_streams": {
+            "duration_ms": 1.71,
+            "throughput_mb_s": 1169.04
+          },
+          "256_streams": {
+            "duration_ms": 2.79,
+            "throughput_mb_s": 1435.49
+          },
+          "512_streams": {
+            "duration_ms": 5.03,
+            "throughput_mb_s": 1591.98
+          },
+          "1024_streams": {
+            "duration_ms": 9.36,
+            "throughput_mb_s": 1708.96
+          }
+        }
+      }
+    },
+    "stage2_stream_grouping": {
+      "classification": "MEASURED",
+      "results": {
+        "num_streams": 256,
+        "num_worker_groups": 8,
+        "group_distribution": {
+          "group_0": 32,
+          "group_1": 32,
+          "group_2": 31,
+          "group_3": 33,
+          "group_4": 31,
+          "group_5": 33,
+          "group_6": 32,
+          "group_7": 32
+        },
+        "load_imbalance_ratio": 1.06,
+        "assignment_time_ms": 1.684,
+        "affinity_preservation": "100%"
+      }
+    },
+    "stage3_control_plane_latency": {
+      "classification": "MEASURED",
+      "results": {
+        "256_streams": {
+          "p50_ms": 0.018,
+          "p95_ms": 0.086,
+          "p99_ms": 0.098,
+          "max_ms": 0.106,
+          "count": 256
+        },
+        "512_streams": {
+          "p50_ms": 0.018,
+          "p95_ms": 0.107,
+          "p99_ms": 0.121,
+          "max_ms": 0.282,
+          "count": 512
+        },
+        "1024_streams": {
+          "p50_ms": 0.02,
+          "p95_ms": 0.109,
+          "p99_ms": 0.119,
+          "max_ms": 0.424,
+          "count": 1024
+        }
+      }
+    },
+    "stage4_lock_contention": {
+      "classification": "MEASURED",
+      "results": {
+        "global_lock_duration_ms": 229.89,
+        "global_lock_contention_rate": 0.9925,
+        "fine_grained_duration_ms": 30.23,
+        "fine_grained_avg_contention_rate": 0.0,
+        "speedup_factor": 7.6
+      }
+    },
+    "stage5_buffer_pool": {
+      "classification": "MEASURED",
+      "results": {
+        "16_KB": {
+          "initial_acquire_ns": 3215,
+          "recycled_acquire_ns": 1960,
+          "speedup_pct": 39.0
+        },
+        "32_KB": {
+          "initial_acquire_ns": 10180,
+          "recycled_acquire_ns": 3715,
+          "speedup_pct": 63.5
+        },
+        "64_KB": {
+          "initial_acquire_ns": 16375,
+          "recycled_acquire_ns": 6735,
+          "speedup_pct": 58.9
+        },
+        "128_KB": {
+          "initial_acquire_ns": 32925,
+          "recycled_acquire_ns": 15040,
+          "speedup_pct": 54.3
+        },
+        "256_KB": {
+          "initial_acquire_ns": 63085,
+          "recycled_acquire_ns": 25505,
+          "speedup_pct": 59.6
+        },
+        "512_KB": {
+          "initial_acquire_ns": 105150,
+          "recycled_acquire_ns": 60320,
+          "speedup_pct": 42.6
+        },
+        "1024_KB": {
+          "initial_acquire_ns": 242225,
+          "recycled_acquire_ns": 646900,
+          "speedup_pct": -167.1
+        },
+        "overall_pool_stats": {
+          "max_memory_mb": 32.0,
+          "current_memory_mb": 31.69,
+          "allocated_count": 140,
+          "reused_count": 140,
+          "released_count": 280,
+          "active_in_flight": 0,
+          "copy_count": 0,
+          "bytes_copied_mb": 0.0,
+          "copy_time_ms": 0.0
+        }
+      }
+    },
+    "stage6_cross_stream_fairness": {
+      "classification": "MEASURED",
+      "results": {
+        "huge_stream_tasks_completed": 500,
+        "small_streams_count": 127,
+        "small_stream_completion_rate": "127/127",
+        "jain_fairness_index": 1.0,
+        "starvation_detected": false
+      }
+    },
+    "stage7_stream_priority": {
+      "classification": "MEASURED",
+      "results": {
+        "total_enqueued": 110,
+        "first_10_are_critical": true,
+        "head_of_line_blocking": false
+      }
+    },
+    "stage8_adaptive_migration": {
+      "classification": "MEASURED",
+      "results": {
+        "transitions": [
+          [
+            8,
+            0.5,
+            "ASYNCIO"
+          ],
+          [
+            32,
+            4.0,
+            "THREAD_POOL"
+          ],
+          [
+            10,
+            1.0,
+            "ASYNCIO"
+          ],
+          [
+            64,
+            5.0,
+            "THREAD_POOL"
+          ]
+        ],
+        "mode_switches_count": 3,
+        "safe_migrations_count": 3,
+        "duplicate_side_effects": 0
+      }
+    },
+    "stage9_worker_recovery": {
+      "classification": "MEASURED",
+      "results": {
+        "worker_replacement_success": true,
+        "alive_workers": 2,
+        "exceptions_caught": 1
+      }
+    },
+    "stage10_deadlock_testing": {
+      "classification": "MEASURED",
+      "results": {
+        "threads_executed": 32,
+        "deadlock_count": 0,
+        "deadlock_free": true
+      }
+    },
+    "stage11_network_conditions": {
+      "classification": "CALCULATED",
+      "results": {
+        "rtt_0ms": {
+          "loss_0pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_1pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_5pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_10pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_25pct": {
+            "selected_buffer_size_kb": 16,
+            "loss_resilience": "VERIFIED"
+          }
+        },
+        "rtt_10ms": {
+          "loss_0pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_1pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_5pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_10pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_25pct": {
+            "selected_buffer_size_kb": 16,
+            "loss_resilience": "VERIFIED"
+          }
+        },
+        "rtt_25ms": {
+          "loss_0pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_1pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_5pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_10pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_25pct": {
+            "selected_buffer_size_kb": 16,
+            "loss_resilience": "VERIFIED"
+          }
+        },
+        "rtt_50ms": {
+          "loss_0pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_1pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_5pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_10pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_25pct": {
+            "selected_buffer_size_kb": 16,
+            "loss_resilience": "VERIFIED"
+          }
+        },
+        "rtt_100ms": {
+          "loss_0pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_1pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_5pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_10pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_25pct": {
+            "selected_buffer_size_kb": 16,
+            "loss_resilience": "VERIFIED"
+          }
+        },
+        "rtt_250ms": {
+          "loss_0pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_1pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_5pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_10pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_25pct": {
+            "selected_buffer_size_kb": 16,
+            "loss_resilience": "VERIFIED"
+          }
+        },
+        "rtt_500ms": {
+          "loss_0pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_1pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_5pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_10pct": {
+            "selected_buffer_size_kb": 64,
+            "loss_resilience": "VERIFIED"
+          },
+          "loss_25pct": {
+            "selected_buffer_size_kb": 16,
+            "loss_resilience": "VERIFIED"
+          }
+        }
+      }
+    },
+    "stage12_concurrency_scaling": {
+      "classification": "MEASURED",
+      "results": {
+        "1_streams": {
+          "asyncio": {
+            "mean": 156.25,
+            "median": 156.25,
+            "stddev": 0.0,
+            "min": 156.25,
+            "max": 156.25,
+            "p50": 156.25,
+            "p95": 156.25,
+            "p99": 156.25
+          },
+          "threaded": {
+            "mean": 156.25,
+            "median": 156.25,
+            "stddev": 0.0,
+            "min": 156.25,
+            "max": 156.25,
+            "p50": 156.25,
+            "p95": 156.25,
+            "p99": 156.25
+          },
+          "adaptive": {
+            "mean": 156.25,
+            "median": 156.25,
+            "stddev": 0.0,
+            "min": 156.25,
+            "max": 156.25,
+            "p50": 156.25,
+            "p95": 156.25,
+            "p99": 156.25
+          }
+        },
+        "8_streams": {
+          "asyncio": {
+            "mean": 1250.0,
+            "median": 1250.0,
+            "stddev": 0.0,
+            "min": 1250.0,
+            "max": 1250.0,
+            "p50": 1250.0,
+            "p95": 1250.0,
+            "p99": 1250.0
+          },
+          "threaded": {
+            "mean": 505.51,
+            "median": 545.14,
+            "stddev": 80.3,
+            "min": 413.09,
+            "max": 558.29,
+            "p50": 545.14,
+            "p95": 558.29,
+            "p99": 558.29
+          },
+          "adaptive": {
+            "mean": 1250.0,
+            "median": 1250.0,
+            "stddev": 0.0,
+            "min": 1250.0,
+            "max": 1250.0,
+            "p50": 1250.0,
+            "p95": 1250.0,
+            "p99": 1250.0
+          }
+        },
+        "16_streams": {
+          "asyncio": {
+            "mean": 2500.0,
+            "median": 2500.0,
+            "stddev": 0.0,
+            "min": 2500.0,
+            "max": 2500.0,
+            "p50": 2500.0,
+            "p95": 2500.0,
+            "p99": 2500.0
+          },
+          "threaded": {
+            "mean": 356.31,
+            "median": 346.74,
+            "stddev": 111.62,
+            "min": 249.78,
+            "max": 472.41,
+            "p50": 346.74,
+            "p95": 472.41,
+            "p99": 472.41
+          },
+          "adaptive": {
+            "mean": 2500.0,
+            "median": 2500.0,
+            "stddev": 0.0,
+            "min": 2500.0,
+            "max": 2500.0,
+            "p50": 2500.0,
+            "p95": 2500.0,
+            "p99": 2500.0
+          }
+        },
+        "32_streams": {
+          "asyncio": {
+            "mean": 4389.07,
+            "median": 4440.5,
+            "stddev": 191.49,
+            "min": 4177.11,
+            "max": 4549.59,
+            "p50": 4440.5,
+            "p95": 4549.59,
+            "p99": 4549.59
+          },
+          "threaded": {
+            "mean": 436.72,
+            "median": 450.17,
+            "stddev": 31.19,
+            "min": 401.06,
+            "max": 458.93,
+            "p50": 450.17,
+            "p95": 458.93,
+            "p99": 458.93
+          },
+          "adaptive": {
+            "mean": 3889.05,
+            "median": 4074.98,
+            "stddev": 333.66,
+            "min": 3503.85,
+            "max": 4088.31,
+            "p50": 4074.98,
+            "p95": 4088.31,
+            "p99": 4088.31
+          }
+        },
+        "64_streams": {
+          "asyncio": {
+            "mean": 3864.8,
+            "median": 4044.49,
+            "stddev": 848.65,
+            "min": 2087.25,
+            "max": 4766.44,
+            "p50": 4046.94,
+            "p95": 4766.44,
+            "p99": 4766.44
+          },
+          "threaded": {
+            "mean": 441.55,
+            "median": 449.23,
+            "stddev": 73.61,
+            "min": 339.4,
+            "max": 530.45,
+            "p50": 453.31,
+            "p95": 530.45,
+            "p99": 530.45
+          },
+          "adaptive": {
+            "mean": 477.11,
+            "median": 492.93,
+            "stddev": 59.94,
+            "min": 383.01,
+            "max": 555.93,
+            "p50": 493.32,
+            "p95": 555.93,
+            "p99": 555.93
+          }
+        },
+        "128_streams": {
+          "asyncio": {
+            "mean": 4382.13,
+            "median": 4589.48,
+            "stddev": 463.23,
+            "min": 3513.09,
+            "max": 4823.93,
+            "p50": 4647.92,
+            "p95": 4823.93,
+            "p99": 4823.93
+          },
+          "threaded": {
+            "mean": 467.78,
+            "median": 464.0,
+            "stddev": 43.38,
+            "min": 387.4,
+            "max": 533.97,
+            "p50": 465.37,
+            "p95": 533.97,
+            "p99": 533.97
+          },
+          "adaptive": {
+            "mean": 460.86,
+            "median": 468.69,
+            "stddev": 39.33,
+            "min": 402.43,
+            "max": 536.45,
+            "p50": 471.85,
+            "p95": 536.45,
+            "p99": 536.45
+          }
+        },
+        "256_streams": {
+          "asyncio": {
+            "mean": 4357.09,
+            "median": 4503.24,
+            "stddev": 506.06,
+            "min": 2995.58,
+            "max": 4765.88,
+            "p50": 4505.52,
+            "p95": 4765.88,
+            "p99": 4765.88
+          },
+          "threaded": {
+            "mean": 483.99,
+            "median": 488.95,
+            "stddev": 34.01,
+            "min": 403.01,
+            "max": 524.44,
+            "p50": 496.78,
+            "p95": 524.44,
+            "p99": 524.44
+          },
+          "adaptive": {
+            "mean": 472.26,
+            "median": 472.88,
+            "stddev": 23.17,
+            "min": 441.55,
+            "max": 526.62,
+            "p50": 473.63,
+            "p95": 526.62,
+            "p99": 526.62
+          }
+        },
+        "512_streams": {
+          "asyncio": {
+            "mean": 4815.02,
+            "median": 4891.47,
+            "stddev": 140.81,
+            "min": 4652.52,
+            "max": 4901.06,
+            "p50": 4891.47,
+            "p95": 4901.06,
+            "p99": 4901.06
+          },
+          "threaded": {
+            "mean": 463.05,
+            "median": 474.09,
+            "stddev": 47.54,
+            "min": 410.96,
+            "max": 504.1,
+            "p50": 474.09,
+            "p95": 504.1,
+            "p99": 504.1
+          },
+          "adaptive": {
+            "mean": 457.17,
+            "median": 460.58,
+            "stddev": 23.19,
+            "min": 432.46,
+            "max": 478.47,
+            "p50": 460.58,
+            "p95": 478.47,
+            "p99": 478.47
+          }
+        },
+        "1024_streams": {
+          "asyncio": {
+            "mean": 4363.64,
+            "median": 4514.8,
+            "stddev": 270.49,
+            "min": 4051.35,
+            "max": 4524.76,
+            "p50": 4514.8,
+            "p95": 4524.76,
+            "p99": 4524.76
+          },
+          "threaded": {
+            "mean": 451.67,
+            "median": 460.44,
+            "stddev": 36.14,
+            "min": 411.96,
+            "max": 482.62,
+            "p50": 460.44,
+            "p95": 482.62,
+            "p99": 482.62
+          },
+          "adaptive": {
+            "mean": 453.45,
+            "median": 463.52,
+            "stddev": 25.78,
+            "min": 424.15,
+            "max": 472.68,
+            "p50": 463.52,
+            "p95": 472.68,
+            "p99": 472.68
+          }
+        }
+      }
+    },
+    "stage13_cpu_memory": {
+      "classification": "MEASURED",
+      "results": {
+        "baseline_rss_mb": 114.27,
+        "peak_rss_mb": 154.26,
+        "buffer_pool_memory_mb": 32.0,
+        "per_stream_memory_kb": 114.27,
+        "context_switch_efficiency": "STABLE"
+      }
+    },
+    "stage14_long_horizon": {
+      "classification": "MEASURED",
+      "results": {
+        "50_cycles": {
+          "duration_ms": 0.64,
+          "thread_leaks": 0,
+          "stream_leaks": 0,
+          "buffer_leaks": 0,
+          "queue_growth": 0
+        },
+        "100_cycles": {
+          "duration_ms": 0.38,
+          "thread_leaks": 0,
+          "stream_leaks": 0,
+          "buffer_leaks": 0,
+          "queue_growth": 0
+        },
+        "250_cycles": {
+          "duration_ms": 1.05,
+          "thread_leaks": 0,
+          "stream_leaks": 0,
+          "buffer_leaks": 0,
+          "queue_growth": 0
+        },
+        "500_cycles": {
+          "duration_ms": 2.13,
+          "thread_leaks": 0,
+          "stream_leaks": 0,
+          "buffer_leaks": 0,
+          "queue_growth": 0
+        },
+        "1000_cycles": {
+          "duration_ms": 4.59,
+          "thread_leaks": 0,
+          "stream_leaks": 0,
+          "buffer_leaks": 0,
+          "queue_growth": 0
+        }
+      }
+    },
+    "stage15_correctness_oracle": {
+      "classification": "MEASURED",
+      "results": {
+        "verdict": "PASS",
+        "total_registered": 50,
+        "total_completed": 50,
+        "duplicate_executions": 0,
+        "duplicate_side_effects": 0,
+        "ownership_conflicts": 0,
+        "false_completions": 0,
+        "false_negatives": 0,
+        "deadlock_count": 0
+      }
+    }
+  }
+}

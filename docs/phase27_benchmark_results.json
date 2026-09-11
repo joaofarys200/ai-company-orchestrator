@@ -1,0 +1,1855 @@
+{
+  "metadata": {
+    "phase": "Phase 27",
+    "title": "Multi-Socket Sharding Qualification & Kernel Parallelism Benchmark",
+    "timestamp": "2026-09-07T20:56:47.384509+00:00",
+    "physical_nic_status": "NOT_AVAILABLE",
+    "evidence_classification": {
+      "baseline_throughput": "MEASURED",
+      "sharding_matrix": "MEASURED",
+      "affinity_matrix": "MEASURED",
+      "scaling_gain": "CALCULATED",
+      "efficiency": "CALCULATED",
+      "jain_fairness": "CALCULATED",
+      "simulated_entries": 0
+    }
+  },
+  "taxonomy": {
+    "previous_limit": "AFD/NDIS loopback UDP serialization plateau at ~445-480 MB/s",
+    "mitigation_evaluated": "Multi-socket sharding with distinct UDP port tuples & independent queues",
+    "current_limit": "Windows NDIS loopback adapter single-driver lock contention persists across multiple sockets",
+    "first_real_failure": "NONE",
+    "minimum_next_fix": "Evaluate physical NIC or Linux AF_XDP for true multi-queue bypass"
+  },
+  "decision_gate": {
+    "verdict": "OPTION B: MULTI_SOCKET_SHARDING_NOT_JUSTIFIED",
+    "parallel_kernel_scaling": "PARALLEL_KERNEL_SCALING: NOT_SUPPORTED",
+    "max_gain": 1.02,
+    "sharding_gain_16": 1.02
+  },
+  "baseline_reproduction": {
+    "throughput_mb_s": 362.62,
+    "packet_rate": 316861.6,
+    "kernel_cpu_pct": 80.6,
+    "dpc_delta_sec": 0.0052
+  },
+  "sharding_matrix": {
+    "1": {
+      "num_shards": 1,
+      "achieved_mb_s": 357.37,
+      "packet_rate": 312275.5,
+      "scaling_gain": 0.99,
+      "efficiency": 0.99,
+      "jain_fairness_index": 1.0,
+      "kernel_cpu_pct": 81.9,
+      "dpc_delta_sec": 0.0052,
+      "control_p99_ms": 0.025,
+      "runs": [
+        {
+          "num_shards": 1,
+          "target_mb_s": 500,
+          "achieved_mb_s": 354.32,
+          "packet_rate": 309611.1,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.0031,
+          "latency_p95_ms": 0.004,
+          "latency_p99_ms": 0.0057,
+          "control_latency_p99_ms": 0.0283,
+          "user_cpu_pct": 14.76,
+          "kernel_cpu_pct": 81.2,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0156,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            65536
+          ],
+          "active_cores_count": 4,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.125,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0938,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        },
+        {
+          "num_shards": 1,
+          "target_mb_s": 500,
+          "achieved_mb_s": 360.6,
+          "packet_rate": 315101.3,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.0031,
+          "latency_p95_ms": 0.004,
+          "latency_p99_ms": 0.0054,
+          "control_latency_p99_ms": 0.0262,
+          "user_cpu_pct": 15.03,
+          "kernel_cpu_pct": 82.64,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0156,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            65536
+          ],
+          "active_cores_count": 7,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.1406,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0469,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0469,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            }
+          ]
+        },
+        {
+          "num_shards": 1,
+          "target_mb_s": 500,
+          "achieved_mb_s": 357.19,
+          "packet_rate": 312114.2,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.003,
+          "latency_p95_ms": 0.0038,
+          "latency_p99_ms": 0.0078,
+          "control_latency_p99_ms": 0.0193,
+          "user_cpu_pct": 7.44,
+          "kernel_cpu_pct": 81.86,
+          "dpc_delta_sec": 0.0156,
+          "isr_delta_sec": 0.0156,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            65536
+          ],
+          "active_cores_count": 5,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0156
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    "2": {
+      "num_shards": 2,
+      "achieved_mb_s": 362.94,
+      "packet_rate": 317138.0,
+      "scaling_gain": 1.0,
+      "efficiency": 0.5,
+      "jain_fairness_index": 1.0,
+      "kernel_cpu_pct": 80.5,
+      "dpc_delta_sec": 0.0052,
+      "control_p99_ms": 0.026,
+      "runs": [
+        {
+          "num_shards": 2,
+          "target_mb_s": 500,
+          "achieved_mb_s": 370.35,
+          "packet_rate": 323620.7,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.003,
+          "latency_p95_ms": 0.0036,
+          "latency_p99_ms": 0.0046,
+          "control_latency_p99_ms": 0.0419,
+          "user_cpu_pct": 30.86,
+          "kernel_cpu_pct": 69.44,
+          "dpc_delta_sec": 0.0156,
+          "isr_delta_sec": 0.0156,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            32768,
+            32768
+          ],
+          "active_cores_count": 7,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0469,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0469,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0156
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        },
+        {
+          "num_shards": 2,
+          "target_mb_s": 500,
+          "achieved_mb_s": 364.63,
+          "packet_rate": 318615.4,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.003,
+          "latency_p95_ms": 0.0042,
+          "latency_p99_ms": 0.0053,
+          "control_latency_p99_ms": 0.0178,
+          "user_cpu_pct": 22.79,
+          "kernel_cpu_pct": 83.56,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0156,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            32768,
+            32768
+          ],
+          "active_cores_count": 5,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0469,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0938,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        },
+        {
+          "num_shards": 2,
+          "target_mb_s": 500,
+          "achieved_mb_s": 353.83,
+          "packet_rate": 309178.0,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.0031,
+          "latency_p95_ms": 0.0043,
+          "latency_p99_ms": 0.0055,
+          "control_latency_p99_ms": 0.0198,
+          "user_cpu_pct": 7.37,
+          "kernel_cpu_pct": 88.46,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0312,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            32768,
+            32768
+          ],
+          "active_cores_count": 5,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.0625,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    "4": {
+      "num_shards": 4,
+      "achieved_mb_s": 357.08,
+      "packet_rate": 312021.6,
+      "scaling_gain": 0.98,
+      "efficiency": 0.245,
+      "jain_fairness_index": 1.0,
+      "kernel_cpu_pct": 79.3,
+      "dpc_delta_sec": 0.0,
+      "control_p99_ms": 0.026,
+      "runs": [
+        {
+          "num_shards": 4,
+          "target_mb_s": 500,
+          "achieved_mb_s": 359.85,
+          "packet_rate": 314442.0,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.003,
+          "latency_p95_ms": 0.0039,
+          "latency_p99_ms": 0.0054,
+          "control_latency_p99_ms": 0.0184,
+          "user_cpu_pct": 29.99,
+          "kernel_cpu_pct": 59.98,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0156,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            16384,
+            16384,
+            16384,
+            16384
+          ],
+          "active_cores_count": 4,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.0469,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.1406,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        },
+        {
+          "num_shards": 4,
+          "target_mb_s": 500,
+          "achieved_mb_s": 358.93,
+          "packet_rate": 313638.7,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.0031,
+          "latency_p95_ms": 0.0039,
+          "latency_p99_ms": 0.0043,
+          "control_latency_p99_ms": 0.0298,
+          "user_cpu_pct": 7.48,
+          "kernel_cpu_pct": 89.73,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            16384,
+            16384,
+            16384,
+            16384
+          ],
+          "active_cores_count": 6,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.125,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.1094,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        },
+        {
+          "num_shards": 4,
+          "target_mb_s": 500,
+          "achieved_mb_s": 352.46,
+          "packet_rate": 307984.1,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.003,
+          "latency_p95_ms": 0.0043,
+          "latency_p99_ms": 0.0062,
+          "control_latency_p99_ms": 0.0296,
+          "user_cpu_pct": 7.34,
+          "kernel_cpu_pct": 88.11,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0312,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            16384,
+            16384,
+            16384,
+            16384
+          ],
+          "active_cores_count": 4,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.125,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0469,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    "8": {
+      "num_shards": 8,
+      "achieved_mb_s": 359.04,
+      "packet_rate": 313734.3,
+      "scaling_gain": 0.99,
+      "efficiency": 0.124,
+      "jain_fairness_index": 1.0,
+      "kernel_cpu_pct": 87.4,
+      "dpc_delta_sec": 0.0052,
+      "control_p99_ms": 0.028,
+      "runs": [
+        {
+          "num_shards": 8,
+          "target_mb_s": 500,
+          "achieved_mb_s": 356.14,
+          "packet_rate": 311202.5,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.0031,
+          "latency_p95_ms": 0.004,
+          "latency_p99_ms": 0.0055,
+          "control_latency_p99_ms": 0.0407,
+          "user_cpu_pct": 14.84,
+          "kernel_cpu_pct": 81.62,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0312,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          "active_cores_count": 6,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.125,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        },
+        {
+          "num_shards": 8,
+          "target_mb_s": 500,
+          "achieved_mb_s": 350.64,
+          "packet_rate": 306392.0,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.0031,
+          "latency_p95_ms": 0.0048,
+          "latency_p99_ms": 0.0054,
+          "control_latency_p99_ms": 0.0265,
+          "user_cpu_pct": 21.91,
+          "kernel_cpu_pct": 80.35,
+          "dpc_delta_sec": 0.0156,
+          "isr_delta_sec": 0.0312,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          "active_cores_count": 8,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.0938,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.1094,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0156
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        },
+        {
+          "num_shards": 8,
+          "target_mb_s": 500,
+          "achieved_mb_s": 370.34,
+          "packet_rate": 323608.5,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.003,
+          "latency_p95_ms": 0.0039,
+          "latency_p99_ms": 0.0059,
+          "control_latency_p99_ms": 0.0163,
+          "user_cpu_pct": 0.0,
+          "kernel_cpu_pct": 100.3,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0312,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          "active_cores_count": 6,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0938,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0625,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    "16": {
+      "num_shards": 16,
+      "achieved_mb_s": 365.91,
+      "packet_rate": 319733.2,
+      "scaling_gain": 1.01,
+      "efficiency": 0.063,
+      "jain_fairness_index": 1.0,
+      "kernel_cpu_pct": 81.5,
+      "dpc_delta_sec": 0.0104,
+      "control_p99_ms": 0.019,
+      "runs": [
+        {
+          "num_shards": 16,
+          "target_mb_s": 500,
+          "achieved_mb_s": 355.83,
+          "packet_rate": 310930.9,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.003,
+          "latency_p95_ms": 0.0041,
+          "latency_p99_ms": 0.0059,
+          "control_latency_p99_ms": 0.0193,
+          "user_cpu_pct": 14.83,
+          "kernel_cpu_pct": 66.72,
+          "dpc_delta_sec": 0.0312,
+          "isr_delta_sec": 0.0156,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096
+          ],
+          "active_cores_count": 8,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0156
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.0938,
+              "dpc_sec": 0.0156
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        },
+        {
+          "num_shards": 16,
+          "target_mb_s": 500,
+          "achieved_mb_s": 375.89,
+          "packet_rate": 328457.3,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.003,
+          "latency_p95_ms": 0.0036,
+          "latency_p99_ms": 0.0042,
+          "control_latency_p99_ms": 0.0182,
+          "user_cpu_pct": 7.83,
+          "kernel_cpu_pct": 86.14,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0312,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096
+          ],
+          "active_cores_count": 9,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0469,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.0625,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.1094,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            }
+          ]
+        },
+        {
+          "num_shards": 16,
+          "target_mb_s": 500,
+          "achieved_mb_s": 366.0,
+          "packet_rate": 319811.4,
+          "packet_loss": 0,
+          "latency_p50_ms": 0.003,
+          "latency_p95_ms": 0.0039,
+          "latency_p99_ms": 0.0051,
+          "control_latency_p99_ms": 0.0182,
+          "user_cpu_pct": 7.62,
+          "kernel_cpu_pct": 91.5,
+          "dpc_delta_sec": 0.0,
+          "isr_delta_sec": 0.0,
+          "jain_fairness_index": 1.0,
+          "shard_packet_distribution": [
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096,
+            4096
+          ],
+          "active_cores_count": 7,
+          "core_metrics": [
+            {
+              "core": 0,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 1,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 2,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 3,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 4,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 5,
+              "system_sec": 0.1094,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 6,
+              "system_sec": 0.1562,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 7,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 8,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 9,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 10,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 11,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 12,
+              "system_sec": 0.0312,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 13,
+              "system_sec": 0.0,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 14,
+              "system_sec": 0.0156,
+              "dpc_sec": 0.0
+            },
+            {
+              "core": 15,
+              "system_sec": 0.0781,
+              "dpc_sec": 0.0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "affinity_matrix": {
+    "1": {
+      "no_affinity_mb_s": 367.08,
+      "pinned_affinity_mb_s": 332.37,
+      "pinned_cores": [
+        0
+      ],
+      "gain_with_affinity": 0.91
+    },
+    "2": {
+      "no_affinity_mb_s": 366.0,
+      "pinned_affinity_mb_s": 332.23,
+      "pinned_cores": [
+        0,
+        1
+      ],
+      "gain_with_affinity": 0.91
+    },
+    "4": {
+      "no_affinity_mb_s": 369.38,
+      "pinned_affinity_mb_s": 348.24,
+      "pinned_cores": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "gain_with_affinity": 0.94
+    },
+    "8": {
+      "no_affinity_mb_s": 366.84,
+      "pinned_affinity_mb_s": 365.95,
+      "pinned_cores": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "gain_with_affinity": 1.0
+    },
+    "16": {
+      "no_affinity_mb_s": 357.66,
+      "pinned_affinity_mb_s": 364.08,
+      "pinned_cores": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "gain_with_affinity": 1.02
+    }
+  },
+  "partitioning_strategies": {
+    "round_robin": {
+      "strategy": "round_robin",
+      "jain_fairness": 0.9976,
+      "total_packets": 100,
+      "drops": 0
+    },
+    "hash_stream": {
+      "strategy": "hash_stream",
+      "jain_fairness": 0.9819,
+      "total_packets": 100,
+      "drops": 0
+    },
+    "hash_flow": {
+      "strategy": "hash_flow",
+      "jain_fairness": 0.9697,
+      "total_packets": 100,
+      "drops": 0
+    }
+  },
+  "compare_modes": [
+    {
+      "mode": "Mode A: 1 socket / no affinity",
+      "num_shards": 1,
+      "throughput_mb_s": 371.55,
+      "packet_rate": 324669.5,
+      "latency_p95_ms": 0.0035,
+      "control_p99_ms": 0.1723,
+      "packet_loss": 0
+    },
+    {
+      "mode": "Mode B: 1 socket / affinity [0]",
+      "num_shards": 1,
+      "throughput_mb_s": 328.11,
+      "packet_rate": 286710.8,
+      "latency_p95_ms": 0.0053,
+      "control_p99_ms": 0.0268,
+      "packet_loss": 0
+    },
+    {
+      "mode": "Mode C: 2 sockets",
+      "num_shards": 2,
+      "throughput_mb_s": 360.41,
+      "packet_rate": 314928.1,
+      "latency_p95_ms": 0.0038,
+      "control_p99_ms": 0.0208,
+      "packet_loss": 0
+    },
+    {
+      "mode": "Mode D: 4 sockets",
+      "num_shards": 4,
+      "throughput_mb_s": 363.26,
+      "packet_rate": 317420.0,
+      "latency_p95_ms": 0.0039,
+      "control_p99_ms": 0.0152,
+      "packet_loss": 0
+    },
+    {
+      "mode": "Mode E: 8 sockets",
+      "num_shards": 8,
+      "throughput_mb_s": 355.61,
+      "packet_rate": 310733.7,
+      "latency_p95_ms": 0.0041,
+      "control_p99_ms": 0.0202,
+      "packet_loss": 0
+    },
+    {
+      "mode": "Mode F: 16 sockets",
+      "num_shards": 16,
+      "throughput_mb_s": 358.86,
+      "packet_rate": 313579.4,
+      "latency_p95_ms": 0.004,
+      "control_p99_ms": 0.0165,
+      "packet_loss": 0
+    }
+  ]
+}

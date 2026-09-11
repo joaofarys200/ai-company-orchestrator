@@ -12,6 +12,8 @@ import {
   Cpu,
   FileCode,
   FolderOpen,
+  Database,
+  GitCommit,
   GitPullRequest,
   GraduationCap,
   KanbanSquare,
@@ -20,6 +22,7 @@ import {
   Loader2,
   MessageSquare,
   MoreHorizontal,
+  Network,
   Play,
   Plus,
   RefreshCw,
@@ -35,19 +38,22 @@ import {
   Undo2,
   WandSparkles,
   X,
+  Zap,
   type LucideIcon,
 } from 'lucide-react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import { MissionPlanner } from '../planner';
+import { MissionUnderstandingView, MissionTimelineView, CheckpointTimelineView, RealUserMissionView, MissionControlCenter } from '../missions';
 import { LecturesPanel } from '../lectures/LecturesPanel';
 import { SentinelDashboard } from '../sentinel/SentinelDashboard';
 import { Modal } from '../../components/Modal';
+import { ProjectArchitectureView } from './ProjectArchitectureView';
 
 interface WorkspaceViewerProps {
   onClose?: () => void;
 }
 
-type TabType = 'kanban' | 'debates' | 'files' | 'preview' | 'terminal' | 'coding' | 'knowledge' | 'rules' | 'planner' | 'lectures' | 'sentinel';
+type TabType = 'kanban' | 'debates' | 'files' | 'architecture' | 'preview' | 'terminal' | 'coding' | 'knowledge' | 'rules' | 'planner' | 'mission_control' | 'mission_understanding' | 'mission_timeline' | 'checkpoint_timeline' | 'real_user_missions' | 'lectures' | 'sentinel';
 
 const PANEL = 'bg-[#0f1b20]/80 border border-[#a1bebf]/15 rounded-md shadow-[0_16px_50px_rgba(0,0,0,0.28)]';
 const SUBTLE_PANEL = 'bg-[#a1bebf]/[0.045] border border-[#a1bebf]/15 rounded-md';
@@ -67,7 +73,7 @@ const PRIMARY_SECTIONS: Array<{ id: WorkspaceSection; label: string; icon: Lucid
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard, defaultTab: 'kanban' },
   { id: 'code', label: 'Código', icon: Code2, defaultTab: 'files' },
   { id: 'run', label: 'Executar', icon: Rocket, defaultTab: 'preview' },
-  { id: 'missions', label: 'Missões', icon: Activity, defaultTab: 'planner' },
+  { id: 'missions', label: 'Missões', icon: Activity, defaultTab: 'mission_control' },
   { id: 'learning', label: 'Aulas', icon: GraduationCap, defaultTab: 'lectures' },
   { id: 'sentinel', label: 'Segurança', icon: Shield, defaultTab: 'sentinel' },
   { id: 'more', label: 'Mais', icon: MoreHorizontal, defaultTab: 'debates' },
@@ -77,13 +83,21 @@ const SECONDARY_TABS: Record<WorkspaceSection, Array<{ id: TabType; label: strin
   overview: [],
   code: [
     { id: 'files', label: 'Ficheiros', icon: FileCode },
+    { id: 'architecture', label: 'Arquitetura & AST', icon: Network },
     { id: 'coding', label: 'Alteração', icon: GitPullRequest },
   ],
   run: [
     { id: 'preview', label: 'Preview', icon: Play },
     { id: 'terminal', label: 'Consola', icon: Terminal },
   ],
-  missions: [],
+  missions: [
+    { id: 'mission_control', label: 'Mission Control Center (Fase 35)', icon: LayoutDashboard },
+    { id: 'real_user_missions', label: 'Real User Missions (Fase 34)', icon: Sparkles },
+    { id: 'mission_understanding', label: 'Mission Understanding', icon: Brain },
+    { id: 'mission_timeline', label: 'Timeline de Execução', icon: GitCommit },
+    { id: 'checkpoint_timeline', label: 'Checkpoints & State', icon: Database },
+    { id: 'planner', label: 'Execução & DAG', icon: Activity },
+  ],
   learning: [
     { id: 'lectures', label: 'Aulas & Cornell', icon: GraduationCap },
   ],
@@ -239,10 +253,12 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     createCodingSession,
     applyCodingSession,
     rollbackCodingSession,
+    architectureSnapshot,
   } = useWebSocket();
 
   const [activeTab, setActiveTab] = useState<TabType>('kanban');
   const [selectedFile, setSelectedFile] = useState('');
+  const [selectedLine, setSelectedLine] = useState<number | undefined>(undefined);
   const [previewKey, setPreviewKey] = useState(0);
   const [noteSearch, setNoteSearch] = useState('');
   const [selectedNoteName, setSelectedNoteName] = useState('');
@@ -286,7 +302,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
   );
   const activeSection: WorkspaceSection = activeTab === 'kanban'
     ? 'overview'
-    : activeTab === 'files' || activeTab === 'coding'
+    : activeTab === 'files' || activeTab === 'architecture' || activeTab === 'coding'
       ? 'code'
       : activeTab === 'preview' || activeTab === 'terminal'
         ? 'run'
@@ -294,7 +310,25 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
           ? 'missions'
           : activeTab === 'lectures'
             ? 'learning'
-            : 'more';
+            : activeTab === 'sentinel'
+              ? 'sentinel'
+              : 'more';
+
+  const totalAstSymbols = useMemo<number>(() => {
+    if (typeof architectureSnapshot?.symbols?.total_count === 'number') {
+      return architectureSnapshot.symbols.total_count;
+    }
+    const candidate = projectContext?.ast_index?.symbol_count;
+    if (typeof candidate === 'number') {
+      return candidate;
+    }
+    if (astState) {
+      return Object.values(astState).reduce((acc, file) => {
+        return acc + (file.classes?.length || 0) + (file.functions?.length || 0);
+      }, 0);
+    }
+    return 0;
+  }, [architectureSnapshot, projectContext, astState]);
   const normalizeSearch = (text: string) => (
     text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
   );
@@ -318,7 +352,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
 
   useEffect(() => {
     if (projects.length > 0 && !projectContext) {
-      const defaultProj = projects.find((p) => p.project_id === 'task-app') || projects[0];
+      const defaultProj = projects.find((p) => p.project_id === 'dina') || projects.find((p) => p.project_id === 'task-app') || projects[0];
       if (defaultProj) {
         openProject(defaultProj.project_id);
       }
@@ -361,13 +395,21 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     }
   }, [fileSelectionProjectId, filenames, filenamesKey, projectContext?.project_id, projectFiles, selectedFile]);
 
-  const activateTab = (tab: TabType) => {
+  const activateTab = useCallback((tab: TabType) => {
     setActiveTab(tab);
     if (tab === 'knowledge') getNotes();
-    if (tab === 'files') {
+    if (tab === 'files' || tab === 'architecture') {
       getAstState();
     }
-  };
+  }, [getAstState, getNotes]);
+
+  useEffect(() => {
+    const win = window as unknown as Record<string, unknown>;
+    win.__setActiveTab = activateTab;
+    return () => {
+      delete win.__setActiveTab;
+    };
+  }, [activateTab]);
 
   const activateSection = (section: WorkspaceSection) => {
     setProjectPickerOpen(false);
@@ -383,8 +425,10 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     setProjectSearch('');
   };
 
-  const handleFileSelect = useCallback((filename: string) => {
+  const handleFileSelect = useCallback((filename: string, line?: number) => {
     setSelectedFile(filename);
+    setSelectedLine(line);
+    setActiveTab('files');
   }, []);
 
   const renderCodeInsights = () => (
@@ -737,9 +781,43 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                       {Object.keys(projectFiles).length}
                     </span>
                   )}
+                  {tab.id === 'architecture' && totalAstSymbols > 0 && (
+                    <span className="ml-1 rounded border border-cyan-400/25 bg-cyan-500/15 px-1.5 py-0.2 text-[10px] font-mono text-cyan-300">
+                      {totalAstSymbols}
+                    </span>
+                  )}
                 </button>
               );
             })}
+
+            {activeSection === 'code' && (
+              <div className="ml-auto hidden md:flex items-center gap-2 text-xs">
+                {projectContext?.entrypoints && projectContext.entrypoints.length > 0 && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-emerald-400/20 bg-emerald-400/10 text-emerald-300 text-[11px]">
+                    <Zap className="h-3 w-3 text-emerald-400" />
+                    <span className="text-gray-400 font-medium">Entrypoint:</span>
+                    <button
+                      onClick={() => handleFileSelect(projectContext.entrypoints[0])}
+                      className="font-mono font-semibold text-emerald-200 hover:text-white hover:underline transition-colors"
+                      title={`Abrir ficheiro de entrada ${projectContext.entrypoints[0]}`}
+                    >
+                      {projectContext.entrypoints[0]}
+                    </button>
+                  </div>
+                )}
+                {totalAstSymbols > 0 && (
+                  <button
+                    onClick={() => activateTab('architecture')}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-cyan-400/20 bg-cyan-400/10 text-cyan-300 text-[11px] hover:bg-cyan-400/15 transition-colors"
+                    title="Ver mapa visual completo de Arquitetura e AST"
+                  >
+                    <Network className="h-3 w-3 text-cyan-400" />
+                    <span className="font-mono font-semibold">{totalAstSymbols} símbolos</span>
+                    <span className="text-[10px] text-cyan-200/70 border-l border-cyan-400/30 pl-1">AST Ativo</span>
+                  </button>
+                )}
+              </div>
+            )}
           </nav>
         )}
       </header>
@@ -927,9 +1005,17 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                     onDeleteFile={deleteProjectFile}
                     onOpenChanges={() => activateTab('coding')}
                     onOpenPreview={() => activateTab('preview')}
+                    onOpenArchitecture={() => activateTab('architecture')}
                     isSaving={isSavingProjectFile}
                     saveState={projectFileSaveState}
                     insights={renderCodeInsights()}
+                    entrypoints={projectContext.entrypoints || []}
+                    astState={astState}
+                    initialLine={selectedLine}
+                    architectureSnapshot={architectureSnapshot}
+                    projectContext={projectContext}
+                    onReindex={reindexProject}
+                    isIndexing={isIndexingProject}
                   />
                 </React.Suspense>
               ) : (
@@ -957,6 +1043,17 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                   </div>
                 </div>
               )}
+            </ViewFrame>
+          )}
+
+          {activeTab === 'architecture' && (
+            <ViewFrame key="architecture" className="h-full overflow-hidden">
+              <ProjectArchitectureView
+                onNavigateToFile={(file, line) => {
+                  handleFileSelect(file, line);
+                }}
+                onOpenChanges={() => activateTab('coding')}
+              />
             </ViewFrame>
           )}
 
@@ -1483,6 +1580,50 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                   </article>
                 ))}
               </MemoryColumn>
+            </ViewFrame>
+          )}
+
+          {activeTab === 'mission_control' && (
+            <ViewFrame key="mission_control" className="overflow-hidden">
+              <MissionControlCenter
+                onOpenInCode={(filePath, line) => {
+                  setSelectedFile(filePath);
+                  if (line !== undefined) setSelectedLine(line);
+                  setActiveTab('files');
+                }}
+                onOpenArchitecture={() => {
+                  setActiveTab('architecture');
+                }}
+              />
+            </ViewFrame>
+          )}
+
+          {activeTab === 'mission_understanding' && (
+            <ViewFrame key="mission_understanding" className="overflow-hidden">
+              <MissionUnderstandingView
+                understanding={null}
+                onConfirm={(mId) => {
+                  console.log('Mission confirmed:', mId);
+                }}
+              />
+            </ViewFrame>
+          )}
+
+          {activeTab === 'mission_timeline' && (
+            <ViewFrame key="mission_timeline" className="overflow-hidden">
+              <MissionTimelineView />
+            </ViewFrame>
+          )}
+
+          {activeTab === 'checkpoint_timeline' && (
+            <ViewFrame key="checkpoint_timeline" className="overflow-hidden">
+              <CheckpointTimelineView />
+            </ViewFrame>
+          )}
+
+          {activeTab === 'real_user_missions' && (
+            <ViewFrame key="real_user_missions" className="overflow-hidden">
+              <RealUserMissionView />
             </ViewFrame>
           )}
 

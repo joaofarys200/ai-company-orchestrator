@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-09-08T12:32:40Z",
+  "phase": "Phase 29",
+  "title": "Local Multi-Process End-to-End Transport Verification",
+  "execution_mode": "LOCAL_MULTI_PROCESS",
+  "physical_multi_host_test": "NOT_AVAILABLE",
+  "evidence_classification": {
+    "execution_mode": "MEASURED",
+    "task_throughput": "MEASURED",
+    "evidence_integrity": "MEASURED",
+    "simulated_entries": 0
+  },
+  "coordinator": {
+    "node_id": "coordinator_proc",
+    "port": 9875,
+    "tasks_assigned": 10,
+    "tasks_completed": 10,
+    "checkpoint_sha256": "c1d3e6aa785aa02c6b94c423705a6bffdb391634998f51e30dfbd6a91e9c53f4",
+    "duration_sec": 0.89,
+    "exit_code": 0
+  },
+  "worker": {
+    "node_id": "worker_proc",
+    "port": 9876,
+    "tasks_processed": 10,
+    "exit_code": 0
+  },
+  "invariants": {
+    "duplicate_execution": 0,
+    "duplicate_side_effect": 0,
+    "task_identity_preserved": true,
+    "checkpoint_identity_preserved": true,
+    "payload_integrity": true,
+    "ordering_within_stream": true,
+    "reconnect_without_mission_restart": true
+  },
+  "status": "PASS"
+}

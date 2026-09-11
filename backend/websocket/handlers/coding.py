@@ -60,8 +60,7 @@ class CodingSessionWebSocketHandler:
                 .create_assisted_session(project_id, objective)
             )
             session.selected_project_id = project_id
-            await self.connections.send(
-                websocket,
+            await self.connections.broadcast(
                 {
                     "type": "coding_session",
                     "data": coding_session.to_dict(),
@@ -126,8 +125,7 @@ class CodingSessionWebSocketHandler:
                 project_id,
                 message.get("session_id"),
             )
-            await self.connections.send(
-                websocket,
+            await self.connections.broadcast(
                 {
                     "type": "coding_session",
                     "data": coding_session.to_dict(),
@@ -182,8 +180,7 @@ class CodingSessionWebSocketHandler:
                 message.get("session_id"),
                 bool(message.get("confirmed")),
             )
-            await self.connections.send(
-                websocket,
+            await self.connections.broadcast(
                 {
                     "type": "coding_session",
                     "data": coding_session.to_dict(),

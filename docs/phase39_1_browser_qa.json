@@ -1,0 +1,82 @@
+{
+  "phase": 39.1,
+  "phase_name": "TypeScript Dependency Intelligence & Predictive Graph Accuracy",
+  "timestamp_iso": "2026-09-11T12:44:30Z",
+  "browser": "Microsoft Edge (msedge.exe)",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "url": "http://127.0.0.1:8000",
+  "scenarios_passed": 10,
+  "total_scenarios": 10,
+  "assertions": [
+    {
+      "id": "ASSERT_01_OVERVIEW",
+      "name": "Mission Control Overview rendered",
+      "passed": true
+    },
+    {
+      "id": "ASSERT_02_MODAL",
+      "name": "Intent Editor Modal opened",
+      "passed": true
+    },
+    {
+      "id": "ASSERT_03_PREDICTION",
+      "name": "Predictive Impact metadata rendered",
+      "passed": true
+    },
+    {
+      "id": "ASSERT_04_ZERO_FALSE_SUCCESS",
+      "name": "Zero False Success warning captured",
+      "passed": true
+    },
+    {
+      "id": "ASSERT_05_REPLAN",
+      "name": "Intent applied and version bumped",
+      "passed": true
+    },
+    {
+      "id": "ASSERT_06_PREDICTED_PANEL",
+      "name": "Predicted Impact Panel rendered",
+      "passed": true
+    },
+    {
+      "id": "ASSERT_07_FILES_TASKS",
+      "name": "Predicted metrics cards verified",
+      "passed": true
+    },
+    {
+      "id": "ASSERT_08_CAUSALITY",
+      "name": "Causal explainability visible",
+      "passed": true
+    },
+    {
+      "id": "ASSERT_09_VS_ACTUAL",
+      "name": "Prediction vs Actual Panel rendered",
+      "passed": true
+    },
+    {
+      "id": "ASSERT_10_PRECISION_RECALL",
+      "name": "Precision and Recall cards verified",
+      "passed": true
+    }
+  ],
+  "console_errors_count": 0,
+  "console_errors": [],
+  "network_errors_count": 0,
+  "network_errors": [],
+  "screenshots": [
+    "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase39_1\\01_mission_control_overview.png",
+    "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase39_1\\02_intent_editor_modal.png",
+    "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase39_1\\03_predictive_impact_preview.png",
+    "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase39_1\\04_evidence_invalidation_warning.png",
+    "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase39_1\\05_intent_applied_replan.png",
+    "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase39_1\\06_predicted_impact_panel.png",
+    "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase39_1\\07_predicted_files_and_tasks.png",
+    "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase39_1\\08_causal_explainability_chain.png",
+    "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase39_1\\09_prediction_vs_actual_panel.png",
+    "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase39_1\\10_calibration_precision_recall.png"
+  ],
+  "verdict": "PASSED"
+}

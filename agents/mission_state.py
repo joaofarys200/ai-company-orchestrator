@@ -1362,7 +1362,7 @@ class MissionStateStore:
         parts = Path(path).parts
         if "missions" in parts:
             try:
-                idx = parts.index("missions")
+                idx = len(parts) - 1 - parts[::-1].index("missions")
                 if len(parts) >= idx + 3:
                     mission_id = parts[idx + 1]
                     project_id = parts[idx - 1] if idx >= 1 else "default"

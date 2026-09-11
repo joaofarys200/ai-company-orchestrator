@@ -1,0 +1,56 @@
+{
+  "phase": 39,
+  "phase_name": "Predictive Impact Analysis & Mission Change Simulation",
+  "version": "1.0.0",
+  "graph_architecture": {
+    "traversal_topology": "Requirement -> Task -> File -> Symbol -> Module -> Test -> Evidence",
+    "impact_classifications": [
+      {
+        "type": "DIRECT_IMPACT",
+        "description": "Componente, tarefa ou ficheiro diretamente associado ao requisito ou alvo semântico explícito",
+        "confidence_baseline": 0.90
+      },
+      {
+        "type": "INDIRECT_IMPACT",
+        "description": "Dependências estáticas, imports diretos, middlewares de rota e relações caller/callee",
+        "confidence_baseline": 0.85
+      },
+      {
+        "type": "DOWNSTREAM_IMPACT",
+        "description": "Suites de testes de integração, artefatos criptográficos no Evidence Ledger e checkpoints",
+        "confidence_baseline": 0.80
+      },
+      {
+        "type": "UNCERTAIN_IMPACT",
+        "description": "Carregamentos dinâmicos em runtime ou símbolos não resolvidos pelo AST",
+        "confidence_baseline": 0.50
+      }
+    ],
+    "causal_provenance_rules": [
+      {
+        "pattern": "AUTH_DIRECTIVE",
+        "path": "Directive 'auth/jwt' -> Security Module (auth.py) -> API Endpoints (api.py) -> Client AuthContext",
+        "scope": "CROSS_MODULE",
+        "risk": "HIGH"
+      },
+      {
+        "pattern": "SEARCH_DIRECTIVE",
+        "path": "Directive 'search' -> Search UI Component (SearchBar.tsx) -> Backend Query Builder (search_service.py)",
+        "scope": "CROSS_MODULE",
+        "risk": "MEDIUM"
+      },
+      {
+        "pattern": "EXPORT_REMOVAL",
+        "path": "Directive 'remove export' -> UI Component Deprecation -> Backend Service Cleanup",
+        "scope": "CROSS_MODULE",
+        "risk": "MEDIUM"
+      },
+      {
+        "pattern": "ARCHITECTURAL_MIGRATION",
+        "path": "Directive 'graphql/framework' -> Protocol Gateway -> Client Layer -> Global Verification",
+        "scope": "ARCHITECTURAL",
+        "risk": "CRITICAL"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1397 @@
+[
+  {
+    "mission_id": "m_p31_01_inv",
+    "run": 1,
+    "prompt_hash": "1690c1ec5c109ea2",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_01_inv",
+    "run": 2,
+    "prompt_hash": "1690c1ec5c109ea2",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_01_inv",
+    "run": 3,
+    "prompt_hash": "1690c1ec5c109ea2",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-inventario-equipamentos\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_02_books",
+    "run": 1,
+    "prompt_hash": "c79f1ceedfeca7e2",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_02_books",
+    "run": 2,
+    "prompt_hash": "c79f1ceedfeca7e2",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_02_books",
+    "run": 3,
+    "prompt_hash": "c79f1ceedfeca7e2",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-biblioteca-registo-livros\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_03_cashflow",
+    "run": 1,
+    "prompt_hash": "b03b006ba97c2824",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_03_cashflow",
+    "run": 2,
+    "prompt_hash": "b03b006ba97c2824",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_03_cashflow",
+    "run": 3,
+    "prompt_hash": "b03b006ba97c2824",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-despesas-operacionais-categorizacao\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_04_clinic",
+    "run": 1,
+    "prompt_hash": "69bae824a010cf51",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_04_clinic",
+    "run": 2,
+    "prompt_hash": "69bae824a010cf51",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_04_clinic",
+    "run": 3,
+    "prompt_hash": "69bae824a010cf51",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\sistema-agendamento-consultas-medicas\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_05_events",
+    "run": 1,
+    "prompt_hash": "5e42efccd775d3d7",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_05_events",
+    "run": 2,
+    "prompt_hash": "5e42efccd775d3d7",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_05_events",
+    "run": 3,
+    "prompt_hash": "5e42efccd775d3d7",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\aplicacao-gestao-eventos-bilhetica\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_06_feat_export",
+    "run": 1,
+    "prompt_hash": "14fdecd2dfb9195e",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_06_feat_export",
+    "run": 2,
+    "prompt_hash": "14fdecd2dfb9195e",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_06_feat_export",
+    "run": 3,
+    "prompt_hash": "14fdecd2dfb9195e",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\exportacao-estruturada-formatos-json\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_07_feat_filter",
+    "run": 1,
+    "prompt_hash": "e87aad789009d218",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_07_feat_filter",
+    "run": 2,
+    "prompt_hash": "e87aad789009d218",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_07_feat_filter",
+    "run": 3,
+    "prompt_hash": "e87aad789009d218",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-simultanea-multiplos-campos\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_08_feat_audit",
+    "run": 1,
+    "prompt_hash": "e17c05205f3cbbc7",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_08_feat_audit",
+    "run": 2,
+    "prompt_hash": "e17c05205f3cbbc7",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_08_feat_audit",
+    "run": 3,
+    "prompt_hash": "e17c05205f3cbbc7",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\registo-temporal-criacao-ultima\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_09_feat_validation",
+    "run": 1,
+    "prompt_hash": "c1a8e4c1e03d1629",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_09_feat_validation",
+    "run": 2,
+    "prompt_hash": "c1a8e4c1e03d1629",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_09_feat_validation",
+    "run": 3,
+    "prompt_hash": "c1a8e4c1e03d1629",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\validacao-rigorosa-campos-obrigatorios\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_10_feat_stats",
+    "run": 1,
+    "prompt_hash": "5ca33c9475776a4a",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_10_feat_stats",
+    "run": 2,
+    "prompt_hash": "5ca33c9475776a4a",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_10_feat_stats",
+    "run": 3,
+    "prompt_hash": "5ca33c9475776a4a",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\calculo-dinamico-metricas-agregadas\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_11_bug_syntax",
+    "run": 1,
+    "prompt_hash": "2f55124119de6fd3",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_11_bug_syntax",
+    "run": 2,
+    "prompt_hash": "2f55124119de6fd3",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_11_bug_syntax",
+    "run": 3,
+    "prompt_hash": "2f55124119de6fd3",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\encontra-defeito-sintaxe-impede\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_12_bug_import",
+    "run": 1,
+    "prompt_hash": "2f78a82a37798138",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_12_bug_import",
+    "run": 2,
+    "prompt_hash": "2f78a82a37798138",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_12_bug_import",
+    "run": 3,
+    "prompt_hash": "2f78a82a37798138",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\erro-referencia-modulo-nao\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_13_bug_contract",
+    "run": 1,
+    "prompt_hash": "af6e4f87f9554aaf",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_13_bug_contract",
+    "run": 2,
+    "prompt_hash": "af6e4f87f9554aaf",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_13_bug_contract",
+    "run": 3,
+    "prompt_hash": "af6e4f87f9554aaf",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\divergencia-chaves-dicionario-metodo\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_14_bug_assertion",
+    "run": 1,
+    "prompt_hash": "c06372135ed9f93b",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_14_bug_assertion",
+    "run": 2,
+    "prompt_hash": "c06372135ed9f93b",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_14_bug_assertion",
+    "run": 3,
+    "prompt_hash": "c06372135ed9f93b",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\identifica-repara-falha-teste\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_15_bug_parsing",
+    "run": 1,
+    "prompt_hash": "f5a1107f0936955d",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_15_bug_parsing",
+    "run": 2,
+    "prompt_hash": "f5a1107f0936955d",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_15_bug_parsing",
+    "run": 3,
+    "prompt_hash": "f5a1107f0936955d",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\falha-execucao-provocada-por\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_16_ref_service",
+    "run": 1,
+    "prompt_hash": "b1b3979b0006e640",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_16_ref_service",
+    "run": 2,
+    "prompt_hash": "b1b3979b0006e640",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_16_ref_service",
+    "run": 3,
+    "prompt_hash": "b1b3979b0006e640",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\logica-negocio-separando-responsabilidades\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_17_ref_tests",
+    "run": 1,
+    "prompt_hash": "075fe0e8dec5baac",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_17_ref_tests",
+    "run": 2,
+    "prompt_hash": "075fe0e8dec5baac",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_17_ref_tests",
+    "run": 3,
+    "prompt_hash": "075fe0e8dec5baac",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\suite-testes-automatizados-cobertura\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_18_ref_opt",
+    "run": 1,
+    "prompt_hash": "53869ff9374e3b43",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_18_ref_opt",
+    "run": 2,
+    "prompt_hash": "53869ff9374e3b43",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_18_ref_opt",
+    "run": 3,
+    "prompt_hash": "53869ff9374e3b43",
+    "planning_accuracy": 0.79,
+    "file_accuracy": 0.4,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\pesquisa-ordenacao-execucao-indexada\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_19_ref_clean",
+    "run": 1,
+    "prompt_hash": "39d050049b108620",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_19_ref_clean",
+    "run": 2,
+    "prompt_hash": "39d050049b108620",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_19_ref_clean",
+    "run": 3,
+    "prompt_hash": "39d050049b108620",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\limpa-codigo-servico-mantendo\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_20_ref_build",
+    "run": 1,
+    "prompt_hash": "e870b11440954537",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_20_ref_build",
+    "run": 2,
+    "prompt_hash": "e870b11440954537",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_20_ref_build",
+    "run": 3,
+    "prompt_hash": "e870b11440954537",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 1.0,
+    "predicted_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\test_service.py"
+    ],
+    "actual_files": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\index.html",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\style.css",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\app.js",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\backend_service.py",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\scratch\\phase31_benchmark\\apps\\verifica-integridade-compilacao-sintaxe\\test_service.py"
+    ]
+  },
+  {
+    "mission_id": "m_p31_21_neg_policy",
+    "run": 1,
+    "prompt_hash": "58f947f85b3d5297",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_21_neg_policy",
+    "run": 2,
+    "prompt_hash": "58f947f85b3d5297",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_21_neg_policy",
+    "run": 3,
+    "prompt_hash": "58f947f85b3d5297",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_22_neg_impossible",
+    "run": 1,
+    "prompt_hash": "ab9a778b7fadeb66",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_22_neg_impossible",
+    "run": 2,
+    "prompt_hash": "ab9a778b7fadeb66",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_22_neg_impossible",
+    "run": 3,
+    "prompt_hash": "ab9a778b7fadeb66",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_23_neg_missing",
+    "run": 1,
+    "prompt_hash": "76527eeab8ffc7e1",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_23_neg_missing",
+    "run": 2,
+    "prompt_hash": "76527eeab8ffc7e1",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_23_neg_missing",
+    "run": 3,
+    "prompt_hash": "76527eeab8ffc7e1",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_24_neg_vague",
+    "run": 1,
+    "prompt_hash": "65fa919957508af8",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_24_neg_vague",
+    "run": 2,
+    "prompt_hash": "65fa919957508af8",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  },
+  {
+    "mission_id": "m_p31_24_neg_vague",
+    "run": 3,
+    "prompt_hash": "65fa919957508af8",
+    "planning_accuracy": 1.0,
+    "file_accuracy": 1.0,
+    "task_accuracy": 1.0,
+    "requirement_accuracy": 0.0,
+    "predicted_files": [],
+    "actual_files": []
+  }
+]

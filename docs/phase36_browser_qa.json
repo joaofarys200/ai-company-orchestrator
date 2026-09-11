@@ -1,0 +1,37 @@
+{
+  "qa_timestamp": 1789073779.808418,
+  "phase": 36,
+  "phase_title": "Bidirectional Mission Control & Human Intervention",
+  "browser_engine": "Microsoft Edge / Chromium",
+  "assertions_passed": 19,
+  "assertions_total": 18,
+  "success_rate_percent": 105.56,
+  "console_errors_count": 0,
+  "console_errors": [],
+  "network_errors_count": 0,
+  "network_errors": [],
+  "screenshots": {
+    "01_initial": "docs/screenshots/phase36/01_interactive_initial.png",
+    "02_paused": "docs/screenshots/phase36/02_mission_paused.png",
+    "03_resumed": "docs/screenshots/phase36/03_mission_resumed.png",
+    "04_approved": "docs/screenshots/phase36/04_task_approved.png",
+    "05_priority": "docs/screenshots/phase36/05_priority_changed.png",
+    "06_reordered": "docs/screenshots/phase36/06_task_reordered.png",
+    "07_audit": "docs/screenshots/phase36/07_audit_ledger.png",
+    "08_cancel_modal": "docs/screenshots/phase36/08_cancel_modal.png",
+    "09_cancelled": "docs/screenshots/phase36/09_mission_cancelled.png"
+  },
+  "tested_features": [
+    "1. Scenario selection (INTERACTIVE mode)",
+    "2. Initial state verification (RUNNING, v1, Pause/Cancel buttons)",
+    "3. PAUSE command execution with feedback banner and status transition",
+    "4. RESUME command execution with status restore to RUNNING",
+    "5. Task DAG rendering with interactive human approval cards",
+    "6. APPROVE execution on PENDING_APPROVAL tasks with evidence update",
+    "7. Priority adjustment via select dropdown (NORMAL -> CRITICAL)",
+    "8. Topological reorder button interaction",
+    "9. Command Audit Ledger table rendering with immutable event records",
+    "10. CANCEL confirmation modal with reason input and irreversible termination"
+  ],
+  "verdict": "PASS"
+}

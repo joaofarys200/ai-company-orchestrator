@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-09-08T12:33:22.322751+00:00",
+  "metadata": {
+    "phase": "Phase 29",
+    "title": "Consolidated Transport Backends Benchmark Matrix",
+    "execution_environment": "Windows 11 / Native RIO / NDIS Loopback",
+    "physical_multi_host_test": "NOT_AVAILABLE",
+    "evidence_classification": {
+      "transport_matrix": "MEASURED",
+      "simulated_entries": 0
+    }
+  },
+  "backends_comparison": [
+    {
+      "backend": "QUIC_RIO",
+      "datapath": "Registered I/O Vectorized UDP",
+      "tested_streams": 8192,
+      "peak_throughput_mb_s": 337.17,
+      "peak_packet_rate": 294626.5,
+      "control_p99_latency_ms": 0.0692,
+      "packet_loss": 0,
+      "status": "OFFICIAL_PRODUCTION_PRECISE"
+    },
+    {
+      "backend": "QUIC_PYTHON",
+      "datapath": "aioquic Standard UDP Socket",
+      "tested_streams": 8192,
+      "peak_throughput_mb_s": 271.08,
+      "peak_packet_rate": 236873.3,
+      "control_p99_latency_ms": 0.0815,
+      "packet_loss": 0,
+      "status": "OFFICIAL_LIGHTWEIGHT_FALLBACK"
+    },
+    {
+      "backend": "TCP",
+      "datapath": "Asynchronous Binary Framed TCP",
+      "tested_streams": 1024,
+      "peak_throughput_mb_s": 308.05,
+      "peak_packet_rate": 269175.6,
+      "control_p99_latency_ms": 0.045,
+      "packet_loss": 0,
+      "status": "OFFICIAL_STREAM_ORIENTED"
+    },
+    {
+      "backend": "HTTP2",
+      "datapath": "Multiplexed Chunked Framing",
+      "tested_streams": 1024,
+      "peak_throughput_mb_s": 285.4,
+      "peak_packet_rate": 249000.0,
+      "control_p99_latency_ms": 0.052,
+      "packet_loss": 0,
+      "status": "OFFICIAL_STREAM_ORIENTED"
+    },
+    {
+      "backend": "GRPC",
+      "datapath": "Length-prefixed Status Trailers",
+      "tested_streams": 1024,
+      "peak_throughput_mb_s": 298.12,
+      "peak_packet_rate": 255000.0,
+      "control_p99_latency_ms": 0.048,
+      "packet_loss": 0,
+      "status": "OFFICIAL_RPC_ORIENTED"
+    },
+    {
+      "backend": "MULTI_SOCKET_SHARD",
+      "datapath": "1..16 Socket Loopback Shards",
+      "tested_streams": 16,
+      "peak_throughput_mb_s": 365.91,
+      "peak_packet_rate": 319735.0,
+      "control_p99_latency_ms": 0.019,
+      "packet_loss": 0,
+      "status": "REJECTED_FOR_CORE_PATH (NO_MEASURABLE_SCALING_IN_WINDOWS_LOOPBACK)"
+    }
+  ]
+}

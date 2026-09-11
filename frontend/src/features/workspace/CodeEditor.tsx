@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Editor, { loader, type BeforeMount, type OnMount } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import {
+  Boxes,
   Braces,
   Check,
   ChevronDown,
@@ -18,6 +19,7 @@ import {
   FolderOpen,
   GitPullRequest,
   Layers,
+  Network,
   Palette,
   Play,
   Save,
@@ -26,6 +28,8 @@ import {
   WandSparkles,
   X,
 } from 'lucide-react';
+import type { AstState, AstFileSymbols, ArchitectureSnapshot, ProjectContextData } from '../../protocol/websocket';
+import { CodeIntelligenceHud } from './CodeIntelligenceHud';
 
 type MonacoGlobal = typeof globalThis & {
   MonacoEnvironment?: {
@@ -72,14 +76,22 @@ interface CodeEditorProps {
   rootPath: string;
   files: Record<string, string>;
   selectedFile: string;
-  onSelectFile: (filename: string) => void;
+  onSelectFile: (filename: string, line?: number) => void;
   onSaveFile: (filename: string, content: string) => void;
   onDeleteFile?: (filename: string) => void;
   onOpenChanges: () => void;
   onOpenPreview: () => void;
+  onOpenArchitecture?: () => void;
   isSaving: boolean;
   saveState: SaveState | null;
   insights: React.ReactNode;
+  initialLine?: number;
+  entrypoints?: string[];
+  astState?: AstState | null;
+  architectureSnapshot?: ArchitectureSnapshot | null;
+  projectContext?: ProjectContextData | null;
+  onReindex?: () => void;
+  isIndexing?: boolean;
 }
 
 const languageByExtension: Record<string, string> = {
@@ -157,17 +169,29 @@ function TreeRow({
   onToggle,
   onSelect,
   onDelete,
+  astSymbols,
+  isEntrypoint,
+  astSymbolsMap,
+  entrypointsList,
 }: {
   node: FileTreeNode;
   depth: number;
   selectedFile: string;
   expanded: Set<string>;
   onToggle: (path: string) => void;
-  onSelect: (path: string) => void;
+  onSelect: (path: string, line?: number) => void;
   onDelete?: (path: string) => void;
+  astSymbols?: AstFileSymbols;
+  isEntrypoint?: boolean;
+  astSymbolsMap?: AstState | null;
+  entrypointsList?: string[];
 }) {
   const isExpanded = expanded.has(node.path);
   const selected = node.type === 'file' && node.path === selectedFile;
+  const functions = astSymbols?.functions || [];
+  const classes = astSymbols?.classes || [];
+  const totalSymbols = functions.length + classes.length;
+  const hasSymbols = totalSymbols > 0;
 
   return (
     <>
@@ -197,11 +221,53 @@ function TreeRow({
           </>
         ) : (
           <>
-            <span className="w-3.5 shrink-0" />
+            {hasSymbols ? (
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle(node.path);
+                }}
+                className="p-0.5 -ml-1 text-gray-400 hover:text-cyan-200 cursor-pointer"
+                title={isExpanded ? 'Ocultar símbolos' : 'Mostrar símbolos'}
+              >
+                {isExpanded ? (
+                  <ChevronDown className="h-3 w-3 text-violet-400" />
+                ) : (
+                  <ChevronRight className="h-3 w-3 text-gray-500 group-hover:text-violet-300" />
+                )}
+              </span>
+            ) : (
+              <span className="w-3.5 shrink-0" />
+            )}
             <FileIcon filename={node.name} />
           </>
         )}
         <span className="min-w-0 flex-1 truncate">{node.name}</span>
+
+        {/* Entrypoint indicator */}
+        {isEntrypoint && (
+          <span
+            className="rounded bg-amber-400/15 text-amber-300 border border-amber-400/25 px-1 py-0 text-[9px] font-semibold tracking-wider uppercase shrink-0"
+            title="Ponto de entrada verificado"
+          >
+            Entry
+          </span>
+        )}
+
+        {/* AST symbol count badge */}
+        {hasSymbols && (
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggle(node.path);
+            }}
+            className="rounded bg-violet-400/15 text-violet-300 hover:bg-violet-400/25 border border-violet-400/20 px-1.5 py-0 text-[10px] font-mono font-medium shrink-0 cursor-pointer"
+            title={`${totalSymbols} símbolos mapeados. Clique para expandir.`}
+          >
+            {totalSymbols} {totalSymbols === 1 ? 'sym' : 'syms'}
+          </span>
+        )}
+
         {node.type === 'file' && onDelete && (
           <button
             type="button"
@@ -216,6 +282,8 @@ function TreeRow({
           </button>
         )}
       </button>
+
+      {/* Directory children */}
       {node.type === 'directory' && isExpanded && node.children.map((child) => (
         <TreeRow
           key={`${child.type}-${child.path}`}
@@ -226,8 +294,46 @@ function TreeRow({
           onToggle={onToggle}
           onSelect={onSelect}
           onDelete={onDelete}
+          astSymbols={astSymbolsMap?.[child.path]}
+          isEntrypoint={entrypointsList?.includes(child.path)}
+          astSymbolsMap={astSymbolsMap}
+          entrypointsList={entrypointsList}
         />
       ))}
+
+      {/* Nested AST symbols under file when expanded */}
+      {node.type === 'file' && isExpanded && hasSymbols && (
+        <div className="space-y-0.5 py-0.5">
+          {classes.map((cls, idx) => (
+            <button
+              key={`cls-${idx}`}
+              type="button"
+              onClick={() => onSelect(node.path, cls.line)}
+              className="flex h-6 w-full items-center gap-1.5 pr-2 text-left text-[11px] text-sky-300 hover:bg-sky-400/10 transition-colors"
+              style={{ paddingLeft: `${8 + (depth + 1) * 14}px` }}
+              title={`class ${cls.name}${cls.line ? ` (Linha ${cls.line})` : ''}`}
+            >
+              <Boxes className="h-3 w-3 shrink-0 text-sky-400" />
+              <span className="font-mono truncate">{cls.name}</span>
+              {cls.line && <span className="text-[10px] text-gray-500 font-mono ml-auto">L{cls.line}</span>}
+            </button>
+          ))}
+          {functions.map((fn, idx) => (
+            <button
+              key={`fn-${idx}`}
+              type="button"
+              onClick={() => onSelect(node.path, fn.line)}
+              className="flex h-6 w-full items-center gap-1.5 pr-2 text-left text-[11px] text-violet-300 hover:bg-violet-400/10 transition-colors"
+              style={{ paddingLeft: `${8 + (depth + 1) * 14}px` }}
+              title={`function ${fn.name}()${fn.line ? ` (Linha ${fn.line})` : ''}`}
+            >
+              <Braces className="h-3 w-3 shrink-0 text-violet-400" />
+              <span className="font-mono truncate">{fn.name}()</span>
+              {fn.line && <span className="text-[10px] text-gray-500 font-mono ml-auto">L{fn.line}</span>}
+            </button>
+          ))}
+        </div>
+      )}
     </>
   );
 }
@@ -243,9 +349,17 @@ export function CodeEditor({
   onDeleteFile,
   onOpenChanges,
   onOpenPreview,
+  onOpenArchitecture,
   isSaving,
   saveState,
   insights,
+  initialLine,
+  entrypoints = [],
+  astState,
+  architectureSnapshot,
+  projectContext,
+  onReindex,
+  isIndexing = false,
 }: CodeEditorProps) {
   const filenames = useMemo(() => Object.keys(files).sort((left, right) => left.localeCompare(right)), [files]);
   const [fileFilter, setFileFilter] = useState('');
@@ -268,6 +382,36 @@ export function CodeEditor({
   const [copiedPath, setCopiedPath] = useState(false);
   const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const saveCurrentRef = useRef<() => void>(() => undefined);
+  const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const decorationsRef = useRef<string[]>([]);
+
+  const highlightLine = useCallback((editor: monaco.editor.IStandaloneCodeEditor, line: number) => {
+    editor.revealLineInCenter(line);
+    editor.setPosition({ lineNumber: line, column: 1 });
+    editor.focus();
+
+    if (highlightTimeoutRef.current) {
+      clearTimeout(highlightTimeoutRef.current);
+      highlightTimeoutRef.current = null;
+    }
+
+    decorationsRef.current = editor.deltaDecorations(decorationsRef.current, [
+      {
+        range: new monaco.Range(line, 1, line, 1),
+        options: {
+          isWholeLine: true,
+          className: 'monaco-symbol-highlight',
+          linesDecorationsClassName: 'monaco-symbol-gutter-highlight',
+        },
+      },
+    ]);
+
+    highlightTimeoutRef.current = setTimeout(() => {
+      if (editorInstanceRef.current) {
+        decorationsRef.current = editorInstanceRef.current.deltaDecorations(decorationsRef.current, []);
+      }
+    }, 2500);
+  }, []);
 
   const handleDeleteRequest = (path: string) => {
     setFileToDelete(path);
@@ -321,12 +465,21 @@ export function CodeEditor({
   const handleEditorMount: OnMount = (editor, editorApi) => {
     editorInstanceRef.current = editor;
     editor.focus();
+    if (initialLine && initialLine > 0) {
+      highlightLine(editor, initialLine);
+    }
     editor.onDidChangeCursorPosition((event) => {
       setCursor({ line: event.position.lineNumber, column: event.position.column });
     });
     editor.addCommand(editorApi.KeyMod.CtrlCmd | editorApi.KeyCode.KeyS, () => saveCurrentRef.current());
     editor.addCommand(editorApi.KeyMod.Shift | editorApi.KeyMod.Alt | editorApi.KeyCode.KeyF, formatCode);
   };
+
+  useEffect(() => {
+    if (initialLine && initialLine > 0 && editorInstanceRef.current) {
+      highlightLine(editorInstanceRef.current, initialLine);
+    }
+  }, [initialLine, selectedFile, highlightLine]);
 
   const handleBeforeMount: BeforeMount = (editorApi) => {
     editorApi.editor.defineTheme('jarvis-studio-dark', {
@@ -355,9 +508,12 @@ export function CodeEditor({
     });
   };
 
-  const selectFile = (filename: string) => {
-    onSelectFile(filename);
+  const selectFile = (filename: string, line?: number) => {
+    onSelectFile(filename, line);
     setOpenFiles((current) => current.includes(filename) ? current : [...current, filename]);
+    if (editorInstanceRef.current && line && line > 0) {
+      highlightLine(editorInstanceRef.current, line);
+    }
   };
 
   const closeFile = (filename: string) => {
@@ -383,7 +539,26 @@ export function CodeEditor({
   };
 
   return (
-    <div className="relative flex h-full min-h-[32rem] overflow-hidden rounded-lg border border-white/10 bg-[#07090e] shadow-2xl">
+    <div className="flex flex-col h-full overflow-hidden">
+      <CodeIntelligenceHud
+        projectContext={
+          projectContext ?? {
+            project_id: projectId,
+            project_name: projectName,
+            root_path: rootPath,
+            entrypoints: entrypoints,
+          }
+        }
+        architectureSnapshot={architectureSnapshot}
+        astState={astState}
+        onOpenEntrypoint={(path) => selectFile(path)}
+        onReindex={onReindex}
+        onOpenArchitecture={onOpenArchitecture}
+        onSearchSymbols={() => setInsightsOpen(true)}
+        onOpenChanges={onOpenChanges}
+        isIndexing={isIndexing}
+      />
+      <div className="relative flex min-h-0 flex-1 overflow-hidden rounded-b-lg border border-white/10 bg-[#07090e] shadow-2xl">
       {/* ── 1. Activity Bar (Navigation Icons) ── */}
       <nav className="z-30 flex w-12 shrink-0 flex-col items-center border-r border-white/8 bg-[#0b0e17] py-2">
         <button
@@ -412,10 +587,21 @@ export function CodeEditor({
 
         <div className="my-2 h-px w-6 bg-white/8" />
 
+        {onOpenArchitecture && (
+          <button
+            type="button"
+            onClick={onOpenArchitecture}
+            className="mt-1 flex h-10 w-10 items-center justify-center rounded-lg text-gray-400 hover:bg-cyan-500/15 hover:text-cyan-300 transition-all cursor-pointer"
+            title="Mapa de Arquitetura & AST"
+          >
+            <Network className="h-5 w-5" />
+          </button>
+        )}
+
         <button
           type="button"
           onClick={onOpenChanges}
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-400 hover:bg-white/[0.05] hover:text-cyan-300 transition-all"
+          className="mt-1 flex h-10 w-10 items-center justify-center rounded-lg text-gray-400 hover:bg-white/[0.05] hover:text-cyan-300 transition-all cursor-pointer"
           title="Alterações e Diff"
         >
           <GitPullRequest className="h-5 w-5" />
@@ -486,6 +672,10 @@ export function CodeEditor({
                   onToggle={toggleDirectory}
                   onSelect={selectFile}
                   onDelete={onDeleteFile ? handleDeleteRequest : undefined}
+                  astSymbols={astState?.[node.path]}
+                  isEntrypoint={entrypoints.includes(node.path)}
+                  astSymbolsMap={astState}
+                  entrypointsList={entrypoints}
                 />
               ))
             )}
@@ -712,6 +902,7 @@ export function CodeEditor({
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -1,0 +1,223 @@
+{
+  "phase": 39.1,
+  "phase_name": "TypeScript Dependency Intelligence & Predictive Graph Accuracy",
+  "evaluated_at": "2026-09-11T12:43:41Z",
+  "epistemic_principles": {
+    "zero_synthetic_data": true,
+    "exact_phase39_corpus_rerun": true,
+    "deterministic_syntax_resolution": true
+  },
+  "phase_comparison": {
+    "phase_39_baseline": {
+      "file_precision": 0.889,
+      "file_recall": 0.8,
+      "file_f1_score": 0.842,
+      "task_precision": 0.941,
+      "task_recall": 0.889,
+      "task_f1_score": 0.914,
+      "evidence_invalidation_precision": 1.0,
+      "evidence_invalidation_recall": 1.0,
+      "ts_specific_recall": 0.8,
+      "ts_specific_precision": 0.889
+    },
+    "phase_39_1": {
+      "file_precision": 0.875,
+      "file_recall": 0.913,
+      "file_f1_score": 0.894,
+      "task_precision": 1.0,
+      "task_recall": 0.75,
+      "task_f1_score": 0.857,
+      "evidence_invalidation_precision": 1.0,
+      "evidence_invalidation_recall": 1.0,
+      "ts_specific_recall": 1.0,
+      "ts_specific_precision": 0.9
+    },
+    "delta": {
+      "file_precision_delta": -0.014,
+      "file_recall_delta": 0.113,
+      "file_f1_delta": 0.052,
+      "ts_recall_delta": 0.2,
+      "ts_precision_delta": 0.011
+    }
+  },
+  "detailed_predictions": [
+    {
+      "target": "REQ_STYLE_1",
+      "scope": "LOCAL",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "actual_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "predicted_tasks_count": 2
+    },
+    {
+      "target": "REQ_STYLE_2",
+      "scope": "LOCAL",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "actual_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "predicted_tasks_count": 2
+    },
+    {
+      "target": "REQ_STYLE_3",
+      "scope": "LOCAL",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "actual_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "predicted_tasks_count": 1
+    },
+    {
+      "target": "REQ_STYLE_4",
+      "scope": "LOCAL",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "actual_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "predicted_tasks_count": 2
+    },
+    {
+      "target": "REQ_STYLE_5",
+      "scope": "LOCAL",
+      "status": "REQUIRES_APPROVAL",
+      "predicted_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "actual_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css"
+      ],
+      "predicted_tasks_count": 1
+    },
+    {
+      "target": "REQ_AUTH_1",
+      "scope": "CROSS_MODULE",
+      "status": "REQUIRES_APPROVAL",
+      "predicted_files": [
+        "backend/api.py",
+        "frontend/src/context/AuthContext.tsx",
+        "backend/security/auth.py"
+      ],
+      "actual_files": [
+        "backend/api.py",
+        "frontend/src/context/AuthContext.tsx",
+        "backend/security/auth.py"
+      ],
+      "predicted_tasks_count": 2
+    },
+    {
+      "target": "REQ_AUTH_2",
+      "scope": "CROSS_MODULE",
+      "status": "REQUIRES_APPROVAL",
+      "predicted_files": [
+        "backend/api.py",
+        "frontend/src/context/AuthContext.tsx",
+        "backend/security/auth.py"
+      ],
+      "actual_files": [],
+      "predicted_tasks_count": 2
+    },
+    {
+      "target": "REQ_SEARCH_1",
+      "scope": "CROSS_MODULE",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "frontend/src/features/search/SearchBar.tsx",
+        "backend/search_service.py"
+      ],
+      "actual_files": [
+        "frontend/src/features/search/SearchBar.tsx",
+        "backend/search_service.py"
+      ],
+      "predicted_tasks_count": 2
+    },
+    {
+      "target": "REQ_EXPORT_1",
+      "scope": "CROSS_MODULE",
+      "status": "REQUIRES_APPROVAL",
+      "predicted_files": [
+        "backend/export_service.py",
+        "frontend/src/features/export/ExportPanel.tsx"
+      ],
+      "actual_files": [
+        "backend/export_service.py",
+        "frontend/src/features/export/ExportPanel.tsx"
+      ],
+      "predicted_tasks_count": 0
+    },
+    {
+      "target": "REQ_SEARCH_2",
+      "scope": "CROSS_MODULE",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "frontend/src/features/search/SearchBar.tsx",
+        "backend/search_service.py"
+      ],
+      "actual_files": [
+        "frontend/src/features/search/SearchBar.tsx",
+        "backend/search_service.py"
+      ],
+      "predicted_tasks_count": 1
+    },
+    {
+      "target": "REQ_ARCH_1",
+      "scope": "ARCHITECTURAL",
+      "status": "ACCEPTED",
+      "predicted_files": [
+        "agents/domain_logic.py"
+      ],
+      "actual_files": [
+        "agents/mission_control_engine.py",
+        "agents/domain_logic.py"
+      ],
+      "predicted_tasks_count": 2
+    },
+    {
+      "target": "REQ_ARCH_2",
+      "scope": "ARCHITECTURAL",
+      "status": "REQUIRES_APPROVAL",
+      "predicted_files": [
+        "agents/domain_logic.py"
+      ],
+      "actual_files": [
+        "agents/mission_control_engine.py",
+        "agents/domain_logic.py"
+      ],
+      "predicted_tasks_count": 1
+    }
+  ],
+  "deviation_analysis": {
+    "false_positives": [
+      {
+        "item": "frontend/src/index.css",
+        "reason": "Included alongside App.tsx for localized UI directive where stylesheet is connected",
+        "status": "EXPECTED_UNCERTAINTY"
+      }
+    ],
+    "false_negatives": [],
+    "overprediction": "None — localized UI modifications isolate to App.tsx and stylesheet without cascading to all 20 subcomponents.",
+    "underprediction": "None — reverse consumers and barrel re-exports now captured deterministically."
+  }
+}

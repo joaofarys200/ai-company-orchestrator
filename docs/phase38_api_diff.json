@@ -1,0 +1,47 @@
+{
+  "phase": "Phase 38 — Public API Contract Preservation Diff",
+  "timestamp": 1789078400.0,
+  "target_file": "frontend/src/features/missions/MissionControlCenter.tsx",
+  "verdict": "UNCHANGED",
+  "before_api": {
+    "exports": [
+      "default (MissionControlCenter)",
+      "MissionControlCenter",
+      "MissionControlCenterProps",
+      "ScenarioKey",
+      "SCENARIOS"
+    ],
+    "public_functions": [
+      "MissionControlCenter"
+    ],
+    "types_interfaces": [
+      "MissionControlCenterProps",
+      "ScenarioKey"
+    ],
+    "constants": [
+      "SCENARIOS"
+    ]
+  },
+  "after_api": {
+    "exports": [
+      "default (MissionControlCenter)",
+      "MissionControlCenter",
+      "MissionControlCenterProps",
+      "ScenarioKey",
+      "SCENARIOS"
+    ],
+    "public_functions": [
+      "MissionControlCenter"
+    ],
+    "types_interfaces": [
+      "MissionControlCenterProps",
+      "ScenarioKey"
+    ],
+    "constants": [
+      "SCENARIOS"
+    ]
+  },
+  "compatibility_shims": [],
+  "breaking_changes": [],
+  "status": "APPROVED_CONTRACT_PRESERVED"
+}

@@ -107,6 +107,7 @@ class ServiceInfo:
     category: str  # FRONTEND, BACKEND, DATABASE, SHARED, TESTS, BUILD, RUNTIME, OTHER
     root_path: str
     entrypoints: list[str] = field(default_factory=list)
+    files: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -114,6 +115,7 @@ class ServiceInfo:
             "category": self.category,
             "root_path": self.root_path.replace("\\", "/"),
             "entrypoints": [e.replace("\\", "/") for e in self.entrypoints],
+            "files": [f.replace("\\", "/") for f in self.files],
         }
 
 
@@ -158,6 +160,7 @@ class ArchitectureSnapshot:
     confidence: float
     source_commit: str | None = None
     staleness: str = StalenessStatus.FRESH.value
+    freshness: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -184,6 +187,7 @@ class ArchitectureSnapshot:
             confidence=float(data.get("confidence", 1.0)),
             source_commit=data.get("source_commit"),
             staleness=data.get("staleness", StalenessStatus.FRESH.value),
+            freshness=data.get("freshness", {}),
         )
 
 
@@ -621,6 +625,7 @@ class ProjectIntakeService:
                     category=cat_name,
                     root_path=cat_name.lower(),
                     entrypoints=cat_eps,
+                    files=sorted(cat_files),
                 ))
 
         return services
@@ -790,12 +795,22 @@ class ProjectIntakeService:
         all_symbols = [s for s_list in graph.symbols.values() for s in s_list]
         all_imports = [i for i_list in graph.imports.values() for i in i_list]
 
+        key_symbols_list: list[dict[str, Any]] = []
+        for s in all_symbols[:100]:
+            sym_dict = s.to_dict()
+            sym_dict["referenced_by"] = [
+                f"{ref.source_file}:{ref.line_number}"
+                for ref in graph.references.get(s.name, [])
+            ]
+            sym_dict["calls"] = s.metadata.get("calls", []) if isinstance(s.metadata, dict) else []
+            key_symbols_list.append(sym_dict)
+
         symbols_data = {
             "total_count": len(all_symbols),
             "classes_count": sum(1 for s in all_symbols if s.symbol_type == "CLASS"),
             "functions_count": sum(1 for s in all_symbols if s.symbol_type in {"FUNCTION", "METHOD"}),
             "interfaces_count": sum(1 for s in all_symbols if s.symbol_type == "TYPE_ALIAS"),
-            "key_symbols": [s.to_dict() for s in all_symbols[:50]],
+            "key_symbols": key_symbols_list,
         }
 
         imports_data = {
@@ -889,6 +904,7 @@ class ProjectIntakeService:
             snapshot_hash="",
             confidence=avg_conf,
             staleness=StalenessStatus.FRESH.value,
+            freshness=StalenessCheckResult(status=StalenessStatus.FRESH.value, reason="freshly_built").to_dict(),
         )
 
         arch_summary = self.generate_architecture_summary(temp_snapshot)
@@ -944,7 +960,10 @@ class ProjectIntakeService:
             return StalenessCheckResult(status=StalenessStatus.STALE.value, reason="project_root_missing")
 
         current_files_dict = self.project_context.read_project_files(project_id)
-        indexed_files = {f["path"]: f["sha256"] for f in snapshot.files}
+        indexed_files = {
+            (f.path if hasattr(f, "path") else f["path"]): (f.sha256 if hasattr(f, "sha256") else f["sha256"])
+            for f in snapshot.files
+        }
 
         current_paths = set(current_files_dict.keys())
         indexed_paths = set(indexed_files.keys())
@@ -1044,13 +1063,23 @@ class ProjectIntakeService:
         all_symbols = [s for s_list in graph.symbols.values() for s in s_list]
         all_imports = [i for i_list in graph.imports.values() for i in i_list]
 
+        key_symbols_list: list[dict[str, Any]] = []
+        for s in all_symbols[:100]:
+            sym_dict = s.to_dict()
+            sym_dict["referenced_by"] = [
+                f"{ref.source_file}:{ref.line_number}"
+                for ref in graph.references.get(s.name, [])
+            ]
+            sym_dict["calls"] = s.metadata.get("calls", []) if isinstance(s.metadata, dict) else []
+            key_symbols_list.append(sym_dict)
+
         snapshot.files = updated_files
         snapshot.symbols = {
             "total_count": len(all_symbols),
             "classes_count": sum(1 for s in all_symbols if s.symbol_type == "CLASS"),
             "functions_count": sum(1 for s in all_symbols if s.symbol_type in {"FUNCTION", "METHOD"}),
             "interfaces_count": sum(1 for s in all_symbols if s.symbol_type == "TYPE_ALIAS"),
-            "key_symbols": [s.to_dict() for s in all_symbols[:50]],
+            "key_symbols": key_symbols_list,
         }
         snapshot.imports = {
             "total_imports": len(all_imports),

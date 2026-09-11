@@ -179,6 +179,81 @@ export interface ExpansionRecord {
   timestamp: string;
 }
 
+export interface RequirementItem {
+  req_id: string;
+  description: string;
+  source: 'USER' | 'SYSTEM';
+  status: 'VERIFIED' | 'INFERRED' | 'UNKNOWN';
+  confidence: number;
+  category: string;
+  verifiable_via: string;
+}
+
+export interface AssumptionItem {
+  assumption_id: string;
+  description: string;
+  rationale: string;
+  source: 'USER' | 'SYSTEM';
+  status: 'VERIFIED' | 'INFERRED' | 'UNKNOWN';
+  confidence: number;
+  impact_area: string;
+}
+
+export interface PreExecutionTaskItem {
+  task_id: string;
+  title: string;
+  agent_type: string;
+  dependencies: string[];
+  priority: number;
+  estimated_duration_sec: number;
+  target_paths: string[];
+}
+
+export interface PreExecutionUnderstanding {
+  mission_id: string;
+  prompt: string;
+  prompt_hash: string;
+  interpreted_goal: string;
+  mission_class: string;
+  novelty_class: string;
+  status: 'READY' | 'REQUEST_INFORMATION' | 'BLOCKED_REQUIRED_INFORMATION' | 'BLOCKED_POLICY' | 'BLOCKED_TECHNICAL_CONSTRAINT';
+  requirements: RequirementItem[];
+  assumptions: AssumptionItem[];
+  unknowns: string[];
+  entrypoints: string[];
+  affected_files: string[];
+  architecture_layers: string[];
+  task_plan: PreExecutionTaskItem[];
+  validation_strategy: string[];
+  risks: string[];
+  rejection_reason?: string;
+  created_at: number;
+}
+
+export interface MissionTimelineEvent {
+  id: string;
+  sequence: number;
+  type: string;
+  title: string;
+  agent_role: string;
+  timestamp: number;
+  details?: Record<string, unknown>;
+}
+
+export interface MissionTimelinePayload {
+  mission_id: string;
+  title: string;
+  status: string;
+  complexity_level: string;
+  total_transitions: number;
+  success_rate: number;
+  drift_score: number;
+  requirement_retention: number;
+  checkpoints_count: number;
+  active_agents_count: number;
+  events: MissionTimelineEvent[];
+}
+
 export interface MissionDeliverable {
   deliverable_id: string;
   mission_id: string;
@@ -374,6 +449,124 @@ export interface ProjectReferenceResult {
   references: ProjectReference[];
 }
 
+export interface ArchitectureEntrypoint {
+  path: string;
+  kind: string;
+  source: string;
+  confidence: number;
+  resolution_method: string;
+  status: string;
+}
+
+export interface ArchitectureKeySymbol {
+  name: string;
+  file_path: string;
+  line_number: number;
+  end_line: number;
+  symbol_type: string;
+  signature: string;
+  docstring: string;
+  is_exported: boolean;
+  parent_symbol: string | null;
+  metadata?: Record<string, unknown>;
+  referenced_by?: string[];
+  calls?: string[];
+}
+
+export interface ArchitecturePackage {
+  name: string;
+  path: string;
+  kind: string;
+  dependencies: string[];
+}
+
+export interface ArchitectureService {
+  name: string;
+  category: string;
+  root_path: string;
+  entrypoints: string[];
+  files?: string[];
+}
+
+export interface ArchitectureFile {
+  path: string;
+  size_bytes: number;
+  sha256: string;
+  language: string;
+}
+
+export interface ArchitectureDependency {
+  name: string;
+  version: string;
+  source: string;
+  is_dev: boolean;
+  category?: 'RUNTIME' | 'DEV' | 'BUILD' | 'TOOLS';
+}
+
+export interface ArchitectureFreshness {
+  status: 'FRESH' | 'PARTIALLY_STALE' | 'STALE';
+  changed_files?: string[];
+  added_files?: string[];
+  deleted_files?: string[];
+  config_changed?: boolean;
+  reason?: string;
+  last_indexed_at?: string;
+}
+
+export interface ArchitectureSnapshot {
+  project: {
+    project_id: string;
+    project_name: string;
+    root_path: string;
+  };
+  stack: {
+    languages: string[];
+    frameworks: string[];
+    package_managers: string[];
+    build_tools: string[];
+    test_frameworks: string[];
+    containerization: string[];
+    evidence?: Record<string, {
+      source: string;
+      confidence: number;
+      resolution_method: string;
+      status: string;
+    }>;
+  };
+  entrypoints: ArchitectureEntrypoint[];
+  packages: ArchitecturePackage[];
+  services: ArchitectureService[];
+  files: ArchitectureFile[];
+  symbols: {
+    total_count: number;
+    classes_count: number;
+    functions_count: number;
+    interfaces_count: number;
+    key_symbols: ArchitectureKeySymbol[];
+  };
+  imports?: {
+    total_imports: number;
+    internal_imports: number;
+    external_imports: number;
+    edges: Array<{
+      source: string;
+      target: string;
+      is_external: boolean;
+      symbol_name?: string;
+    }>;
+  };
+  dependencies: ArchitectureDependency[];
+  architecture?: {
+    summary_tree?: string;
+    data_flows?: string[];
+    components_count?: number;
+  };
+  staleness?: string;
+  freshness?: ArchitectureFreshness;
+  confidence?: number;
+  generated_at?: string;
+}
+
 export interface CodingValidationResult {
   kind: string;
   command: string;
@@ -558,6 +751,13 @@ export interface ProjectContextMessage {
   files: Record<string, string>;
   file_hashes: Record<string, string>;
   symbols: AstState;
+  architecture_snapshot?: ArchitectureSnapshot | null;
+}
+
+export interface ArchitectureSnapshotMessage {
+  type: 'architecture_snapshot';
+  project_id: string;
+  data: ArchitectureSnapshot | null;
 }
 
 export interface ProjectFileSaveResultMessage {
@@ -923,6 +1123,44 @@ export interface MissionPlanEvaluationResultMessage {
   };
 }
 
+export interface MissionControlStateMessage {
+  type: 'mission_control_state';
+  state: MissionControlStateData;
+}
+
+export interface MissionControlCommandResultMessage {
+  type: 'mission_control_command_result';
+  result: MissionControlCommandResultData;
+}
+
+export interface MissionIntentPreviewResultMessage {
+  type: 'mission_intent_preview_result';
+  project_id?: string;
+  mission_id: string;
+  resolved: boolean;
+  status: string;
+  reason?: string;
+  confidence: number;
+  data: Record<string, unknown>;
+  conflicts?: Array<Record<string, unknown>>;
+  impact?: Record<string, unknown>;
+  clarification_prompt?: string | null;
+}
+
+export interface MissionIntentResultMessage {
+  type: 'mission_intent_result';
+  project_id?: string;
+  command_id?: string;
+  mission_id: string;
+  status: string;
+  reason: string;
+  mission_version?: number;
+  intent_version?: number;
+  plan_version?: number;
+  data?: MissionControlStateData;
+  details?: Record<string, unknown>;
+}
+
 export type ServerMessage =
   | SystemMessage
   | ChatProtocolMessage
@@ -943,8 +1181,13 @@ export type ServerMessage =
   | DecisionsMessage
   | PlannerStateMessage
   | MissionListMessage
+  | MissionControlStateMessage
+  | MissionControlCommandResultMessage
+  | MissionIntentPreviewResultMessage
+  | MissionIntentResultMessage
   | MissionSnapshotMessage
   | AstStateMessage
+  | ArchitectureSnapshotMessage
   | ProjectsListMessage
   | ProjectContextMessage
   | ProjectFileSaveResultMessage
@@ -977,6 +1220,8 @@ export type ServerMessage =
   | MissionAdaptationHistoryMessage
   | MissionAdaptationProposalResultMessage
   | MissionPlanEvaluationResultMessage
+  | MissionControlStateMessage
+  | MissionControlCommandResultMessage
   | UnknownServerMessage;
 
 export type ClientMessage =
@@ -1470,6 +1715,12 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
       return { type, data: normalizeMissionSnapshot(raw.data) };
     case 'ast_state':
       return { type, data: normalizeAst(raw.data) };
+    case 'architecture_snapshot':
+      return {
+        type: 'architecture_snapshot',
+        project_id: asString(raw.project_id),
+        data: isRecord(raw.data) ? (raw.data as unknown as ArchitectureSnapshot) : null,
+      };
     case 'projects_list':
       return { type, projects: normalizeProjects(raw.projects) };
     case 'project_context':
@@ -1479,6 +1730,7 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         files: isRecord(raw.files) ? Object.fromEntries(Object.entries(raw.files).map(([key, value]) => [key, asString(value)])) : {},
         file_hashes: isRecord(raw.file_hashes) ? Object.fromEntries(Object.entries(raw.file_hashes).map(([key, value]) => [key, asString(value)])) : {},
         symbols: normalizeAst(raw.symbols) ?? {},
+        architecture_snapshot: isRecord(raw.architecture_snapshot) ? (raw.architecture_snapshot as unknown as ArchitectureSnapshot) : undefined,
       };
     case 'project_file_save_result':
       return {
@@ -1725,6 +1977,44 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
           metrics: {},
         },
       };
+    case 'mission_control_state':
+      return {
+        type,
+        state: (isRecord(raw.state) ? raw.state : raw) as unknown as MissionControlStateData,
+      };
+    case 'mission_control_command_result':
+      return {
+        type,
+        result: (isRecord(raw.result) ? raw.result : raw) as unknown as MissionControlCommandResultData,
+      };
+    case 'mission_intent_preview_result':
+      return {
+        type,
+        project_id: typeof raw.project_id === 'string' ? raw.project_id : undefined,
+        mission_id: asString(raw.mission_id),
+        resolved: Boolean(raw.resolved),
+        status: asString(raw.status),
+        reason: asString(raw.reason),
+        confidence: typeof raw.confidence === 'number' ? raw.confidence : 1.0,
+        data: isRecord(raw.data) ? raw.data : {},
+        conflicts: Array.isArray(raw.conflicts) ? (raw.conflicts as Array<Record<string, unknown>>) : [],
+        impact: isRecord(raw.impact) ? (raw.impact as Record<string, unknown>) : {},
+        clarification_prompt: raw.clarification_prompt ? asString(raw.clarification_prompt) : null,
+      } as MissionIntentPreviewResultMessage;
+    case 'mission_intent_result':
+      return {
+        type,
+        project_id: typeof raw.project_id === 'string' ? raw.project_id : undefined,
+        command_id: asString(raw.command_id),
+        mission_id: asString(raw.mission_id),
+        status: asString(raw.status),
+        reason: asString(raw.reason),
+        mission_version: typeof raw.mission_version === 'number' ? raw.mission_version : undefined,
+        intent_version: typeof raw.intent_version === 'number' ? raw.intent_version : undefined,
+        plan_version: typeof raw.plan_version === 'number' ? raw.plan_version : undefined,
+        data: isRecord(raw.data) ? (raw.data as unknown as MissionControlStateData) : undefined,
+        details: isRecord(raw.details) ? (raw.details as Record<string, unknown>) : {},
+      } as MissionIntentResultMessage;
     case 'ui':
     case 'ui_action':
       return { type, action: asString(raw.action) };
@@ -1761,4 +2051,242 @@ export const normalizeSentinelAction = (raw: Record<string, unknown>): SentinelA
   error_message: typeof raw.error_message === 'string' ? raw.error_message : null,
   schema_version: asNumber(raw.schema_version, 1),
 });
+
+// ==========================================
+// PHASE 35: Mission Control Center & Explainable Autonomous Execution UX
+// ==========================================
+
+export type MissionControlStatus =
+  | 'PLANNING'
+  | 'READY'
+  | 'RUNNING'
+  | 'PAUSED'
+  | 'REPAIRING'
+  | 'REPLANNING'
+  | 'VALIDATING'
+  | 'BLOCKED'
+  | 'CANCELLING'
+  | 'CANCELLED'
+  | 'COMPLETED'
+  | 'FAILED'
+  | 'RECOVERING';
+
+export type CommandType =
+  | 'APPROVE'
+  | 'PAUSE'
+  | 'RESUME'
+  | 'CANCEL'
+  | 'CHANGE_PRIORITY'
+  | 'REORDER';
+
+export type CommandStatus =
+  | 'ACCEPTED'
+  | 'REJECTED'
+  | 'STALE'
+  | 'SECURITY_BLOCK'
+  | 'INVALID_STATE'
+  | 'NOT_FOUND'
+  | 'CONFLICT';
+
+export type PriorityLevel = 'CRITICAL' | 'HIGH' | 'NORMAL' | 'LOW';
+
+export interface UserAuditRecordData {
+  command_id: string;
+  user_id: string;
+  command_type: string;
+  target_task_id?: string | null;
+  status: string;
+  reason: string;
+  old_state: string;
+  new_state: string;
+  mission_version: number;
+  timestamp: number;
+}
+
+export interface MissionControlCommandPayload {
+  command_id: string;
+  mission_id: string;
+  command_type: CommandType;
+  user_id?: string;
+  target_task_id?: string | null;
+  requested_at?: number;
+  expected_mission_version?: number;
+  expected_task_version?: number | null;
+  payload?: Record<string, unknown>;
+  reason?: string | null;
+  idempotency_key?: string;
+}
+
+export interface MissionControlCommandResultData {
+  command_id: string;
+  mission_id: string;
+  status: CommandStatus;
+  reason: string;
+  mission_version: number;
+  data?: MissionControlStateData;
+  details?: Record<string, unknown>;
+}
+
+export type MissionControlStage =
+  | 'UNDERSTANDING'
+  | 'PLANNING'
+  | 'EXECUTION'
+  | 'VALIDATION'
+  | 'REPAIR'
+  | 'COMPLETION';
+
+export interface WhyPanelItemData {
+  action: string;
+  reason: string;
+  source: string;
+  evidence: string;
+}
+
+export interface SwarmAgentDetailData {
+  agent_id: string;
+  name: string;
+  role: string;
+  status: string;
+  current_task: string;
+  files_touched: string[];
+  completed_tasks_count: number;
+  failures_count: number;
+  handoffs_count: number;
+}
+
+export interface RepairExplainabilityData {
+  failure_title: string;
+  diagnosis: string;
+  patch_description: string;
+  files_changed: string[];
+  validation_result: string;
+  duration_ms: number;
+}
+
+export interface ReplanExplainabilityData {
+  old_plan_summary: string;
+  new_plan_summary: string;
+  why_changed: string;
+  trigger: string;
+  tasks_added: string[];
+  tasks_modified: string[];
+}
+
+export interface RecoveryExplainabilityData {
+  worker_failed_id: string;
+  checkpoint_id: string;
+  state_restored_at: number;
+  recovered_tasks: string[];
+  duplicate_work_prevented: boolean;
+  recovery_duration_seconds: number;
+}
+
+export interface MissionControlEventData {
+  event_id: string;
+  mission_id: string;
+  timestamp: number;
+  type: string;
+  event_type?: string;
+  stage: string;
+  title: string;
+  agent: string;
+  details?: Record<string, unknown>;
+  payload?: Record<string, unknown>;
+}
+
+export interface MissionControlRequirementData {
+  id: string;
+  desc: string;
+  source: 'USER_REQUIREMENT' | 'SYSTEM_ASSUMPTION' | 'USER_INTENT_DELTA' | string;
+  status:
+    | 'IDENTIFIED'
+    | 'PLANNED'
+    | 'IMPLEMENTED'
+    | 'VALIDATED'
+    | 'MODIFIED'
+    | 'SUPERSEDED'
+    | 'REMOVED'
+    | 'BLOCKED'
+    | 'REQUIRES_REVALIDATION'
+    | 'INFERRED'
+    | string;
+  verification_status: 'VERIFIED' | 'INFERRED' | 'UNKNOWN' | string;
+  rationale?: string;
+}
+
+export interface MissionControlTaskData {
+  id: string;
+  title: string;
+  owner: string;
+  priority: string;
+  dependencies: string[];
+  evidence: string;
+  duration_seconds: number;
+  status: string;
+  approval_status?: string;
+}
+
+export interface MissionControlEvidenceData {
+  type: string;
+  status: string;
+  timestamp: number;
+  source: string;
+  details: Record<string, unknown>;
+}
+
+export interface MissionControlArtifactData {
+  name: string;
+  path: string;
+  type: string;
+  summary: string;
+  line_target?: number;
+  symbol_target?: string;
+}
+
+export interface MissionControlStateData {
+  mission_id: string;
+  user_goal: string;
+  interpreted_goal: string;
+  status: MissionControlStatus;
+  current_stage: MissionControlStage;
+  elapsed_time_seconds: number;
+  progress_percentage: number;
+  eta_seconds: number;
+  active_agents_count: number;
+  requirements_count: number;
+  requirements_validated_count: number;
+  time_to_first_output_seconds: number;
+  time_to_first_validated_seconds: number;
+  time_to_useful_result_seconds: number;
+  total_duration_seconds: number;
+  user_effort_score: number;
+  output_quality_score: number;
+  execution_success: boolean;
+  requirement_satisfaction: boolean;
+  validation_evidence: boolean;
+  is_user_useful: boolean;
+  requirements: MissionControlRequirementData[];
+  assumptions: MissionControlRequirementData[];
+  unknowns: string[];
+  tasks: MissionControlTaskData[];
+  agents: SwarmAgentDetailData[];
+  why_items: WhyPanelItemData[];
+  repairs: RepairExplainabilityData[];
+  replans: ReplanExplainabilityData[];
+  recoveries: RecoveryExplainabilityData[];
+  evidence: MissionControlEvidenceData[];
+  artifacts: MissionControlArtifactData[];
+  events: MissionControlEventData[];
+  final_result: Record<string, unknown>;
+  mission_version?: number;
+  command_history?: UserAuditRecordData[];
+  intent_version?: number;
+  plan_version?: number;
+  intent?: Record<string, unknown> | null;
+  intent_history?: Array<Record<string, unknown>>;
+  requirement_diff?: any[] | Record<string, unknown> | null;
+  plan_diff?: any[] | Record<string, unknown> | null;
+  evidence_impact?: any[] | Record<string, unknown> | null;
+}
+
 

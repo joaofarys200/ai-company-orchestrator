@@ -1,0 +1,41 @@
+{
+  "tracker_name": "Phase 37 Evidence Impact & Invalidation Tracker",
+  "policy": "Zero False Success: Historical evidence is never deleted from disk/database; superseded evidence is marked and cannot satisfy requirements without physical revalidation.",
+  "invalidation_records": [
+    {
+      "evidence_id": "BUILD",
+      "status": "SUPERSEDED",
+      "reason": "Requisito/arquitetura alterada na intenção v2",
+      "source_intent_version": 1,
+      "current_intent_version": 2,
+      "revalidation_required": true,
+      "historical_file_path": "evidence/build_v1.log",
+      "revalidation_task": "TSK_AUTH_02"
+    },
+    {
+      "evidence_id": "RUNTIME",
+      "status": "SUPERSEDED",
+      "reason": "Requisito/arquitetura alterada na intenção v2",
+      "source_intent_version": 1,
+      "current_intent_version": 2,
+      "revalidation_required": true,
+      "historical_file_path": "evidence/runtime_v1.json",
+      "revalidation_task": "TSK_AUTH_02"
+    },
+    {
+      "evidence_id": "ev_browser_01",
+      "status": "SUPERSEDED",
+      "reason": "Revisão de abordagem para React na intenção v4",
+      "source_intent_version": 3,
+      "current_intent_version": 4,
+      "revalidation_required": true,
+      "historical_file_path": "evidence/browser_vanilla_v3.png",
+      "revalidation_task": "TSK_REACT_VALIDATION"
+    }
+  ],
+  "epistemic_guarantees": {
+    "zero_deleted_evidence_verified": true,
+    "unvalidated_requirements_marked_unsatisfied": true,
+    "audit_trail_unbroken": true
+  }
+}

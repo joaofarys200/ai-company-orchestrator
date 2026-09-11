@@ -1,0 +1,36 @@
+{
+  "benchmark_name": "JARVIS OS Phase 34 Real User Mission Scorecard",
+  "timestamp": "2026-09-09T15:43:58Z",
+  "total_missions": 8,
+  "total_runs": 16,
+  "metrics": {
+    "mission_success_rate": 1.0,
+    "first_pass_success_rate": 0.875,
+    "eventual_success_rate": 1.0,
+    "user_useful_rate": 1.0,
+    "false_success_rate": 0.0,
+    "human_intervention_rate": 0.0,
+    "repair_success_rate": 1.0,
+    "recovery_success_rate": 1.0,
+    "browser_validation_rate": 1.0,
+    "average_user_effort_score": 0.0,
+    "average_output_quality_score": 0.994,
+    "time_to_first_output_mean_seconds": 0.0667,
+    "time_to_first_validated_artifact_mean_seconds": 0.1727,
+    "time_to_useful_result_mean_seconds": 0.1728,
+    "total_mission_duration_mean_seconds": 0.1728
+  },
+  "acceptance_breakdown": {
+    "accepted_immediately": 16,
+    "accepted_minor_review": 0,
+    "requires_human_work": 0,
+    "not_useful": 0
+  },
+  "boundaries": {
+    "first_real_limit": "TIME_TO_VALUE_AT_EXTREME_APP_COMPLEXITY",
+    "first_real_failure": "NONE",
+    "decision_gate": "REAL_USER_VALUE_PROVEN_WITHIN_TEST_SCOPE"
+  },
+  "simulated_metrics_count": 0,
+  "evidence_ledger_status": "ALL_MEASURED_OR_CALCULATED"
+}

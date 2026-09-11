@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "timestamp": "2026-09-07T19:01:19Z",
+  "chromium_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "chromium_version": "152.0.4191.66",
+  "playwright_version": "1.62.0",
+  "screenshot_path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase20_browser_qa.png",
+  "screenshot_bytes": 122524,
+  "duration_seconds": 2.124,
+  "console_errors_count": 0,
+  "console_errors": [],
+  "network_errors_count": 0,
+  "network_errors": [],
+  "metrics_verified": {
+    "active_streams": 128,
+    "worker_count": 8,
+    "control_p95_ms": 0.086,
+    "lock_speedup": 7.6,
+    "jain_fairness": 1,
+    "deadlocks": 0,
+    "duplicate_side_effects": 0
+  }
+}

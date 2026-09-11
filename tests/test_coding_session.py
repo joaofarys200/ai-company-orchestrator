@@ -383,3 +383,56 @@ def test_rollback_failure_preserves_both_errors(task_app_service, monkeypatch):
     assert failed.rollback_error["message"] == "rollback storage failure"
     assert failed.rollback_attempted is True
     assert failed.rollback_succeeded is False
+
+
+def test_multi_change_same_file_applies_sequentially(task_app_service):
+    sessions, _projects, root = task_app_service
+    # Propose two changes on index.html: one on the title, one on the body
+    original = (root / "index.html").read_text(encoding="utf-8")
+    change1 = {
+        "file": "index.html",
+        "operation": "replace_text",
+        "old_text": "<title>Task App</title>",
+        "new_text": "<title>My Awesome App</title>",
+        "reason": "Change title",
+    }
+    change2 = {
+        "file": "index.html",
+        "operation": "replace_text",
+        "old_text": "<h2>Task Manager</h2>",
+        "new_text": "<h2>Awesome Task Manager</h2>",
+        "reason": "Change header",
+    }
+    session = sessions.create_session("task-app", "Multiplas alteracoes no mesmo ficheiro", [change1, change2])
+    applied = sessions.apply_session("task-app", session.session_id)
+    assert applied.status == "SUCCEEDED"
+    result = (root / "index.html").read_text(encoding="utf-8")
+    assert "<title>My Awesome App</title>" in result
+    assert "<h2>Awesome Task Manager</h2>" in result
+
+
+def test_multi_change_symbol_and_text_same_file(task_app_service):
+    sessions, _projects, root = task_app_service
+    change1 = {
+        "file": "app.js",
+        "operation": "replace_symbol",
+        "symbol": "addTask",
+        "new_code": VALID_ADD_TASK,
+        "reason": "Update addTask logic",
+    }
+    change2 = {
+        "file": "app.js",
+        "operation": "replace_text",
+        "old_text": "input.value = '';",
+        "new_text": "input.value = '';\n  // Clear input done",
+        "reason": "Add comment after clear",
+    }
+    session = sessions.create_session("task-app", "Alterar simbolo e texto no mesmo ficheiro", [change1, change2])
+    assert len(session.proposed_changes) == 1
+    applied = sessions.apply_session("task-app", session.session_id)
+    assert applied.status == "SUCCEEDED"
+    result = (root / "app.js").read_text(encoding="utf-8")
+    assert "input.value.trim()" in result
+    assert "// Clear input done" in result
+
+

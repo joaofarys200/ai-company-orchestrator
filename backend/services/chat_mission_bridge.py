@@ -214,6 +214,7 @@ class ChatMissionBridge:
         project_intake: Any = None,
         project_context: Any = None,
         orchestration_service: Any = None,
+        autonomous_engine: Any = None,
         connections: Any = None,
         callbacks: Any = None,
         logger: Any = None,
@@ -225,6 +226,7 @@ class ChatMissionBridge:
         self.project_intake = project_intake
         self.project_context = project_context
         self.orchestration_service = orchestration_service
+        self.autonomous_engine = autonomous_engine
         self.connections = connections
         self.callbacks = callbacks
         self.logger = logger or get_logger(__name__)
@@ -382,6 +384,38 @@ class ChatMissionBridge:
         crit_id = f"crit_{correlation_id}"
         ev_id = f"ev_{correlation_id}"
 
+        # ── Phase 31: Pre-Execution Intelligence & Understanding ──────────────
+        from intelligence.mission_understanding import (
+            PreExecutionUnderstandingEngine,
+            UnderstandingStatus,
+        )
+        understanding = PreExecutionUnderstandingEngine.analyze(
+            prompt=prompt,
+            mission_id=mission_id,
+            project_context={"project_id": target_proj},
+        )
+
+        # Broadcast Pre-Execution Understanding to UI before making changes
+        if self.connections:
+            await self.connections.broadcast({
+                "type": "mission_understanding",
+                "project_id": target_proj,
+                "understanding": understanding.to_dict(),
+            })
+
+        # Check for Negative / Infeasible / Missing Information cases
+        if understanding.status != UnderstandingStatus.READY:
+            block_msg = f"⛔ Missão bloqueada pelo Pre-Execution Intelligence: {understanding.rejection_reason}"
+            await self.broadcast_chat("JARVIS", "Mission Understanding", block_msg)
+            await self.broadcast_state("idle")
+            return {
+                "status": understanding.status.value,
+                "mission_id": mission_id,
+                "reason": understanding.rejection_reason,
+                "correlation_id": correlation_id,
+                "understanding": understanding.to_dict(),
+            }
+
         # 1. Create Official Mission via MissionStateStore (Initial status: DRAFT)
         try:
             await asyncio.to_thread(
@@ -397,6 +431,7 @@ class ChatMissionBridge:
                     "session_id": session_id,
                     "task_type": resolved.task_type,
                     "is_economic": resolved.is_economic,
+                    "understanding": understanding.to_dict(),
                 },
                 mission_id=mission_id,
             )
@@ -634,6 +669,21 @@ class ChatMissionBridge:
                     success=False,
                     summary="",
                     error=cycle_res.stop_reason or f"Autonomia terminou com status {cycle_res.status}.",
+                )
+
+            # Delegate to Autonomous Mission Productization Engine if registered
+            if getattr(self, "autonomous_engine", None):
+                auto_res = await self.autonomous_engine.execute_minimalist_goal(prompt, session_id)
+                if auto_res.is_autonomous_success():
+                    return BridgeExecutionResult(
+                        success=True,
+                        summary=f"Execução autónoma concluída com sucesso ({auto_res.evidence_count} evidências validadas).",
+                        details={"mission_id": auto_res.mission_id, "category": auto_res.category.value},
+                    )
+                return BridgeExecutionResult(
+                    success=False,
+                    summary="",
+                    error=auto_res.failure_reason or f"Execução autónoma falhou no status {auto_res.final_status}",
                 )
 
             return BridgeExecutionResult(

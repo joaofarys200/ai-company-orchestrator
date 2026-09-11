@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JARVIS OS — Phase 39.1: TypeScript Dependency Intelligence Contract",
+  "version": "39.1.0",
+  "status": "ACTIVE",
+  "defined_at": "2026-09-11T13:30:00Z",
+  "principles": [
+    "DETERMINISTIC_SYNTAX_RESOLUTION",
+    "NORMALIZED_REPO_GRAPH_COMPATIBILITY",
+    "INCREMENTAL_CONTENT_HASH_CACHE",
+    "ZERO_SPECULATIVE_RELATIONS",
+    "CANONICAL_WINDOWS_PATH_NORMALIZATION"
+  ],
+  "models": {
+    "TypeScriptImport": {
+      "fields": {
+        "source_file": "string (canonical workspace-relative path)",
+        "module_specifier": "string (raw specifier from import statement)",
+        "imported_symbols": "list[string] (named imported symbols)",
+        "default_import": "string | null (default imported identifier)",
+        "namespace_import": "string | null (namespace alias identifier)",
+        "is_type_only": "boolean (import type { ... })",
+        "is_relative": "boolean (starts with . or ..)",
+        "is_dynamic": "boolean (import() or require())",
+        "line_number": "integer (1-indexed source line)",
+        "resolved_target": "string | null (canonical workspace-relative file path)",
+        "confidence": "enum (DETERMINISTIC | INFERRED | UNCERTAIN)",
+        "boundary": "enum (INTRA_PACKAGE | INTER_PACKAGE | EXTERNAL_PACKAGE)"
+      }
+    },
+    "TypeScriptExport": {
+      "fields": {
+        "source_file": "string",
+        "exported_symbols": "list[string]",
+        "is_default": "boolean",
+        "is_re_export": "boolean",
+        "re_export_source": "string | null",
+        "is_star_export": "boolean",
+        "star_namespace": "string | null",
+        "is_type_only": "boolean",
+        "line_number": "integer",
+        "resolved_target": "string | null"
+      }
+    },
+    "TypeScriptSymbol": {
+      "fields": {
+        "name": "string",
+        "symbol_type": "enum (FUNCTION | CLASS | INTERFACE | TYPE_ALIAS | ENUM | CONSTANT | REACT_COMPONENT | UNKNOWN)",
+        "line_number": "integer",
+        "is_exported": "boolean",
+        "is_default_export": "boolean",
+        "signature": "string"
+      }
+    },
+    "DependencyEdge": {
+      "fields": {
+        "source": "string",
+        "target": "string",
+        "relation_type": "enum (IMPORTS | RE_EXPORTS | REFERENCES | PACKAGE_DEPENDS | ALIAS_RESOLVES | DYNAMIC_UNRESOLVED)",
+        "confidence_class": "enum (DETERMINISTIC | INFERRED | UNCERTAIN)",
+        "origin": "string (e.g. import, re-export, alias)",
+        "resolved": "boolean",
+        "symbol": "string | null",
+        "metadata": "object"
+      }
+    },
+    "TypeScriptDependencyIndex": {
+      "fields": {
+        "file_path": "string",
+        "imports": "list[TypeScriptImport]",
+        "exports": "list[TypeScriptExport]",
+        "local_symbols": "list[TypeScriptSymbol]",
+        "imported_symbols": "list[string]",
+        "re_exports": "list[TypeScriptExport]",
+        "resolved_targets": "list[string]",
+        "unresolved_imports": "list[string]",
+        "aliases_used": "list[object]",
+        "package_name": "string",
+        "module_boundary": "BoundaryType",
+        "parser_version": "string",
+        "content_hash": "string (SHA-256)",
+        "parsed_at": "float (UNIX epoch timestamp)"
+      }
+    }
+  },
+  "resolution_rules": {
+    "relative_resolution": {
+      "extensions": [".ts", ".tsx", ".d.ts", ".js", ".jsx", ".mjs", ".cjs", ".json"],
+      "directory_barrels": ["index.ts", "index.tsx", "index.d.ts", "index.js", "index.jsx"]
+    },
+    "alias_resolution": {
+      "sources": ["tsconfig.json compilerOptions.paths", "tsconfig.json compilerOptions.baseUrl"],
+      "fallback": "Strict unmapped alias -> UNCERTAIN, no speculative mapping"
+    },
+    "package_resolution": {
+      "sources": ["package.json exports", "package.json main", "package.json module", "package.json types"],
+      "workspace_boundary": "INTRA_PACKAGE if within root package; INTER_PACKAGE if workspace package; EXTERNAL_PACKAGE if node_modules"
+    }
+  },
+  "invalidation_invariants": {
+    "file_change": "Invalidates affected file index and computes downstream blast radius via recursive reverse consumers",
+    "file_deletion": "Removes file node from cache and marks all importer edges as stale/unresolved",
+    "file_rename": "Removes old file entry and indexes new file path",
+    "tsconfig_change": "Invalidates all files under directory tree governed by modified tsconfig",
+    "package_json_change": "Invalidates all files under directory tree governed by modified package.json"
+  }
+}

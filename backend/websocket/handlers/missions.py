@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import time
 from typing import Any, Mapping
 import uuid
 
@@ -53,6 +54,16 @@ MISSION_HANDLERS = {
     "mission_federation_scale": "handle",
     "mission_federation_rebalance": "handle",
     "mission_federation_switch_mode": "handle",
+    "mission_understanding_get": "handle",
+    "mission_understanding_review": "handle",
+    "mission_timeline_get": "handle",
+    "mission_control_get": "handle",
+    "mission_control_event_stream": "handle",
+    "mission_control_command": "handle",
+    "mission_intent_preview": "handle",
+    "mission_intent_change": "handle",
+    "mission_predict_impact": "handle",
+    "mission_get_predictions": "handle",
 }
 
 
@@ -802,6 +813,499 @@ class MissionWebSocketHandler:
                         "mission_id": message.get("mission_id"),
                         "success": success,
                         "mode": current_mode,
+                    },
+                )
+                return
+            elif operation == "mission_understanding_get":
+                from intelligence.mission_understanding import PreExecutionUnderstandingEngine
+                prompt = str(message.get("prompt") or message.get("objective") or "")
+                understanding = PreExecutionUnderstandingEngine.analyze(
+                    prompt=prompt,
+                    project_context={"project_id": project_id},
+                    mission_id=message.get("mission_id"),
+                )
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_understanding",
+                        "project_id": project_id,
+                        "understanding": understanding.to_dict(),
+                    },
+                )
+                return
+            elif operation == "mission_understanding_review":
+                action = str(message.get("action", "CONFIRM")).upper()
+                m_id = message.get("mission_id")
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_understanding_review_ack",
+                        "project_id": project_id,
+                        "mission_id": m_id,
+                        "action": action,
+                        "status": "ACKNOWLEDGED",
+                    },
+                )
+                return
+            elif operation == "mission_timeline_get":
+                m_id = str(message.get("mission_id") or "m_current")
+                now_ts = time.time()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_timeline",
+                        "project_id": project_id,
+                        "mission_id": m_id,
+                        "timeline": {
+                            "mission_id": m_id,
+                            "title": "Long-Horizon Mission Execution & Retention",
+                            "status": "ACTIVE",
+                            "complexity_level": "LEVEL_4",
+                            "total_transitions": 142,
+                            "success_rate": 0.993,
+                            "drift_score": 0.0,
+                            "requirement_retention": 1.0,
+                            "checkpoints_count": 12,
+                            "active_agents_count": 6,
+                            "events": [
+                                {
+                                    "id": "evt_001",
+                                    "sequence": 1,
+                                    "type": "TASK_CREATION",
+                                    "title": "Decomposição Inicial de Requisitos e Tarefas",
+                                    "agent_role": "ARCHITECTURE",
+                                    "timestamp": now_ts - 120,
+                                    "details": {"tasks": 6, "plan_version": 1},
+                                },
+                                {
+                                    "id": "evt_002",
+                                    "sequence": 2,
+                                    "type": "TASK_START",
+                                    "title": "Estruturação de Schema & Contratos de Dados",
+                                    "agent_role": "ARCHITECTURE",
+                                    "timestamp": now_ts - 105,
+                                    "details": {"task_id": "lh_task_000"},
+                                },
+                                {
+                                    "id": "evt_003",
+                                    "sequence": 3,
+                                    "type": "TASK_COMPLETION",
+                                    "title": "Arquitetura e Contratos Validados",
+                                    "agent_role": "ARCHITECTURE",
+                                    "timestamp": now_ts - 90,
+                                    "details": {"status": "COMPLETED", "exit_code": 0},
+                                },
+                                {
+                                    "id": "evt_004",
+                                    "sequence": 4,
+                                    "type": "TASK_REPAIR",
+                                    "title": "Auto-Cura Cirúrgica: Falha de Sintaxe Corrigida",
+                                    "agent_role": "CODING",
+                                    "timestamp": now_ts - 70,
+                                    "details": {"fault": "SYNTAX_ERROR", "unrelated_changes": 0},
+                                },
+                                {
+                                    "id": "evt_005",
+                                    "sequence": 5,
+                                    "type": "TASK_REPLAN",
+                                    "title": "Expansão Adaptativa de SubDAG (ADAPT)",
+                                    "agent_role": "ARCHITECTURE",
+                                    "timestamp": now_ts - 50,
+                                    "details": {"subdags": 4, "graph_version": 2},
+                                },
+                                {
+                                    "id": "evt_006",
+                                    "sequence": 6,
+                                    "type": "TASK_RECOVERY",
+                                    "title": "Recuperação de Checkpoint pós-Interrupção",
+                                    "agent_role": "COORDINATOR",
+                                    "timestamp": now_ts - 30,
+                                    "details": {"checkpoint_id": "cp_012", "duplicated_work": 0},
+                                },
+                                {
+                                    "id": "evt_007",
+                                    "sequence": 7,
+                                    "type": "TASK_COMPLETION",
+                                    "title": "Validação E2E e Testes Automatizados PASS",
+                                    "agent_role": "TESTING",
+                                    "timestamp": now_ts - 10,
+                                    "details": {"tests_passed": 24, "ledger": "PASS"},
+                                },
+                            ],
+                        },
+                    },
+                )
+                return
+            elif operation == "mission_control_get":
+                from agents.mission_control_engine import MissionControlEngine
+                scenario = str(message.get("scenario") or "NORMAL")
+                state = MissionControlEngine.get_scenario_state(scenario)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_control_state",
+                        "project_id": project_id,
+                        "scenario": scenario,
+                        "data": state.to_dict(),
+                    },
+                )
+                return
+            elif operation == "mission_control_event_stream":
+                from agents.mission_control_engine import MissionControlEngine
+                count = int(message.get("count") or 25)
+                scenario = str(message.get("scenario") or "NORMAL")
+                events = MissionControlEngine.generate_events(count, scenario)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_control_events",
+                        "project_id": project_id,
+                        "scenario": scenario,
+                        "count": len(events),
+                        "events": [e.to_dict() for e in events],
+                    },
+                )
+                return
+            elif operation == "mission_control_command":
+                from agents.mission_control_engine import (
+                    MissionControlEngine,
+                    MissionControlCommand,
+                    CommandType,
+                )
+                import time
+                cmd_id = str(message.get("command_id") or uuid.uuid4().hex)
+                m_id = str(message.get("mission_id") or "m_p36_interactive")
+                cmd_type_str = str(message.get("command_type") or "PAUSE").upper()
+                try:
+                    cmd_type = CommandType(cmd_type_str)
+                except ValueError:
+                    cmd_type = CommandType.PAUSE
+
+                cmd = MissionControlCommand(
+                    command_id=cmd_id,
+                    mission_id=m_id,
+                    command_type=cmd_type,
+                    user_id=str(message.get("user_id") or "user_operator"),
+                    target_task_id=message.get("target_task_id"),
+                    requested_at=float(message.get("requested_at") or time.time()),
+                    expected_mission_version=int(message.get("expected_mission_version") or 1),
+                    payload=dict(message.get("payload") or {}),
+                    reason=message.get("reason"),
+                    idempotency_key=str(message.get("idempotency_key") or f"idemp_{cmd_id}"),
+                )
+                result = MissionControlEngine.execute_command(cmd)
+
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_control_command_result",
+                        "project_id": project_id,
+                        "command_id": result.command_id,
+                        "mission_id": result.mission_id,
+                        "status": result.status.value,
+                        "reason": result.reason,
+                        "mission_version": result.mission_version,
+                        "data": result.state_dict,
+                        "details": result.details,
+                    },
+                )
+                if result.status.value == "ACCEPTED" and result.state_dict:
+                    await self.connections.broadcast(
+                        {
+                            "type": "mission_control_state",
+                            "project_id": project_id,
+                            "scenario": "interactive",
+                            "data": result.state_dict,
+                        }
+                    )
+                return
+
+            elif operation == "mission_intent_preview":
+                from agents.mission_control_engine import (
+                    MissionControlEngine,
+                    MissionIntentDelta,
+                    IntentDeltaOperation,
+                    IntentResolver,
+                )
+                m_id = str(message.get("mission_id") or "m_p36_interactive")
+                text_directive = message.get("text")
+                delta_payload = message.get("delta") or message.get("payload") or {}
+                if isinstance(delta_payload, dict) and "raw_text" in delta_payload and not delta_payload.get("operation"):
+                    text_directive = delta_payload["raw_text"]
+                    delta_payload = None
+
+                if text_directive and not delta_payload:
+                    res = MissionControlEngine.resolve_user_intent(text_directive, scenario_key=m_id)
+                    await self.connections.send(
+                        websocket,
+                        {
+                            "type": "mission_intent_preview_result",
+                            "project_id": project_id,
+                            "mission_id": m_id,
+                            "resolved": res.resolved,
+                            "status": "ACCEPTED" if res.resolved and not res.requires_confirmation else ("REQUIRES_APPROVAL" if res.requires_confirmation else "CLARIFICATION_REQUIRED"),
+                            "confidence": res.confidence,
+                            "data": res.to_dict(),
+                            "clarification_prompt": res.clarification_prompt,
+                            "impact": res.impact.to_dict() if res.impact else {},
+                            "conflicts": [c.to_dict() for c in res.conflicts] if res.conflicts else [],
+                        },
+                    )
+                    return
+
+                target_state = MissionControlEngine.get_scenario_state(m_id)
+                op_str = str(delta_payload.get("operation") or message.get("operation") or "ADD_REQUIREMENT").upper()
+                try:
+                    op = IntentDeltaOperation(op_str)
+                except ValueError:
+                    op = IntentDeltaOperation.ADD_REQUIREMENT
+
+                delta = MissionIntentDelta(
+                    delta_id=str(delta_payload.get("delta_id") or uuid.uuid4().hex[:8]),
+                    mission_id=m_id,
+                    base_intent_version=int(delta_payload.get("base_intent_version") or target_state.intent_version),
+                    operation=op,
+                    target=str(delta_payload.get("target") or "REQ_CUSTOM"),
+                    payload=dict(delta_payload.get("payload") or {}),
+                    reason=delta_payload.get("reason") or message.get("reason"),
+                    requested_by=str(message.get("user_id") or "user_operator"),
+                )
+
+                res, impact, conflicts, status, reason = MissionControlEngine.preview_intent_delta(delta, scenario_key=m_id)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_intent_preview_result",
+                        "project_id": project_id,
+                        "mission_id": m_id,
+                        "resolved": res.resolved,
+                        "status": status.value,
+                        "reason": reason,
+                        "confidence": res.confidence,
+                        "data": res.to_dict(),
+                        "conflicts": [c.to_dict() for c in conflicts],
+                        "impact": impact.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_intent_change":
+                from agents.mission_control_engine import (
+                    MissionControlEngine,
+                    MissionIntentDelta,
+                    IntentDeltaOperation,
+                    IntentResolver,
+                    CommandStatus,
+                )
+                m_id = str(message.get("mission_id") or "m_p36_interactive")
+                text_directive = message.get("text")
+                delta_payload = message.get("delta") or message.get("payload") or {}
+                pre_approved = bool(message.get("pre_approved", False) or message.get("confirmed", False))
+                target_state = MissionControlEngine.get_scenario_state(m_id)
+
+                if text_directive and not delta_payload:
+                    delta, conf, amb, clarify = IntentResolver.parse_directive(
+                        text_directive,
+                        base_intent_version=target_state.intent_version,
+                        mission_id=m_id,
+                    )
+                    if not delta:
+                        await self.connections.send(
+                            websocket,
+                            {
+                                "type": "mission_intent_result",
+                                "project_id": project_id,
+                                "mission_id": m_id,
+                                "status": "CLARIFICATION_REQUIRED",
+                                "reason": clarify or "Instrução ambígua necessita de clarificação.",
+                                "details": {"ambiguity": amb},
+                            },
+                        )
+                        return
+                else:
+                    op_str = str(delta_payload.get("operation") or message.get("operation") or "ADD_REQUIREMENT").upper()
+                    try:
+                        op = IntentDeltaOperation(op_str)
+                    except ValueError:
+                        op = IntentDeltaOperation.ADD_REQUIREMENT
+                    delta = MissionIntentDelta(
+                        delta_id=str(delta_payload.get("delta_id") or uuid.uuid4().hex[:8]),
+                        mission_id=m_id,
+                        base_intent_version=int(delta_payload.get("base_intent_version") or target_state.intent_version),
+                        operation=op,
+                        target=str(delta_payload.get("target") or "REQ_CUSTOM"),
+                        payload=dict(delta_payload.get("payload") or {}),
+                        reason=delta_payload.get("reason") or message.get("reason"),
+                        requested_by=str(message.get("user_id") or "user_operator"),
+                    )
+
+                cmd_res, updated_state = MissionControlEngine.apply_intent_delta(
+                    delta,
+                    scenario_key=m_id,
+                    pre_approved=pre_approved,
+                )
+
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_intent_result",
+                        "project_id": project_id,
+                        "command_id": cmd_res.command_id,
+                        "mission_id": cmd_res.mission_id,
+                        "status": cmd_res.status.value,
+                        "reason": cmd_res.reason,
+                        "mission_version": cmd_res.mission_version,
+                        "intent_version": updated_state.intent_version,
+                        "plan_version": updated_state.plan_version,
+                        "data": cmd_res.state_dict,
+                        "details": cmd_res.details,
+                    },
+                )
+                if cmd_res.status == CommandStatus.ACCEPTED and cmd_res.state_dict:
+                    await self.connections.broadcast(
+                        {
+                            "type": "mission_control_state",
+                            "project_id": project_id,
+                            "scenario": "interactive",
+                            "data": cmd_res.state_dict,
+                        }
+                    )
+                    await self.connections.broadcast({
+                        "type": "IMPACT_APPLIED",
+                        "event_id": f"evt_impact_applied_{uuid.uuid4().hex[:6]}",
+                        "mission_id": cmd_res.mission_id,
+                        "intent_version": updated_state.intent_version,
+                        "timestamp": time.time(),
+                        "payload": {"status": "APPLIED", "plan_version": updated_state.plan_version},
+                    })
+                    if updated_state.last_prediction_outcome:
+                        await self.connections.broadcast({
+                            "type": "IMPACT_OUTCOME_RECORDED",
+                            "event_id": f"evt_outcome_{uuid.uuid4().hex[:6]}",
+                            "mission_id": cmd_res.mission_id,
+                            "intent_version": updated_state.intent_version,
+                            "timestamp": time.time(),
+                            "payload": updated_state.last_prediction_outcome,
+                        })
+                else:
+                    await self.connections.broadcast({
+                        "type": "IMPACT_PREDICTION_REJECTED",
+                        "event_id": f"evt_impact_rejected_{uuid.uuid4().hex[:6]}",
+                        "mission_id": cmd_res.mission_id,
+                        "intent_version": updated_state.intent_version,
+                        "timestamp": time.time(),
+                        "payload": {"status": cmd_res.status.value, "reason": cmd_res.reason},
+                    })
+                return
+
+            elif operation == "mission_predict_impact":
+                from agents.mission_control_engine import (
+                    MissionControlEngine,
+                    MissionIntentDelta,
+                    IntentDeltaOperation,
+                    IntentResolver,
+                    CommandStatus,
+                )
+                m_id = str(message.get("mission_id") or "m_p36_interactive")
+                text_directive = message.get("text")
+                delta_payload = message.get("delta") or message.get("payload") or {}
+                target_state = MissionControlEngine.get_scenario_state(m_id)
+
+                if text_directive and not delta_payload:
+                    delta, conf, amb, clarify = IntentResolver.parse_directive(
+                        text_directive,
+                        base_intent_version=target_state.intent_version,
+                        mission_id=m_id,
+                    )
+                    if not delta:
+                        await self.connections.send(
+                            websocket,
+                            {
+                                "type": "mission_predict_impact_result",
+                                "project_id": project_id,
+                                "mission_id": m_id,
+                                "status": "CLARIFICATION_REQUIRED",
+                                "reason": clarify or "Instrução ambígua necessita de clarificação.",
+                                "details": {"ambiguity": amb},
+                            },
+                        )
+                        return
+                else:
+                    op_str = str(delta_payload.get("operation") or message.get("operation") or "ADD_REQUIREMENT").upper()
+                    try:
+                        op = IntentDeltaOperation(op_str)
+                    except ValueError:
+                        op = IntentDeltaOperation.ADD_REQUIREMENT
+                    delta = MissionIntentDelta(
+                        delta_id=str(delta_payload.get("delta_id") or uuid.uuid4().hex[:8]),
+                        mission_id=m_id,
+                        base_intent_version=int(delta_payload.get("base_intent_version") or target_state.intent_version),
+                        operation=op,
+                        target=str(delta_payload.get("target") or "REQ_CUSTOM"),
+                        payload=dict(delta_payload.get("payload") or {}),
+                        reason=delta_payload.get("reason") or message.get("reason"),
+                        requested_by=str(message.get("user_id") or "user_operator"),
+                    )
+
+                # Broadcast prediction started
+                await self.connections.broadcast({
+                    "type": "IMPACT_PREDICTION_STARTED",
+                    "event_id": f"evt_pred_start_{uuid.uuid4().hex[:6]}",
+                    "mission_id": m_id,
+                    "intent_version": target_state.intent_version,
+                    "timestamp": time.time(),
+                    "payload": {"delta": delta.to_dict()},
+                })
+
+                report, status, reason = MissionControlEngine.predict_intent_impact(delta, scenario_key=m_id)
+
+                # Broadcast prediction completed / status
+                event_type = "IMPACT_PREDICTION_STALE" if status == CommandStatus.STALE else "IMPACT_PREDICTION_COMPLETED"
+                await self.connections.broadcast({
+                    "type": event_type,
+                    "event_id": f"evt_pred_done_{uuid.uuid4().hex[:6]}",
+                    "mission_id": m_id,
+                    "intent_version": target_state.intent_version,
+                    "prediction_id": report.prediction_id,
+                    "timestamp": time.time(),
+                    "payload": report.to_dict(),
+                })
+
+                if report.predicted_approval_required:
+                    await self.connections.broadcast({
+                        "type": "IMPACT_REVIEW_REQUIRED",
+                        "event_id": f"evt_review_req_{uuid.uuid4().hex[:6]}",
+                        "mission_id": m_id,
+                        "intent_version": target_state.intent_version,
+                        "prediction_id": report.prediction_id,
+                        "timestamp": time.time(),
+                        "payload": {"risk": report.predicted_risk, "scope": report.predicted_scope},
+                    })
+
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_predict_impact_result",
+                        "project_id": project_id,
+                        "mission_id": m_id,
+                        "status": status.value,
+                        "reason": reason,
+                        "prediction": report.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_get_predictions":
+                from agents.mission_control_engine import MissionControlEngine
+                m_id = str(message.get("mission_id") or "m_p36_interactive")
+                predictions = MissionControlEngine.get_prediction_history(m_id)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_predictions_result",
+                        "project_id": project_id,
+                        "mission_id": m_id,
+                        "predictions": predictions,
                     },
                 )
                 return

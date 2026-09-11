@@ -1,0 +1,47 @@
+[
+  {
+    "mission_id": "mission_1_simple_todo",
+    "fault_type": "NONE",
+    "target_stage": "EXECUTION",
+    "escalation_path": "DIRECT_SUCCESS",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "mission_2_simulated_auth",
+    "fault_type": "NONE",
+    "target_stage": "EXECUTION",
+    "escalation_path": "DIRECT_SUCCESS",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "mission_3_bug_repair",
+    "fault_type": "SYNTAX_ERROR",
+    "target_stage": "EXECUTION",
+    "escalation_path": "FAIL -> DIAGNOSE -> REPAIR -> REVALIDATE -> CONTINUE",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "mission_4_feature_and_tests",
+    "fault_type": "NONE",
+    "target_stage": "EXECUTION",
+    "escalation_path": "DIRECT_SUCCESS",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  },
+  {
+    "mission_id": "mission_5_build_repair_browser",
+    "fault_type": "BUILD_FAILURE",
+    "target_stage": "EXECUTION",
+    "escalation_path": "FAIL -> DIAGNOSE -> REPAIR -> REVALIDATE -> CONTINUE",
+    "autonomous_repair_successful": true,
+    "human_intervention_required": false,
+    "unrelated_changes": 0
+  }
+]

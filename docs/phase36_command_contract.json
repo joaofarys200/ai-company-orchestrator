@@ -1,0 +1,170 @@
+{
+  "phase": "Fase 36",
+  "name": "Bidirectional Mission Control & Human Intervention Command Contract",
+  "version": "1.0.0",
+  "generated_at": "2026-09-10T21:44:00Z",
+  "architecture_invariant": "USER ACTION -> VALIDATION -> MISSION GATE -> STATE TRANSITION -> EXECUTION/SCHEDULING -> EVIDENCE -> UI UPDATE",
+  "simulation_count": 0,
+  "command_schema": {
+    "type": "object",
+    "required": ["command_id", "mission_id", "command_type"],
+    "properties": {
+      "command_id": { "type": "string", "description": "Unique command UUID" },
+      "mission_id": { "type": "string", "description": "Target mission identifier" },
+      "command_type": { 
+        "type": "string", 
+        "enum": ["APPROVE", "PAUSE", "RESUME", "CANCEL", "CHANGE_PRIORITY", "REORDER"] 
+      },
+      "user_id": { "type": "string", "default": "user_default" },
+      "target_task_id": { "type": "string", "nullable": true },
+      "requested_at": { "type": "number", "description": "Epoch timestamp in seconds" },
+      "expected_mission_version": { "type": "integer", "default": 1 },
+      "expected_task_version": { "type": "integer", "nullable": true },
+      "payload": { "type": "object", "description": "Command-specific arguments" },
+      "reason": { "type": "string", "nullable": true },
+      "idempotency_key": { "type": "string" }
+    }
+  },
+  "result_schema": {
+    "type": "object",
+    "required": ["command_id", "mission_id", "status", "reason", "mission_version"],
+    "properties": {
+      "command_id": { "type": "string" },
+      "mission_id": { "type": "string" },
+      "status": { 
+        "type": "string", 
+        "enum": ["ACCEPTED", "REJECTED", "STALE", "SECURITY_BLOCK", "INVALID_STATE", "NOT_FOUND", "CONFLICT"] 
+      },
+      "reason": { "type": "string" },
+      "mission_version": { "type": "integer" },
+      "state": { "type": "object", "nullable": true },
+      "details": { "type": "object" }
+    }
+  },
+  "audit_record_schema": {
+    "type": "object",
+    "required": ["command_id", "user_id", "command_type", "status", "reason", "old_state", "new_state", "mission_version", "timestamp"],
+    "properties": {
+      "command_id": { "type": "string" },
+      "user_id": { "type": "string" },
+      "command_type": { "type": "string" },
+      "target_task_id": { "type": "string", "nullable": true },
+      "status": { "type": "string" },
+      "reason": { "type": "string" },
+      "old_state": { "type": "string" },
+      "new_state": { "type": "string" },
+      "mission_version": { "type": "integer" },
+      "timestamp": { "type": "number" }
+    }
+  },
+  "commands": {
+    "APPROVE": {
+      "description": "Approves or rejects a task paused in PENDING_APPROVAL state, unblocking or cancelling its execution tree.",
+      "target": "task",
+      "required_payload_fields": ["approved"],
+      "preconditions": [
+        "target_task_id exists in mission task graph",
+        "target task status must be PENDING_APPROVAL",
+        "mission must not be in terminal state (COMPLETED, FAILED, CANCELLED)"
+      ],
+      "postconditions": [
+        "If approved=true: target task status transitions to READY or RUNNING; next step is dispatched to assigned agent",
+        "If approved=false: target task status transitions to FAILED/REJECTED; dependents marked BLOCKED",
+        "mission_version increments by 1",
+        "Audit ledger records decision with operator user_id and reason"
+      ],
+      "error_codes": ["NOT_FOUND", "INVALID_STATE", "STALE", "SECURITY_BLOCK"]
+    },
+    "PAUSE": {
+      "description": "Cooperatively suspends active mission execution at nearest safe task boundary.",
+      "target": "mission",
+      "required_payload_fields": [],
+      "preconditions": [
+        "mission status is RUNNING, REPAIRING, or REPLANNING",
+        "mission is not already PAUSED or in terminal state"
+      ],
+      "postconditions": [
+        "Active running task completes checkpoint or yields execution lease",
+        "mission status transitions to PAUSED",
+        "mission_version increments by 1",
+        "Audit ledger records PAUSE event"
+      ],
+      "error_codes": ["INVALID_STATE", "STALE", "SECURITY_BLOCK"]
+    },
+    "RESUME": {
+      "description": "Resumes execution of a PAUSED mission from latest durable checkpoint.",
+      "target": "mission",
+      "required_payload_fields": [],
+      "preconditions": [
+        "mission status is PAUSED"
+      ],
+      "postconditions": [
+        "mission status transitions to RUNNING",
+        "Agent scheduler re-activates leases for pending ready tasks",
+        "mission_version increments by 1",
+        "Audit ledger records RESUME event"
+      ],
+      "error_codes": ["INVALID_STATE", "STALE", "SECURITY_BLOCK"]
+    },
+    "CANCEL": {
+      "description": "Irreversibly cancels mission execution, terminating running workers and finalizing evidence.",
+      "target": "mission",
+      "required_payload_fields": [],
+      "preconditions": [
+        "mission is not already in terminal state (COMPLETED, FAILED, CANCELLED)"
+      ],
+      "postconditions": [
+        "mission status transitions to CANCELLING, then immediately to CANCELLED",
+        "All active task leases revoked; running tasks cancelled",
+        "Complete execution history, logs, and partial evidence are permanently preserved",
+        "mission_version increments by 1",
+        "Audit ledger records CANCEL with operator reason"
+      ],
+      "error_codes": ["INVALID_STATE", "STALE", "SECURITY_BLOCK"]
+    },
+    "CHANGE_PRIORITY": {
+      "description": "Modifies priority level (CRITICAL, HIGH, NORMAL, LOW) of a target task without violating DAG structure.",
+      "target": "task",
+      "required_payload_fields": ["priority"],
+      "allowed_priorities": ["CRITICAL", "HIGH", "NORMAL", "LOW"],
+      "preconditions": [
+        "target_task_id exists in mission task graph",
+        "target task is not in terminal status (COMPLETED, FAILED, CANCELLED)",
+        "priority value is one of CRITICAL, HIGH, NORMAL, LOW"
+      ],
+      "postconditions": [
+        "target task priority updated in task record",
+        "Scheduler queue dynamically re-sorted by priority for ready tasks",
+        "DAG topological dependency constraints remain strictly preserved",
+        "mission_version increments by 1",
+        "Audit ledger records priority change"
+      ],
+      "error_codes": ["NOT_FOUND", "INVALID_STATE", "STALE", "SECURITY_BLOCK"]
+    },
+    "REORDER": {
+      "description": "Adjusts task execution order within permissible topological bounds, strictly refusing cycle creation or dependency violations.",
+      "target": "task",
+      "required_payload_fields": ["direction"],
+      "allowed_directions": ["UP", "DOWN"],
+      "preconditions": [
+        "target_task_id exists in task sequence",
+        "Adjacent swap target exists in specified direction",
+        "Swap does not move target task before any prerequisite/dependency",
+        "Swap does not move target task after any task that depends on target task"
+      ],
+      "postconditions": [
+        "Task sequence order swapped in mission plan",
+        "DAG remains acyclic and topographically valid",
+        "mission_version increments by 1",
+        "Audit ledger records REORDER event"
+      ],
+      "error_codes": ["NOT_FOUND", "CONFLICT", "STALE", "SECURITY_BLOCK"]
+    }
+  },
+  "safety_gates": {
+    "sentinel_security_gate": "Every command is evaluated against Security Sentinel before gate dispatch; blocked commands return SECURITY_BLOCK and are logged in audit ledger.",
+    "optimistic_concurrency_lock": "If expected_mission_version does not match current mission_version, command is rejected with STALE status to prevent lost updates.",
+    "idempotency_cache": "Duplicate idempotency_key within cache window returns identical cached CommandResult without executing duplicate state transitions.",
+    "topological_invariance": "Task reordering cannot violate causal dependencies: predecessor cannot be scheduled after successor; cycle formation is strictly prevented."
+  }
+}

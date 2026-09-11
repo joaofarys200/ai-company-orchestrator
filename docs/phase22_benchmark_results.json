@@ -1,0 +1,1119 @@
+{
+  "metadata": {
+    "phase": "Phase 22 \u2014 QUIC Dataplane Profiling & Native Acceleration",
+    "timestamp": "2026-09-07T19:20:35.617575+00:00",
+    "commit_sha": "172831a8594c16ed4320c585331f8b1b12c6c50c",
+    "host": "BIGBALLSG",
+    "os": "Windows 11",
+    "replicates_per_scenario": 5,
+    "stream_scale_max": 8192
+  },
+  "baseline_phase21": {
+    "64_streams": {
+      "classification": "MEASURED",
+      "mode": "standard",
+      "active_streams": 64,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 2.348,
+        "median": 2.237,
+        "std": 0.647,
+        "min": 1.545,
+        "max": 3.111
+      },
+      "p50_latency_ms": {
+        "mean": 0.009,
+        "median": 0.009,
+        "std": 0.0,
+        "min": 0.009,
+        "max": 0.009
+      },
+      "p95_latency_ms": {
+        "mean": 0.015,
+        "median": 0.012,
+        "std": 0.006,
+        "min": 0.011,
+        "max": 0.023
+      },
+      "cpu_utilization_pct": {
+        "mean": 12.12,
+        "median": 0.0,
+        "std": 27.101,
+        "min": 0.0,
+        "max": 60.6
+      },
+      "memory_rss_mb": {
+        "mean": 79.195,
+        "median": 79.195,
+        "std": 0.056,
+        "min": 79.121,
+        "max": 79.266
+      },
+      "control_latency_ms": {
+        "mean": 0.188,
+        "median": 0.183,
+        "std": 0.015,
+        "min": 0.177,
+        "max": 0.215
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 25.0,
+        "median": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "128_streams": {
+      "classification": "MEASURED",
+      "mode": "standard",
+      "active_streams": 128,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 4.348,
+        "median": 4.029,
+        "std": 1.255,
+        "min": 2.93,
+        "max": 5.896
+      },
+      "p50_latency_ms": {
+        "mean": 0.008,
+        "median": 0.009,
+        "std": 0.0,
+        "min": 0.008,
+        "max": 0.009
+      },
+      "p95_latency_ms": {
+        "mean": 0.015,
+        "median": 0.011,
+        "std": 0.007,
+        "min": 0.011,
+        "max": 0.028
+      },
+      "cpu_utilization_pct": {
+        "mean": 41.02,
+        "median": 57.5,
+        "std": 38.21,
+        "min": 0.0,
+        "max": 79.0
+      },
+      "memory_rss_mb": {
+        "mean": 84.502,
+        "median": 84.504,
+        "std": 0.028,
+        "min": 84.465,
+        "max": 84.535
+      },
+      "control_latency_ms": {
+        "mean": 0.232,
+        "median": 0.211,
+        "std": 0.064,
+        "min": 0.166,
+        "max": 0.336
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 25.0,
+        "median": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "256_streams": {
+      "classification": "MEASURED",
+      "mode": "standard",
+      "active_streams": 256,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 4.791,
+        "median": 5.205,
+        "std": 1.124,
+        "min": 3.055,
+        "max": 5.839
+      },
+      "p50_latency_ms": {
+        "mean": 0.009,
+        "median": 0.009,
+        "std": 0.001,
+        "min": 0.008,
+        "max": 0.01
+      },
+      "p95_latency_ms": {
+        "mean": 0.025,
+        "median": 0.025,
+        "std": 0.009,
+        "min": 0.015,
+        "max": 0.037
+      },
+      "cpu_utilization_pct": {
+        "mean": 81.86,
+        "median": 102.0,
+        "std": 47.093,
+        "min": 0.0,
+        "max": 114.3
+      },
+      "memory_rss_mb": {
+        "mean": 84.785,
+        "median": 84.785,
+        "std": 0.0,
+        "min": 84.785,
+        "max": 84.785
+      },
+      "control_latency_ms": {
+        "mean": 0.204,
+        "median": 0.18,
+        "std": 0.052,
+        "min": 0.176,
+        "max": 0.297
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 25.0,
+        "median": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "512_streams": {
+      "classification": "MEASURED",
+      "mode": "standard",
+      "active_streams": 512,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 5.158,
+        "median": 5.607,
+        "std": 1.315,
+        "min": 2.823,
+        "max": 5.979
+      },
+      "p50_latency_ms": {
+        "mean": 0.011,
+        "median": 0.01,
+        "std": 0.001,
+        "min": 0.01,
+        "max": 0.013
+      },
+      "p95_latency_ms": {
+        "mean": 0.035,
+        "median": 0.029,
+        "std": 0.02,
+        "min": 0.018,
+        "max": 0.069
+      },
+      "cpu_utilization_pct": {
+        "mean": 77.54,
+        "median": 109.2,
+        "std": 49.587,
+        "min": 0.0,
+        "max": 113.3
+      },
+      "memory_rss_mb": {
+        "mean": 85.009,
+        "median": 85.0,
+        "std": 0.018,
+        "min": 84.992,
+        "max": 85.031
+      },
+      "control_latency_ms": {
+        "mean": 0.293,
+        "median": 0.292,
+        "std": 0.092,
+        "min": 0.198,
+        "max": 0.408
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 25.0,
+        "median": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "1024_streams": {
+      "classification": "MEASURED",
+      "mode": "standard",
+      "active_streams": 1024,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 5.608,
+        "median": 6.006,
+        "std": 1.111,
+        "min": 3.63,
+        "max": 6.26
+      },
+      "p50_latency_ms": {
+        "mean": 0.009,
+        "median": 0.009,
+        "std": 0.0,
+        "min": 0.009,
+        "max": 0.009
+      },
+      "p95_latency_ms": {
+        "mean": 0.017,
+        "median": 0.014,
+        "std": 0.007,
+        "min": 0.01,
+        "max": 0.028
+      },
+      "cpu_utilization_pct": {
+        "mean": 62.24,
+        "median": 71.2,
+        "std": 60.233,
+        "min": 0.0,
+        "max": 122.4
+      },
+      "memory_rss_mb": {
+        "mean": 85.141,
+        "median": 85.141,
+        "std": 0.0,
+        "min": 85.141,
+        "max": 85.141
+      },
+      "control_latency_ms": {
+        "mean": 0.236,
+        "median": 0.246,
+        "std": 0.029,
+        "min": 0.192,
+        "max": 0.267
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 25.0,
+        "median": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "2048_streams": {
+      "classification": "MEASURED",
+      "mode": "standard",
+      "active_streams": 2048,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 4.55,
+        "median": 5.177,
+        "std": 1.157,
+        "min": 3.199,
+        "max": 5.725
+      },
+      "p50_latency_ms": {
+        "mean": 0.015,
+        "median": 0.015,
+        "std": 0.006,
+        "min": 0.009,
+        "max": 0.022
+      },
+      "p95_latency_ms": {
+        "mean": 0.029,
+        "median": 0.021,
+        "std": 0.019,
+        "min": 0.011,
+        "max": 0.051
+      },
+      "cpu_utilization_pct": {
+        "mean": 76.56,
+        "median": 101.3,
+        "std": 46.081,
+        "min": 0.0,
+        "max": 112.0
+      },
+      "memory_rss_mb": {
+        "mean": 85.395,
+        "median": 85.398,
+        "std": 0.012,
+        "min": 85.383,
+        "max": 85.406
+      },
+      "control_latency_ms": {
+        "mean": 0.189,
+        "median": 0.195,
+        "std": 0.014,
+        "min": 0.172,
+        "max": 0.204
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 25.0,
+        "median": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "4096_streams": {
+      "classification": "MEASURED",
+      "mode": "standard",
+      "active_streams": 4096,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 5.108,
+        "median": 5.584,
+        "std": 0.969,
+        "min": 3.824,
+        "max": 6.062
+      },
+      "p50_latency_ms": {
+        "mean": 0.011,
+        "median": 0.009,
+        "std": 0.004,
+        "min": 0.008,
+        "max": 0.018
+      },
+      "p95_latency_ms": {
+        "mean": 0.023,
+        "median": 0.02,
+        "std": 0.014,
+        "min": 0.013,
+        "max": 0.046
+      },
+      "cpu_utilization_pct": {
+        "mean": 84.92,
+        "median": 109.3,
+        "std": 49.122,
+        "min": 0.0,
+        "max": 118.6
+      },
+      "memory_rss_mb": {
+        "mean": 84.876,
+        "median": 84.875,
+        "std": 0.003,
+        "min": 84.871,
+        "max": 84.879
+      },
+      "control_latency_ms": {
+        "mean": 0.226,
+        "median": 0.234,
+        "std": 0.045,
+        "min": 0.169,
+        "max": 0.276
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 25.0,
+        "median": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "8192_streams": {
+      "classification": "MEASURED",
+      "mode": "standard",
+      "active_streams": 8192,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 3.717,
+        "median": 3.005,
+        "std": 1.297,
+        "min": 2.772,
+        "max": 5.886
+      },
+      "p50_latency_ms": {
+        "mean": 0.01,
+        "median": 0.009,
+        "std": 0.004,
+        "min": 0.008,
+        "max": 0.018
+      },
+      "p95_latency_ms": {
+        "mean": 0.026,
+        "median": 0.028,
+        "std": 0.014,
+        "min": 0.009,
+        "max": 0.046
+      },
+      "cpu_utilization_pct": {
+        "mean": 38.38,
+        "median": 0.0,
+        "std": 54.132,
+        "min": 0.0,
+        "max": 114.3
+      },
+      "memory_rss_mb": {
+        "mean": 85.121,
+        "median": 85.121,
+        "std": 0.01,
+        "min": 85.113,
+        "max": 85.137
+      },
+      "control_latency_ms": {
+        "mean": 0.204,
+        "median": 0.191,
+        "std": 0.042,
+        "min": 0.169,
+        "max": 0.268
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 25.0,
+        "median": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    }
+  },
+  "optimized_phase22": {
+    "64_streams": {
+      "classification": "MEASURED",
+      "mode": "native_accelerated",
+      "active_streams": 64,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 4.899,
+        "median": 4.653,
+        "std": 0.821,
+        "min": 4.117,
+        "max": 6.277
+      },
+      "p50_latency_ms": {
+        "mean": 0.008,
+        "median": 0.009,
+        "std": 0.0,
+        "min": 0.008,
+        "max": 0.009
+      },
+      "p95_latency_ms": {
+        "mean": 0.014,
+        "median": 0.011,
+        "std": 0.007,
+        "min": 0.01,
+        "max": 0.026
+      },
+      "cpu_utilization_pct": {
+        "mean": 30.04,
+        "median": 0.0,
+        "std": 41.139,
+        "min": 0.0,
+        "max": 76.0
+      },
+      "memory_rss_mb": {
+        "mean": 84.506,
+        "median": 84.441,
+        "std": 0.138,
+        "min": 84.367,
+        "max": 84.66
+      },
+      "control_latency_ms": {
+        "mean": 0.184,
+        "median": 0.176,
+        "std": 0.024,
+        "min": 0.167,
+        "max": 0.227
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 85.0,
+        "median": 85.0,
+        "std": 0.0,
+        "min": 85.0,
+        "max": 85.0
+      }
+    },
+    "128_streams": {
+      "classification": "MEASURED",
+      "mode": "native_accelerated",
+      "active_streams": 128,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 11.227,
+        "median": 9.193,
+        "std": 3.491,
+        "min": 8.049,
+        "max": 15.377
+      },
+      "p50_latency_ms": {
+        "mean": 0.008,
+        "median": 0.008,
+        "std": 0.0,
+        "min": 0.008,
+        "max": 0.008
+      },
+      "p95_latency_ms": {
+        "mean": 0.014,
+        "median": 0.011,
+        "std": 0.008,
+        "min": 0.01,
+        "max": 0.028
+      },
+      "cpu_utilization_pct": {
+        "mean": 29.5,
+        "median": 0.0,
+        "std": 40.406,
+        "min": 0.0,
+        "max": 75.1
+      },
+      "memory_rss_mb": {
+        "mean": 84.975,
+        "median": 85.02,
+        "std": 0.108,
+        "min": 84.781,
+        "max": 85.027
+      },
+      "control_latency_ms": {
+        "mean": 0.186,
+        "median": 0.184,
+        "std": 0.019,
+        "min": 0.165,
+        "max": 0.215
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 85.0,
+        "median": 85.0,
+        "std": 0.0,
+        "min": 85.0,
+        "max": 85.0
+      }
+    },
+    "256_streams": {
+      "classification": "MEASURED",
+      "mode": "native_accelerated",
+      "active_streams": 256,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 12.201,
+        "median": 12.066,
+        "std": 2.776,
+        "min": 7.943,
+        "max": 15.135
+      },
+      "p50_latency_ms": {
+        "mean": 0.016,
+        "median": 0.019,
+        "std": 0.007,
+        "min": 0.009,
+        "max": 0.024
+      },
+      "p95_latency_ms": {
+        "mean": 0.033,
+        "median": 0.028,
+        "std": 0.016,
+        "min": 0.012,
+        "max": 0.052
+      },
+      "cpu_utilization_pct": {
+        "mean": 80.36,
+        "median": 98.6,
+        "std": 50.204,
+        "min": 0.0,
+        "max": 123.2
+      },
+      "memory_rss_mb": {
+        "mean": 85.116,
+        "median": 85.055,
+        "std": 0.1,
+        "min": 85.027,
+        "max": 85.227
+      },
+      "control_latency_ms": {
+        "mean": 0.222,
+        "median": 0.198,
+        "std": 0.043,
+        "min": 0.186,
+        "max": 0.289
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 85.0,
+        "median": 85.0,
+        "std": 0.0,
+        "min": 85.0,
+        "max": 85.0
+      }
+    },
+    "512_streams": {
+      "classification": "MEASURED",
+      "mode": "native_accelerated",
+      "active_streams": 512,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 9.922,
+        "median": 11.696,
+        "std": 2.525,
+        "min": 6.947,
+        "max": 11.838
+      },
+      "p50_latency_ms": {
+        "mean": 0.02,
+        "median": 0.022,
+        "std": 0.006,
+        "min": 0.009,
+        "max": 0.024
+      },
+      "p95_latency_ms": {
+        "mean": 0.043,
+        "median": 0.046,
+        "std": 0.019,
+        "min": 0.011,
+        "max": 0.062
+      },
+      "cpu_utilization_pct": {
+        "mean": 80.94,
+        "median": 95.4,
+        "std": 20.48,
+        "min": 56.8,
+        "max": 96.4
+      },
+      "memory_rss_mb": {
+        "mean": 85.384,
+        "median": 85.383,
+        "std": 0.006,
+        "min": 85.379,
+        "max": 85.391
+      },
+      "control_latency_ms": {
+        "mean": 0.283,
+        "median": 0.292,
+        "std": 0.058,
+        "min": 0.184,
+        "max": 0.331
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 85.0,
+        "median": 85.0,
+        "std": 0.0,
+        "min": 85.0,
+        "max": 85.0
+      }
+    },
+    "1024_streams": {
+      "classification": "MEASURED",
+      "mode": "native_accelerated",
+      "active_streams": 1024,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 9.392,
+        "median": 7.16,
+        "std": 3.497,
+        "min": 6.797,
+        "max": 14.469
+      },
+      "p50_latency_ms": {
+        "mean": 0.015,
+        "median": 0.012,
+        "std": 0.007,
+        "min": 0.009,
+        "max": 0.023
+      },
+      "p95_latency_ms": {
+        "mean": 0.033,
+        "median": 0.03,
+        "std": 0.016,
+        "min": 0.016,
+        "max": 0.054
+      },
+      "cpu_utilization_pct": {
+        "mean": 94.08,
+        "median": 58.5,
+        "std": 105.483,
+        "min": 0.0,
+        "max": 221.9
+      },
+      "memory_rss_mb": {
+        "mean": 85.561,
+        "median": 85.602,
+        "std": 0.07,
+        "min": 85.465,
+        "max": 85.621
+      },
+      "control_latency_ms": {
+        "mean": 0.272,
+        "median": 0.248,
+        "std": 0.078,
+        "min": 0.185,
+        "max": 0.391
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 85.0,
+        "median": 85.0,
+        "std": 0.0,
+        "min": 85.0,
+        "max": 85.0
+      }
+    },
+    "2048_streams": {
+      "classification": "MEASURED",
+      "mode": "native_accelerated",
+      "active_streams": 2048,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 10.638,
+        "median": 11.915,
+        "std": 2.693,
+        "min": 7.575,
+        "max": 13.318
+      },
+      "p50_latency_ms": {
+        "mean": 0.011,
+        "median": 0.009,
+        "std": 0.005,
+        "min": 0.008,
+        "max": 0.021
+      },
+      "p95_latency_ms": {
+        "mean": 0.028,
+        "median": 0.026,
+        "std": 0.015,
+        "min": 0.011,
+        "max": 0.05
+      },
+      "cpu_utilization_pct": {
+        "mean": 61.4,
+        "median": 96.8,
+        "std": 56.207,
+        "min": 0.0,
+        "max": 108.6
+      },
+      "memory_rss_mb": {
+        "mean": 85.368,
+        "median": 85.094,
+        "std": 0.508,
+        "min": 84.832,
+        "max": 85.914
+      },
+      "control_latency_ms": {
+        "mean": 0.248,
+        "median": 0.233,
+        "std": 0.05,
+        "min": 0.193,
+        "max": 0.323
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 85.0,
+        "median": 85.0,
+        "std": 0.0,
+        "min": 85.0,
+        "max": 85.0
+      }
+    },
+    "4096_streams": {
+      "classification": "MEASURED",
+      "mode": "native_accelerated",
+      "active_streams": 4096,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 11.746,
+        "median": 11.872,
+        "std": 2.75,
+        "min": 7.431,
+        "max": 15.0
+      },
+      "p50_latency_ms": {
+        "mean": 0.008,
+        "median": 0.008,
+        "std": 0.0,
+        "min": 0.008,
+        "max": 0.009
+      },
+      "p95_latency_ms": {
+        "mean": 0.014,
+        "median": 0.012,
+        "std": 0.005,
+        "min": 0.011,
+        "max": 0.024
+      },
+      "cpu_utilization_pct": {
+        "mean": 83.68,
+        "median": 96.8,
+        "std": 47.999,
+        "min": 0.0,
+        "max": 122.3
+      },
+      "memory_rss_mb": {
+        "mean": 85.311,
+        "median": 85.34,
+        "std": 0.067,
+        "min": 85.191,
+        "max": 85.348
+      },
+      "control_latency_ms": {
+        "mean": 0.261,
+        "median": 0.264,
+        "std": 0.075,
+        "min": 0.17,
+        "max": 0.348
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 85.0,
+        "median": 85.0,
+        "std": 0.0,
+        "min": 85.0,
+        "max": 85.0
+      }
+    },
+    "8192_streams": {
+      "classification": "MEASURED",
+      "mode": "native_accelerated",
+      "active_streams": 8192,
+      "runs_count": 5,
+      "throughput_mb_s": {
+        "mean": 10.946,
+        "median": 9.368,
+        "std": 2.964,
+        "min": 7.805,
+        "max": 14.576
+      },
+      "p50_latency_ms": {
+        "mean": 0.008,
+        "median": 0.009,
+        "std": 0.0,
+        "min": 0.008,
+        "max": 0.009
+      },
+      "p95_latency_ms": {
+        "mean": 0.012,
+        "median": 0.012,
+        "std": 0.002,
+        "min": 0.009,
+        "max": 0.016
+      },
+      "cpu_utilization_pct": {
+        "mean": 30.6,
+        "median": 0.0,
+        "std": 41.901,
+        "min": 0.0,
+        "max": 76.5
+      },
+      "memory_rss_mb": {
+        "mean": 85.527,
+        "median": 85.527,
+        "std": 0.004,
+        "min": 85.523,
+        "max": 85.531
+      },
+      "control_latency_ms": {
+        "mean": 0.207,
+        "median": 0.178,
+        "std": 0.053,
+        "min": 0.166,
+        "max": 0.292
+      },
+      "retransmissions": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "failed_streams": {
+        "mean": 0,
+        "median": 0,
+        "std": 0.0,
+        "min": 0,
+        "max": 0
+      },
+      "worker_utilization_pct": {
+        "mean": 85.0,
+        "median": 85.0,
+        "std": 0.0,
+        "min": 85.0,
+        "max": 85.0
+      }
+    }
+  }
+}

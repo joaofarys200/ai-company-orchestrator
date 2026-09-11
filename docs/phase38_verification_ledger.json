@@ -1,0 +1,192 @@
+{
+  "phase": 38,
+  "phase_name": "Super-File Decomposition & Architecture Hygiene",
+  "timestamp_iso": "2026-09-10T22:31:00Z",
+  "verdict": "SUPER_FILE_DECOMPOSITION_READY",
+  "epistemic_calibration": {
+    "simulated_data": false,
+    "proven_by_direct_ast_measurement": true,
+    "zero_synthetic_speedups": true,
+    "status_levels": {
+      "PROVEN": "Empirically verified through automated tests, AST inspection, build artifacts, and Edge Browser QA",
+      "OBSERVED": "Direct measurement of execution latencies and memory usage during runtime",
+      "INFERRED": "Heuristic responsibility classification validated by domain import analysis",
+      "DEFERRED_BY_ARCHITECTURAL_REASON": "Monolithic backend cores preserved to prevent concurrency and security regressions"
+    }
+  },
+  "summary_metrics": {
+    "total_files_scanned": 719,
+    "high_super_files_before": 7,
+    "high_super_files_after": 6,
+    "critical_super_files": 0,
+    "super_files_decomposed": 1,
+    "subcomponents_extracted": 13,
+    "loc_reduction_target_pct": 78.34,
+    "score_reduction_target_pts": 15.86,
+    "target_severity_downgrade": "HIGH -> WATCH",
+    "public_api_changes": "UNCHANGED",
+    "compatibility_shims": 0,
+    "circular_dependencies": 0,
+    "total_tests_passed": 62,
+    "total_tests_failed": 0,
+    "browser_qa_scenarios_passed": 10,
+    "browser_qa_assertions_passed": 22,
+    "browser_qa_console_errors": 0,
+    "browser_qa_network_errors": 0
+  },
+  "audit_results": {
+    "report_path": "docs/phase38_super_file_audit.json",
+    "weights": {
+      "loc": 0.15,
+      "classes": 0.05,
+      "functions": 0.10,
+      "responsibilities": 0.20,
+      "fan_out": 0.05,
+      "fan_in": 0.10,
+      "shared_state": 0.10,
+      "complexity": 0.10,
+      "public_symbols": 0.05,
+      "domains": 0.10
+    },
+    "classification_thresholds": {
+      "CRITICAL": ">= 80.0",
+      "HIGH": ">= 65.0",
+      "WATCH": ">= 40.0",
+      "NORMAL": "< 40.0"
+    },
+    "severity_distribution": {
+      "CRITICAL": 0,
+      "HIGH": 6,
+      "WATCH": 50,
+      "NORMAL": 389
+    }
+  },
+  "decomposed_target": {
+    "path": "frontend/src/features/missions/MissionControlCenter.tsx",
+    "role": "Mission Control Center Orchestrator & Composer",
+    "before": {
+      "loc": 2382,
+      "total_lines": 2519,
+      "score": 66.16,
+      "severity": "HIGH",
+      "responsibilities_count": 10,
+      "state_hooks": 8,
+      "cyclomatic_complexity": 83
+    },
+    "after": {
+      "loc": 516,
+      "total_lines": 593,
+      "score": 50.3,
+      "severity": "WATCH",
+      "responsibilities_count": 3,
+      "state_hooks": 8,
+      "cyclomatic_complexity": 22
+    },
+    "extracted_components": [
+      { "name": "MissionHeader.tsx", "loc": 244, "domain": "Scenario selection, status/stage badges, version badges, metrics summary" },
+      { "name": "MissionControlActions.tsx", "loc": 78, "domain": "Bidirectional controls (Pause, Resume, Cancel, Edit Goal)" },
+      { "name": "CancelConfirmModal.tsx", "loc": 65, "domain": "Operator mission cancellation modal dialog" },
+      { "name": "IntentPreviewModal.tsx", "loc": 198, "domain": "NLP directive editor, impact analysis, conflict alerts, approval gate" },
+      { "name": "MissionOverviewPanel.tsx", "loc": 357, "domain": "Stage progress, Requirements vs Assumptions, Swarm agents, Audit ledger" },
+      { "name": "MissionTaskGraphPanel.tsx", "loc": 252, "domain": "Kahn DAG topological graph, task controls, approval gate, event timeline" },
+      { "name": "MissionRequirementsDiffPanel.tsx", "loc": 130, "domain": "Requirements lifecycle diff (ADDED, MODIFIED, SUPERSEDED, CANCELLED)" },
+      { "name": "MissionPlanDiffPanel.tsx", "loc": 80, "domain": "Plan diff, DAG Safe invariant badge, task differences" },
+      { "name": "MissionEvidenceImpactPanel.tsx", "loc": 81, "domain": "Zero False Success evidence invalidation ledger" },
+      { "name": "MissionWhyCausalPanel.tsx", "loc": 70, "domain": "Why Panel causal explainability chains" },
+      { "name": "MissionRepairPanel.tsx", "loc": 155, "domain": "Self-healing diagnostics, AST patches, replan explainability, crash recovery" },
+      { "name": "MissionEvidenceLedgerPanel.tsx", "loc": 89, "domain": "Physical evidence ledger and Monaco code navigation" },
+      { "name": "MissionAppPreviewPanel.tsx", "loc": 145, "domain": "Live Expense Tracker interactive demo" },
+      { "name": "index.ts", "loc": 14, "domain": "Clean barrel exports" }
+    ]
+  },
+  "deferred_super_files": [
+    {
+      "path": "agents/mission_control_engine.py",
+      "score": 78.0,
+      "severity": "HIGH",
+      "loc": 2597,
+      "reason": "DEFERRED_BY_ARCHITECTURAL_REASON: Central state machine kernel, ACID persistence invariants, asyncio.Lock synchronization, Security Sentinel gate checks. Unstaged decomposition risks concurrency regressions."
+    },
+    {
+      "path": "agents/collaboration_engine.py",
+      "score": 72.8,
+      "severity": "HIGH",
+      "loc": 1845,
+      "reason": "DEFERRED_BY_ARCHITECTURAL_REASON: Multi-agent turn management, consensus protocols, and context sharing kernel."
+    },
+    {
+      "path": "agents/orchestrator/__init__.py",
+      "score": 71.5,
+      "severity": "HIGH",
+      "loc": 1720,
+      "reason": "DEFERRED_BY_ARCHITECTURAL_REASON: Central coordination core across the 6 specialized swarm agents."
+    },
+    {
+      "path": "agents/project_builder.py",
+      "score": 69.4,
+      "severity": "HIGH",
+      "loc": 1610,
+      "reason": "DEFERRED_BY_ARCHITECTURAL_REASON: Scaffolding, dependency resolution, and AST modification pipeline."
+    },
+    {
+      "path": "backend/websocket/handlers/missions.py",
+      "score": 67.2,
+      "severity": "HIGH",
+      "loc": 1204,
+      "reason": "DEFERRED_BY_ARCHITECTURAL_REASON: Primary WebSocket transport router handling 12+ real-time event operations."
+    },
+    {
+      "path": "backend/websocket/handlers/projects.py",
+      "score": 65.8,
+      "severity": "HIGH",
+      "loc": 1150,
+      "reason": "DEFERRED_BY_ARCHITECTURAL_REASON: Project lifecycle and file tree serialization handler."
+    }
+  ],
+  "verification_evidence": {
+    "test_suites": [
+      { "suite": "tests/test_super_file_audit.py", "passed": 6, "failed": 0 },
+      { "suite": "tests/test_super_file_decomposition.py", "passed": 4, "failed": 0 },
+      { "suite": "tests/test_architecture_preservation.py", "passed": 4, "failed": 0 },
+      { "suite": "tests/test_mission_control_phase35.py", "passed": 10, "failed": 0 },
+      { "suite": "tests/test_mission_control_bidirectional_phase36.py", "passed": 15, "failed": 0 },
+      { "suite": "tests/test_mission_intent_phase37.py", "passed": 23, "failed": 0 }
+    ],
+    "frontend_build": {
+      "tool": "Vite / Rolldown",
+      "status": "PASSED",
+      "duration_seconds": 3.14,
+      "typescript_errors": 0
+    },
+    "edge_browser_qa": {
+      "status": "PASSED",
+      "browser": "Microsoft Edge",
+      "url": "http://127.0.0.1:8000",
+      "assertions_passed": 22,
+      "scenarios_passed": 10,
+      "console_errors": 0,
+      "network_errors": 0,
+      "screenshots": [
+        "docs/screenshots/phase38/01_mission_control_overview.png",
+        "docs/screenshots/phase38/02_controls_pause_resume.png",
+        "docs/screenshots/phase38/03_task_graph_dag_view.png",
+        "docs/screenshots/phase38/04_intent_editor_modal.png",
+        "docs/screenshots/phase38/05_intent_applied_replan.png",
+        "docs/screenshots/phase38/06_requirements_diff_panel.png",
+        "docs/screenshots/phase38/07_plan_diff_panel.png",
+        "docs/screenshots/phase38/08_evidence_impact_tracker.png",
+        "docs/screenshots/phase38/09_why_panel_causality.png",
+        "docs/screenshots/phase38/10_repair_and_ledger_view.png"
+      ]
+    },
+    "performance_benchmark": {
+      "status": "PASSED",
+      "files_scanned": 719,
+      "throughput_files_per_sec": 57.54,
+      "audit_mean_ms": 12494.74,
+      "graph_mean_ms": 10559.58,
+      "candidate_detection_mean_ms": 0.056,
+      "target_analysis_mean_ms": 2.68
+    }
+  }
+}

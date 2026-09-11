@@ -41,6 +41,7 @@ sandbox_dir/
 .jarvis_backups/
 .jarvis_plan.json
 symbols_index.json
+.jarvis/
 workspace/.jarvis/
 workspace/projects/*
 !workspace/projects/task-app/

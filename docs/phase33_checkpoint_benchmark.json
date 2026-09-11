@@ -1,0 +1,807 @@
+{
+  "timestamp": "2026-09-08T20:29:31.923804+00:00",
+  "phase": 33,
+  "taxonomy": "MEASURED",
+  "simulated": 0,
+  "horizons": [
+    20,
+    50,
+    100,
+    150,
+    200,
+    250,
+    300,
+    500,
+    750,
+    1000
+  ],
+  "runs_per_horizon": 5,
+  "full_checkpoint_benchmark": [
+    {
+      "mode": "FULL_CHECKPOINT",
+      "horizon": 20,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 3.245,
+        "median": 2.7268,
+        "p95": 11.5422,
+        "std": 1.9768,
+        "min": 2.4247,
+        "max": 11.5422
+      },
+      "load_duration_ms": {
+        "mean": 0.2603,
+        "median": 0.2669,
+        "p95": 0.2759,
+        "std": 0.0163,
+        "min": 0.24,
+        "max": 0.2759
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 25208.0,
+        "median": 25252.0,
+        "p95": 25853.0,
+        "std": 535.6536,
+        "min": 24475.0,
+        "max": 25853.0
+      },
+      "total_bytes_per_run_avg": 100832.0,
+      "cpu_percent": 20.6,
+      "memory_mb": 70.72
+    },
+    {
+      "mode": "FULL_CHECKPOINT",
+      "horizon": 50,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 3.1186,
+        "median": 3.1305,
+        "p95": 4.1707,
+        "std": 0.3831,
+        "min": 2.2573,
+        "max": 4.1707
+      },
+      "load_duration_ms": {
+        "mean": 0.537,
+        "median": 0.5079,
+        "p95": 0.642,
+        "std": 0.0595,
+        "min": 0.5028,
+        "max": 0.642
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 61921.25,
+        "median": 62029.0,
+        "p95": 63533.0,
+        "std": 1336.9103,
+        "min": 60094.0,
+        "max": 63533.0
+      },
+      "total_bytes_per_run_avg": 247685.0,
+      "cpu_percent": 54.5,
+      "memory_mb": 71.32
+    },
+    {
+      "mode": "FULL_CHECKPOINT",
+      "horizon": 100,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 3.4874,
+        "median": 3.3598,
+        "p95": 5.5484,
+        "std": 0.5026,
+        "min": 3.1942,
+        "max": 5.5484
+      },
+      "load_duration_ms": {
+        "mean": 0.8078,
+        "median": 0.7572,
+        "p95": 1.0166,
+        "std": 0.118,
+        "min": 0.7371,
+        "max": 1.0166
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 123110.5,
+        "median": 123325.0,
+        "p95": 126337.0,
+        "std": 2675.0899,
+        "min": 119455.0,
+        "max": 126337.0
+      },
+      "total_bytes_per_run_avg": 492442.0,
+      "cpu_percent": 57.0,
+      "memory_mb": 72.54
+    },
+    {
+      "mode": "FULL_CHECKPOINT",
+      "horizon": 150,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 3.46,
+        "median": 3.5349,
+        "p95": 5.0299,
+        "std": 0.7038,
+        "min": 2.1737,
+        "max": 5.0299
+      },
+      "load_duration_ms": {
+        "mean": 1.2341,
+        "median": 1.15,
+        "p95": 1.4451,
+        "std": 0.1482,
+        "min": 1.094,
+        "max": 1.4451
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 184348.75,
+        "median": 184671.5,
+        "p95": 189187.0,
+        "std": 4012.7618,
+        "min": 178865.0,
+        "max": 189187.0
+      },
+      "total_bytes_per_run_avg": 737395.0,
+      "cpu_percent": 59.1,
+      "memory_mb": 73.49
+    },
+    {
+      "mode": "FULL_CHECKPOINT",
+      "horizon": 200,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 4.5856,
+        "median": 4.4428,
+        "p95": 9.4532,
+        "std": 1.4131,
+        "min": 2.8105,
+        "max": 9.4532
+      },
+      "load_duration_ms": {
+        "mean": 1.668,
+        "median": 1.5551,
+        "p95": 2.2776,
+        "std": 0.3665,
+        "min": 1.3717,
+        "max": 2.2776
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 245587.0,
+        "median": 246018.0,
+        "p95": 252037.0,
+        "std": 5349.6721,
+        "min": 238275.0,
+        "max": 252037.0
+      },
+      "total_bytes_per_run_avg": 982348.0,
+      "cpu_percent": 89.0,
+      "memory_mb": 74.8
+    },
+    {
+      "mode": "FULL_CHECKPOINT",
+      "horizon": 250,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 4.6761,
+        "median": 4.3977,
+        "p95": 7.3877,
+        "std": 0.8972,
+        "min": 3.7247,
+        "max": 7.3877
+      },
+      "load_duration_ms": {
+        "mean": 1.8035,
+        "median": 1.7802,
+        "p95": 1.9208,
+        "std": 0.0926,
+        "min": 1.7153,
+        "max": 1.9208
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 306824.5,
+        "median": 307363.0,
+        "p95": 314887.0,
+        "std": 6686.8996,
+        "min": 297685.0,
+        "max": 314887.0
+      },
+      "total_bytes_per_run_avg": 1227298.0,
+      "cpu_percent": 58.8,
+      "memory_mb": 75.29
+    },
+    {
+      "mode": "FULL_CHECKPOINT",
+      "horizon": 300,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 6.7197,
+        "median": 6.5496,
+        "p95": 9.9768,
+        "std": 1.5299,
+        "min": 4.3306,
+        "max": 9.9768
+      },
+      "load_duration_ms": {
+        "mean": 3.1347,
+        "median": 3.0145,
+        "p95": 4.0844,
+        "std": 0.923,
+        "min": 2.151,
+        "max": 4.0844
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 368062.0,
+        "median": 368708.0,
+        "p95": 377737.0,
+        "std": 8024.1272,
+        "min": 357095.0,
+        "max": 377737.0
+      },
+      "total_bytes_per_run_avg": 1472248.0,
+      "cpu_percent": 87.6,
+      "memory_mb": 76.51
+    },
+    {
+      "mode": "FULL_CHECKPOINT",
+      "horizon": 500,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 8.9469,
+        "median": 8.7684,
+        "p95": 15.0408,
+        "std": 2.3938,
+        "min": 5.6956,
+        "max": 15.0408
+      },
+      "load_duration_ms": {
+        "mean": 5.5189,
+        "median": 4.8874,
+        "p95": 7.833,
+        "std": 1.855,
+        "min": 3.8042,
+        "max": 7.833
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 613012.75,
+        "median": 614088.0,
+        "p95": 629137.0,
+        "std": 13371.9586,
+        "min": 594738.0,
+        "max": 629137.0
+      },
+      "total_bytes_per_run_avg": 2452051.0,
+      "cpu_percent": 80.9,
+      "memory_mb": 77.97
+    },
+    {
+      "mode": "FULL_CHECKPOINT",
+      "horizon": 750,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 11.4187,
+        "median": 11.0218,
+        "p95": 18.4204,
+        "std": 2.6111,
+        "min": 8.0507,
+        "max": 18.4204
+      },
+      "load_duration_ms": {
+        "mean": 8.9672,
+        "median": 8.9096,
+        "p95": 11.0236,
+        "std": 1.6273,
+        "min": 6.8141,
+        "max": 11.0236
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 919200.25,
+        "median": 920813.0,
+        "p95": 943387.0,
+        "std": 20058.0965,
+        "min": 891788.0,
+        "max": 943387.0
+      },
+      "total_bytes_per_run_avg": 3676801.0,
+      "cpu_percent": 88.9,
+      "memory_mb": 78.86
+    },
+    {
+      "mode": "FULL_CHECKPOINT",
+      "horizon": 1000,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 14.5734,
+        "median": 14.4937,
+        "p95": 18.5474,
+        "std": 2.28,
+        "min": 10.4286,
+        "max": 18.5474
+      },
+      "load_duration_ms": {
+        "mean": 11.0906,
+        "median": 11.1534,
+        "p95": 12.7035,
+        "std": 1.5236,
+        "min": 8.6472,
+        "max": 12.7035
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 1225389.5,
+        "median": 1227539.0,
+        "p95": 1257641.0,
+        "std": 26745.1865,
+        "min": 1188839.0,
+        "max": 1257641.0
+      },
+      "total_bytes_per_run_avg": 4901558.0,
+      "cpu_percent": 95.9,
+      "memory_mb": 84.15
+    }
+  ],
+  "incremental_checkpoint_benchmark": [
+    {
+      "mode": "INCREMENTAL_CHECKPOINT",
+      "horizon": 20,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 4.7374,
+        "median": 4.8055,
+        "p95": 5.8515,
+        "std": 0.7864,
+        "min": 3.1921,
+        "max": 6.6392
+      },
+      "load_duration_ms": {
+        "mean": 2.248,
+        "median": 2.2544,
+        "p95": 2.5701,
+        "std": 0.3103,
+        "min": 1.8914,
+        "max": 2.5701
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 7179.6,
+        "median": 6118.0,
+        "p95": 15070.0,
+        "std": 4117.7056,
+        "min": 3960.0,
+        "max": 15070.0
+      },
+      "total_bytes_per_run_avg": 35898.0,
+      "compaction_count": 0.0,
+      "reconstruction_accuracy": 100.0,
+      "cpu_percent": 43.3,
+      "memory_mb": 70.91
+    },
+    {
+      "mode": "INCREMENTAL_CHECKPOINT",
+      "horizon": 50,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 5.938,
+        "median": 5.8193,
+        "p95": 7.4825,
+        "std": 0.8409,
+        "min": 5.0234,
+        "max": 8.6552
+      },
+      "load_duration_ms": {
+        "mean": 3.4483,
+        "median": 3.4177,
+        "p95": 3.6297,
+        "std": 0.1335,
+        "min": 3.3083,
+        "max": 3.6297
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 16108.2,
+        "median": 13093.0,
+        "p95": 36280.0,
+        "std": 10461.1758,
+        "min": 8706.0,
+        "max": 36280.0
+      },
+      "total_bytes_per_run_avg": 80541.0,
+      "compaction_count": 0.0,
+      "reconstruction_accuracy": 100.0,
+      "cpu_percent": 65.4,
+      "memory_mb": 71.76
+    },
+    {
+      "mode": "INCREMENTAL_CHECKPOINT",
+      "horizon": 100,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 7.0241,
+        "median": 7.0152,
+        "p95": 7.7099,
+        "std": 0.465,
+        "min": 6.2774,
+        "max": 8.0998
+      },
+      "load_duration_ms": {
+        "mean": 6.2729,
+        "median": 6.1704,
+        "p95": 6.6646,
+        "std": 0.3239,
+        "min": 5.9441,
+        "max": 6.6646
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 30990.8,
+        "median": 24710.0,
+        "p95": 71633.0,
+        "std": 21041.4463,
+        "min": 16620.0,
+        "max": 71633.0
+      },
+      "total_bytes_per_run_avg": 154954.0,
+      "compaction_count": 0.0,
+      "reconstruction_accuracy": 100.0,
+      "cpu_percent": 80.2,
+      "memory_mb": 72.79
+    },
+    {
+      "mode": "INCREMENTAL_CHECKPOINT",
+      "horizon": 150,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 9.1429,
+        "median": 9.1687,
+        "p95": 10.7047,
+        "std": 0.9691,
+        "min": 7.1905,
+        "max": 11.0293
+      },
+      "load_duration_ms": {
+        "mean": 9.3036,
+        "median": 9.2122,
+        "p95": 10.6552,
+        "std": 0.88,
+        "min": 8.2617,
+        "max": 10.6552
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 45891.4,
+        "median": 36325.0,
+        "p95": 107033.0,
+        "std": 31637.3425,
+        "min": 24560.0,
+        "max": 107033.0
+      },
+      "total_bytes_per_run_avg": 229457.0,
+      "compaction_count": 0.0,
+      "reconstruction_accuracy": 100.0,
+      "cpu_percent": 87.6,
+      "memory_mb": 73.73
+    },
+    {
+      "mode": "INCREMENTAL_CHECKPOINT",
+      "horizon": 200,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 11.4621,
+        "median": 11.121,
+        "p95": 14.0127,
+        "std": 1.5553,
+        "min": 9.5918,
+        "max": 15.6457
+      },
+      "load_duration_ms": {
+        "mean": 14.2745,
+        "median": 11.4569,
+        "p95": 26.2519,
+        "std": 6.7013,
+        "min": 10.8817,
+        "max": 26.2519
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 60792.0,
+        "median": 47943.0,
+        "p95": 142433.0,
+        "std": 42235.1281,
+        "min": 32480.0,
+        "max": 142433.0
+      },
+      "total_bytes_per_run_avg": 303960.0,
+      "compaction_count": 0.0,
+      "reconstruction_accuracy": 100.0,
+      "cpu_percent": 83.9,
+      "memory_mb": 74.56
+    },
+    {
+      "mode": "INCREMENTAL_CHECKPOINT",
+      "horizon": 250,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 13.6879,
+        "median": 12.0618,
+        "p95": 18.8967,
+        "std": 3.5717,
+        "min": 9.8964,
+        "max": 25.186
+      },
+      "load_duration_ms": {
+        "mean": 14.3679,
+        "median": 13.1373,
+        "p95": 18.1419,
+        "std": 2.5918,
+        "min": 12.0651,
+        "max": 18.1419
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 75692.0,
+        "median": 59583.0,
+        "p95": 177833.0,
+        "std": 52833.2129,
+        "min": 40400.0,
+        "max": 177833.0
+      },
+      "total_bytes_per_run_avg": 378460.0,
+      "compaction_count": 0.0,
+      "reconstruction_accuracy": 100.0,
+      "cpu_percent": 76.2,
+      "memory_mb": 75.95
+    },
+    {
+      "mode": "INCREMENTAL_CHECKPOINT",
+      "horizon": 300,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 21.9031,
+        "median": 21.0539,
+        "p95": 29.2188,
+        "std": 4.6088,
+        "min": 12.7075,
+        "max": 31.8807
+      },
+      "load_duration_ms": {
+        "mean": 32.9863,
+        "median": 32.0409,
+        "p95": 46.278,
+        "std": 8.1532,
+        "min": 26.1518,
+        "max": 46.278
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 90592.0,
+        "median": 71223.0,
+        "p95": 213233.0,
+        "std": 63431.3564,
+        "min": 48320.0,
+        "max": 213233.0
+      },
+      "total_bytes_per_run_avg": 452960.0,
+      "compaction_count": 0.0,
+      "reconstruction_accuracy": 100.0,
+      "cpu_percent": 93.3,
+      "memory_mb": 75.62
+    },
+    {
+      "mode": "INCREMENTAL_CHECKPOINT",
+      "horizon": 500,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 28.1491,
+        "median": 27.9535,
+        "p95": 42.934,
+        "std": 6.0414,
+        "min": 19.7323,
+        "max": 45.4755
+      },
+      "load_duration_ms": {
+        "mean": 35.2793,
+        "median": 33.5972,
+        "p95": 42.6505,
+        "std": 6.072,
+        "min": 27.373,
+        "max": 42.6505
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 150192.6,
+        "median": 117783.0,
+        "p95": 354833.0,
+        "std": 105823.7535,
+        "min": 80000.0,
+        "max": 354833.0
+      },
+      "total_bytes_per_run_avg": 750963.0,
+      "compaction_count": 0.0,
+      "reconstruction_accuracy": 100.0,
+      "cpu_percent": 94.1,
+      "memory_mb": 78.39
+    },
+    {
+      "mode": "INCREMENTAL_CHECKPOINT",
+      "horizon": 750,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 40.14,
+        "median": 39.1474,
+        "p95": 51.49,
+        "std": 7.0998,
+        "min": 28.6494,
+        "max": 57.7007
+      },
+      "load_duration_ms": {
+        "mean": 66.6238,
+        "median": 65.5948,
+        "p95": 81.8717,
+        "std": 10.1323,
+        "min": 56.3954,
+        "max": 81.8717
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 224692.6,
+        "median": 175933.0,
+        "p95": 531833.0,
+        "std": 158811.2777,
+        "min": 119600.0,
+        "max": 531833.0
+      },
+      "total_bytes_per_run_avg": 1123463.0,
+      "compaction_count": 0.0,
+      "reconstruction_accuracy": 100.0,
+      "cpu_percent": 89.7,
+      "memory_mb": 81.44
+    },
+    {
+      "mode": "INCREMENTAL_CHECKPOINT",
+      "horizon": 1000,
+      "runs": 5,
+      "save_duration_ms": {
+        "mean": 56.0885,
+        "median": 53.7734,
+        "p95": 80.1327,
+        "std": 12.1859,
+        "min": 39.2293,
+        "max": 88.4654
+      },
+      "load_duration_ms": {
+        "mean": 78.937,
+        "median": 75.104,
+        "p95": 92.7015,
+        "std": 10.3911,
+        "min": 68.1456,
+        "max": 92.7015
+      },
+      "bytes_written_per_checkpoint": {
+        "mean": 299195.2,
+        "median": 234085.0,
+        "p95": 708836.0,
+        "std": 211798.9904,
+        "min": 159204.0,
+        "max": 708836.0
+      },
+      "total_bytes_per_run_avg": 1495976.0,
+      "compaction_count": 0.0,
+      "reconstruction_accuracy": 100.0,
+      "cpu_percent": 91.4,
+      "memory_mb": 85.37
+    }
+  ],
+  "scorecard": {
+    "checkpoint_save_latency_full_vs_incr": {
+      "20": {
+        "full_ms": 3.245,
+        "incr_ms": 4.7374,
+        "speedup_ratio": 0.68
+      },
+      "50": {
+        "full_ms": 3.1186,
+        "incr_ms": 5.938,
+        "speedup_ratio": 0.53
+      },
+      "100": {
+        "full_ms": 3.4874,
+        "incr_ms": 7.0241,
+        "speedup_ratio": 0.5
+      },
+      "150": {
+        "full_ms": 3.46,
+        "incr_ms": 9.1429,
+        "speedup_ratio": 0.38
+      },
+      "200": {
+        "full_ms": 4.5856,
+        "incr_ms": 11.4621,
+        "speedup_ratio": 0.4
+      },
+      "250": {
+        "full_ms": 4.6761,
+        "incr_ms": 13.6879,
+        "speedup_ratio": 0.34
+      },
+      "300": {
+        "full_ms": 6.7197,
+        "incr_ms": 21.9031,
+        "speedup_ratio": 0.31
+      },
+      "500": {
+        "full_ms": 8.9469,
+        "incr_ms": 28.1491,
+        "speedup_ratio": 0.32
+      },
+      "750": {
+        "full_ms": 11.4187,
+        "incr_ms": 40.14,
+        "speedup_ratio": 0.28
+      },
+      "1000": {
+        "full_ms": 14.5734,
+        "incr_ms": 56.0885,
+        "speedup_ratio": 0.26
+      }
+    },
+    "bytes_written_full_vs_incr": {
+      "20": {
+        "full_bytes": 25208.0,
+        "incr_bytes": 7179.6,
+        "reduction_pct": 71.52
+      },
+      "50": {
+        "full_bytes": 61921.25,
+        "incr_bytes": 16108.2,
+        "reduction_pct": 73.99
+      },
+      "100": {
+        "full_bytes": 123110.5,
+        "incr_bytes": 30990.8,
+        "reduction_pct": 74.83
+      },
+      "150": {
+        "full_bytes": 184348.75,
+        "incr_bytes": 45891.4,
+        "reduction_pct": 75.11
+      },
+      "200": {
+        "full_bytes": 245587.0,
+        "incr_bytes": 60792.0,
+        "reduction_pct": 75.25
+      },
+      "250": {
+        "full_bytes": 306824.5,
+        "incr_bytes": 75692.0,
+        "reduction_pct": 75.33
+      },
+      "300": {
+        "full_bytes": 368062.0,
+        "incr_bytes": 90592.0,
+        "reduction_pct": 75.39
+      },
+      "500": {
+        "full_bytes": 613012.75,
+        "incr_bytes": 150192.6,
+        "reduction_pct": 75.5
+      },
+      "750": {
+        "full_bytes": 919200.25,
+        "incr_bytes": 224692.6,
+        "reduction_pct": 75.56
+      },
+      "1000": {
+        "full_bytes": 1225389.5,
+        "incr_bytes": 299195.2,
+        "reduction_pct": 75.58
+      }
+    },
+    "recovery_latency_curve": {
+      "20": 4.4678,
+      "50": 3.6749,
+      "100": 3.4677,
+      "150": 6.7757,
+      "200": 11.1571,
+      "250": 10.1593
+    },
+    "overall_summary": {
+      "max_horizon_tested": 1000,
+      "max_speedup_observed": 0.68,
+      "max_byte_reduction_observed": 75.58,
+      "reconstruction_accuracy": 100.0,
+      "semantic_equivalence": true,
+      "duplicate_delta_application": 0,
+      "first_real_limit": "DISK_FSYNC_IOP_CEILING_AT_EXTREME_CADENCE",
+      "first_real_failure": "NONE"
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "benchmark": "Phase 35 Event Contract & High-Throughput Stream",
+  "timestamp": 1788978830.3393435,
+  "contract_verified": true,
+  "temporal_ordering_coherent": true,
+  "required_fields": [
+    "event_id",
+    "mission_id",
+    "timestamp",
+    "type",
+    "payload"
+  ],
+  "idempotence_strategy": "DETERMINISTIC_EVENT_ID_SET",
+  "performance_across_scales": [
+    {
+      "event_count": 10,
+      "stream_size_with_dupes": 12,
+      "duplicates_rejected": 2,
+      "generation_time_ms": 0.11,
+      "dedup_processing_time_ms": 0.0067,
+      "total_processing_time_ms": 0.1576,
+      "peak_memory_kb": 6.24,
+      "events_per_second": 63451.8,
+      "status": "PASS"
+    },
+    {
+      "event_count": 50,
+      "stream_size_with_dupes": 62,
+      "duplicates_rejected": 12,
+      "generation_time_ms": 0.5926,
+      "dedup_processing_time_ms": 0.0116,
+      "total_processing_time_ms": 0.7199,
+      "peak_memory_kb": 27.35,
+      "events_per_second": 69454.1,
+      "status": "PASS"
+    },
+    {
+      "event_count": 100,
+      "stream_size_with_dupes": 125,
+      "duplicates_rejected": 25,
+      "generation_time_ms": 0.5811,
+      "dedup_processing_time_ms": 0.0197,
+      "total_processing_time_ms": 0.8019,
+      "peak_memory_kb": 58.34,
+      "events_per_second": 124703.8,
+      "status": "PASS"
+    },
+    {
+      "event_count": 250,
+      "stream_size_with_dupes": 312,
+      "duplicates_rejected": 62,
+      "generation_time_ms": 1.4412,
+      "dedup_processing_time_ms": 0.0389,
+      "total_processing_time_ms": 1.9804,
+      "peak_memory_kb": 123.97,
+      "events_per_second": 126237.1,
+      "status": "PASS"
+    },
+    {
+      "event_count": 500,
+      "stream_size_with_dupes": 625,
+      "duplicates_rejected": 125,
+      "generation_time_ms": 2.8586,
+      "dedup_processing_time_ms": 0.099,
+      "total_processing_time_ms": 4.1092,
+      "peak_memory_kb": 277.32,
+      "events_per_second": 121678.2,
+      "status": "PASS"
+    },
+    {
+      "event_count": 1000,
+      "stream_size_with_dupes": 1250,
+      "duplicates_rejected": 250,
+      "generation_time_ms": 6.7199,
+      "dedup_processing_time_ms": 0.2033,
+      "total_processing_time_ms": 9.236,
+      "peak_memory_kb": 541.61,
+      "events_per_second": 108272.0,
+      "status": "PASS"
+    }
+  ]
+}

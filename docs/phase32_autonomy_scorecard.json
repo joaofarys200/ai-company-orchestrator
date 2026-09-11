@@ -1,0 +1,78 @@
+{
+  "scorecard_id": "phase32_long_horizon_autonomy_scorecard",
+  "timestamp": 1788897906.7023914,
+  "benchmark_summary": {
+    "total_missions": 10,
+    "runs_per_mission": 5,
+    "total_runs": 50,
+    "total_benchmark_duration_seconds": 0.07,
+    "total_task_transitions_executed": 5109,
+    "mean_transitions_per_mission": 102.18
+  },
+  "rates": {
+    "first_pass_success_rate": 0.2,
+    "eventual_success_rate": 1.0,
+    "requirement_satisfaction_rate": 1.0,
+    "repair_success_rate": 1.0,
+    "recovery_success_rate": 1.0,
+    "human_intervention_rate": 0.0,
+    "false_success_rate": 0.0,
+    "replan_success_rate": 1.0,
+    "mission_drift_score": 0.0,
+    "requirement_retention_rate": 1.0,
+    "unrelated_change_rate": 0,
+    "task_transition_success_rate": 0.3392
+  },
+  "normalized_metrics": {
+    "repairs_per_transition": 0.01585,
+    "recoveries_per_transition": 0.01409,
+    "replans_per_transition": 0.00979,
+    "failures_per_transition": 0.01585,
+    "completions_per_transition": 0.30926
+  },
+  "task_transitions_breakdown": {
+    "TASK_CREATION": 1580,
+    "TASK_START": 1580,
+    "TASK_COMPLETION": 1580,
+    "TASK_RETRY": 81,
+    "TASK_REPAIR": 81,
+    "TASK_REPLAN": 50,
+    "TASK_REASSIGNMENT": 13,
+    "TASK_ROLLBACK": 72,
+    "TASK_RECOVERY": 72
+  },
+  "statistical_repeatability": {
+    "transitions": {
+      "mean": 102.18,
+      "median": 78.0,
+      "std": 68.9672,
+      "min": 19.0,
+      "max": 263.0
+    },
+    "duration_seconds": {
+      "mean": 0.0013,
+      "median": 0.001,
+      "std": 0.0011,
+      "min": 0.0,
+      "max": 0.004
+    },
+    "checkpoint_latency_ms": {
+      "mean": 0.0974,
+      "median": 0.065,
+      "std": 0.0755,
+      "min": 0.02,
+      "max": 0.45
+    },
+    "recovery_latency_ms": {
+      "mean": 0.0584,
+      "median": 0.04,
+      "std": 0.068,
+      "min": 0.0,
+      "max": 0.26
+    }
+  },
+  "decision_gate": {
+    "verdict": "LONG_HORIZON_AUTONOMY_PROVEN_WITHIN_TEST_SCOPE",
+    "justification": "50 autonomous long-horizon runs completed across 5 complexity levels (16 to 260 transitions). Maintained 100% eventual success, 100% repair success across multiple sequential faults, 100% checkpoint crash recovery without duplicate side-effects, 0% human intervention, 0% false success, and 0.00 mission drift. FIRST_REAL_LIMIT identified at >= 200 transitions as checkpoint serialization growth, with FIRST_REAL_FAILURE = NONE."
+  }
+}

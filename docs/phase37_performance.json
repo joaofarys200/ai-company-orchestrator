@@ -1,0 +1,152 @@
+{
+  "benchmark_name": "Phase 37 Dynamic Mission Intent & Runtime Goal Editing Benchmark",
+  "environment": {
+    "os": "Windows 11 Pro",
+    "python": "3.14.7",
+    "timestamp": 1789077119.6488202
+  },
+  "pipeline_step_latencies": {
+    "parse_nlp_ms": {
+      "sample_count": 100,
+      "mean_ms": 0.0065,
+      "median_ms": 0.0052,
+      "p95_ms": 0.014,
+      "p99_ms": 0.0195
+    },
+    "resolution_ms": {
+      "sample_count": 100,
+      "mean_ms": 0.0115,
+      "median_ms": 0.0078,
+      "p95_ms": 0.0254,
+      "p99_ms": 0.0321
+    },
+    "impact_analysis_ms": {
+      "sample_count": 100,
+      "mean_ms": 0.0022,
+      "median_ms": 0.0015,
+      "p95_ms": 0.0036,
+      "p99_ms": 0.0048
+    },
+    "conflict_detection_ms": {
+      "sample_count": 100,
+      "mean_ms": 0.007,
+      "median_ms": 0.0061,
+      "p95_ms": 0.0117,
+      "p99_ms": 0.0177
+    },
+    "mission_gate_ms": {
+      "sample_count": 100,
+      "mean_ms": 0.0102,
+      "median_ms": 0.0086,
+      "p95_ms": 0.018,
+      "p99_ms": 0.0219
+    },
+    "dynamic_replan_ms": {
+      "sample_count": 100,
+      "mean_ms": 0.0078,
+      "median_ms": 0.0066,
+      "p95_ms": 0.0133,
+      "p99_ms": 0.015
+    },
+    "evidence_invalidation_ms": {
+      "sample_count": 100,
+      "mean_ms": 0.0005,
+      "median_ms": 0.0005,
+      "p95_ms": 0.0009,
+      "p99_ms": 0.0011
+    },
+    "persistence_commit_ms": {
+      "sample_count": 100,
+      "mean_ms": 0.0635,
+      "median_ms": 0.0503,
+      "p95_ms": 0.1112,
+      "p99_ms": 0.225
+    }
+  },
+  "intent_change_classes": {
+    "local_intent_change": {
+      "sample_count": 50,
+      "mean_ms": 0.1029,
+      "median_ms": 0.0827,
+      "p95_ms": 0.1878,
+      "p99_ms": 0.2476
+    },
+    "structural_intent_change": {
+      "sample_count": 50,
+      "mean_ms": 0.1156,
+      "median_ms": 0.0975,
+      "p95_ms": 0.1894,
+      "p99_ms": 0.2985
+    }
+  },
+  "long_horizon_transitions": {
+    "10_transitions": {
+      "sample_count": 10,
+      "mean_ms": 0.0467,
+      "median_ms": 0.043,
+      "p95_ms": 0.058,
+      "p99_ms": 0.0626,
+      "total_horizon_duration_ms": 0.4942,
+      "final_intent_version": 11,
+      "final_plan_version": 11,
+      "final_tasks_count": 7,
+      "final_history_depth": 10
+    },
+    "50_transitions": {
+      "sample_count": 50,
+      "mean_ms": 0.0537,
+      "median_ms": 0.0524,
+      "p95_ms": 0.0679,
+      "p99_ms": 0.0823,
+      "total_horizon_duration_ms": 2.7809,
+      "final_intent_version": 51,
+      "final_plan_version": 51,
+      "final_tasks_count": 17,
+      "final_history_depth": 50
+    },
+    "100_transitions": {
+      "sample_count": 100,
+      "mean_ms": 0.0685,
+      "median_ms": 0.0694,
+      "p95_ms": 0.1018,
+      "p99_ms": 0.1169,
+      "total_horizon_duration_ms": 7.0346,
+      "final_intent_version": 101,
+      "final_plan_version": 101,
+      "final_tasks_count": 30,
+      "final_history_depth": 100
+    },
+    "250_transitions": {
+      "sample_count": 250,
+      "mean_ms": 0.1238,
+      "median_ms": 0.1149,
+      "p95_ms": 0.1905,
+      "p99_ms": 0.2586,
+      "total_horizon_duration_ms": 31.4929,
+      "final_intent_version": 251,
+      "final_plan_version": 251,
+      "final_tasks_count": 67,
+      "final_history_depth": 250
+    },
+    "500_transitions": {
+      "sample_count": 500,
+      "mean_ms": 0.2147,
+      "median_ms": 0.207,
+      "p95_ms": 0.3707,
+      "p99_ms": 0.485,
+      "total_horizon_duration_ms": 108.6135,
+      "final_intent_version": 501,
+      "final_plan_version": 501,
+      "final_tasks_count": 130,
+      "final_history_depth": 500
+    }
+  },
+  "verification_invariants": {
+    "zero_simulated_metrics": true,
+    "deterministic_pipeline": true,
+    "monotonic_versioning_verified": true,
+    "evidence_invalidation_tracked": true,
+    "non_destructive_rollback_verified": true,
+    "max_sample_count_evaluated": 500
+  }
+}

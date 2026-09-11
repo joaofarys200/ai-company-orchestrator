@@ -17,6 +17,7 @@ import {
   type MissionClientOperation,
   type MissionData,
   type MissionSnapshot,
+  type ArchitectureSnapshot,
   type PlannerState,
   type ProjectContextData,
   type ProjectReferenceResult,
@@ -33,6 +34,11 @@ import {
   type SentinelActionData,
   type ExpansionRecord,
   type AdaptationRecordData,
+  type MissionControlStateData,
+  type MissionControlCommandResultData,
+  type MissionControlCommandPayload,
+  type MissionIntentPreviewResultMessage,
+  type MissionIntentResultMessage,
 } from '../protocol/websocket';
 
 declare global {
@@ -124,6 +130,7 @@ interface WebSocketContextType {
   getPlannerState: () => void;
   missions: MissionData[];
   missionSnapshot: MissionSnapshot | null;
+  architectureSnapshot: ArchitectureSnapshot | null;
   getMissions: () => void;
   openMission: (missionId: string) => void;
   sendMissionOperation: (operation: MissionClientOperation) => void;
@@ -181,6 +188,17 @@ interface WebSocketContextType {
   rejectSentinelAction: (actionId: string, reason: string, user?: string) => void;
   rollbackSentinelAction: (actionId: string, user?: string, sessionId?: string) => void;
   submitSentinelReview: (eventId: string, finalClassification: string, reason: string, operator?: string) => void;
+  missionControlState: MissionControlStateData | null;
+  missionControlCommandResult: MissionControlCommandResultData | null;
+  sendMissionControlCommand: (cmd: MissionControlCommandPayload) => void;
+  getMissionControlState: (scenario?: string) => void;
+  clearMissionControlCommandResult: () => void;
+  missionIntentPreviewResult: MissionIntentPreviewResultMessage | null;
+  missionIntentResult: MissionIntentResultMessage | null;
+  sendMissionIntentPreview: (missionId: string, textOrDelta: string | Record<string, unknown>) => void;
+  sendMissionIntentChange: (missionId: string, textOrDelta: string | Record<string, unknown>, preApproved?: boolean) => void;
+  clearMissionIntentPreviewResult: () => void;
+  clearMissionIntentResult: () => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -250,6 +268,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isGeneratingLecture, setIsGeneratingLecture] = useState(false);
   const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
   const [isRecordingLecture, setIsRecordingLecture] = useState(false);
+  const [missionControlState, setMissionControlState] = useState<MissionControlStateData | null>(null);
+  const [missionControlCommandResult, setMissionControlCommandResult] = useState<MissionControlCommandResultData | null>(null);
+  const [missionIntentPreviewResult, setMissionIntentPreviewResult] = useState<MissionIntentPreviewResultMessage | null>(null);
+  const [missionIntentResult, setMissionIntentResult] = useState<MissionIntentResultMessage | null>(null);
 
   const [kanban, setKanban] = useState<KanbanState>({
     backlog: [],
@@ -714,6 +736,36 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           addSystemMessage(`[SENTINEL RESPOSTA ERRO] ${msg.message}`);
         } else {
           addSystemMessage(`[SENTINEL RESPOSTA SUCESSO] ${msg.message}`);
+        }
+        break;
+      case 'mission_control_state':
+        setMissionControlState((msg as any).state || (msg as any).data);
+        break;
+      case 'mission_control_command_result': {
+        const cmdResult = (msg as any).result || (msg as any);
+        setMissionControlCommandResult(cmdResult);
+        const resStatus = cmdResult?.status;
+        const resReason = cmdResult?.reason || '';
+        if (resStatus === 'ACCEPTED') {
+          addSystemMessage(`[MISSION CONTROL: COMANDO ACEITE] ${resReason}`);
+        } else if (resStatus === 'SECURITY_BLOCK') {
+          addSystemMessage(`[MISSION CONTROL: BLOQUEIO SENTINEL] ${resReason}`);
+        } else if (resStatus) {
+          addSystemMessage(`[MISSION CONTROL: COMANDO ${resStatus}] ${resReason}`);
+        }
+        break;
+      }
+      case 'mission_intent_preview_result':
+        setMissionIntentPreviewResult(msg);
+        break;
+      case 'mission_intent_result':
+        setMissionIntentResult(msg);
+        if (msg.status === 'ACCEPTED') {
+          addSystemMessage(`[DYNAMIC INTENT: ACEITE] ${msg.reason}`);
+        } else if (msg.status === 'SECURITY_BLOCK') {
+          addSystemMessage(`[DYNAMIC INTENT: BLOQUEIO SENTINEL] ${msg.reason}`);
+        } else {
+          addSystemMessage(`[DYNAMIC INTENT: ${msg.status}] ${msg.reason}`);
         }
         break;
       case 'unknown':
@@ -1328,6 +1380,66 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
   }, [sendClientMessage]);
 
+  const sendMissionControlCommand = useCallback((cmd: MissionControlCommandPayload) => {
+    sendClientMessage({
+      type: 'mission_control_command',
+      ...cmd,
+    } as any);
+  }, [sendClientMessage]);
+
+  const getMissionControlState = useCallback((scenario?: string) => {
+    sendClientMessage({
+      type: 'mission_control_get',
+      scenario,
+    } as any);
+  }, [sendClientMessage]);
+
+  const clearMissionControlCommandResult = useCallback(() => {
+    setMissionControlCommandResult(null);
+  }, []);
+
+  const sendMissionIntentPreview = useCallback((missionId: string, textOrDelta: string | Record<string, unknown>) => {
+    if (typeof textOrDelta === 'string') {
+      sendClientMessage({
+        type: 'mission_intent_preview',
+        mission_id: missionId,
+        text: textOrDelta,
+      } as any);
+    } else {
+      sendClientMessage({
+        type: 'mission_intent_preview',
+        mission_id: missionId,
+        delta: textOrDelta,
+      } as any);
+    }
+  }, [sendClientMessage]);
+
+  const sendMissionIntentChange = useCallback((missionId: string, textOrDelta: string | Record<string, unknown>, preApproved?: boolean) => {
+    if (typeof textOrDelta === 'string') {
+      sendClientMessage({
+        type: 'mission_intent_change',
+        mission_id: missionId,
+        text: textOrDelta,
+        pre_approved: preApproved ?? false,
+      } as any);
+    } else {
+      sendClientMessage({
+        type: 'mission_intent_change',
+        mission_id: missionId,
+        delta: textOrDelta,
+        pre_approved: preApproved ?? false,
+      } as any);
+    }
+  }, [sendClientMessage]);
+
+  const clearMissionIntentPreviewResult = useCallback(() => {
+    setMissionIntentPreviewResult(null);
+  }, []);
+
+  const clearMissionIntentResult = useCallback(() => {
+    setMissionIntentResult(null);
+  }, []);
+
   return (
     <WebSocketContext.Provider
       value={{
@@ -1370,6 +1482,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         plannerState,
         missions,
         missionSnapshot,
+        architectureSnapshot: null,
         astState,
         getPlannerState,
         getMissions,
@@ -1433,6 +1546,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         rejectSentinelAction,
         rollbackSentinelAction,
         submitSentinelReview,
+        missionControlState,
+        missionControlCommandResult,
+        sendMissionControlCommand,
+        getMissionControlState,
+        clearMissionControlCommandResult,
+        missionIntentPreviewResult,
+        missionIntentResult,
+        sendMissionIntentPreview,
+        sendMissionIntentChange,
+        clearMissionIntentPreviewResult,
+        clearMissionIntentResult,
       }}
     >
       {children}

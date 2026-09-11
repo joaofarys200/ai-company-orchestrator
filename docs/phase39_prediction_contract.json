@@ -1,0 +1,81 @@
+{
+  "phase": 39,
+  "phase_name": "Predictive Impact Analysis & Mission Change Simulation",
+  "version": "1.0.0",
+  "contract_type": "PREDICTIVE_IMPACT_CONTRACT",
+  "epistemic_calibration": {
+    "separation_of_concerns": "Strict separation between PREDICTION and OBSERVED RESULT",
+    "no_mutation_guarantee": "Predictive simulation is purely descriptive and side-effect free. No writes to database, no DAG mutations, no agent leases acquired.",
+    "prediction_ne_authorization": "Predictions inform decisions but never authorize execution. Authorization remains strictly governed by Mission Gate, Security Sentinel, and Approval Policy.",
+    "calibrated_language": [
+      "Predicted",
+      "Potentially affected",
+      "Likely",
+      "Possible",
+      "Requires validation"
+    ]
+  },
+  "schemas": {
+    "PredictiveImpactReport": {
+      "prediction_id": "string (uuid)",
+      "mission_id": "string",
+      "source_intent_version": "integer",
+      "proposed_intent_version": "integer",
+      "generated_at": "float (timestamp)",
+      "predicted_scope": "enum (NONE, LOCAL, CROSS_FILE, CROSS_MODULE, ARCHITECTURAL, MISSION_WIDE)",
+      "predicted_risk": "enum (LOW, MEDIUM, HIGH, CRITICAL)",
+      "risk_factors": "object (breakdown of 9 risk dimensions)",
+      "affected_requirements": "array of strings",
+      "affected_constraints": "array of strings",
+      "predicted_tasks": "array of PredictedTask objects",
+      "predicted_files": "array of PredictedFile objects",
+      "predicted_symbols": "array of PredictedSymbol objects",
+      "predicted_tests": "array of test specification objects",
+      "predicted_evidence_impact": "array of PredictedEvidenceImpact objects",
+      "predicted_browser_validation": "boolean",
+      "predicted_pause_required": "boolean",
+      "predicted_approval_required": "boolean",
+      "assumptions": "array of PredictedAssumption objects (SYSTEM_ASSUMPTION, INFERRED)",
+      "uncertainties": "array of strings",
+      "confidence": "float (0.0 to 1.0)",
+      "status": "enum (GENERATED, REVIEWED, APPLIED, REJECTED, STALE, SUPERSEDED, INVALIDATED)",
+      "simulation_marker": "SIMULATION_ONLY"
+    },
+    "PredictionOutcome": {
+      "outcome_id": "string (uuid)",
+      "prediction_id": "string",
+      "mission_id": "string",
+      "actual_intent_version": "integer",
+      "actual_plan_version": "integer",
+      "evaluated_at": "float (timestamp)",
+      "actual_files_changed": "array of strings",
+      "actual_tasks_added": "array of strings",
+      "actual_tasks_modified": "array of strings",
+      "actual_tasks_removed": "array of strings",
+      "actual_evidence_invalidated": "array of strings",
+      "actual_agents_used": "array of strings",
+      "actual_browser_validation": "boolean",
+      "actual_scope": "string",
+      "file_precision": "float (0.0 to 1.0)",
+      "file_recall": "float (0.0 to 1.0)",
+      "task_precision": "float (0.0 to 1.0)",
+      "task_recall": "float (0.0 to 1.0)",
+      "evidence_precision": "float (0.0 to 1.0)",
+      "evidence_recall": "float (0.0 to 1.0)",
+      "classification": "enum (CORRECT, PARTIALLY_CORRECT, OVERPREDICTED, UNDERPREDICTED, MISSED)",
+      "matched_files": "array of strings",
+      "missed_files": "array of strings (false positives in prediction)",
+      "unexpected_files": "array of strings (false positives in actual)",
+      "deviations": "array of deviation objects"
+    }
+  },
+  "websocket_events": [
+    "IMPACT_PREDICTION_STARTED",
+    "IMPACT_PREDICTION_COMPLETED",
+    "IMPACT_PREDICTION_REJECTED",
+    "IMPACT_PREDICTION_STALE",
+    "IMPACT_REVIEW_REQUIRED",
+    "IMPACT_APPLIED",
+    "IMPACT_OUTCOME_RECORDED"
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "phase": "Phase 38 — Super-File Decomposition & Architecture Hygiene",
+  "plan_version": "1.0.0",
+  "timestamp": 1789078100.0,
+  "strategy": "HIGH_VALUE_LOW_RISK_FIRST",
+  "targets": [
+    {
+      "target_file": "frontend/src/features/missions/MissionControlCenter.tsx",
+      "current_loc": 2382,
+      "current_responsibilities": 10,
+      "current_score": 66.16,
+      "risk_classification": "LOW_RISK",
+      "rationale": "High responsibility density in UI orchestrator with well-isolated visual sub-panels, clear props contracts, and comprehensive browser QA test coverage.",
+      "orchestrator_target_loc": 350,
+      "planned_extractions": [
+        {
+          "module_path": "frontend/src/features/missions/components/MissionHeader.tsx",
+          "responsibility": "Header, scenario selection, operational status badges, intent/plan version badges, and real-time execution metrics.",
+          "estimated_loc": 180,
+          "shared_state": "readonly_props"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/MissionControlActions.tsx",
+          "responsibility": "Operational human intervention controls: Pause, Resume, Cancel, Edit Goal, and command feedback alerts.",
+          "estimated_loc": 160,
+          "shared_state": "action_callbacks"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/IntentPreviewModal.tsx",
+          "responsibility": "Fase 37 Dynamic Intent preview modal: natural language input, preset prompts, impact analysis badge, conflict alerts, and Sentinel blocks.",
+          "estimated_loc": 320,
+          "shared_state": "modal_state_callbacks"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/CancelConfirmModal.tsx",
+          "responsibility": "Mission cancellation safety dialog with mandatory operator justification input.",
+          "estimated_loc": 90,
+          "shared_state": "modal_state_callbacks"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/MissionOverviewPanel.tsx",
+          "responsibility": "Overview tab: stage lifecycle progress, understanding summary, swarm agent allocations, execution timeline, and command audit ledger.",
+          "estimated_loc": 310,
+          "shared_state": "readonly_props"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/MissionTaskGraphPanel.tsx",
+          "responsibility": "Plan tab: DAG task graph visualization, Kahn topological ordering, human approval gate controls, task priority dropdown, and topological reordering buttons.",
+          "estimated_loc": 280,
+          "shared_state": "task_action_callbacks"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/MissionRequirementsDiffPanel.tsx",
+          "responsibility": "Requirements Diff tab: lifecycle diff view with ADDED, MODIFIED, SUPERSEDED, CANCELLED indicators.",
+          "estimated_loc": 140,
+          "shared_state": "readonly_props"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/MissionPlanDiffPanel.tsx",
+          "responsibility": "Plan Diff tab: DAG structural diff view, Kahn validation status badge ('DAG: SAFE & VALID'), added tasks, and cancelled tasks.",
+          "estimated_loc": 120,
+          "shared_state": "readonly_props"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/MissionEvidenceImpactPanel.tsx",
+          "responsibility": "Evidence Invalidation tab: Zero False Success tracker, superseded evidence artifacts, and revalidation required notices.",
+          "estimated_loc": 140,
+          "shared_state": "readonly_props"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/MissionWhyCausalPanel.tsx",
+          "responsibility": "Why Panel tab: causal explainability chains, replanning trigger provenance, and delta lineage tracking.",
+          "estimated_loc": 130,
+          "shared_state": "readonly_props"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/MissionRepairPanel.tsx",
+          "responsibility": "Repairs tab: autonomous self-healing diagnostics, AST patch diff view, and syntax repair logs.",
+          "estimated_loc": 170,
+          "shared_state": "readonly_props"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/MissionEvidenceLedgerPanel.tsx",
+          "responsibility": "Evidence tab: durable cryptographic evidence artifacts, verification statuses, and ledger inspector.",
+          "estimated_loc": 110,
+          "shared_state": "readonly_props"
+        },
+        {
+          "module_path": "frontend/src/features/missions/components/MissionAppPreviewPanel.tsx",
+          "responsibility": "Preview tab: live interactive web application demo (expense tracker) verifying frontend delivery.",
+          "estimated_loc": 140,
+          "shared_state": "isolated_preview_state"
+        }
+      ]
+    }
+  ],
+  "backend_evaluations": [
+    {
+      "target_file": "agents/mission_control_engine.py",
+      "loc": 2597,
+      "score": 78.0,
+      "risk": "DEFERRED_BY_ARCHITECTURAL_REASON",
+      "decision": "DEFERRED",
+      "architectural_reason": "High coupling with SQLite ACID transaction boundary, concurrency locks (asyncio.Lock), Security Sentinel authorization gates, and Kahn DAG scheduler invariants. Extracting sub-modules without staged multi-phase verification introduces high risk of race conditions and deadlock regressions."
+    },
+    {
+      "target_file": "agents/orchestrator/__init__.py",
+      "loc": 2346,
+      "score": 73.56,
+      "risk": "DEFERRED_BY_ARCHITECTURAL_REASON",
+      "decision": "DEFERRED",
+      "architectural_reason": "Core multi-agent lifecycle orchestrator with 21 inbound consumers. Direct decomposition without staged compatibility shims would disrupt worker allocation across active swarms."
+    },
+    {
+      "target_file": "agents/collaboration_engine.py",
+      "loc": 2735,
+      "score": 63.16,
+      "risk": "DEFERRED_BY_ARCHITECTURAL_REASON",
+      "decision": "DEFERRED",
+      "architectural_reason": "Agent collaboration consensus gate with shared state and turn-taking protocol invariants."
+    }
+  ]
+}

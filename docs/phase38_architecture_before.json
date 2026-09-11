@@ -1,0 +1,43 @@
+{
+  "phase": "Phase 38 — Pre-Decomposition Architectural Snapshot",
+  "timestamp": 1789078120.0,
+  "files_scanned": 703,
+  "metrics": {
+    "total_super_files": 430,
+    "critical_count": 0,
+    "high_count": 7,
+    "watch_count": 49,
+    "normal_count": 374,
+    "average_loc": 284.5,
+    "max_loc": 3342,
+    "circular_dependencies_detected": 0
+  },
+  "target_snapshot": {
+    "path": "frontend/src/features/missions/MissionControlCenter.tsx",
+    "loc": 2382,
+    "raw_lines": 2519,
+    "score": 66.16,
+    "severity": "HIGH",
+    "responsibilities_count": 10,
+    "responsibilities": [
+      "dynamic_intent_editor",
+      "evidence_invalidation_display",
+      "mission_control_actions",
+      "modal_dialog_management",
+      "navigation_and_tabs",
+      "state_management",
+      "task_dag_visualization",
+      "ui_rendering",
+      "websocket_client",
+      "why_causal_explainability"
+    ],
+    "fan_in": 1,
+    "fan_out": 3,
+    "complexity": {
+      "cyclomatic_complexity": 84,
+      "branch_count": 83,
+      "jsx_element_count": 312,
+      "state_hooks": 13
+    }
+  }
+}

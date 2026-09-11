@@ -1,0 +1,1085 @@
+{
+  "timestamp": "2026-09-07T20:49:09.136028+00:00",
+  "scaling_summary": {
+    "1_core_mb_s": 435.11,
+    "2_cores_mb_s": 387.64,
+    "4_cores_mb_s": 379.36,
+    "8_cores_mb_s": 389.36,
+    "all_16_cores_mb_s": 304.44,
+    "scaling_ratio": 0.7,
+    "conclusion": "CORE_INDEPENDENT_SERIALIZATION: Plateau does NOT scale proportionally with cores. Kernel dispatch serialization (AFD/NDIS) dominates independent of available logical cores."
+  },
+  "configs": {
+    "1_core": {
+      "affinity_mask": [
+        0
+      ],
+      "core_count": 1,
+      "peak_plateau_mb_s": 435.11,
+      "targets": {
+        "300": {
+          "target_mb_s": 300,
+          "achieved_mean_mb_s": 415.13,
+          "achieved_stdev_mb_s": 32.27,
+          "user_cpu_pct": 21.63,
+          "kernel_cpu_pct": 49.84,
+          "dpc_delta_sec": 0.0052,
+          "runs": [
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 441.28,
+              "packet_rate": 385596.6,
+              "packet_loss": 0,
+              "user_cpu_pct": 22.99,
+              "kernel_cpu_pct": 45.98,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0034
+            },
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 379.06,
+              "packet_rate": 331226.5,
+              "packet_loss": 0,
+              "user_cpu_pct": 19.75,
+              "kernel_cpu_pct": 59.24,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0042
+            },
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 425.04,
+              "packet_rate": 371408.0,
+              "packet_loss": 0,
+              "user_cpu_pct": 22.14,
+              "kernel_cpu_pct": 44.29,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0037
+            }
+          ]
+        },
+        "450": {
+          "target_mb_s": 450,
+          "achieved_mean_mb_s": 436.56,
+          "achieved_stdev_mb_s": 31.06,
+          "user_cpu_pct": 10.49,
+          "kernel_cpu_pct": 75.84,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 465.52,
+              "packet_rate": 406778.3,
+              "packet_loss": 0,
+              "user_cpu_pct": 16.17,
+              "kernel_cpu_pct": 80.87,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0027
+            },
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 403.76,
+              "packet_rate": 352808.3,
+              "packet_loss": 0,
+              "user_cpu_pct": 0.0,
+              "kernel_cpu_pct": 70.14,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0035
+            },
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 440.4,
+              "packet_rate": 384826.3,
+              "packet_loss": 0,
+              "user_cpu_pct": 15.3,
+              "kernel_cpu_pct": 76.51,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0032
+            }
+          ]
+        },
+        "475": {
+          "target_mb_s": 475,
+          "achieved_mean_mb_s": 439.7,
+          "achieved_stdev_mb_s": 18.55,
+          "user_cpu_pct": 19.9,
+          "kernel_cpu_pct": 81.35,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 439.25,
+              "packet_rate": 383826.8,
+              "packet_loss": 0,
+              "user_cpu_pct": 14.45,
+              "kernel_cpu_pct": 86.7,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0037
+            },
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 421.38,
+              "packet_rate": 368209.0,
+              "packet_loss": 0,
+              "user_cpu_pct": 0.0,
+              "kernel_cpu_pct": 97.03,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0037
+            },
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 458.47,
+              "packet_rate": 400615.1,
+              "packet_loss": 0,
+              "user_cpu_pct": 45.25,
+              "kernel_cpu_pct": 60.33,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.003
+            }
+          ]
+        },
+        "500": {
+          "target_mb_s": 500,
+          "achieved_mean_mb_s": 434.04,
+          "achieved_stdev_mb_s": 18.32,
+          "user_cpu_pct": 22.97,
+          "kernel_cpu_pct": 67.68,
+          "dpc_delta_sec": 0.0104,
+          "runs": [
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 436.3,
+              "packet_rate": 381242.0,
+              "packet_loss": 0,
+              "user_cpu_pct": 13.64,
+              "kernel_cpu_pct": 81.83,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0034
+            },
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 414.69,
+              "packet_rate": 362362.7,
+              "packet_loss": 0,
+              "user_cpu_pct": 12.96,
+              "kernel_cpu_pct": 64.81,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0042
+            },
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 451.12,
+              "packet_rate": 394195.7,
+              "packet_loss": 0,
+              "user_cpu_pct": 42.3,
+              "kernel_cpu_pct": 56.4,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.003
+            }
+          ]
+        },
+        "600": {
+          "target_mb_s": 600,
+          "achieved_mean_mb_s": 431.6,
+          "achieved_stdev_mb_s": 11.15,
+          "user_cpu_pct": 30.06,
+          "kernel_cpu_pct": 56.07,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 422.74,
+              "packet_rate": 369398.3,
+              "packet_loss": 0,
+              "user_cpu_pct": 22.02,
+              "kernel_cpu_pct": 55.06,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0042
+            },
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 427.95,
+              "packet_rate": 373949.1,
+              "packet_loss": 0,
+              "user_cpu_pct": 33.44,
+              "kernel_cpu_pct": 66.88,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0039
+            },
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 444.12,
+              "packet_rate": 388077.8,
+              "packet_loss": 0,
+              "user_cpu_pct": 34.71,
+              "kernel_cpu_pct": 46.27,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0035
+            }
+          ]
+        }
+      }
+    },
+    "2_cores": {
+      "affinity_mask": [
+        0,
+        1
+      ],
+      "core_count": 2,
+      "peak_plateau_mb_s": 387.64,
+      "targets": {
+        "300": {
+          "target_mb_s": 300,
+          "achieved_mean_mb_s": 443.82,
+          "achieved_stdev_mb_s": 23.34,
+          "user_cpu_pct": 16.35,
+          "kernel_cpu_pct": 67.96,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 429.13,
+              "packet_rate": 374982.8,
+              "packet_loss": 0,
+              "user_cpu_pct": 0.0,
+              "kernel_cpu_pct": 89.42,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0043
+            },
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 470.73,
+              "packet_rate": 411332.4,
+              "packet_loss": 0,
+              "user_cpu_pct": 49.05,
+              "kernel_cpu_pct": 24.52,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0025
+            },
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 431.59,
+              "packet_rate": 377126.6,
+              "packet_loss": 0,
+              "user_cpu_pct": 0.0,
+              "kernel_cpu_pct": 89.94,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0036
+            }
+          ]
+        },
+        "450": {
+          "target_mb_s": 450,
+          "achieved_mean_mb_s": 444.59,
+          "achieved_stdev_mb_s": 29.12,
+          "user_cpu_pct": 16.07,
+          "kernel_cpu_pct": 75.99,
+          "dpc_delta_sec": 0.0104,
+          "runs": [
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 411.28,
+              "packet_rate": 359380.9,
+              "packet_loss": 0,
+              "user_cpu_pct": 0.0,
+              "kernel_cpu_pct": 100.03,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0042
+            },
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 457.21,
+              "packet_rate": 399520.1,
+              "packet_loss": 0,
+              "user_cpu_pct": 15.89,
+              "kernel_cpu_pct": 79.43,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0036
+            },
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 465.27,
+              "packet_rate": 406559.4,
+              "packet_loss": 0,
+              "user_cpu_pct": 32.33,
+              "kernel_cpu_pct": 48.5,
+              "dpc_delta_sec": 0.0312,
+              "latency_p95_ms": 0.0026
+            }
+          ]
+        },
+        "475": {
+          "target_mb_s": 475,
+          "achieved_mean_mb_s": 380.71,
+          "achieved_stdev_mb_s": 19.25,
+          "user_cpu_pct": 12.74,
+          "kernel_cpu_pct": 79.32,
+          "dpc_delta_sec": 0.0052,
+          "runs": [
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 399.97,
+              "packet_rate": 349498.5,
+              "packet_loss": 0,
+              "user_cpu_pct": 26.32,
+              "kernel_cpu_pct": 78.95,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0044
+            },
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 380.7,
+              "packet_rate": 332664.9,
+              "packet_loss": 0,
+              "user_cpu_pct": 0.0,
+              "kernel_cpu_pct": 87.67,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0036
+            },
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 361.47,
+              "packet_rate": 315857.6,
+              "packet_loss": 0,
+              "user_cpu_pct": 11.89,
+              "kernel_cpu_pct": 71.35,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0049
+            }
+          ]
+        },
+        "500": {
+          "target_mb_s": 500,
+          "achieved_mean_mb_s": 393.01,
+          "achieved_stdev_mb_s": 16.77,
+          "user_cpu_pct": 32.84,
+          "kernel_cpu_pct": 57.45,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 385.48,
+              "packet_rate": 336833.5,
+              "packet_loss": 0,
+              "user_cpu_pct": 24.1,
+              "kernel_cpu_pct": 60.25,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.004
+            },
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 412.23,
+              "packet_rate": 360210.0,
+              "packet_loss": 0,
+              "user_cpu_pct": 38.66,
+              "kernel_cpu_pct": 64.43,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0039
+            },
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 381.32,
+              "packet_rate": 333204.7,
+              "packet_loss": 0,
+              "user_cpu_pct": 35.76,
+              "kernel_cpu_pct": 47.68,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0048
+            }
+          ]
+        },
+        "600": {
+          "target_mb_s": 600,
+          "achieved_mean_mb_s": 389.19,
+          "achieved_stdev_mb_s": 5.87,
+          "user_cpu_pct": 23.71,
+          "kernel_cpu_pct": 70.96,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 395.39,
+              "packet_rate": 345499.2,
+              "packet_loss": 0,
+              "user_cpu_pct": 30.9,
+              "kernel_cpu_pct": 72.09,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0042
+            },
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 388.46,
+              "packet_rate": 339441.4,
+              "packet_loss": 0,
+              "user_cpu_pct": 20.24,
+              "kernel_cpu_pct": 70.83,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0042
+            },
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 383.71,
+              "packet_rate": 335290.1,
+              "packet_loss": 0,
+              "user_cpu_pct": 19.99,
+              "kernel_cpu_pct": 69.96,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0038
+            }
+          ]
+        }
+      }
+    },
+    "4_cores": {
+      "affinity_mask": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "core_count": 4,
+      "peak_plateau_mb_s": 379.36,
+      "targets": {
+        "300": {
+          "target_mb_s": 300,
+          "achieved_mean_mb_s": 381.3,
+          "achieved_stdev_mb_s": 9.21,
+          "user_cpu_pct": 26.27,
+          "kernel_cpu_pct": 66.57,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 380.06,
+              "packet_rate": 332103.3,
+              "packet_loss": 0,
+              "user_cpu_pct": 59.4,
+              "kernel_cpu_pct": 39.6,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0046
+            },
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 372.77,
+              "packet_rate": 325727.5,
+              "packet_loss": 0,
+              "user_cpu_pct": 19.42,
+              "kernel_cpu_pct": 58.26,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0055
+            },
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 391.06,
+              "packet_rate": 341715.4,
+              "packet_loss": 0,
+              "user_cpu_pct": 0.0,
+              "kernel_cpu_pct": 101.86,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0044
+            }
+          ]
+        },
+        "450": {
+          "target_mb_s": 450,
+          "achieved_mean_mb_s": 377.7,
+          "achieved_stdev_mb_s": 9.55,
+          "user_cpu_pct": 21.77,
+          "kernel_cpu_pct": 74.35,
+          "dpc_delta_sec": 0.0052,
+          "runs": [
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 386.71,
+              "packet_rate": 337910.3,
+              "packet_loss": 0,
+              "user_cpu_pct": 13.44,
+              "kernel_cpu_pct": 80.62,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0049
+            },
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 367.69,
+              "packet_rate": 321293.0,
+              "packet_loss": 0,
+              "user_cpu_pct": 25.55,
+              "kernel_cpu_pct": 76.65,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0052
+            },
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 378.7,
+              "packet_rate": 330913.1,
+              "packet_loss": 0,
+              "user_cpu_pct": 26.32,
+              "kernel_cpu_pct": 65.79,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0043
+            }
+          ]
+        },
+        "475": {
+          "target_mb_s": 475,
+          "achieved_mean_mb_s": 380.13,
+          "achieved_stdev_mb_s": 15.74,
+          "user_cpu_pct": 25.16,
+          "kernel_cpu_pct": 74.87,
+          "dpc_delta_sec": 0.0052,
+          "runs": [
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 365.02,
+              "packet_rate": 318957.8,
+              "packet_loss": 0,
+              "user_cpu_pct": 12.01,
+              "kernel_cpu_pct": 84.05,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0064
+            },
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 396.44,
+              "packet_rate": 346412.8,
+              "packet_loss": 0,
+              "user_cpu_pct": 26.08,
+              "kernel_cpu_pct": 78.25,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0041
+            },
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 378.92,
+              "packet_rate": 331101.2,
+              "packet_loss": 0,
+              "user_cpu_pct": 37.39,
+              "kernel_cpu_pct": 62.32,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0044
+            }
+          ]
+        },
+        "500": {
+          "target_mb_s": 500,
+          "achieved_mean_mb_s": 377.42,
+          "achieved_stdev_mb_s": 13.45,
+          "user_cpu_pct": 31.41,
+          "kernel_cpu_pct": 70.78,
+          "dpc_delta_sec": 0.0104,
+          "runs": [
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 362.35,
+              "packet_rate": 316623.4,
+              "packet_loss": 0,
+              "user_cpu_pct": 33.98,
+              "kernel_cpu_pct": 67.96,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0049
+            },
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 388.19,
+              "packet_rate": 339202.9,
+              "packet_loss": 0,
+              "user_cpu_pct": 36.4,
+              "kernel_cpu_pct": 72.8,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0047
+            },
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 381.73,
+              "packet_rate": 333559.9,
+              "packet_loss": 0,
+              "user_cpu_pct": 23.86,
+              "kernel_cpu_pct": 71.59,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0054
+            }
+          ]
+        },
+        "600": {
+          "target_mb_s": 600,
+          "achieved_mean_mb_s": 380.54,
+          "achieved_stdev_mb_s": 5.32,
+          "user_cpu_pct": 16.52,
+          "kernel_cpu_pct": 76.08,
+          "dpc_delta_sec": 0.0104,
+          "runs": [
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 386.01,
+              "packet_rate": 337299.9,
+              "packet_loss": 0,
+              "user_cpu_pct": 20.11,
+              "kernel_cpu_pct": 80.44,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0044
+            },
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 380.22,
+              "packet_rate": 332242.9,
+              "packet_loss": 0,
+              "user_cpu_pct": 9.9,
+              "kernel_cpu_pct": 89.14,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.005
+            },
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 375.38,
+              "packet_rate": 328010.2,
+              "packet_loss": 0,
+              "user_cpu_pct": 19.56,
+              "kernel_cpu_pct": 58.67,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0056
+            }
+          ]
+        }
+      }
+    },
+    "8_cores": {
+      "affinity_mask": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "core_count": 8,
+      "peak_plateau_mb_s": 389.36,
+      "targets": {
+        "300": {
+          "target_mb_s": 300,
+          "achieved_mean_mb_s": 376.34,
+          "achieved_stdev_mb_s": 17.19,
+          "user_cpu_pct": 32.0,
+          "kernel_cpu_pct": 59.26,
+          "dpc_delta_sec": 0.0052,
+          "runs": [
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 356.96,
+              "packet_rate": 311914.6,
+              "packet_loss": 0,
+              "user_cpu_pct": 55.79,
+              "kernel_cpu_pct": 37.19,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0051
+            },
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 389.73,
+              "packet_rate": 340554.7,
+              "packet_loss": 0,
+              "user_cpu_pct": 20.3,
+              "kernel_cpu_pct": 60.91,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0052
+            },
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 382.33,
+              "packet_rate": 334088.0,
+              "packet_loss": 0,
+              "user_cpu_pct": 19.92,
+              "kernel_cpu_pct": 79.67,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0051
+            }
+          ]
+        },
+        "450": {
+          "target_mb_s": 450,
+          "achieved_mean_mb_s": 386.79,
+          "achieved_stdev_mb_s": 25.85,
+          "user_cpu_pct": 39.8,
+          "kernel_cpu_pct": 58.41,
+          "dpc_delta_sec": 0.0104,
+          "runs": [
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 401.89,
+              "packet_rate": 351177.9,
+              "packet_loss": 0,
+              "user_cpu_pct": 27.93,
+              "kernel_cpu_pct": 55.85,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0037
+            },
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 401.54,
+              "packet_rate": 350871.2,
+              "packet_loss": 0,
+              "user_cpu_pct": 41.85,
+              "kernel_cpu_pct": 69.76,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.004
+            },
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 356.95,
+              "packet_rate": 311906.2,
+              "packet_loss": 0,
+              "user_cpu_pct": 49.61,
+              "kernel_cpu_pct": 49.61,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.006
+            }
+          ]
+        },
+        "475": {
+          "target_mb_s": 475,
+          "achieved_mean_mb_s": 385.0,
+          "achieved_stdev_mb_s": 5.55,
+          "user_cpu_pct": 25.35,
+          "kernel_cpu_pct": 71.68,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 380.7,
+              "packet_rate": 332663.3,
+              "packet_loss": 0,
+              "user_cpu_pct": 12.52,
+              "kernel_cpu_pct": 87.67,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0051
+            },
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 391.27,
+              "packet_rate": 341900.1,
+              "packet_loss": 0,
+              "user_cpu_pct": 25.74,
+              "kernel_cpu_pct": 64.36,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0041
+            },
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 383.03,
+              "packet_rate": 334693.5,
+              "packet_loss": 0,
+              "user_cpu_pct": 37.8,
+              "kernel_cpu_pct": 63.0,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0051
+            }
+          ]
+        },
+        "500": {
+          "target_mb_s": 500,
+          "achieved_mean_mb_s": 385.43,
+          "achieved_stdev_mb_s": 8.33,
+          "user_cpu_pct": 8.21,
+          "kernel_cpu_pct": 88.09,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 377.21,
+              "packet_rate": 329612.9,
+              "packet_loss": 0,
+              "user_cpu_pct": 0.0,
+              "kernel_cpu_pct": 106.12,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0046
+            },
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 385.21,
+              "packet_rate": 336605.4,
+              "packet_loss": 0,
+              "user_cpu_pct": 0.0,
+              "kernel_cpu_pct": 84.29,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0048
+            },
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 393.86,
+              "packet_rate": 344161.1,
+              "packet_loss": 0,
+              "user_cpu_pct": 24.62,
+              "kernel_cpu_pct": 73.87,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0043
+            }
+          ]
+        },
+        "600": {
+          "target_mb_s": 600,
+          "achieved_mean_mb_s": 397.66,
+          "achieved_stdev_mb_s": 4.4,
+          "user_cpu_pct": 31.14,
+          "kernel_cpu_pct": 65.59,
+          "dpc_delta_sec": 0.0052,
+          "runs": [
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 395.58,
+              "packet_rate": 345659.4,
+              "packet_loss": 0,
+              "user_cpu_pct": 20.61,
+              "kernel_cpu_pct": 72.13,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0045
+            },
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 394.69,
+              "packet_rate": 344889.5,
+              "packet_loss": 0,
+              "user_cpu_pct": 30.84,
+              "kernel_cpu_pct": 61.69,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0043
+            },
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 402.71,
+              "packet_rate": 351892.7,
+              "packet_loss": 0,
+              "user_cpu_pct": 41.96,
+              "kernel_cpu_pct": 62.94,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0042
+            }
+          ]
+        }
+      }
+    },
+    "all_16_cores": {
+      "affinity_mask": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "core_count": 16,
+      "peak_plateau_mb_s": 304.44,
+      "targets": {
+        "300": {
+          "target_mb_s": 300,
+          "achieved_mean_mb_s": 279.75,
+          "achieved_stdev_mb_s": 39.01,
+          "user_cpu_pct": 9.85,
+          "kernel_cpu_pct": 90.83,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 271.99,
+              "packet_rate": 237669.0,
+              "packet_loss": 0,
+              "user_cpu_pct": 0.0,
+              "kernel_cpu_pct": 99.19,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.007
+            },
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 245.2,
+              "packet_rate": 214263.1,
+              "packet_loss": 0,
+              "user_cpu_pct": 12.77,
+              "kernel_cpu_pct": 89.42,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0095
+            },
+            {
+              "target_mb_s": 300,
+              "achieved_mb_s": 322.06,
+              "packet_rate": 281422.7,
+              "packet_loss": 0,
+              "user_cpu_pct": 16.78,
+              "kernel_cpu_pct": 83.89,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0065
+            }
+          ]
+        },
+        "450": {
+          "target_mb_s": 450,
+          "achieved_mean_mb_s": 262.16,
+          "achieved_stdev_mb_s": 23.72,
+          "user_cpu_pct": 21.14,
+          "kernel_cpu_pct": 75.2,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 289.25,
+              "packet_rate": 252752.1,
+              "packet_loss": 0,
+              "user_cpu_pct": 20.1,
+              "kernel_cpu_pct": 70.35,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0075
+            },
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 245.07,
+              "packet_rate": 214145.4,
+              "packet_loss": 0,
+              "user_cpu_pct": 17.03,
+              "kernel_cpu_pct": 85.15,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0128
+            },
+            {
+              "target_mb_s": 450,
+              "achieved_mb_s": 252.17,
+              "packet_rate": 220349.2,
+              "packet_loss": 0,
+              "user_cpu_pct": 26.28,
+              "kernel_cpu_pct": 70.09,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0089
+            }
+          ]
+        },
+        "475": {
+          "target_mb_s": 475,
+          "achieved_mean_mb_s": 333.05,
+          "achieved_stdev_mb_s": 32.68,
+          "user_cpu_pct": 25.87,
+          "kernel_cpu_pct": 72.04,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 341.5,
+              "packet_rate": 298405.9,
+              "packet_loss": 0,
+              "user_cpu_pct": 22.47,
+              "kernel_cpu_pct": 78.64,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.006
+            },
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 296.97,
+              "packet_rate": 259498.8,
+              "packet_loss": 0,
+              "user_cpu_pct": 19.54,
+              "kernel_cpu_pct": 78.15,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0084
+            },
+            {
+              "target_mb_s": 475,
+              "achieved_mb_s": 360.68,
+              "packet_rate": 315168.2,
+              "packet_loss": 0,
+              "user_cpu_pct": 35.6,
+              "kernel_cpu_pct": 59.33,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0062
+            }
+          ]
+        },
+        "500": {
+          "target_mb_s": 500,
+          "achieved_mean_mb_s": 284.17,
+          "achieved_stdev_mb_s": 1.47,
+          "user_cpu_pct": 14.81,
+          "kernel_cpu_pct": 82.9,
+          "dpc_delta_sec": 0.0052,
+          "runs": [
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 282.9,
+              "packet_rate": 247205.2,
+              "packet_loss": 0,
+              "user_cpu_pct": 17.69,
+              "kernel_cpu_pct": 79.59,
+              "dpc_delta_sec": 0.0156,
+              "latency_p95_ms": 0.0077
+            },
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 283.83,
+              "packet_rate": 248017.1,
+              "packet_loss": 0,
+              "user_cpu_pct": 8.87,
+              "kernel_cpu_pct": 88.72,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0068
+            },
+            {
+              "target_mb_s": 500,
+              "achieved_mb_s": 285.78,
+              "packet_rate": 249716.2,
+              "packet_loss": 0,
+              "user_cpu_pct": 17.87,
+              "kernel_cpu_pct": 80.39,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0077
+            }
+          ]
+        },
+        "600": {
+          "target_mb_s": 600,
+          "achieved_mean_mb_s": 296.09,
+          "achieved_stdev_mb_s": 26.46,
+          "user_cpu_pct": 32.67,
+          "kernel_cpu_pct": 67.26,
+          "dpc_delta_sec": 0.0,
+          "runs": [
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 325.85,
+              "packet_rate": 284733.2,
+              "packet_loss": 0,
+              "user_cpu_pct": 16.98,
+              "kernel_cpu_pct": 84.88,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0063
+            },
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 287.21,
+              "packet_rate": 250966.0,
+              "packet_loss": 0,
+              "user_cpu_pct": 52.37,
+              "kernel_cpu_pct": 52.37,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0113
+            },
+            {
+              "target_mb_s": 600,
+              "achieved_mb_s": 275.21,
+              "packet_rate": 240484.3,
+              "packet_loss": 0,
+              "user_cpu_pct": 28.67,
+              "kernel_cpu_pct": 64.52,
+              "dpc_delta_sec": 0.0,
+              "latency_p95_ms": 0.0072
+            }
+          ]
+        }
+      }
+    }
+  }
+}

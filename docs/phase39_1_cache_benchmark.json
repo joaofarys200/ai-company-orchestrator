@@ -1,0 +1,45 @@
+{
+  "phase": 39.1,
+  "cache_version": "1.0",
+  "storage_mechanism": "SHA-256 Content-Hash Memory + Persistent Disk JSON",
+  "cache_disk_path": ".jarvis/ts_dependency_cache.json",
+  "benchmark_results": {
+    "cold_cache": {
+      "files_reparsed": 435,
+      "files_reused": 0,
+      "hit_rate": 0.0,
+      "duration_ms": 607.06
+    },
+    "warm_cache": {
+      "files_reparsed": 0,
+      "files_reused": 435,
+      "hit_rate": 1.0,
+      "duration_ms": 126.416
+    },
+    "single_file_change": {
+      "target_file": "frontend/src/App.tsx",
+      "files_reparsed": 1,
+      "files_reused": 434,
+      "hit_rate": 0.9977,
+      "duration_ms": 134.499
+    },
+    "multi_file_change": {
+      "target_files": [
+        "frontend/src/App.tsx",
+        "frontend/src/main.tsx",
+        "frontend/src/features/chat/index.ts"
+      ],
+      "files_reparsed": 3,
+      "files_reused": 432,
+      "hit_rate": 0.9931,
+      "duration_ms": 131.408
+    },
+    "tsconfig_change": {
+      "target_config": "frontend/tsconfig.json",
+      "files_reparsed": 435,
+      "files_reused": 0,
+      "hit_rate": 0.0,
+      "duration_ms": 481.851
+    }
+  }
+}

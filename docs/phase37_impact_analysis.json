@@ -1,0 +1,84 @@
+{
+  "impact_analyzer_name": "Phase 37 Multi-Dimensional Impact Engine",
+  "levels": {
+    "NONE": {
+      "description": "Nenhum impacto material sobre tarefas, evidências ou requisitos.",
+      "pause_required": false,
+      "approval_required": false
+    },
+    "LOCAL": {
+      "description": "Impacto circunscrito a cosmética, preferências ou prioridades pontuais sem tocar em contratos de dados.",
+      "pause_required": false,
+      "approval_required": false
+    },
+    "PARTIAL": {
+      "description": "Impacto em 1 ou 2 módulos independentes, adicionando restrições ou removendo features não críticas.",
+      "pause_required": false,
+      "approval_required": false
+    },
+    "STRUCTURAL": {
+      "description": "Impacto profundo na arquitetura, middleware de segurança, framework ou contratos fundamentais.",
+      "pause_required": true,
+      "approval_required": true
+    },
+    "MISSION_WIDE": {
+      "description": "Impacto transversal que invalida a quase totalidade do plano corrente ou redefine a meta da missão.",
+      "pause_required": true,
+      "approval_required": true
+    }
+  },
+  "evaluated_cases": [
+    {
+      "case": "ADD_REQUIREMENT (REQ_AUTH)",
+      "impact_level": "STRUCTURAL",
+      "requirements_affected": ["REQ_AUTH", "REQ_01"],
+      "constraints_affected": ["SEC_ISOLATION"],
+      "tasks_affected": ["TSK_02", "TSK_03", "TSK_04", "TSK_05"],
+      "agents_affected": ["CODING", "TESTING", "COORDINATOR"],
+      "files_affected": ["auth.py", "session.py", "middleware.py"],
+      "evidence_invalidated": ["BUILD", "RUNTIME"],
+      "estimated_replan_scope": "Inclusão estrutural de segurança: middleware de autenticação e proteção de rotas.",
+      "requires_pause": true,
+      "approval_status": "REQUIRES_APPROVAL"
+    },
+    {
+      "case": "REVISE_APPROACH (React framework)",
+      "impact_level": "STRUCTURAL",
+      "requirements_affected": ["REQ_02", "REQ_03"],
+      "constraints_affected": ["UI_STACK"],
+      "tasks_affected": ["TSK_02", "TSK_03", "TSK_05"],
+      "agents_affected": ["CODING", "TESTING", "BROWSER"],
+      "files_affected": ["package.json", "App.tsx", "index.tsx", "style.css"],
+      "evidence_invalidated": ["ev_browser_01", "ev_build_01"],
+      "estimated_replan_scope": "Reestruturação arquitetural: substituição do pipeline de renderização e framework de UI.",
+      "requires_pause": true,
+      "approval_status": "REQUIRES_APPROVAL"
+    },
+    {
+      "case": "ADD_CONSTRAINT (CST_API_IMMUTABLE)",
+      "impact_level": "PARTIAL",
+      "requirements_affected": ["REQ_01"],
+      "constraints_affected": ["CST_API_IMMUTABLE"],
+      "tasks_affected": ["TSK_01"],
+      "agents_affected": ["CODING"],
+      "files_affected": ["api.py"],
+      "evidence_invalidated": [],
+      "estimated_replan_scope": "Preservação estrita de contratos de API REST.",
+      "requires_pause": false,
+      "approval_status": "AUTO_APPLY"
+    },
+    {
+      "case": "ADD_PREFERENCE (PRF_THEME)",
+      "impact_level": "LOCAL",
+      "requirements_affected": [],
+      "constraints_affected": [],
+      "tasks_affected": ["TSK_02"],
+      "agents_affected": ["CODING"],
+      "files_affected": ["style.css"],
+      "evidence_invalidated": [],
+      "estimated_replan_scope": "Ajuste cosmético local de UI.",
+      "requires_pause": false,
+      "approval_status": "AUTO_APPLY"
+    }
+  ]
+}

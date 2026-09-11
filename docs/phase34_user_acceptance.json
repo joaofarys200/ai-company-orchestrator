@@ -1,0 +1,546 @@
+[
+  {
+    "mission_id": "m_p34_01_analysis",
+    "run_index": 1,
+    "category": "EXISTING_PROJECT_ANALYSIS",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_01_analysis",
+    "run_index": 2,
+    "category": "EXISTING_PROJECT_ANALYSIS",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_02_bugfix",
+    "run_index": 1,
+    "category": "BUG_FIX",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_02_bugfix",
+    "run_index": 2,
+    "category": "BUG_FIX",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_03_feature",
+    "run_index": 1,
+    "category": "FEATURE_IMPLEMENTATION",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_03_feature",
+    "run_index": 2,
+    "category": "FEATURE_IMPLEMENTATION",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_04_ui",
+    "run_index": 1,
+    "category": "UI_IMPROVEMENT",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_04_ui",
+    "run_index": 2,
+    "category": "UI_IMPROVEMENT",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_05_new_app",
+    "run_index": 1,
+    "category": "NEW_SMALL_APPLICATION",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_05_new_app",
+    "run_index": 2,
+    "category": "NEW_SMALL_APPLICATION",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_06_refactor",
+    "run_index": 1,
+    "category": "REFACTORING",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_06_refactor",
+    "run_index": 2,
+    "category": "REFACTORING",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_07_test_quality",
+    "run_index": 1,
+    "category": "TESTING_QUALITY",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_07_test_quality",
+    "run_index": 2,
+    "category": "TESTING_QUALITY",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_08_e2e_product",
+    "run_index": 1,
+    "category": "END_TO_END_PRODUCT_TASK",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  },
+  {
+    "mission_id": "m_p34_08_e2e_product",
+    "run_index": 2,
+    "category": "END_TO_END_PRODUCT_TASK",
+    "user_useful": true,
+    "user_useful_label": "USER_USEFUL",
+    "value_level": "IMMEDIATELY_USEFUL",
+    "user_acceptance": {
+      "question_1_matched_request": true,
+      "question_2_evaluator_would_use": true,
+      "question_3_manual_work_needed": "NONE",
+      "question_4_readiness_state": "READY",
+      "question_5_explanation_accurate": true,
+      "decision": "ACCEPTED",
+      "value_level": "IMMEDIATELY_USEFUL"
+    },
+    "output_quality": {
+      "artifact_correctness": 1.0,
+      "runtime_correctness": 1.0,
+      "requirement_satisfaction": 1.0,
+      "usability_score": 0.96,
+      "browser_behavior": 1.0,
+      "code_health_score": 0.98,
+      "composite_score": 0.994
+    },
+    "user_effort": {
+      "prompts_required": 1,
+      "manual_approvals": 0,
+      "manual_file_edits": 0,
+      "manual_retries": 0,
+      "manual_debugging_steps": 0,
+      "effort_score": 0.0
+    }
+  }
+]

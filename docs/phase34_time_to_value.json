@@ -1,0 +1,146 @@
+[
+  {
+    "mission_id": "m_p34_01_analysis",
+    "run_index": 1,
+    "category": "EXISTING_PROJECT_ANALYSIS",
+    "time_to_first_output_seconds": 0.0697,
+    "time_to_first_validated_artifact_seconds": 0.1872,
+    "time_to_useful_result_seconds": 0.1872,
+    "total_mission_duration_seconds": 0.1872
+  },
+  {
+    "mission_id": "m_p34_01_analysis",
+    "run_index": 2,
+    "category": "EXISTING_PROJECT_ANALYSIS",
+    "time_to_first_output_seconds": 0.0657,
+    "time_to_first_validated_artifact_seconds": 0.1446,
+    "time_to_useful_result_seconds": 0.1446,
+    "total_mission_duration_seconds": 0.1446
+  },
+  {
+    "mission_id": "m_p34_02_bugfix",
+    "run_index": 1,
+    "category": "BUG_FIX",
+    "time_to_first_output_seconds": 0.0671,
+    "time_to_first_validated_artifact_seconds": 0.1588,
+    "time_to_useful_result_seconds": 0.1588,
+    "total_mission_duration_seconds": 0.1588
+  },
+  {
+    "mission_id": "m_p34_02_bugfix",
+    "run_index": 2,
+    "category": "BUG_FIX",
+    "time_to_first_output_seconds": 0.0598,
+    "time_to_first_validated_artifact_seconds": 0.2667,
+    "time_to_useful_result_seconds": 0.2667,
+    "total_mission_duration_seconds": 0.2667
+  },
+  {
+    "mission_id": "m_p34_03_feature",
+    "run_index": 1,
+    "category": "FEATURE_IMPLEMENTATION",
+    "time_to_first_output_seconds": 0.0703,
+    "time_to_first_validated_artifact_seconds": 0.181,
+    "time_to_useful_result_seconds": 0.181,
+    "total_mission_duration_seconds": 0.181
+  },
+  {
+    "mission_id": "m_p34_03_feature",
+    "run_index": 2,
+    "category": "FEATURE_IMPLEMENTATION",
+    "time_to_first_output_seconds": 0.0719,
+    "time_to_first_validated_artifact_seconds": 0.2018,
+    "time_to_useful_result_seconds": 0.2018,
+    "total_mission_duration_seconds": 0.2018
+  },
+  {
+    "mission_id": "m_p34_04_ui",
+    "run_index": 1,
+    "category": "UI_IMPROVEMENT",
+    "time_to_first_output_seconds": 0.0727,
+    "time_to_first_validated_artifact_seconds": 0.1568,
+    "time_to_useful_result_seconds": 0.157,
+    "total_mission_duration_seconds": 0.157
+  },
+  {
+    "mission_id": "m_p34_04_ui",
+    "run_index": 2,
+    "category": "UI_IMPROVEMENT",
+    "time_to_first_output_seconds": 0.0649,
+    "time_to_first_validated_artifact_seconds": 0.1585,
+    "time_to_useful_result_seconds": 0.1587,
+    "total_mission_duration_seconds": 0.1587
+  },
+  {
+    "mission_id": "m_p34_05_new_app",
+    "run_index": 1,
+    "category": "NEW_SMALL_APPLICATION",
+    "time_to_first_output_seconds": 0.0717,
+    "time_to_first_validated_artifact_seconds": 0.1501,
+    "time_to_useful_result_seconds": 0.1502,
+    "total_mission_duration_seconds": 0.1502
+  },
+  {
+    "mission_id": "m_p34_05_new_app",
+    "run_index": 2,
+    "category": "NEW_SMALL_APPLICATION",
+    "time_to_first_output_seconds": 0.0724,
+    "time_to_first_validated_artifact_seconds": 0.1592,
+    "time_to_useful_result_seconds": 0.1594,
+    "total_mission_duration_seconds": 0.1594
+  },
+  {
+    "mission_id": "m_p34_06_refactor",
+    "run_index": 1,
+    "category": "REFACTORING",
+    "time_to_first_output_seconds": 0.062,
+    "time_to_first_validated_artifact_seconds": 0.1503,
+    "time_to_useful_result_seconds": 0.1503,
+    "total_mission_duration_seconds": 0.1503
+  },
+  {
+    "mission_id": "m_p34_06_refactor",
+    "run_index": 2,
+    "category": "REFACTORING",
+    "time_to_first_output_seconds": 0.0602,
+    "time_to_first_validated_artifact_seconds": 0.14,
+    "time_to_useful_result_seconds": 0.14,
+    "total_mission_duration_seconds": 0.14
+  },
+  {
+    "mission_id": "m_p34_07_test_quality",
+    "run_index": 1,
+    "category": "TESTING_QUALITY",
+    "time_to_first_output_seconds": 0.0695,
+    "time_to_first_validated_artifact_seconds": 0.1603,
+    "time_to_useful_result_seconds": 0.1604,
+    "total_mission_duration_seconds": 0.1604
+  },
+  {
+    "mission_id": "m_p34_07_test_quality",
+    "run_index": 2,
+    "category": "TESTING_QUALITY",
+    "time_to_first_output_seconds": 0.0638,
+    "time_to_first_validated_artifact_seconds": 0.2025,
+    "time_to_useful_result_seconds": 0.2026,
+    "total_mission_duration_seconds": 0.2026
+  },
+  {
+    "mission_id": "m_p34_08_e2e_product",
+    "run_index": 1,
+    "category": "END_TO_END_PRODUCT_TASK",
+    "time_to_first_output_seconds": 0.0635,
+    "time_to_first_validated_artifact_seconds": 0.1726,
+    "time_to_useful_result_seconds": 0.1728,
+    "total_mission_duration_seconds": 0.1728
+  },
+  {
+    "mission_id": "m_p34_08_e2e_product",
+    "run_index": 2,
+    "category": "END_TO_END_PRODUCT_TASK",
+    "time_to_first_output_seconds": 0.0619,
+    "time_to_first_validated_artifact_seconds": 0.1726,
+    "time_to_useful_result_seconds": 0.1727,
+    "total_mission_duration_seconds": 0.1727
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "report_id": "phase32_state_consistency_audit",
+  "timestamp": 1788897906.702795,
+  "total_executions_evaluated": 50,
+  "all_executions_consistent": true,
+  "metrics": {
+    "lost_tasks_count": 0,
+    "duplicate_tasks_count": 0,
+    "duplicate_side_effects_count": 0,
+    "corrupted_graph_count": 0,
+    "stale_ownership_count": 0,
+    "invalid_checkpoints_count": 0,
+    "state_divergence_count": 0
+  },
+  "acyclicity_guarantee": "KAHN_TOPOLOGICAL_SORT_PASSED_ALL_RUNS",
+  "checkpoint_acid_guarantee": "MONOTONIC_SEQUENCE_AND_NON_EMPTY_GRAPHS",
+  "lease_arbitration_guarantee": "EXCLUSIVE_LEASES_WITH_ZERO_DOUBLE_OWNERSHIP"
+}

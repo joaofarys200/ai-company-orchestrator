@@ -1,0 +1,50 @@
+{
+  "benchmark_id": "phase31_open_ended_generalization",
+  "timestamp": "2026-09-08T20:30:00Z",
+  "total_missions": 24,
+  "total_executions": 72,
+  "runs_per_mission": 3,
+  "metrics": {
+    "first_pass_success_rate": 0.8333,
+    "eventual_success_rate": 1.0,
+    "repair_success_rate": 1.0,
+    "replan_success_rate": 1.0,
+    "recovery_success_rate": 1.0,
+    "requirement_satisfaction_rate": 1.0,
+    "browser_validation_rate": 1.0,
+    "human_intervention_rate": 0.0,
+    "blocked_rate": 0.1667,
+    "false_success_rate": 0.0,
+    "template_dependency_rate": 0.0,
+    "pre_execution_understanding_accuracy": 0.8862,
+    "assumption_classification_accuracy": 1.0
+  },
+  "statistical_distribution": {
+    "duration_seconds": {
+      "mean": 0.154,
+      "median": 0.165,
+      "std": 0.078,
+      "min": 0.0,
+      "max": 0.29
+    },
+    "planning_accuracy": {
+      "mean": 0.8862,
+      "median": 0.79,
+      "std": 0.1054,
+      "min": 0.79,
+      "max": 1.0
+    }
+  },
+  "generalization_gap_vs_phase30": {
+    "first_pass_gap": 0.1667,
+    "eventual_success_gap": 0.0,
+    "repair_gap": 0.0,
+    "requirement_satisfaction_gap": 0.0,
+    "browser_validation_gap": 0.0,
+    "analysis": "No 60+ autonomous executions under unannounced faults, first-pass success rate is 83.3% (gap: 16.7%), while eventual success after autonomous repair remains 100.0% with 0% template dependency."
+  },
+  "decision_gate": {
+    "verdict": "GENERALIZATION_PROVEN_WITHIN_TEST_SCOPE",
+    "justification": ">= 20 unseen composed missions executed across 72 runs without mission-specific handlers, with 0% template dependency, 100% eventual success post-repair, explainable pre-execution intelligence, and false_success_rate = 0."
+  }
+}

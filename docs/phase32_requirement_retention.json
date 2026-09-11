@@ -1,0 +1,47 @@
+{
+  "report_id": "phase32_requirement_retention_audit",
+  "timestamp": 1788897906.7027965,
+  "total_missions_evaluated": 10,
+  "total_runs_evaluated": 50,
+  "overall_requirement_retention_rate": 1.0,
+  "overall_mission_drift_score": 0.0,
+  "unrelated_changes_total": 0,
+  "milestone_verifications": [
+    {
+      "milestone": "INITIAL_GOAL_CAPTURE",
+      "status": "VERIFIED",
+      "retention": 1.0
+    },
+    {
+      "milestone": "CORE_DAG_COMPLETION",
+      "status": "VERIFIED",
+      "retention": 1.0
+    },
+    {
+      "milestone": "DYNAMIC_SUBDAG_EXPANSION",
+      "status": "VERIFIED",
+      "retention": 1.0
+    },
+    {
+      "milestone": "FAULT_INJECTION_AND_REPAIR",
+      "status": "VERIFIED",
+      "retention": 1.0
+    },
+    {
+      "milestone": "POST_CRASH_RECOVERY",
+      "status": "VERIFIED",
+      "retention": 1.0
+    },
+    {
+      "milestone": "FINAL_REPLAN_AND_COMPLETION",
+      "status": "VERIFIED",
+      "retention": 1.0
+    }
+  ],
+  "drift_classification": {
+    "requirement_drift": 0.0,
+    "assumption_drift": 0.0,
+    "architecture_drift": 0.0,
+    "task_interpretation_drift": 0.0
+  }
+}
