@@ -1,0 +1,20 @@
+{
+  "shadow_version": "41.0.0-shadow",
+  "total_comparisons": 25,
+  "agreements": 24,
+  "disagreements": 1,
+  "agreement_rate": 0.96,
+  "recent_disagreements": [
+    {
+      "comparison_id": "shd_cycle_shd_25_7633",
+      "cycle_id": "cycle_shd_25",
+      "active_policy_version": "40.1.0",
+      "active_decision": "CONTINUE",
+      "shadow_policy_version": "41.0.0-shadow",
+      "shadow_decision": "REQUEST_HUMAN",
+      "agreement": false,
+      "disagreement_reason": "Active chose CONTINUE; Shadow chose REQUEST_HUMAN via rule RULE_03_OSCILLATION_DETECTED",
+      "created_at": 1789154937.6338582
+    }
+  ]
+}

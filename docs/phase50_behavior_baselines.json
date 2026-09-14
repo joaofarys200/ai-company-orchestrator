@@ -1,0 +1,153 @@
+[
+  {
+    "contract_id": "listMissions",
+    "contract_version": "2.4.0",
+    "consumer_id": "frontend-mission-dashboard",
+    "operation": "GET /api/v1/missions",
+    "input_shape": {},
+    "output_shape": {
+      "missions": [
+        {
+          "id": "<CANONICAL_ID>",
+          "title": "Mission Alpha",
+          "status": "ACTIVE"
+        }
+      ],
+      "total": 1
+    },
+    "status_code": 200,
+    "side_effects": [],
+    "events": [
+      {
+        "topic": "mission.queried"
+      }
+    ],
+    "economic_effects": [],
+    "authorization_state": {
+      "requires_auth": false,
+      "roles": []
+    },
+    "latency_class": "FAST",
+    "trace_hash": "",
+    "timestamp": 1789334280.8985827,
+    "source": "runtime_observation",
+    "provenance": {},
+    "baseline_hash": "58a83ef11fcaaba72b223a86a5ffc09944de21a787fc153305fdc038c5fafe1b"
+  },
+  {
+    "contract_id": "createMission",
+    "contract_version": "2.4.0",
+    "consumer_id": "mission-orchestrator-cli",
+    "operation": "POST /api/v1/missions",
+    "input_shape": {
+      "title": "Mission Beta",
+      "priority": "HIGH"
+    },
+    "output_shape": {
+      "mission_id": "<CANONICAL_ID>",
+      "created": true
+    },
+    "status_code": 201,
+    "side_effects": [
+      {
+        "type": "db_insert",
+        "table": "missions"
+      }
+    ],
+    "events": [
+      {
+        "topic": "mission.created"
+      }
+    ],
+    "economic_effects": [],
+    "authorization_state": {
+      "requires_auth": true,
+      "roles": [
+        "operator",
+        "admin"
+      ]
+    },
+    "latency_class": "NORMAL",
+    "trace_hash": "",
+    "timestamp": 1789334280.898588,
+    "source": "runtime_observation",
+    "provenance": {},
+    "baseline_hash": "b8ca43ceb72d92a496028266c00c55a213df3ba0348819c672eed042222cfdba"
+  },
+  {
+    "contract_id": "settlePayment",
+    "contract_version": "1.0.0",
+    "consumer_id": "economic-execution-gateway",
+    "operation": "POST /api/v1/economic/settle",
+    "input_shape": {
+      "transaction_id": "<CANONICAL_ID>",
+      "amount": 150.0,
+      "currency": "USD"
+    },
+    "output_shape": {
+      "settled": true,
+      "ledger_seq": 4920
+    },
+    "status_code": 200,
+    "side_effects": [
+      {
+        "type": "ledger_write",
+        "action": "COMMIT"
+      }
+    ],
+    "events": [
+      {
+        "topic": "payment.settled"
+      }
+    ],
+    "economic_effects": [
+      {
+        "amount": 150.0,
+        "currency": "USD",
+        "ledger_action": "COMMIT"
+      }
+    ],
+    "authorization_state": {
+      "requires_auth": true,
+      "roles": [
+        "financial_sentinel"
+      ]
+    },
+    "latency_class": "FAST",
+    "trace_hash": "",
+    "timestamp": 1789334280.898591,
+    "source": "runtime_observation",
+    "provenance": {},
+    "baseline_hash": "6a5cfd0b4f5fd6e098a0414e896bfcd5096fa94bf67a5b7b7d6edfc317497f98"
+  },
+  {
+    "contract_id": "getUserProfile",
+    "contract_version": "1.0.0",
+    "consumer_id": "frontend-user-badge",
+    "operation": "GET /api/v1/users/{id}",
+    "input_shape": {
+      "user_id": "usr_991"
+    },
+    "output_shape": {
+      "id": "usr_991",
+      "name": "Admin",
+      "avatar": "https://cdn.example.com/a.png"
+    },
+    "status_code": 200,
+    "side_effects": [],
+    "events": [],
+    "economic_effects": [],
+    "authorization_state": {
+      "requires_auth": true,
+      "roles": [
+        "user"
+      ]
+    },
+    "latency_class": "FAST",
+    "trace_hash": "",
+    "timestamp": 1789334280.8985932,
+    "source": "runtime_observation",
+    "provenance": {},
+    "baseline_hash": "ba5677799c5157d694b5a939bb5aa236a1107c6c7051aa5089ad7a69217f1b7b"
+  }
+]

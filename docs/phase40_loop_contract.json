@@ -1,0 +1,79 @@
+{
+  "contract_name": "JARVIS OS — Phase 40 Autonomous Engineering Loop Contract",
+  "version": "1.0.0",
+  "architecture_principle": "ObservedState(t) + Prediction(t) + Evidence(t) + MissionIntent(t) -> Decision(t+1)",
+  "anti_patterns_banned": [
+    "sleeps",
+    "fixed_retries",
+    "hardcoded_always_repair",
+    "hardcoded_always_replan",
+    "fake_progress",
+    "synthetic_autonomy",
+    "model_direct_operational_mutation"
+  ],
+  "cycle_stages": [
+    { "step": 1, "stage": "SNAPSHOT", "description": "Deterministic capture of workspace, DAG, requirements, evidence, and prediction state." },
+    { "step": 2, "stage": "PREDICT", "description": "Read-only predictive impact projection without side-effects." },
+    { "step": 3, "stage": "PLAN", "description": "Evaluation of current DAG plan validity or adaptation requirement." },
+    { "step": 4, "stage": "GATE", "description": "Mission Gate verification of pending actions, security, and economic rules." },
+    { "step": 5, "stage": "EXECUTE", "description": "Swarm lifecycle task execution and agent assignment." },
+    { "step": 6, "stage": "OBSERVE", "description": "Empirical observation ingestion (AST, build, tests, browser QA, evidence)." },
+    { "step": 7, "stage": "COMPARE", "description": "PredictionComparator evaluation of predicted vs actual outcomes." },
+    { "step": 8, "stage": "DECIDE", "description": "Deterministic policy evaluation producing structured decision and causal chain." },
+    { "step": 9, "stage": "APPLY_ADAPTATION", "description": "Application of gated adaptation proposals (repair, replan, reassign, task mutation)." },
+    { "step": 10, "stage": "VALIDATE", "description": "Verification of requirement retention, drift limits, and state consistency." },
+    { "step": 11, "stage": "RECORD", "description": "Idempotent state checkpointing and WebSocket event publishing." },
+    { "step": 12, "stage": "NEXT_CYCLE", "description": "Advancement to next iteration or termination via Finish Gate." }
+  ],
+  "decision_types": [
+    "CONTINUE",
+    "ADAPT",
+    "REPLAN",
+    "REPAIR",
+    "REASSIGN",
+    "WAIT",
+    "REQUEST_HUMAN",
+    "BLOCK",
+    "ROLLBACK",
+    "COMPENSATE",
+    "FINISH"
+  ],
+  "adaptation_types": [
+    "MODIFY_TASK",
+    "ADD_TASK",
+    "REMOVE_TASK",
+    "CHANGE_PRIORITY",
+    "REASSIGN",
+    "ADD_VALIDATION",
+    "REPLAN",
+    "REPAIR",
+    "REQUEST_HUMAN"
+  ],
+  "budget_defaults": {
+    "max_adaptations": 15,
+    "max_replans": 5,
+    "max_repairs": 5,
+    "max_consecutive_failures": 3,
+    "max_oscillations": 2,
+    "max_human_requests": 5
+  },
+  "oscillation_fingerprint": {
+    "components": [
+      "plan_version",
+      "task_states_signature",
+      "failure_signature",
+      "adaptation_signature"
+    ],
+    "threshold_repetitions": 2,
+    "escalation": "REQUEST_HUMAN"
+  },
+  "finish_gate_invariants": {
+    "execution_success": true,
+    "requirement_satisfaction": true,
+    "required_validation": true,
+    "evidence_complete": true,
+    "state_consistent": true,
+    "no_active_block": true,
+    "no_pending_approval": true
+  }
+}

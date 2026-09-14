@@ -1,0 +1,25 @@
+{
+  "drift_events": [
+    {
+      "drift_id": "poly_drift_evt_01",
+      "contract_id": "ctr_events",
+      "type": "VARIANT_ADDED",
+      "variant_id": "var_user_archived",
+      "discriminator_value": "user.archived",
+      "classification": "POLYMORPHIC_VARIANTS",
+      "recommended_action": "REQUEST_VALIDATION",
+      "is_breaking": false,
+      "notes": "Coherent variant with consistent discriminator partition."
+    },
+    {
+      "drift_id": "poly_drift_evt_02",
+      "contract_id": "ctr_events",
+      "type": "DISCRIMINATOR_CHANGED",
+      "old_field": "type",
+      "new_field": "event_type",
+      "classification": "BREAKING",
+      "recommended_action": "REQUEST_HUMAN",
+      "is_breaking": true
+    }
+  ]
+}

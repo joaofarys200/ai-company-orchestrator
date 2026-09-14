@@ -1,0 +1,413 @@
+{
+  "timestamp": 1789333232.7035403,
+  "mission_id": "mission_corpus_real",
+  "endpoints_extracted": {
+    "listMissions": {
+      "endpoint_id": "listMissions",
+      "path": "/api/v1/missions",
+      "method": "GET",
+      "request_schema": null,
+      "response_schema": {
+        "$ref": "#/components/schemas/MissionListDto"
+      },
+      "parameters": [],
+      "auth": {
+        "requires_auth": false,
+        "auth_scheme": "None",
+        "roles": [],
+        "scopes": []
+      },
+      "version": "2.4.0",
+      "provenance": {
+        "source_type": "GENERATED_OPENAPI",
+        "artifact_path": "JARVIS Autonomous Mission Control API",
+        "json_pointer": "#/paths//api/v1/missions/get",
+        "content_hash": "8825566e803d14d9ab9a31c1ca47758cac959bbc6ade96679f9fb944674e7e70",
+        "extracted_at": 1789333232.5952206
+      }
+    },
+    "createMission": {
+      "endpoint_id": "createMission",
+      "path": "/api/v1/missions",
+      "method": "POST",
+      "request_schema": {
+        "$ref": "#/components/schemas/CreateMissionDto"
+      },
+      "response_schema": null,
+      "parameters": [],
+      "auth": {
+        "requires_auth": false,
+        "auth_scheme": "None",
+        "roles": [],
+        "scopes": []
+      },
+      "version": "2.4.0",
+      "provenance": {
+        "source_type": "GENERATED_OPENAPI",
+        "artifact_path": "JARVIS Autonomous Mission Control API",
+        "json_pointer": "#/paths//api/v1/missions/post",
+        "content_hash": "37af78c15fe74f2a428f89c91c2db7446d3b80ab3efa0ce7fe38c859f0347807",
+        "extracted_at": 1789333232.5952742
+      }
+    },
+    "extractBuildContracts": {
+      "endpoint_id": "extractBuildContracts",
+      "path": "/api/v1/contracts/extract",
+      "method": "POST",
+      "request_schema": null,
+      "response_schema": {
+        "$ref": "#/components/schemas/ExtractionStatusDto"
+      },
+      "parameters": [],
+      "auth": {
+        "requires_auth": false,
+        "auth_scheme": "None",
+        "roles": [],
+        "scopes": []
+      },
+      "version": "2.4.0",
+      "provenance": {
+        "source_type": "GENERATED_OPENAPI",
+        "artifact_path": "JARVIS Autonomous Mission Control API",
+        "json_pointer": "#/paths//api/v1/contracts/extract/post",
+        "content_hash": "14eed82f91a86cb2ec10dfb9aecfdcf47cfce7f6b9c2db20898326d7c08811fe",
+        "extracted_at": 1789333232.5953052
+      }
+    }
+  },
+  "types_extracted": {
+    "type_MissionListDto": {
+      "type_id": "type_MissionListDto",
+      "name": "MissionListDto",
+      "kind": "ARRAY",
+      "properties": {},
+      "variants": [],
+      "discriminator": null,
+      "enum_values": [],
+      "language": "agnostic",
+      "provenance": {
+        "source_type": "GENERATED_OPENAPI",
+        "artifact_path": "JARVIS Autonomous Mission Control API",
+        "json_pointer": "#/components/schemas/MissionListDto",
+        "content_hash": "cb839f6503912da07f91f70b74e2f7b3fe054c18ef152b352d0b5b818432f833",
+        "extracted_at": 1789333232.5948498
+      }
+    },
+    "type_CreateMissionDto": {
+      "type_id": "type_CreateMissionDto",
+      "name": "CreateMissionDto",
+      "kind": "OBJECT",
+      "properties": {
+        "project_id": {
+          "field_name": "project_id",
+          "field_type": "string",
+          "required": true,
+          "nullable": false,
+          "default_value": null,
+          "description": "",
+          "provenance": {
+            "source_type": "GENERATED_OPENAPI",
+            "artifact_path": "JARVIS Autonomous Mission Control API",
+            "json_pointer": "#/components/schemas/CreateMissionDto/properties/project_id",
+            "content_hash": "38a346cadbd3820527bdd4c8fa746275ff6b6435dcb4a7c22e0b2c68bcfed961",
+            "extracted_at": 1789333232.5949774
+          }
+        },
+        "title": {
+          "field_name": "title",
+          "field_type": "string",
+          "required": true,
+          "nullable": false,
+          "default_value": null,
+          "description": "",
+          "provenance": {
+            "source_type": "GENERATED_OPENAPI",
+            "artifact_path": "JARVIS Autonomous Mission Control API",
+            "json_pointer": "#/components/schemas/CreateMissionDto/properties/title",
+            "content_hash": "38a346cadbd3820527bdd4c8fa746275ff6b6435dcb4a7c22e0b2c68bcfed961",
+            "extracted_at": 1789333232.5949917
+          }
+        },
+        "objective": {
+          "field_name": "objective",
+          "field_type": "string",
+          "required": true,
+          "nullable": false,
+          "default_value": null,
+          "description": "",
+          "provenance": {
+            "source_type": "GENERATED_OPENAPI",
+            "artifact_path": "JARVIS Autonomous Mission Control API",
+            "json_pointer": "#/components/schemas/CreateMissionDto/properties/objective",
+            "content_hash": "38a346cadbd3820527bdd4c8fa746275ff6b6435dcb4a7c22e0b2c68bcfed961",
+            "extracted_at": 1789333232.5950036
+          }
+        },
+        "autonomy_level": {
+          "field_name": "autonomy_level",
+          "field_type": "string",
+          "required": false,
+          "nullable": false,
+          "default_value": null,
+          "description": "",
+          "provenance": {
+            "source_type": "GENERATED_OPENAPI",
+            "artifact_path": "JARVIS Autonomous Mission Control API",
+            "json_pointer": "#/components/schemas/CreateMissionDto/properties/autonomy_level",
+            "content_hash": "2d6f206479427c3bfb1a1d0ca62a9b3d5e9e49a16d969a1797263908631df606",
+            "extracted_at": 1789333232.5950143
+          }
+        }
+      },
+      "variants": [],
+      "discriminator": null,
+      "enum_values": [],
+      "language": "agnostic",
+      "provenance": {
+        "source_type": "GENERATED_OPENAPI",
+        "artifact_path": "JARVIS Autonomous Mission Control API",
+        "json_pointer": "#/components/schemas/CreateMissionDto",
+        "content_hash": "c7e61d558f290be603c0ddd9310fe8a0b4124570867dcf136c5acdf572bf4f99",
+        "extracted_at": 1789333232.5949628
+      }
+    },
+    "type_ExtractionStatusDto": {
+      "type_id": "type_ExtractionStatusDto",
+      "name": "ExtractionStatusDto",
+      "kind": "OBJECT",
+      "properties": {
+        "status": {
+          "field_name": "status",
+          "field_type": "string",
+          "required": true,
+          "nullable": false,
+          "default_value": null,
+          "description": "",
+          "provenance": {
+            "source_type": "GENERATED_OPENAPI",
+            "artifact_path": "JARVIS Autonomous Mission Control API",
+            "json_pointer": "#/components/schemas/ExtractionStatusDto/properties/status",
+            "content_hash": "38a346cadbd3820527bdd4c8fa746275ff6b6435dcb4a7c22e0b2c68bcfed961",
+            "extracted_at": 1789333232.5950444
+          }
+        },
+        "contracts_count": {
+          "field_name": "contracts_count",
+          "field_type": "integer",
+          "required": true,
+          "nullable": false,
+          "default_value": null,
+          "description": "",
+          "provenance": {
+            "source_type": "GENERATED_OPENAPI",
+            "artifact_path": "JARVIS Autonomous Mission Control API",
+            "json_pointer": "#/components/schemas/ExtractionStatusDto/properties/contracts_count",
+            "content_hash": "644595857f568d17df101cbd4b9a79a42bea5c26040187875146355cfdd4eda7",
+            "extracted_at": 1789333232.5950582
+          }
+        }
+      },
+      "variants": [],
+      "discriminator": null,
+      "enum_values": [],
+      "language": "agnostic",
+      "provenance": {
+        "source_type": "GENERATED_OPENAPI",
+        "artifact_path": "JARVIS Autonomous Mission Control API",
+        "json_pointer": "#/components/schemas/ExtractionStatusDto",
+        "content_hash": "940162bc65dce7343e393e3a64e50e84e28a28b556e8592dc95a49f8a1cab832",
+        "extracted_at": 1789333232.595035
+      }
+    },
+    "type_MissionWebSocketOperations": {
+      "type_id": "type_MissionWebSocketOperations",
+      "name": "MissionWebSocketOperations",
+      "kind": "ENUM",
+      "properties": {},
+      "variants": [],
+      "discriminator": null,
+      "enum_values": [
+        "mission_build_contract_extraction_status",
+        "mission_dynamic_consumer_resolution",
+        "mission_build_contract_trigger_extract",
+        "mission_contract_change_prediction",
+        "mission_contract_migration_plan",
+        "mission_contract_change_gate_action",
+        "mission_polymorphic_schema_status",
+        "mission_semantic_graph_status",
+        "overview",
+        "plan",
+        "requirements_diff",
+        "plan_diff",
+        "predicted_impact",
+        "prediction_vs_actual",
+        "autonomous_loop",
+        "decision_calibration",
+        "experience_memory",
+        "contract_discovery",
+        "contract_health",
+        "polymorphic_contracts",
+        "contract_change_mgmt",
+        "build_contract_extraction"
+      ],
+      "language": "agnostic",
+      "provenance": {
+        "source_type": "GENERATED_OPENAPI",
+        "artifact_path": "JARVIS Autonomous Mission Control API",
+        "json_pointer": "#/components/schemas/MissionWebSocketOperations",
+        "content_hash": "1fee35726d03d5c80744b99ef1d6dcb7ea3cadd0a5e5bf9701cf790f7ff60160",
+        "extracted_at": 1789333232.5951264
+      }
+    },
+    "type_AuditNotificationEvent": {
+      "type_id": "type_AuditNotificationEvent",
+      "name": "AuditNotificationEvent",
+      "kind": "UNION",
+      "properties": {},
+      "variants": [
+        {
+          "variant_id": "var_AuditNotificationEvent_user.created",
+          "discriminator_value": "user.created",
+          "schema": {
+            "title": "user.created",
+            "type": "object",
+            "properties": {
+              "user_id": {
+                "type": "string"
+              }
+            }
+          },
+          "required_fields": [],
+          "forbidden_fields": [],
+          "description": "",
+          "provenance": {
+            "source_type": "GENERATED_OPENAPI",
+            "artifact_path": "JARVIS Autonomous Mission Control API",
+            "json_pointer": "#/components/schemas/AuditNotificationEvent",
+            "content_hash": "f8c34d7af18f5615f3df2ab835167a46d9a271e97f7770413a2e141712be2531",
+            "extracted_at": 1789333232.5951629
+          }
+        },
+        {
+          "variant_id": "var_AuditNotificationEvent_user.updated",
+          "discriminator_value": "user.updated",
+          "schema": {
+            "title": "user.updated",
+            "type": "object",
+            "properties": {
+              "user_id": {
+                "type": "string"
+              }
+            }
+          },
+          "required_fields": [],
+          "forbidden_fields": [],
+          "description": "",
+          "provenance": {
+            "source_type": "GENERATED_OPENAPI",
+            "artifact_path": "JARVIS Autonomous Mission Control API",
+            "json_pointer": "#/components/schemas/AuditNotificationEvent",
+            "content_hash": "f8c34d7af18f5615f3df2ab835167a46d9a271e97f7770413a2e141712be2531",
+            "extracted_at": 1789333232.5951629
+          }
+        },
+        {
+          "variant_id": "var_AuditNotificationEvent_task.started",
+          "discriminator_value": "task.started",
+          "schema": {
+            "title": "task.started",
+            "type": "object",
+            "properties": {
+              "task_id": {
+                "type": "string"
+              }
+            }
+          },
+          "required_fields": [],
+          "forbidden_fields": [],
+          "description": "",
+          "provenance": {
+            "source_type": "GENERATED_OPENAPI",
+            "artifact_path": "JARVIS Autonomous Mission Control API",
+            "json_pointer": "#/components/schemas/AuditNotificationEvent",
+            "content_hash": "f8c34d7af18f5615f3df2ab835167a46d9a271e97f7770413a2e141712be2531",
+            "extracted_at": 1789333232.5951629
+          }
+        },
+        {
+          "variant_id": "var_AuditNotificationEvent_task.completed",
+          "discriminator_value": "task.completed",
+          "schema": {
+            "title": "task.completed",
+            "type": "object",
+            "properties": {
+              "task_id": {
+                "type": "string"
+              }
+            }
+          },
+          "required_fields": [],
+          "forbidden_fields": [],
+          "description": "",
+          "provenance": {
+            "source_type": "GENERATED_OPENAPI",
+            "artifact_path": "JARVIS Autonomous Mission Control API",
+            "json_pointer": "#/components/schemas/AuditNotificationEvent",
+            "content_hash": "f8c34d7af18f5615f3df2ab835167a46d9a271e97f7770413a2e141712be2531",
+            "extracted_at": 1789333232.5951629
+          }
+        }
+      ],
+      "discriminator": {
+        "field": "event_type",
+        "location": "BODY",
+        "mapping": {},
+        "discriminator_type": "STRING_ENUM"
+      },
+      "enum_values": [],
+      "language": "agnostic",
+      "provenance": {
+        "source_type": "GENERATED_OPENAPI",
+        "artifact_path": "JARVIS Autonomous Mission Control API",
+        "json_pointer": "#/components/schemas/AuditNotificationEvent",
+        "content_hash": "f8c34d7af18f5615f3df2ab835167a46d9a271e97f7770413a2e141712be2531",
+        "extracted_at": 1789333232.5951629
+      }
+    }
+  },
+  "versions_extracted": {
+    "listMissions": {
+      "contract_id": "listMissions",
+      "version": "2.4.0",
+      "content_hash": "8825566e803d14d9ab9a31c1ca47758cac959bbc6ade96679f9fb944674e7e70",
+      "status": "VALIDATED",
+      "source_type": "GENERATED_OPENAPI",
+      "parent_version": null,
+      "created_at": 1789333232.5952606
+    },
+    "createMission": {
+      "contract_id": "createMission",
+      "version": "2.4.0",
+      "content_hash": "37af78c15fe74f2a428f89c91c2db7446d3b80ab3efa0ce7fe38c859f0347807",
+      "status": "VALIDATED",
+      "source_type": "GENERATED_OPENAPI",
+      "parent_version": null,
+      "created_at": 1789333232.5952947
+    },
+    "extractBuildContracts": {
+      "contract_id": "extractBuildContracts",
+      "version": "2.4.0",
+      "content_hash": "14eed82f91a86cb2ec10dfb9aecfdcf47cfce7f6b9c2db20898326d7c08811fe",
+      "status": "VALIDATED",
+      "source_type": "GENERATED_OPENAPI",
+      "parent_version": null,
+      "created_at": 1789333232.5953183
+    }
+  },
+  "summary": {
+    "total_endpoints": 3,
+    "total_types": 5,
+    "source": "GENERATED_OPENAPI",
+    "validation_status": "VALIDATED"
+  }
+}

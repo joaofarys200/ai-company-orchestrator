@@ -1,0 +1,13 @@
+{
+  "evaluation_corpus_size": 10,
+  "ground_truth_relevant": 5,
+  "retrieved_total": 5,
+  "true_positives": 5,
+  "false_positives": 0,
+  "false_negatives": 0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "explanation_completeness": 1.0,
+  "anti_leakage_violations": 0
+}

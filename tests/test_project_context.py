@@ -228,3 +228,33 @@ def test_delete_project_file_rejects_paths_outside_project(tmp_path):
 
     with pytest.raises(ProjectContextError, match="Caminho"):
         service.delete_project_file("safe-del-app", "../outside.js")
+
+
+def test_sandbox_preflight_check_catches_undeclared_app_and_syntax(tmp_path):
+    import sandbox
+
+    proj_dir = tmp_path / "broken_node_proj"
+    proj_dir.mkdir()
+    (proj_dir / "package.json").write_text(json.dumps({"main": "app.js"}), encoding="utf-8")
+    (proj_dir / "app.js").write_text("app.post('/test', (req, res) => res.send('ok'));", encoding="utf-8")
+
+    logs = []
+    sandbox._preflight_check_node_project(str(proj_dir), logs.append)
+    combined = "".join(logs)
+    assert "Preflight Warning" in combined
+    assert "app" in combined
+
+
+def test_sandbox_runtime_error_diagnostic():
+    import sandbox
+
+    logs = []
+    sandbox._diagnose_runtime_error("ReferenceError: app is not defined", logs.append)
+    assert any("ReferenceError detetado" in l for l in logs)
+    assert any("A variável 'app'" in l for l in logs)
+
+    logs_mod = []
+    sandbox._diagnose_runtime_error("Error: Cannot find module 'express'", logs_mod.append)
+    assert any("Módulo em falta" in l for l in logs_mod)
+    assert any("express" in l for l in logs_mod)
+

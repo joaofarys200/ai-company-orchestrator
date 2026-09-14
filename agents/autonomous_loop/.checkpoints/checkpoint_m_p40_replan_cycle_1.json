@@ -1,0 +1,182 @@
+{
+  "mission_id": "m_p40_replan",
+  "cycle_id": "cycle_1",
+  "timestamp": 1789152866.4702914,
+  "state": {
+    "mission_id": "m_p40_replan",
+    "loop_version": 1,
+    "cycle_id": "cycle_1",
+    "mission_version": 1,
+    "intent_version": 1,
+    "plan_version": 2,
+    "current_stage": "RECORD",
+    "current_decision": "REPLAN",
+    "current_observations": [],
+    "latest_prediction_id": "pred_9c8fed75",
+    "latest_outcome_id": "out_ae23e127",
+    "latest_evidence_ids": [
+      "EVD_CYC_1"
+    ],
+    "active_failures": [],
+    "active_repairs": [],
+    "active_replans": [
+      {
+        "adaptation_id": "adapt_cycle_1_66470",
+        "cycle_id": "cycle_1",
+        "adaptation_type": "REPLAN",
+        "reason": "Plan DAG invalid or new dependency discovered: Topology modification required.",
+        "source_observation": {
+          "observation_id": "obs_cycle_1_66469",
+          "cycle_id": "cycle_1",
+          "mission_id": "m_p40_replan",
+          "timestamp": 1789152866.4698284,
+          "task_results": [
+            {
+              "task_id": "task_dep_1",
+              "owner_agent": "coder",
+              "status": "COMPLETED",
+              "exit_code": 0,
+              "files_touched": [],
+              "artifacts_created": [],
+              "error_message": null,
+              "execution_duration_seconds": 0.0
+            }
+          ],
+          "validations": [
+            {
+              "validation_type": "TEST",
+              "target": "tests/test_suite.py",
+              "passed": true,
+              "summary": "Tests passed clean",
+              "evidence_id": "EVD_CYC_1",
+              "details": {}
+            }
+          ],
+          "files_changed": [],
+          "active_failures": [],
+          "evidence_ids_collected": [
+            "EVD_CYC_1"
+          ],
+          "all_tasks_completed": true,
+          "all_validations_passed": true,
+          "build_clean": true,
+          "tests_clean": true,
+          "ast_clean": true,
+          "browser_clean": true,
+          "has_unrepairable_failure": false
+        },
+        "previous_plan_version": 1,
+        "proposed_change": {
+          "action": "COMPUTE_PLAN_DELTA",
+          "trigger": "NEW_DEPENDENCY_OR_INVALID_DAG",
+          "preserve_completed_tasks": true
+        },
+        "predicted_impact": {
+          "risk": "MEDIUM",
+          "scope": "CROSS_MODULE"
+        },
+        "risk": "MEDIUM",
+        "requires_approval": false,
+        "gate_result": {
+          "status": "APPROVED",
+          "passed": true,
+          "reason": "Mission Gate authorized adaptation.",
+          "evaluated_at": 1789152866.4701693
+        },
+        "status": "APPLIED",
+        "applied_at": 1789152866.4701753
+      }
+    ],
+    "adaptation_count": 1,
+    "consecutive_successes": 1,
+    "consecutive_failures": 0,
+    "human_intervention_count": 0,
+    "state_hash": "cb84b16af4686275",
+    "created_at": 1789152865.4148679,
+    "updated_at": 1789152866.4702551
+  },
+  "snapshot_hash": "af6c7cd03030400c",
+  "decision": "REPLAN",
+  "adaptation": {
+    "adaptation_id": "adapt_cycle_1_66470",
+    "cycle_id": "cycle_1",
+    "adaptation_type": "REPLAN",
+    "reason": "Plan DAG invalid or new dependency discovered: Topology modification required.",
+    "source_observation": {
+      "observation_id": "obs_cycle_1_66469",
+      "cycle_id": "cycle_1",
+      "mission_id": "m_p40_replan",
+      "timestamp": 1789152866.4698284,
+      "task_results": [
+        {
+          "task_id": "task_dep_1",
+          "owner_agent": "coder",
+          "status": "COMPLETED",
+          "exit_code": 0,
+          "files_touched": [],
+          "artifacts_created": [],
+          "error_message": null,
+          "execution_duration_seconds": 0.0
+        }
+      ],
+      "validations": [
+        {
+          "validation_type": "TEST",
+          "target": "tests/test_suite.py",
+          "passed": true,
+          "summary": "Tests passed clean",
+          "evidence_id": "EVD_CYC_1",
+          "details": {}
+        }
+      ],
+      "files_changed": [],
+      "active_failures": [],
+      "evidence_ids_collected": [
+        "EVD_CYC_1"
+      ],
+      "all_tasks_completed": true,
+      "all_validations_passed": true,
+      "build_clean": true,
+      "tests_clean": true,
+      "ast_clean": true,
+      "browser_clean": true,
+      "has_unrepairable_failure": false
+    },
+    "previous_plan_version": 1,
+    "proposed_change": {
+      "action": "COMPUTE_PLAN_DELTA",
+      "trigger": "NEW_DEPENDENCY_OR_INVALID_DAG",
+      "preserve_completed_tasks": true
+    },
+    "predicted_impact": {
+      "risk": "MEDIUM",
+      "scope": "CROSS_MODULE"
+    },
+    "risk": "MEDIUM",
+    "requires_approval": false,
+    "gate_result": {
+      "status": "APPROVED",
+      "passed": true,
+      "reason": "Mission Gate authorized adaptation.",
+      "evaluated_at": 1789152866.4701693
+    },
+    "status": "APPLIED",
+    "applied_at": 1789152866.4701753
+  },
+  "outcome": {
+    "outcome_id": "out_ae23e127",
+    "cycle_id": "cycle_1",
+    "prediction_id": "pred_9c8fed75",
+    "matched": [],
+    "missed": [
+      "agents/domain_logic.py"
+    ],
+    "overpredicted": [],
+    "underpredicted": [],
+    "unexpected_changes": [],
+    "discrepancy_score": 1.0
+  },
+  "plan_version": 2,
+  "intent_version": 1,
+  "fingerprints_count": 1
+}

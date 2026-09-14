@@ -1,0 +1,38 @@
+{
+  "taxonomy_name": "DecisionErrorTaxonomy",
+  "categories": [
+    "OBSERVATION_GAP",
+    "POLICY_GAP",
+    "POLICY_PRIORITY_ERROR",
+    "STALE_STATE",
+    "INCORRECT_CLASSIFICATION",
+    "INSUFFICIENT_EVIDENCE",
+    "PREDICTION_ERROR",
+    "EXECUTION_ERROR",
+    "EXTERNAL_FAILURE",
+    "EXPECTED_BLOCK",
+    "AMBIGUOUS_CASE",
+    "UNDETERMINED"
+  ],
+  "severities": [
+    "INFO",
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "CRITICAL"
+  ],
+  "missed_observation_types": [
+    "OBSERVATION_AVAILABLE_BUT_UNUSED",
+    "OBSERVATION_UNAVAILABLE",
+    "OBSERVATION_LATE",
+    "OBSERVATION_INCORRECT",
+    "NO_OBSERVATION_GAP"
+  ],
+  "prohibited_operations": [
+    "REMOVE_EVIDENCE_REQUIREMENT",
+    "WEAKEN_ECONOMIC_LIMITS",
+    "BYPASS_MISSION_GATE",
+    "DISABLE_SECURITY",
+    "REMOVE_HUMAN_APPROVAL_POLICY"
+  ]
+}

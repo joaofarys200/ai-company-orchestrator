@@ -1,0 +1,44 @@
+{
+  "phase": 44,
+  "graph_version": 3,
+  "total_nodes": 18,
+  "total_edges": 24,
+  "node_types": [
+    "REQUIREMENT",
+    "CONSTRAINT",
+    "ARCHITECTURE_COMPONENT",
+    "FRONTEND_COMPONENT",
+    "BACKEND_SERVICE",
+    "API_ENDPOINT",
+    "API_CONTRACT",
+    "DATA_MODEL",
+    "PERSISTENCE_OPERATION",
+    "TASK",
+    "TEST",
+    "BROWSER_SCENARIO",
+    "AGENT",
+    "EVIDENCE"
+  ],
+  "relation_types": [
+    "IMPLEMENTS",
+    "SERVES",
+    "CALLS",
+    "EXPOSES",
+    "CONSUMES",
+    "PERSISTS",
+    "VALIDATES",
+    "TESTS",
+    "REQUIRES",
+    "DEPENDS_ON",
+    "GENERATES",
+    "PROVES",
+    "REMEDIATES",
+    "TRANSLATES_TO"
+  ],
+  "confidence_classes": [
+    "CONTRACTUAL",
+    "DIRECT",
+    "INFERRED",
+    "UNCERTAIN"
+  ]
+}

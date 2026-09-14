@@ -1,0 +1,11 @@
+{
+  "temporal_leakage_count": 0,
+  "invariants_tested": [
+    "future experience never leaks backward",
+    "future evidence strictly filtered",
+    "future outcome strictly filtered",
+    "temporal upper bound enforced in query_candidates"
+  ],
+  "total_checks": 100,
+  "status": "ZERO_LEAKAGE_CONFIRMED"
+}

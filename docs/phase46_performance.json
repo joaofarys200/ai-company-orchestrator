@@ -1,0 +1,58 @@
+{
+  "scales": {
+    "100": {
+      "observations_count": 100,
+      "generation_time_sec": 0.0001,
+      "cold_eval_ms": 0.248,
+      "warm_eval_ms": 0.254,
+      "throughput_obs_per_sec": 403877.2,
+      "detected_drift_status": "POTENTIALLY_BREAKING_DRIFT",
+      "detected_classification": "POTENTIALLY_BREAKING",
+      "sample_count": 100
+    },
+    "1000": {
+      "observations_count": 1000,
+      "generation_time_sec": 0.0015,
+      "cold_eval_ms": 1.588,
+      "warm_eval_ms": 1.586,
+      "throughput_obs_per_sec": 629722.9,
+      "detected_drift_status": "POTENTIALLY_BREAKING_DRIFT",
+      "detected_classification": "POTENTIALLY_BREAKING",
+      "sample_count": 1000
+    },
+    "10000": {
+      "observations_count": 10000,
+      "generation_time_sec": 0.0156,
+      "cold_eval_ms": 15.761,
+      "warm_eval_ms": 16.086,
+      "throughput_obs_per_sec": 634489.6,
+      "detected_drift_status": "POTENTIALLY_BREAKING_DRIFT",
+      "detected_classification": "POTENTIALLY_BREAKING",
+      "sample_count": 10000
+    },
+    "100000": {
+      "observations_count": 100000,
+      "generation_time_sec": 0.2073,
+      "cold_eval_ms": 164.434,
+      "warm_eval_ms": 167.244,
+      "throughput_obs_per_sec": 608146.4,
+      "detected_drift_status": "POTENTIALLY_BREAKING_DRIFT",
+      "detected_classification": "POTENTIALLY_BREAKING",
+      "sample_count": 100000
+    }
+  },
+  "operations": {
+    "observation_comparison_ms": 0.0005,
+    "schema_diff_ms": 0.0042,
+    "consumer_impact_lookup_ms": 0.0001,
+    "drift_classification_ms": 0.0003,
+    "proposal_generation_ms": 0.0229,
+    "contract_registry_update_ms": 0.0051
+  },
+  "incremental_vs_full": {
+    "single_contract_incremental_ms": 0.335,
+    "ten_contracts_ms": 0.516,
+    "hundred_contracts_ms": 5.802,
+    "incremental_saving_pct": 35.1
+  }
+}

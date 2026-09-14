@@ -1,0 +1,51 @@
+{
+  "mission_id": "m_p40_long_100",
+  "cycle_id": "cycle_2",
+  "timestamp": 1789152764.2601113,
+  "state": {
+    "mission_id": "m_p40_long_100",
+    "loop_version": 2,
+    "cycle_id": "cycle_2",
+    "mission_version": 1,
+    "intent_version": 1,
+    "plan_version": 1,
+    "current_stage": "RECORD",
+    "current_decision": "CONTINUE",
+    "current_observations": [],
+    "latest_prediction_id": "pred_91482be6",
+    "latest_outcome_id": "out_19c23f88",
+    "latest_evidence_ids": [
+      "EVD_CYC_1",
+      "EVD_CYC_2"
+    ],
+    "active_failures": [],
+    "active_repairs": [],
+    "active_replans": [],
+    "adaptation_count": 0,
+    "consecutive_successes": 2,
+    "consecutive_failures": 0,
+    "human_intervention_count": 0,
+    "state_hash": "b80c3ab53ba10a96",
+    "created_at": 1789152762.1358283,
+    "updated_at": 1789152764.2600691
+  },
+  "snapshot_hash": "9c66d05ec4245f2e",
+  "decision": "CONTINUE",
+  "adaptation": null,
+  "outcome": {
+    "outcome_id": "out_19c23f88",
+    "cycle_id": "cycle_2",
+    "prediction_id": "pred_91482be6",
+    "matched": [],
+    "missed": [
+      "agents/domain_logic.py"
+    ],
+    "overpredicted": [],
+    "underpredicted": [],
+    "unexpected_changes": [],
+    "discrepancy_score": 1.0
+  },
+  "plan_version": 1,
+  "intent_version": 1,
+  "fingerprints_count": 2
+}

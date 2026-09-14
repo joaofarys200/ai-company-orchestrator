@@ -1,0 +1,182 @@
+[
+  {
+    "drift_id": "drift_event_01_optional_field_added",
+    "case": "optional_field_added",
+    "drift_type": "FIELD_ADDED",
+    "classification": "NON_BREAKING",
+    "deterministic_rule": "Rule_FIELD_ADDED_in_response",
+    "is_breaking": false,
+    "requires_human_approval": false
+  },
+  {
+    "drift_id": "drift_event_02_required_field_added",
+    "case": "required_field_added",
+    "drift_type": "REQUIREDNESS_CHANGED",
+    "classification": "BREAKING",
+    "deterministic_rule": "Rule_REQUIREDNESS_CHANGED_in_request",
+    "is_breaking": true,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_03_field_removed",
+    "case": "field_removed",
+    "drift_type": "FIELD_REMOVED",
+    "classification": "BREAKING",
+    "deterministic_rule": "Rule_FIELD_REMOVED_in_response",
+    "is_breaking": true,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_04_type_changed",
+    "case": "type_changed",
+    "drift_type": "TYPE_CHANGED",
+    "classification": "BREAKING",
+    "deterministic_rule": "Rule_TYPE_CHANGED_in_response",
+    "is_breaking": true,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_05_nullable_changed",
+    "case": "nullable_changed",
+    "drift_type": "NULLABILITY_CHANGED",
+    "classification": "BREAKING",
+    "deterministic_rule": "Rule_NULLABILITY_CHANGED_in_response",
+    "is_breaking": true,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_06_enum_expanded",
+    "case": "enum_expanded",
+    "drift_type": "ENUM_CHANGED",
+    "classification": "NON_BREAKING",
+    "deterministic_rule": "Rule_ENUM_CHANGED_in_response",
+    "is_breaking": false,
+    "requires_human_approval": false
+  },
+  {
+    "drift_id": "drift_event_07_enum_narrowed",
+    "case": "enum_narrowed",
+    "drift_type": "ENUM_CHANGED",
+    "classification": "POTENTIALLY_BREAKING",
+    "deterministic_rule": "Rule_ENUM_CHANGED_in_response",
+    "is_breaking": false,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_08_status_changed",
+    "case": "status_changed",
+    "drift_type": "STATUS_CHANGED",
+    "classification": "POTENTIALLY_BREAKING",
+    "deterministic_rule": "Rule_STATUS_CHANGED_in_response",
+    "is_breaking": false,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_09_request_schema_changed",
+    "case": "request_schema_changed",
+    "drift_type": "REQUEST_CHANGED",
+    "classification": "BREAKING",
+    "deterministic_rule": "Rule_REQUEST_CHANGED_in_request",
+    "is_breaking": true,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_10_response_schema_changed",
+    "case": "response_schema_changed",
+    "drift_type": "RESPONSE_CHANGED",
+    "classification": "BREAKING",
+    "deterministic_rule": "Rule_RESPONSE_CHANGED_in_response",
+    "is_breaking": true,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_11_auth_changed",
+    "case": "auth_changed",
+    "drift_type": "AUTH_CONTRACT_CHANGED",
+    "classification": "BREAKING",
+    "deterministic_rule": "Rule_AUTH_CONTRACT_CHANGED_in_response",
+    "is_breaking": true,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_12_error_contract_changed",
+    "case": "error_contract_changed",
+    "drift_type": "ERROR_CONTRACT_CHANGED",
+    "classification": "POTENTIALLY_BREAKING",
+    "deterministic_rule": "Rule_ERROR_CONTRACT_CHANGED_in_response",
+    "is_breaking": false,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_13_one_off_noise",
+    "case": "one_off_noise",
+    "drift_type": "FIELD_ADDED",
+    "classification": "NON_BREAKING",
+    "deterministic_rule": "Rule_FIELD_ADDED_in_response",
+    "is_breaking": false,
+    "requires_human_approval": false
+  },
+  {
+    "drift_id": "drift_event_14_repeated_drift",
+    "case": "repeated_drift",
+    "drift_type": "FIELD_ADDED",
+    "classification": "NON_BREAKING",
+    "deterministic_rule": "Rule_FIELD_ADDED_in_response",
+    "is_breaking": false,
+    "requires_human_approval": false
+  },
+  {
+    "drift_id": "drift_event_15_multi_environment_drift",
+    "case": "multi_environment_drift",
+    "drift_type": "TYPE_CHANGED",
+    "classification": "BREAKING",
+    "deterministic_rule": "Rule_TYPE_CHANGED_in_response",
+    "is_breaking": true,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_16_breaking_drift_with_consumers",
+    "case": "breaking_drift_with_consumers",
+    "drift_type": "FIELD_REMOVED",
+    "classification": "BREAKING",
+    "deterministic_rule": "Rule_FIELD_REMOVED_in_response",
+    "is_breaking": true,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_17_drift_with_no_consumers",
+    "case": "drift_with_no_consumers",
+    "drift_type": "FIELD_REMOVED",
+    "classification": "BREAKING",
+    "deterministic_rule": "Rule_FIELD_REMOVED_in_response",
+    "is_breaking": true,
+    "requires_human_approval": true
+  },
+  {
+    "drift_id": "drift_event_18_rollback_case",
+    "case": "rollback_case",
+    "drift_type": "FIELD_ADDED",
+    "classification": "NON_BREAKING",
+    "deterministic_rule": "Rule_FIELD_ADDED_in_response",
+    "is_breaking": false,
+    "requires_human_approval": false
+  },
+  {
+    "drift_id": "drift_event_19_stale_contract",
+    "case": "stale_contract",
+    "drift_type": "UNKNOWN_VARIATION",
+    "classification": "NON_BREAKING",
+    "deterministic_rule": "Rule_UNKNOWN_VARIATION_in_response",
+    "is_breaking": false,
+    "requires_human_approval": false
+  },
+  {
+    "drift_id": "drift_event_20_unknown_variation",
+    "case": "unknown_variation",
+    "drift_type": "UNKNOWN_VARIATION",
+    "classification": "UNCERTAIN",
+    "deterministic_rule": "Rule_UNKNOWN_VARIATION_in_response",
+    "is_breaking": false,
+    "requires_human_approval": false
+  }
+]

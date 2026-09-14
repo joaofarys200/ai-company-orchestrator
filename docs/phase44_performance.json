@@ -1,0 +1,48 @@
+{
+  "timestamp": 1789222353.3223171,
+  "scales": [
+    {
+      "node_count": 100,
+      "edge_count": 75,
+      "cold_construction_ms": 0.201,
+      "traversal_kahn_ms": 0.061,
+      "incremental_blast_radius_ms": 0.0061,
+      "blast_radius_size": 2,
+      "speedup_incremental_vs_cold": 32.9
+    },
+    {
+      "node_count": 1000,
+      "edge_count": 750,
+      "cold_construction_ms": 1.768,
+      "traversal_kahn_ms": 0.418,
+      "incremental_blast_radius_ms": 0.0054,
+      "blast_radius_size": 2,
+      "speedup_incremental_vs_cold": 327.4
+    },
+    {
+      "node_count": 10000,
+      "edge_count": 7500,
+      "cold_construction_ms": 19.095,
+      "traversal_kahn_ms": 4.532,
+      "incremental_blast_radius_ms": 0.0085,
+      "blast_radius_size": 2,
+      "speedup_incremental_vs_cold": 2246.4
+    },
+    {
+      "node_count": 100000,
+      "edge_count": 75000,
+      "cold_construction_ms": 277.529,
+      "traversal_kahn_ms": 80.606,
+      "incremental_blast_radius_ms": 0.0131,
+      "blast_radius_size": 2,
+      "speedup_incremental_vs_cold": 21185.4
+    }
+  ],
+  "latencies_us": {
+    "adapter_resolution": 1.256,
+    "schema_compatibility_check": 2.655,
+    "schema_conflict_detection": 3.181,
+    "task_translation": 8.926,
+    "security_sentinel_sanitization": 8.375
+  }
+}

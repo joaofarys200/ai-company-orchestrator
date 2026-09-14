@@ -1,0 +1,16 @@
+{
+  "registered_contracts_count": 6,
+  "sample_contract": {
+    "contract_id": "contract_users_search_v1",
+    "route": "/api/v1/users/search",
+    "method": "GET",
+    "version": "v1.0.0",
+    "producer": "backend_users_service",
+    "consumers": [
+      "frontend_search_box"
+    ],
+    "auth_requirements": [
+      "BEARER_JWT"
+    ]
+  }
+}

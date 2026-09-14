@@ -1,0 +1,131 @@
+[
+  {
+    "drift_id": "drift_event_01_optional_field_added",
+    "action": "MONITOR",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.1.0",
+    "operator": "SYSTEM_POLICY",
+    "outcome": "ACCEPTED"
+  },
+  {
+    "drift_id": "drift_event_02_required_field_added",
+    "action": "CREATE_NEW_VERSION",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.0.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "UNDER_REVIEW"
+  },
+  {
+    "drift_id": "drift_event_03_field_removed",
+    "action": "CREATE_NEW_VERSION",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.3.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "ACCEPTED"
+  },
+  {
+    "drift_id": "drift_event_04_type_changed",
+    "action": "CREATE_NEW_VERSION",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.0.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "UNDER_REVIEW"
+  },
+  {
+    "drift_id": "drift_event_05_nullable_changed",
+    "action": "CREATE_NEW_VERSION",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.5.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "ACCEPTED"
+  },
+  {
+    "drift_id": "drift_event_06_enum_expanded",
+    "action": "MONITOR",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.0.0",
+    "operator": "SYSTEM_POLICY",
+    "outcome": "UNDER_REVIEW"
+  },
+  {
+    "drift_id": "drift_event_09_request_schema_changed",
+    "action": "CREATE_NEW_VERSION",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.9.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "ACCEPTED"
+  },
+  {
+    "drift_id": "drift_event_10_response_schema_changed",
+    "action": "CREATE_NEW_VERSION",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.0.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "UNDER_REVIEW"
+  },
+  {
+    "drift_id": "drift_event_11_auth_changed",
+    "action": "CREATE_NEW_VERSION",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.11.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "ACCEPTED"
+  },
+  {
+    "drift_id": "drift_event_14_repeated_drift",
+    "action": "MONITOR",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.0.0",
+    "operator": "SYSTEM_POLICY",
+    "outcome": "UNDER_REVIEW"
+  },
+  {
+    "drift_id": "drift_event_15_multi_environment_drift",
+    "action": "CREATE_NEW_VERSION",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.15.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "ACCEPTED"
+  },
+  {
+    "drift_id": "drift_event_16_breaking_drift_with_consumers",
+    "action": "CREATE_NEW_VERSION",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.0.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "UNDER_REVIEW"
+  },
+  {
+    "drift_id": "drift_event_17_drift_with_no_consumers",
+    "action": "CREATE_NEW_VERSION",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.17.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "ACCEPTED"
+  },
+  {
+    "drift_id": "drift_event_18_rollback_case",
+    "action": "MONITOR",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.0.0",
+    "operator": "SYSTEM_POLICY",
+    "outcome": "UNDER_REVIEW"
+  },
+  {
+    "drift_id": "drift_event_19_stale_contract",
+    "action": "MONITOR",
+    "contract_version_before": "1.0.0",
+    "contract_version_after": "1.19.0",
+    "operator": "SYSTEM_POLICY",
+    "outcome": "ACCEPTED"
+  },
+  {
+    "drift_id": "drift_event_18_rollback_case",
+    "action": "ROLLBACK",
+    "contract_version_before": "1.18.0",
+    "contract_version_after": "1.0.0",
+    "operator": "HUMAN_MISSION_OPERATOR",
+    "outcome": "ROLLED_BACK",
+    "note": "Regression detected in downstream client; rolled back to v1.0.0 while preserving v1.18.0 history"
+  }
+]

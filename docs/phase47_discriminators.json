@@ -1,0 +1,42 @@
+[
+  {
+    "field": "type",
+    "location": "BODY",
+    "type": "STRING_ENUM",
+    "observed_values": [
+      "user.created",
+      "user.updated",
+      "user.deleted",
+      "user.archived"
+    ],
+    "is_explicit": true,
+    "confidence": 1.0,
+    "status": "DETERMINISTIC"
+  },
+  {
+    "field": "status",
+    "location": "BODY",
+    "type": "STRING_ENUM",
+    "observed_values": [
+      "SUCCESS",
+      "REQUIRES_ACTION",
+      "FAILED"
+    ],
+    "is_explicit": true,
+    "confidence": 0.98,
+    "status": "DETERMINISTIC"
+  },
+  {
+    "field": "FIELD_PRESENCE:permissions",
+    "location": "BODY",
+    "type": "INFERRED_STRUCTURAL",
+    "observed_values": [
+      "has_permissions",
+      "no_permissions"
+    ],
+    "is_explicit": false,
+    "confidence": 0.61,
+    "status": "INFERRED",
+    "notes": "Kept as UNCERTAIN / INFERRED candidate until explicit confirmation."
+  }
+]

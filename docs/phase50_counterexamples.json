@@ -1,0 +1,125 @@
+[
+  {
+    "counterexample_id": "cex_frontend-user-badge_getUserProfile_1789334280898",
+    "input_payload": {
+      "user_id": "usr_991"
+    },
+    "expected_behavior": {
+      "status_code": 200,
+      "output_shape": {
+        "id": "usr_991",
+        "name": "Admin",
+        "avatar": "https://cdn.example.com/a.png"
+      },
+      "events": [],
+      "economic_effects": [],
+      "authorization_state": {
+        "requires_auth": true,
+        "roles": [
+          "user"
+        ]
+      }
+    },
+    "observed_behavior": {
+      "status_code": 200,
+      "output_payload": {
+        "id": "usr_991",
+        "name": "Admin",
+        "avatar": {
+          "url": "https://cdn.example.com/a.png",
+          "width": 128,
+          "height": 128
+        }
+      },
+      "events": [],
+      "economic_effects": [],
+      "authorization_state": {
+        "requires_auth": true,
+        "roles": [
+          "user"
+        ]
+      }
+    },
+    "difference": "Scalar-to-object change at 'response.avatar': expected scalar str, observed object",
+    "consumer_id": "frontend-user-badge",
+    "contract_id": "getUserProfile",
+    "trace_id": "trace_1789334280898_frontend-user-badge_GET /api/v1/users/{id}",
+    "evidence": {
+      "failed_invariants": [],
+      "equivalence_level": "BREAKING_CHANGE"
+    },
+    "timestamp": 1789334280.8989952
+  },
+  {
+    "counterexample_id": "cex_economic-execution-gateway_settlePayment_1789334280899",
+    "input_payload": {
+      "transaction_id": "tx_123"
+    },
+    "expected_behavior": {
+      "status_code": 200,
+      "output_shape": {
+        "settled": true,
+        "ledger_seq": 4920
+      },
+      "events": [
+        {
+          "topic": "payment.settled"
+        }
+      ],
+      "economic_effects": [
+        {
+          "amount": 150.0,
+          "currency": "USD",
+          "ledger_action": "COMMIT"
+        }
+      ],
+      "authorization_state": {
+        "requires_auth": true,
+        "roles": [
+          "financial_sentinel"
+        ]
+      }
+    },
+    "observed_behavior": {
+      "status_code": 200,
+      "output_payload": {
+        "settled": true,
+        "ledger_seq": 4921
+      },
+      "events": [
+        {
+          "topic": "payment.settled"
+        }
+      ],
+      "economic_effects": [
+        {
+          "amount": 135.0,
+          "currency": "EUR",
+          "ledger_action": "COMMIT"
+        }
+      ],
+      "authorization_state": {
+        "requires_auth": true,
+        "roles": [
+          "financial_sentinel"
+        ]
+      }
+    },
+    "difference": "Value mismatch at 'response.ledger_seq': expected '4920', observed '4921'; Currency mismatch at economic effect [0]: expected 'USD', observed 'EUR'; Amount mismatch at economic effect [0]: expected '150.0', observed '135.0'; Invariant [ECONOMIC_VALUE_PRESERVED] violated: Monetary amount delta at item [0]: baseline 150.0, observed 135.0",
+    "consumer_id": "economic-execution-gateway",
+    "contract_id": "settlePayment",
+    "trace_id": "trace_1789334280898_economic-execution-gateway_POST /api/v1/economic/settle",
+    "evidence": {
+      "failed_invariants": [
+        {
+          "invariant": "ECONOMIC_VALUE_PRESERVED",
+          "satisfied": false,
+          "violation_reason": "Monetary amount delta at item [0]: baseline 150.0, observed 135.0",
+          "details": {}
+        }
+      ],
+      "equivalence_level": "BREAKING_CHANGE"
+    },
+    "timestamp": 1789334280.8990595
+  }
+]

@@ -1,0 +1,67 @@
+[
+  {
+    "migration_id": "mig_real_01_list_missions",
+    "contract_id": "listMissionsEndpoint",
+    "scope_id": "scp_a19de8258cde51f7",
+    "proof_result": "PROVEN_COMPATIBLE_WITHIN_SCOPE",
+    "gate_decision": "GATE_CLEARED",
+    "coverage_percentage": 90.0,
+    "counterexamples_count": 0,
+    "shrunk_counterexamples_count": 0,
+    "latency_ms": 5.46,
+    "proof_hash": "prf_07ad90f95769264c",
+    "timestamp": 1789335068.842859
+  },
+  {
+    "migration_id": "mig_real_02_payment_clearing",
+    "contract_id": "economicDisbursementContract",
+    "scope_id": "scp_49908ccdd04e2be5",
+    "proof_result": "INSUFFICIENT_COVERAGE",
+    "gate_decision": "EXECUTION_BLOCKED",
+    "coverage_percentage": 90.0,
+    "counterexamples_count": 0,
+    "shrunk_counterexamples_count": 0,
+    "latency_ms": 4.4,
+    "proof_hash": "prf_fc4750f20816b0e6",
+    "timestamp": 1789335068.8472915
+  },
+  {
+    "migration_id": "mig_real_03_auth_jwt_sentinel",
+    "contract_id": "securityAuthSentinelVerify",
+    "scope_id": "scp_264c43d950b39ae6",
+    "proof_result": "INSUFFICIENT_COVERAGE",
+    "gate_decision": "HUMAN_REVIEW_REQUIRED",
+    "coverage_percentage": 88.0,
+    "counterexamples_count": 0,
+    "shrunk_counterexamples_count": 0,
+    "latency_ms": 3.1,
+    "proof_hash": "prf_dff17b5e7a82817e",
+    "timestamp": 1789335068.8504205
+  },
+  {
+    "migration_id": "mig_real_04_dynamic_unresolved",
+    "contract_id": "runtimeDynamicPluginConsumer",
+    "scope_id": "scp_d07fdc17b9ed6bc5",
+    "proof_result": "INSUFFICIENT_EVIDENCE",
+    "gate_decision": "HUMAN_REVIEW_REQUIRED",
+    "coverage_percentage": 85.5,
+    "counterexamples_count": 0,
+    "shrunk_counterexamples_count": 0,
+    "latency_ms": 1.48,
+    "proof_hash": "prf_e3ce7c5dc3493461",
+    "timestamp": 1789335068.8519316
+  },
+  {
+    "migration_id": "mig_real_05_breaking_discount",
+    "contract_id": "orderCalculationContract",
+    "scope_id": "scp_47baf1bff186de68",
+    "proof_result": "PROVEN_INCOMPATIBLE",
+    "gate_decision": "EXECUTION_BLOCKED",
+    "coverage_percentage": 87.5,
+    "counterexamples_count": 26,
+    "shrunk_counterexamples_count": 26,
+    "latency_ms": 9.88,
+    "proof_hash": "prf_640fcac247ff7dca",
+    "timestamp": 1789335068.8618882
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "total_queries": 175,
+  "relevant_queries": 50,
+  "irrelevant_queries": 50,
+  "conflicting_queries": 25,
+  "stale_queries": 25,
+  "incompatible_queries": 25,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "false_positives": 0,
+  "false_negatives": 0
+}

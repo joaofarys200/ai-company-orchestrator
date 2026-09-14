@@ -1,0 +1,16 @@
+{
+  "feature_intent": "Implement Fast User Search",
+  "translated_tasks_count": 5,
+  "dependency_ordering": [
+    "1. persistence: Create index in SQL",
+    "2. backend: Implement FastAPI handler",
+    "3. api: Publish OpenAPI contract v1",
+    "4. frontend: React SearchBox UI (depends on api)",
+    "5. browser: Playwright Edge QA (depends on frontend)"
+  ],
+  "invariants_enforced": [
+    "Producer precedes Consumer",
+    "No reversed dependencies",
+    "Traceable evidence"
+  ]
+}

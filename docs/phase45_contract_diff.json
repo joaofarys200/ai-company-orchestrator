@@ -1,0 +1,84 @@
+{
+  "diff_id": "diff_e71db760",
+  "route": "/",
+  "method": "GET",
+  "changes": [
+    {
+      "field_path": "id",
+      "diff_type": "REQUIRED_CHANGED",
+      "old_value": false,
+      "new_value": true,
+      "severity": "POTENTIALLY_BREAKING",
+      "message": "Field 'id' requiredness changed from False to True.",
+      "description": "Field 'id' requiredness changed."
+    },
+    {
+      "field_path": "role",
+      "diff_type": "ADDED_FIELD",
+      "old_value": null,
+      "new_value": "string",
+      "severity": "NON_BREAKING",
+      "message": "New optional field 'role' (string) observed in payload.",
+      "description": "New optional field 'role' (string) observed in payload."
+    },
+    {
+      "field_path": "username",
+      "diff_type": "REQUIRED_CHANGED",
+      "old_value": false,
+      "new_value": true,
+      "severity": "POTENTIALLY_BREAKING",
+      "message": "Field 'username' requiredness changed from False to True.",
+      "description": "Field 'username' requiredness changed."
+    },
+    {
+      "field_path": "verified",
+      "diff_type": "ADDED_FIELD",
+      "old_value": null,
+      "new_value": "boolean",
+      "severity": "NON_BREAKING",
+      "message": "New optional field 'verified' (boolean) observed in payload.",
+      "description": "New optional field 'verified' (boolean) observed in payload."
+    }
+  ],
+  "differences": [
+    {
+      "field_path": "id",
+      "diff_type": "REQUIRED_CHANGED",
+      "old_value": false,
+      "new_value": true,
+      "severity": "POTENTIALLY_BREAKING",
+      "message": "Field 'id' requiredness changed from False to True.",
+      "description": "Field 'id' requiredness changed."
+    },
+    {
+      "field_path": "role",
+      "diff_type": "ADDED_FIELD",
+      "old_value": null,
+      "new_value": "string",
+      "severity": "NON_BREAKING",
+      "message": "New optional field 'role' (string) observed in payload.",
+      "description": "New optional field 'role' (string) observed in payload."
+    },
+    {
+      "field_path": "username",
+      "diff_type": "REQUIRED_CHANGED",
+      "old_value": false,
+      "new_value": true,
+      "severity": "POTENTIALLY_BREAKING",
+      "message": "Field 'username' requiredness changed from False to True.",
+      "description": "Field 'username' requiredness changed."
+    },
+    {
+      "field_path": "verified",
+      "diff_type": "ADDED_FIELD",
+      "old_value": null,
+      "new_value": "boolean",
+      "severity": "NON_BREAKING",
+      "message": "New optional field 'verified' (boolean) observed in payload.",
+      "description": "New optional field 'verified' (boolean) observed in payload."
+    }
+  ],
+  "severity": "POTENTIALLY_BREAKING",
+  "is_breaking": false,
+  "summary": "Compared schemas: 4 differences detected (POTENTIALLY_BREAKING)."
+}

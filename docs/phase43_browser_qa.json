@@ -1,0 +1,163 @@
+{
+  "timestamp": 1789221630.827151,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "scenarios_count": 15,
+  "scenarios": [
+    {
+      "id": 1,
+      "name": "memory overview",
+      "status": "PASSED"
+    },
+    {
+      "id": 2,
+      "name": "relevant memory",
+      "status": "PASSED"
+    },
+    {
+      "id": 3,
+      "name": "irrelevant memory",
+      "status": "PASSED"
+    },
+    {
+      "id": 4,
+      "name": "stale memory",
+      "status": "PASSED"
+    },
+    {
+      "id": 5,
+      "name": "conflicting memory",
+      "status": "PASSED"
+    },
+    {
+      "id": 6,
+      "name": "incompatible technology",
+      "status": "PASSED"
+    },
+    {
+      "id": 7,
+      "name": "architecture mismatch",
+      "status": "PASSED"
+    },
+    {
+      "id": 8,
+      "name": "memory influence",
+      "status": "PASSED"
+    },
+    {
+      "id": 9,
+      "name": "harmful memory detection",
+      "status": "PASSED"
+    },
+    {
+      "id": 10,
+      "name": "temporal leakage block",
+      "status": "PASSED"
+    },
+    {
+      "id": 11,
+      "name": "cold vs warm",
+      "status": "PASSED"
+    },
+    {
+      "id": 12,
+      "name": "cross-mission reuse",
+      "status": "PASSED"
+    },
+    {
+      "id": 13,
+      "name": "human curation",
+      "status": "PASSED"
+    },
+    {
+      "id": 14,
+      "name": "incremental index",
+      "status": "PASSED"
+    },
+    {
+      "id": 15,
+      "name": "memory security",
+      "status": "PASSED"
+    }
+  ],
+  "screenshots": [
+    {
+      "filename": "phase43_01_memory_overview.png",
+      "description": "Experience Memory Overview with top telemetry metric cards and baseline cold vs warm summary",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_01_memory_overview.png"
+    },
+    {
+      "filename": "phase43_02_relevant_memory.png",
+      "description": "Relevant experiences retrieved with structured confidence and RELEVANT status",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_02_relevant_memory.png"
+    },
+    {
+      "filename": "phase43_03_irrelevant_memory.png",
+      "description": "Deterministic filtering rejecting out-of-domain experiences with 100% precision",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_03_irrelevant_memory.png"
+    },
+    {
+      "filename": "phase43_04_stale_memory.png",
+      "description": "Stale experience detection flagging obsolete architecture patterns",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_04_stale_memory.png"
+    },
+    {
+      "filename": "phase43_05_conflicting_memory.png",
+      "description": "Contradictory experiences resolved without naive recency bias, demoted to CONTEXT_ONLY",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_05_conflicting_memory.png"
+    },
+    {
+      "filename": "phase43_06_incompatible_technology.png",
+      "description": "Applicability Validator enforcing technology stack compatibility boundaries",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_06_incompatible_technology.png"
+    },
+    {
+      "filename": "phase43_07_architecture_mismatch.png",
+      "description": "Architecture drift detection distinguishing monolith vs microservices paradigms",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_07_architecture_mismatch.png"
+    },
+    {
+      "filename": "phase43_08_memory_influence.png",
+      "description": "Deep causal trace verifying advisory influence (PLANNING_HINT, DIAGNOSTIC) without authorization bypass",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_08_memory_influence.png"
+    },
+    {
+      "filename": "phase43_09_harmful_memory_detection.png",
+      "description": "Memory Harm Monitor tracking 0% harm, 78.6% beneficial reuse, and 0% false transfer",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_09_harmful_memory_detection.png"
+    },
+    {
+      "filename": "phase43_10_temporal_leakage_block.png",
+      "description": "Temporal Leakage Sentinel verifying zero backward leakage (T_experience < T_mission_start strictly)",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_10_temporal_leakage_block.png"
+    },
+    {
+      "filename": "phase43_11_cold_vs_warm.png",
+      "description": "Controlled Ablation Table across 5 regimes (WITHOUT_MEMORY, WITH_MEMORY, WRONG, STALE, CONFLICTING)",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_11_cold_vs_warm.png"
+    },
+    {
+      "filename": "phase43_12_cross_mission_reuse.png",
+      "description": "Cross-mission reuse on unseen test mission with deterministic 6-axis novelty badge",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_12_cross_mission_reuse.png"
+    },
+    {
+      "filename": "phase43_13_human_curation.png",
+      "description": "Operator curation actions (MARK_TRUSTED, MARK_MISLEADING, ARCHIVE, CONTEXT_ONLY) with immutable audit",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_13_human_curation.png"
+    },
+    {
+      "filename": "phase43_14_incremental_index.png",
+      "description": "Event-driven incremental indexing telemetry (bisect.insort O(log N) append vs full rebuild)",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_14_incremental_index.png"
+    },
+    {
+      "filename": "phase43_15_memory_security.png",
+      "description": "Memory Security Sentinel neutralizing prompt injection, fake system tags, and data exfiltration",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase43\\phase43_15_memory_security.png"
+    }
+  ],
+  "console_errors": [],
+  "network_errors": [],
+  "passed": true
+}

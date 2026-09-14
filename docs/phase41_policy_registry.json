@@ -1,0 +1,148 @@
+[
+  {
+    "policy_id": "pol_v40_baseline",
+    "version": "40.1.0",
+    "rules": [
+      {
+        "rule_id": "RULE_01_SECURITY_BLOCK",
+        "priority": 1,
+        "condition_name": "security_violation",
+        "allowed_decision": "BLOCK",
+        "description": "Security Sentinel violation detected or prohibited privilege escalation requested.",
+        "consequence": "Execution halted immediately; mission state transitions to BLOCKED."
+      },
+      {
+        "rule_id": "RULE_02_ECONOMIC_APPROVAL",
+        "priority": 2,
+        "condition_name": "economic_approval_required",
+        "allowed_decision": "REQUEST_HUMAN",
+        "description": "Mission involves financial transaction or resource purchase exceeding autonomous limit.",
+        "consequence": "Halt for mandatory operator authorization before funds commitment."
+      },
+      {
+        "rule_id": "RULE_03_OSCILLATION_DETECTED",
+        "priority": 3,
+        "condition_name": "oscillation_detected",
+        "allowed_decision": "REQUEST_HUMAN",
+        "description": "Repetitive state, cyclical replanning, or repeated repair oscillation detected.",
+        "consequence": "Escalate to operator to break cyclic deadlock; autonomous loop suspended."
+      },
+      {
+        "rule_id": "RULE_04_UNEXPECTED_DRIFT",
+        "priority": 4,
+        "condition_name": "unexpected_drift",
+        "allowed_decision": "REQUEST_HUMAN",
+        "description": "Mission requirements or scope diverged unexpectedly from original user directive without formal intent delta.",
+        "consequence": "Escalate to operator for confirmation of scope realignment."
+      },
+      {
+        "rule_id": "RULE_05_ADAPTATION_BUDGET_EXHAUSTED",
+        "priority": 5,
+        "condition_name": "adaptation_budget_exhausted",
+        "allowed_decision": "REQUEST_HUMAN",
+        "description": "Adaptations, repairs, or replans exceeded configured AdaptationBudget limits.",
+        "consequence": "Escalate to operator to avoid infinite resource consumption."
+      },
+      {
+        "rule_id": "RULE_06_CONSECUTIVE_FAILURES_EXHAUSTED",
+        "priority": 6,
+        "condition_name": "consecutive_failures_exhausted",
+        "allowed_decision": "REQUEST_HUMAN",
+        "description": "Consecutive execution or validation failures exceeded threshold.",
+        "consequence": "Halt autonomous attempts and request manual guidance."
+      },
+      {
+        "rule_id": "RULE_07_FINISH_GATE_SATISFIED",
+        "priority": 7,
+        "condition_name": "finish_gate_satisfied",
+        "allowed_decision": "FINISH",
+        "description": "All requirements satisfied, execution succeeded, evidence complete, validation passed, zero false success confirmed.",
+        "consequence": "Mission concludes successfully with verifiable proof ledger."
+      },
+      {
+        "rule_id": "RULE_08_HUMAN_APPROVAL_PENDING",
+        "priority": 8,
+        "condition_name": "human_approval_required",
+        "allowed_decision": "REQUEST_HUMAN",
+        "description": "Pending human gate confirmation requested by policy, high risk score, or explicit directive.",
+        "consequence": "Wait for operator input; loop enters WAITING_HUMAN stage."
+      },
+      {
+        "rule_id": "RULE_09_REPAIRABLE_VALIDATION_FAILURE",
+        "priority": 9,
+        "condition_name": "repairable_validation_failure",
+        "allowed_decision": "REPAIR",
+        "description": "Task or validation failure occurred with AST/runtime diagnosis and repair budget available.",
+        "consequence": "Trigger self-healing repair pipeline without declaring premature success."
+      },
+      {
+        "rule_id": "RULE_10_UNREPAIRABLE_FAILURE",
+        "priority": 10,
+        "condition_name": "unrepairable_failure",
+        "allowed_decision": "REQUEST_HUMAN",
+        "description": "Task failure occurred without viable automated patch diagnosis.",
+        "consequence": "Escalate to operator with diagnostics and failure logs."
+      },
+      {
+        "rule_id": "RULE_11_PLAN_INVALID_OR_NEW_DEPENDENCY",
+        "priority": 11,
+        "condition_name": "plan_invalid_or_new_dependency",
+        "allowed_decision": "REPLAN",
+        "description": "Task dependency invalidated, new structural dependency discovered, or plan DAG broken.",
+        "consequence": "Trigger dynamic replanning to compute plan delta preserving completed work."
+      },
+      {
+        "rule_id": "RULE_12_PREDICTION_DEVIATION_SATISFIABLE",
+        "priority": 12,
+        "condition_name": "prediction_deviation_satisfiable",
+        "allowed_decision": "ADAPT",
+        "description": "Observed outcome deviated from prediction, but mission requirements remain satisfiable via localized adaptation.",
+        "consequence": "Formulate and apply AdaptationProposal (e.g. add validation, adjust task priority)."
+      },
+      {
+        "rule_id": "RULE_13_AGENT_UNAVAILABLE_COMPATIBLE_EXISTS",
+        "priority": 13,
+        "condition_name": "agent_unavailable_compatible_exists",
+        "allowed_decision": "REASSIGN",
+        "description": "Assigned task owner agent is offline/unresponsive, and another capable swarm agent is available.",
+        "consequence": "Reassign task ownership to standby agent and update DAG routing."
+      },
+      {
+        "rule_id": "RULE_14_NORMAL_PROGRESSION",
+        "priority": 14,
+        "condition_name": "normal_progression",
+        "allowed_decision": "CONTINUE",
+        "description": "Observed state matches expectations, validations pass, requirements progressing steadily.",
+        "consequence": "Advance to next cycle and continue DAG execution."
+      }
+    ],
+    "status": "ACTIVE",
+    "parent_version": null,
+    "changelog": "Phase 40 baseline deterministic decision policy (14 rules).",
+    "created_at": 1789154937.6314096,
+    "approval_metadata": {
+      "approved_by": "SYSTEM_BOOTSTRAP",
+      "reason": "Phase 40 verified baseline"
+    },
+    "version_hash": "04265df3f81a4c1a"
+  },
+  {
+    "policy_id": "pol_41_0_0",
+    "version": "41.0.0",
+    "rules": [],
+    "status": "ROLLED_BACK",
+    "parent_version": "40.1.0",
+    "changelog": "Proposal prop_c_oscillation_defense_1_37623: Guarantees oscillation history recorded in previous cycle is evaluated before deciding next step, eliminating observation gap in Decision #191.",
+    "created_at": 1789154937.6316028,
+    "approval_metadata": {
+      "creator": "PolicyProposalEngine",
+      "proposal_id": "prop_c_oscillation_defense_1_37623",
+      "approved_by": "human_operator",
+      "approved_at": 1789154937.6316338,
+      "notes": "Phase 41 benchmark validation approved.",
+      "rolled_back_by": "human_operator",
+      "rolled_back_at": 1789154937.6316416
+    },
+    "version_hash": "6eb0d2aa2bb9e6b7"
+  }
+]

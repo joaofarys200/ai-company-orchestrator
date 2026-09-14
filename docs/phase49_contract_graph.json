@@ -1,0 +1,3415 @@
+{
+  "timestamp": 1789333232.7060795,
+  "nodes_count": 137,
+  "edges_count": 11,
+  "nodes": [
+    {
+      "node_id": "endpoint::listMissions",
+      "node_type": "API_ENDPOINT",
+      "language": "python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "GET /api/v1/missions",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "version": "2.4.0",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/paths//api/v1/missions/get",
+          "content_hash": "8825566e803d14d9ab9a31c1ca47758cac959bbc6ade96679f9fb944674e7e70",
+          "extracted_at": 1789333232.5952206
+        }
+      },
+      "properties": {
+        "version": "2.4.0",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/paths//api/v1/missions/get",
+          "content_hash": "8825566e803d14d9ab9a31c1ca47758cac959bbc6ade96679f9fb944674e7e70",
+          "extracted_at": 1789333232.5952206
+        }
+      }
+    },
+    {
+      "node_id": "schema::listMissions_response",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "/api/v1/missions Response Schema",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/paths//api/v1/missions/get",
+          "content_hash": "8825566e803d14d9ab9a31c1ca47758cac959bbc6ade96679f9fb944674e7e70",
+          "extracted_at": 1789333232.5952206
+        }
+      },
+      "properties": {
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/paths//api/v1/missions/get",
+          "content_hash": "8825566e803d14d9ab9a31c1ca47758cac959bbc6ade96679f9fb944674e7e70",
+          "extracted_at": 1789333232.5952206
+        }
+      }
+    },
+    {
+      "node_id": "endpoint::createMission",
+      "node_type": "API_ENDPOINT",
+      "language": "python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "POST /api/v1/missions",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "version": "2.4.0",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/paths//api/v1/missions/post",
+          "content_hash": "37af78c15fe74f2a428f89c91c2db7446d3b80ab3efa0ce7fe38c859f0347807",
+          "extracted_at": 1789333232.5952742
+        }
+      },
+      "properties": {
+        "version": "2.4.0",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/paths//api/v1/missions/post",
+          "content_hash": "37af78c15fe74f2a428f89c91c2db7446d3b80ab3efa0ce7fe38c859f0347807",
+          "extracted_at": 1789333232.5952742
+        }
+      }
+    },
+    {
+      "node_id": "endpoint::extractBuildContracts",
+      "node_type": "API_ENDPOINT",
+      "language": "python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "POST /api/v1/contracts/extract",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "version": "2.4.0",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/paths//api/v1/contracts/extract/post",
+          "content_hash": "14eed82f91a86cb2ec10dfb9aecfdcf47cfce7f6b9c2db20898326d7c08811fe",
+          "extracted_at": 1789333232.5953052
+        }
+      },
+      "properties": {
+        "version": "2.4.0",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/paths//api/v1/contracts/extract/post",
+          "content_hash": "14eed82f91a86cb2ec10dfb9aecfdcf47cfce7f6b9c2db20898326d7c08811fe",
+          "extracted_at": 1789333232.5953052
+        }
+      }
+    },
+    {
+      "node_id": "schema::extractBuildContracts_response",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "/api/v1/contracts/extract Response Schema",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/paths//api/v1/contracts/extract/post",
+          "content_hash": "14eed82f91a86cb2ec10dfb9aecfdcf47cfce7f6b9c2db20898326d7c08811fe",
+          "extracted_at": 1789333232.5953052
+        }
+      },
+      "properties": {
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/paths//api/v1/contracts/extract/post",
+          "content_hash": "14eed82f91a86cb2ec10dfb9aecfdcf47cfce7f6b9c2db20898326d7c08811fe",
+          "extracted_at": 1789333232.5953052
+        }
+      }
+    },
+    {
+      "node_id": "type::type_MissionListDto",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "MissionListDto",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "kind": "ARRAY",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/components/schemas/MissionListDto",
+          "content_hash": "cb839f6503912da07f91f70b74e2f7b3fe054c18ef152b352d0b5b818432f833",
+          "extracted_at": 1789333232.5948498
+        }
+      },
+      "properties": {
+        "kind": "ARRAY",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/components/schemas/MissionListDto",
+          "content_hash": "cb839f6503912da07f91f70b74e2f7b3fe054c18ef152b352d0b5b818432f833",
+          "extracted_at": 1789333232.5948498
+        }
+      }
+    },
+    {
+      "node_id": "type::type_CreateMissionDto",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "CreateMissionDto",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "kind": "OBJECT",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/components/schemas/CreateMissionDto",
+          "content_hash": "c7e61d558f290be603c0ddd9310fe8a0b4124570867dcf136c5acdf572bf4f99",
+          "extracted_at": 1789333232.5949628
+        }
+      },
+      "properties": {
+        "kind": "OBJECT",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/components/schemas/CreateMissionDto",
+          "content_hash": "c7e61d558f290be603c0ddd9310fe8a0b4124570867dcf136c5acdf572bf4f99",
+          "extracted_at": 1789333232.5949628
+        }
+      }
+    },
+    {
+      "node_id": "field::type_CreateMissionDto::project_id",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "CreateMissionDto.project_id",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "field_type": "string",
+        "required": true
+      },
+      "properties": {
+        "field_type": "string",
+        "required": true
+      }
+    },
+    {
+      "node_id": "field::type_CreateMissionDto::title",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "CreateMissionDto.title",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "field_type": "string",
+        "required": true
+      },
+      "properties": {
+        "field_type": "string",
+        "required": true
+      }
+    },
+    {
+      "node_id": "field::type_CreateMissionDto::objective",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "CreateMissionDto.objective",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "field_type": "string",
+        "required": true
+      },
+      "properties": {
+        "field_type": "string",
+        "required": true
+      }
+    },
+    {
+      "node_id": "field::type_CreateMissionDto::autonomy_level",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "CreateMissionDto.autonomy_level",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "field_type": "string",
+        "required": false
+      },
+      "properties": {
+        "field_type": "string",
+        "required": false
+      }
+    },
+    {
+      "node_id": "type::type_ExtractionStatusDto",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "ExtractionStatusDto",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "kind": "OBJECT",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/components/schemas/ExtractionStatusDto",
+          "content_hash": "940162bc65dce7343e393e3a64e50e84e28a28b556e8592dc95a49f8a1cab832",
+          "extracted_at": 1789333232.595035
+        }
+      },
+      "properties": {
+        "kind": "OBJECT",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/components/schemas/ExtractionStatusDto",
+          "content_hash": "940162bc65dce7343e393e3a64e50e84e28a28b556e8592dc95a49f8a1cab832",
+          "extracted_at": 1789333232.595035
+        }
+      }
+    },
+    {
+      "node_id": "field::type_ExtractionStatusDto::status",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "ExtractionStatusDto.status",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "field_type": "string",
+        "required": true
+      },
+      "properties": {
+        "field_type": "string",
+        "required": true
+      }
+    },
+    {
+      "node_id": "field::type_ExtractionStatusDto::contracts_count",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "ExtractionStatusDto.contracts_count",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "field_type": "integer",
+        "required": true
+      },
+      "properties": {
+        "field_type": "integer",
+        "required": true
+      }
+    },
+    {
+      "node_id": "type::type_MissionWebSocketOperations",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "MissionWebSocketOperations",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "kind": "ENUM",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/components/schemas/MissionWebSocketOperations",
+          "content_hash": "1fee35726d03d5c80744b99ef1d6dcb7ea3cadd0a5e5bf9701cf790f7ff60160",
+          "extracted_at": 1789333232.5951264
+        }
+      },
+      "properties": {
+        "kind": "ENUM",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/components/schemas/MissionWebSocketOperations",
+          "content_hash": "1fee35726d03d5c80744b99ef1d6dcb7ea3cadd0a5e5bf9701cf790f7ff60160",
+          "extracted_at": 1789333232.5951264
+        }
+      }
+    },
+    {
+      "node_id": "type::type_AuditNotificationEvent",
+      "node_type": "DATA_MODEL",
+      "language": "agnostic",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "AuditNotificationEvent",
+      "semantic_role": "",
+      "source_ref": "",
+      "version": "1.0.0",
+      "metadata": {
+        "kind": "UNION",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/components/schemas/AuditNotificationEvent",
+          "content_hash": "f8c34d7af18f5615f3df2ab835167a46d9a271e97f7770413a2e141712be2531",
+          "extracted_at": 1789333232.5951629
+        }
+      },
+      "properties": {
+        "kind": "UNION",
+        "provenance": {
+          "source_type": "GENERATED_OPENAPI",
+          "artifact_path": "JARVIS Autonomous Mission Control API",
+          "json_pointer": "#/components/schemas/AuditNotificationEvent",
+          "content_hash": "f8c34d7af18f5615f3df2ab835167a46d9a271e97f7770413a2e141712be2531",
+          "extracted_at": 1789333232.5951629
+        }
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_contracts_py_144",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/contracts.py:144",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/contracts.py:144",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_dispatcher_py_50",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/dispatcher.py:50",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/dispatcher.py:50",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "RESOLVED",
+        "evidence_state": "GENERATED",
+        "uncertainty_reason": "NO_REASON",
+        "pattern_type": "DISPATCH_TABLE"
+      },
+      "properties": {
+        "resolution_status": "RESOLVED",
+        "evidence_state": "GENERATED",
+        "uncertainty_reason": "NO_REASON",
+        "pattern_type": "DISPATCH_TABLE"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_dispatcher_py_51",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/dispatcher.py:51",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/dispatcher.py:51",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "RESOLVED",
+        "evidence_state": "GENERATED",
+        "uncertainty_reason": "NO_REASON",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "RESOLVED",
+        "evidence_state": "GENERATED",
+        "uncertainty_reason": "NO_REASON",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_dispatcher_py_80",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/dispatcher.py:80",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/dispatcher.py:80",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "RESOLVED",
+        "evidence_state": "GENERATED",
+        "uncertainty_reason": "NO_REASON",
+        "pattern_type": "DISPATCH_TABLE"
+      },
+      "properties": {
+        "resolution_status": "RESOLVED",
+        "evidence_state": "GENERATED",
+        "uncertainty_reason": "NO_REASON",
+        "pattern_type": "DISPATCH_TABLE"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1755",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1755",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1755",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_401",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:401",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:401",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_431",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:431",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:431",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_470",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:470",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:470",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_444",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:444",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:444",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_452",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:452",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:452",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_492",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:492",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:492",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_518",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:518",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:518",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_551",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:551",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:551",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_433",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:433",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:433",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_566",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:566",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:566",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_530",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:530",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:530",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_588",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:588",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:588",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_628",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:628",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:628",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_650",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:650",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:650",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_629",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:629",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:629",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_695",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:695",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:695",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_651",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:651",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:651",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_670",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:670",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:670",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "REGISTRY_LOOKUP"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "REGISTRY_LOOKUP"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_716",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:716",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:716",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_696",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:696",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:696",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_717",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:717",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:717",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_760",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:760",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:760",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_782",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:782",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:782",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_810",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:810",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:810",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_824",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:824",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:824",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      },
+      "properties": {
+        "resolution_status": "UNRESOLVED",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "MISSING_CONTRACT_SCHEMA",
+        "pattern_type": "DYNAMIC_GETATTR"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1088",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1088",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1088",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1156",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1156",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1156",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1199",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1199",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1199",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1217",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1217",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1217",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1264",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1264",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1264",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1277",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1277",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1277",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1290",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1290",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1290",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1208",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1208",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1208",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1301",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1301",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1301",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_backend_websocket_handlers_missions_py_1403",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@backend/websocket/handlers/missions.py:1403",
+      "semantic_role": "",
+      "source_ref": "backend/websocket/handlers/missions.py:1403",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1457",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1457",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1457",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2122",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2122",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2122",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2123",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2123",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2123",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2675",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2675",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2675",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_4766",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:4766",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:4766",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_4767",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:4767",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:4767",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1441",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1441",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1441",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1643",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1643",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1643",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1645",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1645",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1645",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1679",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1679",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1679",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1703",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1703",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1703",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1717",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1717",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1717",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1731",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1731",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1731",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1784",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1784",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1784",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1785",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1785",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1785",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2659",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2659",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2659",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_321",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:321",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:321",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_899",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:899",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:899",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_908",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:908",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:908",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1799",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1799",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1799",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_3747",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:3747",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:3747",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_909",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:909",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:909",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1815",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1815",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1815",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2799",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2799",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2799",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2800",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2800",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2800",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_898",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:898",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:898",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1776",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1776",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1776",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1831",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1831",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1831",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1856",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1856",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1856",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1874",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1874",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1874",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1886",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1886",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1886",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2522",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2522",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2522",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1913",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1913",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1913",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1931",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1931",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1931",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1943",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1943",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1943",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1956",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1956",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1956",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1995",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1995",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1995",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2343",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2343",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2343",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2507",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2507",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2507",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1973",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1973",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1973",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_1992",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:1992",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:1992",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2005",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2005",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2005",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2022",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2022",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2022",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2029",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2029",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2029",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2040",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2040",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2040",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2045",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2045",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2045",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_mission_control_engine_py_2056",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/mission_control_engine.py:2056",
+      "semantic_role": "",
+      "source_ref": "agents/mission_control_engine.py:2056",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_106",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:106",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:106",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_107",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:107",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:107",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_55",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:55",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:55",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_194",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:194",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:194",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_76",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:76",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:76",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_189",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:189",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:189",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_90",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:90",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:90",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_100",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:100",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:100",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_221",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:221",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:221",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_239",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:239",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:239",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_256",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:256",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:256",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_274",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:274",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:274",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_290",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:290",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:290",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_agents_contract_change_management_analyzer_py_307",
+      "node_type": "BACKEND_SERVICE",
+      "language": "Python",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@agents/contract_change_management/analyzer.py:307",
+      "semantic_role": "",
+      "source_ref": "agents/contract_change_management/analyzer.py:307",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_MissionControlCenter_tsx_396",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/MissionControlCenter.tsx:396",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/MissionControlCenter.tsx:396",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_MissionControlCenter_tsx_397",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/MissionControlCenter.tsx:397",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/MissionControlCenter.tsx:397",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_MissionControlCenter_tsx_398",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/MissionControlCenter.tsx:398",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/MissionControlCenter.tsx:398",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_147",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:147",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:147",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_158",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:158",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:158",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "REGISTRY_LOOKUP"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "REGISTRY_LOOKUP"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_159",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:159",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:159",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "REGISTRY_LOOKUP"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "REGISTRY_LOOKUP"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_174",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:174",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:174",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_175",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:175",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:175",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_190",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:190",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:190",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DISPATCH_TABLE"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DISPATCH_TABLE"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_191",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:191",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:191",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DISPATCH_TABLE"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DISPATCH_TABLE"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_222",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:222",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:222",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "METHOD_DISPATCH"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "METHOD_DISPATCH"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_223",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:223",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:223",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_256",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:256",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:256",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_257",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:257",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:257",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_341",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:341",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:341",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_502",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:502",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:502",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "REGISTRY_LOOKUP"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "REGISTRY_LOOKUP"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_745",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:745",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:745",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "REGISTRY_LOOKUP"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "REGISTRY_LOOKUP"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_746",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:746",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:746",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DYNAMIC_INDEX"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_747",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:747",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:747",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DISPATCH_TABLE"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "DISPATCH_TABLE"
+      }
+    },
+    {
+      "node_id": "consumer::consumer_frontend_src_features_missions_components_BuildContractExtractionPanel_tsx_749",
+      "node_type": "FRONTEND_COMPONENT",
+      "language": "TypeScript",
+      "ecosystem": "agnostic",
+      "package": "",
+      "module": "",
+      "symbol": "DynamicConsumer@frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:749",
+      "semantic_role": "",
+      "source_ref": "frontend/src/features/missions/components/BuildContractExtractionPanel.tsx:749",
+      "version": "1.0.0",
+      "metadata": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "METHOD_DISPATCH"
+      },
+      "properties": {
+        "resolution_status": "UNCERTAIN",
+        "evidence_state": "UNCERTAIN",
+        "uncertainty_reason": "DYNAMIC_KEY_NOT_RESOLVABLE",
+        "pattern_type": "METHOD_DISPATCH"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "endpoint::listMissions",
+      "target": "schema::listMissions_response",
+      "edge_type": "SERVES",
+      "provenance": "BUILD_EXTRACTED"
+    },
+    {
+      "source": "endpoint::extractBuildContracts",
+      "target": "schema::extractBuildContracts_response",
+      "edge_type": "SERVES",
+      "provenance": "BUILD_EXTRACTED"
+    },
+    {
+      "source": "type::type_CreateMissionDto",
+      "target": "field::type_CreateMissionDto::project_id",
+      "edge_type": "IMPLEMENTS",
+      "provenance": "BUILD_EXTRACTED"
+    },
+    {
+      "source": "type::type_CreateMissionDto",
+      "target": "field::type_CreateMissionDto::title",
+      "edge_type": "IMPLEMENTS",
+      "provenance": "BUILD_EXTRACTED"
+    },
+    {
+      "source": "type::type_CreateMissionDto",
+      "target": "field::type_CreateMissionDto::objective",
+      "edge_type": "IMPLEMENTS",
+      "provenance": "BUILD_EXTRACTED"
+    },
+    {
+      "source": "type::type_CreateMissionDto",
+      "target": "field::type_CreateMissionDto::autonomy_level",
+      "edge_type": "IMPLEMENTS",
+      "provenance": "BUILD_EXTRACTED"
+    },
+    {
+      "source": "type::type_ExtractionStatusDto",
+      "target": "field::type_ExtractionStatusDto::status",
+      "edge_type": "IMPLEMENTS",
+      "provenance": "BUILD_EXTRACTED"
+    },
+    {
+      "source": "type::type_ExtractionStatusDto",
+      "target": "field::type_ExtractionStatusDto::contracts_count",
+      "edge_type": "IMPLEMENTS",
+      "provenance": "BUILD_EXTRACTED"
+    },
+    {
+      "source": "consumer::consumer_backend_websocket_dispatcher_py_50",
+      "target": "type::type_MissionWebSocketOperations",
+      "edge_type": "CONSUMES",
+      "provenance": "BUILD_EXTRACTED"
+    },
+    {
+      "source": "consumer::consumer_backend_websocket_dispatcher_py_51",
+      "target": "type::type_MissionWebSocketOperations",
+      "edge_type": "CONSUMES",
+      "provenance": "BUILD_EXTRACTED"
+    },
+    {
+      "source": "consumer::consumer_backend_websocket_dispatcher_py_80",
+      "target": "type::type_MissionWebSocketOperations",
+      "edge_type": "CONSUMES",
+      "provenance": "BUILD_EXTRACTED"
+    }
+  ]
+}

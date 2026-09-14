@@ -1,0 +1,60 @@
+{
+  "mission_id": "m_p40_long_50",
+  "cycle_id": "cycle_11",
+  "timestamp": 1789152713.11759,
+  "state": {
+    "mission_id": "m_p40_long_50",
+    "loop_version": 11,
+    "cycle_id": "cycle_11",
+    "mission_version": 1,
+    "intent_version": 1,
+    "plan_version": 1,
+    "current_stage": "RECORD",
+    "current_decision": "CONTINUE",
+    "current_observations": [],
+    "latest_prediction_id": "pred_2e8bc999",
+    "latest_outcome_id": "out_dd665564",
+    "latest_evidence_ids": [
+      "EVD_CYC_1",
+      "EVD_CYC_2",
+      "EVD_CYC_3",
+      "EVD_CYC_4",
+      "EVD_CYC_5",
+      "EVD_CYC_6",
+      "EVD_CYC_7",
+      "EVD_CYC_8",
+      "EVD_CYC_9",
+      "EVD_CYC_10",
+      "EVD_CYC_11"
+    ],
+    "active_failures": [],
+    "active_repairs": [],
+    "active_replans": [],
+    "adaptation_count": 0,
+    "consecutive_successes": 11,
+    "consecutive_failures": 0,
+    "human_intervention_count": 0,
+    "state_hash": "e5b6294f715f2810",
+    "created_at": 1789152699.6211236,
+    "updated_at": 1789152713.1175487
+  },
+  "snapshot_hash": "3402c65239f3a09e",
+  "decision": "CONTINUE",
+  "adaptation": null,
+  "outcome": {
+    "outcome_id": "out_dd665564",
+    "cycle_id": "cycle_11",
+    "prediction_id": "pred_2e8bc999",
+    "matched": [],
+    "missed": [
+      "agents/domain_logic.py"
+    ],
+    "overpredicted": [],
+    "underpredicted": [],
+    "unexpected_changes": [],
+    "discrepancy_score": 1.0
+  },
+  "plan_version": 1,
+  "intent_version": 1,
+  "fingerprints_count": 11
+}

@@ -1,0 +1,21 @@
+{
+  "compatible_case": {
+    "frontend": {
+      "avatar": "string"
+    },
+    "backend": {
+      "avatar": "str"
+    },
+    "verdict": "VALID"
+  },
+  "conflict_case": {
+    "frontend": {
+      "avatar": "string"
+    },
+    "backend": {
+      "avatar": "dict"
+    },
+    "verdict": "SCHEMA_CONFLICT",
+    "action": "BLOCKED_EXECUTION"
+  }
+}

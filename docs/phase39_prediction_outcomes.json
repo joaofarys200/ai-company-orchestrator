@@ -1,110 +1,34 @@
 {
   "predictions": [
     {
-      "prediction_id": "pred_876de992",
-      "mission_id": "m_alpha",
+      "prediction_id": "pred_cf85b4ba",
+      "mission_id": "m_ctrl_01",
       "source_intent_version": 1,
       "proposed_intent_version": 2,
-      "generated_at": 1789132734.0669074,
+      "generated_at": 1789334124.8616564,
       "analysis_version": "1.0.0",
       "predicted_scope": "LOCAL",
-      "predicted_risk": "LOW",
+      "predicted_risk": "MEDIUM",
       "risk_factors": {
-        "total_score": 16.0,
+        "total_score": 35.0,
         "breakdown": {
           "scope_score": 5.0,
           "coupling_score": 3.0,
           "security_score": 0.0,
-          "architecture_score": 2.0,
+          "architecture_score": 14.0,
           "state_score": 1.0,
           "evidence_invalidation_score": 0.0,
           "rollback_complexity_score": 3.0,
-          "concurrency_score": 1.0,
+          "concurrency_score": 8.0,
           "economic_score": 1.0
         },
-        "justification": "Risco avaliado como LOW: Alteração de escopo LOCAL com baixo acoplamento e sem impacto em segurança."
+        "justification": "Risco avaliado como MEDIUM: Impacto arquitetural em contratos ou serviços centrais."
       },
       "affected_requirements": [
-        "REQ_A"
+        "cycle_1_step"
       ],
       "affected_constraints": [],
-      "predicted_tasks": [
-        {
-          "predicted_task_id": "ptask_impl_1",
-          "action": "ADD_TASK",
-          "title": "Implementar REQ_A",
-          "description": "Desenvolver componentes e lógica associada à diretiva: Alpha feature",
-          "source_requirement": "REQ_A",
-          "dependencies": [],
-          "predicted_owner": "coder",
-          "confidence": 0.92,
-          "status": "PREDICTED_ONLY",
-          "category": "Coding",
-          "derivation_type": "DIRECT_FILE_IMPACT",
-          "confidence_class": "DETERMINISTIC",
-          "predicted_files": [
-            "agents/domain_logic.py"
-          ],
-          "impacted_symbols": [],
-          "source_requirements": [
-            "REQ_A"
-          ],
-          "source_constraints": [],
-          "derived_from": [
-            "INTENT_DELTA",
-            "IMPACT_GRAPH"
-          ],
-          "reason": "Implementação associada à diretiva 'Alpha feature'",
-          "causal_trace": {
-            "requirement": "REQ_A",
-            "impact_scope": "LOCAL",
-            "directive": "Alpha feature",
-            "impacted_files": [
-              "agents/domain_logic.py"
-            ],
-            "impacted_symbols": [],
-            "rationale": "Implementação requerida pelo requisito REQ_A."
-          }
-        },
-        {
-          "predicted_task_id": "ptask_test_2",
-          "action": "ADD_TASK",
-          "title": "Validar testes para REQ_A",
-          "description": "Executar suite de testes unitários e de integração para REQ_A",
-          "source_requirement": "REQ_A",
-          "dependencies": [
-            "ptask_impl_1"
-          ],
-          "predicted_owner": "test_engineer",
-          "confidence": 0.9,
-          "status": "PREDICTED_ONLY",
-          "category": "Testing",
-          "derivation_type": "VALIDATION_DRIVEN",
-          "confidence_class": "DETERMINISTIC",
-          "predicted_files": [
-            "agents/domain_logic.py"
-          ],
-          "impacted_symbols": [],
-          "source_requirements": [
-            "REQ_A"
-          ],
-          "source_constraints": [],
-          "derived_from": [
-            "ptask_impl_1",
-            "VALIDATION_POLICY"
-          ],
-          "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_A",
-          "causal_trace": {
-            "requirement": "REQ_A",
-            "impact_scope": "LOCAL",
-            "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
-            "target_files": [
-              "agents/domain_logic.py"
-            ],
-            "derived_from_task": "ptask_impl_1"
-          }
-        }
-      ],
+      "predicted_tasks": [],
       "predicted_dependencies": [],
       "predicted_agents": [
         "coder",
@@ -114,16 +38,21 @@
         {
           "file_path": "agents/domain_logic.py",
           "classification": "DIRECT",
-          "reason": "Implementação das regras de negócio associadas a: REQ_A",
+          "reason": "Implementação das regras de negócio associadas a: cycle_1_step",
           "estimated_change_type": "MODIFY",
           "related_symbol": null,
           "confidence": 0.75
+        },
+        {
+          "file_path": "server.py",
+          "classification": "DIRECT",
+          "reason": "Planned task target"
         }
       ],
       "predicted_symbols": [],
       "predicted_architecture_changes": [
         {
-          "origin": "Directive 'REQ_A'",
+          "origin": "Directive 'cycle_1_step'",
           "path": "Directive -> Domain Business Logic",
           "impact_type": "LOCAL"
         }
@@ -161,12 +90,12 @@
         }
       ],
       "uncertainties": [
-        "O grafo estático não determinou ficheiro unívoco para 'REQ_A'. Mapeado heuristicamente para domain_logic.py."
+        "O grafo estático não determinou ficheiro unívoco para 'cycle_1_step'. Mapeado heuristicamente para domain_logic.py."
       ],
       "confidence": 0.88,
       "causal_chains": [
         {
-          "origin": "Directive 'REQ_A'",
+          "origin": "Directive 'cycle_1_step'",
           "path": "Directive -> Domain Business Logic",
           "impact_type": "LOCAL"
         }
@@ -174,138 +103,50 @@
       "status": "GENERATED",
       "simulation_marker": "SIMULATION_ONLY",
       "task_file_matrix": {
-        "tasks": [
-          {
-            "predicted_task_id": "ptask_impl_1",
-            "action": "ADD_TASK",
-            "title": "Implementar REQ_A",
-            "description": "Desenvolver componentes e lógica associada à diretiva: Alpha feature",
-            "source_requirement": "REQ_A",
-            "dependencies": [],
-            "predicted_owner": "coder",
-            "confidence": 0.92,
-            "status": "PREDICTED_ONLY",
-            "category": "Coding",
-            "derivation_type": "DIRECT_FILE_IMPACT",
-            "confidence_class": "DETERMINISTIC",
-            "predicted_files": [
-              "agents/domain_logic.py"
-            ],
-            "impacted_symbols": [],
-            "source_requirements": [
-              "REQ_A"
-            ],
-            "source_constraints": [],
-            "derived_from": [
-              "INTENT_DELTA",
-              "IMPACT_GRAPH"
-            ],
-            "reason": "Implementação associada à diretiva 'Alpha feature'",
-            "causal_trace": {
-              "requirement": "REQ_A",
-              "impact_scope": "LOCAL",
-              "directive": "Alpha feature",
-              "impacted_files": [
-                "agents/domain_logic.py"
-              ],
-              "impacted_symbols": [],
-              "rationale": "Implementação requerida pelo requisito REQ_A."
-            }
-          },
-          {
-            "predicted_task_id": "ptask_test_2",
-            "action": "ADD_TASK",
-            "title": "Validar testes para REQ_A",
-            "description": "Executar suite de testes unitários e de integração para REQ_A",
-            "source_requirement": "REQ_A",
-            "dependencies": [
-              "ptask_impl_1"
-            ],
-            "predicted_owner": "test_engineer",
-            "confidence": 0.9,
-            "status": "PREDICTED_ONLY",
-            "category": "Testing",
-            "derivation_type": "VALIDATION_DRIVEN",
-            "confidence_class": "DETERMINISTIC",
-            "predicted_files": [
-              "agents/domain_logic.py"
-            ],
-            "impacted_symbols": [],
-            "source_requirements": [
-              "REQ_A"
-            ],
-            "source_constraints": [],
-            "derived_from": [
-              "ptask_impl_1",
-              "VALIDATION_POLICY"
-            ],
-            "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_A",
-            "causal_trace": {
-              "requirement": "REQ_A",
-              "impact_scope": "LOCAL",
-              "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
-              "target_files": [
-                "agents/domain_logic.py"
-              ],
-              "derived_from_task": "ptask_impl_1"
-            }
-          }
-        ],
+        "tasks": [],
         "files": [
           {
             "file_path": "agents/domain_logic.py",
             "classification": "DIRECT",
-            "reason": "Implementação das regras de negócio associadas a: REQ_A",
+            "reason": "Implementação das regras de negócio associadas a: cycle_1_step",
             "estimated_change_type": "MODIFY",
             "related_symbol": null,
             "confidence": 0.75
           }
         ],
-        "relationships": [
-          {
-            "task_id": "ptask_impl_1",
-            "task_title": "Implementar REQ_A",
-            "task_category": "Coding",
-            "file_path": "agents/domain_logic.py",
-            "file_classification": "DIRECT",
-            "relation_type": "DIRECT",
-            "derivation_type": "DIRECT_FILE_IMPACT",
-            "confidence": 0.92
-          },
-          {
-            "task_id": "ptask_test_2",
-            "task_title": "Validar testes para REQ_A",
-            "task_category": "Testing",
-            "file_path": "agents/domain_logic.py",
-            "file_classification": "DIRECT",
-            "relation_type": "VALIDATION",
-            "derivation_type": "VALIDATION_DRIVEN",
-            "confidence": 0.9
-          }
-        ],
-        "total_relationships": 2
+        "relationships": [],
+        "total_relationships": 0
       },
       "consistency_report": {
-        "verdict": "CONSISTENT",
+        "verdict": "PARTIALLY_TRACEABLE",
         "is_valid": true,
-        "checks_passed": 9,
+        "checks_passed": 8,
         "checks_total": 9,
-        "issues": [],
-        "task_count": 2,
+        "issues": [
+          {
+            "invariant": 2,
+            "severity": "WARNING",
+            "files": [
+              "agents/domain_logic.py"
+            ],
+            "message": "1 impacted file(s) are not referenced by any predicted task"
+          }
+        ],
+        "task_count": 0,
         "file_count": 1
       }
     },
     {
-      "prediction_id": "pred_ed9bfc55",
-      "mission_id": "m_beta",
+      "prediction_id": "pred_45a6a2a3",
+      "mission_id": "m_ctrl_02",
       "source_intent_version": 1,
       "proposed_intent_version": 2,
-      "generated_at": 1789132734.5499156,
+      "generated_at": 1789334125.3794303,
       "analysis_version": "1.0.0",
       "predicted_scope": "LOCAL",
       "predicted_risk": "LOW",
       "risk_factors": {
-        "total_score": 16.0,
+        "total_score": 23.0,
         "breakdown": {
           "scope_score": 5.0,
           "coupling_score": 3.0,
@@ -314,92 +155,16 @@
           "state_score": 1.0,
           "evidence_invalidation_score": 0.0,
           "rollback_complexity_score": 3.0,
-          "concurrency_score": 1.0,
+          "concurrency_score": 8.0,
           "economic_score": 1.0
         },
         "justification": "Risco avaliado como LOW: Alteração de escopo LOCAL com baixo acoplamento e sem impacto em segurança."
       },
       "affected_requirements": [
-        "REQ_B"
+        "cycle_1_step"
       ],
       "affected_constraints": [],
-      "predicted_tasks": [
-        {
-          "predicted_task_id": "ptask_impl_1",
-          "action": "ADD_TASK",
-          "title": "Implementar REQ_B",
-          "description": "Desenvolver componentes e lógica associada à diretiva: Beta feature",
-          "source_requirement": "REQ_B",
-          "dependencies": [],
-          "predicted_owner": "coder",
-          "confidence": 0.92,
-          "status": "PREDICTED_ONLY",
-          "category": "Coding",
-          "derivation_type": "DIRECT_FILE_IMPACT",
-          "confidence_class": "DETERMINISTIC",
-          "predicted_files": [
-            "agents/domain_logic.py"
-          ],
-          "impacted_symbols": [],
-          "source_requirements": [
-            "REQ_B"
-          ],
-          "source_constraints": [],
-          "derived_from": [
-            "INTENT_DELTA",
-            "IMPACT_GRAPH"
-          ],
-          "reason": "Implementação associada à diretiva 'Beta feature'",
-          "causal_trace": {
-            "requirement": "REQ_B",
-            "impact_scope": "LOCAL",
-            "directive": "Beta feature",
-            "impacted_files": [
-              "agents/domain_logic.py"
-            ],
-            "impacted_symbols": [],
-            "rationale": "Implementação requerida pelo requisito REQ_B."
-          }
-        },
-        {
-          "predicted_task_id": "ptask_test_2",
-          "action": "ADD_TASK",
-          "title": "Validar testes para REQ_B",
-          "description": "Executar suite de testes unitários e de integração para REQ_B",
-          "source_requirement": "REQ_B",
-          "dependencies": [
-            "ptask_impl_1"
-          ],
-          "predicted_owner": "test_engineer",
-          "confidence": 0.9,
-          "status": "PREDICTED_ONLY",
-          "category": "Testing",
-          "derivation_type": "VALIDATION_DRIVEN",
-          "confidence_class": "DETERMINISTIC",
-          "predicted_files": [
-            "agents/domain_logic.py"
-          ],
-          "impacted_symbols": [],
-          "source_requirements": [
-            "REQ_B"
-          ],
-          "source_constraints": [],
-          "derived_from": [
-            "ptask_impl_1",
-            "VALIDATION_POLICY"
-          ],
-          "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_B",
-          "causal_trace": {
-            "requirement": "REQ_B",
-            "impact_scope": "LOCAL",
-            "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
-            "target_files": [
-              "agents/domain_logic.py"
-            ],
-            "derived_from_task": "ptask_impl_1"
-          }
-        }
-      ],
+      "predicted_tasks": [],
       "predicted_dependencies": [],
       "predicted_agents": [
         "coder",
@@ -409,16 +174,21 @@
         {
           "file_path": "agents/domain_logic.py",
           "classification": "DIRECT",
-          "reason": "Implementação das regras de negócio associadas a: REQ_B",
+          "reason": "Implementação das regras de negócio associadas a: cycle_1_step",
           "estimated_change_type": "MODIFY",
           "related_symbol": null,
           "confidence": 0.75
+        },
+        {
+          "file_path": "parser.py",
+          "classification": "DIRECT",
+          "reason": "Planned task target"
         }
       ],
       "predicted_symbols": [],
       "predicted_architecture_changes": [
         {
-          "origin": "Directive 'REQ_B'",
+          "origin": "Directive 'cycle_1_step'",
           "path": "Directive -> Domain Business Logic",
           "impact_type": "LOCAL"
         }
@@ -456,12 +226,12 @@
         }
       ],
       "uncertainties": [
-        "O grafo estático não determinou ficheiro unívoco para 'REQ_B'. Mapeado heuristicamente para domain_logic.py."
+        "O grafo estático não determinou ficheiro unívoco para 'cycle_1_step'. Mapeado heuristicamente para domain_logic.py."
       ],
       "confidence": 0.88,
       "causal_chains": [
         {
-          "origin": "Directive 'REQ_B'",
+          "origin": "Directive 'cycle_1_step'",
           "path": "Directive -> Domain Business Logic",
           "impact_type": "LOCAL"
         }
@@ -469,128 +239,307 @@
       "status": "GENERATED",
       "simulation_marker": "SIMULATION_ONLY",
       "task_file_matrix": {
-        "tasks": [
-          {
-            "predicted_task_id": "ptask_impl_1",
-            "action": "ADD_TASK",
-            "title": "Implementar REQ_B",
-            "description": "Desenvolver componentes e lógica associada à diretiva: Beta feature",
-            "source_requirement": "REQ_B",
-            "dependencies": [],
-            "predicted_owner": "coder",
-            "confidence": 0.92,
-            "status": "PREDICTED_ONLY",
-            "category": "Coding",
-            "derivation_type": "DIRECT_FILE_IMPACT",
-            "confidence_class": "DETERMINISTIC",
-            "predicted_files": [
-              "agents/domain_logic.py"
-            ],
-            "impacted_symbols": [],
-            "source_requirements": [
-              "REQ_B"
-            ],
-            "source_constraints": [],
-            "derived_from": [
-              "INTENT_DELTA",
-              "IMPACT_GRAPH"
-            ],
-            "reason": "Implementação associada à diretiva 'Beta feature'",
-            "causal_trace": {
-              "requirement": "REQ_B",
-              "impact_scope": "LOCAL",
-              "directive": "Beta feature",
-              "impacted_files": [
-                "agents/domain_logic.py"
-              ],
-              "impacted_symbols": [],
-              "rationale": "Implementação requerida pelo requisito REQ_B."
-            }
-          },
-          {
-            "predicted_task_id": "ptask_test_2",
-            "action": "ADD_TASK",
-            "title": "Validar testes para REQ_B",
-            "description": "Executar suite de testes unitários e de integração para REQ_B",
-            "source_requirement": "REQ_B",
-            "dependencies": [
-              "ptask_impl_1"
-            ],
-            "predicted_owner": "test_engineer",
-            "confidence": 0.9,
-            "status": "PREDICTED_ONLY",
-            "category": "Testing",
-            "derivation_type": "VALIDATION_DRIVEN",
-            "confidence_class": "DETERMINISTIC",
-            "predicted_files": [
-              "agents/domain_logic.py"
-            ],
-            "impacted_symbols": [],
-            "source_requirements": [
-              "REQ_B"
-            ],
-            "source_constraints": [],
-            "derived_from": [
-              "ptask_impl_1",
-              "VALIDATION_POLICY"
-            ],
-            "reason": "Validação empírica de testes exigida pelo princípio Zero False Success para REQ_B",
-            "causal_trace": {
-              "requirement": "REQ_B",
-              "impact_scope": "LOCAL",
-              "validation_policy": "Zero False Success: toda alteração requer suite de testes e validação de invariantes.",
-              "target_files": [
-                "agents/domain_logic.py"
-              ],
-              "derived_from_task": "ptask_impl_1"
-            }
-          }
-        ],
+        "tasks": [],
         "files": [
           {
             "file_path": "agents/domain_logic.py",
             "classification": "DIRECT",
-            "reason": "Implementação das regras de negócio associadas a: REQ_B",
+            "reason": "Implementação das regras de negócio associadas a: cycle_1_step",
             "estimated_change_type": "MODIFY",
             "related_symbol": null,
             "confidence": 0.75
           }
         ],
-        "relationships": [
-          {
-            "task_id": "ptask_impl_1",
-            "task_title": "Implementar REQ_B",
-            "task_category": "Coding",
-            "file_path": "agents/domain_logic.py",
-            "file_classification": "DIRECT",
-            "relation_type": "DIRECT",
-            "derivation_type": "DIRECT_FILE_IMPACT",
-            "confidence": 0.92
-          },
-          {
-            "task_id": "ptask_test_2",
-            "task_title": "Validar testes para REQ_B",
-            "task_category": "Testing",
-            "file_path": "agents/domain_logic.py",
-            "file_classification": "DIRECT",
-            "relation_type": "VALIDATION",
-            "derivation_type": "VALIDATION_DRIVEN",
-            "confidence": 0.9
-          }
-        ],
-        "total_relationships": 2
+        "relationships": [],
+        "total_relationships": 0
       },
       "consistency_report": {
-        "verdict": "CONSISTENT",
+        "verdict": "PARTIALLY_TRACEABLE",
         "is_valid": true,
-        "checks_passed": 9,
+        "checks_passed": 8,
         "checks_total": 9,
-        "issues": [],
-        "task_count": 2,
+        "issues": [
+          {
+            "invariant": 2,
+            "severity": "WARNING",
+            "files": [
+              "agents/domain_logic.py"
+            ],
+            "message": "1 impacted file(s) are not referenced by any predicted task"
+          }
+        ],
+        "task_count": 0,
+        "file_count": 1
+      }
+    },
+    {
+      "prediction_id": "pred_9990e0f7",
+      "mission_id": "m_ctrl_03",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789334125.9018574,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "LOCAL",
+      "predicted_risk": "LOW",
+      "risk_factors": {
+        "total_score": 23.0,
+        "breakdown": {
+          "scope_score": 5.0,
+          "coupling_score": 3.0,
+          "security_score": 0.0,
+          "architecture_score": 2.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como LOW: Alteração de escopo LOCAL com baixo acoplamento e sem impacto em segurança."
+      },
+      "affected_requirements": [
+        "cycle_1_step"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "agents/domain_logic.py",
+          "classification": "DIRECT",
+          "reason": "Implementação das regras de negócio associadas a: cycle_1_step",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.75
+        },
+        {
+          "file_path": "docs.md",
+          "classification": "DIRECT",
+          "reason": "Planned task target"
+        }
+      ],
+      "predicted_symbols": [],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'cycle_1_step'",
+          "path": "Directive -> Domain Business Logic",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_domain_logic.py",
+          "target_module": "agents/domain_logic.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de agents/domain_logic.py"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": false,
+      "predicted_pause_required": false,
+      "predicted_approval_required": false,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [
+        "O grafo estático não determinou ficheiro unívoco para 'cycle_1_step'. Mapeado heuristicamente para domain_logic.py."
+      ],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'cycle_1_step'",
+          "path": "Directive -> Domain Business Logic",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY",
+      "task_file_matrix": {
+        "tasks": [],
+        "files": [
+          {
+            "file_path": "agents/domain_logic.py",
+            "classification": "DIRECT",
+            "reason": "Implementação das regras de negócio associadas a: cycle_1_step",
+            "estimated_change_type": "MODIFY",
+            "related_symbol": null,
+            "confidence": 0.75
+          }
+        ],
+        "relationships": [],
+        "total_relationships": 0
+      },
+      "consistency_report": {
+        "verdict": "PARTIALLY_TRACEABLE",
+        "is_valid": true,
+        "checks_passed": 8,
+        "checks_total": 9,
+        "issues": [
+          {
+            "invariant": 2,
+            "severity": "WARNING",
+            "files": [
+              "agents/domain_logic.py"
+            ],
+            "message": "1 impacted file(s) are not referenced by any predicted task"
+          }
+        ],
+        "task_count": 0,
+        "file_count": 1
+      }
+    },
+    {
+      "prediction_id": "pred_de9122d1",
+      "mission_id": "m_ctrl_04",
+      "source_intent_version": 1,
+      "proposed_intent_version": 2,
+      "generated_at": 1789334126.4265914,
+      "analysis_version": "1.0.0",
+      "predicted_scope": "LOCAL",
+      "predicted_risk": "LOW",
+      "risk_factors": {
+        "total_score": 23.0,
+        "breakdown": {
+          "scope_score": 5.0,
+          "coupling_score": 3.0,
+          "security_score": 0.0,
+          "architecture_score": 2.0,
+          "state_score": 1.0,
+          "evidence_invalidation_score": 0.0,
+          "rollback_complexity_score": 3.0,
+          "concurrency_score": 8.0,
+          "economic_score": 1.0
+        },
+        "justification": "Risco avaliado como LOW: Alteração de escopo LOCAL com baixo acoplamento e sem impacto em segurança."
+      },
+      "affected_requirements": [
+        "cycle_1_step"
+      ],
+      "affected_constraints": [],
+      "predicted_tasks": [],
+      "predicted_dependencies": [],
+      "predicted_agents": [
+        "coder",
+        "test_engineer"
+      ],
+      "predicted_files": [
+        {
+          "file_path": "agents/domain_logic.py",
+          "classification": "DIRECT",
+          "reason": "Implementação das regras de negócio associadas a: cycle_1_step",
+          "estimated_change_type": "MODIFY",
+          "related_symbol": null,
+          "confidence": 0.75
+        }
+      ],
+      "predicted_symbols": [],
+      "predicted_architecture_changes": [
+        {
+          "origin": "Directive 'cycle_1_step'",
+          "path": "Directive -> Domain Business Logic",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "predicted_tests": [
+        {
+          "test_file": "tests/test_domain_logic.py",
+          "target_module": "agents/domain_logic.py",
+          "test_type": "unit_and_regression",
+          "reason": "Verificação de invariantes de agents/domain_logic.py"
+        }
+      ],
+      "predicted_evidence_impact": [],
+      "predicted_checkpoint_impact": [
+        {
+          "checkpoint_id": "chk_pre_intent",
+          "action": "CREATE_SNAPSHOT"
+        }
+      ],
+      "predicted_browser_validation": false,
+      "predicted_pause_required": false,
+      "predicted_approval_required": false,
+      "assumptions": [
+        {
+          "assumption_id": "asm_compat",
+          "statement": "Preservação da compatibilidade com os endpoints e contratos públicos existentes",
+          "category": "SYSTEM_ASSUMPTION",
+          "confidence": 0.9
+        },
+        {
+          "assumption_id": "asm_deps",
+          "statement": "Reutilização dos serviços e utilitários já mapeados no workspace",
+          "category": "INFERRED",
+          "confidence": 0.85
+        }
+      ],
+      "uncertainties": [
+        "O grafo estático não determinou ficheiro unívoco para 'cycle_1_step'. Mapeado heuristicamente para domain_logic.py."
+      ],
+      "confidence": 0.88,
+      "causal_chains": [
+        {
+          "origin": "Directive 'cycle_1_step'",
+          "path": "Directive -> Domain Business Logic",
+          "impact_type": "LOCAL"
+        }
+      ],
+      "status": "GENERATED",
+      "simulation_marker": "SIMULATION_ONLY",
+      "task_file_matrix": {
+        "tasks": [],
+        "files": [
+          {
+            "file_path": "agents/domain_logic.py",
+            "classification": "DIRECT",
+            "reason": "Implementação das regras de negócio associadas a: cycle_1_step",
+            "estimated_change_type": "MODIFY",
+            "related_symbol": null,
+            "confidence": 0.75
+          }
+        ],
+        "relationships": [],
+        "total_relationships": 0
+      },
+      "consistency_report": {
+        "verdict": "PARTIALLY_TRACEABLE",
+        "is_valid": true,
+        "checks_passed": 8,
+        "checks_total": 9,
+        "issues": [
+          {
+            "invariant": 2,
+            "severity": "WARNING",
+            "files": [
+              "agents/domain_logic.py"
+            ],
+            "message": "1 impacted file(s) are not referenced by any predicted task"
+          }
+        ],
+        "task_count": 0,
         "file_count": 1
       }
     }
   ],
   "outcomes": [],
-  "timestamp": 1789132734.5501838
+  "timestamp": 1789334126.4268768
 }

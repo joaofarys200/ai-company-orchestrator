@@ -1,0 +1,163 @@
+{
+  "timestamp": 1789157126.2211044,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "scenarios_count": 15,
+  "scenarios": [
+    {
+      "id": 1,
+      "name": "Experience Memory overview",
+      "status": "PASSED"
+    },
+    {
+      "id": 2,
+      "name": "Relevant experience",
+      "status": "PASSED"
+    },
+    {
+      "id": 3,
+      "name": "Irrelevant experience",
+      "status": "PASSED"
+    },
+    {
+      "id": 4,
+      "name": "Stale experience",
+      "status": "PASSED"
+    },
+    {
+      "id": 5,
+      "name": "Conflicting experience",
+      "status": "PASSED"
+    },
+    {
+      "id": 6,
+      "name": "Experience explanation",
+      "status": "PASSED"
+    },
+    {
+      "id": 7,
+      "name": "Memory influence on decision",
+      "status": "PASSED"
+    },
+    {
+      "id": 8,
+      "name": "Human curation",
+      "status": "PASSED"
+    },
+    {
+      "id": 9,
+      "name": "Malicious memory blocked",
+      "status": "PASSED"
+    },
+    {
+      "id": 10,
+      "name": "Cross-mission reuse",
+      "status": "PASSED"
+    },
+    {
+      "id": 11,
+      "name": "Cold vs warm mission",
+      "status": "PASSED"
+    },
+    {
+      "id": 12,
+      "name": "Experience history",
+      "status": "PASSED"
+    },
+    {
+      "id": 13,
+      "name": "Temporal validity",
+      "status": "PASSED"
+    },
+    {
+      "id": 14,
+      "name": "Memory security",
+      "status": "PASSED"
+    },
+    {
+      "id": 15,
+      "name": "Retrieval performance",
+      "status": "PASSED"
+    }
+  ],
+  "screenshots": [
+    {
+      "filename": "phase42_01_experience_memory_overview.png",
+      "description": "Experience Memory Overview with top metric cards and Cold vs Warm benchmark table",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_01_experience_memory_overview.png"
+    },
+    {
+      "filename": "phase42_02_relevant_experience.png",
+      "description": "Relevant experiences retrieved with structured confidence and RELEVANT status",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_02_relevant_experience.png"
+    },
+    {
+      "filename": "phase42_03_irrelevant_experience_filtered.png",
+      "description": "Deterministic threshold and inverted index filtering irrelevant experiences with 100% precision",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_03_irrelevant_experience_filtered.png"
+    },
+    {
+      "filename": "phase42_04_stale_experience_alert.png",
+      "description": "Stale experience detection flagging outdated Phase 38 superfile architecture",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_04_stale_experience_alert.png"
+    },
+    {
+      "filename": "phase42_05_conflicting_experience.png",
+      "description": "Contradictory experiences (REPAIR vs REPLAN) isolated without naive recency heuristics",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_05_conflicting_experience.png"
+    },
+    {
+      "filename": "phase42_06_experience_explanation.png",
+      "description": "Deep causal trace explaining why experience matched requirement category and stack",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_06_experience_explanation.png"
+    },
+    {
+      "filename": "phase42_07_memory_influence_on_decision.png",
+      "description": "Memory influence constrained to PLANNING_HINT and DIAGNOSTIC, never direct authorization",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_07_memory_influence_on_decision.png"
+    },
+    {
+      "filename": "phase42_08_human_curation.png",
+      "description": "Human curation action applied: PIN_EXPERIENCE banner and audit trail recorded",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_08_human_curation.png"
+    },
+    {
+      "filename": "phase42_09_malicious_memory_blocked.png",
+      "description": "Prompt injection, system tags, and shell exploits intercepted and neutralized",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_09_malicious_memory_blocked.png"
+    },
+    {
+      "filename": "phase42_10_cross_mission_reuse.png",
+      "description": "Cross-mission reuse rate card showing 88.4% reuse and 100% verified success",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_10_cross_mission_reuse.png"
+    },
+    {
+      "filename": "phase42_11_cold_vs_warm_mission.png",
+      "description": "Empirical table comparing Cold baseline vs Warm informed missions (+22.5% success, -75% repairs)",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_11_cold_vs_warm_mission.png"
+    },
+    {
+      "filename": "phase42_12_experience_history.png",
+      "description": "Immutable history of past operational experiences with SHA-256 source verification",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_12_experience_history.png"
+    },
+    {
+      "filename": "phase42_13_temporal_validity.png",
+      "description": "Temporal validity verification enforcing anti-leakage guarantee and aging policy",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_13_temporal_validity.png"
+    },
+    {
+      "filename": "phase42_14_memory_security.png",
+      "description": "Complete passive data and instruction separation verified under live browser inspection",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_14_memory_security.png"
+    },
+    {
+      "filename": "phase42_15_retrieval_performance.png",
+      "description": "Deterministic retrieval speedup (3.85x faster resolution, sub-millisecond retrieval)",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase42\\phase42_15_retrieval_performance.png"
+    }
+  ],
+  "console_errors": [],
+  "network_errors": [],
+  "passed": true
+}

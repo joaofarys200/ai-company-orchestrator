@@ -1,0 +1,28 @@
+{
+  "cold_missions": {
+    "mission_count": 10,
+    "first_pass_success_rate": 0.5,
+    "total_repairs": 3,
+    "total_replans": 2,
+    "mean_decision_accuracy": 0.97,
+    "mean_prediction_accuracy": 0.9200000000000002,
+    "human_escalations": 1,
+    "mean_time_to_resolution_sec": 5.53
+  },
+  "warm_missions": {
+    "mission_count": 10,
+    "first_pass_success_rate": 0.9,
+    "total_repairs": 1,
+    "total_replans": 0,
+    "mean_decision_accuracy": 0.998,
+    "mean_prediction_accuracy": 0.9800000000000001,
+    "human_escalations": 0,
+    "mean_time_to_resolution_sec": 3.28
+  },
+  "improvements": {
+    "first_pass_delta": "+40.0%",
+    "repair_reduction": "-66.7%",
+    "replan_reduction": "-100.0%",
+    "resolution_time_speedup": "-40.7%"
+  }
+}

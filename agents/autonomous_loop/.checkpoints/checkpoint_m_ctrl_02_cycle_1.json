@@ -1,0 +1,270 @@
+{
+  "mission_id": "m_ctrl_02",
+  "cycle_id": "cycle_1",
+  "timestamp": 1789334125.3814137,
+  "state": {
+    "mission_id": "m_ctrl_02",
+    "loop_version": 1,
+    "cycle_id": "cycle_1",
+    "mission_version": 1,
+    "intent_version": 1,
+    "plan_version": 2,
+    "current_stage": "RECORD",
+    "current_decision": "REPAIR",
+    "current_observations": [],
+    "latest_prediction_id": "pred_45a6a2a3",
+    "latest_outcome_id": "out_75e345a5",
+    "latest_evidence_ids": [],
+    "active_failures": [
+      {
+        "task_id": "t2",
+        "error": "IndentationError: unexpected indent in parser.py line 4",
+        "exit_code": 1,
+        "is_repairable": true,
+        "target_file": "parser.py",
+        "timestamp": 1789334125.3810506
+      },
+      {
+        "validation_type": "BUILD",
+        "target": "",
+        "error": "IndentationError in parser.py",
+        "is_repairable": true,
+        "timestamp": 1789334125.3810601
+      }
+    ],
+    "active_repairs": [
+      {
+        "adaptation_id": "adapt_cycle_1_25381",
+        "cycle_id": "cycle_1",
+        "adaptation_type": "REPAIR",
+        "reason": "Repairable failure encountered: IndentationError: unexpected indent in parser.py line 4; IndentationError in parser.py",
+        "source_observation": {
+          "observation_id": "obs_cycle_1_25381",
+          "cycle_id": "cycle_1",
+          "mission_id": "m_ctrl_02",
+          "timestamp": 1789334125.3810682,
+          "task_results": [
+            {
+              "task_id": "t2",
+              "owner_agent": "swarm_worker",
+              "status": "FAILED",
+              "exit_code": 1,
+              "files_touched": [
+                "parser.py"
+              ],
+              "artifacts_created": [],
+              "error_message": "IndentationError: unexpected indent in parser.py line 4",
+              "execution_duration_seconds": 0.0
+            }
+          ],
+          "validations": [
+            {
+              "validation_type": "BUILD",
+              "target": "",
+              "passed": false,
+              "summary": "IndentationError in parser.py",
+              "evidence_id": null,
+              "details": {}
+            }
+          ],
+          "files_changed": [
+            "parser.py"
+          ],
+          "active_failures": [
+            {
+              "task_id": "t2",
+              "error": "IndentationError: unexpected indent in parser.py line 4",
+              "exit_code": 1,
+              "is_repairable": true,
+              "target_file": "parser.py",
+              "timestamp": 1789334125.3810506
+            },
+            {
+              "validation_type": "BUILD",
+              "target": "",
+              "error": "IndentationError in parser.py",
+              "is_repairable": true,
+              "timestamp": 1789334125.3810601
+            }
+          ],
+          "evidence_ids_collected": [],
+          "all_tasks_completed": false,
+          "all_validations_passed": false,
+          "build_clean": false,
+          "tests_clean": true,
+          "ast_clean": true,
+          "browser_clean": true,
+          "has_unrepairable_failure": false
+        },
+        "previous_plan_version": 1,
+        "proposed_change": {
+          "action": "TRIGGER_AST_REPAIR",
+          "failures": [
+            {
+              "task_id": "t2",
+              "error": "IndentationError: unexpected indent in parser.py line 4",
+              "exit_code": 1,
+              "is_repairable": true,
+              "target_file": "parser.py",
+              "timestamp": 1789334125.3810506
+            },
+            {
+              "validation_type": "BUILD",
+              "target": "",
+              "error": "IndentationError in parser.py",
+              "is_repairable": true,
+              "timestamp": 1789334125.3810601
+            }
+          ],
+          "target_files": [
+            "parser.py"
+          ]
+        },
+        "predicted_impact": {
+          "risk": "LOW",
+          "scope": "LOCAL"
+        },
+        "risk": "LOW",
+        "requires_approval": false,
+        "gate_result": {
+          "status": "APPROVED",
+          "passed": true,
+          "reason": "Mission Gate authorized adaptation.",
+          "evaluated_at": 1789334125.3813312
+        },
+        "status": "APPLIED",
+        "applied_at": 1789334125.381334
+      }
+    ],
+    "active_replans": [],
+    "adaptation_count": 1,
+    "consecutive_successes": 0,
+    "consecutive_failures": 1,
+    "human_intervention_count": 0,
+    "state_hash": "4d76801decc35eb3",
+    "created_at": 1789334124.8647692,
+    "updated_at": 1789334125.3813918
+  },
+  "snapshot_hash": "326836566dd71642",
+  "decision": "REPAIR",
+  "adaptation": {
+    "adaptation_id": "adapt_cycle_1_25381",
+    "cycle_id": "cycle_1",
+    "adaptation_type": "REPAIR",
+    "reason": "Repairable failure encountered: IndentationError: unexpected indent in parser.py line 4; IndentationError in parser.py",
+    "source_observation": {
+      "observation_id": "obs_cycle_1_25381",
+      "cycle_id": "cycle_1",
+      "mission_id": "m_ctrl_02",
+      "timestamp": 1789334125.3810682,
+      "task_results": [
+        {
+          "task_id": "t2",
+          "owner_agent": "swarm_worker",
+          "status": "FAILED",
+          "exit_code": 1,
+          "files_touched": [
+            "parser.py"
+          ],
+          "artifacts_created": [],
+          "error_message": "IndentationError: unexpected indent in parser.py line 4",
+          "execution_duration_seconds": 0.0
+        }
+      ],
+      "validations": [
+        {
+          "validation_type": "BUILD",
+          "target": "",
+          "passed": false,
+          "summary": "IndentationError in parser.py",
+          "evidence_id": null,
+          "details": {}
+        }
+      ],
+      "files_changed": [
+        "parser.py"
+      ],
+      "active_failures": [
+        {
+          "task_id": "t2",
+          "error": "IndentationError: unexpected indent in parser.py line 4",
+          "exit_code": 1,
+          "is_repairable": true,
+          "target_file": "parser.py",
+          "timestamp": 1789334125.3810506
+        },
+        {
+          "validation_type": "BUILD",
+          "target": "",
+          "error": "IndentationError in parser.py",
+          "is_repairable": true,
+          "timestamp": 1789334125.3810601
+        }
+      ],
+      "evidence_ids_collected": [],
+      "all_tasks_completed": false,
+      "all_validations_passed": false,
+      "build_clean": false,
+      "tests_clean": true,
+      "ast_clean": true,
+      "browser_clean": true,
+      "has_unrepairable_failure": false
+    },
+    "previous_plan_version": 1,
+    "proposed_change": {
+      "action": "TRIGGER_AST_REPAIR",
+      "failures": [
+        {
+          "task_id": "t2",
+          "error": "IndentationError: unexpected indent in parser.py line 4",
+          "exit_code": 1,
+          "is_repairable": true,
+          "target_file": "parser.py",
+          "timestamp": 1789334125.3810506
+        },
+        {
+          "validation_type": "BUILD",
+          "target": "",
+          "error": "IndentationError in parser.py",
+          "is_repairable": true,
+          "timestamp": 1789334125.3810601
+        }
+      ],
+      "target_files": [
+        "parser.py"
+      ]
+    },
+    "predicted_impact": {
+      "risk": "LOW",
+      "scope": "LOCAL"
+    },
+    "risk": "LOW",
+    "requires_approval": false,
+    "gate_result": {
+      "status": "APPROVED",
+      "passed": true,
+      "reason": "Mission Gate authorized adaptation.",
+      "evaluated_at": 1789334125.3813312
+    },
+    "status": "APPLIED",
+    "applied_at": 1789334125.381334
+  },
+  "outcome": {
+    "outcome_id": "out_75e345a5",
+    "cycle_id": "cycle_1",
+    "prediction_id": "pred_45a6a2a3",
+    "matched": [
+      "parser.py"
+    ],
+    "missed": [
+      "agents/domain_logic.py"
+    ],
+    "overpredicted": [],
+    "underpredicted": [],
+    "unexpected_changes": [],
+    "discrepancy_score": 0.5
+  },
+  "plan_version": 2,
+  "intent_version": 1,
+  "fingerprints_count": 1
+}

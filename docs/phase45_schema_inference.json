@@ -1,0 +1,44 @@
+{
+  "inferred_schema_name": "UserResponse",
+  "fields": {
+    "id": {
+      "type": "integer",
+      "presence_ratio": 1.0,
+      "is_required": true,
+      "is_nullable": false,
+      "is_enum": false,
+      "is_enum_candidate": false
+    },
+    "username": {
+      "type": "string",
+      "presence_ratio": 1.0,
+      "is_required": true,
+      "is_nullable": false,
+      "is_enum": false,
+      "is_enum_candidate": false
+    },
+    "role": {
+      "type": "string",
+      "presence_ratio": 1.0,
+      "is_required": true,
+      "is_nullable": false,
+      "is_enum": true,
+      "is_enum_candidate": true,
+      "enum_candidate": [
+        "ADMIN",
+        "MEMBER"
+      ],
+      "enum_values": [
+        "ADMIN",
+        "MEMBER"
+      ]
+    },
+    "verified": {
+      "type": "boolean",
+      "is_required": false,
+      "is_nullable": false,
+      "presence_ratio": 0.001
+    }
+  },
+  "sample_count": 1000
+}

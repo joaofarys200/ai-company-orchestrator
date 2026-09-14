@@ -1,0 +1,1408 @@
+[
+  {
+    "migration_id": "mig_7d0909181f",
+    "source_contract_version": "1.0.0",
+    "target_contract_version": "1.1.0",
+    "contract_id": "contract_users_v1",
+    "affected_consumers": [
+      {
+        "consumer_id": "frontend-user-card",
+        "name": "Frontend UserCard Component",
+        "file_path": "frontend/src/components/UserCard.tsx",
+        "category": "DIRECT",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Directly renders user profile fields expecting avatar to be a primitive string.",
+        "required_action": "Adapt component to handle avatar object structure.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "admin-user-table",
+        "name": "Admin Dashboard User Table",
+        "file_path": "frontend/src/features/admin/UserTable.tsx",
+        "category": "INDIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Displays user table with optional fallback rendering.",
+        "required_action": "Revalidate table columns.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "test-user-api",
+        "name": "User API Integration Test",
+        "file_path": "tests/test_user_api.py",
+        "category": "TEST",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Asserts response JSON matches v1 schema.",
+        "required_action": "Update expected schema fixture to v2.",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "browser-user-profile-qa",
+        "name": "Browser QA User Profile Scenario",
+        "file_path": "scripts/run_browser_qa_user.py",
+        "category": "BROWSER_SCENARIO",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Verifies profile page display in browser.",
+        "required_action": "Verify profile avatar rendering.",
+        "language": "Python",
+        "line_ref": null
+      }
+    ],
+    "required_tasks": [
+      {
+        "task_id": "task_mig_7d0909181f_01_backend",
+        "title": "Deploy contract changes for contract_users_v1 (1.1.0)",
+        "target_component": "BACKEND",
+        "category": "BACKEND",
+        "description": "Update route schema and handlers to satisfy contract version 1.1.0.",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7d0909181f_02_consumer_1",
+        "title": "Migrate consumer Frontend UserCard Component",
+        "target_component": "frontend-user-card",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/components/UserCard.tsx: Adapt component to handle avatar object structure. (Directly renders user profile fields expecting avatar to be a primitive string.).",
+        "dependencies": [
+          "task_mig_7d0909181f_01_backend"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7d0909181f_02_consumer_3",
+        "title": "Migrate consumer User API Integration Test",
+        "target_component": "test-user-api",
+        "category": "BACKEND",
+        "description": "Update tests/test_user_api.py: Update expected schema fixture to v2. (Asserts response JSON matches v1 schema.).",
+        "dependencies": [
+          "task_mig_7d0909181f_01_backend"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7d0909181f_02_consumer_4",
+        "title": "Migrate consumer Browser QA User Profile Scenario",
+        "target_component": "browser-user-profile-qa",
+        "category": "BACKEND",
+        "description": "Update scripts/run_browser_qa_user.py: Verify profile avatar rendering. (Verifies profile page display in browser.).",
+        "dependencies": [
+          "task_mig_7d0909181f_01_backend"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7d0909181f_03_tests",
+        "title": "Update and execute contract test suite for contract_users_v1",
+        "target_component": "TESTS",
+        "category": "TEST",
+        "description": "Ensure integration and contract test suites validate 1.1.0.",
+        "dependencies": [
+          "task_mig_7d0909181f_01_backend",
+          "task_mig_7d0909181f_02_consumer_1",
+          "task_mig_7d0909181f_02_consumer_3",
+          "task_mig_7d0909181f_02_consumer_4"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7d0909181f_04_browser",
+        "title": "Run browser scenario QA for contract_users_v1",
+        "target_component": "BROWSER",
+        "category": "BROWSER",
+        "description": "Execute official browser end-to-end scenarios verifying visual rendering without console/network errors.",
+        "dependencies": [
+          "task_mig_7d0909181f_03_tests"
+        ],
+        "status": "PENDING"
+      }
+    ],
+    "compatibility_strategy": "BACKWARD_COMPATIBLE",
+    "rollout_strategy": "PREPARE_VALIDATE_MIGRATE_SWITCH",
+    "rollback_strategy": "RESTORE_ACTIVE_VERSION_1.0.0_WITH_AUDIT_PRESERVATION",
+    "validation_plan": [
+      "Pre-flight schema comparison: 1.0.0 -> 1.1.0",
+      "Unit and integration test suites execution",
+      "Consumer reverse dependency compatibility check",
+      "Browser QA validation session in Microsoft Edge",
+      "Zero false success confirmation via Contract Completion Gate"
+    ],
+    "approval_required": false,
+    "status": "APPROVED",
+    "created_at": 1789246343.0147028
+  },
+  {
+    "migration_id": "mig_12a25d8fc9",
+    "source_contract_version": "1.0.0",
+    "target_contract_version": "2.0.0",
+    "contract_id": "contract_users_v1",
+    "affected_consumers": [
+      {
+        "consumer_id": "frontend-user-card",
+        "name": "Frontend UserCard Component",
+        "file_path": "frontend/src/components/UserCard.tsx",
+        "category": "DIRECT",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Directly renders user profile fields expecting avatar to be a primitive string.",
+        "required_action": "Adapt component to handle avatar object structure.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "admin-user-table",
+        "name": "Admin Dashboard User Table",
+        "file_path": "frontend/src/features/admin/UserTable.tsx",
+        "category": "INDIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Displays user table with optional fallback rendering.",
+        "required_action": "Revalidate table columns.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "test-user-api",
+        "name": "User API Integration Test",
+        "file_path": "tests/test_user_api.py",
+        "category": "TEST",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Asserts response JSON matches v1 schema.",
+        "required_action": "Update expected schema fixture to v2.",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "browser-user-profile-qa",
+        "name": "Browser QA User Profile Scenario",
+        "file_path": "scripts/run_browser_qa_user.py",
+        "category": "BROWSER_SCENARIO",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Verifies profile page display in browser.",
+        "required_action": "Verify profile avatar rendering.",
+        "language": "Python",
+        "line_ref": null
+      }
+    ],
+    "required_tasks": [
+      {
+        "task_id": "task_mig_12a25d8fc9_01_backend",
+        "title": "Deploy contract changes for contract_users_v1 (2.0.0)",
+        "target_component": "BACKEND",
+        "category": "BACKEND",
+        "description": "Update route schema and handlers to satisfy contract version 2.0.0.",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_12a25d8fc9_02_consumer_1",
+        "title": "Migrate consumer Frontend UserCard Component",
+        "target_component": "frontend-user-card",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/components/UserCard.tsx: Adapt component to handle avatar object structure. (Directly renders user profile fields expecting avatar to be a primitive string.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_12a25d8fc9_02_consumer_2",
+        "title": "Migrate consumer Admin Dashboard User Table",
+        "target_component": "admin-user-table",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/features/admin/UserTable.tsx: Revalidate table columns. (Displays user table with optional fallback rendering.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_12a25d8fc9_02_consumer_3",
+        "title": "Migrate consumer User API Integration Test",
+        "target_component": "test-user-api",
+        "category": "BACKEND",
+        "description": "Update tests/test_user_api.py: Update expected schema fixture to v2. (Asserts response JSON matches v1 schema.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_12a25d8fc9_02_consumer_4",
+        "title": "Migrate consumer Browser QA User Profile Scenario",
+        "target_component": "browser-user-profile-qa",
+        "category": "BACKEND",
+        "description": "Update scripts/run_browser_qa_user.py: Verify profile avatar rendering. (Verifies profile page display in browser.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_12a25d8fc9_03_tests",
+        "title": "Update and execute contract test suite for contract_users_v1",
+        "target_component": "TESTS",
+        "category": "TEST",
+        "description": "Ensure integration and contract test suites validate 2.0.0.",
+        "dependencies": [
+          "task_mig_12a25d8fc9_01_backend",
+          "task_mig_12a25d8fc9_02_consumer_1",
+          "task_mig_12a25d8fc9_02_consumer_2",
+          "task_mig_12a25d8fc9_02_consumer_3",
+          "task_mig_12a25d8fc9_02_consumer_4"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_12a25d8fc9_04_browser",
+        "title": "Run browser scenario QA for contract_users_v1",
+        "target_component": "BROWSER",
+        "category": "BROWSER",
+        "description": "Execute official browser end-to-end scenarios verifying visual rendering without console/network errors.",
+        "dependencies": [
+          "task_mig_12a25d8fc9_03_tests"
+        ],
+        "status": "PENDING"
+      }
+    ],
+    "compatibility_strategy": "MIGRATE_THEN_SWITCH",
+    "rollout_strategy": "PREPARE_VALIDATE_MIGRATE_SWITCH",
+    "rollback_strategy": "RESTORE_ACTIVE_VERSION_1.0.0_WITH_AUDIT_PRESERVATION",
+    "validation_plan": [
+      "Pre-flight schema comparison: 1.0.0 -> 2.0.0",
+      "Unit and integration test suites execution",
+      "Consumer reverse dependency compatibility check",
+      "Browser QA validation session in Microsoft Edge",
+      "Zero false success confirmation via Contract Completion Gate"
+    ],
+    "approval_required": true,
+    "status": "PROPOSED",
+    "created_at": 1789246343.014933
+  },
+  {
+    "migration_id": "mig_7ae202de11",
+    "source_contract_version": "1.0.0",
+    "target_contract_version": "2.0.0",
+    "contract_id": "contract_users_v1",
+    "affected_consumers": [
+      {
+        "consumer_id": "frontend-user-card",
+        "name": "Frontend UserCard Component",
+        "file_path": "frontend/src/components/UserCard.tsx",
+        "category": "DIRECT",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Directly renders user profile fields expecting avatar to be a primitive string.",
+        "required_action": "Adapt component to handle avatar object structure.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "admin-user-table",
+        "name": "Admin Dashboard User Table",
+        "file_path": "frontend/src/features/admin/UserTable.tsx",
+        "category": "INDIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Displays user table with optional fallback rendering.",
+        "required_action": "Revalidate table columns.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "test-user-api",
+        "name": "User API Integration Test",
+        "file_path": "tests/test_user_api.py",
+        "category": "TEST",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Asserts response JSON matches v1 schema.",
+        "required_action": "Update expected schema fixture to v2.",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "browser-user-profile-qa",
+        "name": "Browser QA User Profile Scenario",
+        "file_path": "scripts/run_browser_qa_user.py",
+        "category": "BROWSER_SCENARIO",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Verifies profile page display in browser.",
+        "required_action": "Verify profile avatar rendering.",
+        "language": "Python",
+        "line_ref": null
+      }
+    ],
+    "required_tasks": [
+      {
+        "task_id": "task_mig_7ae202de11_01_backend",
+        "title": "Deploy contract changes for contract_users_v1 (2.0.0)",
+        "target_component": "BACKEND",
+        "category": "BACKEND",
+        "description": "Update route schema and handlers to satisfy contract version 2.0.0.",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7ae202de11_02_consumer_1",
+        "title": "Migrate consumer Frontend UserCard Component",
+        "target_component": "frontend-user-card",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/components/UserCard.tsx: Adapt component to handle avatar object structure. (Directly renders user profile fields expecting avatar to be a primitive string.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7ae202de11_02_consumer_2",
+        "title": "Migrate consumer Admin Dashboard User Table",
+        "target_component": "admin-user-table",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/features/admin/UserTable.tsx: Revalidate table columns. (Displays user table with optional fallback rendering.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7ae202de11_02_consumer_3",
+        "title": "Migrate consumer User API Integration Test",
+        "target_component": "test-user-api",
+        "category": "BACKEND",
+        "description": "Update tests/test_user_api.py: Update expected schema fixture to v2. (Asserts response JSON matches v1 schema.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7ae202de11_02_consumer_4",
+        "title": "Migrate consumer Browser QA User Profile Scenario",
+        "target_component": "browser-user-profile-qa",
+        "category": "BACKEND",
+        "description": "Update scripts/run_browser_qa_user.py: Verify profile avatar rendering. (Verifies profile page display in browser.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7ae202de11_03_tests",
+        "title": "Update and execute contract test suite for contract_users_v1",
+        "target_component": "TESTS",
+        "category": "TEST",
+        "description": "Ensure integration and contract test suites validate 2.0.0.",
+        "dependencies": [
+          "task_mig_7ae202de11_01_backend",
+          "task_mig_7ae202de11_02_consumer_1",
+          "task_mig_7ae202de11_02_consumer_2",
+          "task_mig_7ae202de11_02_consumer_3",
+          "task_mig_7ae202de11_02_consumer_4"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_7ae202de11_04_browser",
+        "title": "Run browser scenario QA for contract_users_v1",
+        "target_component": "BROWSER",
+        "category": "BROWSER",
+        "description": "Execute official browser end-to-end scenarios verifying visual rendering without console/network errors.",
+        "dependencies": [
+          "task_mig_7ae202de11_03_tests"
+        ],
+        "status": "PENDING"
+      }
+    ],
+    "compatibility_strategy": "MIGRATE_THEN_SWITCH",
+    "rollout_strategy": "PREPARE_VALIDATE_MIGRATE_SWITCH",
+    "rollback_strategy": "RESTORE_ACTIVE_VERSION_1.0.0_WITH_AUDIT_PRESERVATION",
+    "validation_plan": [
+      "Pre-flight schema comparison: 1.0.0 -> 2.0.0",
+      "Unit and integration test suites execution",
+      "Consumer reverse dependency compatibility check",
+      "Browser QA validation session in Microsoft Edge",
+      "Zero false success confirmation via Contract Completion Gate"
+    ],
+    "approval_required": true,
+    "status": "PROPOSED",
+    "created_at": 1789246343.0151396
+  },
+  {
+    "migration_id": "mig_c56c5e8e40",
+    "source_contract_version": "1.2.0",
+    "target_contract_version": "1.3.0",
+    "contract_id": "contract_events_v1",
+    "affected_consumers": [
+      {
+        "consumer_id": "audit-logger-svc",
+        "name": "Audit Logging Worker",
+        "file_path": "backend/workers/audit_logger.py",
+        "category": "DIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Consumes only common headers and metadata; tolerates variant changes.",
+        "required_action": "None",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "billing-dispatcher",
+        "name": "Billing Event Dispatcher",
+        "file_path": "backend/services/billing.py",
+        "category": "INDIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Explicitly filters on billing namespace; ignores other variants.",
+        "required_action": "None",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "crm-sync-worker",
+        "name": "CRM Sync Worker (Exhaustive Switch)",
+        "file_path": "frontend/src/features/crm/syncHandler.ts",
+        "category": "DIRECT",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Exhaustive TypeScript switch on event type; lacks default fallback branch.",
+        "required_action": "Update switch statement with new case or default handler.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "test-events-suite",
+        "name": "Audit Event Contract Tests",
+        "file_path": "tests/test_audit_events.py",
+        "category": "TEST",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Asserts payload shape and discriminator values.",
+        "required_action": "Add test scenario for proposed variant.",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "browser-audit-qa",
+        "name": "Browser QA Activity Log View",
+        "file_path": "scripts/run_browser_qa.py",
+        "category": "BROWSER_SCENARIO",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Renders activity stream table with fallback icons.",
+        "required_action": "Verify visual rendering of new event card.",
+        "language": "Python",
+        "line_ref": null
+      }
+    ],
+    "required_tasks": [
+      {
+        "task_id": "task_mig_c56c5e8e40_01_backend",
+        "title": "Deploy contract changes for contract_events_v1 (1.3.0)",
+        "target_component": "BACKEND",
+        "category": "BACKEND",
+        "description": "Update route schema and handlers to satisfy contract version 1.3.0.",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_c56c5e8e40_02_consumer_1",
+        "title": "Migrate consumer Audit Logging Worker",
+        "target_component": "audit-logger-svc",
+        "category": "BACKEND",
+        "description": "Update backend/workers/audit_logger.py: None (Consumes only common headers and metadata; tolerates variant changes.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_c56c5e8e40_02_consumer_2",
+        "title": "Migrate consumer Billing Event Dispatcher",
+        "target_component": "billing-dispatcher",
+        "category": "BACKEND",
+        "description": "Update backend/services/billing.py: None (Explicitly filters on billing namespace; ignores other variants.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_c56c5e8e40_02_consumer_3",
+        "title": "Migrate consumer CRM Sync Worker (Exhaustive Switch)",
+        "target_component": "crm-sync-worker",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/features/crm/syncHandler.ts: Update switch statement with new case or default handler. (Exhaustive TypeScript switch on event type; lacks default fallback branch.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_c56c5e8e40_02_consumer_4",
+        "title": "Migrate consumer Audit Event Contract Tests",
+        "target_component": "test-events-suite",
+        "category": "BACKEND",
+        "description": "Update tests/test_audit_events.py: Add test scenario for proposed variant. (Asserts payload shape and discriminator values.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_c56c5e8e40_02_consumer_5",
+        "title": "Migrate consumer Browser QA Activity Log View",
+        "target_component": "browser-audit-qa",
+        "category": "BACKEND",
+        "description": "Update scripts/run_browser_qa.py: Verify visual rendering of new event card. (Renders activity stream table with fallback icons.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_c56c5e8e40_03_tests",
+        "title": "Update and execute contract test suite for contract_events_v1",
+        "target_component": "TESTS",
+        "category": "TEST",
+        "description": "Ensure integration and contract test suites validate 1.3.0.",
+        "dependencies": [
+          "task_mig_c56c5e8e40_01_backend",
+          "task_mig_c56c5e8e40_02_consumer_1",
+          "task_mig_c56c5e8e40_02_consumer_2",
+          "task_mig_c56c5e8e40_02_consumer_3",
+          "task_mig_c56c5e8e40_02_consumer_4",
+          "task_mig_c56c5e8e40_02_consumer_5"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_c56c5e8e40_04_browser",
+        "title": "Run browser scenario QA for contract_events_v1",
+        "target_component": "BROWSER",
+        "category": "BROWSER",
+        "description": "Execute official browser end-to-end scenarios verifying visual rendering without console/network errors.",
+        "dependencies": [
+          "task_mig_c56c5e8e40_03_tests"
+        ],
+        "status": "PENDING"
+      }
+    ],
+    "compatibility_strategy": "MIGRATE_THEN_SWITCH",
+    "rollout_strategy": "PREPARE_VALIDATE_MIGRATE_SWITCH",
+    "rollback_strategy": "RESTORE_ACTIVE_VERSION_1.2.0_WITH_AUDIT_PRESERVATION",
+    "validation_plan": [
+      "Pre-flight schema comparison: 1.2.0 -> 1.3.0",
+      "Unit and integration test suites execution",
+      "Consumer reverse dependency compatibility check",
+      "Browser QA validation session in Microsoft Edge",
+      "Zero false success confirmation via Contract Completion Gate"
+    ],
+    "approval_required": true,
+    "status": "PROPOSED",
+    "created_at": 1789246343.0153255
+  },
+  {
+    "migration_id": "mig_a21c430bdc",
+    "source_contract_version": "1.2.0",
+    "target_contract_version": "2.0.0",
+    "contract_id": "contract_events_v1",
+    "affected_consumers": [
+      {
+        "consumer_id": "audit-logger-svc",
+        "name": "Audit Logging Worker",
+        "file_path": "backend/workers/audit_logger.py",
+        "category": "DIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Consumes only common headers and metadata; tolerates variant changes.",
+        "required_action": "None",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "billing-dispatcher",
+        "name": "Billing Event Dispatcher",
+        "file_path": "backend/services/billing.py",
+        "category": "INDIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Explicitly filters on billing namespace; ignores other variants.",
+        "required_action": "None",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "crm-sync-worker",
+        "name": "CRM Sync Worker (Exhaustive Switch)",
+        "file_path": "frontend/src/features/crm/syncHandler.ts",
+        "category": "DIRECT",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Exhaustive TypeScript switch on event type; lacks default fallback branch.",
+        "required_action": "Update switch statement with new case or default handler.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "test-events-suite",
+        "name": "Audit Event Contract Tests",
+        "file_path": "tests/test_audit_events.py",
+        "category": "TEST",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Asserts payload shape and discriminator values.",
+        "required_action": "Add test scenario for proposed variant.",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "browser-audit-qa",
+        "name": "Browser QA Activity Log View",
+        "file_path": "scripts/run_browser_qa.py",
+        "category": "BROWSER_SCENARIO",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Renders activity stream table with fallback icons.",
+        "required_action": "Verify visual rendering of new event card.",
+        "language": "Python",
+        "line_ref": null
+      }
+    ],
+    "required_tasks": [
+      {
+        "task_id": "task_mig_a21c430bdc_01_backend",
+        "title": "Deploy contract changes for contract_events_v1 (2.0.0)",
+        "target_component": "BACKEND",
+        "category": "BACKEND",
+        "description": "Update route schema and handlers to satisfy contract version 2.0.0.",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_a21c430bdc_02_consumer_1",
+        "title": "Migrate consumer Audit Logging Worker",
+        "target_component": "audit-logger-svc",
+        "category": "BACKEND",
+        "description": "Update backend/workers/audit_logger.py: None (Consumes only common headers and metadata; tolerates variant changes.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_a21c430bdc_02_consumer_2",
+        "title": "Migrate consumer Billing Event Dispatcher",
+        "target_component": "billing-dispatcher",
+        "category": "BACKEND",
+        "description": "Update backend/services/billing.py: None (Explicitly filters on billing namespace; ignores other variants.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_a21c430bdc_02_consumer_3",
+        "title": "Migrate consumer CRM Sync Worker (Exhaustive Switch)",
+        "target_component": "crm-sync-worker",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/features/crm/syncHandler.ts: Update switch statement with new case or default handler. (Exhaustive TypeScript switch on event type; lacks default fallback branch.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_a21c430bdc_02_consumer_4",
+        "title": "Migrate consumer Audit Event Contract Tests",
+        "target_component": "test-events-suite",
+        "category": "BACKEND",
+        "description": "Update tests/test_audit_events.py: Add test scenario for proposed variant. (Asserts payload shape and discriminator values.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_a21c430bdc_02_consumer_5",
+        "title": "Migrate consumer Browser QA Activity Log View",
+        "target_component": "browser-audit-qa",
+        "category": "BACKEND",
+        "description": "Update scripts/run_browser_qa.py: Verify visual rendering of new event card. (Renders activity stream table with fallback icons.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_a21c430bdc_03_tests",
+        "title": "Update and execute contract test suite for contract_events_v1",
+        "target_component": "TESTS",
+        "category": "TEST",
+        "description": "Ensure integration and contract test suites validate 2.0.0.",
+        "dependencies": [
+          "task_mig_a21c430bdc_01_backend",
+          "task_mig_a21c430bdc_02_consumer_1",
+          "task_mig_a21c430bdc_02_consumer_2",
+          "task_mig_a21c430bdc_02_consumer_3",
+          "task_mig_a21c430bdc_02_consumer_4",
+          "task_mig_a21c430bdc_02_consumer_5"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_a21c430bdc_04_browser",
+        "title": "Run browser scenario QA for contract_events_v1",
+        "target_component": "BROWSER",
+        "category": "BROWSER",
+        "description": "Execute official browser end-to-end scenarios verifying visual rendering without console/network errors.",
+        "dependencies": [
+          "task_mig_a21c430bdc_03_tests"
+        ],
+        "status": "PENDING"
+      }
+    ],
+    "compatibility_strategy": "MIGRATE_THEN_SWITCH",
+    "rollout_strategy": "PREPARE_VALIDATE_MIGRATE_SWITCH",
+    "rollback_strategy": "RESTORE_ACTIVE_VERSION_1.2.0_WITH_AUDIT_PRESERVATION",
+    "validation_plan": [
+      "Pre-flight schema comparison: 1.2.0 -> 2.0.0",
+      "Unit and integration test suites execution",
+      "Consumer reverse dependency compatibility check",
+      "Browser QA validation session in Microsoft Edge",
+      "Zero false success confirmation via Contract Completion Gate"
+    ],
+    "approval_required": true,
+    "status": "PROPOSED",
+    "created_at": 1789246343.0155165
+  },
+  {
+    "migration_id": "mig_dfc90d3d7f",
+    "source_contract_version": "1.0.0",
+    "target_contract_version": "2.0.0",
+    "contract_id": "contract_users_v1",
+    "affected_consumers": [
+      {
+        "consumer_id": "frontend-user-card",
+        "name": "Frontend UserCard Component",
+        "file_path": "frontend/src/components/UserCard.tsx",
+        "category": "DIRECT",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Directly renders user profile fields expecting avatar to be a primitive string.",
+        "required_action": "Adapt component to handle avatar object structure.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "admin-user-table",
+        "name": "Admin Dashboard User Table",
+        "file_path": "frontend/src/features/admin/UserTable.tsx",
+        "category": "INDIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Displays user table with optional fallback rendering.",
+        "required_action": "Revalidate table columns.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "test-user-api",
+        "name": "User API Integration Test",
+        "file_path": "tests/test_user_api.py",
+        "category": "TEST",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Asserts response JSON matches v1 schema.",
+        "required_action": "Update expected schema fixture to v2.",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "browser-user-profile-qa",
+        "name": "Browser QA User Profile Scenario",
+        "file_path": "scripts/run_browser_qa_user.py",
+        "category": "BROWSER_SCENARIO",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Verifies profile page display in browser.",
+        "required_action": "Verify profile avatar rendering.",
+        "language": "Python",
+        "line_ref": null
+      }
+    ],
+    "required_tasks": [
+      {
+        "task_id": "task_mig_dfc90d3d7f_01_backend",
+        "title": "Deploy contract changes for contract_users_v1 (2.0.0)",
+        "target_component": "BACKEND",
+        "category": "BACKEND",
+        "description": "Update route schema and handlers to satisfy contract version 2.0.0.",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_dfc90d3d7f_02_consumer_1",
+        "title": "Migrate consumer Frontend UserCard Component",
+        "target_component": "frontend-user-card",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/components/UserCard.tsx: Adapt component to handle avatar object structure. (Directly renders user profile fields expecting avatar to be a primitive string.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_dfc90d3d7f_02_consumer_2",
+        "title": "Migrate consumer Admin Dashboard User Table",
+        "target_component": "admin-user-table",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/features/admin/UserTable.tsx: Revalidate table columns. (Displays user table with optional fallback rendering.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_dfc90d3d7f_02_consumer_3",
+        "title": "Migrate consumer User API Integration Test",
+        "target_component": "test-user-api",
+        "category": "BACKEND",
+        "description": "Update tests/test_user_api.py: Update expected schema fixture to v2. (Asserts response JSON matches v1 schema.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_dfc90d3d7f_02_consumer_4",
+        "title": "Migrate consumer Browser QA User Profile Scenario",
+        "target_component": "browser-user-profile-qa",
+        "category": "BACKEND",
+        "description": "Update scripts/run_browser_qa_user.py: Verify profile avatar rendering. (Verifies profile page display in browser.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_dfc90d3d7f_03_tests",
+        "title": "Update and execute contract test suite for contract_users_v1",
+        "target_component": "TESTS",
+        "category": "TEST",
+        "description": "Ensure integration and contract test suites validate 2.0.0.",
+        "dependencies": [
+          "task_mig_dfc90d3d7f_01_backend",
+          "task_mig_dfc90d3d7f_02_consumer_1",
+          "task_mig_dfc90d3d7f_02_consumer_2",
+          "task_mig_dfc90d3d7f_02_consumer_3",
+          "task_mig_dfc90d3d7f_02_consumer_4"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_dfc90d3d7f_04_browser",
+        "title": "Run browser scenario QA for contract_users_v1",
+        "target_component": "BROWSER",
+        "category": "BROWSER",
+        "description": "Execute official browser end-to-end scenarios verifying visual rendering without console/network errors.",
+        "dependencies": [
+          "task_mig_dfc90d3d7f_03_tests"
+        ],
+        "status": "PENDING"
+      }
+    ],
+    "compatibility_strategy": "MIGRATE_THEN_SWITCH",
+    "rollout_strategy": "PREPARE_VALIDATE_MIGRATE_SWITCH",
+    "rollback_strategy": "RESTORE_ACTIVE_VERSION_1.0.0_WITH_AUDIT_PRESERVATION",
+    "validation_plan": [
+      "Pre-flight schema comparison: 1.0.0 -> 2.0.0",
+      "Unit and integration test suites execution",
+      "Consumer reverse dependency compatibility check",
+      "Browser QA validation session in Microsoft Edge",
+      "Zero false success confirmation via Contract Completion Gate"
+    ],
+    "approval_required": true,
+    "status": "PROPOSED",
+    "created_at": 1789246343.0156815
+  },
+  {
+    "migration_id": "mig_8662056998",
+    "source_contract_version": "1.2.0",
+    "target_contract_version": "1.3.0",
+    "contract_id": "contract_events_v1",
+    "affected_consumers": [
+      {
+        "consumer_id": "audit-logger-svc",
+        "name": "Audit Logging Worker",
+        "file_path": "backend/workers/audit_logger.py",
+        "category": "DIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Consumes only common headers and metadata; tolerates variant changes.",
+        "required_action": "None",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "billing-dispatcher",
+        "name": "Billing Event Dispatcher",
+        "file_path": "backend/services/billing.py",
+        "category": "INDIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Explicitly filters on billing namespace; ignores other variants.",
+        "required_action": "None",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "crm-sync-worker",
+        "name": "CRM Sync Worker (Exhaustive Switch)",
+        "file_path": "frontend/src/features/crm/syncHandler.ts",
+        "category": "DIRECT",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Exhaustive TypeScript switch on event type; lacks default fallback branch.",
+        "required_action": "Update switch statement with new case or default handler.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "test-events-suite",
+        "name": "Audit Event Contract Tests",
+        "file_path": "tests/test_audit_events.py",
+        "category": "TEST",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Asserts payload shape and discriminator values.",
+        "required_action": "Add test scenario for proposed variant.",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "browser-audit-qa",
+        "name": "Browser QA Activity Log View",
+        "file_path": "scripts/run_browser_qa.py",
+        "category": "BROWSER_SCENARIO",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Renders activity stream table with fallback icons.",
+        "required_action": "Verify visual rendering of new event card.",
+        "language": "Python",
+        "line_ref": null
+      }
+    ],
+    "required_tasks": [
+      {
+        "task_id": "task_mig_8662056998_01_backend",
+        "title": "Deploy contract changes for contract_events_v1 (1.3.0)",
+        "target_component": "BACKEND",
+        "category": "BACKEND",
+        "description": "Update route schema and handlers to satisfy contract version 1.3.0.",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_8662056998_02_consumer_1",
+        "title": "Migrate consumer Audit Logging Worker",
+        "target_component": "audit-logger-svc",
+        "category": "BACKEND",
+        "description": "Update backend/workers/audit_logger.py: None (Consumes only common headers and metadata; tolerates variant changes.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_8662056998_02_consumer_2",
+        "title": "Migrate consumer Billing Event Dispatcher",
+        "target_component": "billing-dispatcher",
+        "category": "BACKEND",
+        "description": "Update backend/services/billing.py: None (Explicitly filters on billing namespace; ignores other variants.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_8662056998_02_consumer_3",
+        "title": "Migrate consumer CRM Sync Worker (Exhaustive Switch)",
+        "target_component": "crm-sync-worker",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/features/crm/syncHandler.ts: Update switch statement with new case or default handler. (Exhaustive TypeScript switch on event type; lacks default fallback branch.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_8662056998_02_consumer_4",
+        "title": "Migrate consumer Audit Event Contract Tests",
+        "target_component": "test-events-suite",
+        "category": "BACKEND",
+        "description": "Update tests/test_audit_events.py: Add test scenario for proposed variant. (Asserts payload shape and discriminator values.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_8662056998_02_consumer_5",
+        "title": "Migrate consumer Browser QA Activity Log View",
+        "target_component": "browser-audit-qa",
+        "category": "BACKEND",
+        "description": "Update scripts/run_browser_qa.py: Verify visual rendering of new event card. (Renders activity stream table with fallback icons.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_8662056998_03_tests",
+        "title": "Update and execute contract test suite for contract_events_v1",
+        "target_component": "TESTS",
+        "category": "TEST",
+        "description": "Ensure integration and contract test suites validate 1.3.0.",
+        "dependencies": [
+          "task_mig_8662056998_01_backend",
+          "task_mig_8662056998_02_consumer_1",
+          "task_mig_8662056998_02_consumer_2",
+          "task_mig_8662056998_02_consumer_3",
+          "task_mig_8662056998_02_consumer_4",
+          "task_mig_8662056998_02_consumer_5"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_8662056998_04_browser",
+        "title": "Run browser scenario QA for contract_events_v1",
+        "target_component": "BROWSER",
+        "category": "BROWSER",
+        "description": "Execute official browser end-to-end scenarios verifying visual rendering without console/network errors.",
+        "dependencies": [
+          "task_mig_8662056998_03_tests"
+        ],
+        "status": "PENDING"
+      }
+    ],
+    "compatibility_strategy": "MIGRATE_THEN_SWITCH",
+    "rollout_strategy": "PREPARE_VALIDATE_MIGRATE_SWITCH",
+    "rollback_strategy": "RESTORE_ACTIVE_VERSION_1.2.0_WITH_AUDIT_PRESERVATION",
+    "validation_plan": [
+      "Pre-flight schema comparison: 1.2.0 -> 1.3.0",
+      "Unit and integration test suites execution",
+      "Consumer reverse dependency compatibility check",
+      "Browser QA validation session in Microsoft Edge",
+      "Zero false success confirmation via Contract Completion Gate"
+    ],
+    "approval_required": true,
+    "status": "PROPOSED",
+    "created_at": 1789246343.015849
+  },
+  {
+    "migration_id": "mig_17f737566a",
+    "source_contract_version": "1.2.0",
+    "target_contract_version": "1.3.0",
+    "contract_id": "contract_events_v1",
+    "affected_consumers": [
+      {
+        "consumer_id": "audit-logger-svc",
+        "name": "Audit Logging Worker",
+        "file_path": "backend/workers/audit_logger.py",
+        "category": "DIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Consumes only common headers and metadata; tolerates variant changes.",
+        "required_action": "None",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "billing-dispatcher",
+        "name": "Billing Event Dispatcher",
+        "file_path": "backend/services/billing.py",
+        "category": "INDIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Explicitly filters on billing namespace; ignores other variants.",
+        "required_action": "None",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "crm-sync-worker",
+        "name": "CRM Sync Worker (Exhaustive Switch)",
+        "file_path": "frontend/src/features/crm/syncHandler.ts",
+        "category": "DIRECT",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Exhaustive TypeScript switch on event type; lacks default fallback branch.",
+        "required_action": "Update switch statement with new case or default handler.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "test-events-suite",
+        "name": "Audit Event Contract Tests",
+        "file_path": "tests/test_audit_events.py",
+        "category": "TEST",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Asserts payload shape and discriminator values.",
+        "required_action": "Add test scenario for proposed variant.",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "browser-audit-qa",
+        "name": "Browser QA Activity Log View",
+        "file_path": "scripts/run_browser_qa.py",
+        "category": "BROWSER_SCENARIO",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Renders activity stream table with fallback icons.",
+        "required_action": "Verify visual rendering of new event card.",
+        "language": "Python",
+        "line_ref": null
+      }
+    ],
+    "required_tasks": [
+      {
+        "task_id": "task_mig_17f737566a_01_backend",
+        "title": "Deploy contract changes for contract_events_v1 (1.3.0)",
+        "target_component": "BACKEND",
+        "category": "BACKEND",
+        "description": "Update route schema and handlers to satisfy contract version 1.3.0.",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_17f737566a_02_consumer_1",
+        "title": "Migrate consumer Audit Logging Worker",
+        "target_component": "audit-logger-svc",
+        "category": "BACKEND",
+        "description": "Update backend/workers/audit_logger.py: None (Consumes only common headers and metadata; tolerates variant changes.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_17f737566a_02_consumer_2",
+        "title": "Migrate consumer Billing Event Dispatcher",
+        "target_component": "billing-dispatcher",
+        "category": "BACKEND",
+        "description": "Update backend/services/billing.py: None (Explicitly filters on billing namespace; ignores other variants.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_17f737566a_02_consumer_3",
+        "title": "Migrate consumer CRM Sync Worker (Exhaustive Switch)",
+        "target_component": "crm-sync-worker",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/features/crm/syncHandler.ts: Update switch statement with new case or default handler. (Exhaustive TypeScript switch on event type; lacks default fallback branch.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_17f737566a_02_consumer_4",
+        "title": "Migrate consumer Audit Event Contract Tests",
+        "target_component": "test-events-suite",
+        "category": "BACKEND",
+        "description": "Update tests/test_audit_events.py: Add test scenario for proposed variant. (Asserts payload shape and discriminator values.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_17f737566a_02_consumer_5",
+        "title": "Migrate consumer Browser QA Activity Log View",
+        "target_component": "browser-audit-qa",
+        "category": "BACKEND",
+        "description": "Update scripts/run_browser_qa.py: Verify visual rendering of new event card. (Renders activity stream table with fallback icons.).",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_17f737566a_03_tests",
+        "title": "Update and execute contract test suite for contract_events_v1",
+        "target_component": "TESTS",
+        "category": "TEST",
+        "description": "Ensure integration and contract test suites validate 1.3.0.",
+        "dependencies": [
+          "task_mig_17f737566a_01_backend",
+          "task_mig_17f737566a_02_consumer_1",
+          "task_mig_17f737566a_02_consumer_2",
+          "task_mig_17f737566a_02_consumer_3",
+          "task_mig_17f737566a_02_consumer_4",
+          "task_mig_17f737566a_02_consumer_5"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_17f737566a_04_browser",
+        "title": "Run browser scenario QA for contract_events_v1",
+        "target_component": "BROWSER",
+        "category": "BROWSER",
+        "description": "Execute official browser end-to-end scenarios verifying visual rendering without console/network errors.",
+        "dependencies": [
+          "task_mig_17f737566a_03_tests"
+        ],
+        "status": "PENDING"
+      }
+    ],
+    "compatibility_strategy": "MIGRATE_THEN_SWITCH",
+    "rollout_strategy": "PREPARE_VALIDATE_MIGRATE_SWITCH",
+    "rollback_strategy": "RESTORE_ACTIVE_VERSION_1.2.0_WITH_AUDIT_PRESERVATION",
+    "validation_plan": [
+      "Pre-flight schema comparison: 1.2.0 -> 1.3.0",
+      "Unit and integration test suites execution",
+      "Consumer reverse dependency compatibility check",
+      "Browser QA validation session in Microsoft Edge",
+      "Zero false success confirmation via Contract Completion Gate"
+    ],
+    "approval_required": true,
+    "status": "PROPOSED",
+    "created_at": 1789246343.0160198
+  },
+  {
+    "migration_id": "mig_027f384192",
+    "source_contract_version": "1.0.0",
+    "target_contract_version": "2.0.0",
+    "contract_id": "contract_users_v1",
+    "affected_consumers": [
+      {
+        "consumer_id": "frontend-user-card",
+        "name": "Frontend UserCard Component",
+        "file_path": "frontend/src/components/UserCard.tsx",
+        "category": "DIRECT",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Directly renders user profile fields expecting avatar to be a primitive string.",
+        "required_action": "Adapt component to handle avatar object structure.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "admin-user-table",
+        "name": "Admin Dashboard User Table",
+        "file_path": "frontend/src/features/admin/UserTable.tsx",
+        "category": "INDIRECT",
+        "pattern_matching": "OPEN_WITH_FALLBACK",
+        "impact_reason": "Displays user table with optional fallback rendering.",
+        "required_action": "Revalidate table columns.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "test-user-api",
+        "name": "User API Integration Test",
+        "file_path": "tests/test_user_api.py",
+        "category": "TEST",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Asserts response JSON matches v1 schema.",
+        "required_action": "Update expected schema fixture to v2.",
+        "language": "Python",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "browser-user-profile-qa",
+        "name": "Browser QA User Profile Scenario",
+        "file_path": "scripts/run_browser_qa_user.py",
+        "category": "BROWSER_SCENARIO",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Verifies profile page display in browser.",
+        "required_action": "Verify profile avatar rendering.",
+        "language": "Python",
+        "line_ref": null
+      }
+    ],
+    "required_tasks": [
+      {
+        "task_id": "task_mig_027f384192_01_backend",
+        "title": "Deploy contract changes for contract_users_v1 (2.0.0)",
+        "target_component": "BACKEND",
+        "category": "BACKEND",
+        "description": "Update route schema and handlers to satisfy contract version 2.0.0.",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_027f384192_02_consumer_1",
+        "title": "Migrate consumer Frontend UserCard Component",
+        "target_component": "frontend-user-card",
+        "category": "FRONTEND",
+        "description": "Update frontend/src/components/UserCard.tsx: Adapt component to handle avatar object structure. (Directly renders user profile fields expecting avatar to be a primitive string.).",
+        "dependencies": [
+          "task_mig_027f384192_01_backend"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_027f384192_02_consumer_3",
+        "title": "Migrate consumer User API Integration Test",
+        "target_component": "test-user-api",
+        "category": "BACKEND",
+        "description": "Update tests/test_user_api.py: Update expected schema fixture to v2. (Asserts response JSON matches v1 schema.).",
+        "dependencies": [
+          "task_mig_027f384192_01_backend"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_027f384192_02_consumer_4",
+        "title": "Migrate consumer Browser QA User Profile Scenario",
+        "target_component": "browser-user-profile-qa",
+        "category": "BACKEND",
+        "description": "Update scripts/run_browser_qa_user.py: Verify profile avatar rendering. (Verifies profile page display in browser.).",
+        "dependencies": [
+          "task_mig_027f384192_01_backend"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_027f384192_03_tests",
+        "title": "Update and execute contract test suite for contract_users_v1",
+        "target_component": "TESTS",
+        "category": "TEST",
+        "description": "Ensure integration and contract test suites validate 2.0.0.",
+        "dependencies": [
+          "task_mig_027f384192_01_backend",
+          "task_mig_027f384192_02_consumer_1",
+          "task_mig_027f384192_02_consumer_3",
+          "task_mig_027f384192_02_consumer_4"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_027f384192_04_browser",
+        "title": "Run browser scenario QA for contract_users_v1",
+        "target_component": "BROWSER",
+        "category": "BROWSER",
+        "description": "Execute official browser end-to-end scenarios verifying visual rendering without console/network errors.",
+        "dependencies": [
+          "task_mig_027f384192_03_tests"
+        ],
+        "status": "PENDING"
+      }
+    ],
+    "compatibility_strategy": "BACKWARD_COMPATIBLE",
+    "rollout_strategy": "PREPARE_VALIDATE_MIGRATE_SWITCH",
+    "rollback_strategy": "RESTORE_ACTIVE_VERSION_1.0.0_WITH_AUDIT_PRESERVATION",
+    "validation_plan": [
+      "Pre-flight schema comparison: 1.0.0 -> 2.0.0",
+      "Unit and integration test suites execution",
+      "Consumer reverse dependency compatibility check",
+      "Browser QA validation session in Microsoft Edge",
+      "Zero false success confirmation via Contract Completion Gate"
+    ],
+    "approval_required": false,
+    "status": "APPROVED",
+    "created_at": 1789246343.0161324
+  },
+  {
+    "migration_id": "mig_d097987fc6",
+    "source_contract_version": "1.0.0",
+    "target_contract_version": "2.0.0",
+    "contract_id": "contract_payments_v2",
+    "affected_consumers": [
+      {
+        "consumer_id": "api_v2_payments-client",
+        "name": "Api_V2_Payments API Client",
+        "file_path": "frontend/src/api/api_v2_payments.ts",
+        "category": "DIRECT",
+        "pattern_matching": "UNKNOWN",
+        "impact_reason": "Direct HTTP consumer calling endpoint.",
+        "required_action": "Verify parameter and response types.",
+        "language": "TypeScript",
+        "line_ref": null
+      },
+      {
+        "consumer_id": "test-api_v2_payments",
+        "name": "Test Api_V2_Payments",
+        "file_path": "tests/test_api_v2_payments.py",
+        "category": "TEST",
+        "pattern_matching": "CLOSED_EXHAUSTIVE",
+        "impact_reason": "Verifies endpoint contract invariants.",
+        "required_action": "Run test suite against updated contract.",
+        "language": "Python",
+        "line_ref": null
+      }
+    ],
+    "required_tasks": [
+      {
+        "task_id": "task_mig_d097987fc6_01_backend",
+        "title": "Deploy contract changes for contract_payments_v2 (2.0.0)",
+        "target_component": "BACKEND",
+        "category": "BACKEND",
+        "description": "Update route schema and handlers to satisfy contract version 2.0.0.",
+        "dependencies": [],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_d097987fc6_02_consumer_2",
+        "title": "Migrate consumer Test Api_V2_Payments",
+        "target_component": "test-api_v2_payments",
+        "category": "BACKEND",
+        "description": "Update tests/test_api_v2_payments.py: Run test suite against updated contract. (Verifies endpoint contract invariants.).",
+        "dependencies": [
+          "task_mig_d097987fc6_01_backend"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_d097987fc6_03_tests",
+        "title": "Update and execute contract test suite for contract_payments_v2",
+        "target_component": "TESTS",
+        "category": "TEST",
+        "description": "Ensure integration and contract test suites validate 2.0.0.",
+        "dependencies": [
+          "task_mig_d097987fc6_01_backend",
+          "task_mig_d097987fc6_02_consumer_2"
+        ],
+        "status": "PENDING"
+      },
+      {
+        "task_id": "task_mig_d097987fc6_04_browser",
+        "title": "Run browser scenario QA for contract_payments_v2",
+        "target_component": "BROWSER",
+        "category": "BROWSER",
+        "description": "Execute official browser end-to-end scenarios verifying visual rendering without console/network errors.",
+        "dependencies": [
+          "task_mig_d097987fc6_03_tests"
+        ],
+        "status": "PENDING"
+      }
+    ],
+    "compatibility_strategy": "BACKWARD_COMPATIBLE",
+    "rollout_strategy": "PREPARE_VALIDATE_MIGRATE_SWITCH",
+    "rollback_strategy": "RESTORE_ACTIVE_VERSION_1.0.0_WITH_AUDIT_PRESERVATION",
+    "validation_plan": [
+      "Pre-flight schema comparison: 1.0.0 -> 2.0.0",
+      "Unit and integration test suites execution",
+      "Consumer reverse dependency compatibility check",
+      "Browser QA validation session in Microsoft Edge",
+      "Zero false success confirmation via Contract Completion Gate"
+    ],
+    "approval_required": false,
+    "status": "APPROVED",
+    "created_at": 1789246343.0162096
+  }
+]

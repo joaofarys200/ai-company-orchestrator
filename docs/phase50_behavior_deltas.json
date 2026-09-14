@@ -1,0 +1,49 @@
+[
+  {
+    "delta_id": "delta_mig_list_missions",
+    "contract_id": "listMissions",
+    "consumer_id": "frontend-mission-dashboard",
+    "predicted_delta": {
+      "added_keys": [
+        "page"
+      ],
+      "breaking": false
+    },
+    "observed_delta": {
+      "added_keys": [
+        "page"
+      ],
+      "breaking": false
+    },
+    "is_predicted_match": true
+  },
+  {
+    "delta_id": "delta_mig_user_profile",
+    "contract_id": "getUserProfile",
+    "consumer_id": "frontend-user-badge",
+    "predicted_delta": {
+      "type_change": "scalar_to_object",
+      "breaking": true
+    },
+    "observed_delta": {
+      "type_change": "scalar_to_object",
+      "breaking": true
+    },
+    "is_predicted_match": true
+  },
+  {
+    "delta_id": "delta_mig_settle_payment",
+    "contract_id": "settlePayment",
+    "consumer_id": "economic-execution-gateway",
+    "predicted_delta": {
+      "economic_effects_divergence": true,
+      "breaking": true
+    },
+    "observed_delta": {
+      "currency_changed": "USD->EUR",
+      "amount_changed": "150->135",
+      "breaking": true
+    },
+    "is_predicted_match": true
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "phase": "43",
+  "title": "Cross-Mission Generalization & Memory Reliability",
+  "metrics": {
+    "total_unseen_missions": 28,
+    "cold_success_count": 27,
+    "warm_success_count": 28,
+    "cold_success_rate": 0.9643,
+    "warm_success_rate": 1.0,
+    "warm_delta": 0.0357,
+    "memory_benefit_rate": 0.25,
+    "memory_harm_rate": 0.0,
+    "false_memory_transfer_rate": 0.0,
+    "retrieval_precision": 1.0,
+    "retrieval_recall": 1.0,
+    "applicability_accuracy": 1.0,
+    "stale_rejection_rate": 1.0,
+    "conflict_resolution_accuracy": 1.0,
+    "temporal_leakage_count": 0,
+    "sample_counts": {
+      "unseen_missions": "28/28",
+      "cold_missions": "27/28",
+      "beneficial_reuses": "7/28",
+      "harmful_reuses": "0/28",
+      "false_transfers": "0/28"
+    }
+  },
+  "novelty_counts": {
+    "FAMILIAR": 4,
+    "RELATED": 11,
+    "NOVEL": 12,
+    "HIGHLY_NOVEL": 1
+  },
+  "unseen_missions_evaluated": 28,
+  "statistical_honesty": {
+    "cold_success_ratio": "27/28",
+    "warm_success_ratio": "28/28",
+    "memory_benefit_ratio": "7/28",
+    "memory_harm_ratio": "0/28",
+    "false_memory_transfer_ratio": "0/50"
+  },
+  "timestamp": 1789221564.043649
+}

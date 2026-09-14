@@ -1,0 +1,181 @@
+{
+  "timestamp": 1789155012.2288225,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "scenarios_count": 15,
+  "scenarios": [
+    {
+      "id": 1,
+      "name": "Decision Quality Overview",
+      "status": "PASSED"
+    },
+    {
+      "id": 2,
+      "name": "Inspect Decision Trace",
+      "status": "PASSED"
+    },
+    {
+      "id": 3,
+      "name": "Open First Decision Error",
+      "status": "PASSED"
+    },
+    {
+      "id": 4,
+      "name": "Counterfactual View",
+      "status": "PASSED"
+    },
+    {
+      "id": 5,
+      "name": "Policy Proposal",
+      "status": "PASSED"
+    },
+    {
+      "id": 6,
+      "name": "Policy Diff View",
+      "status": "PASSED"
+    },
+    {
+      "id": 7,
+      "name": "Historical Replay",
+      "status": "PASSED"
+    },
+    {
+      "id": 8,
+      "name": "Shadow Policy Monitor",
+      "status": "PASSED"
+    },
+    {
+      "id": 9,
+      "name": "Human Approval",
+      "status": "PASSED"
+    },
+    {
+      "id": 10,
+      "name": "Rejected Policy Guard",
+      "status": "PASSED"
+    },
+    {
+      "id": 11,
+      "name": "Atomic Rollback",
+      "status": "PASSED"
+    },
+    {
+      "id": 12,
+      "name": "False Finish Alert",
+      "status": "PASSED"
+    },
+    {
+      "id": 13,
+      "name": "False Continue Rate",
+      "status": "PASSED"
+    },
+    {
+      "id": 14,
+      "name": "False Escalation Rate",
+      "status": "PASSED"
+    },
+    {
+      "id": 15,
+      "name": "Policy Version Timeline",
+      "status": "PASSED"
+    }
+  ],
+  "screenshots": [
+    {
+      "filename": "phase41_01_decision_quality_overview.png",
+      "description": "Decision Quality panel header metrics & multi-axis cards",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_01_decision_quality_overview.png"
+    },
+    {
+      "filename": "phase41_02_decision_trace.png",
+      "description": "Multi-axis decision matrix and governance invariant cards",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_02_decision_trace.png"
+    },
+    {
+      "filename": "phase41_03_first_decision_error.png",
+      "description": "First decision error detail: Decision #191 root cause OBSERVATION_GAP",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_03_first_decision_error.png"
+    },
+    {
+      "filename": "phase41_04_counterfactual_view.png",
+      "description": "Counterfactual analysis: Executed vs simulated path in read-only mode",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_04_counterfactual_view.png"
+    },
+    {
+      "filename": "phase41_05_policy_proposal.png",
+      "description": "Policy change proposal prop_p40_osc_01 targeting Rule 3 refinement",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_05_policy_proposal.png"
+    },
+    {
+      "filename": "phase41_06_policy_diff.png",
+      "description": "Policy AST condition diff: old condition vs proposed refined condition",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_06_policy_diff.png"
+    },
+    {
+      "filename": "phase41_07_historical_replay.png",
+      "description": "Historical replay sandbox result: 100% accuracy, 0 security regressions",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_07_historical_replay.png"
+    },
+    {
+      "filename": "phase41_08_shadow_policy.png",
+      "description": "Shadow policy dual-evaluation monitor with live disagreement tracking",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_08_shadow_policy.png"
+    },
+    {
+      "filename": "phase41_09_human_approval.png",
+      "description": "Human approval granted: Proposal approved and policy v41.0.0 activated",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_09_human_approval.png"
+    },
+    {
+      "filename": "phase41_10_rejected_policy.png",
+      "description": "Human governance guard: Rejection path and terminal state auditing",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_10_rejected_policy.png"
+    },
+    {
+      "filename": "phase41_11_rollback.png",
+      "description": "Atomic rollback executed: Seamless reversion to parent version v40.1.0",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_11_rollback.png"
+    },
+    {
+      "filename": "phase41_12_false_finish_alert.png",
+      "description": "False Finish Alert card: Zero Tolerance invariant strictly enforced",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_12_false_finish_alert.png"
+    },
+    {
+      "filename": "phase41_13_false_continue.png",
+      "description": "False Continue metric card: Capturing overly optimistic progression",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_13_false_continue.png"
+    },
+    {
+      "filename": "phase41_14_false_escalation.png",
+      "description": "False Escalation metric card: Validating minimal operational friction",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_14_false_escalation.png"
+    },
+    {
+      "filename": "phase41_15_policy_version_timeline.png",
+      "description": "Policy version timeline: Immutable DAG linking v40.1.0 and v41.0.0",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase41\\phase41_15_policy_version_timeline.png"
+    }
+  ],
+  "console_errors": [
+    "The tag <%s> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter. g",
+    "[WebSocket] Error: Event",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "WebSocket connection to 'ws://127.0.0.1:8001/?token=local-dev-token' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED",
+    "[WebSocket] Error: Event",
+    "WebSocket connection to 'ws://127.0.0.1:8001/?token=local-dev-token' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED",
+    "[WebSocket] Error: Event",
+    "WebSocket connection to 'ws://127.0.0.1:8001/?token=local-dev-token' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED",
+    "[WebSocket] Error: Event",
+    "WebSocket connection to 'ws://127.0.0.1:8001/?token=local-dev-token' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED",
+    "[WebSocket] Error: Event",
+    "WebSocket connection to 'ws://127.0.0.1:8001/?token=local-dev-token' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED",
+    "[WebSocket] Error: Event",
+    "WebSocket connection to 'ws://127.0.0.1:8001/?token=local-dev-token' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED",
+    "[WebSocket] Error: Event",
+    "WebSocket connection to 'ws://127.0.0.1:8001/?token=local-dev-token' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED",
+    "[WebSocket] Error: Event"
+  ],
+  "network_errors": [],
+  "passed": true
+}

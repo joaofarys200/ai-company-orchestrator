@@ -1,0 +1,51 @@
+{
+  "scales": {
+    "10_variants": {
+      "variant_count": 10,
+      "compatibility_ms": 0.052,
+      "diff_ms": 0.028,
+      "consumer_impact_ms": 0.007,
+      "total_ms": 0.316,
+      "diff_count": 1,
+      "verdict": "POTENTIALLY_COMPATIBLE"
+    },
+    "100_variants": {
+      "variant_count": 100,
+      "compatibility_ms": 0.249,
+      "diff_ms": 0.328,
+      "consumer_impact_ms": 0.012,
+      "total_ms": 1.321,
+      "diff_count": 1,
+      "verdict": "POTENTIALLY_COMPATIBLE"
+    },
+    "1000_variants": {
+      "variant_count": 1000,
+      "compatibility_ms": 2.112,
+      "diff_ms": 1.383,
+      "consumer_impact_ms": 0.006,
+      "total_ms": 12.396,
+      "diff_count": 1,
+      "verdict": "POTENTIALLY_COMPATIBLE"
+    }
+  },
+  "stages": {
+    "10k_observations": {
+      "cold_ms": 6.857,
+      "warm_ms": 19.035,
+      "incremental_ms": 0.0058,
+      "blast_radius": 1,
+      "variants_discovered": 4
+    },
+    "graph_propagation": {
+      "graph_ms": 0.076,
+      "is_acyclic": true,
+      "nodes_affected": 5
+    }
+  },
+  "summary": {
+    "benchmark_status": "PASSED",
+    "max_variant_scale_tested": 1000,
+    "total_observations_tested": 10000,
+    "timestamp": 1789225603.2278078
+  }
+}

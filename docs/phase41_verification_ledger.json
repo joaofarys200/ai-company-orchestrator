@@ -1,0 +1,22 @@
+{
+  "ledger_id": "VL-PHASE41-20260911-FINAL",
+  "phase": "41",
+  "status": "DECISION_CALIBRATION_READY",
+  "timestamp": 1789154937.7995043,
+  "summary": {
+    "total_decisions_evaluated": 191,
+    "baseline_accuracy": 0.9948,
+    "calibrated_proposed_accuracy": 1.0,
+    "false_finish_count": 0,
+    "false_continue_count": 1,
+    "false_escalation_count": 0,
+    "first_incorrect_decision_identified": "dec_p40_191",
+    "first_incorrect_root_cause": "OBSERVATION_GAP",
+    "policy_proposals_count": 1,
+    "safety_regressions_count": 0,
+    "economic_regressions_count": 0,
+    "shadow_agreement_rate": 0.96,
+    "unit_tests_passing": 52,
+    "invariants_verified": 15
+  }
+}

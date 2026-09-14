@@ -1,0 +1,324 @@
+{
+  "registered_adapters_count": 15,
+  "adapters": [
+    {
+      "adapter_id": "REQUIREMENT_TO_ARCHITECTURE",
+      "source_ecosystem": "agnostic",
+      "target_ecosystem": "agnostic",
+      "source_node_types": [
+        "REQUIREMENT",
+        "CONSTRAINT"
+      ],
+      "target_node_types": [
+        "ARCHITECTURE_COMPONENT"
+      ],
+      "supported_relations": [
+        "IMPLEMENTS",
+        "REQUIRES"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Requirement must state functional capability",
+        "Architecture component must be language-neutral"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "ARCHITECTURE_TO_IMPLEMENTATION",
+      "source_ecosystem": "agnostic",
+      "target_ecosystem": "*",
+      "source_node_types": [
+        "ARCHITECTURE_COMPONENT"
+      ],
+      "target_node_types": [
+        "FRONTEND_COMPONENT",
+        "BACKEND_SERVICE"
+      ],
+      "supported_relations": [
+        "IMPLEMENTS",
+        "EXPOSES"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Architecture component defines capability boundary"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "TS_FRONTEND_TO_API",
+      "source_ecosystem": "react",
+      "target_ecosystem": "openapi",
+      "source_node_types": [
+        "FRONTEND_COMPONENT"
+      ],
+      "target_node_types": [
+        "API_CONTRACT",
+        "API_ENDPOINT"
+      ],
+      "supported_relations": [
+        "CONSUMES",
+        "CALLS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Frontend component consumes route/method defined in API contract",
+        "Type definitions match schema shape"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "VUE_FRONTEND_TO_API",
+      "source_ecosystem": "vue",
+      "target_ecosystem": "openapi",
+      "source_node_types": [
+        "FRONTEND_COMPONENT"
+      ],
+      "target_node_types": [
+        "API_CONTRACT",
+        "API_ENDPOINT"
+      ],
+      "supported_relations": [
+        "CONSUMES",
+        "CALLS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Vue component consumes route/method defined in API contract"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "GENERIC_TS_TO_API",
+      "source_ecosystem": "typescript",
+      "target_ecosystem": "openapi",
+      "source_node_types": [
+        "FRONTEND_COMPONENT"
+      ],
+      "target_node_types": [
+        "API_CONTRACT",
+        "API_ENDPOINT"
+      ],
+      "supported_relations": [
+        "CONSUMES",
+        "CALLS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Generic TypeScript caller consumes API contract"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "API_TO_FASTAPI_BACKEND",
+      "source_ecosystem": "openapi",
+      "target_ecosystem": "fastapi",
+      "source_node_types": [
+        "API_CONTRACT",
+        "API_ENDPOINT"
+      ],
+      "target_node_types": [
+        "BACKEND_SERVICE"
+      ],
+      "supported_relations": [
+        "SERVES",
+        "IMPLEMENTS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "FastAPI router implements OpenAPI route and payload"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "API_TO_DJANGO_BACKEND",
+      "source_ecosystem": "openapi",
+      "target_ecosystem": "django",
+      "source_node_types": [
+        "API_CONTRACT",
+        "API_ENDPOINT"
+      ],
+      "target_node_types": [
+        "BACKEND_SERVICE"
+      ],
+      "supported_relations": [
+        "SERVES",
+        "IMPLEMENTS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Django view / DRF viewset handles API route"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "API_TO_NODE_BACKEND",
+      "source_ecosystem": "openapi",
+      "target_ecosystem": "node",
+      "source_node_types": [
+        "API_CONTRACT",
+        "API_ENDPOINT"
+      ],
+      "target_node_types": [
+        "BACKEND_SERVICE"
+      ],
+      "supported_relations": [
+        "SERVES",
+        "IMPLEMENTS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Node.js handler serves OpenAPI contract"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "API_TO_EXPRESS_BACKEND",
+      "source_ecosystem": "openapi",
+      "target_ecosystem": "express",
+      "source_node_types": [
+        "API_CONTRACT",
+        "API_ENDPOINT"
+      ],
+      "target_node_types": [
+        "BACKEND_SERVICE"
+      ],
+      "supported_relations": [
+        "SERVES",
+        "IMPLEMENTS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Express route serves OpenAPI contract"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "API_TO_JAVA_BACKEND",
+      "source_ecosystem": "openapi",
+      "target_ecosystem": "java",
+      "source_node_types": [
+        "API_CONTRACT",
+        "API_ENDPOINT"
+      ],
+      "target_node_types": [
+        "BACKEND_SERVICE"
+      ],
+      "supported_relations": [
+        "SERVES",
+        "IMPLEMENTS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Java Spring/JAX-RS controller implements contract"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "API_TO_PYTHON_GENERIC",
+      "source_ecosystem": "openapi",
+      "target_ecosystem": "python",
+      "source_node_types": [
+        "API_CONTRACT",
+        "API_ENDPOINT"
+      ],
+      "target_node_types": [
+        "BACKEND_SERVICE"
+      ],
+      "supported_relations": [
+        "SERVES",
+        "IMPLEMENTS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Python service handles API contract"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "BACKEND_TO_PERSISTENCE",
+      "source_ecosystem": "*",
+      "target_ecosystem": "sql",
+      "source_node_types": [
+        "BACKEND_SERVICE"
+      ],
+      "target_node_types": [
+        "PERSISTENCE_OPERATION",
+        "DATA_MODEL"
+      ],
+      "supported_relations": [
+        "PERSISTS",
+        "CALLS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Backend repository executes query/ORM against data model"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "PERSISTENCE_TO_MODEL",
+      "source_ecosystem": "sql",
+      "target_ecosystem": "sql",
+      "source_node_types": [
+        "PERSISTENCE_OPERATION"
+      ],
+      "target_node_types": [
+        "DATA_MODEL"
+      ],
+      "supported_relations": [
+        "PERSISTS",
+        "DEPENDS_ON"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Operation operates on specific schema table/entity"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "TEST_TO_TARGET",
+      "source_ecosystem": "*",
+      "target_ecosystem": "*",
+      "source_node_types": [
+        "TEST"
+      ],
+      "target_node_types": [
+        "FRONTEND_COMPONENT",
+        "BACKEND_SERVICE",
+        "API_CONTRACT",
+        "API_ENDPOINT",
+        "DATA_MODEL"
+      ],
+      "supported_relations": [
+        "VALIDATES",
+        "TESTS"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Test suite asserts behavior or contract compliance"
+      ],
+      "metadata": {}
+    },
+    {
+      "adapter_id": "BROWSER_TO_FRONTEND",
+      "source_ecosystem": "playwright",
+      "target_ecosystem": "*",
+      "source_node_types": [
+        "BROWSER_SCENARIO"
+      ],
+      "target_node_types": [
+        "FRONTEND_COMPONENT",
+        "REQUIREMENT"
+      ],
+      "supported_relations": [
+        "VALIDATES",
+        "PROVES"
+      ],
+      "schema_version": "1.0.0",
+      "validation_rules": [
+        "Browser QA verifies rendered UI and user interaction"
+      ],
+      "metadata": {}
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+[
+  {
+    "trace_id": "trace_1789334280898_frontend-mission-dashboard_GET /api/v1/missions",
+    "source": "runtime_observation",
+    "timestamp": 1789334280.8987522,
+    "mission_id": "m_real_corpus",
+    "consumer_id": "frontend-mission-dashboard",
+    "contract_id": "listMissions",
+    "operation": "GET /api/v1/missions",
+    "input_payload": {},
+    "output_payload": {
+      "missions": [
+        {
+          "id": "m_99",
+          "title": "Mission Alpha",
+          "status": "ACTIVE"
+        }
+      ],
+      "total": 1,
+      "page": 1
+    },
+    "status_code": 200,
+    "stages": [],
+    "side_effects": [],
+    "events": [
+      {
+        "topic": "mission.queried"
+      }
+    ],
+    "economic_effects": [],
+    "authorization_state": {
+      "requires_auth": false,
+      "roles": []
+    },
+    "trace_hash": "1396a0c5191fe6b09264b8da99154b5eada88efb939a852592706620288ddc2b",
+    "parent_trace_hash": null,
+    "environment": "production",
+    "build_hash": ""
+  },
+  {
+    "trace_id": "trace_1789334280898_frontend-user-badge_GET /api/v1/users/{id}",
+    "source": "runtime_observation",
+    "timestamp": 1789334280.8987758,
+    "mission_id": "m_real_corpus",
+    "consumer_id": "frontend-user-badge",
+    "contract_id": "getUserProfile",
+    "operation": "GET /api/v1/users/{id}",
+    "input_payload": {
+      "user_id": "usr_991"
+    },
+    "output_payload": {
+      "id": "usr_991",
+      "name": "Admin",
+      "avatar": {
+        "url": "https://cdn.example.com/a.png",
+        "width": 128,
+        "height": 128
+      }
+    },
+    "status_code": 200,
+    "stages": [],
+    "side_effects": [],
+    "events": [],
+    "economic_effects": [],
+    "authorization_state": {
+      "requires_auth": true,
+      "roles": [
+        "user"
+      ]
+    },
+    "trace_hash": "2bb58e0f185726c32e7ae6866f6479a4624f08862d013e9812efd02392a6b94b",
+    "parent_trace_hash": null,
+    "environment": "production",
+    "build_hash": ""
+  },
+  {
+    "trace_id": "trace_1789334280898_economic-execution-gateway_POST /api/v1/economic/settle",
+    "source": "runtime_observation",
+    "timestamp": 1789334280.8987947,
+    "mission_id": "m_real_corpus",
+    "consumer_id": "economic-execution-gateway",
+    "contract_id": "settlePayment",
+    "operation": "POST /api/v1/economic/settle",
+    "input_payload": {
+      "transaction_id": "tx_123"
+    },
+    "output_payload": {
+      "settled": true,
+      "ledger_seq": 4921
+    },
+    "status_code": 200,
+    "stages": [],
+    "side_effects": [
+      {
+        "type": "ledger_write",
+        "action": "COMMIT"
+      }
+    ],
+    "events": [
+      {
+        "topic": "payment.settled"
+      }
+    ],
+    "economic_effects": [
+      {
+        "amount": 135.0,
+        "currency": "EUR",
+        "ledger_action": "COMMIT"
+      }
+    ],
+    "authorization_state": {
+      "requires_auth": true,
+      "roles": [
+        "financial_sentinel"
+      ]
+    },
+    "trace_hash": "6af042fead6939900d59c64c0d73ab8b465bdd6372cd38fba472ee3fa2cfac65",
+    "parent_trace_hash": null,
+    "environment": "production",
+    "build_hash": ""
+  },
+  {
+    "trace_id": "trace_1789334280898_consumer_backend_websocket_dispatcher_py_50_POST /api/v1/missions",
+    "source": "runtime_observation",
+    "timestamp": 1789334280.8988104,
+    "mission_id": "m_real_corpus",
+    "consumer_id": "consumer_backend_websocket_dispatcher_py_50",
+    "contract_id": "createMission",
+    "operation": "POST /api/v1/missions",
+    "input_payload": {
+      "title": "Mission Beta",
+      "priority": "HIGH"
+    },
+    "output_payload": {
+      "mission_id": "m_beta_01",
+      "created": true
+    },
+    "status_code": 201,
+    "stages": [],
+    "side_effects": [
+      {
+        "type": "db_insert",
+        "table": "missions"
+      }
+    ],
+    "events": [
+      {
+        "topic": "mission.created"
+      }
+    ],
+    "economic_effects": [],
+    "authorization_state": {
+      "requires_auth": true,
+      "roles": [
+        "operator",
+        "admin"
+      ]
+    },
+    "trace_hash": "8d50f380169fbbf1e89e42738352369a5bce8ffd5098f620983d28f96acad78d",
+    "parent_trace_hash": null,
+    "environment": "production",
+    "build_hash": ""
+  }
+]

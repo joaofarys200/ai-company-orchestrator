@@ -1,0 +1,29 @@
+{
+  "decision_id": "dec_189",
+  "cycle_id": "c_oscillation_defense_1",
+  "mission_id": "m_oscillation_defense",
+  "policy_version": "40.1.0",
+  "rule_matched": "RULE_14_NORMAL_PROGRESSION",
+  "decision_taken": "CONTINUE",
+  "expected_decision": "REQUEST_HUMAN",
+  "root_cause": "OBSERVATION_GAP",
+  "severity": "MEDIUM",
+  "missed_observations": "OBSERVATION_AVAILABLE_BUT_UNUSED",
+  "contributing_factors": [
+    "Unused observations: oscillation_status",
+    "Oscillation state confirmed in previous cycle but not ingested into evaluation context."
+  ],
+  "observed_outcome": "Observed compliant transition",
+  "counterfactual": {
+    "alternative_decision": "REQUEST_HUMAN",
+    "why_valid": "Alternative decision 'REQUEST_HUMAN' directly satisfies active invariants (OBSERVATION_GAP).",
+    "why_not_selected": "Rule evaluating 'CONTINUE' had higher precedence or context missed observation.",
+    "expected_effect": "Would have halted oscillation/repaired failure immediately, avoiding invalid cycle progress.",
+    "observed_effect": "Observed compliant transition",
+    "evidence_support": []
+  },
+  "proposed_correction": {
+    "refinement": "Refinar a condi\u00e7\u00e3o da RULE_03_OSCILLATION_DETECTED para verificar o hist\u00f3rico acumulado no loop_state.",
+    "target_policy_version": "41.0.0"
+  }
+}

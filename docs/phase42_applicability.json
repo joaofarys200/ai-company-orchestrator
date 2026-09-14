@@ -1,0 +1,51 @@
+{
+  "validation_axes": [
+    "technology_compatibility",
+    "architecture_compatibility",
+    "mission_state",
+    "policy_version",
+    "security_context",
+    "dependency_context",
+    "evidence_freshness",
+    "intent_compatibility"
+  ],
+  "ratings": [
+    "RELEVANT",
+    "POSSIBLY_RELEVANT",
+    "STALE",
+    "CONFLICTING",
+    "INAPPLICABLE"
+  ],
+  "sample_verifications": [
+    {
+      "experience_id": "exp_p35_001",
+      "target_tech": [
+        "vanilla_ts"
+      ],
+      "rating": "RELEVANT",
+      "influence": "REPAIR_HINT",
+      "allowed": true
+    },
+    {
+      "experience_id": "gold_incomp_1",
+      "target_tech": [
+        "python",
+        "vanilla_ts"
+      ],
+      "rating": "INAPPLICABLE",
+      "influence": "NONE",
+      "allowed": false,
+      "reason": "Technology stack mismatch: ['rust', 'wasm'] incompatible with ['python', 'vanilla_ts']"
+    },
+    {
+      "experience_id": "gold_stale_1",
+      "target_tech": [
+        "vanilla_ts"
+      ],
+      "rating": "STALE",
+      "influence": "CONTEXT_ONLY",
+      "allowed": false,
+      "reason": "Temporal validity is STALE; historical policy version 38.0.0"
+    }
+  ]
+}

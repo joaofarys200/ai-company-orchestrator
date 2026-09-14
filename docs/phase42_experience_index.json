@@ -1,0 +1,37 @@
+{
+  "index_type": "Deterministic_Multi_Axis_Inverted_Index",
+  "dimensions": [
+    "intent_category",
+    "taxonomy_tags",
+    "technology_stack",
+    "failure_classes",
+    "decision_context",
+    "temporal_timeline"
+  ],
+  "active_records_indexed": 5,
+  "archived_records": 0,
+  "vector_embedding_used": false,
+  "anti_leakage_upper_bound_enforced": true,
+  "indexes_summary": {
+    "by_intent": {
+      "FINANCIAL_LEDGER": 1,
+      "SEARCH_AND_FILTER": 1,
+      "IMPACT_PREDICTION": 1,
+      "OSCILLATION_DEFENSE": 1,
+      "GENERAL_FEATURE": 1
+    },
+    "by_tech": {
+      "json": 1,
+      "python": 4,
+      "css": 1,
+      "html": 1,
+      "vanilla_ts": 1,
+      "typescript": 1
+    },
+    "by_failure": {
+      "SYNTAX_ERROR": 1,
+      "OSCILLATION_DETECTED": 1,
+      "DECISION_ERROR_FALSE_FINISH": 1
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "axes_evaluated": [
+    "Technology compatibility",
+    "Architecture compatibility (with drift detection)",
+    "Mission state compatibility",
+    "Policy version compatibility",
+    "Security context compatibility",
+    "Dependency context",
+    "Evidence freshness",
+    "Intent compatibility"
+  ],
+  "architecture_drift_handling": "Detects paradigm mismatch (e.g. monolith vs microservices) and marks INAPPLICABLE/STALE",
+  "policy_version_handling": "Evaluates delta: <=2 requires validation, >2 marks POLICY_MISMATCH",
+  "applicability_accuracy": 1.0
+}

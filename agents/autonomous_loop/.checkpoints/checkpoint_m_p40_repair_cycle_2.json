@@ -1,0 +1,256 @@
+{
+  "mission_id": "m_p40_repair",
+  "cycle_id": "cycle_2",
+  "timestamp": 1789152865.4133487,
+  "state": {
+    "mission_id": "m_p40_repair",
+    "loop_version": 2,
+    "cycle_id": "cycle_2",
+    "mission_version": 1,
+    "intent_version": 1,
+    "plan_version": 2,
+    "current_stage": "RECORD",
+    "current_decision": "CONTINUE",
+    "current_observations": [],
+    "latest_prediction_id": "pred_ca1adf8f",
+    "latest_outcome_id": "out_ebb47144",
+    "latest_evidence_ids": [
+      "EVD_REPAIR_01"
+    ],
+    "active_failures": [],
+    "active_repairs": [
+      {
+        "adaptation_id": "adapt_cycle_1_64443",
+        "cycle_id": "cycle_1",
+        "adaptation_type": "REPAIR",
+        "reason": "Repairable failure encountered: TypeError: Cannot read properties of undefined (reading 'sort'); TypeError on sort in ExpenseList.tsx",
+        "source_observation": {
+          "observation_id": "obs_cycle_1_64443",
+          "cycle_id": "cycle_1",
+          "mission_id": "m_p40_repair",
+          "timestamp": 1789152864.4436646,
+          "task_results": [
+            {
+              "task_id": "task_exp_sort",
+              "owner_agent": "swarm_worker",
+              "status": "FAILED",
+              "exit_code": 1,
+              "files_touched": [
+                "frontend/src/components/ExpenseList.tsx"
+              ],
+              "artifacts_created": [],
+              "error_message": "TypeError: Cannot read properties of undefined (reading 'sort')",
+              "execution_duration_seconds": 0.0
+            }
+          ],
+          "validations": [
+            {
+              "validation_type": "BUILD",
+              "target": "",
+              "passed": false,
+              "summary": "TypeError on sort in ExpenseList.tsx",
+              "evidence_id": null,
+              "details": {}
+            }
+          ],
+          "files_changed": [
+            "frontend/src/components/ExpenseList.tsx"
+          ],
+          "active_failures": [
+            {
+              "task_id": "task_exp_sort",
+              "error": "TypeError: Cannot read properties of undefined (reading 'sort')",
+              "exit_code": 1,
+              "is_repairable": true,
+              "target_file": "frontend/src/components/ExpenseList.tsx",
+              "timestamp": 1789152864.443647
+            },
+            {
+              "validation_type": "BUILD",
+              "target": "",
+              "error": "TypeError on sort in ExpenseList.tsx",
+              "is_repairable": true,
+              "timestamp": 1789152864.443657
+            }
+          ],
+          "evidence_ids_collected": [],
+          "all_tasks_completed": false,
+          "all_validations_passed": false,
+          "build_clean": false,
+          "tests_clean": true,
+          "ast_clean": true,
+          "browser_clean": true,
+          "has_unrepairable_failure": false
+        },
+        "previous_plan_version": 1,
+        "proposed_change": {
+          "action": "TRIGGER_AST_REPAIR",
+          "failures": [
+            {
+              "task_id": "task_exp_sort",
+              "error": "TypeError: Cannot read properties of undefined (reading 'sort')",
+              "exit_code": 1,
+              "is_repairable": true,
+              "target_file": "frontend/src/components/ExpenseList.tsx",
+              "timestamp": 1789152864.443647
+            },
+            {
+              "validation_type": "BUILD",
+              "target": "",
+              "error": "TypeError on sort in ExpenseList.tsx",
+              "is_repairable": true,
+              "timestamp": 1789152864.443657
+            }
+          ],
+          "target_files": [
+            "frontend/src/components/ExpenseList.tsx"
+          ]
+        },
+        "predicted_impact": {
+          "risk": "LOW",
+          "scope": "LOCAL"
+        },
+        "risk": "LOW",
+        "requires_approval": false,
+        "gate_result": {
+          "status": "APPROVED",
+          "passed": true,
+          "reason": "Mission Gate authorized adaptation.",
+          "evaluated_at": 1789152864.4439275
+        },
+        "status": "APPLIED",
+        "applied_at": 1789152864.4439318
+      }
+    ],
+    "active_replans": [],
+    "adaptation_count": 1,
+    "consecutive_successes": 1,
+    "consecutive_failures": 0,
+    "human_intervention_count": 0,
+    "state_hash": "5dd3c26741f22a5d",
+    "created_at": 1789152863.3908985,
+    "updated_at": 1789152865.413313
+  },
+  "snapshot_hash": "473f4228334d466a",
+  "decision": "CONTINUE",
+  "adaptation": {
+    "adaptation_id": "adapt_cycle_1_64443",
+    "cycle_id": "cycle_1",
+    "adaptation_type": "REPAIR",
+    "reason": "Repairable failure encountered: TypeError: Cannot read properties of undefined (reading 'sort'); TypeError on sort in ExpenseList.tsx",
+    "source_observation": {
+      "observation_id": "obs_cycle_1_64443",
+      "cycle_id": "cycle_1",
+      "mission_id": "m_p40_repair",
+      "timestamp": 1789152864.4436646,
+      "task_results": [
+        {
+          "task_id": "task_exp_sort",
+          "owner_agent": "swarm_worker",
+          "status": "FAILED",
+          "exit_code": 1,
+          "files_touched": [
+            "frontend/src/components/ExpenseList.tsx"
+          ],
+          "artifacts_created": [],
+          "error_message": "TypeError: Cannot read properties of undefined (reading 'sort')",
+          "execution_duration_seconds": 0.0
+        }
+      ],
+      "validations": [
+        {
+          "validation_type": "BUILD",
+          "target": "",
+          "passed": false,
+          "summary": "TypeError on sort in ExpenseList.tsx",
+          "evidence_id": null,
+          "details": {}
+        }
+      ],
+      "files_changed": [
+        "frontend/src/components/ExpenseList.tsx"
+      ],
+      "active_failures": [
+        {
+          "task_id": "task_exp_sort",
+          "error": "TypeError: Cannot read properties of undefined (reading 'sort')",
+          "exit_code": 1,
+          "is_repairable": true,
+          "target_file": "frontend/src/components/ExpenseList.tsx",
+          "timestamp": 1789152864.443647
+        },
+        {
+          "validation_type": "BUILD",
+          "target": "",
+          "error": "TypeError on sort in ExpenseList.tsx",
+          "is_repairable": true,
+          "timestamp": 1789152864.443657
+        }
+      ],
+      "evidence_ids_collected": [],
+      "all_tasks_completed": false,
+      "all_validations_passed": false,
+      "build_clean": false,
+      "tests_clean": true,
+      "ast_clean": true,
+      "browser_clean": true,
+      "has_unrepairable_failure": false
+    },
+    "previous_plan_version": 1,
+    "proposed_change": {
+      "action": "TRIGGER_AST_REPAIR",
+      "failures": [
+        {
+          "task_id": "task_exp_sort",
+          "error": "TypeError: Cannot read properties of undefined (reading 'sort')",
+          "exit_code": 1,
+          "is_repairable": true,
+          "target_file": "frontend/src/components/ExpenseList.tsx",
+          "timestamp": 1789152864.443647
+        },
+        {
+          "validation_type": "BUILD",
+          "target": "",
+          "error": "TypeError on sort in ExpenseList.tsx",
+          "is_repairable": true,
+          "timestamp": 1789152864.443657
+        }
+      ],
+      "target_files": [
+        "frontend/src/components/ExpenseList.tsx"
+      ]
+    },
+    "predicted_impact": {
+      "risk": "LOW",
+      "scope": "LOCAL"
+    },
+    "risk": "LOW",
+    "requires_approval": false,
+    "gate_result": {
+      "status": "APPROVED",
+      "passed": true,
+      "reason": "Mission Gate authorized adaptation.",
+      "evaluated_at": 1789152864.4439275
+    },
+    "status": "APPLIED",
+    "applied_at": 1789152864.4439318
+  },
+  "outcome": {
+    "outcome_id": "out_ebb47144",
+    "cycle_id": "cycle_2",
+    "prediction_id": "pred_ca1adf8f",
+    "matched": [
+      "frontend/src/components/expenselist.tsx"
+    ],
+    "missed": [
+      "agents/domain_logic.py"
+    ],
+    "overpredicted": [],
+    "underpredicted": [],
+    "unexpected_changes": [],
+    "discrepancy_score": 0.5
+  },
+  "plan_version": 2,
+  "intent_version": 1,
+  "fingerprints_count": 2
+}

@@ -1,0 +1,163 @@
+{
+  "timestamp": 1789222382.8462243,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "scenarios_count": 15,
+  "scenarios": [
+    {
+      "id": 1,
+      "name": "semantic graph overview",
+      "status": "PASSED"
+    },
+    {
+      "id": 2,
+      "name": "frontend to api bridge",
+      "status": "PASSED"
+    },
+    {
+      "id": 3,
+      "name": "api to backend bridge",
+      "status": "PASSED"
+    },
+    {
+      "id": 4,
+      "name": "backend to persistence bridge",
+      "status": "PASSED"
+    },
+    {
+      "id": 5,
+      "name": "cross-language task graph",
+      "status": "PASSED"
+    },
+    {
+      "id": 6,
+      "name": "contract validation",
+      "status": "PASSED"
+    },
+    {
+      "id": 7,
+      "name": "schema conflict",
+      "status": "PASSED"
+    },
+    {
+      "id": 8,
+      "name": "uncertain translation",
+      "status": "PASSED"
+    },
+    {
+      "id": 9,
+      "name": "prediction with semantic impact",
+      "status": "PASSED"
+    },
+    {
+      "id": 10,
+      "name": "task reconciliation",
+      "status": "PASSED"
+    },
+    {
+      "id": 11,
+      "name": "why panel",
+      "status": "PASSED"
+    },
+    {
+      "id": 12,
+      "name": "versioned contract",
+      "status": "PASSED"
+    },
+    {
+      "id": 13,
+      "name": "architecture graph",
+      "status": "PASSED"
+    },
+    {
+      "id": 14,
+      "name": "cross-mission experience",
+      "status": "PASSED"
+    },
+    {
+      "id": 15,
+      "name": "security block",
+      "status": "PASSED"
+    }
+  ],
+  "screenshots": [
+    {
+      "filename": "phase44_01_semantic_graph_overview.png",
+      "description": "Semantic graph overview telemetry chips with total nodes, edges, contracts, and adapters",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_01_semantic_graph_overview.png"
+    },
+    {
+      "filename": "phase44_02_frontend_to_api_bridge.png",
+      "description": "Frontend React to OpenAPI contract bridge with CONSUMES formal adapter",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_02_frontend_to_api_bridge.png"
+    },
+    {
+      "filename": "phase44_03_api_to_backend_bridge.png",
+      "description": "API contract to FastAPI backend service bridge with SERVES formal adapter",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_03_api_to_backend_bridge.png"
+    },
+    {
+      "filename": "phase44_04_backend_to_persistence.png",
+      "description": "FastAPI service to Postgres SQL data model bridge with PERSISTS formal adapter",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_04_backend_to_persistence.png"
+    },
+    {
+      "filename": "phase44_05_cross_language_task_graph.png",
+      "description": "Cross-language task DAG with Kahn topological sort ordering producer before consumer",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_05_cross_language_task_graph.png"
+    },
+    {
+      "filename": "phase44_06_contract_validation.png",
+      "description": "Formal contract validation verifying CONTRACTUAL VALID status under adapter rules",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_06_contract_validation.png"
+    },
+    {
+      "filename": "phase44_07_schema_conflict.png",
+      "description": "Detected schema conflict blocking execution when frontend expects string and backend produces object",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_07_schema_conflict.png"
+    },
+    {
+      "filename": "phase44_08_uncertain_translation.png",
+      "description": "Explicit UNCERTAIN status for legacy uncontracted script relations without guessing",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_08_uncertain_translation.png"
+    },
+    {
+      "filename": "phase44_09_prediction_semantic_impact.png",
+      "description": "Multi-layer predictive impact blast radius calculated through semantic graph bridges",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_09_prediction_semantic_impact.png"
+    },
+    {
+      "filename": "phase44_10_task_reconciliation.png",
+      "description": "TaskImpactConsistencyValidator passing 9 out of 9 invariants for translated tasks",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_10_task_reconciliation.png"
+    },
+    {
+      "filename": "phase44_11_why_panel.png",
+      "description": "Causal explainability chain justifying task ordering and contract dependencies",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_11_why_panel.png"
+    },
+    {
+      "filename": "phase44_12_versioned_contract.png",
+      "description": "API v1 versus v2 contract versioning detecting breaking changes and marking INCOMPATIBLE",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_12_versioned_contract.png"
+    },
+    {
+      "filename": "phase44_13_architecture_graph.png",
+      "description": "Multi-layer architecture bridge linking language-neutral requirements to concrete stack",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_13_architecture_graph.png"
+    },
+    {
+      "filename": "phase44_14_cross_mission_experience.png",
+      "description": "Memory applicability validation blocking invalid transfer from React+FastAPI to Vue+Django",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_14_cross_mission_experience.png"
+    },
+    {
+      "filename": "phase44_15_security_block.png",
+      "description": "Security Sentinel active defense neutralizing prompt injections and blocking command injections",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase44\\phase44_15_security_block.png"
+    }
+  ],
+  "console_errors": [],
+  "network_errors": [],
+  "passed": true
+}

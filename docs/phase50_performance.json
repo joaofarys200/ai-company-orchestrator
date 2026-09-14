@@ -1,0 +1,59 @@
+{
+  "timestamp": 1789334260.915643,
+  "phase": 50,
+  "environment": {
+    "os": "Windows",
+    "python": "3.14.7"
+  },
+  "scales": {
+    "scale_100": {
+      "traces_evaluated": 100,
+      "normalization_time_ms": 1.25,
+      "normalization_throughput_payloads_sec": 79744.8,
+      "comparison_time_ms": 2.96,
+      "comparison_throughput_ops_sec": 33813.5,
+      "proof_time_ms": 3.93,
+      "proof_throughput_proofs_sec": 25471.9
+    },
+    "scale_1000": {
+      "traces_evaluated": 1000,
+      "normalization_time_ms": 12.09,
+      "normalization_throughput_payloads_sec": 82721.9,
+      "comparison_time_ms": 27.53,
+      "comparison_throughput_ops_sec": 36325.5,
+      "proof_time_ms": 38.35,
+      "proof_throughput_proofs_sec": 26077.9
+    },
+    "scale_10000": {
+      "traces_evaluated": 10000,
+      "normalization_time_ms": 120.33,
+      "normalization_throughput_payloads_sec": 83101.8,
+      "comparison_time_ms": 277.14,
+      "comparison_throughput_ops_sec": 36082.2,
+      "proof_time_ms": 394.7,
+      "proof_throughput_proofs_sec": 25335.5
+    },
+    "scale_100000": {
+      "traces_evaluated": 100000,
+      "normalization_time_ms": 1276.43,
+      "normalization_throughput_payloads_sec": 78343.7,
+      "comparison_time_ms": 553.93,
+      "comparison_throughput_ops_sec": 36105.3,
+      "proof_time_ms": 774.43,
+      "proof_throughput_proofs_sec": 25825.6
+    }
+  },
+  "microbenchmark": {
+    "baseline_sha256_hash_latency_us": 6.359,
+    "sentinel_security_check_latency_us": 1.417,
+    "invariant_evaluation_latency_us": 7.281,
+    "counterexample_generation_latency_us": 1.096
+  },
+  "mission_level": {
+    "end_to_end_pipeline_overhead_ms": 11.2,
+    "mission_gate_check_overhead_ms": 1.4,
+    "finish_gate_evaluation_overhead_ms": 1.8,
+    "counterfactual_simulation_overhead_ms": 4.6,
+    "rollback_lineage_overhead_ms": 2.1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "intent": "UPDATE_SEARCH_SCHEMA",
+  "focal_node": "contract_users_search",
+  "blast_radius_nodes": [
+    "fe_searchbox",
+    "be_service",
+    "test_api",
+    "browser_qa"
+  ],
+  "ecosystems_affected": [
+    "react",
+    "fastapi",
+    "pytest",
+    "playwright"
+  ],
+  "scope": "CROSS_MODULE"
+}

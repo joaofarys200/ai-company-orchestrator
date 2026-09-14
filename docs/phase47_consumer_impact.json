@@ -1,0 +1,21 @@
+[
+  {
+    "consumer_id": "audit-logger-svc",
+    "variant_id": "var_user_archived",
+    "stance": "ALREADY_TOLERATES",
+    "reason": "Consumes only common fields (id, timestamp, type, source)."
+  },
+  {
+    "consumer_id": "billing-dispatcher",
+    "variant_id": "var_user_archived",
+    "stance": "IGNORES",
+    "reason": "Filtered out by billing event regex prefix."
+  },
+  {
+    "consumer_id": "crm-sync-worker",
+    "variant_id": "var_user_archived",
+    "stance": "POTENTIALLY_BREAKING",
+    "reason": "Uses closed pattern match on user.* event variants without default branch.",
+    "derived_task": "Update CRMSyncWorker event listener with user.archived case."
+  }
+]

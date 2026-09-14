@@ -1,0 +1,1482 @@
+[
+  {
+    "profile": "SHORT_HORIZON",
+    "cycle_id": "cycle_1",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "SHORT_HORIZON",
+    "cycle_id": "cycle_2",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "SHORT_HORIZON",
+    "cycle_id": "cycle_3",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "SHORT_HORIZON",
+    "cycle_id": "cycle_4",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "SHORT_HORIZON",
+    "cycle_id": "cycle_5",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "SHORT_HORIZON",
+    "cycle_id": "cycle_6",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "SHORT_HORIZON",
+    "cycle_id": "cycle_7",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "SHORT_HORIZON",
+    "cycle_id": "cycle_8",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "SHORT_HORIZON",
+    "cycle_id": "cycle_9",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "SHORT_HORIZON",
+    "cycle_id": "cycle_10",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_1",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_2",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_3",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_4",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_5",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_6",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_7",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_8",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_9",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_10",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_11",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_12",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_13",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_14",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_15",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_16",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_17",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_18",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_19",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_20",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_21",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_22",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_23",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_24",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "MEDIUM_HORIZON",
+    "cycle_id": "cycle_25",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_1",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_2",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_3",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_4",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_5",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_6",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_7",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_8",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_9",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_10",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_11",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_12",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_13",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_14",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_15",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_16",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_17",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_18",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_19",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_20",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_21",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_22",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_23",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_24",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_25",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_26",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_27",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_28",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_29",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_30",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_31",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_32",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_33",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_34",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_35",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_36",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_37",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_38",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_39",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_40",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_41",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_42",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_43",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_44",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_45",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_46",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_47",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_48",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_49",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_50",
+    "cycle_id": "cycle_50",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_1",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_2",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_3",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_4",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_5",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_6",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_7",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_8",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_9",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_10",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_11",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_12",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_13",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_14",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_15",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_16",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_17",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_18",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_19",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_20",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_21",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_22",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_23",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_24",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_25",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_26",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_27",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_28",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_29",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_30",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_31",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_32",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_33",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_34",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_35",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_36",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_37",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_38",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_39",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_40",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_41",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_42",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_43",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_44",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_45",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_46",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_47",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_48",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_49",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_50",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_51",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_52",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_53",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_54",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_55",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_56",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_57",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_58",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_59",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_60",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_61",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_62",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_63",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_64",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_65",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_66",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_67",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_68",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_69",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_70",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_71",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_72",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_73",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_74",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_75",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_76",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_77",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_78",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_79",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_80",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_81",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_82",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_83",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_84",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_85",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_86",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_87",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_88",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_89",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_90",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_91",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_92",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_93",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_94",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_95",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_96",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_97",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_98",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_99",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  },
+  {
+    "profile": "LONG_HORIZON_100",
+    "cycle_id": "cycle_100",
+    "decision": "CONTINUE",
+    "rule": "RULE_14_NORMAL_PROGRESSION",
+    "stage": "NEXT_CYCLE",
+    "plan_version": 1
+  }
+]

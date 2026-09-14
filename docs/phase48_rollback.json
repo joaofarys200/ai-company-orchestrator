@@ -1,0 +1,114 @@
+[
+  {
+    "status": "SUCCESS",
+    "contract_id": "contract_users_v1",
+    "restored_version": "1.0.0",
+    "rollback_record": {
+      "action": "ROLLBACK",
+      "contract_id": "contract_users_v1",
+      "reverted_from": "2.0.0",
+      "restored_to": "1.0.0",
+      "migration_id": "mig_12a25d8fc9",
+      "timestamp": 1789246343.015012,
+      "history_preserved": true
+    },
+    "reason": "Simulated regression Canary canary test",
+    "operator": "operator_jarvis_ci"
+  },
+  {
+    "status": "SUCCESS",
+    "contract_id": "contract_users_v1",
+    "restored_version": "1.0.0",
+    "rollback_record": {
+      "action": "ROLLBACK",
+      "contract_id": "contract_users_v1",
+      "reverted_from": "2.0.0",
+      "restored_to": "1.0.0",
+      "migration_id": "mig_7ae202de11",
+      "timestamp": 1789246343.0151935,
+      "history_preserved": true
+    },
+    "reason": "Simulated regression Canary canary test",
+    "operator": "operator_jarvis_ci"
+  },
+  {
+    "status": "SUCCESS",
+    "contract_id": "contract_events_v1",
+    "restored_version": "1.2.0",
+    "rollback_record": {
+      "action": "ROLLBACK",
+      "contract_id": "contract_events_v1",
+      "reverted_from": "1.3.0",
+      "restored_to": "1.2.0",
+      "migration_id": "mig_c56c5e8e40",
+      "timestamp": 1789246343.0153837,
+      "history_preserved": true
+    },
+    "reason": "Simulated regression Canary canary test",
+    "operator": "operator_jarvis_ci"
+  },
+  {
+    "status": "SUCCESS",
+    "contract_id": "contract_events_v1",
+    "restored_version": "1.2.0",
+    "rollback_record": {
+      "action": "ROLLBACK",
+      "contract_id": "contract_events_v1",
+      "reverted_from": "2.0.0",
+      "restored_to": "1.2.0",
+      "migration_id": "mig_a21c430bdc",
+      "timestamp": 1789246343.0155728,
+      "history_preserved": true
+    },
+    "reason": "Simulated regression Canary canary test",
+    "operator": "operator_jarvis_ci"
+  },
+  {
+    "status": "SUCCESS",
+    "contract_id": "contract_users_v1",
+    "restored_version": "1.0.0",
+    "rollback_record": {
+      "action": "ROLLBACK",
+      "contract_id": "contract_users_v1",
+      "reverted_from": "2.0.0",
+      "restored_to": "1.0.0",
+      "migration_id": "mig_dfc90d3d7f",
+      "timestamp": 1789246343.0157287,
+      "history_preserved": true
+    },
+    "reason": "Simulated regression Canary canary test",
+    "operator": "operator_jarvis_ci"
+  },
+  {
+    "status": "SUCCESS",
+    "contract_id": "contract_events_v1",
+    "restored_version": "1.2.0",
+    "rollback_record": {
+      "action": "ROLLBACK",
+      "contract_id": "contract_events_v1",
+      "reverted_from": "1.3.0",
+      "restored_to": "1.2.0",
+      "migration_id": "mig_8662056998",
+      "timestamp": 1789246343.0159018,
+      "history_preserved": true
+    },
+    "reason": "Simulated regression Canary canary test",
+    "operator": "operator_jarvis_ci"
+  },
+  {
+    "status": "SUCCESS",
+    "contract_id": "contract_events_v1",
+    "restored_version": "1.2.0",
+    "rollback_record": {
+      "action": "ROLLBACK",
+      "contract_id": "contract_events_v1",
+      "reverted_from": "1.3.0",
+      "restored_to": "1.2.0",
+      "migration_id": "mig_17f737566a",
+      "timestamp": 1789246343.016072,
+      "history_preserved": true
+    },
+    "reason": "Simulated regression Canary canary test",
+    "operator": "operator_jarvis_ci"
+  }
+]

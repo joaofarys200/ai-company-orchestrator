@@ -2,15 +2,27 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   Boxes,
   Brain,
+  BookOpen,
   GitBranch,
   GitPullRequest,
   Layers,
+  Orbit,
   Play,
+  Scale,
   ShieldAlert,
   ShieldCheck,
   Sparkles,
   TrendingUp,
   Wrench,
+  Network,
+  Radio,
+  Split,
+  GitMerge,
+  FileCode2,
+  FileCheck,
+  Compass,
+  Crosshair,
+  Stethoscope,
 } from 'lucide-react';
 import type {
   MissionControlStateData,
@@ -34,6 +46,19 @@ import {
   MissionAppPreviewPanel,
   MissionPredictedImpactPanel,
   MissionPredictionOutcomePanel,
+  AutonomousLoopPanel,
+  DecisionQualityPanel,
+  ExperienceMemoryPanel,
+  SemanticGraphPanel,
+  RuntimeContractDiscoveryPanel,
+  ContractHealthPanel,
+  PolymorphicSchemaPanel,
+  ContractChangeManagementPanel,
+  BuildContractExtractionPanel,
+  BehavioralContractProofPanel,
+  BehavioralProofExplorationPanel,
+  RiskDirectedExplorationPanel,
+  UniversalPreflightRecoveryPanel,
 } from './components';
 
 export interface MissionControlCenterProps {
@@ -199,7 +224,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   const [selectedScenario, setSelectedScenario] = useState<ScenarioKey>('INTERACTIVE');
   const [missionState, setMissionState] = useState<MissionControlStateData>(FALLBACK_INTERACTIVE_STATE);
   const [activeViewSection, setActiveViewSection] = useState<
-    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
+    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
   >('overview');
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
 
@@ -536,6 +561,19 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
           { id: 'plan_diff', label: 'Diff de Planos (DAG)', icon: GitPullRequest },
           { id: 'predicted_impact', label: 'Impacto Preditivo (Fase 39)', icon: Sparkles },
           { id: 'prediction_vs_actual', label: 'Previsão vs Realidade', icon: TrendingUp },
+          { id: 'autonomous_loop', label: 'Loop Autónomo (Fase 40)', icon: Orbit },
+          { id: 'decision_calibration', label: 'Calibração & Decisão (Fase 41)', icon: Scale },
+          { id: 'experience_memory', label: 'Memória & Experiência (Fase 42)', icon: BookOpen },
+          { id: 'semantic_graph', label: 'Grafo Semântico (Fase 44)', icon: Network },
+          { id: 'contract_discovery', label: 'Contratos & Schema (Fase 45)', icon: Radio },
+          { id: 'contract_health', label: 'Governação & Drift (Fase 46)', icon: ShieldCheck },
+          { id: 'polymorphic_contracts', label: 'Polimorfismo & Uniões (Fase 47)', icon: Split },
+          { id: 'contract_change_mgmt', label: 'Mudanças Contratuais (Fase 48)', icon: GitMerge },
+          { id: 'build_contract_extraction', label: 'Extração & Consumers (Fase 49)', icon: FileCode2 },
+          { id: 'behavioral_contract_proof', label: 'Prova Comportamental (Fase 50)', icon: FileCheck },
+          { id: 'behavioral_proof_exploration', label: 'Exploração & Cobertura (Fase 51)', icon: Compass },
+          { id: 'risk_directed_exploration', label: 'Exploração por Risco (Fase 52)', icon: Crosshair },
+          { id: 'universal_preflight_recovery', label: 'Preflight & Auto-Recovery (Fase 53)', icon: Stethoscope },
           { id: 'evidence_impact', label: 'Impacto em Evidências', icon: ShieldAlert },
           { id: 'why', label: 'Painel do Porquê ("Why Panel")', icon: Brain },
           { id: 'repairs', label: 'Auto-Cura & Adaptação', icon: Wrench },
@@ -650,6 +688,82 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
             }}
             predictionReport={(missionState as any).last_prediction_report}
           />
+        )}
+
+        {activeViewSection === 'autonomous_loop' && (
+          <AutonomousLoopPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'decision_calibration' && (
+          <DecisionQualityPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'experience_memory' && (
+          <ExperienceMemoryPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'semantic_graph' && (
+          <SemanticGraphPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'contract_discovery' && (
+          <RuntimeContractDiscoveryPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'contract_health' && (
+          <ContractHealthPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'polymorphic_contracts' && (
+          <PolymorphicSchemaPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'contract_change_mgmt' && (
+          <ContractChangeManagementPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'build_contract_extraction' && (
+          <BuildContractExtractionPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'behavioral_contract_proof' && (
+          <BehavioralContractProofPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'behavioral_proof_exploration' && (
+          <BehavioralProofExplorationPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'risk_directed_exploration' && (
+          <RiskDirectedExplorationPanel
+            missionId={missionState.mission_id}
+          />
+        )}
+
+        {activeViewSection === 'universal_preflight_recovery' && (
+          <UniversalPreflightRecoveryPanel />
         )}
 
         {activeViewSection === 'evidence_impact' && (

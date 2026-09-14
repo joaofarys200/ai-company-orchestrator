@@ -1,0 +1,165 @@
+{
+  "timestamp": 1789224326.4764643,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "scenarios_count": 15,
+  "scenarios": [
+    {
+      "scenario_id": 1,
+      "title": "Contract Health Overview",
+      "passed": true
+    },
+    {
+      "scenario_id": 2,
+      "title": "In-Sync Contract",
+      "passed": true
+    },
+    {
+      "scenario_id": 3,
+      "title": "Observed Non-Breaking Drift",
+      "passed": true
+    },
+    {
+      "scenario_id": 4,
+      "title": "Breaking Drift Alert",
+      "passed": true
+    },
+    {
+      "scenario_id": 5,
+      "title": "Consumer Impact Matrix",
+      "passed": true
+    },
+    {
+      "scenario_id": 6,
+      "title": "Proposed Contract Version v2",
+      "passed": true
+    },
+    {
+      "scenario_id": 7,
+      "title": "Contract Diff",
+      "passed": true
+    },
+    {
+      "scenario_id": 8,
+      "title": "Human Approval Gate",
+      "passed": true
+    },
+    {
+      "scenario_id": 9,
+      "title": "Contract Activation",
+      "passed": true
+    },
+    {
+      "scenario_id": 10,
+      "title": "Contract Rollback",
+      "passed": true
+    },
+    {
+      "scenario_id": 11,
+      "title": "Stale Contract",
+      "passed": true
+    },
+    {
+      "scenario_id": 12,
+      "title": "Multi-Environment Drift",
+      "passed": true
+    },
+    {
+      "scenario_id": 13,
+      "title": "Auth Contract Drift",
+      "passed": true
+    },
+    {
+      "scenario_id": 14,
+      "title": "Error Contract Drift",
+      "passed": true
+    },
+    {
+      "scenario_id": 15,
+      "title": "Why Panel Causality",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    {
+      "filename": "phase46_01_contract_health_overview.png",
+      "description": "Contract health overview showing active immutable baselines, status distribution counters, and environment filter",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_01_contract_health_overview.png"
+    },
+    {
+      "filename": "phase46_02_in_sync_contract.png",
+      "description": "In-sync contract card displaying 100% compliance with verified baseline hash and zero observed drift",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_02_in_sync_contract.png"
+    },
+    {
+      "filename": "phase46_03_observed_non_breaking_drift.png",
+      "description": "Observed non-breaking variation with optional field 'user_tier' added in runtime traffic",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_03_observed_non_breaking_drift.png"
+    },
+    {
+      "filename": "phase46_04_breaking_drift_alert.png",
+      "description": "Prominent breaking drift alert banner warning of type conflict on POST /api/v1/reports/export",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_04_breaking_drift_alert.png"
+    },
+    {
+      "filename": "phase46_05_consumer_impact.png",
+      "description": "Reverse consumer dependency index from CrossLanguageSemanticGraph identifying impacted frontend components and test suites",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_05_consumer_impact.png"
+    },
+    {
+      "filename": "phase46_06_proposed_v2.png",
+      "description": "Versioned contract evolution proposal card v1.0.0 -> v2.0.0 requiring human approval gate",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_06_proposed_v2.png"
+    },
+    {
+      "filename": "phase46_07_contract_diff.png",
+      "description": "Structural diff comparing baseline schema against observed runtime response format",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_07_contract_diff.png"
+    },
+    {
+      "filename": "phase46_08_human_approval.png",
+      "description": "Human approval gate requiring explicit operator validation before promotion to active baseline",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_08_human_approval.png"
+    },
+    {
+      "filename": "phase46_09_activation.png",
+      "description": "Activated v2.0.0 contract in registry with feedback alert and updated active baseline version",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_09_activation.png"
+    },
+    {
+      "filename": "phase46_10_rollback.png",
+      "description": "Deterministic rollback to v1.0.0 restoring previous verified state while preserving v2.0.0 history",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_10_rollback.png"
+    },
+    {
+      "filename": "phase46_11_stale_contract.png",
+      "description": "Stale contract identification distinguishing traffic absence from schema incompatibility",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_11_stale_contract.png"
+    },
+    {
+      "filename": "phase46_12_multi_environment_drift.png",
+      "description": "Environment isolation view showing DEVELOPMENT drift isolated from PRODUCTION policies",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_12_multi_environment_drift.png"
+    },
+    {
+      "filename": "phase46_13_auth_drift.png",
+      "description": "Authentication contract health verification enforcing rigorous policy against auth header drift",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_13_auth_drift.png"
+    },
+    {
+      "filename": "phase46_14_error_contract_drift.png",
+      "description": "Error contract drift detection distinguishing 5xx application crashes from 4xx schema changes",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_14_error_contract_drift.png"
+    },
+    {
+      "filename": "phase46_15_why_panel.png",
+      "description": "Mission Control Why Panel answering Why Drift, What Changed, Who is Affected, and What Should Happen",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase46\\phase46_15_why_panel.png"
+    }
+  ],
+  "console_errors": [],
+  "network_errors": [],
+  "passed": true,
+  "console_errors_count": 0,
+  "network_errors_count": 0
+}

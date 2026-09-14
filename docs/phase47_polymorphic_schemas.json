@@ -1,0 +1,388 @@
+[
+  {
+    "schema_id": "poly_inferred",
+    "contract_id": "contract_inferred",
+    "kind": "DISCRIMINATED_UNION",
+    "variants": [
+      {
+        "variant_id": "var_type_user_archived",
+        "label": "Variant 'user.archived'",
+        "schema": {
+          "type": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "id": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "timestamp": {
+            "type": "integer",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "payload_user_archived": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          }
+        },
+        "required_fields": [
+          "id",
+          "payload_user_archived",
+          "timestamp",
+          "type"
+        ],
+        "optional_fields": [],
+        "forbidden_fields": [
+          "payload_user_created",
+          "payload_user_deleted",
+          "payload_user_updated"
+        ],
+        "nullable_fields": [],
+        "discriminator_value": "user.archived",
+        "evidence_refs": [
+          "obs_0",
+          "obs_1",
+          "obs_2",
+          "obs_3",
+          "obs_4",
+          "obs_5",
+          "obs_6",
+          "obs_7",
+          "obs_8",
+          "obs_9"
+        ],
+        "observed_count": 1250,
+        "confidence": 0.95,
+        "status": "VALIDATED",
+        "metadata": {}
+      },
+      {
+        "variant_id": "var_type_user_created",
+        "label": "Variant 'user.created'",
+        "schema": {
+          "type": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "id": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "timestamp": {
+            "type": "integer",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "payload_user_created": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          }
+        },
+        "required_fields": [
+          "id",
+          "payload_user_created",
+          "timestamp",
+          "type"
+        ],
+        "optional_fields": [],
+        "forbidden_fields": [
+          "payload_user_archived",
+          "payload_user_deleted",
+          "payload_user_updated"
+        ],
+        "nullable_fields": [],
+        "discriminator_value": "user.created",
+        "evidence_refs": [
+          "obs_0",
+          "obs_1",
+          "obs_2",
+          "obs_3",
+          "obs_4",
+          "obs_5",
+          "obs_6",
+          "obs_7",
+          "obs_8",
+          "obs_9"
+        ],
+        "observed_count": 1250,
+        "confidence": 0.95,
+        "status": "VALIDATED",
+        "metadata": {}
+      },
+      {
+        "variant_id": "var_type_user_deleted",
+        "label": "Variant 'user.deleted'",
+        "schema": {
+          "type": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "id": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "timestamp": {
+            "type": "integer",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "payload_user_deleted": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          }
+        },
+        "required_fields": [
+          "id",
+          "payload_user_deleted",
+          "timestamp",
+          "type"
+        ],
+        "optional_fields": [],
+        "forbidden_fields": [
+          "payload_user_archived",
+          "payload_user_created",
+          "payload_user_updated"
+        ],
+        "nullable_fields": [],
+        "discriminator_value": "user.deleted",
+        "evidence_refs": [
+          "obs_0",
+          "obs_1",
+          "obs_2",
+          "obs_3",
+          "obs_4",
+          "obs_5",
+          "obs_6",
+          "obs_7",
+          "obs_8",
+          "obs_9"
+        ],
+        "observed_count": 1250,
+        "confidence": 0.95,
+        "status": "VALIDATED",
+        "metadata": {}
+      },
+      {
+        "variant_id": "var_type_user_updated",
+        "label": "Variant 'user.updated'",
+        "schema": {
+          "type": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "id": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "timestamp": {
+            "type": "integer",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          },
+          "payload_user_updated": {
+            "type": "string",
+            "presence_ratio": 1.0,
+            "is_required": true,
+            "is_nullable": false,
+            "is_enum": false,
+            "is_enum_candidate": false
+          }
+        },
+        "required_fields": [
+          "id",
+          "payload_user_updated",
+          "timestamp",
+          "type"
+        ],
+        "optional_fields": [],
+        "forbidden_fields": [
+          "payload_user_archived",
+          "payload_user_created",
+          "payload_user_deleted"
+        ],
+        "nullable_fields": [],
+        "discriminator_value": "user.updated",
+        "evidence_refs": [
+          "obs_0",
+          "obs_1",
+          "obs_2",
+          "obs_3",
+          "obs_4",
+          "obs_5",
+          "obs_6",
+          "obs_7",
+          "obs_8",
+          "obs_9"
+        ],
+        "observed_count": 1250,
+        "confidence": 0.95,
+        "status": "VALIDATED",
+        "metadata": {}
+      }
+    ],
+    "discriminator": {
+      "field": "type",
+      "location": "BODY",
+      "discriminator_type": "STRING_ENUM",
+      "observed_values": [
+        "user.archived",
+        "user.created",
+        "user.deleted",
+        "user.updated"
+      ],
+      "mapping": {
+        "user.archived": "var_type_user_archived",
+        "user.created": "var_type_user_created",
+        "user.deleted": "var_type_user_deleted",
+        "user.updated": "var_type_user_updated"
+      },
+      "confidence": 1.0,
+      "is_inferred": false,
+      "evidence_refs": []
+    },
+    "discriminator_location": "BODY",
+    "discriminator_type": "STRING_ENUM",
+    "common_fields": [
+      "id",
+      "timestamp",
+      "type"
+    ],
+    "variant_fields": [
+      "payload_user_archived",
+      "payload_user_created",
+      "payload_user_deleted",
+      "payload_user_updated"
+    ],
+    "variant_required_fields": {
+      "var_type_user_archived": [
+        "id",
+        "payload_user_archived",
+        "timestamp",
+        "type"
+      ],
+      "var_type_user_created": [
+        "id",
+        "payload_user_created",
+        "timestamp",
+        "type"
+      ],
+      "var_type_user_deleted": [
+        "id",
+        "payload_user_deleted",
+        "timestamp",
+        "type"
+      ],
+      "var_type_user_updated": [
+        "id",
+        "payload_user_updated",
+        "timestamp",
+        "type"
+      ]
+    },
+    "variant_constraints": {},
+    "error_variants": [],
+    "source": "RUNTIME_OBSERVATION",
+    "version": "1.0.0",
+    "status": "VALIDATED",
+    "schema_hash": "53e50d480aa613d0fd321487b116035a4d1bd6f709c5863adfb136d3894e69a7",
+    "created_at": 1789225603.2273254,
+    "metadata": {}
+  },
+  {
+    "schema_id": "poly_payment_response_v2",
+    "contract_id": "ctr_payments",
+    "kind": "DISCRIMINATED_UNION",
+    "status": "VALIDATED",
+    "discriminator": {
+      "field": "status",
+      "location": "BODY",
+      "type": "STRING_ENUM",
+      "observed_values": [
+        "SUCCESS",
+        "REQUIRES_ACTION",
+        "FAILED"
+      ]
+    },
+    "common_fields": [
+      "transaction_id",
+      "amount",
+      "currency",
+      "status"
+    ],
+    "variants_count": 3
+  },
+  {
+    "schema_id": "poly_members_query_v1",
+    "contract_id": "ctr_members",
+    "kind": "UNKNOWN_POLYMORPHIC_RESPONSE",
+    "status": "UNCERTAIN",
+    "discriminator": {
+      "field": "FIELD_PRESENCE:permissions",
+      "type": "INFERRED_STRUCTURAL",
+      "is_inferred": true
+    },
+    "common_fields": [
+      "member_id",
+      "name",
+      "email"
+    ],
+    "variants_count": 2
+  }
+]

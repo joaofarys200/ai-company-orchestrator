@@ -1,0 +1,40 @@
+{
+  "scales_tested": {
+    "100": {
+      "scale": 100,
+      "insert_total_sec": 0.0019,
+      "insert_ms_per_op": 0.0195,
+      "indexing_total_sec": 0.0005,
+      "indexing_ms_per_op": 0.0051,
+      "cold_retrieval_ms": 0.365,
+      "warm_retrieval_ms": 0.282,
+      "applicability_validation_ms": 0.0037,
+      "conflict_analysis_ms": 0.0113
+    },
+    "1000": {
+      "scale": 1000,
+      "insert_total_sec": 0.0213,
+      "insert_ms_per_op": 0.0213,
+      "indexing_total_sec": 0.0314,
+      "indexing_ms_per_op": 0.0314,
+      "cold_retrieval_ms": 3.261,
+      "warm_retrieval_ms": 2.612,
+      "applicability_validation_ms": 0.0029,
+      "conflict_analysis_ms": 0.012
+    },
+    "10000": {
+      "scale": 10000,
+      "insert_total_sec": 0.1846,
+      "insert_ms_per_op": 0.0185,
+      "indexing_total_sec": 3.3119,
+      "indexing_ms_per_op": 0.3312,
+      "cold_retrieval_ms": 45.273,
+      "warm_retrieval_ms": 47.243,
+      "applicability_validation_ms": 0.0048,
+      "conflict_analysis_ms": 0.0111
+    }
+  },
+  "benchmark_environment": "Python 3.14 / Windows Localhost",
+  "vector_search_dependency": "NONE (Deterministic Inverted Index)",
+  "memory_overhead_per_10k_records_kb": 2450.0
+}

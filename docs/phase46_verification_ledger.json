@@ -1,0 +1,84 @@
+{
+  "invariants": [
+    {
+      "id": 1,
+      "rule": "baseline contract immutable",
+      "status": "VERIFIED",
+      "proof": "ContractBaseline instance attributes are frozen / re-hashes verified on update."
+    },
+    {
+      "id": 2,
+      "rule": "runtime observation never directly mutates contract",
+      "status": "VERIFIED",
+      "proof": "ObservationWindow only appends RuntimeObservation; ContractDriftEngine returns distinct ContractDriftReport without modifying baseline."
+    },
+    {
+      "id": 3,
+      "rule": "drift classification deterministic",
+      "status": "VERIFIED",
+      "proof": "Strict schema type / nullability / requiredness rules evaluated by DriftClassification enum."
+    },
+    {
+      "id": 4,
+      "rule": "breaking drift cannot silently activate",
+      "status": "VERIFIED",
+      "proof": "ContractEvolutionManager raises ContractEvolutionError if approval token missing for breaking drift."
+    },
+    {
+      "id": 5,
+      "rule": "consumer impact traceable",
+      "status": "VERIFIED",
+      "proof": "CrossLanguageSemanticGraph reverse index maps contract to consumers, tests, browser scenarios, and tasks."
+    },
+    {
+      "id": 6,
+      "rule": "every contract version has parent",
+      "status": "VERIFIED",
+      "proof": "ContractBaseline.parent_version enforced in all proposed and activated versions."
+    },
+    {
+      "id": 7,
+      "rule": "rollback preserves history",
+      "status": "VERIFIED",
+      "proof": "Rollback updates active pointer and registers audit event without deleting newer version from registry."
+    },
+    {
+      "id": 8,
+      "rule": "stale contract cannot be treated as current",
+      "status": "VERIFIED",
+      "proof": "TemporalStatus evaluates timestamp against staleness threshold and flags AGING/STALE."
+    },
+    {
+      "id": 9,
+      "rule": "environment-specific drift is isolated",
+      "status": "VERIFIED",
+      "proof": "ObservationWindow enforces EnvironmentType; DEV drift does not contaminate PROD reports."
+    },
+    {
+      "id": 10,
+      "rule": "drift cannot bypass Mission Gate",
+      "status": "VERIFIED",
+      "proof": "ContractGovernanceBridge connects drift to predictive impact and mission reconciliation gates."
+    },
+    {
+      "id": 11,
+      "rule": "drift cannot weaken Security Sentinel",
+      "status": "VERIFIED",
+      "proof": "ContractGovernanceSecurity rejects shell commands, prompt injections, and invalid approvals."
+    },
+    {
+      "id": 12,
+      "rule": "evidence remains immutable",
+      "status": "VERIFIED",
+      "proof": "Evidence refs store immutable observation IDs and SHA-256 payload hashes."
+    },
+    {
+      "id": 13,
+      "rule": "Semantic Graph versions remain consistent",
+      "status": "VERIFIED",
+      "proof": "Contract updates check graph_version and emit updated graph snapshots."
+    }
+  ],
+  "total_verified": 13,
+  "all_passed": true
+}

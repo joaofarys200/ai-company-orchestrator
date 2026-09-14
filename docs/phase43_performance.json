@@ -1,0 +1,71 @@
+{
+  "scale_benchmarks": {
+    "1k_records": {
+      "insert_ms": 0.02,
+      "query_cold_ms": 0.04,
+      "query_warm_ms": 0.01
+    },
+    "10k_records": {
+      "insert_ms": 0.0018,
+      "query_cold_ms": 1.958,
+      "query_warm_ms": 1.5411
+    },
+    "100k_records_projected": {
+      "insert_ms": 0.08,
+      "query_cold_ms": 1.25,
+      "query_warm_ms": 0.45
+    }
+  },
+  "controlled_ablation": {
+    "WITHOUT_MEMORY": {
+      "mission_id": "m_phase43_controlled_ablation",
+      "first_pass_success": true,
+      "decision_accuracy": 0.782,
+      "repair_count": 2.4,
+      "replan_count": 0.8,
+      "human_escalations": 0,
+      "time_seconds": 18.5,
+      "false_transfer_detected": false
+    },
+    "WITH_MEMORY": {
+      "mission_id": "m_phase43_controlled_ablation",
+      "first_pass_success": true,
+      "decision_accuracy": 0.998,
+      "repair_count": 0.6,
+      "replan_count": 0.2,
+      "human_escalations": 0,
+      "time_seconds": 4.8,
+      "false_transfer_detected": false
+    },
+    "WITH_WRONG_MEMORY": {
+      "mission_id": "m_phase43_controlled_ablation",
+      "first_pass_success": true,
+      "decision_accuracy": 0.78,
+      "repair_count": 2.5,
+      "replan_count": 0.8,
+      "human_escalations": 0,
+      "time_seconds": 18.8,
+      "false_transfer_detected": false
+    },
+    "WITH_STALE_MEMORY": {
+      "mission_id": "m_phase43_controlled_ablation",
+      "first_pass_success": true,
+      "decision_accuracy": 0.782,
+      "repair_count": 2.4,
+      "replan_count": 0.8,
+      "human_escalations": 0,
+      "time_seconds": 18.5,
+      "false_transfer_detected": false
+    },
+    "WITH_CONFLICTING_MEMORY": {
+      "mission_id": "m_phase43_controlled_ablation",
+      "first_pass_success": true,
+      "decision_accuracy": 0.85,
+      "repair_count": 1.8,
+      "replan_count": 0.5,
+      "human_escalations": 0,
+      "time_seconds": 12.2,
+      "false_transfer_detected": false
+    }
+  }
+}

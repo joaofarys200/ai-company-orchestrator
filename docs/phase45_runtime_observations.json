@@ -1,0 +1,535 @@
+{
+  "total_recorded": 111201,
+  "samples": [
+    {
+      "observation_id": "obs_df64cbe8",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "GET",
+      "route": "/api/v1/orders",
+      "status_code": 400,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": null,
+      "response_payload": {
+        "id": 0,
+        "username": "user_0",
+        "role": "ADMIN"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5344245,
+      "metadata": {
+        "original_route": "/api/v1/orders",
+        "redactions_applied": 2,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_08ea2d28",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "POST",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": {
+        "user_id": 1,
+        "password": "[REDACTED_CREDENTIAL]"
+      },
+      "response_payload": {
+        "id": 1,
+        "username": "user_1",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5344543,
+      "metadata": {
+        "original_route": "/api/v1/users/1",
+        "redactions_applied": 3,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_e4933515",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "GET",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": null,
+      "response_payload": {
+        "id": 2,
+        "username": "user_2",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5344746,
+      "metadata": {
+        "original_route": "/api/v1/users/2",
+        "redactions_applied": 2,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_bab1496f",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "POST",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": {
+        "user_id": 3,
+        "password": "[REDACTED_CREDENTIAL]"
+      },
+      "response_payload": {
+        "id": 3,
+        "username": "user_3",
+        "role": "ADMIN"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.53449,
+      "metadata": {
+        "original_route": "/api/v1/users/3",
+        "redactions_applied": 3,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_adaef1e5",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "GET",
+      "route": "/api/v1/orders",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": null,
+      "response_payload": {
+        "id": 4,
+        "username": "user_4",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.534504,
+      "metadata": {
+        "original_route": "/api/v1/orders",
+        "redactions_applied": 2,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_437de46e",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "POST",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": {
+        "user_id": 5,
+        "password": "[REDACTED_CREDENTIAL]"
+      },
+      "response_payload": {
+        "id": 5,
+        "username": "user_5",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5345182,
+      "metadata": {
+        "original_route": "/api/v1/users/5",
+        "redactions_applied": 3,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_86ac8433",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "GET",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": null,
+      "response_payload": {
+        "id": 6,
+        "username": "user_6",
+        "role": "ADMIN"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5345302,
+      "metadata": {
+        "original_route": "/api/v1/users/6",
+        "redactions_applied": 2,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_fbf9aafb",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "POST",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": {
+        "user_id": 7,
+        "password": "[REDACTED_CREDENTIAL]"
+      },
+      "response_payload": {
+        "id": 7,
+        "username": "user_7",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.534543,
+      "metadata": {
+        "original_route": "/api/v1/users/7",
+        "redactions_applied": 3,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_87244c5a",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "GET",
+      "route": "/api/v1/orders",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": null,
+      "response_payload": {
+        "id": 8,
+        "username": "user_8",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.534553,
+      "metadata": {
+        "original_route": "/api/v1/orders",
+        "redactions_applied": 2,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_c9d2b003",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "POST",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": {
+        "user_id": 9,
+        "password": "[REDACTED_CREDENTIAL]"
+      },
+      "response_payload": {
+        "id": 9,
+        "username": "user_9",
+        "role": "ADMIN"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5345638,
+      "metadata": {
+        "original_route": "/api/v1/users/9",
+        "redactions_applied": 3,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_33c055da",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "GET",
+      "route": "/api/v1/users/{id}",
+      "status_code": 401,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": null,
+      "response_payload": {
+        "id": 10,
+        "username": "user_10",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5345757,
+      "metadata": {
+        "original_route": "/api/v1/users/10",
+        "redactions_applied": 2,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_ca3a28f1",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "POST",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": {
+        "user_id": 11,
+        "password": "[REDACTED_CREDENTIAL]"
+      },
+      "response_payload": {
+        "id": 11,
+        "username": "user_11",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5345874,
+      "metadata": {
+        "original_route": "/api/v1/users/11",
+        "redactions_applied": 3,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_df14b57f",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "GET",
+      "route": "/api/v1/orders",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": null,
+      "response_payload": {
+        "id": 12,
+        "username": "user_12",
+        "role": "ADMIN"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5345976,
+      "metadata": {
+        "original_route": "/api/v1/orders",
+        "redactions_applied": 2,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_a920f3c9",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "POST",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": {
+        "user_id": 13,
+        "password": "[REDACTED_CREDENTIAL]"
+      },
+      "response_payload": {
+        "id": 13,
+        "username": "user_13",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5346105,
+      "metadata": {
+        "original_route": "/api/v1/users/13",
+        "redactions_applied": 3,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_973ff4b1",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "GET",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": null,
+      "response_payload": {
+        "id": 14,
+        "username": "user_14",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.534622,
+      "metadata": {
+        "original_route": "/api/v1/users/14",
+        "redactions_applied": 2,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_79f5e912",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "POST",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": {
+        "user_id": 15,
+        "password": "[REDACTED_CREDENTIAL]"
+      },
+      "response_payload": {
+        "id": 15,
+        "username": "user_15",
+        "role": "ADMIN"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5346332,
+      "metadata": {
+        "original_route": "/api/v1/users/15",
+        "redactions_applied": 3,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_c36c2ac9",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "GET",
+      "route": "/api/v1/orders",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": null,
+      "response_payload": {
+        "id": 16,
+        "username": "user_16",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.534643,
+      "metadata": {
+        "original_route": "/api/v1/orders",
+        "redactions_applied": 2,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_afdfde0a",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "POST",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": {
+        "user_id": 17,
+        "password": "[REDACTED_CREDENTIAL]"
+      },
+      "response_payload": {
+        "id": 17,
+        "username": "user_17",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5346558,
+      "metadata": {
+        "original_route": "/api/v1/users/17",
+        "redactions_applied": 3,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_fd59c902",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "GET",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": null,
+      "response_payload": {
+        "id": 18,
+        "username": "user_18",
+        "role": "ADMIN"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.534666,
+      "metadata": {
+        "original_route": "/api/v1/users/18",
+        "redactions_applied": 2,
+        "security_alerts": []
+      }
+    },
+    {
+      "observation_id": "obs_f5d253de",
+      "source_type": "BROWSER_NETWORK_LOGS",
+      "method": "POST",
+      "route": "/api/v1/users/{id}",
+      "status_code": 200,
+      "request_headers": {
+        "Authorization": "[REDACTED_CREDENTIAL]",
+        "Cookie": "[REDACTED_CREDENTIAL]"
+      },
+      "request_payload": {
+        "user_id": 19,
+        "password": "[REDACTED_CREDENTIAL]"
+      },
+      "response_payload": {
+        "id": 19,
+        "username": "user_19",
+        "role": "MEMBER"
+      },
+      "content_type": "application/json",
+      "response_time_ms": 12.5,
+      "timestamp": 1789223213.5348728,
+      "metadata": {
+        "original_route": "/api/v1/users/19",
+        "redactions_applied": 3,
+        "security_alerts": []
+      }
+    }
+  ]
+}

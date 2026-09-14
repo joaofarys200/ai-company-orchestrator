@@ -1,0 +1,26 @@
+[
+  {
+    "proposal_id": "prop_c_oscillation_defense_1_37623",
+    "source_outcome_id": "out_m_oscillation_defense_c_oscillation_defense_1_37622",
+    "current_policy_version": "40.1.0",
+    "proposed_policy_version": "41.0.0",
+    "change_type": "REFINE_CONDITION",
+    "affected_rules": [
+      "RULE_03_OSCILLATION_DETECTED"
+    ],
+    "old_conditions": "ctx.oscillation_status == OscillationStatus.CONFIRMED_OSCILLATION",
+    "new_conditions": "ctx.oscillation_status == OscillationStatus.CONFIRMED_OSCILLATION or ctx.loop_state.oscillation_status == OscillationStatus.CONFIRMED_OSCILLATION",
+    "expected_benefit": "Guarantees oscillation history recorded in previous cycle is evaluated before deciding next step, eliminating observation gap in Decision #191.",
+    "possible_regression": "None. Security Sentinel and Finish Gate invariants are untouched.",
+    "evidence_refs": [
+      "EVD_OSC_DEFENSE_01"
+    ],
+    "confidence": 0.98,
+    "requires_human_review": true,
+    "status": "PROPOSED",
+    "created_at": 1789154937.6239316,
+    "approved_by": null,
+    "approved_at": null,
+    "rejection_reason": null
+  }
+]

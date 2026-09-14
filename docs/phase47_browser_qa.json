@@ -1,0 +1,167 @@
+{
+  "timestamp": 1789225763.9571877,
+  "phase": 47,
+  "feature": "Polymorphic Schema Semantics & Contract Compatibility",
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "scenarios_count": 15,
+  "scenarios": [
+    {
+      "scenario_id": 1,
+      "title": "Polymorphic Contract Overview",
+      "passed": true
+    },
+    {
+      "scenario_id": 2,
+      "title": "Explicit Discriminator",
+      "passed": true
+    },
+    {
+      "scenario_id": 3,
+      "title": "Inferred Variant",
+      "passed": true
+    },
+    {
+      "scenario_id": 4,
+      "title": "Ambiguous Variant Warning",
+      "passed": true
+    },
+    {
+      "scenario_id": 5,
+      "title": "Variant-Specific Requiredness",
+      "passed": true
+    },
+    {
+      "scenario_id": 6,
+      "title": "Variant Diff Viewer",
+      "passed": true
+    },
+    {
+      "scenario_id": 7,
+      "title": "Variant Addition",
+      "passed": true
+    },
+    {
+      "scenario_id": 8,
+      "title": "Variant Removal & Compatibility Checks",
+      "passed": true
+    },
+    {
+      "scenario_id": 9,
+      "title": "Consumer Impact Matrix",
+      "passed": true
+    },
+    {
+      "scenario_id": 10,
+      "title": "Cross-Language Union",
+      "passed": true
+    },
+    {
+      "scenario_id": 11,
+      "title": "Runtime Discovery",
+      "passed": true
+    },
+    {
+      "scenario_id": 12,
+      "title": "Human Approval Action",
+      "passed": true
+    },
+    {
+      "scenario_id": 13,
+      "title": "Breaking Variant Change",
+      "passed": true
+    },
+    {
+      "scenario_id": 14,
+      "title": "Variant Rollback",
+      "passed": true
+    },
+    {
+      "scenario_id": 15,
+      "title": "Why Polymorphic Drift",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    {
+      "filename": "phase47_01_polymorphic_contract_overview.png",
+      "description": "Polymorphic contract governance overview displaying metrics grid, active schema selector, and formal VARIANT != CONTRACT invariant alert",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_01_polymorphic_contract_overview.png"
+    },
+    {
+      "filename": "phase47_02_explicit_discriminator.png",
+      "description": "Explicit discriminator card showing field 'type' at BODY location with 100% confidence over 13,960 runtime observations",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_02_explicit_discriminator.png"
+    },
+    {
+      "filename": "phase47_03_inferred_variant.png",
+      "description": "Inferred discriminator card showing structural field-presence candidate with PROPOSED status, avoiding false universal promotion",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_03_inferred_variant.png"
+    },
+    {
+      "filename": "phase47_04_ambiguous_variant.png",
+      "description": "Ambiguous variant warning banner enforcing Rule 28: overlapping shapes remain strictly UNCERTAIN without guessing",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_04_ambiguous_variant.png"
+    },
+    {
+      "filename": "phase47_05_variant_specific_requiredness.png",
+      "description": "Requiredness matrix table displaying global common fields and variant-specific required, forbidden, and optional constraints",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_05_variant_specific_requiredness.png"
+    },
+    {
+      "filename": "phase47_06_variant_diff.png",
+      "description": "Structural diff viewer comparing UserCreated vs UserArchived highlighting added required fields and forbidden properties",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_06_variant_diff.png"
+    },
+    {
+      "filename": "phase47_07_variant_addition.png",
+      "description": "Variant addition view displaying UserArchived runtime-proposed variant with discriminator 'user.archived' and compliance audit",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_07_variant_addition.png"
+    },
+    {
+      "filename": "phase47_08_variant_removal.png",
+      "description": "Schema compatibility matrix evaluating Old vs New contracts, identifying COMPATIBLE, INCOMPATIBLE, and POTENTIALLY_BREAKING transitions",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_08_variant_removal.png"
+    },
+    {
+      "filename": "phase47_09_consumer_impact.png",
+      "description": "Consumer impact matrix tracking consumers stances (ALREADY_TOLERATES, IGNORES, POTENTIALLY_BREAKING) per registered consumer",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_09_consumer_impact.png"
+    },
+    {
+      "filename": "phase47_10_cross_language_union.png",
+      "description": "Cross-language semantic graph card displaying union type equivalents in TypeScript, Python, and Rust with bidirectional proof",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_10_cross_language_union.png"
+    },
+    {
+      "filename": "phase47_11_runtime_discovery.png",
+      "description": "Runtime discovery of discriminated union for POST /api/v2/payments/checkout with variants SUCCESS, REQUIRES_ACTION, FAILED",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_11_runtime_discovery.png"
+    },
+    {
+      "filename": "phase47_12_human_approval.png",
+      "description": "Human approval action validating proposed variant UserArchived with success banner and status updated to VALIDATED",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_12_human_approval.png"
+    },
+    {
+      "filename": "phase47_13_breaking_variant_change.png",
+      "description": "Breaking variant change alert for consumer 'crm-sync-worker' showing POTENTIALLY_BREAKING stance and auto-generated mitigation task",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_13_breaking_variant_change.png"
+    },
+    {
+      "filename": "phase47_14_variant_rollback.png",
+      "description": "Deterministic variant rollback action safely reverting variant from active baseline while keeping audit history",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_14_variant_rollback.png"
+    },
+    {
+      "filename": "phase47_15_why_polymorphic_drift.png",
+      "description": "Why Polymorphic Drift explanation panel answering causal step-by-step why runtime variation represents polymorphic variants not schema drift",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase47\\phase47_15_why_polymorphic_drift.png"
+    }
+  ],
+  "console_errors": [],
+  "network_errors": [],
+  "passed": true,
+  "console_errors_count": 0,
+  "network_errors_count": 0
+}

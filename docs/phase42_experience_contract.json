@@ -1,0 +1,61 @@
+{
+  "phase": 42,
+  "contract_name": "ExperienceRecord_Causal_Memory_Contract",
+  "invariants": [
+    "memory_never_directly_authorizes_execution",
+    "memory_never_mutates_mission_state",
+    "historical_experience_is_immutable",
+    "stale_memory_cannot_be_treated_as_current",
+    "conflicting_experience_is_explicitly_represented",
+    "future_information_cannot_leak_backwards",
+    "malicious_memory_cannot_become_executable_instruction",
+    "mission_gate_remains_authoritative",
+    "security_sentinel_remains_authoritative",
+    "evidence_remains_authoritative",
+    "policy_version_remains_explicit",
+    "memory_influence_is_auditable",
+    "no_experience_is_silently_discarded"
+  ],
+  "fields": [
+    "experience_id",
+    "mission_id",
+    "cycle_id",
+    "intent_signature",
+    "mission_context",
+    "decision",
+    "policy_version",
+    "observation",
+    "outcome",
+    "root_cause",
+    "severity",
+    "prediction",
+    "actual_result",
+    "adaptation",
+    "evidence_refs",
+    "task_refs",
+    "architecture_refs",
+    "tags",
+    "applicability",
+    "confidence",
+    "created_at",
+    "source_type",
+    "source_hash",
+    "causal_chain",
+    "temporal_validity",
+    "curation_status"
+  ],
+  "allowed_influence_types": [
+    "NONE",
+    "CONTEXT_ONLY",
+    "DIAGNOSTIC",
+    "PLANNING_HINT",
+    "PREDICTION_HINT",
+    "REPAIR_HINT",
+    "ESCALATION_HINT"
+  ],
+  "forbidden_influence_types": [
+    "DIRECT_AUTHORIZATION",
+    "STATE_MUTATION",
+    "GATE_BYPASS"
+  ]
+}

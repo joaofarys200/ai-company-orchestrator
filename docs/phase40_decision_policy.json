@@ -1,0 +1,118 @@
+{
+  "policy_name": "AutonomousLoopDeterministicPolicy",
+  "policy_version": "1.0.0",
+  "rules": [
+    {
+      "rule_id": 1,
+      "name": "SECURITY_BLOCK",
+      "priority": 100,
+      "conditions": "ctx.security_blocked == True or ctx.security_violations is not empty",
+      "decision": "BLOCK",
+      "rationale": "Security invariant violation detected by Security Sentinel. Operational loop halted immediately."
+    },
+    {
+      "rule_id": 2,
+      "name": "BUDGET_EXCEEDED",
+      "priority": 95,
+      "conditions": "ctx.budget.is_exceeded() or ctx.consecutive_failures >= ctx.budget.max_consecutive_failures",
+      "decision": "REQUEST_HUMAN",
+      "rationale": "Autonomous budget exceeded (adaptations, repairs, or consecutive failures). Requires human governance."
+    },
+    {
+      "rule_id": 3,
+      "name": "OSCILLATION_DETECTED",
+      "priority": 90,
+      "conditions": "ctx.oscillation_detected == True or ctx.repeated_cycles >= 2",
+      "decision": "REQUEST_HUMAN",
+      "rationale": "State repetition cycle detected (A -> B -> A). Loop halted to prevent infinite churn."
+    },
+    {
+      "rule_id": 4,
+      "name": "UNEXPECTED_DRIFT",
+      "priority": 85,
+      "conditions": "ctx.drift_classification == UNEXPECTED_DRIFT",
+      "decision": "REQUEST_HUMAN",
+      "rationale": "Mission intent/requirements drifted beyond tolerance without formal intent amendment."
+    },
+    {
+      "rule_id": 5,
+      "name": "HUMAN_APPROVAL_PENDING",
+      "priority": 80,
+      "conditions": "ctx.pending_human_approval == True or ctx.requires_financial_approval == True",
+      "decision": "REQUEST_HUMAN",
+      "rationale": "Action requires explicit human authorization or economic clearance under Mission Gate."
+    },
+    {
+      "rule_id": 6,
+      "name": "TERMINAL_FINISH",
+      "priority": 75,
+      "conditions": "all_requirements_satisfied and all_validations_passed and evidence_complete and not active_failures",
+      "decision": "FINISH",
+      "rationale": "All mission requirements verified with empirical proof under Zero False Success standard."
+    },
+    {
+      "rule_id": 7,
+      "name": "REPAIR_VERIFIED",
+      "priority": 70,
+      "conditions": "ctx.active_repair_in_progress and repair_evidence_verified == True",
+      "decision": "CONTINUE",
+      "rationale": "Self-healing repair succeeded and produced verified AST/test evidence. Resuming mission."
+    },
+    {
+      "rule_id": 8,
+      "name": "AGENT_UNAVAILABLE",
+      "priority": 65,
+      "conditions": "ctx.task_owner_unavailable and ctx.alternative_agent_available == True",
+      "decision": "REASSIGN",
+      "rationale": "Task owner agent disconnected or crashed; compatible agent available in swarm."
+    },
+    {
+      "rule_id": 9,
+      "name": "REPAIRABLE_FAILURE",
+      "priority": 60,
+      "conditions": "ctx.active_failures is not empty and ctx.failure_is_repairable and repairs_count < max_repairs",
+      "decision": "REPAIR",
+      "rationale": "Validation/build failure is repairable via localized AST diagnostic patch."
+    },
+    {
+      "rule_id": 10,
+      "name": "UNREPAIRABLE_FAILURE",
+      "priority": 55,
+      "conditions": "ctx.active_failures is not empty and (not ctx.failure_is_repairable or repairs_count >= max_repairs)",
+      "decision": "REPLAN",
+      "rationale": "Failure cannot be repaired surgically; requiring structural DAG replan."
+    },
+    {
+      "rule_id": 11,
+      "name": "PLAN_INVALID_OR_NEW_DEP",
+      "priority": 50,
+      "conditions": "ctx.plan_invalid or ctx.new_dependencies_discovered is not empty",
+      "decision": "REPLAN",
+      "rationale": "New file/package dependency discovered dynamically; DAG must be reconstructed."
+    },
+    {
+      "rule_id": 12,
+      "name": "PREDICTION_DEVIATION",
+      "priority": 45,
+      "conditions": "ctx.prediction_outcome and ctx.prediction_outcome.unexpected_changes is not empty and satisfiable",
+      "decision": "ADAPT",
+      "rationale": "Observed execution touched unexpected files; adapting DAG validation scope to maintain integrity."
+    },
+    {
+      "rule_id": 13,
+      "name": "INCOMPLETE_EVIDENCE",
+      "priority": 40,
+      "conditions": "ctx.evidence_incomplete and not ctx.active_failures",
+      "decision": "WAIT",
+      "rationale": "Asynchronous validation tasks or browser telemetry still recording evidence."
+    },
+    {
+      "rule_id": 14,
+      "name": "DEFAULT_PROGRESS",
+      "priority": 10,
+      "conditions": "no blocking conditions; tasks pending",
+      "decision": "CONTINUE",
+      "rationale": "Plan is valid, prediction matches reality, advancing to next executable task."
+    }
+  ]
+}

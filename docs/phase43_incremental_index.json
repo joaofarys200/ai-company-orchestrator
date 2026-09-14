@@ -1,0 +1,16 @@
+{
+  "method": "Event-driven incremental indexing via bisect.insort O(log N)",
+  "telemetry": {
+    "append_1_ms": 0.0018,
+    "append_10_ms": 0.0529,
+    "append_100_ms": 0.4784,
+    "rebuild_10k_ms": 12.07,
+    "speedup_ratio": 6707.5
+  },
+  "index_metadata": {
+    "index_version": "43.0.0",
+    "schema_version": "2.0.0",
+    "policy_version": "43.0.0",
+    "architecture_snapshot": "JARVIS_PHASE_43_MODULAR"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "rep_13eb1a35bec1e2b2": {
+    "repair_id": "rep_13eb1a35bec1e2b2",
+    "diagnostic_id": "diag_ref_1bc45139de29657b",
+    "category": "MIDDLEWARE_MISSING",
+    "confidence": "HIGH_CONFIDENCE",
+    "reason": "Instanciar aplica\u00e7\u00e3o Express e middlewares para resolver ReferenceError: app is not defined",
+    "file_patches": [
+      {
+        "relative_path": "app.js",
+        "original_content_length": 165,
+        "patched_content_length": 522,
+        "reason": "Adi\u00e7\u00e3o de imports do Express e inicializa\u00e7\u00e3o do servidor"
+      }
+    ],
+    "risk_score": 0.1,
+    "rollback_plan": {
+      "strategy": "RESTORE_SNAPSHOT",
+      "files": [
+        "app.js"
+      ],
+      "created_at": 1789404633.6659083
+    },
+    "expected_effect": "Aplica\u00e7\u00e3o Express inicializada e rotas registadas sem ReferenceError",
+    "created_at": 1789404633.6659124
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "timestamp": 1789333033.7234836,
+  "phase": 49,
+  "environment": {
+    "os": "Windows",
+    "python": "3.14.7"
+  },
+  "scales": {
+    "scale_100": {
+      "extraction_and_normalization_ms": 0.84,
+      "extraction_throughput_entities_per_sec": 119161.1,
+      "dynamic_consumers_tested": 100,
+      "dynamic_consumers_resolved": 10,
+      "dynamic_consumers_uncertain_preserved": 50,
+      "dynamic_resolution_ms": 0.53,
+      "dynamic_resolution_throughput_ops_sec": 190150.2,
+      "graph_integration_ms": 1.39,
+      "graph_nodes_count": 400,
+      "graph_edges_count": 300
+    },
+    "scale_1000": {
+      "extraction_and_normalization_ms": 6.31,
+      "extraction_throughput_entities_per_sec": 158516.3,
+      "dynamic_consumers_tested": 1000,
+      "dynamic_consumers_resolved": 100,
+      "dynamic_consumers_uncertain_preserved": 500,
+      "dynamic_resolution_ms": 5.91,
+      "dynamic_resolution_throughput_ops_sec": 169067.4,
+      "graph_integration_ms": 13.16,
+      "graph_nodes_count": 4000,
+      "graph_edges_count": 3000
+    },
+    "scale_10000": {
+      "extraction_and_normalization_ms": 62.71,
+      "extraction_throughput_entities_per_sec": 159462.7,
+      "dynamic_consumers_tested": 10000,
+      "dynamic_consumers_resolved": 1000,
+      "dynamic_consumers_uncertain_preserved": 5000,
+      "dynamic_resolution_ms": 64.01,
+      "dynamic_resolution_throughput_ops_sec": 156230.0,
+      "graph_integration_ms": 167.9,
+      "graph_nodes_count": 40000,
+      "graph_edges_count": 30000
+    },
+    "scale_100000": {
+      "extraction_and_normalization_ms": 834.85,
+      "extraction_throughput_entities_per_sec": 119782.3,
+      "dynamic_consumers_tested": 20000,
+      "dynamic_consumers_resolved": 2000,
+      "dynamic_consumers_uncertain_preserved": 10000,
+      "dynamic_resolution_ms": 266.33,
+      "dynamic_resolution_throughput_ops_sec": 75095.3,
+      "graph_integration_ms": "N/A (sharded partition above 10K)"
+    }
+  },
+  "microbenchmark": {
+    "structural_hash_latency_us": 1.569,
+    "cache_key_computation_latency_us": 1.25,
+    "pattern_ast_match_latency_us": 3.4,
+    "uncertain_rejection_latency_us": 0.85
+  },
+  "mission_level": {
+    "end_to_end_pipeline_overhead_ms": 14.8,
+    "predictive_impact_delta_overhead_ms": 6.2,
+    "task_reconciliation_time_ms": 8.4,
+    "mission_gate_check_overhead_ms": 1.1
+  }
+}

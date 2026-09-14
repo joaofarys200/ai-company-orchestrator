@@ -1,0 +1,112 @@
+[
+  {
+    "migration_id": "mig_real_01_list_missions",
+    "contract_id": "listMissionsEndpoint",
+    "policy": "STANDARD",
+    "budget": {
+      "max_cost": 80.0,
+      "max_runtime": 4.0,
+      "max_scenarios": 41,
+      "max_depth": 2,
+      "risk_budget": 0.5,
+      "cost_spent": 28.0,
+      "runtime_spent": 0.0077,
+      "scenarios_executed": 28,
+      "scenarios_skipped": 3
+    },
+    "scenarios_ranked": 31,
+    "scenarios_executed": 28,
+    "scenarios_skipped": 3,
+    "early_stopped": true,
+    "early_stop_reason": "Proof conditions achieved: 83.3% coverage met under STANDARD policy",
+    "scenario_efficiency": 0.000346
+  },
+  {
+    "migration_id": "mig_real_02_payment_clearing",
+    "contract_id": "economicDisbursementContract",
+    "policy": "ECONOMIC_CRITICAL",
+    "budget": {
+      "max_cost": 150.0,
+      "max_runtime": 8.0,
+      "max_scenarios": 120,
+      "max_depth": 4,
+      "risk_budget": 1.5,
+      "cost_spent": 31.0,
+      "runtime_spent": 0.0097,
+      "scenarios_executed": 31,
+      "scenarios_skipped": 0
+    },
+    "scenarios_ranked": 31,
+    "scenarios_executed": 31,
+    "scenarios_skipped": 0,
+    "early_stopped": false,
+    "early_stop_reason": null,
+    "scenario_efficiency": 0.0
+  },
+  {
+    "migration_id": "mig_real_03_auth_jwt_sentinel",
+    "contract_id": "securityAuthSentinelVerify",
+    "policy": "SECURITY_CRITICAL",
+    "budget": {
+      "max_cost": 150.0,
+      "max_runtime": 8.0,
+      "max_scenarios": 120,
+      "max_depth": 4,
+      "risk_budget": 1.5,
+      "cost_spent": 22.0,
+      "runtime_spent": 0.0072,
+      "scenarios_executed": 22,
+      "scenarios_skipped": 0
+    },
+    "scenarios_ranked": 22,
+    "scenarios_executed": 22,
+    "scenarios_skipped": 0,
+    "early_stopped": false,
+    "early_stop_reason": null,
+    "scenario_efficiency": 0.0
+  },
+  {
+    "migration_id": "mig_real_04_dynamic_unresolved",
+    "contract_id": "runtimeDynamicPluginConsumer",
+    "policy": "STANDARD",
+    "budget": {
+      "max_cost": 80.0,
+      "max_runtime": 4.0,
+      "max_scenarios": 44,
+      "max_depth": 2,
+      "risk_budget": 0.5,
+      "cost_spent": 1.0,
+      "runtime_spent": 0.0002,
+      "scenarios_executed": 1,
+      "scenarios_skipped": 15
+    },
+    "scenarios_ranked": 16,
+    "scenarios_executed": 1,
+    "scenarios_skipped": 15,
+    "early_stopped": true,
+    "early_stop_reason": "Proof conditions achieved: 90.0% coverage met under STANDARD policy",
+    "scenario_efficiency": 0.09375
+  },
+  {
+    "migration_id": "mig_real_05_breaking_discount",
+    "contract_id": "orderCalculationContract",
+    "policy": "STANDARD",
+    "budget": {
+      "max_cost": 80.0,
+      "max_runtime": 4.0,
+      "max_scenarios": 40,
+      "max_depth": 2,
+      "risk_budget": 0.5,
+      "cost_spent": 1.0,
+      "runtime_spent": 0.0003,
+      "scenarios_executed": 1,
+      "scenarios_skipped": 35
+    },
+    "scenarios_ranked": 26,
+    "scenarios_executed": 1,
+    "scenarios_skipped": 35,
+    "early_stopped": true,
+    "early_stop_reason": "Counterexample detected in scenario scen_0f00ed9d7825ddae: Output payload divergence between before and after versions",
+    "scenario_efficiency": 0.096154
+  }
+]

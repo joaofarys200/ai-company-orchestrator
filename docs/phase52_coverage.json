@@ -1,0 +1,902 @@
+[
+  {
+    "coverage_id": "cov_1bdf17750f22c04c",
+    "scope_id": "scp_adapt_d550902685531672",
+    "dimensions": {
+      "field": {
+        "dimension": "field",
+        "total": 3,
+        "covered": 3,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "limit",
+          "offset",
+          "status_filter"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "input": {
+        "dimension": "input",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "boundary",
+          "missing_required",
+          "null_value",
+          "unknown_field",
+          "valid_input"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "branch": {
+        "dimension": "branch",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "status_200",
+          "status_400",
+          "status_401",
+          "status_500",
+          "status_504"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "variant": {
+        "dimension": "variant",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "PREMIUM_TIER",
+          "STANDARD_TIER"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "error_path": {
+        "dimension": "error_path",
+        "total": 4,
+        "covered": 4,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "authorization_failure",
+          "invalid_enum",
+          "partial_failure_rollback",
+          "timeout_recovery"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "invariant": {
+        "dimension": "invariant",
+        "total": 7,
+        "covered": 7,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "AUTHORIZATION_PRESERVED",
+          "CONSUMER_EXPECTATION_PRESERVED",
+          "ECONOMIC_VALUE_PRESERVED",
+          "ERROR_SEMANTICS_PRESERVED",
+          "EVENT_SEMANTICS_PRESERVED",
+          "REQUIRED_FIELDS_PRESERVED",
+          "SIDE_EFFECT_ORDER_PRESERVED"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "consumer": {
+        "dimension": "consumer",
+        "total": 3,
+        "covered": 1,
+        "uncovered": 2,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.3333,
+        "covered_items": [
+          "frontend-mission-control"
+        ],
+        "uncovered_items": [
+          "audit-service",
+          "cli-agent-runner"
+        ],
+        "unknown_items": []
+      },
+      "event": {
+        "dimension": "event",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "duplicate_event"
+        ],
+        "uncovered_items": [
+          "event_dispatch"
+        ],
+        "unknown_items": []
+      },
+      "side_effect": {
+        "dimension": "side_effect",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "retry_idempotency"
+        ],
+        "uncovered_items": [
+          "side_effect_order"
+        ],
+        "unknown_items": []
+      },
+      "authorization": {
+        "dimension": "authorization",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "authorization_failure",
+          "authorization_state"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      }
+    },
+    "overall_percentage": 0.8333,
+    "threshold_policy": "STANDARD",
+    "threshold_met": true,
+    "uncovered_items": [
+      "consumer:audit-service",
+      "consumer:cli-agent-runner"
+    ],
+    "unknown_items": [],
+    "evaluated_at": 1789340463.0786538
+  },
+  {
+    "coverage_id": "cov_7a157ed660bc1bc8",
+    "scope_id": "scp_adapt_3b39759ef7a180cc",
+    "dimensions": {
+      "field": {
+        "dimension": "field",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "amount",
+          "beneficiary",
+          "currency",
+          "id",
+          "settlement_type"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "input": {
+        "dimension": "input",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "boundary",
+          "missing_required",
+          "null_value",
+          "unknown_field",
+          "valid_input"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "branch": {
+        "dimension": "branch",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "status_200",
+          "status_400",
+          "status_401",
+          "status_500",
+          "status_504"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "variant": {
+        "dimension": "variant",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "PREMIUM_TIER",
+          "STANDARD_TIER"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "error_path": {
+        "dimension": "error_path",
+        "total": 4,
+        "covered": 4,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "authorization_failure",
+          "invalid_enum",
+          "partial_failure_rollback",
+          "timeout_recovery"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "invariant": {
+        "dimension": "invariant",
+        "total": 7,
+        "covered": 7,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "AUTHORIZATION_PRESERVED",
+          "CONSUMER_EXPECTATION_PRESERVED",
+          "ECONOMIC_VALUE_PRESERVED",
+          "ERROR_SEMANTICS_PRESERVED",
+          "EVENT_SEMANTICS_PRESERVED",
+          "REQUIRED_FIELDS_PRESERVED",
+          "SIDE_EFFECT_ORDER_PRESERVED"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "consumer": {
+        "dimension": "consumer",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "treasury-service"
+        ],
+        "uncovered_items": [
+          "ledger-sync"
+        ],
+        "unknown_items": []
+      },
+      "event": {
+        "dimension": "event",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "duplicate_event"
+        ],
+        "uncovered_items": [
+          "event_dispatch"
+        ],
+        "unknown_items": []
+      },
+      "side_effect": {
+        "dimension": "side_effect",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "retry_idempotency"
+        ],
+        "uncovered_items": [
+          "side_effect_order"
+        ],
+        "unknown_items": []
+      },
+      "authorization": {
+        "dimension": "authorization",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "authorization_failure",
+          "authorization_state"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      }
+    },
+    "overall_percentage": 0.85,
+    "threshold_policy": "CRITICAL",
+    "threshold_met": false,
+    "uncovered_items": [
+      "consumer:ledger-sync"
+    ],
+    "unknown_items": [],
+    "evaluated_at": 1789340463.0894768
+  },
+  {
+    "coverage_id": "cov_2b115d8e1c2993a4",
+    "scope_id": "scp_adapt_be9358621d394cf7",
+    "dimensions": {
+      "field": {
+        "dimension": "field",
+        "total": 3,
+        "covered": 3,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "client_id",
+          "required_role",
+          "token"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "input": {
+        "dimension": "input",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "boundary",
+          "missing_required",
+          "null_value",
+          "unknown_field",
+          "valid_input"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "branch": {
+        "dimension": "branch",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "status_200",
+          "status_400",
+          "status_401",
+          "status_500",
+          "status_504"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "variant": {
+        "dimension": "variant",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "PREMIUM_TIER",
+          "STANDARD_TIER"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "error_path": {
+        "dimension": "error_path",
+        "total": 4,
+        "covered": 4,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "authorization_failure",
+          "invalid_enum",
+          "partial_failure_rollback",
+          "timeout_recovery"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "invariant": {
+        "dimension": "invariant",
+        "total": 7,
+        "covered": 7,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "AUTHORIZATION_PRESERVED",
+          "CONSUMER_EXPECTATION_PRESERVED",
+          "ECONOMIC_VALUE_PRESERVED",
+          "ERROR_SEMANTICS_PRESERVED",
+          "EVENT_SEMANTICS_PRESERVED",
+          "REQUIRED_FIELDS_PRESERVED",
+          "SIDE_EFFECT_ORDER_PRESERVED"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "consumer": {
+        "dimension": "consumer",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "api-gateway"
+        ],
+        "uncovered_items": [
+          "websocket-server"
+        ],
+        "unknown_items": []
+      },
+      "event": {
+        "dimension": "event",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "duplicate_event"
+        ],
+        "uncovered_items": [
+          "event_dispatch"
+        ],
+        "unknown_items": []
+      },
+      "side_effect": {
+        "dimension": "side_effect",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "retry_idempotency"
+        ],
+        "uncovered_items": [
+          "side_effect_order"
+        ],
+        "unknown_items": []
+      },
+      "authorization": {
+        "dimension": "authorization",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "authorization_failure",
+          "authorization_state"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      }
+    },
+    "overall_percentage": 0.85,
+    "threshold_policy": "CRITICAL",
+    "threshold_met": false,
+    "uncovered_items": [
+      "consumer:websocket-server"
+    ],
+    "unknown_items": [],
+    "evaluated_at": 1789340463.0975504
+  },
+  {
+    "coverage_id": "cov_08e3255b2b0e4c89",
+    "scope_id": "scp_adapt_6c0f41f3f8878a3f",
+    "dimensions": {
+      "field": {
+        "dimension": "field",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "config_payload",
+          "plugin_id"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "input": {
+        "dimension": "input",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "boundary",
+          "missing_required",
+          "null_value",
+          "unknown_field",
+          "valid_input"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "branch": {
+        "dimension": "branch",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "status_200",
+          "status_400",
+          "status_401",
+          "status_500",
+          "status_504"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "variant": {
+        "dimension": "variant",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "PREMIUM_TIER",
+          "STANDARD_TIER"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "error_path": {
+        "dimension": "error_path",
+        "total": 4,
+        "covered": 4,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "authorization_failure",
+          "invalid_enum",
+          "partial_failure_rollback",
+          "timeout_recovery"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "invariant": {
+        "dimension": "invariant",
+        "total": 7,
+        "covered": 7,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "AUTHORIZATION_PRESERVED",
+          "CONSUMER_EXPECTATION_PRESERVED",
+          "ECONOMIC_VALUE_PRESERVED",
+          "ERROR_SEMANTICS_PRESERVED",
+          "EVENT_SEMANTICS_PRESERVED",
+          "REQUIRED_FIELDS_PRESERVED",
+          "SIDE_EFFECT_ORDER_PRESERVED"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "consumer": {
+        "dimension": "consumer",
+        "total": 1,
+        "covered": 1,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "plugin-loader"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "event": {
+        "dimension": "event",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "duplicate_event"
+        ],
+        "uncovered_items": [
+          "event_dispatch"
+        ],
+        "unknown_items": []
+      },
+      "side_effect": {
+        "dimension": "side_effect",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "retry_idempotency"
+        ],
+        "uncovered_items": [
+          "side_effect_order"
+        ],
+        "unknown_items": []
+      },
+      "authorization": {
+        "dimension": "authorization",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "authorization_failure",
+          "authorization_state"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      }
+    },
+    "overall_percentage": 0.9,
+    "threshold_policy": "STANDARD",
+    "threshold_met": true,
+    "uncovered_items": [],
+    "unknown_items": [],
+    "evaluated_at": 1789340463.098641
+  },
+  {
+    "coverage_id": "cov_925be850d5abfc54",
+    "scope_id": "scp_adapt_5537a76fbe832b0e",
+    "dimensions": {
+      "field": {
+        "dimension": "field",
+        "total": 3,
+        "covered": 3,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "discount_rate",
+          "order_id",
+          "subtotal"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "input": {
+        "dimension": "input",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "boundary",
+          "missing_required",
+          "null_value",
+          "unknown_field",
+          "valid_input"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "branch": {
+        "dimension": "branch",
+        "total": 5,
+        "covered": 5,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "status_200",
+          "status_400",
+          "status_401",
+          "status_500",
+          "status_504"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "variant": {
+        "dimension": "variant",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "PREMIUM_TIER",
+          "STANDARD_TIER"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "error_path": {
+        "dimension": "error_path",
+        "total": 4,
+        "covered": 4,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "authorization_failure",
+          "invalid_enum",
+          "partial_failure_rollback",
+          "timeout_recovery"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "invariant": {
+        "dimension": "invariant",
+        "total": 7,
+        "covered": 7,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "AUTHORIZATION_PRESERVED",
+          "CONSUMER_EXPECTATION_PRESERVED",
+          "ECONOMIC_VALUE_PRESERVED",
+          "ERROR_SEMANTICS_PRESERVED",
+          "EVENT_SEMANTICS_PRESERVED",
+          "REQUIRED_FIELDS_PRESERVED",
+          "SIDE_EFFECT_ORDER_PRESERVED"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "consumer": {
+        "dimension": "consumer",
+        "total": 1,
+        "covered": 1,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "checkout-ui"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      },
+      "event": {
+        "dimension": "event",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "duplicate_event"
+        ],
+        "uncovered_items": [
+          "event_dispatch"
+        ],
+        "unknown_items": []
+      },
+      "side_effect": {
+        "dimension": "side_effect",
+        "total": 2,
+        "covered": 1,
+        "uncovered": 1,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 0.5,
+        "covered_items": [
+          "retry_idempotency"
+        ],
+        "uncovered_items": [
+          "side_effect_order"
+        ],
+        "unknown_items": []
+      },
+      "authorization": {
+        "dimension": "authorization",
+        "total": 2,
+        "covered": 2,
+        "uncovered": 0,
+        "unknown": 0,
+        "not_applicable": 0,
+        "percentage": 1.0,
+        "covered_items": [
+          "authorization_failure",
+          "authorization_state"
+        ],
+        "uncovered_items": [],
+        "unknown_items": []
+      }
+    },
+    "overall_percentage": 0.9,
+    "threshold_policy": "STANDARD",
+    "threshold_met": true,
+    "uncovered_items": [],
+    "unknown_items": [],
+    "evaluated_at": 1789340463.1000538
+  }
+]

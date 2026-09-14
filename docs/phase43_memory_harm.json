@@ -1,0 +1,16 @@
+{
+  "memory_harm_rate": 0.0,
+  "false_memory_transfer_rate": 0.0,
+  "harm_investigation": {
+    "harmful_reusable_count": 0,
+    "stale_rejections": 25,
+    "incompatible_technology_rejections": 25,
+    "first_real_failure": "NOT_OBSERVED_IN_VALIDATED_CORPUS",
+    "recommended_action_policy": "Curate with MARK_MISLEADING or MARK_STALE without deleting history."
+  },
+  "sample_counts": {
+    "evaluated_reuses": 28,
+    "harmful_cases": 0,
+    "false_transfers": 0
+  }
+}

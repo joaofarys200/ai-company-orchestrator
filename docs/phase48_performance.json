@@ -1,0 +1,61 @@
+{
+  "scales": {
+    "10_items": {
+      "scale_count": 10,
+      "preflight_ops_sec": 18786.4,
+      "consumer_ops_sec": 199600.9,
+      "migration_ops_sec": 69396.24,
+      "verification_ops_sec": 65659.88,
+      "graph_traversal_ms": 0.068,
+      "total_elapsed_ms": 0.973
+    },
+    "100_items": {
+      "scale_count": 100,
+      "preflight_ops_sec": 51279.42,
+      "consumer_ops_sec": 314169.01,
+      "migration_ops_sec": 104515.05,
+      "verification_ops_sec": 374111.49,
+      "graph_traversal_ms": 0.284,
+      "total_elapsed_ms": 3.996
+    },
+    "1000_items": {
+      "scale_count": 1000,
+      "preflight_ops_sec": 50059.57,
+      "consumer_ops_sec": 193997.71,
+      "migration_ops_sec": 101524.9,
+      "verification_ops_sec": 389377.77,
+      "graph_traversal_ms": 2.818,
+      "total_elapsed_ms": 42.212
+    },
+    "10000_items": {
+      "scale_count": 10000,
+      "preflight_ops_sec": 48440.22,
+      "consumer_ops_sec": 193296.48,
+      "migration_ops_sec": 92681.27,
+      "verification_ops_sec": 344613.68,
+      "graph_traversal_ms": 3.217,
+      "total_elapsed_ms": 42.04
+    }
+  },
+  "microbenchmarks": {
+    "scenarios_analyzed": 10,
+    "predictions_generated": 10,
+    "migration_plans_generated": 10,
+    "rollbacks_simulated": 7,
+    "average_analysis_ms": 0.007
+  },
+  "summary": {
+    "status": "CONTRACT_AWARE_AUTONOMOUS_CHANGE_READY",
+    "scales_tested": [
+      10,
+      100,
+      1000,
+      10000
+    ],
+    "max_scale": 10000,
+    "timestamp": 1789246343.016237,
+    "read_only_invariant_preserved": true,
+    "finish_gate_false_success_prevention": true,
+    "closed_enum_consumer_detection": true
+  }
+}

@@ -1,0 +1,3232 @@
+[
+  {
+    "proof_id": "prf_3a7f27d7c493878a",
+    "migration_id": "mig_real_01_list_missions",
+    "scope": {
+      "scope_id": "scp_a19de8258cde51f7",
+      "contract_id": "listMissionsEndpoint",
+      "before_version": "v1.9.0",
+      "after_version": "v2.0.0",
+      "budget": {
+        "max_scenarios": 50,
+        "max_depth": 3,
+        "max_runtime": 5.0,
+        "max_branching": 5,
+        "max_trace_size": 1000,
+        "max_concurrency_variants": 10
+      },
+      "strategies": [
+        "SCHEMA_MUTATION",
+        "BOUNDARY_EXPLORATION",
+        "POLYMORPHIC_EXPLORATION",
+        "ERROR_PATH_EXPLORATION",
+        "RETRY_EXPLORATION"
+      ],
+      "seed": 42,
+      "environment": "sandbox",
+      "max_interleavings": 10,
+      "invariants": [],
+      "coverage_threshold_policy": "STANDARD",
+      "provenance": {
+        "mission_id": "mig_real_01_list_missions",
+        "seed": 42
+      },
+      "created_at": 1789335068.8374588
+    },
+    "coverage": {
+      "coverage_id": "cov_19e95767bde70189",
+      "scope_id": "scp_a19de8258cde51f7",
+      "dimensions": {
+        "field": {
+          "dimension": "field",
+          "total": 4,
+          "covered": 4,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "include_traces",
+            "limit",
+            "offset",
+            "status_filter"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "input": {
+          "dimension": "input",
+          "total": 5,
+          "covered": 5,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "boundary",
+            "missing_required",
+            "null_value",
+            "unknown_field",
+            "valid_input"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "branch": {
+          "dimension": "branch",
+          "total": 5,
+          "covered": 5,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "status_200",
+            "status_400",
+            "status_401",
+            "status_500",
+            "status_504"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "variant": {
+          "dimension": "variant",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "PAGINATED_STREAM",
+            "STANDARD_QUERY"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "error_path": {
+          "dimension": "error_path",
+          "total": 4,
+          "covered": 4,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "authorization_failure",
+            "invalid_enum",
+            "partial_failure_rollback",
+            "timeout_recovery"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "invariant": {
+          "dimension": "invariant",
+          "total": 7,
+          "covered": 7,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "AUTHORIZATION_PRESERVED",
+            "CONSUMER_EXPECTATION_PRESERVED",
+            "ECONOMIC_VALUE_PRESERVED",
+            "ERROR_SEMANTICS_PRESERVED",
+            "EVENT_SEMANTICS_PRESERVED",
+            "REQUIRED_FIELDS_PRESERVED",
+            "SIDE_EFFECT_ORDER_PRESERVED"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "consumer": {
+          "dimension": "consumer",
+          "total": 3,
+          "covered": 3,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "audit-service",
+            "cli-agent-runner",
+            "frontend-mission-control"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "event": {
+          "dimension": "event",
+          "total": 2,
+          "covered": 1,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.5,
+          "covered_items": [
+            "duplicate_event"
+          ],
+          "uncovered_items": [
+            "event_dispatch"
+          ],
+          "unknown_items": []
+        },
+        "side_effect": {
+          "dimension": "side_effect",
+          "total": 2,
+          "covered": 1,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.5,
+          "covered_items": [
+            "retry_idempotency"
+          ],
+          "uncovered_items": [
+            "side_effect_order"
+          ],
+          "unknown_items": []
+        },
+        "authorization": {
+          "dimension": "authorization",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "authorization_state",
+            "authorization_failure"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        }
+      },
+      "overall_percentage": 0.9,
+      "threshold_policy": "STANDARD",
+      "threshold_met": true,
+      "uncovered_items": [],
+      "unknown_items": [],
+      "evaluated_at": 1789335068.8427095
+    },
+    "result": "PROVEN_COMPATIBLE_WITHIN_SCOPE",
+    "counterexamples": [],
+    "shrunk_counterexamples": [],
+    "invariants_checked": [],
+    "invariants_preserved": true,
+    "unexplored_interleavings": [
+      "op_scen_2 -> op_scen_5 -> op_scen_5",
+      "op_scen_2 -> op_scen_5 -> op_scen_2",
+      "op_scen_2 -> op_scen_5 -> op_scen_2",
+      "op_scen_2 -> op_scen_5 -> op_scen_5",
+      "op_scen_2 -> op_scen_2 -> op_scen_5",
+      "op_scen_2 -> op_scen_2 -> op_scen_5",
+      "op_scen_2 -> op_scen_5 -> op_scen_5",
+      "op_scen_2 -> op_scen_5 -> op_scen_2",
+      "op_scen_5 -> op_scen_5 -> op_scen_2",
+      "op_scen_5 -> op_scen_5 -> op_scen_2",
+      "op_scen_5 -> op_scen_2 -> op_scen_5",
+      "op_scen_5 -> op_scen_2 -> op_scen_2",
+      "op_scen_5 -> op_scen_2 -> op_scen_5",
+      "op_scen_5 -> op_scen_2 -> op_scen_2"
+    ],
+    "consumer_uncertainties": [],
+    "confidence": 1.0,
+    "gate_decision": "GATE_CLEARED",
+    "provenance": {
+      "reasons": [
+        "All 90.0% covered within explicit scope scp_a19de8258cde51f7 with zero counterexamples and all invariants preserved."
+      ],
+      "mission_id": "mig_real_01_list_missions"
+    },
+    "timestamp": 100.0,
+    "proof_hash": "prf_07ad90f95769264c"
+  },
+  {
+    "proof_id": "prf_a38e97703b251e4c",
+    "migration_id": "mig_real_02_payment_clearing",
+    "scope": {
+      "scope_id": "scp_49908ccdd04e2be5",
+      "contract_id": "economicDisbursementContract",
+      "before_version": "v3.1.0",
+      "after_version": "v3.2.0",
+      "budget": {
+        "max_scenarios": 50,
+        "max_depth": 3,
+        "max_runtime": 5.0,
+        "max_branching": 5,
+        "max_trace_size": 1000,
+        "max_concurrency_variants": 10
+      },
+      "strategies": [
+        "SCHEMA_MUTATION",
+        "BOUNDARY_EXPLORATION",
+        "POLYMORPHIC_EXPLORATION",
+        "ERROR_PATH_EXPLORATION",
+        "RETRY_EXPLORATION"
+      ],
+      "seed": 42,
+      "environment": "sandbox",
+      "max_interleavings": 10,
+      "invariants": [],
+      "coverage_threshold_policy": "STRICT",
+      "provenance": {
+        "mission_id": "mig_real_02_payment_clearing",
+        "seed": 42
+      },
+      "created_at": 1789335068.8428807
+    },
+    "coverage": {
+      "coverage_id": "cov_1990e8d7ae4da62a",
+      "scope_id": "scp_49908ccdd04e2be5",
+      "dimensions": {
+        "field": {
+          "dimension": "field",
+          "total": 5,
+          "covered": 5,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "amount",
+            "beneficiary",
+            "currency",
+            "id",
+            "settlement_type"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "input": {
+          "dimension": "input",
+          "total": 5,
+          "covered": 5,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "boundary",
+            "missing_required",
+            "null_value",
+            "unknown_field",
+            "valid_input"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "branch": {
+          "dimension": "branch",
+          "total": 5,
+          "covered": 5,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "status_200",
+            "status_400",
+            "status_401",
+            "status_500",
+            "status_504"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "variant": {
+          "dimension": "variant",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "BATCH",
+            "INSTANT"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "error_path": {
+          "dimension": "error_path",
+          "total": 4,
+          "covered": 4,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "authorization_failure",
+            "invalid_enum",
+            "partial_failure_rollback",
+            "timeout_recovery"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "invariant": {
+          "dimension": "invariant",
+          "total": 7,
+          "covered": 7,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "AUTHORIZATION_PRESERVED",
+            "CONSUMER_EXPECTATION_PRESERVED",
+            "ECONOMIC_VALUE_PRESERVED",
+            "ERROR_SEMANTICS_PRESERVED",
+            "EVENT_SEMANTICS_PRESERVED",
+            "REQUIRED_FIELDS_PRESERVED",
+            "SIDE_EFFECT_ORDER_PRESERVED"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "consumer": {
+          "dimension": "consumer",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "ledger-sync",
+            "treasury-service"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "event": {
+          "dimension": "event",
+          "total": 2,
+          "covered": 1,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.5,
+          "covered_items": [
+            "duplicate_event"
+          ],
+          "uncovered_items": [
+            "event_dispatch"
+          ],
+          "unknown_items": []
+        },
+        "side_effect": {
+          "dimension": "side_effect",
+          "total": 2,
+          "covered": 1,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.5,
+          "covered_items": [
+            "retry_idempotency"
+          ],
+          "uncovered_items": [
+            "side_effect_order"
+          ],
+          "unknown_items": []
+        },
+        "authorization": {
+          "dimension": "authorization",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "authorization_state",
+            "authorization_failure"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        }
+      },
+      "overall_percentage": 0.9,
+      "threshold_policy": "STRICT",
+      "threshold_met": false,
+      "uncovered_items": [],
+      "unknown_items": [],
+      "evaluated_at": 1789335068.847147
+    },
+    "result": "INSUFFICIENT_COVERAGE",
+    "counterexamples": [],
+    "shrunk_counterexamples": [],
+    "invariants_checked": [],
+    "invariants_preserved": true,
+    "unexplored_interleavings": [
+      "op_scen_8 -> op_scen_9 -> op_scen_6",
+      "op_scen_8 -> op_scen_9 -> op_scen_3",
+      "op_scen_3 -> op_scen_6 -> op_scen_8",
+      "op_scen_3 -> op_scen_6 -> op_scen_9",
+      "op_scen_3 -> op_scen_8 -> op_scen_6",
+      "op_scen_3 -> op_scen_8 -> op_scen_9",
+      "op_scen_3 -> op_scen_9 -> op_scen_6",
+      "op_scen_3 -> op_scen_9 -> op_scen_8",
+      "op_scen_9 -> op_scen_6 -> op_scen_8",
+      "op_scen_9 -> op_scen_6 -> op_scen_3",
+      "op_scen_9 -> op_scen_8 -> op_scen_6",
+      "op_scen_9 -> op_scen_8 -> op_scen_3",
+      "op_scen_9 -> op_scen_3 -> op_scen_6",
+      "op_scen_9 -> op_scen_3 -> op_scen_8"
+    ],
+    "consumer_uncertainties": [],
+    "confidence": 0.85,
+    "gate_decision": "EXECUTION_BLOCKED",
+    "provenance": {
+      "reasons": [
+        "Behavioral coverage 90.0% below required threshold for policy STRICT."
+      ],
+      "mission_id": "mig_real_02_payment_clearing"
+    },
+    "timestamp": 100.0,
+    "proof_hash": "prf_fc4750f20816b0e6"
+  },
+  {
+    "proof_id": "prf_35a25105a3e09348",
+    "migration_id": "mig_real_03_auth_jwt_sentinel",
+    "scope": {
+      "scope_id": "scp_264c43d950b39ae6",
+      "contract_id": "securityAuthSentinelVerify",
+      "before_version": "v2.5.0",
+      "after_version": "v2.6.0",
+      "budget": {
+        "max_scenarios": 50,
+        "max_depth": 3,
+        "max_runtime": 5.0,
+        "max_branching": 5,
+        "max_trace_size": 1000,
+        "max_concurrency_variants": 10
+      },
+      "strategies": [
+        "SCHEMA_MUTATION",
+        "BOUNDARY_EXPLORATION",
+        "POLYMORPHIC_EXPLORATION",
+        "ERROR_PATH_EXPLORATION",
+        "RETRY_EXPLORATION"
+      ],
+      "seed": 42,
+      "environment": "sandbox",
+      "max_interleavings": 10,
+      "invariants": [],
+      "coverage_threshold_policy": "STRICT",
+      "provenance": {
+        "mission_id": "mig_real_03_auth_jwt_sentinel",
+        "seed": 42
+      },
+      "created_at": 1789335068.847309
+    },
+    "coverage": {
+      "coverage_id": "cov_25c01ea2abceefa1",
+      "scope_id": "scp_264c43d950b39ae6",
+      "dimensions": {
+        "field": {
+          "dimension": "field",
+          "total": 3,
+          "covered": 3,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "client_id",
+            "required_role",
+            "token"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "input": {
+          "dimension": "input",
+          "total": 5,
+          "covered": 4,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.8,
+          "covered_items": [
+            "missing_required",
+            "null_value",
+            "unknown_field",
+            "valid_input"
+          ],
+          "uncovered_items": [
+            "boundary"
+          ],
+          "unknown_items": []
+        },
+        "branch": {
+          "dimension": "branch",
+          "total": 5,
+          "covered": 5,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "status_200",
+            "status_400",
+            "status_401",
+            "status_500",
+            "status_504"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "variant": {
+          "dimension": "variant",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "PREMIUM_TIER",
+            "STANDARD_TIER"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "error_path": {
+          "dimension": "error_path",
+          "total": 4,
+          "covered": 4,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "authorization_failure",
+            "invalid_enum",
+            "partial_failure_rollback",
+            "timeout_recovery"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "invariant": {
+          "dimension": "invariant",
+          "total": 7,
+          "covered": 7,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "AUTHORIZATION_PRESERVED",
+            "CONSUMER_EXPECTATION_PRESERVED",
+            "ECONOMIC_VALUE_PRESERVED",
+            "ERROR_SEMANTICS_PRESERVED",
+            "EVENT_SEMANTICS_PRESERVED",
+            "REQUIRED_FIELDS_PRESERVED",
+            "SIDE_EFFECT_ORDER_PRESERVED"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "consumer": {
+          "dimension": "consumer",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "api-gateway",
+            "websocket-server"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "event": {
+          "dimension": "event",
+          "total": 2,
+          "covered": 1,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.5,
+          "covered_items": [
+            "duplicate_event"
+          ],
+          "uncovered_items": [
+            "event_dispatch"
+          ],
+          "unknown_items": []
+        },
+        "side_effect": {
+          "dimension": "side_effect",
+          "total": 2,
+          "covered": 1,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.5,
+          "covered_items": [
+            "retry_idempotency"
+          ],
+          "uncovered_items": [
+            "side_effect_order"
+          ],
+          "unknown_items": []
+        },
+        "authorization": {
+          "dimension": "authorization",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "authorization_state",
+            "authorization_failure"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        }
+      },
+      "overall_percentage": 0.88,
+      "threshold_policy": "STRICT",
+      "threshold_met": false,
+      "uncovered_items": [
+        "input:boundary"
+      ],
+      "unknown_items": [],
+      "evaluated_at": 1789335068.8503163
+    },
+    "result": "INSUFFICIENT_COVERAGE",
+    "counterexamples": [],
+    "shrunk_counterexamples": [],
+    "invariants_checked": [],
+    "invariants_preserved": true,
+    "unexplored_interleavings": [
+      "op_scen_3 -> op_scen_0 -> op_scen_2",
+      "op_scen_3 -> op_scen_0 -> op_scen_5",
+      "op_scen_5 -> op_scen_2 -> op_scen_3",
+      "op_scen_5 -> op_scen_2 -> op_scen_0",
+      "op_scen_5 -> op_scen_3 -> op_scen_2",
+      "op_scen_5 -> op_scen_3 -> op_scen_0",
+      "op_scen_5 -> op_scen_0 -> op_scen_2",
+      "op_scen_5 -> op_scen_0 -> op_scen_3",
+      "op_scen_0 -> op_scen_2 -> op_scen_3",
+      "op_scen_0 -> op_scen_2 -> op_scen_5",
+      "op_scen_0 -> op_scen_3 -> op_scen_2",
+      "op_scen_0 -> op_scen_3 -> op_scen_5",
+      "op_scen_0 -> op_scen_5 -> op_scen_2",
+      "op_scen_0 -> op_scen_5 -> op_scen_3"
+    ],
+    "consumer_uncertainties": [],
+    "confidence": 0.85,
+    "gate_decision": "HUMAN_REVIEW_REQUIRED",
+    "provenance": {
+      "reasons": [
+        "Behavioral coverage 88.0% below required threshold for policy STRICT."
+      ],
+      "mission_id": "mig_real_03_auth_jwt_sentinel"
+    },
+    "timestamp": 100.0,
+    "proof_hash": "prf_dff17b5e7a82817e"
+  },
+  {
+    "proof_id": "prf_90add055196f70b0",
+    "migration_id": "mig_real_04_dynamic_unresolved",
+    "scope": {
+      "scope_id": "scp_d07fdc17b9ed6bc5",
+      "contract_id": "runtimeDynamicPluginConsumer",
+      "before_version": "v1.0.0",
+      "after_version": "v1.1.0",
+      "budget": {
+        "max_scenarios": 50,
+        "max_depth": 3,
+        "max_runtime": 5.0,
+        "max_branching": 5,
+        "max_trace_size": 1000,
+        "max_concurrency_variants": 10
+      },
+      "strategies": [
+        "SCHEMA_MUTATION",
+        "BOUNDARY_EXPLORATION",
+        "POLYMORPHIC_EXPLORATION",
+        "ERROR_PATH_EXPLORATION",
+        "RETRY_EXPLORATION"
+      ],
+      "seed": 42,
+      "environment": "sandbox",
+      "max_interleavings": 10,
+      "invariants": [],
+      "coverage_threshold_policy": "STANDARD",
+      "provenance": {
+        "mission_id": "mig_real_04_dynamic_unresolved",
+        "seed": 42
+      },
+      "created_at": 1789335068.8504353
+    },
+    "coverage": {
+      "coverage_id": "cov_3700b6ad26feadbb",
+      "scope_id": "scp_d07fdc17b9ed6bc5",
+      "dimensions": {
+        "field": {
+          "dimension": "field",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "config_payload",
+            "plugin_id"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "input": {
+          "dimension": "input",
+          "total": 5,
+          "covered": 4,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.8,
+          "covered_items": [
+            "missing_required",
+            "null_value",
+            "unknown_field",
+            "valid_input"
+          ],
+          "uncovered_items": [
+            "boundary"
+          ],
+          "unknown_items": []
+        },
+        "branch": {
+          "dimension": "branch",
+          "total": 5,
+          "covered": 5,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "status_200",
+            "status_400",
+            "status_401",
+            "status_500",
+            "status_504"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "variant": {
+          "dimension": "variant",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "PREMIUM_TIER",
+            "STANDARD_TIER"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "error_path": {
+          "dimension": "error_path",
+          "total": 4,
+          "covered": 3,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.75,
+          "covered_items": [
+            "authorization_failure",
+            "partial_failure_rollback",
+            "timeout_recovery"
+          ],
+          "uncovered_items": [
+            "invalid_enum"
+          ],
+          "unknown_items": []
+        },
+        "invariant": {
+          "dimension": "invariant",
+          "total": 7,
+          "covered": 7,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "AUTHORIZATION_PRESERVED",
+            "CONSUMER_EXPECTATION_PRESERVED",
+            "ECONOMIC_VALUE_PRESERVED",
+            "ERROR_SEMANTICS_PRESERVED",
+            "EVENT_SEMANTICS_PRESERVED",
+            "REQUIRED_FIELDS_PRESERVED",
+            "SIDE_EFFECT_ORDER_PRESERVED"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "consumer": {
+          "dimension": "consumer",
+          "total": 1,
+          "covered": 1,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "plugin-loader"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "event": {
+          "dimension": "event",
+          "total": 2,
+          "covered": 1,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.5,
+          "covered_items": [
+            "duplicate_event"
+          ],
+          "uncovered_items": [
+            "event_dispatch"
+          ],
+          "unknown_items": []
+        },
+        "side_effect": {
+          "dimension": "side_effect",
+          "total": 2,
+          "covered": 1,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.5,
+          "covered_items": [
+            "retry_idempotency"
+          ],
+          "uncovered_items": [
+            "side_effect_order"
+          ],
+          "unknown_items": []
+        },
+        "authorization": {
+          "dimension": "authorization",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "authorization_state",
+            "authorization_failure"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        }
+      },
+      "overall_percentage": 0.855,
+      "threshold_policy": "STANDARD",
+      "threshold_met": true,
+      "uncovered_items": [
+        "input:boundary",
+        "error_path:invalid_enum"
+      ],
+      "unknown_items": [],
+      "evaluated_at": 1789335068.8518353
+    },
+    "result": "INSUFFICIENT_EVIDENCE",
+    "counterexamples": [],
+    "shrunk_counterexamples": [],
+    "invariants_checked": [],
+    "invariants_preserved": true,
+    "unexplored_interleavings": [
+      "op_scen_3 -> op_scen_d -> op_scen_f",
+      "op_scen_3 -> op_scen_d -> op_scen_f",
+      "op_scen_f -> op_scen_f -> op_scen_3",
+      "op_scen_f -> op_scen_f -> op_scen_d",
+      "op_scen_f -> op_scen_3 -> op_scen_f",
+      "op_scen_f -> op_scen_3 -> op_scen_d",
+      "op_scen_f -> op_scen_d -> op_scen_f",
+      "op_scen_f -> op_scen_d -> op_scen_3",
+      "op_scen_d -> op_scen_f -> op_scen_3",
+      "op_scen_d -> op_scen_f -> op_scen_f",
+      "op_scen_d -> op_scen_3 -> op_scen_f",
+      "op_scen_d -> op_scen_3 -> op_scen_f",
+      "op_scen_d -> op_scen_f -> op_scen_f",
+      "op_scen_d -> op_scen_f -> op_scen_3"
+    ],
+    "consumer_uncertainties": [
+      "UNCERTAIN_EXTERNAL_PLUGIN_RUNNER"
+    ],
+    "confidence": 0.85,
+    "gate_decision": "HUMAN_REVIEW_REQUIRED",
+    "provenance": {
+      "reasons": [
+        "Unresolved structural uncertainty persists for consumers: ['UNCERTAIN_EXTERNAL_PLUGIN_RUNNER']. 100% coverage does not eliminate structural dynamic consumer ambiguity."
+      ],
+      "mission_id": "mig_real_04_dynamic_unresolved"
+    },
+    "timestamp": 100.0,
+    "proof_hash": "prf_e3ce7c5dc3493461"
+  },
+  {
+    "proof_id": "prf_8ee4767038848624",
+    "migration_id": "mig_real_05_breaking_discount",
+    "scope": {
+      "scope_id": "scp_47baf1bff186de68",
+      "contract_id": "orderCalculationContract",
+      "before_version": "v1.2.0",
+      "after_version": "v2.0.0",
+      "budget": {
+        "max_scenarios": 50,
+        "max_depth": 3,
+        "max_runtime": 5.0,
+        "max_branching": 5,
+        "max_trace_size": 1000,
+        "max_concurrency_variants": 10
+      },
+      "strategies": [
+        "SCHEMA_MUTATION",
+        "BOUNDARY_EXPLORATION",
+        "POLYMORPHIC_EXPLORATION",
+        "ERROR_PATH_EXPLORATION",
+        "RETRY_EXPLORATION"
+      ],
+      "seed": 42,
+      "environment": "sandbox",
+      "max_interleavings": 10,
+      "invariants": [],
+      "coverage_threshold_policy": "STANDARD",
+      "provenance": {
+        "mission_id": "mig_real_05_breaking_discount",
+        "seed": 42
+      },
+      "created_at": 1789335068.8519545
+    },
+    "coverage": {
+      "coverage_id": "cov_24d7322fe7bfb935",
+      "scope_id": "scp_47baf1bff186de68",
+      "dimensions": {
+        "field": {
+          "dimension": "field",
+          "total": 3,
+          "covered": 3,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "discount_rate",
+            "order_id",
+            "subtotal"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "input": {
+          "dimension": "input",
+          "total": 5,
+          "covered": 5,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "boundary",
+            "missing_required",
+            "null_value",
+            "unknown_field",
+            "valid_input"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "branch": {
+          "dimension": "branch",
+          "total": 5,
+          "covered": 5,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "status_200",
+            "status_400",
+            "status_401",
+            "status_500",
+            "status_504"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "variant": {
+          "dimension": "variant",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "PREMIUM_TIER",
+            "STANDARD_TIER"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "error_path": {
+          "dimension": "error_path",
+          "total": 4,
+          "covered": 3,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.75,
+          "covered_items": [
+            "authorization_failure",
+            "partial_failure_rollback",
+            "timeout_recovery"
+          ],
+          "uncovered_items": [
+            "invalid_enum"
+          ],
+          "unknown_items": []
+        },
+        "invariant": {
+          "dimension": "invariant",
+          "total": 7,
+          "covered": 7,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "AUTHORIZATION_PRESERVED",
+            "CONSUMER_EXPECTATION_PRESERVED",
+            "ECONOMIC_VALUE_PRESERVED",
+            "ERROR_SEMANTICS_PRESERVED",
+            "EVENT_SEMANTICS_PRESERVED",
+            "REQUIRED_FIELDS_PRESERVED",
+            "SIDE_EFFECT_ORDER_PRESERVED"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "consumer": {
+          "dimension": "consumer",
+          "total": 1,
+          "covered": 1,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "checkout-ui"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        },
+        "event": {
+          "dimension": "event",
+          "total": 2,
+          "covered": 1,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.5,
+          "covered_items": [
+            "duplicate_event"
+          ],
+          "uncovered_items": [
+            "event_dispatch"
+          ],
+          "unknown_items": []
+        },
+        "side_effect": {
+          "dimension": "side_effect",
+          "total": 2,
+          "covered": 1,
+          "uncovered": 1,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 0.5,
+          "covered_items": [
+            "retry_idempotency"
+          ],
+          "uncovered_items": [
+            "side_effect_order"
+          ],
+          "unknown_items": []
+        },
+        "authorization": {
+          "dimension": "authorization",
+          "total": 2,
+          "covered": 2,
+          "uncovered": 0,
+          "unknown": 0,
+          "not_applicable": 0,
+          "percentage": 1.0,
+          "covered_items": [
+            "authorization_state",
+            "authorization_failure"
+          ],
+          "uncovered_items": [],
+          "unknown_items": []
+        }
+      },
+      "overall_percentage": 0.875,
+      "threshold_policy": "STANDARD",
+      "threshold_met": true,
+      "uncovered_items": [
+        "error_path:invalid_enum"
+      ],
+      "unknown_items": [],
+      "evaluated_at": 1789335068.8617272
+    },
+    "result": "PROVEN_INCOMPATIBLE",
+    "counterexamples": [
+      {
+        "counterexample_id": "cx_901e7da24387bb7d",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 10.0
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_c6f8b3a92beed77e_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 42,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_938410490328fc18",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0
+        },
+        "expected_behavior": {
+          "error": "BAD_REQUEST",
+          "details": {
+            "type": "missing_field",
+            "target_field": "discount_rate"
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Side effects count/order divergence",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_e711eefeb0461505_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 43,
+          "before_status": 400,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_c66b65dcb6ed9e78",
+        "input_payload": {
+          "subtotal": 10.0,
+          "discount_rate": 10.0
+        },
+        "expected_behavior": {
+          "error": "BAD_REQUEST",
+          "details": {
+            "type": "missing_field",
+            "target_field": "order_id"
+          }
+        },
+        "observed_behavior": {
+          "id": null,
+          "status": "processed"
+        },
+        "difference": "Side effects count/order divergence",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_66ae6f52f7ecdd81_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 44,
+          "before_status": 400,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_6bc7beafbf68fc47",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "discount_rate": 10.0
+        },
+        "expected_behavior": {
+          "error": "BAD_REQUEST",
+          "details": {
+            "type": "missing_field",
+            "target_field": "subtotal"
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Side effects count/order divergence",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_37cec8c7e2a9a163_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 45,
+          "before_status": 400,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_f56882624a838396",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 0,
+          "discount_rate": 10.0
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 0,
+            "discount_rate": 10.0
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_75ec34fc216efaa6_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 46,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_6a6ac1ba9b10d64d",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": -1,
+          "discount_rate": 10.0
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": -1,
+            "discount_rate": 10.0
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_748b7dd1b5b02f45_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 47,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_bb8e3ec1a5eec1bd",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 999999999,
+          "discount_rate": 10.0
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 999999999,
+            "discount_rate": 10.0
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_697f445d0b427391_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 48,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_b87b5f677392933d",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 0.0001,
+          "discount_rate": 10.0
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 0.0001,
+            "discount_rate": 10.0
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_33af0da53121a5d9_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 49,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_515c2cfd0db1afa3",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 0
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 0
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_0f00ed9d7825ddae_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 50,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_23bf8827b42f53b9",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": -1
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": -1
+          }
+        },
+        "observed_behavior": {
+          "error": "UNPROCESSABLE_ENTITY"
+        },
+        "difference": "Status code mismatch: before=200, after=422",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_6ff9636022968f93_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 51,
+          "before_status": 200,
+          "after_status": 422,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_25b380b3f5e1b114",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 999999999
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 999999999
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_80360b9d8c02c64c_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 52,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_752cdf014e1307b0",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 0.0001
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 0.0001
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_1d09fd3279064335_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 53,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_e03dafbc92236fe9",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": []
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 10.0,
+            "items": []
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_4d418f08720b83ae_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 54,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_6034832a356ebe8b",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "elem_0",
+            "elem_1",
+            "elem_2",
+            "elem_3",
+            "elem_4",
+            "elem_5",
+            "elem_6",
+            "elem_7",
+            "elem_8",
+            "elem_9",
+            "elem_10",
+            "elem_11",
+            "elem_12",
+            "elem_13",
+            "elem_14",
+            "elem_15",
+            "elem_16",
+            "elem_17",
+            "elem_18",
+            "elem_19",
+            "elem_20",
+            "elem_21",
+            "elem_22",
+            "elem_23",
+            "elem_24",
+            "elem_25",
+            "elem_26",
+            "elem_27",
+            "elem_28",
+            "elem_29",
+            "elem_30",
+            "elem_31",
+            "elem_32",
+            "elem_33",
+            "elem_34",
+            "elem_35",
+            "elem_36",
+            "elem_37",
+            "elem_38",
+            "elem_39",
+            "elem_40",
+            "elem_41",
+            "elem_42",
+            "elem_43",
+            "elem_44",
+            "elem_45",
+            "elem_46",
+            "elem_47",
+            "elem_48",
+            "elem_49",
+            "elem_50",
+            "elem_51",
+            "elem_52",
+            "elem_53",
+            "elem_54",
+            "elem_55",
+            "elem_56",
+            "elem_57",
+            "elem_58",
+            "elem_59",
+            "elem_60",
+            "elem_61",
+            "elem_62",
+            "elem_63",
+            "elem_64",
+            "elem_65",
+            "elem_66",
+            "elem_67",
+            "elem_68",
+            "elem_69",
+            "elem_70",
+            "elem_71",
+            "elem_72",
+            "elem_73",
+            "elem_74",
+            "elem_75",
+            "elem_76",
+            "elem_77",
+            "elem_78",
+            "elem_79",
+            "elem_80",
+            "elem_81",
+            "elem_82",
+            "elem_83",
+            "elem_84",
+            "elem_85",
+            "elem_86",
+            "elem_87",
+            "elem_88",
+            "elem_89",
+            "elem_90",
+            "elem_91",
+            "elem_92",
+            "elem_93",
+            "elem_94",
+            "elem_95",
+            "elem_96",
+            "elem_97",
+            "elem_98",
+            "elem_99"
+          ]
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 10.0,
+            "items": [
+              "elem_0",
+              "elem_1",
+              "elem_2",
+              "elem_3",
+              "elem_4",
+              "elem_5",
+              "elem_6",
+              "elem_7",
+              "elem_8",
+              "elem_9",
+              "elem_10",
+              "elem_11",
+              "elem_12",
+              "elem_13",
+              "elem_14",
+              "elem_15",
+              "elem_16",
+              "elem_17",
+              "elem_18",
+              "elem_19",
+              "elem_20",
+              "elem_21",
+              "elem_22",
+              "elem_23",
+              "elem_24",
+              "elem_25",
+              "elem_26",
+              "elem_27",
+              "elem_28",
+              "elem_29",
+              "elem_30",
+              "elem_31",
+              "elem_32",
+              "elem_33",
+              "elem_34",
+              "elem_35",
+              "elem_36",
+              "elem_37",
+              "elem_38",
+              "elem_39",
+              "elem_40",
+              "elem_41",
+              "elem_42",
+              "elem_43",
+              "elem_44",
+              "elem_45",
+              "elem_46",
+              "elem_47",
+              "elem_48",
+              "elem_49",
+              "elem_50",
+              "elem_51",
+              "elem_52",
+              "elem_53",
+              "elem_54",
+              "elem_55",
+              "elem_56",
+              "elem_57",
+              "elem_58",
+              "elem_59",
+              "elem_60",
+              "elem_61",
+              "elem_62",
+              "elem_63",
+              "elem_64",
+              "elem_65",
+              "elem_66",
+              "elem_67",
+              "elem_68",
+              "elem_69",
+              "elem_70",
+              "elem_71",
+              "elem_72",
+              "elem_73",
+              "elem_74",
+              "elem_75",
+              "elem_76",
+              "elem_77",
+              "elem_78",
+              "elem_79",
+              "elem_80",
+              "elem_81",
+              "elem_82",
+              "elem_83",
+              "elem_84",
+              "elem_85",
+              "elem_86",
+              "elem_87",
+              "elem_88",
+              "elem_89",
+              "elem_90",
+              "elem_91",
+              "elem_92",
+              "elem_93",
+              "elem_94",
+              "elem_95",
+              "elem_96",
+              "elem_97",
+              "elem_98",
+              "elem_99"
+            ]
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_6eb0f536d58a756e_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 55,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_a8bcf6dd14a620f1",
+        "input_payload": {
+          "order_id": null,
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ]
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": null,
+            "subtotal": 10.0,
+            "discount_rate": 10.0,
+            "items": [
+              "item_1",
+              "item_2"
+            ]
+          }
+        },
+        "observed_behavior": {
+          "id": null,
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_3c7dfcb2188f17ce_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 56,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_7dea3b6626da1174",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": null,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ]
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": null,
+            "discount_rate": 10.0,
+            "items": [
+              "item_1",
+              "item_2"
+            ]
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_b9bf6ebc065ec069_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 57,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_7b9f2cb3f1c91e82",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": null,
+          "items": [
+            "item_1",
+            "item_2"
+          ]
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": null,
+            "items": [
+              "item_1",
+              "item_2"
+            ]
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_e8dbb735c9f09537_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 58,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_10ba9f98f11d1d41",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "__unexpected_extra_attribute__": "unknown_probe_val"
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 10.0,
+            "items": [
+              "item_1",
+              "item_2"
+            ]
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_f61f98d70ea375e4_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 59,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_502b0f679028b560",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "type": "STANDARD_TIER",
+          "variant": "STANDARD_TIER"
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 10.0,
+            "items": [
+              "item_1",
+              "item_2"
+            ],
+            "type": "STANDARD_TIER",
+            "variant": "STANDARD_TIER"
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_646b587060e41c7e_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 60,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_a4af7f02d909fa0a",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "type": "PREMIUM_TIER",
+          "variant": "PREMIUM_TIER"
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 10.0,
+            "items": [
+              "item_1",
+              "item_2"
+            ],
+            "type": "PREMIUM_TIER",
+            "variant": "PREMIUM_TIER"
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_f198abeba84a7875_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 61,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_12c171ebe4de7c57",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "type": "FUTURE_EXPERIMENTAL_VARIANT",
+          "variant": "FUTURE_EXPERIMENTAL_VARIANT"
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 10.0,
+            "items": [
+              "item_1",
+              "item_2"
+            ],
+            "type": "FUTURE_EXPERIMENTAL_VARIANT",
+            "variant": "FUTURE_EXPERIMENTAL_VARIANT"
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_e0c5c5d6576fdfe7_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 62,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_0e48611fdaaca653",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "idempotency_key": "idem_key_retry_001"
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 10.0,
+            "items": [
+              "item_1",
+              "item_2"
+            ],
+            "idempotency_key": "idem_key_retry_001"
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_0a17a2a608616898_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 63,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_eb427710b9eccf52",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "event_id": "event_dup_999",
+          "is_duplicate": true
+        },
+        "expected_behavior": {
+          "id": "res_01",
+          "status": "processed",
+          "echo": {
+            "order_id": "sample_order_id",
+            "subtotal": 10.0,
+            "discount_rate": 10.0,
+            "items": [
+              "item_1",
+              "item_2"
+            ],
+            "event_id": "event_dup_999",
+            "is_duplicate": true
+          }
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_8778dbb33a9d7a66_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 64,
+          "before_status": 200,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_7fd62d2533620e1a",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "__simulate_timeout__": true
+        },
+        "expected_behavior": {
+          "error": "GATEWAY_TIMEOUT",
+          "success": false
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Status code mismatch: before=504, after=200",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_ced851c9e0ebbdb8_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 65,
+          "before_status": 504,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_9b1a8da7b9a1487a",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "__simulate_partial_failure__": true
+        },
+        "expected_behavior": {
+          "error": "INTERNAL_SERVER_ERROR",
+          "success": false
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Status code mismatch: before=500, after=200",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_09623d9cff82f4a2_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 66,
+          "before_status": 500,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "cx_6108c3e5eb09104b",
+        "input_payload": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "__simulate_auth_failure__": true
+        },
+        "expected_behavior": {
+          "error": "UNAUTHORIZED",
+          "success": false
+        },
+        "observed_behavior": {
+          "id": "sample_order_id",
+          "status": "processed"
+        },
+        "difference": "Side effects count/order divergence",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "trace_id": "trace_scen_14924eb7dcff972c_after",
+        "evidence": {
+          "scope_id": "scp_47baf1bff186de68",
+          "seed": 67,
+          "before_status": 401,
+          "after_status": 200,
+          "environment": "sandbox"
+        },
+        "timestamp": 100.0
+      }
+    ],
+    "shrunk_counterexamples": [
+      {
+        "counterexample_id": "shrunk_67f36ccf14871bc6",
+        "scenario_id": "scen_c6f8b3a92beed77e",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0
+        },
+        "minimal_input": {
+          "discount_rate": 10.0
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 3,
+        "minimal_field_count": 1,
+        "shrink_steps": 2,
+        "trace_id": "trace_scen_c6f8b3a92beed77e_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 42,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_592fb7490ae1459c",
+        "scenario_id": "scen_e711eefeb0461505",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0
+        },
+        "minimal_input": {
+          "subtotal": 10.0
+        },
+        "difference": "Side effects count/order divergence",
+        "original_field_count": 2,
+        "minimal_field_count": 1,
+        "shrink_steps": 1,
+        "trace_id": "trace_scen_e711eefeb0461505_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 43,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_c57546a4e0548f9a",
+        "scenario_id": "scen_66ae6f52f7ecdd81",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "subtotal": 10.0,
+          "discount_rate": 10.0
+        },
+        "minimal_input": {
+          "discount_rate": 10.0
+        },
+        "difference": "Side effects count/order divergence",
+        "original_field_count": 2,
+        "minimal_field_count": 1,
+        "shrink_steps": 1,
+        "trace_id": "trace_scen_66ae6f52f7ecdd81_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 44,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_024da08a3e464e3e",
+        "scenario_id": "scen_37cec8c7e2a9a163",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "discount_rate": 10.0
+        },
+        "minimal_input": {
+          "discount_rate": 10.0
+        },
+        "difference": "Side effects count/order divergence",
+        "original_field_count": 2,
+        "minimal_field_count": 1,
+        "shrink_steps": 1,
+        "trace_id": "trace_scen_37cec8c7e2a9a163_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 45,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_1485ed064b8541d4",
+        "scenario_id": "scen_75ec34fc216efaa6",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 0,
+          "discount_rate": 10.0
+        },
+        "minimal_input": {
+          "discount_rate": 10.0
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 3,
+        "minimal_field_count": 1,
+        "shrink_steps": 2,
+        "trace_id": "trace_scen_75ec34fc216efaa6_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 46,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_e4d51c1ff685eeb4",
+        "scenario_id": "scen_748b7dd1b5b02f45",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": -1,
+          "discount_rate": 10.0
+        },
+        "minimal_input": {
+          "discount_rate": 10.0
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 3,
+        "minimal_field_count": 1,
+        "shrink_steps": 2,
+        "trace_id": "trace_scen_748b7dd1b5b02f45_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 47,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_d947f593d7596671",
+        "scenario_id": "scen_697f445d0b427391",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 999999999,
+          "discount_rate": 10.0
+        },
+        "minimal_input": {
+          "discount_rate": 10.0
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 3,
+        "minimal_field_count": 1,
+        "shrink_steps": 2,
+        "trace_id": "trace_scen_697f445d0b427391_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 48,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_3b012b61a2622c59",
+        "scenario_id": "scen_33af0da53121a5d9",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 0.0001,
+          "discount_rate": 10.0
+        },
+        "minimal_input": {
+          "discount_rate": 10.0
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 3,
+        "minimal_field_count": 1,
+        "shrink_steps": 2,
+        "trace_id": "trace_scen_33af0da53121a5d9_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 49,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_7fd7c786fe645f39",
+        "scenario_id": "scen_0f00ed9d7825ddae",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 0
+        },
+        "minimal_input": {
+          "discount_rate": 0
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 3,
+        "minimal_field_count": 1,
+        "shrink_steps": 2,
+        "trace_id": "trace_scen_0f00ed9d7825ddae_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 50,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_c44844c35ab22213",
+        "scenario_id": "scen_6ff9636022968f93",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": -1
+        },
+        "minimal_input": {
+          "discount_rate": -1
+        },
+        "difference": "Status code mismatch: before=200, after=422",
+        "original_field_count": 3,
+        "minimal_field_count": 1,
+        "shrink_steps": 2,
+        "trace_id": "trace_scen_6ff9636022968f93_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 51,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_2301c3a0a57a59b2",
+        "scenario_id": "scen_80360b9d8c02c64c",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 999999999
+        },
+        "minimal_input": {
+          "discount_rate": 999999999
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 3,
+        "minimal_field_count": 1,
+        "shrink_steps": 2,
+        "trace_id": "trace_scen_80360b9d8c02c64c_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 52,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_21f66fad84860a48",
+        "scenario_id": "scen_1d09fd3279064335",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 0.0001
+        },
+        "minimal_input": {
+          "discount_rate": 0.0001
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 3,
+        "minimal_field_count": 1,
+        "shrink_steps": 2,
+        "trace_id": "trace_scen_1d09fd3279064335_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 53,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_b3759863e998a05f",
+        "scenario_id": "scen_4d418f08720b83ae",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": []
+        },
+        "minimal_input": {
+          "items": []
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 4,
+        "minimal_field_count": 1,
+        "shrink_steps": 3,
+        "trace_id": "trace_scen_4d418f08720b83ae_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 54,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_1153f248f28fa62f",
+        "scenario_id": "scen_6eb0f536d58a756e",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "elem_0",
+            "elem_1",
+            "elem_2",
+            "elem_3",
+            "elem_4",
+            "elem_5",
+            "elem_6",
+            "elem_7",
+            "elem_8",
+            "elem_9",
+            "elem_10",
+            "elem_11",
+            "elem_12",
+            "elem_13",
+            "elem_14",
+            "elem_15",
+            "elem_16",
+            "elem_17",
+            "elem_18",
+            "elem_19",
+            "elem_20",
+            "elem_21",
+            "elem_22",
+            "elem_23",
+            "elem_24",
+            "elem_25",
+            "elem_26",
+            "elem_27",
+            "elem_28",
+            "elem_29",
+            "elem_30",
+            "elem_31",
+            "elem_32",
+            "elem_33",
+            "elem_34",
+            "elem_35",
+            "elem_36",
+            "elem_37",
+            "elem_38",
+            "elem_39",
+            "elem_40",
+            "elem_41",
+            "elem_42",
+            "elem_43",
+            "elem_44",
+            "elem_45",
+            "elem_46",
+            "elem_47",
+            "elem_48",
+            "elem_49",
+            "elem_50",
+            "elem_51",
+            "elem_52",
+            "elem_53",
+            "elem_54",
+            "elem_55",
+            "elem_56",
+            "elem_57",
+            "elem_58",
+            "elem_59",
+            "elem_60",
+            "elem_61",
+            "elem_62",
+            "elem_63",
+            "elem_64",
+            "elem_65",
+            "elem_66",
+            "elem_67",
+            "elem_68",
+            "elem_69",
+            "elem_70",
+            "elem_71",
+            "elem_72",
+            "elem_73",
+            "elem_74",
+            "elem_75",
+            "elem_76",
+            "elem_77",
+            "elem_78",
+            "elem_79",
+            "elem_80",
+            "elem_81",
+            "elem_82",
+            "elem_83",
+            "elem_84",
+            "elem_85",
+            "elem_86",
+            "elem_87",
+            "elem_88",
+            "elem_89",
+            "elem_90",
+            "elem_91",
+            "elem_92",
+            "elem_93",
+            "elem_94",
+            "elem_95",
+            "elem_96",
+            "elem_97",
+            "elem_98",
+            "elem_99"
+          ]
+        },
+        "minimal_input": {
+          "items": [
+            "elem_0",
+            "elem_1",
+            "elem_2",
+            "elem_3",
+            "elem_4",
+            "elem_5",
+            "elem_6",
+            "elem_7",
+            "elem_8",
+            "elem_9",
+            "elem_10",
+            "elem_11",
+            "elem_12",
+            "elem_13",
+            "elem_14",
+            "elem_15",
+            "elem_16",
+            "elem_17",
+            "elem_18",
+            "elem_19",
+            "elem_20",
+            "elem_21",
+            "elem_22",
+            "elem_23",
+            "elem_24",
+            "elem_25",
+            "elem_26",
+            "elem_27",
+            "elem_28",
+            "elem_29",
+            "elem_30",
+            "elem_31",
+            "elem_32",
+            "elem_33",
+            "elem_34",
+            "elem_35",
+            "elem_36",
+            "elem_37",
+            "elem_38",
+            "elem_39",
+            "elem_40",
+            "elem_41",
+            "elem_42",
+            "elem_43",
+            "elem_44",
+            "elem_45",
+            "elem_46",
+            "elem_47",
+            "elem_48",
+            "elem_49",
+            "elem_50",
+            "elem_51",
+            "elem_52",
+            "elem_53",
+            "elem_54",
+            "elem_55",
+            "elem_56",
+            "elem_57",
+            "elem_58",
+            "elem_59",
+            "elem_60",
+            "elem_61",
+            "elem_62",
+            "elem_63",
+            "elem_64",
+            "elem_65",
+            "elem_66",
+            "elem_67",
+            "elem_68",
+            "elem_69",
+            "elem_70",
+            "elem_71",
+            "elem_72",
+            "elem_73",
+            "elem_74",
+            "elem_75",
+            "elem_76",
+            "elem_77",
+            "elem_78",
+            "elem_79",
+            "elem_80",
+            "elem_81",
+            "elem_82",
+            "elem_83",
+            "elem_84",
+            "elem_85",
+            "elem_86",
+            "elem_87",
+            "elem_88",
+            "elem_89",
+            "elem_90",
+            "elem_91",
+            "elem_92",
+            "elem_93",
+            "elem_94",
+            "elem_95",
+            "elem_96",
+            "elem_97",
+            "elem_98",
+            "elem_99"
+          ]
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 4,
+        "minimal_field_count": 1,
+        "shrink_steps": 3,
+        "trace_id": "trace_scen_6eb0f536d58a756e_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 55,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_932f745e62e1257f",
+        "scenario_id": "scen_3c7dfcb2188f17ce",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": null,
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ]
+        },
+        "minimal_input": {
+          "items": [
+            "item_1",
+            "item_2"
+          ]
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 4,
+        "minimal_field_count": 1,
+        "shrink_steps": 3,
+        "trace_id": "trace_scen_3c7dfcb2188f17ce_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 56,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_bac6f1be67d2714c",
+        "scenario_id": "scen_b9bf6ebc065ec069",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": null,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ]
+        },
+        "minimal_input": {
+          "items": [
+            "item_1",
+            "item_2"
+          ]
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 4,
+        "minimal_field_count": 1,
+        "shrink_steps": 3,
+        "trace_id": "trace_scen_b9bf6ebc065ec069_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 57,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_a12c7447df729a1e",
+        "scenario_id": "scen_e8dbb735c9f09537",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": null,
+          "items": [
+            "item_1",
+            "item_2"
+          ]
+        },
+        "minimal_input": {
+          "items": [
+            "item_1",
+            "item_2"
+          ]
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 4,
+        "minimal_field_count": 1,
+        "shrink_steps": 3,
+        "trace_id": "trace_scen_e8dbb735c9f09537_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 58,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_af1195b9d60705f9",
+        "scenario_id": "scen_f61f98d70ea375e4",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "__unexpected_extra_attribute__": "unknown_probe_val"
+        },
+        "minimal_input": {
+          "__unexpected_extra_attribute__": "unknown_probe_val"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 5,
+        "minimal_field_count": 1,
+        "shrink_steps": 4,
+        "trace_id": "trace_scen_f61f98d70ea375e4_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 59,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_4c90757b8e5909fe",
+        "scenario_id": "scen_646b587060e41c7e",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "type": "STANDARD_TIER",
+          "variant": "STANDARD_TIER"
+        },
+        "minimal_input": {
+          "variant": "STANDARD_TIER"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 6,
+        "minimal_field_count": 1,
+        "shrink_steps": 5,
+        "trace_id": "trace_scen_646b587060e41c7e_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 60,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_c9979328461b01df",
+        "scenario_id": "scen_f198abeba84a7875",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "type": "PREMIUM_TIER",
+          "variant": "PREMIUM_TIER"
+        },
+        "minimal_input": {
+          "variant": "PREMIUM_TIER"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 6,
+        "minimal_field_count": 1,
+        "shrink_steps": 5,
+        "trace_id": "trace_scen_f198abeba84a7875_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 61,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_5fb8f52310137b3e",
+        "scenario_id": "scen_e0c5c5d6576fdfe7",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "type": "FUTURE_EXPERIMENTAL_VARIANT",
+          "variant": "FUTURE_EXPERIMENTAL_VARIANT"
+        },
+        "minimal_input": {
+          "variant": "FUTURE_EXPERIMENTAL_VARIANT"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 6,
+        "minimal_field_count": 1,
+        "shrink_steps": 5,
+        "trace_id": "trace_scen_e0c5c5d6576fdfe7_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 62,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_76f54f28bb0a1968",
+        "scenario_id": "scen_0a17a2a608616898",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "idempotency_key": "idem_key_retry_001"
+        },
+        "minimal_input": {
+          "idempotency_key": "idem_key_retry_001"
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 5,
+        "minimal_field_count": 1,
+        "shrink_steps": 4,
+        "trace_id": "trace_scen_0a17a2a608616898_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 63,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_ab0aa1a290cddbba",
+        "scenario_id": "scen_8778dbb33a9d7a66",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "event_id": "event_dup_999",
+          "is_duplicate": true
+        },
+        "minimal_input": {
+          "is_duplicate": true
+        },
+        "difference": "Output payload divergence between before and after versions",
+        "original_field_count": 6,
+        "minimal_field_count": 1,
+        "shrink_steps": 5,
+        "trace_id": "trace_scen_8778dbb33a9d7a66_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 64,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_b8fb02655a86503c",
+        "scenario_id": "scen_ced851c9e0ebbdb8",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "__simulate_timeout__": true
+        },
+        "minimal_input": {
+          "__simulate_timeout__": true
+        },
+        "difference": "Status code mismatch: before=504, after=200",
+        "original_field_count": 5,
+        "minimal_field_count": 1,
+        "shrink_steps": 4,
+        "trace_id": "trace_scen_ced851c9e0ebbdb8_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 65,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_0bbce9c9956a597e",
+        "scenario_id": "scen_09623d9cff82f4a2",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "__simulate_partial_failure__": true
+        },
+        "minimal_input": {
+          "__simulate_partial_failure__": true
+        },
+        "difference": "Status code mismatch: before=500, after=200",
+        "original_field_count": 5,
+        "minimal_field_count": 1,
+        "shrink_steps": 4,
+        "trace_id": "trace_scen_09623d9cff82f4a2_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 66,
+        "timestamp": 100.0
+      },
+      {
+        "counterexample_id": "shrunk_eb32c37936f81fa9",
+        "scenario_id": "scen_14924eb7dcff972c",
+        "consumer_id": "checkout-ui",
+        "contract_id": "orderCalculationContract",
+        "original_input": {
+          "order_id": "sample_order_id",
+          "subtotal": 10.0,
+          "discount_rate": 10.0,
+          "items": [
+            "item_1",
+            "item_2"
+          ],
+          "__simulate_auth_failure__": true
+        },
+        "minimal_input": {
+          "__simulate_auth_failure__": true
+        },
+        "difference": "Side effects count/order divergence",
+        "original_field_count": 5,
+        "minimal_field_count": 1,
+        "shrink_steps": 4,
+        "trace_id": "trace_scen_14924eb7dcff972c_after",
+        "proof_scope_id": "scp_47baf1bff186de68",
+        "reproducible_seed": 67,
+        "timestamp": 100.0
+      }
+    ],
+    "invariants_checked": [],
+    "invariants_preserved": false,
+    "unexplored_interleavings": [
+      "op_scen_e -> op_scen_3 -> op_scen_c",
+      "op_scen_e -> op_scen_3 -> op_scen_6",
+      "op_scen_6 -> op_scen_c -> op_scen_e",
+      "op_scen_6 -> op_scen_c -> op_scen_3",
+      "op_scen_6 -> op_scen_e -> op_scen_c",
+      "op_scen_6 -> op_scen_e -> op_scen_3",
+      "op_scen_6 -> op_scen_3 -> op_scen_c",
+      "op_scen_6 -> op_scen_3 -> op_scen_e",
+      "op_scen_3 -> op_scen_c -> op_scen_e",
+      "op_scen_3 -> op_scen_c -> op_scen_6",
+      "op_scen_3 -> op_scen_e -> op_scen_c",
+      "op_scen_3 -> op_scen_e -> op_scen_6",
+      "op_scen_3 -> op_scen_6 -> op_scen_c",
+      "op_scen_3 -> op_scen_6 -> op_scen_e"
+    ],
+    "consumer_uncertainties": [],
+    "confidence": 0.85,
+    "gate_decision": "EXECUTION_BLOCKED",
+    "provenance": {
+      "reasons": [
+        "26 counterexample(s) detected during scenario exploration.",
+        "Invariants violated: ['SIDE_EFFECT_ORDER_PRESERVED', 'ERROR_SEMANTICS_PRESERVED']"
+      ],
+      "mission_id": "mig_real_05_breaking_discount"
+    },
+    "timestamp": 100.0,
+    "proof_hash": "prf_640fcac247ff7dca"
+  }
+]

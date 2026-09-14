@@ -1,0 +1,13 @@
+{
+  "conflict_detection_strategy": "deterministic_divergence_analysis",
+  "recency_bias_prevention": true,
+  "sample_conflict": {
+    "primary_experience_id": "exp_conf_01",
+    "conflicting_experience_id": "exp_conf_02",
+    "divergence_summary": "Primary recommends REPAIR (policy 40.1.0) while conflicting recommends REPLAN (policy 41.0.0)",
+    "policy_version_delta": "40.1.0 vs 41.0.0",
+    "evidence_delta": "Primary: 1 evidence ref(s); Conflicting: 2 evidence ref(s)",
+    "severity_comparison": "Primary: MEDIUM vs Conflicting: HIGH",
+    "resolution_guidance": "Expose conflicting divergence to operator; do not silently pick newest record"
+  }
+}

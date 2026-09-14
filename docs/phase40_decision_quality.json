@@ -1,0 +1,1344 @@
+{
+  "total_evaluations": 191,
+  "correct_evaluations": 190,
+  "decision_accuracy": 0.9947643979057592,
+  "evaluations": [
+    {
+      "profile": "SHORT_HORIZON",
+      "cycle": 1,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "SHORT_HORIZON",
+      "cycle": 2,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "SHORT_HORIZON",
+      "cycle": 3,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "SHORT_HORIZON",
+      "cycle": 4,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "SHORT_HORIZON",
+      "cycle": 5,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "SHORT_HORIZON",
+      "cycle": 6,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "SHORT_HORIZON",
+      "cycle": 7,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "SHORT_HORIZON",
+      "cycle": 8,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "SHORT_HORIZON",
+      "cycle": 9,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "SHORT_HORIZON",
+      "cycle": 10,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 1,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 2,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 3,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 4,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 5,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 6,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 7,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 8,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 9,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 10,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 11,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 12,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 13,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 14,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 15,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 16,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 17,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 18,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 19,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 20,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 21,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 22,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 23,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 24,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "MEDIUM_HORIZON",
+      "cycle": 25,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 1,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 2,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 3,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 4,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 5,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 6,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 7,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 8,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 9,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 10,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 11,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 12,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 13,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 14,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 15,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 16,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 17,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 18,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 19,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 20,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 21,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 22,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 23,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 24,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 25,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 26,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 27,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 28,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 29,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 30,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 31,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 32,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 33,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 34,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 35,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 36,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 37,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 38,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 39,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 40,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 41,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 42,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 43,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 44,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 45,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 46,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 47,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 48,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 49,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_50",
+      "cycle": 50,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 1,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 2,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 3,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 4,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 5,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 6,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 7,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 8,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 9,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 10,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 11,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 12,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 13,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 14,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 15,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 16,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 17,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 18,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 19,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 20,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 21,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 22,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 23,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 24,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 25,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 26,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 27,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 28,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 29,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 30,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 31,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 32,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 33,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 34,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 35,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 36,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 37,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 38,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 39,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 40,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 41,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 42,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 43,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 44,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 45,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 46,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 47,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 48,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 49,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 50,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 51,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 52,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 53,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 54,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 55,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 56,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 57,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 58,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 59,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 60,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 61,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 62,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 63,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 64,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 65,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 66,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 67,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 68,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 69,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 70,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 71,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 72,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 73,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 74,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 75,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 76,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 77,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 78,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 79,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 80,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 81,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 82,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 83,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 84,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 85,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 86,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 87,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 88,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 89,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 90,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 91,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 92,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 93,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 94,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 95,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 96,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 97,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 98,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 99,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "LONG_HORIZON_100",
+      "cycle": 100,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "REPAIR_HEAVY",
+      "cycle": 1,
+      "expected": "REPAIR",
+      "actual": "REPAIR",
+      "correct": true
+    },
+    {
+      "profile": "REPAIR_HEAVY",
+      "cycle": 2,
+      "expected": "CONTINUE",
+      "actual": "CONTINUE",
+      "correct": true
+    },
+    {
+      "profile": "REPLAN_HEAVY",
+      "cycle": 1,
+      "expected": "REPLAN",
+      "actual": "REPLAN",
+      "correct": true
+    },
+    {
+      "profile": "OSCILLATION_DEFENSE",
+      "cycle": 1,
+      "expected": "REQUEST_HUMAN",
+      "actual": "CONTINUE",
+      "correct": false
+    },
+    {
+      "profile": "DRIFT_DEFENSE",
+      "cycle": 1,
+      "expected": "UNEXPECTED_DRIFT",
+      "actual": "UNEXPECTED_DRIFT",
+      "correct": true
+    },
+    {
+      "profile": "FINISH_GATE",
+      "cycle": 1,
+      "expected": "FINISH",
+      "actual": "FINISH",
+      "correct": true
+    }
+  ]
+}

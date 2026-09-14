@@ -1,0 +1,68 @@
+{
+  "phase": 51,
+  "benchmark_type": "Bounded Behavioral Proof Exploration Scalability",
+  "timestamp": 1789335026.9359915,
+  "benchmarks": {
+    "scale_100": {
+      "scenarios_count": 100,
+      "generation_seconds": 1e-05,
+      "generation_scenarios_per_sec": 1000000.0,
+      "normalization_and_comparison_seconds": 0.00353,
+      "normalization_ops_per_sec": 28346.3,
+      "coverage_calculation_seconds": 0.00026,
+      "coverage_achieved_pct": 80.0,
+      "counterexample_shrink_time_ms": 0.082,
+      "counterexample_shrink_steps": 20,
+      "counterexample_minimal_fields": 1,
+      "mission_proof_e2e_latency_ms": 10.56,
+      "scenario_compute_cost_microseconds": 0.058
+    },
+    "scale_1000": {
+      "scenarios_count": 1000,
+      "generation_seconds": 4e-05,
+      "generation_scenarios_per_sec": 10000000.0,
+      "normalization_and_comparison_seconds": 0.03582,
+      "normalization_ops_per_sec": 27916.7,
+      "coverage_calculation_seconds": 0.00063,
+      "coverage_achieved_pct": 80.0,
+      "counterexample_shrink_time_ms": 0.071,
+      "counterexample_shrink_steps": 20,
+      "counterexample_minimal_fields": 1,
+      "mission_proof_e2e_latency_ms": 10.33,
+      "scenario_compute_cost_microseconds": 0.043
+    },
+    "scale_10000": {
+      "scenarios_count": 10000,
+      "generation_seconds": 0.00032,
+      "generation_scenarios_per_sec": 31065547.7,
+      "normalization_and_comparison_seconds": 0.3475,
+      "normalization_ops_per_sec": 28776.7,
+      "coverage_calculation_seconds": 0.00264,
+      "coverage_achieved_pct": 80.0,
+      "counterexample_shrink_time_ms": 0.071,
+      "counterexample_shrink_steps": 20,
+      "counterexample_minimal_fields": 1,
+      "mission_proof_e2e_latency_ms": 11.72,
+      "scenario_compute_cost_microseconds": 0.032
+    },
+    "scale_100000": {
+      "scenarios_count": 100000,
+      "generation_seconds": 0.00343,
+      "generation_scenarios_per_sec": 29166423.4,
+      "normalization_and_comparison_seconds": 3.64136,
+      "normalization_ops_per_sec": 27462.3,
+      "coverage_calculation_seconds": 0.00271,
+      "coverage_achieved_pct": 80.0,
+      "counterexample_shrink_time_ms": 0.075,
+      "counterexample_shrink_steps": 20,
+      "counterexample_minimal_fields": 1,
+      "mission_proof_e2e_latency_ms": 10.64,
+      "scenario_compute_cost_microseconds": 0.034
+    }
+  },
+  "summary": {
+    "max_throughput_scenarios_per_sec": 31065547.7,
+    "sub_millisecond_shrinking": true,
+    "status": "PASS"
+  }
+}

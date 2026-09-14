@@ -5,6 +5,7 @@ import http.server
 import socketserver
 import json
 import sys
+import re
 from urllib.parse import quote
 
 from backend.errors import safe_user_error
@@ -241,6 +242,145 @@ def _package_script(package_dir: str) -> str | None:
     return None
 
 
+def _diagnose_runtime_error(line: str, on_output_callback) -> None:
+    """
+    Analyzes error lines output by the child process to provide instant diagnosis and suggestions.
+    """
+    # JavaScript ReferenceError
+    ref_match = re.search(r'ReferenceError:\s*(\w+)\s*is not defined', line)
+    if ref_match:
+        var_name = ref_match.group(1)
+        on_output_callback(
+            f"\n[JARVIS Auto-Diagnostic] [ERRO] Falha de Execução: ReferenceError detetado!\n"
+            f"   • Causa: A variável '{var_name}' está a ser utilizada sem ter sido definida ou importada.\n"
+            f"   • Sugestão: Adicione 'const {var_name} = ...;' ou a importação correspondente no topo do ficheiro.\n\n"
+        )
+        return
+
+    # Node.js Module Not Found
+    mod_match = re.search(r"Cannot find module ['\"]([^'\"]+)['\"]", line)
+    if mod_match:
+        mod_name = mod_match.group(1)
+        on_output_callback(
+            f"\n[JARVIS Auto-Diagnostic] [ERRO] Falha de Execução: Módulo em falta!\n"
+            f"   • Causa: O pacote '{mod_name}' não foi encontrado em node_modules.\n"
+            f"   • Sugestão: Execute 'npm install {mod_name}' para adicionar a dependência.\n\n"
+        )
+        return
+
+    # Python NameError
+    name_match = re.search(r"NameError:\s*name ['\"](\w+)['\"] is not defined", line)
+    if name_match:
+        var_name = name_match.group(1)
+        on_output_callback(
+            f"\n[JARVIS Auto-Diagnostic] [ERRO] Falha de Execução: NameError detetado!\n"
+            f"   • Causa: A variável ou função '{var_name}' não foi definida antes do uso.\n"
+            f"   • Sugestão: Defina ou importe '{var_name}' no início do script Python.\n\n"
+        )
+        return
+
+    # Python ModuleNotFoundError
+    py_mod_match = re.search(r"ModuleNotFoundError:\s*No module named ['\"]([^'\"]+)['\"]", line)
+    if py_mod_match:
+        mod_name = py_mod_match.group(1)
+        on_output_callback(
+            f"\n[JARVIS Auto-Diagnostic] [ERRO] Falha de Execução: Módulo Python em falta!\n"
+            f"   • Causa: O módulo '{mod_name}' não está instalado no ambiente Python.\n"
+            f"   • Sugestão: Execute 'pip install {mod_name}' no terminal do projeto.\n\n"
+        )
+        return
+
+    # EADDRINUSE Port conflict
+    port_match = re.search(r'EADDRINUSE.*:(\d+)', line)
+    if port_match:
+        port_num = port_match.group(1)
+        on_output_callback(
+            f"\n[JARVIS Auto-Diagnostic] [ERRO] Falha de Execução: Porta {port_num} já ocupada!\n"
+            f"   • Causa: Outro processo está a utilizar a porta {port_num}.\n"
+            f"   • Sugestão: Encerre o processo anterior ou altere a porta configurada no servidor.\n\n"
+        )
+        return
+
+
+def _preflight_check_node_project(package_dir: str, on_output_callback) -> bool:
+    """
+    Performs preflight checks on Node.js entrypoints before launching npm start/dev.
+    1. Syntax verification with node --check.
+    2. Static detection of undeclared variables (e.g. app.post used without app declaration).
+    """
+    try:
+        entrypoint = None
+        pkg_path = os.path.join(package_dir, "package.json")
+        if os.path.isfile(pkg_path):
+            with open(pkg_path, "r", encoding="utf-8") as f:
+                pkg_data = json.load(f)
+                entrypoint = pkg_data.get("main")
+
+        if not entrypoint or not os.path.isfile(os.path.join(package_dir, entrypoint)):
+            for candidate in ("app.js", "server.js", "index.js", "main.js", "src/index.js", "src/app.js"):
+                if os.path.isfile(os.path.join(package_dir, candidate)):
+                    entrypoint = candidate
+                    break
+
+        if not entrypoint:
+            return True
+
+        entry_full = os.path.join(package_dir, entrypoint)
+        if not entry_full.endswith((".js", ".cjs", ".mjs")):
+            return True
+
+        # 1. Node syntax check
+        check_proc = subprocess.run(
+            ["node", "--check", entrypoint],
+            cwd=package_dir,
+            text=True,
+            capture_output=True,
+            timeout=10,
+        )
+        if check_proc.returncode != 0:
+            on_output_callback(f"[JARVIS Preflight Error] Erro de sintaxe detetado em {entrypoint}:\n{check_proc.stderr}\n")
+            return False
+
+        # 2. Static heuristic for missing declarations
+        with open(entry_full, "r", encoding="utf-8", errors="ignore") as f:
+            code = f.read()
+
+        warnings = []
+        if re.search(r'\bapp\.(get|post|put|delete|patch|use|listen)\s*\(', code):
+            if not re.search(r'\b(const|let|var)\s+app\b', code) and not re.search(r'\bfunction\s+app\b', code):
+                warnings.append("A variável 'app' é utilizada mas não foi declarada nem inicializada (ex: const express = require('express'); const app = express();).")
+
+        if re.search(r'\bexpress\s*\(', code) and not re.search(r'\b(const|let|var|import)\s+.*express\b', code):
+            warnings.append("O módulo 'express' é chamado mas não foi importado (ex: const express = require('express');).")
+
+        if re.search(r'\baxios(\.|\s*\()', code) and not re.search(r'\b(const|let|var|import)\s+.*axios\b', code):
+            warnings.append("O módulo 'axios' é utilizado mas não foi importado (ex: const axios = require('axios');).")
+
+        if warnings:
+            on_output_callback(f"[JARVIS Preflight Warning] Avisos de sanidade detetados em {entrypoint}:\n")
+            for w in warnings:
+                on_output_callback(f"   • {w}\n")
+
+        return True
+    except Exception:
+        return True
+
+
+def _preflight_check_python_project(script_path: str, on_output_callback) -> bool:
+    """
+    Performs preflight syntax checks on Python entrypoints using py_compile.
+    """
+    try:
+        import py_compile
+        py_compile.compile(script_path, doraise=True)
+        return True
+    except py_compile.PyCompileError as e:
+        on_output_callback(f"[JARVIS Preflight Error] Erro de compilação Python em {os.path.basename(script_path)}:\n{e.msg}\n")
+        return False
+    except Exception:
+        return True
+
+
 def run_custom_project(on_output_callback, root_dir: str | None = None, allow_dependency_install: bool | None = None):
     global project_process, last_project_root
     stop_custom_project()
@@ -272,6 +412,9 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
         else:
             on_output_callback(f"[Project] package.json detetado em {location}. A usar o script existente '{script_name}'.\n")
 
+        # Preflight Check for Node.js
+        _preflight_check_node_project(package_dir, on_output_callback)
+
         def run_thread():
             global project_process
             try:
@@ -300,6 +443,7 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
                 if project_process.stdout:
                     for line in project_process.stdout:
                         on_output_callback(line)
+                        _diagnose_runtime_error(line, on_output_callback)
             except Exception as e:
                 on_output_callback(f"[Sandbox Error] {safe_user_error('Erro ao iniciar projeto node', e)}\n")
 
@@ -313,6 +457,9 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
         script_name = os.path.basename(python_entry)
         rel_script = os.path.relpath(python_entry, selected_root)
         on_output_callback(f"[Project] Python detetado: {rel_script}. A iniciar 'python {script_name}'...\n")
+
+        # Preflight Check for Python
+        _preflight_check_python_project(python_entry, on_output_callback)
 
         def run_thread():
             global project_process
@@ -344,6 +491,7 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
                 if project_process.stdout:
                     for line in project_process.stdout:
                         on_output_callback(line)
+                        _diagnose_runtime_error(line, on_output_callback)
             except Exception as e:
                 on_output_callback(f"[Sandbox Error] {safe_user_error('Erro ao iniciar projeto python', e)}\n")
 

@@ -1,0 +1,12 @@
+{
+  "conflict_policy": "Recency is strictly forbidden from acting as sovereign authority",
+  "resolution_factors": [
+    "Applicability",
+    "Evidence weight",
+    "Success rate",
+    "Policy compatibility"
+  ],
+  "ambiguous_fallback": "Demoted to CONTEXT_ONLY with status CONFLICT_UNRESOLVED",
+  "conflicts_tested": 25,
+  "resolution_accuracy": 1.0
+}

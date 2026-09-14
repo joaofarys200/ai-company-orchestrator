@@ -1,0 +1,594 @@
+[
+  {
+    "contract_id": "ctr_001_api_v1_users",
+    "version": "1.0.0",
+    "schema_hash": "99122c348a5ae4068b564ef9768646f47d07fb6d4bba0e67e22ea7064b728763",
+    "route": "/api/v1/users",
+    "method": "GET",
+    "request_schema": {
+      "properties": {
+        "page": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      }
+    },
+    "response_schema": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "status": {
+          "type": "string",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "timestamp": {
+          "type": "string",
+          "is_required": false,
+          "is_nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "error_contract": {
+      "400": {
+        "description": "Bad Request"
+      },
+      "404": {
+        "description": "Not Found"
+      }
+    },
+    "provenance": "SYSTEM_VERIFIED_PHASE45",
+    "validated_at": 1789224244.797638,
+    "validated_by": "CONTRACT_GOVERNANCE_GATE",
+    "semantic_graph_version": 1,
+    "policy_version": "1.0.0",
+    "parent_version": null,
+    "created_at": 1789224244.797639,
+    "metadata": {
+      "requires_auth": true
+    }
+  },
+  {
+    "contract_id": "ctr_002_api_v1_users",
+    "version": "1.0.0",
+    "schema_hash": "978dba53b9e5e60a4dc72d44b74d7fd99e657dec55c5e88f9b74891da11df892",
+    "route": "/api/v1/users",
+    "method": "POST",
+    "request_schema": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "response_schema": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "status": {
+          "type": "string",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "timestamp": {
+          "type": "string",
+          "is_required": false,
+          "is_nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "error_contract": {
+      "400": {
+        "description": "Bad Request"
+      },
+      "404": {
+        "description": "Not Found"
+      }
+    },
+    "provenance": "SYSTEM_VERIFIED_PHASE45",
+    "validated_at": 1789224244.7976637,
+    "validated_by": "CONTRACT_GOVERNANCE_GATE",
+    "semantic_graph_version": 1,
+    "policy_version": "1.0.0",
+    "parent_version": null,
+    "created_at": 1789224244.7976644,
+    "metadata": {
+      "requires_auth": true
+    }
+  },
+  {
+    "contract_id": "ctr_003_api_v1_auth_login",
+    "version": "1.0.0",
+    "schema_hash": "978dba53b9e5e60a4dc72d44b74d7fd99e657dec55c5e88f9b74891da11df892",
+    "route": "/api/v1/auth/login",
+    "method": "POST",
+    "request_schema": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "response_schema": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "status": {
+          "type": "string",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "timestamp": {
+          "type": "string",
+          "is_required": false,
+          "is_nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "error_contract": {
+      "400": {
+        "description": "Bad Request"
+      },
+      "404": {
+        "description": "Not Found"
+      }
+    },
+    "provenance": "SYSTEM_VERIFIED_PHASE45",
+    "validated_at": 1789224244.7976804,
+    "validated_by": "CONTRACT_GOVERNANCE_GATE",
+    "semantic_graph_version": 1,
+    "policy_version": "1.0.0",
+    "parent_version": null,
+    "created_at": 1789224244.7976809,
+    "metadata": {
+      "requires_auth": false
+    }
+  },
+  {
+    "contract_id": "ctr_004_api_v1_orders",
+    "version": "1.0.0",
+    "schema_hash": "99122c348a5ae4068b564ef9768646f47d07fb6d4bba0e67e22ea7064b728763",
+    "route": "/api/v1/orders",
+    "method": "GET",
+    "request_schema": {
+      "properties": {
+        "page": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      }
+    },
+    "response_schema": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "status": {
+          "type": "string",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "timestamp": {
+          "type": "string",
+          "is_required": false,
+          "is_nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "error_contract": {
+      "400": {
+        "description": "Bad Request"
+      },
+      "404": {
+        "description": "Not Found"
+      }
+    },
+    "provenance": "SYSTEM_VERIFIED_PHASE45",
+    "validated_at": 1789224244.7976933,
+    "validated_by": "CONTRACT_GOVERNANCE_GATE",
+    "semantic_graph_version": 1,
+    "policy_version": "1.0.0",
+    "parent_version": null,
+    "created_at": 1789224244.7976937,
+    "metadata": {
+      "requires_auth": true
+    }
+  },
+  {
+    "contract_id": "ctr_005_api_v1_orders",
+    "version": "1.0.0",
+    "schema_hash": "978dba53b9e5e60a4dc72d44b74d7fd99e657dec55c5e88f9b74891da11df892",
+    "route": "/api/v1/orders",
+    "method": "POST",
+    "request_schema": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "response_schema": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "status": {
+          "type": "string",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "timestamp": {
+          "type": "string",
+          "is_required": false,
+          "is_nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "error_contract": {
+      "400": {
+        "description": "Bad Request"
+      },
+      "404": {
+        "description": "Not Found"
+      }
+    },
+    "provenance": "SYSTEM_VERIFIED_PHASE45",
+    "validated_at": 1789224244.7977052,
+    "validated_by": "CONTRACT_GOVERNANCE_GATE",
+    "semantic_graph_version": 1,
+    "policy_version": "1.0.0",
+    "parent_version": null,
+    "created_at": 1789224244.7977057,
+    "metadata": {
+      "requires_auth": true
+    }
+  },
+  {
+    "contract_id": "ctr_006_api_v1_products_search",
+    "version": "1.0.0",
+    "schema_hash": "99122c348a5ae4068b564ef9768646f47d07fb6d4bba0e67e22ea7064b728763",
+    "route": "/api/v1/products/search",
+    "method": "GET",
+    "request_schema": {
+      "properties": {
+        "page": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      }
+    },
+    "response_schema": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "status": {
+          "type": "string",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "timestamp": {
+          "type": "string",
+          "is_required": false,
+          "is_nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "error_contract": {
+      "400": {
+        "description": "Bad Request"
+      },
+      "404": {
+        "description": "Not Found"
+      }
+    },
+    "provenance": "SYSTEM_VERIFIED_PHASE45",
+    "validated_at": 1789224244.7977161,
+    "validated_by": "CONTRACT_GOVERNANCE_GATE",
+    "semantic_graph_version": 1,
+    "policy_version": "1.0.0",
+    "parent_version": null,
+    "created_at": 1789224244.7977164,
+    "metadata": {
+      "requires_auth": true
+    }
+  },
+  {
+    "contract_id": "ctr_007_api_v1_analytics_events",
+    "version": "1.0.0",
+    "schema_hash": "978dba53b9e5e60a4dc72d44b74d7fd99e657dec55c5e88f9b74891da11df892",
+    "route": "/api/v1/analytics/events",
+    "method": "POST",
+    "request_schema": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "response_schema": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "status": {
+          "type": "string",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "timestamp": {
+          "type": "string",
+          "is_required": false,
+          "is_nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "error_contract": {
+      "400": {
+        "description": "Bad Request"
+      },
+      "404": {
+        "description": "Not Found"
+      }
+    },
+    "provenance": "SYSTEM_VERIFIED_PHASE45",
+    "validated_at": 1789224244.7977266,
+    "validated_by": "CONTRACT_GOVERNANCE_GATE",
+    "semantic_graph_version": 1,
+    "policy_version": "1.0.0",
+    "parent_version": null,
+    "created_at": 1789224244.7977269,
+    "metadata": {
+      "requires_auth": true
+    }
+  },
+  {
+    "contract_id": "ctr_008_api_v1_billing_invoices",
+    "version": "1.0.0",
+    "schema_hash": "99122c348a5ae4068b564ef9768646f47d07fb6d4bba0e67e22ea7064b728763",
+    "route": "/api/v1/billing/invoices",
+    "method": "GET",
+    "request_schema": {
+      "properties": {
+        "page": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      }
+    },
+    "response_schema": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "status": {
+          "type": "string",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "timestamp": {
+          "type": "string",
+          "is_required": false,
+          "is_nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "error_contract": {
+      "400": {
+        "description": "Bad Request"
+      },
+      "404": {
+        "description": "Not Found"
+      }
+    },
+    "provenance": "SYSTEM_VERIFIED_PHASE45",
+    "validated_at": 1789224244.797737,
+    "validated_by": "CONTRACT_GOVERNANCE_GATE",
+    "semantic_graph_version": 1,
+    "policy_version": "1.0.0",
+    "parent_version": null,
+    "created_at": 1789224244.7977374,
+    "metadata": {
+      "requires_auth": true
+    }
+  },
+  {
+    "contract_id": "ctr_009_api_v1_notifications",
+    "version": "1.0.0",
+    "schema_hash": "99122c348a5ae4068b564ef9768646f47d07fb6d4bba0e67e22ea7064b728763",
+    "route": "/api/v1/notifications",
+    "method": "GET",
+    "request_schema": {
+      "properties": {
+        "page": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      }
+    },
+    "response_schema": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "status": {
+          "type": "string",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "timestamp": {
+          "type": "string",
+          "is_required": false,
+          "is_nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "error_contract": {
+      "400": {
+        "description": "Bad Request"
+      },
+      "404": {
+        "description": "Not Found"
+      }
+    },
+    "provenance": "SYSTEM_VERIFIED_PHASE45",
+    "validated_at": 1789224244.797749,
+    "validated_by": "CONTRACT_GOVERNANCE_GATE",
+    "semantic_graph_version": 1,
+    "policy_version": "1.0.0",
+    "parent_version": null,
+    "created_at": 1789224244.7977493,
+    "metadata": {
+      "requires_auth": true
+    }
+  },
+  {
+    "contract_id": "ctr_010_api_v1_health",
+    "version": "1.0.0",
+    "schema_hash": "99122c348a5ae4068b564ef9768646f47d07fb6d4bba0e67e22ea7064b728763",
+    "route": "/api/v1/health",
+    "method": "GET",
+    "request_schema": {
+      "properties": {
+        "page": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      }
+    },
+    "response_schema": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "status": {
+          "type": "string",
+          "is_required": true,
+          "is_nullable": false
+        },
+        "timestamp": {
+          "type": "string",
+          "is_required": false,
+          "is_nullable": false
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ]
+    },
+    "error_contract": {
+      "400": {
+        "description": "Bad Request"
+      },
+      "404": {
+        "description": "Not Found"
+      }
+    },
+    "provenance": "SYSTEM_VERIFIED_PHASE45",
+    "validated_at": 1789224244.797759,
+    "validated_by": "CONTRACT_GOVERNANCE_GATE",
+    "semantic_graph_version": 1,
+    "policy_version": "1.0.0",
+    "parent_version": null,
+    "created_at": 1789224244.7977595,
+    "metadata": {
+      "requires_auth": false
+    }
+  }
+]

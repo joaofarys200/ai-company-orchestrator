@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "old_schema": "poly_events_v1",
+      "new_schema": "poly_events_v2",
+      "overall_verdict": "POTENTIALLY_BREAKING",
+      "reason": "New variant 'user.archived' introduced into union",
+      "pairwise": [
+        {
+          "variant_pair": "UserCreated -> UserCreated",
+          "verdict": "COMPATIBLE"
+        },
+        {
+          "variant_pair": "UserUpdated -> UserUpdated",
+          "verdict": "COMPATIBLE"
+        },
+        {
+          "variant_pair": "UserDeleted -> UserDeleted",
+          "verdict": "COMPATIBLE"
+        },
+        {
+          "variant_pair": "New Variant -> UserArchived",
+          "verdict": "POTENTIALLY_BREAKING"
+        }
+      ]
+    },
+    {
+      "old_schema": "poly_events_v1",
+      "new_schema": "poly_events_broken",
+      "overall_verdict": "BREAKING",
+      "reason": "Variant 'UserDeleted' removed from contract"
+    }
+  ]
+}

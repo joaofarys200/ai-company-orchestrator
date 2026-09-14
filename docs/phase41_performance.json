@@ -1,0 +1,27 @@
+{
+  "timestamp": 1789154937.634918,
+  "micro_decision_eval_ms": 0.052,
+  "single_outcome_classification_ms": 0.042,
+  "proposal_synthesis_ms": 0.125,
+  "safety_regression_suite_ms": 0.38,
+  "scales": {
+    "replay_100_decisions": {
+      "decisions_count": 100,
+      "total_latency_ms": 2.21,
+      "latency_per_decision_ms": 0.02213,
+      "throughput_decisions_per_sec": 45189.6
+    },
+    "replay_1000_decisions": {
+      "decisions_count": 1000,
+      "total_latency_ms": 13.37,
+      "latency_per_decision_ms": 0.01337,
+      "throughput_decisions_per_sec": 74810.0
+    },
+    "replay_10000_decisions": {
+      "decisions_count": 10000,
+      "total_latency_ms": 133.04,
+      "latency_per_decision_ms": 0.0133,
+      "throughput_decisions_per_sec": 75168.1
+    }
+  }
+}

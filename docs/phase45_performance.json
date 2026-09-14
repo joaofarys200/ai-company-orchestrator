@@ -1,0 +1,54 @@
+{
+  "status": "PASS",
+  "benchmark_timestamp": 1789223214.9699087,
+  "scales": {
+    "100": {
+      "observations_count": 100,
+      "ingest_time_seconds": 0.0014,
+      "ingest_ops_per_sec": 72663.86,
+      "query_time_seconds": 6e-06,
+      "inference_time_seconds": 8.9e-05,
+      "validation_time_seconds": 2e-06,
+      "graph_update_time_seconds": 2.9e-05,
+      "policy_action": "PROPOSE_CONTRACT"
+    },
+    "1000": {
+      "observations_count": 1000,
+      "ingest_time_seconds": 0.0114,
+      "ingest_ops_per_sec": 87525.82,
+      "query_time_seconds": 1e-05,
+      "inference_time_seconds": 0.0004,
+      "validation_time_seconds": 4e-06,
+      "graph_update_time_seconds": 2.8e-05,
+      "policy_action": "PROPOSE_CONTRACT"
+    },
+    "10000": {
+      "observations_count": 10000,
+      "ingest_time_seconds": 0.1214,
+      "ingest_ops_per_sec": 82370.76,
+      "query_time_seconds": 3.6e-05,
+      "inference_time_seconds": 0.001326,
+      "validation_time_seconds": 3e-06,
+      "graph_update_time_seconds": 3.3e-05,
+      "policy_action": "PROPOSE_CONTRACT"
+    },
+    "100000": {
+      "observations_count": 100000,
+      "ingest_time_seconds": 1.283,
+      "ingest_ops_per_sec": 77942.37,
+      "query_time_seconds": 0.0002,
+      "inference_time_seconds": 0.001294,
+      "validation_time_seconds": 2e-06,
+      "graph_update_time_seconds": 2.3e-05,
+      "policy_action": "PROPOSE_CONTRACT"
+    }
+  },
+  "incremental_benchmarks": {
+    "append_1_observation_seconds": 4.9e-05,
+    "append_100_observations_seconds": 0.001866,
+    "rebuild_10k_observations_seconds": 0.0128,
+    "incremental_advantage_ratio": 6.88
+  },
+  "redacted_credentials_total": 277750,
+  "security_alerts_total": 0
+}

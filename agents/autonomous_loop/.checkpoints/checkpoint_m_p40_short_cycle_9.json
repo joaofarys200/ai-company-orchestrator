@@ -1,0 +1,69 @@
+{
+  "mission_id": "m_p40_short",
+  "cycle_id": "cycle_9",
+  "timestamp": 1789152666.373556,
+  "state": {
+    "mission_id": "m_p40_short",
+    "loop_version": 9,
+    "cycle_id": "cycle_9",
+    "mission_version": 1,
+    "intent_version": 1,
+    "plan_version": 1,
+    "current_stage": "RECORD",
+    "current_decision": "CONTINUE",
+    "current_observations": [],
+    "latest_prediction_id": "pred_71c71df0",
+    "latest_outcome_id": "out_0606ad17",
+    "latest_evidence_ids": [
+      "EVD_CYC_1",
+      "EVD_CYC_2",
+      "EVD_CYC_3",
+      "EVD_CYC_4",
+      "EVD_CYC_5",
+      "EVD_CYC_6",
+      "EVD_CYC_7",
+      "EVD_CYC_8",
+      "EVD_CYC_9"
+    ],
+    "active_failures": [],
+    "active_repairs": [],
+    "active_replans": [],
+    "adaptation_count": 0,
+    "consecutive_successes": 9,
+    "consecutive_failures": 0,
+    "human_intervention_count": 0,
+    "state_hash": "a4869e1a372598d2",
+    "created_at": 1789152655.787698,
+    "updated_at": 1789152666.3734646
+  },
+  "snapshot_hash": "decf8163f01b39c6",
+  "decision": "CONTINUE",
+  "adaptation": null,
+  "outcome": {
+    "outcome_id": "out_0606ad17",
+    "cycle_id": "cycle_9",
+    "prediction_id": "pred_71c71df0",
+    "matched": [
+      "src/mod_9.py"
+    ],
+    "missed": [
+      "agents/domain_logic.py",
+      "src/mod_1.py",
+      "src/mod_10.py",
+      "src/mod_2.py",
+      "src/mod_3.py",
+      "src/mod_4.py",
+      "src/mod_5.py",
+      "src/mod_6.py",
+      "src/mod_7.py",
+      "src/mod_8.py"
+    ],
+    "overpredicted": [],
+    "underpredicted": [],
+    "unexpected_changes": [],
+    "discrepancy_score": 0.909
+  },
+  "plan_version": 1,
+  "intent_version": 1,
+  "fingerprints_count": 9
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "counterexample_id": "cx_515c2cfd0db1afa3",
+    "input_payload": {
+      "order_id": "sample_order_id",
+      "subtotal": 10.0,
+      "discount_rate": 0
+    },
+    "expected_behavior": {
+      "id": "res_01",
+      "status": "processed",
+      "echo": {
+        "order_id": "sample_order_id",
+        "subtotal": 10.0,
+        "discount_rate": 0
+      }
+    },
+    "observed_behavior": {
+      "id": "sample_order_id",
+      "status": "processed"
+    },
+    "difference": "Output payload divergence between before and after versions",
+    "consumer_id": "checkout-ui",
+    "contract_id": "orderCalculationContract",
+    "trace_id": "trace_scen_0f00ed9d7825ddae_after",
+    "evidence": {
+      "scope_id": "scp_adapt_5537a76fbe832b0e",
+      "seed": 50,
+      "before_status": 200,
+      "after_status": 200,
+      "environment": "sandbox"
+    },
+    "timestamp": 100.0
+  },
+  {
+    "counterexample_id": "shrunk_272c4f77376e1a12",
+    "scenario_id": "scen_0f00ed9d7825ddae",
+    "consumer_id": "checkout-ui",
+    "contract_id": "orderCalculationContract",
+    "original_input": {
+      "order_id": "sample_order_id",
+      "subtotal": 10.0,
+      "discount_rate": 0
+    },
+    "minimal_input": {
+      "discount_rate": 0
+    },
+    "difference": "Output payload divergence between before and after versions",
+    "original_field_count": 3,
+    "minimal_field_count": 1,
+    "shrink_steps": 2,
+    "trace_id": "trace_scen_0f00ed9d7825ddae_after",
+    "proof_scope_id": "scp_adapt_5537a76fbe832b0e",
+    "reproducible_seed": 50,
+    "timestamp": 100.0
+  }
+]
