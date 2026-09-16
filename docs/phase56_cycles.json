@@ -1,0 +1,7 @@
+[
+  {
+    "scenario": "corpus_03_react_circular_import_pingpong",
+    "type": "PING_PONG_OSCILLATION",
+    "period": 2
+  }
+]

@@ -1,0 +1,86 @@
+{
+  "timestamp": 1789518589.4342322,
+  "phase": 56,
+  "scales": {
+    "1": {
+      "repairs_count": 1,
+      "cycle_detection_ms": 0.004,
+      "stall_detection_ms": 0.002,
+      "divergence_detection_ms": 0.014,
+      "certificate_generation_ms": 0.025,
+      "ledger_verification_ms": 0.009,
+      "replay_ms": 0.035,
+      "total_governance_overhead_ms": 0.215,
+      "per_step_overhead_ms": 0.215
+    },
+    "5": {
+      "repairs_count": 5,
+      "cycle_detection_ms": 0.025,
+      "stall_detection_ms": 0.008,
+      "divergence_detection_ms": 0.016,
+      "certificate_generation_ms": 0.019,
+      "ledger_verification_ms": 0.025,
+      "replay_ms": 0.068,
+      "total_governance_overhead_ms": 0.268,
+      "per_step_overhead_ms": 0.054
+    },
+    "10": {
+      "repairs_count": 10,
+      "cycle_detection_ms": 0.023,
+      "stall_detection_ms": 0.005,
+      "divergence_detection_ms": 0.012,
+      "certificate_generation_ms": 0.019,
+      "ledger_verification_ms": 0.044,
+      "replay_ms": 0.111,
+      "total_governance_overhead_ms": 0.379,
+      "per_step_overhead_ms": 0.038
+    },
+    "25": {
+      "repairs_count": 25,
+      "cycle_detection_ms": 0.022,
+      "stall_detection_ms": 0.005,
+      "divergence_detection_ms": 0.01,
+      "certificate_generation_ms": 0.021,
+      "ledger_verification_ms": 0.103,
+      "replay_ms": 0.196,
+      "total_governance_overhead_ms": 0.734,
+      "per_step_overhead_ms": 0.029
+    },
+    "50": {
+      "repairs_count": 50,
+      "cycle_detection_ms": 0.019,
+      "stall_detection_ms": 0.004,
+      "divergence_detection_ms": 0.012,
+      "certificate_generation_ms": 0.028,
+      "ledger_verification_ms": 0.205,
+      "replay_ms": 0.202,
+      "total_governance_overhead_ms": 1.184,
+      "per_step_overhead_ms": 0.024
+    },
+    "100": {
+      "repairs_count": 100,
+      "cycle_detection_ms": 0.022,
+      "stall_detection_ms": 0.007,
+      "divergence_detection_ms": 0.018,
+      "certificate_generation_ms": 0.042,
+      "ledger_verification_ms": 0.421,
+      "replay_ms": 0.201,
+      "total_governance_overhead_ms": 2.16,
+      "per_step_overhead_ms": 0.022
+    }
+  },
+  "microbenchmarks": {
+    "avg_cycle_detection_100_ms": 0.022,
+    "avg_stall_detection_100_ms": 0.007,
+    "avg_divergence_detection_100_ms": 0.018,
+    "avg_certificate_generation_ms": 0.042,
+    "avg_ledger_verification_100_ms": 0.421,
+    "avg_replay_latency_ms": 0.201
+  },
+  "mission_level_summary": {
+    "max_step_overhead_ms": 0.215,
+    "sla_target_ms": 50.0,
+    "sla_met": true,
+    "epistemic_note": "Governed convergence overhead scales linearly O(N) with ledger and cycle window, well under the 50ms SLA budget."
+  }
+}

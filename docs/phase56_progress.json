@@ -1,0 +1,82 @@
+[
+  {
+    "scenario_id": "corpus_01_dina_startup_crash",
+    "step": 1,
+    "active_failures": 3,
+    "risk": 0.4,
+    "coverage": 0.7,
+    "decision": "CONTINUE_REPAIR"
+  },
+  {
+    "scenario_id": "corpus_01_dina_startup_crash",
+    "step": 2,
+    "active_failures": 1,
+    "risk": 0.22,
+    "coverage": 0.85,
+    "decision": "CONTINUE_REPAIR"
+  },
+  {
+    "scenario_id": "corpus_01_dina_startup_crash",
+    "step": 3,
+    "active_failures": 0,
+    "risk": 0.05,
+    "coverage": 0.94,
+    "decision": "COMMIT_TRANSACTION"
+  },
+  {
+    "scenario_id": "corpus_02_fastapi_pydantic_drift",
+    "step": 1,
+    "active_failures": 1,
+    "risk": 0.2,
+    "coverage": 0.82,
+    "decision": "CONTINUE_REPAIR"
+  },
+  {
+    "scenario_id": "corpus_02_fastapi_pydantic_drift",
+    "step": 2,
+    "active_failures": 0,
+    "risk": 0.04,
+    "coverage": 0.92,
+    "decision": "COMMIT_TRANSACTION"
+  },
+  {
+    "scenario_id": "corpus_03_react_circular_import_pingpong",
+    "step": 1,
+    "active_failures": 1,
+    "risk": 0.5,
+    "coverage": 0.6,
+    "decision": "CONTINUE_REPAIR"
+  },
+  {
+    "scenario_id": "corpus_03_react_circular_import_pingpong",
+    "step": 2,
+    "active_failures": 1,
+    "risk": 0.5,
+    "coverage": 0.6,
+    "decision": "TRIGGER_ROLLBACK"
+  },
+  {
+    "scenario_id": "corpus_04_payment_economic_mutation",
+    "step": 1,
+    "active_failures": 1,
+    "risk": 0.75,
+    "coverage": 0.7,
+    "decision": "CONTINUE_REPAIR"
+  },
+  {
+    "scenario_id": "corpus_04_payment_economic_mutation",
+    "step": 2,
+    "active_failures": 1,
+    "risk": 0.76,
+    "coverage": 0.7,
+    "decision": "BLOCK_ECONOMIC_COMMIT"
+  },
+  {
+    "scenario_id": "corpus_05_unbounded_failure_cascade",
+    "step": 1,
+    "active_failures": 3,
+    "risk": 0.85,
+    "coverage": 0.4,
+    "decision": "TRIGGER_ROLLBACK"
+  }
+]

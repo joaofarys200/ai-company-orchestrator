@@ -26,3 +26,6 @@ export { BehavioralContractProofPanel } from './BehavioralContractProofPanel';
 export { BehavioralProofExplorationPanel } from './BehavioralProofExplorationPanel';
 export { RiskDirectedExplorationPanel } from './RiskDirectedExplorationPanel';
 export { UniversalPreflightRecoveryPanel } from './UniversalPreflightRecoveryPanel';
+export { VerifiedRepairSynthesisPanel } from './VerifiedRepairSynthesisPanel';
+export { MultiRepairOrchestrationPanel } from './MultiRepairOrchestrationPanel';
+export { AutonomousRepairConvergencePanel } from './AutonomousRepairConvergencePanel';

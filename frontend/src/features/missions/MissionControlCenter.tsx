@@ -59,6 +59,9 @@ import {
   BehavioralProofExplorationPanel,
   RiskDirectedExplorationPanel,
   UniversalPreflightRecoveryPanel,
+  VerifiedRepairSynthesisPanel,
+  MultiRepairOrchestrationPanel,
+  AutonomousRepairConvergencePanel,
 } from './components';
 
 export interface MissionControlCenterProps {
@@ -224,7 +227,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   const [selectedScenario, setSelectedScenario] = useState<ScenarioKey>('INTERACTIVE');
   const [missionState, setMissionState] = useState<MissionControlStateData>(FALLBACK_INTERACTIVE_STATE);
   const [activeViewSection, setActiveViewSection] = useState<
-    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
+    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'verified_repair_synthesis' | 'multi_repair_orchestration' | 'autonomous_repair_convergence' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
   >('overview');
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
 
@@ -574,6 +577,9 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
           { id: 'behavioral_proof_exploration', label: 'Exploração & Cobertura (Fase 51)', icon: Compass },
           { id: 'risk_directed_exploration', label: 'Exploração por Risco (Fase 52)', icon: Crosshair },
           { id: 'universal_preflight_recovery', label: 'Preflight & Auto-Recovery (Fase 53)', icon: Stethoscope },
+          { id: 'verified_repair_synthesis', label: 'Síntese & Prova de Reparação (Fase 54)', icon: Wrench },
+          { id: 'multi_repair_orchestration', label: 'Orquestração Multi-Reparação (Fase 55)', icon: GitMerge },
+          { id: 'autonomous_repair_convergence', label: 'Governação de Convergência (Fase 56)', icon: Scale },
           { id: 'evidence_impact', label: 'Impacto em Evidências', icon: ShieldAlert },
           { id: 'why', label: 'Painel do Porquê ("Why Panel")', icon: Brain },
           { id: 'repairs', label: 'Auto-Cura & Adaptação', icon: Wrench },
@@ -764,6 +770,18 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
 
         {activeViewSection === 'universal_preflight_recovery' && (
           <UniversalPreflightRecoveryPanel />
+        )}
+
+        {activeViewSection === 'verified_repair_synthesis' && (
+          <VerifiedRepairSynthesisPanel />
+        )}
+
+        {activeViewSection === 'multi_repair_orchestration' && (
+          <MultiRepairOrchestrationPanel />
+        )}
+
+        {activeViewSection === 'autonomous_repair_convergence' && (
+          <AutonomousRepairConvergencePanel />
         )}
 
         {activeViewSection === 'evidence_impact' && (

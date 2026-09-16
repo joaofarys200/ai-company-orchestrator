@@ -1,0 +1,78 @@
+{
+  "phase": 56,
+  "browser": "Microsoft Edge Official",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "timestamp": 1789518728.7029037,
+  "scenarios_passed": 11,
+  "total_scenarios": 11,
+  "console_errors_count": 4,
+  "network_errors_count": 0,
+  "scenarios": [
+    {
+      "name": "phase56_01_convergence_overview",
+      "description": "Vis\u00e3o geral da governa\u00e7\u00e3o com m\u00e9tricas de Lyapunov, estado e tabela de trajet\u00f3ria",
+      "screenshot": "phase56_01_convergence_overview.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase56_02_progress_ledger",
+      "description": "Livro-raz\u00e3o criptogr\u00e1fico append-only com hashes encadeados SHA-256",
+      "screenshot": "phase56_02_progress_ledger.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase56_03_risk_trajectory",
+      "description": "Trajet\u00f3ria de redu\u00e7\u00e3o estrita de risco operacional de 0.580 para 0.080",
+      "screenshot": "phase56_03_risk_trajectory.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase56_04_coverage_trajectory",
+      "description": "Vetor de progresso multidimensional P (8 dimens\u00f5es) e pontua\u00e7\u00e3o Delta P",
+      "screenshot": "phase56_04_coverage_trajectory.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase56_05_cycle_detected",
+      "description": "Alerta formal de ciclo oscilat\u00f3rio de comprimento 2 com paragem mandat\u00f3ria",
+      "screenshot": "phase56_05_cycle_detected.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase56_06_stall_detected",
+      "description": "Dete\u00e7\u00e3o de estagna\u00e7\u00e3o de repara\u00e7\u00e3o (stall) por falta de progresso mono-direcional",
+      "screenshot": "phase56_06_stall_detected.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase56_07_divergence_detected",
+      "description": "Decomposi\u00e7\u00e3o expl\u00edcita do DivergenceScore nos 5 fatores de risco e regress\u00e3o",
+      "screenshot": "phase56_07_divergence_detected.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase56_08_human_review",
+      "description": "Estado formal HUMAN_REVIEW_REQUIRED e despacho de ticket de escalonamento",
+      "screenshot": "phase56_08_human_review.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase56_09_rollback",
+      "description": "Rollback determin\u00edstico executado para ckpt_stable com prova de equival\u00eancia de hash",
+      "screenshot": "phase56_09_rollback.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase56_10_successful_convergence",
+      "description": "Converg\u00eancia bem-sucedida com limites de or\u00e7amento adaptativo supervisionados pelo Sentinel",
+      "screenshot": "phase56_10_successful_convergence.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase56_11_convergence_certificate",
+      "description": "Modal interativo de certificado formal de converg\u00eancia com assinatura SHA-256 verificada",
+      "screenshot": "phase56_11_convergence_certificate.png",
+      "status": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,227 @@
+[
+  {
+    "entry_id": "led_0_72da7c3a",
+    "sequence": 0,
+    "timestamp": 1789518627.0534554,
+    "event_type": "convergence_started",
+    "payload": {
+      "mission_id": "corpus_01_dina_startup_crash",
+      "transaction_id": "tx_corpus_01_dina_startup_crash",
+      "state": "INITIAL",
+      "failure_count": 3,
+      "state_hash": "9a5d4b986f430429"
+    },
+    "previous_hash": "0000000000000000",
+    "entry_hash": "05394e6c4a9484ec"
+  },
+  {
+    "entry_id": "led_1_334707f5",
+    "sequence": 1,
+    "timestamp": 1789518627.0535908,
+    "event_type": "progress_recorded",
+    "payload": {
+      "step": 1,
+      "state": "CONVERGING",
+      "delta_score": 8.8,
+      "failures": 3,
+      "decision": "CONTINUE_REPAIR"
+    },
+    "previous_hash": "05394e6c4a9484ec",
+    "entry_hash": "9c3cbf006c0173be"
+  },
+  {
+    "entry_id": "led_2_9c0adcfe",
+    "sequence": 2,
+    "timestamp": 1789518627.053705,
+    "event_type": "progress_recorded",
+    "payload": {
+      "step": 2,
+      "state": "CONVERGING",
+      "delta_score": 13.6,
+      "failures": 1,
+      "decision": "CONTINUE_REPAIR"
+    },
+    "previous_hash": "9c3cbf006c0173be",
+    "entry_hash": "bfe73205f5da6e71"
+  },
+  {
+    "entry_id": "led_3_e26464e4",
+    "sequence": 3,
+    "timestamp": 1789518627.0538094,
+    "event_type": "progress_recorded",
+    "payload": {
+      "step": 3,
+      "state": "COMMITTED",
+      "delta_score": 9.75,
+      "failures": 0,
+      "decision": "COMMIT_TRANSACTION"
+    },
+    "previous_hash": "bfe73205f5da6e71",
+    "entry_hash": "2a904d4918e49481"
+  },
+  {
+    "entry_id": "led_0_e4c9eb70",
+    "sequence": 0,
+    "timestamp": 1789518627.0539482,
+    "event_type": "convergence_started",
+    "payload": {
+      "mission_id": "corpus_02_fastapi_pydantic_drift",
+      "transaction_id": "tx_corpus_02_fastapi_pydantic_drift",
+      "state": "INITIAL",
+      "failure_count": 2,
+      "state_hash": "631f446d69d15c7b"
+    },
+    "previous_hash": "0000000000000000",
+    "entry_hash": "ba3cf415d5c4f58a"
+  },
+  {
+    "entry_id": "led_1_4a8ebf3d",
+    "sequence": 1,
+    "timestamp": 1789518627.0540152,
+    "event_type": "progress_recorded",
+    "payload": {
+      "step": 1,
+      "state": "CONVERGING",
+      "delta_score": 14.7,
+      "failures": 1,
+      "decision": "CONTINUE_REPAIR"
+    },
+    "previous_hash": "ba3cf415d5c4f58a",
+    "entry_hash": "59f9bf41a7ea67ed"
+  },
+  {
+    "entry_id": "led_2_4fdbbf74",
+    "sequence": 2,
+    "timestamp": 1789518627.0540938,
+    "event_type": "progress_recorded",
+    "payload": {
+      "step": 2,
+      "state": "COMMITTED",
+      "delta_score": 11.4,
+      "failures": 0,
+      "decision": "COMMIT_TRANSACTION"
+    },
+    "previous_hash": "59f9bf41a7ea67ed",
+    "entry_hash": "d0c1e87529a00dfa"
+  },
+  {
+    "entry_id": "led_0_4bb1c9f0",
+    "sequence": 0,
+    "timestamp": 1789518627.054199,
+    "event_type": "convergence_started",
+    "payload": {
+      "mission_id": "corpus_03_react_circular_import_pingpong",
+      "transaction_id": "tx_corpus_03_react_circular_import_pingpong",
+      "state": "INITIAL",
+      "failure_count": 1,
+      "state_hash": "afcbedc8ac113b13"
+    },
+    "previous_hash": "0000000000000000",
+    "entry_hash": "377fd1eee85718c5"
+  },
+  {
+    "entry_id": "led_1_f36963c8",
+    "sequence": 1,
+    "timestamp": 1789518627.0542603,
+    "event_type": "progress_recorded",
+    "payload": {
+      "step": 1,
+      "state": "CONVERGING",
+      "delta_score": -7.0,
+      "failures": 1,
+      "decision": "CONTINUE_REPAIR"
+    },
+    "previous_hash": "377fd1eee85718c5",
+    "entry_hash": "20736317074819d7"
+  },
+  {
+    "entry_id": "led_2_486259c7",
+    "sequence": 2,
+    "timestamp": 1789518627.054345,
+    "event_type": "progress_recorded",
+    "payload": {
+      "step": 2,
+      "state": "OSCILLATING",
+      "delta_score": 3.0,
+      "failures": 1,
+      "decision": "TRIGGER_ROLLBACK"
+    },
+    "previous_hash": "20736317074819d7",
+    "entry_hash": "060e251e8d597b0b"
+  },
+  {
+    "entry_id": "led_0_0fd14494",
+    "sequence": 0,
+    "timestamp": 1789518627.0544415,
+    "event_type": "convergence_started",
+    "payload": {
+      "mission_id": "corpus_04_payment_economic_mutation",
+      "transaction_id": "tx_corpus_04_payment_economic_mutation",
+      "state": "INITIAL",
+      "failure_count": 1,
+      "state_hash": "aebf66929fdc836d"
+    },
+    "previous_hash": "0000000000000000",
+    "entry_hash": "2e4869d106c26d0a"
+  },
+  {
+    "entry_id": "led_1_6c6483f6",
+    "sequence": 1,
+    "timestamp": 1789518627.0545006,
+    "event_type": "progress_recorded",
+    "payload": {
+      "step": 1,
+      "state": "CONVERGING",
+      "delta_score": -2.75,
+      "failures": 1,
+      "decision": "CONTINUE_REPAIR"
+    },
+    "previous_hash": "2e4869d106c26d0a",
+    "entry_hash": "d18d8ba5d5b95e9a"
+  },
+  {
+    "entry_id": "led_2_9eb67507",
+    "sequence": 2,
+    "timestamp": 1789518627.0545788,
+    "event_type": "progress_recorded",
+    "payload": {
+      "step": 2,
+      "state": "HUMAN_REVIEW_REQUIRED",
+      "delta_score": -0.15,
+      "failures": 1,
+      "decision": "BLOCK_ECONOMIC_COMMIT"
+    },
+    "previous_hash": "d18d8ba5d5b95e9a",
+    "entry_hash": "856143ea2ecb2ba0"
+  },
+  {
+    "entry_id": "led_0_c36dcbf0",
+    "sequence": 0,
+    "timestamp": 1789518627.0546792,
+    "event_type": "convergence_started",
+    "payload": {
+      "mission_id": "corpus_05_unbounded_failure_cascade",
+      "transaction_id": "tx_corpus_05_unbounded_failure_cascade",
+      "state": "INITIAL",
+      "failure_count": 1,
+      "state_hash": "fd2f6c8258a5ae23"
+    },
+    "previous_hash": "0000000000000000",
+    "entry_hash": "3a975c1135c0934d"
+  },
+  {
+    "entry_id": "led_1_b0a34a45",
+    "sequence": 1,
+    "timestamp": 1789518627.0547526,
+    "event_type": "progress_recorded",
+    "payload": {
+      "step": 1,
+      "state": "DIVERGING",
+      "delta_score": -33.25,
+      "failures": 3,
+      "decision": "TRIGGER_ROLLBACK"
+    },
+    "previous_hash": "3a975c1135c0934d",
+    "entry_hash": "2a605791288ebabb"
+  }
+]

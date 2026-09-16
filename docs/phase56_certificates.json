@@ -1,0 +1,399 @@
+[
+  {
+    "certificate_id": "cert_0552d6504f0b",
+    "mission_id": "corpus_01_dina_startup_crash",
+    "transaction_id": "tx_corpus_01_dina_startup_crash",
+    "termination_reason": "CONVERGED_VERIFIED",
+    "convergence_verdict": "CONVERGED",
+    "initial_state_hash": "9a5d4b986f430429",
+    "final_state_hash": "51db0a047ca5ef39",
+    "repair_sequence": [
+      "patch_pkg_json",
+      "patch_app_scope",
+      "patch_auth_secret"
+    ],
+    "progress_history": [
+      {
+        "resolved_delta": 1,
+        "new_delta": 0,
+        "blocking_delta": 0,
+        "coverage_delta": 0.1,
+        "risk_delta": 0.1,
+        "uncertainty_delta": 0.0,
+        "proof_delta": 0.33,
+        "cost_delta": 0.0,
+        "score": 8.8,
+        "is_positive": true
+      },
+      {
+        "resolved_delta": 2,
+        "new_delta": 0,
+        "blocking_delta": 0,
+        "coverage_delta": 0.15,
+        "risk_delta": 0.18,
+        "uncertainty_delta": 0.0,
+        "proof_delta": 0.34,
+        "cost_delta": 0.0,
+        "score": 13.6,
+        "is_positive": true
+      },
+      {
+        "resolved_delta": 1,
+        "new_delta": 0,
+        "blocking_delta": 0,
+        "coverage_delta": 0.09,
+        "risk_delta": 0.17,
+        "uncertainty_delta": 0.0,
+        "proof_delta": 0.33,
+        "cost_delta": 0.0,
+        "score": 9.75,
+        "is_positive": true
+      }
+    ],
+    "risk_history": [
+      0.5,
+      0.4,
+      0.22,
+      0.05
+    ],
+    "coverage_history": [
+      0.6,
+      0.7,
+      0.85,
+      0.94
+    ],
+    "proof_history": [
+      "patch_pkg_json",
+      "patch_app_scope",
+      "patch_auth_secret"
+    ],
+    "cycles_detected": 0,
+    "rollbacks_count": 0,
+    "human_review_required": false,
+    "budget_summary": {
+      "max_repairs": 25,
+      "max_cycles": 2,
+      "max_runtime": 300.0,
+      "max_rollbacks": 3,
+      "max_revealed_failures": 5,
+      "max_risk": 0.85,
+      "max_transaction_depth": 15,
+      "consumed_repairs": 3,
+      "consumed_cycles": 0,
+      "consumed_runtime": 0.0005757808685302734,
+      "consumed_rollbacks": 0,
+      "consumed_revealed_failures": 0,
+      "current_risk": 0.05,
+      "current_depth": 4,
+      "is_exhausted": false,
+      "exhausted_reasons": []
+    },
+    "total_iterations": 4,
+    "total_duration_seconds": 0.00040149688720703125,
+    "security_sentinel_approved": true,
+    "signature": "CERT_SIG_d001396d74efe368",
+    "metadata": {}
+  },
+  {
+    "certificate_id": "cert_7fe8c9b804ec",
+    "mission_id": "corpus_02_fastapi_pydantic_drift",
+    "transaction_id": "tx_corpus_02_fastapi_pydantic_drift",
+    "termination_reason": "CONVERGED_VERIFIED",
+    "convergence_verdict": "CONVERGED",
+    "initial_state_hash": "631f446d69d15c7b",
+    "final_state_hash": "7788e3d298d4609b",
+    "repair_sequence": [
+      "patch_pydantic_field",
+      "patch_config_dict"
+    ],
+    "progress_history": [
+      {
+        "resolved_delta": 1,
+        "new_delta": 0,
+        "blocking_delta": 0,
+        "coverage_delta": 0.22,
+        "risk_delta": 0.3,
+        "uncertainty_delta": 0.0,
+        "proof_delta": 0.5,
+        "cost_delta": 0.0,
+        "score": 14.7,
+        "is_positive": true
+      },
+      {
+        "resolved_delta": 1,
+        "new_delta": 0,
+        "blocking_delta": 0,
+        "coverage_delta": 0.1,
+        "risk_delta": 0.16,
+        "uncertainty_delta": 0.0,
+        "proof_delta": 0.5,
+        "cost_delta": 0.0,
+        "score": 11.4,
+        "is_positive": true
+      }
+    ],
+    "risk_history": [
+      0.5,
+      0.2,
+      0.04
+    ],
+    "coverage_history": [
+      0.6,
+      0.82,
+      0.92
+    ],
+    "proof_history": [
+      "patch_pydantic_field",
+      "patch_config_dict"
+    ],
+    "cycles_detected": 0,
+    "rollbacks_count": 0,
+    "human_review_required": false,
+    "budget_summary": {
+      "max_repairs": 25,
+      "max_cycles": 2,
+      "max_runtime": 300.0,
+      "max_rollbacks": 3,
+      "max_revealed_failures": 5,
+      "max_risk": 0.85,
+      "max_transaction_depth": 15,
+      "consumed_repairs": 2,
+      "consumed_cycles": 0,
+      "consumed_runtime": 0.00014448165893554688,
+      "consumed_rollbacks": 0,
+      "consumed_revealed_failures": 0,
+      "current_risk": 0.04,
+      "current_depth": 3,
+      "is_exhausted": false,
+      "exhausted_reasons": []
+    },
+    "total_iterations": 3,
+    "total_duration_seconds": 0.0001811981201171875,
+    "security_sentinel_approved": true,
+    "signature": "CERT_SIG_c2bc8b5c95282da9",
+    "metadata": {}
+  },
+  {
+    "certificate_id": "cert_f85f30e10a05",
+    "mission_id": "corpus_03_react_circular_import_pingpong",
+    "transaction_id": "tx_corpus_03_react_circular_import_pingpong",
+    "termination_reason": "OSCILLATION_DETECTED",
+    "convergence_verdict": "OSCILLATING",
+    "initial_state_hash": "afcbedc8ac113b13",
+    "final_state_hash": "7cc39e6071ffaffc",
+    "repair_sequence": [
+      "patch_move_header_import",
+      "patch_invert_actions_import"
+    ],
+    "progress_history": [
+      {
+        "resolved_delta": 1,
+        "new_delta": 1,
+        "blocking_delta": 1,
+        "coverage_delta": 0.0,
+        "risk_delta": 0.0,
+        "uncertainty_delta": 0.0,
+        "proof_delta": 0.0,
+        "cost_delta": 0.0,
+        "score": -7.0,
+        "is_positive": false
+      },
+      {
+        "resolved_delta": 1,
+        "new_delta": 0,
+        "blocking_delta": 0,
+        "coverage_delta": 0.0,
+        "risk_delta": 0.0,
+        "uncertainty_delta": 0.0,
+        "proof_delta": 0.0,
+        "cost_delta": 0.0,
+        "score": 3.0,
+        "is_positive": true
+      }
+    ],
+    "risk_history": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "coverage_history": [
+      0.6,
+      0.6,
+      0.6
+    ],
+    "proof_history": [
+      "patch_move_header_import",
+      "patch_invert_actions_import"
+    ],
+    "cycles_detected": 1,
+    "rollbacks_count": 1,
+    "human_review_required": false,
+    "budget_summary": {
+      "max_repairs": 25,
+      "max_cycles": 2,
+      "max_runtime": 300.0,
+      "max_rollbacks": 3,
+      "max_revealed_failures": 5,
+      "max_risk": 0.85,
+      "max_transaction_depth": 15,
+      "consumed_repairs": 2,
+      "consumed_cycles": 0,
+      "consumed_runtime": 0.00012826919555664062,
+      "consumed_rollbacks": 1,
+      "consumed_revealed_failures": 0,
+      "current_risk": 0.5,
+      "current_depth": 3,
+      "is_exhausted": false,
+      "exhausted_reasons": []
+    },
+    "total_iterations": 3,
+    "total_duration_seconds": 0.0001785755157470703,
+    "security_sentinel_approved": true,
+    "signature": "CERT_SIG_2a6ef01f16af08e0",
+    "metadata": {}
+  },
+  {
+    "certificate_id": "cert_bd372596ca68",
+    "mission_id": "corpus_04_payment_economic_mutation",
+    "transaction_id": "tx_corpus_04_payment_economic_mutation",
+    "termination_reason": "HUMAN_INTERVENTION_REQUIRED",
+    "convergence_verdict": "ESCALATED",
+    "initial_state_hash": "aebf66929fdc836d",
+    "final_state_hash": "96ebd8fba4c85e7d",
+    "repair_sequence": [
+      "patch_currency_override",
+      "patch_currency_retry"
+    ],
+    "progress_history": [
+      {
+        "resolved_delta": 0,
+        "new_delta": 0,
+        "blocking_delta": 0,
+        "coverage_delta": 0.1,
+        "risk_delta": -0.25,
+        "uncertainty_delta": 0.0,
+        "proof_delta": 0.0,
+        "cost_delta": 0.0,
+        "score": -2.75,
+        "is_positive": false
+      },
+      {
+        "resolved_delta": 0,
+        "new_delta": 0,
+        "blocking_delta": 0,
+        "coverage_delta": 0.0,
+        "risk_delta": -0.01,
+        "uncertainty_delta": 0.0,
+        "proof_delta": 0.0,
+        "cost_delta": 0.0,
+        "score": -0.15,
+        "is_positive": false
+      }
+    ],
+    "risk_history": [
+      0.5,
+      0.75,
+      0.76
+    ],
+    "coverage_history": [
+      0.6,
+      0.7,
+      0.7
+    ],
+    "proof_history": [
+      "patch_currency_override",
+      "patch_currency_retry"
+    ],
+    "cycles_detected": 0,
+    "rollbacks_count": 0,
+    "human_review_required": true,
+    "budget_summary": {
+      "max_repairs": 25,
+      "max_cycles": 2,
+      "max_runtime": 300.0,
+      "max_rollbacks": 3,
+      "max_revealed_failures": 5,
+      "max_risk": 0.85,
+      "max_transaction_depth": 15,
+      "consumed_repairs": 2,
+      "consumed_cycles": 0,
+      "consumed_runtime": 0.00012183189392089844,
+      "consumed_rollbacks": 0,
+      "consumed_revealed_failures": 0,
+      "current_risk": 0.76,
+      "current_depth": 3,
+      "is_exhausted": false,
+      "exhausted_reasons": []
+    },
+    "total_iterations": 3,
+    "total_duration_seconds": 0.00016927719116210938,
+    "security_sentinel_approved": true,
+    "signature": "CERT_SIG_3c73ca817e754ce3",
+    "metadata": {}
+  },
+  {
+    "certificate_id": "cert_37f056d1056c",
+    "mission_id": "corpus_05_unbounded_failure_cascade",
+    "transaction_id": "tx_corpus_05_unbounded_failure_cascade",
+    "termination_reason": "DIVERGENCE_DETECTED",
+    "convergence_verdict": "DIVERGED",
+    "initial_state_hash": "fd2f6c8258a5ae23",
+    "final_state_hash": "2efbcf7de1bc7f4a",
+    "repair_sequence": [
+      "patch_drop_table"
+    ],
+    "progress_history": [
+      {
+        "resolved_delta": 1,
+        "new_delta": 3,
+        "blocking_delta": 3,
+        "coverage_delta": -0.2,
+        "risk_delta": -0.35,
+        "uncertainty_delta": 0.0,
+        "proof_delta": 0.1,
+        "cost_delta": 0.0,
+        "score": -33.25,
+        "is_positive": false
+      }
+    ],
+    "risk_history": [
+      0.5,
+      0.85
+    ],
+    "coverage_history": [
+      0.6,
+      0.4
+    ],
+    "proof_history": [
+      "patch_drop_table"
+    ],
+    "cycles_detected": 0,
+    "rollbacks_count": 0,
+    "human_review_required": false,
+    "budget_summary": {
+      "max_repairs": 25,
+      "max_cycles": 2,
+      "max_runtime": 300.0,
+      "max_rollbacks": 3,
+      "max_revealed_failures": 5,
+      "max_risk": 0.85,
+      "max_transaction_depth": 15,
+      "consumed_repairs": 1,
+      "consumed_cycles": 0,
+      "consumed_runtime": 3.6716461181640625e-05,
+      "consumed_rollbacks": 0,
+      "consumed_revealed_failures": 0,
+      "current_risk": 0.85,
+      "current_depth": 2,
+      "is_exhausted": true,
+      "exhausted_reasons": [
+        "max_risk"
+      ]
+    },
+    "total_iterations": 2,
+    "total_duration_seconds": 0.00010275840759277344,
+    "security_sentinel_approved": true,
+    "signature": "CERT_SIG_31a522fbf1d3532f",
+    "metadata": {}
+  }
+]

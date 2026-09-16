@@ -1,0 +1,37 @@
+[
+  {
+    "scenario_id": "corpus_01_dina_startup_crash",
+    "reason": "CONVERGED_VERIFIED",
+    "verdict": "CONVERGED",
+    "iterations": 4,
+    "signature": "CERT_SIG_d001396d74efe368"
+  },
+  {
+    "scenario_id": "corpus_02_fastapi_pydantic_drift",
+    "reason": "CONVERGED_VERIFIED",
+    "verdict": "CONVERGED",
+    "iterations": 3,
+    "signature": "CERT_SIG_c2bc8b5c95282da9"
+  },
+  {
+    "scenario_id": "corpus_03_react_circular_import_pingpong",
+    "reason": "OSCILLATION_DETECTED",
+    "verdict": "OSCILLATING",
+    "iterations": 3,
+    "signature": "CERT_SIG_2a6ef01f16af08e0"
+  },
+  {
+    "scenario_id": "corpus_04_payment_economic_mutation",
+    "reason": "HUMAN_INTERVENTION_REQUIRED",
+    "verdict": "ESCALATED",
+    "iterations": 3,
+    "signature": "CERT_SIG_3c73ca817e754ce3"
+  },
+  {
+    "scenario_id": "corpus_05_unbounded_failure_cascade",
+    "reason": "DIVERGENCE_DETECTED",
+    "verdict": "DIVERGED",
+    "iterations": 2,
+    "signature": "CERT_SIG_31a522fbf1d3532f"
+  }
+]

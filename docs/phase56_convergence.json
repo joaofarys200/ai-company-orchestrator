@@ -1,0 +1,15 @@
+{
+  "total_transactions": 5,
+  "converged": 2,
+  "oscillated": 1,
+  "stalled": 0,
+  "diverged": 1,
+  "human_review": 1,
+  "rolled_back": 2,
+  "denominators": {
+    "converged_rate": "2/5 (40.0%)",
+    "diverged_rate": "1/5 (20.0%)",
+    "oscillated_rate": "1/5 (20.0%)",
+    "escalated_rate": "1/5 (20.0%)"
+  }
+}
