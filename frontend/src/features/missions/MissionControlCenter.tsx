@@ -64,6 +64,7 @@ import {
   MultiRepairOrchestrationPanel,
   AutonomousRepairConvergencePanel,
   AutonomousTaskCompletionPanel,
+  MassiveProjectStatePanel,
 } from './components';
 
 export interface MissionControlCenterProps {
@@ -229,7 +230,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   const [selectedScenario, setSelectedScenario] = useState<ScenarioKey>('INTERACTIVE');
   const [missionState, setMissionState] = useState<MissionControlStateData>(FALLBACK_INTERACTIVE_STATE);
   const [activeViewSection, setActiveViewSection] = useState<
-    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'verified_repair_synthesis' | 'multi_repair_orchestration' | 'autonomous_repair_convergence' | 'autonomous_task_completion' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
+    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'verified_repair_synthesis' | 'multi_repair_orchestration' | 'autonomous_repair_convergence' | 'autonomous_task_completion' | 'massive_project_state' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
   >('overview');
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
 
@@ -583,6 +584,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
           { id: 'multi_repair_orchestration', label: 'Orquestração Multi-Reparação (Fase 55)', icon: GitMerge },
           { id: 'autonomous_repair_convergence', label: 'Governação de Convergência (Fase 56)', icon: Scale },
           { id: 'autonomous_task_completion', label: 'Conclusão Autónoma de Missões (Fase 57)', icon: Award },
+          { id: 'massive_project_state', label: 'Estado Massivo & Monorepo (Fase 58)', icon: Layers },
           { id: 'evidence_impact', label: 'Impacto em Evidências', icon: ShieldAlert },
           { id: 'why', label: 'Painel do Porquê ("Why Panel")', icon: Brain },
           { id: 'repairs', label: 'Auto-Cura & Adaptação', icon: Wrench },
@@ -789,6 +791,10 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
 
         {activeViewSection === 'autonomous_task_completion' && (
           <AutonomousTaskCompletionPanel />
+        )}
+
+        {activeViewSection === 'massive_project_state' && (
+          <MassiveProjectStatePanel />
         )}
 
         {activeViewSection === 'evidence_impact' && (

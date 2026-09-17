@@ -1,0 +1,296 @@
+{
+  "total_shards": 5,
+  "shards": [
+    {
+      "shard_id": "frontend",
+      "name": "Frontend Web & UI Client",
+      "partition_type": "SERVICE",
+      "state_hash": "d07f982494ff097d",
+      "schema_version": "1.0.0",
+      "last_indexed_revision": 74,
+      "dependencies": [
+        "shared"
+      ],
+      "status": "EVICTED",
+      "file_count": 73,
+      "symbol_count": 45,
+      "last_access": 1789659680.7730973,
+      "tier": "COLD"
+    },
+    {
+      "shard_id": "backend",
+      "name": "Backend API & Orchestration Core",
+      "partition_type": "SERVICE",
+      "state_hash": "7fcd80846ef5b4b1",
+      "schema_version": "1.0.0",
+      "last_indexed_revision": 824,
+      "dependencies": [
+        "shared"
+      ],
+      "status": "EVICTED",
+      "file_count": 823,
+      "symbol_count": 2860,
+      "last_access": 1789659680.811386,
+      "tier": "COLD"
+    },
+    {
+      "shard_id": "workers",
+      "name": "Async Background Workers & Tasks",
+      "partition_type": "SERVICE",
+      "state_hash": "41d9dbfedf57fd0d",
+      "schema_version": "1.0.0",
+      "last_indexed_revision": 4,
+      "dependencies": [
+        "shared",
+        "backend"
+      ],
+      "status": "EVICTED",
+      "file_count": 3,
+      "symbol_count": 2,
+      "last_access": 1789659681.1728282,
+      "tier": "COLD"
+    },
+    {
+      "shard_id": "infra",
+      "name": "Deployment, Infrastructure & CI/CD",
+      "partition_type": "DOMAIN",
+      "state_hash": "864f4984579130f9",
+      "schema_version": "1.0.0",
+      "last_indexed_revision": 192,
+      "dependencies": [
+        "shared"
+      ],
+      "status": "EVICTED",
+      "file_count": 191,
+      "symbol_count": 365,
+      "last_access": 1789659689.683032,
+      "tier": "COLD"
+    },
+    {
+      "shard_id": "shared",
+      "name": "Shared Contracts, Schemas & Protocols",
+      "partition_type": "PACKAGE",
+      "state_hash": "a91997177ce25f34",
+      "schema_version": "1.0.0",
+      "last_indexed_revision": 26416,
+      "dependencies": [],
+      "status": "EVICTED",
+      "file_count": 26415,
+      "symbol_count": 2175,
+      "last_access": 1789659689.6875033,
+      "tier": "COLD"
+    }
+  ],
+  "tier_distribution": {
+    "HOT": 0,
+    "WARM": 0,
+    "COLD": 5
+  },
+  "indexes": {
+    "total_symbols": 4233,
+    "total_files": 27505,
+    "total_dependencies": 0,
+    "total_contracts": 3,
+    "total_tasks": 2,
+    "total_runtimes": 0,
+    "revisions": {
+      "symbols": 5448,
+      "files": 27506,
+      "dependencies": 1,
+      "contracts": 4,
+      "tasks": 3,
+      "runtimes": 1
+    }
+  },
+  "graph_edges": 0,
+  "cache": {
+    "entries": 0,
+    "max_entries": 2000,
+    "bytes_used": 0,
+    "max_bytes": 134217728,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hit_ratio": 0.0
+  },
+  "memory": {
+    "budget": {
+      "max_hot_files": 1000,
+      "max_hot_symbols": 10000,
+      "max_graph_edges": 20000,
+      "max_ram_bytes": 268435456,
+      "max_subgraph_size": 200,
+      "max_concurrent_queries": 16
+    },
+    "eviction_count": 5,
+    "recent_evictions": [
+      {
+        "evicted_shard": "workers",
+        "timestamp": 1789659678.653683,
+        "reason": "hot_files (1001) > limit (1000)"
+      },
+      {
+        "evicted_shard": "infra",
+        "timestamp": 1789659678.6541295,
+        "reason": "hot_files (1002) > limit (1000)"
+      },
+      {
+        "evicted_shard": "frontend",
+        "timestamp": 1789659678.654531,
+        "reason": "hot_files (1003) > limit (1000)"
+      },
+      {
+        "evicted_shard": "backend",
+        "timestamp": 1789659678.6548598,
+        "reason": "hot_files (1004) > limit (1000)"
+      },
+      {
+        "evicted_shard": "shared",
+        "timestamp": 1789659678.6551836,
+        "reason": "hot_files (1005) > limit (1000)"
+      }
+    ],
+    "learned_hotspots_count": 0
+  },
+  "metrics": {
+    "total_events": 27516,
+    "events_by_type": {
+      "state_fabric_initialized": 1,
+      "file_registered": 27505,
+      "contract_registered": 3,
+      "subgraph_extracted": 3,
+      "change_plan_created": 3,
+      "snapshot_created": 1
+    },
+    "avg_latency_ms": 0.0,
+    "recent_events": [
+      {
+        "event_type": "contract_registered",
+        "repository_id": "jarvis_os",
+        "mission_id": "",
+        "partition": "shared",
+        "state_hash": "hash_ws_proto_v1",
+        "index_version": 1,
+        "memory_bytes": 0,
+        "latency_ms": 0.0,
+        "decision": "REGISTERED",
+        "timestamp": 1789659689.6876357
+      },
+      {
+        "event_type": "contract_registered",
+        "repository_id": "jarvis_os",
+        "mission_id": "",
+        "partition": "shared",
+        "state_hash": "hash_task_compl_v1",
+        "index_version": 1,
+        "memory_bytes": 0,
+        "latency_ms": 0.0,
+        "decision": "REGISTERED",
+        "timestamp": 1789659689.6876643
+      },
+      {
+        "event_type": "contract_registered",
+        "repository_id": "jarvis_os",
+        "mission_id": "",
+        "partition": "shared",
+        "state_hash": "hash_massive_state_v1",
+        "index_version": 1,
+        "memory_bytes": 0,
+        "latency_ms": 0.0,
+        "decision": "REGISTERED",
+        "timestamp": 1789659689.6876867
+      },
+      {
+        "event_type": "subgraph_extracted",
+        "repository_id": "jarvis_os",
+        "mission_id": "",
+        "partition": "",
+        "state_hash": "",
+        "index_version": 1,
+        "memory_bytes": 0,
+        "latency_ms": 0.08040003012865782,
+        "decision": "EXTRACTED",
+        "timestamp": 1789659689.6878638
+      },
+      {
+        "event_type": "subgraph_extracted",
+        "repository_id": "jarvis_os",
+        "mission_id": "",
+        "partition": "",
+        "state_hash": "",
+        "index_version": 1,
+        "memory_bytes": 0,
+        "latency_ms": 0.02929999027401209,
+        "decision": "EXTRACTED",
+        "timestamp": 1789659689.6879196
+      },
+      {
+        "event_type": "subgraph_extracted",
+        "repository_id": "jarvis_os",
+        "mission_id": "",
+        "partition": "",
+        "state_hash": "",
+        "index_version": 1,
+        "memory_bytes": 0,
+        "latency_ms": 0.018299906514585018,
+        "decision": "EXTRACTED",
+        "timestamp": 1789659689.6879444
+      },
+      {
+        "event_type": "change_plan_created",
+        "repository_id": "jarvis_os",
+        "mission_id": "",
+        "partition": "",
+        "state_hash": "",
+        "index_version": 1,
+        "memory_bytes": 0,
+        "latency_ms": 0.0,
+        "decision": "CROSS_SERVICE",
+        "timestamp": 1789659689.6880367
+      },
+      {
+        "event_type": "change_plan_created",
+        "repository_id": "jarvis_os",
+        "mission_id": "",
+        "partition": "",
+        "state_hash": "",
+        "index_version": 1,
+        "memory_bytes": 0,
+        "latency_ms": 0.0,
+        "decision": "REGIONAL",
+        "timestamp": 1789659689.6881657
+      },
+      {
+        "event_type": "change_plan_created",
+        "repository_id": "jarvis_os",
+        "mission_id": "",
+        "partition": "",
+        "state_hash": "",
+        "index_version": 1,
+        "memory_bytes": 0,
+        "latency_ms": 0.0,
+        "decision": "REGIONAL",
+        "timestamp": 1789659689.688261
+      },
+      {
+        "event_type": "snapshot_created",
+        "repository_id": "jarvis_os",
+        "mission_id": "",
+        "partition": "",
+        "state_hash": "854fbb30824bb5fb",
+        "index_version": 1,
+        "memory_bytes": 0,
+        "latency_ms": 0.0,
+        "decision": "SNAPSHOT_SAVED",
+        "timestamp": 1789659689.6883984
+      }
+    ]
+  },
+  "real_metrics": {
+    "total_files_scanned": 27505,
+    "total_files_indexed": 27505,
+    "total_loc": 2904408,
+    "total_symbols_indexed": 5447,
+    "indexing_duration_seconds": 12.3
+  }
+}

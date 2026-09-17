@@ -1,0 +1,81 @@
+[
+  {
+    "shard_id": "frontend",
+    "name": "Frontend Web & UI Client",
+    "partition_type": "SERVICE",
+    "state_hash": "d07f982494ff097d",
+    "schema_version": "1.0.0",
+    "last_indexed_revision": 74,
+    "dependencies": [
+      "shared"
+    ],
+    "status": "EVICTED",
+    "file_count": 73,
+    "symbol_count": 45,
+    "last_access": 1789659680.7730973,
+    "tier": "COLD"
+  },
+  {
+    "shard_id": "backend",
+    "name": "Backend API & Orchestration Core",
+    "partition_type": "SERVICE",
+    "state_hash": "7fcd80846ef5b4b1",
+    "schema_version": "1.0.0",
+    "last_indexed_revision": 824,
+    "dependencies": [
+      "shared"
+    ],
+    "status": "EVICTED",
+    "file_count": 823,
+    "symbol_count": 2860,
+    "last_access": 1789659680.811386,
+    "tier": "COLD"
+  },
+  {
+    "shard_id": "workers",
+    "name": "Async Background Workers & Tasks",
+    "partition_type": "SERVICE",
+    "state_hash": "41d9dbfedf57fd0d",
+    "schema_version": "1.0.0",
+    "last_indexed_revision": 4,
+    "dependencies": [
+      "shared",
+      "backend"
+    ],
+    "status": "EVICTED",
+    "file_count": 3,
+    "symbol_count": 2,
+    "last_access": 1789659681.1728282,
+    "tier": "COLD"
+  },
+  {
+    "shard_id": "infra",
+    "name": "Deployment, Infrastructure & CI/CD",
+    "partition_type": "DOMAIN",
+    "state_hash": "864f4984579130f9",
+    "schema_version": "1.0.0",
+    "last_indexed_revision": 192,
+    "dependencies": [
+      "shared"
+    ],
+    "status": "EVICTED",
+    "file_count": 191,
+    "symbol_count": 365,
+    "last_access": 1789659689.683032,
+    "tier": "COLD"
+  },
+  {
+    "shard_id": "shared",
+    "name": "Shared Contracts, Schemas & Protocols",
+    "partition_type": "PACKAGE",
+    "state_hash": "a91997177ce25f34",
+    "schema_version": "1.0.0",
+    "last_indexed_revision": 26416,
+    "dependencies": [],
+    "status": "EVICTED",
+    "file_count": 26415,
+    "symbol_count": 2175,
+    "last_access": 1789659689.6875033,
+    "tier": "COLD"
+  }
+]

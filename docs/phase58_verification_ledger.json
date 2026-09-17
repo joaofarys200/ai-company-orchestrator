@@ -1,0 +1,96 @@
+{
+  "snapshot_id": "snap_71512ad3",
+  "repository_state_hash": "854fbb30824bb5fb",
+  "ledger_items": [
+    {
+      "entity": "shard:frontend",
+      "type": "state_shard",
+      "hash": "d07f982494ff097d",
+      "revision": 74,
+      "tier": "COLD",
+      "status": "EVICTED"
+    },
+    {
+      "entity": "shard:backend",
+      "type": "state_shard",
+      "hash": "7fcd80846ef5b4b1",
+      "revision": 824,
+      "tier": "COLD",
+      "status": "EVICTED"
+    },
+    {
+      "entity": "shard:workers",
+      "type": "state_shard",
+      "hash": "41d9dbfedf57fd0d",
+      "revision": 4,
+      "tier": "COLD",
+      "status": "EVICTED"
+    },
+    {
+      "entity": "shard:infra",
+      "type": "state_shard",
+      "hash": "864f4984579130f9",
+      "revision": 192,
+      "tier": "COLD",
+      "status": "EVICTED"
+    },
+    {
+      "entity": "shard:shared",
+      "type": "state_shard",
+      "hash": "a91997177ce25f34",
+      "revision": 26416,
+      "tier": "COLD",
+      "status": "EVICTED"
+    },
+    {
+      "entity": "contract:contract_websocket_schema",
+      "type": "contract",
+      "hash": "hash_ws_proto_v1",
+      "version": "1.0.0",
+      "provider": [
+        "backend"
+      ]
+    },
+    {
+      "entity": "contract:contract_task_completion",
+      "type": "contract",
+      "hash": "hash_task_compl_v1",
+      "version": "1.0.0",
+      "provider": [
+        "backend"
+      ]
+    },
+    {
+      "entity": "contract:contract_massive_state",
+      "type": "contract",
+      "hash": "hash_massive_state_v1",
+      "version": "1.0.0",
+      "provider": [
+        "backend"
+      ]
+    },
+    {
+      "entity": "plan:plan_002dddf1",
+      "type": "change_plan",
+      "scope": "CROSS_SERVICE",
+      "hash": "44aae3c6cb4ebe6a56e2871bd5296ad7919856ceaa4eae22b33ac844e64dd3fc",
+      "files_count": 2
+    },
+    {
+      "entity": "plan:plan_f9d73e73",
+      "type": "change_plan",
+      "scope": "REGIONAL",
+      "hash": "6583fa2583a7a5abddcb2c5064a1e42bc365eabfaea2c6dbedbc7a26ebe0fb0a",
+      "files_count": 1
+    },
+    {
+      "entity": "plan:plan_c332344f",
+      "type": "change_plan",
+      "scope": "REGIONAL",
+      "hash": "bec621dd60ad9a5e419276c71b8ba94366080c424d8b2a0016d53950b6f59306",
+      "files_count": 2
+    }
+  ],
+  "total_items": 11,
+  "simulated": 0
+}

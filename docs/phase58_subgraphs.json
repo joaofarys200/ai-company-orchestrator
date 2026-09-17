@@ -1,0 +1,80 @@
+[
+  {
+    "subgraph_id": "subgraph_e09a7e41",
+    "root_symbols": [
+      "sym_missions_MissionWebSocketHandler"
+    ],
+    "node_count": 1,
+    "edge_count": 0,
+    "nodes": {
+      "sym_missions_MissionWebSocketHandler": {
+        "type": "node",
+        "id": "sym_missions_MissionWebSocketHandler"
+      }
+    },
+    "edges": [],
+    "direct_consumers": [],
+    "downstream_symbols": [],
+    "contracts": [],
+    "tasks": [],
+    "browser_scenarios": [],
+    "runtime_dependencies": [],
+    "extraction_time_ms": 0.08040003012865782
+  },
+  {
+    "subgraph_id": "subgraph_8521ecd6",
+    "root_symbols": [
+      "sym_completion_MissionCompletionEvaluator"
+    ],
+    "node_count": 1,
+    "edge_count": 0,
+    "nodes": {
+      "sym_completion_MissionCompletionEvaluator": {
+        "type": "symbol",
+        "name": "MissionCompletionEvaluator",
+        "kind": "class",
+        "shard_id": "backend",
+        "file_path": "backend/agents/autonomous_task_completion/completion.py"
+      }
+    },
+    "edges": [],
+    "direct_consumers": [],
+    "downstream_symbols": [],
+    "contracts": [],
+    "tasks": [
+      "task_contract_drift_governance"
+    ],
+    "browser_scenarios": [],
+    "runtime_dependencies": [
+      "backend"
+    ],
+    "extraction_time_ms": 0.02929999027401209
+  },
+  {
+    "subgraph_id": "subgraph_ac02c5d7",
+    "root_symbols": [
+      "sym_planner_RepositoryChangePlanner"
+    ],
+    "node_count": 1,
+    "edge_count": 0,
+    "nodes": {
+      "sym_planner_RepositoryChangePlanner": {
+        "type": "symbol",
+        "name": "RepositoryChangePlanner",
+        "kind": "class",
+        "shard_id": "backend",
+        "file_path": "backend/agents/massive_project_state/planner.py"
+      }
+    },
+    "edges": [],
+    "direct_consumers": [],
+    "downstream_symbols": [],
+    "contracts": [],
+    "tasks": [],
+    "browser_scenarios": [],
+    "runtime_dependencies": [
+      "backend"
+    ],
+    "extraction_time_ms": 0.018299906514585018
+  }
+]

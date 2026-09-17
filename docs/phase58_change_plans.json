@@ -1,0 +1,134 @@
+[
+  {
+    "plan_id": "plan_002dddf1",
+    "objective": "Evolu\u00e7\u00e3o do contrato de WebSocket para planeamento massivo",
+    "scope": "CROSS_SERVICE",
+    "changed_files": [
+      "backend/websocket/handlers/missions.py",
+      "frontend/src/features/missions/MissionControlCenter.tsx"
+    ],
+    "affected_symbols": [
+      "sym_MissionControlCenter_const",
+      "sym_missions_message_type"
+    ],
+    "affected_tasks": [
+      "task_repo_planning_01"
+    ],
+    "affected_contracts": [
+      "contract_websocket_schema"
+    ],
+    "affected_consumers": [],
+    "affected_services": [
+      "backend",
+      "frontend"
+    ],
+    "required_tests": [
+      "test_service_frontend",
+      "test_service_backend",
+      "test_contract_conformance"
+    ],
+    "browser_scenarios": [
+      "qa_user_interface_flow"
+    ],
+    "predicted_risk": "HIGH",
+    "required_validation": [
+      "validate_code_syntax",
+      "validate_contract_compatibility",
+      "validate_contract_drift",
+      "validate_browser_scenarios"
+    ],
+    "subgraph_id": "subgraph_ff038829",
+    "provenance": {
+      "subgraph_extraction_ms": 0.02,
+      "nodes_count": 2,
+      "edges_count": 0
+    }
+  },
+  {
+    "plan_id": "plan_f9d73e73",
+    "objective": "Ajuste cir\u00fargico em \u00edndice reverso de ficheiros",
+    "scope": "REGIONAL",
+    "changed_files": [
+      "backend/agents/massive_project_state/file_index.py"
+    ],
+    "affected_symbols": [
+      "sym_file_index_FileReverseIndex",
+      "sym_file_index___init__",
+      "sym_file_index_add_file",
+      "sym_file_index_clear",
+      "sym_file_index_get_file",
+      "sym_file_index_get_file_for_symbol",
+      "sym_file_index_get_files_by_shard",
+      "sym_file_index_remove_file",
+      "sym_file_index_size"
+    ],
+    "affected_tasks": [],
+    "affected_contracts": [],
+    "affected_consumers": [],
+    "affected_services": [
+      "backend"
+    ],
+    "required_tests": [
+      "test_service_backend"
+    ],
+    "browser_scenarios": [],
+    "predicted_risk": "LOW",
+    "required_validation": [
+      "validate_code_syntax",
+      "validate_contract_compatibility"
+    ],
+    "subgraph_id": "subgraph_41f92f1d",
+    "provenance": {
+      "subgraph_extraction_ms": 0.04,
+      "nodes_count": 9,
+      "edges_count": 0
+    }
+  },
+  {
+    "plan_id": "plan_c332344f",
+    "objective": "Refactor transversal no m\u00f3dulo compartilhado de tipos",
+    "scope": "REGIONAL",
+    "changed_files": [
+      "backend/agents/massive_project_state/models.py",
+      "backend/agents/massive_project_state/state.py"
+    ],
+    "affected_symbols": [
+      "sym_models_GraphPartitionLevel",
+      "sym_models_ImpactScope",
+      "sym_models_PartitionType",
+      "sym_models_ProjectMemoryBudget",
+      "sym_models_ShardStatus",
+      "sym_models_StateShard",
+      "sym_models_StateTier",
+      "sym_models_SymbolRecord",
+      "sym_models_to_dict",
+      "sym_state_ProjectStateFabric",
+      "sym_state___init__"
+    ],
+    "affected_tasks": [],
+    "affected_contracts": [
+      "contract_massive_state"
+    ],
+    "affected_consumers": [],
+    "affected_services": [
+      "backend"
+    ],
+    "required_tests": [
+      "test_service_backend",
+      "test_contract_conformance"
+    ],
+    "browser_scenarios": [],
+    "predicted_risk": "LOW",
+    "required_validation": [
+      "validate_code_syntax",
+      "validate_contract_compatibility",
+      "validate_contract_drift"
+    ],
+    "subgraph_id": "subgraph_a7356070",
+    "provenance": {
+      "subgraph_extraction_ms": 0.05,
+      "nodes_count": 11,
+      "edges_count": 0
+    }
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "total_symbols": 4233,
+  "total_files": 27505,
+  "total_dependencies": 0,
+  "total_contracts": 3,
+  "total_tasks": 2,
+  "total_runtimes": 0,
+  "revisions": {
+    "symbols": 5448,
+    "files": 27506,
+    "dependencies": 1,
+    "contracts": 4,
+    "tasks": 3,
+    "runtimes": 1
+  }
+}

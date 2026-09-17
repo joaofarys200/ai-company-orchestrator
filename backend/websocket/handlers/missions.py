@@ -1372,6 +1372,40 @@ class MissionWebSocketHandler:
                 )
                 return
 
+            elif operation == "mission_massive_project_state_status":
+                from backend.agents.massive_project_state.bridge import MassiveProjectStateBridge
+                p_id = str(message.get("project_id") or project_id or "default")
+                status = MassiveProjectStateBridge.get_state_status(p_id)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_massive_project_state_status_result",
+                        "project_id": p_id,
+                        "status": status,
+                    },
+                )
+                return
+
+            elif operation == "mission_massive_project_state_plan_change":
+                from backend.agents.massive_project_state.bridge import MassiveProjectStateBridge
+                p_id = str(message.get("project_id") or project_id or "default")
+                objective = str(message.get("objective") or "Repository change")
+                changed_files = list(message.get("changed_files") or [])
+                plan = MassiveProjectStateBridge.plan_mission_change(
+                    objective=objective,
+                    changed_files=changed_files,
+                    project_id=p_id,
+                )
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_massive_project_state_plan_change_result",
+                        "project_id": p_id,
+                        "plan": plan,
+                    },
+                )
+                return
+
             if snapshot is None:
                 return
             active_store = getattr(

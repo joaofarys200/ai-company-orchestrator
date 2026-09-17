@@ -1,0 +1,39 @@
+{
+  "budget": {
+    "max_hot_files": 1000,
+    "max_hot_symbols": 10000,
+    "max_graph_edges": 20000,
+    "max_ram_bytes": 268435456,
+    "max_subgraph_size": 200,
+    "max_concurrent_queries": 16
+  },
+  "eviction_count": 5,
+  "recent_evictions": [
+    {
+      "evicted_shard": "workers",
+      "timestamp": 1789659678.653683,
+      "reason": "hot_files (1001) > limit (1000)"
+    },
+    {
+      "evicted_shard": "infra",
+      "timestamp": 1789659678.6541295,
+      "reason": "hot_files (1002) > limit (1000)"
+    },
+    {
+      "evicted_shard": "frontend",
+      "timestamp": 1789659678.654531,
+      "reason": "hot_files (1003) > limit (1000)"
+    },
+    {
+      "evicted_shard": "backend",
+      "timestamp": 1789659678.6548598,
+      "reason": "hot_files (1004) > limit (1000)"
+    },
+    {
+      "evicted_shard": "shared",
+      "timestamp": 1789659678.6551836,
+      "reason": "hot_files (1005) > limit (1000)"
+    }
+  ],
+  "learned_hotspots_count": 0
+}
