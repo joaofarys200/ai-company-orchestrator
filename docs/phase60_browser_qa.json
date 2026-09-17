@@ -1,0 +1,84 @@
+{
+  "timestamp": 1789664448.5345707,
+  "phase": 60,
+  "browser": "Microsoft Edge",
+  "scenarios_passed": 11,
+  "scenarios": [
+    {
+      "name": "phase60_01_symbol_graph_overview",
+      "description": "Fine-grained symbol graph overview and dual-layer stats",
+      "screenshot": "phase60_01_symbol_graph_overview.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase60_02_file_vs_symbol_comparison",
+      "description": "File-level 583-node SCC vs Symbol-level SCC decomposition",
+      "screenshot": "phase60_02_file_vs_symbol_comparison.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase60_03_barrel_analysis",
+      "description": "Barrel analysis of agents/__init__.py and index.ts",
+      "screenshot": "phase60_03_barrel_analysis.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase60_04_largest_scc",
+      "description": "Largest cyclic symbol SCC details and metrics",
+      "screenshot": "phase60_04_largest_scc.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase60_05_symbol_scc",
+      "description": "Symbol SCC explorer with density, instability, and cohesion",
+      "screenshot": "phase60_05_symbol_scc.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase60_06_targeted_symbol_impact",
+      "description": "Targeted impact query starting from symbol_id",
+      "screenshot": "phase60_06_targeted_symbol_impact.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase60_07_scc_split",
+      "description": "SCC_SPLIT lineage event when cycle is broken",
+      "screenshot": "phase60_07_scc_split.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase60_08_scc_merge",
+      "description": "SCC_MERGE lineage event when new dependency forms cycle",
+      "screenshot": "phase60_08_scc_merge.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase60_09_incremental_update",
+      "description": "Incremental update state after symbol additions and lineage updates",
+      "screenshot": "phase60_09_incremental_update.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase60_10_predictive_impact_comparison",
+      "description": "Precision gain and overapproximation reduction scorecard",
+      "screenshot": "phase60_10_predictive_impact_comparison.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase60_11_security",
+      "description": "Symbol Security Sentinel integrity and path traversal prevention",
+      "screenshot": "phase60_11_security.png",
+      "status": "PASS"
+    }
+  ],
+  "console_errors": [
+    "[error] The tag <%s> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter. g",
+    "[warning] WebSocket connection to 'ws://127.0.0.1:8001/?token=local-dev-token' failed: WebSocket is closed before the connection is established.",
+    "[error] [WebSocket] Error: Event",
+    "[warning] [Transport] Unknown message type: sandbox_status"
+  ],
+  "network_errors": [],
+  "zero_console_errors_verified": false,
+  "zero_network_errors_verified": true,
+  "status": "PASS"
+}

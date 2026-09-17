@@ -1442,6 +1442,35 @@ class MissionWebSocketHandler:
                 )
                 return
 
+            elif operation == "mission_symbol_graph_status":
+                from backend.agents.symbol_fine_grained_graph.bridge import SymbolFineGrainedGraphBridge
+                bridge = SymbolFineGrainedGraphBridge.get_instance()
+                status = bridge.get_status()
+                largest_scc = bridge.get_largest_scc()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_symbol_graph_status_result",
+                        "status": status,
+                        "largest_scc": largest_scc,
+                    },
+                )
+                return
+
+            elif operation == "mission_symbol_graph_query_impact":
+                from backend.agents.symbol_fine_grained_graph.bridge import SymbolFineGrainedGraphBridge
+                bridge = SymbolFineGrainedGraphBridge.get_instance()
+                symbol_id = str(message.get("symbol_id") or "agents/__init__.py::TaskRunner")
+                result = bridge.query_symbol_impact(symbol_id=symbol_id)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_symbol_graph_query_impact_result",
+                        "result": result,
+                    },
+                )
+                return
+
             if snapshot is None:
                 return
 

@@ -1,0 +1,19 @@
+{
+  "timestamp": 1789664254.3408463,
+  "phase": 60,
+  "status": "SYMBOL_FINE_GRAINED_IMPACT_READY",
+  "total_files_scanned": 588,
+  "total_symbols_extracted": 13447,
+  "total_symbol_edges": 42834,
+  "derived_file_edges": 4430,
+  "phase59_file_scc_size": 583,
+  "phase60_symbol_scc_size": 1,
+  "precision_gain": 0.9983,
+  "overapproximation_reduction": 0.9983,
+  "partition_completeness_verified": true,
+  "dag_acyclicity_verified": true,
+  "grounding_parity_verified": true,
+  "historical_limit_mitigated": "Monolithic Barrel-Induced Super-SCCs decomposed into fine-grained symbol SCCs",
+  "first_implementation_failure": "AttributeError on untyped signature hashing and extractor tuple unpacking \u2014 resolved with robust parameter normalization",
+  "first_real_limit": "Dynamic import / reflection references marked as DYNAMIC/UNKNOWN with lower confidence (0.4/0.2) to maintain formal soundness"
+}

@@ -1,0 +1,106 @@
+{
+  "timestamp": 1789664159.1214733,
+  "phase": 60,
+  "title": "Phase 60 Performance Benchmark: Scale & Memory Bounds",
+  "synthetic_scales": [
+    {
+      "scale": 1000,
+      "actual_nodes_evaluated": 1000,
+      "build_time_ms": 9.18,
+      "scc_detection_ms": 9.76,
+      "query_latency_ms": 0.0268,
+      "scc_count": 1000,
+      "ram_mb": 2.87,
+      "storage_est_kb": 180.0
+    },
+    {
+      "scale": 10000,
+      "actual_nodes_evaluated": 10000,
+      "build_time_ms": 74.24,
+      "scc_detection_ms": 108.43,
+      "query_latency_ms": 0.5462,
+      "scc_count": 10000,
+      "ram_mb": 27.27,
+      "storage_est_kb": 1800.0
+    },
+    {
+      "scale": 100000,
+      "actual_nodes_evaluated": 100000,
+      "build_time_ms": 936.54,
+      "scc_detection_ms": 1645.44,
+      "query_latency_ms": 9.3649,
+      "scc_count": 100000,
+      "ram_mb": 264.87,
+      "storage_est_kb": 18000.0
+    },
+    {
+      "scale": 1000000,
+      "actual_nodes_evaluated": 250000,
+      "build_time_ms": 4128.59,
+      "scc_detection_ms": 6103.93,
+      "query_latency_ms": 31.974,
+      "scc_count": 250000,
+      "ram_mb": 472.7,
+      "storage_est_kb": 45000.0
+    }
+  ],
+  "dense_barrels": [
+    {
+      "barrel_size": 10,
+      "reexport_count": 10,
+      "resolution_time_ms": 0.26,
+      "overapproximation_ratio": 15.0,
+      "classification": "OVER_APPROXIMATED",
+      "total_file_level_symbols": 150,
+      "actual_symbol_level_impact": 10,
+      "precision_gain": 0.9333,
+      "ram_mb": 0.1
+    },
+    {
+      "barrel_size": 100,
+      "reexport_count": 100,
+      "resolution_time_ms": 0.95,
+      "overapproximation_ratio": 15.0,
+      "classification": "OVER_APPROXIMATED",
+      "total_file_level_symbols": 1500,
+      "actual_symbol_level_impact": 100,
+      "precision_gain": 0.9333,
+      "ram_mb": 0.1
+    },
+    {
+      "barrel_size": 500,
+      "reexport_count": 500,
+      "resolution_time_ms": 5.2,
+      "overapproximation_ratio": 15.0,
+      "classification": "OVER_APPROXIMATED",
+      "total_file_level_symbols": 7500,
+      "actual_symbol_level_impact": 500,
+      "precision_gain": 0.9333,
+      "ram_mb": 0.1
+    },
+    {
+      "barrel_size": 1000,
+      "reexport_count": 1000,
+      "resolution_time_ms": 12.29,
+      "overapproximation_ratio": 15.0,
+      "classification": "OVER_APPROXIMATED",
+      "total_file_level_symbols": 15000,
+      "actual_symbol_level_impact": 1000,
+      "precision_gain": 0.9333,
+      "ram_mb": 0.1
+    },
+    {
+      "barrel_size": 5000,
+      "reexport_count": 5000,
+      "resolution_time_ms": 45.15,
+      "overapproximation_ratio": 15.0,
+      "classification": "OVER_APPROXIMATED",
+      "total_file_level_symbols": 75000,
+      "actual_symbol_level_impact": 5000,
+      "precision_gain": 0.9333,
+      "ram_mb": 0.1
+    }
+  ],
+  "memory_bounded": true,
+  "f58_scalability_preserved": true
+}

@@ -1,0 +1,65 @@
+{
+  "timestamp": 1789664159.1228516,
+  "phase": 60,
+  "title": "Phase 60 Precision Benchmark: File SCC vs Symbol SCC",
+  "dense_barrel_precision": [
+    {
+      "barrel_size": 10,
+      "reexport_count": 10,
+      "resolution_time_ms": 0.26,
+      "overapproximation_ratio": 15.0,
+      "classification": "OVER_APPROXIMATED",
+      "total_file_level_symbols": 150,
+      "actual_symbol_level_impact": 10,
+      "precision_gain": 0.9333,
+      "ram_mb": 0.1
+    },
+    {
+      "barrel_size": 100,
+      "reexport_count": 100,
+      "resolution_time_ms": 0.95,
+      "overapproximation_ratio": 15.0,
+      "classification": "OVER_APPROXIMATED",
+      "total_file_level_symbols": 1500,
+      "actual_symbol_level_impact": 100,
+      "precision_gain": 0.9333,
+      "ram_mb": 0.1
+    },
+    {
+      "barrel_size": 500,
+      "reexport_count": 500,
+      "resolution_time_ms": 5.2,
+      "overapproximation_ratio": 15.0,
+      "classification": "OVER_APPROXIMATED",
+      "total_file_level_symbols": 7500,
+      "actual_symbol_level_impact": 500,
+      "precision_gain": 0.9333,
+      "ram_mb": 0.1
+    },
+    {
+      "barrel_size": 1000,
+      "reexport_count": 1000,
+      "resolution_time_ms": 12.29,
+      "overapproximation_ratio": 15.0,
+      "classification": "OVER_APPROXIMATED",
+      "total_file_level_symbols": 15000,
+      "actual_symbol_level_impact": 1000,
+      "precision_gain": 0.9333,
+      "ram_mb": 0.1
+    },
+    {
+      "barrel_size": 5000,
+      "reexport_count": 5000,
+      "resolution_time_ms": 45.15,
+      "overapproximation_ratio": 15.0,
+      "classification": "OVER_APPROXIMATED",
+      "total_file_level_symbols": 75000,
+      "actual_symbol_level_impact": 5000,
+      "precision_gain": 0.9333,
+      "ram_mb": 0.1
+    }
+  ],
+  "average_precision_gain": 0.9333,
+  "conflation_eliminated": true,
+  "epistemic_calibration": "Resolved all explicit AST bindings; dynamic reflection marked as UNKNOWN/DYNAMIC."
+}

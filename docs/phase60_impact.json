@@ -1,0 +1,50 @@
+{
+  "impact": {
+    "impact_id": "impact_agents/adaptive_planning.py__annotations",
+    "root_symbols": [
+      "agents/adaptive_planning.py::annotations"
+    ],
+    "root_sccs": [
+      "scc_sym_77d2aaac68a7"
+    ],
+    "included_sccs": [
+      "scc_sym_77d2aaac68a7"
+    ],
+    "excluded_sccs": [],
+    "boundary_edges": [],
+    "scope": "SYMBOL_LOCAL",
+    "confidence": "FULL",
+    "affected_symbols": [
+      "agents/adaptive_planning.py::annotations"
+    ],
+    "internal_affected_symbols": [
+      "agents/adaptive_planning.py::annotations"
+    ],
+    "external_affected_symbols": [],
+    "affected_files": [
+      "agents/adaptive_planning.py"
+    ],
+    "contracts": [],
+    "tasks": [],
+    "browser_scenarios": [],
+    "services": [
+      "agents"
+    ],
+    "blast_radius_score": 0.7,
+    "truncated_at_boundary": false,
+    "extraction_ms": 2.04
+  },
+  "comparison": {
+    "file_scc_size": 71,
+    "symbol_scc_size": 1,
+    "file_impact_count": 181,
+    "symbol_impact_count": 1,
+    "precision_gain": 0.9945,
+    "overapproximation_reduction": 0.9859,
+    "reasons": [
+      "File-level graph conflates all 181 symbols in 2 files.",
+      "Symbol-level graph resolved 1 precise symbols directly on the call/import graph.",
+      "Overapproximation reduced by 98.6% through granular edge filtering."
+    ]
+  }
+}

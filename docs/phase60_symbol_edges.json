@@ -1,0 +1,6501 @@
+{
+  "total_symbol_edges": 42834,
+  "sample_edges": [
+    {
+      "source_symbol": "agents/adaptive_planning.py::annotations",
+      "target_symbol": "__future__::annotations",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "__future__",
+        "target_name": "annotations"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::asyncio",
+      "target_symbol": "asyncio::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "asyncio"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 3
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::enum",
+      "target_symbol": "enum::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "enum"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 4
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::hashlib",
+      "target_symbol": "hashlib::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "hashlib"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 5
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::json",
+      "target_symbol": "json::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "json"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 6
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::os",
+      "target_symbol": "os::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "os"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 7
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::re",
+      "target_symbol": "re::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "re"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::uuid",
+      "target_symbol": "uuid::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "uuid"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 9
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::asdict",
+      "target_symbol": "dataclasses::asdict",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "dataclasses",
+        "target_name": "asdict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 10
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::dataclass",
+      "target_symbol": "dataclasses::dataclass",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "dataclasses",
+        "target_name": "dataclass"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 10
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::field",
+      "target_symbol": "dataclasses::field",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "dataclasses",
+        "target_name": "field"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 10
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::datetime",
+      "target_symbol": "datetime::datetime",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "datetime",
+        "target_name": "datetime"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::timezone",
+      "target_symbol": "datetime::timezone",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "datetime",
+        "target_name": "timezone"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Any",
+      "target_symbol": "typing::Any",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "Any"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 12
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Mapping",
+      "target_symbol": "typing::Mapping",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "Mapping"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 12
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Sequence",
+      "target_symbol": "typing::Sequence",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "Sequence"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 12
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::compute_semantic_key",
+      "target_symbol": "agents/dynamic_subdag.py::compute_semantic_key",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.dynamic_subdag",
+        "target_name": "compute_semantic_key",
+        "original_target": "agents.dynamic_subdag::compute_semantic_key"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 14
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionStateError",
+      "target_symbol": "agents/mission_state.py::MissionStateError",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.mission_state",
+        "target_name": "MissionStateError",
+        "original_target": "agents.mission_state::MissionStateError"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionStateStore",
+      "target_symbol": "agents/mission_state.py::MissionStateStore",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.mission_state",
+        "target_name": "MissionStateStore",
+        "original_target": "agents.mission_state::MissionStateStore"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::WorkPackage",
+      "target_symbol": "agents/mission_state.py::WorkPackage",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.mission_state",
+        "target_name": "WorkPackage",
+        "original_target": "agents.mission_state::WorkPackage"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::WORK_PACKAGE_STATUSES",
+      "target_symbol": "agents/mission_state.py::WORK_PACKAGE_STATUSES",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.mission_state",
+        "target_name": "WORK_PACKAGE_STATUSES",
+        "original_target": "agents.mission_state::WORK_PACKAGE_STATUSES"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::utc_now",
+      "target_symbol": "agents/mission_state.py::utc_now",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.mission_state",
+        "target_name": "utc_now",
+        "original_target": "agents.mission_state::utc_now"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::FailureCategory",
+      "target_symbol": "agents/task_graph.py::FailureCategory",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.task_graph",
+        "target_name": "FailureCategory",
+        "original_target": "agents.task_graph::FailureCategory"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::FailureInfo",
+      "target_symbol": "agents/task_graph.py::FailureInfo",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.task_graph",
+        "target_name": "FailureInfo",
+        "original_target": "agents.task_graph::FailureInfo"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::RetryConfig",
+      "target_symbol": "agents/task_graph.py::RetryConfig",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.task_graph",
+        "target_name": "RetryConfig",
+        "original_target": "agents.task_graph::RetryConfig"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::TaskDependencyError",
+      "target_symbol": "agents/task_graph.py::TaskDependencyError",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.task_graph",
+        "target_name": "TaskDependencyError",
+        "original_target": "agents.task_graph::TaskDependencyError"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::TaskGraph",
+      "target_symbol": "agents/task_graph.py::TaskGraph",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.task_graph",
+        "target_name": "TaskGraph",
+        "original_target": "agents.task_graph::TaskGraph"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::TaskGraphCycleError",
+      "target_symbol": "agents/task_graph.py::TaskGraphCycleError",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.task_graph",
+        "target_name": "TaskGraphCycleError",
+        "original_target": "agents.task_graph::TaskGraphCycleError"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::TaskGraphError",
+      "target_symbol": "agents/task_graph.py::TaskGraphError",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.task_graph",
+        "target_name": "TaskGraphError",
+        "original_target": "agents.task_graph::TaskGraphError"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::TaskNode",
+      "target_symbol": "agents/task_graph.py::TaskNode",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.task_graph",
+        "target_name": "TaskNode",
+        "original_target": "agents.task_graph::TaskNode"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::TaskStatus",
+      "target_symbol": "agents/task_graph.py::TaskStatus",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.task_graph",
+        "target_name": "TaskStatus",
+        "original_target": "agents.task_graph::TaskStatus"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::get_logger",
+      "target_symbol": "backend.logging_config::get_logger",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "backend.logging_config",
+        "target_name": "get_logger"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::log_event",
+      "target_symbol": "backend.logging_config::log_event",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "backend.logging_config",
+        "target_name": "log_event"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationTrigger",
+      "target_symbol": "unresolved::str",
+      "edge_type": "EXTENDS",
+      "provenance": {
+        "base_name": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 40,
+        "col": 0
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::ObservationSource",
+      "target_symbol": "unresolved::str",
+      "edge_type": "EXTENDS",
+      "provenance": {
+        "base_name": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 63,
+        "col": 0
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::ObservationSeverity",
+      "target_symbol": "unresolved::str",
+      "edge_type": "EXTENDS",
+      "provenance": {
+        "base_name": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 73,
+        "col": 0
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanEvaluationDecision",
+      "target_symbol": "unresolved::str",
+      "edge_type": "EXTENDS",
+      "provenance": {
+        "base_name": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 80,
+        "col": 0
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationStatus",
+      "target_symbol": "unresolved::str",
+      "edge_type": "EXTENDS",
+      "provenance": {
+        "base_name": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 87,
+        "col": 0
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.__post_init__",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 116,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.__post_init__",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 121,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.__post_init__",
+      "target_symbol": "unresolved::utc_now",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "utc_now"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 115,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.__post_init__",
+      "target_symbol": "unresolved::ObservationSource",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "ObservationSource"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 118,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.__post_init__",
+      "target_symbol": "unresolved::ObservationSeverity",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "ObservationSeverity"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 123,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.__post_init__",
+      "target_symbol": "unresolved::uuid4",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "uuid4"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 113,
+        "col": 41
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.to_dict",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 137,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.to_dict",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 130,
+        "col": 43
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.to_dict",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 130,
+        "col": 91
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.to_dict",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 134,
+        "col": 47
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.to_dict",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 134,
+        "col": 99
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::cls",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "cls"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 142,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 143,
+        "col": 27
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 144,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 145,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 146,
+        "col": 20
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 147,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 148,
+        "col": 21
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 149,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 150,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 151,
+        "col": 20
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 151,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::Observation.from_dict",
+      "target_symbol": "unresolved::uuid4",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "uuid4"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 143,
+        "col": 61
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationBudget.to_dict",
+      "target_symbol": "unresolved::asdict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "asdict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 163,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationBudget.from_dict",
+      "target_symbol": "unresolved::cls",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "cls"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 167,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationBudget.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 168,
+        "col": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationBudget.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 169,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationBudget.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 170,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationBudget.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 171,
+        "col": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationBudget.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 168,
+        "col": 37
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationBudget.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 169,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationBudget.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 170,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationBudget.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 171,
+        "col": 37
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.to_dict",
+      "target_symbol": "unresolved::asdict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "asdict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 192,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::cls",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "cls"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 196,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 197,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 198,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 199,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::float",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "float"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 200,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 201,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 202,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 203,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 204,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 205,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 206,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 207,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 208,
+        "col": 35
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::float",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "float"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 209,
+        "col": 39
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 197,
+        "col": 36
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 198,
+        "col": 36
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 199,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 200,
+        "col": 34
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 201,
+        "col": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 202,
+        "col": 34
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 203,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 204,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 205,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 206,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 207,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 208,
+        "col": 40
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanQualityMetrics.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 209,
+        "col": 45
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanEvaluationResult.__post_init__",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 224,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanEvaluationResult.__post_init__",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 229,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanEvaluationResult.__post_init__",
+      "target_symbol": "unresolved::PlanEvaluationDecision",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationDecision"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 226,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanEvaluationResult.__post_init__",
+      "target_symbol": "unresolved::AdaptationTrigger",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AdaptationTrigger"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 231,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanEvaluationResult.to_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 241,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanEvaluationResult.to_dict",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 237,
+        "col": 47
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanEvaluationResult.to_dict",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 237,
+        "col": 102
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanEvaluationResult.to_dict",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 239,
+        "col": 45
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::PlanEvaluationResult.to_dict",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 239,
+        "col": 94
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.__post_init__",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 274,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.__post_init__",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 279,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.__post_init__",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 284,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.__post_init__",
+      "target_symbol": "unresolved::utc_now",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "utc_now"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 273,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.__post_init__",
+      "target_symbol": "unresolved::AdaptationTrigger",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AdaptationTrigger"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 276,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.__post_init__",
+      "target_symbol": "unresolved::AdaptationStatus",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AdaptationStatus"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 281,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.__post_init__",
+      "target_symbol": "unresolved::PlanEvaluationDecision",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationDecision"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 286,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.compute_strategy_fingerprint",
+      "target_symbol": "unresolved::sorted",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sorted"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 292,
+        "col": 21
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.compute_strategy_fingerprint",
+      "target_symbol": "unresolved::sorted",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sorted"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 296,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.compute_strategy_fingerprint",
+      "target_symbol": "unresolved::sorted",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sorted"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 297,
+        "col": 16
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.compute_strategy_fingerprint",
+      "target_symbol": "unresolved::hexdigest",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "hexdigest"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 299,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.compute_strategy_fingerprint",
+      "target_symbol": "unresolved::compute_semantic_key",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "compute_semantic_key"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 293,
+        "col": 12
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.compute_strategy_fingerprint",
+      "target_symbol": "unresolved::sha256",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sha256"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 299,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.compute_strategy_fingerprint",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 293,
+        "col": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.compute_strategy_fingerprint",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 293,
+        "col": 53
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.compute_strategy_fingerprint",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 297,
+        "col": 39
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.compute_strategy_fingerprint",
+      "target_symbol": "unresolved::encode",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "encode"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 299,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 308,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 310,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 315,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 316,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 322,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 323,
+        "col": 27
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 306,
+        "col": 45
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 306,
+        "col": 94
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 309,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 311,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 312,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 313,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 314,
+        "col": 44
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 319,
+        "col": 43
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 319,
+        "col": 90
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 321,
+        "col": 47
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.to_dict",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 321,
+        "col": 102
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 328,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 330,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::cls",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "cls"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 333,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 336,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 337,
+        "col": 20
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 338,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 339,
+        "col": 27
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 340,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 341,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 342,
+        "col": 27
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 345,
+        "col": 40
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 346,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 347,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 348,
+        "col": 46
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 349,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 350,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 351,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 352,
+        "col": 21
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 353,
+        "col": 21
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 354,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 329,
+        "col": 77
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 331,
+        "col": 77
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 336,
+        "col": 35
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 339,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 340,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 341,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 342,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 345,
+        "col": 45
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 346,
+        "col": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 347,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 353,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::MissionAdaptationProposal.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 354,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.__post_init__",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 381,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.__post_init__",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 383,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.__post_init__",
+      "target_symbol": "unresolved::utc_now",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "utc_now"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 380,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.to_dict",
+      "target_symbol": "unresolved::asdict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "asdict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 387,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::cls",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "cls"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 391,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 395,
+        "col": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 396,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 397,
+        "col": 21
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 398,
+        "col": 20
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 399,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 400,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 401,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 402,
+        "col": 27
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 403,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 404,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 405,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 406,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 407,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 408,
+        "col": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 395,
+        "col": 37
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 396,
+        "col": 36
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 400,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 401,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 402,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 403,
+        "col": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 404,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 405,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptationRecord.from_dict",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 406,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.__init__",
+      "target_symbol": "unresolved::AdaptationBudget",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AdaptationBudget"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 418,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::MissionAdaptationProposal",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "MissionAdaptationProposal"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 422,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::TaskGraph",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "TaskGraph"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 423,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 430,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::getattr",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "getattr"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 463,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::sum",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sum"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 468,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::sum",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sum"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 469,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::sum",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sum"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 470,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::compute_strategy_fingerprint",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "compute_strategy_fingerprint"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 487,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::sum",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sum"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 488,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::getattr",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "getattr"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 535,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::items",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "items"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 553,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::set",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "set"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 608,
+        "col": 35
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 433,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::any",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "any"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 454,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 475,
+        "col": 50
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 475,
+        "col": 109
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 482,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 482,
+        "col": 53
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 493,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 494,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 495,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 507,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 519,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::lower",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "lower"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 547,
+        "col": 27
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::any",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "any"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 548,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::TaskNode",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "TaskNode"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 554,
+        "col": 35
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 591,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 610,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::add",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "add"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 617,
+        "col": 12
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::compute_semantic_key",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "compute_semantic_key"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 620,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::values",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "values"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 621,
+        "col": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 625,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::TaskNode",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "TaskNode"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 628,
+        "col": 35
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::TaskGraph",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "TaskGraph"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 658,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 675,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 676,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::AdaptationTrigger",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AdaptationTrigger"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 435,
+        "col": 35
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 440,
+        "col": 34
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 526,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::any",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "any"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 526,
+        "col": 42
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::dumps",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dumps"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 529,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::search",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "search"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 531,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::lower",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "lower"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 537,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::lower",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "lower"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 538,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::lower",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "lower"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 539,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::values",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "values"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 585,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 620,
+        "col": 43
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 620,
+        "col": 69
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::TaskStatus",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "TaskStatus"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 626,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::remove",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "remove"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 654,
+        "col": 16
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::keys",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "keys"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 669,
+        "col": 27
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::strip",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "strip"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 440,
+        "col": 38
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 455,
+        "col": 16
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 471,
+        "col": 12
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 471,
+        "col": 44
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 529,
+        "col": 49
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 544,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 559,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 566,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 568,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 573,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 601,
+        "col": 34
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 603,
+        "col": 38
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::update",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "update"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 605,
+        "col": 20
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 630,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 631,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 632,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 633,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 635,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::float",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "float"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 636,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 637,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::utc_now",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "utc_now"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 638,
+        "col": 27
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 639,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::append",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "append"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 650,
+        "col": 20
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 658,
+        "col": 42
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 468,
+        "col": 54
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 469,
+        "col": 50
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 471,
+        "col": 16
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 471,
+        "col": 48
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 488,
+        "col": 49
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 537,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 538,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 539,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::remove",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "remove"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 587,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 633,
+        "col": 34
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 635,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 636,
+        "col": 38
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 637,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 639,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::values",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "values"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 658,
+        "col": 47
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 537,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 538,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 539,
+        "col": 27
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 623,
+        "col": 86
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate_proposal",
+      "target_symbol": "unresolved::MissionAdaptationProposal",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "MissionAdaptationProposal"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 686,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate_proposal",
+      "target_symbol": "unresolved::TaskGraph",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "TaskGraph"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 687,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate_proposal",
+      "target_symbol": "unresolved::validate",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "validate"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 691,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate_proposal",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 694,
+        "col": 16
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate_proposal",
+      "target_symbol": "unresolved::TaskGraph",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "TaskGraph"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 695,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate_proposal",
+      "target_symbol": "unresolved::values",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "values"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 694,
+        "col": 21
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.validate_proposal",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 694,
+        "col": 21
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.get_preserved_task_ids",
+      "target_symbol": "unresolved::MissionAdaptationProposal",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "MissionAdaptationProposal"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 700,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.get_preserved_task_ids",
+      "target_symbol": "unresolved::TaskGraph",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "TaskGraph"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 701,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningValidator.get_preserved_task_ids",
+      "target_symbol": "unresolved::keys",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "keys"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 705,
+        "col": 27
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.__init__",
+      "target_symbol": "unresolved::AdaptivePlanningValidator",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AdaptivePlanningValidator"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 720,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.__init__",
+      "target_symbol": "unresolved::PlanQualityMetrics",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanQualityMetrics"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 721,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.__init__",
+      "target_symbol": "unresolved::Lock",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "Lock"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 722,
+        "col": 21
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.__init__",
+      "target_symbol": "unresolved::AdaptationBudget",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AdaptationBudget"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 719,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::TaskGraph",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "TaskGraph"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 726,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::PlanQualityMetrics",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanQualityMetrics"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 731,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 739,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 740,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 741,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 742,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::sum",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sum"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 744,
+        "col": 39
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::get_completed_tasks",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get_completed_tasks"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 740,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::get_failed_tasks",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get_failed_tasks"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 741,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::get_blocked_tasks",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get_blocked_tasks"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 742,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::has_unrecoverable_failures",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "has_unrecoverable_failures"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 743,
+        "col": 35
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 743,
+        "col": 81
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 743,
+        "col": 86
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 743,
+        "col": 217
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::get_blocked_tasks",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get_blocked_tasks"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 743,
+        "col": 90
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 743,
+        "col": 133
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 743,
+        "col": 176
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::get_completed_tasks",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get_completed_tasks"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 743,
+        "col": 137
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.compute_plan_quality_metrics",
+      "target_symbol": "unresolved::get_failed_tasks",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get_failed_tasks"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 743,
+        "col": 180
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::TaskGraph",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "TaskGraph"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 753,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 763,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 764,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::sum",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sum"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 767,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::sum",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "sum"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 768,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::get_blocked_tasks",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get_blocked_tasks"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 856,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::get_ready_tasks",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get_ready_tasks"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 858,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::PlanEvaluationResult",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationResult"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 872,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::PlanEvaluationResult",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationResult"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 770,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::PlanEvaluationResult",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationResult"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 778,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::PlanEvaluationResult",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationResult"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 788,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::PlanEvaluationResult",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationResult"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 799,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::PlanEvaluationResult",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationResult"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 862,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::PlanEvaluationResult",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationResult"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 815,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::PlanEvaluationResult",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationResult"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 824,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::PlanEvaluationResult",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationResult"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 837,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::values",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "values"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 857,
+        "col": 36
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::is_all_completed",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "is_all_completed"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 860,
+        "col": 75
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 804,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 814,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::lower",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "lower"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 814,
+        "col": 52
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::lower",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "lower"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 814,
+        "col": 97
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::PlanEvaluationResult",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "PlanEvaluationResult"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 846,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 767,
+        "col": 54
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 768,
+        "col": 50
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 804,
+        "col": 36
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 801,
+        "col": 88
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.evaluate_plan",
+      "target_symbol": "unresolved::get_failed_tasks",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get_failed_tasks"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 845,
+        "col": 54
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::MissionAdaptationProposal",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "MissionAdaptationProposal"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 883,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::Any",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "Any"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 884,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::getattr",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "getattr"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 893,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::validate",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "validate"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 903,
+        "col": 37
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::AdaptationRecord",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AdaptationRecord"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 925,
+        "col": 21
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::to_thread",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "to_thread"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 896,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::log_event",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "log_event"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 907,
+        "col": 16
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::TaskGraph",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "TaskGraph"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 946,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 947,
+        "col": 46
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::save_checkpoint",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "save_checkpoint"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 973,
+        "col": 16
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::log_event",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "log_event"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 977,
+        "col": 16
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 940,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::to_thread",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "to_thread"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 951,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 963,
+        "col": 50
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 963,
+        "col": 72
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::isinstance",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "isinstance"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 964,
+        "col": 58
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 964,
+        "col": 117
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::log_event",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "log_event"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 994,
+        "col": 16
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 938,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 939,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 946,
+        "col": 44
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 983,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::len",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "len"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 984,
+        "col": 34
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::uuid4",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "uuid4"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 924,
+        "col": 37
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::values",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "values"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 946,
+        "col": 49
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine.apply_adaptation",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 998,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::MissionStateStore",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "MissionStateStore"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1004,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::str",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1005,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::str",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1006,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::MissionAdaptationProposal",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "MissionAdaptationProposal"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1007,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::AdaptationRecord",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "AdaptationRecord"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1008,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::int",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1009,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::load_mission",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "load_mission"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1014,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1015,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::update_mission_metadata",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "update_mission_metadata"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1021,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::items",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "items"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1025,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::record_adaptation",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "record_adaptation"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1079,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1015,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1019,
+        "col": 39
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::_entity_path",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "_entity_path"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1026,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::utc_now",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "utc_now"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1030,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::_entity_path",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "_entity_path"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1062,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::exists",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "exists"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1063,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::to_dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "to_dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1079,
+        "col": 56
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1019,
+        "col": 43
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::hasattr",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "hasattr"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1027,
+        "col": 46
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1027,
+        "col": 81
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::hasattr",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "hasattr"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1029,
+        "col": 76
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::has_work_package",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "has_work_package"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1029,
+        "col": 21
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::exists",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "exists"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1029,
+        "col": 116
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::WorkPackage",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "WorkPackage"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1032,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::_write_entity",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "_write_entity"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1045,
+        "col": 16
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1015,
+        "col": 28
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::load_work_package",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "load_work_package"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1048,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::load_work_package",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "load_work_package"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1065,
+        "col": 25
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1038,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::list",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "list"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1039,
+        "col": 33
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::bool",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "bool"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1041,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1049,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::set_work_package_status",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "set_work_package_status"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1050,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1066,
+        "col": 23
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::set_work_package_status",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "set_work_package_status"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1067,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1055,
+        "col": 45
+      }
+    },
+    {
+      "source_symbol": "agents/adaptive_planning.py::AdaptivePlanningEngine._persist_adaptation_to_store",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1072,
+        "col": 45
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::annotations",
+      "target_symbol": "__future__::annotations",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "__future__",
+        "target_name": "annotations"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 1
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::asdict",
+      "target_symbol": "dataclasses::asdict",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "dataclasses",
+        "target_name": "asdict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 3
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::dataclass",
+      "target_symbol": "dataclasses::dataclass",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "dataclasses",
+        "target_name": "dataclass"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 3
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::Iterable",
+      "target_symbol": "typing::Iterable",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "Iterable"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 4
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfile.to_dict",
+      "target_symbol": "unresolved::asdict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "asdict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 16,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.__init__",
+      "target_symbol": "unresolved::_normalize",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "_normalize"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 23,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.__init__",
+      "target_symbol": "unresolved::ValueError",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "ValueError"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 25,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.__init__",
+      "target_symbol": "unresolved::ValueError",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "ValueError"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 27,
+        "col": 22
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.get",
+      "target_symbol": "unresolved::str",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 32,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.get",
+      "target_symbol": "unresolved::_normalize",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "_normalize"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 33,
+        "col": 14
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.get",
+      "target_symbol": "unresolved::ValueError",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "ValueError"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 37,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.resolve",
+      "target_symbol": "unresolved::str",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 43,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.resolve",
+      "target_symbol": "unresolved::strip",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "strip"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 47,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.resolve",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 61,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.resolve",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 53,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.resolve",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 61,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.resolve",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 47,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.resolve",
+      "target_symbol": "unresolved::upper",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "upper"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 61,
+        "col": 37
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.resolve",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 48,
+        "col": 12
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.resolve",
+      "target_symbol": "unresolved::get",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "get"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 49,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.resolve",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 61,
+        "col": 37
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.describe",
+      "target_symbol": "unresolved::to_dict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "to_dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 65,
+        "col": 17
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry.describe",
+      "target_symbol": "unresolved::items",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "items"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 66,
+        "col": 32
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry._normalize",
+      "target_symbol": "unresolved::str",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 70,
+        "col": 19
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry._normalize",
+      "target_symbol": "unresolved::lower",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "lower"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 71,
+        "col": 14
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry._normalize",
+      "target_symbol": "unresolved::ValueError",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "ValueError"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 73,
+        "col": 18
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry._normalize",
+      "target_symbol": "unresolved::strip",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "strip"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 71,
+        "col": 14
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::AgentProfileRegistry._normalize",
+      "target_symbol": "unresolved::str",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 71,
+        "col": 14
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::create_default_agent_profile_registry",
+      "target_symbol": "unresolved::AgentProfileRegistry",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AgentProfileRegistry"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 78,
+        "col": 11
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::create_default_agent_profile_registry",
+      "target_symbol": "unresolved::AgentProfile",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AgentProfile"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 79,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::create_default_agent_profile_registry",
+      "target_symbol": "unresolved::AgentProfile",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AgentProfile"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 92,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::create_default_agent_profile_registry",
+      "target_symbol": "unresolved::AgentProfile",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AgentProfile"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 106,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/agent_profiles.py::create_default_agent_profile_registry",
+      "target_symbol": "unresolved::AgentProfile",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "AgentProfile"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 122,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::annotations",
+      "target_symbol": "__future__::annotations",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "__future__",
+        "target_name": "annotations"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 24
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::ast",
+      "target_symbol": "ast::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "ast"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 26
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::copy",
+      "target_symbol": "copy::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "copy"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 27
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::dataclasses",
+      "target_symbol": "dataclasses::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "dataclasses"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 28
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::asdict",
+      "target_symbol": "dataclasses::asdict",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "dataclasses",
+        "target_name": "asdict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 29
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::dataclass",
+      "target_symbol": "dataclasses::dataclass",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "dataclasses",
+        "target_name": "dataclass"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 29
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::field",
+      "target_symbol": "dataclasses::field",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "dataclasses",
+        "target_name": "field"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 29
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::difflib",
+      "target_symbol": "difflib::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "difflib"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 30
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::enum",
+      "target_symbol": "enum::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "enum"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 31
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::hashlib",
+      "target_symbol": "hashlib::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "hashlib"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 32
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::json",
+      "target_symbol": "json::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "json"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 33
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::logging",
+      "target_symbol": "logging::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "logging"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 34
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::os",
+      "target_symbol": "os::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "os"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 35
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::re",
+      "target_symbol": "re::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "re"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 36
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::sys",
+      "target_symbol": "sys::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "sys"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 37
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::time",
+      "target_symbol": "time::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "time"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 38
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::uuid",
+      "target_symbol": "uuid::MODULE",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "import_source": "uuid"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 39
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::Any",
+      "target_symbol": "typing::Any",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "Any"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 40
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::Callable",
+      "target_symbol": "typing::Callable",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "Callable"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 40
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::Dict",
+      "target_symbol": "typing::Dict",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "Dict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 40
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::List",
+      "target_symbol": "typing::List",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "List"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 40
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::Optional",
+      "target_symbol": "typing::Optional",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "Optional"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 40
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::Set",
+      "target_symbol": "typing::Set",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "Set"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 40
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::Tuple",
+      "target_symbol": "typing::Tuple",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "typing",
+        "target_name": "Tuple"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 40
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::utc_now",
+      "target_symbol": "agents/mission_state.py::utc_now",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "agents.mission_state",
+        "target_name": "utc_now",
+        "original_target": "agents.mission_state::utc_now"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 42
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::get_logger",
+      "target_symbol": "backend.logging_config::get_logger",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "backend.logging_config",
+        "target_name": "get_logger"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 43
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::log_event",
+      "target_symbol": "backend.logging_config::log_event",
+      "edge_type": "IMPORTS",
+      "provenance": {
+        "source_module": "backend.logging_config",
+        "target_name": "log_event"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 43
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::MissionCategory",
+      "target_symbol": "unresolved::str",
+      "edge_type": "EXTENDS",
+      "provenance": {
+        "base_name": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 50,
+        "col": 0
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::EvidenceProvenance",
+      "target_symbol": "unresolved::str",
+      "edge_type": "EXTENDS",
+      "provenance": {
+        "base_name": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 75,
+        "col": 0
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::FaultType",
+      "target_symbol": "unresolved::str",
+      "edge_type": "EXTENDS",
+      "provenance": {
+        "base_name": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 106,
+        "col": 0
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::MissionFaultInjector.register_fault",
+      "target_symbol": "unresolved::FaultInjectionPlan",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "FaultInjectionPlan"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 141,
+        "col": 29
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::MissionFaultInjector.register_fault",
+      "target_symbol": "unresolved::append",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "append"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 142,
+        "col": 8
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::MissionFaultInjector.check_and_apply",
+      "target_symbol": "unresolved::str",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 144,
+        "col": 30
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::MissionFaultInjector.check_and_apply",
+      "target_symbol": "unresolved::str",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 144,
+        "col": 50
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::MissionFaultInjector.check_and_apply",
+      "target_symbol": "unresolved::int",
+      "edge_type": "TYPE_USES",
+      "provenance": {
+        "type_annotation": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 144,
+        "col": 69
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::MissionFaultInjector.check_and_apply",
+      "target_symbol": "unresolved::append",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "append"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 150,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::MissionFaultInjector.check_and_apply",
+      "target_symbol": "unresolved::log_event",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "log_event"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 157,
+        "col": 24
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::MissionFaultInjector.check_and_apply",
+      "target_symbol": "unresolved::utc_now",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "utc_now"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 155,
+        "col": 41
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::FailureEscalationLevel",
+      "target_symbol": "unresolved::str",
+      "edge_type": "EXTENDS",
+      "provenance": {
+        "base_name": "str"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 164,
+        "col": 0
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::RetryBudgets.to_dict",
+      "target_symbol": "unresolved::asdict",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "asdict"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 210,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::RetryBudgets.from_dict",
+      "target_symbol": "unresolved::cls",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "cls"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 214,
+        "col": 15
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::RetryBudgets.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 215,
+        "col": 31
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::RetryBudgets.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 216,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::RetryBudgets.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 217,
+        "col": 26
+      }
+    },
+    {
+      "source_symbol": "agents/autonomous_mission_engine.py::RetryBudgets.from_dict",
+      "target_symbol": "unresolved::int",
+      "edge_type": "CALLS",
+      "provenance": {
+        "callee": "int"
+      },
+      "confidence": 1.0,
+      "source_location": {
+        "line": 218,
+        "col": 33
+      }
+    }
+  ]
+}

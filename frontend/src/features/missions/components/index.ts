@@ -32,3 +32,4 @@ export { AutonomousRepairConvergencePanel } from './AutonomousRepairConvergenceP
 export { AutonomousTaskCompletionPanel } from './AutonomousTaskCompletionPanel';
 export { MassiveProjectStatePanel } from './MassiveProjectStatePanel';
 export { SCCAwareGraphPanel } from './SCCAwareGraphPanel';
+export { SymbolFineGrainedGraphPanel } from './SymbolFineGrainedGraphPanel';

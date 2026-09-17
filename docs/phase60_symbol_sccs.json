@@ -1,0 +1,2239 @@
+{
+  "total_symbol_sccs": 13447,
+  "largest_symbol_scc_size": 1,
+  "sample_sccs": [
+    {
+      "scc_id": "scc_sym_000be210809b",
+      "symbols": [
+        "agents/real_user_mission_engine.py::RealUserMissionEngine._build_bugfix_workload"
+      ],
+      "files": [
+        "agents/real_user_mission_engine.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/real_user_mission_engine.py::RealUserMissionEngine._build_bugfix_workload",
+          "target_symbol": "unresolved::str",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 603,
+            "col": 37
+          }
+        },
+        {
+          "source_symbol": "agents/real_user_mission_engine.py::RealUserMissionEngine._build_bugfix_workload",
+          "target_symbol": "unresolved::str",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 603,
+            "col": 52
+          }
+        },
+        {
+          "source_symbol": "agents/real_user_mission_engine.py::RealUserMissionEngine._build_bugfix_workload",
+          "target_symbol": "unresolved::join",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "join"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 657,
+            "col": 17
+          }
+        },
+        {
+          "source_symbol": "agents/real_user_mission_engine.py::RealUserMissionEngine._build_bugfix_workload",
+          "target_symbol": "unresolved::join",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "join"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 658,
+            "col": 17
+          }
+        },
+        {
+          "source_symbol": "agents/real_user_mission_engine.py::RealUserMissionEngine._build_bugfix_workload",
+          "target_symbol": "unresolved::open",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "open"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 659,
+            "col": 13
+          }
+        },
+        {
+          "source_symbol": "agents/real_user_mission_engine.py::RealUserMissionEngine._build_bugfix_workload",
+          "target_symbol": "unresolved::write",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "write"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 660,
+            "col": 12
+          }
+        },
+        {
+          "source_symbol": "agents/real_user_mission_engine.py::RealUserMissionEngine._build_bugfix_workload",
+          "target_symbol": "unresolved::open",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "open"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 661,
+            "col": 13
+          }
+        },
+        {
+          "source_symbol": "agents/real_user_mission_engine.py::RealUserMissionEngine._build_bugfix_workload",
+          "target_symbol": "unresolved::write",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "write"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 662,
+            "col": 12
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "000be210809bf74ed9f70d5c74986a20dc86b632c1d65c99a9dc36e89fd53976",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_000ceb9b83d1",
+      "symbols": [
+        "agents/symbol_fine_grained_graph/cache.py::Optional"
+      ],
+      "files": [
+        "agents/symbol_fine_grained_graph/cache.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/symbol_fine_grained_graph/cache.py::Optional",
+          "target_symbol": "typing::Optional",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "typing",
+            "target_name": "Optional"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 6
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "000ceb9b83d19a89bf883c5102032e07c944fd201bc6733b23897a930f9fc78a",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_000f96a1bc39",
+      "symbols": [
+        "agents/autonomous_task_completion/planner.py::uuid"
+      ],
+      "files": [
+        "agents/autonomous_task_completion/planner.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/autonomous_task_completion/planner.py::uuid",
+          "target_symbol": "uuid::MODULE",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "import_source": "uuid"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 10
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "000f96a1bc39a23b6d9c772a5024860844ee152f67bc0ade4a6aff2378dff9ed",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_001f9a911829",
+      "symbols": [
+        "agents/contract_change_management/migration.py::time"
+      ],
+      "files": [
+        "agents/contract_change_management/migration.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/contract_change_management/migration.py::time",
+          "target_symbol": "time::MODULE",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "import_source": "time"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 8
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "001f9a91182918ee883a316c1dd8a8b182694a96ec598450c9f62e726a5224e9",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0022540e4719",
+      "symbols": [
+        "agents/autonomous_mission_productization.py::AutonomousMissionProductizationEngine"
+      ],
+      "files": [
+        "agents/autonomous_mission_productization.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "0022540e471980d3cbed52289edb0f5997c4644daa1b56af40b245b30ca792b2",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0022aa4c236d",
+      "symbols": [
+        "agents/verified_repair/models.py::json"
+      ],
+      "files": [
+        "agents/verified_repair/models.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/verified_repair/models.py::json",
+          "target_symbol": "json::MODULE",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "import_source": "json"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 9
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "0022aa4c236d6ca049585e056d7903e742777f14d3d8528de806beec943028ed",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0022ecff5269",
+      "symbols": [
+        "agents/autonomous_task_completion/executor.py::MissionHumanReviewReason"
+      ],
+      "files": [
+        "agents/autonomous_task_completion/executor.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/autonomous_task_completion/executor.py::MissionHumanReviewReason",
+          "target_symbol": "backend/agents/verified_repair/models.py::MissionHumanReviewReason",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "models",
+            "target_name": "MissionHumanReviewReason",
+            "original_target": "models::MissionHumanReviewReason"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 21
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "0022ecff5269eb826b2d71637b17bec3abe74126aa7746f1f631a3e55f683a4c",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0023f362a252",
+      "symbols": [
+        "agents/behavioral_contract_proof/models.py::BehavioralDelta"
+      ],
+      "files": [
+        "agents/behavioral_contract_proof/models.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "0023f362a252b676717af91f95d7101cbf8bf6bdeefe96c2b389215d786340e3",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00281c934217",
+      "symbols": [
+        "agents/repair_convergence_governance/oscillation_detector.py::OscillationDetector"
+      ],
+      "files": [
+        "agents/repair_convergence_governance/oscillation_detector.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00281c934217fe66520d739a82716511a583bdaf37a03c03ced036c1c1e3fa28",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00286675e906",
+      "symbols": [
+        "agents/repair_convergence_governance/divergence_detector.py::RepairStepSnapshot"
+      ],
+      "files": [
+        "agents/repair_convergence_governance/divergence_detector.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/repair_convergence_governance/divergence_detector.py::RepairStepSnapshot",
+          "target_symbol": "agents/repair_convergence_governance/models.py::RepairStepSnapshot",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "agents.repair_convergence_governance.models",
+            "target_name": "RepairStepSnapshot",
+            "original_target": "agents.repair_convergence_governance.models::RepairStepSnapshot"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 9
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00286675e90661da6c2e555a304d0285a110060bb77bf79fa332ced084391cda",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0029d1936c19",
+      "symbols": [
+        "backend/agents/autonomous_task_completion/convergence.py::annotations"
+      ],
+      "files": [
+        "backend/agents/autonomous_task_completion/convergence.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "backend/agents/autonomous_task_completion/convergence.py::annotations",
+          "target_symbol": "__future__::annotations",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "__future__",
+            "target_name": "annotations"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 7
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "0029d1936c1967caf6e9045f0ac76953d258042c19c3e4f44785fbf565897d49",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_002bedc23201",
+      "symbols": [
+        "agents/autonomous_loop/metrics.py::Any"
+      ],
+      "files": [
+        "agents/autonomous_loop/metrics.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/autonomous_loop/metrics.py::Any",
+          "target_symbol": "typing::Any",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "typing",
+            "target_name": "Any"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 11
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "002bedc232016ee333d5a4308eae0dd5f98ad10bd91c546ba785ea8f1d9664b6",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_002ec89bfe5e",
+      "symbols": [
+        "agents/project_preflight/javascript.py::annotations"
+      ],
+      "files": [
+        "agents/project_preflight/javascript.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/project_preflight/javascript.py::annotations",
+          "target_symbol": "__future__::annotations",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "__future__",
+            "target_name": "annotations"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 7
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "002ec89bfe5e50508fb5a458c1c856644ea008c2174b36a3eeef956d355f49ce",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0036cd5ca31d",
+      "symbols": [
+        "agents/autonomous_mission_productization.py::MissionProductizationCategory"
+      ],
+      "files": [
+        "agents/autonomous_mission_productization.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/autonomous_mission_productization.py::MissionProductizationCategory",
+          "target_symbol": "unresolved::str",
+          "edge_type": "EXTENDS",
+          "provenance": {
+            "base_name": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 94,
+            "col": 0
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "0036cd5ca31d2d0a85371d79f5567f229bdc8d685509d78b8446270f05817814",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_003a93ff6824",
+      "symbols": [
+        "backend/agents/multi_repair_orchestration/graph.py::RepairGraphBuilder.has_cycle"
+      ],
+      "files": [
+        "backend/agents/multi_repair_orchestration/graph.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "backend/agents/multi_repair_orchestration/graph.py::RepairGraphBuilder.has_cycle",
+          "target_symbol": "unresolved::RepairGraph",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "RepairGraph"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 66,
+            "col": 24
+          }
+        },
+        {
+          "source_symbol": "backend/agents/multi_repair_orchestration/graph.py::RepairGraphBuilder.has_cycle",
+          "target_symbol": "unresolved::bool",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "bool"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 66,
+            "col": 44
+          }
+        },
+        {
+          "source_symbol": "backend/agents/multi_repair_orchestration/graph.py::RepairGraphBuilder.has_cycle",
+          "target_symbol": "unresolved::append",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "append"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 75,
+            "col": 12
+          }
+        },
+        {
+          "source_symbol": "backend/agents/multi_repair_orchestration/graph.py::RepairGraphBuilder.has_cycle",
+          "target_symbol": "unresolved::get",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "get"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 81,
+            "col": 21
+          }
+        },
+        {
+          "source_symbol": "backend/agents/multi_repair_orchestration/graph.py::RepairGraphBuilder.has_cycle",
+          "target_symbol": "unresolved::dfs",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "dfs"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 91,
+            "col": 19
+          }
+        },
+        {
+          "source_symbol": "backend/agents/multi_repair_orchestration/graph.py::RepairGraphBuilder.has_cycle",
+          "target_symbol": "unresolved::setdefault",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "setdefault"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 75,
+            "col": 12
+          }
+        },
+        {
+          "source_symbol": "backend/agents/multi_repair_orchestration/graph.py::RepairGraphBuilder.has_cycle",
+          "target_symbol": "unresolved::get",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "get"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 82,
+            "col": 19
+          }
+        },
+        {
+          "source_symbol": "backend/agents/multi_repair_orchestration/graph.py::RepairGraphBuilder.has_cycle",
+          "target_symbol": "unresolved::dfs",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "dfs"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 84,
+            "col": 46
+          }
+        },
+        {
+          "source_symbol": "backend/agents/multi_repair_orchestration/graph.py::RepairGraphBuilder.has_cycle",
+          "target_symbol": "unresolved::get",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "get"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 84,
+            "col": 19
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "003a93ff6824e5b26a8a6fdb2b161f9dc3af0062238ff86c9ba668f42ea87717",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_003b390ac21a",
+      "symbols": [
+        "agents/autonomous_task_completion/executor.py::MissionSafetyGate"
+      ],
+      "files": [
+        "agents/autonomous_task_completion/executor.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/autonomous_task_completion/executor.py::MissionSafetyGate",
+          "target_symbol": "backend/agents/autonomous_task_completion/gate.py::MissionSafetyGate",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "gate",
+            "target_name": "MissionSafetyGate",
+            "original_target": "gate::MissionSafetyGate"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 16
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "003b390ac21af07b3d68ddb0f2c8fe421210b5cc2599a5c67b89f5b562cd6881",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_003cdef76a54",
+      "symbols": [
+        "agents/quic_native_dataplane.py::MultiCoreQuicDataplane"
+      ],
+      "files": [
+        "agents/quic_native_dataplane.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "003cdef76a54658c8bc8cfaef2cd1a924055f3797a1105cb5aa3c3942e98c2e0",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_003fc2fcd135",
+      "symbols": [
+        "agents/autonomous_task_completion/metrics.py::time"
+      ],
+      "files": [
+        "agents/autonomous_task_completion/metrics.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/autonomous_task_completion/metrics.py::time",
+          "target_symbol": "time::MODULE",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "import_source": "time"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 8
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "003fc2fcd135f7d93a61b4287a885a0d3dedac9eda981cf37ad79126758c150a",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00403d8ace73",
+      "symbols": [
+        "agents/massive_project_state/symbol_index.py::SymbolReverseIndex"
+      ],
+      "files": [
+        "agents/massive_project_state/symbol_index.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/massive_project_state/symbol_index.py::SymbolReverseIndex",
+          "target_symbol": "unresolved::BaseReverseIndex",
+          "edge_type": "EXTENDS",
+          "provenance": {
+            "base_name": "BaseReverseIndex"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 9,
+            "col": 0
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00403d8ace7378745d9d6385848af34190f291c96ddf83c223a6e306b2bd7c25",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00409a0809c7",
+      "symbols": [
+        "agents/swarm_federation.py::SubSwarmCoordinator.restore_checkpoint"
+      ],
+      "files": [
+        "agents/swarm_federation.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/swarm_federation.py::SubSwarmCoordinator.restore_checkpoint",
+          "target_symbol": "unresolved::SubSwarmCheckpoint",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "SubSwarmCheckpoint"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1679,
+            "col": 33
+          }
+        },
+        {
+          "source_symbol": "agents/swarm_federation.py::SubSwarmCoordinator.restore_checkpoint",
+          "target_symbol": "unresolved::SubSwarmStatus",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "SubSwarmStatus"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1680,
+            "col": 22
+          }
+        },
+        {
+          "source_symbol": "agents/swarm_federation.py::SubSwarmCoordinator.restore_checkpoint",
+          "target_symbol": "unresolved::set",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "set"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1681,
+            "col": 31
+          }
+        },
+        {
+          "source_symbol": "agents/swarm_federation.py::SubSwarmCoordinator.restore_checkpoint",
+          "target_symbol": "unresolved::set",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "set"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1682,
+            "col": 28
+          }
+        },
+        {
+          "source_symbol": "agents/swarm_federation.py::SubSwarmCoordinator.restore_checkpoint",
+          "target_symbol": "unresolved::clear",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "clear"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1683,
+            "col": 8
+          }
+        },
+        {
+          "source_symbol": "agents/swarm_federation.py::SubSwarmCoordinator.restore_checkpoint",
+          "target_symbol": "unresolved::FileOwnershipRegistry",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "FileOwnershipRegistry"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1684,
+            "col": 30
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00409a0809c768566c185e8823a6ae77cbbaeef92a2a04b3139f41509dc5d655",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00414536f73a",
+      "symbols": [
+        "agents/repair_convergence_governance/escalation.py::HumanEscalationManager"
+      ],
+      "files": [
+        "agents/repair_convergence_governance/escalation.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00414536f73ad36cad610e47cdc60d14d4ba2ca4edd1e8c5f26456b89267f194",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0042393d2c61",
+      "symbols": [
+        "backend/agents/repair_convergence_governance/experience.py::ConvergenceExperienceStore.__init__"
+      ],
+      "files": [
+        "backend/agents/repair_convergence_governance/experience.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "0042393d2c61304a7887dd4643f1c7f50411868a904dcf21df20fbd8e5d92011",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0045fc4cfbda",
+      "symbols": [
+        "backend/agents/scc_aware_graph/index.py::annotations"
+      ],
+      "files": [
+        "backend/agents/scc_aware_graph/index.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "backend/agents/scc_aware_graph/index.py::annotations",
+          "target_symbol": "__future__::annotations",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "__future__",
+            "target_name": "annotations"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "0045fc4cfbdae7f54e76cf7260b2c97d72e025b1b91f21b3fc66731cd2101f08",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00482bf01615",
+      "symbols": [
+        "backend/agents/autonomous_task_completion/validator_registry.py::annotations"
+      ],
+      "files": [
+        "backend/agents/autonomous_task_completion/validator_registry.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "backend/agents/autonomous_task_completion/validator_registry.py::annotations",
+          "target_symbol": "__future__::annotations",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "__future__",
+            "target_name": "annotations"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 6
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "00482bf016157f274c64f023bd596ac945fc5c895910da2f9786753b232defb7",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0048b4ef0028",
+      "symbols": [
+        "backend/agents/repair_convergence_governance/experience.py::annotations"
+      ],
+      "files": [
+        "backend/agents/repair_convergence_governance/experience.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "backend/agents/repair_convergence_governance/experience.py::annotations",
+          "target_symbol": "__future__::annotations",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "__future__",
+            "target_name": "annotations"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 6
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "0048b4ef00289a0c32826b4a5a492d6b6a7381d42d2e392e7c1eafd13e71297a",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_004f9260638b",
+      "symbols": [
+        "agents/orchestrator/project_builder.py::_plan_package_json"
+      ],
+      "files": [
+        "agents/orchestrator/project_builder.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/orchestrator/project_builder.py::_plan_package_json",
+          "target_symbol": "unresolved::ProjectPlan",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "ProjectPlan"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 6324,
+            "col": 23
+          }
+        },
+        {
+          "source_symbol": "agents/orchestrator/project_builder.py::_plan_package_json",
+          "target_symbol": "unresolved::next",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "next"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 6325,
+            "col": 19
+          }
+        },
+        {
+          "source_symbol": "agents/orchestrator/project_builder.py::_plan_package_json",
+          "target_symbol": "unresolved::loads",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "loads"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 6329,
+            "col": 16
+          }
+        },
+        {
+          "source_symbol": "agents/orchestrator/project_builder.py::_plan_package_json",
+          "target_symbol": "unresolved::isinstance",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "isinstance"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 6332,
+            "col": 20
+          }
+        },
+        {
+          "source_symbol": "agents/orchestrator/project_builder.py::_plan_package_json",
+          "target_symbol": "unresolved::lower",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "lower"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 6325,
+            "col": 56
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "004f9260638b3f9002df62d50e48173f06c416efdd164ecb820de50debf6d63a",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00501f21acf8",
+      "symbols": [
+        "agents/repair_convergence_governance/recovery.py::Any"
+      ],
+      "files": [
+        "agents/repair_convergence_governance/recovery.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/repair_convergence_governance/recovery.py::Any",
+          "target_symbol": "typing::Any",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "typing",
+            "target_name": "Any"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 9
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00501f21acf88538785fde2c408fe90daea6d2e39cca63e28f772ddddba5eecb",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_005149fdd203",
+      "symbols": [
+        "agents/autonomous_mission_engine.py::MissionStateSnapshot"
+      ],
+      "files": [
+        "agents/autonomous_mission_engine.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "005149fdd2039c3bde02a031c4dc5e171648a7273b798c4ebb909aad59a08d76",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_005393648f49",
+      "symbols": [
+        "agents/build_contract_extraction/bridge.py::EvidenceState"
+      ],
+      "files": [
+        "agents/build_contract_extraction/bridge.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/build_contract_extraction/bridge.py::EvidenceState",
+          "target_symbol": "agents/build_contract_extraction/models.py::EvidenceState",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "agents.build_contract_extraction.models",
+            "target_name": "EvidenceState",
+            "original_target": "agents.build_contract_extraction.models::EvidenceState"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 15
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "005393648f49304e02cbd87afa452c490031a1725f26ddd5ccbf26b82c605ae3",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0056b6bd821c",
+      "symbols": [
+        "backend/agents/repair_convergence_governance/stall_detector.py::StallDetector"
+      ],
+      "files": [
+        "backend/agents/repair_convergence_governance/stall_detector.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "0056b6bd821c13dd60d474cc6311b764ab7eec98bc3b1ad03a0763ef4de5665a",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_005b19bc822a",
+      "symbols": [
+        "agents/mission_orchestrator.py::PlanQualityMetrics"
+      ],
+      "files": [
+        "agents/mission_orchestrator.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/mission_orchestrator.py::PlanQualityMetrics",
+          "target_symbol": "agents/adaptive_planning.py::PlanQualityMetrics",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "agents.adaptive_planning",
+            "target_name": "PlanQualityMetrics",
+            "original_target": "agents.adaptive_planning::PlanQualityMetrics"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 14
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "005b19bc822a9403ded55df8250844c12ea5caa86fbbf4e9ab0476853a17bb26",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_006427c8462d",
+      "symbols": [
+        "agents/behavioral_contract_proof/cache.py::BehaviorProofCache.put"
+      ],
+      "files": [
+        "agents/behavioral_contract_proof/cache.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/behavioral_contract_proof/cache.py::BehaviorProofCache.put",
+          "target_symbol": "unresolved::str",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 40,
+            "col": 18
+          }
+        },
+        {
+          "source_symbol": "agents/behavioral_contract_proof/cache.py::BehaviorProofCache.put",
+          "target_symbol": "unresolved::MigrationProof",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "MigrationProof"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 40,
+            "col": 28
+          }
+        },
+        {
+          "source_symbol": "agents/behavioral_contract_proof/cache.py::BehaviorProofCache.put",
+          "target_symbol": "unresolved::len",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "len"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 42,
+            "col": 11
+          }
+        },
+        {
+          "source_symbol": "agents/behavioral_contract_proof/cache.py::BehaviorProofCache.put",
+          "target_symbol": "unresolved::next",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "next"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 44,
+            "col": 24
+          }
+        },
+        {
+          "source_symbol": "agents/behavioral_contract_proof/cache.py::BehaviorProofCache.put",
+          "target_symbol": "unresolved::iter",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "iter"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 44,
+            "col": 29
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "006427c8462d686c204aed0b07fc5d1f47af07afb6abfcbf26edce4481aa8ef5",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0065341e3e1b",
+      "symbols": [
+        "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect"
+      ],
+      "files": [
+        "agents/polymorphic_schema/security.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect",
+          "target_symbol": "unresolved::Any",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "Any"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 152,
+            "col": 32
+          }
+        },
+        {
+          "source_symbol": "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect",
+          "target_symbol": "unresolved::str",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 152,
+            "col": 65
+          }
+        },
+        {
+          "source_symbol": "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect",
+          "target_symbol": "unresolved::isinstance",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "isinstance"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 153,
+            "col": 11
+          }
+        },
+        {
+          "source_symbol": "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect",
+          "target_symbol": "unresolved::_check_string",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "_check_string"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 154,
+            "col": 12
+          }
+        },
+        {
+          "source_symbol": "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect",
+          "target_symbol": "unresolved::isinstance",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "isinstance"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 155,
+            "col": 13
+          }
+        },
+        {
+          "source_symbol": "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect",
+          "target_symbol": "unresolved::items",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "items"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 156,
+            "col": 24
+          }
+        },
+        {
+          "source_symbol": "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect",
+          "target_symbol": "unresolved::isinstance",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "isinstance"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 159,
+            "col": 13
+          }
+        },
+        {
+          "source_symbol": "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect",
+          "target_symbol": "unresolved::_check_string",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "_check_string"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 157,
+            "col": 16
+          }
+        },
+        {
+          "source_symbol": "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect",
+          "target_symbol": "unresolved::enumerate",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "enumerate"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 160,
+            "col": 29
+          }
+        },
+        {
+          "source_symbol": "agents/polymorphic_schema/security.py::PolymorphicSecuritySentinel._recursive_inspect",
+          "target_symbol": "unresolved::str",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 157,
+            "col": 34
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "0065341e3e1bb4126416640b78f0dcb3868c6e2a74fa5cbbe8bddc7737703ee3",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00673152eec1",
+      "symbols": [
+        "agents/swarm_federation.py::InProcessBackend.get_metrics"
+      ],
+      "files": [
+        "agents/swarm_federation.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00673152eec10c319a2e5f0cc39791df6fc0baa96b90c2f9254b6c5c6ca42964",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00721f7fa063",
+      "symbols": [
+        "backend/agents/massive_project_state/validator.py::Dict"
+      ],
+      "files": [
+        "backend/agents/massive_project_state/validator.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "backend/agents/massive_project_state/validator.py::Dict",
+          "target_symbol": "typing::Dict",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "typing",
+            "target_name": "Dict"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 3
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "00721f7fa063742567add8ffaa0ba0866ed9bf6f4ab6cb472aa13fad0bf6404c",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_007949c9cb97",
+      "symbols": [
+        "agents/long_horizon_mission_engine.py::List"
+      ],
+      "files": [
+        "agents/long_horizon_mission_engine.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/long_horizon_mission_engine.py::List",
+          "target_symbol": "typing::List",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "typing",
+            "target_name": "List"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 30
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "007949c9cb9797c82b854699746b0c267460a360de50e2df68f97b7a08dd53c5",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_008b66a1adb0",
+      "symbols": [
+        "backend/agents/verified_repair/models.py::FailureResolutionStatus"
+      ],
+      "files": [
+        "backend/agents/verified_repair/models.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "backend/agents/verified_repair/models.py::FailureResolutionStatus",
+          "target_symbol": "unresolved::str",
+          "edge_type": "EXTENDS",
+          "provenance": {
+            "base_name": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 37,
+            "col": 0
+          }
+        },
+        {
+          "source_symbol": "backend/agents/verified_repair/models.py::FailureResolutionStatus",
+          "target_symbol": "unresolved::Enum",
+          "edge_type": "EXTENDS",
+          "provenance": {
+            "base_name": "Enum"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 37,
+            "col": 0
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "008b66a1adb0347108aab74632dd381f108b604e2299e49fd685a8c66542fcd6",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_008cd2ca6736",
+      "symbols": [
+        "agents/contract_change_management/models.py::ContractChangePrediction"
+      ],
+      "files": [
+        "agents/contract_change_management/models.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "008cd2ca6736930a1fc21bdc748605579642d397f55e83245e25aa71df2d046d",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00905858e117",
+      "symbols": [
+        "agents/scc_aware_graph/index.py::SCCReverseIndex.get_sccs_by_service"
+      ],
+      "files": [
+        "agents/scc_aware_graph/index.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/scc_aware_graph/index.py::SCCReverseIndex.get_sccs_by_service",
+          "target_symbol": "unresolved::str",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 37,
+            "col": 34
+          }
+        },
+        {
+          "source_symbol": "agents/scc_aware_graph/index.py::SCCReverseIndex.get_sccs_by_service",
+          "target_symbol": "unresolved::sorted",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "sorted"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 38,
+            "col": 15
+          }
+        },
+        {
+          "source_symbol": "agents/scc_aware_graph/index.py::SCCReverseIndex.get_sccs_by_service",
+          "target_symbol": "unresolved::list",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "list"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 38,
+            "col": 22
+          }
+        },
+        {
+          "source_symbol": "agents/scc_aware_graph/index.py::SCCReverseIndex.get_sccs_by_service",
+          "target_symbol": "unresolved::get",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "get"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 38,
+            "col": 27
+          }
+        },
+        {
+          "source_symbol": "agents/scc_aware_graph/index.py::SCCReverseIndex.get_sccs_by_service",
+          "target_symbol": "unresolved::set",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "set"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 38,
+            "col": 64
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00905858e11739013fc03bae7d5c2a97816d3117d52b11115ef551a666e0b4be",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_0099c9ea054e",
+      "symbols": [
+        "backend/agents/project_preflight/healthcheck.py::HealthcheckEngine"
+      ],
+      "files": [
+        "backend/agents/project_preflight/healthcheck.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "0099c9ea054e4055ab8e7cba4478467661172f05566e7536e8b66be8c230c5c5",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_009c648b692c",
+      "symbols": [
+        "agents/mission_persistence.py::ShardedFilesystemPersistence.load_mission"
+      ],
+      "files": [
+        "agents/mission_persistence.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/mission_persistence.py::ShardedFilesystemPersistence.load_mission",
+          "target_symbol": "unresolved::str",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1063,
+            "col": 27
+          }
+        },
+        {
+          "source_symbol": "agents/mission_persistence.py::ShardedFilesystemPersistence.load_mission",
+          "target_symbol": "unresolved::str",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1063,
+            "col": 44
+          }
+        },
+        {
+          "source_symbol": "agents/mission_persistence.py::ShardedFilesystemPersistence.load_mission",
+          "target_symbol": "unresolved::join",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "join"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1064,
+            "col": 15
+          }
+        },
+        {
+          "source_symbol": "agents/mission_persistence.py::ShardedFilesystemPersistence.load_mission",
+          "target_symbol": "unresolved::_mission_dir",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "_mission_dir"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1064,
+            "col": 28
+          }
+        },
+        {
+          "source_symbol": "agents/mission_persistence.py::ShardedFilesystemPersistence.load_mission",
+          "target_symbol": "unresolved::isfile",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "isfile"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1065,
+            "col": 15
+          }
+        },
+        {
+          "source_symbol": "agents/mission_persistence.py::ShardedFilesystemPersistence.load_mission",
+          "target_symbol": "unresolved::open",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "open"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1067,
+            "col": 13
+          }
+        },
+        {
+          "source_symbol": "agents/mission_persistence.py::ShardedFilesystemPersistence.load_mission",
+          "target_symbol": "unresolved::load",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "load"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 1068,
+            "col": 19
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "009c648b692ca85435c3d0f2a276df59caa847cd46dc0bd94d8167ce6a8064d7",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_009e38739685",
+      "symbols": [
+        "agents/massive_project_state/models.py::TargetedSubgraph"
+      ],
+      "files": [
+        "agents/massive_project_state/models.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "009e38739685c9840de3e80177fc9672364bc56ed9d3448b272b0a56f3eccf45",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_009f55b28c2b",
+      "symbols": [
+        "backend/agents/autonomous_task_completion/completion.py::Any"
+      ],
+      "files": [
+        "backend/agents/autonomous_task_completion/completion.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "backend/agents/autonomous_task_completion/completion.py::Any",
+          "target_symbol": "typing::Any",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "typing",
+            "target_name": "Any"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 10
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "009f55b28c2b3e3957876d8a5180df412f792574c6eced3dac2a9fe9319006e0",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00a06c97103f",
+      "symbols": [
+        "agents/native_rio_transport/__init__.py::RioRegisteredBufferPool.acquire_slice"
+      ],
+      "files": [
+        "agents/native_rio_transport/__init__.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/native_rio_transport/__init__.py::RioRegisteredBufferPool.acquire_slice",
+          "target_symbol": "unresolved::pop",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "pop"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 141,
+            "col": 22
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00a06c97103f0ea1b27a1ae5665910fba856ca2dd0decda91b5ffe25180e2fac",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00a501e8b30d",
+      "symbols": [
+        "backend/agents/verified_repair/bridge.py::RootCauseEngine"
+      ],
+      "files": [
+        "backend/agents/verified_repair/bridge.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "backend/agents/verified_repair/bridge.py::RootCauseEngine",
+          "target_symbol": "agents/verified_repair/cause.py::RootCauseEngine",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "agents.verified_repair.cause",
+            "target_name": "RootCauseEngine",
+            "original_target": "agents.verified_repair.cause::RootCauseEngine"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 16
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "backend"
+      ],
+      "state_hash": "00a501e8b30d2ac776710943c10cfa259321ad6e36e967bac107667f600cd4d3",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00a89271ef0b",
+      "symbols": [
+        "agents/decision_calibration/models.py::PolicyChangeProposal.to_dict"
+      ],
+      "files": [
+        "agents/decision_calibration/models.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/decision_calibration/models.py::PolicyChangeProposal.to_dict",
+          "target_symbol": "unresolved::asdict",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "asdict"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 230,
+            "col": 12
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00a89271ef0b7f329bf65fd99e00737ff192eb41f3614420debf01ca8e9c9097",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00a8b70ce988",
+      "symbols": [
+        "agents/risk_directed_exploration/coverage.py::BehavioralCoverageEngine"
+      ],
+      "files": [
+        "agents/risk_directed_exploration/coverage.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/risk_directed_exploration/coverage.py::BehavioralCoverageEngine",
+          "target_symbol": "agents/behavioral_proof_exploration/coverage.py::BehavioralCoverageEngine",
+          "edge_type": "IMPORTS",
+          "provenance": {
+            "source_module": "agents.behavioral_proof_exploration.coverage",
+            "target_name": "BehavioralCoverageEngine",
+            "original_target": "agents.behavioral_proof_exploration.coverage::BehavioralCoverageEngine"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 10
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00a8b70ce9882fea24eb9c3154dbd5cfc471cc8ae67690b3993b13f8dba9ad3d",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00b5d3ad5d62",
+      "symbols": [
+        "agents/repair_convergence_governance/side_effect_detector.py::SideEffectDetector.__init__"
+      ],
+      "files": [
+        "agents/repair_convergence_governance/side_effect_detector.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00b5d3ad5d62f6852208f02b1f4735e8939859c1dc6b1fc98903fda2623eb951",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00b8fd1f1814",
+      "symbols": [
+        "agents/massive_project_state/memory.py::ProjectMemoryBudgetManager.record_experience_hotspot"
+      ],
+      "files": [
+        "agents/massive_project_state/memory.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [
+        {
+          "source_symbol": "agents/massive_project_state/memory.py::ProjectMemoryBudgetManager.record_experience_hotspot",
+          "target_symbol": "unresolved::str",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "str"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 59,
+            "col": 40
+          }
+        },
+        {
+          "source_symbol": "agents/massive_project_state/memory.py::ProjectMemoryBudgetManager.record_experience_hotspot",
+          "target_symbol": "unresolved::int",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "int"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 59,
+            "col": 55
+          }
+        },
+        {
+          "source_symbol": "agents/massive_project_state/memory.py::ProjectMemoryBudgetManager.record_experience_hotspot",
+          "target_symbol": "unresolved::int",
+          "edge_type": "TYPE_USES",
+          "provenance": {
+            "type_annotation": "int"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 59,
+            "col": 78
+          }
+        },
+        {
+          "source_symbol": "agents/massive_project_state/memory.py::ProjectMemoryBudgetManager.record_experience_hotspot",
+          "target_symbol": "unresolved::append",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "append"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 61,
+            "col": 8
+          }
+        },
+        {
+          "source_symbol": "agents/massive_project_state/memory.py::ProjectMemoryBudgetManager.record_experience_hotspot",
+          "target_symbol": "unresolved::time",
+          "edge_type": "CALLS",
+          "provenance": {
+            "callee": "time"
+          },
+          "confidence": 1.0,
+          "source_location": {
+            "line": 65,
+            "col": 27
+          }
+        }
+      ],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00b8fd1f18145535dabae02cfc617e39568c8f92d86a3ffefff8f2ffd169db2d",
+      "is_cycle": false
+    },
+    {
+      "scc_id": "scc_sym_00bbb56d6559",
+      "symbols": [
+        "agents/semantic_graph/graph.py::CrossLanguageSemanticGraph"
+      ],
+      "files": [
+        "agents/semantic_graph/graph.py"
+      ],
+      "edges_internal": [],
+      "edges_external": [],
+      "size": 1,
+      "density": 0.0,
+      "languages": [
+        "python"
+      ],
+      "services": [
+        "agents"
+      ],
+      "state_hash": "00bbb56d6559a6c59e942e57e7bd0603a63c5d5059b60362ef576caefe9561fb",
+      "is_cycle": false
+    }
+  ]
+}
