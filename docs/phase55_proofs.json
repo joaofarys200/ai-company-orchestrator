@@ -1,0 +1,35 @@
+{
+  "proof_id": "prf_tx_20cd777652de46fa",
+  "transaction_id": "tx_33d88e2a01229f39",
+  "repairs_count": 6,
+  "resolved_failures_count": 6,
+  "revealed_failures_count": 0,
+  "before_hash": "1e67b0ca214b754f",
+  "after_hash": "1e67b0ca214b754f",
+  "checkpoints_count": 6,
+  "behavior_proof": {
+    "success": true
+  },
+  "regression_proof": {
+    "success": true
+  },
+  "security_validation": {
+    "success": true
+  },
+  "economic_validation": {
+    "success": true
+  },
+  "rollback_validation": {
+    "success": true
+  },
+  "convergence_status": "CONVERGED",
+  "result": "TRANSACTION_PROVEN",
+  "invariants": [
+    "STATE_HASH_LINEAGE_PRESERVED",
+    "SECURITY_SENTINEL_SOVEREIGNTY_MAINTAINED",
+    "PRODUCER_BEFORE_CONSUMER_ORDERING_ENFORCED",
+    "CHECKPOINT_ROLLBACK_INTEGRITY_VERIFIED",
+    "BOUNDED_BEHAVIORAL_CONVERGENCE_PROVEN"
+  ],
+  "created_at": 1789491495.3664844
+}

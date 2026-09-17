@@ -1,0 +1,187 @@
+[
+  {
+    "cluster_id": "cluster_9ea8248fc1eff5d0",
+    "root_cause_category": "AttributeError",
+    "shared_files": [
+      "backend/services/auth_service.py"
+    ],
+    "shared_symbols": [
+      "UserDTO.email"
+    ],
+    "shared_contracts": [],
+    "shared_consumers": [],
+    "shared_tasks": [],
+    "failures": [
+      {
+        "failure_id": "FAIL_API_003",
+        "error_class": "AttributeError",
+        "symbol": "UserDTO.email",
+        "file_path": "backend/services/auth_service.py",
+        "line": 102,
+        "message": "AttributeError: 'dict' object has no attribute 'email'",
+        "evidence": "",
+        "mission_id": "default_mission",
+        "raw_log": "",
+        "fingerprint": "1bc164091c60c5c3",
+        "failure_type": "ORIGINAL_FAILURE",
+        "revealed_by_repair_id": null,
+        "created_at": 1789491495.3620825
+      }
+    ],
+    "cluster_signature": "3c69a5bd81b0cdfb",
+    "risk_score": 0.25,
+    "mission_id": "mission_phase55_corpus_eval",
+    "created_at": 1789491495.3666406
+  },
+  {
+    "cluster_id": "cluster_a655de95de2db7d8",
+    "root_cause_category": "ImportError",
+    "shared_files": [
+      "agents/core/dina_bridge.py"
+    ],
+    "shared_symbols": [
+      "AdaptivePolicy"
+    ],
+    "shared_contracts": [],
+    "shared_consumers": [],
+    "shared_tasks": [],
+    "failures": [
+      {
+        "failure_id": "FAIL_DINA_001",
+        "error_class": "ImportError",
+        "symbol": "AdaptivePolicy",
+        "file_path": "agents/core/dina_bridge.py",
+        "line": 18,
+        "message": "ImportError: cannot import name 'AdaptivePolicy' from 'agents.policy'",
+        "evidence": "",
+        "mission_id": "default_mission",
+        "raw_log": "",
+        "fingerprint": "9fde170adc66ec02",
+        "failure_type": "ORIGINAL_FAILURE",
+        "revealed_by_repair_id": null,
+        "created_at": 1789491495.362085
+      }
+    ],
+    "cluster_signature": "297e151ae640af3e",
+    "risk_score": 0.25,
+    "mission_id": "mission_phase55_corpus_eval",
+    "created_at": 1789491495.3666487
+  },
+  {
+    "cluster_id": "cluster_afa6a2e7804a7979",
+    "root_cause_category": "RuntimeError",
+    "shared_files": [
+      "agents/core/dina_executor.py"
+    ],
+    "shared_symbols": [
+      "AdaptivePolicy.evaluate"
+    ],
+    "shared_contracts": [],
+    "shared_consumers": [],
+    "shared_tasks": [],
+    "failures": [
+      {
+        "failure_id": "FAIL_DINA_002",
+        "error_class": "RuntimeError",
+        "symbol": "AdaptivePolicy.evaluate",
+        "file_path": "agents/core/dina_executor.py",
+        "line": 77,
+        "message": "RuntimeError: AdaptivePolicy uninitialized context",
+        "evidence": "",
+        "mission_id": "default_mission",
+        "raw_log": "",
+        "fingerprint": "894ef82066b1d7bb",
+        "failure_type": "ORIGINAL_FAILURE",
+        "revealed_by_repair_id": null,
+        "created_at": 1789491495.3620875
+      }
+    ],
+    "cluster_signature": "736525d863463f66",
+    "risk_score": 0.25,
+    "mission_id": "mission_phase55_corpus_eval",
+    "created_at": 1789491495.3666549
+  },
+  {
+    "cluster_id": "cluster_d643cafd21e459a1",
+    "root_cause_category": "TypeError",
+    "shared_files": [
+      "frontend/src/features/missions/components/MultiRepairOrchestrationPanel.tsx"
+    ],
+    "shared_symbols": [
+      "MultiRepairOrchestrationPanel"
+    ],
+    "shared_contracts": [],
+    "shared_consumers": [],
+    "shared_tasks": [],
+    "failures": [
+      {
+        "failure_id": "FAIL_FRONTEND_001",
+        "error_class": "TypeError",
+        "symbol": "MultiRepairOrchestrationPanel",
+        "file_path": "frontend/src/features/missions/components/MultiRepairOrchestrationPanel.tsx",
+        "line": 120,
+        "message": "TypeError: Cannot read properties of undefined (reading 'active_transaction')",
+        "evidence": "",
+        "mission_id": "default_mission",
+        "raw_log": "",
+        "fingerprint": "16337a3013791ebb",
+        "failure_type": "ORIGINAL_FAILURE",
+        "revealed_by_repair_id": null,
+        "created_at": 1789491495.3620892
+      }
+    ],
+    "cluster_signature": "9f23ed9936ff2247",
+    "risk_score": 0.25,
+    "mission_id": "mission_phase55_corpus_eval",
+    "created_at": 1789491495.3666615
+  },
+  {
+    "cluster_id": "cluster_de4ac63d90839d6e",
+    "root_cause_category": "TypeError",
+    "shared_files": [
+      "backend/api/users.py"
+    ],
+    "shared_symbols": [
+      "UserDTO"
+    ],
+    "shared_contracts": [],
+    "shared_consumers": [],
+    "shared_tasks": [],
+    "failures": [
+      {
+        "failure_id": "FAIL_API_001",
+        "error_class": "ReferenceError",
+        "symbol": "UserDTO",
+        "file_path": "backend/api/users.py",
+        "line": 45,
+        "message": "NameError: name 'UserDTO' is not defined",
+        "evidence": "",
+        "mission_id": "default_mission",
+        "raw_log": "",
+        "fingerprint": "6fbc661eb94b81d5",
+        "failure_type": "ORIGINAL_FAILURE",
+        "revealed_by_repair_id": null,
+        "created_at": 1789491495.3620408
+      },
+      {
+        "failure_id": "FAIL_API_002",
+        "error_class": "TypeError",
+        "symbol": "UserDTO",
+        "file_path": "backend/api/users.py",
+        "line": 52,
+        "message": "TypeError: UserDTO missing required positional argument 'email'",
+        "evidence": "",
+        "mission_id": "default_mission",
+        "raw_log": "",
+        "fingerprint": "d1191b88e5d8d2da",
+        "failure_type": "ORIGINAL_FAILURE",
+        "revealed_by_repair_id": null,
+        "created_at": 1789491495.3620772
+      }
+    ],
+    "cluster_signature": "ddd1c2f16572b838",
+    "risk_score": 0.4,
+    "mission_id": "mission_phase55_corpus_eval",
+    "created_at": 1789491495.3666286
+  }
+]

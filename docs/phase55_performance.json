@@ -1,0 +1,112 @@
+{
+  "benchmark_name": "Phase 55 Transactional Multi-Repair Orchestration Benchmark",
+  "timestamp": "2026-09-15T17:57:10Z",
+  "scales_tested": [
+    10,
+    50,
+    100,
+    500,
+    1000,
+    5000,
+    10000
+  ],
+  "results": [
+    {
+      "scale": 10,
+      "clusters_count": 10,
+      "ordered_repairs_count": 10,
+      "graph_nodes": 10,
+      "graph_edges": 6,
+      "clustering_time_ms": 0.126,
+      "dag_sort_time_ms": 0.022,
+      "checkpoint_time_ms": 0.14,
+      "graph_build_time_ms": 0.114,
+      "total_time_ms": 0.485,
+      "throughput_repairs_per_sec": 20618.56
+    },
+    {
+      "scale": 50,
+      "clusters_count": 5,
+      "ordered_repairs_count": 50,
+      "graph_nodes": 50,
+      "graph_edges": 33,
+      "clustering_time_ms": 0.392,
+      "dag_sort_time_ms": 0.227,
+      "checkpoint_time_ms": 0.611,
+      "graph_build_time_ms": 0.395,
+      "total_time_ms": 1.782,
+      "throughput_repairs_per_sec": 28064.66
+    },
+    {
+      "scale": 100,
+      "clusters_count": 5,
+      "ordered_repairs_count": 100,
+      "graph_nodes": 100,
+      "graph_edges": 66,
+      "clustering_time_ms": 1.068,
+      "dag_sort_time_ms": 0.806,
+      "checkpoint_time_ms": 1.025,
+      "graph_build_time_ms": 0.75,
+      "total_time_ms": 4.069,
+      "throughput_repairs_per_sec": 24576.67
+    },
+    {
+      "scale": 500,
+      "clusters_count": 5,
+      "ordered_repairs_count": 500,
+      "graph_nodes": 500,
+      "graph_edges": 333,
+      "clustering_time_ms": 25.556,
+      "dag_sort_time_ms": 19.553,
+      "checkpoint_time_ms": 5.56,
+      "graph_build_time_ms": 4.317,
+      "total_time_ms": 56.442,
+      "throughput_repairs_per_sec": 8858.71
+    },
+    {
+      "scale": 1000,
+      "clusters_count": 5,
+      "ordered_repairs_count": 1000,
+      "graph_nodes": 1000,
+      "graph_edges": 666,
+      "clustering_time_ms": 100.307,
+      "dag_sort_time_ms": 77.377,
+      "checkpoint_time_ms": 5.492,
+      "graph_build_time_ms": 11.032,
+      "total_time_ms": 197.062,
+      "throughput_repairs_per_sec": 5074.54
+    },
+    {
+      "scale": 5000,
+      "clusters_count": 5,
+      "ordered_repairs_count": 5000,
+      "graph_nodes": 1000,
+      "graph_edges": 666,
+      "clustering_time_ms": 2557.36,
+      "dag_sort_time_ms": 1891.313,
+      "checkpoint_time_ms": 5.177,
+      "graph_build_time_ms": 11.679,
+      "total_time_ms": 4480.582,
+      "throughput_repairs_per_sec": 1115.93
+    },
+    {
+      "scale": 10000,
+      "clusters_count": 5,
+      "ordered_repairs_count": 10000,
+      "graph_nodes": 1000,
+      "graph_edges": 666,
+      "clustering_time_ms": 10322.364,
+      "dag_sort_time_ms": 7658.106,
+      "checkpoint_time_ms": 5.721,
+      "graph_build_time_ms": 11.206,
+      "total_time_ms": 18026.382,
+      "throughput_repairs_per_sec": 554.74
+    }
+  ],
+  "summary": {
+    "max_throughput_repairs_per_sec": 28064.66,
+    "dag_sort_time_10k_ms": 7658.106,
+    "clustering_time_10k_ms": 10322.364,
+    "topological_sorting_strictly_deterministic": true
+  }
+}

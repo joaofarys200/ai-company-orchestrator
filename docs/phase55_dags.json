@@ -1,0 +1,97 @@
+{
+  "nodes": {
+    "REP_API_PROD_001": {
+      "node_id": "REP_API_PROD_001",
+      "node_type": "REPAIR",
+      "label": "Repair Candidate REP_API_PROD_001",
+      "metadata": {}
+    },
+    "REP_API_CONS_002": {
+      "node_id": "REP_API_CONS_002",
+      "node_type": "REPAIR",
+      "label": "Repair Candidate REP_API_CONS_002",
+      "metadata": {}
+    },
+    "REP_API_CONS_003": {
+      "node_id": "REP_API_CONS_003",
+      "node_type": "REPAIR",
+      "label": "Repair Candidate REP_API_CONS_003",
+      "metadata": {}
+    },
+    "REP_DINA_PROD_001": {
+      "node_id": "REP_DINA_PROD_001",
+      "node_type": "REPAIR",
+      "label": "Repair Candidate REP_DINA_PROD_001",
+      "metadata": {}
+    },
+    "REP_DINA_CONS_002": {
+      "node_id": "REP_DINA_CONS_002",
+      "node_type": "REPAIR",
+      "label": "Repair Candidate REP_DINA_CONS_002",
+      "metadata": {}
+    },
+    "REP_FRONTEND_001": {
+      "node_id": "REP_FRONTEND_001",
+      "node_type": "REPAIR",
+      "label": "Repair Candidate REP_FRONTEND_001",
+      "metadata": {}
+    },
+    "FAIL_API_001": {
+      "node_id": "FAIL_API_001",
+      "node_type": "FAILURE",
+      "label": "ReferenceError: NameError: name 'UserDTO' is not defined",
+      "metadata": {}
+    },
+    "FAIL_API_002": {
+      "node_id": "FAIL_API_002",
+      "node_type": "FAILURE",
+      "label": "TypeError: TypeError: UserDTO missing required positional argument 'email'",
+      "metadata": {}
+    },
+    "FAIL_API_003": {
+      "node_id": "FAIL_API_003",
+      "node_type": "FAILURE",
+      "label": "AttributeError: AttributeError: 'dict' object has no attribute 'email'",
+      "metadata": {}
+    },
+    "FAIL_DINA_001": {
+      "node_id": "FAIL_DINA_001",
+      "node_type": "FAILURE",
+      "label": "ImportError: ImportError: cannot import name 'AdaptivePolicy' from 'agents.policy'",
+      "metadata": {}
+    },
+    "FAIL_DINA_002": {
+      "node_id": "FAIL_DINA_002",
+      "node_type": "FAILURE",
+      "label": "RuntimeError: RuntimeError: AdaptivePolicy uninitialized context",
+      "metadata": {}
+    },
+    "FAIL_FRONTEND_001": {
+      "node_id": "FAIL_FRONTEND_001",
+      "node_type": "FAILURE",
+      "label": "TypeError: TypeError: Cannot read properties of undefined (reading 'active_transaction')",
+      "metadata": {}
+    }
+  },
+  "edges": [
+    {
+      "source_id": "REP_API_CONS_002",
+      "target_id": "REP_API_PROD_001",
+      "relation": "DEPENDS_ON",
+      "metadata": {}
+    },
+    {
+      "source_id": "REP_API_CONS_003",
+      "target_id": "REP_API_CONS_002",
+      "relation": "DEPENDS_ON",
+      "metadata": {}
+    },
+    {
+      "source_id": "REP_DINA_CONS_002",
+      "target_id": "REP_DINA_PROD_001",
+      "relation": "DEPENDS_ON",
+      "metadata": {}
+    }
+  ],
+  "graph_hash": "867bc3782acfa812"
+}

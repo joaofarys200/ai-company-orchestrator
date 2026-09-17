@@ -1,0 +1,116 @@
+[
+  {
+    "checkpoint_id": "chk_tx_33d88e2a01229f39_0_REP_API_",
+    "transaction_id": "tx_33d88e2a01229f39",
+    "step_index": 0,
+    "repair_id": "REP_API_PROD_001",
+    "state_hash": "1e67b0ca214b754f",
+    "tree_hash": "95cf9e7bf3e38a4c",
+    "patch_hash": "4f32e2d3c43b7352",
+    "verification_result": "PRE_APPLY",
+    "created_at": 1789491495.3631523,
+    "snapshot_files": [
+      "backend/models/user.py",
+      "backend/api/users.py",
+      "backend/services/auth_service.py",
+      "agents/policy/adaptive.py",
+      "agents/core/dina_executor.py",
+      "frontend/src/features/missions/components/MultiRepairOrchestrationPanel.tsx"
+    ]
+  },
+  {
+    "checkpoint_id": "chk_tx_33d88e2a01229f39_1_REP_API_",
+    "transaction_id": "tx_33d88e2a01229f39",
+    "step_index": 1,
+    "repair_id": "REP_API_CONS_002",
+    "state_hash": "1e67b0ca214b754f",
+    "tree_hash": "95cf9e7bf3e38a4c",
+    "patch_hash": "7bfd98a5461fc4c7",
+    "verification_result": "PRE_APPLY",
+    "created_at": 1789491495.3637128,
+    "snapshot_files": [
+      "backend/models/user.py",
+      "backend/api/users.py",
+      "backend/services/auth_service.py",
+      "agents/policy/adaptive.py",
+      "agents/core/dina_executor.py",
+      "frontend/src/features/missions/components/MultiRepairOrchestrationPanel.tsx"
+    ]
+  },
+  {
+    "checkpoint_id": "chk_tx_33d88e2a01229f39_2_REP_API_",
+    "transaction_id": "tx_33d88e2a01229f39",
+    "step_index": 2,
+    "repair_id": "REP_API_CONS_003",
+    "state_hash": "1e67b0ca214b754f",
+    "tree_hash": "95cf9e7bf3e38a4c",
+    "patch_hash": "a4bd9c542b57fbd7",
+    "verification_result": "PRE_APPLY",
+    "created_at": 1789491495.3642855,
+    "snapshot_files": [
+      "backend/models/user.py",
+      "backend/api/users.py",
+      "backend/services/auth_service.py",
+      "agents/policy/adaptive.py",
+      "agents/core/dina_executor.py",
+      "frontend/src/features/missions/components/MultiRepairOrchestrationPanel.tsx"
+    ]
+  },
+  {
+    "checkpoint_id": "chk_tx_33d88e2a01229f39_3_REP_DINA",
+    "transaction_id": "tx_33d88e2a01229f39",
+    "step_index": 3,
+    "repair_id": "REP_DINA_PROD_001",
+    "state_hash": "1e67b0ca214b754f",
+    "tree_hash": "95cf9e7bf3e38a4c",
+    "patch_hash": "a0618ff61238195d",
+    "verification_result": "PRE_APPLY",
+    "created_at": 1789491495.3646793,
+    "snapshot_files": [
+      "backend/models/user.py",
+      "backend/api/users.py",
+      "backend/services/auth_service.py",
+      "agents/policy/adaptive.py",
+      "agents/core/dina_executor.py",
+      "frontend/src/features/missions/components/MultiRepairOrchestrationPanel.tsx"
+    ]
+  },
+  {
+    "checkpoint_id": "chk_tx_33d88e2a01229f39_4_REP_DINA",
+    "transaction_id": "tx_33d88e2a01229f39",
+    "step_index": 4,
+    "repair_id": "REP_DINA_CONS_002",
+    "state_hash": "1e67b0ca214b754f",
+    "tree_hash": "95cf9e7bf3e38a4c",
+    "patch_hash": "5b167691bbf9b576",
+    "verification_result": "PRE_APPLY",
+    "created_at": 1789491495.3651338,
+    "snapshot_files": [
+      "backend/models/user.py",
+      "backend/api/users.py",
+      "backend/services/auth_service.py",
+      "agents/policy/adaptive.py",
+      "agents/core/dina_executor.py",
+      "frontend/src/features/missions/components/MultiRepairOrchestrationPanel.tsx"
+    ]
+  },
+  {
+    "checkpoint_id": "chk_tx_33d88e2a01229f39_5_REP_FRON",
+    "transaction_id": "tx_33d88e2a01229f39",
+    "step_index": 5,
+    "repair_id": "REP_FRONTEND_001",
+    "state_hash": "1e67b0ca214b754f",
+    "tree_hash": "95cf9e7bf3e38a4c",
+    "patch_hash": "ffb56ac7813a7cb2",
+    "verification_result": "PRE_APPLY",
+    "created_at": 1789491495.3658502,
+    "snapshot_files": [
+      "backend/models/user.py",
+      "backend/api/users.py",
+      "backend/services/auth_service.py",
+      "agents/policy/adaptive.py",
+      "agents/core/dina_executor.py",
+      "frontend/src/features/missions/components/MultiRepairOrchestrationPanel.tsx"
+    ]
+  }
+]
