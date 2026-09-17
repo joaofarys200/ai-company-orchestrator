@@ -1,0 +1,200 @@
+[
+  {
+    "repair_id": "rep_cand_d5c541ff9246c6c1",
+    "cause_id": "cause_raw_9f556fc97c1cf9f5",
+    "strategy_name": "DECLARATIVE_EXPRESS_BOILERPLATE",
+    "files": [
+      "app.js"
+    ],
+    "patches": [
+      {
+        "relative_path": "app.js",
+        "original_content": "const bodyParser = require('body-parser');\n\n// Route registration without Express initialization\napp.post('/ddos', (req, res) => {\n  res.json({ status: 'active', target: req.body.target });\n});\n",
+        "patched_content": "const express = require('express');\nconst app = express();\napp.use(express.json());\nconst bodyParser = require('body-parser');\n\n// Route registration without Express initialization\napp.post('/ddos', (req, res) => {\n  res.json({ status: 'active', target: req.body.target });\n});\n\nconst PORT = process.env.PORT || 3000;\napp.listen(PORT, () => console.log(`Server listening on port ${PORT}`));\nmodule.exports = app;\n",
+        "reason": "Inje\u00e7\u00e3o determin\u00edstica de boilerplate Express e inicializa\u00e7\u00e3o de listener HTTP",
+        "lines_added": 7,
+        "lines_removed": 0
+      }
+    ],
+    "expected_effect": "Injetar instancia\u00e7\u00e3o e listener do framework Express",
+    "risk": 0.1,
+    "confidence": 0.95,
+    "predicted_impact": {
+      "predicted_files": [
+        "app.js"
+      ],
+      "predicted_symbols": [
+        "express",
+        "app"
+      ],
+      "predicted_tasks": [
+        "TSK_PREFLIGHT_STARTUP_VERIFY",
+        "TSK_HEALTHCHECK_SMOKE"
+      ],
+      "predicted_contracts": [
+        "API_ROOT_ENDPOINT"
+      ],
+      "predicted_consumers": [
+        "external_api_clients",
+        "web_frontend"
+      ],
+      "predicted_behavior_changes": [
+        "Process transitions from immediate exit to continuous listening socket.",
+        "HTTP requests to exposed routes become serviceable."
+      ],
+      "predicted_risk": 0.05,
+      "confidence": 0.95
+    },
+    "rollback_plan": {
+      "snapshots": {
+        "app.js": "const bodyParser = require('body-parser');\n\n// Route registration without Express initialization\napp.post('/ddos', (req, res) => {\n  res.json({ status: 'active', target: req.body.target });\n});\n"
+      },
+      "strategy": "DECLARATIVE_EXPRESS_BOILERPLATE"
+    },
+    "provenance": {
+      "source_cause": "cause_raw_9f556fc97c1cf9f5",
+      "strategy": "DECLARATIVE_EXPRESS_BOILERPLATE"
+    },
+    "minimality": {
+      "files_changed": 1,
+      "lines_added": 7,
+      "lines_removed": 0,
+      "symbols_changed": 9,
+      "dependencies_changed": 0,
+      "config_changed": false,
+      "behavioral_surface_changed": false,
+      "minimality_score": 0.93
+    },
+    "created_at": 1789414107.4988577
+  },
+  {
+    "repair_id": "rep_cand_f25dd57d43363f6e",
+    "cause_id": "cause_raw_9f556fc97c1cf9f5",
+    "strategy_name": "MODULAR_APP_IMPORT",
+    "files": [
+      "app.js"
+    ],
+    "patches": [
+      {
+        "relative_path": "app.js",
+        "original_content": "const bodyParser = require('body-parser');\n\n// Route registration without Express initialization\napp.post('/ddos', (req, res) => {\n  res.json({ status: 'active', target: req.body.target });\n});\n",
+        "patched_content": "const app = require('./app_instance');\nconst bodyParser = require('body-parser');\n\n// Route registration without Express initialization\napp.post('/ddos', (req, res) => {\n  res.json({ status: 'active', target: req.body.target });\n});\n",
+        "reason": "Importa\u00e7\u00e3o modular de inst\u00e2ncia pr\u00e9-existente de app",
+        "lines_added": 1,
+        "lines_removed": 0
+      }
+    ],
+    "expected_effect": "Importar m\u00f3dulo de aplica\u00e7\u00e3o pr\u00e9-existente",
+    "risk": 0.25,
+    "confidence": 0.75,
+    "predicted_impact": {
+      "predicted_files": [
+        "app.js"
+      ],
+      "predicted_symbols": [],
+      "predicted_tasks": [
+        "TSK_PREFLIGHT_STARTUP_VERIFY",
+        "TSK_HEALTHCHECK_SMOKE"
+      ],
+      "predicted_contracts": [
+        "API_ROOT_ENDPOINT"
+      ],
+      "predicted_consumers": [
+        "external_api_clients",
+        "web_frontend"
+      ],
+      "predicted_behavior_changes": [
+        "Process transitions from immediate exit to continuous listening socket.",
+        "HTTP requests to exposed routes become serviceable."
+      ],
+      "predicted_risk": 0.05,
+      "confidence": 0.95
+    },
+    "rollback_plan": {
+      "snapshots": {
+        "app.js": "const bodyParser = require('body-parser');\n\n// Route registration without Express initialization\napp.post('/ddos', (req, res) => {\n  res.json({ status: 'active', target: req.body.target });\n});\n"
+      },
+      "strategy": "MODULAR_APP_IMPORT"
+    },
+    "provenance": {
+      "source_cause": "cause_raw_9f556fc97c1cf9f5",
+      "strategy": "MODULAR_APP_IMPORT"
+    },
+    "minimality": {
+      "files_changed": 1,
+      "lines_added": 1,
+      "lines_removed": 0,
+      "symbols_changed": 2,
+      "dependencies_changed": 0,
+      "config_changed": false,
+      "behavioral_surface_changed": false,
+      "minimality_score": 0.99
+    },
+    "created_at": 1789414107.499101
+  },
+  {
+    "repair_id": "rep_cand_bcb0bca8afc59d1d",
+    "cause_id": "cause_raw_9f556fc97c1cf9f5",
+    "strategy_name": "ARCHITECTURAL_MOCK_STUB",
+    "files": [
+      "app.js"
+    ],
+    "patches": [
+      {
+        "relative_path": "app.js",
+        "original_content": "const bodyParser = require('body-parser');\n\n// Route registration without Express initialization\napp.post('/ddos', (req, res) => {\n  res.json({ status: 'active', target: req.body.target });\n});\n",
+        "patched_content": "const app = { get: () => {}, post: () => {}, use: () => {}, listen: (p, cb) => cb && cb() };\nconst bodyParser = require('body-parser');\n\n// Route registration without Express initialization\napp.post('/ddos', (req, res) => {\n  res.json({ status: 'active', target: req.body.target });\n});\n",
+        "reason": "Substitui\u00e7\u00e3o por mock stub em escopo global",
+        "lines_added": 1,
+        "lines_removed": 0
+      }
+    ],
+    "expected_effect": "Substituir chamadas por mock global em mem\u00f3ria",
+    "risk": 0.65,
+    "confidence": 0.5,
+    "predicted_impact": {
+      "predicted_files": [
+        "app.js"
+      ],
+      "predicted_symbols": [],
+      "predicted_tasks": [
+        "TSK_PREFLIGHT_STARTUP_VERIFY",
+        "TSK_HEALTHCHECK_SMOKE"
+      ],
+      "predicted_contracts": [
+        "API_ROOT_ENDPOINT"
+      ],
+      "predicted_consumers": [
+        "external_api_clients",
+        "web_frontend"
+      ],
+      "predicted_behavior_changes": [
+        "Process transitions from immediate exit to continuous listening socket.",
+        "HTTP requests to exposed routes become serviceable."
+      ],
+      "predicted_risk": 0.05,
+      "confidence": 0.95
+    },
+    "rollback_plan": {
+      "snapshots": {
+        "app.js": "const bodyParser = require('body-parser');\n\n// Route registration without Express initialization\napp.post('/ddos', (req, res) => {\n  res.json({ status: 'active', target: req.body.target });\n});\n"
+      },
+      "strategy": "ARCHITECTURAL_MOCK_STUB"
+    },
+    "provenance": {
+      "source_cause": "cause_raw_9f556fc97c1cf9f5",
+      "strategy": "ARCHITECTURAL_MOCK_STUB"
+    },
+    "minimality": {
+      "files_changed": 1,
+      "lines_added": 1,
+      "lines_removed": 0,
+      "symbols_changed": 3,
+      "dependencies_changed": 0,
+      "config_changed": false,
+      "behavioral_surface_changed": false,
+      "minimality_score": 0.99
+    },
+    "created_at": 1789414107.4993129
+  }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "predicted_files": [
+      "app.js"
+    ],
+    "predicted_symbols": [
+      "express",
+      "app"
+    ],
+    "predicted_tasks": [
+      "TSK_PREFLIGHT_STARTUP_VERIFY",
+      "TSK_HEALTHCHECK_SMOKE"
+    ],
+    "predicted_contracts": [
+      "API_ROOT_ENDPOINT"
+    ],
+    "predicted_consumers": [
+      "external_api_clients",
+      "web_frontend"
+    ],
+    "predicted_behavior_changes": [
+      "Process transitions from immediate exit to continuous listening socket.",
+      "HTTP requests to exposed routes become serviceable."
+    ],
+    "predicted_risk": 0.05,
+    "confidence": 0.95
+  }
+]

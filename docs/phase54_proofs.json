@@ -1,0 +1,125 @@
+[
+  {
+    "proof_id": "prf_42dd9edf723f2403",
+    "repair_id": "rep_cand_1e87b2fa07ee1e73",
+    "failure_id": "diag_ref_6e00ec07ed87afed",
+    "root_cause": "O identificador 'app' foi invocado sem instancia\u00e7\u00e3o ou importa\u00e7\u00e3o pr\u00e9via de framework HTTP (ex: Express).",
+    "patch_hash": "patch_c27e498dc5aa42bc",
+    "before_hash": "state_ada58c046a981176",
+    "after_hash": "state_1e077212cbb3f3fc",
+    "original_failure_resolved": "ORIGINAL_FAILURE_RESOLVED",
+    "preflight_passed": true,
+    "startup_passed": true,
+    "healthcheck_passed": true,
+    "behavior_result": "PROVEN_COMPATIBLE_WITHIN_SCOPE",
+    "regression_result": "REGRESSION_FREE_WITHIN_SCOPE",
+    "coverage": 0.95,
+    "counterexamples": [],
+    "invariants": [
+      "HTTP Socket Listening Invariant",
+      "Non-Destructive Rollback Invariant",
+      "Zero Lateral Regression Invariant"
+    ],
+    "rollback_verified": true,
+    "proof_result": "REPAIR_PROVEN",
+    "scope": "LOCAL_MODULE_HTTP_RUNTIME",
+    "timestamp": 1789414107.5011742
+  },
+  {
+    "proof_id": "prf_364fa2de3577cdcd",
+    "repair_id": "rep_cand_aeb83957f108dcb4",
+    "failure_id": "diag_ref_ae6f1a4babcfdeec",
+    "root_cause": "O s\u00edmbolo 'axios' foi referenciado mas n\u00e3o est\u00e1 definido no escopo local ou global.",
+    "patch_hash": "patch_30eb8ae1bf663ba5",
+    "before_hash": "state_f9918589d23e9872",
+    "after_hash": "state_2d862c6f1718fb3f",
+    "original_failure_resolved": "ORIGINAL_FAILURE_NOT_RESOLVED",
+    "preflight_passed": false,
+    "startup_passed": false,
+    "healthcheck_passed": false,
+    "behavior_result": "PROVEN_COMPATIBLE_WITHIN_SCOPE",
+    "regression_result": "REGRESSION_FREE_WITHIN_SCOPE",
+    "coverage": 0.95,
+    "counterexamples": [],
+    "invariants": [
+      "HTTP Socket Listening Invariant",
+      "Non-Destructive Rollback Invariant",
+      "Zero Lateral Regression Invariant"
+    ],
+    "rollback_verified": true,
+    "proof_result": "REPAIR_REJECTED",
+    "scope": "LOCAL_MODULE_HTTP_RUNTIME",
+    "timestamp": 1789414107.545589
+  },
+  {
+    "proof_id": "prf_5d0c81dcad8c5b48",
+    "repair_id": "rep_cand_422356c034fe4b6d",
+    "failure_id": "diag_port_29a4ac63ef4c83f1",
+    "root_cause": "Conflito de socket de rede: a porta 3000 j\u00e1 est\u00e1 vinculada (EADDRINUSE).",
+    "patch_hash": "patch_b51b209c44497a18",
+    "before_hash": "state_f9918589d23e9872",
+    "after_hash": "state_f9918589d23e9872",
+    "original_failure_resolved": "ORIGINAL_FAILURE_NOT_RESOLVED",
+    "preflight_passed": false,
+    "startup_passed": false,
+    "healthcheck_passed": false,
+    "behavior_result": "PROVEN_COMPATIBLE_WITHIN_SCOPE",
+    "regression_result": "REGRESSION_FREE_WITHIN_SCOPE",
+    "coverage": 0.95,
+    "counterexamples": [],
+    "invariants": [
+      "HTTP Socket Listening Invariant",
+      "Non-Destructive Rollback Invariant",
+      "Zero Lateral Regression Invariant"
+    ],
+    "rollback_verified": true,
+    "proof_result": "REPAIR_REJECTED",
+    "scope": "LOCAL_MODULE_HTTP_RUNTIME",
+    "timestamp": 1789414107.5824187
+  },
+  {
+    "proof_id": "prf_f67c179a12009ba3",
+    "repair_id": "rep_cand_1e87b2fa07ee1e73",
+    "failure_id": "diag_ref_6e00ec07ed87afed",
+    "root_cause": "O identificador 'app' foi invocado sem instancia\u00e7\u00e3o ou importa\u00e7\u00e3o pr\u00e9via de framework HTTP (ex: Express).",
+    "patch_hash": "patch_5f44305479bee352",
+    "before_hash": "state_1e077212cbb3f3fc",
+    "after_hash": "state_c131b30f087da6d2",
+    "original_failure_resolved": "ORIGINAL_FAILURE_RESOLVED",
+    "preflight_passed": true,
+    "startup_passed": true,
+    "healthcheck_passed": true,
+    "behavior_result": "INSUFFICIENT_EVIDENCE",
+    "regression_result": "REGRESSION_DETECTED",
+    "coverage": 0.95,
+    "counterexamples": [
+      {
+        "counterexample_id": "cex_9699ba7e9241e639",
+        "route_or_entry": "/api/users",
+        "input_payload": {
+          "limit": 10
+        },
+        "expected_output": {
+          "status": 200,
+          "users": []
+        },
+        "observed_output": {
+          "status": 500,
+          "error": "Internal Server Error in auxiliary route"
+        },
+        "severity": "CRITICAL",
+        "is_shrunk": true,
+        "details": "Regress\u00e3o lateral detetada: endpoint /api/users quebrado ap\u00f3s muta\u00e7\u00e3o de escopo."
+      }
+    ],
+    "invariants": [
+      "HTTP Socket Listening Invariant",
+      "Non-Destructive Rollback Invariant",
+      "Zero Lateral Regression Invariant"
+    ],
+    "rollback_verified": true,
+    "proof_result": "REPAIR_REJECTED",
+    "scope": "LOCAL_MODULE_HTTP_RUNTIME",
+    "timestamp": 1789414107.5836973
+  }
+]

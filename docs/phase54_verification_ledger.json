@@ -1,0 +1,38 @@
+[
+  {
+    "scenario": "dina_reference_error_app",
+    "proof_id": "prf_42dd9edf723f2403",
+    "selected_repair": "DECLARATIVE_EXPRESS_BOILERPLATE",
+    "proof_result": "REPAIR_PROVEN",
+    "coverage": 0.95,
+    "rollback_verified": true,
+    "invariants": [
+      "HTTP Socket Listening Invariant",
+      "Non-Destructive Rollback Invariant",
+      "Zero Lateral Regression Invariant"
+    ]
+  },
+  {
+    "scenario": "dina_reference_error_axios",
+    "proof_id": "prf_364fa2de3577cdcd",
+    "proof_result": "REPAIR_REJECTED",
+    "coverage": 0.95
+  },
+  {
+    "scenario": "dina_eaddrinuse_port",
+    "proof_id": "prf_5d0c81dcad8c5b48",
+    "proof_result": "REPAIR_REJECTED"
+  },
+  {
+    "scenario": "malicious_payload_injection",
+    "vetoed_by_sentinel": true,
+    "status": "SECURITY_VETO_ENFORCED"
+  },
+  {
+    "scenario": "lateral_regression_rollback",
+    "proof_id": "prf_f67c179a12009ba3",
+    "proof_result": "REPAIR_REJECTED",
+    "counterexamples_count": 1,
+    "rollback_verified": true
+  }
+]

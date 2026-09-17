@@ -1,0 +1,44 @@
+[
+  {
+    "cause_id": "cause_raw_9f556fc97c1cf9f5",
+    "failure_id": "fail_ce9ad7277e7fe2fd",
+    "category": "RUNTIME_SCOPE_ERROR",
+    "evidence": "Log de crash cont\u00e9m ReferenceError expl\u00edcito para o s\u00edmbolo 'app'.",
+    "source_locations": [
+      "app.js:1"
+    ],
+    "confidence": 0.95,
+    "supporting_observations": [
+      "ReferenceError detetado no stack trace."
+    ],
+    "contradicting_observations": [],
+    "predicted_effect": "Instanciar Express e declarar 'app' resolver\u00e1 a falha.",
+    "timestamp": 1789414107.4985247
+  },
+  {
+    "cause_id": "cause_raw_069279ae4192f4a7",
+    "failure_id": "fail_60c955fbde7f17c4",
+    "category": "UNKNOWN",
+    "evidence": "N\u00e3o foram encontrados padr\u00f5es de erro conhecidos no log bruto.",
+    "source_locations": [],
+    "confidence": 0.3,
+    "supporting_observations": [],
+    "contradicting_observations": [],
+    "predicted_effect": "Inconclusivo; requer telemetria adicional.",
+    "timestamp": 1789414107.501244
+  },
+  {
+    "cause_id": "cause_raw_d0b94e37273f3d8b",
+    "failure_id": "fail_5f52af83890c995b",
+    "category": "PORT_CONFLICT",
+    "evidence": "A porta solicitada j\u00e1 est\u00e1 em uso por outro processo.",
+    "source_locations": [],
+    "confidence": 0.95,
+    "supporting_observations": [
+      "EADDRINUSE presente no log de arranque."
+    ],
+    "contradicting_observations": [],
+    "predicted_effect": "Utilizar uma porta livre resolver\u00e1 a falha de bind.",
+    "timestamp": 1789414107.5456204
+  }
+]

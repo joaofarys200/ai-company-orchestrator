@@ -1,0 +1,40 @@
+[
+  {
+    "cause_id": "cause_raw_9f556fc97c1cf9f5",
+    "rankings": [
+      {
+        "repair_id": "rep_cand_d5c541ff9246c6c1",
+        "rank": 1,
+        "score": 0.7235,
+        "confidence_score": 0.95,
+        "root_cause_support": 0.95,
+        "risk_penalty": 0.025,
+        "blast_radius_penalty": 0.0075,
+        "minimality_bonus": 0.186,
+        "rationale": "Estrat\u00e9gia DECLARATIVE_EXPRESS_BOILERPLATE: Confian\u00e7a=0.95, Risco=0.10, Minimalidade=0.19"
+      },
+      {
+        "repair_id": "rep_cand_f25dd57d43363f6e",
+        "rank": 2,
+        "score": 0.628,
+        "confidence_score": 0.75,
+        "root_cause_support": 0.95,
+        "risk_penalty": 0.0625,
+        "blast_radius_penalty": 0.0075,
+        "minimality_bonus": 0.198,
+        "rationale": "Estrat\u00e9gia MODULAR_APP_IMPORT: Confian\u00e7a=0.75, Risco=0.25, Minimalidade=0.20"
+      },
+      {
+        "repair_id": "rep_cand_bcb0bca8afc59d1d",
+        "rank": 3,
+        "score": 0.4405,
+        "confidence_score": 0.5,
+        "root_cause_support": 0.95,
+        "risk_penalty": 0.1625,
+        "blast_radius_penalty": 0.0075,
+        "minimality_bonus": 0.198,
+        "rationale": "Estrat\u00e9gia ARCHITECTURAL_MOCK_STUB: Confian\u00e7a=0.50, Risco=0.65, Minimalidade=0.20"
+      }
+    ]
+  }
+]
