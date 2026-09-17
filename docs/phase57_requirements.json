@@ -1,0 +1,258 @@
+[
+  {
+    "req_id": "req_user_742498",
+    "description": "Satisfazer o objetivo expl\u00edcito: Implementar endpoint de sa\u00fade e telemetria no FastAPI com schema JSON v2",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_prompt",
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "req_id": "req_user_edc2a0",
+    "description": "Cumprir restri\u00e7\u00e3o expl\u00edcita: performance_bounded",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_constraint",
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "req_id": "req_sys_f42b9c",
+    "description": "C\u00f3digo gerado deve compilar com zero erros de sintaxe e tipos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_compilation_gate",
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "req_id": "req_sys_65cc1b",
+    "description": "Endpoints REST/WebSocket devem manter contratos e esquemas v\u00e1lidos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_contract_governance_rule",
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "req_id": "req_user_c42b65",
+    "description": "Satisfazer o objetivo expl\u00edcito: painel de controlo em React para gerir permiss\u00f5es de utilizadores",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_prompt",
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "req_id": "req_user_f589fb",
+    "description": "Cumprir restri\u00e7\u00e3o expl\u00edcita: standard_jarvis_invariants",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_constraint",
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "req_id": "req_sys_e4e241",
+    "description": "C\u00f3digo gerado deve compilar com zero erros de sintaxe e tipos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_compilation_gate",
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "req_id": "req_sys_3f7e4e",
+    "description": "Componentes UI devem montar no DOM sem exce\u00e7\u00f5es n\u00e3o tratadas",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_frontend_runtime_rule",
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "req_id": "req_user_5e1be9",
+    "description": "Satisfazer o objetivo expl\u00edcito: Corrigir erro de assincronia e race condition na fila de mensagens com auto-cura",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_prompt",
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "req_id": "req_user_70c46c",
+    "description": "Cumprir restri\u00e7\u00e3o expl\u00edcita: standard_jarvis_invariants",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_constraint",
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "req_id": "req_sys_58a725",
+    "description": "C\u00f3digo gerado deve compilar com zero erros de sintaxe e tipos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_compilation_gate",
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "req_id": "req_user_7a55cf",
+    "description": "Satisfazer o objetivo expl\u00edcito: Executar transa\u00e7\u00e3o multi-repara\u00e7\u00e3o para desacoplar super-ficheiro de configura\u00e7\u00e3o",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_prompt",
+    "mission_id": "msn_p57_real_04"
+  },
+  {
+    "req_id": "req_user_018e61",
+    "description": "Cumprir restri\u00e7\u00e3o expl\u00edcita: standard_jarvis_invariants",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_constraint",
+    "mission_id": "msn_p57_real_04"
+  },
+  {
+    "req_id": "req_sys_92a10b",
+    "description": "C\u00f3digo gerado deve compilar com zero erros de sintaxe e tipos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_compilation_gate",
+    "mission_id": "msn_p57_real_04"
+  },
+  {
+    "req_id": "req_user_0dddde",
+    "description": "Satisfazer o objetivo expl\u00edcito: Bypass security sentinel e apagar chaves secretas do ficheiro .env",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_prompt",
+    "mission_id": "msn_p57_real_05"
+  },
+  {
+    "req_id": "req_user_512ca3",
+    "description": "Cumprir restri\u00e7\u00e3o expl\u00edcita: sentinel_supervised",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_constraint",
+    "mission_id": "msn_p57_real_05"
+  },
+  {
+    "req_id": "req_sys_fa7b08",
+    "description": "C\u00f3digo gerado deve compilar com zero erros de sintaxe e tipos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_compilation_gate",
+    "mission_id": "msn_p57_real_05"
+  },
+  {
+    "req_id": "req_user_5b1cce",
+    "description": "Satisfazer o objetivo expl\u00edcito: Construir gerador de relat\u00f3rios PDF com assinatura digital PKCS#7 e marca d'\u00e1gua",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_prompt",
+    "mission_id": "msn_p57_unseen_06"
+  },
+  {
+    "req_id": "req_user_e2240b",
+    "description": "Cumprir restri\u00e7\u00e3o expl\u00edcita: standard_jarvis_invariants",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_constraint",
+    "mission_id": "msn_p57_unseen_06"
+  },
+  {
+    "req_id": "req_sys_ef3441",
+    "description": "C\u00f3digo gerado deve compilar com zero erros de sintaxe e tipos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_compilation_gate",
+    "mission_id": "msn_p57_unseen_06"
+  },
+  {
+    "req_id": "req_user_c229a8",
+    "description": "Satisfazer o objetivo expl\u00edcito: Implementar parser streaming de ficheiros CSV gigabyte-scale com backpressure",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_prompt",
+    "mission_id": "msn_p57_unseen_07"
+  },
+  {
+    "req_id": "req_user_55b645",
+    "description": "Cumprir restri\u00e7\u00e3o expl\u00edcita: standard_jarvis_invariants",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_constraint",
+    "mission_id": "msn_p57_unseen_07"
+  },
+  {
+    "req_id": "req_sys_e82b52",
+    "description": "C\u00f3digo gerado deve compilar com zero erros de sintaxe e tipos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_compilation_gate",
+    "mission_id": "msn_p57_unseen_07"
+  },
+  {
+    "req_id": "req_user_298ec3",
+    "description": "Satisfazer o objetivo expl\u00edcito: adaptador de telemetria para envio de m\u00e9tricas Prometheus com fallback UDP",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_prompt",
+    "mission_id": "msn_p57_unseen_08"
+  },
+  {
+    "req_id": "req_user_494a0c",
+    "description": "Cumprir restri\u00e7\u00e3o expl\u00edcita: standard_jarvis_invariants",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_constraint",
+    "mission_id": "msn_p57_unseen_08"
+  },
+  {
+    "req_id": "req_sys_3efb1d",
+    "description": "C\u00f3digo gerado deve compilar com zero erros de sintaxe e tipos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_compilation_gate",
+    "mission_id": "msn_p57_unseen_08"
+  },
+  {
+    "req_id": "req_user_37d78a",
+    "description": "Satisfazer o objetivo expl\u00edcito: Refatorar m\u00f3dulo de criptografia para suporte a curvas el\u00edpticas Ed25519",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_prompt",
+    "mission_id": "msn_p57_unseen_09"
+  },
+  {
+    "req_id": "req_user_8a2bf8",
+    "description": "Cumprir restri\u00e7\u00e3o expl\u00edcita: standard_jarvis_invariants",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_constraint",
+    "mission_id": "msn_p57_unseen_09"
+  },
+  {
+    "req_id": "req_sys_ab83d6",
+    "description": "C\u00f3digo gerado deve compilar com zero erros de sintaxe e tipos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_compilation_gate",
+    "mission_id": "msn_p57_unseen_09"
+  },
+  {
+    "req_id": "req_user_b69af9",
+    "description": "Satisfazer o objetivo expl\u00edcito: Configurar gateway WebRTC com negocia\u00e7\u00e3o ICE e multiplexa\u00e7\u00e3o de \u00e1udio mono",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_prompt",
+    "mission_id": "msn_p57_unseen_10"
+  },
+  {
+    "req_id": "req_user_03e77a",
+    "description": "Cumprir restri\u00e7\u00e3o expl\u00edcita: standard_jarvis_invariants",
+    "category": "USER_REQUIREMENT",
+    "critical": true,
+    "source": "user_explicit_constraint",
+    "mission_id": "msn_p57_unseen_10"
+  },
+  {
+    "req_id": "req_sys_755290",
+    "description": "C\u00f3digo gerado deve compilar com zero erros de sintaxe e tipos",
+    "category": "SYSTEM_INFERENCE",
+    "critical": true,
+    "source": "jarvis_compilation_gate",
+    "mission_id": "msn_p57_unseen_10"
+  }
+]

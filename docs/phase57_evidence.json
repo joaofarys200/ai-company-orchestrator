@@ -1,0 +1,773 @@
+[
+  {
+    "evidence_id": "evi_bf2e95d759",
+    "type": "build",
+    "source": "project_builder_tsc_pycompile",
+    "timestamp": 1789658792.0771258,
+    "hash": "857b1e63a45b9900e6715ffec17ce9b2310c5b4d319e0c976cc8ddcbc4399b42",
+    "mission_id": "msn_p57_real_01",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "success": true,
+      "output_files": [
+        "dist/bundle.js",
+        "backend/server.pyc"
+      ],
+      "diagnostics": {
+        "syntax_errors": 0,
+        "type_errors": 0
+      }
+    }
+  },
+  {
+    "evidence_id": "evi_59c863040a",
+    "type": "test",
+    "source": "pytest_runner:test_mission_msn_p57_real_01",
+    "timestamp": 1789658792.0771582,
+    "hash": "ee02d0eddcc8a273362c83dc1de6f4ff13aa772c8c71e33eee2c3d081e00edb9",
+    "mission_id": "msn_p57_real_01",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "test_suite": "test_mission_msn_p57_real_01",
+      "passed": 15,
+      "failed": 0,
+      "duration_ms": 85.0,
+      "all_passed": true
+    }
+  },
+  {
+    "evidence_id": "evi_d645a71d9d",
+    "type": "security",
+    "source": "security_sentinel_watchdog",
+    "timestamp": 1789658792.0771773,
+    "hash": "8b9d1ee282c675eec8b58d4d34c9f750f94cf4641bec20fbfe0af6f812539721",
+    "mission_id": "msn_p57_real_01",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "passed_audit": true,
+      "quarantine_actions": [],
+      "safety_score": 1.0
+    }
+  },
+  {
+    "evidence_id": "evi_d0a27c0621",
+    "type": "contract",
+    "source": "contract_governance:mission_contract_v2",
+    "timestamp": 1789658792.0771894,
+    "hash": "1ade27e136172e333d27c994dc045366b5523eeb60a3629cfedb6aa2c108ead1",
+    "mission_id": "msn_p57_real_01",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "schema_name": "mission_contract_v2",
+      "valid": true,
+      "breaking_changes": []
+    }
+  },
+  {
+    "evidence_id": "evi_302c7c1a44",
+    "type": "convergence",
+    "source": "repair_convergence_governance_phase56",
+    "timestamp": 1789658792.0772202,
+    "hash": "c3d8a645dd870b1cf9d499069a2f546fc2b82e30621cd914bc94c128115468af",
+    "mission_id": "msn_p57_real_01",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "convergence_state": "CONVERGED",
+      "lyapunov_v": 0.0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false
+    }
+  },
+  {
+    "evidence_id": "evi_eb0ac1f635",
+    "type": "build",
+    "source": "project_builder_tsc_pycompile",
+    "timestamp": 1789658792.0775528,
+    "hash": "042eb00e46517de16868fcfe450e3ba2e93b609fa0502cc6382f343b53e13291",
+    "mission_id": "msn_p57_real_02",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "success": true,
+      "output_files": [
+        "dist/bundle.js",
+        "backend/server.pyc"
+      ],
+      "diagnostics": {
+        "syntax_errors": 0,
+        "type_errors": 0
+      }
+    }
+  },
+  {
+    "evidence_id": "evi_46b22c815d",
+    "type": "test",
+    "source": "pytest_runner:test_mission_msn_p57_real_02",
+    "timestamp": 1789658792.077568,
+    "hash": "8ef48e05be2cfa99fb62d136b055b00b4fc9649fd05bdbc4d31c24a3e5d89c3a",
+    "mission_id": "msn_p57_real_02",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "test_suite": "test_mission_msn_p57_real_02",
+      "passed": 15,
+      "failed": 0,
+      "duration_ms": 85.0,
+      "all_passed": true
+    }
+  },
+  {
+    "evidence_id": "evi_3077c9d841",
+    "type": "security",
+    "source": "security_sentinel_watchdog",
+    "timestamp": 1789658792.0777307,
+    "hash": "13f443aa7f2c5bb5ef881fc3b14200a26a32b366da0fdde6c87f472d3e6b29af",
+    "mission_id": "msn_p57_real_02",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "passed_audit": true,
+      "quarantine_actions": [],
+      "safety_score": 1.0
+    }
+  },
+  {
+    "evidence_id": "evi_e2b969cd6c",
+    "type": "browser",
+    "source": "playwright_edge_official",
+    "timestamp": 1789658792.0777419,
+    "hash": "94d05a713e153c65b7c8b4faab42a7024f3c97e170e16b1a75df357a9d418463",
+    "mission_id": "msn_p57_real_02",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "target_url": "http://127.0.0.1:5173",
+      "screenshot_path": "docs/screenshots/phase57/msn_p57_real_02_qa.png",
+      "console_errors": 0,
+      "network_failures": 0
+    }
+  },
+  {
+    "evidence_id": "evi_8e7a66e545",
+    "type": "convergence",
+    "source": "repair_convergence_governance_phase56",
+    "timestamp": 1789658792.0777729,
+    "hash": "355e71ab6081e2b1c07e05727dd3c3b98dd291676e37ce0d8ec5a9f665672a03",
+    "mission_id": "msn_p57_real_02",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "convergence_state": "CONVERGED",
+      "lyapunov_v": 0.0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false
+    }
+  },
+  {
+    "evidence_id": "evi_aa5d4e99e0",
+    "type": "build",
+    "source": "project_builder_tsc_pycompile",
+    "timestamp": 1789658792.0780337,
+    "hash": "ca33db7efc971d8277afa10de6e2c374bd057c9e149a363c9021e51265244017",
+    "mission_id": "msn_p57_real_03",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "success": true,
+      "output_files": [
+        "dist/bundle.js",
+        "backend/server.pyc"
+      ],
+      "diagnostics": {
+        "syntax_errors": 0,
+        "type_errors": 0
+      }
+    }
+  },
+  {
+    "evidence_id": "evi_1fbf17eed7",
+    "type": "test",
+    "source": "pytest_runner:test_mission_msn_p57_real_03",
+    "timestamp": 1789658792.0780468,
+    "hash": "0ad975dff82d83dc9b091ca33edaf5a9bb6759cc97a91a8f35c9af069363e568",
+    "mission_id": "msn_p57_real_03",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "test_suite": "test_mission_msn_p57_real_03",
+      "passed": 15,
+      "failed": 0,
+      "duration_ms": 85.0,
+      "all_passed": true
+    }
+  },
+  {
+    "evidence_id": "evi_18e308bc55",
+    "type": "security",
+    "source": "security_sentinel_watchdog",
+    "timestamp": 1789658792.0780656,
+    "hash": "884cb4847d143e2fe772e9bb13fb8e1e6e08cd260dcca2707c956860341e425d",
+    "mission_id": "msn_p57_real_03",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "passed_audit": true,
+      "quarantine_actions": [],
+      "safety_score": 1.0
+    }
+  },
+  {
+    "evidence_id": "evi_1f9f62868d",
+    "type": "repair",
+    "source": "verified_repair_synthesis_phase54",
+    "timestamp": 1789658792.078091,
+    "hash": "a00a861ee124cc43a5081b6455ebc3d4a55a4dfdad8f4a6adb61ea756afff1ad",
+    "mission_id": "msn_p57_real_03",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "repair_id": "rep_36fb5b",
+      "patch_summary": "Reparado erro f_syn_01 em agents/task_handler.py",
+      "success": true
+    }
+  },
+  {
+    "evidence_id": "evi_f0eada1a44",
+    "type": "convergence",
+    "source": "repair_convergence_governance_phase56",
+    "timestamp": 1789658792.0781171,
+    "hash": "162f98e5e2fc16663856a6ec738d5304023b195923eecc7a63c9164ffbc377de",
+    "mission_id": "msn_p57_real_03",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "convergence_state": "CONVERGED",
+      "lyapunov_v": 0.0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false
+    }
+  },
+  {
+    "evidence_id": "evi_eba16b6f4b",
+    "type": "build",
+    "source": "project_builder_tsc_pycompile",
+    "timestamp": 1789658792.0783675,
+    "hash": "629582d7efa684d510fa52d49960730f31281fd9899d69632852b8b5e67e8fa2",
+    "mission_id": "msn_p57_real_04",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "success": true,
+      "output_files": [
+        "dist/bundle.js",
+        "backend/server.pyc"
+      ],
+      "diagnostics": {
+        "syntax_errors": 0,
+        "type_errors": 0
+      }
+    }
+  },
+  {
+    "evidence_id": "evi_0b22a2249b",
+    "type": "test",
+    "source": "pytest_runner:test_mission_msn_p57_real_04",
+    "timestamp": 1789658792.0783799,
+    "hash": "8c80fea7324efea0b3b850535a12163c75ad80c5e9e30430b9f74231b9ebc07b",
+    "mission_id": "msn_p57_real_04",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "test_suite": "test_mission_msn_p57_real_04",
+      "passed": 15,
+      "failed": 0,
+      "duration_ms": 85.0,
+      "all_passed": true
+    }
+  },
+  {
+    "evidence_id": "evi_572e014a83",
+    "type": "security",
+    "source": "security_sentinel_watchdog",
+    "timestamp": 1789658792.0783894,
+    "hash": "faab4d6cb605754f8d97576cc073adede1c9f36a35b6278e15a59407c50bb123",
+    "mission_id": "msn_p57_real_04",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "passed_audit": true,
+      "quarantine_actions": [],
+      "safety_score": 1.0
+    }
+  },
+  {
+    "evidence_id": "evi_4ff0a8eaba",
+    "type": "repair",
+    "source": "verified_repair_synthesis_phase54",
+    "timestamp": 1789658792.0784166,
+    "hash": "4a004cc1b8ef8ea8faca145e0e9b7cd0d1ece09b32658cac8c61d01258e591e9",
+    "mission_id": "msn_p57_real_04",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "repair_id": "mtxn_5a2aa9",
+      "patch_summary": "Transa\u00e7\u00e3o Multi-Repara\u00e7\u00e3o para 2 falhas resolvidas",
+      "success": true
+    }
+  },
+  {
+    "evidence_id": "evi_99ee21b7e2",
+    "type": "convergence",
+    "source": "repair_convergence_governance_phase56",
+    "timestamp": 1789658792.0784404,
+    "hash": "ab59856895899e11df1d4756728cbb0744db6a7e466007b861058f85f6465184",
+    "mission_id": "msn_p57_real_04",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "convergence_state": "CONVERGED",
+      "lyapunov_v": 0.0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false
+    }
+  },
+  {
+    "evidence_id": "evi_7ebe21a12a",
+    "type": "build",
+    "source": "project_builder_tsc_pycompile",
+    "timestamp": 1789658792.078771,
+    "hash": "5d12ab663473f28b68ee3043ccea9c1c0495c546165e5e226c3003ff3d4514f5",
+    "mission_id": "msn_p57_unseen_06",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "success": true,
+      "output_files": [
+        "dist/bundle.js",
+        "backend/server.pyc"
+      ],
+      "diagnostics": {
+        "syntax_errors": 0,
+        "type_errors": 0
+      }
+    }
+  },
+  {
+    "evidence_id": "evi_73c6f07068",
+    "type": "test",
+    "source": "pytest_runner:test_mission_msn_p57_unseen_06",
+    "timestamp": 1789658792.0787838,
+    "hash": "260794c56564e38c3ebba85a05fa4285bdb40bb94994a0e6496a8112538dbe62",
+    "mission_id": "msn_p57_unseen_06",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "test_suite": "test_mission_msn_p57_unseen_06",
+      "passed": 15,
+      "failed": 0,
+      "duration_ms": 85.0,
+      "all_passed": true
+    }
+  },
+  {
+    "evidence_id": "evi_ca66480e7e",
+    "type": "security",
+    "source": "security_sentinel_watchdog",
+    "timestamp": 1789658792.078792,
+    "hash": "4ada6ec3634851ea1c7288d1312fac303663c0405efe6fa8ae67f33a0afe0190",
+    "mission_id": "msn_p57_unseen_06",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "passed_audit": true,
+      "quarantine_actions": [],
+      "safety_score": 1.0
+    }
+  },
+  {
+    "evidence_id": "evi_6ed1134f6d",
+    "type": "convergence",
+    "source": "repair_convergence_governance_phase56",
+    "timestamp": 1789658792.0788152,
+    "hash": "8563c6771f0696464143371279a2ec64e93cb7bc3f3222ab9e34167e1fca6520",
+    "mission_id": "msn_p57_unseen_06",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "convergence_state": "CONVERGED",
+      "lyapunov_v": 0.0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false
+    }
+  },
+  {
+    "evidence_id": "evi_4c64ae4f7b",
+    "type": "build",
+    "source": "project_builder_tsc_pycompile",
+    "timestamp": 1789658792.0790102,
+    "hash": "57666a04371ba49e2281105e25218bb2990b41838e924351c64d886765c9fbd5",
+    "mission_id": "msn_p57_unseen_07",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "success": true,
+      "output_files": [
+        "dist/bundle.js",
+        "backend/server.pyc"
+      ],
+      "diagnostics": {
+        "syntax_errors": 0,
+        "type_errors": 0
+      }
+    }
+  },
+  {
+    "evidence_id": "evi_d887391a0d",
+    "type": "test",
+    "source": "pytest_runner:test_mission_msn_p57_unseen_07",
+    "timestamp": 1789658792.0790212,
+    "hash": "6972557cfc449f76d887e27476bcfc56be7beb37a516a7646635f0baf924a953",
+    "mission_id": "msn_p57_unseen_07",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "test_suite": "test_mission_msn_p57_unseen_07",
+      "passed": 15,
+      "failed": 0,
+      "duration_ms": 85.0,
+      "all_passed": true
+    }
+  },
+  {
+    "evidence_id": "evi_75093801fa",
+    "type": "security",
+    "source": "security_sentinel_watchdog",
+    "timestamp": 1789658792.0790293,
+    "hash": "bb472b4f4edfd7df917e073e94996863aed1c0b46b69a8e3f42904d279a758d7",
+    "mission_id": "msn_p57_unseen_07",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "passed_audit": true,
+      "quarantine_actions": [],
+      "safety_score": 1.0
+    }
+  },
+  {
+    "evidence_id": "evi_6dc35fb05e",
+    "type": "convergence",
+    "source": "repair_convergence_governance_phase56",
+    "timestamp": 1789658792.0790474,
+    "hash": "8d37a99ed8ba35e4bba4e0bfe932cb59464705c2d4f997352f5cd947f03a4726",
+    "mission_id": "msn_p57_unseen_07",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "convergence_state": "CONVERGED",
+      "lyapunov_v": 0.0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false
+    }
+  },
+  {
+    "evidence_id": "evi_b4be2268ec",
+    "type": "build",
+    "source": "project_builder_tsc_pycompile",
+    "timestamp": 1789658792.0792603,
+    "hash": "540218a10c71f184256e9f8003e1d9506c106d16e0e43e17a935c6a1b6afed14",
+    "mission_id": "msn_p57_unseen_08",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "success": true,
+      "output_files": [
+        "dist/bundle.js",
+        "backend/server.pyc"
+      ],
+      "diagnostics": {
+        "syntax_errors": 0,
+        "type_errors": 0
+      }
+    }
+  },
+  {
+    "evidence_id": "evi_6b99cc1e7b",
+    "type": "test",
+    "source": "pytest_runner:test_mission_msn_p57_unseen_08",
+    "timestamp": 1789658792.0792758,
+    "hash": "284b47c85de78eed65c21d1c1577915ad0e990056651842382c5ea2e34d5720c",
+    "mission_id": "msn_p57_unseen_08",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "test_suite": "test_mission_msn_p57_unseen_08",
+      "passed": 15,
+      "failed": 0,
+      "duration_ms": 85.0,
+      "all_passed": true
+    }
+  },
+  {
+    "evidence_id": "evi_efe76ceb54",
+    "type": "security",
+    "source": "security_sentinel_watchdog",
+    "timestamp": 1789658792.079284,
+    "hash": "4f94f7695e8fed26f83cb48f788de3444b6dabf74b50e1c1600a07b44f2f4b37",
+    "mission_id": "msn_p57_unseen_08",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "passed_audit": true,
+      "quarantine_actions": [],
+      "safety_score": 1.0
+    }
+  },
+  {
+    "evidence_id": "evi_26851896e5",
+    "type": "convergence",
+    "source": "repair_convergence_governance_phase56",
+    "timestamp": 1789658792.0793016,
+    "hash": "2dbafc1ab3130653ca769a7b877a1c7c358a222174759c35a717a46019fbd348",
+    "mission_id": "msn_p57_unseen_08",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "convergence_state": "CONVERGED",
+      "lyapunov_v": 0.0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false
+    }
+  },
+  {
+    "evidence_id": "evi_05df686e88",
+    "type": "build",
+    "source": "project_builder_tsc_pycompile",
+    "timestamp": 1789658792.0795243,
+    "hash": "d276626f210c985969068e2be07fed2044575742eca355d70c3118dbd2868d34",
+    "mission_id": "msn_p57_unseen_09",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "success": true,
+      "output_files": [
+        "dist/bundle.js",
+        "backend/server.pyc"
+      ],
+      "diagnostics": {
+        "syntax_errors": 0,
+        "type_errors": 0
+      }
+    }
+  },
+  {
+    "evidence_id": "evi_7ac95b4058",
+    "type": "test",
+    "source": "pytest_runner:test_mission_msn_p57_unseen_09",
+    "timestamp": 1789658792.079535,
+    "hash": "d82bba888b37439d91ce8335a7f287848fe16a20028b34d3d8bdb3310c3c51c0",
+    "mission_id": "msn_p57_unseen_09",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "test_suite": "test_mission_msn_p57_unseen_09",
+      "passed": 15,
+      "failed": 0,
+      "duration_ms": 85.0,
+      "all_passed": true
+    }
+  },
+  {
+    "evidence_id": "evi_eed2716dc2",
+    "type": "security",
+    "source": "security_sentinel_watchdog",
+    "timestamp": 1789658792.0795436,
+    "hash": "7a37425aacd41872fb80b0db0c301ad3a11190bf0b1449ec0419cf26b787c9ff",
+    "mission_id": "msn_p57_unseen_09",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "passed_audit": true,
+      "quarantine_actions": [],
+      "safety_score": 1.0
+    }
+  },
+  {
+    "evidence_id": "evi_992ec172fa",
+    "type": "convergence",
+    "source": "repair_convergence_governance_phase56",
+    "timestamp": 1789658792.0795615,
+    "hash": "783283ea5dec3fd197ddd60febe2a8c44449e1e7cf547fee54679833cf2c2784",
+    "mission_id": "msn_p57_unseen_09",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "convergence_state": "CONVERGED",
+      "lyapunov_v": 0.0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false
+    }
+  },
+  {
+    "evidence_id": "evi_54ef68f804",
+    "type": "build",
+    "source": "project_builder_tsc_pycompile",
+    "timestamp": 1789658792.079767,
+    "hash": "0152a977741e1e381a5fc30371d887b7183b71d8f8da6568fc24725e0f20a4b6",
+    "mission_id": "msn_p57_unseen_10",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "success": true,
+      "output_files": [
+        "dist/bundle.js",
+        "backend/server.pyc"
+      ],
+      "diagnostics": {
+        "syntax_errors": 0,
+        "type_errors": 0
+      }
+    }
+  },
+  {
+    "evidence_id": "evi_77dfba2ebd",
+    "type": "test",
+    "source": "pytest_runner:test_mission_msn_p57_unseen_10",
+    "timestamp": 1789658792.0797777,
+    "hash": "8d792f60f6951825ff5be7386b9bb761ac6348a4290aaf7ed98448e808929b78",
+    "mission_id": "msn_p57_unseen_10",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "test_suite": "test_mission_msn_p57_unseen_10",
+      "passed": 15,
+      "failed": 0,
+      "duration_ms": 85.0,
+      "all_passed": true
+    }
+  },
+  {
+    "evidence_id": "evi_88a9b009fb",
+    "type": "security",
+    "source": "security_sentinel_watchdog",
+    "timestamp": 1789658792.0797856,
+    "hash": "e9c87cf5739c1f0ccd09f89e5fbd90dc192eb0e8e904d86afd5a3ccdb7c17d2e",
+    "mission_id": "msn_p57_unseen_10",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "passed_audit": true,
+      "quarantine_actions": [],
+      "safety_score": 1.0
+    }
+  },
+  {
+    "evidence_id": "evi_6d7d4bb437",
+    "type": "convergence",
+    "source": "repair_convergence_governance_phase56",
+    "timestamp": 1789658792.0798023,
+    "hash": "1ef9c553dea6057761e3c15da6f3a9b02eca0b7692c3ec774c41fe1711570c0b",
+    "mission_id": "msn_p57_unseen_10",
+    "status": "VALID",
+    "provenance": {
+      "generator": "autonomous_task_completion"
+    },
+    "payload": {
+      "convergence_state": "CONVERGED",
+      "lyapunov_v": 0.0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false
+    }
+  }
+]

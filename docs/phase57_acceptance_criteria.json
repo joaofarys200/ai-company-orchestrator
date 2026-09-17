@@ -1,0 +1,708 @@
+[
+  {
+    "criterion_id": "crit_build_valid",
+    "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+    "verification_method": "BUILD",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_bf2e95d759",
+    "details": {},
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "criterion_id": "crit_tests_pass",
+    "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+    "verification_method": "TEST",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_59c863040a",
+    "details": {},
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "criterion_id": "crit_security_valid",
+    "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+    "verification_method": "SECURITY",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_d645a71d9d",
+    "details": {},
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "criterion_id": "crit_endpoint_exists",
+    "description": "Endpoint de API alvo responde adequadamente na porta de servi\u00e7o",
+    "verification_method": "CONTRACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_d0a27c0621",
+    "details": {},
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "criterion_id": "crit_contract_valid",
+    "description": "Esquemas de dados e tipos de payloads est\u00e3o em conformidade com o contrato",
+    "verification_method": "CONTRACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_d0a27c0621",
+    "details": {},
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "criterion_id": "crit_artifact_execution_log",
+    "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "execution_log"
+    },
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "criterion_id": "crit_artifact_verification_evidence",
+    "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "verification_evidence"
+    },
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "criterion_id": "crit_artifact_api_endpoint",
+    "description": "Artefacto obrigat\u00f3rio 'api_endpoint' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "api_endpoint"
+    },
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "criterion_id": "crit_artifact_contract_schema",
+    "description": "Artefacto obrigat\u00f3rio 'contract_schema' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "contract_schema"
+    },
+    "mission_id": "msn_p57_real_01"
+  },
+  {
+    "criterion_id": "crit_build_valid",
+    "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+    "verification_method": "BUILD",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_eb0ac1f635",
+    "details": {},
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "criterion_id": "crit_tests_pass",
+    "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+    "verification_method": "TEST",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_46b22c815d",
+    "details": {},
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "criterion_id": "crit_security_valid",
+    "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+    "verification_method": "SECURITY",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_3077c9d841",
+    "details": {},
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "criterion_id": "crit_frontend_loads",
+    "description": "P\u00e1gina frontend carrega sem erros cr\u00edticos de consola",
+    "verification_method": "BROWSER",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_e2b969cd6c",
+    "details": {},
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "criterion_id": "crit_ui_elements_visible",
+    "description": "Elementos de interface essenciais s\u00e3o renderizados no DOM",
+    "verification_method": "BROWSER",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_e2b969cd6c",
+    "details": {},
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "criterion_id": "crit_artifact_execution_log",
+    "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "execution_log"
+    },
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "criterion_id": "crit_artifact_verification_evidence",
+    "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "verification_evidence"
+    },
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "criterion_id": "crit_artifact_ui_components",
+    "description": "Artefacto obrigat\u00f3rio 'ui_components' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "ui_components"
+    },
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "criterion_id": "crit_artifact_browser_screenshot",
+    "description": "Artefacto obrigat\u00f3rio 'browser_screenshot' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "browser_screenshot"
+    },
+    "mission_id": "msn_p57_real_02"
+  },
+  {
+    "criterion_id": "crit_build_valid",
+    "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+    "verification_method": "BUILD",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_aa5d4e99e0",
+    "details": {},
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "criterion_id": "crit_tests_pass",
+    "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+    "verification_method": "TEST",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_1fbf17eed7",
+    "details": {},
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "criterion_id": "crit_security_valid",
+    "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+    "verification_method": "SECURITY",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_18e308bc55",
+    "details": {},
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "criterion_id": "crit_bug_repaired",
+    "description": "Falha diagnosticada deixa de ocorrer e regress\u00f5es s\u00e3o nulas",
+    "verification_method": "BEHAVIOR",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {},
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "criterion_id": "crit_artifact_execution_log",
+    "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "execution_log"
+    },
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "criterion_id": "crit_artifact_verification_evidence",
+    "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "verification_evidence"
+    },
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "criterion_id": "crit_artifact_repaired_code",
+    "description": "Artefacto obrigat\u00f3rio 'repaired_code' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "repaired_code"
+    },
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "criterion_id": "crit_artifact_regression_proof",
+    "description": "Artefacto obrigat\u00f3rio 'regression_proof' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "regression_proof"
+    },
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "criterion_id": "crit_build_valid",
+    "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+    "verification_method": "BUILD",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_eba16b6f4b",
+    "details": {},
+    "mission_id": "msn_p57_real_04"
+  },
+  {
+    "criterion_id": "crit_tests_pass",
+    "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+    "verification_method": "TEST",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_0b22a2249b",
+    "details": {},
+    "mission_id": "msn_p57_real_04"
+  },
+  {
+    "criterion_id": "crit_security_valid",
+    "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+    "verification_method": "SECURITY",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_572e014a83",
+    "details": {},
+    "mission_id": "msn_p57_real_04"
+  },
+  {
+    "criterion_id": "crit_artifact_execution_log",
+    "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "execution_log"
+    },
+    "mission_id": "msn_p57_real_04"
+  },
+  {
+    "criterion_id": "crit_artifact_verification_evidence",
+    "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "verification_evidence"
+    },
+    "mission_id": "msn_p57_real_04"
+  },
+  {
+    "criterion_id": "crit_build_valid",
+    "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+    "verification_method": "BUILD",
+    "required": true,
+    "status": "PENDING",
+    "evidence_id": null,
+    "details": {},
+    "mission_id": "msn_p57_real_05"
+  },
+  {
+    "criterion_id": "crit_tests_pass",
+    "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+    "verification_method": "TEST",
+    "required": true,
+    "status": "PENDING",
+    "evidence_id": null,
+    "details": {},
+    "mission_id": "msn_p57_real_05"
+  },
+  {
+    "criterion_id": "crit_security_valid",
+    "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+    "verification_method": "SECURITY",
+    "required": true,
+    "status": "PENDING",
+    "evidence_id": null,
+    "details": {},
+    "mission_id": "msn_p57_real_05"
+  },
+  {
+    "criterion_id": "crit_artifact_execution_log",
+    "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "PENDING",
+    "evidence_id": null,
+    "details": {
+      "target_output": "execution_log"
+    },
+    "mission_id": "msn_p57_real_05"
+  },
+  {
+    "criterion_id": "crit_artifact_verification_evidence",
+    "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "PENDING",
+    "evidence_id": null,
+    "details": {
+      "target_output": "verification_evidence"
+    },
+    "mission_id": "msn_p57_real_05"
+  },
+  {
+    "criterion_id": "crit_artifact_security_audit_log",
+    "description": "Artefacto obrigat\u00f3rio 'security_audit_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "PENDING",
+    "evidence_id": null,
+    "details": {
+      "target_output": "security_audit_log"
+    },
+    "mission_id": "msn_p57_real_05"
+  },
+  {
+    "criterion_id": "crit_artifact_sentinel_clearance",
+    "description": "Artefacto obrigat\u00f3rio 'sentinel_clearance' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "PENDING",
+    "evidence_id": null,
+    "details": {
+      "target_output": "sentinel_clearance"
+    },
+    "mission_id": "msn_p57_real_05"
+  },
+  {
+    "criterion_id": "crit_build_valid",
+    "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+    "verification_method": "BUILD",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_7ebe21a12a",
+    "details": {},
+    "mission_id": "msn_p57_unseen_06"
+  },
+  {
+    "criterion_id": "crit_tests_pass",
+    "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+    "verification_method": "TEST",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_73c6f07068",
+    "details": {},
+    "mission_id": "msn_p57_unseen_06"
+  },
+  {
+    "criterion_id": "crit_security_valid",
+    "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+    "verification_method": "SECURITY",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_ca66480e7e",
+    "details": {},
+    "mission_id": "msn_p57_unseen_06"
+  },
+  {
+    "criterion_id": "crit_frontend_loads",
+    "description": "P\u00e1gina frontend carrega sem erros cr\u00edticos de consola",
+    "verification_method": "BROWSER",
+    "required": true,
+    "status": "PENDING",
+    "evidence_id": null,
+    "details": {},
+    "mission_id": "msn_p57_unseen_06"
+  },
+  {
+    "criterion_id": "crit_ui_elements_visible",
+    "description": "Elementos de interface essenciais s\u00e3o renderizados no DOM",
+    "verification_method": "BROWSER",
+    "required": true,
+    "status": "PENDING",
+    "evidence_id": null,
+    "details": {},
+    "mission_id": "msn_p57_unseen_06"
+  },
+  {
+    "criterion_id": "crit_artifact_execution_log",
+    "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "execution_log"
+    },
+    "mission_id": "msn_p57_unseen_06"
+  },
+  {
+    "criterion_id": "crit_artifact_verification_evidence",
+    "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "verification_evidence"
+    },
+    "mission_id": "msn_p57_unseen_06"
+  },
+  {
+    "criterion_id": "crit_build_valid",
+    "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+    "verification_method": "BUILD",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_4c64ae4f7b",
+    "details": {},
+    "mission_id": "msn_p57_unseen_07"
+  },
+  {
+    "criterion_id": "crit_tests_pass",
+    "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+    "verification_method": "TEST",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_d887391a0d",
+    "details": {},
+    "mission_id": "msn_p57_unseen_07"
+  },
+  {
+    "criterion_id": "crit_security_valid",
+    "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+    "verification_method": "SECURITY",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_75093801fa",
+    "details": {},
+    "mission_id": "msn_p57_unseen_07"
+  },
+  {
+    "criterion_id": "crit_artifact_execution_log",
+    "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "execution_log"
+    },
+    "mission_id": "msn_p57_unseen_07"
+  },
+  {
+    "criterion_id": "crit_artifact_verification_evidence",
+    "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "verification_evidence"
+    },
+    "mission_id": "msn_p57_unseen_07"
+  },
+  {
+    "criterion_id": "crit_build_valid",
+    "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+    "verification_method": "BUILD",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_b4be2268ec",
+    "details": {},
+    "mission_id": "msn_p57_unseen_08"
+  },
+  {
+    "criterion_id": "crit_tests_pass",
+    "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+    "verification_method": "TEST",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_6b99cc1e7b",
+    "details": {},
+    "mission_id": "msn_p57_unseen_08"
+  },
+  {
+    "criterion_id": "crit_security_valid",
+    "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+    "verification_method": "SECURITY",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_efe76ceb54",
+    "details": {},
+    "mission_id": "msn_p57_unseen_08"
+  },
+  {
+    "criterion_id": "crit_artifact_execution_log",
+    "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "execution_log"
+    },
+    "mission_id": "msn_p57_unseen_08"
+  },
+  {
+    "criterion_id": "crit_artifact_verification_evidence",
+    "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "verification_evidence"
+    },
+    "mission_id": "msn_p57_unseen_08"
+  },
+  {
+    "criterion_id": "crit_build_valid",
+    "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+    "verification_method": "BUILD",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_05df686e88",
+    "details": {},
+    "mission_id": "msn_p57_unseen_09"
+  },
+  {
+    "criterion_id": "crit_tests_pass",
+    "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+    "verification_method": "TEST",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_7ac95b4058",
+    "details": {},
+    "mission_id": "msn_p57_unseen_09"
+  },
+  {
+    "criterion_id": "crit_security_valid",
+    "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+    "verification_method": "SECURITY",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_eed2716dc2",
+    "details": {},
+    "mission_id": "msn_p57_unseen_09"
+  },
+  {
+    "criterion_id": "crit_artifact_execution_log",
+    "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "execution_log"
+    },
+    "mission_id": "msn_p57_unseen_09"
+  },
+  {
+    "criterion_id": "crit_artifact_verification_evidence",
+    "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "verification_evidence"
+    },
+    "mission_id": "msn_p57_unseen_09"
+  },
+  {
+    "criterion_id": "crit_build_valid",
+    "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+    "verification_method": "BUILD",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_54ef68f804",
+    "details": {},
+    "mission_id": "msn_p57_unseen_10"
+  },
+  {
+    "criterion_id": "crit_tests_pass",
+    "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+    "verification_method": "TEST",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_77dfba2ebd",
+    "details": {},
+    "mission_id": "msn_p57_unseen_10"
+  },
+  {
+    "criterion_id": "crit_security_valid",
+    "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+    "verification_method": "SECURITY",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": "evi_88a9b009fb",
+    "details": {},
+    "mission_id": "msn_p57_unseen_10"
+  },
+  {
+    "criterion_id": "crit_artifact_execution_log",
+    "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "execution_log"
+    },
+    "mission_id": "msn_p57_unseen_10"
+  },
+  {
+    "criterion_id": "crit_artifact_verification_evidence",
+    "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+    "verification_method": "ARTIFACT",
+    "required": true,
+    "status": "SATISFIED",
+    "evidence_id": null,
+    "details": {
+      "target_output": "verification_evidence"
+    },
+    "mission_id": "msn_p57_unseen_10"
+  }
+]

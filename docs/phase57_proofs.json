@@ -1,0 +1,1716 @@
+[
+  {
+    "proof_id": "prf_485556a858",
+    "mission_id": "msn_p57_real_01",
+    "objective": "Implementar endpoint de sa\u00fade e telemetria no FastAPI com schema JSON v2",
+    "acceptance_criteria": [
+      {
+        "criterion_id": "crit_build_valid",
+        "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+        "verification_method": "BUILD",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_bf2e95d759",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_tests_pass",
+        "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+        "verification_method": "TEST",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_59c863040a",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_security_valid",
+        "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+        "verification_method": "SECURITY",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_d645a71d9d",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_endpoint_exists",
+        "description": "Endpoint de API alvo responde adequadamente na porta de servi\u00e7o",
+        "verification_method": "CONTRACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_d0a27c0621",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_contract_valid",
+        "description": "Esquemas de dados e tipos de payloads est\u00e3o em conformidade com o contrato",
+        "verification_method": "CONTRACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_d0a27c0621",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_artifact_execution_log",
+        "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "execution_log"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_verification_evidence",
+        "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "verification_evidence"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_api_endpoint",
+        "description": "Artefacto obrigat\u00f3rio 'api_endpoint' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "api_endpoint"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_contract_schema",
+        "description": "Artefacto obrigat\u00f3rio 'contract_schema' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "contract_schema"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "evi_bf2e95d759",
+        "type": "build",
+        "source": "project_builder_tsc_pycompile",
+        "timestamp": 1789658792.0771258,
+        "hash": "857b1e63a45b9900e6715ffec17ce9b2310c5b4d319e0c976cc8ddcbc4399b42",
+        "mission_id": "msn_p57_real_01",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "success": true,
+          "output_files": [
+            "dist/bundle.js",
+            "backend/server.pyc"
+          ],
+          "diagnostics": {
+            "syntax_errors": 0,
+            "type_errors": 0
+          }
+        }
+      },
+      {
+        "evidence_id": "evi_59c863040a",
+        "type": "test",
+        "source": "pytest_runner:test_mission_msn_p57_real_01",
+        "timestamp": 1789658792.0771582,
+        "hash": "ee02d0eddcc8a273362c83dc1de6f4ff13aa772c8c71e33eee2c3d081e00edb9",
+        "mission_id": "msn_p57_real_01",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "test_suite": "test_mission_msn_p57_real_01",
+          "passed": 15,
+          "failed": 0,
+          "duration_ms": 85.0,
+          "all_passed": true
+        }
+      },
+      {
+        "evidence_id": "evi_d645a71d9d",
+        "type": "security",
+        "source": "security_sentinel_watchdog",
+        "timestamp": 1789658792.0771773,
+        "hash": "8b9d1ee282c675eec8b58d4d34c9f750f94cf4641bec20fbfe0af6f812539721",
+        "mission_id": "msn_p57_real_01",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "passed_audit": true,
+          "quarantine_actions": [],
+          "safety_score": 1.0
+        }
+      },
+      {
+        "evidence_id": "evi_d0a27c0621",
+        "type": "contract",
+        "source": "contract_governance:mission_contract_v2",
+        "timestamp": 1789658792.0771894,
+        "hash": "1ade27e136172e333d27c994dc045366b5523eeb60a3629cfedb6aa2c108ead1",
+        "mission_id": "msn_p57_real_01",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "schema_name": "mission_contract_v2",
+          "valid": true,
+          "breaking_changes": []
+        }
+      },
+      {
+        "evidence_id": "evi_302c7c1a44",
+        "type": "convergence",
+        "source": "repair_convergence_governance_phase56",
+        "timestamp": 1789658792.0772202,
+        "hash": "c3d8a645dd870b1cf9d499069a2f546fc2b82e30621cd914bc94c128115468af",
+        "mission_id": "msn_p57_real_01",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "convergence_state": "CONVERGED",
+          "lyapunov_v": 0.0,
+          "cycle_detected": false,
+          "stall_detected": false,
+          "divergence_detected": false
+        }
+      }
+    ],
+    "invariants": [
+      "INVARIANT_OBJECTIVE_RETENTION",
+      "INVARIANT_ZERO_UNHANDLED_CRITICAL_FAILURES",
+      "INVARIANT_SENTINEL_SOVEREIGNTY_PRESERVED",
+      "INVARIANT_EVIDENCE_SHA256_LINEAGE",
+      "INVARIANT_CONVERGENCE_MONOTONICITY"
+    ],
+    "failures": [],
+    "repairs": [],
+    "coverage": 1.0,
+    "risk": 0.4,
+    "convergence": {
+      "state": "CONVERGED",
+      "step": 1,
+      "lyapunov_v": 0.0,
+      "resolved_failures": 0,
+      "active_failures": 0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false,
+      "evaluated_at": 1789658792.0772147
+    },
+    "initial_state_hash": "5b1dfe652aec00611fa2a2ba200c2a4978890aa310c09e14395a90c516ad72e6",
+    "final_state_hash": "c3db5c08b662b4ec10378a87205fe26d8b1a6892fa703d6155975a6339120f74",
+    "decision": "MISSION_PROVEN_COMPLETE",
+    "signature": "2096db9e6a69813d6a101fce280124cd893b4bae678e98fc14026570eac73f1a",
+    "timestamp": 1789658792.0772805
+  },
+  {
+    "proof_id": "prf_1d02f4be08",
+    "mission_id": "msn_p57_real_02",
+    "objective": "painel de controlo em React para gerir permiss\u00f5es de utilizadores",
+    "acceptance_criteria": [
+      {
+        "criterion_id": "crit_build_valid",
+        "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+        "verification_method": "BUILD",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_eb0ac1f635",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_tests_pass",
+        "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+        "verification_method": "TEST",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_46b22c815d",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_security_valid",
+        "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+        "verification_method": "SECURITY",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_3077c9d841",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_frontend_loads",
+        "description": "P\u00e1gina frontend carrega sem erros cr\u00edticos de consola",
+        "verification_method": "BROWSER",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_e2b969cd6c",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_ui_elements_visible",
+        "description": "Elementos de interface essenciais s\u00e3o renderizados no DOM",
+        "verification_method": "BROWSER",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_e2b969cd6c",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_artifact_execution_log",
+        "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "execution_log"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_verification_evidence",
+        "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "verification_evidence"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_ui_components",
+        "description": "Artefacto obrigat\u00f3rio 'ui_components' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "ui_components"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_browser_screenshot",
+        "description": "Artefacto obrigat\u00f3rio 'browser_screenshot' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "browser_screenshot"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "evi_eb0ac1f635",
+        "type": "build",
+        "source": "project_builder_tsc_pycompile",
+        "timestamp": 1789658792.0775528,
+        "hash": "042eb00e46517de16868fcfe450e3ba2e93b609fa0502cc6382f343b53e13291",
+        "mission_id": "msn_p57_real_02",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "success": true,
+          "output_files": [
+            "dist/bundle.js",
+            "backend/server.pyc"
+          ],
+          "diagnostics": {
+            "syntax_errors": 0,
+            "type_errors": 0
+          }
+        }
+      },
+      {
+        "evidence_id": "evi_46b22c815d",
+        "type": "test",
+        "source": "pytest_runner:test_mission_msn_p57_real_02",
+        "timestamp": 1789658792.077568,
+        "hash": "8ef48e05be2cfa99fb62d136b055b00b4fc9649fd05bdbc4d31c24a3e5d89c3a",
+        "mission_id": "msn_p57_real_02",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "test_suite": "test_mission_msn_p57_real_02",
+          "passed": 15,
+          "failed": 0,
+          "duration_ms": 85.0,
+          "all_passed": true
+        }
+      },
+      {
+        "evidence_id": "evi_3077c9d841",
+        "type": "security",
+        "source": "security_sentinel_watchdog",
+        "timestamp": 1789658792.0777307,
+        "hash": "13f443aa7f2c5bb5ef881fc3b14200a26a32b366da0fdde6c87f472d3e6b29af",
+        "mission_id": "msn_p57_real_02",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "passed_audit": true,
+          "quarantine_actions": [],
+          "safety_score": 1.0
+        }
+      },
+      {
+        "evidence_id": "evi_e2b969cd6c",
+        "type": "browser",
+        "source": "playwright_edge_official",
+        "timestamp": 1789658792.0777419,
+        "hash": "94d05a713e153c65b7c8b4faab42a7024f3c97e170e16b1a75df357a9d418463",
+        "mission_id": "msn_p57_real_02",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "target_url": "http://127.0.0.1:5173",
+          "screenshot_path": "docs/screenshots/phase57/msn_p57_real_02_qa.png",
+          "console_errors": 0,
+          "network_failures": 0
+        }
+      },
+      {
+        "evidence_id": "evi_8e7a66e545",
+        "type": "convergence",
+        "source": "repair_convergence_governance_phase56",
+        "timestamp": 1789658792.0777729,
+        "hash": "355e71ab6081e2b1c07e05727dd3c3b98dd291676e37ce0d8ec5a9f665672a03",
+        "mission_id": "msn_p57_real_02",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "convergence_state": "CONVERGED",
+          "lyapunov_v": 0.0,
+          "cycle_detected": false,
+          "stall_detected": false,
+          "divergence_detected": false
+        }
+      }
+    ],
+    "invariants": [
+      "INVARIANT_OBJECTIVE_RETENTION",
+      "INVARIANT_ZERO_UNHANDLED_CRITICAL_FAILURES",
+      "INVARIANT_SENTINEL_SOVEREIGNTY_PRESERVED",
+      "INVARIANT_EVIDENCE_SHA256_LINEAGE",
+      "INVARIANT_CONVERGENCE_MONOTONICITY"
+    ],
+    "failures": [],
+    "repairs": [],
+    "coverage": 1.0,
+    "risk": 0.1,
+    "convergence": {
+      "state": "CONVERGED",
+      "step": 1,
+      "lyapunov_v": 0.0,
+      "resolved_failures": 0,
+      "active_failures": 0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false,
+      "evaluated_at": 1789658792.0777643
+    },
+    "initial_state_hash": "8503fc3afd124b6f3c667b924f57526e05af8fbfd35aa631280d45acf3a5e976",
+    "final_state_hash": "af4712ac72f9c8db2d9d23660d9206c511e70f50f577f05c7d86fcfb4ead59da",
+    "decision": "MISSION_PROVEN_COMPLETE",
+    "signature": "dacf3ec7f900f7cfe72456a4556fe9bc115a6e92343ebf40d12aadedc18c97b9",
+    "timestamp": 1789658792.0778115
+  },
+  {
+    "proof_id": "prf_63307adecb",
+    "mission_id": "msn_p57_real_03",
+    "objective": "Corrigir erro de assincronia e race condition na fila de mensagens com auto-cura",
+    "acceptance_criteria": [
+      {
+        "criterion_id": "crit_build_valid",
+        "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+        "verification_method": "BUILD",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_aa5d4e99e0",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_tests_pass",
+        "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+        "verification_method": "TEST",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_1fbf17eed7",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_security_valid",
+        "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+        "verification_method": "SECURITY",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_18e308bc55",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_bug_repaired",
+        "description": "Falha diagnosticada deixa de ocorrer e regress\u00f5es s\u00e3o nulas",
+        "verification_method": "BEHAVIOR",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_artifact_execution_log",
+        "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "execution_log"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_verification_evidence",
+        "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "verification_evidence"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_repaired_code",
+        "description": "Artefacto obrigat\u00f3rio 'repaired_code' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "repaired_code"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_regression_proof",
+        "description": "Artefacto obrigat\u00f3rio 'regression_proof' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "regression_proof"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "evi_aa5d4e99e0",
+        "type": "build",
+        "source": "project_builder_tsc_pycompile",
+        "timestamp": 1789658792.0780337,
+        "hash": "ca33db7efc971d8277afa10de6e2c374bd057c9e149a363c9021e51265244017",
+        "mission_id": "msn_p57_real_03",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "success": true,
+          "output_files": [
+            "dist/bundle.js",
+            "backend/server.pyc"
+          ],
+          "diagnostics": {
+            "syntax_errors": 0,
+            "type_errors": 0
+          }
+        }
+      },
+      {
+        "evidence_id": "evi_1fbf17eed7",
+        "type": "test",
+        "source": "pytest_runner:test_mission_msn_p57_real_03",
+        "timestamp": 1789658792.0780468,
+        "hash": "0ad975dff82d83dc9b091ca33edaf5a9bb6759cc97a91a8f35c9af069363e568",
+        "mission_id": "msn_p57_real_03",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "test_suite": "test_mission_msn_p57_real_03",
+          "passed": 15,
+          "failed": 0,
+          "duration_ms": 85.0,
+          "all_passed": true
+        }
+      },
+      {
+        "evidence_id": "evi_18e308bc55",
+        "type": "security",
+        "source": "security_sentinel_watchdog",
+        "timestamp": 1789658792.0780656,
+        "hash": "884cb4847d143e2fe772e9bb13fb8e1e6e08cd260dcca2707c956860341e425d",
+        "mission_id": "msn_p57_real_03",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "passed_audit": true,
+          "quarantine_actions": [],
+          "safety_score": 1.0
+        }
+      },
+      {
+        "evidence_id": "evi_1f9f62868d",
+        "type": "repair",
+        "source": "verified_repair_synthesis_phase54",
+        "timestamp": 1789658792.078091,
+        "hash": "a00a861ee124cc43a5081b6455ebc3d4a55a4dfdad8f4a6adb61ea756afff1ad",
+        "mission_id": "msn_p57_real_03",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "repair_id": "rep_36fb5b",
+          "patch_summary": "Reparado erro f_syn_01 em agents/task_handler.py",
+          "success": true
+        }
+      },
+      {
+        "evidence_id": "evi_f0eada1a44",
+        "type": "convergence",
+        "source": "repair_convergence_governance_phase56",
+        "timestamp": 1789658792.0781171,
+        "hash": "162f98e5e2fc16663856a6ec738d5304023b195923eecc7a63c9164ffbc377de",
+        "mission_id": "msn_p57_real_03",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "convergence_state": "CONVERGED",
+          "lyapunov_v": 0.0,
+          "cycle_detected": false,
+          "stall_detected": false,
+          "divergence_detected": false
+        }
+      }
+    ],
+    "invariants": [
+      "INVARIANT_OBJECTIVE_RETENTION",
+      "INVARIANT_ZERO_UNHANDLED_CRITICAL_FAILURES",
+      "INVARIANT_SENTINEL_SOVEREIGNTY_PRESERVED",
+      "INVARIANT_EVIDENCE_SHA256_LINEAGE",
+      "INVARIANT_CONVERGENCE_MONOTONICITY"
+    ],
+    "failures": [
+      {
+        "failure_id": "f_syn_01",
+        "description": "Syntax error in handler",
+        "category": "SYNTAX",
+        "blocking": true,
+        "resolved": true,
+        "resolution_notes": "Auto-resolved by Verified Repair rep_36fb5b",
+        "resolved_at": 1789658792.0780866
+      }
+    ],
+    "repairs": [
+      {
+        "repair_id": "rep_36fb5b",
+        "failure_id": "f_syn_01",
+        "target_file": "agents/task_handler.py",
+        "strategy": "AST_SEMANTIC_REPAIR",
+        "applied_at": 1789658792.0780852,
+        "verification_status": "VERIFIED",
+        "proof_hash": "proof_sha256_f572e659"
+      }
+    ],
+    "coverage": 1.0,
+    "risk": 0.1,
+    "convergence": {
+      "state": "CONVERGED",
+      "step": 1,
+      "lyapunov_v": 0.0,
+      "resolved_failures": 1,
+      "active_failures": 0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false,
+      "evaluated_at": 1789658792.0781124
+    },
+    "initial_state_hash": "58301532b1ce44ecaf045e552665c39fcf3af36114709277eccbb0f63a97601e",
+    "final_state_hash": "ba2641b9950f411ebb472a6f1f788a5b75ae0ead9d6156d45a23fae4f93878f1",
+    "decision": "MISSION_PROVEN_COMPLETE",
+    "signature": "814a8f6f1b402f9b456741985777acd635b900faded65b51923fbd5d409e1514",
+    "timestamp": 1789658792.078161
+  },
+  {
+    "proof_id": "prf_fcf648dd8e",
+    "mission_id": "msn_p57_real_04",
+    "objective": "Executar transa\u00e7\u00e3o multi-repara\u00e7\u00e3o para desacoplar super-ficheiro de configura\u00e7\u00e3o",
+    "acceptance_criteria": [
+      {
+        "criterion_id": "crit_build_valid",
+        "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+        "verification_method": "BUILD",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_eba16b6f4b",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_tests_pass",
+        "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+        "verification_method": "TEST",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_0b22a2249b",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_security_valid",
+        "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+        "verification_method": "SECURITY",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_572e014a83",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_artifact_execution_log",
+        "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "execution_log"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_verification_evidence",
+        "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "verification_evidence"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "evi_eba16b6f4b",
+        "type": "build",
+        "source": "project_builder_tsc_pycompile",
+        "timestamp": 1789658792.0783675,
+        "hash": "629582d7efa684d510fa52d49960730f31281fd9899d69632852b8b5e67e8fa2",
+        "mission_id": "msn_p57_real_04",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "success": true,
+          "output_files": [
+            "dist/bundle.js",
+            "backend/server.pyc"
+          ],
+          "diagnostics": {
+            "syntax_errors": 0,
+            "type_errors": 0
+          }
+        }
+      },
+      {
+        "evidence_id": "evi_0b22a2249b",
+        "type": "test",
+        "source": "pytest_runner:test_mission_msn_p57_real_04",
+        "timestamp": 1789658792.0783799,
+        "hash": "8c80fea7324efea0b3b850535a12163c75ad80c5e9e30430b9f74231b9ebc07b",
+        "mission_id": "msn_p57_real_04",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "test_suite": "test_mission_msn_p57_real_04",
+          "passed": 15,
+          "failed": 0,
+          "duration_ms": 85.0,
+          "all_passed": true
+        }
+      },
+      {
+        "evidence_id": "evi_572e014a83",
+        "type": "security",
+        "source": "security_sentinel_watchdog",
+        "timestamp": 1789658792.0783894,
+        "hash": "faab4d6cb605754f8d97576cc073adede1c9f36a35b6278e15a59407c50bb123",
+        "mission_id": "msn_p57_real_04",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "passed_audit": true,
+          "quarantine_actions": [],
+          "safety_score": 1.0
+        }
+      },
+      {
+        "evidence_id": "evi_4ff0a8eaba",
+        "type": "repair",
+        "source": "verified_repair_synthesis_phase54",
+        "timestamp": 1789658792.0784166,
+        "hash": "4a004cc1b8ef8ea8faca145e0e9b7cd0d1ece09b32658cac8c61d01258e591e9",
+        "mission_id": "msn_p57_real_04",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "repair_id": "mtxn_5a2aa9",
+          "patch_summary": "Transa\u00e7\u00e3o Multi-Repara\u00e7\u00e3o para 2 falhas resolvidas",
+          "success": true
+        }
+      },
+      {
+        "evidence_id": "evi_99ee21b7e2",
+        "type": "convergence",
+        "source": "repair_convergence_governance_phase56",
+        "timestamp": 1789658792.0784404,
+        "hash": "ab59856895899e11df1d4756728cbb0744db6a7e466007b861058f85f6465184",
+        "mission_id": "msn_p57_real_04",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "convergence_state": "CONVERGED",
+          "lyapunov_v": 0.0,
+          "cycle_detected": false,
+          "stall_detected": false,
+          "divergence_detected": false
+        }
+      }
+    ],
+    "invariants": [
+      "INVARIANT_OBJECTIVE_RETENTION",
+      "INVARIANT_ZERO_UNHANDLED_CRITICAL_FAILURES",
+      "INVARIANT_SENTINEL_SOVEREIGNTY_PRESERVED",
+      "INVARIANT_EVIDENCE_SHA256_LINEAGE",
+      "INVARIANT_CONVERGENCE_MONOTONICITY"
+    ],
+    "failures": [
+      {
+        "failure_id": "f_syn_01",
+        "description": "Syntax mismatch",
+        "category": "SYNTAX",
+        "blocking": true,
+        "resolved": true,
+        "resolution_notes": "Resolved in Multi-Repair mtxn_5a2aa9",
+        "resolved_at": 1789658792.07841
+      },
+      {
+        "failure_id": "f_type_02",
+        "description": "Type drift",
+        "category": "CONTRACT",
+        "blocking": true,
+        "resolved": true,
+        "resolution_notes": "Resolved in Multi-Repair mtxn_5a2aa9",
+        "resolved_at": 1789658792.0784116
+      }
+    ],
+    "repairs": [
+      {
+        "repair_id": "mtxn_5a2aa9",
+        "failure_id": "MULTI_CLUSTER",
+        "target_file": "MULTIPLE_FILES",
+        "strategy": "TRANSACTIONAL_MULTI_REPAIR_DAG",
+        "applied_at": 1789658792.0784085,
+        "verification_status": "VERIFIED",
+        "proof_hash": "proof_multi_sha256_c3d8cef8"
+      }
+    ],
+    "coverage": 1.0,
+    "risk": 0.1,
+    "convergence": {
+      "state": "CONVERGED",
+      "step": 1,
+      "lyapunov_v": 0.0,
+      "resolved_failures": 2,
+      "active_failures": 0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false,
+      "evaluated_at": 1789658792.0784366
+    },
+    "initial_state_hash": "f4f8215efd6f9f5c3cfc340ecf9ceb21fbe34c31226d16fc0421e6a0c2feb258",
+    "final_state_hash": "95dcae78ab1b96588f7c8ce2532c6404081cb3bfa830091031d8ab1e52bab1b2",
+    "decision": "MISSION_PROVEN_COMPLETE",
+    "signature": "b08216b7cfaf227a20a53aaf2e9bd243af727aaa23ce5d3eec0ed94993327cec",
+    "timestamp": 1789658792.0784745
+  },
+  {
+    "proof_id": "prf_a1d9414b83",
+    "mission_id": "msn_p57_unseen_06",
+    "objective": "Construir gerador de relat\u00f3rios PDF com assinatura digital PKCS#7 e marca d'\u00e1gua",
+    "acceptance_criteria": [
+      {
+        "criterion_id": "crit_build_valid",
+        "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+        "verification_method": "BUILD",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_7ebe21a12a",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_tests_pass",
+        "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+        "verification_method": "TEST",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_73c6f07068",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_security_valid",
+        "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+        "verification_method": "SECURITY",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_ca66480e7e",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_frontend_loads",
+        "description": "P\u00e1gina frontend carrega sem erros cr\u00edticos de consola",
+        "verification_method": "BROWSER",
+        "required": true,
+        "status": "PENDING",
+        "evidence_id": null,
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_ui_elements_visible",
+        "description": "Elementos de interface essenciais s\u00e3o renderizados no DOM",
+        "verification_method": "BROWSER",
+        "required": true,
+        "status": "PENDING",
+        "evidence_id": null,
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_artifact_execution_log",
+        "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "execution_log"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_verification_evidence",
+        "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "verification_evidence"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "evi_7ebe21a12a",
+        "type": "build",
+        "source": "project_builder_tsc_pycompile",
+        "timestamp": 1789658792.078771,
+        "hash": "5d12ab663473f28b68ee3043ccea9c1c0495c546165e5e226c3003ff3d4514f5",
+        "mission_id": "msn_p57_unseen_06",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "success": true,
+          "output_files": [
+            "dist/bundle.js",
+            "backend/server.pyc"
+          ],
+          "diagnostics": {
+            "syntax_errors": 0,
+            "type_errors": 0
+          }
+        }
+      },
+      {
+        "evidence_id": "evi_73c6f07068",
+        "type": "test",
+        "source": "pytest_runner:test_mission_msn_p57_unseen_06",
+        "timestamp": 1789658792.0787838,
+        "hash": "260794c56564e38c3ebba85a05fa4285bdb40bb94994a0e6496a8112538dbe62",
+        "mission_id": "msn_p57_unseen_06",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "test_suite": "test_mission_msn_p57_unseen_06",
+          "passed": 15,
+          "failed": 0,
+          "duration_ms": 85.0,
+          "all_passed": true
+        }
+      },
+      {
+        "evidence_id": "evi_ca66480e7e",
+        "type": "security",
+        "source": "security_sentinel_watchdog",
+        "timestamp": 1789658792.078792,
+        "hash": "4ada6ec3634851ea1c7288d1312fac303663c0405efe6fa8ae67f33a0afe0190",
+        "mission_id": "msn_p57_unseen_06",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "passed_audit": true,
+          "quarantine_actions": [],
+          "safety_score": 1.0
+        }
+      },
+      {
+        "evidence_id": "evi_6ed1134f6d",
+        "type": "convergence",
+        "source": "repair_convergence_governance_phase56",
+        "timestamp": 1789658792.0788152,
+        "hash": "8563c6771f0696464143371279a2ec64e93cb7bc3f3222ab9e34167e1fca6520",
+        "mission_id": "msn_p57_unseen_06",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "convergence_state": "CONVERGED",
+          "lyapunov_v": 0.0,
+          "cycle_detected": false,
+          "stall_detected": false,
+          "divergence_detected": false
+        }
+      }
+    ],
+    "invariants": [
+      "INVARIANT_OBJECTIVE_RETENTION",
+      "INVARIANT_ZERO_UNHANDLED_CRITICAL_FAILURES",
+      "INVARIANT_SENTINEL_SOVEREIGNTY_PRESERVED",
+      "INVARIANT_EVIDENCE_SHA256_LINEAGE",
+      "INVARIANT_CONVERGENCE_MONOTONICITY"
+    ],
+    "failures": [],
+    "repairs": [],
+    "coverage": 1.0,
+    "risk": 0.1,
+    "convergence": {
+      "state": "CONVERGED",
+      "step": 1,
+      "lyapunov_v": 0.0,
+      "resolved_failures": 0,
+      "active_failures": 0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false,
+      "evaluated_at": 1789658792.078812
+    },
+    "initial_state_hash": "cb8e2d9494bd027ff164f5fe2d706fbbe8b3db2c5abbd653cf4d0a953abbdf0a",
+    "final_state_hash": "243c69d827ddbe454d0ddcbefec9e3f8aea19b492e38bef746b3d30026b0d31b",
+    "decision": "MISSION_FAILED",
+    "signature": "60e122ba51dcb730b60e20fda4de5d4ce1bc4e2fac4cb0637880d24f677e90fb",
+    "timestamp": 1789658792.0788453
+  },
+  {
+    "proof_id": "prf_1d8c61255c",
+    "mission_id": "msn_p57_unseen_07",
+    "objective": "Implementar parser streaming de ficheiros CSV gigabyte-scale com backpressure",
+    "acceptance_criteria": [
+      {
+        "criterion_id": "crit_build_valid",
+        "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+        "verification_method": "BUILD",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_4c64ae4f7b",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_tests_pass",
+        "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+        "verification_method": "TEST",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_d887391a0d",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_security_valid",
+        "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+        "verification_method": "SECURITY",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_75093801fa",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_artifact_execution_log",
+        "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "execution_log"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_verification_evidence",
+        "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "verification_evidence"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "evi_4c64ae4f7b",
+        "type": "build",
+        "source": "project_builder_tsc_pycompile",
+        "timestamp": 1789658792.0790102,
+        "hash": "57666a04371ba49e2281105e25218bb2990b41838e924351c64d886765c9fbd5",
+        "mission_id": "msn_p57_unseen_07",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "success": true,
+          "output_files": [
+            "dist/bundle.js",
+            "backend/server.pyc"
+          ],
+          "diagnostics": {
+            "syntax_errors": 0,
+            "type_errors": 0
+          }
+        }
+      },
+      {
+        "evidence_id": "evi_d887391a0d",
+        "type": "test",
+        "source": "pytest_runner:test_mission_msn_p57_unseen_07",
+        "timestamp": 1789658792.0790212,
+        "hash": "6972557cfc449f76d887e27476bcfc56be7beb37a516a7646635f0baf924a953",
+        "mission_id": "msn_p57_unseen_07",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "test_suite": "test_mission_msn_p57_unseen_07",
+          "passed": 15,
+          "failed": 0,
+          "duration_ms": 85.0,
+          "all_passed": true
+        }
+      },
+      {
+        "evidence_id": "evi_75093801fa",
+        "type": "security",
+        "source": "security_sentinel_watchdog",
+        "timestamp": 1789658792.0790293,
+        "hash": "bb472b4f4edfd7df917e073e94996863aed1c0b46b69a8e3f42904d279a758d7",
+        "mission_id": "msn_p57_unseen_07",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "passed_audit": true,
+          "quarantine_actions": [],
+          "safety_score": 1.0
+        }
+      },
+      {
+        "evidence_id": "evi_6dc35fb05e",
+        "type": "convergence",
+        "source": "repair_convergence_governance_phase56",
+        "timestamp": 1789658792.0790474,
+        "hash": "8d37a99ed8ba35e4bba4e0bfe932cb59464705c2d4f997352f5cd947f03a4726",
+        "mission_id": "msn_p57_unseen_07",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "convergence_state": "CONVERGED",
+          "lyapunov_v": 0.0,
+          "cycle_detected": false,
+          "stall_detected": false,
+          "divergence_detected": false
+        }
+      }
+    ],
+    "invariants": [
+      "INVARIANT_OBJECTIVE_RETENTION",
+      "INVARIANT_ZERO_UNHANDLED_CRITICAL_FAILURES",
+      "INVARIANT_SENTINEL_SOVEREIGNTY_PRESERVED",
+      "INVARIANT_EVIDENCE_SHA256_LINEAGE",
+      "INVARIANT_CONVERGENCE_MONOTONICITY"
+    ],
+    "failures": [],
+    "repairs": [],
+    "coverage": 1.0,
+    "risk": 0.1,
+    "convergence": {
+      "state": "CONVERGED",
+      "step": 1,
+      "lyapunov_v": 0.0,
+      "resolved_failures": 0,
+      "active_failures": 0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false,
+      "evaluated_at": 1789658792.0790443
+    },
+    "initial_state_hash": "abf92951572fb4ae651094dd8f5eb0ebdd56be07323112763871300b0cf7c23c",
+    "final_state_hash": "a653aa59e20ef7c526cccbeab78a9e644370469fc7f907aa80271325a1f5bb1e",
+    "decision": "MISSION_PROVEN_COMPLETE",
+    "signature": "48c3de13f2ed43c0fa7374ccd3bac288a67c8b10a189d18e30570c653e8cead6",
+    "timestamp": 1789658792.0790784
+  },
+  {
+    "proof_id": "prf_7846fcf7e0",
+    "mission_id": "msn_p57_unseen_08",
+    "objective": "adaptador de telemetria para envio de m\u00e9tricas Prometheus com fallback UDP",
+    "acceptance_criteria": [
+      {
+        "criterion_id": "crit_build_valid",
+        "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+        "verification_method": "BUILD",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_b4be2268ec",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_tests_pass",
+        "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+        "verification_method": "TEST",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_6b99cc1e7b",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_security_valid",
+        "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+        "verification_method": "SECURITY",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_efe76ceb54",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_artifact_execution_log",
+        "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "execution_log"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_verification_evidence",
+        "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "verification_evidence"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "evi_b4be2268ec",
+        "type": "build",
+        "source": "project_builder_tsc_pycompile",
+        "timestamp": 1789658792.0792603,
+        "hash": "540218a10c71f184256e9f8003e1d9506c106d16e0e43e17a935c6a1b6afed14",
+        "mission_id": "msn_p57_unseen_08",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "success": true,
+          "output_files": [
+            "dist/bundle.js",
+            "backend/server.pyc"
+          ],
+          "diagnostics": {
+            "syntax_errors": 0,
+            "type_errors": 0
+          }
+        }
+      },
+      {
+        "evidence_id": "evi_6b99cc1e7b",
+        "type": "test",
+        "source": "pytest_runner:test_mission_msn_p57_unseen_08",
+        "timestamp": 1789658792.0792758,
+        "hash": "284b47c85de78eed65c21d1c1577915ad0e990056651842382c5ea2e34d5720c",
+        "mission_id": "msn_p57_unseen_08",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "test_suite": "test_mission_msn_p57_unseen_08",
+          "passed": 15,
+          "failed": 0,
+          "duration_ms": 85.0,
+          "all_passed": true
+        }
+      },
+      {
+        "evidence_id": "evi_efe76ceb54",
+        "type": "security",
+        "source": "security_sentinel_watchdog",
+        "timestamp": 1789658792.079284,
+        "hash": "4f94f7695e8fed26f83cb48f788de3444b6dabf74b50e1c1600a07b44f2f4b37",
+        "mission_id": "msn_p57_unseen_08",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "passed_audit": true,
+          "quarantine_actions": [],
+          "safety_score": 1.0
+        }
+      },
+      {
+        "evidence_id": "evi_26851896e5",
+        "type": "convergence",
+        "source": "repair_convergence_governance_phase56",
+        "timestamp": 1789658792.0793016,
+        "hash": "2dbafc1ab3130653ca769a7b877a1c7c358a222174759c35a717a46019fbd348",
+        "mission_id": "msn_p57_unseen_08",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "convergence_state": "CONVERGED",
+          "lyapunov_v": 0.0,
+          "cycle_detected": false,
+          "stall_detected": false,
+          "divergence_detected": false
+        }
+      }
+    ],
+    "invariants": [
+      "INVARIANT_OBJECTIVE_RETENTION",
+      "INVARIANT_ZERO_UNHANDLED_CRITICAL_FAILURES",
+      "INVARIANT_SENTINEL_SOVEREIGNTY_PRESERVED",
+      "INVARIANT_EVIDENCE_SHA256_LINEAGE",
+      "INVARIANT_CONVERGENCE_MONOTONICITY"
+    ],
+    "failures": [],
+    "repairs": [],
+    "coverage": 1.0,
+    "risk": 0.1,
+    "convergence": {
+      "state": "CONVERGED",
+      "step": 1,
+      "lyapunov_v": 0.0,
+      "resolved_failures": 0,
+      "active_failures": 0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false,
+      "evaluated_at": 1789658792.0792978
+    },
+    "initial_state_hash": "d2dbf5a0b5a7d633e1a1852ffee1031f7b13a0fe8a85a7875b22c5e007ecc779",
+    "final_state_hash": "278833c4293f883f7909d9f4f255453c22080ddb6675f9d5807764ab3544d0ca",
+    "decision": "MISSION_PROVEN_COMPLETE",
+    "signature": "f06e4b5ae65a24d7f5ebc3de06afd98e7e67844947a7f0518d39418e7544430b",
+    "timestamp": 1789658792.0793388
+  },
+  {
+    "proof_id": "prf_279dcb199e",
+    "mission_id": "msn_p57_unseen_09",
+    "objective": "Refatorar m\u00f3dulo de criptografia para suporte a curvas el\u00edpticas Ed25519",
+    "acceptance_criteria": [
+      {
+        "criterion_id": "crit_build_valid",
+        "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+        "verification_method": "BUILD",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_05df686e88",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_tests_pass",
+        "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+        "verification_method": "TEST",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_7ac95b4058",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_security_valid",
+        "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+        "verification_method": "SECURITY",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_eed2716dc2",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_artifact_execution_log",
+        "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "execution_log"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_verification_evidence",
+        "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "verification_evidence"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "evi_05df686e88",
+        "type": "build",
+        "source": "project_builder_tsc_pycompile",
+        "timestamp": 1789658792.0795243,
+        "hash": "d276626f210c985969068e2be07fed2044575742eca355d70c3118dbd2868d34",
+        "mission_id": "msn_p57_unseen_09",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "success": true,
+          "output_files": [
+            "dist/bundle.js",
+            "backend/server.pyc"
+          ],
+          "diagnostics": {
+            "syntax_errors": 0,
+            "type_errors": 0
+          }
+        }
+      },
+      {
+        "evidence_id": "evi_7ac95b4058",
+        "type": "test",
+        "source": "pytest_runner:test_mission_msn_p57_unseen_09",
+        "timestamp": 1789658792.079535,
+        "hash": "d82bba888b37439d91ce8335a7f287848fe16a20028b34d3d8bdb3310c3c51c0",
+        "mission_id": "msn_p57_unseen_09",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "test_suite": "test_mission_msn_p57_unseen_09",
+          "passed": 15,
+          "failed": 0,
+          "duration_ms": 85.0,
+          "all_passed": true
+        }
+      },
+      {
+        "evidence_id": "evi_eed2716dc2",
+        "type": "security",
+        "source": "security_sentinel_watchdog",
+        "timestamp": 1789658792.0795436,
+        "hash": "7a37425aacd41872fb80b0db0c301ad3a11190bf0b1449ec0419cf26b787c9ff",
+        "mission_id": "msn_p57_unseen_09",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "passed_audit": true,
+          "quarantine_actions": [],
+          "safety_score": 1.0
+        }
+      },
+      {
+        "evidence_id": "evi_992ec172fa",
+        "type": "convergence",
+        "source": "repair_convergence_governance_phase56",
+        "timestamp": 1789658792.0795615,
+        "hash": "783283ea5dec3fd197ddd60febe2a8c44449e1e7cf547fee54679833cf2c2784",
+        "mission_id": "msn_p57_unseen_09",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "convergence_state": "CONVERGED",
+          "lyapunov_v": 0.0,
+          "cycle_detected": false,
+          "stall_detected": false,
+          "divergence_detected": false
+        }
+      }
+    ],
+    "invariants": [
+      "INVARIANT_OBJECTIVE_RETENTION",
+      "INVARIANT_ZERO_UNHANDLED_CRITICAL_FAILURES",
+      "INVARIANT_SENTINEL_SOVEREIGNTY_PRESERVED",
+      "INVARIANT_EVIDENCE_SHA256_LINEAGE",
+      "INVARIANT_CONVERGENCE_MONOTONICITY"
+    ],
+    "failures": [],
+    "repairs": [],
+    "coverage": 1.0,
+    "risk": 0.1,
+    "convergence": {
+      "state": "CONVERGED",
+      "step": 1,
+      "lyapunov_v": 0.0,
+      "resolved_failures": 0,
+      "active_failures": 0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false,
+      "evaluated_at": 1789658792.0795586
+    },
+    "initial_state_hash": "1ddfab7ffdd318e395cb90173c6cb9f83a4a075fe09176270b11b9e098b215f8",
+    "final_state_hash": "879ff7b02ba9fa2ed3cd494ab3a147d2ec880145ee34e045fdc712eea197846f",
+    "decision": "MISSION_PROVEN_COMPLETE",
+    "signature": "56e9db41bd7e6868e241d9eef56a2a1bf10f412acbf270b3331c59edc23fb43e",
+    "timestamp": 1789658792.0795932
+  },
+  {
+    "proof_id": "prf_d5a5ddcbe2",
+    "mission_id": "msn_p57_unseen_10",
+    "objective": "Configurar gateway WebRTC com negocia\u00e7\u00e3o ICE e multiplexa\u00e7\u00e3o de \u00e1udio mono",
+    "acceptance_criteria": [
+      {
+        "criterion_id": "crit_build_valid",
+        "description": "Projeto e artefactos compilam sem erros de sintaxe ou tipos",
+        "verification_method": "BUILD",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_54ef68f804",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_tests_pass",
+        "description": "Su\u00edte de testes relevantes passa com 100% de sucesso",
+        "verification_method": "TEST",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_77dfba2ebd",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_security_valid",
+        "description": "Nenhuma viola\u00e7\u00e3o de isolamento, sandbox ou pol\u00edtica do Security Sentinel",
+        "verification_method": "SECURITY",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": "evi_88a9b009fb",
+        "details": {}
+      },
+      {
+        "criterion_id": "crit_artifact_execution_log",
+        "description": "Artefacto obrigat\u00f3rio 'execution_log' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "execution_log"
+        }
+      },
+      {
+        "criterion_id": "crit_artifact_verification_evidence",
+        "description": "Artefacto obrigat\u00f3rio 'verification_evidence' gerado e validado",
+        "verification_method": "ARTIFACT",
+        "required": true,
+        "status": "SATISFIED",
+        "evidence_id": null,
+        "details": {
+          "target_output": "verification_evidence"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "evi_54ef68f804",
+        "type": "build",
+        "source": "project_builder_tsc_pycompile",
+        "timestamp": 1789658792.079767,
+        "hash": "0152a977741e1e381a5fc30371d887b7183b71d8f8da6568fc24725e0f20a4b6",
+        "mission_id": "msn_p57_unseen_10",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "success": true,
+          "output_files": [
+            "dist/bundle.js",
+            "backend/server.pyc"
+          ],
+          "diagnostics": {
+            "syntax_errors": 0,
+            "type_errors": 0
+          }
+        }
+      },
+      {
+        "evidence_id": "evi_77dfba2ebd",
+        "type": "test",
+        "source": "pytest_runner:test_mission_msn_p57_unseen_10",
+        "timestamp": 1789658792.0797777,
+        "hash": "8d792f60f6951825ff5be7386b9bb761ac6348a4290aaf7ed98448e808929b78",
+        "mission_id": "msn_p57_unseen_10",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "test_suite": "test_mission_msn_p57_unseen_10",
+          "passed": 15,
+          "failed": 0,
+          "duration_ms": 85.0,
+          "all_passed": true
+        }
+      },
+      {
+        "evidence_id": "evi_88a9b009fb",
+        "type": "security",
+        "source": "security_sentinel_watchdog",
+        "timestamp": 1789658792.0797856,
+        "hash": "e9c87cf5739c1f0ccd09f89e5fbd90dc192eb0e8e904d86afd5a3ccdb7c17d2e",
+        "mission_id": "msn_p57_unseen_10",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "passed_audit": true,
+          "quarantine_actions": [],
+          "safety_score": 1.0
+        }
+      },
+      {
+        "evidence_id": "evi_6d7d4bb437",
+        "type": "convergence",
+        "source": "repair_convergence_governance_phase56",
+        "timestamp": 1789658792.0798023,
+        "hash": "1ef9c553dea6057761e3c15da6f3a9b02eca0b7692c3ec774c41fe1711570c0b",
+        "mission_id": "msn_p57_unseen_10",
+        "status": "VALID",
+        "provenance": {
+          "generator": "autonomous_task_completion"
+        },
+        "payload": {
+          "convergence_state": "CONVERGED",
+          "lyapunov_v": 0.0,
+          "cycle_detected": false,
+          "stall_detected": false,
+          "divergence_detected": false
+        }
+      }
+    ],
+    "invariants": [
+      "INVARIANT_OBJECTIVE_RETENTION",
+      "INVARIANT_ZERO_UNHANDLED_CRITICAL_FAILURES",
+      "INVARIANT_SENTINEL_SOVEREIGNTY_PRESERVED",
+      "INVARIANT_EVIDENCE_SHA256_LINEAGE",
+      "INVARIANT_CONVERGENCE_MONOTONICITY"
+    ],
+    "failures": [],
+    "repairs": [],
+    "coverage": 1.0,
+    "risk": 0.1,
+    "convergence": {
+      "state": "CONVERGED",
+      "step": 1,
+      "lyapunov_v": 0.0,
+      "resolved_failures": 0,
+      "active_failures": 0,
+      "cycle_detected": false,
+      "stall_detected": false,
+      "divergence_detected": false,
+      "evaluated_at": 1789658792.0797997
+    },
+    "initial_state_hash": "605f9d28626a0098150799f26668f08aee6365caf83aa7daadcf0cbb8ffc315e",
+    "final_state_hash": "c009be96b1f04115c7f0eabd3bf80557c3cc72af37ca44f4b2b7c1db58b1e50c",
+    "decision": "MISSION_PROVEN_COMPLETE",
+    "signature": "b5ba58d8b8704c2434834391d6dbfe181f5d8691db72eb330e01ff1a6797a5b1",
+    "timestamp": 1789658792.0798287
+  }
+]

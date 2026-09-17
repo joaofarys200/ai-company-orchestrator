@@ -1,0 +1,22 @@
+[
+  {
+    "repair_id": "rep_36fb5b",
+    "failure_id": "f_syn_01",
+    "target_file": "agents/task_handler.py",
+    "strategy": "AST_SEMANTIC_REPAIR",
+    "applied_at": 1789658792.0780852,
+    "verification_status": "VERIFIED",
+    "proof_hash": "proof_sha256_f572e659",
+    "mission_id": "msn_p57_real_03"
+  },
+  {
+    "repair_id": "mtxn_5a2aa9",
+    "failure_id": "MULTI_CLUSTER",
+    "target_file": "MULTIPLE_FILES",
+    "strategy": "TRANSACTIONAL_MULTI_REPAIR_DAG",
+    "applied_at": 1789658792.0784085,
+    "verification_status": "VERIFIED",
+    "proof_hash": "proof_multi_sha256_c3d8cef8",
+    "mission_id": "msn_p57_real_04"
+  }
+]

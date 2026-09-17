@@ -1,0 +1,102 @@
+[
+  {
+    "mission_id": "msn_p57_real_01",
+    "state": "COMPLETED",
+    "final_decision": "MISSION_PROVEN_COMPLETE",
+    "initial_state_hash": "5b1dfe652aec00611fa2a2ba200c2a4978890aa310c09e14395a90c516ad72e6",
+    "final_state_hash": "b7ee31909fd31b685bc0bbcb3f22d88f5b5a10d9269878ce52e70e723a1a95a2",
+    "plan_tasks": 4,
+    "checkpoints_count": 7,
+    "duration": 0.0009808540344238281
+  },
+  {
+    "mission_id": "msn_p57_real_02",
+    "state": "COMPLETED",
+    "final_decision": "MISSION_PROVEN_COMPLETE",
+    "initial_state_hash": "8503fc3afd124b6f3c667b924f57526e05af8fbfd35aa631280d45acf3a5e976",
+    "final_state_hash": "c792d6a91089de46ee5785334a3ed4cfd80a0be50e213451253370895bf60e62",
+    "plan_tasks": 5,
+    "checkpoints_count": 7,
+    "duration": 0.00044155120849609375
+  },
+  {
+    "mission_id": "msn_p57_real_03",
+    "state": "COMPLETED",
+    "final_decision": "MISSION_PROVEN_COMPLETE",
+    "initial_state_hash": "58301532b1ce44ecaf045e552665c39fcf3af36114709277eccbb0f63a97601e",
+    "final_state_hash": "61c82e4d0ea7a3a630b274a2d6d68189b29e659f8fd3a7583d54dd58e2ff7b4a",
+    "plan_tasks": 4,
+    "checkpoints_count": 8,
+    "duration": 0.0002810955047607422
+  },
+  {
+    "mission_id": "msn_p57_real_04",
+    "state": "COMPLETED",
+    "final_decision": "MISSION_PROVEN_COMPLETE",
+    "initial_state_hash": "f4f8215efd6f9f5c3cfc340ecf9ceb21fbe34c31226d16fc0421e6a0c2feb258",
+    "final_state_hash": "853145d747ad80d905ad30160abcf038c4cb2a6b056dfdf31da50fe89fe23e4b",
+    "plan_tasks": 4,
+    "checkpoints_count": 8,
+    "duration": 0.00025153160095214844
+  },
+  {
+    "mission_id": "msn_p57_real_05",
+    "state": "HUMAN_REVIEW_REQUIRED",
+    "final_decision": "NONE",
+    "initial_state_hash": "5bce4a7cf0c2924eea2edf57e57b48bb1afab53c80f6ad7e3d44be77c4a37f4c",
+    "final_state_hash": "00f4350a4eec44acbee543e5c08a01b27acf2be6493fc88b7b342a7f6402dded",
+    "plan_tasks": 0,
+    "checkpoints_count": 0,
+    "duration": 7.772445678710938e-05
+  },
+  {
+    "mission_id": "msn_p57_unseen_06",
+    "state": "FAILED",
+    "final_decision": "MISSION_FAILED",
+    "initial_state_hash": "cb8e2d9494bd027ff164f5fe2d706fbbe8b3db2c5abbd653cf4d0a953abbdf0a",
+    "final_state_hash": "14cce0695d90f91fdd74a40031c64abe0365c5e6c9ad22787871206d1c3aff25",
+    "plan_tasks": 4,
+    "checkpoints_count": 6,
+    "duration": 0.0002002716064453125
+  },
+  {
+    "mission_id": "msn_p57_unseen_07",
+    "state": "COMPLETED",
+    "final_decision": "MISSION_PROVEN_COMPLETE",
+    "initial_state_hash": "abf92951572fb4ae651094dd8f5eb0ebdd56be07323112763871300b0cf7c23c",
+    "final_state_hash": "4218e98b5407e144efda8b3650b93696202baf8261e0989f0a6bc3b688444a2f",
+    "plan_tasks": 4,
+    "checkpoints_count": 7,
+    "duration": 0.0001952648162841797
+  },
+  {
+    "mission_id": "msn_p57_unseen_08",
+    "state": "COMPLETED",
+    "final_decision": "MISSION_PROVEN_COMPLETE",
+    "initial_state_hash": "d2dbf5a0b5a7d633e1a1852ffee1031f7b13a0fe8a85a7875b22c5e007ecc779",
+    "final_state_hash": "11b0a3f3b22c4ddf0b433cbaa5942ad0f2b2e2e343f9b51b65c6b14517ab77e6",
+    "plan_tasks": 4,
+    "checkpoints_count": 7,
+    "duration": 0.00021719932556152344
+  },
+  {
+    "mission_id": "msn_p57_unseen_09",
+    "state": "COMPLETED",
+    "final_decision": "MISSION_PROVEN_COMPLETE",
+    "initial_state_hash": "1ddfab7ffdd318e395cb90173c6cb9f83a4a075fe09176270b11b9e098b215f8",
+    "final_state_hash": "4e17fb5a41ffec5a58afd25b53fa7ce127d8ff91c929d79a55cdd691b1c7eeca",
+    "plan_tasks": 4,
+    "checkpoints_count": 7,
+    "duration": 0.00020384788513183594
+  },
+  {
+    "mission_id": "msn_p57_unseen_10",
+    "state": "COMPLETED",
+    "final_decision": "MISSION_PROVEN_COMPLETE",
+    "initial_state_hash": "605f9d28626a0098150799f26668f08aee6365caf83aa7daadcf0cbb8ffc315e",
+    "final_state_hash": "4b770737442fcf9a8442c94acd4ad100a8d5996d7bd425479156afc329e15bc2",
+    "plan_tasks": 4,
+    "checkpoints_count": 7,
+    "duration": 0.00019097328186035156
+  }
+]

@@ -29,3 +29,4 @@ export { UniversalPreflightRecoveryPanel } from './UniversalPreflightRecoveryPan
 export { VerifiedRepairSynthesisPanel } from './VerifiedRepairSynthesisPanel';
 export { MultiRepairOrchestrationPanel } from './MultiRepairOrchestrationPanel';
 export { AutonomousRepairConvergencePanel } from './AutonomousRepairConvergencePanel';
+export { AutonomousTaskCompletionPanel } from './AutonomousTaskCompletionPanel';

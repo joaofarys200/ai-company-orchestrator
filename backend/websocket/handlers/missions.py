@@ -1337,6 +1337,41 @@ class MissionWebSocketHandler:
                 )
                 return
 
+            elif operation == "mission_task_completion_run":
+                from backend.agents.autonomous_task_completion.bridge import AutonomousTaskCompletionBridge
+                raw_intent = str(message.get("intent") or "Implementar tarefa autónoma de engenharia com verificação completa")
+                m_id = str(message.get("mission_id") or "m_p57_task_01")
+                mission = await asyncio.to_thread(
+                    AutonomousTaskCompletionBridge.run_intent_to_completion,
+                    raw_intent=raw_intent,
+                    mission_id=m_id,
+                )
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_task_completion_run_result",
+                        "project_id": project_id,
+                        "mission_id": m_id,
+                        "mission": mission.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_task_completion_status":
+                from backend.agents.autonomous_task_completion.bridge import AutonomousTaskCompletionBridge
+                m_id = str(message.get("mission_id") or "m_p57_task_01")
+                mission = AutonomousTaskCompletionBridge.get_mission(m_id)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_task_completion_status_result",
+                        "project_id": project_id,
+                        "mission_id": m_id,
+                        "mission": mission.to_dict() if mission else None,
+                    },
+                )
+                return
+
             if snapshot is None:
                 return
             active_store = getattr(
