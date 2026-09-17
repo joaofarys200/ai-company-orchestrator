@@ -1406,8 +1406,45 @@ class MissionWebSocketHandler:
                 )
                 return
 
+            elif operation == "mission_scc_graph_status":
+                from backend.agents.scc_aware_graph.bridge import SCCAwareGraphBridge
+                p_id = str(message.get("project_id") or project_id or "default")
+                status = SCCAwareGraphBridge.get_graph_status(p_id)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_scc_graph_status_result",
+                        "project_id": p_id,
+                        "status": status,
+                    },
+                )
+                return
+
+            elif operation == "mission_scc_graph_query_impact":
+                from backend.agents.scc_aware_graph.bridge import SCCAwareGraphBridge
+                p_id = str(message.get("project_id") or project_id or "default")
+                symbols = list(message.get("symbols") or ["fe_scc_panel"])
+                max_sccs = int(message.get("max_sccs") or 15)
+                max_nodes = int(message.get("max_nodes") or 250)
+                impact_result = SCCAwareGraphBridge.query_impact(
+                    symbols=symbols,
+                    project_id=p_id,
+                    max_sccs=max_sccs,
+                    max_nodes=max_nodes,
+                )
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_scc_graph_query_impact_result",
+                        "project_id": p_id,
+                        "impact": impact_result,
+                    },
+                )
+                return
+
             if snapshot is None:
                 return
+
             active_store = getattr(
                 planner,
                 "mission_state",
