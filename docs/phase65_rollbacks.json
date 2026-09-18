@@ -1,0 +1,9 @@
+[
+  {
+    "case_index": 5,
+    "transaction_id": "tx_case_5",
+    "status": "ROLLED_BACK",
+    "hash_verification_passed": true,
+    "residual_changes": []
+  }
+]

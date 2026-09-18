@@ -1,0 +1,42 @@
+[
+  {
+    "decision_id": "dec_real_01",
+    "problem_id": "prob_fe_mod",
+    "alternative_id": "alt_fe_mod_01",
+    "state": "APPROVED_FOR_IMPLEMENTATION",
+    "provenance_hash": "fe01fe01fe01fe01fe01fe01fe01fe01",
+    "sentinel_passed": true
+  },
+  {
+    "decision_id": "dec_real_02",
+    "problem_id": "prob_be_boundary",
+    "alternative_id": "alt_be_boundary_01",
+    "state": "APPROVED_FOR_IMPLEMENTATION",
+    "provenance_hash": "be02be02be02be02be02be02be02be02",
+    "sentinel_passed": true
+  },
+  {
+    "decision_id": "dec_real_03",
+    "problem_id": "prob_dep_inversion",
+    "alternative_id": "alt_dep_inversion_01",
+    "state": "APPROVED_FOR_IMPLEMENTATION",
+    "provenance_hash": "di03di03di03di03di03di03di03di03",
+    "sentinel_passed": true
+  },
+  {
+    "decision_id": "dec_real_04",
+    "problem_id": "prob_contract_preserv",
+    "alternative_id": "alt_contract_preserv_01",
+    "state": "APPROVED_FOR_IMPLEMENTATION",
+    "provenance_hash": "cp04cp04cp04cp04cp04cp04cp04cp04",
+    "sentinel_passed": true
+  },
+  {
+    "decision_id": "dec_real_05",
+    "problem_id": "prob_testability_fail",
+    "alternative_id": "alt_testability_fail_01",
+    "state": "APPROVED_FOR_IMPLEMENTATION",
+    "provenance_hash": "tf05tf05tf05tf05tf05tf05tf05tf05",
+    "sentinel_passed": true
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "case": 1,
+    "checkpoints": [
+      "PRE_APPLY",
+      "POST_APPLY"
+    ]
+  },
+  {
+    "case": 2,
+    "checkpoints": [
+      "PRE_APPLY",
+      "POST_APPLY"
+    ]
+  },
+  {
+    "case": 3,
+    "checkpoints": [
+      "PRE_APPLY",
+      "POST_APPLY"
+    ]
+  },
+  {
+    "case": 4,
+    "checkpoints": [
+      "PRE_APPLY",
+      "POST_APPLY"
+    ]
+  },
+  {
+    "case": 5,
+    "checkpoints": [
+      "PRE_APPLY",
+      "POST_APPLY"
+    ]
+  }
+]

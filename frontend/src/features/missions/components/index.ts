@@ -37,3 +37,4 @@ export { AutonomousTestSynthesisPanel } from './AutonomousTestSynthesisPanel';
 export { ContinuousVerificationPanel } from './ContinuousVerificationPanel';
 export { CrossProjectLearningPanel } from './CrossProjectLearningPanel';
 export { ArchitectureEvolutionPanel } from './ArchitectureEvolutionPanel';
+export { SafeSelfModificationPanel } from './SafeSelfModificationPanel';

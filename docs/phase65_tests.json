@@ -1,0 +1,32 @@
+[
+  {
+    "case_index": 1,
+    "status": "PASS",
+    "passed": 1,
+    "failed": 0
+  },
+  {
+    "case_index": 2,
+    "status": "PASS",
+    "passed": 1,
+    "failed": 0
+  },
+  {
+    "case_index": 3,
+    "status": "PASS",
+    "passed": 1,
+    "failed": 0
+  },
+  {
+    "case_index": 4,
+    "status": "PASS",
+    "passed": 1,
+    "failed": 0
+  },
+  {
+    "case_index": 5,
+    "status": "FAIL",
+    "passed": 0,
+    "failed": 1
+  }
+]

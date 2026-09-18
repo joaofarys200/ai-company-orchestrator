@@ -1,0 +1,89 @@
+{
+  "phase": 65,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "timestamp": 1789764072.4230516,
+  "scenarios_tested": 12,
+  "scenarios_passed": 12,
+  "scenarios": [
+    {
+      "scenario": "01 governance approval",
+      "filename": "phase65_01_governance_approval.png",
+      "description": "Phase 64 approved proposal input gate with provenance hash and security check",
+      "status": "PASS"
+    },
+    {
+      "scenario": "02 preflight",
+      "filename": "phase65_02_preflight.png",
+      "description": "Repository cleanliness check, baseline frozen, git status verification",
+      "status": "PASS"
+    },
+    {
+      "scenario": "03 snapshot",
+      "filename": "phase65_03_snapshot.png",
+      "description": "Immutable SHA-256 state snapshot of files, symbols, contracts, and architecture",
+      "status": "PASS"
+    },
+    {
+      "scenario": "04 patch proposal",
+      "filename": "phase65_04_patch_proposal.png",
+      "description": "Minimal verified patch diff proposal with inverse rollback patch specification",
+      "status": "PASS"
+    },
+    {
+      "scenario": "05 patch validation",
+      "filename": "phase65_05_patch_validation.png",
+      "description": "Syntax AST validation, import resolution, scope boundary enforcement, Sentinel scan",
+      "status": "PASS"
+    },
+    {
+      "scenario": "06 transaction state",
+      "filename": "phase65_06_transaction_state.png",
+      "description": "Transactional lifecycle state machine (CREATED -> COMMITTED / ROLLED_BACK)",
+      "status": "PASS"
+    },
+    {
+      "scenario": "07 build",
+      "filename": "phase65_07_build.png",
+      "description": "Build validation, Python compilation, TypeScript check, container readiness",
+      "status": "PASS"
+    },
+    {
+      "scenario": "08 tests",
+      "filename": "phase65_08_tests.png",
+      "description": "Impacted test selection, synthesized test execution, zero missing test PASS fallacy",
+      "status": "PASS"
+    },
+    {
+      "scenario": "09 verification",
+      "filename": "phase65_09_verification.png",
+      "description": "Continuous verification ledger, contract compatibility, and behavioral proof",
+      "status": "PASS"
+    },
+    {
+      "scenario": "10 architecture rescan",
+      "filename": "phase65_10_architecture_rescan.png",
+      "description": "Empirical before/after architecture re-scan comparing coupling, cohesion, and SCCs",
+      "status": "PASS"
+    },
+    {
+      "scenario": "11 rollback",
+      "filename": "phase65_11_rollback.png",
+      "description": "Deterministic rollback engine verifying CURRENT_HASHES == SNAPSHOT_HASHES",
+      "status": "PASS"
+    },
+    {
+      "scenario": "12 commit gate",
+      "filename": "phase65_12_commit_gate.png",
+      "description": "Strict 11-rule commit eligibility gate preventing unverified autonomous commits",
+      "status": "PASS"
+    }
+  ],
+  "console_errors": [
+    "[ERROR] The tag <%s> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter. g",
+    "[ERROR] [WebSocket] Error: Event",
+    "[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "failed_requests": [],
+  "overall_status": "WARNING"
+}

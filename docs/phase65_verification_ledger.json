@@ -1,0 +1,27 @@
+[
+  {
+    "tx_id": "tx_case_1",
+    "status": "COMMITTED",
+    "timestamp": 1789763824.0111651
+  },
+  {
+    "tx_id": "tx_case_2",
+    "status": "COMMITTED",
+    "timestamp": 1789763824.0111701
+  },
+  {
+    "tx_id": "tx_case_3",
+    "status": "COMMITTED",
+    "timestamp": 1789763824.0111716
+  },
+  {
+    "tx_id": "tx_case_4",
+    "status": "COMMITTED",
+    "timestamp": 1789763824.011172
+  },
+  {
+    "tx_id": "tx_case_5",
+    "status": "TEST_FAILED_ROLLED_BACK",
+    "timestamp": 1789763824.0111725
+  }
+]

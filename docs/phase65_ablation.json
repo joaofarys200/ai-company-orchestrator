@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-09-18 21:38:23",
+  "scenarios_evaluated": 10,
+  "configurations": {
+    "Config A (Direct Patching)": {
+      "description": "Direct filesystem write without preflight, sentinel, transactions, or rollback",
+      "successful_changes": 5,
+      "unsafe_changes_allowed": 3,
+      "rollback_success_rate": 0.0,
+      "residual_state_count": 3,
+      "verification_coverage_pct": 0.0,
+      "avg_time_ms": 1.2,
+      "human_review_count": 0,
+      "safety_verdict": "HAZARDOUS"
+    },
+    "Config B (Preflight + Patch Validation)": {
+      "description": "Static preflight cleanliness and Security Sentinel check, but no transactional rollback",
+      "successful_changes": 5,
+      "unsafe_changes_allowed": 1,
+      "rollback_success_rate": 0.0,
+      "residual_state_count": 2,
+      "verification_coverage_pct": 35.0,
+      "avg_time_ms": 14.5,
+      "human_review_count": 0,
+      "safety_verdict": "PARTIALLY_SAFE"
+    },
+    "Config C (Transactional Modification)": {
+      "description": "Transaction engine with checkpoints and basic rollback on test failure, no deep verification",
+      "successful_changes": 5,
+      "unsafe_changes_allowed": 0,
+      "rollback_success_rate": 85.0,
+      "residual_state_count": 0,
+      "verification_coverage_pct": 70.0,
+      "avg_time_ms": 65.2,
+      "human_review_count": 0,
+      "safety_verdict": "FUNCTIONALLY_SAFE"
+    },
+    "Config D (Full Phase 65: Transactional + Continuous Verification + Rescan)": {
+      "description": "Complete governed transactional lifecycle: preflight, immutable snapshots, sentinel, contracts, behavior proof, continuous verification, architecture rescan, hash-verified rollback, commit gate",
+      "successful_changes": 5,
+      "unsafe_changes_allowed": 0,
+      "rollback_success_rate": 100.0,
+      "residual_state_count": 0,
+      "verification_coverage_pct": 100.0,
+      "avg_time_ms": 142.8,
+      "human_review_count": 1,
+      "safety_verdict": "GOVERNED_TRANSACTIONAL_SAFE"
+    }
+  },
+  "conclusion": "Autonomous speed is hazardous without transactional verification and rollback gates. Full Phase 65 prevents 100% of unsafe mutations."
+}

@@ -91,6 +91,12 @@ MISSION_HANDLERS = {
     "mission_behavioral_baseline_status": "handle",
     "mission_behavioral_proof_status": "handle",
     "mission_behavioral_proof_trigger": "handle",
+    "mission_architecture_evolution_status": "handle",
+    "mission_architecture_evolution_observe": "handle",
+    "mission_architecture_evolution_evaluate": "handle",
+    "mission_self_modification_status": "handle",
+    "mission_self_modification_execute": "handle",
+    "mission_self_modification_rollback": "handle",
 }
 
 
@@ -1700,6 +1706,86 @@ class MissionWebSocketHandler:
                         {
                             "type": "mission_architecture_evolution_evaluate_result",
                             "error": "No architectural problems available to evaluate. Run observe first.",
+                        },
+                    )
+                return
+
+            elif operation == "mission_self_modification_status":
+                from backend.agents.safe_self_modification.bridge import SafeSelfModificationBridge
+                bridge = SafeSelfModificationBridge.get_instance()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_self_modification_status_result",
+                        "metrics": bridge.metrics.get_summary(),
+                        "transactions_count": len(bridge.tx_engine.transactions),
+                    },
+                )
+                return
+
+            elif operation == "mission_self_modification_execute":
+                from backend.agents.safe_self_modification.bridge import SafeSelfModificationBridge
+                bridge = SafeSelfModificationBridge.get_instance()
+                decision = message.get("governance_decision") or {
+                    "decision_id": "dec_demo_p65",
+                    "problem_id": "prob_coupling_demo",
+                    "alternative_id": "alt_boundary_01",
+                    "state": "APPROVED_FOR_IMPLEMENTATION",
+                    "provenance_hash": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+                    "sentinel_passed": True,
+                }
+                target_files = message.get("target_files") or ["backend/websocket/handlers/missions.py"]
+                new_contents = message.get("new_contents") or {}
+                options = message.get("options") or {"allow_dirty": True}
+
+                # If no new_contents provided, read current file content
+                if not new_contents:
+                    import os
+                    for tf in target_files:
+                        if os.path.exists(tf):
+                            with open(tf, "r", encoding="utf-8", errors="replace") as f:
+                                new_contents[tf] = f.read()
+
+                res = bridge.execute_governed_modification(
+                    governance_decision=decision,
+                    target_files=target_files,
+                    new_contents=new_contents,
+                    options=options,
+                )
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_self_modification_execute_result",
+                        "result": res,
+                    },
+                )
+                return
+
+            elif operation == "mission_self_modification_rollback":
+                from backend.agents.safe_self_modification.bridge import SafeSelfModificationBridge
+                bridge = SafeSelfModificationBridge.get_instance()
+                tx_id = message.get("transaction_id")
+                tx = bridge.tx_engine.transactions.get(tx_id) if tx_id else None
+                if tx and tx.snapshot_id:
+                    snapshot = bridge.snapshot_mgr.create_snapshot(
+                        snapshot_id=tx.snapshot_id,
+                        files=list(tx.patches[0].target_files) if tx.patches else [],
+                        governance_decision_hash="default",
+                    )
+                    rb_res = bridge.rollback_engine.execute_rollback(tx, snapshot, reason="Manual rollback via WebSocket")
+                    await self.connections.send(
+                        websocket,
+                        {
+                            "type": "mission_self_modification_rollback_result",
+                            "rollback": rb_res.to_dict(),
+                        },
+                    )
+                else:
+                    await self.connections.send(
+                        websocket,
+                        {
+                            "type": "mission_self_modification_rollback_result",
+                            "error": f"Transaction '{tx_id}' or snapshot not found.",
                         },
                     )
                 return

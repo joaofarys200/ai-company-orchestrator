@@ -1,0 +1,32 @@
+[
+  {
+    "case_index": 1,
+    "contract": "NON_BREAKING",
+    "behavior": "PRESERVED_WITHIN_SCOPE",
+    "status": "VERIFIED"
+  },
+  {
+    "case_index": 2,
+    "contract": "NON_BREAKING",
+    "behavior": "PRESERVED_WITHIN_SCOPE",
+    "status": "VERIFIED"
+  },
+  {
+    "case_index": 3,
+    "contract": "NON_BREAKING",
+    "behavior": "PRESERVED_WITHIN_SCOPE",
+    "status": "VERIFIED"
+  },
+  {
+    "case_index": 4,
+    "contract": "NON_BREAKING",
+    "behavior": "PRESERVED_WITHIN_SCOPE",
+    "status": "VERIFIED"
+  },
+  {
+    "case_index": 5,
+    "contract": "BREAKING",
+    "behavior": "POTENTIAL_DRIFT",
+    "status": "REGRESSION_DETECTED"
+  }
+]

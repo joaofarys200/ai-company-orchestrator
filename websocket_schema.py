@@ -308,9 +308,23 @@ CLIENT_MESSAGE_TYPES = {
     "mission_behavioral_baseline_status",
     "mission_behavioral_proof_status",
     "mission_behavioral_proof_trigger",
+    # Phase 64
+    "mission_architecture_evolution_status",
+    "mission_architecture_evolution_observe",
+    "mission_architecture_evolution_evaluate",
+    # Phase 65
+    "mission_self_modification_status",
+    "mission_self_modification_execute",
+    "mission_self_modification_rollback",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
+    "mission_architecture_evolution_status": (),
+    "mission_architecture_evolution_observe": (),
+    "mission_architecture_evolution_evaluate": (),
+    "mission_self_modification_status": (),
+    "mission_self_modification_execute": (),
+    "mission_self_modification_rollback": (),
     "mission_behavioral_baseline_status": (),
     "mission_behavioral_proof_status": (),
     "mission_behavioral_proof_trigger": (),
