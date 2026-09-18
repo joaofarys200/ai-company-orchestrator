@@ -1,0 +1,142 @@
+{
+  "standard_plan": {
+    "plan_id": "vplan_1789742959737",
+    "surface": {
+      "affected_files": [
+        "backend/legacy/v1_billing.py",
+        "backend/services/payment.py",
+        "contracts/schemas/payment_dto.py",
+        "frontend/src/features/missions/TaskCard.tsx",
+        "tests/test_payment_new.py"
+      ],
+      "affected_symbols": [
+        "class:PaymentDTO",
+        "func:old_calc",
+        "func:process_payment"
+      ],
+      "affected_tests": [
+        "test_TaskCard.py",
+        "test_payment.py",
+        "test_payment_dto.py",
+        "test_test_payment_new.py",
+        "test_v1_billing.py",
+        "tests/test_TaskCard.py",
+        "tests/test_payment.py",
+        "tests/test_payment_dto.py",
+        "tests/test_payment_new.py",
+        "tests/test_test_payment_new.py",
+        "tests/test_v1_billing.py"
+      ],
+      "affected_contracts": [
+        "class:PaymentDTO",
+        "contracts/schemas/payment_dto.py"
+      ],
+      "affected_behaviors": [],
+      "affected_consumers": [],
+      "browser_surfaces": [
+        "frontend/src/features/missions/TaskCard.tsx"
+      ],
+      "risk_level": "CRITICAL",
+      "uncertainty": 0.0,
+      "dynamic_boundaries": [],
+      "scc_clusters": []
+    },
+    "policy": {
+      "name": "STANDARD",
+      "max_tests": 50,
+      "max_runtime": 60.0,
+      "max_synthesis_attempts": 3,
+      "max_mutation_scope": 10,
+      "max_browser_tests": 3,
+      "max_retries": 2,
+      "max_memory_mb": 1024,
+      "allow_synthesis": true,
+      "allow_retries": true,
+      "fail_on_flaky": false,
+      "enforce_sentinel": true
+    },
+    "verification_required": true,
+    "status_signal": "VERIFICATION_REQUIRED",
+    "target_requirements": [
+      "SYMBOL_PRECISION_TEST",
+      "CONTRACT_CONFORMANCE_TEST",
+      "BROWSER_SURFACE_TEST",
+      "HIGH_RISK_DEFENSIVE_TEST"
+    ],
+    "budget_tests": 50,
+    "budget_runtime_s": 60.0,
+    "browser_verification_required": true,
+    "synthesis_permitted": true,
+    "created_at": 1789742959.737533
+  },
+  "strict_plan": {
+    "plan_id": "vplan_1789742959737",
+    "surface": {
+      "affected_files": [
+        "backend/legacy/v1_billing.py",
+        "backend/services/payment.py",
+        "contracts/schemas/payment_dto.py",
+        "frontend/src/features/missions/TaskCard.tsx",
+        "tests/test_payment_new.py"
+      ],
+      "affected_symbols": [
+        "class:PaymentDTO",
+        "func:old_calc",
+        "func:process_payment"
+      ],
+      "affected_tests": [
+        "test_TaskCard.py",
+        "test_payment.py",
+        "test_payment_dto.py",
+        "test_test_payment_new.py",
+        "test_v1_billing.py",
+        "tests/test_TaskCard.py",
+        "tests/test_payment.py",
+        "tests/test_payment_dto.py",
+        "tests/test_payment_new.py",
+        "tests/test_test_payment_new.py",
+        "tests/test_v1_billing.py"
+      ],
+      "affected_contracts": [
+        "class:PaymentDTO",
+        "contracts/schemas/payment_dto.py"
+      ],
+      "affected_behaviors": [],
+      "affected_consumers": [],
+      "browser_surfaces": [
+        "frontend/src/features/missions/TaskCard.tsx"
+      ],
+      "risk_level": "CRITICAL",
+      "uncertainty": 0.0,
+      "dynamic_boundaries": [],
+      "scc_clusters": []
+    },
+    "policy": {
+      "name": "STRICT",
+      "max_tests": 150,
+      "max_runtime": 180.0,
+      "max_synthesis_attempts": 5,
+      "max_mutation_scope": 25,
+      "max_browser_tests": 8,
+      "max_retries": 3,
+      "max_memory_mb": 2048,
+      "allow_synthesis": true,
+      "allow_retries": true,
+      "fail_on_flaky": true,
+      "enforce_sentinel": true
+    },
+    "verification_required": true,
+    "status_signal": "VERIFICATION_REQUIRED",
+    "target_requirements": [
+      "SYMBOL_PRECISION_TEST",
+      "CONTRACT_CONFORMANCE_TEST",
+      "BROWSER_SURFACE_TEST",
+      "HIGH_RISK_DEFENSIVE_TEST"
+    ],
+    "budget_tests": 150,
+    "budget_runtime_s": 180.0,
+    "browser_verification_required": true,
+    "synthesis_permitted": true,
+    "created_at": 1789742959.73755
+  }
+}

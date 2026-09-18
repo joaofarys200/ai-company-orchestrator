@@ -1,0 +1,107 @@
+{
+  "selected": [
+    {
+      "test_id": "test_payment_known_failure",
+      "priority": 1,
+      "priority_name": "KNOWN_FAILURE_REGRESSION",
+      "reason": "Matches known failure regression: test_payment_known_failure",
+      "is_synthesized": false,
+      "framework": "pytest",
+      "file_path": "backend/services/payment.py",
+      "symbol_id": "",
+      "estimated_cost_ms": 10.0
+    },
+    {
+      "test_id": "test_process_payment_direct",
+      "priority": 2,
+      "priority_name": "DIRECTLY_AFFECTED_SYMBOL",
+      "reason": "Directly tests affected symbol: func:process_payment",
+      "is_synthesized": false,
+      "framework": "pytest",
+      "file_path": "backend/services/payment.py",
+      "symbol_id": "func:process_payment",
+      "estimated_cost_ms": 10.0
+    },
+    {
+      "test_id": "test_payment_dto_contract",
+      "priority": 4,
+      "priority_name": "CONTRACT",
+      "reason": "Verifies affected contract boundary: contracts/schemas/payment_dto.py",
+      "is_synthesized": false,
+      "framework": "pytest",
+      "file_path": "contracts/schemas/payment_dto.py",
+      "symbol_id": "",
+      "estimated_cost_ms": 10.0
+    },
+    {
+      "test_id": "test_payment_pipeline_behavior",
+      "priority": 5,
+      "priority_name": "BEHAVIORAL",
+      "reason": "Validates behavioral preservation: test_payment_pipeline_behavior",
+      "is_synthesized": false,
+      "framework": "pytest",
+      "file_path": "backend/workflows/pipeline.py",
+      "symbol_id": "",
+      "estimated_cost_ms": 10.0
+    },
+    {
+      "test_id": "test_security_payment_token",
+      "priority": 6,
+      "priority_name": "HIGH_RISK",
+      "reason": "High-risk defensive test: test_security_payment_token",
+      "is_synthesized": false,
+      "framework": "pytest",
+      "file_path": "backend/services/payment.py",
+      "symbol_id": "",
+      "estimated_cost_ms": 10.0
+    },
+    {
+      "test_id": "test_browser_payment_ui",
+      "priority": 7,
+      "priority_name": "BROWSER",
+      "reason": "Browser UI surface test: test_browser_payment_ui",
+      "is_synthesized": false,
+      "framework": "playwright",
+      "file_path": "frontend/src/features/missions/TaskCard.tsx",
+      "symbol_id": "",
+      "estimated_cost_ms": 50.0
+    },
+    {
+      "test_id": "test_broader_payment_integration",
+      "priority": 8,
+      "priority_name": "BROADER_REGRESSION",
+      "reason": "Broader regression on affected file: backend/services/payment.py",
+      "is_synthesized": false,
+      "framework": "pytest",
+      "file_path": "backend/services/payment.py",
+      "symbol_id": "",
+      "estimated_cost_ms": 10.0
+    }
+  ],
+  "skipped": [],
+  "deferred": [],
+  "required_but_missing": [
+    {
+      "gap_type": "SYMBOL_UNCOVERED",
+      "target_symbol": "class:PaymentDTO",
+      "reason": "No existing test selected for affected symbol 'class:PaymentDTO'",
+      "risk_level": "CRITICAL"
+    },
+    {
+      "gap_type": "SYMBOL_UNCOVERED",
+      "target_symbol": "func:old_calc",
+      "reason": "No existing test selected for affected symbol 'func:old_calc'",
+      "risk_level": "CRITICAL"
+    },
+    {
+      "gap_type": "CONTRACT_UNCOVERED",
+      "target_contract": "class:PaymentDTO",
+      "reason": "Contract 'class:PaymentDTO' has no corresponding contract test selected",
+      "risk_level": "CRITICAL"
+    }
+  ],
+  "total_selected": 7,
+  "total_skipped": 0,
+  "total_deferred": 0,
+  "total_missing": 3
+}

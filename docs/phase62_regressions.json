@@ -1,0 +1,86 @@
+{
+  "classification": "REGRESSION",
+  "dimensions_evaluated": {
+    "pass_fail": {
+      "status": "REGRESSED",
+      "failed_tests": [
+        "test_payment_known_failure"
+      ]
+    },
+    "line_coverage": {
+      "status": "IMPROVED",
+      "current": 0.85,
+      "baseline": 0.0,
+      "delta": 0.85
+    },
+    "branch_coverage": {
+      "status": "IMPROVED",
+      "current": 0.73,
+      "baseline": 0.0,
+      "delta": 0.73
+    },
+    "symbol_coverage": {
+      "status": "IMPROVED",
+      "current": 1.0,
+      "baseline": 0.0,
+      "delta": 1.0
+    },
+    "contract_coverage": {
+      "status": "IMPROVED",
+      "current": 1.0,
+      "baseline": 0.0,
+      "delta": 1.0
+    },
+    "behavior_coverage": {
+      "status": "IMPROVED",
+      "current": 1.0,
+      "baseline": 0.0,
+      "delta": 1.0
+    },
+    "invariant_coverage": {
+      "status": "IMPROVED",
+      "current": 0.95,
+      "baseline": 0.0,
+      "delta": 0.95
+    },
+    "consumer_coverage": {
+      "status": "IMPROVED",
+      "current": 1.0,
+      "baseline": 0.0,
+      "delta": 1.0
+    },
+    "browser_coverage": {
+      "status": "IMPROVED",
+      "current": 1.0,
+      "baseline": 0.0,
+      "delta": 1.0
+    },
+    "mutation_coverage": {
+      "status": "IMPROVED",
+      "current": 0.82,
+      "baseline": 0.0,
+      "delta": 0.82
+    },
+    "execution_time": {
+      "status": "STABLE",
+      "current_s": 0.45,
+      "baseline_s": 0.0
+    }
+  },
+  "regressed_items": [
+    "failed_test:test_payment_known_failure"
+  ],
+  "improved_items": [
+    "coverage_gain:line_coverage",
+    "coverage_gain:branch_coverage",
+    "coverage_gain:symbol_coverage",
+    "coverage_gain:contract_coverage",
+    "coverage_gain:behavior_coverage",
+    "coverage_gain:invariant_coverage",
+    "coverage_gain:consumer_coverage",
+    "coverage_gain:browser_coverage",
+    "coverage_gain:mutation_coverage"
+  ],
+  "explanation": "Regressions detected across 1 dimension(s): failed_test:test_payment_known_failure",
+  "confidence": 0.85
+}

@@ -1,0 +1,80 @@
+{
+  "id": "cs_canonical_phase62",
+  "deterministic_hash": "c10fbfecaf7ea573f590da1609aba37248849ff061c330f18e813d64d00a0993",
+  "total_files": 5,
+  "total_symbols": 3,
+  "timestamp": 1789742959.7349787,
+  "source": "canonical_generation",
+  "changes": [
+    {
+      "file_path": "backend/services/payment.py",
+      "symbol_id": "func:process_payment",
+      "change_type": "SYMBOL_CHANGED",
+      "before_hash": "h1",
+      "after_hash": "h2",
+      "diff_metadata": {
+        "lines_added": 5,
+        "lines_removed": 2
+      },
+      "source": "WORKSPACE_MODIFICATION",
+      "logical_timestamp": 0,
+      "confidence": 1.0
+    },
+    {
+      "file_path": "contracts/schemas/payment_dto.py",
+      "symbol_id": "class:PaymentDTO",
+      "change_type": "CONTRACT_CHANGED",
+      "before_hash": "h3",
+      "after_hash": "h4",
+      "diff_metadata": {
+        "lines_added": 3,
+        "lines_removed": 0
+      },
+      "source": "GIT",
+      "logical_timestamp": 0,
+      "confidence": 1.0
+    },
+    {
+      "file_path": "backend/legacy/v1_billing.py",
+      "symbol_id": "func:old_calc",
+      "change_type": "SYMBOL_REMOVED",
+      "before_hash": "h5",
+      "after_hash": "",
+      "diff_metadata": {
+        "lines_added": 0,
+        "lines_removed": 12
+      },
+      "source": "REPAIR_RESULT",
+      "logical_timestamp": 0,
+      "confidence": 1.0
+    },
+    {
+      "file_path": "frontend/src/features/missions/TaskCard.tsx",
+      "symbol_id": null,
+      "change_type": "MODIFIED",
+      "before_hash": "h6",
+      "after_hash": "h7",
+      "diff_metadata": {
+        "lines_added": 4,
+        "lines_removed": 1
+      },
+      "source": "RUNTIME_MISSION",
+      "logical_timestamp": 0,
+      "confidence": 1.0
+    },
+    {
+      "file_path": "tests/test_payment_new.py",
+      "symbol_id": null,
+      "change_type": "TEST_CHANGED",
+      "before_hash": "",
+      "after_hash": "h8",
+      "diff_metadata": {
+        "lines_added": 25,
+        "lines_removed": 0
+      },
+      "source": "AUTONOMOUS_MODIFICATION",
+      "logical_timestamp": 0,
+      "confidence": 1.0
+    }
+  ]
+}

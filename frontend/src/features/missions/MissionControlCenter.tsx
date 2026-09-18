@@ -70,6 +70,7 @@ import {
   SCCAwareGraphPanel,
   SymbolFineGrainedGraphPanel,
   AutonomousTestSynthesisPanel,
+  ContinuousVerificationPanel,
 } from './components';
 
 
@@ -236,7 +237,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   const [selectedScenario, setSelectedScenario] = useState<ScenarioKey>('INTERACTIVE');
   const [missionState, setMissionState] = useState<MissionControlStateData>(FALLBACK_INTERACTIVE_STATE);
   const [activeViewSection, setActiveViewSection] = useState<
-    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'verified_repair_synthesis' | 'multi_repair_orchestration' | 'autonomous_repair_convergence' | 'autonomous_task_completion' | 'massive_project_state' | 'scc_aware_graph' | 'symbol_fine_grained_graph' | 'autonomous_test_synthesis' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
+    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'verified_repair_synthesis' | 'multi_repair_orchestration' | 'autonomous_repair_convergence' | 'autonomous_task_completion' | 'massive_project_state' | 'scc_aware_graph' | 'symbol_fine_grained_graph' | 'autonomous_test_synthesis' | 'continuous_verification' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
   >('overview');
 
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
@@ -595,6 +596,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
           { id: 'scc_aware_graph', label: 'Grafo SCC & Condensação DAG (Fase 59)', icon: Network },
           { id: 'symbol_fine_grained_graph', label: 'Grafo de Símbolos & Precisão SCC (Fase 60)', icon: Cpu },
           { id: 'autonomous_test_synthesis', label: 'Síntese de Testes & Cobertura (Fase 61)', icon: FlaskConical },
+          { id: 'continuous_verification', label: 'Verificação Contínua & Regressão (Fase 62)', icon: ShieldCheck },
           { id: 'evidence_impact', label: 'Impacto em Evidências', icon: ShieldAlert },
           { id: 'why', label: 'Painel do Porquê ("Why Panel")', icon: Brain },
           { id: 'repairs', label: 'Auto-Cura & Adaptação', icon: Wrench },
@@ -817,6 +819,10 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
 
         {activeViewSection === 'autonomous_test_synthesis' && (
           <AutonomousTestSynthesisPanel />
+        )}
+
+        {activeViewSection === 'continuous_verification' && (
+          <ContinuousVerificationPanel />
         )}
 
         {activeViewSection === 'evidence_impact' && (

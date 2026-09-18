@@ -1499,6 +1499,52 @@ class MissionWebSocketHandler:
                 )
                 return
 
+            elif operation == "mission_continuous_verification_status":
+                from backend.agents.continuous_verification.bridge import ContinuousVerificationBridge
+                bridge = ContinuousVerificationBridge.get_instance()
+                latest_baseline = bridge.baseline_store.get_latest_snapshot()
+                metrics = bridge.metrics.to_dict()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_continuous_verification_status_result",
+                        "status": "ready",
+                        "policy": "STANDARD",
+                        "metrics": metrics,
+                        "latest_baseline": latest_baseline.to_dict() if latest_baseline else None,
+                    },
+                )
+                return
+
+            elif operation == "mission_continuous_verification_run":
+                from backend.agents.continuous_verification.bridge import ContinuousVerificationBridge
+                from backend.agents.continuous_verification.models import ChangeItem, ChangeSet, ChangeType, ChangeSource
+                bridge = ContinuousVerificationBridge.get_instance()
+                file_path = str(message.get("file_path") or "agents/payment.py")
+                symbol_id = str(message.get("symbol_id") or "process_transaction")
+                policy_str = str(message.get("policy") or "STANDARD")
+
+                item = ChangeItem(
+                    file_path=file_path,
+                    symbol_id=symbol_id,
+                    change_type=ChangeType.MODIFIED,
+                    before_hash="hash_v1",
+                    after_hash="hash_v2",
+                    diff_metadata={"lines_added": 5, "lines_removed": 2},
+                    source=ChangeSource.WORKSPACE_MODIFICATION,
+                )
+                cs = ChangeSet(id="cs_ws_trigger", changes=[item], source="websocket")
+                decision = bridge.verify_change(change_set=cs, policy=policy_str)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_continuous_verification_run_result",
+                        "decision": decision.to_dict(),
+                        "metrics": bridge.metrics.to_dict(),
+                    },
+                )
+                return
+
             if snapshot is None:
                 return
 

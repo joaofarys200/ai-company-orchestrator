@@ -1,0 +1,68 @@
+{
+  "total_executed": 7,
+  "results": [
+    {
+      "test_id": "test_payment_known_failure",
+      "status": "FAIL",
+      "duration_ms": 0.11,
+      "output": "",
+      "error_message": "Simulated regression assertion failure",
+      "failure_fingerprint": "9d1430adce",
+      "is_synthesized": false
+    },
+    {
+      "test_id": "test_process_payment_direct",
+      "status": "PASS",
+      "duration_ms": 0.01,
+      "output": "Executed test_process_payment_direct successfully",
+      "error_message": null,
+      "failure_fingerprint": null,
+      "is_synthesized": false
+    },
+    {
+      "test_id": "test_payment_dto_contract",
+      "status": "PASS",
+      "duration_ms": 0.0,
+      "output": "Executed test_payment_dto_contract successfully",
+      "error_message": null,
+      "failure_fingerprint": null,
+      "is_synthesized": false
+    },
+    {
+      "test_id": "test_payment_pipeline_behavior",
+      "status": "PASS",
+      "duration_ms": 0.0,
+      "output": "Executed test_payment_pipeline_behavior successfully",
+      "error_message": null,
+      "failure_fingerprint": null,
+      "is_synthesized": false
+    },
+    {
+      "test_id": "test_security_payment_token",
+      "status": "PASS",
+      "duration_ms": 0.0,
+      "output": "Executed test_security_payment_token successfully",
+      "error_message": null,
+      "failure_fingerprint": null,
+      "is_synthesized": false
+    },
+    {
+      "test_id": "test_browser_payment_ui",
+      "status": "PASS",
+      "duration_ms": 0.0,
+      "output": "Executed test_browser_payment_ui successfully",
+      "error_message": null,
+      "failure_fingerprint": null,
+      "is_synthesized": false
+    },
+    {
+      "test_id": "test_broader_payment_integration",
+      "status": "PASS",
+      "duration_ms": 0.0,
+      "output": "Executed test_broader_payment_integration successfully",
+      "error_message": null,
+      "failure_fingerprint": null,
+      "is_synthesized": false
+    }
+  ]
+}

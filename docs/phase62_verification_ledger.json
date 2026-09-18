@@ -1,0 +1,532 @@
+{
+  "decision_id": "dec_vrun_1789742959758",
+  "outcome": "REGRESSION_DETECTED",
+  "evidence_entries": [
+    {
+      "stage": "INITIAL",
+      "data_hash": "a5daa90c63d6667aedc6feb52a016f4bd5fb92d305b2438d1b3d9903edbf50d3",
+      "details": {
+        "run_id": "vrun_1789742959758",
+        "policy": "STANDARD"
+      },
+      "timestamp": 1789742959.7587764
+    },
+    {
+      "stage": "CHANGE_DETECTED",
+      "data_hash": "f150d490d3da6fdb69c0505e3d5205e0f234be81b66f9c17107abe8532b6ab9c",
+      "details": {
+        "change_hash": "c10fbfecaf7ea573f590da1609aba37248849ff061c330f18e813d64d00a0993",
+        "total_changes": 5
+      },
+      "timestamp": 1789742959.759258
+    },
+    {
+      "stage": "IMPACT_ANALYSIS",
+      "data_hash": "e2b5fd1690a8072dc36a0e6f2a8f82cf6d77972d670e8676b371caebe49c273e",
+      "details": {
+        "affected_files": [
+          "backend/legacy/v1_billing.py",
+          "backend/services/payment.py",
+          "contracts/schemas/payment_dto.py",
+          "frontend/src/features/missions/TaskCard.tsx",
+          "tests/test_payment_new.py"
+        ],
+        "affected_symbols": [
+          "class:PaymentDTO",
+          "func:old_calc",
+          "func:process_payment"
+        ],
+        "affected_tests": [
+          "test_TaskCard.py",
+          "test_payment.py",
+          "test_payment_dto.py",
+          "test_test_payment_new.py",
+          "test_v1_billing.py",
+          "tests/test_TaskCard.py",
+          "tests/test_payment.py",
+          "tests/test_payment_dto.py",
+          "tests/test_payment_new.py",
+          "tests/test_test_payment_new.py",
+          "tests/test_v1_billing.py"
+        ],
+        "affected_contracts": [
+          "class:PaymentDTO",
+          "contracts/schemas/payment_dto.py"
+        ],
+        "affected_behaviors": [],
+        "affected_consumers": [],
+        "browser_surfaces": [
+          "frontend/src/features/missions/TaskCard.tsx"
+        ],
+        "risk_level": "CRITICAL",
+        "uncertainty": 0.0,
+        "dynamic_boundaries": [],
+        "scc_clusters": []
+      },
+      "timestamp": 1789742959.7594438
+    },
+    {
+      "stage": "PLANNING",
+      "data_hash": "294fbfd299335d47bdea9d133b7bdf79340b5de266d5a0055c8d5ac6d02c98d5",
+      "details": {
+        "plan_id": "vplan_1789742959759",
+        "surface": {
+          "affected_files": [
+            "backend/legacy/v1_billing.py",
+            "backend/services/payment.py",
+            "contracts/schemas/payment_dto.py",
+            "frontend/src/features/missions/TaskCard.tsx",
+            "tests/test_payment_new.py"
+          ],
+          "affected_symbols": [
+            "class:PaymentDTO",
+            "func:old_calc",
+            "func:process_payment"
+          ],
+          "affected_tests": [
+            "test_TaskCard.py",
+            "test_payment.py",
+            "test_payment_dto.py",
+            "test_test_payment_new.py",
+            "test_v1_billing.py",
+            "tests/test_TaskCard.py",
+            "tests/test_payment.py",
+            "tests/test_payment_dto.py",
+            "tests/test_payment_new.py",
+            "tests/test_test_payment_new.py",
+            "tests/test_v1_billing.py"
+          ],
+          "affected_contracts": [
+            "class:PaymentDTO",
+            "contracts/schemas/payment_dto.py"
+          ],
+          "affected_behaviors": [],
+          "affected_consumers": [],
+          "browser_surfaces": [
+            "frontend/src/features/missions/TaskCard.tsx"
+          ],
+          "risk_level": "CRITICAL",
+          "uncertainty": 0.0,
+          "dynamic_boundaries": [],
+          "scc_clusters": []
+        },
+        "policy": {
+          "name": "STANDARD",
+          "max_tests": 50,
+          "max_runtime": 60.0,
+          "max_synthesis_attempts": 3,
+          "max_mutation_scope": 10,
+          "max_browser_tests": 3,
+          "max_retries": 2,
+          "max_memory_mb": 1024,
+          "allow_synthesis": true,
+          "allow_retries": true,
+          "fail_on_flaky": false,
+          "enforce_sentinel": true
+        },
+        "verification_required": true,
+        "status_signal": "VERIFICATION_REQUIRED",
+        "target_requirements": [
+          "SYMBOL_PRECISION_TEST",
+          "CONTRACT_CONFORMANCE_TEST",
+          "BROWSER_SURFACE_TEST",
+          "HIGH_RISK_DEFENSIVE_TEST"
+        ],
+        "budget_tests": 50,
+        "budget_runtime_s": 60.0,
+        "browser_verification_required": true,
+        "synthesis_permitted": true,
+        "created_at": 1789742959.7594876
+      },
+      "timestamp": 1789742959.75961
+    },
+    {
+      "stage": "SELECTING",
+      "data_hash": "f1a2848e863ebf519661afef9f84a77f08f362058ab4d1e536b3e96a15c418de",
+      "details": {
+        "selected": [
+          {
+            "test_id": "test_payment_known_failure",
+            "priority": 1,
+            "priority_name": "KNOWN_FAILURE_REGRESSION",
+            "reason": "Matches known failure regression: test_payment_known_failure",
+            "is_synthesized": false,
+            "framework": "pytest",
+            "file_path": "backend/services/payment.py",
+            "symbol_id": "",
+            "estimated_cost_ms": 10.0
+          },
+          {
+            "test_id": "test_process_payment_direct",
+            "priority": 2,
+            "priority_name": "DIRECTLY_AFFECTED_SYMBOL",
+            "reason": "Directly tests affected symbol: func:process_payment",
+            "is_synthesized": false,
+            "framework": "pytest",
+            "file_path": "backend/services/payment.py",
+            "symbol_id": "func:process_payment",
+            "estimated_cost_ms": 10.0
+          },
+          {
+            "test_id": "test_payment_dto_contract",
+            "priority": 4,
+            "priority_name": "CONTRACT",
+            "reason": "Verifies affected contract boundary: contracts/schemas/payment_dto.py",
+            "is_synthesized": false,
+            "framework": "pytest",
+            "file_path": "contracts/schemas/payment_dto.py",
+            "symbol_id": "",
+            "estimated_cost_ms": 10.0
+          },
+          {
+            "test_id": "test_payment_pipeline_behavior",
+            "priority": 5,
+            "priority_name": "BEHAVIORAL",
+            "reason": "Validates behavioral preservation: test_payment_pipeline_behavior",
+            "is_synthesized": false,
+            "framework": "pytest",
+            "file_path": "backend/workflows/pipeline.py",
+            "symbol_id": "",
+            "estimated_cost_ms": 10.0
+          },
+          {
+            "test_id": "test_security_payment_token",
+            "priority": 6,
+            "priority_name": "HIGH_RISK",
+            "reason": "High-risk defensive test: test_security_payment_token",
+            "is_synthesized": false,
+            "framework": "pytest",
+            "file_path": "backend/services/payment.py",
+            "symbol_id": "",
+            "estimated_cost_ms": 10.0
+          },
+          {
+            "test_id": "test_browser_payment_ui",
+            "priority": 7,
+            "priority_name": "BROWSER",
+            "reason": "Browser UI surface test: test_browser_payment_ui",
+            "is_synthesized": false,
+            "framework": "playwright",
+            "file_path": "frontend/src/features/missions/TaskCard.tsx",
+            "symbol_id": "",
+            "estimated_cost_ms": 50.0
+          },
+          {
+            "test_id": "test_broader_payment_integration",
+            "priority": 8,
+            "priority_name": "BROADER_REGRESSION",
+            "reason": "Broader regression on affected file: backend/services/payment.py",
+            "is_synthesized": false,
+            "framework": "pytest",
+            "file_path": "backend/services/payment.py",
+            "symbol_id": "",
+            "estimated_cost_ms": 10.0
+          }
+        ],
+        "skipped": [],
+        "deferred": [],
+        "required_but_missing": [
+          {
+            "gap_type": "SYMBOL_UNCOVERED",
+            "target_symbol": "class:PaymentDTO",
+            "reason": "No existing test selected for affected symbol 'class:PaymentDTO'",
+            "risk_level": "CRITICAL"
+          },
+          {
+            "gap_type": "SYMBOL_UNCOVERED",
+            "target_symbol": "func:old_calc",
+            "reason": "No existing test selected for affected symbol 'func:old_calc'",
+            "risk_level": "CRITICAL"
+          },
+          {
+            "gap_type": "CONTRACT_UNCOVERED",
+            "target_contract": "class:PaymentDTO",
+            "reason": "Contract 'class:PaymentDTO' has no corresponding contract test selected",
+            "risk_level": "CRITICAL"
+          }
+        ],
+        "total_selected": 7,
+        "total_skipped": 0,
+        "total_deferred": 0,
+        "total_missing": 3
+      },
+      "timestamp": 1789742959.7598367
+    },
+    {
+      "stage": "SYNTHESIZING",
+      "data_hash": "7f941e5e2ecece02c507c7def1d92ee807f63d83e5c0a5dde7fbb5d3a4254ac4",
+      "details": {
+        "synthesized_count": 3,
+        "unresolved_gaps": []
+      },
+      "timestamp": 1789742959.760565
+    },
+    {
+      "stage": "VALIDATING_TESTS",
+      "data_hash": "a7304a8a44c66d6a03eb0309560037b084e32b2d662c08b2b747875670bf09aa",
+      "details": {
+        "validated_count": 10
+      },
+      "timestamp": 1789742959.7609353
+    },
+    {
+      "stage": "EXECUTING",
+      "data_hash": "773d90aa8acde90a1e406dae76a09a563a0c0dc3f8ea94e1e5a03ec737b9a21c",
+      "details": {
+        "results": [
+          {
+            "test_id": "test_payment_known_failure",
+            "status": "FAIL",
+            "duration_ms": 0.01,
+            "output": "",
+            "error_message": "Simulated regression assertion failure",
+            "failure_fingerprint": "9d1430adce",
+            "is_synthesized": false
+          },
+          {
+            "test_id": "test_process_payment_direct",
+            "status": "PASS",
+            "duration_ms": 0.0,
+            "output": "Executed test_process_payment_direct successfully",
+            "error_message": null,
+            "failure_fingerprint": null,
+            "is_synthesized": false
+          },
+          {
+            "test_id": "test_payment_dto_contract",
+            "status": "PASS",
+            "duration_ms": 0.0,
+            "output": "Executed test_payment_dto_contract successfully",
+            "error_message": null,
+            "failure_fingerprint": null,
+            "is_synthesized": false
+          },
+          {
+            "test_id": "test_payment_pipeline_behavior",
+            "status": "PASS",
+            "duration_ms": 0.0,
+            "output": "Executed test_payment_pipeline_behavior successfully",
+            "error_message": null,
+            "failure_fingerprint": null,
+            "is_synthesized": false
+          },
+          {
+            "test_id": "test_security_payment_token",
+            "status": "PASS",
+            "duration_ms": 0.0,
+            "output": "Executed test_security_payment_token successfully",
+            "error_message": null,
+            "failure_fingerprint": null,
+            "is_synthesized": false
+          },
+          {
+            "test_id": "test_browser_payment_ui",
+            "status": "PASS",
+            "duration_ms": 0.0,
+            "output": "Executed test_browser_payment_ui successfully",
+            "error_message": null,
+            "failure_fingerprint": null,
+            "is_synthesized": false
+          },
+          {
+            "test_id": "test_broader_payment_integration",
+            "status": "PASS",
+            "duration_ms": 0.0,
+            "output": "Executed test_broader_payment_integration successfully",
+            "error_message": null,
+            "failure_fingerprint": null,
+            "is_synthesized": false
+          },
+          {
+            "test_id": "test_synth_f62_6ba3f563859c",
+            "status": "PASS",
+            "duration_ms": 0.0,
+            "output": "Executed test_synth_f62_6ba3f563859c successfully",
+            "error_message": null,
+            "failure_fingerprint": null,
+            "is_synthesized": true
+          },
+          {
+            "test_id": "test_synth_f62_34e96ebfc044",
+            "status": "PASS",
+            "duration_ms": 0.0,
+            "output": "Executed test_synth_f62_34e96ebfc044 successfully",
+            "error_message": null,
+            "failure_fingerprint": null,
+            "is_synthesized": true
+          },
+          {
+            "test_id": "test_synth_f62_a02dc873ee4b",
+            "status": "PASS",
+            "duration_ms": 0.0,
+            "output": "Executed test_synth_f62_a02dc873ee4b successfully",
+            "error_message": null,
+            "failure_fingerprint": null,
+            "is_synthesized": true
+          }
+        ]
+      },
+      "timestamp": 1789742959.7614038
+    },
+    {
+      "stage": "OBSERVING",
+      "data_hash": "2743fd8cb562b311e8cd96f9600346737ab3d234d9089e2db451947f27e56cd2",
+      "details": {
+        "results_map": {
+          "test_payment_known_failure": "FAIL",
+          "test_process_payment_direct": "PASS",
+          "test_payment_dto_contract": "PASS",
+          "test_payment_pipeline_behavior": "PASS",
+          "test_security_payment_token": "PASS",
+          "test_browser_payment_ui": "PASS",
+          "test_broader_payment_integration": "PASS",
+          "test_synth_f62_6ba3f563859c": "PASS",
+          "test_synth_f62_34e96ebfc044": "PASS",
+          "test_synth_f62_a02dc873ee4b": "PASS"
+        }
+      },
+      "timestamp": 1789742959.761428
+    },
+    {
+      "stage": "COVERAGE",
+      "data_hash": "6df96a00c0ddaf72fea108fba7957e3ab97aa184c0ac2fa20f900a4e65ba56a5",
+      "details": {
+        "line_coverage": 0.95,
+        "branch_coverage": 0.81,
+        "symbol_coverage": 1.0,
+        "contract_coverage": 1.0,
+        "behavior_coverage": 1.0,
+        "invariant_coverage": 1.0,
+        "consumer_coverage": 1.0,
+        "browser_coverage": 1.0,
+        "mutation_coverage": 0.88
+      },
+      "timestamp": 1789742959.7615626
+    },
+    {
+      "stage": "FLAKY_ANALYSIS",
+      "data_hash": "5da4ba0fadc5d5615b621966ce46055d700aabfecab8ca15d578af20a750a5ab",
+      "details": {
+        "flaky_results": [
+          {
+            "test_id": "test_payment_known_failure",
+            "status": "STABLE_FAIL",
+            "attempts": 3,
+            "outcomes": [
+              "FAIL",
+              "FAIL",
+              "FAIL"
+            ],
+            "timing_variance": 0.0,
+            "environment_variance": 0.0,
+            "failure_fingerprints": [
+              "9d1430adce"
+            ],
+            "review_required": false
+          }
+        ]
+      },
+      "timestamp": 1789742959.7620625
+    },
+    {
+      "stage": "COMPARING",
+      "data_hash": "f1f2c6327dff32c2cefed9a2bdea15f1547e825c84b5afec5e33b7311660bc09",
+      "details": {
+        "classification": "REGRESSION",
+        "dimensions_evaluated": {
+          "pass_fail": {
+            "status": "REGRESSED",
+            "failed_tests": [
+              "test_payment_known_failure"
+            ]
+          },
+          "line_coverage": {
+            "status": "IMPROVED",
+            "current": 0.95,
+            "baseline": 0.0,
+            "delta": 0.95
+          },
+          "branch_coverage": {
+            "status": "IMPROVED",
+            "current": 0.81,
+            "baseline": 0.0,
+            "delta": 0.81
+          },
+          "symbol_coverage": {
+            "status": "IMPROVED",
+            "current": 1.0,
+            "baseline": 0.0,
+            "delta": 1.0
+          },
+          "contract_coverage": {
+            "status": "IMPROVED",
+            "current": 1.0,
+            "baseline": 0.0,
+            "delta": 1.0
+          },
+          "behavior_coverage": {
+            "status": "IMPROVED",
+            "current": 1.0,
+            "baseline": 0.0,
+            "delta": 1.0
+          },
+          "invariant_coverage": {
+            "status": "IMPROVED",
+            "current": 1.0,
+            "baseline": 0.0,
+            "delta": 1.0
+          },
+          "consumer_coverage": {
+            "status": "IMPROVED",
+            "current": 1.0,
+            "baseline": 0.0,
+            "delta": 1.0
+          },
+          "browser_coverage": {
+            "status": "IMPROVED",
+            "current": 1.0,
+            "baseline": 0.0,
+            "delta": 1.0
+          },
+          "mutation_coverage": {
+            "status": "IMPROVED",
+            "current": 0.88,
+            "baseline": 0.0,
+            "delta": 0.88
+          },
+          "execution_time": {
+            "status": "STABLE",
+            "current_s": 0.003706200000124227,
+            "baseline_s": 0.0
+          }
+        },
+        "regressed_items": [
+          "failed_test:test_payment_known_failure"
+        ],
+        "improved_items": [
+          "coverage_gain:line_coverage",
+          "coverage_gain:branch_coverage",
+          "coverage_gain:symbol_coverage",
+          "coverage_gain:contract_coverage",
+          "coverage_gain:behavior_coverage",
+          "coverage_gain:invariant_coverage",
+          "coverage_gain:consumer_coverage",
+          "coverage_gain:browser_coverage",
+          "coverage_gain:mutation_coverage"
+        ],
+        "explanation": "Regressions detected across 1 dimension(s): failed_test:test_payment_known_failure",
+        "confidence": 0.85
+      },
+      "timestamp": 1789742959.762325
+    },
+    {
+      "stage": "EVIDENCE_BUILDING",
+      "data_hash": "dbd5c470e1dd0561e909500897b64657ce51d41d52088b17bce90737dee8b0d8",
+      "details": {
+        "signature": "ccc807c09fdb173aa7cfccde99a449bbf0f07bbcb3e06399b4481d4554a0a55e"
+      },
+      "timestamp": 1789742959.76238
+    }
+  ],
+  "signature": "dbd5c470e1dd0561e909500897b64657ce51d41d52088b17bce90737dee8b0d8"
+}

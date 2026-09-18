@@ -1,0 +1,32 @@
+{
+  "flaky_analysis_records": [
+    {
+      "test_id": "test_socket_io_flaky",
+      "status": "FLAKY",
+      "attempts": 3,
+      "outcomes": [
+        "FAIL",
+        "PASS",
+        "PASS"
+      ],
+      "timing_variance": 12.4,
+      "environment_variance": 0.1,
+      "failure_fingerprints": [
+        "err_timeout"
+      ],
+      "review_required": true
+    },
+    {
+      "test_id": "test_db_stable_pass",
+      "status": "STABLE_PASS",
+      "attempts": 1,
+      "outcomes": [
+        "PASS"
+      ],
+      "timing_variance": 0.0,
+      "environment_variance": 0.0,
+      "failure_fingerprints": [],
+      "review_required": false
+    }
+  ]
+}

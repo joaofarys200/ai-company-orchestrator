@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "environment": "JARVIS OS - Local Runner",
+    "phase": 62,
+    "architecture": "Continuous Verification & Autonomous Regression Governance",
+    "timestamp": 1789742837.8439817,
+    "cpu_sum_invariant_verified": true
+  },
+  "scales": {
+    "100": {
+      "scale_changes": 100,
+      "change_detection_ms": 0.15,
+      "impact_ms": 1.21,
+      "execution_planning_ms": 0.01,
+      "selection_ms": 0.28,
+      "synthesis_ms": 0.0,
+      "comparison_ms": 0.04,
+      "persistence_ms": 3.38,
+      "total_cpu_ms": 5.07,
+      "microbenchmark_throughput_changes_per_sec": 19723.87,
+      "sum_invariant_verified": true
+    },
+    "1000": {
+      "scale_changes": 1000,
+      "change_detection_ms": 1.31,
+      "impact_ms": 3.35,
+      "execution_planning_ms": 0.01,
+      "selection_ms": 1.02,
+      "synthesis_ms": 1.45,
+      "comparison_ms": 0.04,
+      "persistence_ms": 12.54,
+      "total_cpu_ms": 19.72,
+      "microbenchmark_throughput_changes_per_sec": 50709.94,
+      "sum_invariant_verified": true
+    },
+    "10000": {
+      "scale_changes": 10000,
+      "change_detection_ms": 21.99,
+      "impact_ms": 22.88,
+      "execution_planning_ms": 0.03,
+      "selection_ms": 6.04,
+      "synthesis_ms": 3.63,
+      "comparison_ms": 0.05,
+      "persistence_ms": 128.52,
+      "total_cpu_ms": 183.14,
+      "microbenchmark_throughput_changes_per_sec": 54603.04,
+      "sum_invariant_verified": true
+    },
+    "100000": {
+      "scale_changes": 100000,
+      "change_detection_ms": 175.96,
+      "impact_ms": 225.8,
+      "execution_planning_ms": 0.43,
+      "selection_ms": 78.97,
+      "synthesis_ms": 49.19,
+      "comparison_ms": 0.06,
+      "persistence_ms": 1483.58,
+      "total_cpu_ms": 2013.99,
+      "microbenchmark_throughput_changes_per_sec": 49652.68,
+      "sum_invariant_verified": true
+    }
+  }
+}
