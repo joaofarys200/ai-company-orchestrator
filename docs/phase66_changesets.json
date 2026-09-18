@@ -1,0 +1,56 @@
+{
+  "changesets": [
+    {
+      "changeset_id": "cs_be",
+      "agent_id": "agent_be_handler",
+      "intent_id": "intent_be_02",
+      "transaction_id": "tx_intent_be_02",
+      "base_snapshot": "snap_base_0",
+      "patch": "{\"backend/websocket/handlers/missions.py\": \"def handle(): pass\\n\"}",
+      "affected_files": [
+        "backend/websocket/handlers/missions.py"
+      ],
+      "affected_symbols": [
+        "MissionWebSocketHandler.handle"
+      ],
+      "affected_contracts": [],
+      "verification_evidence": {},
+      "patch_hash": "7842ed01806c630b4ca66ff1a7ed856a295b40ee8d2901cfec64a75c7f6ccb57",
+      "timestamp": 1789765390.8286662
+    },
+    {
+      "changeset_id": "cs_rf",
+      "agent_id": "agent_safe_refactor",
+      "intent_id": "intent_rf_08",
+      "transaction_id": "tx_intent_rf_08",
+      "base_snapshot": "snap_base_0",
+      "patch": "{\"backend/websocket/handlers/missions.py\": \"def routes(): pass\\n\"}",
+      "affected_files": [
+        "backend/websocket/handlers/missions.py"
+      ],
+      "affected_symbols": [
+        "MissionWebSocketHandler.routes"
+      ],
+      "affected_contracts": [],
+      "verification_evidence": {},
+      "patch_hash": "a52543339ab864ca43c702c1e07d9e162775a50721e96f432458952b6bcb935a",
+      "timestamp": 1789765390.8286917
+    },
+    {
+      "changeset_id": "cs_br",
+      "agent_id": "agent_browser_qa",
+      "intent_id": "intent_br_05",
+      "transaction_id": "tx_intent_br_05",
+      "base_snapshot": "snap_merge_agent_be_handler_agent_safe_refactor_90828",
+      "patch": "{\"scripts/run_phase66_browser_qa.py\": \"def run_browser_qa(): pass\\n\"}",
+      "affected_files": [
+        "scripts/run_phase66_browser_qa.py"
+      ],
+      "affected_symbols": [],
+      "affected_contracts": [],
+      "verification_evidence": {},
+      "patch_hash": "7d41869519025c1e6c75b90165dfd4f537d829d1dfe816a35aabb195a35be151",
+      "timestamp": 1789765390.828762
+    }
+  ]
+}

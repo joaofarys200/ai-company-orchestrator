@@ -1,0 +1,6 @@
+{
+  "state": "NO_DEADLOCK",
+  "has_deadlock": false,
+  "cycle_nodes": [],
+  "resolution": "NONE"
+}

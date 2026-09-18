@@ -1,0 +1,19 @@
+{
+  "conflicts": [
+    {
+      "conflict_id": "conf_file_mergeable_intent_be_02_intent_rf_08_backend/websocket/handlers/missions.py",
+      "intent_a": "intent_be_02",
+      "intent_b": "intent_rf_08",
+      "resource": "backend/websocket/handlers/missions.py",
+      "conflict_type": "FILE_CONFLICT",
+      "evidence": "Shared file 'backend/websocket/handlers/missions.py' with disjoint symbols; mergeable candidate.",
+      "severity": "MEDIUM",
+      "resolution_options": [
+        "MERGE",
+        "SERIALIZE"
+      ],
+      "timestamp": 1789765390.8262308
+    }
+  ],
+  "total": 1
+}

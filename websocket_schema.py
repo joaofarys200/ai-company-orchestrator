@@ -316,9 +316,18 @@ CLIENT_MESSAGE_TYPES = {
     "mission_self_modification_status",
     "mission_self_modification_execute",
     "mission_self_modification_rollback",
+    # Phase 66
+    "mission_multi_agent_coordination_status",
+    "mission_multi_agent_intent_submit",
+    "mission_multi_agent_arbitrate",
+    "mission_multi_agent_schedule",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
+    "mission_multi_agent_coordination_status": (),
+    "mission_multi_agent_intent_submit": (),
+    "mission_multi_agent_arbitrate": (),
+    "mission_multi_agent_schedule": (),
     "mission_architecture_evolution_status": (),
     "mission_architecture_evolution_observe": (),
     "mission_architecture_evolution_evaluate": (),

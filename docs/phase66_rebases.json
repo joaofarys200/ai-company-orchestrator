@@ -1,0 +1,15 @@
+{
+  "rebases": [
+    {
+      "success": true,
+      "rebase_id": "rebase_cs_br_90828",
+      "old_base": "snap_base_0",
+      "new_base": "snap_merge_agent_be_handler_agent_safe_refactor_90828",
+      "semantic_drift_detected": false,
+      "status": "REBASED",
+      "details": {
+        "drift_reasons": []
+      }
+    }
+  ]
+}

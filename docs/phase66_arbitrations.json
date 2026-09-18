@@ -1,0 +1,17 @@
+{
+  "arbitrations": [
+    {
+      "decision_id": "arb_conf_file_mergeable_intent_be_02_intent_rf_08_backend/websocket/handlers/missions.py_390826",
+      "conflict_id": "conf_file_mergeable_intent_be_02_intent_rf_08_backend/websocket/handlers/missions.py",
+      "resolution": "MERGE",
+      "reason": "DISJOINT_SYMBOLS: Same file with disjoint symbol modifications is safe for 3-way merge.",
+      "execution_order": [
+        "intent_be_02",
+        "intent_rf_08"
+      ],
+      "details": {},
+      "timestamp": 1789765390.8262594
+    }
+  ],
+  "total": 1
+}

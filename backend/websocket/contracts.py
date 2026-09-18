@@ -134,6 +134,10 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "mission_self_modification_status",
         "mission_self_modification_execute",
         "mission_self_modification_rollback",
+        "mission_multi_agent_coordination_status",
+        "mission_multi_agent_intent_submit",
+        "mission_multi_agent_arbitrate",
+        "mission_multi_agent_schedule",
     }
 )
 

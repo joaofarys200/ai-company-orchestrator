@@ -1,0 +1,135 @@
+{
+  "timestamp": 1789765407.8334222,
+  "total_scenarios": 15,
+  "scenarios": [
+    {
+      "id": "scenario_01_disjoint_agents",
+      "description": "Two agents touching completely disjoint files and subsystems",
+      "expected": "PARALLEL_SAFE",
+      "outcome": "PARALLEL_SAFE",
+      "status": "MERGED",
+      "success": true
+    },
+    {
+      "id": "scenario_02_same_file",
+      "description": "Two agents modifying different functions in the same module",
+      "expected": "MERGE",
+      "outcome": "MERGE",
+      "status": "MERGED",
+      "success": true
+    },
+    {
+      "id": "scenario_03_same_symbol",
+      "description": "Two agents modifying the exact same symbol concurrently",
+      "expected": "SERIALIZE",
+      "outcome": "SERIALIZE",
+      "status": "SERIALIZED",
+      "success": true
+    },
+    {
+      "id": "scenario_04_contract_conflict",
+      "description": "Two agents submitting breaking mutations to the same API contract",
+      "expected": "SERIALIZE",
+      "outcome": "SERIALIZE",
+      "status": "SERIALIZED",
+      "success": true
+    },
+    {
+      "id": "scenario_05_behavior_conflict",
+      "description": "Asynchronous event-loop race condition detected between concurrent agents",
+      "expected": "HUMAN_REVIEW",
+      "outcome": "HUMAN_REVIEW",
+      "status": "HUMAN_REVIEW",
+      "success": true
+    },
+    {
+      "id": "scenario_06_architecture_conflict",
+      "description": "Cyclic boundary coupling introduced across service layers",
+      "expected": "HUMAN_REVIEW",
+      "outcome": "SERIALIZE",
+      "status": "HUMAN_REVIEW",
+      "success": true
+    },
+    {
+      "id": "scenario_07_security_conflict",
+      "description": "Agent attempting to modify protected secrets file without authorization",
+      "expected": "BLOCK",
+      "outcome": "BLOCK",
+      "status": "BLOCKED",
+      "success": true
+    },
+    {
+      "id": "scenario_08_deadlock",
+      "description": "Two agents in mutual dependency lock wait condition",
+      "expected": "DEADLOCK",
+      "outcome": "DEADLOCK",
+      "status": "SERIALIZED",
+      "success": true
+    },
+    {
+      "id": "scenario_09_starvation",
+      "description": "Agent waiting indefinitely for resource claim lease",
+      "expected": "PRIORITY_BOOST_APPLIED",
+      "outcome": "PRIORITY_BOOST_APPLIED",
+      "status": "SERIALIZED",
+      "success": true
+    },
+    {
+      "id": "scenario_10_stale_base",
+      "description": "Target workspace updated concurrently invalidating base snapshot",
+      "expected": "STALE_BASE",
+      "outcome": "STALE_BASE",
+      "status": "REBASABLE",
+      "success": true
+    },
+    {
+      "id": "scenario_11_rebase",
+      "description": "Rebasing changeset cleanly onto updated ancestor snapshot",
+      "expected": "REBASED",
+      "outcome": "REBASED",
+      "status": "REBASED",
+      "success": true
+    },
+    {
+      "id": "scenario_12_merge_conflict",
+      "description": "Two agents conflicting on same line and symbol in AST",
+      "expected": "CONFLICT",
+      "outcome": "CONFLICT",
+      "status": "HUMAN_REVIEW",
+      "success": true
+    },
+    {
+      "id": "scenario_13_rollback_after_merge",
+      "description": "Transactional revert restoring original workspace files following failed test",
+      "expected": "ROLLED_BACK",
+      "outcome": "ROLLED_BACK",
+      "status": "ROLLED_BACK",
+      "success": true
+    },
+    {
+      "id": "scenario_14_browser_conflict",
+      "description": "Concurrent Playwright workers competing for the same browser page session",
+      "expected": "SERIAL_REQUIRED",
+      "outcome": "SERIAL_REQUIRED",
+      "status": "SERIALIZED",
+      "success": true
+    },
+    {
+      "id": "scenario_15_high_risk_mission",
+      "description": "High-risk financial module mutation under standard autonomy",
+      "expected": "HUMAN_REVIEW",
+      "outcome": "SERIALIZE",
+      "status": "HUMAN_REVIEW",
+      "success": true
+    }
+  ],
+  "outcomes_distribution": {
+    "MERGED": 2,
+    "SERIALIZED": 5,
+    "REBASABLE": 1,
+    "REBASED": 1,
+    "HUMAN_REVIEW": 4,
+    "BLOCKED": 1,
+    "ROLLED_BACK": 1
+  }
+}

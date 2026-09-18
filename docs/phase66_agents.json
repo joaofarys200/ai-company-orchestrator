@@ -1,0 +1,53 @@
+{
+  "agents": [
+    {
+      "agent_id": "agent_fe_extract",
+      "role": "Frontend Specialist",
+      "mission": "m66_ui",
+      "status": "ACTIVE"
+    },
+    {
+      "agent_id": "agent_be_handler",
+      "role": "Backend Handler Architect",
+      "mission": "m66_api",
+      "status": "ACTIVE"
+    },
+    {
+      "agent_id": "agent_test_gen",
+      "role": "Test Synthesis Specialist",
+      "mission": "m66_test",
+      "status": "ACTIVE"
+    },
+    {
+      "agent_id": "agent_contract_upd",
+      "role": "Contract Governance Lead",
+      "mission": "m66_contract",
+      "status": "ACTIVE"
+    },
+    {
+      "agent_id": "agent_browser_qa",
+      "role": "Browser & Playwright Engineer",
+      "mission": "m66_browser",
+      "status": "ACTIVE"
+    },
+    {
+      "agent_id": "agent_arch_obs",
+      "role": "Architecture Observer",
+      "mission": "m66_arch",
+      "status": "ACTIVE"
+    },
+    {
+      "agent_id": "agent_docs_sync",
+      "role": "Documentation & ADR Custodian",
+      "mission": "m66_docs",
+      "status": "ACTIVE"
+    },
+    {
+      "agent_id": "agent_safe_refactor",
+      "role": "Safe Refactoring Specialist",
+      "mission": "m66_refactor",
+      "status": "ACTIVE"
+    }
+  ],
+  "total": 8
+}

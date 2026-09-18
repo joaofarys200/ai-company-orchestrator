@@ -1,0 +1,93 @@
+{
+  "workspaces": [
+    {
+      "workspace_id": "ws_agent_fe_extract_intent_fe_01_90826",
+      "agent_id": "agent_fe_extract",
+      "intent_id": "intent_fe_01",
+      "transaction_id": "tx_intent_fe_01",
+      "snapshot_id": "snap_base_0",
+      "sandbox_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_fe_extract_q4sv64ys",
+      "isolated_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_fe_extract_q4sv64ys",
+      "created_at": 1789765390.8277287,
+      "is_active": true
+    },
+    {
+      "workspace_id": "ws_agent_be_handler_intent_be_02_90827",
+      "agent_id": "agent_be_handler",
+      "intent_id": "intent_be_02",
+      "transaction_id": "tx_intent_be_02",
+      "snapshot_id": "snap_base_0",
+      "sandbox_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_be_handler_g5ipnttt",
+      "isolated_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_be_handler_g5ipnttt",
+      "created_at": 1789765390.827901,
+      "is_active": true
+    },
+    {
+      "workspace_id": "ws_agent_test_gen_intent_ts_03_90827",
+      "agent_id": "agent_test_gen",
+      "intent_id": "intent_ts_03",
+      "transaction_id": "tx_intent_ts_03",
+      "snapshot_id": "snap_base_0",
+      "sandbox_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_test_gen_i4tux_wd",
+      "isolated_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_test_gen_i4tux_wd",
+      "created_at": 1789765390.8280337,
+      "is_active": true
+    },
+    {
+      "workspace_id": "ws_agent_contract_upd_intent_ct_04_90828",
+      "agent_id": "agent_contract_upd",
+      "intent_id": "intent_ct_04",
+      "transaction_id": "tx_intent_ct_04",
+      "snapshot_id": "snap_base_0",
+      "sandbox_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_contract_upd_g3zzsx0s",
+      "isolated_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_contract_upd_g3zzsx0s",
+      "created_at": 1789765390.828192,
+      "is_active": true
+    },
+    {
+      "workspace_id": "ws_agent_browser_qa_intent_br_05_90828",
+      "agent_id": "agent_browser_qa",
+      "intent_id": "intent_br_05",
+      "transaction_id": "tx_intent_br_05",
+      "snapshot_id": "snap_base_0",
+      "sandbox_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_browser_qa_mobeal88",
+      "isolated_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_browser_qa_mobeal88",
+      "created_at": 1789765390.8283176,
+      "is_active": true
+    },
+    {
+      "workspace_id": "ws_agent_arch_obs_intent_ar_06_90828",
+      "agent_id": "agent_arch_obs",
+      "intent_id": "intent_ar_06",
+      "transaction_id": "tx_intent_ar_06",
+      "snapshot_id": "snap_base_0",
+      "sandbox_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_arch_obs_b9x5hn_6",
+      "isolated_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_arch_obs_b9x5hn_6",
+      "created_at": 1789765390.8284445,
+      "is_active": true
+    },
+    {
+      "workspace_id": "ws_agent_docs_sync_intent_dc_07_90828",
+      "agent_id": "agent_docs_sync",
+      "intent_id": "intent_dc_07",
+      "transaction_id": "tx_intent_dc_07",
+      "snapshot_id": "snap_base_0",
+      "sandbox_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_docs_sync_0v3pjmw5",
+      "isolated_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_docs_sync_0v3pjmw5",
+      "created_at": 1789765390.8285556,
+      "is_active": true
+    },
+    {
+      "workspace_id": "ws_agent_safe_refactor_intent_rf_08_90828",
+      "agent_id": "agent_safe_refactor",
+      "intent_id": "intent_rf_08",
+      "transaction_id": "tx_intent_rf_08",
+      "snapshot_id": "snap_base_0",
+      "sandbox_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_safe_refactor_umex3a14",
+      "isolated_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\jarvis_coord_agent_safe_refactor_umex3a14",
+      "created_at": 1789765390.82866,
+      "is_active": true
+    }
+  ],
+  "total": 8
+}

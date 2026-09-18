@@ -97,6 +97,10 @@ MISSION_HANDLERS = {
     "mission_self_modification_status": "handle",
     "mission_self_modification_execute": "handle",
     "mission_self_modification_rollback": "handle",
+    "mission_multi_agent_coordination_status": "handle",
+    "mission_multi_agent_intent_submit": "handle",
+    "mission_multi_agent_arbitrate": "handle",
+    "mission_multi_agent_schedule": "handle",
 }
 
 
@@ -1788,6 +1792,80 @@ class MissionWebSocketHandler:
                             "error": f"Transaction '{tx_id}' or snapshot not found.",
                         },
                     )
+                return
+
+            elif operation == "mission_multi_agent_coordination_status":
+                from backend.agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
+                bridge = MultiAgentCoordinationBridge.get_instance()
+                status = bridge.get_coordination_status()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_multi_agent_coordination_status_result",
+                        "status": status,
+                    },
+                )
+                return
+
+            elif operation == "mission_multi_agent_intent_submit":
+                from backend.agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
+                from backend.agents.multi_agent_coordination.models import AgentEngineeringIntent
+                bridge = MultiAgentCoordinationBridge.get_instance()
+                intent_data = message.get("intent", {})
+                if isinstance(intent_data, dict) and "agent_id" in intent_data:
+                    intent = AgentEngineeringIntent.from_dict(intent_data)
+                else:
+                    intent = AgentEngineeringIntent(
+                        agent_id=str(message.get("agent_id") or "agent_unknown"),
+                        mission_id=str(message.get("mission_id") or "mission_default"),
+                        task_id=str(message.get("task_id") or "task_default"),
+                        intent_id=str(message.get("intent_id") or f"intent_{uuid.uuid4().hex[:8]}"),
+                        requested_files=list(message.get("requested_files", [])),
+                        requested_symbols=list(message.get("requested_symbols", [])),
+                        requested_contracts=list(message.get("requested_contracts", [])),
+                        expected_changes=list(message.get("expected_changes", [])),
+                        expected_effect=str(message.get("expected_effect") or ""),
+                    )
+                ok, reg_msg = bridge.intent_mgr.register_intent(intent)
+                if ok:
+                    bridge.intent_mgr.validate_intent(intent.intent_id)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_multi_agent_intent_submit_result",
+                        "success": ok,
+                        "message": reg_msg,
+                        "intent": intent.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_multi_agent_arbitrate":
+                from backend.agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
+                bridge = MultiAgentCoordinationBridge.get_instance()
+                intents = list(bridge.intent_mgr.intents.values())
+                coord_res = bridge.coordinate_intents(intents)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_multi_agent_arbitrate_result",
+                        "result": coord_res,
+                    },
+                )
+                return
+
+            elif operation == "mission_multi_agent_schedule":
+                from backend.agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
+                bridge = MultiAgentCoordinationBridge.get_instance()
+                intents = list(bridge.intent_mgr.intents.values())
+                sched = bridge.scheduler.schedule_intents(intents)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_multi_agent_schedule_result",
+                        "schedule": sched,
+                    },
+                )
                 return
 
             if snapshot is None:

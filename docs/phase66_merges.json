@@ -1,0 +1,21 @@
+{
+  "merges": [
+    {
+      "success": true,
+      "merge_id": "merge_agent_be_handler_agent_safe_refactor_90828",
+      "base_snapshot": "snap_base_0",
+      "merged_snapshot": "snap_merge_agent_be_handler_agent_safe_refactor_90828",
+      "conflicts_encountered": [],
+      "files_merged": [
+        "backend/websocket/handlers/missions.py"
+      ],
+      "merged_files": {
+        "backend/websocket/handlers/missions.py": "# Disjoint 3-way merge\n{\"backend/websocket/handlers/missions.py\": \"def handle(): pass\\n\"}\n{\"backend/websocket/handlers/missions.py\": \"def routes(): pass\\n\"}\n"
+      },
+      "verification_passed": true,
+      "evidence_hash": "62dc631c659ef650af4c649cafdf0e557eddcf2a7400adfcc0ed6bba9e2ab0ff",
+      "duration_ms": 0.01,
+      "status": "MERGED"
+    }
+  ]
+}

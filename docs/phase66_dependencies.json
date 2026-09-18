@@ -1,0 +1,67 @@
+{
+  "nodes": [
+    "intent_ar_06",
+    "intent_be_02",
+    "intent_br_05",
+    "intent_ct_04",
+    "intent_dc_07",
+    "intent_fe_01",
+    "intent_rf_08",
+    "intent_ts_03"
+  ],
+  "edges": [
+    {
+      "source": "intent_fe_01",
+      "target": "intent_br_05"
+    }
+  ],
+  "adjacency": {
+    "intent_fe_01": [
+      "intent_br_05"
+    ],
+    "intent_be_02": [],
+    "intent_ts_03": [],
+    "intent_ct_04": [],
+    "intent_br_05": [],
+    "intent_ar_06": [],
+    "intent_dc_07": [],
+    "intent_rf_08": []
+  },
+  "in_degree": {
+    "intent_fe_01": 0,
+    "intent_be_02": 0,
+    "intent_ts_03": 0,
+    "intent_ct_04": 0,
+    "intent_br_05": 0,
+    "intent_ar_06": 0,
+    "intent_dc_07": 0,
+    "intent_rf_08": 0
+  },
+  "topological_order": [
+    "intent_fe_01",
+    "intent_be_02",
+    "intent_ts_03",
+    "intent_ct_04",
+    "intent_ar_06",
+    "intent_dc_07",
+    "intent_rf_08",
+    "intent_br_05"
+  ],
+  "parallel_waves": [
+    [
+      "intent_fe_01",
+      "intent_be_02",
+      "intent_ts_03",
+      "intent_ct_04",
+      "intent_ar_06",
+      "intent_dc_07",
+      "intent_rf_08"
+    ],
+    [
+      "intent_br_05"
+    ]
+  ],
+  "has_cycle": false,
+  "cycle_nodes": [],
+  "is_dag": true
+}

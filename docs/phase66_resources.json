@@ -1,0 +1,59 @@
+{
+  "resources": [
+    {
+      "resource_id": "frontend/src/features/missions/components/MultiAgentCoordinationPanel.tsx",
+      "granularity": "FILE",
+      "owner_agent": "agent_fe_extract",
+      "active_claims": 1
+    },
+    {
+      "resource_id": "backend/websocket/handlers/missions.py",
+      "granularity": "FILE",
+      "owner_agent": "agent_be_handler",
+      "active_claims": 1
+    },
+    {
+      "resource_id": "tests/test_multi_agent_coordination.py",
+      "granularity": "FILE",
+      "owner_agent": "agent_test_gen",
+      "active_claims": 1
+    },
+    {
+      "resource_id": "backend/websocket/contracts.py",
+      "granularity": "FILE",
+      "owner_agent": "agent_contract_upd",
+      "active_claims": 1
+    },
+    {
+      "resource_id": "websocket_schema.py",
+      "granularity": "FILE",
+      "owner_agent": "agent_contract_upd",
+      "active_claims": 1
+    },
+    {
+      "resource_id": "scripts/run_phase66_browser_qa.py",
+      "granularity": "FILE",
+      "owner_agent": "agent_browser_qa",
+      "active_claims": 1
+    },
+    {
+      "resource_id": "backend/agents/multi_agent_coordination/bridge.py",
+      "granularity": "FILE",
+      "owner_agent": "agent_arch_obs",
+      "active_claims": 1
+    },
+    {
+      "resource_id": "docs/PHASE_66_REPORT.md",
+      "granularity": "FILE",
+      "owner_agent": "agent_docs_sync",
+      "active_claims": 1
+    },
+    {
+      "resource_id": "backend/websocket/handlers/missions.py",
+      "granularity": "FILE",
+      "owner_agent": "agent_safe_refactor",
+      "active_claims": 1
+    }
+  ],
+  "total": 9
+}

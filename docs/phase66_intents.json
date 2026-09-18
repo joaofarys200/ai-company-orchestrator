@@ -1,0 +1,254 @@
+{
+  "intents": [
+    {
+      "agent_id": "agent_fe_extract",
+      "mission_id": "m66_ui",
+      "task_id": "t_fe_extract",
+      "intent_id": "intent_fe_01",
+      "requested_files": [
+        "frontend/src/features/missions/components/MultiAgentCoordinationPanel.tsx"
+      ],
+      "requested_symbols": [
+        "MultiAgentCoordinationPanel"
+      ],
+      "requested_contracts": [
+        "MultiAgentCoordinationPanelProps"
+      ],
+      "expected_changes": [
+        "Add 12 subtabs for multi-agent coordination panel"
+      ],
+      "expected_effect": "Complete UI panel for Phase 66",
+      "risk": "LOW",
+      "priority": {
+        "mission_criticality": 1.0,
+        "urgency": 1.0
+      },
+      "dependencies": [],
+      "provenance": {},
+      "policy": "STANDARD",
+      "timestamp": 1789765390.8260808,
+      "state": "VALIDATED",
+      "wait_count": 0,
+      "wait_age_sec": 0.0,
+      "intent_hash": "e99cd1f1beccaf0eaf13545e66ce8e8149076053bac338092d501efc18762950"
+    },
+    {
+      "agent_id": "agent_be_handler",
+      "mission_id": "m66_api",
+      "task_id": "t_be_handler",
+      "intent_id": "intent_be_02",
+      "requested_files": [
+        "backend/websocket/handlers/missions.py"
+      ],
+      "requested_symbols": [
+        "MISSION_HANDLERS",
+        "MissionWebSocketHandler.handle"
+      ],
+      "requested_contracts": [
+        "mission_multi_agent_coordination_status"
+      ],
+      "expected_changes": [
+        "Register 4 Phase 66 websocket handlers"
+      ],
+      "expected_effect": "Enable websocket dispatch for coordination engine",
+      "risk": "LOW",
+      "priority": {
+        "mission_criticality": 1.0,
+        "urgency": 1.0
+      },
+      "dependencies": [],
+      "provenance": {},
+      "policy": "STANDARD",
+      "timestamp": 1789765390.8260846,
+      "state": "VALIDATED",
+      "wait_count": 0,
+      "wait_age_sec": 0.0,
+      "intent_hash": "4f9fbe6209c750081ad2146754aa5bcc0a89b7fab491467c9be2b0281f46a0e3"
+    },
+    {
+      "agent_id": "agent_test_gen",
+      "mission_id": "m66_test",
+      "task_id": "t_test_gen",
+      "intent_id": "intent_ts_03",
+      "requested_files": [
+        "tests/test_multi_agent_coordination.py"
+      ],
+      "requested_symbols": [
+        "TestMultiAgentCoordination"
+      ],
+      "requested_contracts": [],
+      "expected_changes": [
+        "Synthesize 20 multi-agent coordination unit tests"
+      ],
+      "expected_effect": "Verify all 20 required coordination dimensions",
+      "risk": "LOW",
+      "priority": {
+        "mission_criticality": 0.9,
+        "urgency": 0.9
+      },
+      "dependencies": [],
+      "provenance": {},
+      "policy": "STANDARD",
+      "timestamp": 1789765390.8260863,
+      "state": "VALIDATED",
+      "wait_count": 0,
+      "wait_age_sec": 0.0,
+      "intent_hash": "df4069c88998991a56dc07dc456e2380534de637a951c0bb6ecb197985fa3b85"
+    },
+    {
+      "agent_id": "agent_contract_upd",
+      "mission_id": "m66_contract",
+      "task_id": "t_contract_upd",
+      "intent_id": "intent_ct_04",
+      "requested_files": [
+        "backend/websocket/contracts.py",
+        "websocket_schema.py"
+      ],
+      "requested_symbols": [
+        "EXPECTED_MESSAGE_TYPES",
+        "CLIENT_MESSAGE_TYPES"
+      ],
+      "requested_contracts": [
+        "MultiAgentProtocol"
+      ],
+      "expected_changes": [
+        "Add coordination message types to schemas"
+      ],
+      "expected_effect": "Synchronize client-server schema contracts",
+      "risk": "LOW",
+      "priority": {
+        "mission_criticality": 0.95,
+        "urgency": 0.95
+      },
+      "dependencies": [],
+      "provenance": {},
+      "policy": "STANDARD",
+      "timestamp": 1789765390.826088,
+      "state": "VALIDATED",
+      "wait_count": 0,
+      "wait_age_sec": 0.0,
+      "intent_hash": "3efab3f71ec0dfd0faab018cb2d41a371f855558db450d10309631dee9a2426a"
+    },
+    {
+      "agent_id": "agent_browser_qa",
+      "mission_id": "m66_browser",
+      "task_id": "t_browser_qa",
+      "intent_id": "intent_br_05",
+      "requested_files": [
+        "scripts/run_phase66_browser_qa.py"
+      ],
+      "requested_symbols": [
+        "run_browser_qa"
+      ],
+      "requested_contracts": [],
+      "expected_changes": [
+        "Automate Edge browser testing across 12 subtabs"
+      ],
+      "expected_effect": "Produce 12 QA screenshots without errors",
+      "risk": "LOW",
+      "priority": {
+        "mission_criticality": 0.8,
+        "urgency": 0.7
+      },
+      "dependencies": [
+        "intent_fe_01"
+      ],
+      "provenance": {},
+      "policy": "STANDARD",
+      "timestamp": 1789765390.8260896,
+      "state": "VALIDATED",
+      "wait_count": 0,
+      "wait_age_sec": 0.0,
+      "intent_hash": "355bb08ee771c9781fb36f57e7b9bac1c31a9617ba1b7ae2f01f2bc0491f8ade"
+    },
+    {
+      "agent_id": "agent_arch_obs",
+      "mission_id": "m66_arch",
+      "task_id": "t_arch_obs",
+      "intent_id": "intent_ar_06",
+      "requested_files": [
+        "backend/agents/multi_agent_coordination/bridge.py"
+      ],
+      "requested_symbols": [
+        "MultiAgentCoordinationBridge"
+      ],
+      "requested_contracts": [],
+      "expected_changes": [
+        "Verify architecture modularity across 28 files"
+      ],
+      "expected_effect": "Prevent monolithic anti-patterns",
+      "risk": "LOW",
+      "priority": {
+        "mission_criticality": 0.7,
+        "urgency": 0.6
+      },
+      "dependencies": [],
+      "provenance": {},
+      "policy": "STANDARD",
+      "timestamp": 1789765390.8260913,
+      "state": "VALIDATED",
+      "wait_count": 0,
+      "wait_age_sec": 0.0,
+      "intent_hash": "79b1c6dec820cf9fbf7fb46f271e63a4adb6df02e6fa6de6bc52be597b617b44"
+    },
+    {
+      "agent_id": "agent_docs_sync",
+      "mission_id": "m66_docs",
+      "task_id": "t_docs_sync",
+      "intent_id": "intent_dc_07",
+      "requested_files": [
+        "docs/PHASE_66_REPORT.md"
+      ],
+      "requested_symbols": [],
+      "requested_contracts": [],
+      "expected_changes": [
+        "Generate comprehensive Phase 66 markdown report"
+      ],
+      "expected_effect": "Document all 22 required evaluation sections",
+      "risk": "LOW",
+      "priority": {
+        "mission_criticality": 0.85,
+        "urgency": 0.8
+      },
+      "dependencies": [],
+      "provenance": {},
+      "policy": "STANDARD",
+      "timestamp": 1789765390.8260925,
+      "state": "VALIDATED",
+      "wait_count": 0,
+      "wait_age_sec": 0.0,
+      "intent_hash": "acc65d6eb5438336e04d587fd823897fd2b5e3218ec48a201e365ad3019eca50"
+    },
+    {
+      "agent_id": "agent_safe_refactor",
+      "mission_id": "m66_refactor",
+      "task_id": "t_safe_refactor",
+      "intent_id": "intent_rf_08",
+      "requested_files": [
+        "backend/websocket/handlers/missions.py"
+      ],
+      "requested_symbols": [
+        "MissionWebSocketHandler.routes"
+      ],
+      "requested_contracts": [],
+      "expected_changes": [
+        "Optimize route binding caching"
+      ],
+      "expected_effect": "Reduce handler dispatch latency",
+      "risk": "LOW",
+      "priority": {
+        "mission_criticality": 0.6,
+        "urgency": 0.5
+      },
+      "dependencies": [],
+      "provenance": {},
+      "policy": "STANDARD",
+      "timestamp": 1789765390.826094,
+      "state": "VALIDATED",
+      "wait_count": 0,
+      "wait_age_sec": 0.0,
+      "intent_hash": "689b6b6179c0ea014ab73fb3d0e9aaf4837b3d79bafbf77976a3676a73361948"
+    }
+  ],
+  "total": 8
+}

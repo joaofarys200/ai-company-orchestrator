@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "status": "VERIFIED",
+  "agents_verified": [
+    "agent_be_handler",
+    "agent_safe_refactor",
+    "agent_browser_qa"
+  ],
+  "affected_files_count": 8,
+  "tests_executed_count": 1,
+  "evidence_hash": "7ad59e67fc43d814d3179d907488f1d5e8e1f7fbbda1fe9d6e36fc8efea949d3",
+  "evidence": {
+    "tests_evaluated": 1,
+    "evidence_hash": "7ad59e67fc43d814d3179d907488f1d5e8e1f7fbbda1fe9d6e36fc8efea949d3",
+    "status": "PASS"
+  },
+  "duration_ms": 0.03
+}

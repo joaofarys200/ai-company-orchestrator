@@ -1,0 +1,153 @@
+{
+  "ledger": [
+    {
+      "record_id": "prov_agent_fe_extract_intent_fe_01_390829",
+      "agent_id": "agent_fe_extract",
+      "mission_id": "m66_ui",
+      "intent_id": "intent_fe_01",
+      "claim_ids": [
+        "claim_agent_fe_extract_390826"
+      ],
+      "transaction_id": "tx_intent_fe_01",
+      "base_snapshot": "snap_base_0",
+      "patch_hash": "e99cd1f1beccaf0e",
+      "merge_hash": "62dc631c659ef650",
+      "verification_hash": "7ad59e67fc43d814",
+      "parent_records": [],
+      "timestamp": 1789765390.829494,
+      "record_hash": "3f77df4cd9dbe7d4a210756811c3400341a9fedebc0acce7cb5ccde084947b67"
+    },
+    {
+      "record_id": "prov_agent_be_handler_intent_be_02_390829",
+      "agent_id": "agent_be_handler",
+      "mission_id": "m66_api",
+      "intent_id": "intent_be_02",
+      "claim_ids": [
+        "claim_agent_be_handler_390826"
+      ],
+      "transaction_id": "tx_intent_be_02",
+      "base_snapshot": "snap_base_0",
+      "patch_hash": "4f9fbe6209c75008",
+      "merge_hash": "62dc631c659ef650",
+      "verification_hash": "7ad59e67fc43d814",
+      "parent_records": [],
+      "timestamp": 1789765390.8295274,
+      "record_hash": "6c4e9f4f82d19def2fc1d791db7bb8991c6f41dc26bf4d4f08e6f8e087ab8310"
+    },
+    {
+      "record_id": "prov_agent_test_gen_intent_ts_03_390829",
+      "agent_id": "agent_test_gen",
+      "mission_id": "m66_test",
+      "intent_id": "intent_ts_03",
+      "claim_ids": [
+        "claim_agent_test_gen_390826"
+      ],
+      "transaction_id": "tx_intent_ts_03",
+      "base_snapshot": "snap_base_0",
+      "patch_hash": "df4069c88998991a",
+      "merge_hash": "62dc631c659ef650",
+      "verification_hash": "7ad59e67fc43d814",
+      "parent_records": [],
+      "timestamp": 1789765390.829547,
+      "record_hash": "612e22840965f93b85b596f8aa6e78d4d6a2e068fe707215f480cb533398b932"
+    },
+    {
+      "record_id": "prov_agent_contract_upd_intent_ct_04_390829",
+      "agent_id": "agent_contract_upd",
+      "mission_id": "m66_contract",
+      "intent_id": "intent_ct_04",
+      "claim_ids": [
+        "claim_agent_contract_upd_390826",
+        "claim_agent_contract_upd_390826"
+      ],
+      "transaction_id": "tx_intent_ct_04",
+      "base_snapshot": "snap_base_0",
+      "patch_hash": "3efab3f71ec0dfd0",
+      "merge_hash": "62dc631c659ef650",
+      "verification_hash": "7ad59e67fc43d814",
+      "parent_records": [],
+      "timestamp": 1789765390.8295636,
+      "record_hash": "989b5f023ab89132e8f1f6a89d3bae37d8b5db5cac811e1c03cf08145ff6673c"
+    },
+    {
+      "record_id": "prov_agent_browser_qa_intent_br_05_390829",
+      "agent_id": "agent_browser_qa",
+      "mission_id": "m66_browser",
+      "intent_id": "intent_br_05",
+      "claim_ids": [
+        "claim_agent_browser_qa_390826"
+      ],
+      "transaction_id": "tx_intent_br_05",
+      "base_snapshot": "snap_base_0",
+      "patch_hash": "355bb08ee771c978",
+      "merge_hash": "62dc631c659ef650",
+      "verification_hash": "7ad59e67fc43d814",
+      "parent_records": [],
+      "timestamp": 1789765390.829579,
+      "record_hash": "c992c5cd7355ff7c4a600d7fe6b513824a5af6f8ba502cc6d6e63481c1d62f4f"
+    },
+    {
+      "record_id": "prov_agent_arch_obs_intent_ar_06_390829",
+      "agent_id": "agent_arch_obs",
+      "mission_id": "m66_arch",
+      "intent_id": "intent_ar_06",
+      "claim_ids": [
+        "claim_agent_arch_obs_390826"
+      ],
+      "transaction_id": "tx_intent_ar_06",
+      "base_snapshot": "snap_base_0",
+      "patch_hash": "79b1c6dec820cf9f",
+      "merge_hash": "62dc631c659ef650",
+      "verification_hash": "7ad59e67fc43d814",
+      "parent_records": [],
+      "timestamp": 1789765390.8295949,
+      "record_hash": "545b9162752a4fd7e0fa69dabb47f0a3cc19b9a860554dd06713ad4bdf5d55dd"
+    },
+    {
+      "record_id": "prov_agent_docs_sync_intent_dc_07_390829",
+      "agent_id": "agent_docs_sync",
+      "mission_id": "m66_docs",
+      "intent_id": "intent_dc_07",
+      "claim_ids": [
+        "claim_agent_docs_sync_390826"
+      ],
+      "transaction_id": "tx_intent_dc_07",
+      "base_snapshot": "snap_base_0",
+      "patch_hash": "acc65d6eb5438336",
+      "merge_hash": "62dc631c659ef650",
+      "verification_hash": "7ad59e67fc43d814",
+      "parent_records": [],
+      "timestamp": 1789765390.8296092,
+      "record_hash": "fe989536931eea5799331e1bb81c4ec7e5f84bb7ccb41ea195acbb8152cf060b"
+    },
+    {
+      "record_id": "prov_agent_safe_refactor_intent_rf_08_390829",
+      "agent_id": "agent_safe_refactor",
+      "mission_id": "m66_refactor",
+      "intent_id": "intent_rf_08",
+      "claim_ids": [],
+      "transaction_id": "tx_intent_rf_08",
+      "base_snapshot": "snap_base_0",
+      "patch_hash": "689b6b6179c0ea01",
+      "merge_hash": "62dc631c659ef650",
+      "verification_hash": "7ad59e67fc43d814",
+      "parent_records": [],
+      "timestamp": 1789765390.8296242,
+      "record_hash": "d91bf7d668c90b14af13c6042e98cb4d87b4d71cbd1cf0a9650e90ea2efb2fa4"
+    }
+  ],
+  "commit_gate": {
+    "status": "COMMIT_ELIGIBLE",
+    "is_eligible": true,
+    "criteria": {
+      "intents_processed": true,
+      "conflicts_arbitrated": true,
+      "merges_successful": true,
+      "shared_verification_passed": true,
+      "security_passed": true,
+      "provenance_verified": true
+    },
+    "failed_criteria": []
+  },
+  "overall_status": "MULTI_AGENT_COORDINATION_READY"
+}

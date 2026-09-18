@@ -38,3 +38,4 @@ export { ContinuousVerificationPanel } from './ContinuousVerificationPanel';
 export { CrossProjectLearningPanel } from './CrossProjectLearningPanel';
 export { ArchitectureEvolutionPanel } from './ArchitectureEvolutionPanel';
 export { SafeSelfModificationPanel } from './SafeSelfModificationPanel';
+export { MultiAgentCoordinationPanel } from './MultiAgentCoordinationPanel';
