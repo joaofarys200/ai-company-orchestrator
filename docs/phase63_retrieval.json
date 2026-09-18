@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "query": "resilience retry with jitter",
+  "candidates": [
+    {
+      "knowledge_id": "k_test_fcbd2ece",
+      "category": "TEST_PATTERN",
+      "score": 0.7734,
+      "matching_dimensions": [
+        "language_overlap_1.00",
+        "architecture_match",
+        "intent_alignment_0.75"
+      ],
+      "missing_dimensions": [],
+      "applicability_confidence": 0.6574
+    },
+    {
+      "knowledge_id": "k_repa_0f1e35cb",
+      "category": "REPAIR_PATTERN",
+      "score": 0.6984,
+      "matching_dimensions": [
+        "language_overlap_1.00",
+        "architecture_match"
+      ],
+      "missing_dimensions": [],
+      "applicability_confidence": 0.5936
+    },
+    {
+      "knowledge_id": "k_reco_5b2bfb26",
+      "category": "RECOVERY_PATTERN",
+      "score": 0.6984,
+      "matching_dimensions": [
+        "language_overlap_1.00",
+        "architecture_match"
+      ],
+      "missing_dimensions": [],
+      "applicability_confidence": 0.5936
+    },
+    {
+      "knowledge_id": "k_arch_b00b0a60",
+      "category": "ARCHITECTURE_PATTERN",
+      "score": 0.6609,
+      "matching_dimensions": [
+        "language_overlap_1.00",
+        "architecture_match"
+      ],
+      "missing_dimensions": [],
+      "applicability_confidence": 0.5617
+    },
+    {
+      "knowledge_id": "k_fail_d752e75c",
+      "category": "FAILURE_PATTERN",
+      "score": 0.6609,
+      "matching_dimensions": [
+        "language_overlap_1.00",
+        "architecture_match"
+      ],
+      "missing_dimensions": [],
+      "applicability_confidence": 0.5617
+    }
+  ]
+}

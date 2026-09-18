@@ -1545,6 +1545,59 @@ class MissionWebSocketHandler:
                 )
                 return
 
+            elif operation == "mission_cross_project_learning_status":
+                from backend.agents.cross_project_learning.bridge import CrossProjectLearningBridge
+                bridge = CrossProjectLearningBridge.get_instance()
+                metrics = bridge.metrics.to_dict()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_cross_project_learning_status_result",
+                        "status": "ready",
+                        "policy": "STANDARD",
+                        "metrics": metrics,
+                        "indexed_items": bridge.index.size(),
+                    },
+                )
+                return
+
+            elif operation == "mission_cross_project_learning_transfer":
+                from backend.agents.cross_project_learning.bridge import CrossProjectLearningBridge
+                from backend.agents.cross_project_learning.project_fingerprint import ProjectFingerprintExtractor
+                bridge = CrossProjectLearningBridge.get_instance()
+                target_project = str(message.get("target_project") or project_id or "target_project_alpha")
+                query_intent = str(message.get("query_intent") or "resilience and retry patterns")
+                policy_str = str(message.get("policy") or "STANDARD")
+
+                if target_project not in bridge.fingerprints:
+                    fp = ProjectFingerprintExtractor.create_fingerprint(
+                        project_id=target_project,
+                        languages=["typescript", "python"],
+                        frameworks=["react", "fastapi"],
+                        contract_types=["openapi", "websocket"],
+                    )
+                    bridge.register_fingerprint(fp)
+
+                decisions = bridge.transfer_knowledge(
+                    target_project_id=target_project,
+                    query_intent=query_intent,
+                    policy=policy_str,
+                )
+                serialized = [
+                    {"decision": d[0].to_dict(), "candidate": d[1].to_dict()}
+                    for d in decisions
+                ]
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_cross_project_learning_transfer_result",
+                        "target_project": target_project,
+                        "transfers": serialized,
+                        "metrics": bridge.metrics.to_dict(),
+                    },
+                )
+                return
+
             if snapshot is None:
                 return
 

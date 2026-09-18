@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "records": [
+    {
+      "knowledge_id": "k_test_retry_jitter",
+      "state": "FRESH",
+      "last_validated": 1789744225.4306061,
+      "decay_factor": 1.0
+    },
+    {
+      "knowledge_id": "k_arch_hexagonal",
+      "state": "AGING",
+      "last_validated": 1789444225.4306104,
+      "decay_factor": 0.94
+    },
+    {
+      "knowledge_id": "k_legacy_node_callback",
+      "state": "STALE",
+      "last_validated": 1780744225.4306145,
+      "decay_factor": 0.45
+    }
+  ]
+}

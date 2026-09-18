@@ -1,0 +1,55 @@
+{
+  "status": "PASS",
+  "evaluations": [
+    {
+      "knowledge_id": "k_test_fcbd2ece",
+      "status": "DIRECTLY_APPLICABLE",
+      "confidence": 0.6574,
+      "why_applicable": [
+        "Matching language",
+        "Precondition satisfied"
+      ],
+      "why_not_applicable": []
+    },
+    {
+      "knowledge_id": "k_repa_0f1e35cb",
+      "status": "DIRECTLY_APPLICABLE",
+      "confidence": 0.5936,
+      "why_applicable": [
+        "Matching language",
+        "Precondition satisfied"
+      ],
+      "why_not_applicable": []
+    },
+    {
+      "knowledge_id": "k_reco_5b2bfb26",
+      "status": "DIRECTLY_APPLICABLE",
+      "confidence": 0.5936,
+      "why_applicable": [
+        "Matching language",
+        "Precondition satisfied"
+      ],
+      "why_not_applicable": []
+    },
+    {
+      "knowledge_id": "k_arch_b00b0a60",
+      "status": "DIRECTLY_APPLICABLE",
+      "confidence": 0.5617,
+      "why_applicable": [
+        "Matching language",
+        "Precondition satisfied"
+      ],
+      "why_not_applicable": []
+    },
+    {
+      "knowledge_id": "k_fail_d752e75c",
+      "status": "DIRECTLY_APPLICABLE",
+      "confidence": 0.5617,
+      "why_applicable": [
+        "Matching language",
+        "Precondition satisfied"
+      ],
+      "why_not_applicable": []
+    }
+  ]
+}

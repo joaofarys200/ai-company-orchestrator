@@ -1,0 +1,102 @@
+{
+  "status": "PASS",
+  "transfers": [
+    {
+      "decision_id": "dec_trans_40ed6084",
+      "state": "TRANSFER_TO_TEST_GENERATION",
+      "target_project_id": "ecommerce_checkout_service",
+      "item_id": "k_test_fcbd2ece",
+      "category": "TEST_PATTERN",
+      "rationale": "Transferred as TRANSFER_TO_TEST_GENERATION under STANDARD policy. Applicability: PARTIALLY_APPLICABLE (conf=0.66). Reasons: Matching language environment: python, typescript; Architectural alignment on modular_monolith.",
+      "local_validation_plan": {
+        "required_local_validation": true,
+        "target_project": "ecommerce_checkout_service",
+        "source_knowledge_id": "k_test_fcbd2ece",
+        "category": "TEST_PATTERN",
+        "validation_method": "PHASE_61_SYNTHESIS_AND_EXECUTION",
+        "target_invariant": "assert retry_count <= 3",
+        "test_generation_scope": [
+          "test_k_test_fcbd2ece"
+        ]
+      },
+      "requires_human_review": false,
+      "confidence": 0.6574,
+      "timestamp": 1789744225.4224222
+    },
+    {
+      "decision_id": "dec_trans_d9fd2757",
+      "state": "TRANSFER_TO_REPAIR_SEARCH",
+      "target_project_id": "ecommerce_checkout_service",
+      "item_id": "k_repa_0f1e35cb",
+      "category": "REPAIR_PATTERN",
+      "rationale": "Transferred as TRANSFER_TO_REPAIR_SEARCH under STANDARD policy. Applicability: PARTIALLY_APPLICABLE (conf=0.59). Reasons: Matching language environment: python, typescript; Architectural alignment on modular_monolith.",
+      "local_validation_plan": {
+        "required_local_validation": true,
+        "target_project": "ecommerce_checkout_service",
+        "source_knowledge_id": "k_repa_0f1e35cb",
+        "category": "REPAIR_PATTERN",
+        "validation_method": "PHASE_54_VERIFIED_REPAIR_PROOF",
+        "failure_signature": "socket_closed"
+      },
+      "requires_human_review": false,
+      "confidence": 0.5936,
+      "timestamp": 1789744225.423368
+    },
+    {
+      "decision_id": "dec_trans_bf135658",
+      "state": "TRANSFER_TO_REPAIR_SEARCH",
+      "target_project_id": "ecommerce_checkout_service",
+      "item_id": "k_reco_5b2bfb26",
+      "category": "RECOVERY_PATTERN",
+      "rationale": "Transferred as TRANSFER_TO_REPAIR_SEARCH under STANDARD policy. Applicability: PARTIALLY_APPLICABLE (conf=0.59). Reasons: Matching language environment: python, typescript; Architectural alignment on modular_monolith.",
+      "local_validation_plan": {
+        "required_local_validation": true,
+        "target_project": "ecommerce_checkout_service",
+        "source_knowledge_id": "k_reco_5b2bfb26",
+        "category": "RECOVERY_PATTERN",
+        "validation_method": "PHASE_54_VERIFIED_REPAIR_PROOF",
+        "failure_signature": "unknown_sig"
+      },
+      "requires_human_review": false,
+      "confidence": 0.5936,
+      "timestamp": 1789744225.423908
+    },
+    {
+      "decision_id": "dec_trans_94512c85",
+      "state": "TRANSFER_AS_HYPOTHESIS",
+      "target_project_id": "ecommerce_checkout_service",
+      "item_id": "k_arch_b00b0a60",
+      "category": "ARCHITECTURE_PATTERN",
+      "rationale": "Transferred as TRANSFER_AS_HYPOTHESIS under STANDARD policy. Applicability: PARTIALLY_APPLICABLE (conf=0.56). Reasons: Matching language environment: python, typescript; Architectural alignment on modular_monolith.",
+      "local_validation_plan": {
+        "required_local_validation": true,
+        "target_project": "ecommerce_checkout_service",
+        "source_knowledge_id": "k_arch_b00b0a60",
+        "category": "ARCHITECTURE_PATTERN",
+        "validation_method": "EXPLORATORY_HYPOTHESIS_TESTING"
+      },
+      "requires_human_review": false,
+      "confidence": 0.5617,
+      "timestamp": 1789744225.4240675
+    },
+    {
+      "decision_id": "dec_trans_da47f76d",
+      "state": "TRANSFER_TO_RISK_MODEL",
+      "target_project_id": "ecommerce_checkout_service",
+      "item_id": "k_fail_d752e75c",
+      "category": "FAILURE_PATTERN",
+      "rationale": "Transferred as TRANSFER_TO_RISK_MODEL under STANDARD policy. Applicability: PARTIALLY_APPLICABLE (conf=0.56). Reasons: Matching language environment: python, typescript; Architectural alignment on modular_monolith.",
+      "local_validation_plan": {
+        "required_local_validation": true,
+        "target_project": "ecommerce_checkout_service",
+        "source_knowledge_id": "k_fail_d752e75c",
+        "category": "FAILURE_PATTERN",
+        "validation_method": "PHASE_62_CONTINUOUS_VERIFICATION_HINT",
+        "risk_class": "unknown_risk"
+      },
+      "requires_human_review": false,
+      "confidence": 0.5617,
+      "timestamp": 1789744225.4241874
+    }
+  ]
+}

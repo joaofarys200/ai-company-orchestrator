@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "conflicts": [
+    {
+      "conflict_id": "conf_arch_01",
+      "pair_item_ids": [
+        "k_arch_monolith",
+        "k_arch_microservice"
+      ],
+      "conflict_type": "ARCHITECTURAL_CONTRADICTION",
+      "reason": "Opposing architecture styles for billing domain: modular_monolith vs microservices",
+      "resolution_status": "OPEN",
+      "action": "NON_MERGING_GUARANTEED"
+    }
+  ]
+}

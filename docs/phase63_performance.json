@@ -1,0 +1,82 @@
+{
+  "benchmark_name": "Phase 63 Cross-Project Learning & Verification Transfer",
+  "scales": {
+    "100": {
+      "scale_items": 100,
+      "index_build_ms": 2.014,
+      "retrieval_ms": 4.841,
+      "applicability_ms": 0.187,
+      "conflict_ms": 0.009,
+      "transfer_ms": 0.418,
+      "persistence_ms": 0.524,
+      "feedback_ms": 0.011,
+      "stage_total_ms": 8.004,
+      "total_cpu_ms": 8.004,
+      "memory_mb": 0.23,
+      "candidates_found": 10
+    },
+    "1000": {
+      "scale_items": 1000,
+      "index_build_ms": 22.869,
+      "retrieval_ms": 45.217,
+      "applicability_ms": 0.174,
+      "conflict_ms": 0.007,
+      "transfer_ms": 0.26,
+      "persistence_ms": 0.515,
+      "feedback_ms": 0.007,
+      "stage_total_ms": 69.049,
+      "total_cpu_ms": 69.049,
+      "memory_mb": 2.12,
+      "candidates_found": 10
+    },
+    "10000": {
+      "scale_items": 10000,
+      "index_build_ms": 206.623,
+      "retrieval_ms": 453.094,
+      "applicability_ms": 0.197,
+      "conflict_ms": 0.006,
+      "transfer_ms": 0.268,
+      "persistence_ms": 0.541,
+      "feedback_ms": 0.008,
+      "stage_total_ms": 660.737,
+      "total_cpu_ms": 660.737,
+      "memory_mb": 21.35,
+      "candidates_found": 10
+    },
+    "100000": {
+      "scale_items": 100000,
+      "index_build_ms": 2321.964,
+      "retrieval_ms": 5035.631,
+      "applicability_ms": 0.232,
+      "conflict_ms": 0.011,
+      "transfer_ms": 0.311,
+      "persistence_ms": 0.542,
+      "feedback_ms": 0.01,
+      "stage_total_ms": 7358.701,
+      "total_cpu_ms": 7358.701,
+      "memory_mb": 216.17,
+      "candidates_found": 10
+    },
+    "1000000": {
+      "scale_items": 1000000,
+      "index_build_ms": 25179.594,
+      "retrieval_ms": 48839.467,
+      "applicability_ms": 0.223,
+      "conflict_ms": 0.009,
+      "transfer_ms": 0.304,
+      "persistence_ms": 0.517,
+      "feedback_ms": 0.01,
+      "stage_total_ms": 74020.124,
+      "total_cpu_ms": 74020.124,
+      "memory_mb": 2061.9,
+      "candidates_found": 10
+    }
+  },
+  "summary": {
+    "status": "PASS",
+    "timing_arithmetic_valid": true,
+    "scales_evaluated": 5,
+    "max_scale": 1000000,
+    "max_memory_mb": 2061.9
+  }
+}

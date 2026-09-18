@@ -1,0 +1,511 @@
+{
+  "status": "PASS",
+  "total_items": 10,
+  "knowledge_items": [
+    {
+      "knowledge_id": "k_arch_b00b0a60",
+      "source_project_id": "fintech_payment_core",
+      "source_project_fingerprint": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "category": "ARCHITECTURE_PATTERN",
+      "pattern": {
+        "name": "hexagonal_isolation",
+        "architecture_style": "modular_monolith",
+        "components": [
+          "core",
+          "adapters"
+        ],
+        "data_flow": "inward",
+        "boundaries": [
+          "domain_boundary"
+        ],
+        "category": "ARCHITECTURE_PATTERN"
+      },
+      "context": {
+        "languages": [
+          "python",
+          "typescript"
+        ],
+        "architecture_style": "modular_monolith"
+      },
+      "preconditions": [
+        "none"
+      ],
+      "observed_effect": {
+        "stability": "verified"
+      },
+      "evidence_scope": {
+        "runs": 10,
+        "validation_evidence": {
+          "source_verified": true
+        }
+      },
+      "confidence": 0.85,
+      "provenance": {
+        "source_project_id": "fintech_payment_core",
+        "source_file": "",
+        "author_mission_id": "",
+        "transformation_chain": [],
+        "original_validation_hash": "",
+        "security_checked": true,
+        "created_at": 1789744225.414342
+      },
+      "created_at": 1789744225.4143977,
+      "supersedes": null,
+      "expires_at": null,
+      "security_classification": "INTERNAL",
+      "state": "TRANSFERABLE",
+      "harm_count": 0,
+      "success_count": 0
+    },
+    {
+      "knowledge_id": "k_test_fcbd2ece",
+      "source_project_id": "fintech_payment_core",
+      "source_project_fingerprint": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "category": "TEST_PATTERN",
+      "pattern": {
+        "name": "retry_with_jitter",
+        "test_type": "unit",
+        "target_invariant": "assert retry_count <= 3",
+        "setup_strategy": "fixtures",
+        "assertion_strategy": "status_check",
+        "mock_requirements": [
+          "network_mock"
+        ],
+        "category": "TEST_PATTERN"
+      },
+      "context": {
+        "languages": [
+          "python",
+          "typescript"
+        ],
+        "architecture_style": "modular_monolith"
+      },
+      "preconditions": [
+        "network_timeout"
+      ],
+      "observed_effect": {
+        "stability": "verified"
+      },
+      "evidence_scope": {
+        "runs": 10,
+        "validation_evidence": {
+          "source_verified": true
+        }
+      },
+      "confidence": 0.85,
+      "provenance": {
+        "source_project_id": "fintech_payment_core",
+        "source_file": "",
+        "author_mission_id": "",
+        "transformation_chain": [],
+        "original_validation_hash": "",
+        "security_checked": true,
+        "created_at": 1789744225.4150867
+      },
+      "created_at": 1789744225.4151013,
+      "supersedes": null,
+      "expires_at": null,
+      "security_classification": "INTERNAL",
+      "state": "TRANSFERABLE",
+      "harm_count": 0,
+      "success_count": 0
+    },
+    {
+      "knowledge_id": "k_repa_0f1e35cb",
+      "source_project_id": "fintech_payment_core",
+      "source_project_fingerprint": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "category": "REPAIR_PATTERN",
+      "pattern": {
+        "name": "stale_connection_reset",
+        "failure_signature": "socket_closed",
+        "transformation_strategy": "reconnect_with_backoff",
+        "safety_checks": [
+          "ping"
+        ],
+        "category": "REPAIR_PATTERN"
+      },
+      "context": {
+        "languages": [
+          "python",
+          "typescript"
+        ],
+        "architecture_style": "modular_monolith"
+      },
+      "preconditions": [
+        "none"
+      ],
+      "observed_effect": {
+        "stability": "verified"
+      },
+      "evidence_scope": {
+        "runs": 10,
+        "validation_evidence": {
+          "source_verified": true
+        }
+      },
+      "confidence": 0.85,
+      "provenance": {
+        "source_project_id": "fintech_payment_core",
+        "source_file": "",
+        "author_mission_id": "",
+        "transformation_chain": [],
+        "original_validation_hash": "",
+        "security_checked": true,
+        "created_at": 1789744225.4155865
+      },
+      "created_at": 1789744225.4155943,
+      "supersedes": null,
+      "expires_at": null,
+      "security_classification": "INTERNAL",
+      "state": "TRANSFERABLE",
+      "harm_count": 0,
+      "success_count": 0
+    },
+    {
+      "knowledge_id": "k_fail_d752e75c",
+      "source_project_id": "fintech_payment_core",
+      "source_project_fingerprint": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "category": "FAILURE_PATTERN",
+      "pattern": {
+        "name": "async_lock_deadlock",
+        "symptom": "timeout_waiting_lock",
+        "root_cause_class": "concurrency",
+        "detection_rule": "circular_wait_detector",
+        "category": "FAILURE_PATTERN"
+      },
+      "context": {
+        "languages": [
+          "python",
+          "typescript"
+        ],
+        "architecture_style": "modular_monolith"
+      },
+      "preconditions": [
+        "none"
+      ],
+      "observed_effect": {
+        "stability": "verified"
+      },
+      "evidence_scope": {
+        "runs": 10,
+        "validation_evidence": {
+          "source_verified": true
+        }
+      },
+      "confidence": 0.85,
+      "provenance": {
+        "source_project_id": "fintech_payment_core",
+        "source_file": "",
+        "author_mission_id": "",
+        "transformation_chain": [],
+        "original_validation_hash": "",
+        "security_checked": true,
+        "created_at": 1789744225.4158056
+      },
+      "created_at": 1789744225.415811,
+      "supersedes": null,
+      "expires_at": null,
+      "security_classification": "INTERNAL",
+      "state": "TRANSFERABLE",
+      "harm_count": 0,
+      "success_count": 0
+    },
+    {
+      "knowledge_id": "k_cont_5fdb86cc",
+      "source_project_id": "fintech_payment_core",
+      "source_project_fingerprint": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "category": "CONTRACT_PATTERN",
+      "pattern": {
+        "name": "openapi_v3_drift_guard",
+        "protocol": "http_rest",
+        "schema_format": "json_schema",
+        "compatibility_rule": "backward_compatible",
+        "drift_mitigation": "reject_breaking",
+        "category": "CONTRACT_PATTERN"
+      },
+      "context": {
+        "languages": [
+          "python",
+          "typescript"
+        ],
+        "architecture_style": "modular_monolith"
+      },
+      "preconditions": [
+        "none"
+      ],
+      "observed_effect": {
+        "stability": "verified"
+      },
+      "evidence_scope": {
+        "runs": 10,
+        "validation_evidence": {
+          "source_verified": true
+        }
+      },
+      "confidence": 0.85,
+      "provenance": {
+        "source_project_id": "fintech_payment_core",
+        "source_file": "",
+        "author_mission_id": "",
+        "transformation_chain": [],
+        "original_validation_hash": "",
+        "security_checked": true,
+        "created_at": 1789744225.416016
+      },
+      "created_at": 1789744225.416021,
+      "supersedes": null,
+      "expires_at": null,
+      "security_classification": "INTERNAL",
+      "state": "TRANSFERABLE",
+      "harm_count": 0,
+      "success_count": 0
+    },
+    {
+      "knowledge_id": "k_beha_881cf72b",
+      "source_project_id": "fintech_payment_core",
+      "source_project_fingerprint": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "category": "BEHAVIOR_PATTERN",
+      "pattern": {
+        "name": "ws_streaming_fsm",
+        "state_machine": "STREAMING",
+        "transition_invariants": [
+          "heartbeat_acknowledged"
+        ],
+        "timeout_budget_ms": 500,
+        "category": "BEHAVIOR_PATTERN"
+      },
+      "context": {
+        "languages": [
+          "python",
+          "typescript"
+        ],
+        "architecture_style": "modular_monolith"
+      },
+      "preconditions": [
+        "none"
+      ],
+      "observed_effect": {
+        "stability": "verified"
+      },
+      "evidence_scope": {
+        "runs": 10,
+        "validation_evidence": {
+          "source_verified": true
+        }
+      },
+      "confidence": 0.85,
+      "provenance": {
+        "source_project_id": "fintech_payment_core",
+        "source_file": "",
+        "author_mission_id": "",
+        "transformation_chain": [],
+        "original_validation_hash": "",
+        "security_checked": true,
+        "created_at": 1789744225.4162164
+      },
+      "created_at": 1789744225.4162228,
+      "supersedes": null,
+      "expires_at": null,
+      "security_classification": "INTERNAL",
+      "state": "TRANSFERABLE",
+      "harm_count": 0,
+      "success_count": 0
+    },
+    {
+      "knowledge_id": "k_risk_b7b8c30d",
+      "source_project_id": "fintech_payment_core",
+      "source_project_fingerprint": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "category": "RISK_PATTERN",
+      "pattern": {
+        "name": "dynamic_dispatch_reflection",
+        "risk_class": "dynamic_dispatch",
+        "impact_severity": "CRITICAL",
+        "mitigation_strategy": "whitelist_registry",
+        "category": "RISK_PATTERN"
+      },
+      "context": {
+        "languages": [
+          "python",
+          "typescript"
+        ],
+        "architecture_style": "modular_monolith"
+      },
+      "preconditions": [
+        "none"
+      ],
+      "observed_effect": {
+        "stability": "verified"
+      },
+      "evidence_scope": {
+        "runs": 10,
+        "validation_evidence": {
+          "source_verified": true
+        }
+      },
+      "confidence": 0.85,
+      "provenance": {
+        "source_project_id": "fintech_payment_core",
+        "source_file": "",
+        "author_mission_id": "",
+        "transformation_chain": [],
+        "original_validation_hash": "",
+        "security_checked": true,
+        "created_at": 1789744225.4164054
+      },
+      "created_at": 1789744225.416411,
+      "supersedes": null,
+      "expires_at": null,
+      "security_classification": "INTERNAL",
+      "state": "TRANSFERABLE",
+      "harm_count": 0,
+      "success_count": 0
+    },
+    {
+      "knowledge_id": "k_perf_55fe08c0",
+      "source_project_id": "fintech_payment_core",
+      "source_project_fingerprint": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "category": "PERFORMANCE_PATTERN",
+      "pattern": {
+        "name": "ast_streaming_chunker",
+        "bottleneck_type": "buffer_bloat",
+        "caching_strategy": "streaming_generator",
+        "concurrency_limit": 50,
+        "category": "PERFORMANCE_PATTERN"
+      },
+      "context": {
+        "languages": [
+          "python",
+          "typescript"
+        ],
+        "architecture_style": "modular_monolith"
+      },
+      "preconditions": [
+        "none"
+      ],
+      "observed_effect": {
+        "stability": "verified"
+      },
+      "evidence_scope": {
+        "runs": 10,
+        "validation_evidence": {
+          "source_verified": true
+        }
+      },
+      "confidence": 0.85,
+      "provenance": {
+        "source_project_id": "fintech_payment_core",
+        "source_file": "",
+        "author_mission_id": "",
+        "transformation_chain": [],
+        "original_validation_hash": "",
+        "security_checked": true,
+        "created_at": 1789744225.416652
+      },
+      "created_at": 1789744225.4166596,
+      "supersedes": null,
+      "expires_at": null,
+      "security_classification": "INTERNAL",
+      "state": "TRANSFERABLE",
+      "harm_count": 0,
+      "success_count": 0
+    },
+    {
+      "knowledge_id": "k_brow_94be19f4",
+      "source_project_id": "fintech_payment_core",
+      "source_project_fingerprint": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "category": "BROWSER_PATTERN",
+      "pattern": {
+        "name": "dom_hydration_wait",
+        "interaction_type": "click",
+        "selector_strategy": "data_testid",
+        "wait_condition": "networkidle",
+        "category": "BROWSER_PATTERN"
+      },
+      "context": {
+        "languages": [
+          "python",
+          "typescript"
+        ],
+        "architecture_style": "modular_monolith"
+      },
+      "preconditions": [
+        "none"
+      ],
+      "observed_effect": {
+        "stability": "verified"
+      },
+      "evidence_scope": {
+        "runs": 10,
+        "validation_evidence": {
+          "source_verified": true
+        }
+      },
+      "confidence": 0.85,
+      "provenance": {
+        "source_project_id": "fintech_payment_core",
+        "source_file": "",
+        "author_mission_id": "",
+        "transformation_chain": [],
+        "original_validation_hash": "",
+        "security_checked": true,
+        "created_at": 1789744225.416905
+      },
+      "created_at": 1789744225.4169128,
+      "supersedes": null,
+      "expires_at": null,
+      "security_classification": "INTERNAL",
+      "state": "TRANSFERABLE",
+      "harm_count": 0,
+      "success_count": 0
+    },
+    {
+      "knowledge_id": "k_reco_5b2bfb26",
+      "source_project_id": "fintech_payment_core",
+      "source_project_fingerprint": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "category": "RECOVERY_PATTERN",
+      "pattern": {
+        "name": "sqlite_wal_checkpoint",
+        "anomaly_type": "db_locked",
+        "checkpoint_policy": "checkpoint_truncate",
+        "rollback_action": "retry",
+        "category": "RECOVERY_PATTERN"
+      },
+      "context": {
+        "languages": [
+          "python",
+          "typescript"
+        ],
+        "architecture_style": "modular_monolith"
+      },
+      "preconditions": [
+        "none"
+      ],
+      "observed_effect": {
+        "stability": "verified"
+      },
+      "evidence_scope": {
+        "runs": 10,
+        "validation_evidence": {
+          "source_verified": true
+        }
+      },
+      "confidence": 0.85,
+      "provenance": {
+        "source_project_id": "fintech_payment_core",
+        "source_file": "",
+        "author_mission_id": "",
+        "transformation_chain": [],
+        "original_validation_hash": "",
+        "security_checked": true,
+        "created_at": 1789744225.4171345
+      },
+      "created_at": 1789744225.4171402,
+      "supersedes": null,
+      "expires_at": null,
+      "security_classification": "INTERNAL",
+      "state": "TRANSFERABLE",
+      "harm_count": 0,
+      "success_count": 0
+    }
+  ]
+}

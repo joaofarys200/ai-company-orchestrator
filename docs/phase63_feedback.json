@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "total_feedbacks": 42,
+  "transfer_successes": 38,
+  "transfer_neutrals": 3,
+  "transfer_harms": 1,
+  "harm_events": [
+    {
+      "harm_id": "harm_01",
+      "knowledge_id": "k_arch_leaky_global_bus",
+      "target_project_id": "distributed_data_mesh",
+      "harm_type": "LOCK_CONTENTION_REGRESSION",
+      "penalty_applied": 0.2,
+      "status": "QUARANTINED"
+    }
+  ]
+}

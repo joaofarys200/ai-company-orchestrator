@@ -1,0 +1,221 @@
+{
+  "status": "PASS",
+  "total_unseen_tasks": 12,
+  "validated_transfers": 11,
+  "human_reviews": 1,
+  "rejected_transfers": 0,
+  "tasks": [
+    {
+      "task_id": "unseen_01_python_backend",
+      "domain": "Python backend async service",
+      "target_project": "unseen_micro_telemetry",
+      "target_fingerprint_hash": "30184a0eac9c24e572acc516863173e799277252bc74bc9986f10dc925495463",
+      "retrieved_knowledge_id": "k_repa_7e049a68",
+      "applicability_status": "TRANSFER_TO_REPAIR_SEARCH",
+      "confidence": 0.532,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_repa_7e049a68_local"
+        ],
+        "local_hash": "84fd7a9b110042cb"
+      }
+    },
+    {
+      "task_id": "unseen_02_ts_frontend",
+      "domain": "TypeScript frontend UI state",
+      "target_project": "unseen_dashboard_ui",
+      "target_fingerprint_hash": "8bb483421620ca61df67e13b759ac4ec2a52aec852486b196acb7b3e0ccc551d",
+      "retrieved_knowledge_id": "k_brow_c7546e40",
+      "applicability_status": "TRANSFER_AS_HYPOTHESIS",
+      "confidence": 0.5107,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_brow_c7546e40_local"
+        ],
+        "local_hash": "8aed87d2f068447a"
+      }
+    },
+    {
+      "task_id": "unseen_03_js_legacy",
+      "domain": "JavaScript legacy Node.js module",
+      "target_project": "unseen_legacy_logger",
+      "target_fingerprint_hash": "6638277ef85c14e6a44e1e7a3c2a585919f0f3d5028cde2648f8125f88208548",
+      "retrieved_knowledge_id": "k_perf_87a212d7",
+      "applicability_status": "TRANSFER_AS_HYPOTHESIS",
+      "confidence": 0.5915,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_perf_87a212d7_local"
+        ],
+        "local_hash": "7f5caafa570c4e50"
+      }
+    },
+    {
+      "task_id": "unseen_04_rest_contract",
+      "domain": "REST OpenAPI schema drift guard",
+      "target_project": "unseen_customer_api",
+      "target_fingerprint_hash": "331a4abc76bc76cfac7857e386f4df3ad2c080afe7b4990b2b755eccb738a34a",
+      "retrieved_knowledge_id": "k_cont_dbb4a4fe",
+      "applicability_status": "TRANSFER_AS_HYPOTHESIS",
+      "confidence": 0.6467,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_cont_dbb4a4fe_local"
+        ],
+        "local_hash": "c08bc5ff838c416d"
+      }
+    },
+    {
+      "task_id": "unseen_05_websocket_stream",
+      "domain": "WebSocket real-time streaming pipeline",
+      "target_project": "unseen_crypto_feed",
+      "target_fingerprint_hash": "d1fbeed6c6fde556d99dd3f0a98acf55645a45d7ab820d8de3ce5d2182ce36cc",
+      "retrieved_knowledge_id": "k_beha_b69708f0",
+      "applicability_status": "TRANSFER_AS_HYPOTHESIS",
+      "confidence": 0.4789,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_beha_b69708f0_local"
+        ],
+        "local_hash": "eb65803819584b17"
+      }
+    },
+    {
+      "task_id": "unseen_06_database_migration",
+      "domain": "Database transactional schema change",
+      "target_project": "unseen_inventory_db",
+      "target_fingerprint_hash": "81b8a33a6c2ae8a0d5287a81d0f22ba7c53ad03ab3ab15ba557746b0c1d30d84",
+      "retrieved_knowledge_id": "k_reco_9939c639",
+      "applicability_status": "TRANSFER_TO_REPAIR_SEARCH",
+      "confidence": 0.6127,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_reco_9939c639_local"
+        ],
+        "local_hash": "7317de120ac347e4"
+      }
+    },
+    {
+      "task_id": "unseen_07_browser_ui_flow",
+      "domain": "Browser UI complex checkout interaction",
+      "target_project": "unseen_kiosk_app",
+      "target_fingerprint_hash": "d5e7ff7b952a8d662587a9fc22f9d8eddb577bd1ecbf467835e478fa18c0a8b9",
+      "retrieved_knowledge_id": "k_brow_2b4c5508",
+      "applicability_status": "TRANSFER_AS_HYPOTHESIS",
+      "confidence": 0.6127,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_brow_2b4c5508_local"
+        ],
+        "local_hash": "ce328decae1a4b4e"
+      }
+    },
+    {
+      "task_id": "unseen_08_auth_token_rotation",
+      "domain": "Authentication zero-downtime key rotation",
+      "target_project": "unseen_identity_server",
+      "target_fingerprint_hash": "510268c43371212a6c42f847748bf0ec2ee5d0d0640bfc75daa45ebc4f446f37",
+      "retrieved_knowledge_id": "k_risk_d65a0cb4",
+      "applicability_status": "TRANSFER_TO_RISK_MODEL",
+      "confidence": 0.6382,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_risk_d65a0cb4_local"
+        ],
+        "local_hash": "6d8fa9f143c54f41"
+      }
+    },
+    {
+      "task_id": "unseen_09_exponential_retry",
+      "domain": "Retry logic with decorrelated full jitter",
+      "target_project": "unseen_webhook_sender",
+      "target_fingerprint_hash": "c2da155f77eeb7c0aa8f02b8ad1724a3cbde575872c2c817c16bc9c646f57504",
+      "retrieved_knowledge_id": "k_test_125dc265",
+      "applicability_status": "TRANSFER_TO_TEST_GENERATION",
+      "confidence": 0.583,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_test_125dc265_local"
+        ],
+        "local_hash": "a58b423b8b4d416a"
+      }
+    },
+    {
+      "task_id": "unseen_10_economic_safety",
+      "domain": "Economic safety strictly synthetic mocks",
+      "target_project": "unseen_billing_calc",
+      "target_fingerprint_hash": "49c320d0a03ec91fa29edded73207e3ff82f8ae9b5c91ca61de1dbb6bc599963",
+      "retrieved_knowledge_id": "k_cont_dbb4a4fe",
+      "applicability_status": "TRANSFER_AS_HYPOTHESIS",
+      "confidence": 0.6005,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_cont_dbb4a4fe_local"
+        ],
+        "local_hash": "b8a763ec2d7f4ff9"
+      }
+    },
+    {
+      "task_id": "unseen_11_dynamic_reflection",
+      "domain": "Dynamic reflection uncertainty containment",
+      "target_project": "unseen_plugin_host",
+      "target_fingerprint_hash": "58b0583f7c33e3542ee93b342e2ed445884b96c0c95da9b5966cfe20196488c2",
+      "retrieved_knowledge_id": "k_risk_5856f1d8",
+      "applicability_status": "HUMAN_REVIEW",
+      "confidence": 0.6637,
+      "local_validation_required": true,
+      "final_category": "HUMAN_REVIEW",
+      "evidence": {
+        "reason": "Strict security policy required operator audit for dynamic dispatch"
+      }
+    },
+    {
+      "task_id": "unseen_12_cross_language_py_to_ts",
+      "domain": "Cross-language Python to TypeScript semantic transfer",
+      "target_project": "unseen_ts_node_backend",
+      "target_fingerprint_hash": "31371769abbf7a76f20bb6f6a4d6a591b5610d42c945c304e47c470744209495",
+      "retrieved_knowledge_id": "k_brow_2b4c5508",
+      "applicability_status": "TRANSFER_AS_HYPOTHESIS",
+      "confidence": 0.5433,
+      "local_validation_required": true,
+      "final_category": "VALIDATED_TRANSFER",
+      "evidence": {
+        "exit_code": 0,
+        "passed_tests": [
+          "test_k_brow_2b4c5508_local"
+        ],
+        "local_hash": "f6652e1992c84541"
+      }
+    }
+  ]
+}

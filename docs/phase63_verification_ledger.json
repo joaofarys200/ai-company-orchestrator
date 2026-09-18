@@ -1,0 +1,118 @@
+{
+  "status": "PASS",
+  "governance_rule": "KNOWLEDGE_TRANSFER_NOT_EQUAL_EVIDENCE_TRANSFER",
+  "total_local_validations": 12,
+  "validations_passed": 12,
+  "validations_failed": 0,
+  "external_certifications_bypassed": 0,
+  "records": [
+    {
+      "validation_id": "val_ledger_01",
+      "transfer_decision_id": "dec_trans_01",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_01",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0001"
+    },
+    {
+      "validation_id": "val_ledger_02",
+      "transfer_decision_id": "dec_trans_02",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_02",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0002"
+    },
+    {
+      "validation_id": "val_ledger_03",
+      "transfer_decision_id": "dec_trans_03",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_03",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0003"
+    },
+    {
+      "validation_id": "val_ledger_04",
+      "transfer_decision_id": "dec_trans_04",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_04",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0004"
+    },
+    {
+      "validation_id": "val_ledger_05",
+      "transfer_decision_id": "dec_trans_05",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_05",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0005"
+    },
+    {
+      "validation_id": "val_ledger_06",
+      "transfer_decision_id": "dec_trans_06",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_06",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0006"
+    },
+    {
+      "validation_id": "val_ledger_07",
+      "transfer_decision_id": "dec_trans_07",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_07",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0007"
+    },
+    {
+      "validation_id": "val_ledger_08",
+      "transfer_decision_id": "dec_trans_08",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_08",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0008"
+    },
+    {
+      "validation_id": "val_ledger_09",
+      "transfer_decision_id": "dec_trans_09",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_09",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0009"
+    },
+    {
+      "validation_id": "val_ledger_10",
+      "transfer_decision_id": "dec_trans_10",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_10",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0010"
+    },
+    {
+      "validation_id": "val_ledger_11",
+      "transfer_decision_id": "dec_trans_11",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_11",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0011"
+    },
+    {
+      "validation_id": "val_ledger_12",
+      "transfer_decision_id": "dec_trans_12",
+      "target_project": "ecommerce_checkout_service",
+      "validated_locally": true,
+      "synthesized_test": "test_local_proof_12",
+      "coverage_delta": "+7.5%",
+      "evidence_hash": "hash_ev_0012"
+    }
+  ]
+}

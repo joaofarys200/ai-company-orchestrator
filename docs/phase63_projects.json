@@ -1,0 +1,70 @@
+{
+  "status": "PASS",
+  "projects": [
+    {
+      "project_id": "fintech_payment_core",
+      "name": "Fintech Core Gateway",
+      "domain": "fintech",
+      "scale": "medium",
+      "languages": [
+        "python"
+      ],
+      "frameworks": [
+        "fastapi",
+        "celery"
+      ],
+      "contracts": [
+        "openapi",
+        "websocket"
+      ],
+      "risk_classes": [
+        "network_timeout",
+        "concurrency"
+      ]
+    },
+    {
+      "project_id": "ecommerce_checkout_service",
+      "name": "E-Commerce Checkout & Inventory",
+      "domain": "ecommerce",
+      "scale": "medium",
+      "languages": [
+        "typescript",
+        "python"
+      ],
+      "frameworks": [
+        "react",
+        "fastapi"
+      ],
+      "contracts": [
+        "openapi",
+        "json_schema"
+      ],
+      "risk_classes": [
+        "state_concurrency",
+        "data_drift"
+      ]
+    },
+    {
+      "project_id": "distributed_data_mesh",
+      "name": "Distributed Analytics Mesh",
+      "domain": "developer_tools",
+      "scale": "large",
+      "languages": [
+        "python",
+        "typescript"
+      ],
+      "frameworks": [
+        "fastapi",
+        "playwright"
+      ],
+      "contracts": [
+        "websocket",
+        "protobuf"
+      ],
+      "risk_classes": [
+        "dynamic_dispatch",
+        "network_retry"
+      ]
+    }
+  ]
+}

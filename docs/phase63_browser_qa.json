@@ -1,0 +1,89 @@
+{
+  "phase": 63,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "timestamp": 1789744207.9030027,
+  "scenarios_tested": 12,
+  "scenarios_passed": 12,
+  "scenarios": [
+    {
+      "scenario": "01 project fingerprint",
+      "filename": "phase63_01_project_fingerprint.png",
+      "description": "Sanitized SHA256 deterministic project fingerprinting",
+      "status": "PASS"
+    },
+    {
+      "scenario": "02 knowledge library",
+      "filename": "phase63_02_knowledge_library.png",
+      "description": "10 categories of engineering knowledge items",
+      "status": "PASS"
+    },
+    {
+      "scenario": "03 retrieval",
+      "filename": "phase63_03_retrieval.png",
+      "description": "Hybrid multidimensional ranking without textual bias",
+      "status": "PASS"
+    },
+    {
+      "scenario": "04 applicability",
+      "filename": "phase63_04_applicability.png",
+      "description": "Structured why/why-not explanations and applicability status",
+      "status": "PASS"
+    },
+    {
+      "scenario": "05 conflict",
+      "filename": "phase63_05_conflict.png",
+      "description": "Conflicting pattern detection and non-merging safeguards",
+      "status": "PASS"
+    },
+    {
+      "scenario": "06 transfer decision",
+      "filename": "phase63_06_transfer_decision.png",
+      "description": "Governance transfer decision state with local validation plan",
+      "status": "PASS"
+    },
+    {
+      "scenario": "07 external test pattern",
+      "filename": "phase63_07_external_test_pattern.png",
+      "description": "External test pattern converted to local requirement",
+      "status": "PASS"
+    },
+    {
+      "scenario": "08 local validation",
+      "filename": "phase63_08_local_validation.png",
+      "description": "Closed-loop local validation ledger and coverage gain",
+      "status": "PASS"
+    },
+    {
+      "scenario": "09 freshness",
+      "filename": "phase63_09_freshness.png",
+      "description": "Staleness and freshness state transitions on drift",
+      "status": "PASS"
+    },
+    {
+      "scenario": "10 transfer harm",
+      "filename": "phase63_10_transfer_harm.png",
+      "description": "Harm telemetry, performance regression alerts & penalties",
+      "status": "PASS"
+    },
+    {
+      "scenario": "11 security",
+      "filename": "phase63_11_security.png",
+      "description": "Multi-sentinel security filter and quarantine against injection/secrets",
+      "status": "PASS"
+    },
+    {
+      "scenario": "12 audit provenance",
+      "filename": "phase63_12_audit_provenance.png",
+      "description": "Complete immutable provenance ledger and lineage audit",
+      "status": "PASS"
+    }
+  ],
+  "console_errors": [
+    "[ERROR] The tag <%s> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter. g",
+    "[ERROR] [WebSocket] Error: Event",
+    "[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "failed_requests": [],
+  "overall_status": "WARNING"
+}

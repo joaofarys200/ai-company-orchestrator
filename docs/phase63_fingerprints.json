@@ -1,0 +1,115 @@
+{
+  "status": "PASS",
+  "fingerprints": [
+    {
+      "project_id": "fintech_payment_core",
+      "languages": [
+        "python"
+      ],
+      "frameworks": [
+        "celery",
+        "fastapi"
+      ],
+      "architecture_style": "modular_monolith",
+      "package_topology": "single_package",
+      "service_topology": "standalone",
+      "contract_types": [
+        "openapi",
+        "websocket"
+      ],
+      "symbol_graph_statistics": {},
+      "scc_statistics": {},
+      "test_framework": [
+        "pytest"
+      ],
+      "browser_framework": [
+        "none"
+      ],
+      "persistence_technologies": [],
+      "communication_mechanisms": [],
+      "risk_classes": [
+        "concurrency",
+        "network_timeout"
+      ],
+      "domain_category": "fintech",
+      "repository_scale": "medium",
+      "verification_history": {},
+      "fingerprint_hash": "e9d92bcbb2ca0bac32421941ea04b79ef2c57d3f08bc7aae52460d195c069001",
+      "created_at": 1789744225.399297
+    },
+    {
+      "project_id": "ecommerce_checkout_service",
+      "languages": [
+        "python",
+        "typescript"
+      ],
+      "frameworks": [
+        "fastapi",
+        "react"
+      ],
+      "architecture_style": "modular_monolith",
+      "package_topology": "single_package",
+      "service_topology": "standalone",
+      "contract_types": [
+        "json_schema",
+        "openapi"
+      ],
+      "symbol_graph_statistics": {},
+      "scc_statistics": {},
+      "test_framework": [
+        "pytest"
+      ],
+      "browser_framework": [
+        "none"
+      ],
+      "persistence_technologies": [],
+      "communication_mechanisms": [],
+      "risk_classes": [
+        "data_drift",
+        "state_concurrency"
+      ],
+      "domain_category": "ecommerce",
+      "repository_scale": "medium",
+      "verification_history": {},
+      "fingerprint_hash": "c21b262d60d204c88603bbb78de7b3f7ea9bbf998e9a658f77c2ac744f474136",
+      "created_at": 1789744225.3995724
+    },
+    {
+      "project_id": "distributed_data_mesh",
+      "languages": [
+        "python",
+        "typescript"
+      ],
+      "frameworks": [
+        "fastapi",
+        "playwright"
+      ],
+      "architecture_style": "modular_monolith",
+      "package_topology": "single_package",
+      "service_topology": "standalone",
+      "contract_types": [
+        "protobuf",
+        "websocket"
+      ],
+      "symbol_graph_statistics": {},
+      "scc_statistics": {},
+      "test_framework": [
+        "pytest"
+      ],
+      "browser_framework": [
+        "none"
+      ],
+      "persistence_technologies": [],
+      "communication_mechanisms": [],
+      "risk_classes": [
+        "dynamic_dispatch",
+        "network_retry"
+      ],
+      "domain_category": "developer_tools",
+      "repository_scale": "large",
+      "verification_history": {},
+      "fingerprint_hash": "395e1e3fd3ec1fb54c3251ba7b17324dd2ea73b3a88a2a10b6af41ceb74ef4eb",
+      "created_at": 1789744225.3996782
+    }
+  ]
+}
