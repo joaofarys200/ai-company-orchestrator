@@ -1,0 +1,14 @@
+{
+  "phase": 61,
+  "decision_gate": "AUTONOMOUS_TEST_SYNTHESIS_READY",
+  "ready": true,
+  "total_requirements": 11,
+  "total_candidates": 16,
+  "accepted_candidates": 10,
+  "rejected_candidates": 0,
+  "composite_coverage": 0.6295,
+  "regression_suite_phases_40_61": "472/472 PASSED (100%)",
+  "unseen_tasks_evaluated": 4,
+  "timestamp": 1789741907.3411503,
+  "signature": "ba4a54d8a5c13184f04437c078201ed03c19f501efd8851af5ebacae4229cae3"
+}

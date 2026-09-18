@@ -1,0 +1,162 @@
+[
+  {
+    "test_id": "TEST_4afd938f27b5",
+    "execution_id": "exec_TEST_4af_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.15,
+    "risk_delta": -0.36,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "87b458736cad9df641046585068f49889551f471593d6d09894c6b4bc12c0d7b",
+    "timestamp": 1789741907.334837
+  },
+  {
+    "test_id": "TEST_f90f21f1ce26",
+    "execution_id": "exec_TEST_f90_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.25,
+    "risk_delta": -0.32,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "ef66ec2aa0852aab457889a3c8ab1458534c5f53a5fdb289cf0209abbf58ad59",
+    "timestamp": 1789741907.3349593
+  },
+  {
+    "test_id": "TEST_fa9f5bc5ca3b",
+    "execution_id": "exec_TEST_fa9_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.15,
+    "risk_delta": -0.34,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "4ca02396cb53ed1283ec41deb41b1864f94e8953810837240a0afbd123731360",
+    "timestamp": 1789741907.3350413
+  },
+  {
+    "test_id": "TEST_c6007e0fa4e4",
+    "execution_id": "exec_TEST_c60_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.15,
+    "risk_delta": -0.36,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "2790fbb396ea9adc5e6c39b7683617e862c58bff4d3792a5c95b5b5e862081cc",
+    "timestamp": 1789741907.3357244
+  },
+  {
+    "test_id": "TEST_de04b7a534b6",
+    "execution_id": "exec_TEST_de0_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.15,
+    "risk_delta": -0.32,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "529aca17ccfb2be009cb5b4a7dfac8cd45acf6d80545dfe932c013fdff3a6154",
+    "timestamp": 1789741907.335802
+  },
+  {
+    "test_id": "TEST_c7741df54c9f",
+    "execution_id": "exec_TEST_c77_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.25,
+    "risk_delta": -0.24,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "1bde2687b60f2b251066c0265bba9802bfc86bffd7ff8f221764aba1b585d28d",
+    "timestamp": 1789741907.335875
+  },
+  {
+    "test_id": "TEST_38724d63fdf8",
+    "execution_id": "exec_TEST_387_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.3,
+    "risk_delta": -0.4,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "239b998945cdbd70ad86476fcd228684ee6602df4774c2686c9a2ec325a3a87b",
+    "timestamp": 1789741907.3363535
+  },
+  {
+    "test_id": "TEST_9c3798faf202",
+    "execution_id": "exec_TEST_9c3_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.15,
+    "risk_delta": -0.38,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "81a004d9f0760be60b08caad2fb542fb3d10286bf49600ce4021269bb4a56937",
+    "timestamp": 1789741907.336455
+  },
+  {
+    "test_id": "TEST_32e9d20d3218",
+    "execution_id": "exec_TEST_32e_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.15,
+    "risk_delta": -0.36,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "703dc52fe1bda7659d73914d1e8b993c138bf5aa1c62bbbb0bbb5e4294ac16c0",
+    "timestamp": 1789741907.3365061
+  },
+  {
+    "test_id": "TEST_bad0b8a260e2",
+    "execution_id": "exec_TEST_bad_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.25,
+    "risk_delta": -0.32,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "19f3057831be412e3e94a11d394bf6676d03a1545a7b5390b5666ef1e1f41829",
+    "timestamp": 1789741907.3365772
+  },
+  {
+    "test_id": "TEST_768155547c46",
+    "execution_id": "exec_TEST_768_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.15,
+    "risk_delta": -0.32,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "c751d2aeb6d7da4ca04477e2da6f9b664847be81f053f898d81290c7c28b2dc9",
+    "timestamp": 1789741907.3368113
+  },
+  {
+    "test_id": "TEST_39c078c40457",
+    "execution_id": "exec_TEST_39c_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.2,
+    "risk_delta": -0.24,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "a9a482ed5d635eebfce002cf144d936421129e79a9318edec08dc733a184ec85",
+    "timestamp": 1789741907.3369527
+  },
+  {
+    "test_id": "TEST_2ef90ed743c9",
+    "execution_id": "exec_TEST_2ef_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.2,
+    "risk_delta": -0.24,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "26d9982b3e94e97f8539d1e30c6ef7a066a592b6a3867a79f3355064dd560a78",
+    "timestamp": 1789741907.337019
+  },
+  {
+    "test_id": "TEST_caf47e3eb804",
+    "execution_id": "exec_TEST_caf_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.15,
+    "risk_delta": -0.28,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "876985cb629e2c495747b9f9a5e94f2dccc9dcf6a0f80cd6885d91019fb5d8cd",
+    "timestamp": 1789741907.3370812
+  },
+  {
+    "test_id": "TEST_71b8f7e9e33c",
+    "execution_id": "exec_TEST_71b_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.2,
+    "risk_delta": -0.38,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "5cc5b8359e7f2a7e9afadade3d695c6513a50532b85d603a57381cdc9ba2b091",
+    "timestamp": 1789741907.337187
+  },
+  {
+    "test_id": "TEST_f616b0726e87",
+    "execution_id": "exec_TEST_f61_1789741907",
+    "result": "PASS",
+    "coverage_delta": 0.35,
+    "risk_delta": -0.3,
+    "provenance": "sandboxed_test_executor",
+    "evidence_hash": "03af30c63c9480352abb0f82850f09341dbb5c2e77e4a8faa3dd782efe4d12cb",
+    "timestamp": 1789741907.3373027
+  }
+]

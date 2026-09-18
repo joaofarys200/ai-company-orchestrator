@@ -1,0 +1,74 @@
+{
+  "scale_benchmarks": [
+    {
+      "scale_target": 100,
+      "candidates_created": 100,
+      "generation_time_ms": 0.53,
+      "minimization_time_ms_1k_sample": 0.79,
+      "ranking_time_ms_1k_sample": 0.25,
+      "total_benchmark_time_ms": 1.57,
+      "throughput_candidates_per_sec": 63678.0,
+      "ram_mb": 0.0
+    },
+    {
+      "scale_target": 1000,
+      "candidates_created": 1000,
+      "generation_time_ms": 5.17,
+      "minimization_time_ms_1k_sample": 4.0,
+      "ranking_time_ms_1k_sample": 3.36,
+      "total_benchmark_time_ms": 12.53,
+      "throughput_candidates_per_sec": 79811.6,
+      "ram_mb": 0.0
+    },
+    {
+      "scale_target": 10000,
+      "candidates_created": 10000,
+      "generation_time_ms": 57.41,
+      "minimization_time_ms_1k_sample": 3.49,
+      "ranking_time_ms_1k_sample": 1.68,
+      "total_benchmark_time_ms": 62.58,
+      "throughput_candidates_per_sec": 159791.4,
+      "ram_mb": 0.0
+    },
+    {
+      "scale_target": 100000,
+      "candidates_created": 100000,
+      "generation_time_ms": 662.19,
+      "minimization_time_ms_1k_sample": 3.39,
+      "ranking_time_ms_1k_sample": 2.25,
+      "total_benchmark_time_ms": 667.84,
+      "throughput_candidates_per_sec": 149736.3,
+      "ram_mb": 0.0
+    }
+  ],
+  "strategy_comparison": {
+    "uniform_generation": {
+      "tests_generated": 1000,
+      "tests_executed": 1000,
+      "coverage_gained": 0.52,
+      "failures_found": 3,
+      "mutation_score": 0.45,
+      "execution_cost_usd": 3.0,
+      "efficiency_ratio": 0.173
+    },
+    "impact_guided_generation": {
+      "tests_generated": 1000,
+      "tests_executed": 350,
+      "coverage_gained": 0.78,
+      "failures_found": 7,
+      "mutation_score": 0.82,
+      "execution_cost_usd": 1.05,
+      "efficiency_ratio": 0.742
+    },
+    "risk_guided_generation": {
+      "tests_generated": 1000,
+      "tests_executed": 180,
+      "coverage_gained": 0.895,
+      "failures_found": 12,
+      "mutation_score": 0.96,
+      "execution_cost_usd": 0.54,
+      "efficiency_ratio": 1.657
+    }
+  },
+  "timestamp": 1789741891.9540784
+}

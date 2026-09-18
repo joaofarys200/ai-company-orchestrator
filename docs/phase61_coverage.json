@@ -1,0 +1,25 @@
+{
+  "current_metrics": {
+    "line_cov": 1.0,
+    "branch_cov": 1.0,
+    "symbol_cov": 1.0,
+    "contract_cov": 0.9,
+    "behavior_cov": 0.33,
+    "invariant_cov": 0.3,
+    "consumer_cov": 0.0,
+    "browser_cov": 0.0,
+    "composite_score": 0.6295
+  },
+  "targets": {
+    "line": 0.85,
+    "branch": 0.8,
+    "symbol": 0.9,
+    "contract": 0.95,
+    "behavior": 0.9,
+    "invariant": 0.85,
+    "consumer": 0.8,
+    "browser": 0.7
+  },
+  "sufficient": false,
+  "composite_score": 0.6295
+}

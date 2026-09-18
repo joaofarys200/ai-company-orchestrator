@@ -1,0 +1,84 @@
+{
+  "phase": 61,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "timestamp": 1789741975.3138747,
+  "scenarios_tested": 11,
+  "scenarios_passed": 11,
+  "scenarios": [
+    {
+      "name": "phase61_01_test_requirements",
+      "description": "Overview of autonomous test synthesis and global decision gate",
+      "screenshot": "phase61_01_test_requirements.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase61_02_candidate_matrix",
+      "description": "Formal test requirement extraction matrix with sources, symbols, and invariants",
+      "screenshot": "phase61_02_candidate_matrix.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase61_03_risk_ranking",
+      "description": "Multi-objective risk-guided ranking table with cost penalties and security boost",
+      "screenshot": "phase61_03_risk_ranking.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase61_04_generated_test",
+      "description": "Synthesized test code viewer with pytest/vitest deterministic assertions",
+      "screenshot": "phase61_04_generated_test.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase61_05_coverage_gaps",
+      "description": "Multi-dimensional coverage tracker across 8 dimensions (line, branch, symbol, contract, behavior, invariant, consumer, browser)",
+      "screenshot": "phase61_05_coverage_gaps.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase61_06_mutation_result",
+      "description": "Bounded mutation testing score and killer test candidate tracking",
+      "screenshot": "phase61_06_mutation_result.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase61_07_counterexample_regression",
+      "description": "Counterexample-derived regression tests under KNOWN_FAILURE_REGRESSION",
+      "screenshot": "phase61_07_counterexample_regression.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase61_08_browser_test_generation",
+      "description": "Synthesized Playwright browser scenarios for UI regression prevention",
+      "screenshot": "phase61_08_browser_test_generation.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase61_09_accepted_rejected_tests",
+      "description": "Quality gates rejecting trivial assertions (assert True) and accepting high-value tests",
+      "screenshot": "phase61_09_accepted_rejected_tests.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase61_10_proof_integration",
+      "description": "Adaptive generation loop and evidence ledger proof integration",
+      "screenshot": "phase61_10_proof_integration.png",
+      "status": "PASS"
+    },
+    {
+      "name": "phase61_11_security",
+      "description": "Security Sentinel audit log and economic sandbox mock enforcement",
+      "screenshot": "phase61_11_security.png",
+      "status": "PASS"
+    }
+  ],
+  "console_errors": [
+    "[error] The tag <%s> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter. g",
+    "[warning] WebSocket connection to 'ws://127.0.0.1:8001/?token=local-dev-token' failed: WebSocket is closed before the connection is established.",
+    "[error] [WebSocket] Error: Event",
+    "[warning] [Transport] Unknown message type: sandbox_status"
+  ],
+  "failed_requests": [],
+  "overall_status": "PASS"
+}

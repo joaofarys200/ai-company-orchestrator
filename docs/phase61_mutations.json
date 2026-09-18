@@ -1,0 +1,30 @@
+{
+  "total_mutants": 2,
+  "mutants_detected": 2,
+  "mutants_survived": 0,
+  "mutation_score": 1.0,
+  "mutants": [
+    {
+      "mutant_id": "MUT_process__1",
+      "mutation_type": "OPERATOR_SWAP",
+      "target_symbol": "process_order",
+      "target_file": "order.py",
+      "detected": true,
+      "killing_test_id": "TEST_d4ddb5671130",
+      "survived": false,
+      "original_snippet": "\ndef process_order(price, tax, is_vip):\n    if is_vip:\n        discount = price * 0.10\n    else:\n        discount = 0.0\n    total = price - discount + tax\n    return total\n",
+      "mutated_snippet": "\ndef process_order(price, tax, is_vip):\n    if is_vip:\n        discount = price * 0.10\n    else:\n        discount = 0.0\n    total = price - discount - tax\n    return total\n"
+    },
+    {
+      "mutant_id": "MUT_process__2",
+      "mutation_type": "OPERATOR_SWAP",
+      "target_symbol": "process_order",
+      "target_file": "order.py",
+      "detected": true,
+      "killing_test_id": "TEST_d4ddb5671130",
+      "survived": false,
+      "original_snippet": "\ndef process_order(price, tax, is_vip):\n    if is_vip:\n        discount = price * 0.10\n    else:\n        discount = 0.0\n    total = price - discount + tax\n    return total\n",
+      "mutated_snippet": "\ndef process_order(price, tax, is_vip):\n    if is_vip:\n        discount = price * 0.10\n    else:\n        discount = 0.0\n    total = price + discount + tax\n    return total\n"
+    }
+  ]
+}

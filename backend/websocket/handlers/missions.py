@@ -1471,6 +1471,34 @@ class MissionWebSocketHandler:
                 )
                 return
 
+            elif operation == "mission_test_synthesis_status":
+                from backend.agents.autonomous_test_synthesis.bridge import AutonomousTestSynthesisBridge
+                bridge = AutonomousTestSynthesisBridge.get_instance()
+                status = bridge.get_status()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_test_synthesis_status_result",
+                        "status": status,
+                    },
+                )
+                return
+
+            elif operation == "mission_test_synthesis_generate":
+                from backend.agents.autonomous_test_synthesis.bridge import AutonomousTestSynthesisBridge
+                bridge = AutonomousTestSynthesisBridge.get_instance()
+                sym = str(message.get("symbol_id") or "agents/payment.py::process_transaction")
+                fpath = str(message.get("file_id") or "agents/payment.py")
+                res = bridge.synthesize_for_change(symbol_id=sym, file_id=fpath)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_test_synthesis_generate_result",
+                        "result": res,
+                    },
+                )
+                return
+
             if snapshot is None:
                 return
 
