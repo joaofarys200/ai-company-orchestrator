@@ -177,6 +177,15 @@ SERVER_MESSAGE_TYPES = {
     "mission_contract_change_prediction_result",
     "mission_contract_migration_plan_result",
     "mission_contract_change_gate_action_result",
+    # Phase 67 Long-Horizon Missions
+    "mission_long_horizon_status_result",
+    "mission_long_horizon_create_result",
+    "mission_long_horizon_step_result",
+    "mission_long_horizon_run_result",
+    "mission_long_horizon_checkpoint_create_result",
+    "mission_long_horizon_recover_result",
+    "mission_long_horizon_adapt_result",
+    "mission_long_horizon_completion_evaluate_result",
 }
 
 
@@ -321,9 +330,26 @@ CLIENT_MESSAGE_TYPES = {
     "mission_multi_agent_intent_submit",
     "mission_multi_agent_arbitrate",
     "mission_multi_agent_schedule",
+    # Phase 67
+    "mission_long_horizon_status",
+    "mission_long_horizon_create",
+    "mission_long_horizon_step",
+    "mission_long_horizon_run",
+    "mission_long_horizon_checkpoint_create",
+    "mission_long_horizon_recover",
+    "mission_long_horizon_adapt",
+    "mission_long_horizon_completion_evaluate",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
+    "mission_long_horizon_status": (),
+    "mission_long_horizon_create": (),
+    "mission_long_horizon_step": (),
+    "mission_long_horizon_run": (),
+    "mission_long_horizon_checkpoint_create": (),
+    "mission_long_horizon_recover": (),
+    "mission_long_horizon_adapt": (),
+    "mission_long_horizon_completion_evaluate": (),
     "mission_multi_agent_coordination_status": (),
     "mission_multi_agent_intent_submit": (),
     "mission_multi_agent_arbitrate": (),

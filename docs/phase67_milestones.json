@@ -1,0 +1,32 @@
+[
+  {
+    "total_milestones": 12,
+    "completed_milestones": 12,
+    "failed_milestones": 0,
+    "completion_percentage": 100.0
+  },
+  {
+    "total_milestones": 15,
+    "completed_milestones": 15,
+    "failed_milestones": 0,
+    "completion_percentage": 100.0
+  },
+  {
+    "total_milestones": 100,
+    "completed_milestones": 100,
+    "failed_milestones": 0,
+    "completion_percentage": 100.0
+  },
+  {
+    "total_milestones": 17,
+    "completed_milestones": 13,
+    "failed_milestones": 1,
+    "completion_percentage": 76.47
+  },
+  {
+    "total_milestones": 10,
+    "completed_milestones": 2,
+    "failed_milestones": 0,
+    "completion_percentage": 20.0
+  }
+]

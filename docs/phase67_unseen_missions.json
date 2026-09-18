@@ -1,0 +1,147 @@
+{
+  "timestamp": 1789766983.4458683,
+  "total_unseen_missions": 15,
+  "missions": [
+    {
+      "mission_id": "unseen_01_large_frontend",
+      "name": "Large Frontend Dashboard",
+      "milestone_count": 14,
+      "mode": "NOMINAL",
+      "outcome": "COMPLETED",
+      "steps_executed": 14,
+      "budget_consumed_pct": 3.27
+    },
+    {
+      "mission_id": "unseen_02_backend_feature",
+      "name": "Backend Event Sourcing Core",
+      "milestone_count": 12,
+      "mode": "NOMINAL",
+      "outcome": "COMPLETED",
+      "steps_executed": 12,
+      "budget_consumed_pct": 2.81
+    },
+    {
+      "mission_id": "unseen_03_api_evolution",
+      "name": "REST to GraphQL Adapter Layer",
+      "milestone_count": 10,
+      "mode": "NOMINAL",
+      "outcome": "COMPLETED",
+      "steps_executed": 10,
+      "budget_consumed_pct": 2.34
+    },
+    {
+      "mission_id": "unseen_04_browser_feature",
+      "name": "Headless Browser Virtual DOM Session",
+      "milestone_count": 10,
+      "mode": "NOMINAL",
+      "outcome": "COMPLETED",
+      "steps_executed": 10,
+      "budget_consumed_pct": 2.34
+    },
+    {
+      "mission_id": "unseen_05_arch_refactor",
+      "name": "Microservice Boundary Splitting",
+      "milestone_count": 20,
+      "mode": "NOMINAL",
+      "outcome": "COMPLETED",
+      "steps_executed": 20,
+      "budget_consumed_pct": 4.68
+    },
+    {
+      "mission_id": "unseen_06_db_migration",
+      "name": "Zero-Downtime Blue/Green DB Schema",
+      "milestone_count": 15,
+      "mode": "NOMINAL",
+      "outcome": "COMPLETED",
+      "steps_executed": 15,
+      "budget_consumed_pct": 3.51
+    },
+    {
+      "mission_id": "unseen_07_cross_service",
+      "name": "Cross-Service Idempotency Propagation",
+      "milestone_count": 16,
+      "mode": "NOMINAL",
+      "outcome": "COMPLETED",
+      "steps_executed": 16,
+      "budget_consumed_pct": 3.74
+    },
+    {
+      "mission_id": "unseen_08_security_sensitive",
+      "name": "OAuth2 Token Cryptographic Hardening",
+      "milestone_count": 10,
+      "mode": "SECURITY_BLOCK",
+      "outcome": "BLOCKED",
+      "steps_executed": 2,
+      "budget_consumed_pct": 0.3
+    },
+    {
+      "mission_id": "unseen_09_test_gap",
+      "name": "Coverage Gap Autonomous Synthesis",
+      "milestone_count": 12,
+      "mode": "NOMINAL",
+      "outcome": "COMPLETED",
+      "steps_executed": 12,
+      "budget_consumed_pct": 2.81
+    },
+    {
+      "mission_id": "unseen_10_contract_drift",
+      "name": "Contract Drift Detection & Migration",
+      "milestone_count": 12,
+      "mode": "RESIDUAL_RISK",
+      "outcome": "COMPLETED_WITH_UNRESOLVED_RISK",
+      "steps_executed": 12,
+      "budget_consumed_pct": 2.81
+    },
+    {
+      "mission_id": "unseen_11_async_workflow",
+      "name": "Distributed Sagas Orchestration",
+      "milestone_count": 15,
+      "mode": "NOMINAL",
+      "outcome": "COMPLETED",
+      "steps_executed": 15,
+      "budget_consumed_pct": 3.51
+    },
+    {
+      "mission_id": "unseen_12_multi_agent_conflict",
+      "name": "Simultaneous AST Symbol Contention",
+      "milestone_count": 14,
+      "mode": "NOMINAL",
+      "outcome": "COMPLETED",
+      "steps_executed": 14,
+      "budget_consumed_pct": 3.27
+    },
+    {
+      "mission_id": "unseen_13_intentional_failure",
+      "name": "Hard Hardware Fault Simulation",
+      "milestone_count": 10,
+      "mode": "INTENTIONAL_FAIL",
+      "outcome": "FAILED",
+      "steps_executed": 3,
+      "budget_consumed_pct": 0.53
+    },
+    {
+      "mission_id": "unseen_14_crash_recovery",
+      "name": "Sudden Power Loss Mid-Verification",
+      "milestone_count": 12,
+      "mode": "CRASH_RECOVERY",
+      "outcome": "COMPLETED",
+      "steps_executed": 12,
+      "budget_consumed_pct": 2.81
+    },
+    {
+      "mission_id": "unseen_15_objective_ambiguity",
+      "name": "Underspecified User Query with High Ambiguity",
+      "milestone_count": 10,
+      "mode": "HUMAN_REVIEW",
+      "outcome": "HUMAN_REVIEW",
+      "steps_executed": 1,
+      "budget_consumed_pct": 0.23
+    }
+  ],
+  "empirical_outcomes_summary": {
+    "completed": 12,
+    "blocked": 1,
+    "failed": 1,
+    "human_review": 1
+  }
+}

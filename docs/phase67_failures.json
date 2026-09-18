@@ -1,0 +1,13 @@
+[
+  {
+    "mission_id": "m4_contract_recovery",
+    "failed_milestone": "M_00005",
+    "failure_type": "CONTRACT_FAILURE",
+    "action": "ADAPTIVE_REPAIR_INJECTED"
+  },
+  {
+    "mission_id": "m5_security_negative_gate",
+    "failure_type": "SECURITY_FAILURE",
+    "action": "EXECUTION_BLOCKED"
+  }
+]

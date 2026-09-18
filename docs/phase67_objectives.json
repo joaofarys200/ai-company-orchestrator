@@ -1,0 +1,279 @@
+[
+  {
+    "objectives": {
+      "OBJ_m1_frontend_cockpit_01": {
+        "objective_id": "OBJ_m1_frontend_cockpit_01",
+        "description": "Implement responsive telemetry cockpit with real-time WebSocket state streaming",
+        "category": "PRIMARY_OBJECTIVES",
+        "measurable_conditions": [
+          "tests_pass >= 1"
+        ],
+        "evidence_requirements": [
+          "CONTINUOUS_VERIFICATION"
+        ],
+        "verification_requirements": [],
+        "priority": 1,
+        "scope": "GLOBAL",
+        "status": "SATISFIED",
+        "metadata": {
+          "evidence_refs": [
+            "evd_M_00001_unit_test",
+            "evd_M_00002_unit_test",
+            "evd_M_00003_unit_test",
+            "evd_M_00004_unit_test",
+            "evd_M_00005_unit_test",
+            "evd_M_00006_unit_test",
+            "evd_M_00007_unit_test",
+            "evd_M_00008_unit_test",
+            "evd_M_00009_unit_test",
+            "evd_M_00010_unit_test",
+            "evd_M_00011_unit_test",
+            "evd_M_00012_unit_test"
+          ]
+        }
+      }
+    },
+    "baseline_signatures": {
+      "OBJ_m1_frontend_cockpit_01": "OBJ_m1_frontend_cockpit_01::implement responsive telemetry cockpit with real-time websocket state streaming::PRIMARY_OBJECTIVES::tests_pass >= 1::CONTINUOUS_VERIFICATION::::1"
+    },
+    "history_count": 13
+  },
+  {
+    "objectives": {
+      "OBJ_m2_backend_outbox_01": {
+        "objective_id": "OBJ_m2_backend_outbox_01",
+        "description": "Implement durable transactional outbox worker with idempotency keys",
+        "category": "PRIMARY_OBJECTIVES",
+        "measurable_conditions": [
+          "tests_pass >= 1"
+        ],
+        "evidence_requirements": [
+          "CONTINUOUS_VERIFICATION"
+        ],
+        "verification_requirements": [],
+        "priority": 1,
+        "scope": "GLOBAL",
+        "status": "SATISFIED",
+        "metadata": {
+          "evidence_refs": [
+            "evd_M_00001_unit_test",
+            "evd_M_00002_unit_test",
+            "evd_M_00003_unit_test",
+            "evd_M_00004_unit_test",
+            "evd_M_00005_unit_test",
+            "evd_M_00006_unit_test",
+            "evd_M_00007_unit_test",
+            "evd_M_00008_unit_test",
+            "evd_M_00009_unit_test",
+            "evd_M_00010_unit_test",
+            "evd_M_00011_unit_test",
+            "evd_M_00012_unit_test",
+            "evd_M_00013_unit_test",
+            "evd_M_00014_unit_test",
+            "evd_M_00015_unit_test"
+          ]
+        }
+      }
+    },
+    "baseline_signatures": {
+      "OBJ_m2_backend_outbox_01": "OBJ_m2_backend_outbox_01::implement durable transactional outbox worker with idempotency keys::PRIMARY_OBJECTIVES::tests_pass >= 1::CONTINUOUS_VERIFICATION::::1"
+    },
+    "history_count": 16
+  },
+  {
+    "objectives": {
+      "OBJ_m3_massive_refactor_100_01": {
+        "objective_id": "OBJ_m3_massive_refactor_100_01",
+        "description": "Monorepo component boundary decoupling and fine-grained SCC graph condensation",
+        "category": "PRIMARY_OBJECTIVES",
+        "measurable_conditions": [
+          "tests_pass >= 1"
+        ],
+        "evidence_requirements": [
+          "CONTINUOUS_VERIFICATION"
+        ],
+        "verification_requirements": [],
+        "priority": 1,
+        "scope": "GLOBAL",
+        "status": "SATISFIED",
+        "metadata": {
+          "evidence_refs": [
+            "evd_M_00001_unit_test",
+            "evd_M_00002_unit_test",
+            "evd_M_00003_unit_test",
+            "evd_M_00004_unit_test",
+            "evd_M_00005_unit_test",
+            "evd_M_00006_unit_test",
+            "evd_M_00007_unit_test",
+            "evd_M_00008_unit_test",
+            "evd_M_00009_unit_test",
+            "evd_M_00010_unit_test",
+            "evd_M_00011_unit_test",
+            "evd_M_00012_unit_test",
+            "evd_M_00013_unit_test",
+            "evd_M_00014_unit_test",
+            "evd_M_00015_unit_test",
+            "evd_M_00016_unit_test",
+            "evd_M_00017_unit_test",
+            "evd_M_00018_unit_test",
+            "evd_M_00019_unit_test",
+            "evd_M_00020_unit_test",
+            "evd_M_00021_unit_test",
+            "evd_M_00022_unit_test",
+            "evd_M_00023_unit_test",
+            "evd_M_00024_unit_test",
+            "evd_M_00025_unit_test",
+            "evd_M_00026_unit_test",
+            "evd_M_00027_unit_test",
+            "evd_M_00028_unit_test",
+            "evd_M_00029_unit_test",
+            "evd_M_00030_unit_test",
+            "evd_M_00031_unit_test",
+            "evd_M_00032_unit_test",
+            "evd_M_00033_unit_test",
+            "evd_M_00034_unit_test",
+            "evd_M_00035_unit_test",
+            "evd_M_00036_unit_test",
+            "evd_M_00037_unit_test",
+            "evd_M_00038_unit_test",
+            "evd_M_00039_unit_test",
+            "evd_M_00040_unit_test",
+            "evd_M_00041_unit_test",
+            "evd_M_00042_unit_test",
+            "evd_M_00043_unit_test",
+            "evd_M_00044_unit_test",
+            "evd_M_00045_unit_test",
+            "evd_M_00046_unit_test",
+            "evd_M_00047_unit_test",
+            "evd_M_00048_unit_test",
+            "evd_M_00049_unit_test",
+            "evd_M_00050_unit_test",
+            "evd_M_00051_unit_test",
+            "evd_M_00052_unit_test",
+            "evd_M_00053_unit_test",
+            "evd_M_00054_unit_test",
+            "evd_M_00055_unit_test",
+            "evd_M_00056_unit_test",
+            "evd_M_00057_unit_test",
+            "evd_M_00058_unit_test",
+            "evd_M_00059_unit_test",
+            "evd_M_00060_unit_test",
+            "evd_M_00061_unit_test",
+            "evd_M_00062_unit_test",
+            "evd_M_00063_unit_test",
+            "evd_M_00064_unit_test",
+            "evd_M_00065_unit_test",
+            "evd_M_00066_unit_test",
+            "evd_M_00067_unit_test",
+            "evd_M_00068_unit_test",
+            "evd_M_00069_unit_test",
+            "evd_M_00070_unit_test",
+            "evd_M_00071_unit_test",
+            "evd_M_00072_unit_test",
+            "evd_M_00073_unit_test",
+            "evd_M_00074_unit_test",
+            "evd_M_00075_unit_test",
+            "evd_M_00076_unit_test",
+            "evd_M_00077_unit_test",
+            "evd_M_00078_unit_test",
+            "evd_M_00079_unit_test",
+            "evd_M_00080_unit_test",
+            "evd_M_00081_unit_test",
+            "evd_M_00082_unit_test",
+            "evd_M_00083_unit_test",
+            "evd_M_00084_unit_test",
+            "evd_M_00085_unit_test",
+            "evd_M_00086_unit_test",
+            "evd_M_00087_unit_test",
+            "evd_M_00088_unit_test",
+            "evd_M_00089_unit_test",
+            "evd_M_00090_unit_test",
+            "evd_M_00091_unit_test",
+            "evd_M_00092_unit_test",
+            "evd_M_00093_unit_test",
+            "evd_M_00094_unit_test",
+            "evd_M_00095_unit_test",
+            "evd_M_00096_unit_test",
+            "evd_M_00097_unit_test",
+            "evd_M_00098_unit_test",
+            "evd_M_00099_unit_test",
+            "evd_M_00100_unit_test"
+          ]
+        }
+      }
+    },
+    "baseline_signatures": {
+      "OBJ_m3_massive_refactor_100_01": "OBJ_m3_massive_refactor_100_01::monorepo component boundary decoupling and fine-grained scc graph condensation::PRIMARY_OBJECTIVES::tests_pass >= 1::CONTINUOUS_VERIFICATION::::1"
+    },
+    "history_count": 101
+  },
+  {
+    "objectives": {
+      "OBJ_m4_contract_recovery_01": {
+        "objective_id": "OBJ_m4_contract_recovery_01",
+        "description": "Polymorphic schema migration with contract drift recovery",
+        "category": "PRIMARY_OBJECTIVES",
+        "measurable_conditions": [
+          "tests_pass >= 1"
+        ],
+        "evidence_requirements": [
+          "CONTINUOUS_VERIFICATION"
+        ],
+        "verification_requirements": [],
+        "priority": 1,
+        "scope": "GLOBAL",
+        "status": "SATISFIED",
+        "metadata": {
+          "evidence_refs": [
+            "evd_M_00001_unit_test",
+            "evd_M_00002_unit_test",
+            "evd_M_00003_unit_test",
+            "evd_M_00004_unit_test",
+            "evd_M_00006_unit_test",
+            "evd_M_00007_unit_test",
+            "evd_M_00008_unit_test",
+            "evd_M_00010_unit_test",
+            "evd_M_00011_unit_test",
+            "evd_M_00012_unit_test",
+            "evd_M_00014_unit_test",
+            "evd_M_00015_unit_test",
+            "evd_M_00016_unit_test"
+          ]
+        }
+      }
+    },
+    "baseline_signatures": {
+      "OBJ_m4_contract_recovery_01": "OBJ_m4_contract_recovery_01::polymorphic schema migration with contract drift recovery::PRIMARY_OBJECTIVES::tests_pass >= 1::CONTINUOUS_VERIFICATION::::1"
+    },
+    "history_count": 14
+  },
+  {
+    "objectives": {
+      "OBJ_m5_security_negative_gate_01": {
+        "objective_id": "OBJ_m5_security_negative_gate_01",
+        "description": "Cross-service authentication middleware update with unauthorized token privilege modification",
+        "category": "PRIMARY_OBJECTIVES",
+        "measurable_conditions": [
+          "tests_pass >= 1"
+        ],
+        "evidence_requirements": [
+          "CONTINUOUS_VERIFICATION"
+        ],
+        "verification_requirements": [],
+        "priority": 1,
+        "scope": "GLOBAL",
+        "status": "SATISFIED",
+        "metadata": {
+          "evidence_refs": [
+            "evd_M_00001_unit_test",
+            "evd_M_00002_unit_test"
+          ]
+        }
+      }
+    },
+    "baseline_signatures": {
+      "OBJ_m5_security_negative_gate_01": "OBJ_m5_security_negative_gate_01::cross-service authentication middleware update with unauthorized token privilege modification::PRIMARY_OBJECTIVES::tests_pass >= 1::CONTINUOUS_VERIFICATION::::1"
+    },
+    "history_count": 3
+  }
+]

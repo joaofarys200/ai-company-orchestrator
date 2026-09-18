@@ -1,0 +1,5584 @@
+[
+  {
+    "plan_id": "plan_fc857801",
+    "mission_id": "m1_frontend_cockpit",
+    "milestones": {
+      "M_00001": {
+        "milestone_id": "M_00001",
+        "title": "Milestone Step 1",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00001.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ALWAYS",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00001.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00001_unit_test",
+          "evd_M_00001_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8554928,
+        "completed_at": 1789766969.8555813
+      },
+      "M_00002": {
+        "milestone_id": "M_00002",
+        "title": "Milestone Step 2",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00002.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00002.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00002_unit_test",
+          "evd_M_00002_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8559196,
+        "completed_at": 1789766969.8559546
+      },
+      "M_00003": {
+        "milestone_id": "M_00003",
+        "title": "Milestone Step 3",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00003.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00003.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00003_unit_test",
+          "evd_M_00003_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8563333,
+        "completed_at": 1789766969.8563638
+      },
+      "M_00004": {
+        "milestone_id": "M_00004",
+        "title": "Milestone Step 4",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00004.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00004.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00004_unit_test",
+          "evd_M_00004_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8567107,
+        "completed_at": 1789766969.8567388
+      },
+      "M_00005": {
+        "milestone_id": "M_00005",
+        "title": "Milestone Step 5",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [
+          "M_00001"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00005.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00005.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00005_unit_test",
+          "evd_M_00005_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8571346,
+        "completed_at": 1789766969.857168
+      },
+      "M_00006": {
+        "milestone_id": "M_00006",
+        "title": "Milestone Step 6",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [
+          "M_00002"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00006.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00006.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00006_unit_test",
+          "evd_M_00006_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8575833,
+        "completed_at": 1789766969.8576133
+      },
+      "M_00007": {
+        "milestone_id": "M_00007",
+        "title": "Milestone Step 7",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [
+          "M_00003"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00007.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00007.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00007_unit_test",
+          "evd_M_00007_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8581038,
+        "completed_at": 1789766969.8581314
+      },
+      "M_00008": {
+        "milestone_id": "M_00008",
+        "title": "Milestone Step 8",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [
+          "M_00004"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00008.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00008.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00008_unit_test",
+          "evd_M_00008_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8586385,
+        "completed_at": 1789766969.8586686
+      },
+      "M_00009": {
+        "milestone_id": "M_00009",
+        "title": "Milestone Step 9",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [
+          "M_00005"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00009.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00009.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00009_unit_test",
+          "evd_M_00009_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8595293,
+        "completed_at": 1789766969.859566
+      },
+      "M_00010": {
+        "milestone_id": "M_00010",
+        "title": "Milestone Step 10",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [
+          "M_00006"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00010.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00010.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00010_unit_test",
+          "evd_M_00010_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.860161,
+        "completed_at": 1789766969.86019
+      },
+      "M_00011": {
+        "milestone_id": "M_00011",
+        "title": "Milestone Step 11",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [
+          "M_00007"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00011.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00011.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00011_unit_test",
+          "evd_M_00011_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8608425,
+        "completed_at": 1789766969.8608744
+      },
+      "M_00012": {
+        "milestone_id": "M_00012",
+        "title": "Milestone Step 12",
+        "objective_ids": [
+          "OBJ_m1_frontend_cockpit_01"
+        ],
+        "dependencies": [
+          "M_00008"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00012.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00012.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00012_unit_test",
+          "evd_M_00012_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.861639,
+        "completed_at": 1789766969.8617005
+      }
+    },
+    "dag_edges": [
+      [
+        "M_00001",
+        "M_00005"
+      ],
+      [
+        "M_00002",
+        "M_00006"
+      ],
+      [
+        "M_00003",
+        "M_00007"
+      ],
+      [
+        "M_00004",
+        "M_00008"
+      ],
+      [
+        "M_00005",
+        "M_00009"
+      ],
+      [
+        "M_00006",
+        "M_00010"
+      ],
+      [
+        "M_00007",
+        "M_00011"
+      ],
+      [
+        "M_00008",
+        "M_00012"
+      ]
+    ],
+    "topological_order": [
+      "M_00001",
+      "M_00002",
+      "M_00003",
+      "M_00004",
+      "M_00005",
+      "M_00006",
+      "M_00007",
+      "M_00008",
+      "M_00009",
+      "M_00010",
+      "M_00011",
+      "M_00012"
+    ],
+    "created_at": 1789766969.8549342,
+    "replan_count": 0
+  },
+  {
+    "plan_id": "plan_d30575f6",
+    "mission_id": "m2_backend_outbox",
+    "milestones": {
+      "M_00001": {
+        "milestone_id": "M_00001",
+        "title": "Milestone Step 1",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00001.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ALWAYS",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00001.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00001_unit_test",
+          "evd_M_00001_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8630803,
+        "completed_at": 1789766969.8631225
+      },
+      "M_00002": {
+        "milestone_id": "M_00002",
+        "title": "Milestone Step 2",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00002.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00002.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00002_unit_test",
+          "evd_M_00002_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8634605,
+        "completed_at": 1789766969.8634992
+      },
+      "M_00003": {
+        "milestone_id": "M_00003",
+        "title": "Milestone Step 3",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00003.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00003.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00003_unit_test",
+          "evd_M_00003_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.863863,
+        "completed_at": 1789766969.8638923
+      },
+      "M_00004": {
+        "milestone_id": "M_00004",
+        "title": "Milestone Step 4",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00004.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00004.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00004_unit_test",
+          "evd_M_00004_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8642743,
+        "completed_at": 1789766969.8643022
+      },
+      "M_00005": {
+        "milestone_id": "M_00005",
+        "title": "Milestone Step 5",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00001"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00005.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00005.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00005_unit_test",
+          "evd_M_00005_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8647087,
+        "completed_at": 1789766969.8647366
+      },
+      "M_00006": {
+        "milestone_id": "M_00006",
+        "title": "Milestone Step 6",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00002"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00006.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00006.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00006_unit_test",
+          "evd_M_00006_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.865319,
+        "completed_at": 1789766969.8653495
+      },
+      "M_00007": {
+        "milestone_id": "M_00007",
+        "title": "Milestone Step 7",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00003"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00007.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00007.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00007_unit_test",
+          "evd_M_00007_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.865815,
+        "completed_at": 1789766969.8658433
+      },
+      "M_00008": {
+        "milestone_id": "M_00008",
+        "title": "Milestone Step 8",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00004"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00008.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00008.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00008_unit_test",
+          "evd_M_00008_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8663802,
+        "completed_at": 1789766969.8664098
+      },
+      "M_00009": {
+        "milestone_id": "M_00009",
+        "title": "Milestone Step 9",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00005"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00009.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00009.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00009_unit_test",
+          "evd_M_00009_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8669882,
+        "completed_at": 1789766969.8670173
+      },
+      "M_00010": {
+        "milestone_id": "M_00010",
+        "title": "Milestone Step 10",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00006"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00010.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00010.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00010_unit_test",
+          "evd_M_00010_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8676114,
+        "completed_at": 1789766969.8676393
+      },
+      "M_00011": {
+        "milestone_id": "M_00011",
+        "title": "Milestone Step 11",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00007"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00011.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00011.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00011_unit_test",
+          "evd_M_00011_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.868277,
+        "completed_at": 1789766969.868306
+      },
+      "M_00012": {
+        "milestone_id": "M_00012",
+        "title": "Milestone Step 12",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00008"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00012.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00012.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00012_unit_test",
+          "evd_M_00012_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8689547,
+        "completed_at": 1789766969.8689828
+      },
+      "M_00013": {
+        "milestone_id": "M_00013",
+        "title": "Milestone Step 13",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00009"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00013.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00013.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00013_unit_test",
+          "evd_M_00013_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8696902,
+        "completed_at": 1789766969.8697195
+      },
+      "M_00014": {
+        "milestone_id": "M_00014",
+        "title": "Milestone Step 14",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00010"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00014.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00014.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00014_unit_test",
+          "evd_M_00014_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8729198,
+        "completed_at": 1789766969.8729565
+      },
+      "M_00015": {
+        "milestone_id": "M_00015",
+        "title": "Milestone Step 15",
+        "objective_ids": [
+          "OBJ_m2_backend_outbox_01"
+        ],
+        "dependencies": [
+          "M_00011"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00015.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00015.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00015_unit_test",
+          "evd_M_00015_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.873718,
+        "completed_at": 1789766969.8737493
+      }
+    },
+    "dag_edges": [
+      [
+        "M_00001",
+        "M_00005"
+      ],
+      [
+        "M_00002",
+        "M_00006"
+      ],
+      [
+        "M_00003",
+        "M_00007"
+      ],
+      [
+        "M_00004",
+        "M_00008"
+      ],
+      [
+        "M_00005",
+        "M_00009"
+      ],
+      [
+        "M_00006",
+        "M_00010"
+      ],
+      [
+        "M_00007",
+        "M_00011"
+      ],
+      [
+        "M_00008",
+        "M_00012"
+      ],
+      [
+        "M_00009",
+        "M_00013"
+      ],
+      [
+        "M_00010",
+        "M_00014"
+      ],
+      [
+        "M_00011",
+        "M_00015"
+      ]
+    ],
+    "topological_order": [
+      "M_00001",
+      "M_00002",
+      "M_00003",
+      "M_00004",
+      "M_00005",
+      "M_00006",
+      "M_00007",
+      "M_00008",
+      "M_00009",
+      "M_00010",
+      "M_00011",
+      "M_00012",
+      "M_00013",
+      "M_00014",
+      "M_00015"
+    ],
+    "created_at": 1789766969.862884,
+    "replan_count": 0
+  },
+  {
+    "plan_id": "plan_b7aa5ad8",
+    "mission_id": "m3_massive_refactor_100",
+    "milestones": {
+      "M_00001": {
+        "milestone_id": "M_00001",
+        "title": "Milestone Step 1",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00001.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ALWAYS",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00001.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00001_unit_test",
+          "evd_M_00001_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8758388,
+        "completed_at": 1789766969.8758776
+      },
+      "M_00002": {
+        "milestone_id": "M_00002",
+        "title": "Milestone Step 2",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00002.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00002.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00002_unit_test",
+          "evd_M_00002_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8770254,
+        "completed_at": 1789766969.8770554
+      },
+      "M_00003": {
+        "milestone_id": "M_00003",
+        "title": "Milestone Step 3",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00003.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00003.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00003_unit_test",
+          "evd_M_00003_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8781476,
+        "completed_at": 1789766969.878177
+      },
+      "M_00004": {
+        "milestone_id": "M_00004",
+        "title": "Milestone Step 4",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00004.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00004.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00004_unit_test",
+          "evd_M_00004_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8793957,
+        "completed_at": 1789766969.8794248
+      },
+      "M_00005": {
+        "milestone_id": "M_00005",
+        "title": "Milestone Step 5",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00001"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00005.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00005.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00005_unit_test",
+          "evd_M_00005_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8805907,
+        "completed_at": 1789766969.8806186
+      },
+      "M_00006": {
+        "milestone_id": "M_00006",
+        "title": "Milestone Step 6",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00002"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00006.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00006.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00006_unit_test",
+          "evd_M_00006_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8818219,
+        "completed_at": 1789766969.8818505
+      },
+      "M_00007": {
+        "milestone_id": "M_00007",
+        "title": "Milestone Step 7",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00003"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00007.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00007.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00007_unit_test",
+          "evd_M_00007_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8831155,
+        "completed_at": 1789766969.8831453
+      },
+      "M_00008": {
+        "milestone_id": "M_00008",
+        "title": "Milestone Step 8",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00004"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00008.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00008.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00008_unit_test",
+          "evd_M_00008_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.884452,
+        "completed_at": 1789766969.8844807
+      },
+      "M_00009": {
+        "milestone_id": "M_00009",
+        "title": "Milestone Step 9",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00005"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00009.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00009.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00009_unit_test",
+          "evd_M_00009_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.885816,
+        "completed_at": 1789766969.885841
+      },
+      "M_00010": {
+        "milestone_id": "M_00010",
+        "title": "Milestone Step 10",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00006"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00010.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00010.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00010_unit_test",
+          "evd_M_00010_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8871412,
+        "completed_at": 1789766969.887171
+      },
+      "M_00011": {
+        "milestone_id": "M_00011",
+        "title": "Milestone Step 11",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00007"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00011.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00011.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00011_unit_test",
+          "evd_M_00011_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8884988,
+        "completed_at": 1789766969.8885252
+      },
+      "M_00012": {
+        "milestone_id": "M_00012",
+        "title": "Milestone Step 12",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00008"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00012.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00012.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00012_unit_test",
+          "evd_M_00012_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.889871,
+        "completed_at": 1789766969.8898976
+      },
+      "M_00013": {
+        "milestone_id": "M_00013",
+        "title": "Milestone Step 13",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00009"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00013.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00013.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00013_unit_test",
+          "evd_M_00013_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8913608,
+        "completed_at": 1789766969.8913882
+      },
+      "M_00014": {
+        "milestone_id": "M_00014",
+        "title": "Milestone Step 14",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00010"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00014.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00014.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00014_unit_test",
+          "evd_M_00014_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8934617,
+        "completed_at": 1789766969.8934917
+      },
+      "M_00015": {
+        "milestone_id": "M_00015",
+        "title": "Milestone Step 15",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00011"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00015.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00015.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00015_unit_test",
+          "evd_M_00015_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8949814,
+        "completed_at": 1789766969.895013
+      },
+      "M_00016": {
+        "milestone_id": "M_00016",
+        "title": "Milestone Step 16",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00012"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00016.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00016.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00016_unit_test",
+          "evd_M_00016_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.896495,
+        "completed_at": 1789766969.8965213
+      },
+      "M_00017": {
+        "milestone_id": "M_00017",
+        "title": "Milestone Step 17",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00013"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00017.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00017.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00017_unit_test",
+          "evd_M_00017_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.898018,
+        "completed_at": 1789766969.8980455
+      },
+      "M_00018": {
+        "milestone_id": "M_00018",
+        "title": "Milestone Step 18",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00014"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00018.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00018.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00018_unit_test",
+          "evd_M_00018_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.8995786,
+        "completed_at": 1789766969.8996055
+      },
+      "M_00019": {
+        "milestone_id": "M_00019",
+        "title": "Milestone Step 19",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00015"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00019.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00019.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00019_unit_test",
+          "evd_M_00019_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9011366,
+        "completed_at": 1789766969.901164
+      },
+      "M_00020": {
+        "milestone_id": "M_00020",
+        "title": "Milestone Step 20",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00016"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00020.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00020.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00020_unit_test",
+          "evd_M_00020_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.902759,
+        "completed_at": 1789766969.9027834
+      },
+      "M_00021": {
+        "milestone_id": "M_00021",
+        "title": "Milestone Step 21",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00017"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00021.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00021.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00021_unit_test",
+          "evd_M_00021_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9044278,
+        "completed_at": 1789766969.9044557
+      },
+      "M_00022": {
+        "milestone_id": "M_00022",
+        "title": "Milestone Step 22",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00018"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00022.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00022.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00022_unit_test",
+          "evd_M_00022_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9060593,
+        "completed_at": 1789766969.9060864
+      },
+      "M_00023": {
+        "milestone_id": "M_00023",
+        "title": "Milestone Step 23",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00019"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00023.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00023.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00023_unit_test",
+          "evd_M_00023_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9077425,
+        "completed_at": 1789766969.9077709
+      },
+      "M_00024": {
+        "milestone_id": "M_00024",
+        "title": "Milestone Step 24",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00020"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00024.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00024.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00024_unit_test",
+          "evd_M_00024_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.909495,
+        "completed_at": 1789766969.909531
+      },
+      "M_00025": {
+        "milestone_id": "M_00025",
+        "title": "Milestone Step 25",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00021"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00025.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00025.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00025_unit_test",
+          "evd_M_00025_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9112778,
+        "completed_at": 1789766969.9113038
+      },
+      "M_00026": {
+        "milestone_id": "M_00026",
+        "title": "Milestone Step 26",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00022"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00026.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ALWAYS",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00026.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00026_unit_test",
+          "evd_M_00026_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9137654,
+        "completed_at": 1789766969.9137928
+      },
+      "M_00027": {
+        "milestone_id": "M_00027",
+        "title": "Milestone Step 27",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00023"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00027.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00027.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00027_unit_test",
+          "evd_M_00027_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9155664,
+        "completed_at": 1789766969.9155927
+      },
+      "M_00028": {
+        "milestone_id": "M_00028",
+        "title": "Milestone Step 28",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00024"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00028.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00028.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00028_unit_test",
+          "evd_M_00028_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9173915,
+        "completed_at": 1789766969.9174178
+      },
+      "M_00029": {
+        "milestone_id": "M_00029",
+        "title": "Milestone Step 29",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00025"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00029.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00029.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00029_unit_test",
+          "evd_M_00029_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9193206,
+        "completed_at": 1789766969.9193478
+      },
+      "M_00030": {
+        "milestone_id": "M_00030",
+        "title": "Milestone Step 30",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00026"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00030.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00030.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00030_unit_test",
+          "evd_M_00030_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9212914,
+        "completed_at": 1789766969.9213188
+      },
+      "M_00031": {
+        "milestone_id": "M_00031",
+        "title": "Milestone Step 31",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00027"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00031.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00031.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00031_unit_test",
+          "evd_M_00031_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9233255,
+        "completed_at": 1789766969.9233534
+      },
+      "M_00032": {
+        "milestone_id": "M_00032",
+        "title": "Milestone Step 32",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00028"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00032.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00032.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00032_unit_test",
+          "evd_M_00032_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9253345,
+        "completed_at": 1789766969.9253616
+      },
+      "M_00033": {
+        "milestone_id": "M_00033",
+        "title": "Milestone Step 33",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00029"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00033.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00033.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00033_unit_test",
+          "evd_M_00033_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.927329,
+        "completed_at": 1789766969.9273565
+      },
+      "M_00034": {
+        "milestone_id": "M_00034",
+        "title": "Milestone Step 34",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00030"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00034.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00034.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00034_unit_test",
+          "evd_M_00034_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9293773,
+        "completed_at": 1789766969.9294062
+      },
+      "M_00035": {
+        "milestone_id": "M_00035",
+        "title": "Milestone Step 35",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00031"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00035.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00035.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00035_unit_test",
+          "evd_M_00035_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9314373,
+        "completed_at": 1789766969.9314644
+      },
+      "M_00036": {
+        "milestone_id": "M_00036",
+        "title": "Milestone Step 36",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00032"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00036.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00036.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00036_unit_test",
+          "evd_M_00036_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9334984,
+        "completed_at": 1789766969.9335258
+      },
+      "M_00037": {
+        "milestone_id": "M_00037",
+        "title": "Milestone Step 37",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00033"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00037.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00037.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00037_unit_test",
+          "evd_M_00037_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9355857,
+        "completed_at": 1789766969.9356122
+      },
+      "M_00038": {
+        "milestone_id": "M_00038",
+        "title": "Milestone Step 38",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00034"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00038.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00038.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00038_unit_test",
+          "evd_M_00038_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9390893,
+        "completed_at": 1789766969.9391193
+      },
+      "M_00039": {
+        "milestone_id": "M_00039",
+        "title": "Milestone Step 39",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00035"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00039.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00039.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00039_unit_test",
+          "evd_M_00039_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9412758,
+        "completed_at": 1789766969.9413052
+      },
+      "M_00040": {
+        "milestone_id": "M_00040",
+        "title": "Milestone Step 40",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00036"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00040.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00040.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00040_unit_test",
+          "evd_M_00040_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9434922,
+        "completed_at": 1789766969.9435196
+      },
+      "M_00041": {
+        "milestone_id": "M_00041",
+        "title": "Milestone Step 41",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00037"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00041.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00041.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00041_unit_test",
+          "evd_M_00041_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9457884,
+        "completed_at": 1789766969.9458165
+      },
+      "M_00042": {
+        "milestone_id": "M_00042",
+        "title": "Milestone Step 42",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00038"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00042.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00042.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00042_unit_test",
+          "evd_M_00042_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9480846,
+        "completed_at": 1789766969.948113
+      },
+      "M_00043": {
+        "milestone_id": "M_00043",
+        "title": "Milestone Step 43",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00039"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00043.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00043.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00043_unit_test",
+          "evd_M_00043_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9503818,
+        "completed_at": 1789766969.95041
+      },
+      "M_00044": {
+        "milestone_id": "M_00044",
+        "title": "Milestone Step 44",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00040"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00044.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00044.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00044_unit_test",
+          "evd_M_00044_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9527726,
+        "completed_at": 1789766969.952802
+      },
+      "M_00045": {
+        "milestone_id": "M_00045",
+        "title": "Milestone Step 45",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00041"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00045.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00045.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00045_unit_test",
+          "evd_M_00045_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.955864,
+        "completed_at": 1789766969.9559104
+      },
+      "M_00046": {
+        "milestone_id": "M_00046",
+        "title": "Milestone Step 46",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00042"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00046.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00046.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00046_unit_test",
+          "evd_M_00046_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9585283,
+        "completed_at": 1789766969.9585571
+      },
+      "M_00047": {
+        "milestone_id": "M_00047",
+        "title": "Milestone Step 47",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00043"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00047.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00047.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00047_unit_test",
+          "evd_M_00047_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9610906,
+        "completed_at": 1789766969.9611228
+      },
+      "M_00048": {
+        "milestone_id": "M_00048",
+        "title": "Milestone Step 48",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00044"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00048.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00048.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00048_unit_test",
+          "evd_M_00048_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9636867,
+        "completed_at": 1789766969.9637148
+      },
+      "M_00049": {
+        "milestone_id": "M_00049",
+        "title": "Milestone Step 49",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00045"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00049.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00049.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00049_unit_test",
+          "evd_M_00049_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9663033,
+        "completed_at": 1789766969.9663312
+      },
+      "M_00050": {
+        "milestone_id": "M_00050",
+        "title": "Milestone Step 50",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00046"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00050.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00050.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00050_unit_test",
+          "evd_M_00050_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9703584,
+        "completed_at": 1789766969.9703896
+      },
+      "M_00051": {
+        "milestone_id": "M_00051",
+        "title": "Milestone Step 51",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00047"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00051.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ALWAYS",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00051.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00051_unit_test",
+          "evd_M_00051_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.973372,
+        "completed_at": 1789766969.9734051
+      },
+      "M_00052": {
+        "milestone_id": "M_00052",
+        "title": "Milestone Step 52",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00048"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00052.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00052.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00052_unit_test",
+          "evd_M_00052_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9763513,
+        "completed_at": 1789766969.9763823
+      },
+      "M_00053": {
+        "milestone_id": "M_00053",
+        "title": "Milestone Step 53",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00049"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00053.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00053.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00053_unit_test",
+          "evd_M_00053_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9791071,
+        "completed_at": 1789766969.9791346
+      },
+      "M_00054": {
+        "milestone_id": "M_00054",
+        "title": "Milestone Step 54",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00050"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00054.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00054.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00054_unit_test",
+          "evd_M_00054_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.981817,
+        "completed_at": 1789766969.9818485
+      },
+      "M_00055": {
+        "milestone_id": "M_00055",
+        "title": "Milestone Step 55",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00051"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00055.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00055.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00055_unit_test",
+          "evd_M_00055_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9849236,
+        "completed_at": 1789766969.9849775
+      },
+      "M_00056": {
+        "milestone_id": "M_00056",
+        "title": "Milestone Step 56",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00052"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00056.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00056.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00056_unit_test",
+          "evd_M_00056_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.988264,
+        "completed_at": 1789766969.9882953
+      },
+      "M_00057": {
+        "milestone_id": "M_00057",
+        "title": "Milestone Step 57",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00053"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00057.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00057.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00057_unit_test",
+          "evd_M_00057_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9914916,
+        "completed_at": 1789766969.99153
+      },
+      "M_00058": {
+        "milestone_id": "M_00058",
+        "title": "Milestone Step 58",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00054"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00058.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00058.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00058_unit_test",
+          "evd_M_00058_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9944694,
+        "completed_at": 1789766969.994499
+      },
+      "M_00059": {
+        "milestone_id": "M_00059",
+        "title": "Milestone Step 59",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00055"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00059.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00059.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00059_unit_test",
+          "evd_M_00059_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766969.9973369,
+        "completed_at": 1789766969.9973636
+      },
+      "M_00060": {
+        "milestone_id": "M_00060",
+        "title": "Milestone Step 60",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00056"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00060.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00060.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00060_unit_test",
+          "evd_M_00060_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0005891,
+        "completed_at": 1789766970.0006235
+      },
+      "M_00061": {
+        "milestone_id": "M_00061",
+        "title": "Milestone Step 61",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00057"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00061.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00061.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00061_unit_test",
+          "evd_M_00061_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0038884,
+        "completed_at": 1789766970.0039337
+      },
+      "M_00062": {
+        "milestone_id": "M_00062",
+        "title": "Milestone Step 62",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00058"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00062.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00062.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00062_unit_test",
+          "evd_M_00062_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.008957,
+        "completed_at": 1789766970.0089884
+      },
+      "M_00063": {
+        "milestone_id": "M_00063",
+        "title": "Milestone Step 63",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00059"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00063.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00063.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00063_unit_test",
+          "evd_M_00063_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0120246,
+        "completed_at": 1789766970.0120535
+      },
+      "M_00064": {
+        "milestone_id": "M_00064",
+        "title": "Milestone Step 64",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00060"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00064.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00064.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00064_unit_test",
+          "evd_M_00064_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0153866,
+        "completed_at": 1789766970.0154228
+      },
+      "M_00065": {
+        "milestone_id": "M_00065",
+        "title": "Milestone Step 65",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00061"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00065.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00065.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00065_unit_test",
+          "evd_M_00065_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0187068,
+        "completed_at": 1789766970.0187385
+      },
+      "M_00066": {
+        "milestone_id": "M_00066",
+        "title": "Milestone Step 66",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00062"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00066.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00066.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00066_unit_test",
+          "evd_M_00066_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0220807,
+        "completed_at": 1789766970.0221126
+      },
+      "M_00067": {
+        "milestone_id": "M_00067",
+        "title": "Milestone Step 67",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00063"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00067.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00067.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00067_unit_test",
+          "evd_M_00067_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0252998,
+        "completed_at": 1789766970.0253274
+      },
+      "M_00068": {
+        "milestone_id": "M_00068",
+        "title": "Milestone Step 68",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00064"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00068.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00068.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00068_unit_test",
+          "evd_M_00068_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0285752,
+        "completed_at": 1789766970.028605
+      },
+      "M_00069": {
+        "milestone_id": "M_00069",
+        "title": "Milestone Step 69",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00065"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00069.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00069.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00069_unit_test",
+          "evd_M_00069_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0318527,
+        "completed_at": 1789766970.0318859
+      },
+      "M_00070": {
+        "milestone_id": "M_00070",
+        "title": "Milestone Step 70",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00066"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00070.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00070.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00070_unit_test",
+          "evd_M_00070_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0354528,
+        "completed_at": 1789766970.035482
+      },
+      "M_00071": {
+        "milestone_id": "M_00071",
+        "title": "Milestone Step 71",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00067"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00071.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00071.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00071_unit_test",
+          "evd_M_00071_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0389376,
+        "completed_at": 1789766970.0389674
+      },
+      "M_00072": {
+        "milestone_id": "M_00072",
+        "title": "Milestone Step 72",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00068"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00072.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00072.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00072_unit_test",
+          "evd_M_00072_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.042345,
+        "completed_at": 1789766970.0423746
+      },
+      "M_00073": {
+        "milestone_id": "M_00073",
+        "title": "Milestone Step 73",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00069"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00073.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00073.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00073_unit_test",
+          "evd_M_00073_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0456944,
+        "completed_at": 1789766970.045723
+      },
+      "M_00074": {
+        "milestone_id": "M_00074",
+        "title": "Milestone Step 74",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00070"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00074.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00074.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00074_unit_test",
+          "evd_M_00074_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0508597,
+        "completed_at": 1789766970.0508897
+      },
+      "M_00075": {
+        "milestone_id": "M_00075",
+        "title": "Milestone Step 75",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00071"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00075.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00075.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00075_unit_test",
+          "evd_M_00075_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.054882,
+        "completed_at": 1789766970.0549214
+      },
+      "M_00076": {
+        "milestone_id": "M_00076",
+        "title": "Milestone Step 76",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00072"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00076.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ALWAYS",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00076.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00076_unit_test",
+          "evd_M_00076_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0587082,
+        "completed_at": 1789766970.058739
+      },
+      "M_00077": {
+        "milestone_id": "M_00077",
+        "title": "Milestone Step 77",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00073"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00077.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00077.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00077_unit_test",
+          "evd_M_00077_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0624592,
+        "completed_at": 1789766970.0624945
+      },
+      "M_00078": {
+        "milestone_id": "M_00078",
+        "title": "Milestone Step 78",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00074"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00078.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00078.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00078_unit_test",
+          "evd_M_00078_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0663724,
+        "completed_at": 1789766970.0664055
+      },
+      "M_00079": {
+        "milestone_id": "M_00079",
+        "title": "Milestone Step 79",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00075"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00079.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00079.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00079_unit_test",
+          "evd_M_00079_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0701487,
+        "completed_at": 1789766970.0701892
+      },
+      "M_00080": {
+        "milestone_id": "M_00080",
+        "title": "Milestone Step 80",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00076"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00080.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00080.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00080_unit_test",
+          "evd_M_00080_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0738726,
+        "completed_at": 1789766970.0739028
+      },
+      "M_00081": {
+        "milestone_id": "M_00081",
+        "title": "Milestone Step 81",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00077"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00081.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00081.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00081_unit_test",
+          "evd_M_00081_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.077557,
+        "completed_at": 1789766970.0775871
+      },
+      "M_00082": {
+        "milestone_id": "M_00082",
+        "title": "Milestone Step 82",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00078"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00082.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00082.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00082_unit_test",
+          "evd_M_00082_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0812638,
+        "completed_at": 1789766970.0812929
+      },
+      "M_00083": {
+        "milestone_id": "M_00083",
+        "title": "Milestone Step 83",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00079"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00083.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00083.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00083_unit_test",
+          "evd_M_00083_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.084984,
+        "completed_at": 1789766970.0850124
+      },
+      "M_00084": {
+        "milestone_id": "M_00084",
+        "title": "Milestone Step 84",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00080"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00084.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00084.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00084_unit_test",
+          "evd_M_00084_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0888178,
+        "completed_at": 1789766970.0888474
+      },
+      "M_00085": {
+        "milestone_id": "M_00085",
+        "title": "Milestone Step 85",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00081"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00085.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00085.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00085_unit_test",
+          "evd_M_00085_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.0926373,
+        "completed_at": 1789766970.0926652
+      },
+      "M_00086": {
+        "milestone_id": "M_00086",
+        "title": "Milestone Step 86",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00082"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00086.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00086.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00086_unit_test",
+          "evd_M_00086_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.098726,
+        "completed_at": 1789766970.0987606
+      },
+      "M_00087": {
+        "milestone_id": "M_00087",
+        "title": "Milestone Step 87",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00083"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00087.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00087.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00087_unit_test",
+          "evd_M_00087_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1026459,
+        "completed_at": 1789766970.1026757
+      },
+      "M_00088": {
+        "milestone_id": "M_00088",
+        "title": "Milestone Step 88",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00084"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00088.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00088.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00088_unit_test",
+          "evd_M_00088_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1068008,
+        "completed_at": 1789766970.1068363
+      },
+      "M_00089": {
+        "milestone_id": "M_00089",
+        "title": "Milestone Step 89",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00085"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00089.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00089.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00089_unit_test",
+          "evd_M_00089_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1112878,
+        "completed_at": 1789766970.1113203
+      },
+      "M_00090": {
+        "milestone_id": "M_00090",
+        "title": "Milestone Step 90",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00086"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00090.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00090.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00090_unit_test",
+          "evd_M_00090_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.115171,
+        "completed_at": 1789766970.115203
+      },
+      "M_00091": {
+        "milestone_id": "M_00091",
+        "title": "Milestone Step 91",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00087"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00091.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00091.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00091_unit_test",
+          "evd_M_00091_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.119086,
+        "completed_at": 1789766970.1191125
+      },
+      "M_00092": {
+        "milestone_id": "M_00092",
+        "title": "Milestone Step 92",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00088"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00092.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00092.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00092_unit_test",
+          "evd_M_00092_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1232584,
+        "completed_at": 1789766970.123292
+      },
+      "M_00093": {
+        "milestone_id": "M_00093",
+        "title": "Milestone Step 93",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00089"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00093.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00093.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00093_unit_test",
+          "evd_M_00093_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1276276,
+        "completed_at": 1789766970.1276617
+      },
+      "M_00094": {
+        "milestone_id": "M_00094",
+        "title": "Milestone Step 94",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00090"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00094.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00094.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00094_unit_test",
+          "evd_M_00094_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1317472,
+        "completed_at": 1789766970.1317813
+      },
+      "M_00095": {
+        "milestone_id": "M_00095",
+        "title": "Milestone Step 95",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00091"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00095.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00095.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00095_unit_test",
+          "evd_M_00095_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.135842,
+        "completed_at": 1789766970.1358716
+      },
+      "M_00096": {
+        "milestone_id": "M_00096",
+        "title": "Milestone Step 96",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00092"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00096.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00096.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00096_unit_test",
+          "evd_M_00096_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1405606,
+        "completed_at": 1789766970.140595
+      },
+      "M_00097": {
+        "milestone_id": "M_00097",
+        "title": "Milestone Step 97",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00093"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00097.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00097.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00097_unit_test",
+          "evd_M_00097_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1448092,
+        "completed_at": 1789766970.1448429
+      },
+      "M_00098": {
+        "milestone_id": "M_00098",
+        "title": "Milestone Step 98",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00094"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00098.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00098.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00098_unit_test",
+          "evd_M_00098_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1512158,
+        "completed_at": 1789766970.1512518
+      },
+      "M_00099": {
+        "milestone_id": "M_00099",
+        "title": "Milestone Step 99",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00095"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00099.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00099.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00099_unit_test",
+          "evd_M_00099_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1559424,
+        "completed_at": 1789766970.1559834
+      },
+      "M_00100": {
+        "milestone_id": "M_00100",
+        "title": "Milestone Step 100",
+        "objective_ids": [
+          "OBJ_m3_massive_refactor_100_01"
+        ],
+        "dependencies": [
+          "M_00096"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00100.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00100.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00100_unit_test",
+          "evd_M_00100_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.160595,
+        "completed_at": 1789766970.160632
+      }
+    },
+    "dag_edges": [
+      [
+        "M_00001",
+        "M_00005"
+      ],
+      [
+        "M_00002",
+        "M_00006"
+      ],
+      [
+        "M_00003",
+        "M_00007"
+      ],
+      [
+        "M_00004",
+        "M_00008"
+      ],
+      [
+        "M_00005",
+        "M_00009"
+      ],
+      [
+        "M_00006",
+        "M_00010"
+      ],
+      [
+        "M_00007",
+        "M_00011"
+      ],
+      [
+        "M_00008",
+        "M_00012"
+      ],
+      [
+        "M_00009",
+        "M_00013"
+      ],
+      [
+        "M_00010",
+        "M_00014"
+      ],
+      [
+        "M_00011",
+        "M_00015"
+      ],
+      [
+        "M_00012",
+        "M_00016"
+      ],
+      [
+        "M_00013",
+        "M_00017"
+      ],
+      [
+        "M_00014",
+        "M_00018"
+      ],
+      [
+        "M_00015",
+        "M_00019"
+      ],
+      [
+        "M_00016",
+        "M_00020"
+      ],
+      [
+        "M_00017",
+        "M_00021"
+      ],
+      [
+        "M_00018",
+        "M_00022"
+      ],
+      [
+        "M_00019",
+        "M_00023"
+      ],
+      [
+        "M_00020",
+        "M_00024"
+      ],
+      [
+        "M_00021",
+        "M_00025"
+      ],
+      [
+        "M_00022",
+        "M_00026"
+      ],
+      [
+        "M_00023",
+        "M_00027"
+      ],
+      [
+        "M_00024",
+        "M_00028"
+      ],
+      [
+        "M_00025",
+        "M_00029"
+      ],
+      [
+        "M_00026",
+        "M_00030"
+      ],
+      [
+        "M_00027",
+        "M_00031"
+      ],
+      [
+        "M_00028",
+        "M_00032"
+      ],
+      [
+        "M_00029",
+        "M_00033"
+      ],
+      [
+        "M_00030",
+        "M_00034"
+      ],
+      [
+        "M_00031",
+        "M_00035"
+      ],
+      [
+        "M_00032",
+        "M_00036"
+      ],
+      [
+        "M_00033",
+        "M_00037"
+      ],
+      [
+        "M_00034",
+        "M_00038"
+      ],
+      [
+        "M_00035",
+        "M_00039"
+      ],
+      [
+        "M_00036",
+        "M_00040"
+      ],
+      [
+        "M_00037",
+        "M_00041"
+      ],
+      [
+        "M_00038",
+        "M_00042"
+      ],
+      [
+        "M_00039",
+        "M_00043"
+      ],
+      [
+        "M_00040",
+        "M_00044"
+      ],
+      [
+        "M_00041",
+        "M_00045"
+      ],
+      [
+        "M_00042",
+        "M_00046"
+      ],
+      [
+        "M_00043",
+        "M_00047"
+      ],
+      [
+        "M_00044",
+        "M_00048"
+      ],
+      [
+        "M_00045",
+        "M_00049"
+      ],
+      [
+        "M_00046",
+        "M_00050"
+      ],
+      [
+        "M_00047",
+        "M_00051"
+      ],
+      [
+        "M_00048",
+        "M_00052"
+      ],
+      [
+        "M_00049",
+        "M_00053"
+      ],
+      [
+        "M_00050",
+        "M_00054"
+      ],
+      [
+        "M_00051",
+        "M_00055"
+      ],
+      [
+        "M_00052",
+        "M_00056"
+      ],
+      [
+        "M_00053",
+        "M_00057"
+      ],
+      [
+        "M_00054",
+        "M_00058"
+      ],
+      [
+        "M_00055",
+        "M_00059"
+      ],
+      [
+        "M_00056",
+        "M_00060"
+      ],
+      [
+        "M_00057",
+        "M_00061"
+      ],
+      [
+        "M_00058",
+        "M_00062"
+      ],
+      [
+        "M_00059",
+        "M_00063"
+      ],
+      [
+        "M_00060",
+        "M_00064"
+      ],
+      [
+        "M_00061",
+        "M_00065"
+      ],
+      [
+        "M_00062",
+        "M_00066"
+      ],
+      [
+        "M_00063",
+        "M_00067"
+      ],
+      [
+        "M_00064",
+        "M_00068"
+      ],
+      [
+        "M_00065",
+        "M_00069"
+      ],
+      [
+        "M_00066",
+        "M_00070"
+      ],
+      [
+        "M_00067",
+        "M_00071"
+      ],
+      [
+        "M_00068",
+        "M_00072"
+      ],
+      [
+        "M_00069",
+        "M_00073"
+      ],
+      [
+        "M_00070",
+        "M_00074"
+      ],
+      [
+        "M_00071",
+        "M_00075"
+      ],
+      [
+        "M_00072",
+        "M_00076"
+      ],
+      [
+        "M_00073",
+        "M_00077"
+      ],
+      [
+        "M_00074",
+        "M_00078"
+      ],
+      [
+        "M_00075",
+        "M_00079"
+      ],
+      [
+        "M_00076",
+        "M_00080"
+      ],
+      [
+        "M_00077",
+        "M_00081"
+      ],
+      [
+        "M_00078",
+        "M_00082"
+      ],
+      [
+        "M_00079",
+        "M_00083"
+      ],
+      [
+        "M_00080",
+        "M_00084"
+      ],
+      [
+        "M_00081",
+        "M_00085"
+      ],
+      [
+        "M_00082",
+        "M_00086"
+      ],
+      [
+        "M_00083",
+        "M_00087"
+      ],
+      [
+        "M_00084",
+        "M_00088"
+      ],
+      [
+        "M_00085",
+        "M_00089"
+      ],
+      [
+        "M_00086",
+        "M_00090"
+      ],
+      [
+        "M_00087",
+        "M_00091"
+      ],
+      [
+        "M_00088",
+        "M_00092"
+      ],
+      [
+        "M_00089",
+        "M_00093"
+      ],
+      [
+        "M_00090",
+        "M_00094"
+      ],
+      [
+        "M_00091",
+        "M_00095"
+      ],
+      [
+        "M_00092",
+        "M_00096"
+      ],
+      [
+        "M_00093",
+        "M_00097"
+      ],
+      [
+        "M_00094",
+        "M_00098"
+      ],
+      [
+        "M_00095",
+        "M_00099"
+      ],
+      [
+        "M_00096",
+        "M_00100"
+      ]
+    ],
+    "topological_order": [
+      "M_00001",
+      "M_00002",
+      "M_00003",
+      "M_00004",
+      "M_00005",
+      "M_00006",
+      "M_00007",
+      "M_00008",
+      "M_00009",
+      "M_00010",
+      "M_00011",
+      "M_00012",
+      "M_00013",
+      "M_00014",
+      "M_00015",
+      "M_00016",
+      "M_00017",
+      "M_00018",
+      "M_00019",
+      "M_00020",
+      "M_00021",
+      "M_00022",
+      "M_00023",
+      "M_00024",
+      "M_00025",
+      "M_00026",
+      "M_00027",
+      "M_00028",
+      "M_00029",
+      "M_00030",
+      "M_00031",
+      "M_00032",
+      "M_00033",
+      "M_00034",
+      "M_00035",
+      "M_00036",
+      "M_00037",
+      "M_00038",
+      "M_00039",
+      "M_00040",
+      "M_00041",
+      "M_00042",
+      "M_00043",
+      "M_00044",
+      "M_00045",
+      "M_00046",
+      "M_00047",
+      "M_00048",
+      "M_00049",
+      "M_00050",
+      "M_00051",
+      "M_00052",
+      "M_00053",
+      "M_00054",
+      "M_00055",
+      "M_00056",
+      "M_00057",
+      "M_00058",
+      "M_00059",
+      "M_00060",
+      "M_00061",
+      "M_00062",
+      "M_00063",
+      "M_00064",
+      "M_00065",
+      "M_00066",
+      "M_00067",
+      "M_00068",
+      "M_00069",
+      "M_00070",
+      "M_00071",
+      "M_00072",
+      "M_00073",
+      "M_00074",
+      "M_00075",
+      "M_00076",
+      "M_00077",
+      "M_00078",
+      "M_00079",
+      "M_00080",
+      "M_00081",
+      "M_00082",
+      "M_00083",
+      "M_00084",
+      "M_00085",
+      "M_00086",
+      "M_00087",
+      "M_00088",
+      "M_00089",
+      "M_00090",
+      "M_00091",
+      "M_00092",
+      "M_00093",
+      "M_00094",
+      "M_00095",
+      "M_00096",
+      "M_00097",
+      "M_00098",
+      "M_00099",
+      "M_00100"
+    ],
+    "created_at": 1789766969.8752146,
+    "replan_count": 0
+  },
+  {
+    "plan_id": "plan_dfa72576",
+    "mission_id": "m4_contract_recovery",
+    "milestones": {
+      "M_00001": {
+        "milestone_id": "M_00001",
+        "title": "Milestone Step 1",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00001.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ALWAYS",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00001.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00001_unit_test",
+          "evd_M_00001_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1657403,
+        "completed_at": 1789766970.165781
+      },
+      "M_00002": {
+        "milestone_id": "M_00002",
+        "title": "Milestone Step 2",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00002.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00002.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00002_unit_test",
+          "evd_M_00002_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.166073,
+        "completed_at": 1789766970.1660993
+      },
+      "M_00003": {
+        "milestone_id": "M_00003",
+        "title": "Milestone Step 3",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00003.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00003.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00003_unit_test",
+          "evd_M_00003_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1664155,
+        "completed_at": 1789766970.1664388
+      },
+      "M_00004": {
+        "milestone_id": "M_00004",
+        "title": "Milestone Step 4",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00004.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00004.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00004_unit_test",
+          "evd_M_00004_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1667962,
+        "completed_at": 1789766970.1668231
+      },
+      "M_00005": {
+        "milestone_id": "M_00005",
+        "title": "Milestone Step 5",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00001"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00005.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "FAILED",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": "Verification failed on M_00005",
+        "started_at": 1789766970.167317,
+        "completed_at": 1789766970.1673224
+      },
+      "M_00006": {
+        "milestone_id": "M_00006",
+        "title": "Milestone Step 6",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00002"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00006.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00006.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00006_unit_test",
+          "evd_M_00006_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1675162,
+        "completed_at": 1789766970.167543
+      },
+      "M_00007": {
+        "milestone_id": "M_00007",
+        "title": "Milestone Step 7",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00003"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00007.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00007.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00007_unit_test",
+          "evd_M_00007_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1679635,
+        "completed_at": 1789766970.1679893
+      },
+      "M_00008": {
+        "milestone_id": "M_00008",
+        "title": "Milestone Step 8",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00004"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00008.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00008.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00008_unit_test",
+          "evd_M_00008_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1684484,
+        "completed_at": 1789766970.1684744
+      },
+      "M_00009": {
+        "milestone_id": "M_00009",
+        "title": "Milestone Step 9",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00005"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00009.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "PLANNED",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      },
+      "M_00010": {
+        "milestone_id": "M_00010",
+        "title": "Milestone Step 10",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00006"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00010.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00010.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00010_unit_test",
+          "evd_M_00010_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.168965,
+        "completed_at": 1789766970.168988
+      },
+      "M_00011": {
+        "milestone_id": "M_00011",
+        "title": "Milestone Step 11",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00007"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00011.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00011.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00011_unit_test",
+          "evd_M_00011_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.169476,
+        "completed_at": 1789766970.169502
+      },
+      "M_00012": {
+        "milestone_id": "M_00012",
+        "title": "Milestone Step 12",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00008"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00012.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00012.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00012_unit_test",
+          "evd_M_00012_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1705263,
+        "completed_at": 1789766970.1705592
+      },
+      "M_00013": {
+        "milestone_id": "M_00013",
+        "title": "Milestone Step 13",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00009"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00013.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "PLANNED",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      },
+      "M_00014": {
+        "milestone_id": "M_00014",
+        "title": "Milestone Step 14",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00010"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00014.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00014.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00014_unit_test",
+          "evd_M_00014_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1711516,
+        "completed_at": 1789766970.1711798
+      },
+      "M_00015": {
+        "milestone_id": "M_00015",
+        "title": "Milestone Step 15",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00011"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00015.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00015.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00015_unit_test",
+          "evd_M_00015_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.172203,
+        "completed_at": 1789766970.1722398
+      },
+      "M_00016": {
+        "milestone_id": "M_00016",
+        "title": "Milestone Step 16",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00012"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00016.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00016.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00016_unit_test",
+          "evd_M_00016_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1730587,
+        "completed_at": 1789766970.1730857
+      },
+      "M_REPAIR_M_00005_1": {
+        "milestone_id": "M_REPAIR_M_00005_1",
+        "title": "Adaptive Repair for M_00005",
+        "objective_ids": [
+          "OBJ_m4_contract_recovery_01"
+        ],
+        "dependencies": [
+          "M_00005"
+        ],
+        "agent_tasks": [
+          {
+            "task_id": "tsk_M_REPAIR_M_00005_1",
+            "role": "CoderAgent",
+            "issues": [
+              "Failure in M_00005"
+            ]
+          }
+        ],
+        "expected_outputs": [
+          "repair_patch_M_REPAIR_M_00005_1.diff"
+        ],
+        "verification_requirements": [
+          "UNIT",
+          "BEHAVIOR"
+        ],
+        "checkpoint_policy": "PRE_MUTATION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "PLANNED",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      }
+    },
+    "dag_edges": [
+      [
+        "M_00001",
+        "M_00005"
+      ],
+      [
+        "M_00002",
+        "M_00006"
+      ],
+      [
+        "M_00003",
+        "M_00007"
+      ],
+      [
+        "M_00004",
+        "M_00008"
+      ],
+      [
+        "M_00005",
+        "M_00009"
+      ],
+      [
+        "M_00006",
+        "M_00010"
+      ],
+      [
+        "M_00007",
+        "M_00011"
+      ],
+      [
+        "M_00008",
+        "M_00012"
+      ],
+      [
+        "M_00009",
+        "M_00013"
+      ],
+      [
+        "M_00010",
+        "M_00014"
+      ],
+      [
+        "M_00011",
+        "M_00015"
+      ],
+      [
+        "M_00012",
+        "M_00016"
+      ]
+    ],
+    "topological_order": [
+      "M_00001",
+      "M_00002",
+      "M_00003",
+      "M_00004",
+      "M_00005",
+      "M_00006",
+      "M_00007",
+      "M_00008",
+      "M_00009",
+      "M_00010",
+      "M_00011",
+      "M_00012",
+      "M_00013",
+      "M_00014",
+      "M_00015",
+      "M_00016",
+      "M_REPAIR_M_00005_1"
+    ],
+    "created_at": 1789766970.1655858,
+    "replan_count": 1
+  },
+  {
+    "plan_id": "plan_7965d7ba",
+    "mission_id": "m5_security_negative_gate",
+    "milestones": {
+      "M_00001": {
+        "milestone_id": "M_00001",
+        "title": "Milestone Step 1",
+        "objective_ids": [
+          "OBJ_m5_security_negative_gate_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00001.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ALWAYS",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00001.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00001_unit_test",
+          "evd_M_00001_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1742327,
+        "completed_at": 1789766970.1742675
+      },
+      "M_00002": {
+        "milestone_id": "M_00002",
+        "title": "Milestone Step 2",
+        "objective_ids": [
+          "OBJ_m5_security_negative_gate_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00002.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "COMPLETED",
+        "actual_outputs": [
+          "output_M_00002.json"
+        ],
+        "evidence_ids": [
+          "evd_M_00002_unit_test",
+          "evd_M_00002_contract_check"
+        ],
+        "error_message": null,
+        "started_at": 1789766970.1744914,
+        "completed_at": 1789766970.1745145
+      },
+      "M_00003": {
+        "milestone_id": "M_00003",
+        "title": "Milestone Step 3",
+        "objective_ids": [
+          "OBJ_m5_security_negative_gate_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00003.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "READY",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      },
+      "M_00004": {
+        "milestone_id": "M_00004",
+        "title": "Milestone Step 4",
+        "objective_ids": [
+          "OBJ_m5_security_negative_gate_01"
+        ],
+        "dependencies": [],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00004.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "READY",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      },
+      "M_00005": {
+        "milestone_id": "M_00005",
+        "title": "Milestone Step 5",
+        "objective_ids": [
+          "OBJ_m5_security_negative_gate_01"
+        ],
+        "dependencies": [
+          "M_00001"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00005.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "READY",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      },
+      "M_00006": {
+        "milestone_id": "M_00006",
+        "title": "Milestone Step 6",
+        "objective_ids": [
+          "OBJ_m5_security_negative_gate_01"
+        ],
+        "dependencies": [
+          "M_00002"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00006.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "READY",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      },
+      "M_00007": {
+        "milestone_id": "M_00007",
+        "title": "Milestone Step 7",
+        "objective_ids": [
+          "OBJ_m5_security_negative_gate_01"
+        ],
+        "dependencies": [
+          "M_00003"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00007.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "PLANNED",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      },
+      "M_00008": {
+        "milestone_id": "M_00008",
+        "title": "Milestone Step 8",
+        "objective_ids": [
+          "OBJ_m5_security_negative_gate_01"
+        ],
+        "dependencies": [
+          "M_00004"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00008.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "PLANNED",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      },
+      "M_00009": {
+        "milestone_id": "M_00009",
+        "title": "Milestone Step 9",
+        "objective_ids": [
+          "OBJ_m5_security_negative_gate_01"
+        ],
+        "dependencies": [
+          "M_00005"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00009.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "PLANNED",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      },
+      "M_00010": {
+        "milestone_id": "M_00010",
+        "title": "Milestone Step 10",
+        "objective_ids": [
+          "OBJ_m5_security_negative_gate_01"
+        ],
+        "dependencies": [
+          "M_00006"
+        ],
+        "agent_tasks": [],
+        "expected_outputs": [
+          "output_M_00010.json"
+        ],
+        "verification_requirements": [
+          "UNIT_TEST",
+          "CONTRACT_CHECK"
+        ],
+        "checkpoint_policy": "ON_COMPLETION",
+        "rollback_scope": "LOCAL",
+        "budget": {},
+        "status": "PLANNED",
+        "actual_outputs": [],
+        "evidence_ids": [],
+        "error_message": null,
+        "started_at": null,
+        "completed_at": null
+      }
+    },
+    "dag_edges": [
+      [
+        "M_00001",
+        "M_00005"
+      ],
+      [
+        "M_00002",
+        "M_00006"
+      ],
+      [
+        "M_00003",
+        "M_00007"
+      ],
+      [
+        "M_00004",
+        "M_00008"
+      ],
+      [
+        "M_00005",
+        "M_00009"
+      ],
+      [
+        "M_00006",
+        "M_00010"
+      ]
+    ],
+    "topological_order": [
+      "M_00001",
+      "M_00002",
+      "M_00003",
+      "M_00004",
+      "M_00005",
+      "M_00006",
+      "M_00007",
+      "M_00008",
+      "M_00009",
+      "M_00010"
+    ],
+    "created_at": 1789766970.1741025,
+    "replan_count": 0
+  }
+]

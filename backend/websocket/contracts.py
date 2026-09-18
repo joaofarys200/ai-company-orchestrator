@@ -138,6 +138,15 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "mission_multi_agent_intent_submit",
         "mission_multi_agent_arbitrate",
         "mission_multi_agent_schedule",
+        # Phase 67
+        "mission_long_horizon_status",
+        "mission_long_horizon_create",
+        "mission_long_horizon_step",
+        "mission_long_horizon_run",
+        "mission_long_horizon_checkpoint_create",
+        "mission_long_horizon_recover",
+        "mission_long_horizon_adapt",
+        "mission_long_horizon_completion_evaluate",
     }
 )
 

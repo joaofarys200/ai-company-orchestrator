@@ -1,0 +1,72 @@
+{
+  "timestamp": 1789766908.8983192,
+  "suite": "Phase 67 Long-Horizon Autonomous Missions Benchmark",
+  "scales": {
+    "10_milestones": {
+      "node_count": 10,
+      "planning_ms": 0.068,
+      "scheduling_ms": 0.041,
+      "checkpoint_ms": 0.065,
+      "recovery_ms": 0.015,
+      "verification_ms": 0.006,
+      "adaptation_ms": 0.009,
+      "persistence_ms": 0.375,
+      "completion_ms": 0.008,
+      "stage_total_ms": 0.587,
+      "overhead_ms": 0.5,
+      "total_cpu_ms": 1.087,
+      "timing_invariant_valid": true,
+      "memory_mb": 15.25
+    },
+    "100_milestones": {
+      "node_count": 100,
+      "planning_ms": 0.285,
+      "scheduling_ms": 0.126,
+      "checkpoint_ms": 0.035,
+      "recovery_ms": 0.014,
+      "verification_ms": 0.005,
+      "adaptation_ms": 0.011,
+      "persistence_ms": 0.194,
+      "completion_ms": 0.008,
+      "stage_total_ms": 0.678,
+      "overhead_ms": 0.5,
+      "total_cpu_ms": 1.178,
+      "timing_invariant_valid": true,
+      "memory_mb": 15.7
+    },
+    "1000_milestones": {
+      "node_count": 1000,
+      "planning_ms": 8.906,
+      "scheduling_ms": 0.13,
+      "checkpoint_ms": 0.054,
+      "recovery_ms": 0.015,
+      "verification_ms": 0.005,
+      "adaptation_ms": 0.022,
+      "persistence_ms": 0.236,
+      "completion_ms": 0.006,
+      "stage_total_ms": 9.373,
+      "overhead_ms": 0.5,
+      "total_cpu_ms": 9.873,
+      "timing_invariant_valid": true,
+      "memory_mb": 20.2
+    },
+    "10000_milestones": {
+      "node_count": 10000,
+      "planning_ms": 538.239,
+      "scheduling_ms": 0.154,
+      "checkpoint_ms": 0.06,
+      "recovery_ms": 0.017,
+      "verification_ms": 0.005,
+      "adaptation_ms": 0.137,
+      "persistence_ms": 0.285,
+      "completion_ms": 0.008,
+      "stage_total_ms": 538.905,
+      "overhead_ms": 0.5,
+      "total_cpu_ms": 539.405,
+      "timing_invariant_valid": true,
+      "memory_mb": 65.2
+    }
+  },
+  "timing_invariant": "total_cpu_ms == stage_total_ms + overhead_ms",
+  "timing_invariant_status": "ALL_SCALES_VALID"
+}

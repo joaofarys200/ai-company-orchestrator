@@ -1,0 +1,172 @@
+[
+  {
+    "budget": {
+      "limits": {
+        "wall_time_sec": 3600.0,
+        "cpu_sec": 1800.0,
+        "memory_mb": 4096.0,
+        "agent_executions": 500,
+        "patches": 200,
+        "retries": 50,
+        "rollbacks": 30,
+        "generated_tests": 500,
+        "browser_sessions": 50,
+        "architecture_changes": 20,
+        "human_review_requests": 15
+      },
+      "consumed": {
+        "wall_time_sec": 0.6,
+        "cpu_sec": 0.6,
+        "memory_mb": 0.0,
+        "agent_executions": 12.0,
+        "patches": 12.0,
+        "retries": 0,
+        "rollbacks": 0,
+        "generated_tests": 0,
+        "browser_sessions": 0,
+        "architecture_changes": 0,
+        "human_review_requests": 0
+      },
+      "remaining_pct": 97.19444444444446
+    },
+    "is_exhausted": false,
+    "exhausted_dimension": null,
+    "log_entries_count": 48
+  },
+  {
+    "budget": {
+      "limits": {
+        "wall_time_sec": 3600.0,
+        "cpu_sec": 1800.0,
+        "memory_mb": 4096.0,
+        "agent_executions": 500,
+        "patches": 200,
+        "retries": 50,
+        "rollbacks": 30,
+        "generated_tests": 500,
+        "browser_sessions": 50,
+        "architecture_changes": 20,
+        "human_review_requests": 15
+      },
+      "consumed": {
+        "wall_time_sec": 0.7500000000000001,
+        "cpu_sec": 0.7500000000000001,
+        "memory_mb": 0.0,
+        "agent_executions": 15.0,
+        "patches": 15.0,
+        "retries": 0,
+        "rollbacks": 0,
+        "generated_tests": 0,
+        "browser_sessions": 0,
+        "architecture_changes": 0,
+        "human_review_requests": 0
+      },
+      "remaining_pct": 96.49305555555556
+    },
+    "is_exhausted": false,
+    "exhausted_dimension": null,
+    "log_entries_count": 60
+  },
+  {
+    "budget": {
+      "limits": {
+        "wall_time_sec": 3600.0,
+        "cpu_sec": 1800.0,
+        "memory_mb": 4096.0,
+        "agent_executions": 500,
+        "patches": 200,
+        "retries": 50,
+        "rollbacks": 30,
+        "generated_tests": 500,
+        "browser_sessions": 50,
+        "architecture_changes": 20,
+        "human_review_requests": 15
+      },
+      "consumed": {
+        "wall_time_sec": 4.99999999999999,
+        "cpu_sec": 4.99999999999999,
+        "memory_mb": 0.0,
+        "agent_executions": 100.0,
+        "patches": 100.0,
+        "retries": 0,
+        "rollbacks": 0,
+        "generated_tests": 0,
+        "browser_sessions": 0,
+        "architecture_changes": 0,
+        "human_review_requests": 0
+      },
+      "remaining_pct": 76.62037037037037
+    },
+    "is_exhausted": false,
+    "exhausted_dimension": null,
+    "log_entries_count": 400
+  },
+  {
+    "budget": {
+      "limits": {
+        "wall_time_sec": 3600.0,
+        "cpu_sec": 1800.0,
+        "memory_mb": 4096.0,
+        "agent_executions": 500,
+        "patches": 200,
+        "retries": 50,
+        "rollbacks": 30,
+        "generated_tests": 500,
+        "browser_sessions": 50,
+        "architecture_changes": 20,
+        "human_review_requests": 15
+      },
+      "consumed": {
+        "wall_time_sec": 0.7500000000000001,
+        "cpu_sec": 0.7500000000000001,
+        "memory_mb": 0.0,
+        "agent_executions": 15.0,
+        "patches": 13.0,
+        "retries": 0,
+        "rollbacks": 0,
+        "generated_tests": 0,
+        "browser_sessions": 0,
+        "architecture_changes": 0,
+        "human_review_requests": 0
+      },
+      "remaining_pct": 96.82638888888889
+    },
+    "is_exhausted": false,
+    "exhausted_dimension": null,
+    "log_entries_count": 58
+  },
+  {
+    "budget": {
+      "limits": {
+        "wall_time_sec": 3600.0,
+        "cpu_sec": 1800.0,
+        "memory_mb": 4096.0,
+        "agent_executions": 500,
+        "patches": 200,
+        "retries": 50,
+        "rollbacks": 30,
+        "generated_tests": 500,
+        "browser_sessions": 50,
+        "architecture_changes": 20,
+        "human_review_requests": 15
+      },
+      "consumed": {
+        "wall_time_sec": 0.15000000000000002,
+        "cpu_sec": 0.15000000000000002,
+        "memory_mb": 0.0,
+        "agent_executions": 3.0,
+        "patches": 2.0,
+        "retries": 0,
+        "rollbacks": 0,
+        "generated_tests": 0,
+        "browser_sessions": 0,
+        "architecture_changes": 0,
+        "human_review_requests": 0
+      },
+      "remaining_pct": 99.46527777777777
+    },
+    "is_exhausted": false,
+    "exhausted_dimension": null,
+    "log_entries_count": 11
+  }
+]

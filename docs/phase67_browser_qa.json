@@ -1,0 +1,129 @@
+{
+  "phase": 67,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "timestamp": 1789767034.0498984,
+  "scenarios_tested": 14,
+  "scenarios_passed": 14,
+  "scenarios": [
+    {
+      "scenario_id": 1,
+      "title": "01 mission overview",
+      "selector": "#longhorizon-subtab-overview",
+      "description": "Long-horizon mission cockpit overview, pipeline progression, and agent roster",
+      "screenshot": "docs/screenshots/phase67/phase67_01_mission_overview.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 2,
+      "title": "02 objective state",
+      "selector": "#longhorizon-subtab-objectives",
+      "description": "Primary/secondary objectives, invariants, non-goals, and drift guard status",
+      "screenshot": "docs/screenshots/phase67/phase67_02_objective_state.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 3,
+      "title": "03 milestone DAG",
+      "selector": "#longhorizon-subtab-milestones",
+      "description": "Scalable directed acyclic graph (DAG) of verifiable milestones",
+      "screenshot": "docs/screenshots/phase67/phase67_03_milestone_dag.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 4,
+      "title": "04 agent coordination",
+      "selector": "#longhorizon-subtab-coordination",
+      "description": "F66 multi-agent intent submission, resource claims, and transaction registration",
+      "screenshot": "docs/screenshots/phase67/phase67_04_agent_coordination.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 5,
+      "title": "05 budget",
+      "selector": "#longhorizon-subtab-budget",
+      "description": "11-dimension resource metering, consumed vs limits, and wall-time clocks",
+      "screenshot": "docs/screenshots/phase67/phase67_05_budget.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 6,
+      "title": "06 checkpoint",
+      "selector": "#longhorizon-subtab-checkpoints",
+      "description": "Immutable SHA-256 state snapshots and vector verification chain",
+      "screenshot": "docs/screenshots/phase67/phase67_06_checkpoint.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 7,
+      "title": "07 execution",
+      "selector": "#longhorizon-subtab-execution",
+      "description": "Bounded step-by-step orchestrator execution history and logs",
+      "screenshot": "docs/screenshots/phase67/phase67_07_execution.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 8,
+      "title": "08 verification",
+      "selector": "#longhorizon-subtab-verification",
+      "description": "F62 multi-level continuous verification coverage across 7 layers",
+      "screenshot": "docs/screenshots/phase67/phase67_08_verification.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 9,
+      "title": "09 adaptation",
+      "selector": "#longhorizon-subtab-adaptation",
+      "description": "Adaptive replanning, convergence governance, and stall/oscillation detection",
+      "screenshot": "docs/screenshots/phase67/phase67_09_adaptation.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 10,
+      "title": "10 failure",
+      "selector": "#longhorizon-subtab-failures",
+      "description": "Failure taxonomy classification, localization, and auto-repair routing",
+      "screenshot": "docs/screenshots/phase67/phase67_10_failure.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 11,
+      "title": "11 recovery",
+      "selector": "#longhorizon-subtab-recovery",
+      "description": "Crash interruption simulation, workspace reconciliation, and duplicate side-effect prevention",
+      "screenshot": "docs/screenshots/phase67/phase67_11_recovery.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 12,
+      "title": "12 human review",
+      "selector": "#longhorizon-subtab-human-review",
+      "description": "Mandatory human review governance tickets and timeout handling",
+      "screenshot": "docs/screenshots/phase67/phase67_12_human_review.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 13,
+      "title": "13 completion proof",
+      "selector": "#longhorizon-subtab-completion",
+      "description": "MissionCompletionProof scorecard with zero false success invariant validation",
+      "screenshot": "docs/screenshots/phase67/phase67_13_completion_proof.png",
+      "status": "PASS"
+    },
+    {
+      "scenario_id": 14,
+      "title": "14 final mission state",
+      "selector": "#longhorizon-subtab-termination",
+      "description": "Terminal state classification, cryptographic audit records, and evidence roots",
+      "screenshot": "docs/screenshots/phase67/phase67_14_final_mission_state.png",
+      "status": "PASS"
+    }
+  ],
+  "console_errors": [
+    "[ERROR] The tag <%s> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter. g",
+    "[ERROR] [WebSocket] Error: Event",
+    "[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "failed_requests": [],
+  "overall_status": "ALL_SCENARIOS_PASSED"
+}

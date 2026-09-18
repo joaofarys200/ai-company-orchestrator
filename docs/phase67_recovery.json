@@ -1,0 +1,25 @@
+[
+  {
+    "crash_id": "crash_1789766970167",
+    "mission_id": "m4_contract_recovery",
+    "interruption_stage": "verification",
+    "previous_state": "EXECUTING",
+    "timestamp": 1789766970.1673465
+  },
+  {
+    "reconciliation_time_ms": 0.003337860107421875,
+    "checkpoint_id": "chk_m4_contract_recovery_1789766970166",
+    "decision": "RESUME",
+    "discrepancies": [],
+    "residuals": [],
+    "safe_transactions": [
+      "tx_58c6e2c1"
+    ],
+    "checkpoint_milestones_completed": [
+      "M_00001",
+      "M_00002",
+      "M_00003",
+      "M_00004"
+    ]
+  }
+]

@@ -101,6 +101,15 @@ MISSION_HANDLERS = {
     "mission_multi_agent_intent_submit": "handle",
     "mission_multi_agent_arbitrate": "handle",
     "mission_multi_agent_schedule": "handle",
+    # Phase 67
+    "mission_long_horizon_status": "handle",
+    "mission_long_horizon_create": "handle",
+    "mission_long_horizon_step": "handle",
+    "mission_long_horizon_run": "handle",
+    "mission_long_horizon_checkpoint_create": "handle",
+    "mission_long_horizon_recover": "handle",
+    "mission_long_horizon_adapt": "handle",
+    "mission_long_horizon_completion_evaluate": "handle",
 }
 
 
@@ -1864,6 +1873,69 @@ class MissionWebSocketHandler:
                     {
                         "type": "mission_multi_agent_schedule_result",
                         "schedule": sched,
+                    },
+                )
+                return
+
+            elif operation == "mission_long_horizon_status":
+                from backend.agents.long_horizon_missions.bridge import LongHorizonMissionBridge
+                bridge = LongHorizonMissionBridge.get_instance()
+                mid = message.get("mission_id", "default_mission")
+                m = bridge.get_mission(mid)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_long_horizon_status_result",
+                        "mission": m.to_dict() if m else None,
+                    },
+                )
+                return
+
+            elif operation == "mission_long_horizon_create":
+                from backend.agents.long_horizon_missions.bridge import LongHorizonMissionBridge
+                bridge = LongHorizonMissionBridge.get_instance()
+                obj = message.get("objective", "Autonomous Long-Horizon Mission")
+                m = bridge.create_mission(
+                    objective=obj,
+                    success_criteria=message.get("success_criteria"),
+                    policy_name=message.get("policy_name", "GOVERNED"),
+                    milestone_count=int(message.get("milestone_count", 10)),
+                    mission_id=message.get("mission_id"),
+                )
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_long_horizon_create_result",
+                        "mission": m.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_long_horizon_step":
+                from backend.agents.long_horizon_missions.bridge import LongHorizonMissionBridge
+                bridge = LongHorizonMissionBridge.get_instance()
+                mid = message.get("mission_id")
+                res = bridge.execute_step(mid, context=message.get("context"))
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_long_horizon_step_result",
+                        "result": res,
+                    },
+                )
+                return
+
+            elif operation == "mission_long_horizon_run":
+                from backend.agents.long_horizon_missions.bridge import LongHorizonMissionBridge
+                bridge = LongHorizonMissionBridge.get_instance()
+                mid = message.get("mission_id")
+                max_s = int(message.get("max_steps", 100))
+                res = bridge.run_bounded(mid, max_steps=max_s, context=message.get("context"))
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_long_horizon_run_result",
+                        "result": res,
                     },
                 )
                 return
