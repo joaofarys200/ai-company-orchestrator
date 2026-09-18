@@ -1,0 +1,89 @@
+{
+  "phase": 64,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "timestamp": 1789762666.039282,
+  "scenarios_tested": 12,
+  "scenarios_passed": 12,
+  "scenarios": [
+    {
+      "scenario": "01 architecture overview",
+      "filename": "phase64_01_architecture_overview.png",
+      "description": "High-level topological metrics, nodes, edges, SCCs, and invariant card",
+      "status": "PASS"
+    },
+    {
+      "scenario": "02 problem detection",
+      "filename": "phase64_02_problem_detection.png",
+      "description": "Observed and confirmed architectural problems with evidence and affected symbols",
+      "status": "PASS"
+    },
+    {
+      "scenario": "03 constraints",
+      "filename": "phase64_03_constraints.png",
+      "description": "Extracted operational, security sentinel, test invariance, and budget constraints",
+      "status": "PASS"
+    },
+    {
+      "scenario": "04 alternatives",
+      "filename": "phase64_04_alternatives.png",
+      "description": "Diverse candidate generation: baseline keep_current, boundary extraction, DIP, event-driven",
+      "status": "PASS"
+    },
+    {
+      "scenario": "05 comparison",
+      "filename": "phase64_05_comparison.png",
+      "description": "Multi-axis comparative trade-off matrix without single best-architecture fallacy",
+      "status": "PASS"
+    },
+    {
+      "scenario": "06 impact graph",
+      "filename": "phase64_06_impact_graph.png",
+      "description": "Calculated blast radius across code, downstream consumers, and test surfaces",
+      "status": "PASS"
+    },
+    {
+      "scenario": "07 contract analysis",
+      "filename": "phase64_07_contract_analysis.png",
+      "description": "Contract compatibility check and schema versioning governance (F44-F49)",
+      "status": "PASS"
+    },
+    {
+      "scenario": "08 behavior analysis",
+      "filename": "phase64_08_behavior_analysis.png",
+      "description": "Behavioral preservation proof, ordering semantics, retries, and timeouts (F50-F52)",
+      "status": "PASS"
+    },
+    {
+      "scenario": "09 risk analysis",
+      "filename": "phase64_09_risk_analysis.png",
+      "description": "Multi-vector risk evaluation: security, reliability, migration, and rollback",
+      "status": "PASS"
+    },
+    {
+      "scenario": "10 migration plan",
+      "filename": "phase64_10_migration_plan.png",
+      "description": "Staged 7-stage DAG migration plan with automated rollback checkpoints",
+      "status": "PASS"
+    },
+    {
+      "scenario": "11 simulation",
+      "filename": "phase64_11_simulation.png",
+      "description": "Pre-execution dry-run simulation verifying dependency mutations and rollback feasibility",
+      "status": "PASS"
+    },
+    {
+      "scenario": "12 governance decision",
+      "filename": "phase64_12_governance_decision.png",
+      "description": "Strict governance gate verdict, Sentinel security badges, and cryptographic provenance chain",
+      "status": "PASS"
+    }
+  ],
+  "console_errors": [
+    "[ERROR] The tag <%s> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter. g",
+    "[ERROR] [WebSocket] Error: Event",
+    "[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "failed_requests": [],
+  "overall_status": "WARNING"
+}

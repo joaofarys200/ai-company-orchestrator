@@ -1,0 +1,107 @@
+{
+  "alt_keep_db970b": {
+    "alternative_id": "alt_keep_db970b",
+    "behavior_preservation": "PRESERVED",
+    "ordering_preservation": "PRESERVED",
+    "retry_impact": "UNCHANGED",
+    "timeout_impact": "UNCHANGED",
+    "concurrency_impact": "UNCHANGED",
+    "idempotency_impact": "UNCHANGED",
+    "state_transition_impact": "UNCHANGED",
+    "failure_behavior_impact": "UNCHANGED",
+    "status": "PROVEN_WITHIN_SCOPE",
+    "evidence": {
+      "rationale": "Baseline retained with zero code modification."
+    }
+  },
+  "alt_bound_db970b": {
+    "alternative_id": "alt_bound_db970b",
+    "behavior_preservation": "PRESERVED_LOCALLY",
+    "ordering_preservation": "PRESERVED",
+    "retry_impact": "UNCHANGED",
+    "timeout_impact": "UNCHANGED",
+    "concurrency_impact": "UNCHANGED",
+    "idempotency_impact": "UNCHANGED",
+    "state_transition_impact": "UNCHANGED",
+    "failure_behavior_impact": "UNCHANGED",
+    "status": "PROVEN_WITHIN_SCOPE",
+    "evidence": {
+      "proof": "In-process refactoring preserves invocation contracts and call semantics."
+    }
+  },
+  "alt_dip_db970b": {
+    "alternative_id": "alt_dip_db970b",
+    "behavior_preservation": "PRESERVED_LOCALLY",
+    "ordering_preservation": "PRESERVED",
+    "retry_impact": "UNCHANGED",
+    "timeout_impact": "UNCHANGED",
+    "concurrency_impact": "UNCHANGED",
+    "idempotency_impact": "UNCHANGED",
+    "state_transition_impact": "UNCHANGED",
+    "failure_behavior_impact": "UNCHANGED",
+    "status": "PROVEN_WITHIN_SCOPE",
+    "evidence": {
+      "proof": "In-process refactoring preserves invocation contracts and call semantics."
+    }
+  },
+  "alt_evt_db970b": {
+    "alternative_id": "alt_evt_db970b",
+    "behavior_preservation": "EVENTUAL_CONSISTENCY",
+    "ordering_preservation": "POTENTIAL_REORDERING",
+    "retry_impact": "ASYNC_DLQ_RETRIES",
+    "timeout_impact": "DECOUPLED_EXPIRATION",
+    "concurrency_impact": "PARALLEL_CONSUMERS",
+    "idempotency_impact": "MANDATORY_DEDUPLICATION",
+    "state_transition_impact": "EVENT_SOURCED_STATE",
+    "failure_behavior_impact": "PARTIAL_DELIVERY_HANDLING",
+    "status": "POTENTIAL_BEHAVIOR_DRIFT",
+    "evidence": {
+      "risk": "Asynchronous bus can cause message interleaving without causal ordering tokens."
+    }
+  },
+  "alt_keep_241449": {
+    "alternative_id": "alt_keep_241449",
+    "behavior_preservation": "PRESERVED",
+    "ordering_preservation": "PRESERVED",
+    "retry_impact": "UNCHANGED",
+    "timeout_impact": "UNCHANGED",
+    "concurrency_impact": "UNCHANGED",
+    "idempotency_impact": "UNCHANGED",
+    "state_transition_impact": "UNCHANGED",
+    "failure_behavior_impact": "UNCHANGED",
+    "status": "PROVEN_WITHIN_SCOPE",
+    "evidence": {
+      "rationale": "Baseline retained with zero code modification."
+    }
+  },
+  "alt_adp_241449": {
+    "alternative_id": "alt_adp_241449",
+    "behavior_preservation": "PRESERVED",
+    "ordering_preservation": "PRESERVED",
+    "retry_impact": "TRANSPARENT_PASS_THROUGH",
+    "timeout_impact": "NEGLIGIBLE_SERIALIZATION_LATENCY",
+    "concurrency_impact": "THREAD_SAFE_ISOLATION",
+    "idempotency_impact": "PRESERVED",
+    "state_transition_impact": "UNCHANGED",
+    "failure_behavior_impact": "STRUCTURED_EXCEPTION_TRANSLATION",
+    "status": "PROVEN_WITHIN_SCOPE",
+    "evidence": {
+      "proof": "Facade and adapter wrapping preserve synchronous call-stack invariants."
+    }
+  },
+  "alt_fac_241449": {
+    "alternative_id": "alt_fac_241449",
+    "behavior_preservation": "PRESERVED",
+    "ordering_preservation": "PRESERVED",
+    "retry_impact": "TRANSPARENT_PASS_THROUGH",
+    "timeout_impact": "NEGLIGIBLE_SERIALIZATION_LATENCY",
+    "concurrency_impact": "THREAD_SAFE_ISOLATION",
+    "idempotency_impact": "PRESERVED",
+    "state_transition_impact": "UNCHANGED",
+    "failure_behavior_impact": "STRUCTURED_EXCEPTION_TRANSLATION",
+    "status": "PROVEN_WITHIN_SCOPE",
+    "evidence": {
+      "proof": "Facade and adapter wrapping preserve synchronous call-stack invariants."
+    }
+  }
+}

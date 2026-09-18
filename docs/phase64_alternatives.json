@@ -1,0 +1,224 @@
+[
+  {
+    "alternative_id": "alt_keep_db970b",
+    "problem_id": "prob_scc_3525175d",
+    "alternative_type": "keep_current",
+    "title": "Maintain Current Topology (Accept Technical Debt as Documented Smell)",
+    "description": "Preserves existing component boundaries, avoids refactoring churn, and establishes monitoring thresholds.",
+    "benefits": [
+      "Zero migration risk",
+      "Zero deployment downtime",
+      "Zero engineering cost immediately"
+    ],
+    "costs": [
+      "Ongoing maintainability friction",
+      "Gradual coupling accumulation"
+    ],
+    "risks": [
+      "Potential cascade in future feature modifications"
+    ],
+    "affected_components": [],
+    "migration_complexity": "LOW",
+    "compatibility_impact": "MINIMAL",
+    "verification_requirements": [
+      "Maintain existing regression tests"
+    ],
+    "reversibility": "EASILY_REVERSIBLE",
+    "is_hypothesis_from_f63": false,
+    "source_project": null,
+    "knowledge_id": null
+  },
+  {
+    "alternative_id": "alt_bound_db970b",
+    "problem_id": "prob_scc_3525175d",
+    "alternative_type": "boundary_extraction",
+    "title": "Formal Boundary Extraction & Pure Interface Segregation",
+    "description": "Extracts a shared domain interface or independent intermediate layer to break cyclic or dynamic dependencies.",
+    "benefits": [
+      "Breaks cyclic SCC loops",
+      "Enforces static type contracts",
+      "Isolates dynamic reflection"
+    ],
+    "costs": [
+      "Additional abstraction layer",
+      "Interface maintenance overhead"
+    ],
+    "risks": [
+      "Over-engineering if component is rarely modified"
+    ],
+    "affected_components": [
+      "agents/autonomous_loop/controller.py",
+      "agents/orchestrator.py",
+      "backend/agents/continuous_verification/bridge.py"
+    ],
+    "migration_complexity": "MEDIUM",
+    "compatibility_impact": "MINIMAL",
+    "verification_requirements": [
+      "Contract compatibility suite",
+      "Interface compliance verification"
+    ],
+    "reversibility": "EASILY_REVERSIBLE",
+    "is_hypothesis_from_f63": false,
+    "source_project": null,
+    "knowledge_id": null
+  },
+  {
+    "alternative_id": "alt_dip_db970b",
+    "problem_id": "prob_scc_3525175d",
+    "alternative_type": "dependency_inversion",
+    "title": "Dependency Inversion Principle (DIP) Injection",
+    "description": "Inverts the direction of coupling by introducing high-level abstractions injected at runtime.",
+    "benefits": [
+      "Eliminates direct layer violations",
+      "Enables clean mock injection in tests"
+    ],
+    "costs": [
+      "Requires dependency injection container or factory wiring"
+    ],
+    "risks": [
+      "Runtime configuration drift if factory fails"
+    ],
+    "affected_components": [
+      "agents/autonomous_loop/controller.py",
+      "agents/orchestrator.py",
+      "backend/agents/continuous_verification/bridge.py"
+    ],
+    "migration_complexity": "MEDIUM",
+    "compatibility_impact": "MINIMAL",
+    "verification_requirements": [
+      "Dependency injection wiring tests",
+      "Behavioral proof under mocks"
+    ],
+    "reversibility": "REVERSIBLE_WITH_MIGRATION",
+    "is_hypothesis_from_f63": false,
+    "source_project": null,
+    "knowledge_id": null
+  },
+  {
+    "alternative_id": "alt_evt_db970b",
+    "problem_id": "prob_scc_3525175d",
+    "alternative_type": "event_driven",
+    "title": "Asynchronous Event-Driven Decoupling",
+    "description": "Replaces direct synchronous invocation with asynchronous event emission and decoupled subscribers.",
+    "benefits": [
+      "Completely decouples callers and callees",
+      "High temporal resilience"
+    ],
+    "costs": [
+      "Event bus infrastructure",
+      "Eventual consistency complexity"
+    ],
+    "risks": [
+      "Ordering anomalies",
+      "Debugging distributed async traces"
+    ],
+    "affected_components": [
+      "agents/autonomous_loop/controller.py",
+      "agents/orchestrator.py",
+      "backend/agents/continuous_verification/bridge.py"
+    ],
+    "migration_complexity": "HIGH",
+    "compatibility_impact": "MODERATE",
+    "verification_requirements": [
+      "Message ordering invariants",
+      "Consumer idempotency tests",
+      "End-to-end integration"
+    ],
+    "reversibility": "DIFFICULT_TO_REVERSE",
+    "is_hypothesis_from_f63": false,
+    "source_project": null,
+    "knowledge_id": null
+  },
+  {
+    "alternative_id": "alt_keep_241449",
+    "problem_id": "prob_contract_899b97d4",
+    "alternative_type": "keep_current",
+    "title": "Maintain Current Topology (Accept Technical Debt as Documented Smell)",
+    "description": "Preserves existing component boundaries, avoids refactoring churn, and establishes monitoring thresholds.",
+    "benefits": [
+      "Zero migration risk",
+      "Zero deployment downtime",
+      "Zero engineering cost immediately"
+    ],
+    "costs": [
+      "Ongoing maintainability friction",
+      "Gradual coupling accumulation"
+    ],
+    "risks": [
+      "Potential cascade in future feature modifications"
+    ],
+    "affected_components": [],
+    "migration_complexity": "LOW",
+    "compatibility_impact": "MINIMAL",
+    "verification_requirements": [
+      "Maintain existing regression tests"
+    ],
+    "reversibility": "EASILY_REVERSIBLE",
+    "is_hypothesis_from_f63": false,
+    "source_project": null,
+    "knowledge_id": null
+  },
+  {
+    "alternative_id": "alt_adp_241449",
+    "problem_id": "prob_contract_899b97d4",
+    "alternative_type": "adapter_layer",
+    "title": "Two-Way Semantic Adapter Layer",
+    "description": "Translates legacy contract schemas and dynamic payloads into strongly validated canonical structures.",
+    "benefits": [
+      "Guarantees backward compatibility",
+      "Safely absorbs polymorphic contract drift"
+    ],
+    "costs": [
+      "Translation compute overhead per request"
+    ],
+    "risks": [
+      "Mapping errors during schema evolution"
+    ],
+    "affected_components": [
+      "contracts/mission_schema.json",
+      "audit_daemon"
+    ],
+    "migration_complexity": "MEDIUM",
+    "compatibility_impact": "MINIMAL",
+    "verification_requirements": [
+      "Round-trip contract serialization tests",
+      "Fuzzing across schema variants"
+    ],
+    "reversibility": "EASILY_REVERSIBLE",
+    "is_hypothesis_from_f63": false,
+    "source_project": null,
+    "knowledge_id": null
+  },
+  {
+    "alternative_id": "alt_fac_241449",
+    "problem_id": "prob_contract_899b97d4",
+    "alternative_type": "facade",
+    "title": "Consolidated Gateway Facade & Rate-Limited Boundary",
+    "description": "Presents a simplified, unified entry point wrapping concentrated contracts or high fan-in hubs.",
+    "benefits": [
+      "Reduces client coupling",
+      "Centralizes validation and rate-limiting",
+      "Hides internal complexity"
+    ],
+    "costs": [
+      "Single facade choke-point if under high throughput"
+    ],
+    "risks": [
+      "Potential god-object evolution if not bounded"
+    ],
+    "affected_components": [
+      "contracts/mission_schema.json",
+      "audit_daemon"
+    ],
+    "migration_complexity": "LOW",
+    "compatibility_impact": "MINIMAL",
+    "verification_requirements": [
+      "Contract consumer regression tests",
+      "Load and latency benchmarks"
+    ],
+    "reversibility": "EASILY_REVERSIBLE",
+    "is_hypothesis_from_f63": false,
+    "source_project": null,
+    "knowledge_id": null
+  }
+]

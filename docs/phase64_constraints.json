@@ -1,0 +1,56 @@
+[
+  {
+    "constraint_id": "const_compat_db970b",
+    "name": "backward_compatibility_guarantee",
+    "category": "compatibility",
+    "description": "Must preserve API compatibility for 0 external consumers.",
+    "source": "snapshot.consumers",
+    "confidence": 0.98,
+    "evidence": {
+      "affected_consumers": [
+        "contracts/mission_schema.json",
+        "contracts/task_dag_schema.json"
+      ]
+    },
+    "scope": "module"
+  },
+  {
+    "constraint_id": "const_sec_db970b",
+    "name": "security_sentinel_inviolability",
+    "category": "security",
+    "description": "Zero privilege escalation; no plaintext secret movement or unvetted boundary opening.",
+    "source": "security_sentinel_policy",
+    "confidence": 1.0,
+    "evidence": {
+      "risk_zones": [
+        "auth_token_signer",
+        "wallet_transfer_gateway"
+      ]
+    },
+    "scope": "project"
+  },
+  {
+    "constraint_id": "const_test_db970b",
+    "name": "regression_test_invariance",
+    "category": "non_functional",
+    "description": "All existing functional and behavioral regression tests must continue to pass.",
+    "source": "snapshot.test_surfaces",
+    "confidence": 0.95,
+    "evidence": {
+      "test_count": 0
+    },
+    "scope": "project"
+  },
+  {
+    "constraint_id": "const_econ_db970b",
+    "name": "resource_budget_bound",
+    "category": "economic",
+    "description": "Migration effort must not exceed 40 engineering hours or cause permanent memory expansion.",
+    "source": "project_budget_specification",
+    "confidence": 0.88,
+    "evidence": {
+      "node_count": 3
+    },
+    "scope": "project"
+  }
+]

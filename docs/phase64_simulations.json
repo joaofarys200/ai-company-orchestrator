@@ -1,0 +1,114 @@
+{
+  "alt_keep_db970b": {
+    "alternative_id": "alt_keep_db970b",
+    "graph_mutation_valid": true,
+    "contract_changes_safe": true,
+    "behavior_preserved": true,
+    "test_impact_acceptable": true,
+    "rollback_path_verified": true,
+    "failure_scenarios_tested": 1,
+    "migration_ordering_valid": true,
+    "status": "SIMULATION_SAFE",
+    "logs": [
+      "Initiating architectural simulation for alternative 'alt_keep_db970b'...",
+      "Simulated dependency topology: 6 edges remaining (cycle broken: False).",
+      "Simulation completed with verdict: SIMULATION_SAFE"
+    ]
+  },
+  "alt_bound_db970b": {
+    "alternative_id": "alt_bound_db970b",
+    "graph_mutation_valid": true,
+    "contract_changes_safe": true,
+    "behavior_preserved": true,
+    "test_impact_acceptable": true,
+    "rollback_path_verified": true,
+    "failure_scenarios_tested": 7,
+    "migration_ordering_valid": true,
+    "status": "SIMULATION_SAFE",
+    "logs": [
+      "Initiating architectural simulation for alternative 'alt_bound_db970b'...",
+      "Simulated dependency topology: 4 edges remaining (cycle broken: True).",
+      "Simulation completed with verdict: SIMULATION_SAFE"
+    ]
+  },
+  "alt_dip_db970b": {
+    "alternative_id": "alt_dip_db970b",
+    "graph_mutation_valid": true,
+    "contract_changes_safe": true,
+    "behavior_preserved": true,
+    "test_impact_acceptable": true,
+    "rollback_path_verified": true,
+    "failure_scenarios_tested": 7,
+    "migration_ordering_valid": true,
+    "status": "SIMULATION_SAFE",
+    "logs": [
+      "Initiating architectural simulation for alternative 'alt_dip_db970b'...",
+      "Simulated dependency topology: 4 edges remaining (cycle broken: True).",
+      "Simulation completed with verdict: SIMULATION_SAFE"
+    ]
+  },
+  "alt_evt_db970b": {
+    "alternative_id": "alt_evt_db970b",
+    "graph_mutation_valid": true,
+    "contract_changes_safe": true,
+    "behavior_preserved": true,
+    "test_impact_acceptable": true,
+    "rollback_path_verified": true,
+    "failure_scenarios_tested": 7,
+    "migration_ordering_valid": true,
+    "status": "SIMULATION_SAFE",
+    "logs": [
+      "Initiating architectural simulation for alternative 'alt_evt_db970b'...",
+      "Simulated dependency topology: 4 edges remaining (cycle broken: True).",
+      "Simulation completed with verdict: SIMULATION_SAFE"
+    ]
+  },
+  "alt_keep_241449": {
+    "alternative_id": "alt_keep_241449",
+    "graph_mutation_valid": true,
+    "contract_changes_safe": true,
+    "behavior_preserved": true,
+    "test_impact_acceptable": true,
+    "rollback_path_verified": true,
+    "failure_scenarios_tested": 1,
+    "migration_ordering_valid": true,
+    "status": "SIMULATION_SAFE",
+    "logs": [
+      "Initiating architectural simulation for alternative 'alt_keep_241449'...",
+      "Simulated dependency topology: 6 edges remaining (cycle broken: False).",
+      "Simulation completed with verdict: SIMULATION_SAFE"
+    ]
+  },
+  "alt_adp_241449": {
+    "alternative_id": "alt_adp_241449",
+    "graph_mutation_valid": true,
+    "contract_changes_safe": true,
+    "behavior_preserved": true,
+    "test_impact_acceptable": true,
+    "rollback_path_verified": true,
+    "failure_scenarios_tested": 7,
+    "migration_ordering_valid": true,
+    "status": "SIMULATION_SAFE",
+    "logs": [
+      "Initiating architectural simulation for alternative 'alt_adp_241449'...",
+      "Simulated dependency topology: 6 edges remaining (cycle broken: False).",
+      "Simulation completed with verdict: SIMULATION_SAFE"
+    ]
+  },
+  "alt_fac_241449": {
+    "alternative_id": "alt_fac_241449",
+    "graph_mutation_valid": true,
+    "contract_changes_safe": true,
+    "behavior_preserved": true,
+    "test_impact_acceptable": true,
+    "rollback_path_verified": true,
+    "failure_scenarios_tested": 7,
+    "migration_ordering_valid": true,
+    "status": "SIMULATION_SAFE",
+    "logs": [
+      "Initiating architectural simulation for alternative 'alt_fac_241449'...",
+      "Simulated dependency topology: 6 edges remaining (cycle broken: False).",
+      "Simulation completed with verdict: SIMULATION_SAFE"
+    ]
+  }
+}

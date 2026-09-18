@@ -1,0 +1,176 @@
+{
+  "alt_keep_db970b": {
+    "alternative_id": "alt_keep_db970b",
+    "affected_files": [],
+    "affected_symbols": [],
+    "affected_consumers": [],
+    "affected_contracts": [],
+    "affected_behaviors": [],
+    "affected_tests": [],
+    "browser_surfaces": [],
+    "persistence_surfaces": [],
+    "scc_changes": {
+      "scc_split_count": 0,
+      "scc_merge_count": 0
+    },
+    "blast_radius": 0,
+    "scope": "DIRECT"
+  },
+  "alt_bound_db970b": {
+    "alternative_id": "alt_bound_db970b",
+    "affected_files": [
+      "agents/autonomous_loop/controller.py",
+      "backend/agents/continuous_verification/bridge.py"
+    ],
+    "affected_symbols": [],
+    "affected_consumers": [],
+    "affected_contracts": [],
+    "affected_behaviors": [
+      "behavior_of_backend/agents/continuous_verification/bridge.py",
+      "behavior_of_agents/autonomous_loop/controller.py",
+      "behavior_of_agents/orchestrator.py"
+    ],
+    "affected_tests": [],
+    "browser_surfaces": [],
+    "persistence_surfaces": [
+      "missions"
+    ],
+    "scc_changes": {
+      "scc_affected": 1,
+      "breaks_cycle": true
+    },
+    "blast_radius": 4,
+    "scope": "DIRECT"
+  },
+  "alt_dip_db970b": {
+    "alternative_id": "alt_dip_db970b",
+    "affected_files": [
+      "agents/autonomous_loop/controller.py",
+      "backend/agents/continuous_verification/bridge.py"
+    ],
+    "affected_symbols": [],
+    "affected_consumers": [],
+    "affected_contracts": [],
+    "affected_behaviors": [
+      "behavior_of_backend/agents/continuous_verification/bridge.py",
+      "behavior_of_agents/autonomous_loop/controller.py",
+      "behavior_of_agents/orchestrator.py"
+    ],
+    "affected_tests": [],
+    "browser_surfaces": [],
+    "persistence_surfaces": [
+      "missions"
+    ],
+    "scc_changes": {
+      "scc_affected": 1,
+      "breaks_cycle": true
+    },
+    "blast_radius": 4,
+    "scope": "DIRECT"
+  },
+  "alt_evt_db970b": {
+    "alternative_id": "alt_evt_db970b",
+    "affected_files": [
+      "agents/autonomous_loop/controller.py",
+      "backend/agents/continuous_verification/bridge.py"
+    ],
+    "affected_symbols": [],
+    "affected_consumers": [],
+    "affected_contracts": [],
+    "affected_behaviors": [
+      "behavior_of_backend/agents/continuous_verification/bridge.py",
+      "behavior_of_agents/autonomous_loop/controller.py",
+      "behavior_of_agents/orchestrator.py"
+    ],
+    "affected_tests": [],
+    "browser_surfaces": [],
+    "persistence_surfaces": [
+      "missions"
+    ],
+    "scc_changes": {
+      "scc_affected": 1,
+      "breaks_cycle": true
+    },
+    "blast_radius": 4,
+    "scope": "DIRECT"
+  },
+  "alt_keep_241449": {
+    "alternative_id": "alt_keep_241449",
+    "affected_files": [],
+    "affected_symbols": [],
+    "affected_consumers": [],
+    "affected_contracts": [],
+    "affected_behaviors": [],
+    "affected_tests": [],
+    "browser_surfaces": [],
+    "persistence_surfaces": [],
+    "scc_changes": {
+      "scc_split_count": 0,
+      "scc_merge_count": 0
+    },
+    "blast_radius": 0,
+    "scope": "DIRECT"
+  },
+  "alt_adp_241449": {
+    "alternative_id": "alt_adp_241449",
+    "affected_files": [
+      "contracts/mission_schema.json"
+    ],
+    "affected_symbols": [],
+    "affected_consumers": [
+      "audit_daemon",
+      "backend/websocket/handlers/missions.py",
+      "client_sdk",
+      "frontend/src/features/missions/MissionControlCenter.tsx",
+      "monitoring_agent",
+      "telemetry_service"
+    ],
+    "affected_contracts": [
+      "contracts/mission_schema.json"
+    ],
+    "affected_behaviors": [
+      "behavior_of_audit_daemon",
+      "behavior_of_contracts/mission_schema.json"
+    ],
+    "affected_tests": [],
+    "browser_surfaces": [],
+    "persistence_surfaces": [],
+    "scc_changes": {
+      "scc_affected": 0,
+      "breaks_cycle": false
+    },
+    "blast_radius": 24,
+    "scope": "DOWNSTREAM"
+  },
+  "alt_fac_241449": {
+    "alternative_id": "alt_fac_241449",
+    "affected_files": [
+      "contracts/mission_schema.json"
+    ],
+    "affected_symbols": [],
+    "affected_consumers": [
+      "audit_daemon",
+      "backend/websocket/handlers/missions.py",
+      "client_sdk",
+      "frontend/src/features/missions/MissionControlCenter.tsx",
+      "monitoring_agent",
+      "telemetry_service"
+    ],
+    "affected_contracts": [
+      "contracts/mission_schema.json"
+    ],
+    "affected_behaviors": [
+      "behavior_of_audit_daemon",
+      "behavior_of_contracts/mission_schema.json"
+    ],
+    "affected_tests": [],
+    "browser_surfaces": [],
+    "persistence_surfaces": [],
+    "scc_changes": {
+      "scc_affected": 0,
+      "breaks_cycle": false
+    },
+    "blast_radius": 24,
+    "scope": "DOWNSTREAM"
+  }
+}

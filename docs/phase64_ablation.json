@@ -1,0 +1,59 @@
+{
+  "configurations": {
+    "Config A (Current Architecture Only)": {
+      "description": "Baseline: system maintains status quo, logs known debt, zero refactoring.",
+      "problems_detected": 5,
+      "false_architecture_problems": 0,
+      "alternatives_generated": 1,
+      "verification_cost_hours": 11.0,
+      "risk_detection_score": 0.2,
+      "contract_detection_score": 0.35,
+      "behavior_confidence": 0.95,
+      "human_reviews": 0,
+      "unsafe_proposals": 0
+    },
+    "Config B (Architecture Analysis Only)": {
+      "description": "Observation and problem detection with static alternative generation; no F63 and no simulation.",
+      "problems_detected": 5,
+      "false_architecture_problems": 1,
+      "alternatives_generated": 3,
+      "verification_cost_hours": 32.5,
+      "risk_detection_score": 0.72,
+      "contract_detection_score": 0.8,
+      "behavior_confidence": 0.65,
+      "human_reviews": 3,
+      "unsafe_proposals": 2
+    },
+    "Config C (Analysis + Cross-Project Patterns)": {
+      "description": "Adds Phase 63 transferred engineering hypotheses to candidate pool; no simulation dry-run.",
+      "problems_detected": 5,
+      "false_architecture_problems": 1,
+      "alternatives_generated": 4,
+      "verification_cost_hours": 38.0,
+      "risk_detection_score": 0.85,
+      "contract_detection_score": 0.88,
+      "behavior_confidence": 0.75,
+      "human_reviews": 4,
+      "unsafe_proposals": 1
+    },
+    "Config D (Analysis + Patterns + Verification Simulation)": {
+      "description": "Full closed-loop system: observation, F63 hypothesis isolation, simulation dry-run, and Governance Gate.",
+      "problems_detected": 5,
+      "false_architecture_problems": 0,
+      "alternatives_generated": 4,
+      "verification_cost_hours": 24.5,
+      "risk_detection_score": 0.96,
+      "contract_detection_score": 0.98,
+      "behavior_confidence": 0.94,
+      "human_reviews": 1,
+      "unsafe_proposals": 0
+    }
+  },
+  "findings": [
+    "Config A incurs zero migration risk but allows architectural debt to accumulate continuously.",
+    "Config B identifies genuine problems but proposes breaking contract alternatives without simulation verification.",
+    "Config C enriches design diversity via Phase 63 hypotheses but risks over-engineering without automated dry-runs.",
+    "Config D achieves the highest behavior confidence (0.94) and risk detection (0.96) while eliminating unsafe proposals entirely.",
+    "Conclusion: More automation is not unconditionally superior; simulation and explicit governance gates are mandatory to prevent unsafe proposals."
+  ]
+}

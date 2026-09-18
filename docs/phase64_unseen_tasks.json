@@ -1,0 +1,1338 @@
+[
+  {
+    "task_id": "TASK-01",
+    "name": "monolithic_coupling",
+    "problem": {
+      "problem_id": "prob_coupling_e73aaf52",
+      "category": "COUPLING",
+      "affected_nodes": [
+        "core/monolith.py",
+        "sub_0.py",
+        "sub_1.py",
+        "sub_2.py",
+        "sub_3.py",
+        "sub_4.py",
+        "sub_5.py",
+        "sub_6.py",
+        "sub_7.py",
+        "sub_8.py",
+        "sub_9.py"
+      ],
+      "affected_symbols": [
+        "core/monolith.py::Symbol",
+        "sub_0.py::Symbol",
+        "sub_1.py::Symbol",
+        "sub_2.py::Symbol",
+        "sub_3.py::Symbol",
+        "sub_4.py::Symbol",
+        "sub_5.py::Symbol",
+        "sub_6.py::Symbol",
+        "sub_7.py::Symbol",
+        "sub_8.py::Symbol",
+        "sub_9.py::Symbol"
+      ],
+      "evidence": {
+        "fan_out_count": 10,
+        "threshold": 8,
+        "targets_sample": [
+          "sub_0.py",
+          "sub_1.py",
+          "sub_2.py",
+          "sub_3.py",
+          "sub_4.py"
+        ]
+      },
+      "severity": "MEDIUM",
+      "confidence": 0.95,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_monolithic_coupling",
+        "snapshot_hash": "437ad0d1156fe0e1c75cf7f5899ac2316afd22c68af13638111ee95eb863666f",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.680982,
+        "smell_type": "excessive_fan_out"
+      },
+      "status": "CONFIRMED_WITHIN_SCOPE"
+    },
+    "constraints_count": 2,
+    "alternatives_count": 4,
+    "primary_alternative": {
+      "alternative_id": "alt_mod_cc6a0b",
+      "problem_id": "prob_coupling_e73aaf52",
+      "alternative_type": "modularization",
+      "title": "Internal Modularization & Responsibility Decomposition",
+      "description": "Decomposes tightly coupled internal routines into cohesive sub-packages with distinct single responsibilities.",
+      "benefits": [
+        "Decoupled concern spaces",
+        "Improved unit test isolation",
+        "Lower cognitive burden"
+      ],
+      "costs": [
+        "Code reorganization effort",
+        "Internal import re-pathing"
+      ],
+      "risks": [
+        "Internal symbol relocation bugs"
+      ],
+      "affected_components": [
+        "core/monolith.py",
+        "sub_0.py",
+        "sub_1.py",
+        "sub_2.py"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Symbol graph invariant check",
+        "Module import tests",
+        "Full regression suite"
+      ],
+      "reversibility": "REVERSIBLE_WITH_MIGRATION",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_mod_cc6a0b",
+      "affected_files": [
+        "core/monolith.py",
+        "sub_0.py",
+        "sub_1.py",
+        "sub_2.py"
+      ],
+      "affected_symbols": [
+        "core/monolith.py::Symbol",
+        "sub_0.py::Symbol",
+        "sub_1.py::Symbol",
+        "sub_2.py::Symbol"
+      ],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_sub_0.py",
+        "behavior_of_core/monolith.py",
+        "behavior_of_sub_1.py",
+        "behavior_of_sub_2.py"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 0,
+        "breaks_cycle": false
+      },
+      "blast_radius": 12,
+      "scope": "DIRECT"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 61.7,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 4,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-02",
+    "name": "circular_dependency",
+    "problem": {
+      "problem_id": "prob_scc_38331647",
+      "category": "SCC",
+      "affected_nodes": [
+        "service/alpha.py",
+        "service/beta.py",
+        "service/gamma.py"
+      ],
+      "affected_symbols": [
+        "service/alpha.py::Symbol",
+        "service/beta.py::Symbol",
+        "service/gamma.py::Symbol"
+      ],
+      "evidence": {
+        "scc_size": 3,
+        "members": [
+          "service/alpha.py",
+          "service/beta.py",
+          "service/gamma.py"
+        ]
+      },
+      "severity": "MEDIUM",
+      "confidence": 0.98,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_circular_dependency",
+        "snapshot_hash": "2358d282422a6195eeb70ffd61f3ffef4b6c7f95d25cca0261d943160fde2b77",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.6825626,
+        "smell_type": "large_scc_cycle"
+      },
+      "status": "CONFIRMED_WITHIN_SCOPE"
+    },
+    "constraints_count": 2,
+    "alternatives_count": 4,
+    "primary_alternative": {
+      "alternative_id": "alt_bound_0b9ec3",
+      "problem_id": "prob_scc_38331647",
+      "alternative_type": "boundary_extraction",
+      "title": "Formal Boundary Extraction & Pure Interface Segregation",
+      "description": "Extracts a shared domain interface or independent intermediate layer to break cyclic or dynamic dependencies.",
+      "benefits": [
+        "Breaks cyclic SCC loops",
+        "Enforces static type contracts",
+        "Isolates dynamic reflection"
+      ],
+      "costs": [
+        "Additional abstraction layer",
+        "Interface maintenance overhead"
+      ],
+      "risks": [
+        "Over-engineering if component is rarely modified"
+      ],
+      "affected_components": [
+        "service/alpha.py",
+        "service/beta.py",
+        "service/gamma.py"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Contract compatibility suite",
+        "Interface compliance verification"
+      ],
+      "reversibility": "EASILY_REVERSIBLE",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_bound_0b9ec3",
+      "affected_files": [
+        "service/alpha.py",
+        "service/beta.py",
+        "service/gamma.py"
+      ],
+      "affected_symbols": [
+        "service/alpha.py::Symbol",
+        "service/beta.py::Symbol",
+        "service/gamma.py::Symbol"
+      ],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_service/alpha.py",
+        "behavior_of_service/beta.py",
+        "behavior_of_service/gamma.py"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 1,
+        "breaks_cycle": true
+      },
+      "blast_radius": 9,
+      "scope": "DIRECT"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 46.4,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 3,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-03",
+    "name": "service_boundary",
+    "problem": {
+      "problem_id": "prob_boundary_628917dc",
+      "category": "BOUNDARY",
+      "affected_nodes": [
+        "backend/services/payment.py",
+        "frontend/components/checkout.tsx"
+      ],
+      "affected_symbols": [
+        "backend/services/payment.py::Symbol",
+        "frontend/components/checkout.tsx::Symbol"
+      ],
+      "evidence": {
+        "src": "backend/services/payment.py",
+        "dst": "frontend/components/checkout.tsx"
+      },
+      "severity": "CRITICAL",
+      "confidence": 0.99,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_service_boundary",
+        "snapshot_hash": "191d8029d67c3aca63fc5e924686ba76adee955f44970f9a10e5a3310e2d21c1",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.6837423,
+        "smell_type": "layer_inversion_violation"
+      },
+      "status": "CONFIRMED_WITHIN_SCOPE"
+    },
+    "constraints_count": 3,
+    "alternatives_count": 3,
+    "primary_alternative": {
+      "alternative_id": "alt_mod_9e9c7f",
+      "problem_id": "prob_boundary_628917dc",
+      "alternative_type": "modularization",
+      "title": "Internal Modularization & Responsibility Decomposition",
+      "description": "Decomposes tightly coupled internal routines into cohesive sub-packages with distinct single responsibilities.",
+      "benefits": [
+        "Decoupled concern spaces",
+        "Improved unit test isolation",
+        "Lower cognitive burden"
+      ],
+      "costs": [
+        "Code reorganization effort",
+        "Internal import re-pathing"
+      ],
+      "risks": [
+        "Internal symbol relocation bugs"
+      ],
+      "affected_components": [
+        "backend/services/payment.py",
+        "frontend/components/checkout.tsx"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Symbol graph invariant check",
+        "Module import tests",
+        "Full regression suite"
+      ],
+      "reversibility": "REVERSIBLE_WITH_MIGRATION",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_mod_9e9c7f",
+      "affected_files": [
+        "backend/services/payment.py",
+        "frontend/components/checkout.tsx"
+      ],
+      "affected_symbols": [
+        "backend/services/payment.py::Symbol",
+        "frontend/components/checkout.tsx::Symbol"
+      ],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_backend/services/payment.py",
+        "behavior_of_frontend/components/checkout.tsx"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 0,
+        "breaks_cycle": false
+      },
+      "blast_radius": 6,
+      "scope": "DIRECT"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 31.1,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 2,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-04",
+    "name": "contract_concentration",
+    "problem": {
+      "problem_id": "prob_contract_1e22d7f6",
+      "category": "CONTRACT",
+      "affected_nodes": [
+        "contracts/global_api_v1.json",
+        "consumer_0",
+        "consumer_1",
+        "consumer_2",
+        "consumer_3",
+        "consumer_4",
+        "consumer_5",
+        "consumer_6",
+        "consumer_7"
+      ],
+      "affected_symbols": [
+        "contracts/global_api_v1.json::Symbol"
+      ],
+      "evidence": {
+        "consumer_count": 8,
+        "consumers": [
+          "consumer_0",
+          "consumer_1",
+          "consumer_2",
+          "consumer_3",
+          "consumer_4",
+          "consumer_5",
+          "consumer_6",
+          "consumer_7"
+        ]
+      },
+      "severity": "MEDIUM",
+      "confidence": 0.92,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_contract_concentration",
+        "snapshot_hash": "91aee808860e15d3e76cb962a5d39d62a84c71876b1c58113e1a287bd42fb547",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.6845353,
+        "smell_type": "contract_concentration"
+      },
+      "status": "CONFIRMED_WITHIN_SCOPE"
+    },
+    "constraints_count": 3,
+    "alternatives_count": 3,
+    "primary_alternative": {
+      "alternative_id": "alt_adp_70d6f7",
+      "problem_id": "prob_contract_1e22d7f6",
+      "alternative_type": "adapter_layer",
+      "title": "Two-Way Semantic Adapter Layer",
+      "description": "Translates legacy contract schemas and dynamic payloads into strongly validated canonical structures.",
+      "benefits": [
+        "Guarantees backward compatibility",
+        "Safely absorbs polymorphic contract drift"
+      ],
+      "costs": [
+        "Translation compute overhead per request"
+      ],
+      "risks": [
+        "Mapping errors during schema evolution"
+      ],
+      "affected_components": [
+        "contracts/global_api_v1.json",
+        "consumer_0"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Round-trip contract serialization tests",
+        "Fuzzing across schema variants"
+      ],
+      "reversibility": "EASILY_REVERSIBLE",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_adp_70d6f7",
+      "affected_files": [
+        "contracts/global_api_v1.json"
+      ],
+      "affected_symbols": [
+        "contracts/global_api_v1.json::Symbol"
+      ],
+      "affected_consumers": [
+        "consumer_0",
+        "consumer_1",
+        "consumer_2",
+        "consumer_3",
+        "consumer_4",
+        "consumer_5",
+        "consumer_6",
+        "consumer_7"
+      ],
+      "affected_contracts": [
+        "contracts/global_api_v1.json"
+      ],
+      "affected_behaviors": [
+        "behavior_of_consumer_0",
+        "behavior_of_contracts/global_api_v1.json"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 0,
+        "breaks_cycle": false
+      },
+      "blast_radius": 31,
+      "scope": "DOWNSTREAM"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 26.4,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 2,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-05",
+    "name": "database_coupling",
+    "problem": {
+      "problem_id": "prob_coupling_9e9a4f08",
+      "category": "COUPLING",
+      "affected_nodes": [
+        "services/audit.py",
+        "services/billing.py",
+        "transactions_table"
+      ],
+      "affected_symbols": [
+        "db/transactions_table::Symbol",
+        "services/audit.py::Symbol",
+        "services/billing.py::Symbol"
+      ],
+      "evidence": {
+        "table": "transactions_table",
+        "services": [
+          "services/audit.py",
+          "services/billing.py"
+        ]
+      },
+      "severity": "MEDIUM",
+      "confidence": 0.94,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_database_coupling",
+        "snapshot_hash": "dc536a230527f79f87e226aa0e72e7f43ae9989f3cc826c477bd6a971e1a45f4",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.6853726,
+        "smell_type": "shared_database_coupling"
+      },
+      "status": "CONFIRMED_WITHIN_SCOPE"
+    },
+    "constraints_count": 2,
+    "alternatives_count": 4,
+    "primary_alternative": {
+      "alternative_id": "alt_mod_a6f89d",
+      "problem_id": "prob_coupling_9e9a4f08",
+      "alternative_type": "modularization",
+      "title": "Internal Modularization & Responsibility Decomposition",
+      "description": "Decomposes tightly coupled internal routines into cohesive sub-packages with distinct single responsibilities.",
+      "benefits": [
+        "Decoupled concern spaces",
+        "Improved unit test isolation",
+        "Lower cognitive burden"
+      ],
+      "costs": [
+        "Code reorganization effort",
+        "Internal import re-pathing"
+      ],
+      "risks": [
+        "Internal symbol relocation bugs"
+      ],
+      "affected_components": [
+        "services/audit.py",
+        "services/billing.py",
+        "transactions_table"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Symbol graph invariant check",
+        "Module import tests",
+        "Full regression suite"
+      ],
+      "reversibility": "REVERSIBLE_WITH_MIGRATION",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_mod_a6f89d",
+      "affected_files": [
+        "db/transactions_table",
+        "services/audit.py",
+        "services/billing.py"
+      ],
+      "affected_symbols": [
+        "db/transactions_table::Symbol",
+        "services/audit.py::Symbol",
+        "services/billing.py::Symbol"
+      ],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_transactions_table",
+        "behavior_of_services/billing.py",
+        "behavior_of_services/audit.py"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [
+        "transactions_table"
+      ],
+      "scc_changes": {
+        "scc_affected": 0,
+        "breaks_cycle": false
+      },
+      "blast_radius": 9,
+      "scope": "DIRECT"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 46.4,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 3,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-06",
+    "name": "event_driven_migration",
+    "problem": {
+      "problem_id": "prob_reliability_c0bb361b",
+      "category": "RELIABILITY",
+      "affected_nodes": [
+        "ui_sync_emitter",
+        "backend_worker"
+      ],
+      "affected_symbols": [],
+      "evidence": {
+        "source": "ui_sync_emitter",
+        "target": "backend_worker",
+        "type": "tight_sync_rpc"
+      },
+      "severity": "MEDIUM",
+      "confidence": 0.88,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_event_driven_migration",
+        "snapshot_hash": "e67a7bb4db2e0a1de17552372a916886a7e36eeaf5d6c367bb51d95afa2fcbb3",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.6863794,
+        "smell_type": "tight_ui_backend_coupling"
+      },
+      "status": "OBSERVED"
+    },
+    "constraints_count": 2,
+    "alternatives_count": 3,
+    "primary_alternative": {
+      "alternative_id": "alt_mod_06ade5",
+      "problem_id": "prob_reliability_c0bb361b",
+      "alternative_type": "modularization",
+      "title": "Internal Modularization & Responsibility Decomposition",
+      "description": "Decomposes tightly coupled internal routines into cohesive sub-packages with distinct single responsibilities.",
+      "benefits": [
+        "Decoupled concern spaces",
+        "Improved unit test isolation",
+        "Lower cognitive burden"
+      ],
+      "costs": [
+        "Code reorganization effort",
+        "Internal import re-pathing"
+      ],
+      "risks": [
+        "Internal symbol relocation bugs"
+      ],
+      "affected_components": [
+        "ui_sync_emitter",
+        "backend_worker"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Symbol graph invariant check",
+        "Module import tests",
+        "Full regression suite"
+      ],
+      "reversibility": "REVERSIBLE_WITH_MIGRATION",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_mod_06ade5",
+      "affected_files": [],
+      "affected_symbols": [],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_ui_sync_emitter",
+        "behavior_of_backend_worker"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 0,
+        "breaks_cycle": false
+      },
+      "blast_radius": 0,
+      "scope": "UNCERTAIN"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 31.1,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 2,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-07",
+    "name": "retry_architecture",
+    "problem": {
+      "problem_id": "prob_coupling_3f807309",
+      "category": "COUPLING",
+      "affected_nodes": [
+        "network/http_client.py",
+        "endpoint_0",
+        "endpoint_1",
+        "endpoint_2",
+        "endpoint_3",
+        "endpoint_4",
+        "endpoint_5",
+        "endpoint_6",
+        "endpoint_7",
+        "endpoint_8"
+      ],
+      "affected_symbols": [
+        "network/http_client.py::Symbol",
+        "endpoint_0::Symbol",
+        "endpoint_1::Symbol",
+        "endpoint_2::Symbol",
+        "endpoint_3::Symbol",
+        "endpoint_4::Symbol",
+        "endpoint_5::Symbol",
+        "endpoint_6::Symbol",
+        "endpoint_7::Symbol",
+        "endpoint_8::Symbol"
+      ],
+      "evidence": {
+        "fan_out_count": 9,
+        "threshold": 8,
+        "targets_sample": [
+          "endpoint_0",
+          "endpoint_1",
+          "endpoint_2",
+          "endpoint_3",
+          "endpoint_4"
+        ]
+      },
+      "severity": "MEDIUM",
+      "confidence": 0.95,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_retry_architecture",
+        "snapshot_hash": "d5b55a81ace76cad6a4a0dadd885c61ef506ac9b90aee1a3601e6aaa4125100f",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.6871915,
+        "smell_type": "excessive_fan_out"
+      },
+      "status": "CONFIRMED_WITHIN_SCOPE"
+    },
+    "constraints_count": 2,
+    "alternatives_count": 4,
+    "primary_alternative": {
+      "alternative_id": "alt_mod_366406",
+      "problem_id": "prob_coupling_3f807309",
+      "alternative_type": "modularization",
+      "title": "Internal Modularization & Responsibility Decomposition",
+      "description": "Decomposes tightly coupled internal routines into cohesive sub-packages with distinct single responsibilities.",
+      "benefits": [
+        "Decoupled concern spaces",
+        "Improved unit test isolation",
+        "Lower cognitive burden"
+      ],
+      "costs": [
+        "Code reorganization effort",
+        "Internal import re-pathing"
+      ],
+      "risks": [
+        "Internal symbol relocation bugs"
+      ],
+      "affected_components": [
+        "network/http_client.py",
+        "endpoint_0",
+        "endpoint_1",
+        "endpoint_2"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Symbol graph invariant check",
+        "Module import tests",
+        "Full regression suite"
+      ],
+      "reversibility": "REVERSIBLE_WITH_MIGRATION",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_mod_366406",
+      "affected_files": [
+        "endpoint_0",
+        "endpoint_1",
+        "endpoint_2",
+        "network/http_client.py"
+      ],
+      "affected_symbols": [
+        "endpoint_0::Symbol",
+        "endpoint_1::Symbol",
+        "endpoint_2::Symbol",
+        "network/http_client.py::Symbol"
+      ],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_endpoint_0",
+        "behavior_of_endpoint_1",
+        "behavior_of_network/http_client.py",
+        "behavior_of_endpoint_2"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 0,
+        "breaks_cycle": false
+      },
+      "blast_radius": 12,
+      "scope": "DIRECT"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 61.7,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 4,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-08",
+    "name": "browser_backend_coupling",
+    "problem": {
+      "problem_id": "prob_boundary_04b49072",
+      "category": "BOUNDARY",
+      "affected_nodes": [
+        "backend/raw_sql_query.py",
+        "frontend/views/Dashboard.tsx"
+      ],
+      "affected_symbols": [
+        "backend/raw_sql_query.py::Symbol",
+        "frontend/views/Dashboard.tsx::Symbol"
+      ],
+      "evidence": {
+        "src": "backend/raw_sql_query.py",
+        "dst": "frontend/views/Dashboard.tsx"
+      },
+      "severity": "CRITICAL",
+      "confidence": 0.99,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_browser_backend_coupling",
+        "snapshot_hash": "a05f9fb54e2be70199175dea28997921c4505c35fed466535030aafa7e6380ba",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.6883013,
+        "smell_type": "layer_inversion_violation"
+      },
+      "status": "CONFIRMED_WITHIN_SCOPE"
+    },
+    "constraints_count": 3,
+    "alternatives_count": 3,
+    "primary_alternative": {
+      "alternative_id": "alt_mod_76a152",
+      "problem_id": "prob_boundary_04b49072",
+      "alternative_type": "modularization",
+      "title": "Internal Modularization & Responsibility Decomposition",
+      "description": "Decomposes tightly coupled internal routines into cohesive sub-packages with distinct single responsibilities.",
+      "benefits": [
+        "Decoupled concern spaces",
+        "Improved unit test isolation",
+        "Lower cognitive burden"
+      ],
+      "costs": [
+        "Code reorganization effort",
+        "Internal import re-pathing"
+      ],
+      "risks": [
+        "Internal symbol relocation bugs"
+      ],
+      "affected_components": [
+        "backend/raw_sql_query.py",
+        "frontend/views/Dashboard.tsx"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Symbol graph invariant check",
+        "Module import tests",
+        "Full regression suite"
+      ],
+      "reversibility": "REVERSIBLE_WITH_MIGRATION",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_mod_76a152",
+      "affected_files": [
+        "backend/raw_sql_query.py",
+        "frontend/views/Dashboard.tsx"
+      ],
+      "affected_symbols": [
+        "backend/raw_sql_query.py::Symbol",
+        "frontend/views/Dashboard.tsx::Symbol"
+      ],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_frontend/views/Dashboard.tsx",
+        "behavior_of_backend/raw_sql_query.py"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 0,
+        "breaks_cycle": false
+      },
+      "blast_radius": 6,
+      "scope": "DIRECT"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 31.1,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 2,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-09",
+    "name": "security_boundary",
+    "problem": {
+      "problem_id": "prob_security_34a83627",
+      "category": "SECURITY",
+      "affected_nodes": [
+        "dynamic_reflection_eval_signer"
+      ],
+      "affected_symbols": [],
+      "evidence": {
+        "boundary": "dynamic_reflection_eval_signer"
+      },
+      "severity": "HIGH",
+      "confidence": 0.85,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_security_boundary",
+        "snapshot_hash": "804a85b69978aead1eb9088436b4f9d5be22ecd328d4cbc85182e8b96b438f60",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.689177,
+        "smell_type": "dynamic_reflection_boundary"
+      },
+      "status": "SUSPECTED"
+    },
+    "constraints_count": 4,
+    "alternatives_count": 3,
+    "primary_alternative": {
+      "alternative_id": "alt_bound_f2e7e7",
+      "problem_id": "prob_security_34a83627",
+      "alternative_type": "boundary_extraction",
+      "title": "Formal Boundary Extraction & Pure Interface Segregation",
+      "description": "Extracts a shared domain interface or independent intermediate layer to break cyclic or dynamic dependencies.",
+      "benefits": [
+        "Breaks cyclic SCC loops",
+        "Enforces static type contracts",
+        "Isolates dynamic reflection"
+      ],
+      "costs": [
+        "Additional abstraction layer",
+        "Interface maintenance overhead"
+      ],
+      "risks": [
+        "Over-engineering if component is rarely modified"
+      ],
+      "affected_components": [
+        "dynamic_reflection_eval_signer"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Contract compatibility suite",
+        "Interface compliance verification"
+      ],
+      "reversibility": "EASILY_REVERSIBLE",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_bound_f2e7e7",
+      "affected_files": [],
+      "affected_symbols": [],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_dynamic_reflection_eval_signer"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 0,
+        "breaks_cycle": false
+      },
+      "blast_radius": 0,
+      "scope": "UNCERTAIN"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 15.8,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 1,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-10",
+    "name": "high_fan_out_symbol",
+    "problem": {
+      "problem_id": "prob_maintainability_26d1b4aa",
+      "category": "MAINTAINABILITY",
+      "affected_nodes": [
+        "utils/helpers.py",
+        "caller_0",
+        "caller_1",
+        "caller_10",
+        "caller_11",
+        "caller_12",
+        "caller_13",
+        "caller_2",
+        "caller_3"
+      ],
+      "affected_symbols": [
+        "utils/helpers.py::Symbol",
+        "caller_0::Symbol",
+        "caller_1::Symbol",
+        "caller_2::Symbol",
+        "caller_3::Symbol",
+        "caller_10::Symbol",
+        "caller_11::Symbol",
+        "caller_12::Symbol",
+        "caller_13::Symbol"
+      ],
+      "evidence": {
+        "fan_in_count": 14,
+        "callers_sample": [
+          "caller_0",
+          "caller_1",
+          "caller_10",
+          "caller_11",
+          "caller_12"
+        ]
+      },
+      "severity": "MEDIUM",
+      "confidence": 0.9,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_high_fan_out_symbol",
+        "snapshot_hash": "44e76494d53da0af329118ca6566f3899c53176083d7fc0e27a65db4ef7d8f5d",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.6900098,
+        "smell_type": "high_fan_in_hub"
+      },
+      "status": "OBSERVED"
+    },
+    "constraints_count": 2,
+    "alternatives_count": 3,
+    "primary_alternative": {
+      "alternative_id": "alt_mod_31f379",
+      "problem_id": "prob_maintainability_26d1b4aa",
+      "alternative_type": "modularization",
+      "title": "Internal Modularization & Responsibility Decomposition",
+      "description": "Decomposes tightly coupled internal routines into cohesive sub-packages with distinct single responsibilities.",
+      "benefits": [
+        "Decoupled concern spaces",
+        "Improved unit test isolation",
+        "Lower cognitive burden"
+      ],
+      "costs": [
+        "Code reorganization effort",
+        "Internal import re-pathing"
+      ],
+      "risks": [
+        "Internal symbol relocation bugs"
+      ],
+      "affected_components": [
+        "utils/helpers.py",
+        "caller_0",
+        "caller_1",
+        "caller_10"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Symbol graph invariant check",
+        "Module import tests",
+        "Full regression suite"
+      ],
+      "reversibility": "REVERSIBLE_WITH_MIGRATION",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_mod_31f379",
+      "affected_files": [
+        "caller_0",
+        "caller_1",
+        "caller_10",
+        "caller_11",
+        "caller_12",
+        "caller_13",
+        "utils/helpers.py"
+      ],
+      "affected_symbols": [
+        "caller_0::Symbol",
+        "caller_10::Symbol",
+        "caller_11::Symbol",
+        "caller_12::Symbol",
+        "caller_13::Symbol",
+        "caller_1::Symbol",
+        "utils/helpers.py::Symbol"
+      ],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_caller_10",
+        "behavior_of_caller_0",
+        "behavior_of_caller_1",
+        "behavior_of_utils/helpers.py"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 0,
+        "breaks_cycle": false
+      },
+      "blast_radius": 21,
+      "scope": "DIRECT"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 61.7,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 4,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-11",
+    "name": "dynamic_reflection_boundary",
+    "problem": {
+      "problem_id": "prob_security_82ec82ac",
+      "category": "SECURITY",
+      "affected_nodes": [
+        "dynamic_eval_loader"
+      ],
+      "affected_symbols": [],
+      "evidence": {
+        "boundary": "dynamic_eval_loader"
+      },
+      "severity": "HIGH",
+      "confidence": 0.85,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_dynamic_reflection_boundary",
+        "snapshot_hash": "8f0d897cb3bd01201bab07a36ec7f625bc4e8a02beda02d1499794b804654d91",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.6908278,
+        "smell_type": "dynamic_reflection_boundary"
+      },
+      "status": "SUSPECTED"
+    },
+    "constraints_count": 4,
+    "alternatives_count": 3,
+    "primary_alternative": {
+      "alternative_id": "alt_bound_6a10c2",
+      "problem_id": "prob_security_82ec82ac",
+      "alternative_type": "boundary_extraction",
+      "title": "Formal Boundary Extraction & Pure Interface Segregation",
+      "description": "Extracts a shared domain interface or independent intermediate layer to break cyclic or dynamic dependencies.",
+      "benefits": [
+        "Breaks cyclic SCC loops",
+        "Enforces static type contracts",
+        "Isolates dynamic reflection"
+      ],
+      "costs": [
+        "Additional abstraction layer",
+        "Interface maintenance overhead"
+      ],
+      "risks": [
+        "Over-engineering if component is rarely modified"
+      ],
+      "affected_components": [
+        "dynamic_eval_loader"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Contract compatibility suite",
+        "Interface compliance verification"
+      ],
+      "reversibility": "EASILY_REVERSIBLE",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_bound_6a10c2",
+      "affected_files": [],
+      "affected_symbols": [],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_dynamic_eval_loader"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 0,
+        "breaks_cycle": false
+      },
+      "blast_radius": 0,
+      "scope": "UNCERTAIN"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 15.8,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 1,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  },
+  {
+    "task_id": "TASK-12",
+    "name": "cross_language_architecture_proposal",
+    "problem": {
+      "problem_id": "prob_scc_17f98953",
+      "category": "SCC",
+      "affected_nodes": [
+        "python_backend/worker.py",
+        "shared_contract.py",
+        "typescript_edge/handler.ts"
+      ],
+      "affected_symbols": [
+        "python_backend/worker.py::Symbol",
+        "typescript_edge/handler.ts::Symbol",
+        "shared_contract.py::Symbol"
+      ],
+      "evidence": {
+        "scc_size": 3,
+        "members": [
+          "python_backend/worker.py",
+          "shared_contract.py",
+          "typescript_edge/handler.ts"
+        ]
+      },
+      "severity": "MEDIUM",
+      "confidence": 0.98,
+      "constraints": [],
+      "provenance": {
+        "snapshot_id": "snap_cross_language_architecture_proposal",
+        "snapshot_hash": "2fbd23a42706961935fda19c71e7b3af7d7dc28f0b17bdc997829c9164df1f2a",
+        "detector": "ArchitectureProblemDetector",
+        "timestamp": 1789762408.6917474,
+        "smell_type": "large_scc_cycle"
+      },
+      "status": "CONFIRMED_WITHIN_SCOPE"
+    },
+    "constraints_count": 2,
+    "alternatives_count": 4,
+    "primary_alternative": {
+      "alternative_id": "alt_bound_b29c03",
+      "problem_id": "prob_scc_17f98953",
+      "alternative_type": "boundary_extraction",
+      "title": "Formal Boundary Extraction & Pure Interface Segregation",
+      "description": "Extracts a shared domain interface or independent intermediate layer to break cyclic or dynamic dependencies.",
+      "benefits": [
+        "Breaks cyclic SCC loops",
+        "Enforces static type contracts",
+        "Isolates dynamic reflection"
+      ],
+      "costs": [
+        "Additional abstraction layer",
+        "Interface maintenance overhead"
+      ],
+      "risks": [
+        "Over-engineering if component is rarely modified"
+      ],
+      "affected_components": [
+        "python_backend/worker.py",
+        "shared_contract.py",
+        "typescript_edge/handler.ts"
+      ],
+      "migration_complexity": "MEDIUM",
+      "compatibility_impact": "MINIMAL",
+      "verification_requirements": [
+        "Contract compatibility suite",
+        "Interface compliance verification"
+      ],
+      "reversibility": "EASILY_REVERSIBLE",
+      "is_hypothesis_from_f63": false,
+      "source_project": null,
+      "knowledge_id": null
+    },
+    "impact": {
+      "alternative_id": "alt_bound_b29c03",
+      "affected_files": [
+        "python_backend/worker.py",
+        "shared_contract.py",
+        "typescript_edge/handler.ts"
+      ],
+      "affected_symbols": [
+        "python_backend/worker.py::Symbol",
+        "shared_contract.py::Symbol",
+        "typescript_edge/handler.ts::Symbol"
+      ],
+      "affected_consumers": [],
+      "affected_contracts": [],
+      "affected_behaviors": [
+        "behavior_of_shared_contract.py",
+        "behavior_of_python_backend/worker.py",
+        "behavior_of_typescript_edge/handler.ts"
+      ],
+      "affected_tests": [],
+      "browser_surfaces": [],
+      "persistence_surfaces": [],
+      "scc_changes": {
+        "scc_affected": 1,
+        "breaks_cycle": true
+      },
+      "blast_radius": 9,
+      "scope": "DIRECT"
+    },
+    "contract_status": "NON_BREAKING",
+    "behavior_status": "PROVEN_WITHIN_SCOPE",
+    "risk_criticality": "LOW",
+    "cost_hours": 46.4,
+    "migration_steps": 7,
+    "simulation_status": "SIMULATION_SAFE",
+    "verification_requirements": 3,
+    "governance_decision": "APPROVED_FOR_IMPLEMENTATION",
+    "reason": "Proposal verified in simulation with safe reversibility, zero contract breaks, and Sentinel approval."
+  }
+]

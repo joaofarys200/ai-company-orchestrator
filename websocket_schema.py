@@ -157,6 +157,26 @@ SERVER_MESSAGE_TYPES = {
     "flow_control_backpressure",
     "transport_migrated",
     "quic_path_migrated",
+    # Phase 42 Experience Memory & Cross-Mission Learning
+    "mission_experience_memory_status_result",
+    "mission_experience_curate_result",
+    # Phase 44 Semantic Graph & Task Translation
+    "mission_semantic_graph_status_result",
+    # Phase 45 Runtime Contract Discovery & Schema Inference
+    "mission_contract_discovery_status_result",
+    "mission_contract_proposal_review_result",
+    # Phase 46 Contract Drift Detection & Continuous Governance
+    "mission_contract_health_status_result",
+    "mission_contract_drift_review_result",
+    "mission_contract_rollback_result",
+    # Phase 47 Polymorphic Schema Semantics & Contract Compatibility
+    "mission_polymorphic_schema_status_result",
+    "mission_polymorphic_variant_review_result",
+    "mission_polymorphic_compatibility_check_result",
+    # Phase 48 Contract-Aware Autonomous Change Management
+    "mission_contract_change_prediction_result",
+    "mission_contract_migration_plan_result",
+    "mission_contract_change_gate_action_result",
 }
 
 
@@ -253,9 +273,71 @@ CLIENT_MESSAGE_TYPES = {
     "mission_intent_change",
     "mission_predict_impact",
     "mission_get_predictions",
+    "mission_loop_status",
+    "mission_loop_step",
+    "mission_loop_run",
+    "mission_loop_respond_human",
+    "mission_decision_quality_status",
+    "mission_policy_proposal_review",
+    "mission_policy_rollback",
+    # Phase 42
+    "mission_experience_memory_status",
+    "mission_experience_curate",
+    # Phase 44
+    "mission_semantic_graph_status",
+    # Phase 45
+    "mission_contract_discovery_status",
+    "mission_contract_proposal_review",
+    # Phase 46
+    "mission_contract_health_status",
+    "mission_contract_drift_review",
+    "mission_contract_rollback",
+    # Phase 47
+    "mission_polymorphic_schema_status",
+    "mission_polymorphic_variant_review",
+    "mission_polymorphic_compatibility_check",
+    # Phase 48
+    "mission_contract_change_prediction",
+    "mission_contract_migration_plan",
+    "mission_contract_change_gate_action",
+    # Phase 49
+    "mission_build_contract_extraction_status",
+    "mission_dynamic_consumer_resolution",
+    "mission_build_contract_trigger_extract",
+    # Phase 50
+    "mission_behavioral_baseline_status",
+    "mission_behavioral_proof_status",
+    "mission_behavioral_proof_trigger",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
+    "mission_behavioral_baseline_status": (),
+    "mission_behavioral_proof_status": (),
+    "mission_behavioral_proof_trigger": (),
+    "mission_build_contract_extraction_status": (),
+    "mission_dynamic_consumer_resolution": (),
+    "mission_build_contract_trigger_extract": (),
+    "mission_contract_change_prediction": (),
+    "mission_contract_migration_plan": ("migration_id",),
+    "mission_contract_change_gate_action": ("action",),
+    "mission_decision_quality_status": ("mission_id",),
+    "mission_policy_proposal_review": ("proposal_id", "action"),
+    "mission_policy_rollback": (),
+    "mission_experience_memory_status": (),
+    "mission_experience_curate": ("experience_id", "action"),
+    "mission_semantic_graph_status": (),
+    "mission_contract_discovery_status": (),
+    "mission_contract_proposal_review": ("proposal_id", "action"),
+    "mission_contract_health_status": (),
+    "mission_contract_drift_review": ("drift_id", "action"),
+    "mission_contract_rollback": ("contract_id", "target_version"),
+    "mission_polymorphic_schema_status": (),
+    "mission_polymorphic_variant_review": ("schema_id", "variant_id", "action"),
+    "mission_polymorphic_compatibility_check": ("schema_id",),
+    "mission_loop_status": ("mission_id",),
+    "mission_loop_step": ("mission_id",),
+    "mission_loop_run": ("mission_id",),
+    "mission_loop_respond_human": ("mission_id", "action"),
     "mission_control_command": ("command_id", "mission_id", "command_type"),
     "mission_intent_preview": ("mission_id",),
     "mission_intent_change": ("mission_id",),

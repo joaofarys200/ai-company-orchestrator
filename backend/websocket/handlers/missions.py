@@ -1598,6 +1598,112 @@ class MissionWebSocketHandler:
                 )
                 return
 
+            elif operation == "mission_architecture_evolution_status":
+                from backend.agents.architecture_evolution.bridge import ArchitectureEvolutionBridge
+                bridge = ArchitectureEvolutionBridge.get_instance()
+                status_dict = bridge.get_status()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_architecture_evolution_status_result",
+                        "status": status_dict,
+                    },
+                )
+                return
+
+            elif operation == "mission_architecture_evolution_observe":
+                from backend.agents.architecture_evolution.bridge import ArchitectureEvolutionBridge
+                from backend.agents.architecture_evolution.models import ArchitectureSnapshot
+                bridge = ArchitectureEvolutionBridge.get_instance()
+                snap_id = str(message.get("snapshot_id") or "snap_jarvis_core")
+
+                if snap_id not in bridge.snapshots:
+                    # Create representative snapshot if none registered
+                    snap = ArchitectureSnapshot(
+                        snapshot_id=snap_id,
+                        files=[
+                            "backend/websocket/handlers/missions.py",
+                            "agents/autonomous_loop/controller.py",
+                            "backend/agents/continuous_verification/bridge.py",
+                            "frontend/src/features/missions/MissionControlCenter.tsx",
+                            "database/sqlite_store.py",
+                        ],
+                        symbols=[
+                            "backend.websocket.handlers.missions::handle_mission_control",
+                            "agents.autonomous_loop.controller::AutonomousLoopController",
+                            "backend.agents.continuous_verification.bridge::ContinuousVerificationBridge",
+                            "database.sqlite_store::execute_query",
+                        ],
+                        dependencies=[
+                            ("backend/websocket/handlers/missions.py", "agents/autonomous_loop/controller.py"),
+                            ("agents/autonomous_loop/controller.py", "backend/agents/continuous_verification/bridge.py"),
+                            ("backend/agents/continuous_verification/bridge.py", "agents/autonomous_loop/controller.py"), # cyclic SCC
+                            ("backend/websocket/handlers/missions.py", "database/sqlite_store.py"),
+                            ("agents/autonomous_loop/controller.py", "database/sqlite_store.py"), # persistence coupling
+                        ],
+                        consumers={
+                            "contracts/mission_schema.json": ["frontend/src/features/missions/MissionControlCenter.tsx", "backend/websocket/handlers/missions.py", "client_sdk", "monitoring_agent"],
+                        },
+                        sccs=[
+                            ["agents/autonomous_loop/controller.py", "backend/agents/continuous_verification/bridge.py", "agents/orchestrator.py"],
+                        ],
+                        persistence_edges=[
+                            {"source": "backend/websocket/handlers/missions.py", "table": "missions"},
+                            {"source": "agents/autonomous_loop/controller.py", "table": "missions"},
+                        ],
+                        external_boundaries=["dynamic_reflection_getattr_plugin"],
+                        browser_surfaces=["MissionControlCenter.tsx"],
+                        test_surfaces=["tests/test_cross_project_learning.py", "tests/test_continuous_verification.py"],
+                        risk_zones=["auth_token_signer", "wallet_transfer_gateway"],
+                    )
+                    bridge.register_snapshot(snap)
+
+                problems = bridge.observe_and_detect_problems(snap_id)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_architecture_evolution_observe_result",
+                        "snapshot_id": snap_id,
+                        "problems": [p.to_dict() for p in problems],
+                        "metrics": bridge.metrics.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_architecture_evolution_evaluate":
+                from backend.agents.architecture_evolution.bridge import ArchitectureEvolutionBridge
+                bridge = ArchitectureEvolutionBridge.get_instance()
+                prob_id = str(message.get("problem_id") or "")
+                snap_id = str(message.get("snapshot_id") or "snap_jarvis_core")
+                policy_mode = str(message.get("policy") or "STANDARD")
+
+                if not prob_id and bridge.problems:
+                    prob_id = list(bridge.problems.keys())[0]
+
+                if prob_id:
+                    eval_result = bridge.evaluate_problem(
+                        problem_id=prob_id,
+                        snapshot_id=snap_id,
+                        policy_name=policy_mode,
+                    )
+                    await self.connections.send(
+                        websocket,
+                        {
+                            "type": "mission_architecture_evolution_evaluate_result",
+                            "problem_id": prob_id,
+                            "evaluation": eval_result,
+                        },
+                    )
+                else:
+                    await self.connections.send(
+                        websocket,
+                        {
+                            "type": "mission_architecture_evolution_evaluate_result",
+                            "error": "No architectural problems available to evaluate. Run observe first.",
+                        },
+                    )
+                return
+
             if snapshot is None:
                 return
 

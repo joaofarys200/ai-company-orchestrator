@@ -1,0 +1,107 @@
+{
+  "alt_keep_db970b": {
+    "alternative_id": "alt_keep_db970b",
+    "costs": {
+      "implementation": 0.0,
+      "migration": 0.0,
+      "testing": 1.0,
+      "runtime": 0.0,
+      "operational": 2.0,
+      "rollback": 0.0,
+      "maintenance": 8.0
+    },
+    "observation_status": "ESTIMATED",
+    "total_estimated_effort_hours": 11.0,
+    "currency_budget": 0.0
+  },
+  "alt_bound_db970b": {
+    "alternative_id": "alt_bound_db970b",
+    "costs": {
+      "implementation": 18.0,
+      "migration": 7.2,
+      "testing": 9.0,
+      "runtime": 0.5,
+      "operational": 3.6,
+      "rollback": 5.4,
+      "maintenance": 2.7
+    },
+    "observation_status": "ESTIMATED",
+    "total_estimated_effort_hours": 46.4,
+    "currency_budget": 3944.0
+  },
+  "alt_dip_db970b": {
+    "alternative_id": "alt_dip_db970b",
+    "costs": {
+      "implementation": 18.0,
+      "migration": 7.2,
+      "testing": 9.0,
+      "runtime": 0.5,
+      "operational": 3.6,
+      "rollback": 5.4,
+      "maintenance": 2.7
+    },
+    "observation_status": "ESTIMATED",
+    "total_estimated_effort_hours": 46.4,
+    "currency_budget": 3944.0
+  },
+  "alt_evt_db970b": {
+    "alternative_id": "alt_evt_db970b",
+    "costs": {
+      "implementation": 45.0,
+      "migration": 18.0,
+      "testing": 22.5,
+      "runtime": 0.5,
+      "operational": 9.0,
+      "rollback": 13.5,
+      "maintenance": 6.8
+    },
+    "observation_status": "ESTIMATED",
+    "total_estimated_effort_hours": 115.3,
+    "currency_budget": 9800.5
+  },
+  "alt_keep_241449": {
+    "alternative_id": "alt_keep_241449",
+    "costs": {
+      "implementation": 0.0,
+      "migration": 0.0,
+      "testing": 1.0,
+      "runtime": 0.0,
+      "operational": 2.0,
+      "rollback": 0.0,
+      "maintenance": 8.0
+    },
+    "observation_status": "ESTIMATED",
+    "total_estimated_effort_hours": 11.0,
+    "currency_budget": 0.0
+  },
+  "alt_adp_241449": {
+    "alternative_id": "alt_adp_241449",
+    "costs": {
+      "implementation": 9.6,
+      "migration": 3.8,
+      "testing": 4.8,
+      "runtime": 2.0,
+      "operational": 1.9,
+      "rollback": 2.9,
+      "maintenance": 1.4
+    },
+    "observation_status": "ESTIMATED",
+    "total_estimated_effort_hours": 26.4,
+    "currency_budget": 2244.0
+  },
+  "alt_fac_241449": {
+    "alternative_id": "alt_fac_241449",
+    "costs": {
+      "implementation": 9.6,
+      "migration": 3.8,
+      "testing": 4.8,
+      "runtime": 0.5,
+      "operational": 1.9,
+      "rollback": 2.9,
+      "maintenance": 1.4
+    },
+    "observation_status": "ESTIMATED",
+    "total_estimated_effort_hours": 24.9,
+    "currency_budget": 2116.5
+  }
+}

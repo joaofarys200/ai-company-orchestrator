@@ -1,0 +1,260 @@
+[
+  {
+    "problem_id": "prob_scc_3525175d",
+    "alternatives": [
+      {
+        "alternative_id": "alt_keep_db970b",
+        "title": "Maintain Current Topology (Accept Technical Debt as Documented Smell)",
+        "type": "keep_current",
+        "reversibility": "EASILY_REVERSIBLE",
+        "blast_radius": 0,
+        "risk_criticality": "LOW",
+        "estimated_effort_hours": 11.0,
+        "is_hypothesis_from_f63": false
+      },
+      {
+        "alternative_id": "alt_bound_db970b",
+        "title": "Formal Boundary Extraction & Pure Interface Segregation",
+        "type": "boundary_extraction",
+        "reversibility": "EASILY_REVERSIBLE",
+        "blast_radius": 4,
+        "risk_criticality": "LOW",
+        "estimated_effort_hours": 46.4,
+        "is_hypothesis_from_f63": false
+      },
+      {
+        "alternative_id": "alt_dip_db970b",
+        "title": "Dependency Inversion Principle (DIP) Injection",
+        "type": "dependency_inversion",
+        "reversibility": "REVERSIBLE_WITH_MIGRATION",
+        "blast_radius": 4,
+        "risk_criticality": "LOW",
+        "estimated_effort_hours": 46.4,
+        "is_hypothesis_from_f63": false
+      },
+      {
+        "alternative_id": "alt_evt_db970b",
+        "title": "Asynchronous Event-Driven Decoupling",
+        "type": "event_driven",
+        "reversibility": "DIFFICULT_TO_REVERSE",
+        "blast_radius": 4,
+        "risk_criticality": "HIGH",
+        "estimated_effort_hours": 115.3,
+        "is_hypothesis_from_f63": false
+      }
+    ],
+    "tradeoffs": [
+      {
+        "alternative_id": "alt_keep_db970b",
+        "title": "Maintain Current Topology (Accept Technical Debt as Documented Smell)",
+        "pros": [
+          "Zero migration risk",
+          "Zero deployment downtime",
+          "Zero engineering cost immediately"
+        ],
+        "cons": [
+          "Ongoing maintainability friction",
+          "Gradual coupling accumulation"
+        ],
+        "risks": [
+          "Potential cascade in future feature modifications"
+        ],
+        "summary": "Trade-off: Blast radius=0, Effort=11.0h, Reversibility=EASILY_REVERSIBLE"
+      },
+      {
+        "alternative_id": "alt_bound_db970b",
+        "title": "Formal Boundary Extraction & Pure Interface Segregation",
+        "pros": [
+          "Breaks cyclic SCC loops",
+          "Enforces static type contracts",
+          "Isolates dynamic reflection"
+        ],
+        "cons": [
+          "Additional abstraction layer",
+          "Interface maintenance overhead"
+        ],
+        "risks": [
+          "Over-engineering if component is rarely modified"
+        ],
+        "summary": "Trade-off: Blast radius=4, Effort=46.4h, Reversibility=EASILY_REVERSIBLE"
+      },
+      {
+        "alternative_id": "alt_dip_db970b",
+        "title": "Dependency Inversion Principle (DIP) Injection",
+        "pros": [
+          "Eliminates direct layer violations",
+          "Enables clean mock injection in tests"
+        ],
+        "cons": [
+          "Requires dependency injection container or factory wiring"
+        ],
+        "risks": [
+          "Runtime configuration drift if factory fails"
+        ],
+        "summary": "Trade-off: Blast radius=4, Effort=46.4h, Reversibility=REVERSIBLE_WITH_MIGRATION"
+      },
+      {
+        "alternative_id": "alt_evt_db970b",
+        "title": "Asynchronous Event-Driven Decoupling",
+        "pros": [
+          "Completely decouples callers and callees",
+          "High temporal resilience"
+        ],
+        "cons": [
+          "Event bus infrastructure",
+          "Eventual consistency complexity"
+        ],
+        "risks": [
+          "Ordering anomalies",
+          "Debugging distributed async traces"
+        ],
+        "summary": "Trade-off: Blast radius=4, Effort=115.3h, Reversibility=DIFFICULT_TO_REVERSE"
+      }
+    ],
+    "radar_metrics": {
+      "alt_keep_db970b": {
+        "coupling_reduction": 0.5,
+        "reversibility": 1.0,
+        "cost_efficiency": 0.89,
+        "risk_safety": 0.9,
+        "contract_safety": 0.95,
+        "verification_tractability": 0.85
+      },
+      "alt_bound_db970b": {
+        "coupling_reduction": 0.9,
+        "reversibility": 1.0,
+        "cost_efficiency": 0.54,
+        "risk_safety": 0.9,
+        "contract_safety": 0.95,
+        "verification_tractability": 0.85
+      },
+      "alt_dip_db970b": {
+        "coupling_reduction": 0.5,
+        "reversibility": 0.7,
+        "cost_efficiency": 0.54,
+        "risk_safety": 0.9,
+        "contract_safety": 0.95,
+        "verification_tractability": 0.85
+      },
+      "alt_evt_db970b": {
+        "coupling_reduction": 0.5,
+        "reversibility": 0.2,
+        "cost_efficiency": 0.1,
+        "risk_safety": 0.3,
+        "contract_safety": 0.95,
+        "verification_tractability": 0.85
+      }
+    }
+  },
+  {
+    "problem_id": "prob_contract_899b97d4",
+    "alternatives": [
+      {
+        "alternative_id": "alt_keep_241449",
+        "title": "Maintain Current Topology (Accept Technical Debt as Documented Smell)",
+        "type": "keep_current",
+        "reversibility": "EASILY_REVERSIBLE",
+        "blast_radius": 0,
+        "risk_criticality": "LOW",
+        "estimated_effort_hours": 11.0,
+        "is_hypothesis_from_f63": false
+      },
+      {
+        "alternative_id": "alt_adp_241449",
+        "title": "Two-Way Semantic Adapter Layer",
+        "type": "adapter_layer",
+        "reversibility": "EASILY_REVERSIBLE",
+        "blast_radius": 24,
+        "risk_criticality": "LOW",
+        "estimated_effort_hours": 26.4,
+        "is_hypothesis_from_f63": false
+      },
+      {
+        "alternative_id": "alt_fac_241449",
+        "title": "Consolidated Gateway Facade & Rate-Limited Boundary",
+        "type": "facade",
+        "reversibility": "EASILY_REVERSIBLE",
+        "blast_radius": 24,
+        "risk_criticality": "LOW",
+        "estimated_effort_hours": 24.9,
+        "is_hypothesis_from_f63": false
+      }
+    ],
+    "tradeoffs": [
+      {
+        "alternative_id": "alt_keep_241449",
+        "title": "Maintain Current Topology (Accept Technical Debt as Documented Smell)",
+        "pros": [
+          "Zero migration risk",
+          "Zero deployment downtime",
+          "Zero engineering cost immediately"
+        ],
+        "cons": [
+          "Ongoing maintainability friction",
+          "Gradual coupling accumulation"
+        ],
+        "risks": [
+          "Potential cascade in future feature modifications"
+        ],
+        "summary": "Trade-off: Blast radius=0, Effort=11.0h, Reversibility=EASILY_REVERSIBLE"
+      },
+      {
+        "alternative_id": "alt_adp_241449",
+        "title": "Two-Way Semantic Adapter Layer",
+        "pros": [
+          "Guarantees backward compatibility",
+          "Safely absorbs polymorphic contract drift"
+        ],
+        "cons": [
+          "Translation compute overhead per request"
+        ],
+        "risks": [
+          "Mapping errors during schema evolution"
+        ],
+        "summary": "Trade-off: Blast radius=24, Effort=26.4h, Reversibility=EASILY_REVERSIBLE"
+      },
+      {
+        "alternative_id": "alt_fac_241449",
+        "title": "Consolidated Gateway Facade & Rate-Limited Boundary",
+        "pros": [
+          "Reduces client coupling",
+          "Centralizes validation and rate-limiting",
+          "Hides internal complexity"
+        ],
+        "cons": [
+          "Single facade choke-point if under high throughput"
+        ],
+        "risks": [
+          "Potential god-object evolution if not bounded"
+        ],
+        "summary": "Trade-off: Blast radius=24, Effort=24.9h, Reversibility=EASILY_REVERSIBLE"
+      }
+    ],
+    "radar_metrics": {
+      "alt_keep_241449": {
+        "coupling_reduction": 0.5,
+        "reversibility": 1.0,
+        "cost_efficiency": 0.89,
+        "risk_safety": 0.9,
+        "contract_safety": 0.95,
+        "verification_tractability": 0.85
+      },
+      "alt_adp_241449": {
+        "coupling_reduction": 0.5,
+        "reversibility": 1.0,
+        "cost_efficiency": 0.74,
+        "risk_safety": 0.9,
+        "contract_safety": 0.6,
+        "verification_tractability": 0.5
+      },
+      "alt_fac_241449": {
+        "coupling_reduction": 0.5,
+        "reversibility": 1.0,
+        "cost_efficiency": 0.75,
+        "risk_safety": 0.9,
+        "contract_safety": 0.6,
+        "verification_tractability": 0.5
+      }
+    }
+  }
+]

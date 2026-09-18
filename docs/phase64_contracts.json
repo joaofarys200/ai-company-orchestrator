@@ -1,0 +1,93 @@
+{
+  "alt_keep_db970b": {
+    "alternative_id": "alt_keep_db970b",
+    "breaking_contracts": [],
+    "potentially_breaking_contracts": [],
+    "affected_consumers": [],
+    "required_migrations": [],
+    "polymorphic_risks": [],
+    "schema_changes": [],
+    "versioning_needs": [],
+    "status": "NON_BREAKING"
+  },
+  "alt_bound_db970b": {
+    "alternative_id": "alt_bound_db970b",
+    "breaking_contracts": [],
+    "potentially_breaking_contracts": [],
+    "affected_consumers": [],
+    "required_migrations": [],
+    "polymorphic_risks": [],
+    "schema_changes": [],
+    "versioning_needs": [],
+    "status": "NON_BREAKING"
+  },
+  "alt_dip_db970b": {
+    "alternative_id": "alt_dip_db970b",
+    "breaking_contracts": [],
+    "potentially_breaking_contracts": [],
+    "affected_consumers": [],
+    "required_migrations": [],
+    "polymorphic_risks": [],
+    "schema_changes": [],
+    "versioning_needs": [],
+    "status": "NON_BREAKING"
+  },
+  "alt_evt_db970b": {
+    "alternative_id": "alt_evt_db970b",
+    "breaking_contracts": [],
+    "potentially_breaking_contracts": [],
+    "affected_consumers": [],
+    "required_migrations": [],
+    "polymorphic_risks": [],
+    "schema_changes": [],
+    "versioning_needs": [],
+    "status": "NON_BREAKING"
+  },
+  "alt_keep_241449": {
+    "alternative_id": "alt_keep_241449",
+    "breaking_contracts": [],
+    "potentially_breaking_contracts": [],
+    "affected_consumers": [],
+    "required_migrations": [],
+    "polymorphic_risks": [],
+    "schema_changes": [],
+    "versioning_needs": [],
+    "status": "NON_BREAKING"
+  },
+  "alt_adp_241449": {
+    "alternative_id": "alt_adp_241449",
+    "breaking_contracts": [],
+    "potentially_breaking_contracts": [],
+    "affected_consumers": [
+      "audit_daemon",
+      "backend/websocket/handlers/missions.py",
+      "client_sdk",
+      "frontend/src/features/missions/MissionControlCenter.tsx",
+      "monitoring_agent",
+      "telemetry_service"
+    ],
+    "required_migrations": [],
+    "polymorphic_risks": [],
+    "schema_changes": [],
+    "versioning_needs": [],
+    "status": "NON_BREAKING"
+  },
+  "alt_fac_241449": {
+    "alternative_id": "alt_fac_241449",
+    "breaking_contracts": [],
+    "potentially_breaking_contracts": [],
+    "affected_consumers": [
+      "audit_daemon",
+      "backend/websocket/handlers/missions.py",
+      "client_sdk",
+      "frontend/src/features/missions/MissionControlCenter.tsx",
+      "monitoring_agent",
+      "telemetry_service"
+    ],
+    "required_migrations": [],
+    "polymorphic_risks": [],
+    "schema_changes": [],
+    "versioning_needs": [],
+    "status": "NON_BREAKING"
+  }
+}

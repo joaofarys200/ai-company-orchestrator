@@ -1,0 +1,146 @@
+[
+  {
+    "record_id": "prov_e61135d5",
+    "target_id": "snap_jarvis_core_live",
+    "source_type": "ArchitectureSnapshot",
+    "action": "SNAPSHOT_REGISTERED",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.2649534,
+    "hash_signature": "fd90dcd04f8ae6a1005ee32ba39db477f7b1c76ca707dd52bf93bd8c081d7820",
+    "parent_hashes": [
+      "0000000000000000000000000000000000000000000000000000000000000000"
+    ]
+  },
+  {
+    "record_id": "prov_4aedf0d2",
+    "target_id": "prob_scc_3525175d",
+    "source_type": "ArchitectureProblem",
+    "action": "PROBLEM_DETECTED",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.2650926,
+    "hash_signature": "aa5e1f912e5c323fec1bf72668a0f7f7220e3ce9d45e47ea5ed342b0e1f37318",
+    "parent_hashes": [
+      "fd90dcd04f8ae6a1005ee32ba39db477f7b1c76ca707dd52bf93bd8c081d7820"
+    ]
+  },
+  {
+    "record_id": "prov_5b27a082",
+    "target_id": "prob_contract_899b97d4",
+    "source_type": "ArchitectureProblem",
+    "action": "PROBLEM_DETECTED",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.2651289,
+    "hash_signature": "8090522090b0dec3c7260198a277cbc3cd57a59116adac3902ba6133672a151f",
+    "parent_hashes": [
+      "aa5e1f912e5c323fec1bf72668a0f7f7220e3ce9d45e47ea5ed342b0e1f37318"
+    ]
+  },
+  {
+    "record_id": "prov_d497ea54",
+    "target_id": "prob_security_b9a96764",
+    "source_type": "ArchitectureProblem",
+    "action": "PROBLEM_DETECTED",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.2651541,
+    "hash_signature": "401bc59441a85c8ebd3bc0dc3fa3bed66cb12385f8e565126b1ec6a052f70a28",
+    "parent_hashes": [
+      "8090522090b0dec3c7260198a277cbc3cd57a59116adac3902ba6133672a151f"
+    ]
+  },
+  {
+    "record_id": "prov_3d139b1f",
+    "target_id": "prob_coupling_38e4309b",
+    "source_type": "ArchitectureProblem",
+    "action": "PROBLEM_DETECTED",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.2651772,
+    "hash_signature": "be42406667b2121a1452fdc62b6b997bb136e3f3b2f3ecd13e06c92023ecace4",
+    "parent_hashes": [
+      "401bc59441a85c8ebd3bc0dc3fa3bed66cb12385f8e565126b1ec6a052f70a28"
+    ]
+  },
+  {
+    "record_id": "prov_759dfff9",
+    "target_id": "gov_48218716",
+    "source_type": "ArchitectureGovernanceDecision",
+    "action": "GOVERNANCE_STATE_OBSERVATION_ONLY",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.265572,
+    "hash_signature": "9d17c3b95bedc945700a4e7fcc110f953d86ec9120c2f07ae42e0a63d7188971",
+    "parent_hashes": [
+      "be42406667b2121a1452fdc62b6b997bb136e3f3b2f3ecd13e06c92023ecace4"
+    ]
+  },
+  {
+    "record_id": "prov_aa277fe9",
+    "target_id": "gov_46f0e692",
+    "source_type": "ArchitectureGovernanceDecision",
+    "action": "GOVERNANCE_STATE_APPROVED_FOR_IMPLEMENTATION",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.2658176,
+    "hash_signature": "8d5529b11e2c55e422d61873732c416ea91ab53627ed0df9de686d17548c5240",
+    "parent_hashes": [
+      "9d17c3b95bedc945700a4e7fcc110f953d86ec9120c2f07ae42e0a63d7188971"
+    ]
+  },
+  {
+    "record_id": "prov_1e7e2d7b",
+    "target_id": "gov_367a5700",
+    "source_type": "ArchitectureGovernanceDecision",
+    "action": "GOVERNANCE_STATE_APPROVED_FOR_IMPLEMENTATION",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.2660165,
+    "hash_signature": "d117493328168faa0bf5a9502a082151b3688913e32d107b2ddb78c220583971",
+    "parent_hashes": [
+      "8d5529b11e2c55e422d61873732c416ea91ab53627ed0df9de686d17548c5240"
+    ]
+  },
+  {
+    "record_id": "prov_8b011fff",
+    "target_id": "gov_2226c1c1",
+    "source_type": "ArchitectureGovernanceDecision",
+    "action": "GOVERNANCE_STATE_APPROVED_FOR_IMPLEMENTATION",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.266189,
+    "hash_signature": "ee46014235b0ae4ac87e811f531d308140026589b902d9187fb5edc72fce9c16",
+    "parent_hashes": [
+      "d117493328168faa0bf5a9502a082151b3688913e32d107b2ddb78c220583971"
+    ]
+  },
+  {
+    "record_id": "prov_b4aa2d26",
+    "target_id": "gov_f8e827bd",
+    "source_type": "ArchitectureGovernanceDecision",
+    "action": "GOVERNANCE_STATE_OBSERVATION_ONLY",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.2667105,
+    "hash_signature": "7024dd89adcb8c2d99f84874e870c2e2044643c7e426cd2799e282f4d1510356",
+    "parent_hashes": [
+      "ee46014235b0ae4ac87e811f531d308140026589b902d9187fb5edc72fce9c16"
+    ]
+  },
+  {
+    "record_id": "prov_b4a562d7",
+    "target_id": "gov_e54c2d3f",
+    "source_type": "ArchitectureGovernanceDecision",
+    "action": "GOVERNANCE_STATE_APPROVED_FOR_IMPLEMENTATION",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.2668874,
+    "hash_signature": "f0995aca9a4deeed5a6af38ed64ea2af8a25809ca29fb87cc5c6454952790383",
+    "parent_hashes": [
+      "7024dd89adcb8c2d99f84874e870c2e2044643c7e426cd2799e282f4d1510356"
+    ]
+  },
+  {
+    "record_id": "prov_92d4d187",
+    "target_id": "gov_18c2ff90",
+    "source_type": "ArchitectureGovernanceDecision",
+    "action": "GOVERNANCE_STATE_APPROVED_FOR_IMPLEMENTATION",
+    "actor": "ArchitectureEvolutionSystem",
+    "timestamp": 1789762437.267065,
+    "hash_signature": "570f396c1634ab2e11daf8b4f88a4895aff3efbe0a32e657f266a77578739005",
+    "parent_hashes": [
+      "f0995aca9a4deeed5a6af38ed64ea2af8a25809ca29fb87cc5c6454952790383"
+    ]
+  }
+]

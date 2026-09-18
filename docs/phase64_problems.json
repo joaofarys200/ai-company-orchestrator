@@ -1,0 +1,156 @@
+[
+  {
+    "problem_id": "prob_scc_3525175d",
+    "category": "SCC",
+    "affected_nodes": [
+      "agents/autonomous_loop/controller.py",
+      "agents/orchestrator.py",
+      "backend/agents/continuous_verification/bridge.py"
+    ],
+    "affected_symbols": [],
+    "evidence": {
+      "scc_size": 3,
+      "members": [
+        "agents/autonomous_loop/controller.py",
+        "agents/orchestrator.py",
+        "backend/agents/continuous_verification/bridge.py"
+      ]
+    },
+    "severity": "MEDIUM",
+    "confidence": 0.98,
+    "constraints": [],
+    "provenance": {
+      "snapshot_id": "snap_jarvis_core_live",
+      "snapshot_hash": "f00f363b57a019c57efd3b65bb6e780c0a91c6a15d8d015dedb725dda11aae4b",
+      "detector": "ArchitectureProblemDetector",
+      "timestamp": 1789762437.2650099,
+      "smell_type": "large_scc_cycle"
+    },
+    "status": "CONFIRMED_WITHIN_SCOPE"
+  },
+  {
+    "problem_id": "prob_contract_899b97d4",
+    "category": "CONTRACT",
+    "affected_nodes": [
+      "contracts/mission_schema.json",
+      "audit_daemon",
+      "backend/websocket/handlers/missions.py",
+      "client_sdk",
+      "frontend/src/features/missions/MissionControlCenter.tsx",
+      "monitoring_agent",
+      "telemetry_service"
+    ],
+    "affected_symbols": [],
+    "evidence": {
+      "consumer_count": 6,
+      "consumers": [
+        "audit_daemon",
+        "backend/websocket/handlers/missions.py",
+        "client_sdk",
+        "frontend/src/features/missions/MissionControlCenter.tsx",
+        "monitoring_agent",
+        "telemetry_service"
+      ]
+    },
+    "severity": "MEDIUM",
+    "confidence": 0.92,
+    "constraints": [],
+    "provenance": {
+      "snapshot_id": "snap_jarvis_core_live",
+      "snapshot_hash": "f00f363b57a019c57efd3b65bb6e780c0a91c6a15d8d015dedb725dda11aae4b",
+      "detector": "ArchitectureProblemDetector",
+      "timestamp": 1789762437.265029,
+      "smell_type": "contract_concentration"
+    },
+    "status": "CONFIRMED_WITHIN_SCOPE"
+  },
+  {
+    "problem_id": "prob_security_b9a96764",
+    "category": "SECURITY",
+    "affected_nodes": [
+      "dynamic_reflection_getattr_plugin"
+    ],
+    "affected_symbols": [],
+    "evidence": {
+      "boundary": "dynamic_reflection_getattr_plugin"
+    },
+    "severity": "HIGH",
+    "confidence": 0.85,
+    "constraints": [],
+    "provenance": {
+      "snapshot_id": "snap_jarvis_core_live",
+      "snapshot_hash": "f00f363b57a019c57efd3b65bb6e780c0a91c6a15d8d015dedb725dda11aae4b",
+      "detector": "ArchitectureProblemDetector",
+      "timestamp": 1789762437.2650368,
+      "smell_type": "dynamic_reflection_boundary"
+    },
+    "status": "SUSPECTED"
+  },
+  {
+    "problem_id": "prob_coupling_38e4309b",
+    "category": "COUPLING",
+    "affected_nodes": [
+      "agents/autonomous_loop/controller.py",
+      "backend/websocket/handlers/missions.py",
+      "missions"
+    ],
+    "affected_symbols": [
+      "backend.websocket.handlers.missions::handle_mission_control"
+    ],
+    "evidence": {
+      "table": "missions",
+      "services": [
+        "agents/autonomous_loop/controller.py",
+        "backend/websocket/handlers/missions.py"
+      ]
+    },
+    "severity": "MEDIUM",
+    "confidence": 0.94,
+    "constraints": [],
+    "provenance": {
+      "snapshot_id": "snap_jarvis_core_live",
+      "snapshot_hash": "f00f363b57a019c57efd3b65bb6e780c0a91c6a15d8d015dedb725dda11aae4b",
+      "detector": "ArchitectureProblemDetector",
+      "timestamp": 1789762437.2650437,
+      "smell_type": "shared_database_coupling"
+    },
+    "status": "CONFIRMED_WITHIN_SCOPE"
+  },
+  {
+    "problem_id": "prob_maintainability_74a5d7cd",
+    "category": "MAINTAINABILITY",
+    "affected_nodes": [
+      "backend/websocket/handlers/missions.py",
+      "endpoint_0",
+      "endpoint_1",
+      "endpoint_10",
+      "endpoint_11",
+      "endpoint_12",
+      "endpoint_13",
+      "endpoint_14",
+      "endpoint_2"
+    ],
+    "affected_symbols": [],
+    "evidence": {
+      "fan_in_count": 15,
+      "callers_sample": [
+        "endpoint_0",
+        "endpoint_1",
+        "endpoint_10",
+        "endpoint_11",
+        "endpoint_12"
+      ]
+    },
+    "severity": "MEDIUM",
+    "confidence": 0.9,
+    "constraints": [],
+    "provenance": {
+      "snapshot_id": "extra_snap_1",
+      "snapshot_hash": "",
+      "detector": "ArchitectureProblemDetector",
+      "timestamp": 1789762437.2652104,
+      "smell_type": "high_fan_in_hub"
+    },
+    "status": "OBSERVED"
+  }
+]

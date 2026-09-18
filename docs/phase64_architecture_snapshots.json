@@ -1,0 +1,124 @@
+[
+  {
+    "snapshot_id": "snap_jarvis_core_live",
+    "files": [
+      "backend/websocket/handlers/missions.py",
+      "agents/autonomous_loop/controller.py",
+      "backend/agents/continuous_verification/bridge.py",
+      "backend/agents/cross_project_learning/bridge.py",
+      "frontend/src/features/missions/MissionControlCenter.tsx",
+      "database/sqlite_store.py",
+      "agents/plugins/registry.py",
+      "contracts/mission_schema.json"
+    ],
+    "symbols": [
+      "backend.websocket.handlers.missions::handle_mission_control",
+      "agents.autonomous_loop.controller::AutonomousLoopController",
+      "backend.agents.continuous_verification.bridge::ContinuousVerificationBridge",
+      "backend.agents.cross_project_learning.bridge::CrossProjectLearningBridge",
+      "database.sqlite_store::execute_query",
+      "agents.plugins.registry::PluginRegistry"
+    ],
+    "modules": [
+      "backend",
+      "agents",
+      "frontend",
+      "database",
+      "contracts"
+    ],
+    "packages": [
+      "backend.websocket",
+      "agents.autonomous_loop",
+      "database"
+    ],
+    "services": [
+      "mission_control",
+      "continuous_verification",
+      "cross_project_learning"
+    ],
+    "interfaces": [],
+    "contracts": [
+      "contracts/mission_schema.json",
+      "contracts/task_dag_schema.json"
+    ],
+    "dependencies": [
+      [
+        "backend/websocket/handlers/missions.py",
+        "agents/autonomous_loop/controller.py"
+      ],
+      [
+        "agents/autonomous_loop/controller.py",
+        "backend/agents/continuous_verification/bridge.py"
+      ],
+      [
+        "backend/agents/continuous_verification/bridge.py",
+        "agents/autonomous_loop/controller.py"
+      ],
+      [
+        "backend/websocket/handlers/missions.py",
+        "database/sqlite_store.py"
+      ],
+      [
+        "agents/autonomous_loop/controller.py",
+        "database/sqlite_store.py"
+      ],
+      [
+        "backend/websocket/handlers/missions.py",
+        "agents/plugins/registry.py"
+      ]
+    ],
+    "consumers": {
+      "contracts/mission_schema.json": [
+        "frontend/src/features/missions/MissionControlCenter.tsx",
+        "backend/websocket/handlers/missions.py",
+        "client_sdk",
+        "monitoring_agent",
+        "audit_daemon",
+        "telemetry_service"
+      ],
+      "contracts/task_dag_schema.json": [
+        "agents/autonomous_loop/controller.py",
+        "frontend/src/features/missions/MissionControlCenter.tsx"
+      ]
+    },
+    "sccs": [
+      [
+        "agents/autonomous_loop/controller.py",
+        "backend/agents/continuous_verification/bridge.py",
+        "agents/orchestrator.py"
+      ]
+    ],
+    "communication_edges": [],
+    "persistence_edges": [
+      {
+        "source": "backend/websocket/handlers/missions.py",
+        "table": "missions"
+      },
+      {
+        "source": "agents/autonomous_loop/controller.py",
+        "table": "missions"
+      }
+    ],
+    "external_boundaries": [
+      "dynamic_reflection_getattr_plugin"
+    ],
+    "browser_surfaces": [
+      "MissionControlCenter.tsx",
+      "CrossProjectLearningPanel.tsx",
+      "ArchitectureEvolutionPanel.tsx"
+    ],
+    "test_surfaces": [
+      "tests/test_architecture_evolution.py",
+      "tests/test_cross_project_learning.py",
+      "tests/test_continuous_verification.py"
+    ],
+    "risk_zones": [
+      "auth_token_signer",
+      "wallet_transfer_gateway"
+    ],
+    "snapshot_hash": "f00f363b57a019c57efd3b65bb6e780c0a91c6a15d8d015dedb725dda11aae4b",
+    "timestamp": 1789762437.2647836,
+    "source": "workspace",
+    "provenance": {}
+  }
+]

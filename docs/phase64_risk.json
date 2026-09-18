@@ -1,0 +1,226 @@
+{
+  "alt_keep_db970b": {
+    "alternative_id": "alt_keep_db970b",
+    "security_risk": 0.05,
+    "reliability_risk": 0.15,
+    "migration_risk": 0.0,
+    "rollback_risk": 0.0,
+    "economic_risk": 0.0,
+    "operational_risk": 0.1,
+    "data_loss_risk": 0.0,
+    "contract_risk": 0.0,
+    "risk_vector": {
+      "security": 0.05,
+      "reliability": 0.15,
+      "migration": 0.0,
+      "rollback": 0.0,
+      "economic": 0.0,
+      "operational": 0.1,
+      "data_loss": 0.0,
+      "contract": 0.0
+    },
+    "uncertainty_vector": {
+      "security": 0.05,
+      "reliability": 0.05,
+      "migration": 0.05,
+      "rollback": 0.05,
+      "economic": 0.05,
+      "operational": 0.05,
+      "data_loss": 0.05,
+      "contract": 0.05
+    },
+    "criticality": "LOW"
+  },
+  "alt_bound_db970b": {
+    "alternative_id": "alt_bound_db970b",
+    "security_risk": 0.1,
+    "reliability_risk": 0.2,
+    "migration_risk": 0.15,
+    "rollback_risk": 0.1,
+    "economic_risk": 0.15,
+    "operational_risk": 0.1,
+    "data_loss_risk": 0.05,
+    "contract_risk": 0.1,
+    "risk_vector": {
+      "security": 0.1,
+      "reliability": 0.2,
+      "migration": 0.15,
+      "rollback": 0.1,
+      "economic": 0.15,
+      "operational": 0.1,
+      "data_loss": 0.05,
+      "contract": 0.1
+    },
+    "uncertainty_vector": {
+      "security": 0.05,
+      "reliability": 0.08,
+      "migration": 0.15,
+      "rollback": 0.1,
+      "economic": 0.1,
+      "operational": 0.15,
+      "data_loss": 0.1,
+      "contract": 0.12
+    },
+    "criticality": "LOW"
+  },
+  "alt_dip_db970b": {
+    "alternative_id": "alt_dip_db970b",
+    "security_risk": 0.1,
+    "reliability_risk": 0.2,
+    "migration_risk": 0.15,
+    "rollback_risk": 0.1,
+    "economic_risk": 0.15,
+    "operational_risk": 0.1,
+    "data_loss_risk": 0.05,
+    "contract_risk": 0.1,
+    "risk_vector": {
+      "security": 0.1,
+      "reliability": 0.2,
+      "migration": 0.15,
+      "rollback": 0.1,
+      "economic": 0.15,
+      "operational": 0.1,
+      "data_loss": 0.05,
+      "contract": 0.1
+    },
+    "uncertainty_vector": {
+      "security": 0.05,
+      "reliability": 0.08,
+      "migration": 0.15,
+      "rollback": 0.1,
+      "economic": 0.1,
+      "operational": 0.15,
+      "data_loss": 0.1,
+      "contract": 0.12
+    },
+    "criticality": "LOW"
+  },
+  "alt_evt_db970b": {
+    "alternative_id": "alt_evt_db970b",
+    "security_risk": 0.1,
+    "reliability_risk": 0.5,
+    "migration_risk": 0.3,
+    "rollback_risk": 0.6,
+    "economic_risk": 0.15,
+    "operational_risk": 0.25,
+    "data_loss_risk": 0.05,
+    "contract_risk": 0.1,
+    "risk_vector": {
+      "security": 0.1,
+      "reliability": 0.5,
+      "migration": 0.3,
+      "rollback": 0.6,
+      "economic": 0.15,
+      "operational": 0.25,
+      "data_loss": 0.05,
+      "contract": 0.1
+    },
+    "uncertainty_vector": {
+      "security": 0.05,
+      "reliability": 0.2,
+      "migration": 0.15,
+      "rollback": 0.1,
+      "economic": 0.1,
+      "operational": 0.15,
+      "data_loss": 0.1,
+      "contract": 0.12
+    },
+    "criticality": "HIGH"
+  },
+  "alt_keep_241449": {
+    "alternative_id": "alt_keep_241449",
+    "security_risk": 0.05,
+    "reliability_risk": 0.15,
+    "migration_risk": 0.0,
+    "rollback_risk": 0.0,
+    "economic_risk": 0.0,
+    "operational_risk": 0.1,
+    "data_loss_risk": 0.0,
+    "contract_risk": 0.0,
+    "risk_vector": {
+      "security": 0.05,
+      "reliability": 0.15,
+      "migration": 0.0,
+      "rollback": 0.0,
+      "economic": 0.0,
+      "operational": 0.1,
+      "data_loss": 0.0,
+      "contract": 0.0
+    },
+    "uncertainty_vector": {
+      "security": 0.05,
+      "reliability": 0.05,
+      "migration": 0.05,
+      "rollback": 0.05,
+      "economic": 0.05,
+      "operational": 0.05,
+      "data_loss": 0.05,
+      "contract": 0.05
+    },
+    "criticality": "LOW"
+  },
+  "alt_adp_241449": {
+    "alternative_id": "alt_adp_241449",
+    "security_risk": 0.1,
+    "reliability_risk": 0.2,
+    "migration_risk": 0.15,
+    "rollback_risk": 0.1,
+    "economic_risk": 0.15,
+    "operational_risk": 0.1,
+    "data_loss_risk": 0.05,
+    "contract_risk": 0.1,
+    "risk_vector": {
+      "security": 0.1,
+      "reliability": 0.2,
+      "migration": 0.15,
+      "rollback": 0.1,
+      "economic": 0.15,
+      "operational": 0.1,
+      "data_loss": 0.05,
+      "contract": 0.1
+    },
+    "uncertainty_vector": {
+      "security": 0.05,
+      "reliability": 0.08,
+      "migration": 0.15,
+      "rollback": 0.1,
+      "economic": 0.1,
+      "operational": 0.15,
+      "data_loss": 0.1,
+      "contract": 0.12
+    },
+    "criticality": "LOW"
+  },
+  "alt_fac_241449": {
+    "alternative_id": "alt_fac_241449",
+    "security_risk": 0.1,
+    "reliability_risk": 0.2,
+    "migration_risk": 0.15,
+    "rollback_risk": 0.1,
+    "economic_risk": 0.15,
+    "operational_risk": 0.1,
+    "data_loss_risk": 0.05,
+    "contract_risk": 0.1,
+    "risk_vector": {
+      "security": 0.1,
+      "reliability": 0.2,
+      "migration": 0.15,
+      "rollback": 0.1,
+      "economic": 0.15,
+      "operational": 0.1,
+      "data_loss": 0.05,
+      "contract": 0.1
+    },
+    "uncertainty_vector": {
+      "security": 0.05,
+      "reliability": 0.08,
+      "migration": 0.15,
+      "rollback": 0.1,
+      "economic": 0.1,
+      "operational": 0.15,
+      "data_loss": 0.1,
+      "contract": 0.12
+    },
+    "criticality": "LOW"
+  }
+}

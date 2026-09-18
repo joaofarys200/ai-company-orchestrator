@@ -1,0 +1,608 @@
+{
+  "alt_keep_db970b": {
+    "plan_id": "plan_db5a8f00",
+    "alternative_id": "alt_keep_db970b",
+    "steps": [
+      {
+        "step_id": "plan_db5a8f00_step1",
+        "step_type": "OBSERVATION",
+        "title": "Continuous Architecture Invariant Monitoring",
+        "description": "Monitor coupling metrics against regression alert thresholds.",
+        "dependencies": [],
+        "rollback_action": "None required",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_no_external_contract_drift"
+        ]
+      }
+    ],
+    "total_steps": 1,
+    "reversibility_status": "EASILY_REVERSIBLE",
+    "rollback_strategy": "Zero-downtime rollback; no migration executed.",
+    "rollback_complexity": "LOW",
+    "rollback_evidence": "Verified baseline"
+  },
+  "alt_bound_db970b": {
+    "plan_id": "plan_b832d13b",
+    "alternative_id": "alt_bound_db970b",
+    "steps": [
+      {
+        "step_id": "plan_b832d13b_s1_prep",
+        "step_type": "PREPARATION",
+        "title": "Baseline Snapshot & Feature Flag Provisioning",
+        "description": "Capture pre-migration state, configure dynamic routing flag, and establish telemetry.",
+        "dependencies": [],
+        "rollback_action": "Disable feature flag and drop telemetry probes",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_baseline_snapshot",
+          "verify_telemetry_health"
+        ]
+      },
+      {
+        "step_id": "plan_b832d13b_s2_compat",
+        "step_type": "COMPATIBILITY_LAYER",
+        "title": "Deploy Compatibility Shim / Adapter Interface",
+        "description": "Deploy non-breaking translation shim to preserve consumer contracts during evolution.",
+        "dependencies": [
+          "plan_b832d13b_s1_prep"
+        ],
+        "rollback_action": "De-register shim and restore legacy direct bindings",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_contract_non_breaking",
+          "verify_consumer_smoke_test"
+        ]
+      },
+      {
+        "step_id": "plan_b832d13b_s3_dual",
+        "step_type": "DUAL_PATH",
+        "title": "Dual-Execution / Shadow Traffic Shadowing",
+        "description": "Route transactions to new architectural component in shadow mode alongside legacy path.",
+        "dependencies": [
+          "plan_b832d13b_s2_compat"
+        ],
+        "rollback_action": "Set shadow traffic sample rate to 0%",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_shadow_differential_accuracy"
+        ]
+      },
+      {
+        "step_id": "plan_b832d13b_s4_valid",
+        "step_type": "VALIDATION",
+        "title": "Continuous Verification & Invariant Proof",
+        "description": "Execute automated regression suite and verify absence of behavioral drift (F62).",
+        "dependencies": [
+          "plan_b832d13b_s3_dual"
+        ],
+        "rollback_action": "Revert shadow comparison listener",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_zero_behavioral_regressions",
+          "verify_latency_budget"
+        ]
+      },
+      {
+        "step_id": "plan_b832d13b_s5_cutover",
+        "step_type": "CUTOVER",
+        "title": "Incremental Canary Traffic Cutover",
+        "description": "Incrementally promote new architectural component from 10% to 100% active traffic.",
+        "dependencies": [
+          "plan_b832d13b_s4_valid"
+        ],
+        "rollback_action": "Trigger automated canary rollback to 100% legacy path on anomaly",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_canary_error_rate_sub_0_1_percent"
+        ]
+      },
+      {
+        "step_id": "plan_b832d13b_s6_obs",
+        "step_type": "OBSERVATION",
+        "title": "Post-Cutover Soak & Boundary Audit",
+        "description": "Observe 24-hour soak period, confirming decoupled SCC metrics and zero memory leaks.",
+        "dependencies": [
+          "plan_b832d13b_s5_cutover"
+        ],
+        "rollback_action": "Execute full blue-green cutback to legacy fallback container",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_soak_stability",
+          "verify_scc_decoupling_realized"
+        ]
+      },
+      {
+        "step_id": "plan_b832d13b_s7_clean",
+        "step_type": "CLEANUP",
+        "title": "Legacy Path Decommissioning & Contract Purge",
+        "description": "Remove obsolete legacy classes, deprecated methods, and transitional adapters.",
+        "dependencies": [
+          "plan_b832d13b_s6_obs"
+        ],
+        "rollback_action": "Restore legacy source code from git commit checkpoint",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_clean_codebase_build",
+          "verify_final_package_graph"
+        ]
+      }
+    ],
+    "total_steps": 7,
+    "reversibility_status": "EASILY_REVERSIBLE",
+    "rollback_strategy": "Automated stage-by-stage compensation with instant feature flag fallback.",
+    "rollback_complexity": "LOW",
+    "rollback_evidence": "All 7 steps contain executable rollback actions with zero state loss."
+  },
+  "alt_dip_db970b": {
+    "plan_id": "plan_aa435d46",
+    "alternative_id": "alt_dip_db970b",
+    "steps": [
+      {
+        "step_id": "plan_aa435d46_s1_prep",
+        "step_type": "PREPARATION",
+        "title": "Baseline Snapshot & Feature Flag Provisioning",
+        "description": "Capture pre-migration state, configure dynamic routing flag, and establish telemetry.",
+        "dependencies": [],
+        "rollback_action": "Disable feature flag and drop telemetry probes",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_baseline_snapshot",
+          "verify_telemetry_health"
+        ]
+      },
+      {
+        "step_id": "plan_aa435d46_s2_compat",
+        "step_type": "COMPATIBILITY_LAYER",
+        "title": "Deploy Compatibility Shim / Adapter Interface",
+        "description": "Deploy non-breaking translation shim to preserve consumer contracts during evolution.",
+        "dependencies": [
+          "plan_aa435d46_s1_prep"
+        ],
+        "rollback_action": "De-register shim and restore legacy direct bindings",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_contract_non_breaking",
+          "verify_consumer_smoke_test"
+        ]
+      },
+      {
+        "step_id": "plan_aa435d46_s3_dual",
+        "step_type": "DUAL_PATH",
+        "title": "Dual-Execution / Shadow Traffic Shadowing",
+        "description": "Route transactions to new architectural component in shadow mode alongside legacy path.",
+        "dependencies": [
+          "plan_aa435d46_s2_compat"
+        ],
+        "rollback_action": "Set shadow traffic sample rate to 0%",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_shadow_differential_accuracy"
+        ]
+      },
+      {
+        "step_id": "plan_aa435d46_s4_valid",
+        "step_type": "VALIDATION",
+        "title": "Continuous Verification & Invariant Proof",
+        "description": "Execute automated regression suite and verify absence of behavioral drift (F62).",
+        "dependencies": [
+          "plan_aa435d46_s3_dual"
+        ],
+        "rollback_action": "Revert shadow comparison listener",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_zero_behavioral_regressions",
+          "verify_latency_budget"
+        ]
+      },
+      {
+        "step_id": "plan_aa435d46_s5_cutover",
+        "step_type": "CUTOVER",
+        "title": "Incremental Canary Traffic Cutover",
+        "description": "Incrementally promote new architectural component from 10% to 100% active traffic.",
+        "dependencies": [
+          "plan_aa435d46_s4_valid"
+        ],
+        "rollback_action": "Trigger automated canary rollback to 100% legacy path on anomaly",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_canary_error_rate_sub_0_1_percent"
+        ]
+      },
+      {
+        "step_id": "plan_aa435d46_s6_obs",
+        "step_type": "OBSERVATION",
+        "title": "Post-Cutover Soak & Boundary Audit",
+        "description": "Observe 24-hour soak period, confirming decoupled SCC metrics and zero memory leaks.",
+        "dependencies": [
+          "plan_aa435d46_s5_cutover"
+        ],
+        "rollback_action": "Execute full blue-green cutback to legacy fallback container",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_soak_stability",
+          "verify_scc_decoupling_realized"
+        ]
+      },
+      {
+        "step_id": "plan_aa435d46_s7_clean",
+        "step_type": "CLEANUP",
+        "title": "Legacy Path Decommissioning & Contract Purge",
+        "description": "Remove obsolete legacy classes, deprecated methods, and transitional adapters.",
+        "dependencies": [
+          "plan_aa435d46_s6_obs"
+        ],
+        "rollback_action": "Restore legacy source code from git commit checkpoint",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_clean_codebase_build",
+          "verify_final_package_graph"
+        ]
+      }
+    ],
+    "total_steps": 7,
+    "reversibility_status": "REVERSIBLE_WITH_MIGRATION",
+    "rollback_strategy": "Automated stage-by-stage compensation with instant feature flag fallback.",
+    "rollback_complexity": "MEDIUM",
+    "rollback_evidence": "All 7 steps contain executable rollback actions with zero state loss."
+  },
+  "alt_evt_db970b": {
+    "plan_id": "plan_7e159bcd",
+    "alternative_id": "alt_evt_db970b",
+    "steps": [
+      {
+        "step_id": "plan_7e159bcd_s1_prep",
+        "step_type": "PREPARATION",
+        "title": "Baseline Snapshot & Feature Flag Provisioning",
+        "description": "Capture pre-migration state, configure dynamic routing flag, and establish telemetry.",
+        "dependencies": [],
+        "rollback_action": "Disable feature flag and drop telemetry probes",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_baseline_snapshot",
+          "verify_telemetry_health"
+        ]
+      },
+      {
+        "step_id": "plan_7e159bcd_s2_compat",
+        "step_type": "COMPATIBILITY_LAYER",
+        "title": "Deploy Compatibility Shim / Adapter Interface",
+        "description": "Deploy non-breaking translation shim to preserve consumer contracts during evolution.",
+        "dependencies": [
+          "plan_7e159bcd_s1_prep"
+        ],
+        "rollback_action": "De-register shim and restore legacy direct bindings",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_contract_non_breaking",
+          "verify_consumer_smoke_test"
+        ]
+      },
+      {
+        "step_id": "plan_7e159bcd_s3_dual",
+        "step_type": "DUAL_PATH",
+        "title": "Dual-Execution / Shadow Traffic Shadowing",
+        "description": "Route transactions to new architectural component in shadow mode alongside legacy path.",
+        "dependencies": [
+          "plan_7e159bcd_s2_compat"
+        ],
+        "rollback_action": "Set shadow traffic sample rate to 0%",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_shadow_differential_accuracy"
+        ]
+      },
+      {
+        "step_id": "plan_7e159bcd_s4_valid",
+        "step_type": "VALIDATION",
+        "title": "Continuous Verification & Invariant Proof",
+        "description": "Execute automated regression suite and verify absence of behavioral drift (F62).",
+        "dependencies": [
+          "plan_7e159bcd_s3_dual"
+        ],
+        "rollback_action": "Revert shadow comparison listener",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_zero_behavioral_regressions",
+          "verify_latency_budget"
+        ]
+      },
+      {
+        "step_id": "plan_7e159bcd_s5_cutover",
+        "step_type": "CUTOVER",
+        "title": "Incremental Canary Traffic Cutover",
+        "description": "Incrementally promote new architectural component from 10% to 100% active traffic.",
+        "dependencies": [
+          "plan_7e159bcd_s4_valid"
+        ],
+        "rollback_action": "Trigger automated canary rollback to 100% legacy path on anomaly",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_canary_error_rate_sub_0_1_percent"
+        ]
+      },
+      {
+        "step_id": "plan_7e159bcd_s6_obs",
+        "step_type": "OBSERVATION",
+        "title": "Post-Cutover Soak & Boundary Audit",
+        "description": "Observe 24-hour soak period, confirming decoupled SCC metrics and zero memory leaks.",
+        "dependencies": [
+          "plan_7e159bcd_s5_cutover"
+        ],
+        "rollback_action": "Execute full blue-green cutback to legacy fallback container",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_soak_stability",
+          "verify_scc_decoupling_realized"
+        ]
+      },
+      {
+        "step_id": "plan_7e159bcd_s7_clean",
+        "step_type": "CLEANUP",
+        "title": "Legacy Path Decommissioning & Contract Purge",
+        "description": "Remove obsolete legacy classes, deprecated methods, and transitional adapters.",
+        "dependencies": [
+          "plan_7e159bcd_s6_obs"
+        ],
+        "rollback_action": "Restore legacy source code from git commit checkpoint",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_clean_codebase_build",
+          "verify_final_package_graph"
+        ]
+      }
+    ],
+    "total_steps": 7,
+    "reversibility_status": "DIFFICULT_TO_REVERSE",
+    "rollback_strategy": "Automated stage-by-stage compensation with instant feature flag fallback.",
+    "rollback_complexity": "MEDIUM",
+    "rollback_evidence": "All 7 steps contain executable rollback actions with zero state loss."
+  },
+  "alt_keep_241449": {
+    "plan_id": "plan_2f66d1a9",
+    "alternative_id": "alt_keep_241449",
+    "steps": [
+      {
+        "step_id": "plan_2f66d1a9_step1",
+        "step_type": "OBSERVATION",
+        "title": "Continuous Architecture Invariant Monitoring",
+        "description": "Monitor coupling metrics against regression alert thresholds.",
+        "dependencies": [],
+        "rollback_action": "None required",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_no_external_contract_drift"
+        ]
+      }
+    ],
+    "total_steps": 1,
+    "reversibility_status": "EASILY_REVERSIBLE",
+    "rollback_strategy": "Zero-downtime rollback; no migration executed.",
+    "rollback_complexity": "LOW",
+    "rollback_evidence": "Verified baseline"
+  },
+  "alt_adp_241449": {
+    "plan_id": "plan_5ba005bd",
+    "alternative_id": "alt_adp_241449",
+    "steps": [
+      {
+        "step_id": "plan_5ba005bd_s1_prep",
+        "step_type": "PREPARATION",
+        "title": "Baseline Snapshot & Feature Flag Provisioning",
+        "description": "Capture pre-migration state, configure dynamic routing flag, and establish telemetry.",
+        "dependencies": [],
+        "rollback_action": "Disable feature flag and drop telemetry probes",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_baseline_snapshot",
+          "verify_telemetry_health"
+        ]
+      },
+      {
+        "step_id": "plan_5ba005bd_s2_compat",
+        "step_type": "COMPATIBILITY_LAYER",
+        "title": "Deploy Compatibility Shim / Adapter Interface",
+        "description": "Deploy non-breaking translation shim to preserve consumer contracts during evolution.",
+        "dependencies": [
+          "plan_5ba005bd_s1_prep"
+        ],
+        "rollback_action": "De-register shim and restore legacy direct bindings",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_contract_non_breaking",
+          "verify_consumer_smoke_test"
+        ]
+      },
+      {
+        "step_id": "plan_5ba005bd_s3_dual",
+        "step_type": "DUAL_PATH",
+        "title": "Dual-Execution / Shadow Traffic Shadowing",
+        "description": "Route transactions to new architectural component in shadow mode alongside legacy path.",
+        "dependencies": [
+          "plan_5ba005bd_s2_compat"
+        ],
+        "rollback_action": "Set shadow traffic sample rate to 0%",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_shadow_differential_accuracy"
+        ]
+      },
+      {
+        "step_id": "plan_5ba005bd_s4_valid",
+        "step_type": "VALIDATION",
+        "title": "Continuous Verification & Invariant Proof",
+        "description": "Execute automated regression suite and verify absence of behavioral drift (F62).",
+        "dependencies": [
+          "plan_5ba005bd_s3_dual"
+        ],
+        "rollback_action": "Revert shadow comparison listener",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_zero_behavioral_regressions",
+          "verify_latency_budget"
+        ]
+      },
+      {
+        "step_id": "plan_5ba005bd_s5_cutover",
+        "step_type": "CUTOVER",
+        "title": "Incremental Canary Traffic Cutover",
+        "description": "Incrementally promote new architectural component from 10% to 100% active traffic.",
+        "dependencies": [
+          "plan_5ba005bd_s4_valid"
+        ],
+        "rollback_action": "Trigger automated canary rollback to 100% legacy path on anomaly",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_canary_error_rate_sub_0_1_percent"
+        ]
+      },
+      {
+        "step_id": "plan_5ba005bd_s6_obs",
+        "step_type": "OBSERVATION",
+        "title": "Post-Cutover Soak & Boundary Audit",
+        "description": "Observe 24-hour soak period, confirming decoupled SCC metrics and zero memory leaks.",
+        "dependencies": [
+          "plan_5ba005bd_s5_cutover"
+        ],
+        "rollback_action": "Execute full blue-green cutback to legacy fallback container",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_soak_stability",
+          "verify_scc_decoupling_realized"
+        ]
+      },
+      {
+        "step_id": "plan_5ba005bd_s7_clean",
+        "step_type": "CLEANUP",
+        "title": "Legacy Path Decommissioning & Contract Purge",
+        "description": "Remove obsolete legacy classes, deprecated methods, and transitional adapters.",
+        "dependencies": [
+          "plan_5ba005bd_s6_obs"
+        ],
+        "rollback_action": "Restore legacy source code from git commit checkpoint",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_clean_codebase_build",
+          "verify_final_package_graph"
+        ]
+      }
+    ],
+    "total_steps": 7,
+    "reversibility_status": "EASILY_REVERSIBLE",
+    "rollback_strategy": "Automated stage-by-stage compensation with instant feature flag fallback.",
+    "rollback_complexity": "LOW",
+    "rollback_evidence": "All 7 steps contain executable rollback actions with zero state loss."
+  },
+  "alt_fac_241449": {
+    "plan_id": "plan_88bf5181",
+    "alternative_id": "alt_fac_241449",
+    "steps": [
+      {
+        "step_id": "plan_88bf5181_s1_prep",
+        "step_type": "PREPARATION",
+        "title": "Baseline Snapshot & Feature Flag Provisioning",
+        "description": "Capture pre-migration state, configure dynamic routing flag, and establish telemetry.",
+        "dependencies": [],
+        "rollback_action": "Disable feature flag and drop telemetry probes",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_baseline_snapshot",
+          "verify_telemetry_health"
+        ]
+      },
+      {
+        "step_id": "plan_88bf5181_s2_compat",
+        "step_type": "COMPATIBILITY_LAYER",
+        "title": "Deploy Compatibility Shim / Adapter Interface",
+        "description": "Deploy non-breaking translation shim to preserve consumer contracts during evolution.",
+        "dependencies": [
+          "plan_88bf5181_s1_prep"
+        ],
+        "rollback_action": "De-register shim and restore legacy direct bindings",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_contract_non_breaking",
+          "verify_consumer_smoke_test"
+        ]
+      },
+      {
+        "step_id": "plan_88bf5181_s3_dual",
+        "step_type": "DUAL_PATH",
+        "title": "Dual-Execution / Shadow Traffic Shadowing",
+        "description": "Route transactions to new architectural component in shadow mode alongside legacy path.",
+        "dependencies": [
+          "plan_88bf5181_s2_compat"
+        ],
+        "rollback_action": "Set shadow traffic sample rate to 0%",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_shadow_differential_accuracy"
+        ]
+      },
+      {
+        "step_id": "plan_88bf5181_s4_valid",
+        "step_type": "VALIDATION",
+        "title": "Continuous Verification & Invariant Proof",
+        "description": "Execute automated regression suite and verify absence of behavioral drift (F62).",
+        "dependencies": [
+          "plan_88bf5181_s3_dual"
+        ],
+        "rollback_action": "Revert shadow comparison listener",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_zero_behavioral_regressions",
+          "verify_latency_budget"
+        ]
+      },
+      {
+        "step_id": "plan_88bf5181_s5_cutover",
+        "step_type": "CUTOVER",
+        "title": "Incremental Canary Traffic Cutover",
+        "description": "Incrementally promote new architectural component from 10% to 100% active traffic.",
+        "dependencies": [
+          "plan_88bf5181_s4_valid"
+        ],
+        "rollback_action": "Trigger automated canary rollback to 100% legacy path on anomaly",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_canary_error_rate_sub_0_1_percent"
+        ]
+      },
+      {
+        "step_id": "plan_88bf5181_s6_obs",
+        "step_type": "OBSERVATION",
+        "title": "Post-Cutover Soak & Boundary Audit",
+        "description": "Observe 24-hour soak period, confirming decoupled SCC metrics and zero memory leaks.",
+        "dependencies": [
+          "plan_88bf5181_s5_cutover"
+        ],
+        "rollback_action": "Execute full blue-green cutback to legacy fallback container",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_soak_stability",
+          "verify_scc_decoupling_realized"
+        ]
+      },
+      {
+        "step_id": "plan_88bf5181_s7_clean",
+        "step_type": "CLEANUP",
+        "title": "Legacy Path Decommissioning & Contract Purge",
+        "description": "Remove obsolete legacy classes, deprecated methods, and transitional adapters.",
+        "dependencies": [
+          "plan_88bf5181_s6_obs"
+        ],
+        "rollback_action": "Restore legacy source code from git commit checkpoint",
+        "is_reversibility_supported": true,
+        "verification_gates": [
+          "verify_clean_codebase_build",
+          "verify_final_package_graph"
+        ]
+      }
+    ],
+    "total_steps": 7,
+    "reversibility_status": "EASILY_REVERSIBLE",
+    "rollback_strategy": "Automated stage-by-stage compensation with instant feature flag fallback.",
+    "rollback_complexity": "LOW",
+    "rollback_evidence": "All 7 steps contain executable rollback actions with zero state loss."
+  }
+}

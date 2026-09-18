@@ -1,0 +1,220 @@
+{
+  "alt_keep_db970b": {
+    "plan_id": "verif_db5a8f00",
+    "alternative_id": "alt_keep_db970b",
+    "required_tests": [
+      "tests/test_full_architecture_regression.py"
+    ],
+    "required_contract_checks": [
+      "verify_zero_contract_drift_in_subsystem"
+    ],
+    "required_behavior_checks": [
+      "verify_invocation_ordering_invariants",
+      "verify_idempotency_under_network_partition",
+      "verify_timeout_and_backoff_stability"
+    ],
+    "required_browser_checks": [],
+    "required_migration_checks": [
+      "verify_preflight_configuration_readiness",
+      "verify_dual_execution_result_parity",
+      "verify_canary_traffic_routing_metrics"
+    ],
+    "required_rollback_checks": [
+      "verify_feature_flag_immediate_deactivation",
+      "verify_rollback_state_cleanliness"
+    ],
+    "required_security_checks": [
+      "security_sentinel_secret_leak_audit",
+      "privilege_boundary_integrity_scan",
+      "dependency_vulnerability_cve_check"
+    ]
+  },
+  "alt_bound_db970b": {
+    "plan_id": "verif_b832d13b",
+    "alternative_id": "alt_bound_db970b",
+    "required_tests": [
+      "tests/test_agents_autonomous_loop_controller_py_refactor.py",
+      "tests/test_agents_orchestrator_py_refactor.py",
+      "tests/test_backend_agents_continuous_verification_bridge_py_refactor.py"
+    ],
+    "required_contract_checks": [
+      "verify_zero_contract_drift_in_subsystem"
+    ],
+    "required_behavior_checks": [
+      "verify_invocation_ordering_invariants",
+      "verify_idempotency_under_network_partition",
+      "verify_timeout_and_backoff_stability"
+    ],
+    "required_browser_checks": [],
+    "required_migration_checks": [
+      "verify_preflight_configuration_readiness",
+      "verify_dual_execution_result_parity",
+      "verify_canary_traffic_routing_metrics"
+    ],
+    "required_rollback_checks": [
+      "verify_feature_flag_immediate_deactivation",
+      "verify_rollback_state_cleanliness"
+    ],
+    "required_security_checks": [
+      "security_sentinel_secret_leak_audit",
+      "privilege_boundary_integrity_scan",
+      "dependency_vulnerability_cve_check"
+    ]
+  },
+  "alt_dip_db970b": {
+    "plan_id": "verif_aa435d46",
+    "alternative_id": "alt_dip_db970b",
+    "required_tests": [
+      "tests/test_agents_autonomous_loop_controller_py_refactor.py",
+      "tests/test_agents_orchestrator_py_refactor.py",
+      "tests/test_backend_agents_continuous_verification_bridge_py_refactor.py"
+    ],
+    "required_contract_checks": [
+      "verify_zero_contract_drift_in_subsystem"
+    ],
+    "required_behavior_checks": [
+      "verify_invocation_ordering_invariants",
+      "verify_idempotency_under_network_partition",
+      "verify_timeout_and_backoff_stability"
+    ],
+    "required_browser_checks": [],
+    "required_migration_checks": [
+      "verify_preflight_configuration_readiness",
+      "verify_dual_execution_result_parity",
+      "verify_canary_traffic_routing_metrics"
+    ],
+    "required_rollback_checks": [
+      "verify_feature_flag_immediate_deactivation",
+      "verify_rollback_state_cleanliness"
+    ],
+    "required_security_checks": [
+      "security_sentinel_secret_leak_audit",
+      "privilege_boundary_integrity_scan",
+      "dependency_vulnerability_cve_check"
+    ]
+  },
+  "alt_evt_db970b": {
+    "plan_id": "verif_7e159bcd",
+    "alternative_id": "alt_evt_db970b",
+    "required_tests": [
+      "tests/test_agents_autonomous_loop_controller_py_refactor.py",
+      "tests/test_agents_orchestrator_py_refactor.py",
+      "tests/test_backend_agents_continuous_verification_bridge_py_refactor.py"
+    ],
+    "required_contract_checks": [
+      "verify_zero_contract_drift_in_subsystem"
+    ],
+    "required_behavior_checks": [
+      "verify_invocation_ordering_invariants",
+      "verify_idempotency_under_network_partition",
+      "verify_timeout_and_backoff_stability"
+    ],
+    "required_browser_checks": [],
+    "required_migration_checks": [
+      "verify_preflight_configuration_readiness",
+      "verify_dual_execution_result_parity",
+      "verify_canary_traffic_routing_metrics"
+    ],
+    "required_rollback_checks": [
+      "verify_feature_flag_immediate_deactivation",
+      "verify_rollback_state_cleanliness"
+    ],
+    "required_security_checks": [
+      "security_sentinel_secret_leak_audit",
+      "privilege_boundary_integrity_scan",
+      "dependency_vulnerability_cve_check"
+    ]
+  },
+  "alt_keep_241449": {
+    "plan_id": "verif_2f66d1a9",
+    "alternative_id": "alt_keep_241449",
+    "required_tests": [
+      "tests/test_full_architecture_regression.py"
+    ],
+    "required_contract_checks": [
+      "verify_zero_contract_drift_in_subsystem"
+    ],
+    "required_behavior_checks": [
+      "verify_invocation_ordering_invariants",
+      "verify_idempotency_under_network_partition",
+      "verify_timeout_and_backoff_stability"
+    ],
+    "required_browser_checks": [],
+    "required_migration_checks": [
+      "verify_preflight_configuration_readiness",
+      "verify_dual_execution_result_parity",
+      "verify_canary_traffic_routing_metrics"
+    ],
+    "required_rollback_checks": [
+      "verify_feature_flag_immediate_deactivation",
+      "verify_rollback_state_cleanliness"
+    ],
+    "required_security_checks": [
+      "security_sentinel_secret_leak_audit",
+      "privilege_boundary_integrity_scan",
+      "dependency_vulnerability_cve_check"
+    ]
+  },
+  "alt_adp_241449": {
+    "plan_id": "verif_5ba005bd",
+    "alternative_id": "alt_adp_241449",
+    "required_tests": [
+      "tests/test_audit_daemon_refactor.py",
+      "tests/test_contracts_mission_schema_json_refactor.py"
+    ],
+    "required_contract_checks": [
+      "contract_assert_contracts/mission_schema.json"
+    ],
+    "required_behavior_checks": [
+      "verify_invocation_ordering_invariants",
+      "verify_idempotency_under_network_partition",
+      "verify_timeout_and_backoff_stability"
+    ],
+    "required_browser_checks": [],
+    "required_migration_checks": [
+      "verify_preflight_configuration_readiness",
+      "verify_dual_execution_result_parity",
+      "verify_canary_traffic_routing_metrics"
+    ],
+    "required_rollback_checks": [
+      "verify_feature_flag_immediate_deactivation",
+      "verify_rollback_state_cleanliness"
+    ],
+    "required_security_checks": [
+      "security_sentinel_secret_leak_audit",
+      "privilege_boundary_integrity_scan",
+      "dependency_vulnerability_cve_check"
+    ]
+  },
+  "alt_fac_241449": {
+    "plan_id": "verif_88bf5181",
+    "alternative_id": "alt_fac_241449",
+    "required_tests": [
+      "tests/test_audit_daemon_refactor.py",
+      "tests/test_contracts_mission_schema_json_refactor.py"
+    ],
+    "required_contract_checks": [
+      "contract_assert_contracts/mission_schema.json"
+    ],
+    "required_behavior_checks": [
+      "verify_invocation_ordering_invariants",
+      "verify_idempotency_under_network_partition",
+      "verify_timeout_and_backoff_stability"
+    ],
+    "required_browser_checks": [],
+    "required_migration_checks": [
+      "verify_preflight_configuration_readiness",
+      "verify_dual_execution_result_parity",
+      "verify_canary_traffic_routing_metrics"
+    ],
+    "required_rollback_checks": [
+      "verify_feature_flag_immediate_deactivation",
+      "verify_rollback_state_cleanliness"
+    ],
+    "required_security_checks": [
+      "security_sentinel_secret_leak_audit",
+      "privilege_boundary_integrity_scan",
+      "dependency_vulnerability_cve_check"
+    ]
+  }
+}
