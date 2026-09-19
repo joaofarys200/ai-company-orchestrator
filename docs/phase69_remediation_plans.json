@@ -1,0 +1,200 @@
+[
+  {
+    "plan_id": "plan_23b0b260",
+    "debt_id": "debt_architectural_2fed990f",
+    "chosen_option_id": "opt_dep_inv_7fb2b7",
+    "steps": [
+      {
+        "step": 1,
+        "name": "PREFLIGHT_SNAPSHOT",
+        "action": "capture_system_state"
+      },
+      {
+        "step": 2,
+        "name": "TRANSACTION_PATCH",
+        "action": "apply_isolated_patch",
+        "option_id": "opt_dep_inv_7fb2b7"
+      },
+      {
+        "step": 3,
+        "name": "BUILD_AND_TEST",
+        "action": "run_test_suites"
+      },
+      {
+        "step": 4,
+        "name": "CONTRACT_VERIFICATION",
+        "action": "verify_contract_invariants"
+      },
+      {
+        "step": 5,
+        "name": "BEHAVIOR_VERIFICATION",
+        "action": "verify_behavior_invariants"
+      },
+      {
+        "step": 6,
+        "name": "QUALITY_RESCAN",
+        "action": "measure_9_quality_dimensions"
+      },
+      {
+        "step": 7,
+        "name": "RESOLUTION_GATE",
+        "action": "evaluate_debt_resolution"
+      }
+    ],
+    "allocated_budget": {
+      "max_file_mutations": 5,
+      "max_time_seconds": 120.0,
+      "max_retry_attempts": 2
+    },
+    "required_agents": [
+      "AnalysisAgent",
+      "ImplementationAgent",
+      "TestAgent",
+      "VerificationAgent"
+    ],
+    "rollback_plan": {
+      "strategy": "atomic_git_revert",
+      "trigger_conditions": [
+        "BUILD_FAILED",
+        "TESTS_FAILED",
+        "BREAKING_CONTRACT_UNAPPROVED",
+        "BEHAVIOR_DRIFT_DETECTED",
+        "QUALITY_DEGRADATION_OBSERVED"
+      ]
+    },
+    "governance_decision": "APPROVED",
+    "created_at": 1789838477.7156978
+  },
+  {
+    "plan_id": "plan_18dbbe4d",
+    "debt_id": "debt_test_226e39f3",
+    "chosen_option_id": "opt_test_exp_acce1f",
+    "steps": [
+      {
+        "step": 1,
+        "name": "PREFLIGHT_SNAPSHOT",
+        "action": "capture_system_state"
+      },
+      {
+        "step": 2,
+        "name": "TRANSACTION_PATCH",
+        "action": "apply_isolated_patch",
+        "option_id": "opt_test_exp_acce1f"
+      },
+      {
+        "step": 3,
+        "name": "BUILD_AND_TEST",
+        "action": "run_test_suites"
+      },
+      {
+        "step": 4,
+        "name": "CONTRACT_VERIFICATION",
+        "action": "verify_contract_invariants"
+      },
+      {
+        "step": 5,
+        "name": "BEHAVIOR_VERIFICATION",
+        "action": "verify_behavior_invariants"
+      },
+      {
+        "step": 6,
+        "name": "QUALITY_RESCAN",
+        "action": "measure_9_quality_dimensions"
+      },
+      {
+        "step": 7,
+        "name": "RESOLUTION_GATE",
+        "action": "evaluate_debt_resolution"
+      }
+    ],
+    "allocated_budget": {
+      "max_file_mutations": 5,
+      "max_time_seconds": 120.0,
+      "max_retry_attempts": 2
+    },
+    "required_agents": [
+      "AnalysisAgent",
+      "ImplementationAgent",
+      "TestAgent",
+      "VerificationAgent"
+    ],
+    "rollback_plan": {
+      "strategy": "atomic_git_revert",
+      "trigger_conditions": [
+        "BUILD_FAILED",
+        "TESTS_FAILED",
+        "BREAKING_CONTRACT_UNAPPROVED",
+        "BEHAVIOR_DRIFT_DETECTED",
+        "QUALITY_DEGRADATION_OBSERVED"
+      ]
+    },
+    "governance_decision": "APPROVED",
+    "created_at": 1789838477.7164366
+  },
+  {
+    "plan_id": "plan_2a8f4a06",
+    "debt_id": "debt_operational_563acd45",
+    "chosen_option_id": "opt_obs_0152bb",
+    "steps": [
+      {
+        "step": 1,
+        "name": "PREFLIGHT_SNAPSHOT",
+        "action": "capture_system_state"
+      },
+      {
+        "step": 2,
+        "name": "TRANSACTION_PATCH",
+        "action": "apply_isolated_patch",
+        "option_id": "opt_obs_0152bb"
+      },
+      {
+        "step": 3,
+        "name": "BUILD_AND_TEST",
+        "action": "run_test_suites"
+      },
+      {
+        "step": 4,
+        "name": "CONTRACT_VERIFICATION",
+        "action": "verify_contract_invariants"
+      },
+      {
+        "step": 5,
+        "name": "BEHAVIOR_VERIFICATION",
+        "action": "verify_behavior_invariants"
+      },
+      {
+        "step": 6,
+        "name": "QUALITY_RESCAN",
+        "action": "measure_9_quality_dimensions"
+      },
+      {
+        "step": 7,
+        "name": "RESOLUTION_GATE",
+        "action": "evaluate_debt_resolution"
+      }
+    ],
+    "allocated_budget": {
+      "max_file_mutations": 5,
+      "max_time_seconds": 120.0,
+      "max_retry_attempts": 2
+    },
+    "required_agents": [
+      "AnalysisAgent",
+      "ImplementationAgent",
+      "TestAgent",
+      "VerificationAgent"
+    ],
+    "rollback_plan": {
+      "strategy": "atomic_git_revert",
+      "trigger_conditions": [
+        "BUILD_FAILED",
+        "TESTS_FAILED",
+        "BREAKING_CONTRACT_UNAPPROVED",
+        "BEHAVIOR_DRIFT_DETECTED",
+        "QUALITY_DEGRADATION_OBSERVED"
+      ]
+    },
+    "governance_decision": "APPROVED",
+    "created_at": 1789838477.716921
+  }
+]

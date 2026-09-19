@@ -1,0 +1,68 @@
+[
+  {
+    "mission_id": "msn_8ad45172",
+    "debt_id": "debt_architectural_2fed990f",
+    "plan_id": "plan_23b0b260",
+    "status": "INITIALIZED",
+    "current_step_index": 0,
+    "logs": [
+      {
+        "timestamp": 1789838477.7157001,
+        "event": "MISSION_INITIALIZED",
+        "objective": "RESOLVE_DEBT(debt_architectural_2fed990f)",
+        "criteria": [
+          "original_evidence_invalidated",
+          "quality_remeasurement_confirmed",
+          "no_critical_regression",
+          "contracts_preserved",
+          "behavior_preserved",
+          "security_preserved"
+        ]
+      }
+    ]
+  },
+  {
+    "mission_id": "msn_4a7374ad",
+    "debt_id": "debt_test_226e39f3",
+    "plan_id": "plan_18dbbe4d",
+    "status": "INITIALIZED",
+    "current_step_index": 0,
+    "logs": [
+      {
+        "timestamp": 1789838477.7164388,
+        "event": "MISSION_INITIALIZED",
+        "objective": "RESOLVE_DEBT(debt_test_226e39f3)",
+        "criteria": [
+          "original_evidence_invalidated",
+          "quality_remeasurement_confirmed",
+          "no_critical_regression",
+          "contracts_preserved",
+          "behavior_preserved",
+          "security_preserved"
+        ]
+      }
+    ]
+  },
+  {
+    "mission_id": "msn_ea2e3e38",
+    "debt_id": "debt_operational_563acd45",
+    "plan_id": "plan_2a8f4a06",
+    "status": "INITIALIZED",
+    "current_step_index": 0,
+    "logs": [
+      {
+        "timestamp": 1789838477.7169225,
+        "event": "MISSION_INITIALIZED",
+        "objective": "RESOLVE_DEBT(debt_operational_563acd45)",
+        "criteria": [
+          "original_evidence_invalidated",
+          "quality_remeasurement_confirmed",
+          "no_critical_regression",
+          "contracts_preserved",
+          "behavior_preserved",
+          "security_preserved"
+        ]
+      }
+    ]
+  }
+]

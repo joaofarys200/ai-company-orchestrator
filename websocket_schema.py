@@ -194,6 +194,14 @@ SERVER_MESSAGE_TYPES = {
     "mission_quality_governance_debt_list_result",
     "mission_quality_governance_trend_result",
     "mission_quality_governance_hotspots_result",
+    # Phase 69 Autonomous Quality Debt Remediation
+    "mission_debt_remediation_status_result",
+    "mission_debt_remediation_validate_result",
+    "mission_debt_remediation_root_cause_result",
+    "mission_debt_remediation_options_result",
+    "mission_debt_remediation_plan_result",
+    "mission_debt_remediation_execute_result",
+    "mission_debt_remediation_resolve_result",
 }
 
 
@@ -355,6 +363,14 @@ CLIENT_MESSAGE_TYPES = {
     "mission_quality_governance_debt_list",
     "mission_quality_governance_trend",
     "mission_quality_governance_hotspots",
+    # Phase 69
+    "mission_debt_remediation_status",
+    "mission_debt_remediation_validate",
+    "mission_debt_remediation_root_cause",
+    "mission_debt_remediation_options",
+    "mission_debt_remediation_plan",
+    "mission_debt_remediation_execute",
+    "mission_debt_remediation_resolve",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
@@ -374,6 +390,14 @@ MISSION_CLIENT_REQUIRED_FIELDS = {
     "mission_quality_governance_debt_list": (),
     "mission_quality_governance_trend": (),
     "mission_quality_governance_hotspots": (),
+    # Phase 69
+    "mission_debt_remediation_status": (),
+    "mission_debt_remediation_validate": (),
+    "mission_debt_remediation_root_cause": (),
+    "mission_debt_remediation_options": (),
+    "mission_debt_remediation_plan": (),
+    "mission_debt_remediation_execute": (),
+    "mission_debt_remediation_resolve": (),
     "mission_multi_agent_coordination_status": (),
     "mission_multi_agent_intent_submit": (),
     "mission_multi_agent_arbitrate": (),

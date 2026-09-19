@@ -1,0 +1,103 @@
+[
+  {
+    "cause_id": "rc_31b2284f",
+    "debt_id": "debt_architectural_2fed990f",
+    "category": "ARCHITECTURAL_CAUSE",
+    "description": "Architectural coupling / circular dependency identified in surface: backend.agents.massive_project_state <-> backend.agents.scc_aware_graph",
+    "evidence": [
+      {
+        "kind": "dependency_graph",
+        "surface": "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph",
+        "details": {
+          "scc_cycle": true,
+          "condensation_graph_nodes": [
+            "backend.agents.massive_project_state",
+            "backend.agents.scc_aware_graph"
+          ]
+        }
+      }
+    ],
+    "confidence": 0.92,
+    "affected_surface": "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph",
+    "timestamp": 1789838477.7154927
+  },
+  {
+    "cause_id": "rc_e3ac76fe",
+    "debt_id": "debt_code_c8cb6f98",
+    "category": "CODE_CAUSE",
+    "description": "Code complexity hotspot or code duplication in surface: backend.websocket.handlers.missions.MissionWebSocketHandler",
+    "evidence": [
+      {
+        "kind": "ast_metric",
+        "surface": "backend.websocket.handlers.missions.MissionWebSocketHandler",
+        "details": {
+          "cyclomatic_complexity": 34,
+          "lines_of_code": 2059,
+          "handler_operations_count": 48
+        }
+      }
+    ],
+    "confidence": 0.85,
+    "affected_surface": "backend.websocket.handlers.missions.MissionWebSocketHandler",
+    "timestamp": 1789838477.7160645
+  },
+  {
+    "cause_id": "rc_2e0489fb",
+    "debt_id": "debt_test_226e39f3",
+    "category": "TEST_CAUSE",
+    "description": "Test debt, coverage gap, or flaky test behavior in surface: tests.test_collaboration_long_horizon.py",
+    "evidence": [
+      {
+        "kind": "test_suite_trace",
+        "surface": "tests.test_collaboration_long_horizon.py",
+        "details": {
+          "flaky_rate": 0.08,
+          "intermittent_failures": [
+            "test_checkpoint_restore_step_timeout"
+          ]
+        }
+      }
+    ],
+    "confidence": 0.89,
+    "affected_surface": "tests.test_collaboration_long_horizon.py",
+    "timestamp": 1789838477.7163255
+  },
+  {
+    "cause_id": "rc_b52a1794",
+    "debt_id": "debt_operational_563acd45",
+    "category": "UNKNOWN_CAUSE",
+    "description": "Causal origin cannot be reliably isolated for category 'OPERATIONAL'. Routed to BOUNDARY_ANALYSIS and HUMAN_REVIEW.",
+    "evidence": [
+      {
+        "kind": "unresolved_correlation",
+        "surface": "scripts.run_phase67_browser_qa.py",
+        "details": {
+          "failure_mode": "msedge.exe display protocol dependency in headless CI",
+          "missing_fallback": true
+        }
+      }
+    ],
+    "confidence": 0.3,
+    "affected_surface": "scripts.run_phase67_browser_qa.py",
+    "timestamp": 1789838477.7168133
+  },
+  {
+    "cause_id": "rc_e7a9d407",
+    "debt_id": "debt_performance_ee82390c",
+    "category": "PERFORMANCE_CAUSE",
+    "description": "Performance bottleneck or unindexed resource access in surface: backend.memory.MissionStateStore.sqlite_pool",
+    "evidence": [
+      {
+        "kind": "profiler_samples",
+        "surface": "backend.memory.MissionStateStore.sqlite_pool",
+        "details": {
+          "lock_contention_p95_ms": 42.0,
+          "concurrency_limit": 1
+        }
+      }
+    ],
+    "confidence": 0.86,
+    "affected_surface": "backend.memory.MissionStateStore.sqlite_pool",
+    "timestamp": 1789838477.717266
+  }
+]

@@ -118,6 +118,14 @@ MISSION_HANDLERS = {
     "mission_quality_governance_debt_list": "handle",
     "mission_quality_governance_trend": "handle",
     "mission_quality_governance_hotspots": "handle",
+    # Phase 69
+    "mission_debt_remediation_status": "handle",
+    "mission_debt_remediation_validate": "handle",
+    "mission_debt_remediation_root_cause": "handle",
+    "mission_debt_remediation_options": "handle",
+    "mission_debt_remediation_plan": "handle",
+    "mission_debt_remediation_execute": "handle",
+    "mission_debt_remediation_resolve": "handle",
 }
 
 
@@ -2019,6 +2027,154 @@ class MissionWebSocketHandler:
                     {
                         "type": "mission_quality_governance_hotspots_result",
                         "hotspots": [h.to_dict() for h in hotspots],
+                    },
+                )
+                return
+
+            # Phase 69 Autonomous Quality Debt Remediation Handlers
+            elif operation == "mission_debt_remediation_status":
+                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                bridge = QualityDebtRemediationBridge.get_instance()
+                validations = bridge.store.get_all("debt_validations")
+                plans = bridge.store.get_all("remediation_plans")
+                deferments = bridge.store.get_all("deferments")
+                resolutions = bridge.store.get_all("resolution_results")
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_debt_remediation_status_result",
+                        "validations_count": len(validations),
+                        "plans_count": len(plans),
+                        "deferments_count": len(deferments),
+                        "resolutions_count": len(resolutions),
+                        "recent_resolutions": resolutions[-5:] if resolutions else [],
+                    },
+                )
+                return
+
+            elif operation == "mission_debt_remediation_validate":
+                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                bridge = QualityDebtRemediationBridge.get_instance()
+                raw_debt = message.get("debt_item") or {
+                    "debt_id": "debt_demo_01",
+                    "category": "ARCHITECTURAL",
+                    "severity": "HIGH",
+                    "affected_surface": "backend.agents.massive_project_state",
+                    "evidence": {"scc_cycle": True},
+                    "confidence": 0.90,
+                }
+                debt_item = bridge.ingestion_engine.ingest(raw_debt)
+                validation = bridge.validator.validate(debt_item)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_debt_remediation_validate_result",
+                        "validation": validation.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_debt_remediation_root_cause":
+                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                bridge = QualityDebtRemediationBridge.get_instance()
+                raw_debt = message.get("debt_item") or {
+                    "debt_id": "debt_demo_01",
+                    "category": "ARCHITECTURAL",
+                    "severity": "HIGH",
+                    "affected_surface": "backend.agents.massive_project_state",
+                    "evidence": {"scc_cycle": True},
+                    "confidence": 0.90,
+                }
+                debt_item = bridge.ingestion_engine.ingest(raw_debt)
+                root_cause = bridge.root_cause_engine.analyze(debt_item)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_debt_remediation_root_cause_result",
+                        "root_cause": root_cause.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_debt_remediation_options":
+                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                bridge = QualityDebtRemediationBridge.get_instance()
+                raw_debt = message.get("debt_item") or {
+                    "debt_id": "debt_demo_01",
+                    "category": "ARCHITECTURAL",
+                    "severity": "HIGH",
+                    "affected_surface": "backend.agents.massive_project_state",
+                    "evidence": {"scc_cycle": True},
+                    "confidence": 0.90,
+                }
+                debt_item = bridge.ingestion_engine.ingest(raw_debt)
+                root_cause = bridge.root_cause_engine.analyze(debt_item)
+                options = bridge.options_generator.generate_options(debt_item, root_cause)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_debt_remediation_options_result",
+                        "options": [o.to_dict() for o in options],
+                    },
+                )
+                return
+
+            elif operation == "mission_debt_remediation_plan":
+                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                bridge = QualityDebtRemediationBridge.get_instance()
+                raw_debt = message.get("debt_item") or {
+                    "debt_id": "debt_demo_01",
+                    "category": "ARCHITECTURAL",
+                    "severity": "HIGH",
+                    "affected_surface": "backend.agents.massive_project_state",
+                    "evidence": {"scc_cycle": True},
+                    "confidence": 0.90,
+                }
+                debt_item = bridge.ingestion_engine.ingest(raw_debt)
+                root_cause = bridge.root_cause_engine.analyze(debt_item)
+                options = bridge.options_generator.generate_options(debt_item, root_cause)
+                plan = bridge.planner.create_plan(debt_item, options[0])
+                mission = bridge.planner.create_mission(plan)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_debt_remediation_plan_result",
+                        "plan": plan.to_dict(),
+                        "mission": mission.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_debt_remediation_execute":
+                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                bridge = QualityDebtRemediationBridge.get_instance()
+                raw_debt = message.get("debt_item") or {
+                    "debt_id": "debt_demo_01",
+                    "category": "CODE",
+                    "severity": "MEDIUM",
+                    "affected_surface": "backend.websocket.handlers.missions",
+                    "evidence": {"complexity": 25},
+                    "confidence": 0.85,
+                }
+                res = bridge.process_debt_lifecycle(raw_debt)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_debt_remediation_execute_result",
+                        "lifecycle_result": res,
+                    },
+                )
+                return
+
+            elif operation == "mission_debt_remediation_resolve":
+                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                bridge = QualityDebtRemediationBridge.get_instance()
+                resolutions = bridge.store.get_all("resolution_results")
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_debt_remediation_resolve_result",
+                        "resolutions": resolutions,
                     },
                 )
                 return

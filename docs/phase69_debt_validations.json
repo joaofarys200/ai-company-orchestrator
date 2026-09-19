@@ -1,0 +1,57 @@
+[
+  {
+    "validation_id": "val_82ccdd3e",
+    "debt_id": "debt_architectural_2fed990f",
+    "status": "VALID_DEBT",
+    "confidence": 0.94,
+    "evidence_validity": true,
+    "reproducibility": true,
+    "scope": "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph",
+    "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.agents.massive_project_state <-> backend.agents.scc_aware_graph'.",
+    "timestamp": 1789838477.7154105
+  },
+  {
+    "validation_id": "val_a41b98bc",
+    "debt_id": "debt_code_c8cb6f98",
+    "status": "VALID_DEBT",
+    "confidence": 0.9,
+    "evidence_validity": true,
+    "reproducibility": true,
+    "scope": "backend.websocket.handlers.missions.MissionWebSocketHandler",
+    "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.websocket.handlers.missions.MissionWebSocketHandler'.",
+    "timestamp": 1789838477.7160292
+  },
+  {
+    "validation_id": "val_4f4d5871",
+    "debt_id": "debt_test_226e39f3",
+    "status": "VALID_DEBT",
+    "confidence": 0.91,
+    "evidence_validity": true,
+    "reproducibility": true,
+    "scope": "tests.test_collaboration_long_horizon.py",
+    "explanation": "Debt item verified with confirmed structural evidence on surface 'tests.test_collaboration_long_horizon.py'.",
+    "timestamp": 1789838477.716296
+  },
+  {
+    "validation_id": "val_9df04f5e",
+    "debt_id": "debt_operational_563acd45",
+    "status": "VALID_DEBT",
+    "confidence": 0.96,
+    "evidence_validity": true,
+    "reproducibility": true,
+    "scope": "scripts.run_phase67_browser_qa.py",
+    "explanation": "Debt item verified with confirmed structural evidence on surface 'scripts.run_phase67_browser_qa.py'.",
+    "timestamp": 1789838477.7167811
+  },
+  {
+    "validation_id": "val_db002f81",
+    "debt_id": "debt_performance_ee82390c",
+    "status": "VALID_DEBT",
+    "confidence": 0.86,
+    "evidence_validity": true,
+    "reproducibility": true,
+    "scope": "backend.memory.MissionStateStore.sqlite_pool",
+    "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.memory.MissionStateStore.sqlite_pool'.",
+    "timestamp": 1789838477.7172363
+  }
+]

@@ -1,0 +1,79 @@
+[
+  {
+    "debt_id": "debt_architectural_2fed990f",
+    "stage": "ROLLBACK_VERIFIED",
+    "details": {
+      "rollback_id": "rb_9cb7f086",
+      "transaction_id": "tx_c6c3232e",
+      "debt_id": "debt_architectural_2fed990f",
+      "reverted_files": [
+        "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph"
+      ],
+      "success": true,
+      "state_reconciled": true,
+      "pre_patch_hash": "5add3e29ed7b98c4d6bc20e4aa517a3a8abfe8ce0f277b10d9b98936806d3a2f",
+      "post_rollback_hash": "5add3e29ed7b98c4d6bc20e4aa517a3a8abfe8ce0f277b10d9b98936806d3a2f",
+      "rationale": "Transactional rollback succeeded; pre-patch state and hash verified.",
+      "timestamp": 1789838477.7159204
+    }
+  },
+  {
+    "debt_id": "debt_code_c8cb6f98",
+    "stage": "DEFERRED_VERIFIED",
+    "deferment": {
+      "deferment_id": "def_63734827",
+      "debt_id": "debt_code_c8cb6f98",
+      "reason": "Deferred by governance due to budget or priority scheduling.",
+      "risk": 0.15,
+      "expected_cost": 1.5,
+      "revisit_condition": "Next budget cycle",
+      "expiration_date": 1792430477.7161868,
+      "owner": "LeadArchitect",
+      "timestamp": 1789838477.7161877
+    }
+  },
+  {
+    "debt_id": "debt_test_226e39f3",
+    "stage": "PARTIAL_REMEDIATION_VERIFIED",
+    "children": [
+      {
+        "debt_id": "debt_test_226e39f3_child_timeout",
+        "parent_debt_id": "debt_test_226e39f3",
+        "affected_surface": "tests.test_collaboration_long_horizon.py::test_step_timeout_async",
+        "status": "OPEN",
+        "reason": "Remaining hotspot from partial remediation."
+      }
+    ]
+  },
+  {
+    "debt_id": "debt_operational_563acd45",
+    "stage": "RESOLVED_VERIFIED",
+    "verification": {
+      "verification_id": "vrf_59d93754",
+      "debt_id": "debt_operational_563acd45",
+      "original_evidence_invalidated": true,
+      "build_passed": true,
+      "tests_passed": true,
+      "contracts_preserved": true,
+      "behavior_preserved": true,
+      "security_preserved": true,
+      "verification_passed": true,
+      "failure_reasons": []
+    }
+  },
+  {
+    "debt_id": "debt_performance_ee82390c",
+    "stage": "DEFERRED_VERIFIED",
+    "deferment": {
+      "deferment_id": "def_aa53950c",
+      "debt_id": "debt_performance_ee82390c",
+      "reason": "Deferred by governance due to budget or priority scheduling.",
+      "risk": 0.25,
+      "expected_cost": 2.0,
+      "revisit_condition": "Next budget cycle",
+      "expiration_date": 1792430477.717376,
+      "owner": "LeadArchitect",
+      "timestamp": 1789838477.7173765
+    }
+  }
+]

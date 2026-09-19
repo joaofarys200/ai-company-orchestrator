@@ -1,0 +1,70 @@
+[
+  {
+    "resolution_id": "res_35450e5e",
+    "debt_id": "debt_code_c8cb6f98",
+    "status": "DEFERRED",
+    "original_evidence_invalidated": false,
+    "quality_delta": {},
+    "remaining_child_debts": [],
+    "explanation": "Remediation deferred under active governance review.",
+    "timestamp": 1789838477.716225
+  },
+  {
+    "resolution_id": "res_3d36d944",
+    "debt_id": "debt_test_226e39f3",
+    "status": "PARTIALLY_RESOLVED",
+    "original_evidence_invalidated": true,
+    "quality_delta": {
+      "ARCHITECTURE": 0.0,
+      "CODE": 0.0,
+      "TEST": 0.18,
+      "CONTRACT": 0.0,
+      "BEHAVIOR": 0.0,
+      "SECURITY": 0.0,
+      "PERFORMANCE": 0.0,
+      "RELIABILITY": 0.14,
+      "MAINTAINABILITY": 0.0
+    },
+    "remaining_child_debts": [
+      {
+        "debt_id": "debt_test_226e39f3_child_timeout",
+        "parent_debt_id": "debt_test_226e39f3",
+        "affected_surface": "tests.test_collaboration_long_horizon.py::test_step_timeout_async",
+        "status": "OPEN",
+        "reason": "Remaining hotspot from partial remediation."
+      }
+    ],
+    "explanation": "Debt partially resolved (1 remaining hotspot(s) tracked as child debts).",
+    "timestamp": 1789838477.7166893
+  },
+  {
+    "resolution_id": "res_fb33362b",
+    "debt_id": "debt_operational_563acd45",
+    "status": "RESOLVED",
+    "original_evidence_invalidated": true,
+    "quality_delta": {
+      "ARCHITECTURE": 0.0,
+      "CODE": 0.0,
+      "TEST": 0.0,
+      "CONTRACT": 0.0,
+      "BEHAVIOR": 0.0,
+      "SECURITY": 0.0,
+      "PERFORMANCE": 0.0,
+      "RELIABILITY": 0.2,
+      "MAINTAINABILITY": 0.14
+    },
+    "remaining_child_debts": [],
+    "explanation": "Debt verified as fully resolved: evidence invalidated, quality improved, zero critical regressions.",
+    "timestamp": 1789838477.7171483
+  },
+  {
+    "resolution_id": "res_0d6f2e3e",
+    "debt_id": "debt_performance_ee82390c",
+    "status": "DEFERRED",
+    "original_evidence_invalidated": false,
+    "quality_delta": {},
+    "remaining_child_debts": [],
+    "explanation": "Remediation deferred under active governance review.",
+    "timestamp": 1789838477.717403
+  }
+]

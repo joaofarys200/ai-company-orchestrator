@@ -155,6 +155,14 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "mission_quality_governance_debt_list",
         "mission_quality_governance_trend",
         "mission_quality_governance_hotspots",
+        # Phase 69
+        "mission_debt_remediation_status",
+        "mission_debt_remediation_validate",
+        "mission_debt_remediation_root_cause",
+        "mission_debt_remediation_options",
+        "mission_debt_remediation_plan",
+        "mission_debt_remediation_execute",
+        "mission_debt_remediation_resolve",
     }
 )
 

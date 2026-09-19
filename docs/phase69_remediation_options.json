@@ -1,0 +1,272 @@
+[
+  {
+    "option_id": "opt_keep_84c603",
+    "debt_id": "debt_architectural_2fed990f",
+    "option_type": "KEEP_CURRENT",
+    "title": "Keep Current Implementation (No Action)",
+    "description": "Accept existing debt in backend.agents.massive_project_state <-> backend.agents.scc_aware_graph under active observation.",
+    "benefits": [
+      "Zero immediate implementation cost",
+      "No risk of regression from code changes"
+    ],
+    "estimated_cost": 0.0,
+    "risk": 0.6,
+    "affected_files": [],
+    "affected_symbols": [],
+    "affected_contracts": [],
+    "affected_behaviors": [],
+    "verification_requirements": [
+      "Periodic debt reassessment"
+    ],
+    "rollback_strategy": "no_op"
+  },
+  {
+    "option_id": "opt_dep_inv_7fb2b7",
+    "debt_id": "debt_architectural_2fed990f",
+    "option_type": "DEPENDENCY_INVERSION",
+    "title": "Break Cycle via Interface / Dependency Inversion",
+    "description": "Introduce an abstract interface/protocol to break circular coupling in backend.agents.massive_project_state <-> backend.agents.scc_aware_graph.",
+    "benefits": [
+      "Decouples modules",
+      "Eliminates circular SCC dependency",
+      "Preserves public contracts"
+    ],
+    "estimated_cost": 3.5,
+    "risk": 0.25,
+    "affected_files": [
+      "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph"
+    ],
+    "affected_symbols": [
+      "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph.Protocol"
+    ],
+    "affected_contracts": [
+      "InterfaceContract"
+    ],
+    "affected_behaviors": [
+      "CallOrderPreserved"
+    ],
+    "verification_requirements": [
+      "SCC cycle verification",
+      "Interface contract test",
+      "Unit tests"
+    ],
+    "rollback_strategy": "atomic_git_revert"
+  },
+  {
+    "option_id": "opt_mod_ext_c258ee",
+    "debt_id": "debt_architectural_2fed990f",
+    "option_type": "MODULE_EXTRACTION",
+    "title": "Extract Shared Sub-Module",
+    "description": "Extract shared components of backend.agents.massive_project_state <-> backend.agents.scc_aware_graph into a dedicated decoupled package.",
+    "benefits": [
+      "High cohesion",
+      "Clean layered architecture"
+    ],
+    "estimated_cost": 6.0,
+    "risk": 0.45,
+    "affected_files": [
+      "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph",
+      "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph_core.py"
+    ],
+    "affected_symbols": [
+      "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph.SharedEngine"
+    ],
+    "affected_contracts": [
+      "CrossModuleContracts"
+    ],
+    "affected_behaviors": [
+      "StateLifecylePreserved"
+    ],
+    "verification_requirements": [
+      "Architecture rescan",
+      "Full regression suite"
+    ],
+    "rollback_strategy": "atomic_git_revert"
+  },
+  {
+    "option_id": "opt_keep_4106c5",
+    "debt_id": "debt_code_c8cb6f98",
+    "option_type": "KEEP_CURRENT",
+    "title": "Keep Current Implementation (No Action)",
+    "description": "Accept existing debt in backend.websocket.handlers.missions.MissionWebSocketHandler under active observation.",
+    "benefits": [
+      "Zero immediate implementation cost",
+      "No risk of regression from code changes"
+    ],
+    "estimated_cost": 0.0,
+    "risk": 0.6,
+    "affected_files": [],
+    "affected_symbols": [],
+    "affected_contracts": [],
+    "affected_behaviors": [],
+    "verification_requirements": [
+      "Periodic debt reassessment"
+    ],
+    "rollback_strategy": "no_op"
+  },
+  {
+    "option_id": "opt_local_ref_7b7872",
+    "debt_id": "debt_code_c8cb6f98",
+    "option_type": "LOCAL_REFACTOR",
+    "title": "Local Method Extraction and Branch Simplification",
+    "description": "Refactor complex control flow in backend.websocket.handlers.missions.MissionWebSocketHandler into helper methods.",
+    "benefits": [
+      "Reduces cyclomatic complexity",
+      "Improves maintainability index",
+      "Zero API change"
+    ],
+    "estimated_cost": 1.5,
+    "risk": 0.15,
+    "affected_files": [
+      "backend.websocket.handlers.missions.MissionWebSocketHandler"
+    ],
+    "affected_symbols": [
+      "backend.websocket.handlers.missions.MissionWebSocketHandler.helper"
+    ],
+    "affected_contracts": [],
+    "affected_behaviors": [
+      "InputOutputEquivalence"
+    ],
+    "verification_requirements": [
+      "Targeted unit tests",
+      "AST complexity check"
+    ],
+    "rollback_strategy": "atomic_git_revert"
+  },
+  {
+    "option_id": "opt_keep_9fa652",
+    "debt_id": "debt_test_226e39f3",
+    "option_type": "KEEP_CURRENT",
+    "title": "Keep Current Implementation (No Action)",
+    "description": "Accept existing debt in tests.test_collaboration_long_horizon.py under active observation.",
+    "benefits": [
+      "Zero immediate implementation cost",
+      "No risk of regression from code changes"
+    ],
+    "estimated_cost": 0.0,
+    "risk": 0.6,
+    "affected_files": [],
+    "affected_symbols": [],
+    "affected_contracts": [],
+    "affected_behaviors": [],
+    "verification_requirements": [
+      "Periodic debt reassessment"
+    ],
+    "rollback_strategy": "no_op"
+  },
+  {
+    "option_id": "opt_test_exp_acce1f",
+    "debt_id": "debt_test_226e39f3",
+    "option_type": "TEST_EXPANSION",
+    "title": "Expand Test Suite and Stabilize Flaky Fixtures",
+    "description": "Add deterministic mock fixtures and edge case assertions for tests.test_collaboration_long_horizon.py.",
+    "benefits": [
+      "Eliminates flakiness",
+      "Increases test coverage",
+      "Closes regression window"
+    ],
+    "estimated_cost": 2.0,
+    "risk": 0.1,
+    "affected_files": [
+      "tests.test_collaboration_long_horizon.py"
+    ],
+    "affected_symbols": [],
+    "affected_contracts": [],
+    "affected_behaviors": [],
+    "verification_requirements": [
+      "Repeat test execution 10x without flakes"
+    ],
+    "rollback_strategy": "atomic_git_revert"
+  },
+  {
+    "option_id": "opt_keep_9b50bd",
+    "debt_id": "debt_operational_563acd45",
+    "option_type": "KEEP_CURRENT",
+    "title": "Keep Current Implementation (No Action)",
+    "description": "Accept existing debt in scripts.run_phase67_browser_qa.py under active observation.",
+    "benefits": [
+      "Zero immediate implementation cost",
+      "No risk of regression from code changes"
+    ],
+    "estimated_cost": 0.0,
+    "risk": 0.6,
+    "affected_files": [],
+    "affected_symbols": [],
+    "affected_contracts": [],
+    "affected_behaviors": [],
+    "verification_requirements": [
+      "Periodic debt reassessment"
+    ],
+    "rollback_strategy": "no_op"
+  },
+  {
+    "option_id": "opt_obs_0152bb",
+    "debt_id": "debt_operational_563acd45",
+    "option_type": "OBSERVATION_ONLY",
+    "title": "Deep Instrumentation and Human Boundary Review",
+    "description": "Add diagnostic logging and telemetry to scripts.run_phase67_browser_qa.py for human investigation.",
+    "benefits": [
+      "Gathers causal evidence without mutating operational logic"
+    ],
+    "estimated_cost": 1.0,
+    "risk": 0.05,
+    "affected_files": [
+      "scripts.run_phase67_browser_qa.py"
+    ],
+    "affected_symbols": [],
+    "affected_contracts": [],
+    "affected_behaviors": [],
+    "verification_requirements": [
+      "Telemetry ingestion verification"
+    ],
+    "rollback_strategy": "atomic_git_revert"
+  },
+  {
+    "option_id": "opt_keep_c58410",
+    "debt_id": "debt_performance_ee82390c",
+    "option_type": "KEEP_CURRENT",
+    "title": "Keep Current Implementation (No Action)",
+    "description": "Accept existing debt in backend.memory.MissionStateStore.sqlite_pool under active observation.",
+    "benefits": [
+      "Zero immediate implementation cost",
+      "No risk of regression from code changes"
+    ],
+    "estimated_cost": 0.0,
+    "risk": 0.6,
+    "affected_files": [],
+    "affected_symbols": [],
+    "affected_contracts": [],
+    "affected_behaviors": [],
+    "verification_requirements": [
+      "Periodic debt reassessment"
+    ],
+    "rollback_strategy": "no_op"
+  },
+  {
+    "option_id": "opt_perf_opt_bdba0c",
+    "debt_id": "debt_performance_ee82390c",
+    "option_type": "PERFORMANCE_OPTIMIZATION",
+    "title": "Cache Optimization and Query Batching",
+    "description": "Introduce memoization or index lookups in backend.memory.MissionStateStore.sqlite_pool.",
+    "benefits": [
+      "Reduces latency",
+      "Removes N+1 traversal overhead"
+    ],
+    "estimated_cost": 2.0,
+    "risk": 0.25,
+    "affected_files": [
+      "backend.memory.MissionStateStore.sqlite_pool"
+    ],
+    "affected_symbols": [
+      "backend.memory.MissionStateStore.sqlite_pool.lookup_cache"
+    ],
+    "affected_contracts": [],
+    "affected_behaviors": [
+      "DeterministicOutputPreserved"
+    ],
+    "verification_requirements": [
+      "Benchmark latency comparison (<50ms)"
+    ],
+    "rollback_strategy": "atomic_git_revert"
+  }
+]

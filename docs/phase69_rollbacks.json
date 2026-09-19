@@ -1,0 +1,16 @@
+[
+  {
+    "rollback_id": "rb_9cb7f086",
+    "transaction_id": "tx_c6c3232e",
+    "debt_id": "debt_architectural_2fed990f",
+    "reverted_files": [
+      "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph"
+    ],
+    "success": true,
+    "state_reconciled": true,
+    "pre_patch_hash": "5add3e29ed7b98c4d6bc20e4aa517a3a8abfe8ce0f277b10d9b98936806d3a2f",
+    "post_rollback_hash": "5add3e29ed7b98c4d6bc20e4aa517a3a8abfe8ce0f277b10d9b98936806d3a2f",
+    "rationale": "Transactional rollback succeeded; pre-patch state and hash verified.",
+    "timestamp": 1789838477.7159204
+  }
+]

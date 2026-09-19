@@ -1,0 +1,24 @@
+[
+  {
+    "deferment_id": "def_63734827",
+    "debt_id": "debt_code_c8cb6f98",
+    "reason": "Deferred by governance due to budget or priority scheduling.",
+    "risk": 0.15,
+    "expected_cost": 1.5,
+    "revisit_condition": "Next budget cycle",
+    "expiration_date": 1792430477.7161868,
+    "owner": "LeadArchitect",
+    "timestamp": 1789838477.7161877
+  },
+  {
+    "deferment_id": "def_aa53950c",
+    "debt_id": "debt_performance_ee82390c",
+    "reason": "Deferred by governance due to budget or priority scheduling.",
+    "risk": 0.25,
+    "expected_cost": 2.0,
+    "revisit_condition": "Next budget cycle",
+    "expiration_date": 1792430477.717376,
+    "owner": "LeadArchitect",
+    "timestamp": 1789838477.7173765
+  }
+]

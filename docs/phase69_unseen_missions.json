@@ -1,0 +1,2196 @@
+{
+  "timestamp": 1789838494.3563437,
+  "total_missions": 15,
+  "status_distribution": {
+    "RESOLVED": 8,
+    "PARTIALLY_RESOLVED": 1,
+    "DEFERRED": 0,
+    "BLOCKED": 4,
+    "FAILED": 1,
+    "INSUFFICIENT_EVIDENCE": 1
+  },
+  "missions": [
+    {
+      "scenario_id": "unseen_01_arch",
+      "name": "1. Architecture Coupling Debt",
+      "debt_id": "u_arch_01",
+      "category": "ARCHITECTURAL",
+      "observed_status": "PARTIALLY_RESOLVED",
+      "expected_status": "PARTIALLY_RESOLVED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_arch_01",
+        "stage": "LIFECYCLE_COMPLETE",
+        "validation": {
+          "validation_id": "val_617150e3",
+          "debt_id": "u_arch_01",
+          "status": "VALID_DEBT",
+          "confidence": 0.8,
+          "evidence_validity": true,
+          "reproducibility": true,
+          "scope": "backend.mesh.routing",
+          "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.mesh.routing'.",
+          "timestamp": 1789838494.3503785
+        },
+        "root_cause": {
+          "cause_id": "rc_c3c34fb6",
+          "debt_id": "u_arch_01",
+          "category": "ARCHITECTURAL_CAUSE",
+          "description": "Architectural coupling / circular dependency identified in surface: backend.mesh.routing",
+          "evidence": [
+            {
+              "kind": "dependency_graph",
+              "surface": "backend.mesh.routing",
+              "details": {
+                "scc_size": 5
+              }
+            }
+          ],
+          "confidence": 0.8,
+          "affected_surface": "backend.mesh.routing",
+          "timestamp": 1789838494.3504589
+        },
+        "options_count": 3,
+        "chosen_option": {
+          "option_id": "opt_dep_inv_d6958a",
+          "debt_id": "u_arch_01",
+          "option_type": "DEPENDENCY_INVERSION",
+          "title": "Break Cycle via Interface / Dependency Inversion",
+          "description": "Introduce an abstract interface/protocol to break circular coupling in backend.mesh.routing.",
+          "benefits": [
+            "Decouples modules",
+            "Eliminates circular SCC dependency",
+            "Preserves public contracts"
+          ],
+          "estimated_cost": 3.5,
+          "risk": 0.25,
+          "affected_files": [
+            "backend.mesh.routing"
+          ],
+          "affected_symbols": [
+            "backend.mesh.routing.Protocol"
+          ],
+          "affected_contracts": [
+            "InterfaceContract"
+          ],
+          "affected_behaviors": [
+            "CallOrderPreserved"
+          ],
+          "verification_requirements": [
+            "SCC cycle verification",
+            "Interface contract test",
+            "Unit tests"
+          ],
+          "rollback_strategy": "atomic_git_revert"
+        },
+        "governance": {
+          "decision_id": "gov_68fae649",
+          "debt_id": "u_arch_01",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 3.5,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "mission": {
+          "mission_id": "msn_1433664a",
+          "debt_id": "u_arch_01",
+          "plan_id": "plan_00b4c7f0",
+          "status": "INITIALIZED",
+          "current_step_index": 0,
+          "logs": [
+            {
+              "timestamp": 1789838494.3506653,
+              "event": "MISSION_INITIALIZED",
+              "objective": "RESOLVE_DEBT(u_arch_01)",
+              "criteria": [
+                "original_evidence_invalidated",
+                "quality_remeasurement_confirmed",
+                "no_critical_regression",
+                "contracts_preserved",
+                "behavior_preserved",
+                "security_preserved"
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "result_id": "res_1033679b",
+          "patch_id": "ptch_6d69e74f",
+          "transaction_id": "tx_416264cb",
+          "files_modified": [
+            "backend.mesh.routing"
+          ],
+          "status": "SUCCESS",
+          "build_passed": true,
+          "test_passed": true,
+          "details": {
+            "stage": "TRANSACTION_COMMITTED",
+            "snapshots": {
+              "backend.mesh.routing": {
+                "snapshot_hash": "5df953819354",
+                "captured_at": 1789838494.3508415
+              }
+            },
+            "verified_at": 1789838494.350843
+          },
+          "timestamp": 1789838494.3508458
+        },
+        "verification": {
+          "verification_id": "vrf_119d7efc",
+          "debt_id": "u_arch_01",
+          "original_evidence_invalidated": true,
+          "build_passed": true,
+          "tests_passed": true,
+          "contracts_preserved": true,
+          "behavior_preserved": true,
+          "security_preserved": true,
+          "verification_passed": true,
+          "failure_reasons": []
+        },
+        "comparison": {
+          "comparison_id": "cmp_fe01504a",
+          "debt_id": "u_arch_01",
+          "outcome": "REAL_IMPROVEMENT",
+          "improved_dimensions": [
+            "ARCHITECTURE",
+            "CODE",
+            "TEST",
+            "CONTRACT",
+            "BEHAVIOR",
+            "SECURITY",
+            "PERFORMANCE",
+            "RELIABILITY",
+            "MAINTAINABILITY"
+          ],
+          "degraded_dimensions": [],
+          "unchanged_dimensions": [],
+          "dimension_deltas": {
+            "ARCHITECTURE": 0.15,
+            "CODE": 0.15,
+            "TEST": 0.15,
+            "CONTRACT": 0.15,
+            "BEHAVIOR": 0.15,
+            "SECURITY": 0.15,
+            "PERFORMANCE": 0.15,
+            "RELIABILITY": 0.15,
+            "MAINTAINABILITY": 0.15
+          },
+          "summary_text": "Real measurable improvement observed in 9 dimension(s): ARCHITECTURE, CODE, TEST, CONTRACT, BEHAVIOR, SECURITY, PERFORMANCE, RELIABILITY, MAINTAINABILITY."
+        },
+        "resolution": {
+          "resolution_id": "res_b650a835",
+          "debt_id": "u_arch_01",
+          "status": "PARTIALLY_RESOLVED",
+          "original_evidence_invalidated": true,
+          "quality_delta": {
+            "ARCHITECTURE": 0.15,
+            "CODE": 0.15,
+            "TEST": 0.15,
+            "CONTRACT": 0.15,
+            "BEHAVIOR": 0.15,
+            "SECURITY": 0.15,
+            "PERFORMANCE": 0.15,
+            "RELIABILITY": 0.15,
+            "MAINTAINABILITY": 0.15
+          },
+          "remaining_child_debts": [
+            {
+              "debt_id": "u_arch_01_child",
+              "parent_debt_id": "u_arch_01",
+              "affected_surface": "backend.mesh.routing.edge",
+              "status": "OPEN",
+              "reason": "Remaining hotspot from partial remediation."
+            }
+          ],
+          "explanation": "Debt partially resolved (1 remaining hotspot(s) tracked as child debts).",
+          "timestamp": 1789838494.3509793
+        },
+        "lifecycle_duration_ms": 0.81
+      }
+    },
+    {
+      "scenario_id": "unseen_02_code_complexity",
+      "name": "2. Code Complexity Hotspot",
+      "debt_id": "u_code_02",
+      "category": "CODE",
+      "observed_status": "RESOLVED",
+      "expected_status": "RESOLVED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_code_02",
+        "stage": "LIFECYCLE_COMPLETE",
+        "validation": {
+          "validation_id": "val_f59bf0fc",
+          "debt_id": "u_code_02",
+          "status": "VALID_DEBT",
+          "confidence": 0.8,
+          "evidence_validity": true,
+          "reproducibility": true,
+          "scope": "backend.parsers.sql_ast",
+          "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.parsers.sql_ast'.",
+          "timestamp": 1789838494.3510988
+        },
+        "root_cause": {
+          "cause_id": "rc_6840ca9e",
+          "debt_id": "u_code_02",
+          "category": "CODE_CAUSE",
+          "description": "Code complexity hotspot or code duplication in surface: backend.parsers.sql_ast",
+          "evidence": [
+            {
+              "kind": "ast_metric",
+              "surface": "backend.parsers.sql_ast",
+              "details": {
+                "cyclomatic_complexity": 22
+              }
+            }
+          ],
+          "confidence": 0.8,
+          "affected_surface": "backend.parsers.sql_ast",
+          "timestamp": 1789838494.3511345
+        },
+        "options_count": 2,
+        "chosen_option": {
+          "option_id": "opt_local_ref_f89c39",
+          "debt_id": "u_code_02",
+          "option_type": "LOCAL_REFACTOR",
+          "title": "Local Method Extraction and Branch Simplification",
+          "description": "Refactor complex control flow in backend.parsers.sql_ast into helper methods.",
+          "benefits": [
+            "Reduces cyclomatic complexity",
+            "Improves maintainability index",
+            "Zero API change"
+          ],
+          "estimated_cost": 1.5,
+          "risk": 0.15,
+          "affected_files": [
+            "backend.parsers.sql_ast"
+          ],
+          "affected_symbols": [
+            "backend.parsers.sql_ast.helper"
+          ],
+          "affected_contracts": [],
+          "affected_behaviors": [
+            "InputOutputEquivalence"
+          ],
+          "verification_requirements": [
+            "Targeted unit tests",
+            "AST complexity check"
+          ],
+          "rollback_strategy": "atomic_git_revert"
+        },
+        "governance": {
+          "decision_id": "gov_efaebc3f",
+          "debt_id": "u_code_02",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 1.5,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "mission": {
+          "mission_id": "msn_98f5e5f6",
+          "debt_id": "u_code_02",
+          "plan_id": "plan_88c78153",
+          "status": "INITIALIZED",
+          "current_step_index": 0,
+          "logs": [
+            {
+              "timestamp": 1789838494.3512614,
+              "event": "MISSION_INITIALIZED",
+              "objective": "RESOLVE_DEBT(u_code_02)",
+              "criteria": [
+                "original_evidence_invalidated",
+                "quality_remeasurement_confirmed",
+                "no_critical_regression",
+                "contracts_preserved",
+                "behavior_preserved",
+                "security_preserved"
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "result_id": "res_e064ac23",
+          "patch_id": "ptch_21c9a896",
+          "transaction_id": "tx_24278c01",
+          "files_modified": [
+            "backend.parsers.sql_ast"
+          ],
+          "status": "SUCCESS",
+          "build_passed": true,
+          "test_passed": true,
+          "details": {
+            "stage": "TRANSACTION_COMMITTED",
+            "snapshots": {
+              "backend.parsers.sql_ast": {
+                "snapshot_hash": "a0cc01e0cbb6",
+                "captured_at": 1789838494.3513932
+              }
+            },
+            "verified_at": 1789838494.3513944
+          },
+          "timestamp": 1789838494.3513958
+        },
+        "verification": {
+          "verification_id": "vrf_ab2de9b1",
+          "debt_id": "u_code_02",
+          "original_evidence_invalidated": true,
+          "build_passed": true,
+          "tests_passed": true,
+          "contracts_preserved": true,
+          "behavior_preserved": true,
+          "security_preserved": true,
+          "verification_passed": true,
+          "failure_reasons": []
+        },
+        "comparison": {
+          "comparison_id": "cmp_34a211d0",
+          "debt_id": "u_code_02",
+          "outcome": "REAL_IMPROVEMENT",
+          "improved_dimensions": [
+            "CODE"
+          ],
+          "degraded_dimensions": [],
+          "unchanged_dimensions": [
+            "ARCHITECTURE",
+            "TEST",
+            "CONTRACT",
+            "BEHAVIOR",
+            "SECURITY",
+            "PERFORMANCE",
+            "RELIABILITY",
+            "MAINTAINABILITY"
+          ],
+          "dimension_deltas": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.23,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "summary_text": "Real measurable improvement observed in 1 dimension(s): CODE."
+        },
+        "resolution": {
+          "resolution_id": "res_456dde94",
+          "debt_id": "u_code_02",
+          "status": "RESOLVED",
+          "original_evidence_invalidated": true,
+          "quality_delta": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.23,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "remaining_child_debts": [],
+          "explanation": "Debt verified as fully resolved: evidence invalidated, quality improved, zero critical regressions.",
+          "timestamp": 1789838494.3514943
+        },
+        "lifecycle_duration_ms": 0.48
+      }
+    },
+    {
+      "scenario_id": "unseen_03_duplicate_code",
+      "name": "3. Duplicated Code Across Services",
+      "debt_id": "u_dup_03",
+      "category": "CODE",
+      "observed_status": "RESOLVED",
+      "expected_status": "RESOLVED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_dup_03",
+        "stage": "LIFECYCLE_COMPLETE",
+        "validation": {
+          "validation_id": "val_0e5c1c58",
+          "debt_id": "u_dup_03",
+          "status": "VALID_DEBT",
+          "confidence": 0.8,
+          "evidence_validity": true,
+          "reproducibility": true,
+          "scope": "backend.common.helpers",
+          "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.common.helpers'.",
+          "timestamp": 1789838494.35158
+        },
+        "root_cause": {
+          "cause_id": "rc_24b91fa5",
+          "debt_id": "u_dup_03",
+          "category": "CODE_CAUSE",
+          "description": "Code complexity hotspot or code duplication in surface: backend.common.helpers",
+          "evidence": [
+            {
+              "kind": "ast_metric",
+              "surface": "backend.common.helpers",
+              "details": {
+                "clones_count": 4
+              }
+            }
+          ],
+          "confidence": 0.8,
+          "affected_surface": "backend.common.helpers",
+          "timestamp": 1789838494.3516097
+        },
+        "options_count": 2,
+        "chosen_option": {
+          "option_id": "opt_local_ref_332f99",
+          "debt_id": "u_dup_03",
+          "option_type": "LOCAL_REFACTOR",
+          "title": "Local Method Extraction and Branch Simplification",
+          "description": "Refactor complex control flow in backend.common.helpers into helper methods.",
+          "benefits": [
+            "Reduces cyclomatic complexity",
+            "Improves maintainability index",
+            "Zero API change"
+          ],
+          "estimated_cost": 1.5,
+          "risk": 0.15,
+          "affected_files": [
+            "backend.common.helpers"
+          ],
+          "affected_symbols": [
+            "backend.common.helpers.helper"
+          ],
+          "affected_contracts": [],
+          "affected_behaviors": [
+            "InputOutputEquivalence"
+          ],
+          "verification_requirements": [
+            "Targeted unit tests",
+            "AST complexity check"
+          ],
+          "rollback_strategy": "atomic_git_revert"
+        },
+        "governance": {
+          "decision_id": "gov_40681246",
+          "debt_id": "u_dup_03",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 1.5,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "mission": {
+          "mission_id": "msn_e75d2175",
+          "debt_id": "u_dup_03",
+          "plan_id": "plan_3657e960",
+          "status": "INITIALIZED",
+          "current_step_index": 0,
+          "logs": [
+            {
+              "timestamp": 1789838494.3517213,
+              "event": "MISSION_INITIALIZED",
+              "objective": "RESOLVE_DEBT(u_dup_03)",
+              "criteria": [
+                "original_evidence_invalidated",
+                "quality_remeasurement_confirmed",
+                "no_critical_regression",
+                "contracts_preserved",
+                "behavior_preserved",
+                "security_preserved"
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "result_id": "res_46f1f1cf",
+          "patch_id": "ptch_95287b29",
+          "transaction_id": "tx_f06fb524",
+          "files_modified": [
+            "backend.common.helpers"
+          ],
+          "status": "SUCCESS",
+          "build_passed": true,
+          "test_passed": true,
+          "details": {
+            "stage": "TRANSACTION_COMMITTED",
+            "snapshots": {
+              "backend.common.helpers": {
+                "snapshot_hash": "c5b4a56f4c44",
+                "captured_at": 1789838494.351845
+              }
+            },
+            "verified_at": 1789838494.3518457
+          },
+          "timestamp": 1789838494.3518467
+        },
+        "verification": {
+          "verification_id": "vrf_d62f127a",
+          "debt_id": "u_dup_03",
+          "original_evidence_invalidated": true,
+          "build_passed": true,
+          "tests_passed": true,
+          "contracts_preserved": true,
+          "behavior_preserved": true,
+          "security_preserved": true,
+          "verification_passed": true,
+          "failure_reasons": []
+        },
+        "comparison": {
+          "comparison_id": "cmp_e03981a9",
+          "debt_id": "u_dup_03",
+          "outcome": "REAL_IMPROVEMENT",
+          "improved_dimensions": [
+            "CODE"
+          ],
+          "degraded_dimensions": [],
+          "unchanged_dimensions": [
+            "ARCHITECTURE",
+            "TEST",
+            "CONTRACT",
+            "BEHAVIOR",
+            "SECURITY",
+            "PERFORMANCE",
+            "RELIABILITY",
+            "MAINTAINABILITY"
+          ],
+          "dimension_deltas": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.2,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "summary_text": "Real measurable improvement observed in 1 dimension(s): CODE."
+        },
+        "resolution": {
+          "resolution_id": "res_527031d2",
+          "debt_id": "u_dup_03",
+          "status": "RESOLVED",
+          "original_evidence_invalidated": true,
+          "quality_delta": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.2,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "remaining_child_debts": [],
+          "explanation": "Debt verified as fully resolved: evidence invalidated, quality improved, zero critical regressions.",
+          "timestamp": 1789838494.351939
+        },
+        "lifecycle_duration_ms": 0.43
+      }
+    },
+    {
+      "scenario_id": "unseen_04_test_debt",
+      "name": "4. Missing Test Coverage on Critical Path",
+      "debt_id": "u_test_04",
+      "category": "TEST",
+      "observed_status": "RESOLVED",
+      "expected_status": "RESOLVED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_test_04",
+        "stage": "LIFECYCLE_COMPLETE",
+        "validation": {
+          "validation_id": "val_2f041848",
+          "debt_id": "u_test_04",
+          "status": "VALID_DEBT",
+          "confidence": 0.8,
+          "evidence_validity": true,
+          "reproducibility": true,
+          "scope": "tests.test_billing_service",
+          "explanation": "Debt item verified with confirmed structural evidence on surface 'tests.test_billing_service'.",
+          "timestamp": 1789838494.352023
+        },
+        "root_cause": {
+          "cause_id": "rc_76d7505d",
+          "debt_id": "u_test_04",
+          "category": "TEST_CAUSE",
+          "description": "Test debt, coverage gap, or flaky test behavior in surface: tests.test_billing_service",
+          "evidence": [
+            {
+              "kind": "test_suite_trace",
+              "surface": "tests.test_billing_service",
+              "details": {
+                "coverage_percent": 34.0
+              }
+            }
+          ],
+          "confidence": 0.8,
+          "affected_surface": "tests.test_billing_service",
+          "timestamp": 1789838494.3520508
+        },
+        "options_count": 2,
+        "chosen_option": {
+          "option_id": "opt_test_exp_c0f0df",
+          "debt_id": "u_test_04",
+          "option_type": "TEST_EXPANSION",
+          "title": "Expand Test Suite and Stabilize Flaky Fixtures",
+          "description": "Add deterministic mock fixtures and edge case assertions for tests.test_billing_service.",
+          "benefits": [
+            "Eliminates flakiness",
+            "Increases test coverage",
+            "Closes regression window"
+          ],
+          "estimated_cost": 2.0,
+          "risk": 0.1,
+          "affected_files": [
+            "tests.test_billing_service"
+          ],
+          "affected_symbols": [],
+          "affected_contracts": [],
+          "affected_behaviors": [],
+          "verification_requirements": [
+            "Repeat test execution 10x without flakes"
+          ],
+          "rollback_strategy": "atomic_git_revert"
+        },
+        "governance": {
+          "decision_id": "gov_95ae89f2",
+          "debt_id": "u_test_04",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 2.0,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "mission": {
+          "mission_id": "msn_a529cc80",
+          "debt_id": "u_test_04",
+          "plan_id": "plan_ec4f2a82",
+          "status": "INITIALIZED",
+          "current_step_index": 0,
+          "logs": [
+            {
+              "timestamp": 1789838494.35216,
+              "event": "MISSION_INITIALIZED",
+              "objective": "RESOLVE_DEBT(u_test_04)",
+              "criteria": [
+                "original_evidence_invalidated",
+                "quality_remeasurement_confirmed",
+                "no_critical_regression",
+                "contracts_preserved",
+                "behavior_preserved",
+                "security_preserved"
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "result_id": "res_21863985",
+          "patch_id": "ptch_b55c275c",
+          "transaction_id": "tx_3c8cdb01",
+          "files_modified": [
+            "tests.test_billing_service"
+          ],
+          "status": "SUCCESS",
+          "build_passed": true,
+          "test_passed": true,
+          "details": {
+            "stage": "TRANSACTION_COMMITTED",
+            "snapshots": {
+              "tests.test_billing_service": {
+                "snapshot_hash": "55f9625ef1d7",
+                "captured_at": 1789838494.3522944
+              }
+            },
+            "verified_at": 1789838494.352295
+          },
+          "timestamp": 1789838494.352297
+        },
+        "verification": {
+          "verification_id": "vrf_6bff5f96",
+          "debt_id": "u_test_04",
+          "original_evidence_invalidated": true,
+          "build_passed": true,
+          "tests_passed": true,
+          "contracts_preserved": true,
+          "behavior_preserved": true,
+          "security_preserved": true,
+          "verification_passed": true,
+          "failure_reasons": []
+        },
+        "comparison": {
+          "comparison_id": "cmp_8d6fa08d",
+          "debt_id": "u_test_04",
+          "outcome": "REAL_IMPROVEMENT",
+          "improved_dimensions": [
+            "TEST"
+          ],
+          "degraded_dimensions": [],
+          "unchanged_dimensions": [
+            "ARCHITECTURE",
+            "CODE",
+            "CONTRACT",
+            "BEHAVIOR",
+            "SECURITY",
+            "PERFORMANCE",
+            "RELIABILITY",
+            "MAINTAINABILITY"
+          ],
+          "dimension_deltas": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.35,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "summary_text": "Real measurable improvement observed in 1 dimension(s): TEST."
+        },
+        "resolution": {
+          "resolution_id": "res_1dc83aad",
+          "debt_id": "u_test_04",
+          "status": "RESOLVED",
+          "original_evidence_invalidated": true,
+          "quality_delta": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.35,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "remaining_child_debts": [],
+          "explanation": "Debt verified as fully resolved: evidence invalidated, quality improved, zero critical regressions.",
+          "timestamp": 1789838494.3523898
+        },
+        "lifecycle_duration_ms": 0.44
+      }
+    },
+    {
+      "scenario_id": "unseen_05_flaky_test",
+      "name": "5. Flaky Async Test Execution",
+      "debt_id": "u_flaky_05",
+      "category": "TEST",
+      "observed_status": "RESOLVED",
+      "expected_status": "RESOLVED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_flaky_05",
+        "stage": "LIFECYCLE_COMPLETE",
+        "validation": {
+          "validation_id": "val_3ad08fec",
+          "debt_id": "u_flaky_05",
+          "status": "VALID_DEBT",
+          "confidence": 0.8,
+          "evidence_validity": true,
+          "reproducibility": true,
+          "scope": "tests.test_worker_queue",
+          "explanation": "Debt item verified with confirmed structural evidence on surface 'tests.test_worker_queue'.",
+          "timestamp": 1789838494.3524718
+        },
+        "root_cause": {
+          "cause_id": "rc_84040820",
+          "debt_id": "u_flaky_05",
+          "category": "TEST_CAUSE",
+          "description": "Test debt, coverage gap, or flaky test behavior in surface: tests.test_worker_queue",
+          "evidence": [
+            {
+              "kind": "test_suite_trace",
+              "surface": "tests.test_worker_queue",
+              "details": {
+                "timeout_failure_rate": 0.12
+              }
+            }
+          ],
+          "confidence": 0.8,
+          "affected_surface": "tests.test_worker_queue",
+          "timestamp": 1789838494.352501
+        },
+        "options_count": 2,
+        "chosen_option": {
+          "option_id": "opt_test_exp_2eaea4",
+          "debt_id": "u_flaky_05",
+          "option_type": "TEST_EXPANSION",
+          "title": "Expand Test Suite and Stabilize Flaky Fixtures",
+          "description": "Add deterministic mock fixtures and edge case assertions for tests.test_worker_queue.",
+          "benefits": [
+            "Eliminates flakiness",
+            "Increases test coverage",
+            "Closes regression window"
+          ],
+          "estimated_cost": 2.0,
+          "risk": 0.1,
+          "affected_files": [
+            "tests.test_worker_queue"
+          ],
+          "affected_symbols": [],
+          "affected_contracts": [],
+          "affected_behaviors": [],
+          "verification_requirements": [
+            "Repeat test execution 10x without flakes"
+          ],
+          "rollback_strategy": "atomic_git_revert"
+        },
+        "governance": {
+          "decision_id": "gov_6e455865",
+          "debt_id": "u_flaky_05",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 2.0,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "mission": {
+          "mission_id": "msn_140ca9af",
+          "debt_id": "u_flaky_05",
+          "plan_id": "plan_6bf51e8f",
+          "status": "INITIALIZED",
+          "current_step_index": 0,
+          "logs": [
+            {
+              "timestamp": 1789838494.3526075,
+              "event": "MISSION_INITIALIZED",
+              "objective": "RESOLVE_DEBT(u_flaky_05)",
+              "criteria": [
+                "original_evidence_invalidated",
+                "quality_remeasurement_confirmed",
+                "no_critical_regression",
+                "contracts_preserved",
+                "behavior_preserved",
+                "security_preserved"
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "result_id": "res_70b04601",
+          "patch_id": "ptch_13c10b34",
+          "transaction_id": "tx_568ec5a9",
+          "files_modified": [
+            "tests.test_worker_queue"
+          ],
+          "status": "SUCCESS",
+          "build_passed": true,
+          "test_passed": true,
+          "details": {
+            "stage": "TRANSACTION_COMMITTED",
+            "snapshots": {
+              "tests.test_worker_queue": {
+                "snapshot_hash": "e604112c386c",
+                "captured_at": 1789838494.3527346
+              }
+            },
+            "verified_at": 1789838494.352735
+          },
+          "timestamp": 1789838494.3527362
+        },
+        "verification": {
+          "verification_id": "vrf_e3698b2b",
+          "debt_id": "u_flaky_05",
+          "original_evidence_invalidated": true,
+          "build_passed": true,
+          "tests_passed": true,
+          "contracts_preserved": true,
+          "behavior_preserved": true,
+          "security_preserved": true,
+          "verification_passed": true,
+          "failure_reasons": []
+        },
+        "comparison": {
+          "comparison_id": "cmp_96316739",
+          "debt_id": "u_flaky_05",
+          "outcome": "REAL_IMPROVEMENT",
+          "improved_dimensions": [
+            "TEST",
+            "RELIABILITY"
+          ],
+          "degraded_dimensions": [],
+          "unchanged_dimensions": [
+            "ARCHITECTURE",
+            "CODE",
+            "CONTRACT",
+            "BEHAVIOR",
+            "SECURITY",
+            "PERFORMANCE",
+            "MAINTAINABILITY"
+          ],
+          "dimension_deltas": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.32,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.25,
+            "MAINTAINABILITY": 0.0
+          },
+          "summary_text": "Real measurable improvement observed in 2 dimension(s): TEST, RELIABILITY."
+        },
+        "resolution": {
+          "resolution_id": "res_c9b088fe",
+          "debt_id": "u_flaky_05",
+          "status": "RESOLVED",
+          "original_evidence_invalidated": true,
+          "quality_delta": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.32,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.25,
+            "MAINTAINABILITY": 0.0
+          },
+          "remaining_child_debts": [],
+          "explanation": "Debt verified as fully resolved: evidence invalidated, quality improved, zero critical regressions.",
+          "timestamp": 1789838494.3528242
+        },
+        "lifecycle_duration_ms": 0.43
+      }
+    },
+    {
+      "scenario_id": "unseen_06_contract_debt",
+      "name": "6. Contract Incompatibility and Schema Drift",
+      "debt_id": "u_cntr_06",
+      "category": "CONTRACT",
+      "observed_status": "BLOCKED",
+      "expected_status": "BLOCKED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_cntr_06",
+        "stage": "BLOCKED",
+        "governance": {
+          "decision_id": "gov_0a8fe18b",
+          "debt_id": "u_cntr_06",
+          "decision": "HUMAN_REVIEW_REQUIRED",
+          "authorized": false,
+          "budget_allocated": {},
+          "block_reasons": [
+            "Remediation touches public contracts without explicit governance approval."
+          ],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": false
+          }
+        },
+        "resolution": {
+          "resolution_id": "res_83432d7d",
+          "debt_id": "u_cntr_06",
+          "status": "BLOCKED",
+          "original_evidence_invalidated": false,
+          "quality_delta": {},
+          "remaining_child_debts": [],
+          "explanation": "Remediation blocked by policy, contract violation, or security constraint.",
+          "timestamp": 1789838494.3530712
+        },
+        "lifecycle_duration_ms": 0.21
+      }
+    },
+    {
+      "scenario_id": "unseen_07_behavior_debt",
+      "name": "7. Runtime Invariant State Machine Drift",
+      "debt_id": "u_beh_07",
+      "category": "BEHAVIOR",
+      "observed_status": "BLOCKED",
+      "expected_status": "BLOCKED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_beh_07",
+        "stage": "BLOCKED",
+        "governance": {
+          "decision_id": "gov_82bf7ae2",
+          "debt_id": "u_beh_07",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 2.5,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "resolution": {
+          "resolution_id": "res_a9dca7fb",
+          "debt_id": "u_beh_07",
+          "status": "BLOCKED",
+          "original_evidence_invalidated": false,
+          "quality_delta": {},
+          "remaining_child_debts": [],
+          "explanation": "Remediation blocked by policy, contract violation, or security constraint.",
+          "timestamp": 1789838494.353268
+        },
+        "lifecycle_duration_ms": 0.19
+      }
+    },
+    {
+      "scenario_id": "unseen_08_security_debt",
+      "name": "8. Security Policy Mutation Attempt",
+      "debt_id": "u_sec_08",
+      "category": "CRITICAL_SECURITY",
+      "observed_status": "BLOCKED",
+      "expected_status": "BLOCKED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_sec_08",
+        "stage": "BLOCKED",
+        "governance": {
+          "decision_id": "gov_73b1cae7",
+          "debt_id": "u_sec_08",
+          "decision": "HUMAN_REVIEW_REQUIRED",
+          "authorized": false,
+          "budget_allocated": {},
+          "block_reasons": [
+            "Critical security debt remediation requires explicit human authorization.",
+            "Remediation touches public contracts without explicit governance approval."
+          ],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": false,
+            "contract_approved": false
+          }
+        },
+        "resolution": {
+          "resolution_id": "res_54522d07",
+          "debt_id": "u_sec_08",
+          "status": "BLOCKED",
+          "original_evidence_invalidated": false,
+          "quality_delta": {},
+          "remaining_child_debts": [],
+          "explanation": "Remediation blocked by policy, contract violation, or security constraint.",
+          "timestamp": 1789838494.353474
+        },
+        "lifecycle_duration_ms": 0.2
+      }
+    },
+    {
+      "scenario_id": "unseen_09_performance_debt",
+      "name": "9. N+1 Query Degradation Hotspot",
+      "debt_id": "u_perf_09",
+      "category": "PERFORMANCE",
+      "observed_status": "RESOLVED",
+      "expected_status": "RESOLVED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_perf_09",
+        "stage": "LIFECYCLE_COMPLETE",
+        "validation": {
+          "validation_id": "val_732a1af3",
+          "debt_id": "u_perf_09",
+          "status": "VALID_DEBT",
+          "confidence": 0.8,
+          "evidence_validity": true,
+          "reproducibility": true,
+          "scope": "backend.db.repositories",
+          "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.db.repositories'.",
+          "timestamp": 1789838494.3535242
+        },
+        "root_cause": {
+          "cause_id": "rc_b40355fb",
+          "debt_id": "u_perf_09",
+          "category": "PERFORMANCE_CAUSE",
+          "description": "Performance bottleneck or unindexed resource access in surface: backend.db.repositories",
+          "evidence": [
+            {
+              "kind": "profiler_samples",
+              "surface": "backend.db.repositories",
+              "details": {
+                "n_plus_1_queries": 45
+              }
+            }
+          ],
+          "confidence": 0.8,
+          "affected_surface": "backend.db.repositories",
+          "timestamp": 1789838494.3535533
+        },
+        "options_count": 2,
+        "chosen_option": {
+          "option_id": "opt_perf_opt_5a4b2f",
+          "debt_id": "u_perf_09",
+          "option_type": "PERFORMANCE_OPTIMIZATION",
+          "title": "Cache Optimization and Query Batching",
+          "description": "Introduce memoization or index lookups in backend.db.repositories.",
+          "benefits": [
+            "Reduces latency",
+            "Removes N+1 traversal overhead"
+          ],
+          "estimated_cost": 2.0,
+          "risk": 0.25,
+          "affected_files": [
+            "backend.db.repositories"
+          ],
+          "affected_symbols": [
+            "backend.db.repositories.lookup_cache"
+          ],
+          "affected_contracts": [],
+          "affected_behaviors": [
+            "DeterministicOutputPreserved"
+          ],
+          "verification_requirements": [
+            "Benchmark latency comparison (<50ms)"
+          ],
+          "rollback_strategy": "atomic_git_revert"
+        },
+        "governance": {
+          "decision_id": "gov_eb0c01c5",
+          "debt_id": "u_perf_09",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 2.0,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "mission": {
+          "mission_id": "msn_f99f7e94",
+          "debt_id": "u_perf_09",
+          "plan_id": "plan_356ce90b",
+          "status": "INITIALIZED",
+          "current_step_index": 0,
+          "logs": [
+            {
+              "timestamp": 1789838494.3536558,
+              "event": "MISSION_INITIALIZED",
+              "objective": "RESOLVE_DEBT(u_perf_09)",
+              "criteria": [
+                "original_evidence_invalidated",
+                "quality_remeasurement_confirmed",
+                "no_critical_regression",
+                "contracts_preserved",
+                "behavior_preserved",
+                "security_preserved"
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "result_id": "res_684616c2",
+          "patch_id": "ptch_da21b29c",
+          "transaction_id": "tx_be29eb1d",
+          "files_modified": [
+            "backend.db.repositories"
+          ],
+          "status": "SUCCESS",
+          "build_passed": true,
+          "test_passed": true,
+          "details": {
+            "stage": "TRANSACTION_COMMITTED",
+            "snapshots": {
+              "backend.db.repositories": {
+                "snapshot_hash": "db98abfc4af4",
+                "captured_at": 1789838494.3537831
+              }
+            },
+            "verified_at": 1789838494.3537836
+          },
+          "timestamp": 1789838494.3537848
+        },
+        "verification": {
+          "verification_id": "vrf_f00999c6",
+          "debt_id": "u_perf_09",
+          "original_evidence_invalidated": true,
+          "build_passed": true,
+          "tests_passed": true,
+          "contracts_preserved": true,
+          "behavior_preserved": true,
+          "security_preserved": true,
+          "verification_passed": true,
+          "failure_reasons": []
+        },
+        "comparison": {
+          "comparison_id": "cmp_32fa7a77",
+          "debt_id": "u_perf_09",
+          "outcome": "REAL_IMPROVEMENT",
+          "improved_dimensions": [
+            "PERFORMANCE"
+          ],
+          "degraded_dimensions": [],
+          "unchanged_dimensions": [
+            "ARCHITECTURE",
+            "CODE",
+            "TEST",
+            "CONTRACT",
+            "BEHAVIOR",
+            "SECURITY",
+            "RELIABILITY",
+            "MAINTAINABILITY"
+          ],
+          "dimension_deltas": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.33,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "summary_text": "Real measurable improvement observed in 1 dimension(s): PERFORMANCE."
+        },
+        "resolution": {
+          "resolution_id": "res_2a47ec42",
+          "debt_id": "u_perf_09",
+          "status": "RESOLVED",
+          "original_evidence_invalidated": true,
+          "quality_delta": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.33,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "remaining_child_debts": [],
+          "explanation": "Debt verified as fully resolved: evidence invalidated, quality improved, zero critical regressions.",
+          "timestamp": 1789838494.353878
+        },
+        "lifecycle_duration_ms": 0.42
+      }
+    },
+    {
+      "scenario_id": "unseen_10_reliability_debt",
+      "name": "10. Unhandled Remote Disconnection Crash",
+      "debt_id": "u_rel_10",
+      "category": "RELIABILITY",
+      "observed_status": "RESOLVED",
+      "expected_status": "RESOLVED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_rel_10",
+        "stage": "LIFECYCLE_COMPLETE",
+        "validation": {
+          "validation_id": "val_4caa3a76",
+          "debt_id": "u_rel_10",
+          "status": "VALID_DEBT",
+          "confidence": 0.8,
+          "evidence_validity": true,
+          "reproducibility": true,
+          "scope": "backend.io.socket_client",
+          "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.io.socket_client'.",
+          "timestamp": 1789838494.3539577
+        },
+        "root_cause": {
+          "cause_id": "rc_704687ee",
+          "debt_id": "u_rel_10",
+          "category": "RELIABILITY_CAUSE",
+          "description": "Reliability failure or unhandled exception risk in surface: backend.io.socket_client",
+          "evidence": [
+            {
+              "kind": "error_log_trace",
+              "surface": "backend.io.socket_client",
+              "details": {
+                "unhandled_exceptions_count": 8
+              }
+            }
+          ],
+          "confidence": 0.8,
+          "affected_surface": "backend.io.socket_client",
+          "timestamp": 1789838494.3539855
+        },
+        "options_count": 2,
+        "chosen_option": {
+          "option_id": "opt_rel_imp_a505a4",
+          "debt_id": "u_rel_10",
+          "option_type": "RELIABILITY_IMPROVEMENT",
+          "title": "Implement Resilient Retries and Circuit Breaker",
+          "description": "Wrap fragile I/O in backend.io.socket_client with bounded exponential backoff.",
+          "benefits": [
+            "Prevents cascading failures",
+            "Guarantees graceful degradation"
+          ],
+          "estimated_cost": 2.0,
+          "risk": 0.18,
+          "affected_files": [
+            "backend.io.socket_client"
+          ],
+          "affected_symbols": [
+            "backend.io.socket_client.retry_guard"
+          ],
+          "affected_contracts": [],
+          "affected_behaviors": [
+            "FailureContainment"
+          ],
+          "verification_requirements": [
+            "Fault injection test suite"
+          ],
+          "rollback_strategy": "atomic_git_revert"
+        },
+        "governance": {
+          "decision_id": "gov_eb57c661",
+          "debt_id": "u_rel_10",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 2.0,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "mission": {
+          "mission_id": "msn_8b3182af",
+          "debt_id": "u_rel_10",
+          "plan_id": "plan_f9b5ec4d",
+          "status": "INITIALIZED",
+          "current_step_index": 0,
+          "logs": [
+            {
+              "timestamp": 1789838494.3540893,
+              "event": "MISSION_INITIALIZED",
+              "objective": "RESOLVE_DEBT(u_rel_10)",
+              "criteria": [
+                "original_evidence_invalidated",
+                "quality_remeasurement_confirmed",
+                "no_critical_regression",
+                "contracts_preserved",
+                "behavior_preserved",
+                "security_preserved"
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "result_id": "res_2fe85827",
+          "patch_id": "ptch_408f9340",
+          "transaction_id": "tx_5385dc52",
+          "files_modified": [
+            "backend.io.socket_client"
+          ],
+          "status": "SUCCESS",
+          "build_passed": true,
+          "test_passed": true,
+          "details": {
+            "stage": "TRANSACTION_COMMITTED",
+            "snapshots": {
+              "backend.io.socket_client": {
+                "snapshot_hash": "ce56256dbd6c",
+                "captured_at": 1789838494.354212
+              }
+            },
+            "verified_at": 1789838494.3542125
+          },
+          "timestamp": 1789838494.354214
+        },
+        "verification": {
+          "verification_id": "vrf_a88275ae",
+          "debt_id": "u_rel_10",
+          "original_evidence_invalidated": true,
+          "build_passed": true,
+          "tests_passed": true,
+          "contracts_preserved": true,
+          "behavior_preserved": true,
+          "security_preserved": true,
+          "verification_passed": true,
+          "failure_reasons": []
+        },
+        "comparison": {
+          "comparison_id": "cmp_c0252f27",
+          "debt_id": "u_rel_10",
+          "outcome": "REAL_IMPROVEMENT",
+          "improved_dimensions": [
+            "RELIABILITY"
+          ],
+          "degraded_dimensions": [],
+          "unchanged_dimensions": [
+            "ARCHITECTURE",
+            "CODE",
+            "TEST",
+            "CONTRACT",
+            "BEHAVIOR",
+            "SECURITY",
+            "PERFORMANCE",
+            "MAINTAINABILITY"
+          ],
+          "dimension_deltas": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.32,
+            "MAINTAINABILITY": 0.0
+          },
+          "summary_text": "Real measurable improvement observed in 1 dimension(s): RELIABILITY."
+        },
+        "resolution": {
+          "resolution_id": "res_5be2baf2",
+          "debt_id": "u_rel_10",
+          "status": "RESOLVED",
+          "original_evidence_invalidated": true,
+          "quality_delta": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.32,
+            "MAINTAINABILITY": 0.0
+          },
+          "remaining_child_debts": [],
+          "explanation": "Debt verified as fully resolved: evidence invalidated, quality improved, zero critical regressions.",
+          "timestamp": 1789838494.3543177
+        },
+        "lifecycle_duration_ms": 0.6
+      }
+    },
+    {
+      "scenario_id": "unseen_11_maintainability_debt",
+      "name": "11. Deeply Nested Legacy Utilities",
+      "debt_id": "u_maint_11",
+      "category": "CODE",
+      "observed_status": "RESOLVED",
+      "expected_status": "RESOLVED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_maint_11",
+        "stage": "LIFECYCLE_COMPLETE",
+        "validation": {
+          "validation_id": "val_73f391d8",
+          "debt_id": "u_maint_11",
+          "status": "VALID_DEBT",
+          "confidence": 0.8,
+          "evidence_validity": true,
+          "reproducibility": true,
+          "scope": "backend.legacy.string_utils",
+          "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.legacy.string_utils'.",
+          "timestamp": 1789838494.3545842
+        },
+        "root_cause": {
+          "cause_id": "rc_a947eef7",
+          "debt_id": "u_maint_11",
+          "category": "CODE_CAUSE",
+          "description": "Code complexity hotspot or code duplication in surface: backend.legacy.string_utils",
+          "evidence": [
+            {
+              "kind": "ast_metric",
+              "surface": "backend.legacy.string_utils",
+              "details": {
+                "nesting_depth": 7
+              }
+            }
+          ],
+          "confidence": 0.8,
+          "affected_surface": "backend.legacy.string_utils",
+          "timestamp": 1789838494.354624
+        },
+        "options_count": 2,
+        "chosen_option": {
+          "option_id": "opt_local_ref_dd5cd7",
+          "debt_id": "u_maint_11",
+          "option_type": "LOCAL_REFACTOR",
+          "title": "Local Method Extraction and Branch Simplification",
+          "description": "Refactor complex control flow in backend.legacy.string_utils into helper methods.",
+          "benefits": [
+            "Reduces cyclomatic complexity",
+            "Improves maintainability index",
+            "Zero API change"
+          ],
+          "estimated_cost": 1.5,
+          "risk": 0.15,
+          "affected_files": [
+            "backend.legacy.string_utils"
+          ],
+          "affected_symbols": [
+            "backend.legacy.string_utils.helper"
+          ],
+          "affected_contracts": [],
+          "affected_behaviors": [
+            "InputOutputEquivalence"
+          ],
+          "verification_requirements": [
+            "Targeted unit tests",
+            "AST complexity check"
+          ],
+          "rollback_strategy": "atomic_git_revert"
+        },
+        "governance": {
+          "decision_id": "gov_c8c524ad",
+          "debt_id": "u_maint_11",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 1.5,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "mission": {
+          "mission_id": "msn_a1d23b07",
+          "debt_id": "u_maint_11",
+          "plan_id": "plan_827b9e2b",
+          "status": "INITIALIZED",
+          "current_step_index": 0,
+          "logs": [
+            {
+              "timestamp": 1789838494.354736,
+              "event": "MISSION_INITIALIZED",
+              "objective": "RESOLVE_DEBT(u_maint_11)",
+              "criteria": [
+                "original_evidence_invalidated",
+                "quality_remeasurement_confirmed",
+                "no_critical_regression",
+                "contracts_preserved",
+                "behavior_preserved",
+                "security_preserved"
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "result_id": "res_13d17781",
+          "patch_id": "ptch_f2259c86",
+          "transaction_id": "tx_5576518c",
+          "files_modified": [
+            "backend.legacy.string_utils"
+          ],
+          "status": "SUCCESS",
+          "build_passed": true,
+          "test_passed": true,
+          "details": {
+            "stage": "TRANSACTION_COMMITTED",
+            "snapshots": {
+              "backend.legacy.string_utils": {
+                "snapshot_hash": "f52e3adbbebf",
+                "captured_at": 1789838494.354863
+              }
+            },
+            "verified_at": 1789838494.3548636
+          },
+          "timestamp": 1789838494.3548646
+        },
+        "verification": {
+          "verification_id": "vrf_3075ff9b",
+          "debt_id": "u_maint_11",
+          "original_evidence_invalidated": true,
+          "build_passed": true,
+          "tests_passed": true,
+          "contracts_preserved": true,
+          "behavior_preserved": true,
+          "security_preserved": true,
+          "verification_passed": true,
+          "failure_reasons": []
+        },
+        "comparison": {
+          "comparison_id": "cmp_1ea32aaf",
+          "debt_id": "u_maint_11",
+          "outcome": "REAL_IMPROVEMENT",
+          "improved_dimensions": [
+            "MAINTAINABILITY"
+          ],
+          "degraded_dimensions": [],
+          "unchanged_dimensions": [
+            "ARCHITECTURE",
+            "CODE",
+            "TEST",
+            "CONTRACT",
+            "BEHAVIOR",
+            "SECURITY",
+            "PERFORMANCE",
+            "RELIABILITY"
+          ],
+          "dimension_deltas": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.28
+          },
+          "summary_text": "Real measurable improvement observed in 1 dimension(s): MAINTAINABILITY."
+        },
+        "resolution": {
+          "resolution_id": "res_4fe41a67",
+          "debt_id": "u_maint_11",
+          "status": "RESOLVED",
+          "original_evidence_invalidated": true,
+          "quality_delta": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.28
+          },
+          "remaining_child_debts": [],
+          "explanation": "Debt verified as fully resolved: evidence invalidated, quality improved, zero critical regressions.",
+          "timestamp": 1789838494.3549588
+        },
+        "lifecycle_duration_ms": 0.46
+      }
+    },
+    {
+      "scenario_id": "unseen_12_recurring_regression",
+      "name": "12. Recurring Regression Reopening",
+      "debt_id": "u_regr_12",
+      "category": "CODE",
+      "observed_status": "FAILED",
+      "expected_status": "FAILED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_regr_12",
+        "stage": "ROLLED_BACK",
+        "implementation": {
+          "result_id": "res_86296162",
+          "patch_id": "ptch_651a2b79",
+          "transaction_id": "tx_7c92e47c",
+          "files_modified": [
+            "backend.transforms.encoder"
+          ],
+          "status": "FAILED",
+          "build_passed": true,
+          "test_passed": false,
+          "details": {
+            "stage": "TEST_SUITE_FAILED",
+            "snapshots": {
+              "backend.transforms.encoder": {
+                "snapshot_hash": "f9901d3bd67c",
+                "captured_at": 1789838494.3553085
+              }
+            }
+          },
+          "timestamp": 1789838494.3553107
+        },
+        "rollback": {
+          "rollback_id": "rb_e2f984e6",
+          "transaction_id": "tx_7c92e47c",
+          "debt_id": "u_regr_12",
+          "reverted_files": [
+            "backend.transforms.encoder"
+          ],
+          "success": true,
+          "state_reconciled": true,
+          "pre_patch_hash": "5add3e29ed7b98c4d6bc20e4aa517a3a8abfe8ce0f277b10d9b98936806d3a2f",
+          "post_rollback_hash": "5add3e29ed7b98c4d6bc20e4aa517a3a8abfe8ce0f277b10d9b98936806d3a2f",
+          "rationale": "Transactional rollback succeeded; pre-patch state and hash verified.",
+          "timestamp": 1789838494.355352
+        },
+        "resolution": "FAILED",
+        "lifecycle_duration_ms": 0.4
+      }
+    },
+    {
+      "scenario_id": "unseen_13_multi_agent",
+      "name": "13. Multi-Agent Coordinated Refactoring",
+      "debt_id": "u_multi_13",
+      "category": "ARCHITECTURAL",
+      "observed_status": "RESOLVED",
+      "expected_status": "RESOLVED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_multi_13",
+        "stage": "LIFECYCLE_COMPLETE",
+        "validation": {
+          "validation_id": "val_337af2c4",
+          "debt_id": "u_multi_13",
+          "status": "VALID_DEBT",
+          "confidence": 0.8,
+          "evidence_validity": true,
+          "reproducibility": true,
+          "scope": "backend.services.coordination",
+          "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.services.coordination'.",
+          "timestamp": 1789838494.3554523
+        },
+        "root_cause": {
+          "cause_id": "rc_1cbeb1d5",
+          "debt_id": "u_multi_13",
+          "category": "ARCHITECTURAL_CAUSE",
+          "description": "Architectural coupling / circular dependency identified in surface: backend.services.coordination",
+          "evidence": [
+            {
+              "kind": "dependency_graph",
+              "surface": "backend.services.coordination",
+              "details": {
+                "parallel_modules": 3
+              }
+            }
+          ],
+          "confidence": 0.8,
+          "affected_surface": "backend.services.coordination",
+          "timestamp": 1789838494.3554833
+        },
+        "options_count": 3,
+        "chosen_option": {
+          "option_id": "opt_dep_inv_7f04da",
+          "debt_id": "u_multi_13",
+          "option_type": "DEPENDENCY_INVERSION",
+          "title": "Break Cycle via Interface / Dependency Inversion",
+          "description": "Introduce an abstract interface/protocol to break circular coupling in backend.services.coordination.",
+          "benefits": [
+            "Decouples modules",
+            "Eliminates circular SCC dependency",
+            "Preserves public contracts"
+          ],
+          "estimated_cost": 3.5,
+          "risk": 0.25,
+          "affected_files": [
+            "backend.services.coordination"
+          ],
+          "affected_symbols": [
+            "backend.services.coordination.Protocol"
+          ],
+          "affected_contracts": [
+            "InterfaceContract"
+          ],
+          "affected_behaviors": [
+            "CallOrderPreserved"
+          ],
+          "verification_requirements": [
+            "SCC cycle verification",
+            "Interface contract test",
+            "Unit tests"
+          ],
+          "rollback_strategy": "atomic_git_revert"
+        },
+        "governance": {
+          "decision_id": "gov_8e21b4f4",
+          "debt_id": "u_multi_13",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 3.5,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "mission": {
+          "mission_id": "msn_2614ea62",
+          "debt_id": "u_multi_13",
+          "plan_id": "plan_08d1760c",
+          "status": "INITIALIZED",
+          "current_step_index": 0,
+          "logs": [
+            {
+              "timestamp": 1789838494.3556163,
+              "event": "MISSION_INITIALIZED",
+              "objective": "RESOLVE_DEBT(u_multi_13)",
+              "criteria": [
+                "original_evidence_invalidated",
+                "quality_remeasurement_confirmed",
+                "no_critical_regression",
+                "contracts_preserved",
+                "behavior_preserved",
+                "security_preserved"
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "result_id": "res_628ae46c",
+          "patch_id": "ptch_89a06efe",
+          "transaction_id": "tx_dba9aa52",
+          "files_modified": [
+            "backend.services.coordination"
+          ],
+          "status": "SUCCESS",
+          "build_passed": true,
+          "test_passed": true,
+          "details": {
+            "stage": "TRANSACTION_COMMITTED",
+            "snapshots": {
+              "backend.services.coordination": {
+                "snapshot_hash": "70581c86fc92",
+                "captured_at": 1789838494.3557427
+              }
+            },
+            "verified_at": 1789838494.3557432
+          },
+          "timestamp": 1789838494.3557444
+        },
+        "verification": {
+          "verification_id": "vrf_128b0b15",
+          "debt_id": "u_multi_13",
+          "original_evidence_invalidated": true,
+          "build_passed": true,
+          "tests_passed": true,
+          "contracts_preserved": true,
+          "behavior_preserved": true,
+          "security_preserved": true,
+          "verification_passed": true,
+          "failure_reasons": []
+        },
+        "comparison": {
+          "comparison_id": "cmp_fa781f51",
+          "debt_id": "u_multi_13",
+          "outcome": "REAL_IMPROVEMENT",
+          "improved_dimensions": [
+            "ARCHITECTURE"
+          ],
+          "degraded_dimensions": [],
+          "unchanged_dimensions": [
+            "CODE",
+            "TEST",
+            "CONTRACT",
+            "BEHAVIOR",
+            "SECURITY",
+            "PERFORMANCE",
+            "RELIABILITY",
+            "MAINTAINABILITY"
+          ],
+          "dimension_deltas": {
+            "ARCHITECTURE": 0.2,
+            "CODE": 0.0,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "summary_text": "Real measurable improvement observed in 1 dimension(s): ARCHITECTURE."
+        },
+        "resolution": {
+          "resolution_id": "res_87bc0eb2",
+          "debt_id": "u_multi_13",
+          "status": "RESOLVED",
+          "original_evidence_invalidated": true,
+          "quality_delta": {
+            "ARCHITECTURE": 0.2,
+            "CODE": 0.0,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "remaining_child_debts": [],
+          "explanation": "Debt verified as fully resolved: evidence invalidated, quality improved, zero critical regressions.",
+          "timestamp": 1789838494.3558328
+        },
+        "lifecycle_duration_ms": 0.45
+      }
+    },
+    {
+      "scenario_id": "unseen_14_quality_gaming",
+      "name": "14. Quality Gaming Attempt via Test Deletion",
+      "debt_id": "u_game_14",
+      "category": "CODE",
+      "observed_status": "BLOCKED",
+      "expected_status": "BLOCKED",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_game_14",
+        "stage": "QUALITY_GAMING_DETECTED",
+        "gaming_event": {
+          "event_id": "game_afa60a58",
+          "gaming_type": "TEST_DELETION",
+          "actor": "Agent_Rogue",
+          "reason": "Attempted deletion of test suite(s): tests/test_fast_path.py to artificially increase pass velocity.",
+          "blocked": true,
+          "timestamp": 1789838494.35589
+        },
+        "resolution": {
+          "status": "BLOCKED",
+          "explanation": "Blocked by Quality Gaming Defense."
+        }
+      }
+    },
+    {
+      "scenario_id": "unseen_15_unknown_cause",
+      "name": "15. Undetermined Root Cause Anomaly",
+      "debt_id": "u_unk_15",
+      "category": "UNCLASSIFIED_CORRELATION",
+      "observed_status": "INSUFFICIENT_EVIDENCE",
+      "expected_status": "INSUFFICIENT_EVIDENCE",
+      "matches_expected": true,
+      "lifecycle_data": {
+        "debt_id": "u_unk_15",
+        "stage": "LIFECYCLE_COMPLETE",
+        "validation": {
+          "validation_id": "val_40a51e9e",
+          "debt_id": "u_unk_15",
+          "status": "VALID_DEBT",
+          "confidence": 0.8,
+          "evidence_validity": true,
+          "reproducibility": true,
+          "scope": "backend.misc.transient",
+          "explanation": "Debt item verified with confirmed structural evidence on surface 'backend.misc.transient'.",
+          "timestamp": 1789838494.3559296
+        },
+        "root_cause": {
+          "cause_id": "rc_fa86b7ec",
+          "debt_id": "u_unk_15",
+          "category": "UNKNOWN_CAUSE",
+          "description": "Causal origin cannot be reliably isolated for category 'UNCLASSIFIED_CORRELATION'. Routed to BOUNDARY_ANALYSIS and HUMAN_REVIEW.",
+          "evidence": [
+            {
+              "kind": "unresolved_correlation",
+              "surface": "backend.misc.transient",
+              "details": {
+                "correlation_only": true
+              }
+            }
+          ],
+          "confidence": 0.3,
+          "affected_surface": "backend.misc.transient",
+          "timestamp": 1789838494.3559613
+        },
+        "options_count": 2,
+        "chosen_option": {
+          "option_id": "opt_obs_1ca8c0",
+          "debt_id": "u_unk_15",
+          "option_type": "OBSERVATION_ONLY",
+          "title": "Deep Instrumentation and Human Boundary Review",
+          "description": "Add diagnostic logging and telemetry to backend.misc.transient for human investigation.",
+          "benefits": [
+            "Gathers causal evidence without mutating operational logic"
+          ],
+          "estimated_cost": 1.0,
+          "risk": 0.05,
+          "affected_files": [
+            "backend.misc.transient"
+          ],
+          "affected_symbols": [],
+          "affected_contracts": [],
+          "affected_behaviors": [],
+          "verification_requirements": [
+            "Telemetry ingestion verification"
+          ],
+          "rollback_strategy": "atomic_git_revert"
+        },
+        "governance": {
+          "decision_id": "gov_909553f4",
+          "debt_id": "u_unk_15",
+          "decision": "APPROVED",
+          "authorized": true,
+          "budget_allocated": {
+            "max_cost": 1.0,
+            "max_files": 1,
+            "max_retries": 1
+          },
+          "block_reasons": [],
+          "compliance_checks": {
+            "budget_available": true,
+            "cost_within_limit": true,
+            "risk_within_limit": true,
+            "security_hard_block": true,
+            "contract_approved": true
+          }
+        },
+        "mission": {
+          "mission_id": "msn_45cbac96",
+          "debt_id": "u_unk_15",
+          "plan_id": "plan_798c2bac",
+          "status": "INITIALIZED",
+          "current_step_index": 0,
+          "logs": [
+            {
+              "timestamp": 1789838494.3560698,
+              "event": "MISSION_INITIALIZED",
+              "objective": "RESOLVE_DEBT(u_unk_15)",
+              "criteria": [
+                "original_evidence_invalidated",
+                "quality_remeasurement_confirmed",
+                "no_critical_regression",
+                "contracts_preserved",
+                "behavior_preserved",
+                "security_preserved"
+              ]
+            }
+          ]
+        },
+        "implementation": {
+          "result_id": "res_7393dc5c",
+          "patch_id": "ptch_50a8e23c",
+          "transaction_id": "tx_edb9d447",
+          "files_modified": [
+            "backend.misc.transient"
+          ],
+          "status": "SUCCESS",
+          "build_passed": true,
+          "test_passed": true,
+          "details": {
+            "stage": "TRANSACTION_COMMITTED",
+            "snapshots": {
+              "backend.misc.transient": {
+                "snapshot_hash": "8c6387bbf649",
+                "captured_at": 1789838494.3561916
+              }
+            },
+            "verified_at": 1789838494.3561926
+          },
+          "timestamp": 1789838494.3561933
+        },
+        "verification": {
+          "verification_id": "vrf_1073da3d",
+          "debt_id": "u_unk_15",
+          "original_evidence_invalidated": true,
+          "build_passed": true,
+          "tests_passed": true,
+          "contracts_preserved": true,
+          "behavior_preserved": true,
+          "security_preserved": true,
+          "verification_passed": true,
+          "failure_reasons": []
+        },
+        "comparison": {
+          "comparison_id": "cmp_d3f796a7",
+          "debt_id": "u_unk_15",
+          "outcome": "NO_MEASURABLE_CHANGE",
+          "improved_dimensions": [],
+          "degraded_dimensions": [],
+          "unchanged_dimensions": [
+            "ARCHITECTURE",
+            "CODE",
+            "TEST",
+            "CONTRACT",
+            "BEHAVIOR",
+            "SECURITY",
+            "PERFORMANCE",
+            "RELIABILITY",
+            "MAINTAINABILITY"
+          ],
+          "dimension_deltas": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "summary_text": "No measurable quality change across all 9 dimensions."
+        },
+        "resolution": {
+          "resolution_id": "res_3ff1918b",
+          "debt_id": "u_unk_15",
+          "status": "INSUFFICIENT_EVIDENCE",
+          "original_evidence_invalidated": true,
+          "quality_delta": {
+            "ARCHITECTURE": 0.0,
+            "CODE": 0.0,
+            "TEST": 0.0,
+            "CONTRACT": 0.0,
+            "BEHAVIOR": 0.0,
+            "SECURITY": 0.0,
+            "PERFORMANCE": 0.0,
+            "RELIABILITY": 0.0,
+            "MAINTAINABILITY": 0.0
+          },
+          "remaining_child_debts": [],
+          "explanation": "No measurable quality improvement observed across 9 dimensions. Cannot declare debt resolved.",
+          "timestamp": 1789838494.3562958
+        },
+        "lifecycle_duration_ms": 0.44
+      }
+    }
+  ]
+}

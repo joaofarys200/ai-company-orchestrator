@@ -1,0 +1,18 @@
+[
+  {
+    "event_id": "game_f8da0087",
+    "gaming_type": "TEST_DELETION",
+    "actor": "Agent_Unauthorized",
+    "reason": "Attempted deletion of test suite(s): tests/test_collaboration_long_horizon.py to artificially increase pass velocity.",
+    "blocked": true,
+    "timestamp": 1789838477.717742
+  },
+  {
+    "event_id": "game_571f59c0",
+    "gaming_type": "SCOPE_EXCLUSION",
+    "actor": "Agent_Optimizer",
+    "reason": "Attempted exclusion of file paths from quality governance scope: backend/sentinel.",
+    "blocked": true,
+    "timestamp": 1789838477.7177513
+  }
+]
