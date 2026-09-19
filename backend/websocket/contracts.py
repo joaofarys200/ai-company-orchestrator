@@ -170,6 +170,14 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "mission_release_readiness_plan",
         "mission_release_readiness_gate",
         "mission_release_readiness_rollback",
+        # Phase 71
+        "mission_production_operations_status",
+        "mission_production_operations_observe",
+        "mission_production_operations_health",
+        "mission_production_operations_slo",
+        "mission_production_operations_remediate",
+        "mission_production_operations_rollback",
+        "mission_production_operations_replay",
     }
 )
 

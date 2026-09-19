@@ -1,0 +1,47 @@
+{
+  "suite": "Phase 71 Real Local Runtime Scenarios",
+  "timestamp": 1789842157.6225924,
+  "scenarios_count": 5,
+  "scenarios": [
+    {
+      "scenario_id": "real-01-process-crash-recovered",
+      "description": "Local process terminated and cleanly recovered via autonomous process restart.",
+      "state_before": "INCIDENT_DETECTED",
+      "action": "ROLLBACK",
+      "final_state": "RECOVERED",
+      "evidence": "evd-obs-b4a016f6"
+    },
+    {
+      "scenario_id": "real-02-endpoint-unavailable",
+      "description": "Local endpoint port closed resulting in high timeout/unavailability.",
+      "state_before": "DEGRADED",
+      "action": "ROLLBACK",
+      "final_state": "ESCALATED",
+      "evidence": "evd-obs-6ceee448"
+    },
+    {
+      "scenario_id": "real-03-dependency-reconnect",
+      "description": "Postgres connection pool degraded; recovered via dependency reconnect.",
+      "state_before": "DEGRADED",
+      "action": "RECOVER",
+      "final_state": "RECOVERED",
+      "evidence": "evd-obs-bee9414a"
+    },
+    {
+      "scenario_id": "real-04-invalid-configuration",
+      "description": "Configuration drift detected; resolved via configuration reload.",
+      "state_before": "DEGRADED",
+      "action": "CONTINUE",
+      "final_state": "RECOVERED",
+      "evidence": "evd-obs-5ca31f16"
+    },
+    {
+      "scenario_id": "real-05-restart-loop-rollback",
+      "description": "Uncontrolled crash loop (restarts=6) mandated SEV0 rollback.",
+      "state_before": "INCIDENT_DETECTED",
+      "action": "ROLLBACK",
+      "final_state": "ROLLED_BACK",
+      "evidence": "cert-rb-8b4bc9ee"
+    }
+  ]
+}

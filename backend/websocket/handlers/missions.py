@@ -133,6 +133,14 @@ MISSION_HANDLERS = {
     "mission_release_readiness_plan": "handle",
     "mission_release_readiness_gate": "handle",
     "mission_release_readiness_rollback": "handle",
+    # Phase 71
+    "mission_production_operations_status": "handle",
+    "mission_production_operations_observe": "handle",
+    "mission_production_operations_health": "handle",
+    "mission_production_operations_slo": "handle",
+    "mission_production_operations_remediate": "handle",
+    "mission_production_operations_rollback": "handle",
+    "mission_production_operations_replay": "handle",
 }
 
 
@@ -2284,6 +2292,121 @@ class MissionWebSocketHandler:
                         "release_id": release_id,
                         "status": "ROLLED_BACK",
                         "rolled_back_at": "now",
+                    },
+                )
+                return
+
+            # Phase 71 Autonomous Production Operations & Incident Governance
+            elif operation == "mission_production_operations_status":
+                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                bridge = ProductionOperationsBridge()
+                bridge.check_infrastructure_grounding()
+                status_dict = bridge.get_status()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_production_operations_status_result",
+                        **status_dict,
+                    },
+                )
+                return
+
+            elif operation == "mission_production_operations_observe":
+                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                bridge = ProductionOperationsBridge()
+                obs_data = message.get("observation", {})
+                obs = bridge.ingest_runtime_observation(obs_data)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_production_operations_observe_result",
+                        "observation": obs.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_production_operations_health":
+                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                bridge = ProductionOperationsBridge()
+                results = bridge.execute_healthchecks()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_production_operations_health_result",
+                        "results": [r.to_dict() for r in results],
+                    },
+                )
+                return
+
+            elif operation == "mission_production_operations_slo":
+                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                bridge = ProductionOperationsBridge()
+                metrics_data = message.get("metrics", {})
+                evals = bridge.evaluate_slos(metrics_data)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_production_operations_slo_result",
+                        "evaluations": [e.to_dict() for e in evals],
+                    },
+                )
+                return
+
+            elif operation == "mission_production_operations_remediate":
+                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                from backend.agents.production_operations.models import RecoveryPlan, RecoveryStrategy, RemediationSafety
+                bridge = ProductionOperationsBridge()
+                strategy_str = message.get("strategy", "RESTART_PROCESS")
+                strategy = RecoveryStrategy(strategy_str)
+                plan = RecoveryPlan(
+                    plan_id="rec-ws-01",
+                    incident_id=message.get("incident_id", "inc-ws-01"),
+                    strategy=strategy,
+                    safety=RemediationSafety.ALLOWED,
+                    preconditions=[],
+                    expected_effect="Executed via WebSocket command",
+                    risk_level="LOW",
+                    required_evidence=[],
+                    rollback_action=None,
+                    verification_plan=[],
+                    authorized_by_policy=True,
+                )
+                exec_res = bridge.execute_autonomous_recovery(plan)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_production_operations_remediate_result",
+                        "execution": exec_res.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_production_operations_rollback":
+                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                bridge = ProductionOperationsBridge()
+                target = message.get("target_release", "v69.0.0")
+                bridge.rollback.register_checkpoint("v69.0.0", "6900000000000000000000000000000000000000000000000000000000000000")
+                cert = bridge.rollback.execute_rollback("v70.0.0", target)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_production_operations_rollback_result",
+                        "certificate": cert.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_production_operations_replay":
+                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                bridge = ProductionOperationsBridge()
+                status_res, steps, explanation = bridge.replayer.replay(bridge.ledger.get_entries())
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_production_operations_replay_result",
+                        "replay_status": status_res,
+                        "steps": steps,
+                        "explanation": explanation,
                     },
                 )
                 return

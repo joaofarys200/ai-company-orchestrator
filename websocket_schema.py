@@ -209,6 +209,14 @@ SERVER_MESSAGE_TYPES = {
     "mission_release_readiness_plan_result",
     "mission_release_readiness_gate_result",
     "mission_release_readiness_rollback_result",
+    # Phase 71 Autonomous Production Operations & Incident Governance
+    "mission_production_operations_status_result",
+    "mission_production_operations_observe_result",
+    "mission_production_operations_health_result",
+    "mission_production_operations_slo_result",
+    "mission_production_operations_remediate_result",
+    "mission_production_operations_rollback_result",
+    "mission_production_operations_replay_result",
 }
 
 
@@ -385,6 +393,14 @@ CLIENT_MESSAGE_TYPES = {
     "mission_release_readiness_plan",
     "mission_release_readiness_gate",
     "mission_release_readiness_rollback",
+    # Phase 71
+    "mission_production_operations_status",
+    "mission_production_operations_observe",
+    "mission_production_operations_health",
+    "mission_production_operations_slo",
+    "mission_production_operations_remediate",
+    "mission_production_operations_rollback",
+    "mission_production_operations_replay",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
@@ -419,6 +435,14 @@ MISSION_CLIENT_REQUIRED_FIELDS = {
     "mission_release_readiness_plan": (),
     "mission_release_readiness_gate": (),
     "mission_release_readiness_rollback": (),
+    # Phase 71
+    "mission_production_operations_status": (),
+    "mission_production_operations_observe": (),
+    "mission_production_operations_health": (),
+    "mission_production_operations_slo": (),
+    "mission_production_operations_remediate": (),
+    "mission_production_operations_rollback": (),
+    "mission_production_operations_replay": (),
     "mission_multi_agent_coordination_status": (),
     "mission_multi_agent_intent_submit": (),
     "mission_multi_agent_arbitrate": (),

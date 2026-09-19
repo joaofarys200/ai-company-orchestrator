@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
+  Activity,
   Boxes,
   Brain,
   BookOpen,
@@ -84,6 +85,7 @@ import {
   EngineeringQualityGovernancePanel,
   QualityDebtRemediationPanel,
   ReleaseReadinessPanel,
+  ProductionOperationsPanel,
 } from './components';
 
 
@@ -250,7 +252,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   const [selectedScenario, setSelectedScenario] = useState<ScenarioKey>('INTERACTIVE');
   const [missionState, setMissionState] = useState<MissionControlStateData>(FALLBACK_INTERACTIVE_STATE);
   const [activeViewSection, setActiveViewSection] = useState<
-    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'verified_repair_synthesis' | 'multi_repair_orchestration' | 'autonomous_repair_convergence' | 'autonomous_task_completion' | 'massive_project_state' | 'scc_aware_graph' | 'symbol_fine_grained_graph' | 'autonomous_test_synthesis' | 'continuous_verification' | 'cross_project_learning' | 'architecture_evolution' | 'safe_self_modification' | 'multi_agent_coordination' | 'long_horizon_missions' | 'quality_governance' | 'quality_debt_remediation' | 'release_readiness' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
+    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'verified_repair_synthesis' | 'multi_repair_orchestration' | 'autonomous_repair_convergence' | 'autonomous_task_completion' | 'massive_project_state' | 'scc_aware_graph' | 'symbol_fine_grained_graph' | 'autonomous_test_synthesis' | 'continuous_verification' | 'cross_project_learning' | 'architecture_evolution' | 'safe_self_modification' | 'multi_agent_coordination' | 'long_horizon_missions' | 'quality_governance' | 'quality_debt_remediation' | 'release_readiness' | 'production_operations' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
   >('overview');
 
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
@@ -618,6 +620,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
           { id: 'quality_governance', label: 'Governação de Qualidade & Dívida Técnica (Fase 68)', icon: Award },
           { id: 'quality_debt_remediation', label: 'Remediação de Dívida Técnica (Fase 69)', icon: Wrench },
           { id: 'release_readiness', label: 'Release Readiness & Governação (Fase 70)', icon: Rocket },
+          { id: 'production_operations', label: 'Operações de Produção & Governação de Incidentes (Fase 71)', icon: Activity },
           { id: 'evidence_impact', label: 'Impacto em Evidências', icon: ShieldAlert },
           { id: 'why', label: 'Painel do Porquê ("Why Panel")', icon: Brain },
           { id: 'repairs', label: 'Auto-Cura & Adaptação', icon: Wrench },
@@ -876,6 +879,10 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
 
         {activeViewSection === 'release_readiness' && (
           <ReleaseReadinessPanel missionId={missionState.mission_id} />
+        )}
+
+        {activeViewSection === 'production_operations' && (
+          <ProductionOperationsPanel missionId={missionState.mission_id} />
         )}
 
         {activeViewSection === 'evidence_impact' && (

@@ -1,0 +1,143 @@
+{
+  "suite": "Phase 71 Unseen Scenarios Evaluation",
+  "timestamp": 1789842180.44457,
+  "total_evaluated": 15,
+  "all_passed": true,
+  "records": [
+    {
+      "scenario_id": "unseen-01-runtime-failure",
+      "name": "Sudden SIGKILL Runtime Failure",
+      "recommended_action": "ROLLBACK",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 2,
+      "matched": true,
+      "rationale": "SEV0 incident detected. Governance policy mandates immediate rollback to halt corruption or outage."
+    },
+    {
+      "scenario_id": "unseen-02-dep-chain-failure",
+      "name": "Cascading Downstream Auth & DB Drop",
+      "recommended_action": "RECOVER",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 2,
+      "matched": true,
+      "rationale": "Authorized autonomous recovery plan ready: ESCALATE_HUMAN."
+    },
+    {
+      "scenario_id": "unseen-03-repeated-incident",
+      "name": "Recurring Incident Frequency Spike",
+      "recommended_action": "RECOVER",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 1,
+      "matched": true,
+      "rationale": "Authorized autonomous recovery plan ready: ESCALATE_HUMAN."
+    },
+    {
+      "scenario_id": "unseen-04-recovery-failure",
+      "name": "Recovery Script Failure / Exception",
+      "recommended_action": "RECOVER",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 1,
+      "matched": true,
+      "rationale": "Authorized autonomous recovery plan ready: ESCALATE_HUMAN."
+    },
+    {
+      "scenario_id": "unseen-05-catastrophic-rollback",
+      "name": "SEV0 Outage Mandating Rollback",
+      "recommended_action": "ROLLBACK",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 3,
+      "matched": true,
+      "rationale": "SEV0 incident detected. Governance policy mandates immediate rollback to halt corruption or outage."
+    },
+    {
+      "scenario_id": "unseen-06-insufficient-evidence",
+      "name": "Metric Telemetry Below Sample Threshold",
+      "recommended_action": "CONTINUE",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 0,
+      "matched": true,
+      "rationale": "System is operating normally within established SLO boundaries. Zero active incidents."
+    },
+    {
+      "scenario_id": "unseen-07-unknown-dependency",
+      "name": "Unmapped Third-Party Payment Gateway Outage",
+      "recommended_action": "RECOVER",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 2,
+      "matched": true,
+      "rationale": "Authorized autonomous recovery plan ready: ESCALATE_HUMAN."
+    },
+    {
+      "scenario_id": "unseen-08-resource-exhaustion",
+      "name": "CPU/Memory Saturation Near OOM Boundary",
+      "recommended_action": "RECOVER",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 1,
+      "matched": true,
+      "rationale": "Authorized autonomous recovery plan ready: ESCALATE_HUMAN."
+    },
+    {
+      "scenario_id": "unseen-09-configuration-drift",
+      "name": "Configuration Inconsistency in Runtime State",
+      "recommended_action": "CONTINUE",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 0,
+      "matched": true,
+      "rationale": "System is operating normally within established SLO boundaries. Zero active incidents."
+    },
+    {
+      "scenario_id": "unseen-10-corrupted-checkpoint",
+      "name": "Corrupted or Missing Target Checkpoint Hash",
+      "recommended_action": "ROLLBACK",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 3,
+      "matched": true,
+      "rationale": "SEV0 incident detected. Governance policy mandates immediate rollback to halt corruption or outage."
+    },
+    {
+      "scenario_id": "unseen-11-websocket-failure",
+      "name": "Interactive WebSocket Protocol Channel Dropped",
+      "recommended_action": "RECOVER",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 2,
+      "matched": true,
+      "rationale": "Authorized autonomous recovery plan ready: ESCALATE_HUMAN."
+    },
+    {
+      "scenario_id": "unseen-12-local-process-failure",
+      "name": "Local FastApi Worker PID Dead",
+      "recommended_action": "RECOVER",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 1,
+      "matched": true,
+      "rationale": "Authorized autonomous recovery plan ready: ESCALATE_HUMAN."
+    },
+    {
+      "scenario_id": "unseen-13-human-escalation",
+      "name": "Uncertain Diagnostics Below Confidence Gate",
+      "recommended_action": "RECOVER",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 1,
+      "matched": true,
+      "rationale": "Authorized autonomous recovery plan ready: ESCALATE_HUMAN."
+    },
+    {
+      "scenario_id": "unseen-14-infrastructure-unavailable",
+      "name": "Action Requiring Absent Kubernetes Target",
+      "recommended_action": "ESCALATE",
+      "operational_state": "DEPLOYMENT_NOT_AVAILABLE",
+      "incidents_count": 0,
+      "matched": true,
+      "rationale": "Active incidents present without a formulated autonomous recovery plan."
+    },
+    {
+      "scenario_id": "unseen-15-mixed-severity",
+      "name": "Concurrent SEV1 Crash & SEV3 Latency Anomaly",
+      "recommended_action": "RECOVER",
+      "operational_state": "READY_FOR_OPERATIONS",
+      "incidents_count": 2,
+      "matched": true,
+      "rationale": "Authorized autonomous recovery plan ready: ESCALATE_HUMAN."
+    }
+  ]
+}

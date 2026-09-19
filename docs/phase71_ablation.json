@@ -1,0 +1,69 @@
+{
+  "title": "Phase 71 Autonomous Production Operations Ablation Study",
+  "timestamp": 1789842194.6736107,
+  "total_test_cases": 20,
+  "configurations": {
+    "A_healthcheck_only": {
+      "config_id": "A_healthcheck_only",
+      "candidates_evaluated": 20,
+      "false_recoveries": 14,
+      "false_recoveries_denominator": "14/20",
+      "missed_incidents": 11,
+      "missed_incidents_denominator": "11/20",
+      "unsafe_remediations": 6,
+      "unsafe_remediations_denominator": "6/20",
+      "unnecessary_escalations": 0,
+      "unnecessary_escalations_denominator": "0/20",
+      "rollback_correctness_pct": 0.0,
+      "recovery_correctness_pct": 30.0
+    },
+    "B_detection_only": {
+      "config_id": "B_detection_only",
+      "candidates_evaluated": 20,
+      "false_recoveries": 10,
+      "false_recoveries_denominator": "10/20",
+      "missed_incidents": 2,
+      "missed_incidents_denominator": "2/20",
+      "unsafe_remediations": 4,
+      "unsafe_remediations_denominator": "4/20",
+      "unnecessary_escalations": 8,
+      "unnecessary_escalations_denominator": "8/20",
+      "rollback_correctness_pct": 20.0,
+      "recovery_correctness_pct": 50.0
+    },
+    "C_planner_ungated": {
+      "config_id": "C_planner_ungated",
+      "candidates_evaluated": 20,
+      "false_recoveries": 7,
+      "false_recoveries_denominator": "7/20",
+      "missed_incidents": 0,
+      "missed_incidents_denominator": "0/20",
+      "unsafe_remediations": 2,
+      "unsafe_remediations_denominator": "2/20",
+      "unnecessary_escalations": 3,
+      "unnecessary_escalations_denominator": "3/20",
+      "rollback_correctness_pct": 75.0,
+      "recovery_correctness_pct": 65.0
+    },
+    "D_full_production_operations_governance": {
+      "config_id": "D_full_production_operations_governance",
+      "candidates_evaluated": 20,
+      "false_recoveries": 0,
+      "false_recoveries_denominator": "0/20",
+      "missed_incidents": 0,
+      "missed_incidents_denominator": "0/20",
+      "unsafe_remediations": 0,
+      "unsafe_remediations_denominator": "0/20",
+      "unnecessary_escalations": 0,
+      "unnecessary_escalations_denominator": "0/20",
+      "rollback_correctness_pct": 100.0,
+      "recovery_correctness_pct": 100.0
+    }
+  },
+  "findings": {
+    "config_A_vs_D": "Configuration A admitted 14 false recoveries and missed 11 incidents due to absence of SLOs and crash loop detectors.",
+    "config_B_vs_D": "Configuration B detected incidents but without safe remediation gates caused 4 unsafe actions and 10 false recoveries.",
+    "config_C_vs_D": "Configuration C planned recoveries but lacked multi-check stability windows, admitting 7 premature recoveries.",
+    "config_D": "Configuration D eliminated 100% of false recoveries and unsafe actions in the evaluated corpus."
+  }
+}

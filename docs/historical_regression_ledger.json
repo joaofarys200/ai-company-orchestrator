@@ -1,0 +1,83 @@
+{
+  "title": "JARVIS OS Canonical Historical Regression Ledger",
+  "audited_at": 1789842092.4756725,
+  "total_historical_phases_audited": 5,
+  "historical_regression_drift_detected": true,
+  "historical_consistency_status": "HISTORICAL_LEDGER_INCONSISTENCY",
+  "inconsistencies": [
+    {
+      "from_phase": "Phase 68",
+      "to_phase": "Phase 69",
+      "previous_reported": 652,
+      "current_reported": 626,
+      "drop_amount": 26,
+      "omitted_phases": [
+        "Phase 53 (24 tests)",
+        "Phase 56 (24 tests)"
+      ],
+      "root_cause": "Typo in test filenames in test runner script"
+    }
+  ],
+  "phase_records": [
+    {
+      "phase": "Phase 66",
+      "report_file": "docs\\phase66_regression_reconciliation.json",
+      "reported_total": 610,
+      "computed_total": 610,
+      "delta": 0,
+      "previous_reported_total": null,
+      "per_phase_count": 27,
+      "historical_consistency": "CONSISTENT",
+      "notes": "Nominal monotonic progression"
+    },
+    {
+      "phase": "Phase 67",
+      "report_file": "docs\\phase67_regression_reconciliation.json",
+      "reported_total": 630,
+      "computed_total": 630,
+      "delta": 0,
+      "previous_reported_total": 610,
+      "per_phase_count": 28,
+      "historical_consistency": "CONSISTENT",
+      "notes": "Nominal monotonic progression"
+    },
+    {
+      "phase": "Phase 68",
+      "report_file": "docs\\phase68_regression_reconciliation.json",
+      "reported_total": 652,
+      "computed_total": 652,
+      "delta": 0,
+      "previous_reported_total": 630,
+      "per_phase_count": 29,
+      "historical_consistency": "CONSISTENT",
+      "notes": "Nominal monotonic progression"
+    },
+    {
+      "phase": "Phase 69",
+      "report_file": "docs\\phase69_regression_reconciliation.json",
+      "reported_total": 626,
+      "computed_total": 626,
+      "delta": 0,
+      "previous_reported_total": 652,
+      "per_phase_count": 30,
+      "historical_consistency": "HISTORICAL_LEDGER_INCONSISTENCY",
+      "notes": "Reported total dropped from 652 to 626 (dropped 26 tests). Root Cause: Phase 53 ('tests/test_project_preflight_recovery.py') and Phase 56 ('tests/test_repair_convergence_governance.py') were omitted/misnamed in Phase 69 runner."
+    },
+    {
+      "phase": "Phase 70",
+      "report_file": "docs\\phase70_regression_reconciliation.json",
+      "reported_total": 648,
+      "computed_total": 648,
+      "delta": 0,
+      "previous_reported_total": 626,
+      "per_phase_count": 29,
+      "historical_consistency": "CONSISTENT",
+      "notes": "Nominal monotonic progression"
+    }
+  ],
+  "canonical_resolution": {
+    "status": "RESOLVED_IN_PHASE_71",
+    "root_cause_documented": true,
+    "action": "All Phase 53 and Phase 56 tests are present in repository (48 passing tests). Phase 71 regression runner documents both replayed total and historical ledger transition transparently."
+  }
+}

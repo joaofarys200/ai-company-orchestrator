@@ -1,0 +1,174 @@
+{
+  "title": "Phase 71 Production Operations Scalability Benchmark",
+  "timestamp": 1789842208.3569968,
+  "scales_evaluated": [
+    100,
+    1000,
+    10000,
+    100000,
+    1000000
+  ],
+  "all_invariants_valid": true,
+  "results": [
+    {
+      "scale": 100,
+      "category_breakdown": {
+        "MICROBENCHMARK": {
+          "sample_size": 100,
+          "micro_duration_ms": 0.815,
+          "unit_latency_ms": 0.00815
+        },
+        "MISSION_RUNTIME": {
+          "simulated_window_seconds": 300,
+          "target_environment": "LOCAL_RUNTIME",
+          "telemetry_ingest_ms": 0.3667,
+          "incident_detection_ms": 0.163,
+          "healthcheck_ms": 0.1222,
+          "slo_eval_ms": 0.0815,
+          "governance_gate_ms": 0.0815
+        },
+        "REAL_RUNTIME": {
+          "physical_deployment_target": "DEPLOYMENT_NOT_AVAILABLE",
+          "local_runtime_controller_active": true
+        }
+      },
+      "stage_total_ms": 0.8149,
+      "overhead_ms": 0.0367,
+      "total_cpu_ms": 0.8516,
+      "arithmetic_reconciliation_valid": true,
+      "memory_mb": 24.0,
+      "incidents_detected": 1,
+      "recovery_plans": 1,
+      "replay_time_ms": 0.5,
+      "throughput_obs_per_sec": 117426.0
+    },
+    {
+      "scale": 1000,
+      "category_breakdown": {
+        "MICROBENCHMARK": {
+          "sample_size": 100,
+          "micro_duration_ms": 0.707,
+          "unit_latency_ms": 0.00707
+        },
+        "MISSION_RUNTIME": {
+          "simulated_window_seconds": 300,
+          "target_environment": "LOCAL_RUNTIME",
+          "telemetry_ingest_ms": 3.1833,
+          "incident_detection_ms": 1.4148,
+          "healthcheck_ms": 1.0611,
+          "slo_eval_ms": 0.7074,
+          "governance_gate_ms": 0.7074
+        },
+        "REAL_RUNTIME": {
+          "physical_deployment_target": "DEPLOYMENT_NOT_AVAILABLE",
+          "local_runtime_controller_active": true
+        }
+      },
+      "stage_total_ms": 7.074,
+      "overhead_ms": 0.3183,
+      "total_cpu_ms": 7.3923,
+      "arithmetic_reconciliation_valid": true,
+      "memory_mb": 24.01,
+      "incidents_detected": 2,
+      "recovery_plans": 1,
+      "replay_time_ms": 5.0,
+      "throughput_obs_per_sec": 135275.9
+    },
+    {
+      "scale": 10000,
+      "category_breakdown": {
+        "MICROBENCHMARK": {
+          "sample_size": 100,
+          "micro_duration_ms": 0.708,
+          "unit_latency_ms": 0.00708
+        },
+        "MISSION_RUNTIME": {
+          "simulated_window_seconds": 300,
+          "target_environment": "LOCAL_RUNTIME",
+          "telemetry_ingest_ms": 31.8465,
+          "incident_detection_ms": 14.154,
+          "healthcheck_ms": 10.6155,
+          "slo_eval_ms": 7.077,
+          "governance_gate_ms": 7.077
+        },
+        "REAL_RUNTIME": {
+          "physical_deployment_target": "DEPLOYMENT_NOT_AVAILABLE",
+          "local_runtime_controller_active": true
+        }
+      },
+      "stage_total_ms": 70.77,
+      "overhead_ms": 3.1846,
+      "total_cpu_ms": 73.9546,
+      "arithmetic_reconciliation_valid": true,
+      "memory_mb": 24.09,
+      "incidents_detected": 20,
+      "recovery_plans": 10,
+      "replay_time_ms": 50.0,
+      "throughput_obs_per_sec": 135218.1
+    },
+    {
+      "scale": 100000,
+      "category_breakdown": {
+        "MICROBENCHMARK": {
+          "sample_size": 100,
+          "micro_duration_ms": 0.857,
+          "unit_latency_ms": 0.00857
+        },
+        "MISSION_RUNTIME": {
+          "simulated_window_seconds": 300,
+          "target_environment": "LOCAL_RUNTIME",
+          "telemetry_ingest_ms": 385.425,
+          "incident_detection_ms": 171.3,
+          "healthcheck_ms": 128.475,
+          "slo_eval_ms": 85.65,
+          "governance_gate_ms": 85.65
+        },
+        "REAL_RUNTIME": {
+          "physical_deployment_target": "DEPLOYMENT_NOT_AVAILABLE",
+          "local_runtime_controller_active": true
+        }
+      },
+      "stage_total_ms": 856.5,
+      "overhead_ms": 38.5425,
+      "total_cpu_ms": 895.0425,
+      "arithmetic_reconciliation_valid": true,
+      "memory_mb": 24.85,
+      "incidents_detected": 200,
+      "recovery_plans": 100,
+      "replay_time_ms": 500.0,
+      "throughput_obs_per_sec": 111726.5
+    },
+    {
+      "scale": 1000000,
+      "category_breakdown": {
+        "MICROBENCHMARK": {
+          "sample_size": 100,
+          "micro_duration_ms": 0.696,
+          "unit_latency_ms": 0.00696
+        },
+        "MISSION_RUNTIME": {
+          "simulated_window_seconds": 300,
+          "target_environment": "LOCAL_RUNTIME",
+          "telemetry_ingest_ms": 3133.8,
+          "incident_detection_ms": 1392.8,
+          "healthcheck_ms": 1044.6,
+          "slo_eval_ms": 696.4,
+          "governance_gate_ms": 696.4
+        },
+        "REAL_RUNTIME": {
+          "physical_deployment_target": "DEPLOYMENT_NOT_AVAILABLE",
+          "local_runtime_controller_active": true
+        }
+      },
+      "stage_total_ms": 6964.0,
+      "overhead_ms": 313.38,
+      "total_cpu_ms": 7277.38,
+      "arithmetic_reconciliation_valid": true,
+      "memory_mb": 32.5,
+      "incidents_detected": 2000,
+      "recovery_plans": 1000,
+      "replay_time_ms": 5000.0,
+      "throughput_obs_per_sec": 137412.1
+    }
+  ]
+}
