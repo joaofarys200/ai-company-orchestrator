@@ -1,0 +1,52 @@
+[
+  {
+    "event_id": "evt_9c1db2f7",
+    "debt_id": "debt_architectural_2fed990f",
+    "event_type": "CREATED",
+    "details": {
+      "category": "ARCHITECTURAL",
+      "severity": "MEDIUM"
+    },
+    "timestamp": 1789837070.3571444
+  },
+  {
+    "event_id": "evt_f31a0942",
+    "debt_id": "debt_code_c8cb6f98",
+    "event_type": "CREATED",
+    "details": {
+      "category": "CODE",
+      "severity": "MEDIUM"
+    },
+    "timestamp": 1789837070.3571565
+  },
+  {
+    "event_id": "evt_23d4b22d",
+    "debt_id": "debt_test_226e39f3",
+    "event_type": "CREATED",
+    "details": {
+      "category": "TEST",
+      "severity": "MEDIUM"
+    },
+    "timestamp": 1789837070.3571641
+  },
+  {
+    "event_id": "evt_8cad1aae",
+    "debt_id": "debt_operational_563acd45",
+    "event_type": "CREATED",
+    "details": {
+      "category": "OPERATIONAL",
+      "severity": "LOW"
+    },
+    "timestamp": 1789837070.3571699
+  },
+  {
+    "event_id": "evt_4d07f7c3",
+    "debt_id": "debt_performance_ee82390c",
+    "event_type": "CREATED",
+    "details": {
+      "category": "PERFORMANCE",
+      "severity": "MEDIUM"
+    },
+    "timestamp": 1789837070.357175
+  }
+]

@@ -110,6 +110,14 @@ MISSION_HANDLERS = {
     "mission_long_horizon_recover": "handle",
     "mission_long_horizon_adapt": "handle",
     "mission_long_horizon_completion_evaluate": "handle",
+    # Phase 68
+    "mission_quality_governance_status": "handle",
+    "mission_quality_governance_snapshot": "handle",
+    "mission_quality_governance_baseline": "handle",
+    "mission_quality_governance_gate": "handle",
+    "mission_quality_governance_debt_list": "handle",
+    "mission_quality_governance_trend": "handle",
+    "mission_quality_governance_hotspots": "handle",
 }
 
 
@@ -1936,6 +1944,81 @@ class MissionWebSocketHandler:
                     {
                         "type": "mission_long_horizon_run_result",
                         "result": res,
+                    },
+                )
+                return
+
+            elif operation == "mission_quality_governance_status":
+                from backend.agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
+                bridge = EngineeringQualityGovernanceBridge.get_instance()
+                mid = message.get("mission_id", "default_mission")
+                base = bridge.baseline_manager.get_baseline(mid)
+                after = bridge.baseline_manager.get_after(mid)
+                debts = bridge.debt_manager.list_unresolved()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_quality_governance_status_result",
+                        "baseline": base.to_dict() if base else None,
+                        "after": after.to_dict() if after else None,
+                        "unresolved_debt_count": len(debts),
+                    },
+                )
+                return
+
+            elif operation == "mission_quality_governance_snapshot":
+                from backend.agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
+                bridge = EngineeringQualityGovernanceBridge.get_instance()
+                mid = message.get("mission_id", "default_mission")
+                snap = bridge.capture_after(mid, context=message.get("context"))
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_quality_governance_snapshot_result",
+                        "snapshot": snap.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_quality_governance_gate":
+                from backend.agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
+                bridge = EngineeringQualityGovernanceBridge.get_instance()
+                mid = message.get("mission_id", "default_mission")
+                pol = message.get("policy_name", "GOVERNED")
+                gate = bridge.evaluate_quality_gate(mid, policy_name=pol)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_quality_governance_gate_result",
+                        "gate_decision": gate.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_quality_governance_debt_list":
+                from backend.agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
+                bridge = EngineeringQualityGovernanceBridge.get_instance()
+                debts = bridge.debt_manager.list_items()
+                vectors = bridge.prioritize_debt()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_quality_governance_debt_list_result",
+                        "debts": [d.to_dict() for d in debts],
+                        "priority_vectors": [v.to_dict() for v in vectors],
+                    },
+                )
+                return
+
+            elif operation == "mission_quality_governance_hotspots":
+                from backend.agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
+                bridge = EngineeringQualityGovernanceBridge.get_instance()
+                hotspots = bridge.get_hotspots()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_quality_governance_hotspots_result",
+                        "hotspots": [h.to_dict() for h in hotspots],
                     },
                 )
                 return

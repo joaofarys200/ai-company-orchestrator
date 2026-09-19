@@ -1,0 +1,209 @@
+{
+  "decision": "QUALITY_BLOCKED",
+  "scope": "global",
+  "evidence": [
+    {
+      "evaluator": "QualityGateEngine",
+      "dimensions_evaluated": 9
+    },
+    {
+      "budget_compliant": false,
+      "budget_violations": [
+        {
+          "limit": "max_regression_rate",
+          "budget": 0.02,
+          "actual": 0.3333333333333333,
+          "severity": "HIGH",
+          "recommended_action": "BLOCK"
+        },
+        {
+          "limit": "max_architecture_degradation",
+          "budget": 0,
+          "actual": 2,
+          "severity": "HIGH",
+          "recommended_action": "BLOCK"
+        }
+      ]
+    }
+  ],
+  "degradations": [
+    {
+      "metric": "coupling",
+      "from": 0.32,
+      "to": 0.48,
+      "reason": "coupling increased"
+    },
+    {
+      "metric": "scc_size",
+      "from": 4,
+      "to": 12,
+      "reason": "SCC condensation cycle grew"
+    },
+    {
+      "metric": "boundary_violations",
+      "from": 0,
+      "to": 1,
+      "reason": "new boundary violations introduced"
+    },
+    {
+      "metric": "flaky_rate",
+      "from": 0.005,
+      "to": 0.04,
+      "reason": "flakiness increased"
+    },
+    {
+      "metric": "contract_drift",
+      "from": 0,
+      "to": 1,
+      "reason": "contract drift detected"
+    },
+    {
+      "dimension": "ARCHITECTURE",
+      "reason": "Dimension ARCHITECTURE is BLOCKED in snapshot",
+      "status": "BLOCKED"
+    }
+  ],
+  "improvements": [],
+  "debt": [
+    {
+      "debt_id": "debt_architectural_2fed990f",
+      "category": "ARCHITECTURAL",
+      "affected_surface": "backend.agents.massive_project_state <-> backend.agents.scc_aware_graph",
+      "origin_mission": "real_jarvis_quality_mission",
+      "evidence": [
+        {
+          "coupling": "Cross-service condensation graph references"
+        }
+      ],
+      "severity": "MEDIUM",
+      "confidence": 0.8,
+      "estimated_cost": 3.0,
+      "risk": 0.62,
+      "age": 0.0,
+      "dependencies": [],
+      "resolution_options": [
+        "Extract shared DAG condensation interface"
+      ],
+      "status": "OPEN",
+      "recurrence_count": 1,
+      "created_at": 1789837070.3571334,
+      "updated_at": 1789837070.3571336
+    },
+    {
+      "debt_id": "debt_code_c8cb6f98",
+      "category": "CODE",
+      "affected_surface": "backend.websocket.handlers.missions.MissionWebSocketHandler",
+      "origin_mission": "real_jarvis_quality_mission",
+      "evidence": [
+        {
+          "lines": 1980,
+          "complexity": 34
+        }
+      ],
+      "severity": "MEDIUM",
+      "confidence": 0.8,
+      "estimated_cost": 2.5,
+      "risk": 0.58,
+      "age": 0.0,
+      "dependencies": [],
+      "resolution_options": [
+        "Split monolithic handler into modular phase sub-handlers"
+      ],
+      "status": "OPEN",
+      "recurrence_count": 1,
+      "created_at": 1789837070.357152,
+      "updated_at": 1789837070.357152
+    },
+    {
+      "debt_id": "debt_test_226e39f3",
+      "category": "TEST",
+      "affected_surface": "tests.test_collaboration_long_horizon.py",
+      "origin_mission": "real_jarvis_quality_mission",
+      "evidence": [
+        {
+          "intermittent_timeout": "WebSocket connection retry under high concurrency"
+        }
+      ],
+      "severity": "MEDIUM",
+      "confidence": 0.8,
+      "estimated_cost": 1.5,
+      "risk": 0.5,
+      "age": 0.0,
+      "dependencies": [],
+      "resolution_options": [
+        "Mock physical socket in unit integration tier"
+      ],
+      "status": "OPEN",
+      "recurrence_count": 1,
+      "created_at": 1789837070.3571613,
+      "updated_at": 1789837070.3571615
+    },
+    {
+      "debt_id": "debt_operational_563acd45",
+      "category": "OPERATIONAL",
+      "affected_surface": "scripts.run_phase67_browser_qa.py",
+      "origin_mission": "real_jarvis_quality_mission",
+      "evidence": [
+        {
+          "edge_browser_spawn": "Requires edge executable installed locally"
+        }
+      ],
+      "severity": "LOW",
+      "confidence": 0.8,
+      "estimated_cost": 1.0,
+      "risk": 0.35,
+      "age": 0.0,
+      "dependencies": [],
+      "resolution_options": [
+        "Add headless playwright fallback"
+      ],
+      "status": "OPEN",
+      "recurrence_count": 1,
+      "created_at": 1789837070.3571677,
+      "updated_at": 1789837070.3571677
+    },
+    {
+      "debt_id": "debt_performance_ee82390c",
+      "category": "PERFORMANCE",
+      "affected_surface": "backend.memory.MissionStateStore.sqlite_pool",
+      "origin_mission": "real_jarvis_quality_mission",
+      "evidence": [
+        {
+          "in_memory_reconnect": "Potential memory leak if multiple fresh connections opened"
+        }
+      ],
+      "severity": "MEDIUM",
+      "confidence": 0.8,
+      "estimated_cost": 2.0,
+      "risk": 0.45,
+      "age": 0.0,
+      "dependencies": [],
+      "resolution_options": [
+        "Retain single shared connection for in-memory databases"
+      ],
+      "status": "OPEN",
+      "recurrence_count": 1,
+      "created_at": 1789837070.3571725,
+      "updated_at": 1789837070.3571725
+    }
+  ],
+  "uncertainty": 0.06222222222222223,
+  "policy": {
+    "name": "GOVERNED",
+    "strict_mode": false,
+    "budget": {
+      "max_critical_debt": 0,
+      "max_unresolved_contract_drift": 0,
+      "max_security_debt": 0,
+      "max_flaky_rate": 0.05,
+      "max_regression_rate": 0.02,
+      "max_architecture_degradation": 0,
+      "max_quality_uncertainty": 0.35,
+      "max_human_review_backlog": 5
+    },
+    "allow_accepted_with_debt": true,
+    "require_human_review_on_uncertainty": true,
+    "uncertainty_threshold": 0.3
+  },
+  "timestamp": 1789837070.3581114
+}

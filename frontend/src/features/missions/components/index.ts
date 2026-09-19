@@ -40,3 +40,4 @@ export { ArchitectureEvolutionPanel } from './ArchitectureEvolutionPanel';
 export { SafeSelfModificationPanel } from './SafeSelfModificationPanel';
 export { MultiAgentCoordinationPanel } from './MultiAgentCoordinationPanel';
 export { LongHorizonMissionPanel } from './LongHorizonMissionPanel';
+export { EngineeringQualityGovernancePanel } from './EngineeringQualityGovernancePanel';

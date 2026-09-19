@@ -1,0 +1,54 @@
+{
+  "baseline_snapshot_id": "baseline_real_jarvis_quality_mission_1789837070352",
+  "after_snapshot_id": "after_real_jarvis_quality_mission_1789837070354",
+  "mission_id": "real_jarvis_quality_mission",
+  "dimension_changes": {
+    "ARCHITECTURE": "DEGRADED",
+    "CODE": "UNCHANGED",
+    "TEST": "DEGRADED",
+    "CONTRACT": "DEGRADED",
+    "BEHAVIOR": "UNCHANGED",
+    "SECURITY": "UNCHANGED",
+    "PERFORMANCE": "UNCHANGED",
+    "RELIABILITY": "UNCHANGED",
+    "MAINTAINABILITY": "UNCHANGED"
+  },
+  "evidence_efficiency": 1.0,
+  "more_tests": false,
+  "more_useful_evidence": false,
+  "degradations": [
+    {
+      "metric": "coupling",
+      "from": 0.32,
+      "to": 0.48,
+      "reason": "coupling increased"
+    },
+    {
+      "metric": "scc_size",
+      "from": 4,
+      "to": 12,
+      "reason": "SCC condensation cycle grew"
+    },
+    {
+      "metric": "boundary_violations",
+      "from": 0,
+      "to": 1,
+      "reason": "new boundary violations introduced"
+    },
+    {
+      "metric": "flaky_rate",
+      "from": 0.005,
+      "to": 0.04,
+      "reason": "flakiness increased"
+    },
+    {
+      "metric": "contract_drift",
+      "from": 0,
+      "to": 1,
+      "reason": "contract drift detected"
+    }
+  ],
+  "improvements": [],
+  "uncertainty_delta": 0.0,
+  "timestamp": 1789837070.3570094
+}

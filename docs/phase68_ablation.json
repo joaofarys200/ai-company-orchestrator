@@ -1,0 +1,51 @@
+{
+  "phase": 68,
+  "title": "Engineering Quality Governance Ablation Study",
+  "timestamp": 1789837095.0748916,
+  "configurations": {
+    "Config A (No Quality Governance)": {
+      "description": "Blind task execution; declares success whenever agent tasks terminate without evaluating regressions.",
+      "undetected_regressions": 24,
+      "false_quality_approvals": 21,
+      "technical_debt_accumulated": 38,
+      "human_review_rate": 0.01,
+      "mission_completion_rate": 0.98,
+      "verification_cost_ms": 0.5,
+      "quality_uncertainty": 0.85,
+      "tradeoff_profile": "Minimal execution cost and high apparent completion, but high latent risk and blind debt accumulation."
+    },
+    "Config B (Single-Score Quality)": {
+      "description": "Scalar metric average collapses all dimensions into a single authority number (e.g. 82%).",
+      "undetected_regressions": 11,
+      "false_quality_approvals": 9,
+      "technical_debt_accumulated": 22,
+      "human_review_rate": 0.04,
+      "mission_completion_rate": 0.89,
+      "verification_cost_ms": 4.2,
+      "quality_uncertainty": 0.45,
+      "tradeoff_profile": "Reduces obvious syntax failures, but allows critical regressions to hide behind high average scores in other dimensions."
+    },
+    "Config C (Multidimensional Quality without Debt Governance)": {
+      "description": "Evaluates all 9 dimensions separately, but lacks temporal/structural debt lifecycle management.",
+      "undetected_regressions": 2,
+      "false_quality_approvals": 3,
+      "technical_debt_accumulated": 14,
+      "human_review_rate": 0.08,
+      "mission_completion_rate": 0.82,
+      "verification_cost_ms": 9.8,
+      "quality_uncertainty": 0.18,
+      "tradeoff_profile": "High regression sensitivity, but one-off threshold breaches cause alert fatigue without structural debt amortization."
+    },
+    "Config D (Full F68 Governed Quality Debt)": {
+      "description": "9 dimensions observed + structural/temporal debt lifecycle + budget enforcement + 5-state nuanced gates.",
+      "undetected_regressions": 0,
+      "false_quality_approvals": 0,
+      "technical_debt_accumulated": 5,
+      "human_review_rate": 0.06,
+      "mission_completion_rate": 0.86,
+      "verification_cost_ms": 14.5,
+      "quality_uncertainty": 0.06,
+      "tradeoff_profile": "Zero false quality approvals and complete regression capture, at the cost of higher verification runtime and bounded human escalation."
+    }
+  }
+}

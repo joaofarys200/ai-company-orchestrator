@@ -147,6 +147,14 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "mission_long_horizon_recover",
         "mission_long_horizon_adapt",
         "mission_long_horizon_completion_evaluate",
+        # Phase 68
+        "mission_quality_governance_status",
+        "mission_quality_governance_snapshot",
+        "mission_quality_governance_baseline",
+        "mission_quality_governance_gate",
+        "mission_quality_governance_debt_list",
+        "mission_quality_governance_trend",
+        "mission_quality_governance_hotspots",
     }
 )
 

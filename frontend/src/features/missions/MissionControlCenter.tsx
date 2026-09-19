@@ -80,6 +80,7 @@ import {
   SafeSelfModificationPanel,
   MultiAgentCoordinationPanel,
   LongHorizonMissionPanel,
+  EngineeringQualityGovernancePanel,
 } from './components';
 
 
@@ -246,7 +247,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   const [selectedScenario, setSelectedScenario] = useState<ScenarioKey>('INTERACTIVE');
   const [missionState, setMissionState] = useState<MissionControlStateData>(FALLBACK_INTERACTIVE_STATE);
   const [activeViewSection, setActiveViewSection] = useState<
-    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'verified_repair_synthesis' | 'multi_repair_orchestration' | 'autonomous_repair_convergence' | 'autonomous_task_completion' | 'massive_project_state' | 'scc_aware_graph' | 'symbol_fine_grained_graph' | 'autonomous_test_synthesis' | 'continuous_verification' | 'cross_project_learning' | 'architecture_evolution' | 'safe_self_modification' | 'multi_agent_coordination' | 'long_horizon_missions' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
+    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'verified_repair_synthesis' | 'multi_repair_orchestration' | 'autonomous_repair_convergence' | 'autonomous_task_completion' | 'massive_project_state' | 'scc_aware_graph' | 'symbol_fine_grained_graph' | 'autonomous_test_synthesis' | 'continuous_verification' | 'cross_project_learning' | 'architecture_evolution' | 'safe_self_modification' | 'multi_agent_coordination' | 'long_horizon_missions' | 'quality_governance' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
   >('overview');
 
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
@@ -611,6 +612,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
           { id: 'safe_self_modification', label: 'Self-Modification Segura (Fase 65)', icon: GitCommit },
           { id: 'multi_agent_coordination', label: 'Coordenação Multi-Agente (Fase 66)', icon: Users },
           { id: 'long_horizon_missions', label: 'Missões Long-Horizon & Governação (Fase 67)', icon: Compass },
+          { id: 'quality_governance', label: 'Governação de Qualidade & Dívida Técnica (Fase 68)', icon: Award },
           { id: 'evidence_impact', label: 'Impacto em Evidências', icon: ShieldAlert },
           { id: 'why', label: 'Painel do Porquê ("Why Panel")', icon: Brain },
           { id: 'repairs', label: 'Auto-Cura & Adaptação', icon: Wrench },
@@ -857,6 +859,10 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
 
         {activeViewSection === 'long_horizon_missions' && (
           <LongHorizonMissionPanel missionId={missionState.mission_id} />
+        )}
+
+        {activeViewSection === 'quality_governance' && (
+          <EngineeringQualityGovernancePanel missionId={missionState.mission_id} />
         )}
 
         {activeViewSection === 'evidence_impact' && (

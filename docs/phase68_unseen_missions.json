@@ -1,0 +1,1646 @@
+{
+  "phase": 68,
+  "total_scenarios": 15,
+  "scenarios": [
+    {
+      "scenario_index": 1,
+      "scenario_id": "unseen_01_arch_degradation",
+      "scenario_name": "Architecture Degradation",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_01_arch_degradation_1789837084803",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_01_arch_degradation_1789837084805",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 3,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "DEGRADED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_BLOCKED",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": false,
+            "budget_violations": [
+              {
+                "limit": "max_regression_rate",
+                "budget": 0.02,
+                "actual": 0.23076923076923078,
+                "severity": "HIGH",
+                "recommended_action": "BLOCK"
+              },
+              {
+                "limit": "max_architecture_degradation",
+                "budget": 0,
+                "actual": 2,
+                "severity": "HIGH",
+                "recommended_action": "BLOCK"
+              }
+            ]
+          }
+        ],
+        "degradations": [
+          {
+            "metric": "coupling",
+            "from": 0.35,
+            "to": 0.85,
+            "reason": "coupling increased"
+          },
+          {
+            "metric": "scc_size",
+            "from": 4,
+            "to": 28,
+            "reason": "SCC condensation cycle grew"
+          },
+          {
+            "metric": "boundary_violations",
+            "from": 0,
+            "to": 1,
+            "reason": "new boundary violations introduced"
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "reason": "Dimension ARCHITECTURE is BLOCKED in snapshot",
+            "status": "BLOCKED"
+          }
+        ],
+        "improvements": [],
+        "debt": [],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8090901
+      },
+      "evidence": {
+        "degradations": [
+          {
+            "metric": "coupling",
+            "from": 0.35,
+            "to": 0.85,
+            "reason": "coupling increased"
+          },
+          {
+            "metric": "scc_size",
+            "from": 4,
+            "to": 28,
+            "reason": "SCC condensation cycle grew"
+          },
+          {
+            "metric": "boundary_violations",
+            "from": 0,
+            "to": 1,
+            "reason": "new boundary violations introduced"
+          }
+        ],
+        "gate_decision": "QUALITY_BLOCKED",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 2,
+      "scenario_id": "unseen_02_complexity_increase",
+      "scenario_name": "Complexity Increase",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_02_complexity_increase_1789837084809",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_02_complexity_increase_1789837084810",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 1,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "DEGRADED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_BLOCKED",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": false,
+            "budget_violations": [
+              {
+                "limit": "max_regression_rate",
+                "budget": 0.02,
+                "actual": 0.09090909090909091,
+                "severity": "HIGH",
+                "recommended_action": "BLOCK"
+              }
+            ]
+          }
+        ],
+        "degradations": [
+          {
+            "metric": "complexity",
+            "from": 8.5,
+            "to": 26.5,
+            "reason": "cyclomatic complexity increased"
+          }
+        ],
+        "improvements": [],
+        "debt": [],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8150253
+      },
+      "evidence": {
+        "degradations": [
+          {
+            "metric": "complexity",
+            "from": 8.5,
+            "to": 26.5,
+            "reason": "cyclomatic complexity increased"
+          }
+        ],
+        "gate_decision": "QUALITY_BLOCKED",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 3,
+      "scenario_id": "unseen_03_test_inflation",
+      "scenario_name": "Test Inflation Without Evidence",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_03_test_inflation_1789837084815",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_03_test_inflation_1789837084816",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 2,
+        "improvements_count": 0,
+        "evidence_efficiency": 0.0066,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "DEGRADED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_BLOCKED",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": false,
+            "budget_violations": [
+              {
+                "limit": "max_regression_rate",
+                "budget": 0.02,
+                "actual": 0.16666666666666666,
+                "severity": "HIGH",
+                "recommended_action": "BLOCK"
+              }
+            ]
+          }
+        ],
+        "degradations": [
+          {
+            "metric": "mutation_score",
+            "from": 0.76,
+            "to": 0.2,
+            "reason": "mutation score dropped"
+          },
+          {
+            "metric": "evidence_efficiency",
+            "from": 1.0,
+            "to": 0.0066,
+            "reason": "MORE_TESTS added without MORE_USEFUL_EVIDENCE (test inflation)"
+          }
+        ],
+        "improvements": [],
+        "debt": [],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8205504
+      },
+      "evidence": {
+        "degradations": [
+          {
+            "metric": "mutation_score",
+            "from": 0.76,
+            "to": 0.2,
+            "reason": "mutation score dropped"
+          },
+          {
+            "metric": "evidence_efficiency",
+            "from": 1.0,
+            "to": 0.0066,
+            "reason": "MORE_TESTS added without MORE_USEFUL_EVIDENCE (test inflation)"
+          }
+        ],
+        "gate_decision": "QUALITY_BLOCKED",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 4,
+      "scenario_id": "unseen_04_contract_drift",
+      "scenario_name": "Contract Drift",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_04_contract_drift_1789837084820",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_04_contract_drift_1789837084822",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 1,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "DEGRADED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_BLOCKED",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": false,
+            "budget_violations": [
+              {
+                "limit": "max_regression_rate",
+                "budget": 0.02,
+                "actual": 0.09090909090909091,
+                "severity": "HIGH",
+                "recommended_action": "BLOCK"
+              }
+            ]
+          }
+        ],
+        "degradations": [
+          {
+            "metric": "contract_drift",
+            "from": 0,
+            "to": 3,
+            "reason": "contract drift detected"
+          }
+        ],
+        "improvements": [],
+        "debt": [],
+        "uncertainty": 0.06777777777777778,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.825866
+      },
+      "evidence": {
+        "degradations": [
+          {
+            "metric": "contract_drift",
+            "from": 0,
+            "to": 3,
+            "reason": "contract drift detected"
+          }
+        ],
+        "gate_decision": "QUALITY_BLOCKED",
+        "uncertainty": 0.06777777777777778,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 5,
+      "scenario_id": "unseen_05_behavioral_regression",
+      "scenario_name": "Behavioral Regression",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_05_behavioral_regression_1789837084826",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_05_behavioral_regression_1789837084827",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 1,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "DEGRADED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_BLOCKED",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": false,
+            "budget_violations": [
+              {
+                "limit": "max_regression_rate",
+                "budget": 0.02,
+                "actual": 0.09090909090909091,
+                "severity": "HIGH",
+                "recommended_action": "BLOCK"
+              }
+            ]
+          }
+        ],
+        "degradations": [
+          {
+            "metric": "counterexamples",
+            "from": 0,
+            "to": 2,
+            "reason": "new behavioral counterexamples found"
+          }
+        ],
+        "improvements": [],
+        "debt": [],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8309615
+      },
+      "evidence": {
+        "degradations": [
+          {
+            "metric": "counterexamples",
+            "from": 0,
+            "to": 2,
+            "reason": "new behavioral counterexamples found"
+          }
+        ],
+        "gate_decision": "QUALITY_BLOCKED",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 6,
+      "scenario_id": "unseen_06_flaky_increase",
+      "scenario_name": "Flaky Increase",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_06_flaky_increase_1789837084831",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_06_flaky_increase_1789837084832",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 1,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "DEGRADED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_BLOCKED",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": false,
+            "budget_violations": [
+              {
+                "limit": "max_regression_rate",
+                "budget": 0.02,
+                "actual": 0.09090909090909091,
+                "severity": "HIGH",
+                "recommended_action": "BLOCK"
+              }
+            ]
+          }
+        ],
+        "degradations": [
+          {
+            "metric": "flaky_rate",
+            "from": 0.01,
+            "to": 0.12,
+            "reason": "flakiness increased"
+          }
+        ],
+        "improvements": [],
+        "debt": [],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8384273
+      },
+      "evidence": {
+        "degradations": [
+          {
+            "metric": "flaky_rate",
+            "from": 0.01,
+            "to": 0.12,
+            "reason": "flakiness increased"
+          }
+        ],
+        "gate_decision": "QUALITY_BLOCKED",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 7,
+      "scenario_id": "unseen_07_security_regression",
+      "scenario_name": "Security Regression",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_07_security_regression_1789837084838",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_07_security_regression_1789837084840",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 1,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "DEGRADED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_BLOCKED",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": false,
+            "budget_violations": [
+              {
+                "limit": "max_regression_rate",
+                "budget": 0.02,
+                "actual": 0.09090909090909091,
+                "severity": "HIGH",
+                "recommended_action": "BLOCK"
+              }
+            ]
+          }
+        ],
+        "degradations": [
+          {
+            "metric": "secret_exposure_attempts",
+            "from": 0,
+            "to": 1,
+            "reason": "Critical security degradation on secret_exposure_attempts",
+            "severity": "CRITICAL"
+          },
+          {
+            "dimension": "SECURITY",
+            "reason": "Dimension SECURITY is BLOCKED in snapshot",
+            "status": "BLOCKED"
+          }
+        ],
+        "improvements": [],
+        "debt": [],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8434434
+      },
+      "evidence": {
+        "degradations": [
+          {
+            "metric": "secret_exposure_attempts",
+            "from": 0,
+            "to": 1,
+            "reason": "Critical security degradation on secret_exposure_attempts",
+            "severity": "CRITICAL"
+          }
+        ],
+        "gate_decision": "QUALITY_BLOCKED",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 8,
+      "scenario_id": "unseen_08_perf_degradation",
+      "scenario_name": "Performance Degradation",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_08_perf_degradation_1789837084843",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_08_perf_degradation_1789837084845",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 2,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "DEGRADED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_BLOCKED",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": false,
+            "budget_violations": [
+              {
+                "limit": "max_regression_rate",
+                "budget": 0.02,
+                "actual": 0.16666666666666666,
+                "severity": "HIGH",
+                "recommended_action": "BLOCK"
+              }
+            ]
+          }
+        ],
+        "degradations": [
+          {
+            "metric": "p95_latency_ms",
+            "from": 45.0,
+            "to": 380.0,
+            "reason": "latency regressed by >25%"
+          },
+          {
+            "metric": "memory_mb",
+            "from": 180.0,
+            "to": 1200.0,
+            "reason": "memory footprint regressed"
+          }
+        ],
+        "improvements": [],
+        "debt": [],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8487535
+      },
+      "evidence": {
+        "degradations": [
+          {
+            "metric": "p95_latency_ms",
+            "from": 45.0,
+            "to": 380.0,
+            "reason": "latency regressed by >25%"
+          },
+          {
+            "metric": "memory_mb",
+            "from": 180.0,
+            "to": 1200.0,
+            "reason": "memory footprint regressed"
+          }
+        ],
+        "gate_decision": "QUALITY_BLOCKED",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 9,
+      "scenario_id": "unseen_09_reliability_degradation",
+      "scenario_name": "Reliability Degradation",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_09_reliability_degradation_1789837084848",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_09_reliability_degradation_1789837084850",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 2,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "DEGRADED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_BLOCKED",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": false,
+            "budget_violations": [
+              {
+                "limit": "max_regression_rate",
+                "budget": 0.02,
+                "actual": 0.16666666666666666,
+                "severity": "HIGH",
+                "recommended_action": "BLOCK"
+              }
+            ]
+          }
+        ],
+        "degradations": [
+          {
+            "metric": "mission_stalls",
+            "from": 0,
+            "to": 2,
+            "reason": "mission stalls emerged"
+          },
+          {
+            "metric": "oscillations",
+            "from": 0,
+            "to": 3,
+            "reason": "repair oscillations detected"
+          }
+        ],
+        "improvements": [],
+        "debt": [],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8538554
+      },
+      "evidence": {
+        "degradations": [
+          {
+            "metric": "mission_stalls",
+            "from": 0,
+            "to": 2,
+            "reason": "mission stalls emerged"
+          },
+          {
+            "metric": "oscillations",
+            "from": 0,
+            "to": 3,
+            "reason": "repair oscillations detected"
+          }
+        ],
+        "gate_decision": "QUALITY_BLOCKED",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 10,
+      "scenario_id": "unseen_10_debt_accumulation",
+      "scenario_name": "Technical Debt Accumulation",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_10_debt_accumulation_1789837084854",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_10_debt_accumulation_1789837084855",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 0,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [
+        {
+          "debt_id": "debt_operational_048bd66e",
+          "category": "OPERATIONAL",
+          "affected_surface": "auth_core",
+          "origin_mission": "unseen_10_debt_accumulation",
+          "evidence": [
+            {
+              "detection_rule": "repeated_rollback",
+              "surface": "auth_core",
+              "rollback_count": 2
+            }
+          ],
+          "severity": "MEDIUM",
+          "confidence": 0.9,
+          "estimated_cost": 2.5,
+          "risk": 0.75,
+          "age": 0.0,
+          "dependencies": [],
+          "resolution_options": [
+            "Implement transactional staging to avoid repeated rollbacks",
+            "Partition subsystem into isolated failure domains"
+          ],
+          "status": "OPEN",
+          "recurrence_count": 1,
+          "created_at": 1789837084.8580098,
+          "updated_at": 1789837084.85801
+        }
+      ],
+      "gate": {
+        "decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": true,
+            "budget_violations": []
+          }
+        ],
+        "degradations": [],
+        "improvements": [],
+        "debt": [
+          {
+            "debt_id": "debt_operational_048bd66e",
+            "category": "OPERATIONAL",
+            "affected_surface": "auth_core",
+            "origin_mission": "unseen_10_debt_accumulation",
+            "evidence": [
+              {
+                "detection_rule": "repeated_rollback",
+                "surface": "auth_core",
+                "rollback_count": 2
+              }
+            ],
+            "severity": "MEDIUM",
+            "confidence": 0.9,
+            "estimated_cost": 2.5,
+            "risk": 0.75,
+            "age": 0.0,
+            "dependencies": [],
+            "resolution_options": [
+              "Implement transactional staging to avoid repeated rollbacks",
+              "Partition subsystem into isolated failure domains"
+            ],
+            "status": "OPEN",
+            "recurrence_count": 1,
+            "created_at": 1789837084.8580098,
+            "updated_at": 1789837084.85801
+          }
+        ],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8590622
+      },
+      "evidence": {
+        "degradations": [],
+        "gate_decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 11,
+      "scenario_id": "unseen_11_debt_resolution",
+      "scenario_name": "Debt Resolution",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_11_debt_resolution_1789837084859",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_11_debt_resolution_1789837084860",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 0,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [
+        {
+          "debt_id": "debt_code_1a7c73ef",
+          "category": "CODE",
+          "affected_surface": "legacy_parser",
+          "origin_mission": "unseen_11_debt_resolution",
+          "evidence": [
+            {
+              "cycles": 2
+            },
+            {
+              "tests_passing": true,
+              "cyclomatic_reduced": 5
+            }
+          ],
+          "severity": "MEDIUM",
+          "confidence": 0.8,
+          "estimated_cost": 1.0,
+          "risk": 0.5,
+          "age": 0.0,
+          "dependencies": [],
+          "resolution_options": [
+            "Refactor in next maintenance milestone"
+          ],
+          "status": "RESOLVED",
+          "recurrence_count": 1,
+          "created_at": 1789837084.8633995,
+          "updated_at": 1789837084.8634272
+        }
+      ],
+      "gate": {
+        "decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": true,
+            "budget_violations": []
+          }
+        ],
+        "degradations": [],
+        "improvements": [],
+        "debt": [
+          {
+            "debt_id": "debt_operational_048bd66e",
+            "category": "OPERATIONAL",
+            "affected_surface": "auth_core",
+            "origin_mission": "unseen_10_debt_accumulation",
+            "evidence": [
+              {
+                "detection_rule": "repeated_rollback",
+                "surface": "auth_core",
+                "rollback_count": 2
+              }
+            ],
+            "severity": "MEDIUM",
+            "confidence": 0.9,
+            "estimated_cost": 2.5,
+            "risk": 0.75,
+            "age": 0.0,
+            "dependencies": [],
+            "resolution_options": [
+              "Implement transactional staging to avoid repeated rollbacks",
+              "Partition subsystem into isolated failure domains"
+            ],
+            "status": "OPEN",
+            "recurrence_count": 1,
+            "created_at": 1789837084.8580098,
+            "updated_at": 1789837084.85801
+          }
+        ],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8643682
+      },
+      "evidence": {
+        "degradations": [],
+        "gate_decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 12,
+      "scenario_id": "unseen_12_multi_agent_conflict",
+      "scenario_name": "Multi-Agent Quality Conflict",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_12_multi_agent_conflict_1789837084864",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_12_multi_agent_conflict_1789837084866",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 0,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": true,
+            "budget_violations": []
+          }
+        ],
+        "degradations": [],
+        "improvements": [],
+        "debt": [
+          {
+            "debt_id": "debt_operational_048bd66e",
+            "category": "OPERATIONAL",
+            "affected_surface": "auth_core",
+            "origin_mission": "unseen_10_debt_accumulation",
+            "evidence": [
+              {
+                "detection_rule": "repeated_rollback",
+                "surface": "auth_core",
+                "rollback_count": 2
+              }
+            ],
+            "severity": "MEDIUM",
+            "confidence": 0.9,
+            "estimated_cost": 2.5,
+            "risk": 0.75,
+            "age": 0.0,
+            "dependencies": [],
+            "resolution_options": [
+              "Implement transactional staging to avoid repeated rollbacks",
+              "Partition subsystem into isolated failure domains"
+            ],
+            "status": "OPEN",
+            "recurrence_count": 1,
+            "created_at": 1789837084.8580098,
+            "updated_at": 1789837084.85801
+          }
+        ],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8825262
+      },
+      "evidence": {
+        "degradations": [],
+        "gate_decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 13,
+      "scenario_id": "unseen_13_cross_project_hint",
+      "scenario_name": "Cross-Project Quality Hint",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_13_cross_project_hint_1789837084883",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_13_cross_project_hint_1789837084885",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 0,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": true,
+            "budget_violations": []
+          }
+        ],
+        "degradations": [],
+        "improvements": [],
+        "debt": [
+          {
+            "debt_id": "debt_operational_048bd66e",
+            "category": "OPERATIONAL",
+            "affected_surface": "auth_core",
+            "origin_mission": "unseen_10_debt_accumulation",
+            "evidence": [
+              {
+                "detection_rule": "repeated_rollback",
+                "surface": "auth_core",
+                "rollback_count": 2
+              }
+            ],
+            "severity": "MEDIUM",
+            "confidence": 0.9,
+            "estimated_cost": 2.5,
+            "risk": 0.75,
+            "age": 0.0,
+            "dependencies": [],
+            "resolution_options": [
+              "Implement transactional staging to avoid repeated rollbacks",
+              "Partition subsystem into isolated failure domains"
+            ],
+            "status": "OPEN",
+            "recurrence_count": 1,
+            "created_at": 1789837084.8580098,
+            "updated_at": 1789837084.85801
+          }
+        ],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8919466
+      },
+      "evidence": {
+        "degradations": [],
+        "gate_decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "uncertainty": 0.12111111111111111,
+        "hint": {
+          "type": "QUALITY_HINT",
+          "hint_id": "hint_bd6f9114",
+          "source_pattern": "ast_split_pattern",
+          "suggestion": "Consider restructuring dependencies",
+          "confidence": 0.6,
+          "is_evidence": false,
+          "requires_local_validation": true,
+          "validation_status": "PENDING_LOCAL_BENCHMARK"
+        }
+      }
+    },
+    {
+      "scenario_index": 14,
+      "scenario_id": "unseen_14_quality_uncertainty",
+      "scenario_name": "Quality Uncertainty",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_14_quality_uncertainty_1789837084892",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_14_quality_uncertainty_1789837084895",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 0,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [],
+      "gate": {
+        "decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": true,
+            "budget_violations": []
+          }
+        ],
+        "degradations": [],
+        "improvements": [],
+        "debt": [
+          {
+            "debt_id": "debt_operational_048bd66e",
+            "category": "OPERATIONAL",
+            "affected_surface": "auth_core",
+            "origin_mission": "unseen_10_debt_accumulation",
+            "evidence": [
+              {
+                "detection_rule": "repeated_rollback",
+                "surface": "auth_core",
+                "rollback_count": 2
+              }
+            ],
+            "severity": "MEDIUM",
+            "confidence": 0.9,
+            "estimated_cost": 2.5,
+            "risk": 0.75,
+            "age": 0.0,
+            "dependencies": [],
+            "resolution_options": [
+              "Implement transactional staging to avoid repeated rollbacks",
+              "Partition subsystem into isolated failure domains"
+            ],
+            "status": "OPEN",
+            "recurrence_count": 1,
+            "created_at": 1789837084.8580098,
+            "updated_at": 1789837084.85801
+          }
+        ],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.8998427
+      },
+      "evidence": {
+        "degradations": [],
+        "gate_decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    },
+    {
+      "scenario_index": 15,
+      "scenario_id": "unseen_15_mission_completed_with_debt",
+      "scenario_name": "Mission Completed With Debt",
+      "baseline_snapshot": {
+        "snapshot_id": "baseline_unseen_15_mission_completed_with_debt_1789837084900",
+        "dimensions_count": 9
+      },
+      "after_snapshot": {
+        "snapshot_id": "after_unseen_15_mission_completed_with_debt_1789837084902",
+        "dimensions_count": 9
+      },
+      "quality_delta": {
+        "degradations_count": 0,
+        "improvements_count": 0,
+        "evidence_efficiency": 1.0,
+        "dimension_changes": {
+          "ARCHITECTURE": "UNCHANGED",
+          "CODE": "UNCHANGED",
+          "TEST": "UNCHANGED",
+          "CONTRACT": "UNCHANGED",
+          "BEHAVIOR": "UNCHANGED",
+          "SECURITY": "UNCHANGED",
+          "PERFORMANCE": "UNCHANGED",
+          "RELIABILITY": "UNCHANGED",
+          "MAINTAINABILITY": "UNCHANGED"
+        }
+      },
+      "debt": [
+        {
+          "debt_id": "debt_documentation_66b02d6a",
+          "category": "DOCUMENTATION",
+          "affected_surface": "missing_api_docs",
+          "origin_mission": "unseen_15_mission_completed_with_debt",
+          "evidence": [
+            {
+              "undocumented": true
+            }
+          ],
+          "severity": "LOW",
+          "confidence": 0.8,
+          "estimated_cost": 1.0,
+          "risk": 0.5,
+          "age": 0.0,
+          "dependencies": [],
+          "resolution_options": [
+            "Refactor in next maintenance milestone"
+          ],
+          "status": "OPEN",
+          "recurrence_count": 1,
+          "created_at": 1789837084.9053462,
+          "updated_at": 1789837084.9053462
+        }
+      ],
+      "gate": {
+        "decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "scope": "global",
+        "evidence": [
+          {
+            "evaluator": "QualityGateEngine",
+            "dimensions_evaluated": 9
+          },
+          {
+            "budget_compliant": true,
+            "budget_violations": []
+          }
+        ],
+        "degradations": [],
+        "improvements": [],
+        "debt": [
+          {
+            "debt_id": "debt_operational_048bd66e",
+            "category": "OPERATIONAL",
+            "affected_surface": "auth_core",
+            "origin_mission": "unseen_10_debt_accumulation",
+            "evidence": [
+              {
+                "detection_rule": "repeated_rollback",
+                "surface": "auth_core",
+                "rollback_count": 2
+              }
+            ],
+            "severity": "MEDIUM",
+            "confidence": 0.9,
+            "estimated_cost": 2.5,
+            "risk": 0.75,
+            "age": 0.0,
+            "dependencies": [],
+            "resolution_options": [
+              "Implement transactional staging to avoid repeated rollbacks",
+              "Partition subsystem into isolated failure domains"
+            ],
+            "status": "OPEN",
+            "recurrence_count": 1,
+            "created_at": 1789837084.8580098,
+            "updated_at": 1789837084.85801
+          },
+          {
+            "debt_id": "debt_documentation_66b02d6a",
+            "category": "DOCUMENTATION",
+            "affected_surface": "missing_api_docs",
+            "origin_mission": "unseen_15_mission_completed_with_debt",
+            "evidence": [
+              {
+                "undocumented": true
+              }
+            ],
+            "severity": "LOW",
+            "confidence": 0.8,
+            "estimated_cost": 1.0,
+            "risk": 0.5,
+            "age": 0.0,
+            "dependencies": [],
+            "resolution_options": [
+              "Refactor in next maintenance milestone"
+            ],
+            "status": "OPEN",
+            "recurrence_count": 1,
+            "created_at": 1789837084.9053462,
+            "updated_at": 1789837084.9053462
+          }
+        ],
+        "uncertainty": 0.12111111111111111,
+        "policy": {
+          "name": "GOVERNED",
+          "strict_mode": false,
+          "budget": {
+            "max_critical_debt": 0,
+            "max_unresolved_contract_drift": 0,
+            "max_security_debt": 0,
+            "max_flaky_rate": 0.05,
+            "max_regression_rate": 0.02,
+            "max_architecture_degradation": 0,
+            "max_quality_uncertainty": 0.35,
+            "max_human_review_backlog": 5
+          },
+          "allow_accepted_with_debt": true,
+          "require_human_review_on_uncertainty": true,
+          "uncertainty_threshold": 0.3
+        },
+        "timestamp": 1789837084.9065952
+      },
+      "evidence": {
+        "degradations": [],
+        "gate_decision": "QUALITY_ACCEPTED_WITH_DEBT",
+        "uncertainty": 0.12111111111111111,
+        "hint": null
+      }
+    }
+  ]
+}

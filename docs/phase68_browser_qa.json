@@ -1,0 +1,156 @@
+{
+  "phase": 68,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "timestamp": 1789837157.6091497,
+  "scenarios_tested": 14,
+  "scenarios_passed": 14,
+  "screenshots": [
+    {
+      "index": 1,
+      "title": "01 quality overview",
+      "filename": "phase68_01_quality_overview.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_01_quality_overview.png",
+      "selector": "#quality-subtab-overview",
+      "description": "Quality cockpit overview, multi-dimensional scorecards, and evidence efficiency",
+      "size_kb": 234.1,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 2,
+      "title": "02 quality dimensions",
+      "filename": "phase68_02_quality_dimensions.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_02_quality_dimensions.png",
+      "selector": "#quality-subtab-dimensions",
+      "description": "Detailed evaluation across 9 observable dimensions with uncertainty and scope",
+      "size_kb": 224.4,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 3,
+      "title": "03 baseline",
+      "filename": "phase68_03_baseline.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_03_baseline.png",
+      "selector": "#quality-subtab-baseline",
+      "description": "Immutable QUALITY_BASELINE capture and cryptographic hash sealing",
+      "size_kb": 225.5,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 4,
+      "title": "04 comparison",
+      "filename": "phase68_04_comparison.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_04_comparison.png",
+      "selector": "#quality-subtab-comparison",
+      "description": "BEFORE vs AFTER comparison matrix across dimensions with evidence traces",
+      "size_kb": 223.1,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 5,
+      "title": "05 technical debt",
+      "filename": "phase68_05_technical_debt.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_05_technical_debt.png",
+      "selector": "#quality-subtab-debt",
+      "description": "Catalog of governed technical debt items across 9 categories and 8 states",
+      "size_kb": 224.5,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 6,
+      "title": "06 debt priority",
+      "filename": "phase68_06_debt_priority.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_06_debt_priority.png",
+      "selector": "#quality-subtab-priority",
+      "description": "Multi-attribute PRIORITY_VECTOR scoring and natural-language rationale",
+      "size_kb": 224.3,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 7,
+      "title": "07 quality gates",
+      "filename": "phase68_07_quality_gates.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_07_quality_gates.png",
+      "selector": "#quality-subtab-gates",
+      "description": "QualityGateDecision evaluation (5 nuanced states) and budget limit enforcement",
+      "size_kb": 224.1,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 8,
+      "title": "08 regression",
+      "filename": "phase68_08_regression.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_08_regression.png",
+      "selector": "#quality-subtab-regression",
+      "description": "QualityRegressionDetector with uncertainty threshold filtering",
+      "size_kb": 223.4,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 9,
+      "title": "09 trend",
+      "filename": "phase68_09_trend.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_09_trend.png",
+      "selector": "#quality-subtab-trend",
+      "description": "Historical snapshot trajectory analysis (STABLE, IMPROVING, DEGRADING, VOLATILE)",
+      "size_kb": 222.9,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 10,
+      "title": "10 hotspots",
+      "filename": "phase68_10_hotspots.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_10_hotspots.png",
+      "selector": "#quality-subtab-hotspots",
+      "description": "Quality Hotspots concentrating changes, regressions, rollbacks, and debt",
+      "size_kb": 223.2,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 11,
+      "title": "11 mission quality",
+      "filename": "phase68_11_mission_quality.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_11_mission_quality.png",
+      "selector": "#quality-subtab-mission",
+      "description": "F67 integration (COMPLETED_WITH_QUALITY_DEBT vs COMPLETED_WITH_QUALITY_IMPROVEMENT)",
+      "size_kb": 224.4,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 12,
+      "title": "12 agent quality",
+      "filename": "phase68_12_agent_quality.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_12_agent_quality.png",
+      "selector": "#quality-subtab-agent",
+      "description": "F66 multi-agent quality telemetry and intent-level regression tracking",
+      "size_kb": 224.0,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 13,
+      "title": "13 security quality",
+      "filename": "phase68_13_security_quality.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_13_security_quality.png",
+      "selector": "#quality-subtab-security",
+      "description": "Sentinel security guardrails and non-subvertible gate blocking",
+      "size_kb": 223.5,
+      "status": "CAPTURED"
+    },
+    {
+      "index": 14,
+      "title": "14 final governance",
+      "filename": "phase68_14_final_governance.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase68\\phase68_14_final_governance.png",
+      "selector": "#quality-subtab-governance",
+      "description": "Final decision gate: ENGINEERING_QUALITY_GOVERNANCE_READY = TRUE",
+      "size_kb": 223.5,
+      "status": "CAPTURED"
+    }
+  ],
+  "console_errors": [
+    "[ERROR] The tag <%s> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter. g",
+    "[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "page_errors": [],
+  "failed_requests": []
+}

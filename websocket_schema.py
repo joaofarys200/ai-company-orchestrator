@@ -186,6 +186,14 @@ SERVER_MESSAGE_TYPES = {
     "mission_long_horizon_recover_result",
     "mission_long_horizon_adapt_result",
     "mission_long_horizon_completion_evaluate_result",
+    # Phase 68 Engineering Quality Governance
+    "mission_quality_governance_status_result",
+    "mission_quality_governance_snapshot_result",
+    "mission_quality_governance_baseline_result",
+    "mission_quality_governance_gate_result",
+    "mission_quality_governance_debt_list_result",
+    "mission_quality_governance_trend_result",
+    "mission_quality_governance_hotspots_result",
 }
 
 
@@ -339,6 +347,14 @@ CLIENT_MESSAGE_TYPES = {
     "mission_long_horizon_recover",
     "mission_long_horizon_adapt",
     "mission_long_horizon_completion_evaluate",
+    # Phase 68
+    "mission_quality_governance_status",
+    "mission_quality_governance_snapshot",
+    "mission_quality_governance_baseline",
+    "mission_quality_governance_gate",
+    "mission_quality_governance_debt_list",
+    "mission_quality_governance_trend",
+    "mission_quality_governance_hotspots",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
@@ -350,6 +366,14 @@ MISSION_CLIENT_REQUIRED_FIELDS = {
     "mission_long_horizon_recover": (),
     "mission_long_horizon_adapt": (),
     "mission_long_horizon_completion_evaluate": (),
+    # Phase 68
+    "mission_quality_governance_status": (),
+    "mission_quality_governance_snapshot": (),
+    "mission_quality_governance_baseline": (),
+    "mission_quality_governance_gate": (),
+    "mission_quality_governance_debt_list": (),
+    "mission_quality_governance_trend": (),
+    "mission_quality_governance_hotspots": (),
     "mission_multi_agent_coordination_status": (),
     "mission_multi_agent_intent_submit": (),
     "mission_multi_agent_arbitrate": (),

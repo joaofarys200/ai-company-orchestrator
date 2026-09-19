@@ -1,0 +1,2196 @@
+{
+  "baseline": {
+    "snapshot_id": "baseline_real_jarvis_quality_mission_1789837070352",
+    "mission_id": "real_jarvis_quality_mission",
+    "architecture_hash": "arch_init",
+    "contract_hash": "contract_init",
+    "behavior_hash": "behavior_init",
+    "test_hash": "test_init",
+    "security_hash": "sec_init",
+    "timestamp": 1789837070.3522584,
+    "provenance": {
+      "entity_type": "QualitySnapshot",
+      "entity_id": "baseline_real_jarvis_quality_mission",
+      "actor": "GovernanceEngine",
+      "action": "CAPTURE_BASELINE",
+      "details": {
+        "mission_id": "real_jarvis_quality_mission",
+        "scope": "global"
+      },
+      "timestamp": 1789837070.3521965,
+      "signature": "5a7d3074cc149e98578e80c37741eb28ca773ecffb669accdf05ae595bd9f025"
+    },
+    "dimensions": {
+      "ARCHITECTURE": {
+        "dimension": "ARCHITECTURE",
+        "observations": [
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "coupling",
+            "measured_value": 0.32,
+            "evidence": {
+              "coupling_ratio": 0.32
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352083
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "fan_in",
+            "measured_value": 38,
+            "evidence": {
+              "fan_in_count": 38
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352086
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "fan_out",
+            "measured_value": 26,
+            "evidence": {
+              "fan_out_count": 26
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352087
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "scc_size",
+            "measured_value": 4,
+            "evidence": {
+              "largest_scc_node_count": 4
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352088
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "dependency_depth",
+            "measured_value": 7,
+            "evidence": {
+              "max_depth": 7
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3520887
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "architectural_boundaries",
+            "measured_value": 18,
+            "evidence": {
+              "defined_boundaries": 18
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3520894
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "dynamic_boundaries",
+            "measured_value": 3,
+            "evidence": {
+              "runtime_inferred_boundaries": 3
+            },
+            "uncertainty": 0.15,
+            "scope": "global",
+            "observation_type": "INFERRED",
+            "timestamp": 1789837070.3520904
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "blast_radius",
+            "measured_value": 12,
+            "evidence": {
+              "affected_symbol_count": 12
+            },
+            "uncertainty": 0.1,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.352091
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "modularity",
+            "measured_value": 0.74,
+            "evidence": {
+              "cohesion_vs_coupling_score": 0.74
+            },
+            "uncertainty": 0.08,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3520918
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "boundary_violations",
+            "measured_value": 0,
+            "evidence": {
+              "violations_detected": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3520927
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "ArchitectureQualityEvaluator",
+            "coupling": 0.32,
+            "scc_size": 4,
+            "blast_radius": 12,
+            "boundary_violations": 0,
+            "modularity": 0.74
+          }
+        ],
+        "uncertainty": 0.08,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Architecture status HEALTHY: coupling=0.32, scc_size=4, blast_radius=12, violations=0, modularity=0.74"
+      },
+      "CODE": {
+        "dimension": "CODE",
+        "observations": [
+          {
+            "dimension": "CODE",
+            "metric_name": "complexity",
+            "measured_value": 7.8,
+            "evidence": {
+              "mean_cyclomatic_complexity": 7.8
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352115
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "duplication",
+            "measured_value": 0.024,
+            "evidence": {
+              "duplication_ratio": 0.024
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521156
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "function_size",
+            "measured_value": 31.5,
+            "evidence": {
+              "mean_loc_per_function": 31.5
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521166
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "class_size",
+            "measured_value": 158.0,
+            "evidence": {
+              "mean_loc_per_class": 158.0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352117
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "nesting",
+            "measured_value": 2.6,
+            "evidence": {
+              "mean_max_nesting_depth": 2.6
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521175
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "dead_code_signals",
+            "measured_value": 0,
+            "evidence": {
+              "unreferenced_symbols_detected": 0
+            },
+            "uncertainty": 0.1,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.352118
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "import_anomalies",
+            "measured_value": 0,
+            "evidence": {
+              "circular_or_stale_imports": 0
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521187
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "type_uncertainty",
+            "measured_value": 0.04,
+            "evidence": {
+              "untyped_or_any_ratio": 0.04
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521192
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "code_churn",
+            "measured_value": 78570,
+            "evidence": {
+              "lines_added_and_deleted": 78570
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.35212
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "change_concentration",
+            "measured_value": 0.42,
+            "evidence": {
+              "gini_coefficient_of_changes": 0.42
+            },
+            "uncertainty": 0.06,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3521204
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "CodeQualityEvaluator",
+            "churn": 78570
+          }
+        ],
+        "uncertainty": 0.05,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Code status HEALTHY: complexity=7.8, duplication=2.4%, fn_size=31.5, nesting=2.6, dead_code=0, type_uncertainty=4.0%"
+      },
+      "TEST": {
+        "dimension": "TEST",
+        "observations": [
+          {
+            "dimension": "TEST",
+            "metric_name": "line_coverage",
+            "measured_value": 0.89,
+            "evidence": {
+              "line_coverage_pct": 0.89
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521316
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "branch_coverage",
+            "measured_value": 0.84,
+            "evidence": {
+              "branch_coverage_pct": 0.84
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521323
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "symbol_coverage",
+            "measured_value": 0.86,
+            "evidence": {
+              "symbol_coverage_pct": 0.86
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521328
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "contract_coverage",
+            "measured_value": 0.88,
+            "evidence": {
+              "contract_coverage_pct": 0.88
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521333
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "behavior_coverage",
+            "measured_value": 0.82,
+            "evidence": {
+              "behavior_coverage_pct": 0.82
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521342
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "invariant_coverage",
+            "measured_value": 0.8,
+            "evidence": {
+              "invariant_coverage_pct": 0.8
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521347
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "consumer_coverage",
+            "measured_value": 0.85,
+            "evidence": {
+              "consumer_coverage_pct": 0.85
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521354
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "browser_coverage",
+            "measured_value": 0.75,
+            "evidence": {
+              "browser_coverage_pct": 0.75
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352136
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "mutation_score",
+            "measured_value": 0.79,
+            "evidence": {
+              "killed_mutants_ratio": 0.79
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521364
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "regression_density",
+            "measured_value": 0.0,
+            "evidence": {
+              "regressions_per_100_runs": 0.0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521369
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "flaky_rate",
+            "measured_value": 0.005,
+            "evidence": {
+              "flaky_tests_ratio": 0.005
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521376
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "test_redundancy",
+            "measured_value": 0.0006745362563237774,
+            "evidence": {
+              "duplicate_or_zero_mutation_tests": 0.0006745362563237774
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.352138
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "evidence_efficiency",
+            "measured_value": 1.0,
+            "evidence": {
+              "efficiency_score": 1.0
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3521385
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "TestQualityEvaluator",
+            "test_count": 11860,
+            "useful_assertions": 35580,
+            "evidence_efficiency": 1.0
+          }
+        ],
+        "uncertainty": 0.03,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Test status HEALTHY: line_cov=89.0%, mutation=79.0%, flaky=0.5%, efficiency=1.00, count=11860"
+      },
+      "CONTRACT": {
+        "dimension": "CONTRACT",
+        "observations": [
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "breaking_changes",
+            "measured_value": 0,
+            "evidence": {
+              "breaking_count": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521447
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "polymorphic_ambiguity",
+            "measured_value": 0,
+            "evidence": {
+              "ambiguous_variants": 0
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521454
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "consumer_coverage",
+            "measured_value": 0.96,
+            "evidence": {
+              "verified_consumer_ratio": 0.96
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352146
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "contract_drift",
+            "measured_value": 0,
+            "evidence": {
+              "unregistered_schema_deviations": 0
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521464
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "unresolved_consumers",
+            "measured_value": 0,
+            "evidence": {
+              "unresolved_consumer_endpoints": 0
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3521469
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "stale_schemas",
+            "measured_value": 0,
+            "evidence": {
+              "outdated_idl_or_pydantic": 0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521473
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "undocumented_changes",
+            "measured_value": 0,
+            "evidence": {
+              "payload_alterations_without_doc": 0
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521483
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "ContractQualityEvaluator",
+            "breaking": 0
+          }
+        ],
+        "uncertainty": 0.02,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Contract status HEALTHY: breaking=0, drift=0, unresolved=0, consumer_cov=96.0%"
+      },
+      "BEHAVIOR": {
+        "dimension": "BEHAVIOR",
+        "observations": [
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "invariant_coverage",
+            "measured_value": 0.85,
+            "evidence": {
+              "invariant_pct": 0.85
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521538
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "counterexamples",
+            "measured_value": 0,
+            "evidence": {
+              "counterexample_traces": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521547
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "behavioral_drift",
+            "measured_value": 0,
+            "evidence": {
+              "divergent_temporal_properties": 0
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352155
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "idempotency",
+            "measured_value": true,
+            "evidence": {
+              "idempotency_verified": true
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521554
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "concurrency",
+            "measured_value": true,
+            "evidence": {
+              "race_conditions_absent": true
+            },
+            "uncertainty": 0.1,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521562
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "state_transitions_valid_pct",
+            "measured_value": 0.99,
+            "evidence": {
+              "valid_transitions_ratio": 0.99
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521564
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "state_space_explored_pct",
+            "measured_value": 0.75,
+            "evidence": {
+              "explored_state_fraction": 0.75
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3521569
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "BehaviorQualityEvaluator",
+            "counterexamples": 0,
+            "state_space_explored": 0.75
+          }
+        ],
+        "uncertainty": 0.25,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Behavior status HEALTHY: counterexamples=0, drift=0, invariant_cov=85.0%, explored=75.0%, uncertainty=0.25"
+      },
+      "SECURITY": {
+        "dimension": "SECURITY",
+        "observations": [
+          {
+            "dimension": "SECURITY",
+            "metric_name": "blocked_operations",
+            "measured_value": 0,
+            "evidence": {
+              "sentinel_blocked_operations": 0
+            },
+            "uncertainty": 0.001,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521624
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "secret_exposure_attempts",
+            "measured_value": 0,
+            "evidence": {
+              "secret_attempts_caught": 0
+            },
+            "uncertainty": 0.001,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521628
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "privileged_changes",
+            "measured_value": 0,
+            "evidence": {
+              "unvetted_privileged_changes": 0
+            },
+            "uncertainty": 0.005,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521633
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "protected_path_changes",
+            "measured_value": 0,
+            "evidence": {
+              "protected_path_mutations": 0
+            },
+            "uncertainty": 0.001,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521636
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "unsafe_dependency_changes",
+            "measured_value": 0,
+            "evidence": {
+              "unvetted_or_cve_dependencies": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352164
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "sandbox_violations",
+            "measured_value": 0,
+            "evidence": {
+              "container_jail_escapes_or_violations": 0
+            },
+            "uncertainty": 0.001,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521645
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "security_review_backlog",
+            "measured_value": 0,
+            "evidence": {
+              "pending_security_reviews": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521652
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "SecurityQualityEvaluator",
+            "blocked_ops": 0,
+            "secret_attempts": 0,
+            "sandbox_violations": 0
+          }
+        ],
+        "uncertainty": 0.01,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Security status HEALTHY: secret_attempts=0, sandbox_violations=0, blocked_ops=0, protected_path_changes=0, unsafe_deps=0"
+      },
+      "PERFORMANCE": {
+        "dimension": "PERFORMANCE",
+        "observations": [
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "p95_latency_ms",
+            "measured_value": 38.5,
+            "evidence": {
+              "measured_p95_ms": 38.5
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521702
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "throughput_ops",
+            "measured_value": 520.0,
+            "evidence": {
+              "benchmark_ops_per_sec": 520.0
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521707
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "cpu_ms",
+            "measured_value": 115.0,
+            "evidence": {
+              "cpu_active_duration_ms": 115.0
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521712
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "memory_mb",
+            "measured_value": 240.0,
+            "evidence": {
+              "resident_set_size_mb": 240.0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521717
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "io_ops",
+            "measured_value": 18,
+            "evidence": {
+              "disk_or_network_io_calls": 18
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521726
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "cache_efficiency",
+            "measured_value": 0.92,
+            "evidence": {
+              "cache_hits_over_requests": 0.92
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3521733
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "verification_overhead_ms",
+            "measured_value": 28.0,
+            "evidence": {
+              "time_spent_in_verification_ms": 28.0
+            },
+            "uncertainty": 0.08,
+            "scope": "global",
+            "observation_type": "INFERRED",
+            "timestamp": 1789837070.3521738
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "PerformanceQualityEvaluator",
+            "p95": 38.5,
+            "evidence_loss_detected": false
+          }
+        ],
+        "uncertainty": 0.04,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Performance status HEALTHY: p95=38.5ms, throughput=520.0ops/s, memory=240.0MB, cache_eff=92.0%, overhead=28.0ms"
+      },
+      "RELIABILITY": {
+        "dimension": "RELIABILITY",
+        "observations": [
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "recovery_success",
+            "measured_value": 1.0,
+            "evidence": {
+              "successful_recoveries_ratio": 1.0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352179
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "rollback_success",
+            "measured_value": 1.0,
+            "evidence": {
+              "successful_rollbacks_ratio": 1.0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521795
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "residual_states",
+            "measured_value": 0,
+            "evidence": {
+              "orphaned_resources_or_locks": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521802
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "crash_recovery_count",
+            "measured_value": 0,
+            "evidence": {
+              "watchdog_crash_recoveries": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521807
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "mission_stalls",
+            "measured_value": 0,
+            "evidence": {
+              "watchdog_stalls_flagged": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521812
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "oscillations",
+            "measured_value": 0,
+            "evidence": {
+              "ping_pong_repair_or_plan_loops": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521817
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "agent_failures",
+            "measured_value": 0,
+            "evidence": {
+              "subagent_abnormal_terminations": 0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521824
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "retry_count",
+            "measured_value": 1,
+            "evidence": {
+              "automated_retries_executed": 1
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521829
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "human_review_frequency",
+            "measured_value": 0.02,
+            "evidence": {
+              "human_escalations_per_mission": 0.02
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3521833
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "incomplete_missions",
+            "measured_value": 0,
+            "evidence": {
+              "aborted_or_budget_exhausted_missions": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521838
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "ReliabilityQualityEvaluator",
+            "recovery_success": 1.0,
+            "stalls": 0,
+            "oscillations": 0
+          }
+        ],
+        "uncertainty": 0.03,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Reliability status HEALTHY: recovery=100.0%, rollback=100.0%, residuals=0, stalls=0, oscillations=0, failures=0"
+      },
+      "MAINTAINABILITY": {
+        "dimension": "MAINTAINABILITY",
+        "observations": [
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "testability_index",
+            "measured_value": 0.88,
+            "evidence": {
+              "decoupled_injection_score": 0.88
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.352188
+          },
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "documentation_completeness",
+            "measured_value": 0.94,
+            "evidence": {
+              "documented_symbols_ratio": 0.94
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521886
+          },
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "change_propagation_factor",
+            "measured_value": 0.19,
+            "evidence": {
+              "ripple_effect_ratio": 0.19
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3521893
+          },
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "symbol_graph_clarity",
+            "measured_value": 0.9,
+            "evidence": {
+              "unambiguous_symbol_resolution_pct": 0.9
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521898
+          },
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "ownership_clarity",
+            "measured_value": 0.82,
+            "evidence": {
+              "agent_or_team_surface_mapping": 0.82
+            },
+            "uncertainty": 0.08,
+            "scope": "global",
+            "observation_type": "INFERRED",
+            "timestamp": 1789837070.3521903
+          },
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "module_boundary_index",
+            "measured_value": 0.86,
+            "evidence": {
+              "encapsulation_adherence": 0.86
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3521907
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "MaintainabilityQualityEvaluator",
+            "testability_index": 0.88,
+            "change_propagation": 0.19
+          }
+        ],
+        "uncertainty": 0.05,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Maintainability status HEALTHY: testability=88.0%, doc=94.0%, ripple=19.0%, boundaries=86.0%"
+      }
+    },
+    "sealed": true
+  },
+  "after": {
+    "snapshot_id": "after_real_jarvis_quality_mission_1789837070354",
+    "mission_id": "real_jarvis_quality_mission",
+    "architecture_hash": "arch_post",
+    "contract_hash": "contract_post",
+    "behavior_hash": "behavior_post",
+    "test_hash": "test_post",
+    "security_hash": "sec_post",
+    "timestamp": 1789837070.3541753,
+    "provenance": {
+      "entity_type": "QualitySnapshot",
+      "entity_id": "after_real_jarvis_quality_mission",
+      "actor": "GovernanceEngine",
+      "action": "CAPTURE_AFTER",
+      "details": {
+        "mission_id": "real_jarvis_quality_mission",
+        "scope": "global"
+      },
+      "timestamp": 1789837070.3541539,
+      "signature": "fe023f5c35848d579cb791edaab89353cc9120dee447f1df5318e7300bda098c"
+    },
+    "dimensions": {
+      "ARCHITECTURE": {
+        "dimension": "ARCHITECTURE",
+        "observations": [
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "coupling",
+            "measured_value": 0.48,
+            "evidence": {
+              "coupling_ratio": 0.48
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354045
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "fan_in",
+            "measured_value": 38,
+            "evidence": {
+              "fan_in_count": 38
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540468
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "fan_out",
+            "measured_value": 26,
+            "evidence": {
+              "fan_out_count": 26
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540475
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "scc_size",
+            "measured_value": 12,
+            "evidence": {
+              "largest_scc_node_count": 12
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540483
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "dependency_depth",
+            "measured_value": 7,
+            "evidence": {
+              "max_depth": 7
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540487
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "architectural_boundaries",
+            "measured_value": 18,
+            "evidence": {
+              "defined_boundaries": 18
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540492
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "dynamic_boundaries",
+            "measured_value": 3,
+            "evidence": {
+              "runtime_inferred_boundaries": 3
+            },
+            "uncertainty": 0.15,
+            "scope": "global",
+            "observation_type": "INFERRED",
+            "timestamp": 1789837070.3540502
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "blast_radius",
+            "measured_value": 12,
+            "evidence": {
+              "affected_symbol_count": 12
+            },
+            "uncertainty": 0.1,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3540509
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "modularity",
+            "measured_value": 0.74,
+            "evidence": {
+              "cohesion_vs_coupling_score": 0.74
+            },
+            "uncertainty": 0.08,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540514
+          },
+          {
+            "dimension": "ARCHITECTURE",
+            "metric_name": "boundary_violations",
+            "measured_value": 1,
+            "evidence": {
+              "violations_detected": 1
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354052
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "ArchitectureQualityEvaluator",
+            "coupling": 0.48,
+            "scc_size": 12,
+            "blast_radius": 12,
+            "boundary_violations": 1,
+            "modularity": 0.74
+          }
+        ],
+        "uncertainty": 0.08,
+        "scope": "global",
+        "status": "BLOCKED",
+        "summary": "Architecture status BLOCKED: coupling=0.48, scc_size=12, blast_radius=12, violations=1, modularity=0.74"
+      },
+      "CODE": {
+        "dimension": "CODE",
+        "observations": [
+          {
+            "dimension": "CODE",
+            "metric_name": "complexity",
+            "measured_value": 7.8,
+            "evidence": {
+              "mean_cyclomatic_complexity": 7.8
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354064
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "duplication",
+            "measured_value": 0.024,
+            "evidence": {
+              "duplication_ratio": 0.024
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540647
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "function_size",
+            "measured_value": 31.5,
+            "evidence": {
+              "mean_loc_per_function": 31.5
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540654
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "class_size",
+            "measured_value": 158.0,
+            "evidence": {
+              "mean_loc_per_class": 158.0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354066
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "nesting",
+            "measured_value": 2.6,
+            "evidence": {
+              "mean_max_nesting_depth": 2.6
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540664
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "dead_code_signals",
+            "measured_value": 0,
+            "evidence": {
+              "unreferenced_symbols_detected": 0
+            },
+            "uncertainty": 0.1,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.354067
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "import_anomalies",
+            "measured_value": 0,
+            "evidence": {
+              "circular_or_stale_imports": 0
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540678
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "type_uncertainty",
+            "measured_value": 0.04,
+            "evidence": {
+              "untyped_or_any_ratio": 0.04
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540685
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "code_churn",
+            "measured_value": 78570,
+            "evidence": {
+              "lines_added_and_deleted": 78570
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354069
+          },
+          {
+            "dimension": "CODE",
+            "metric_name": "change_concentration",
+            "measured_value": 0.42,
+            "evidence": {
+              "gini_coefficient_of_changes": 0.42
+            },
+            "uncertainty": 0.06,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3540697
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "CodeQualityEvaluator",
+            "churn": 78570
+          }
+        ],
+        "uncertainty": 0.05,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Code status HEALTHY: complexity=7.8, duplication=2.4%, fn_size=31.5, nesting=2.6, dead_code=0, type_uncertainty=4.0%"
+      },
+      "TEST": {
+        "dimension": "TEST",
+        "observations": [
+          {
+            "dimension": "TEST",
+            "metric_name": "line_coverage",
+            "measured_value": 0.89,
+            "evidence": {
+              "line_coverage_pct": 0.89
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540828
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "branch_coverage",
+            "measured_value": 0.84,
+            "evidence": {
+              "branch_coverage_pct": 0.84
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540835
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "symbol_coverage",
+            "measured_value": 0.86,
+            "evidence": {
+              "symbol_coverage_pct": 0.86
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354084
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "contract_coverage",
+            "measured_value": 0.88,
+            "evidence": {
+              "contract_coverage_pct": 0.88
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354085
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "behavior_coverage",
+            "measured_value": 0.82,
+            "evidence": {
+              "behavior_coverage_pct": 0.82
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540854
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "invariant_coverage",
+            "measured_value": 0.8,
+            "evidence": {
+              "invariant_coverage_pct": 0.8
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540862
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "consumer_coverage",
+            "measured_value": 0.85,
+            "evidence": {
+              "consumer_coverage_pct": 0.85
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540866
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "browser_coverage",
+            "measured_value": 0.75,
+            "evidence": {
+              "browser_coverage_pct": 0.75
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540874
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "mutation_score",
+            "measured_value": 0.79,
+            "evidence": {
+              "killed_mutants_ratio": 0.79
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540878
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "regression_density",
+            "measured_value": 0.0,
+            "evidence": {
+              "regressions_per_100_runs": 0.0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540885
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "flaky_rate",
+            "measured_value": 0.04,
+            "evidence": {
+              "flaky_tests_ratio": 0.04
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540893
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "test_redundancy",
+            "measured_value": 0.0006745362563237774,
+            "evidence": {
+              "duplicate_or_zero_mutation_tests": 0.0006745362563237774
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3540897
+          },
+          {
+            "dimension": "TEST",
+            "metric_name": "evidence_efficiency",
+            "measured_value": 1.0,
+            "evidence": {
+              "efficiency_score": 1.0
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3540905
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "TestQualityEvaluator",
+            "test_count": 11860,
+            "useful_assertions": 35580,
+            "evidence_efficiency": 1.0
+          }
+        ],
+        "uncertainty": 0.03,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Test status HEALTHY: line_cov=89.0%, mutation=79.0%, flaky=4.0%, efficiency=1.00, count=11860"
+      },
+      "CONTRACT": {
+        "dimension": "CONTRACT",
+        "observations": [
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "breaking_changes",
+            "measured_value": 0,
+            "evidence": {
+              "breaking_count": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540971
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "polymorphic_ambiguity",
+            "measured_value": 0,
+            "evidence": {
+              "ambiguous_variants": 0
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540978
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "consumer_coverage",
+            "measured_value": 0.96,
+            "evidence": {
+              "verified_consumer_ratio": 0.96
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540983
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "contract_drift",
+            "measured_value": 1,
+            "evidence": {
+              "unregistered_schema_deviations": 1
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3540993
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "unresolved_consumers",
+            "measured_value": 0,
+            "evidence": {
+              "unresolved_consumer_endpoints": 0
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3540998
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "stale_schemas",
+            "measured_value": 0,
+            "evidence": {
+              "outdated_idl_or_pydantic": 0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541005
+          },
+          {
+            "dimension": "CONTRACT",
+            "metric_name": "undocumented_changes",
+            "measured_value": 0,
+            "evidence": {
+              "payload_alterations_without_doc": 0
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354101
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "ContractQualityEvaluator",
+            "breaking": 0
+          }
+        ],
+        "uncertainty": 0.02,
+        "scope": "global",
+        "status": "DEGRADED",
+        "summary": "Contract status DEGRADED: breaking=0, drift=1, unresolved=0, consumer_cov=96.0%"
+      },
+      "BEHAVIOR": {
+        "dimension": "BEHAVIOR",
+        "observations": [
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "invariant_coverage",
+            "measured_value": 0.85,
+            "evidence": {
+              "invariant_pct": 0.85
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541071
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "counterexamples",
+            "measured_value": 0,
+            "evidence": {
+              "counterexample_traces": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541079
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "behavioral_drift",
+            "measured_value": 0,
+            "evidence": {
+              "divergent_temporal_properties": 0
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541083
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "idempotency",
+            "measured_value": true,
+            "evidence": {
+              "idempotency_verified": true
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541093
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "concurrency",
+            "measured_value": true,
+            "evidence": {
+              "race_conditions_absent": true
+            },
+            "uncertainty": 0.1,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541098
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "state_transitions_valid_pct",
+            "measured_value": 0.99,
+            "evidence": {
+              "valid_transitions_ratio": 0.99
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541102
+          },
+          {
+            "dimension": "BEHAVIOR",
+            "metric_name": "state_space_explored_pct",
+            "measured_value": 0.75,
+            "evidence": {
+              "explored_state_fraction": 0.75
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.354111
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "BehaviorQualityEvaluator",
+            "counterexamples": 0,
+            "state_space_explored": 0.75
+          }
+        ],
+        "uncertainty": 0.25,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Behavior status HEALTHY: counterexamples=0, drift=0, invariant_cov=85.0%, explored=75.0%, uncertainty=0.25"
+      },
+      "SECURITY": {
+        "dimension": "SECURITY",
+        "observations": [
+          {
+            "dimension": "SECURITY",
+            "metric_name": "blocked_operations",
+            "measured_value": 0,
+            "evidence": {
+              "sentinel_blocked_operations": 0
+            },
+            "uncertainty": 0.001,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541164
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "secret_exposure_attempts",
+            "measured_value": 0,
+            "evidence": {
+              "secret_attempts_caught": 0
+            },
+            "uncertainty": 0.001,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354117
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "privileged_changes",
+            "measured_value": 0,
+            "evidence": {
+              "unvetted_privileged_changes": 0
+            },
+            "uncertainty": 0.005,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541174
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "protected_path_changes",
+            "measured_value": 0,
+            "evidence": {
+              "protected_path_mutations": 0
+            },
+            "uncertainty": 0.001,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354118
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "unsafe_dependency_changes",
+            "measured_value": 0,
+            "evidence": {
+              "unvetted_or_cve_dependencies": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541186
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "sandbox_violations",
+            "measured_value": 0,
+            "evidence": {
+              "container_jail_escapes_or_violations": 0
+            },
+            "uncertainty": 0.001,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541198
+          },
+          {
+            "dimension": "SECURITY",
+            "metric_name": "security_review_backlog",
+            "measured_value": 0,
+            "evidence": {
+              "pending_security_reviews": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541205
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "SecurityQualityEvaluator",
+            "blocked_ops": 0,
+            "secret_attempts": 0,
+            "sandbox_violations": 0
+          }
+        ],
+        "uncertainty": 0.01,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Security status HEALTHY: secret_attempts=0, sandbox_violations=0, blocked_ops=0, protected_path_changes=0, unsafe_deps=0"
+      },
+      "PERFORMANCE": {
+        "dimension": "PERFORMANCE",
+        "observations": [
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "p95_latency_ms",
+            "measured_value": 38.5,
+            "evidence": {
+              "measured_p95_ms": 38.5
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541255
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "throughput_ops",
+            "measured_value": 520.0,
+            "evidence": {
+              "benchmark_ops_per_sec": 520.0
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541265
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "cpu_ms",
+            "measured_value": 115.0,
+            "evidence": {
+              "cpu_active_duration_ms": 115.0
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354127
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "memory_mb",
+            "measured_value": 240.0,
+            "evidence": {
+              "resident_set_size_mb": 240.0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541274
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "io_ops",
+            "measured_value": 18,
+            "evidence": {
+              "disk_or_network_io_calls": 18
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354128
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "cache_efficiency",
+            "measured_value": 0.92,
+            "evidence": {
+              "cache_hits_over_requests": 0.92
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3541286
+          },
+          {
+            "dimension": "PERFORMANCE",
+            "metric_name": "verification_overhead_ms",
+            "measured_value": 28.0,
+            "evidence": {
+              "time_spent_in_verification_ms": 28.0
+            },
+            "uncertainty": 0.08,
+            "scope": "global",
+            "observation_type": "INFERRED",
+            "timestamp": 1789837070.3541293
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "PerformanceQualityEvaluator",
+            "p95": 38.5,
+            "evidence_loss_detected": false
+          }
+        ],
+        "uncertainty": 0.04,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Performance status HEALTHY: p95=38.5ms, throughput=520.0ops/s, memory=240.0MB, cache_eff=92.0%, overhead=28.0ms"
+      },
+      "RELIABILITY": {
+        "dimension": "RELIABILITY",
+        "observations": [
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "recovery_success",
+            "measured_value": 1.0,
+            "evidence": {
+              "successful_recoveries_ratio": 1.0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354135
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "rollback_success",
+            "measured_value": 1.0,
+            "evidence": {
+              "successful_rollbacks_ratio": 1.0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541358
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "residual_states",
+            "measured_value": 0,
+            "evidence": {
+              "orphaned_resources_or_locks": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541362
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "crash_recovery_count",
+            "measured_value": 0,
+            "evidence": {
+              "watchdog_crash_recoveries": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541372
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "mission_stalls",
+            "measured_value": 0,
+            "evidence": {
+              "watchdog_stalls_flagged": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541377
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "oscillations",
+            "measured_value": 0,
+            "evidence": {
+              "ping_pong_repair_or_plan_loops": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541381
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "agent_failures",
+            "measured_value": 0,
+            "evidence": {
+              "subagent_abnormal_terminations": 0
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541386
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "retry_count",
+            "measured_value": 1,
+            "evidence": {
+              "automated_retries_executed": 1
+            },
+            "uncertainty": 0.02,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541393
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "human_review_frequency",
+            "measured_value": 0.02,
+            "evidence": {
+              "human_escalations_per_mission": 0.02
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3541398
+          },
+          {
+            "dimension": "RELIABILITY",
+            "metric_name": "incomplete_missions",
+            "measured_value": 0,
+            "evidence": {
+              "aborted_or_budget_exhausted_missions": 0
+            },
+            "uncertainty": 0.01,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541405
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "ReliabilityQualityEvaluator",
+            "recovery_success": 1.0,
+            "stalls": 0,
+            "oscillations": 0
+          }
+        ],
+        "uncertainty": 0.03,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Reliability status HEALTHY: recovery=100.0%, rollback=100.0%, residuals=0, stalls=0, oscillations=0, failures=0"
+      },
+      "MAINTAINABILITY": {
+        "dimension": "MAINTAINABILITY",
+        "observations": [
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "testability_index",
+            "measured_value": 0.88,
+            "evidence": {
+              "decoupled_injection_score": 0.88
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541455
+          },
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "documentation_completeness",
+            "measured_value": 0.94,
+            "evidence": {
+              "documented_symbols_ratio": 0.94
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.354146
+          },
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "change_propagation_factor",
+            "measured_value": 0.19,
+            "evidence": {
+              "ripple_effect_ratio": 0.19
+            },
+            "uncertainty": 0.05,
+            "scope": "global",
+            "observation_type": "ESTIMATED",
+            "timestamp": 1789837070.3541467
+          },
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "symbol_graph_clarity",
+            "measured_value": 0.9,
+            "evidence": {
+              "unambiguous_symbol_resolution_pct": 0.9
+            },
+            "uncertainty": 0.03,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541474
+          },
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "ownership_clarity",
+            "measured_value": 0.82,
+            "evidence": {
+              "agent_or_team_surface_mapping": 0.82
+            },
+            "uncertainty": 0.08,
+            "scope": "global",
+            "observation_type": "INFERRED",
+            "timestamp": 1789837070.354148
+          },
+          {
+            "dimension": "MAINTAINABILITY",
+            "metric_name": "module_boundary_index",
+            "measured_value": 0.86,
+            "evidence": {
+              "encapsulation_adherence": 0.86
+            },
+            "uncertainty": 0.04,
+            "scope": "global",
+            "observation_type": "OBSERVED",
+            "timestamp": 1789837070.3541486
+          }
+        ],
+        "evidence": [
+          {
+            "evaluator": "MaintainabilityQualityEvaluator",
+            "testability_index": 0.88,
+            "change_propagation": 0.19
+          }
+        ],
+        "uncertainty": 0.05,
+        "scope": "global",
+        "status": "HEALTHY",
+        "summary": "Maintainability status HEALTHY: testability=88.0%, doc=94.0%, ripple=19.0%, boundaries=86.0%"
+      }
+    },
+    "sealed": true
+  }
+}

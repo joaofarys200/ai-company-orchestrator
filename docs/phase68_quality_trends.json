@@ -1,0 +1,15 @@
+{
+  "direction": "DEGRADING",
+  "details": {
+    "snapshot_count": 2,
+    "trajectory": [
+      1.0,
+      0.7777777777777778
+    ],
+    "positive_moves": 0,
+    "negative_moves": 1,
+    "neutral_moves": 0,
+    "can_forecast_long_term": false,
+    "forecast_note": "Forecast constrained: < 5 snapshots"
+  }
+}

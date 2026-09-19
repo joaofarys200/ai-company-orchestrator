@@ -1,0 +1,34 @@
+[
+  {
+    "entity_type": "file",
+    "entity_name": "backend/agents/engineering_quality_governance/bridge.py",
+    "failure_count": 0,
+    "regression_count": 1,
+    "debt_count": 0,
+    "review_count": 0,
+    "rollback_count": 0,
+    "flakiness_score": 0.0,
+    "risk_weight": 4.0,
+    "evidence": [
+      {
+        "controlled": true
+      }
+    ]
+  },
+  {
+    "entity_type": "module",
+    "entity_name": "backend.websocket.handlers.missions",
+    "failure_count": 0,
+    "regression_count": 0,
+    "debt_count": 0,
+    "review_count": 1,
+    "rollback_count": 0,
+    "flakiness_score": 0.0,
+    "risk_weight": 1.0,
+    "evidence": [
+      {
+        "churn": 450
+      }
+    ]
+  }
+]
