@@ -178,6 +178,14 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "mission_production_operations_remediate",
         "mission_production_operations_rollback",
         "mission_production_operations_replay",
+        # Phase 72
+        "mission_reliability_status",
+        "mission_reliability_observe",
+        "mission_reliability_anomalies",
+        "mission_reliability_predict",
+        "mission_reliability_plan",
+        "mission_reliability_execute",
+        "mission_reliability_replay",
     }
 )
 

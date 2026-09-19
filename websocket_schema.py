@@ -217,6 +217,14 @@ SERVER_MESSAGE_TYPES = {
     "mission_production_operations_remediate_result",
     "mission_production_operations_rollback_result",
     "mission_production_operations_replay_result",
+    # Phase 72 Autonomous Reliability Intelligence & Preventive Operations
+    "mission_reliability_status_result",
+    "mission_reliability_observe_result",
+    "mission_reliability_anomalies_result",
+    "mission_reliability_predict_result",
+    "mission_reliability_plan_result",
+    "mission_reliability_execute_result",
+    "mission_reliability_replay_result",
 }
 
 
@@ -401,6 +409,14 @@ CLIENT_MESSAGE_TYPES = {
     "mission_production_operations_remediate",
     "mission_production_operations_rollback",
     "mission_production_operations_replay",
+    # Phase 72
+    "mission_reliability_status",
+    "mission_reliability_observe",
+    "mission_reliability_anomalies",
+    "mission_reliability_predict",
+    "mission_reliability_plan",
+    "mission_reliability_execute",
+    "mission_reliability_replay",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
@@ -443,6 +459,14 @@ MISSION_CLIENT_REQUIRED_FIELDS = {
     "mission_production_operations_remediate": (),
     "mission_production_operations_rollback": (),
     "mission_production_operations_replay": (),
+    # Phase 72
+    "mission_reliability_status": (),
+    "mission_reliability_observe": (),
+    "mission_reliability_anomalies": (),
+    "mission_reliability_predict": (),
+    "mission_reliability_plan": (),
+    "mission_reliability_execute": (),
+    "mission_reliability_replay": (),
     "mission_multi_agent_coordination_status": (),
     "mission_multi_agent_intent_submit": (),
     "mission_multi_agent_arbitrate": (),

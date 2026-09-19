@@ -141,6 +141,14 @@ MISSION_HANDLERS = {
     "mission_production_operations_remediate": "handle",
     "mission_production_operations_rollback": "handle",
     "mission_production_operations_replay": "handle",
+    # Phase 72
+    "mission_reliability_status": "handle",
+    "mission_reliability_observe": "handle",
+    "mission_reliability_anomalies": "handle",
+    "mission_reliability_predict": "handle",
+    "mission_reliability_plan": "handle",
+    "mission_reliability_execute": "handle",
+    "mission_reliability_replay": "handle",
 }
 
 
@@ -2407,6 +2415,122 @@ class MissionWebSocketHandler:
                         "replay_status": status_res,
                         "steps": steps,
                         "explanation": explanation,
+                    },
+                )
+                return
+
+            # Phase 72 Autonomous Reliability Intelligence & Preventive Operations
+            elif operation == "mission_reliability_status":
+                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                service_id = message.get("service_id", "default-service")
+                bridge = ReliabilityIntelligenceBridge(service_id=service_id)
+                summary = bridge.get_status_summary()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_reliability_status_result",
+                        **summary,
+                    },
+                )
+                return
+
+            elif operation == "mission_reliability_observe":
+                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                service_id = message.get("service_id", "default-service")
+                bridge = ReliabilityIntelligenceBridge(service_id=service_id)
+                obs_data = message.get("observation", {})
+                obs = bridge.ingest_observation(obs_data)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_reliability_observe_result",
+                        "observation": obs.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_reliability_anomalies":
+                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                service_id = message.get("service_id", "default-service")
+                metric = message.get("metric", "latency")
+                bridge = ReliabilityIntelligenceBridge(service_id=service_id)
+                window = bridge.buffer.get_window(service_id, metric)
+                base = bridge.baseline_calc.compute(window)
+                anoms = []
+                if window.observations:
+                    sig = bridge.anomaly_detector.evaluate(window.observations[-1], base)
+                    anoms.append(sig.to_dict())
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_reliability_anomalies_result",
+                        "anomalies": anoms,
+                        "baseline": base.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_reliability_predict":
+                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                service_id = message.get("service_id", "default-service")
+                metric = message.get("metric", "latency")
+                bridge = ReliabilityIntelligenceBridge(service_id=service_id)
+                decision = bridge.run_reliability_cycle(metric=metric)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_reliability_predict_result",
+                        "decision": decision.to_dict(),
+                    },
+                )
+                return
+
+            elif operation == "mission_reliability_plan":
+                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                service_id = message.get("service_id", "default-service")
+                metric = message.get("metric", "latency")
+                bridge = ReliabilityIntelligenceBridge(service_id=service_id)
+                decision = bridge.run_reliability_cycle(metric=metric)
+                plan_dict = decision.plan.to_dict() if decision.plan else None
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_reliability_plan_result",
+                        "plan": plan_dict,
+                    },
+                )
+                return
+
+            elif operation == "mission_reliability_execute":
+                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                service_id = message.get("service_id", "default-service")
+                metric = message.get("metric", "latency")
+                bridge = ReliabilityIntelligenceBridge(service_id=service_id)
+                decision = bridge.run_reliability_cycle(metric=metric)
+                statuses = []
+                if decision.plan:
+                    statuses = [s.value for s in bridge.execute_plan(decision.plan)]
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_reliability_execute_result",
+                        "execution_statuses": statuses,
+                    },
+                )
+                return
+
+            elif operation == "mission_reliability_replay":
+                from backend.agents.reliability_intelligence.replay import PredictionReplayer
+                replayer = PredictionReplayer()
+                raw_obs = message.get("observations", [])
+                from backend.agents.reliability_intelligence.timeseries import TimeSeriesNormalizer
+                norm_obs = [TimeSeriesNormalizer.normalize(o) for o in raw_obs]
+                replay_res = replayer.replay_stream(norm_obs)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_reliability_replay_result",
+                        **replay_res,
                     },
                 )
                 return

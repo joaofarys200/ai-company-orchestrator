@@ -1,0 +1,35 @@
+{
+  "title": "JARVIS OS \u2014 Phase 72 Controlled Fault Injection Validation",
+  "executed_at": 1789846908.3420413,
+  "total_fault_injections": 3,
+  "strict_isolation_verified": true,
+  "injections": [
+    {
+      "fault_id": "fi_01_synthetic_latency_delay",
+      "target": "fault-latency-target",
+      "fault_type": "ARTIFICIAL_LATENCY_DELAY",
+      "source_category": "CONTROLLED_FAULT_INJECTION",
+      "anomaly_flagged": true,
+      "predicted_risk": "HIGH",
+      "is_spontaneous_incident": false
+    },
+    {
+      "fault_id": "fi_02_synthetic_memory_balloon",
+      "target": "fault-memory-target",
+      "fault_type": "SYNTHETIC_MEMORY_BALLOON",
+      "source_category": "CONTROLLED_FAULT_INJECTION",
+      "anomaly_flagged": true,
+      "predicted_risk": "HIGH",
+      "is_spontaneous_incident": false
+    },
+    {
+      "fault_id": "fi_03_synthetic_http_500_injection",
+      "target": "fault-error-target",
+      "fault_type": "SYNTHETIC_HTTP_500_INJECTION",
+      "source_category": "CONTROLLED_FAULT_INJECTION",
+      "anomaly_flagged": true,
+      "predicted_risk": "LOW",
+      "is_spontaneous_incident": false
+    }
+  ]
+}

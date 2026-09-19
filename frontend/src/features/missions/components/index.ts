@@ -44,3 +44,4 @@ export { EngineeringQualityGovernancePanel } from './EngineeringQualityGovernanc
 export { QualityDebtRemediationPanel } from './QualityDebtRemediationPanel';
 export { ReleaseReadinessPanel } from './ReleaseReadinessPanel';
 export { ProductionOperationsPanel } from './ProductionOperationsPanel';
+export { ReliabilityIntelligencePanel } from './ReliabilityIntelligencePanel';

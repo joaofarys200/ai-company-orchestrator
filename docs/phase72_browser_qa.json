@@ -1,0 +1,125 @@
+{
+  "phase": 72,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "timestamp": 1789846978.5147393,
+  "scenarios_tested": 14,
+  "scenarios_passed": 14,
+  "screenshots": [
+    {
+      "title": "01 observations",
+      "filename": "phase72_01_observations.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_01_observations.png",
+      "selector": "#rel-tab-observations",
+      "description": "Normalized time series observations and sliding buffer",
+      "captured": true
+    },
+    {
+      "title": "02 baselines",
+      "filename": "phase72_02_baselines.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_02_baselines.png",
+      "selector": "#rel-tab-baselines",
+      "description": "Statistical rolling mean, median, P95, and stability index",
+      "captured": true
+    },
+    {
+      "title": "03 anomalies",
+      "filename": "phase72_03_anomalies.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_03_anomalies.png",
+      "selector": "#rel-tab-anomalies",
+      "description": "Deterministic tri-state anomaly detector results",
+      "captured": true
+    },
+    {
+      "title": "04 trends",
+      "filename": "phase72_04_trends.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_04_trends.png",
+      "selector": "#rel-tab-trends",
+      "description": "Trajectory slope, acceleration, and persistence",
+      "captured": true
+    },
+    {
+      "title": "05 risk",
+      "filename": "phase72_05_risk.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_05_risk.png",
+      "selector": "#rel-tab-risk",
+      "description": "Normalized multi-factor risk scoring index",
+      "captured": true
+    },
+    {
+      "title": "06 predictions",
+      "filename": "phase72_06_predictions.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_06_predictions.png",
+      "selector": "#rel-tab-predictions",
+      "description": "Calibrated failure risk predictions and horizons",
+      "captured": true
+    },
+    {
+      "title": "07 recurrence",
+      "filename": "phase72_07_recurrence.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_07_recurrence.png",
+      "selector": "#rel-tab-recurrence",
+      "description": "Incident recurrence patterns and frequency tracking",
+      "captured": true
+    },
+    {
+      "title": "08 change_risk",
+      "filename": "phase72_08_change_risk.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_08_change_risk.png",
+      "selector": "#rel-tab-change-risk",
+      "description": "Change risk assessment across files, symbols, and debt",
+      "captured": true
+    },
+    {
+      "title": "09 dependency_risk",
+      "filename": "phase72_09_dependency_risk.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_09_dependency_risk.png",
+      "selector": "#rel-tab-dependency-risk",
+      "description": "Architectural dependency centrality and contract stability",
+      "captured": true
+    },
+    {
+      "title": "10 capacity",
+      "filename": "phase72_10_capacity.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_10_capacity.png",
+      "selector": "#rel-tab-capacity",
+      "description": "Resource saturation, CPU, memory, and queue headroom",
+      "captured": true
+    },
+    {
+      "title": "11 preventive_plans",
+      "filename": "phase72_11_preventive_plans.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_11_preventive_plans.png",
+      "selector": "#rel-tab-preventive-plans",
+      "description": "Structured preventive plans and contingency rollbacks",
+      "captured": true
+    },
+    {
+      "title": "12 verification",
+      "filename": "phase72_12_verification.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_12_verification.png",
+      "selector": "#rel-tab-verification",
+      "description": "Post-remediation stability and verification results",
+      "captured": true
+    },
+    {
+      "title": "13 replay",
+      "filename": "phase72_13_replay.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_13_replay.png",
+      "selector": "#rel-tab-replay",
+      "description": "Deterministic prediction replay verifying REPLAY_MATCH",
+      "captured": true
+    },
+    {
+      "title": "14 calibration",
+      "filename": "phase72_14_calibration.png",
+      "path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase72\\phase72_14_calibration.png",
+      "selector": "#rel-tab-calibration",
+      "description": "Empirical calibration metrics, precision, recall, and Brier score",
+      "captured": true
+    }
+  ],
+  "console_errors": [],
+  "page_errors": [],
+  "failed_requests": []
+}

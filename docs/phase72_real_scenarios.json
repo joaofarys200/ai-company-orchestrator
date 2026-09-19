@@ -1,0 +1,55 @@
+{
+  "title": "JARVIS OS \u2014 Phase 72 Real Local Runtime Scenarios",
+  "executed_at": 1789846905.637435,
+  "total_scenarios": 5,
+  "prediction_preventive_verified_count": 2,
+  "scenarios": [
+    {
+      "scenario_id": "real_scen_01_latency_slo_prevented",
+      "service": "local-api-gateway",
+      "description": "Latency degradation trajectory detected; cache rebuild executed preemptively; recovery verified.",
+      "predicted_risk": "MEDIUM",
+      "failure_class": "RESOURCE_EXHAUSTION_LATENCY",
+      "preventive_action": "rebuild_cache",
+      "execution_status": "EXECUTED",
+      "verification_status": "PREVENTION_EFFECTIVE",
+      "lead_time_seconds": 300.0
+    },
+    {
+      "scenario_id": "real_scen_02_memory_leak_mitigated",
+      "service": "local-indexer",
+      "description": "Memory saturation trajectory detected; cache and transient pool cleared; memory consumption normalized.",
+      "predicted_risk": "HIGH",
+      "failure_class": "RESOURCE_EXHAUSTION_MEMORY",
+      "preventive_action": "create_checkpoint",
+      "execution_status": "EXECUTED",
+      "verification_status": "PREVENTION_EFFECTIVE",
+      "lead_time_seconds": 300.0
+    },
+    {
+      "scenario_id": "real_scen_03_repeated_restart_loop",
+      "service": "local-auth-worker",
+      "description": "Recurrent restart incident pattern detected via F71 operational ledger; flagged as ESCALATING_RECURRENCE.",
+      "predicted_risk": "MEDIUM",
+      "failure_class": "RESOURCE_EXHAUSTION_RESTARTS",
+      "recommended_action": "rebuild_cache",
+      "governance_decision": "APPROVED"
+    },
+    {
+      "scenario_id": "real_scen_04_upstream_dependency_degradation",
+      "service": "local-checkout-service",
+      "description": "Downstream bottleneck identified from database connection latency drift.",
+      "predicted_risk": "LOW",
+      "failure_class": "UNKNOWN_RUNTIME_RISK",
+      "recommended_action": "increase_observation_frequency"
+    },
+    {
+      "scenario_id": "real_scen_05_queue_depth_pressure",
+      "service": "local-event-consumer",
+      "description": "Queue depth accumulation detected without synthetic autoscaling assumption; preflight validation triggered.",
+      "predicted_risk": "MEDIUM",
+      "failure_class": "RESOURCE_EXHAUSTION_QUEUE_DEPTH",
+      "recommended_action": "rebuild_cache"
+    }
+  ]
+}

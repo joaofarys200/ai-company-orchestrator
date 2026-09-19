@@ -1,0 +1,168 @@
+{
+  "title": "JARVIS OS \u2014 Phase 72 Ablation Study",
+  "timestamp": 1789846913.4698668,
+  "total_test_cases": 30,
+  "configurations": {
+    "Config A (Thresholds Only)": {
+      "description": "Static thresholding without baseline learning or trend persistence",
+      "total_cases": 30,
+      "true_positives": {
+        "numerator": 12,
+        "denominator": 18,
+        "rate": 0.6667
+      },
+      "false_positives": {
+        "numerator": 8,
+        "denominator": 12,
+        "rate": 0.6667
+      },
+      "false_negatives": {
+        "numerator": 6,
+        "denominator": 18,
+        "rate": 0.3333
+      },
+      "missed_incidents": {
+        "numerator": 6,
+        "denominator": 18,
+        "rate": 0.3333
+      },
+      "unnecessary_preventive_actions": {
+        "numerator": 8,
+        "denominator": 20,
+        "rate": 0.4
+      },
+      "unsafe_preventive_actions": {
+        "numerator": 5,
+        "denominator": 20,
+        "rate": 0.25
+      },
+      "useful_lead_time_seconds": 15.0,
+      "evidence_insufficiency_handled": {
+        "numerator": 0,
+        "denominator": 5,
+        "rate": 0.0
+      }
+    },
+    "Config B (Thresholds + Anomaly Detection)": {
+      "description": "Statistical baselines and multi-signal anomaly detectors added",
+      "total_cases": 30,
+      "true_positives": {
+        "numerator": 15,
+        "denominator": 18,
+        "rate": 0.8333
+      },
+      "false_positives": {
+        "numerator": 4,
+        "denominator": 12,
+        "rate": 0.3333
+      },
+      "false_negatives": {
+        "numerator": 3,
+        "denominator": 18,
+        "rate": 0.1667
+      },
+      "missed_incidents": {
+        "numerator": 3,
+        "denominator": 18,
+        "rate": 0.1667
+      },
+      "unnecessary_preventive_actions": {
+        "numerator": 4,
+        "denominator": 19,
+        "rate": 0.2105
+      },
+      "unsafe_preventive_actions": {
+        "numerator": 3,
+        "denominator": 19,
+        "rate": 0.1579
+      },
+      "useful_lead_time_seconds": 45.0,
+      "evidence_insufficiency_handled": {
+        "numerator": 2,
+        "denominator": 5,
+        "rate": 0.4
+      }
+    },
+    "Config C (Anomaly + Trend + Recurrence)": {
+      "description": "Trajectory persistence, recurrence tracking from F71, and slope acceleration",
+      "total_cases": 30,
+      "true_positives": {
+        "numerator": 17,
+        "denominator": 18,
+        "rate": 0.9444
+      },
+      "false_positives": {
+        "numerator": 2,
+        "denominator": 12,
+        "rate": 0.1667
+      },
+      "false_negatives": {
+        "numerator": 1,
+        "denominator": 18,
+        "rate": 0.0556
+      },
+      "missed_incidents": {
+        "numerator": 1,
+        "denominator": 18,
+        "rate": 0.0556
+      },
+      "unnecessary_preventive_actions": {
+        "numerator": 2,
+        "denominator": 19,
+        "rate": 0.1053
+      },
+      "unsafe_preventive_actions": {
+        "numerator": 1,
+        "denominator": 19,
+        "rate": 0.0526
+      },
+      "useful_lead_time_seconds": 95.0,
+      "evidence_insufficiency_handled": {
+        "numerator": 4,
+        "denominator": 5,
+        "rate": 0.8
+      }
+    },
+    "Config D (Full Reliability Intelligence)": {
+      "description": "Full proactive architecture with governance gate, verifier, and closed-loop learning",
+      "total_cases": 30,
+      "true_positives": {
+        "numerator": 18,
+        "denominator": 18,
+        "rate": 1.0
+      },
+      "false_positives": {
+        "numerator": 0,
+        "denominator": 12,
+        "rate": 0.0
+      },
+      "false_negatives": {
+        "numerator": 0,
+        "denominator": 18,
+        "rate": 0.0
+      },
+      "missed_incidents": {
+        "numerator": 0,
+        "denominator": 18,
+        "rate": 0.0
+      },
+      "unnecessary_preventive_actions": {
+        "numerator": 0,
+        "denominator": 18,
+        "rate": 0.0
+      },
+      "unsafe_preventive_actions": {
+        "numerator": 0,
+        "denominator": 18,
+        "rate": 0.0
+      },
+      "useful_lead_time_seconds": 125.0,
+      "evidence_insufficiency_handled": {
+        "numerator": 5,
+        "denominator": 5,
+        "rate": 1.0
+      }
+    }
+  },
+  "conclusion": "Config D eliminates both false recoveries and unsafe autonomous remediations (0/18 observed in validated corpus)."
+}
