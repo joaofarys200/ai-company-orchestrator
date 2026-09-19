@@ -1,0 +1,115 @@
+{
+  "phase": 70,
+  "browser": "Microsoft Edge",
+  "browser_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "timestamp": 1789841257.6997268,
+  "scenarios_tested": 14,
+  "scenarios_passed": 14,
+  "screenshots": [
+    {
+      "scenario": "01 release overview",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_01_release_overview.png",
+      "description": "Release candidate metadata, lifecycle state machine, and baseline seal",
+      "selector": "#release-subtab-overview",
+      "status": "PASS"
+    },
+    {
+      "scenario": "02 quality status",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_02_quality_status.png",
+      "description": "Phase 68/69 quality dimensions, degradation deltas, and uncertainty",
+      "selector": "#release-subtab-quality",
+      "status": "PASS"
+    },
+    {
+      "scenario": "03 debt status",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_03_debt_status.png",
+      "description": "Technical debt gate with zero critical debt blockers and governed deferments",
+      "selector": "#release-subtab-debt",
+      "status": "PASS"
+    },
+    {
+      "scenario": "04 contract status",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_04_contract_status.png",
+      "description": "Contract graph verification, breaking change detection, and schema drift",
+      "selector": "#release-subtab-contracts",
+      "status": "PASS"
+    },
+    {
+      "scenario": "05 behavior status",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_05_behavior_status.png",
+      "description": "Behavioral contract proof, counterexample isolation, and idempotency checks",
+      "selector": "#release-subtab-behavior",
+      "status": "PASS"
+    },
+    {
+      "scenario": "06 security status",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_06_security_status.png",
+      "description": "Security Sentinel maximum authority, secrets scan, and sandbox inviolability",
+      "selector": "#release-subtab-security",
+      "status": "PASS"
+    },
+    {
+      "scenario": "07 performance",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_07_performance.png",
+      "description": "Observed vs estimated performance comparison across 7 system dimensions",
+      "selector": "#release-subtab-performance",
+      "status": "PASS"
+    },
+    {
+      "scenario": "08 runtime health",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_08_runtime_health.png",
+      "description": "Operational probes, process health, WebSocket handshake, and DB latency",
+      "selector": "#release-subtab-runtime",
+      "status": "PASS"
+    },
+    {
+      "scenario": "09 observability",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_09_observability.png",
+      "description": "7/7 telemetry signals: structured logs, error tracing, and health telemetry",
+      "selector": "#release-subtab-observability",
+      "status": "PASS"
+    },
+    {
+      "scenario": "10 dependencies",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_10_dependencies.png",
+      "description": "Lockfile consistency, pinned versions, and unvetted auto-install prevention",
+      "selector": "#release-subtab-dependencies",
+      "status": "PASS"
+    },
+    {
+      "scenario": "11 rollback readiness",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_11_rollback_readiness.png",
+      "description": "Phase 65 transactional rollback snapshot, reversibility, and drill pass",
+      "selector": "#release-subtab-rollback",
+      "status": "PASS"
+    },
+    {
+      "scenario": "12 release plan",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_12_release_plan.png",
+      "description": "10-stage DAG rollout emitting DEPLOYMENT_NOT_AVAILABLE rather than simulation",
+      "selector": "#release-subtab-plan",
+      "status": "PASS"
+    },
+    {
+      "scenario": "13 release gate",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_13_release_gate.png",
+      "description": "Final multi-attribute gate decision with 11-dimensional release risk vector",
+      "selector": "#release-subtab-gate",
+      "status": "PASS"
+    },
+    {
+      "scenario": "14 blocked/review state",
+      "file": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\phase70\\phase70_14_blocked_review_state.png",
+      "description": "Human review ticket management, countdown timeout, and approval workflow",
+      "selector": "#release-subtab-blocked",
+      "status": "PASS"
+    }
+  ],
+  "console_errors": [
+    "[ERROR] The tag <%s> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter. g",
+    "[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "[WARNING] [Transport] Unknown message type: sandbox_status"
+  ],
+  "page_errors": [],
+  "failed_requests": []
+}

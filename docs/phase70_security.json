@@ -1,0 +1,98 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "summary": {
+      "verdict": "PASSED",
+      "secrets_count": 0,
+      "credential_exposure": false,
+      "sandbox_violations": 0,
+      "unsafe_commands": 0,
+      "protected_path_breaches": 0,
+      "vulnerabilities_critical": 0,
+      "security_debt_count": 0,
+      "security_review_backlog": 0,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "summary": {
+      "verdict": "PASSED",
+      "secrets_count": 0,
+      "credential_exposure": false,
+      "sandbox_violations": 0,
+      "unsafe_commands": 0,
+      "protected_path_breaches": 0,
+      "vulnerabilities_critical": 0,
+      "security_debt_count": 0,
+      "security_review_backlog": 0,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "summary": {
+      "verdict": "PASSED",
+      "secrets_count": 0,
+      "credential_exposure": false,
+      "sandbox_violations": 0,
+      "unsafe_commands": 0,
+      "protected_path_breaches": 0,
+      "vulnerabilities_critical": 0,
+      "security_debt_count": 0,
+      "security_review_backlog": 0,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "summary": {
+      "verdict": "BLOCKED",
+      "secrets_count": 1,
+      "credential_exposure": true,
+      "sandbox_violations": 0,
+      "unsafe_commands": 0,
+      "protected_path_breaches": 0,
+      "vulnerabilities_critical": 0,
+      "security_debt_count": 1,
+      "security_review_backlog": 0,
+      "blockers": [
+        {
+          "blocker_id": "blocker-sec-secrets-exposed",
+          "category": "critical_security_violation",
+          "description": "Potential credential exposure or plaintext secrets (1 detected)",
+          "evidence": "Sentinel secrets scanner flagged API tokens or credentials in candidate artifacts.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        }
+      ],
+      "requires_human_review": true,
+      "review_reasons": [
+        "1 open non-critical security debt items require verification"
+      ]
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "summary": {
+      "verdict": "PASSED",
+      "secrets_count": 0,
+      "credential_exposure": false,
+      "sandbox_violations": 0,
+      "unsafe_commands": 0,
+      "protected_path_breaches": 0,
+      "vulnerabilities_critical": 0,
+      "security_debt_count": 0,
+      "security_review_backlog": 0,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  }
+]

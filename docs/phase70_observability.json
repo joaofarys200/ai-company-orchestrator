@@ -1,0 +1,93 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "summary": {
+      "status": "READY",
+      "signals_present": 7,
+      "structured_logs": true,
+      "error_visibility": true,
+      "health_signals": true,
+      "request_tracing": true,
+      "mission_telemetry": true,
+      "security_events": true,
+      "verification_evidence": true,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "summary": {
+      "status": "PARTIAL",
+      "signals_present": 3,
+      "structured_logs": true,
+      "error_visibility": true,
+      "health_signals": true,
+      "request_tracing": false,
+      "mission_telemetry": false,
+      "security_events": false,
+      "verification_evidence": false,
+      "blockers": [],
+      "requires_human_review": true,
+      "review_reasons": [
+        "Observability is partial (3/7 signals present); risk elevated"
+      ]
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "summary": {
+      "status": "READY",
+      "signals_present": 5,
+      "structured_logs": true,
+      "error_visibility": true,
+      "health_signals": true,
+      "request_tracing": true,
+      "mission_telemetry": true,
+      "security_events": false,
+      "verification_evidence": false,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "summary": {
+      "status": "PARTIAL",
+      "signals_present": 2,
+      "structured_logs": true,
+      "error_visibility": true,
+      "health_signals": false,
+      "request_tracing": false,
+      "mission_telemetry": false,
+      "security_events": false,
+      "verification_evidence": false,
+      "blockers": [],
+      "requires_human_review": true,
+      "review_reasons": [
+        "Observability is partial (2/7 signals present); risk elevated"
+      ]
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "summary": {
+      "status": "PARTIAL",
+      "signals_present": 2,
+      "structured_logs": true,
+      "error_visibility": true,
+      "health_signals": false,
+      "request_tracing": false,
+      "mission_telemetry": false,
+      "security_events": false,
+      "verification_evidence": false,
+      "blockers": [],
+      "requires_human_review": true,
+      "review_reasons": [
+        "Observability is partial (2/7 signals present); risk elevated"
+      ]
+    }
+  }
+]

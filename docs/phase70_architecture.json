@@ -1,0 +1,81 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "summary": {
+      "classification": "HEALTHY",
+      "forbidden_boundary_violations": 0,
+      "unresolved_sccs": 0,
+      "architecture_drift_pct": 2.1,
+      "architecture_debt_score": 0.0,
+      "migration_state": "COMPLETED",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "summary": {
+      "classification": "HEALTHY",
+      "forbidden_boundary_violations": 0,
+      "unresolved_sccs": 0,
+      "architecture_drift_pct": 0.0,
+      "architecture_debt_score": 0.0,
+      "migration_state": "COMPLETED",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "summary": {
+      "classification": "HEALTHY",
+      "forbidden_boundary_violations": 0,
+      "unresolved_sccs": 0,
+      "architecture_drift_pct": 0.0,
+      "architecture_debt_score": 0.28,
+      "migration_state": "COMPLETED",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "summary": {
+      "classification": "HEALTHY",
+      "forbidden_boundary_violations": 0,
+      "unresolved_sccs": 0,
+      "architecture_drift_pct": 0.0,
+      "architecture_debt_score": 0.0,
+      "migration_state": "COMPLETED",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "summary": {
+      "classification": "BLOCKED",
+      "forbidden_boundary_violations": 0,
+      "unresolved_sccs": 3,
+      "architecture_drift_pct": 0.0,
+      "architecture_debt_score": 0.0,
+      "migration_state": "COMPLETED",
+      "blockers": [
+        {
+          "blocker_id": "blocker-arch-unresolved-sccs",
+          "category": "quality_gate_blocked",
+          "description": "Candidate has 3 unresolved strongly connected component cycles",
+          "evidence": "Cyclic dependency condensation exceeds permissible threshold.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        }
+      ],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  }
+]

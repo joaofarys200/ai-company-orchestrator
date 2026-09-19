@@ -1,0 +1,1857 @@
+[
+  {
+    "decision_id": "gate-dec-e28521bd5b2c",
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "state": "DEPLOYMENT_NOT_AVAILABLE",
+    "risk_vector": {
+      "dimensions": {
+        "security": {
+          "dimension": "security",
+          "value": 0.05,
+          "confidence": 0.95,
+          "evidence": "Blockers: 0, Debt: 0"
+        },
+        "quality": {
+          "dimension": "quality",
+          "value": 0.05,
+          "confidence": 0.96,
+          "evidence": "Score: 0.96, Uncertainty: 0.04"
+        },
+        "architecture": {
+          "dimension": "architecture",
+          "value": 0.08,
+          "confidence": 0.9,
+          "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+        },
+        "behavior": {
+          "dimension": "behavior",
+          "value": 0.05,
+          "confidence": 0.85,
+          "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+        },
+        "contract": {
+          "dimension": "contract",
+          "value": 0.05,
+          "confidence": 0.92,
+          "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+        },
+        "performance": {
+          "dimension": "performance",
+          "value": 0.1,
+          "confidence": 0.95,
+          "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+        },
+        "runtime": {
+          "dimension": "runtime",
+          "value": 0.05,
+          "confidence": 0.9,
+          "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+        },
+        "configuration": {
+          "dimension": "configuration",
+          "value": 0.05,
+          "confidence": 0.95,
+          "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+        },
+        "dependency": {
+          "dimension": "dependency",
+          "value": 0.05,
+          "confidence": 0.92,
+          "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+        },
+        "rollback": {
+          "dimension": "rollback",
+          "value": 0.05,
+          "confidence": 0.9,
+          "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+        },
+        "observability": {
+          "dimension": "observability",
+          "value": 0.08,
+          "confidence": 0.88,
+          "evidence": "Status: ObservabilityStatus.READY, Signals: 7/7"
+        }
+      },
+      "overall_risk_score": 0.06
+    },
+    "blockers": [],
+    "human_review_ticket": null,
+    "domain_summaries": {
+      "security": {
+        "verdict": "PASSED",
+        "secrets_count": 0,
+        "credential_exposure": false,
+        "sandbox_violations": 0,
+        "unsafe_commands": 0,
+        "protected_path_breaches": 0,
+        "vulnerabilities_critical": 0,
+        "security_debt_count": 0,
+        "security_review_backlog": 0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "quality": {
+        "status": "READY",
+        "overall_score": 0.96,
+        "dimensions": {
+          "maintainability": 0.95,
+          "reliability": 0.97
+        },
+        "uncertainty": 0.04,
+        "deltas": {},
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": [],
+        "accepted_with_debt": false
+      },
+      "debt": {
+        "status": "READY_WITH_RISK",
+        "critical_security_debts": 0,
+        "critical_quality_debts": 0,
+        "unresolved_unknowns": 0,
+        "deferred_debt_count": 1,
+        "accepted_with_debt": false,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "architecture": {
+        "classification": "HEALTHY",
+        "forbidden_boundary_violations": 0,
+        "unresolved_sccs": 0,
+        "architecture_drift_pct": 2.1,
+        "architecture_debt_score": 0.0,
+        "migration_state": "COMPLETED",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "contract": {
+        "status": "COMPATIBLE",
+        "breaking_changes": 0,
+        "unmigrated_consumers": 0,
+        "drift_status": "SYNCHRONIZED",
+        "polymorphic_violations": 0,
+        "migration_completed": true,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "behavior": {
+        "status": "PRESERVED_WITHIN_SCOPE",
+        "invariants_violated": 0,
+        "counterexamples_count": 0,
+        "concurrency_hazards": 0,
+        "idempotency_failures": 0,
+        "potential_drift": false,
+        "evidence_depth": "SUFFICIENT",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "performance": {
+        "classification": "IMPROVED",
+        "nature": "observed",
+        "dimension_deltas": {
+          "latency_p95_ms": {
+            "baseline": 12.0,
+            "current": 11.5,
+            "pct_change": -4.17,
+            "nature": "observed",
+            "status": "WITHIN_BUDGET"
+          },
+          "throughput_rps": {
+            "baseline": 1200.0,
+            "current": 1250.0,
+            "pct_change": 4.17,
+            "nature": "observed",
+            "status": "WITHIN_BUDGET"
+          }
+        },
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "runtime": {
+        "status": "HEALTHY",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": [],
+        "details": {
+          "process_started": true,
+          "healthcheck_ok": true,
+          "readiness_ok": true,
+          "liveness_ok": true,
+          "websocket_ok": true,
+          "dependency_connectivity": true,
+          "database_ok": true,
+          "worker_ready": true,
+          "graceful_shutdown_tested": true,
+          "error_rate": 0.0,
+          "blockers": [],
+          "requires_human_review": false,
+          "review_reasons": []
+        }
+      },
+      "observability": {
+        "status": "READY",
+        "signals_present": 7,
+        "structured_logs": true,
+        "error_visibility": true,
+        "health_signals": true,
+        "request_tracing": true,
+        "mission_telemetry": true,
+        "security_events": true,
+        "verification_evidence": true,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "dependency": {
+        "status": "READY",
+        "resolvable": true,
+        "unpinned_count": 0,
+        "lockfile_consistent": true,
+        "runtime_available": true,
+        "incompatible_versions": 0,
+        "missing_packages": 0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "configuration": {
+        "status": "READY",
+        "missing_required_vars_count": 0,
+        "unsafe_defaults": false,
+        "secret_refs_valid": true,
+        "prod_dev_divergence": false,
+        "debug_mode_enabled": false,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "rollback": {
+        "status": "ROLLBACK_READY",
+        "snapshot_available": true,
+        "artifacts_available": true,
+        "db_rollback_strategy": "AVAILABLE",
+        "config_rollback_supported": true,
+        "migration_reversible": true,
+        "checkpoint_verified": true,
+        "drill_tested": true,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      }
+    },
+    "evidence_ledger": [
+      {
+        "domain": "security",
+        "summary": "PASSED"
+      },
+      {
+        "domain": "quality",
+        "summary": "READY"
+      },
+      {
+        "domain": "debt",
+        "summary": "READY_WITH_RISK"
+      },
+      {
+        "domain": "architecture",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "contract",
+        "summary": "COMPATIBLE"
+      },
+      {
+        "domain": "behavior",
+        "summary": "PRESERVED_WITHIN_SCOPE"
+      },
+      {
+        "domain": "performance",
+        "summary": "IMPROVED"
+      },
+      {
+        "domain": "runtime",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "observability",
+        "summary": "READY"
+      },
+      {
+        "domain": "dependency",
+        "summary": "READY"
+      },
+      {
+        "domain": "configuration",
+        "summary": "READY"
+      },
+      {
+        "domain": "rollback",
+        "summary": "ROLLBACK_READY"
+      }
+    ],
+    "provenance_hash": "fad31943c76fabf0644e48bfa7288ce5c811828b0429316f094022ce514d6c4e",
+    "evaluated_at": "2026-09-19T18:06:26Z",
+    "allowed_to_release": false
+  },
+  {
+    "decision_id": "gate-dec-c6cf243f6dc2",
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "state": "HUMAN_REVIEW",
+    "risk_vector": {
+      "dimensions": {
+        "security": {
+          "dimension": "security",
+          "value": 0.05,
+          "confidence": 0.95,
+          "evidence": "Blockers: 0, Debt: 0"
+        },
+        "quality": {
+          "dimension": "quality",
+          "value": 0.06,
+          "confidence": 1.0,
+          "evidence": "Score: 0.94, Uncertainty: 0.00"
+        },
+        "architecture": {
+          "dimension": "architecture",
+          "value": 0.08,
+          "confidence": 0.9,
+          "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+        },
+        "behavior": {
+          "dimension": "behavior",
+          "value": 0.05,
+          "confidence": 0.85,
+          "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+        },
+        "contract": {
+          "dimension": "contract",
+          "value": 0.4,
+          "confidence": 0.92,
+          "evidence": "Status: ContractReadinessStatus.DRIFT_DETECTED, Breaking: 1"
+        },
+        "performance": {
+          "dimension": "performance",
+          "value": 0.1,
+          "confidence": 0.95,
+          "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+        },
+        "runtime": {
+          "dimension": "runtime",
+          "value": 0.05,
+          "confidence": 0.9,
+          "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+        },
+        "configuration": {
+          "dimension": "configuration",
+          "value": 0.05,
+          "confidence": 0.95,
+          "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+        },
+        "dependency": {
+          "dimension": "dependency",
+          "value": 0.05,
+          "confidence": 0.92,
+          "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+        },
+        "rollback": {
+          "dimension": "rollback",
+          "value": 0.05,
+          "confidence": 0.9,
+          "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+        },
+        "observability": {
+          "dimension": "observability",
+          "value": 0.4,
+          "confidence": 0.88,
+          "evidence": "Status: ObservabilityStatus.PARTIAL, Signals: 3/7"
+        }
+      },
+      "overall_risk_score": 0.1218
+    },
+    "blockers": [],
+    "human_review_ticket": {
+      "ticket_id": "ticket-hr-ffea1b73ee",
+      "candidate_id": "rc-jarvis-02-contract-change",
+      "reason": "[CONTRACT] Contract drift detected between runtime interfaces and build schemas; [CONTRACT] 1 migrated breaking contract changes require confirmation; [OBSERVABILITY] Observability is partial (3/7 signals present); risk elevated",
+      "evidence": {
+        "review_reasons": [
+          "[CONTRACT] Contract drift detected between runtime interfaces and build schemas",
+          "[CONTRACT] 1 migrated breaking contract changes require confirmation",
+          "[OBSERVABILITY] Observability is partial (3/7 signals present); risk elevated"
+        ],
+        "risk_vector": {
+          "dimensions": {
+            "security": {
+              "dimension": "security",
+              "value": 0.05,
+              "confidence": 0.95,
+              "evidence": "Blockers: 0, Debt: 0"
+            },
+            "quality": {
+              "dimension": "quality",
+              "value": 0.06,
+              "confidence": 1.0,
+              "evidence": "Score: 0.94, Uncertainty: 0.00"
+            },
+            "architecture": {
+              "dimension": "architecture",
+              "value": 0.08,
+              "confidence": 0.9,
+              "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+            },
+            "behavior": {
+              "dimension": "behavior",
+              "value": 0.05,
+              "confidence": 0.85,
+              "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+            },
+            "contract": {
+              "dimension": "contract",
+              "value": 0.4,
+              "confidence": 0.92,
+              "evidence": "Status: ContractReadinessStatus.DRIFT_DETECTED, Breaking: 1"
+            },
+            "performance": {
+              "dimension": "performance",
+              "value": 0.1,
+              "confidence": 0.95,
+              "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+            },
+            "runtime": {
+              "dimension": "runtime",
+              "value": 0.05,
+              "confidence": 0.9,
+              "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+            },
+            "configuration": {
+              "dimension": "configuration",
+              "value": 0.05,
+              "confidence": 0.95,
+              "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+            },
+            "dependency": {
+              "dimension": "dependency",
+              "value": 0.05,
+              "confidence": 0.92,
+              "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+            },
+            "rollback": {
+              "dimension": "rollback",
+              "value": 0.05,
+              "confidence": 0.9,
+              "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+            },
+            "observability": {
+              "dimension": "observability",
+              "value": 0.4,
+              "confidence": 0.88,
+              "evidence": "Status: ObservabilityStatus.PARTIAL, Signals: 3/7"
+            }
+          },
+          "overall_risk_score": 0.1218
+        },
+        "blocker_count": 0
+      },
+      "timeout_seconds": 3600.0,
+      "created_at": "2026-09-19T18:06:26Z",
+      "status": "PENDING",
+      "decision_notes": ""
+    },
+    "domain_summaries": {
+      "security": {
+        "verdict": "PASSED",
+        "secrets_count": 0,
+        "credential_exposure": false,
+        "sandbox_violations": 0,
+        "unsafe_commands": 0,
+        "protected_path_breaches": 0,
+        "vulnerabilities_critical": 0,
+        "security_debt_count": 0,
+        "security_review_backlog": 0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "quality": {
+        "status": "READY",
+        "overall_score": 0.94,
+        "dimensions": {
+          "maintainability": 0.93
+        },
+        "uncertainty": 0.0,
+        "deltas": {},
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": [],
+        "accepted_with_debt": false
+      },
+      "debt": {
+        "status": "READY",
+        "critical_security_debts": 0,
+        "critical_quality_debts": 0,
+        "unresolved_unknowns": 0,
+        "deferred_debt_count": 0,
+        "accepted_with_debt": false,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "architecture": {
+        "classification": "HEALTHY",
+        "forbidden_boundary_violations": 0,
+        "unresolved_sccs": 0,
+        "architecture_drift_pct": 0.0,
+        "architecture_debt_score": 0.0,
+        "migration_state": "COMPLETED",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "contract": {
+        "status": "DRIFT_DETECTED",
+        "breaking_changes": 1,
+        "unmigrated_consumers": 0,
+        "drift_status": "DRIFT_DETECTED",
+        "polymorphic_violations": 0,
+        "migration_completed": true,
+        "blockers": [],
+        "requires_human_review": true,
+        "review_reasons": [
+          "Contract drift detected between runtime interfaces and build schemas",
+          "1 migrated breaking contract changes require confirmation"
+        ]
+      },
+      "behavior": {
+        "status": "PRESERVED_WITHIN_SCOPE",
+        "invariants_violated": 0,
+        "counterexamples_count": 0,
+        "concurrency_hazards": 0,
+        "idempotency_failures": 0,
+        "potential_drift": false,
+        "evidence_depth": "SUFFICIENT",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "performance": {
+        "classification": "IMPROVED",
+        "nature": "observed",
+        "dimension_deltas": {
+          "latency_p95_ms": {
+            "baseline": 12.0,
+            "current": 12.1,
+            "pct_change": 0.83,
+            "nature": "observed",
+            "status": "WITHIN_BUDGET"
+          }
+        },
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "runtime": {
+        "status": "HEALTHY",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": [],
+        "details": {
+          "process_started": true,
+          "healthcheck_ok": true,
+          "readiness_ok": true,
+          "liveness_ok": true,
+          "websocket_ok": true,
+          "dependency_connectivity": true,
+          "database_ok": true,
+          "worker_ready": true,
+          "graceful_shutdown_tested": true,
+          "error_rate": 0.0,
+          "blockers": [],
+          "requires_human_review": false,
+          "review_reasons": []
+        }
+      },
+      "observability": {
+        "status": "PARTIAL",
+        "signals_present": 3,
+        "structured_logs": true,
+        "error_visibility": true,
+        "health_signals": true,
+        "request_tracing": false,
+        "mission_telemetry": false,
+        "security_events": false,
+        "verification_evidence": false,
+        "blockers": [],
+        "requires_human_review": true,
+        "review_reasons": [
+          "Observability is partial (3/7 signals present); risk elevated"
+        ]
+      },
+      "dependency": {
+        "status": "READY",
+        "resolvable": true,
+        "unpinned_count": 0,
+        "lockfile_consistent": true,
+        "runtime_available": true,
+        "incompatible_versions": 0,
+        "missing_packages": 0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "configuration": {
+        "status": "READY",
+        "missing_required_vars_count": 0,
+        "unsafe_defaults": false,
+        "secret_refs_valid": true,
+        "prod_dev_divergence": false,
+        "debug_mode_enabled": false,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "rollback": {
+        "status": "ROLLBACK_READY",
+        "snapshot_available": true,
+        "artifacts_available": true,
+        "db_rollback_strategy": "AVAILABLE",
+        "config_rollback_supported": true,
+        "migration_reversible": true,
+        "checkpoint_verified": true,
+        "drill_tested": true,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      }
+    },
+    "evidence_ledger": [
+      {
+        "domain": "security",
+        "summary": "PASSED"
+      },
+      {
+        "domain": "quality",
+        "summary": "READY"
+      },
+      {
+        "domain": "debt",
+        "summary": "READY"
+      },
+      {
+        "domain": "architecture",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "contract",
+        "summary": "DRIFT_DETECTED"
+      },
+      {
+        "domain": "behavior",
+        "summary": "PRESERVED_WITHIN_SCOPE"
+      },
+      {
+        "domain": "performance",
+        "summary": "IMPROVED"
+      },
+      {
+        "domain": "runtime",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "observability",
+        "summary": "PARTIAL"
+      },
+      {
+        "domain": "dependency",
+        "summary": "READY"
+      },
+      {
+        "domain": "configuration",
+        "summary": "READY"
+      },
+      {
+        "domain": "rollback",
+        "summary": "ROLLBACK_READY"
+      }
+    ],
+    "provenance_hash": "99ed6d348cac485ab1572ef28cacf57d5d5b7785eae9f7a544813446c41158b5",
+    "evaluated_at": "2026-09-19T18:06:26Z",
+    "allowed_to_release": false
+  },
+  {
+    "decision_id": "gate-dec-c1b5ea170578",
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "state": "RELEASE_READY_WITH_RISK",
+    "risk_vector": {
+      "dimensions": {
+        "security": {
+          "dimension": "security",
+          "value": 0.05,
+          "confidence": 0.95,
+          "evidence": "Blockers: 0, Debt: 0"
+        },
+        "quality": {
+          "dimension": "quality",
+          "value": 0.07,
+          "confidence": 1.0,
+          "evidence": "Score: 0.93, Uncertainty: 0.00"
+        },
+        "architecture": {
+          "dimension": "architecture",
+          "value": 0.08,
+          "confidence": 0.9,
+          "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+        },
+        "behavior": {
+          "dimension": "behavior",
+          "value": 0.05,
+          "confidence": 0.85,
+          "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+        },
+        "contract": {
+          "dimension": "contract",
+          "value": 0.05,
+          "confidence": 0.92,
+          "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+        },
+        "performance": {
+          "dimension": "performance",
+          "value": 0.1,
+          "confidence": 0.95,
+          "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+        },
+        "runtime": {
+          "dimension": "runtime",
+          "value": 0.05,
+          "confidence": 0.9,
+          "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+        },
+        "configuration": {
+          "dimension": "configuration",
+          "value": 0.05,
+          "confidence": 0.95,
+          "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+        },
+        "dependency": {
+          "dimension": "dependency",
+          "value": 0.05,
+          "confidence": 0.92,
+          "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+        },
+        "rollback": {
+          "dimension": "rollback",
+          "value": 0.05,
+          "confidence": 0.9,
+          "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+        },
+        "observability": {
+          "dimension": "observability",
+          "value": 0.08,
+          "confidence": 0.88,
+          "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+        }
+      },
+      "overall_risk_score": 0.0618
+    },
+    "blockers": [],
+    "human_review_ticket": null,
+    "domain_summaries": {
+      "security": {
+        "verdict": "PASSED",
+        "secrets_count": 0,
+        "credential_exposure": false,
+        "sandbox_violations": 0,
+        "unsafe_commands": 0,
+        "protected_path_breaches": 0,
+        "vulnerabilities_critical": 0,
+        "security_debt_count": 0,
+        "security_review_backlog": 0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "quality": {
+        "status": "READY_WITH_RISK",
+        "overall_score": 0.93,
+        "dimensions": {},
+        "uncertainty": 0.0,
+        "deltas": {},
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": [],
+        "accepted_with_debt": true
+      },
+      "debt": {
+        "status": "READY_WITH_RISK",
+        "critical_security_debts": 0,
+        "critical_quality_debts": 0,
+        "unresolved_unknowns": 0,
+        "deferred_debt_count": 1,
+        "accepted_with_debt": true,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "architecture": {
+        "classification": "HEALTHY",
+        "forbidden_boundary_violations": 0,
+        "unresolved_sccs": 0,
+        "architecture_drift_pct": 0.0,
+        "architecture_debt_score": 0.28,
+        "migration_state": "COMPLETED",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "contract": {
+        "status": "COMPATIBLE",
+        "breaking_changes": 0,
+        "unmigrated_consumers": 0,
+        "drift_status": "SYNCHRONIZED",
+        "polymorphic_violations": 0,
+        "migration_completed": true,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "behavior": {
+        "status": "PRESERVED_WITHIN_SCOPE",
+        "invariants_violated": 0,
+        "counterexamples_count": 0,
+        "concurrency_hazards": 0,
+        "idempotency_failures": 0,
+        "potential_drift": false,
+        "evidence_depth": "SUFFICIENT",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "performance": {
+        "classification": "IMPROVED",
+        "nature": "observed",
+        "dimension_deltas": {
+          "latency_p95_ms": {
+            "baseline": 12.0,
+            "current": 10.8,
+            "pct_change": -10.0,
+            "nature": "observed",
+            "status": "IMPROVED"
+          },
+          "memory_mb": {
+            "baseline": 115.0,
+            "current": 94.0,
+            "pct_change": -18.26,
+            "nature": "observed",
+            "status": "IMPROVED"
+          }
+        },
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "runtime": {
+        "status": "HEALTHY",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": [],
+        "details": {
+          "process_started": true,
+          "healthcheck_ok": true,
+          "readiness_ok": true,
+          "liveness_ok": true,
+          "websocket_ok": true,
+          "dependency_connectivity": true,
+          "database_ok": true,
+          "worker_ready": true,
+          "graceful_shutdown_tested": true,
+          "error_rate": 0.0,
+          "blockers": [],
+          "requires_human_review": false,
+          "review_reasons": []
+        }
+      },
+      "observability": {
+        "status": "READY",
+        "signals_present": 5,
+        "structured_logs": true,
+        "error_visibility": true,
+        "health_signals": true,
+        "request_tracing": true,
+        "mission_telemetry": true,
+        "security_events": false,
+        "verification_evidence": false,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "dependency": {
+        "status": "READY",
+        "resolvable": true,
+        "unpinned_count": 0,
+        "lockfile_consistent": true,
+        "runtime_available": true,
+        "incompatible_versions": 0,
+        "missing_packages": 0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "configuration": {
+        "status": "READY",
+        "missing_required_vars_count": 0,
+        "unsafe_defaults": false,
+        "secret_refs_valid": true,
+        "prod_dev_divergence": false,
+        "debug_mode_enabled": false,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "rollback": {
+        "status": "ROLLBACK_READY",
+        "snapshot_available": true,
+        "artifacts_available": true,
+        "db_rollback_strategy": "AVAILABLE",
+        "config_rollback_supported": true,
+        "migration_reversible": true,
+        "checkpoint_verified": true,
+        "drill_tested": true,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      }
+    },
+    "evidence_ledger": [
+      {
+        "domain": "security",
+        "summary": "PASSED"
+      },
+      {
+        "domain": "quality",
+        "summary": "READY_WITH_RISK"
+      },
+      {
+        "domain": "debt",
+        "summary": "READY_WITH_RISK"
+      },
+      {
+        "domain": "architecture",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "contract",
+        "summary": "COMPATIBLE"
+      },
+      {
+        "domain": "behavior",
+        "summary": "PRESERVED_WITHIN_SCOPE"
+      },
+      {
+        "domain": "performance",
+        "summary": "IMPROVED"
+      },
+      {
+        "domain": "runtime",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "observability",
+        "summary": "READY"
+      },
+      {
+        "domain": "dependency",
+        "summary": "READY"
+      },
+      {
+        "domain": "configuration",
+        "summary": "READY"
+      },
+      {
+        "domain": "rollback",
+        "summary": "ROLLBACK_READY"
+      }
+    ],
+    "provenance_hash": "211f68e51c3578c2b66b633ae4a3ef7780200c9ccbcc9cba62701803cbf9c888",
+    "evaluated_at": "2026-09-19T18:06:26Z",
+    "allowed_to_release": true
+  },
+  {
+    "decision_id": "gate-dec-334423cf4146",
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "state": "BLOCKED",
+    "risk_vector": {
+      "dimensions": {
+        "security": {
+          "dimension": "security",
+          "value": 0.95,
+          "confidence": 0.95,
+          "evidence": "Blockers: 1, Debt: 1"
+        },
+        "quality": {
+          "dimension": "quality",
+          "value": 0.05,
+          "confidence": 1.0,
+          "evidence": "Score: 0.95, Uncertainty: 0.00"
+        },
+        "architecture": {
+          "dimension": "architecture",
+          "value": 0.08,
+          "confidence": 0.9,
+          "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+        },
+        "behavior": {
+          "dimension": "behavior",
+          "value": 0.05,
+          "confidence": 0.85,
+          "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+        },
+        "contract": {
+          "dimension": "contract",
+          "value": 0.05,
+          "confidence": 0.92,
+          "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+        },
+        "performance": {
+          "dimension": "performance",
+          "value": 0.1,
+          "confidence": 0.95,
+          "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+        },
+        "runtime": {
+          "dimension": "runtime",
+          "value": 0.05,
+          "confidence": 0.9,
+          "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+        },
+        "configuration": {
+          "dimension": "configuration",
+          "value": 0.05,
+          "confidence": 0.95,
+          "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+        },
+        "dependency": {
+          "dimension": "dependency",
+          "value": 0.05,
+          "confidence": 0.92,
+          "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+        },
+        "rollback": {
+          "dimension": "rollback",
+          "value": 0.05,
+          "confidence": 0.9,
+          "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+        },
+        "observability": {
+          "dimension": "observability",
+          "value": 0.4,
+          "confidence": 0.88,
+          "evidence": "Status: ObservabilityStatus.PARTIAL, Signals: 2/7"
+        }
+      },
+      "overall_risk_score": 0.1709
+    },
+    "blockers": [
+      {
+        "blocker_id": "blocker-sec-secrets-exposed",
+        "category": "critical_security_violation",
+        "description": "Potential credential exposure or plaintext secrets (1 detected)",
+        "evidence": "Sentinel secrets scanner flagged API tokens or credentials in candidate artifacts.",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-debt-critical-security",
+        "category": "critical_security_violation",
+        "description": "Candidate blocked by 1 critical security technical debts",
+        "evidence": "Active security debt items: 1 require remediation before release.",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      }
+    ],
+    "human_review_ticket": null,
+    "domain_summaries": {
+      "security": {
+        "verdict": "BLOCKED",
+        "secrets_count": 1,
+        "credential_exposure": true,
+        "sandbox_violations": 0,
+        "unsafe_commands": 0,
+        "protected_path_breaches": 0,
+        "vulnerabilities_critical": 0,
+        "security_debt_count": 1,
+        "security_review_backlog": 0,
+        "blockers": [
+          {
+            "blocker_id": "blocker-sec-secrets-exposed",
+            "category": "critical_security_violation",
+            "description": "Potential credential exposure or plaintext secrets (1 detected)",
+            "evidence": "Sentinel secrets scanner flagged API tokens or credentials in candidate artifacts.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": true,
+        "review_reasons": [
+          "1 open non-critical security debt items require verification"
+        ]
+      },
+      "quality": {
+        "status": "READY",
+        "overall_score": 0.95,
+        "dimensions": {},
+        "uncertainty": 0.0,
+        "deltas": {},
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": [],
+        "accepted_with_debt": false
+      },
+      "debt": {
+        "status": "BLOCKED",
+        "critical_security_debts": 1,
+        "critical_quality_debts": 0,
+        "unresolved_unknowns": 0,
+        "deferred_debt_count": 0,
+        "accepted_with_debt": false,
+        "blockers": [
+          {
+            "blocker_id": "blocker-debt-critical-security",
+            "category": "critical_security_violation",
+            "description": "Candidate blocked by 1 critical security technical debts",
+            "evidence": "Active security debt items: 1 require remediation before release.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "architecture": {
+        "classification": "HEALTHY",
+        "forbidden_boundary_violations": 0,
+        "unresolved_sccs": 0,
+        "architecture_drift_pct": 0.0,
+        "architecture_debt_score": 0.0,
+        "migration_state": "COMPLETED",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "contract": {
+        "status": "COMPATIBLE",
+        "breaking_changes": 0,
+        "unmigrated_consumers": 0,
+        "drift_status": "SYNCHRONIZED",
+        "polymorphic_violations": 0,
+        "migration_completed": true,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "behavior": {
+        "status": "PRESERVED_WITHIN_SCOPE",
+        "invariants_violated": 0,
+        "counterexamples_count": 0,
+        "concurrency_hazards": 0,
+        "idempotency_failures": 0,
+        "potential_drift": false,
+        "evidence_depth": "SUFFICIENT",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "performance": {
+        "classification": "IMPROVED",
+        "nature": "observed",
+        "dimension_deltas": {
+          "latency_p95_ms": {
+            "baseline": 12.0,
+            "current": 12.2,
+            "pct_change": 1.67,
+            "nature": "observed",
+            "status": "WITHIN_BUDGET"
+          }
+        },
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "runtime": {
+        "status": "HEALTHY",
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": [],
+        "details": {
+          "process_started": true,
+          "healthcheck_ok": true,
+          "readiness_ok": true,
+          "liveness_ok": true,
+          "websocket_ok": true,
+          "dependency_connectivity": true,
+          "database_ok": true,
+          "worker_ready": true,
+          "graceful_shutdown_tested": true,
+          "error_rate": 0.0,
+          "blockers": [],
+          "requires_human_review": false,
+          "review_reasons": []
+        }
+      },
+      "observability": {
+        "status": "PARTIAL",
+        "signals_present": 2,
+        "structured_logs": true,
+        "error_visibility": true,
+        "health_signals": false,
+        "request_tracing": false,
+        "mission_telemetry": false,
+        "security_events": false,
+        "verification_evidence": false,
+        "blockers": [],
+        "requires_human_review": true,
+        "review_reasons": [
+          "Observability is partial (2/7 signals present); risk elevated"
+        ]
+      },
+      "dependency": {
+        "status": "READY",
+        "resolvable": true,
+        "unpinned_count": 0,
+        "lockfile_consistent": true,
+        "runtime_available": true,
+        "incompatible_versions": 0,
+        "missing_packages": 0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "configuration": {
+        "status": "READY",
+        "missing_required_vars_count": 0,
+        "unsafe_defaults": false,
+        "secret_refs_valid": true,
+        "prod_dev_divergence": false,
+        "debug_mode_enabled": false,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "rollback": {
+        "status": "ROLLBACK_READY",
+        "snapshot_available": true,
+        "artifacts_available": true,
+        "db_rollback_strategy": "AVAILABLE",
+        "config_rollback_supported": true,
+        "migration_reversible": true,
+        "checkpoint_verified": true,
+        "drill_tested": true,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      }
+    },
+    "evidence_ledger": [
+      {
+        "domain": "security",
+        "summary": "BLOCKED"
+      },
+      {
+        "domain": "quality",
+        "summary": "READY"
+      },
+      {
+        "domain": "debt",
+        "summary": "BLOCKED"
+      },
+      {
+        "domain": "architecture",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "contract",
+        "summary": "COMPATIBLE"
+      },
+      {
+        "domain": "behavior",
+        "summary": "PRESERVED_WITHIN_SCOPE"
+      },
+      {
+        "domain": "performance",
+        "summary": "IMPROVED"
+      },
+      {
+        "domain": "runtime",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "observability",
+        "summary": "PARTIAL"
+      },
+      {
+        "domain": "dependency",
+        "summary": "READY"
+      },
+      {
+        "domain": "configuration",
+        "summary": "READY"
+      },
+      {
+        "domain": "rollback",
+        "summary": "ROLLBACK_READY"
+      }
+    ],
+    "provenance_hash": "b04a9b2fc2c216eb2269b936be914eb1934aa4cc17ecbbae7fa0b19ba3b43878",
+    "evaluated_at": "2026-09-19T18:06:26Z",
+    "allowed_to_release": false
+  },
+  {
+    "decision_id": "gate-dec-14e0a0751dea",
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "state": "BLOCKED",
+    "risk_vector": {
+      "dimensions": {
+        "security": {
+          "dimension": "security",
+          "value": 0.05,
+          "confidence": 0.95,
+          "evidence": "Blockers: 0, Debt: 0"
+        },
+        "quality": {
+          "dimension": "quality",
+          "value": 0.9,
+          "confidence": 1.0,
+          "evidence": "Score: 0.62, Uncertainty: 0.00"
+        },
+        "architecture": {
+          "dimension": "architecture",
+          "value": 0.9,
+          "confidence": 0.9,
+          "evidence": "Status: ArchitectureClassification.BLOCKED, SCCs: 3"
+        },
+        "behavior": {
+          "dimension": "behavior",
+          "value": 0.95,
+          "confidence": 0.85,
+          "evidence": "Status: BehaviorReadinessStatus.INCOMPATIBLE, Invariants violated: 1"
+        },
+        "contract": {
+          "dimension": "contract",
+          "value": 0.05,
+          "confidence": 0.92,
+          "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+        },
+        "performance": {
+          "dimension": "performance",
+          "value": 0.9,
+          "confidence": 0.95,
+          "evidence": "Classification: PerformanceClassification.CRITICAL_DEGRADATION, Nature: observed"
+        },
+        "runtime": {
+          "dimension": "runtime",
+          "value": 0.95,
+          "confidence": 0.9,
+          "evidence": "Status: RuntimeHealthStatus.UNAVAILABLE, Blockers: 3"
+        },
+        "configuration": {
+          "dimension": "configuration",
+          "value": 0.95,
+          "confidence": 0.95,
+          "evidence": "Status: ConfigurationStatus.UNSAFE, Unsafe defaults: True"
+        },
+        "dependency": {
+          "dimension": "dependency",
+          "value": 0.05,
+          "confidence": 0.92,
+          "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+        },
+        "rollback": {
+          "dimension": "rollback",
+          "value": 0.95,
+          "confidence": 0.9,
+          "evidence": "Status: RollbackReadinessStatus.ROLLBACK_BLOCKED, Checkpoint verified: False"
+        },
+        "observability": {
+          "dimension": "observability",
+          "value": 0.4,
+          "confidence": 0.88,
+          "evidence": "Status: ObservabilityStatus.PARTIAL, Signals: 2/7"
+        }
+      },
+      "overall_risk_score": 0.6409
+    },
+    "blockers": [
+      {
+        "blocker_id": "blocker-qual-degrade-maintainability",
+        "category": "quality_gate_blocked",
+        "description": "Critical quality degradation detected in dimension 'maintainability': delta -0.28",
+        "evidence": "Dimension 'maintainability' dropped by 28.0%. Baseline threshold violated.",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-qual-overall-low",
+        "category": "quality_gate_blocked",
+        "description": "Overall quality score (0.62) falls below release threshold (0.70)",
+        "evidence": "Evaluated quality score: 0.620",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-debt-critical-quality",
+        "category": "quality_gate_blocked",
+        "description": "Candidate blocked by 2 critical quality debts",
+        "evidence": "Active quality debt items: 2 breach release budget thresholds.",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-arch-unresolved-sccs",
+        "category": "quality_gate_blocked",
+        "description": "Candidate has 3 unresolved strongly connected component cycles",
+        "evidence": "Cyclic dependency condensation exceeds permissible threshold.",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-behavior-invariant-violated",
+        "category": "unresolved_incompatible_behavior",
+        "description": "Behavioral proof found 1 invariant violations and 2 counterexamples",
+        "evidence": "Active counterexamples: 2. Violations: 1.",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-perf-latency_p95_ms",
+        "category": "severe_performance_regression",
+        "description": "Critical performance regression in latency_p95_ms: 137.5% shift",
+        "evidence": "Baseline: 12.0, Current: 28.5. Exceeds critical budget (50%).",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-perf-memory_mb",
+        "category": "severe_performance_regression",
+        "description": "Critical performance regression in memory_mb: 195.7% shift",
+        "evidence": "Baseline: 115.0, Current: 340.0. Exceeds critical budget (50%).",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-runtime-probe-failed",
+        "category": "critical_health_failure",
+        "description": "Healthcheck or readiness probe endpoint failed",
+        "evidence": "Healthcheck: False, Readiness: False.",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-runtime-liveness-failed",
+        "category": "critical_health_failure",
+        "description": "Liveness probe returned unhealthy",
+        "evidence": "Process liveness check failed.",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-runtime-high-error-rate",
+        "category": "critical_health_failure",
+        "description": "Runtime error rate elevated at 12.0%",
+        "evidence": "Observed probe failure rate exceeds 5% threshold.",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-cfg-unsafe",
+        "category": "unsafe_configuration",
+        "description": "Unsafe configuration detected: insecure default settings detected;",
+        "evidence": "Configuration security evaluation failed safety invariants (sanitized).",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-cfg-missing-vars",
+        "category": "unsafe_configuration",
+        "description": "Required environment variables missing (1 missing)",
+        "evidence": "Missing variable names (keys only): VAULT_KEY",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      },
+      {
+        "blocker_id": "blocker-rb-unverified-checkpoint",
+        "category": "missing_rollback_when_required",
+        "description": "Mandatory rollback recovery checkpoint is unverified",
+        "evidence": "Pre-release state checkpoint has not been validated for restoration.",
+        "severity": "CRITICAL",
+        "timestamp": "2026-09-19T18:06:26Z"
+      }
+    ],
+    "human_review_ticket": null,
+    "domain_summaries": {
+      "security": {
+        "verdict": "PASSED",
+        "secrets_count": 0,
+        "credential_exposure": false,
+        "sandbox_violations": 0,
+        "unsafe_commands": 0,
+        "protected_path_breaches": 0,
+        "vulnerabilities_critical": 0,
+        "security_debt_count": 0,
+        "security_review_backlog": 0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "quality": {
+        "status": "BLOCKED",
+        "overall_score": 0.62,
+        "dimensions": {
+          "maintainability": 0.55
+        },
+        "uncertainty": 0.0,
+        "deltas": {
+          "maintainability": -0.28
+        },
+        "blockers": [
+          {
+            "blocker_id": "blocker-qual-degrade-maintainability",
+            "category": "quality_gate_blocked",
+            "description": "Critical quality degradation detected in dimension 'maintainability': delta -0.28",
+            "evidence": "Dimension 'maintainability' dropped by 28.0%. Baseline threshold violated.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          },
+          {
+            "blocker_id": "blocker-qual-overall-low",
+            "category": "quality_gate_blocked",
+            "description": "Overall quality score (0.62) falls below release threshold (0.70)",
+            "evidence": "Evaluated quality score: 0.620",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": false,
+        "review_reasons": [],
+        "accepted_with_debt": false
+      },
+      "debt": {
+        "status": "BLOCKED",
+        "critical_security_debts": 0,
+        "critical_quality_debts": 2,
+        "unresolved_unknowns": 0,
+        "deferred_debt_count": 0,
+        "accepted_with_debt": false,
+        "blockers": [
+          {
+            "blocker_id": "blocker-debt-critical-quality",
+            "category": "quality_gate_blocked",
+            "description": "Candidate blocked by 2 critical quality debts",
+            "evidence": "Active quality debt items: 2 breach release budget thresholds.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "architecture": {
+        "classification": "BLOCKED",
+        "forbidden_boundary_violations": 0,
+        "unresolved_sccs": 3,
+        "architecture_drift_pct": 0.0,
+        "architecture_debt_score": 0.0,
+        "migration_state": "COMPLETED",
+        "blockers": [
+          {
+            "blocker_id": "blocker-arch-unresolved-sccs",
+            "category": "quality_gate_blocked",
+            "description": "Candidate has 3 unresolved strongly connected component cycles",
+            "evidence": "Cyclic dependency condensation exceeds permissible threshold.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "contract": {
+        "status": "COMPATIBLE",
+        "breaking_changes": 0,
+        "unmigrated_consumers": 0,
+        "drift_status": "SYNCHRONIZED",
+        "polymorphic_violations": 0,
+        "migration_completed": true,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "behavior": {
+        "status": "INCOMPATIBLE",
+        "invariants_violated": 1,
+        "counterexamples_count": 2,
+        "concurrency_hazards": 0,
+        "idempotency_failures": 0,
+        "potential_drift": false,
+        "evidence_depth": "SUFFICIENT",
+        "blockers": [
+          {
+            "blocker_id": "blocker-behavior-invariant-violated",
+            "category": "unresolved_incompatible_behavior",
+            "description": "Behavioral proof found 1 invariant violations and 2 counterexamples",
+            "evidence": "Active counterexamples: 2. Violations: 1.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "performance": {
+        "classification": "CRITICAL_DEGRADATION",
+        "nature": "observed",
+        "dimension_deltas": {
+          "latency_p95_ms": {
+            "baseline": 12.0,
+            "current": 28.5,
+            "pct_change": 137.5,
+            "nature": "observed",
+            "status": "CRITICAL"
+          },
+          "memory_mb": {
+            "baseline": 115.0,
+            "current": 340.0,
+            "pct_change": 195.65,
+            "nature": "observed",
+            "status": "CRITICAL"
+          }
+        },
+        "blockers": [
+          {
+            "blocker_id": "blocker-perf-latency_p95_ms",
+            "category": "severe_performance_regression",
+            "description": "Critical performance regression in latency_p95_ms: 137.5% shift",
+            "evidence": "Baseline: 12.0, Current: 28.5. Exceeds critical budget (50%).",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          },
+          {
+            "blocker_id": "blocker-perf-memory_mb",
+            "category": "severe_performance_regression",
+            "description": "Critical performance regression in memory_mb: 195.7% shift",
+            "evidence": "Baseline: 115.0, Current: 340.0. Exceeds critical budget (50%).",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "runtime": {
+        "status": "UNAVAILABLE",
+        "blockers": [
+          {
+            "blocker_id": "blocker-runtime-probe-failed",
+            "category": "critical_health_failure",
+            "description": "Healthcheck or readiness probe endpoint failed",
+            "evidence": "Healthcheck: False, Readiness: False.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          },
+          {
+            "blocker_id": "blocker-runtime-liveness-failed",
+            "category": "critical_health_failure",
+            "description": "Liveness probe returned unhealthy",
+            "evidence": "Process liveness check failed.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          },
+          {
+            "blocker_id": "blocker-runtime-high-error-rate",
+            "category": "critical_health_failure",
+            "description": "Runtime error rate elevated at 12.0%",
+            "evidence": "Observed probe failure rate exceeds 5% threshold.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": false,
+        "review_reasons": [],
+        "details": {
+          "process_started": true,
+          "healthcheck_ok": false,
+          "readiness_ok": false,
+          "liveness_ok": false,
+          "websocket_ok": true,
+          "dependency_connectivity": true,
+          "database_ok": true,
+          "worker_ready": true,
+          "graceful_shutdown_tested": true,
+          "error_rate": 0.12,
+          "blockers": [
+            {
+              "blocker_id": "blocker-runtime-probe-failed",
+              "category": "critical_health_failure",
+              "description": "Healthcheck or readiness probe endpoint failed",
+              "evidence": "Healthcheck: False, Readiness: False.",
+              "severity": "CRITICAL",
+              "timestamp": "2026-09-19T18:06:26Z"
+            },
+            {
+              "blocker_id": "blocker-runtime-liveness-failed",
+              "category": "critical_health_failure",
+              "description": "Liveness probe returned unhealthy",
+              "evidence": "Process liveness check failed.",
+              "severity": "CRITICAL",
+              "timestamp": "2026-09-19T18:06:26Z"
+            },
+            {
+              "blocker_id": "blocker-runtime-high-error-rate",
+              "category": "critical_health_failure",
+              "description": "Runtime error rate elevated at 12.0%",
+              "evidence": "Observed probe failure rate exceeds 5% threshold.",
+              "severity": "CRITICAL",
+              "timestamp": "2026-09-19T18:06:26Z"
+            }
+          ],
+          "requires_human_review": false,
+          "review_reasons": []
+        }
+      },
+      "observability": {
+        "status": "PARTIAL",
+        "signals_present": 2,
+        "structured_logs": true,
+        "error_visibility": true,
+        "health_signals": false,
+        "request_tracing": false,
+        "mission_telemetry": false,
+        "security_events": false,
+        "verification_evidence": false,
+        "blockers": [],
+        "requires_human_review": true,
+        "review_reasons": [
+          "Observability is partial (2/7 signals present); risk elevated"
+        ]
+      },
+      "dependency": {
+        "status": "READY",
+        "resolvable": true,
+        "unpinned_count": 0,
+        "lockfile_consistent": true,
+        "runtime_available": true,
+        "incompatible_versions": 0,
+        "missing_packages": 0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "configuration": {
+        "status": "UNSAFE",
+        "missing_required_vars_count": 1,
+        "unsafe_defaults": true,
+        "secret_refs_valid": true,
+        "prod_dev_divergence": false,
+        "debug_mode_enabled": false,
+        "blockers": [
+          {
+            "blocker_id": "blocker-cfg-unsafe",
+            "category": "unsafe_configuration",
+            "description": "Unsafe configuration detected: insecure default settings detected;",
+            "evidence": "Configuration security evaluation failed safety invariants (sanitized).",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          },
+          {
+            "blocker_id": "blocker-cfg-missing-vars",
+            "category": "unsafe_configuration",
+            "description": "Required environment variables missing (1 missing)",
+            "evidence": "Missing variable names (keys only): VAULT_KEY",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": false,
+        "review_reasons": []
+      },
+      "rollback": {
+        "status": "ROLLBACK_BLOCKED",
+        "snapshot_available": true,
+        "artifacts_available": true,
+        "db_rollback_strategy": "AVAILABLE",
+        "config_rollback_supported": true,
+        "migration_reversible": true,
+        "checkpoint_verified": false,
+        "drill_tested": true,
+        "blockers": [
+          {
+            "blocker_id": "blocker-rb-unverified-checkpoint",
+            "category": "missing_rollback_when_required",
+            "description": "Mandatory rollback recovery checkpoint is unverified",
+            "evidence": "Pre-release state checkpoint has not been validated for restoration.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": false,
+        "review_reasons": []
+      }
+    },
+    "evidence_ledger": [
+      {
+        "domain": "security",
+        "summary": "PASSED"
+      },
+      {
+        "domain": "quality",
+        "summary": "BLOCKED"
+      },
+      {
+        "domain": "debt",
+        "summary": "BLOCKED"
+      },
+      {
+        "domain": "architecture",
+        "summary": "BLOCKED"
+      },
+      {
+        "domain": "contract",
+        "summary": "COMPATIBLE"
+      },
+      {
+        "domain": "behavior",
+        "summary": "INCOMPATIBLE"
+      },
+      {
+        "domain": "performance",
+        "summary": "CRITICAL_DEGRADATION"
+      },
+      {
+        "domain": "runtime",
+        "summary": "UNAVAILABLE"
+      },
+      {
+        "domain": "observability",
+        "summary": "PARTIAL"
+      },
+      {
+        "domain": "dependency",
+        "summary": "READY"
+      },
+      {
+        "domain": "configuration",
+        "summary": "UNSAFE"
+      },
+      {
+        "domain": "rollback",
+        "summary": "ROLLBACK_BLOCKED"
+      }
+    ],
+    "provenance_hash": "250c9e8249492a29662d42ce632707a3a517c6d51b57285e101fed6c74d6167a",
+    "evaluated_at": "2026-09-19T18:06:26Z",
+    "allowed_to_release": false
+  }
+]

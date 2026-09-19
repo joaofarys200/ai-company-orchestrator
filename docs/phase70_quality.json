@@ -1,0 +1,98 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "summary": {
+      "status": "READY",
+      "overall_score": 0.96,
+      "dimensions": {
+        "maintainability": 0.95,
+        "reliability": 0.97
+      },
+      "uncertainty": 0.04,
+      "deltas": {},
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": [],
+      "accepted_with_debt": false
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "summary": {
+      "status": "READY",
+      "overall_score": 0.94,
+      "dimensions": {
+        "maintainability": 0.93
+      },
+      "uncertainty": 0.0,
+      "deltas": {},
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": [],
+      "accepted_with_debt": false
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "summary": {
+      "status": "READY_WITH_RISK",
+      "overall_score": 0.93,
+      "dimensions": {},
+      "uncertainty": 0.0,
+      "deltas": {},
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": [],
+      "accepted_with_debt": true
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "summary": {
+      "status": "READY",
+      "overall_score": 0.95,
+      "dimensions": {},
+      "uncertainty": 0.0,
+      "deltas": {},
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": [],
+      "accepted_with_debt": false
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "summary": {
+      "status": "BLOCKED",
+      "overall_score": 0.62,
+      "dimensions": {
+        "maintainability": 0.55
+      },
+      "uncertainty": 0.0,
+      "deltas": {
+        "maintainability": -0.28
+      },
+      "blockers": [
+        {
+          "blocker_id": "blocker-qual-degrade-maintainability",
+          "category": "quality_gate_blocked",
+          "description": "Critical quality degradation detected in dimension 'maintainability': delta -0.28",
+          "evidence": "Dimension 'maintainability' dropped by 28.0%. Baseline threshold violated.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        },
+        {
+          "blocker_id": "blocker-qual-overall-low",
+          "category": "quality_gate_blocked",
+          "description": "Overall quality score (0.62) falls below release threshold (0.70)",
+          "evidence": "Evaluated quality score: 0.620",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        }
+      ],
+      "requires_human_review": false,
+      "review_reasons": [],
+      "accepted_with_debt": false
+    }
+  }
+]

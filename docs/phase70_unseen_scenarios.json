@@ -1,0 +1,1359 @@
+{
+  "suite": "Phase 70 Unseen Release Scenarios",
+  "scenarios_count": 15,
+  "all_passed": true,
+  "timestamp": "2026-09-19T18:06:48Z",
+  "scenarios": [
+    {
+      "scenario_id": "unseen-01-healthy",
+      "description": "Healthy release with all checks passed",
+      "expected_state": "RELEASE_READY",
+      "actual_state": "RELEASE_READY",
+      "allowed_to_release": true,
+      "blockers_count": 0,
+      "blockers": [],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.06
+      },
+      "human_review_required": false,
+      "provenance_hash": "9a12383cd5969efe79c33c43a501ef4b57137283285da4b093bf2f1c1a114475",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-02-critical-debt",
+      "description": "Critical quality and security debt items unresolved",
+      "expected_state": "BLOCKED",
+      "actual_state": "BLOCKED",
+      "allowed_to_release": false,
+      "blockers_count": 1,
+      "blockers": [
+        {
+          "blocker_id": "blocker-debt-critical-security",
+          "category": "critical_security_violation",
+          "description": "Candidate blocked by 1 critical security technical debts",
+          "evidence": "Active security debt items: 1 require remediation before release.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        }
+      ],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.06
+      },
+      "human_review_required": false,
+      "provenance_hash": "51f9fe6fa17723aa2e9f5ad3f3d5dab6a3b9df65bd8027368f2f2176a725cbc3",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-03-security-violation",
+      "description": "Plaintext API token leaked in git diff",
+      "expected_state": "BLOCKED",
+      "actual_state": "BLOCKED",
+      "allowed_to_release": false,
+      "blockers_count": 1,
+      "blockers": [
+        {
+          "blocker_id": "blocker-sec-secrets-exposed",
+          "category": "critical_security_violation",
+          "description": "Potential credential exposure or plaintext secrets (1 detected)",
+          "evidence": "Sentinel secrets scanner flagged API tokens or credentials in candidate artifacts.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        }
+      ],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.95,
+            "confidence": 0.95,
+            "evidence": "Blockers: 1, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.1418
+      },
+      "human_review_required": false,
+      "provenance_hash": "4a9d3b83c4f01da4b37bc6a5897daeb643ec5061d897e13ed1d58b015065d239",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-04-contract-break",
+      "description": "Unmigrated breaking contract change",
+      "expected_state": "BLOCKED",
+      "actual_state": "BLOCKED",
+      "allowed_to_release": false,
+      "blockers_count": 1,
+      "blockers": [
+        {
+          "blocker_id": "blocker-contract-breaking",
+          "category": "breaking_contract_without_migration",
+          "description": "1 breaking contract change(s) detected without migration completion",
+          "evidence": "Breaking changes: 1, unmigrated consumers: 0.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        }
+      ],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.95,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.BREAKING, Breaking: 1"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.1418
+      },
+      "human_review_required": false,
+      "provenance_hash": "24e7bcf849654e86f550f6096e70f5d24ebab0bf963653edc8b193bc90a171be",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-05-behavior-drift",
+      "description": "State machine transition drift detected against baseline",
+      "expected_state": "HUMAN_REVIEW",
+      "actual_state": "HUMAN_REVIEW",
+      "allowed_to_release": false,
+      "blockers_count": 0,
+      "blockers": [],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.45,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.POTENTIAL_DRIFT, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.0964
+      },
+      "human_review_required": true,
+      "provenance_hash": "b897b27afa58df28fc3e8e6ad5bea8f039e084e7d53c960c7d309db45231b44c",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-06-performance-regression",
+      "description": "Severe latency spike (+80% p95)",
+      "expected_state": "BLOCKED",
+      "actual_state": "BLOCKED",
+      "allowed_to_release": false,
+      "blockers_count": 1,
+      "blockers": [
+        {
+          "blocker_id": "blocker-perf-latency_p95_ms",
+          "category": "severe_performance_regression",
+          "description": "Critical performance regression in latency_p95_ms: 85.0% shift",
+          "evidence": "Baseline: 10.0, Current: 18.5. Exceeds critical budget (50%).",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        }
+      ],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.9,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.CRITICAL_DEGRADATION, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.1327
+      },
+      "human_review_required": false,
+      "provenance_hash": "837218e270db033608bca356a2ce70f66ce406c356796eb8eb1ebd3f27be9833",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-07-runtime-unavailable",
+      "description": "Database unreachable from runtime pod",
+      "expected_state": "BLOCKED",
+      "actual_state": "BLOCKED",
+      "allowed_to_release": false,
+      "blockers_count": 2,
+      "blockers": [
+        {
+          "blocker_id": "blocker-runtime-probe-failed",
+          "category": "critical_health_failure",
+          "description": "Healthcheck or readiness probe endpoint failed",
+          "evidence": "Healthcheck: False, Readiness: True.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        },
+        {
+          "blocker_id": "blocker-runtime-dep-unreachable",
+          "category": "critical_health_failure",
+          "description": "Database or essential external dependency unreachable from runtime",
+          "evidence": "Database: False, External deps: True.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        }
+      ],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.95,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.UNAVAILABLE, Blockers: 2"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.1418
+      },
+      "human_review_required": false,
+      "provenance_hash": "e75a812cdb23f2457da4bae93f58299b6a9b70b1bc7e76924c25ff1c2a6e54ae",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-08-dependency-unavailable",
+      "description": "Lockfile checksum mismatch with manifest",
+      "expected_state": "BLOCKED",
+      "actual_state": "BLOCKED",
+      "allowed_to_release": false,
+      "blockers_count": 1,
+      "blockers": [
+        {
+          "blocker_id": "blocker-dep-lockfile-drift",
+          "category": "dependency_failure",
+          "description": "Lockfile is inconsistent with declared project dependencies",
+          "evidence": "Integrity checksum mismatch or out-of-sync package specifications.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        }
+      ],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.9,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.INCOMPATIBLE, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.1373
+      },
+      "human_review_required": false,
+      "provenance_hash": "91ea9f8108b4e82d49a81930f1eecbd19f6df688966d5508bd9f07fec8eb35d1",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-09-unsafe-configuration",
+      "description": "DEBUG=true and secret plaintext in production config",
+      "expected_state": "BLOCKED",
+      "actual_state": "BLOCKED",
+      "allowed_to_release": false,
+      "blockers_count": 1,
+      "blockers": [
+        {
+          "blocker_id": "blocker-cfg-unsafe",
+          "category": "unsafe_configuration",
+          "description": "Unsafe configuration detected: insecure default settings detected; DEBUG mode enabled in production environment;",
+          "evidence": "Configuration security evaluation failed safety invariants (sanitized).",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        }
+      ],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.95,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.UNSAFE, Unsafe defaults: True"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.1418
+      },
+      "human_review_required": false,
+      "provenance_hash": "d4017c63bbd237fdf92df5a10f5bbe45365da8d7e99e6a47ab540b361b470535",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-10-rollback-unavailable",
+      "description": "Recovery checkpoint unverified prior to migration",
+      "expected_state": "BLOCKED",
+      "actual_state": "BLOCKED",
+      "allowed_to_release": false,
+      "blockers_count": 2,
+      "blockers": [
+        {
+          "blocker_id": "blocker-rb-snapshot-missing",
+          "category": "missing_rollback_when_required",
+          "description": "Previous immutable release snapshot or artifact bundle is missing",
+          "evidence": "Snapshot: False, Artifacts: True.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        },
+        {
+          "blocker_id": "blocker-rb-unverified-checkpoint",
+          "category": "missing_rollback_when_required",
+          "description": "Mandatory rollback recovery checkpoint is unverified",
+          "evidence": "Pre-release state checkpoint has not been validated for restoration.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        }
+      ],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.95,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_BLOCKED, Checkpoint verified: False"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.1418
+      },
+      "human_review_required": false,
+      "provenance_hash": "7f96b15556d5d06169104ee11751567faa60a50455f4b1ef839f89cbc9f25664",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-11-observability-missing",
+      "description": "Zero structured logs and no health telemetry",
+      "expected_state": "INSUFFICIENT_EVIDENCE",
+      "actual_state": "INSUFFICIENT_EVIDENCE",
+      "allowed_to_release": false,
+      "blockers_count": 1,
+      "blockers": [
+        {
+          "blocker_id": "blocker-obs-blind-runtime",
+          "category": "missing_mandatory_evidence",
+          "description": "Crucial error visibility and health signaling are missing; system is blind",
+          "evidence": "Neither error visibility nor health signals are enabled in observability configuration.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        }
+      ],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.9,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.PARTIAL, Signals: 2/7"
+          }
+        },
+        "overall_risk_score": 0.1345
+      },
+      "human_review_required": false,
+      "provenance_hash": "ce9c80676b8447e11ba0d96d825cf11012a65af98f79534655b395a076fccaaf",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-12-browser-regression",
+      "description": "Browser render time exceeds threshold (+75%)",
+      "expected_state": "BLOCKED",
+      "actual_state": "BLOCKED",
+      "allowed_to_release": false,
+      "blockers_count": 1,
+      "blockers": [
+        {
+          "blocker_id": "blocker-perf-browser_render_ms",
+          "category": "severe_performance_regression",
+          "description": "Critical performance regression in browser_render_ms: 94.4% shift",
+          "evidence": "Baseline: 18.0, Current: 35.0. Exceeds critical budget (60%).",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:48Z"
+        }
+      ],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.9,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.CRITICAL_DEGRADATION, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.1327
+      },
+      "human_review_required": false,
+      "provenance_hash": "17e3c6cb1e4a6c995ba33754fee36de1b3bf8af991893c54d2047828db045e68",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-13-websocket-failure",
+      "description": "WebSocket connection fails handshake",
+      "expected_state": "HUMAN_REVIEW",
+      "actual_state": "HUMAN_REVIEW",
+      "allowed_to_release": false,
+      "blockers_count": 0,
+      "blockers": [],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.35,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.DEGRADED, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.0873
+      },
+      "human_review_required": true,
+      "provenance_hash": "13754354023ee52d15662eada8bb333901e02a5273d86e8c4e82f3bc355be9b3",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-14-deployment-unavailable",
+      "description": "Valid candidate but no physical deploy target",
+      "expected_state": "DEPLOYMENT_NOT_AVAILABLE",
+      "actual_state": "DEPLOYMENT_NOT_AVAILABLE",
+      "allowed_to_release": false,
+      "blockers_count": 0,
+      "blockers": [],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.05,
+            "confidence": 1.0,
+            "evidence": "Score: 0.95, Uncertainty: 0.00"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.06
+      },
+      "human_review_required": false,
+      "provenance_hash": "277adb9f38626988b752432a09bc1c9ed9809f55ee9dc622477567fd91ae4951",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    },
+    {
+      "scenario_id": "unseen-15-ambiguous-release",
+      "description": "Elevated uncertainty bound (0.45)",
+      "expected_state": "HUMAN_REVIEW",
+      "actual_state": "HUMAN_REVIEW",
+      "allowed_to_release": false,
+      "blockers_count": 0,
+      "blockers": [],
+      "risk_vector": {
+        "dimensions": {
+          "security": {
+            "dimension": "security",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Blockers: 0, Debt: 0"
+          },
+          "quality": {
+            "dimension": "quality",
+            "value": 0.12,
+            "confidence": 0.55,
+            "evidence": "Score: 0.88, Uncertainty: 0.45"
+          },
+          "architecture": {
+            "dimension": "architecture",
+            "value": 0.08,
+            "confidence": 0.9,
+            "evidence": "Status: ArchitectureClassification.HEALTHY, SCCs: 0"
+          },
+          "behavior": {
+            "dimension": "behavior",
+            "value": 0.05,
+            "confidence": 0.85,
+            "evidence": "Status: BehaviorReadinessStatus.PRESERVED_WITHIN_SCOPE, Invariants violated: 0"
+          },
+          "contract": {
+            "dimension": "contract",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: ContractReadinessStatus.COMPATIBLE, Breaking: 0"
+          },
+          "performance": {
+            "dimension": "performance",
+            "value": 0.1,
+            "confidence": 0.95,
+            "evidence": "Classification: PerformanceClassification.IMPROVED, Nature: observed"
+          },
+          "runtime": {
+            "dimension": "runtime",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RuntimeHealthStatus.HEALTHY, Blockers: 0"
+          },
+          "configuration": {
+            "dimension": "configuration",
+            "value": 0.05,
+            "confidence": 0.95,
+            "evidence": "Status: ConfigurationStatus.READY, Unsafe defaults: False"
+          },
+          "dependency": {
+            "dimension": "dependency",
+            "value": 0.05,
+            "confidence": 0.92,
+            "evidence": "Status: DependencyStatus.READY, Unpinned: 0"
+          },
+          "rollback": {
+            "dimension": "rollback",
+            "value": 0.05,
+            "confidence": 0.9,
+            "evidence": "Status: RollbackReadinessStatus.ROLLBACK_READY, Checkpoint verified: True"
+          },
+          "observability": {
+            "dimension": "observability",
+            "value": 0.08,
+            "confidence": 0.88,
+            "evidence": "Status: ObservabilityStatus.READY, Signals: 5/7"
+          }
+        },
+        "overall_risk_score": 0.0664
+      },
+      "human_review_required": true,
+      "provenance_hash": "0ebfbb055263acb4f6a4105190dda7d736c2870b8d3a143648346f7817da0c77",
+      "evaluated_at": "2026-09-19T18:06:48Z"
+    }
+  ]
+}

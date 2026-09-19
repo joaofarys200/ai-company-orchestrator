@@ -1,0 +1,267 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "ledger": [
+      {
+        "domain": "security",
+        "summary": "PASSED"
+      },
+      {
+        "domain": "quality",
+        "summary": "READY"
+      },
+      {
+        "domain": "debt",
+        "summary": "READY_WITH_RISK"
+      },
+      {
+        "domain": "architecture",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "contract",
+        "summary": "COMPATIBLE"
+      },
+      {
+        "domain": "behavior",
+        "summary": "PRESERVED_WITHIN_SCOPE"
+      },
+      {
+        "domain": "performance",
+        "summary": "IMPROVED"
+      },
+      {
+        "domain": "runtime",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "observability",
+        "summary": "READY"
+      },
+      {
+        "domain": "dependency",
+        "summary": "READY"
+      },
+      {
+        "domain": "configuration",
+        "summary": "READY"
+      },
+      {
+        "domain": "rollback",
+        "summary": "ROLLBACK_READY"
+      }
+    ]
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "ledger": [
+      {
+        "domain": "security",
+        "summary": "PASSED"
+      },
+      {
+        "domain": "quality",
+        "summary": "READY"
+      },
+      {
+        "domain": "debt",
+        "summary": "READY"
+      },
+      {
+        "domain": "architecture",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "contract",
+        "summary": "DRIFT_DETECTED"
+      },
+      {
+        "domain": "behavior",
+        "summary": "PRESERVED_WITHIN_SCOPE"
+      },
+      {
+        "domain": "performance",
+        "summary": "IMPROVED"
+      },
+      {
+        "domain": "runtime",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "observability",
+        "summary": "PARTIAL"
+      },
+      {
+        "domain": "dependency",
+        "summary": "READY"
+      },
+      {
+        "domain": "configuration",
+        "summary": "READY"
+      },
+      {
+        "domain": "rollback",
+        "summary": "ROLLBACK_READY"
+      }
+    ]
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "ledger": [
+      {
+        "domain": "security",
+        "summary": "PASSED"
+      },
+      {
+        "domain": "quality",
+        "summary": "READY_WITH_RISK"
+      },
+      {
+        "domain": "debt",
+        "summary": "READY_WITH_RISK"
+      },
+      {
+        "domain": "architecture",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "contract",
+        "summary": "COMPATIBLE"
+      },
+      {
+        "domain": "behavior",
+        "summary": "PRESERVED_WITHIN_SCOPE"
+      },
+      {
+        "domain": "performance",
+        "summary": "IMPROVED"
+      },
+      {
+        "domain": "runtime",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "observability",
+        "summary": "READY"
+      },
+      {
+        "domain": "dependency",
+        "summary": "READY"
+      },
+      {
+        "domain": "configuration",
+        "summary": "READY"
+      },
+      {
+        "domain": "rollback",
+        "summary": "ROLLBACK_READY"
+      }
+    ]
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "ledger": [
+      {
+        "domain": "security",
+        "summary": "BLOCKED"
+      },
+      {
+        "domain": "quality",
+        "summary": "READY"
+      },
+      {
+        "domain": "debt",
+        "summary": "BLOCKED"
+      },
+      {
+        "domain": "architecture",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "contract",
+        "summary": "COMPATIBLE"
+      },
+      {
+        "domain": "behavior",
+        "summary": "PRESERVED_WITHIN_SCOPE"
+      },
+      {
+        "domain": "performance",
+        "summary": "IMPROVED"
+      },
+      {
+        "domain": "runtime",
+        "summary": "HEALTHY"
+      },
+      {
+        "domain": "observability",
+        "summary": "PARTIAL"
+      },
+      {
+        "domain": "dependency",
+        "summary": "READY"
+      },
+      {
+        "domain": "configuration",
+        "summary": "READY"
+      },
+      {
+        "domain": "rollback",
+        "summary": "ROLLBACK_READY"
+      }
+    ]
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "ledger": [
+      {
+        "domain": "security",
+        "summary": "PASSED"
+      },
+      {
+        "domain": "quality",
+        "summary": "BLOCKED"
+      },
+      {
+        "domain": "debt",
+        "summary": "BLOCKED"
+      },
+      {
+        "domain": "architecture",
+        "summary": "BLOCKED"
+      },
+      {
+        "domain": "contract",
+        "summary": "COMPATIBLE"
+      },
+      {
+        "domain": "behavior",
+        "summary": "INCOMPATIBLE"
+      },
+      {
+        "domain": "performance",
+        "summary": "CRITICAL_DEGRADATION"
+      },
+      {
+        "domain": "runtime",
+        "summary": "UNAVAILABLE"
+      },
+      {
+        "domain": "observability",
+        "summary": "PARTIAL"
+      },
+      {
+        "domain": "dependency",
+        "summary": "READY"
+      },
+      {
+        "domain": "configuration",
+        "summary": "UNSAFE"
+      },
+      {
+        "domain": "rollback",
+        "summary": "ROLLBACK_BLOCKED"
+      }
+    ]
+  }
+]

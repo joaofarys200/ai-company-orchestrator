@@ -1,0 +1,86 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "summary": {
+      "status": "PRESERVED_WITHIN_SCOPE",
+      "invariants_violated": 0,
+      "counterexamples_count": 0,
+      "concurrency_hazards": 0,
+      "idempotency_failures": 0,
+      "potential_drift": false,
+      "evidence_depth": "SUFFICIENT",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "summary": {
+      "status": "PRESERVED_WITHIN_SCOPE",
+      "invariants_violated": 0,
+      "counterexamples_count": 0,
+      "concurrency_hazards": 0,
+      "idempotency_failures": 0,
+      "potential_drift": false,
+      "evidence_depth": "SUFFICIENT",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "summary": {
+      "status": "PRESERVED_WITHIN_SCOPE",
+      "invariants_violated": 0,
+      "counterexamples_count": 0,
+      "concurrency_hazards": 0,
+      "idempotency_failures": 0,
+      "potential_drift": false,
+      "evidence_depth": "SUFFICIENT",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "summary": {
+      "status": "PRESERVED_WITHIN_SCOPE",
+      "invariants_violated": 0,
+      "counterexamples_count": 0,
+      "concurrency_hazards": 0,
+      "idempotency_failures": 0,
+      "potential_drift": false,
+      "evidence_depth": "SUFFICIENT",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "summary": {
+      "status": "INCOMPATIBLE",
+      "invariants_violated": 1,
+      "counterexamples_count": 2,
+      "concurrency_hazards": 0,
+      "idempotency_failures": 0,
+      "potential_drift": false,
+      "evidence_depth": "SUFFICIENT",
+      "blockers": [
+        {
+          "blocker_id": "blocker-behavior-invariant-violated",
+          "category": "unresolved_incompatible_behavior",
+          "description": "Behavioral proof found 1 invariant violations and 2 counterexamples",
+          "evidence": "Active counterexamples: 2. Violations: 1.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        }
+      ],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  }
+]

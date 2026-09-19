@@ -1,0 +1,623 @@
+[
+  {
+    "outcome": "DEPLOYMENT_NOT_AVAILABLE",
+    "reason": "Physical deployment target unavailable; cannot simulate live promotion",
+    "plan": {
+      "plan_id": "plan-7c2b516d8f47",
+      "candidate_id": "rc-jarvis-01-normal-feature",
+      "steps": [
+        {
+          "step_id": "step-1-prepare",
+          "name": "PREPARE",
+          "status": "COMPLETED",
+          "depends_on": [],
+          "metadata": {
+            "deployment_available": false
+          }
+        },
+        {
+          "step_id": "step-2-verify-pre",
+          "name": "PRE_RELEASE_VERIFY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-1-prepare"
+          ],
+          "metadata": {
+            "deployment_available": false
+          }
+        },
+        {
+          "step_id": "step-3-snapshot",
+          "name": "SNAPSHOT",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-2-verify-pre"
+          ],
+          "metadata": {
+            "deployment_available": false
+          }
+        },
+        {
+          "step_id": "step-4-deploy",
+          "name": "DEPLOY/START",
+          "status": "BLOCKED",
+          "depends_on": [
+            "step-3-snapshot"
+          ],
+          "metadata": {
+            "deployment_available": false
+          }
+        },
+        {
+          "step_id": "step-5-healthcheck",
+          "name": "HEALTHCHECK",
+          "status": "PENDING",
+          "depends_on": [
+            "step-4-deploy"
+          ],
+          "metadata": {
+            "deployment_available": false
+          }
+        },
+        {
+          "step_id": "step-6-canary",
+          "name": "CANARY",
+          "status": "PENDING",
+          "depends_on": [
+            "step-5-healthcheck"
+          ],
+          "metadata": {
+            "deployment_available": false
+          }
+        },
+        {
+          "step_id": "step-7-observe",
+          "name": "OBSERVE",
+          "status": "PENDING",
+          "depends_on": [
+            "step-6-canary"
+          ],
+          "metadata": {
+            "deployment_available": false
+          }
+        },
+        {
+          "step_id": "step-8-verify-post",
+          "name": "VERIFY",
+          "status": "PENDING",
+          "depends_on": [
+            "step-7-observe"
+          ],
+          "metadata": {
+            "deployment_available": false
+          }
+        },
+        {
+          "step_id": "step-9-promote",
+          "name": "PROMOTE",
+          "status": "PENDING",
+          "depends_on": [
+            "step-8-verify-post"
+          ],
+          "metadata": {
+            "deployment_available": false
+          }
+        },
+        {
+          "step_id": "step-10-rollback",
+          "name": "ROLLBACK",
+          "status": "PENDING",
+          "depends_on": [
+            "step-5-healthcheck",
+            "step-6-canary",
+            "step-7-observe",
+            "step-8-verify-post"
+          ],
+          "metadata": {
+            "deployment_available": false
+          }
+        }
+      ],
+      "current_step_index": 3,
+      "status": "DEPLOYMENT_NOT_AVAILABLE",
+      "deployment_available": false,
+      "created_at": "2026-09-19T18:06:26Z"
+    }
+  },
+  {
+    "outcome": "PROMOTED",
+    "plan": {
+      "plan_id": "plan-eb5e308ab088",
+      "candidate_id": "rc-jarvis-02-contract-change",
+      "steps": [
+        {
+          "step_id": "step-1-prepare",
+          "name": "PREPARE",
+          "status": "COMPLETED",
+          "depends_on": [],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-2-verify-pre",
+          "name": "PRE_RELEASE_VERIFY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-1-prepare"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-3-snapshot",
+          "name": "SNAPSHOT",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-2-verify-pre"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-4-deploy",
+          "name": "DEPLOY/START",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-3-snapshot"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-5-healthcheck",
+          "name": "HEALTHCHECK",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-4-deploy"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-6-canary",
+          "name": "CANARY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-5-healthcheck"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-7-observe",
+          "name": "OBSERVE",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-6-canary"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-8-verify-post",
+          "name": "VERIFY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-7-observe"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-9-promote",
+          "name": "PROMOTE",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-8-verify-post"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-10-rollback",
+          "name": "ROLLBACK",
+          "status": "PENDING",
+          "depends_on": [
+            "step-5-healthcheck",
+            "step-6-canary",
+            "step-7-observe",
+            "step-8-verify-post"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        }
+      ],
+      "current_step_index": 9,
+      "status": "COMPLETED",
+      "deployment_available": true,
+      "created_at": "2026-09-19T18:06:26Z"
+    }
+  },
+  {
+    "outcome": "PROMOTED",
+    "plan": {
+      "plan_id": "plan-c658882aa9af",
+      "candidate_id": "rc-jarvis-03-architecture-refactor",
+      "steps": [
+        {
+          "step_id": "step-1-prepare",
+          "name": "PREPARE",
+          "status": "COMPLETED",
+          "depends_on": [],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-2-verify-pre",
+          "name": "PRE_RELEASE_VERIFY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-1-prepare"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-3-snapshot",
+          "name": "SNAPSHOT",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-2-verify-pre"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-4-deploy",
+          "name": "DEPLOY/START",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-3-snapshot"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-5-healthcheck",
+          "name": "HEALTHCHECK",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-4-deploy"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-6-canary",
+          "name": "CANARY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-5-healthcheck"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-7-observe",
+          "name": "OBSERVE",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-6-canary"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-8-verify-post",
+          "name": "VERIFY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-7-observe"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-9-promote",
+          "name": "PROMOTE",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-8-verify-post"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-10-rollback",
+          "name": "ROLLBACK",
+          "status": "PENDING",
+          "depends_on": [
+            "step-5-healthcheck",
+            "step-6-canary",
+            "step-7-observe",
+            "step-8-verify-post"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        }
+      ],
+      "current_step_index": 9,
+      "status": "COMPLETED",
+      "deployment_available": true,
+      "created_at": "2026-09-19T18:06:26Z"
+    }
+  },
+  {
+    "outcome": "PROMOTED",
+    "plan": {
+      "plan_id": "plan-4ab83f6f7dbc",
+      "candidate_id": "rc-jarvis-04-security-sensitive",
+      "steps": [
+        {
+          "step_id": "step-1-prepare",
+          "name": "PREPARE",
+          "status": "COMPLETED",
+          "depends_on": [],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-2-verify-pre",
+          "name": "PRE_RELEASE_VERIFY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-1-prepare"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-3-snapshot",
+          "name": "SNAPSHOT",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-2-verify-pre"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-4-deploy",
+          "name": "DEPLOY/START",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-3-snapshot"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-5-healthcheck",
+          "name": "HEALTHCHECK",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-4-deploy"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-6-canary",
+          "name": "CANARY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-5-healthcheck"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-7-observe",
+          "name": "OBSERVE",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-6-canary"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-8-verify-post",
+          "name": "VERIFY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-7-observe"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-9-promote",
+          "name": "PROMOTE",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-8-verify-post"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-10-rollback",
+          "name": "ROLLBACK",
+          "status": "PENDING",
+          "depends_on": [
+            "step-5-healthcheck",
+            "step-6-canary",
+            "step-7-observe",
+            "step-8-verify-post"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        }
+      ],
+      "current_step_index": 9,
+      "status": "COMPLETED",
+      "deployment_available": true,
+      "created_at": "2026-09-19T18:06:26Z"
+    }
+  },
+  {
+    "outcome": "PROMOTED",
+    "plan": {
+      "plan_id": "plan-47f08072db14",
+      "candidate_id": "rc-jarvis-05-degraded-quality",
+      "steps": [
+        {
+          "step_id": "step-1-prepare",
+          "name": "PREPARE",
+          "status": "COMPLETED",
+          "depends_on": [],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-2-verify-pre",
+          "name": "PRE_RELEASE_VERIFY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-1-prepare"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-3-snapshot",
+          "name": "SNAPSHOT",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-2-verify-pre"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-4-deploy",
+          "name": "DEPLOY/START",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-3-snapshot"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-5-healthcheck",
+          "name": "HEALTHCHECK",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-4-deploy"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-6-canary",
+          "name": "CANARY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-5-healthcheck"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-7-observe",
+          "name": "OBSERVE",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-6-canary"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-8-verify-post",
+          "name": "VERIFY",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-7-observe"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-9-promote",
+          "name": "PROMOTE",
+          "status": "COMPLETED",
+          "depends_on": [
+            "step-8-verify-post"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        },
+        {
+          "step_id": "step-10-rollback",
+          "name": "ROLLBACK",
+          "status": "PENDING",
+          "depends_on": [
+            "step-5-healthcheck",
+            "step-6-canary",
+            "step-7-observe",
+            "step-8-verify-post"
+          ],
+          "metadata": {
+            "deployment_available": true
+          }
+        }
+      ],
+      "current_step_index": 9,
+      "status": "COMPLETED",
+      "deployment_available": true,
+      "created_at": "2026-09-19T18:06:26Z"
+    }
+  }
+]

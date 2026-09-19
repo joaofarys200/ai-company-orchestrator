@@ -1,0 +1,172 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "summary": {
+      "status": "HEALTHY",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": [],
+      "details": {
+        "process_started": true,
+        "healthcheck_ok": true,
+        "readiness_ok": true,
+        "liveness_ok": true,
+        "websocket_ok": true,
+        "dependency_connectivity": true,
+        "database_ok": true,
+        "worker_ready": true,
+        "graceful_shutdown_tested": true,
+        "error_rate": 0.0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      }
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "summary": {
+      "status": "HEALTHY",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": [],
+      "details": {
+        "process_started": true,
+        "healthcheck_ok": true,
+        "readiness_ok": true,
+        "liveness_ok": true,
+        "websocket_ok": true,
+        "dependency_connectivity": true,
+        "database_ok": true,
+        "worker_ready": true,
+        "graceful_shutdown_tested": true,
+        "error_rate": 0.0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      }
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "summary": {
+      "status": "HEALTHY",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": [],
+      "details": {
+        "process_started": true,
+        "healthcheck_ok": true,
+        "readiness_ok": true,
+        "liveness_ok": true,
+        "websocket_ok": true,
+        "dependency_connectivity": true,
+        "database_ok": true,
+        "worker_ready": true,
+        "graceful_shutdown_tested": true,
+        "error_rate": 0.0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      }
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "summary": {
+      "status": "HEALTHY",
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": [],
+      "details": {
+        "process_started": true,
+        "healthcheck_ok": true,
+        "readiness_ok": true,
+        "liveness_ok": true,
+        "websocket_ok": true,
+        "dependency_connectivity": true,
+        "database_ok": true,
+        "worker_ready": true,
+        "graceful_shutdown_tested": true,
+        "error_rate": 0.0,
+        "blockers": [],
+        "requires_human_review": false,
+        "review_reasons": []
+      }
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "summary": {
+      "status": "UNAVAILABLE",
+      "blockers": [
+        {
+          "blocker_id": "blocker-runtime-probe-failed",
+          "category": "critical_health_failure",
+          "description": "Healthcheck or readiness probe endpoint failed",
+          "evidence": "Healthcheck: False, Readiness: False.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        },
+        {
+          "blocker_id": "blocker-runtime-liveness-failed",
+          "category": "critical_health_failure",
+          "description": "Liveness probe returned unhealthy",
+          "evidence": "Process liveness check failed.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        },
+        {
+          "blocker_id": "blocker-runtime-high-error-rate",
+          "category": "critical_health_failure",
+          "description": "Runtime error rate elevated at 12.0%",
+          "evidence": "Observed probe failure rate exceeds 5% threshold.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        }
+      ],
+      "requires_human_review": false,
+      "review_reasons": [],
+      "details": {
+        "process_started": true,
+        "healthcheck_ok": false,
+        "readiness_ok": false,
+        "liveness_ok": false,
+        "websocket_ok": true,
+        "dependency_connectivity": true,
+        "database_ok": true,
+        "worker_ready": true,
+        "graceful_shutdown_tested": true,
+        "error_rate": 0.12,
+        "blockers": [
+          {
+            "blocker_id": "blocker-runtime-probe-failed",
+            "category": "critical_health_failure",
+            "description": "Healthcheck or readiness probe endpoint failed",
+            "evidence": "Healthcheck: False, Readiness: False.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          },
+          {
+            "blocker_id": "blocker-runtime-liveness-failed",
+            "category": "critical_health_failure",
+            "description": "Liveness probe returned unhealthy",
+            "evidence": "Process liveness check failed.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          },
+          {
+            "blocker_id": "blocker-runtime-high-error-rate",
+            "category": "critical_health_failure",
+            "description": "Runtime error rate elevated at 12.0%",
+            "evidence": "Observed probe failure rate exceeds 5% threshold.",
+            "severity": "CRITICAL",
+            "timestamp": "2026-09-19T18:06:26Z"
+          }
+        ],
+        "requires_human_review": false,
+        "review_reasons": []
+      }
+    }
+  }
+]

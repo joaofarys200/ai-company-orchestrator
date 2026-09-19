@@ -1,0 +1,56 @@
+{
+  "study_name": "Phase 70 Autonomous Release Governance Ablation Experiment",
+  "configurations": {
+    "A_build_only": {
+      "configuration": "A_build_only",
+      "candidates_evaluated": 20,
+      "false_releases": 16,
+      "missed_blockers": 16,
+      "human_reviews": 0,
+      "total_evaluation_time_ms": 10.59,
+      "avg_time_per_candidate_ms": 0.53,
+      "evidence_completeness_pct": 10.0,
+      "rollback_readiness_pct": 0.0
+    },
+    "B_build_tests": {
+      "configuration": "B_build_tests",
+      "candidates_evaluated": 20,
+      "false_releases": 14,
+      "missed_blockers": 14,
+      "human_reviews": 0,
+      "total_evaluation_time_ms": 10.98,
+      "avg_time_per_candidate_ms": 0.549,
+      "evidence_completeness_pct": 35.0,
+      "rollback_readiness_pct": 0.0
+    },
+    "C_quality_aware": {
+      "configuration": "C_quality_aware",
+      "candidates_evaluated": 20,
+      "false_releases": 14,
+      "missed_blockers": 14,
+      "human_reviews": 2,
+      "total_evaluation_time_ms": 10.87,
+      "avg_time_per_candidate_ms": 0.543,
+      "evidence_completeness_pct": 60.0,
+      "rollback_readiness_pct": 0.0
+    },
+    "D_full_release_governance": {
+      "configuration": "D_full_release_governance",
+      "candidates_evaluated": 20,
+      "false_releases": 0,
+      "missed_blockers": 0,
+      "human_reviews": 2,
+      "total_evaluation_time_ms": 11.47,
+      "avg_time_per_candidate_ms": 0.573,
+      "evidence_completeness_pct": 100.0,
+      "rollback_readiness_pct": 90.0
+    }
+  },
+  "findings": {
+    "config_A_vs_D": "Configuration A admitted 16 false releases and missed all operational/security blockers.",
+    "config_B_vs_D": "Configuration B detected 2 test failures but admitted 14 operational and security regressions.",
+    "config_C_vs_D": "Configuration C detected quality debt but missed 8 runtime/security/rollback regressions.",
+    "config_D": "Configuration D eliminated false releases across all tested domains with 100% evidence completeness."
+  },
+  "timestamp": "2026-09-19T18:07:04Z"
+}

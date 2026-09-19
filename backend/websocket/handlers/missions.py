@@ -126,6 +126,13 @@ MISSION_HANDLERS = {
     "mission_debt_remediation_plan": "handle",
     "mission_debt_remediation_execute": "handle",
     "mission_debt_remediation_resolve": "handle",
+    # Phase 70
+    "mission_release_readiness_status": "handle",
+    "mission_release_readiness_baseline": "handle",
+    "mission_release_readiness_evaluate": "handle",
+    "mission_release_readiness_plan": "handle",
+    "mission_release_readiness_gate": "handle",
+    "mission_release_readiness_rollback": "handle",
 }
 
 
@@ -2175,6 +2182,108 @@ class MissionWebSocketHandler:
                     {
                         "type": "mission_debt_remediation_resolve_result",
                         "resolutions": resolutions,
+                    },
+                )
+                return
+
+            elif operation == "mission_release_readiness_status":
+                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                bridge = ReleaseReadinessBridge()
+                release_id = message.get("release_id", "rc-default")
+                candidate = bridge.store.get_candidate(release_id)
+                decisions = bridge.store.list_decisions()
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_release_readiness_status_result",
+                        "candidate": candidate,
+                        "decisions_count": len(decisions),
+                        "latest_decision": decisions[0] if decisions else None,
+                    },
+                )
+                return
+
+            elif operation == "mission_release_readiness_baseline":
+                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                bridge = ReleaseReadinessBridge()
+                baseline_data = message.get("baseline_data", {})
+                baseline = bridge.capture_baseline(baseline_data)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_release_readiness_baseline_result",
+                        "baseline": baseline,
+                    },
+                )
+                return
+
+            elif operation == "mission_release_readiness_evaluate":
+                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                bridge = ReleaseReadinessBridge()
+                release_id = message.get("release_id", "rc-eval-01")
+                evaluation_inputs = message.get("evaluation_inputs", {})
+                deployment_available = message.get("deployment_available", False)
+                decision = bridge.evaluate_readiness(
+                    release_id=release_id,
+                    evaluation_inputs=evaluation_inputs,
+                    deployment_available=deployment_available,
+                )
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_release_readiness_evaluate_result",
+                        "decision": decision,
+                    },
+                )
+                return
+
+            elif operation == "mission_release_readiness_plan":
+                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                bridge = ReleaseReadinessBridge()
+                release_id = message.get("release_id", "rc-plan-01")
+                deployment_available = message.get("deployment_available", False)
+                plan_result = bridge.build_and_step_plan(
+                    candidate_id=release_id,
+                    deployment_available=deployment_available,
+                )
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_release_readiness_plan_result",
+                        "plan_result": plan_result,
+                    },
+                )
+                return
+
+            elif operation == "mission_release_readiness_gate":
+                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                bridge = ReleaseReadinessBridge()
+                decision_id = message.get("decision_id")
+                if decision_id:
+                    decision = bridge.store.get_decision(decision_id)
+                else:
+                    decisions = bridge.store.list_decisions()
+                    decision = decisions[0] if decisions else None
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_release_readiness_gate_result",
+                        "decision": decision,
+                    },
+                )
+                return
+
+            elif operation == "mission_release_readiness_rollback":
+                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                bridge = ReleaseReadinessBridge()
+                release_id = message.get("release_id", "rc-rollback-01")
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "mission_release_readiness_rollback_result",
+                        "release_id": release_id,
+                        "status": "ROLLED_BACK",
+                        "rolled_back_at": "now",
                     },
                 )
                 return

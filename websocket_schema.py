@@ -202,6 +202,13 @@ SERVER_MESSAGE_TYPES = {
     "mission_debt_remediation_plan_result",
     "mission_debt_remediation_execute_result",
     "mission_debt_remediation_resolve_result",
+    # Phase 70 Autonomous Release Readiness & Production Governance
+    "mission_release_readiness_status_result",
+    "mission_release_readiness_baseline_result",
+    "mission_release_readiness_evaluate_result",
+    "mission_release_readiness_plan_result",
+    "mission_release_readiness_gate_result",
+    "mission_release_readiness_rollback_result",
 }
 
 
@@ -371,6 +378,13 @@ CLIENT_MESSAGE_TYPES = {
     "mission_debt_remediation_plan",
     "mission_debt_remediation_execute",
     "mission_debt_remediation_resolve",
+    # Phase 70
+    "mission_release_readiness_status",
+    "mission_release_readiness_baseline",
+    "mission_release_readiness_evaluate",
+    "mission_release_readiness_plan",
+    "mission_release_readiness_gate",
+    "mission_release_readiness_rollback",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
@@ -398,6 +412,13 @@ MISSION_CLIENT_REQUIRED_FIELDS = {
     "mission_debt_remediation_plan": (),
     "mission_debt_remediation_execute": (),
     "mission_debt_remediation_resolve": (),
+    # Phase 70
+    "mission_release_readiness_status": (),
+    "mission_release_readiness_baseline": (),
+    "mission_release_readiness_evaluate": (),
+    "mission_release_readiness_plan": (),
+    "mission_release_readiness_gate": (),
+    "mission_release_readiness_rollback": (),
     "mission_multi_agent_coordination_status": (),
     "mission_multi_agent_intent_submit": (),
     "mission_multi_agent_arbitrate": (),

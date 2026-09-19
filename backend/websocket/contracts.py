@@ -163,6 +163,13 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "mission_debt_remediation_plan",
         "mission_debt_remediation_execute",
         "mission_debt_remediation_resolve",
+        # Phase 70
+        "mission_release_readiness_status",
+        "mission_release_readiness_baseline",
+        "mission_release_readiness_evaluate",
+        "mission_release_readiness_plan",
+        "mission_release_readiness_gate",
+        "mission_release_readiness_rollback",
     }
 )
 

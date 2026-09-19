@@ -1,0 +1,300 @@
+[
+  {
+    "baseline_id": "base-f90afa3ce436",
+    "architecture_hash": "arch_hash_0000",
+    "contract_hash": "contract_hash_0000",
+    "behavior_hash": "behavior_hash_0000",
+    "quality_snapshot": {
+      "overall_quality_score": 0.96,
+      "dimensions": {
+        "maintainability": 0.95,
+        "reliability": 0.97
+      },
+      "quality_uncertainty": 0.04
+    },
+    "technical_debt_snapshot": {
+      "critical_security_debt_count": 0,
+      "critical_quality_debt_count": 0,
+      "unresolved_unknown_count": 0,
+      "deferred_debt_count": 1
+    },
+    "test_results": {
+      "total_tests": 626,
+      "passed": 626,
+      "failed": 0,
+      "coverage_pct": 98.4
+    },
+    "security_state": {
+      "sentinel_status": "PASSED",
+      "secrets_detected": 0,
+      "vulnerabilities": 0,
+      "sandbox_violations": 0
+    },
+    "performance_baseline": {
+      "latency_p95_ms": 12.0,
+      "throughput_rps": 1200.0
+    },
+    "runtime_baseline": {
+      "liveness": "OK",
+      "readiness": "OK",
+      "process_state": "RUNNING",
+      "websocket_active": true
+    },
+    "configuration_baseline": {
+      "env_vars_verified": true,
+      "unsafe_defaults_detected": false,
+      "secrets_in_plaintext": false
+    },
+    "dependency_baseline": {
+      "dependencies_resolved": true,
+      "lockfile_consistent": true,
+      "unpinned_count": 0
+    },
+    "observability_baseline": {
+      "structured_logging": true,
+      "error_visibility": true,
+      "telemetry_level": "FULL"
+    },
+    "rollback_baseline": {
+      "rollback_strategy": "TRANSACTIONAL_CHECKPOINT",
+      "checkpoint_verified": true,
+      "can_rollback": true
+    },
+    "captured_at": "2026-09-19T18:06:26Z",
+    "immutable_hash": "b9f999d3b5a3f436f8285be0ac72ea829e5a5b1da493c422f3c752736ed70d52"
+  },
+  {
+    "baseline_id": "base-e385e0e0e062",
+    "architecture_hash": "arch_hash_0000",
+    "contract_hash": "contract_hash_0000",
+    "behavior_hash": "behavior_hash_0000",
+    "quality_snapshot": {
+      "overall_quality_score": 0.94,
+      "dimensions": {
+        "maintainability": 0.93
+      }
+    },
+    "technical_debt_snapshot": {
+      "critical_security_debt_count": 0,
+      "critical_quality_debt_count": 0,
+      "unresolved_unknown_count": 0
+    },
+    "test_results": {
+      "total_tests": 626,
+      "passed": 626,
+      "failed": 0,
+      "coverage_pct": 98.4
+    },
+    "security_state": {
+      "sentinel_status": "PASSED",
+      "secrets_detected": 0,
+      "vulnerabilities": 0,
+      "sandbox_violations": 0
+    },
+    "performance_baseline": {
+      "latency_p95_ms": 12.0
+    },
+    "runtime_baseline": {
+      "liveness": "OK",
+      "readiness": "OK",
+      "process_state": "RUNNING",
+      "websocket_active": true
+    },
+    "configuration_baseline": {
+      "env_vars_verified": true,
+      "unsafe_defaults_detected": false,
+      "secrets_in_plaintext": false
+    },
+    "dependency_baseline": {
+      "dependencies_resolved": true,
+      "lockfile_consistent": true,
+      "unpinned_count": 0
+    },
+    "observability_baseline": {
+      "structured_logging": true,
+      "error_visibility": true,
+      "telemetry_level": "FULL"
+    },
+    "rollback_baseline": {
+      "rollback_strategy": "TRANSACTIONAL_CHECKPOINT",
+      "checkpoint_verified": true,
+      "can_rollback": true
+    },
+    "captured_at": "2026-09-19T18:06:26Z",
+    "immutable_hash": "f290231680aa1c2cec1926ebce5eb34e7545793f2191c8e394761413dc2c928b"
+  },
+  {
+    "baseline_id": "base-8c3ff1ef8dff",
+    "architecture_hash": "arch_hash_0000",
+    "contract_hash": "contract_hash_0000",
+    "behavior_hash": "behavior_hash_0000",
+    "quality_snapshot": {
+      "overall_quality_score": 0.93,
+      "accepted_with_debt": true
+    },
+    "technical_debt_snapshot": {
+      "critical_security_debt_count": 0,
+      "critical_quality_debt_count": 0,
+      "deferred_debt_count": 1,
+      "accepted_with_debt": true
+    },
+    "test_results": {
+      "total_tests": 626,
+      "passed": 626,
+      "failed": 0,
+      "coverage_pct": 98.4
+    },
+    "security_state": {
+      "sentinel_status": "PASSED",
+      "secrets_detected": 0,
+      "vulnerabilities": 0,
+      "sandbox_violations": 0
+    },
+    "performance_baseline": {
+      "latency_p95_ms": 12.0,
+      "memory_mb": 115.0
+    },
+    "runtime_baseline": {
+      "liveness": "OK",
+      "readiness": "OK",
+      "process_state": "RUNNING",
+      "websocket_active": true
+    },
+    "configuration_baseline": {
+      "env_vars_verified": true,
+      "unsafe_defaults_detected": false,
+      "secrets_in_plaintext": false
+    },
+    "dependency_baseline": {
+      "dependencies_resolved": true,
+      "lockfile_consistent": true,
+      "unpinned_count": 0
+    },
+    "observability_baseline": {
+      "structured_logging": true,
+      "error_visibility": true,
+      "telemetry_level": "FULL"
+    },
+    "rollback_baseline": {
+      "rollback_strategy": "TRANSACTIONAL_CHECKPOINT",
+      "checkpoint_verified": true,
+      "can_rollback": true
+    },
+    "captured_at": "2026-09-19T18:06:26Z",
+    "immutable_hash": "313ca9ff1c991a294a99b3c2685595a43769115ef83b29a083ed4a8c4cc5708a"
+  },
+  {
+    "baseline_id": "base-cdea430507cb",
+    "architecture_hash": "arch_hash_0000",
+    "contract_hash": "contract_hash_0000",
+    "behavior_hash": "behavior_hash_0000",
+    "quality_snapshot": {
+      "overall_quality_score": 0.95
+    },
+    "technical_debt_snapshot": {
+      "critical_security_debt_count": 1
+    },
+    "test_results": {
+      "total_tests": 626,
+      "passed": 626,
+      "failed": 0,
+      "coverage_pct": 98.4
+    },
+    "security_state": {
+      "sentinel_status": "PASSED",
+      "secrets_detected": 0,
+      "vulnerabilities": 0,
+      "sandbox_violations": 0
+    },
+    "performance_baseline": {
+      "latency_p95_ms": 12.0
+    },
+    "runtime_baseline": {
+      "liveness": "OK",
+      "readiness": "OK",
+      "process_state": "RUNNING",
+      "websocket_active": true
+    },
+    "configuration_baseline": {
+      "env_vars_verified": true,
+      "unsafe_defaults_detected": false,
+      "secrets_in_plaintext": false
+    },
+    "dependency_baseline": {
+      "dependencies_resolved": true,
+      "lockfile_consistent": true,
+      "unpinned_count": 0
+    },
+    "observability_baseline": {
+      "structured_logging": true,
+      "error_visibility": true,
+      "telemetry_level": "FULL"
+    },
+    "rollback_baseline": {
+      "rollback_strategy": "TRANSACTIONAL_CHECKPOINT",
+      "checkpoint_verified": true,
+      "can_rollback": true
+    },
+    "captured_at": "2026-09-19T18:06:26Z",
+    "immutable_hash": "06777b8edc17685549a6913832ed20ca607c482b6fc4018589a28751612c9f10"
+  },
+  {
+    "baseline_id": "base-882032127641",
+    "architecture_hash": "arch_hash_0000",
+    "contract_hash": "contract_hash_0000",
+    "behavior_hash": "behavior_hash_0000",
+    "quality_snapshot": {
+      "overall_quality_score": 0.62,
+      "dimensions": {
+        "maintainability": 0.55
+      }
+    },
+    "technical_debt_snapshot": {
+      "critical_quality_debt_count": 2
+    },
+    "test_results": {
+      "total_tests": 626,
+      "passed": 626,
+      "failed": 0,
+      "coverage_pct": 98.4
+    },
+    "security_state": {
+      "sentinel_status": "PASSED",
+      "secrets_detected": 0,
+      "vulnerabilities": 0,
+      "sandbox_violations": 0
+    },
+    "performance_baseline": {
+      "latency_p95_ms": 12.0,
+      "memory_mb": 115.0
+    },
+    "runtime_baseline": {
+      "liveness": "OK",
+      "readiness": "OK",
+      "process_state": "RUNNING",
+      "websocket_active": true
+    },
+    "configuration_baseline": {
+      "env_vars_verified": true,
+      "unsafe_defaults_detected": false,
+      "secrets_in_plaintext": false
+    },
+    "dependency_baseline": {
+      "dependencies_resolved": true,
+      "lockfile_consistent": true,
+      "unpinned_count": 0
+    },
+    "observability_baseline": {
+      "structured_logging": true,
+      "error_visibility": true,
+      "telemetry_level": "FULL"
+    },
+    "rollback_baseline": {
+      "rollback_strategy": "TRANSACTIONAL_CHECKPOINT",
+      "checkpoint_verified": true,
+      "can_rollback": true
+    },
+    "captured_at": "2026-09-19T18:06:26Z",
+    "immutable_hash": "d89cfffc87a4d7eb3f6768f17ed0a76599afd610493ef938625e98c5144c7510"
+  }
+]

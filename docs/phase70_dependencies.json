@@ -1,0 +1,77 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "summary": {
+      "status": "READY",
+      "resolvable": true,
+      "unpinned_count": 0,
+      "lockfile_consistent": true,
+      "runtime_available": true,
+      "incompatible_versions": 0,
+      "missing_packages": 0,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "summary": {
+      "status": "READY",
+      "resolvable": true,
+      "unpinned_count": 0,
+      "lockfile_consistent": true,
+      "runtime_available": true,
+      "incompatible_versions": 0,
+      "missing_packages": 0,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "summary": {
+      "status": "READY",
+      "resolvable": true,
+      "unpinned_count": 0,
+      "lockfile_consistent": true,
+      "runtime_available": true,
+      "incompatible_versions": 0,
+      "missing_packages": 0,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "summary": {
+      "status": "READY",
+      "resolvable": true,
+      "unpinned_count": 0,
+      "lockfile_consistent": true,
+      "runtime_available": true,
+      "incompatible_versions": 0,
+      "missing_packages": 0,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "summary": {
+      "status": "READY",
+      "resolvable": true,
+      "unpinned_count": 0,
+      "lockfile_consistent": true,
+      "runtime_available": true,
+      "incompatible_versions": 0,
+      "missing_packages": 0,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  }
+]

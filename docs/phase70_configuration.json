@@ -1,0 +1,89 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "summary": {
+      "status": "READY",
+      "missing_required_vars_count": 0,
+      "unsafe_defaults": false,
+      "secret_refs_valid": true,
+      "prod_dev_divergence": false,
+      "debug_mode_enabled": false,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "summary": {
+      "status": "READY",
+      "missing_required_vars_count": 0,
+      "unsafe_defaults": false,
+      "secret_refs_valid": true,
+      "prod_dev_divergence": false,
+      "debug_mode_enabled": false,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "summary": {
+      "status": "READY",
+      "missing_required_vars_count": 0,
+      "unsafe_defaults": false,
+      "secret_refs_valid": true,
+      "prod_dev_divergence": false,
+      "debug_mode_enabled": false,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "summary": {
+      "status": "READY",
+      "missing_required_vars_count": 0,
+      "unsafe_defaults": false,
+      "secret_refs_valid": true,
+      "prod_dev_divergence": false,
+      "debug_mode_enabled": false,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "summary": {
+      "status": "UNSAFE",
+      "missing_required_vars_count": 1,
+      "unsafe_defaults": true,
+      "secret_refs_valid": true,
+      "prod_dev_divergence": false,
+      "debug_mode_enabled": false,
+      "blockers": [
+        {
+          "blocker_id": "blocker-cfg-unsafe",
+          "category": "unsafe_configuration",
+          "description": "Unsafe configuration detected: insecure default settings detected;",
+          "evidence": "Configuration security evaluation failed safety invariants (sanitized).",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        },
+        {
+          "blocker_id": "blocker-cfg-missing-vars",
+          "category": "unsafe_configuration",
+          "description": "Required environment variables missing (1 missing)",
+          "evidence": "Missing variable names (keys only): VAULT_KEY",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        }
+      ],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  }
+]

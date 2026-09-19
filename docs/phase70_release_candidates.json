@@ -1,0 +1,97 @@
+[
+  {
+    "release_id": "rc-jarvis-01-normal-feature",
+    "mission_id": "mission-jarvis-f70",
+    "commit_sha": "a17f8b90c12e",
+    "workspace_snapshot": "ws_snap_f70_feature",
+    "artifact_hashes": {},
+    "version": "1.1.0",
+    "environment": "production",
+    "created_at": "2026-09-19T18:06:26Z",
+    "provenance": {
+      "entity_id": "rc-jarvis-01-normal-feature",
+      "entity_type": "ReleaseCandidate",
+      "content_hash": "9cc6886ae2a57f60d0e409f89efd19952ea7615b7c5b4bc1b982da1fcbb705e0",
+      "parent_hash": "",
+      "provenance_hash": "2453fbb6571d4be8df1c4b5945c5fd9b3e94e43db12c1fdcabea0697a602ea15",
+      "hash_algorithm": "SHA-256"
+    },
+    "state": "CREATED"
+  },
+  {
+    "release_id": "rc-jarvis-02-contract-change",
+    "mission_id": "mission-jarvis-f70",
+    "commit_sha": "c39d8e12fa4b",
+    "workspace_snapshot": "ws_snap_f70_contract",
+    "artifact_hashes": {},
+    "version": "1.2.0-rc1",
+    "environment": "production",
+    "created_at": "2026-09-19T18:06:26Z",
+    "provenance": {
+      "entity_id": "rc-jarvis-02-contract-change",
+      "entity_type": "ReleaseCandidate",
+      "content_hash": "b029bdf47f7c23df6d682bc9aef832ae368f768697a7f2d4e52bde9dd1bf7807",
+      "parent_hash": "",
+      "provenance_hash": "7f1d6305710a03087ab8a4c2420b0e21fea92750ff3b7b57ba619d52c97ec9b2",
+      "hash_algorithm": "SHA-256"
+    },
+    "state": "CREATED"
+  },
+  {
+    "release_id": "rc-jarvis-03-architecture-refactor",
+    "mission_id": "mission-jarvis-f70",
+    "commit_sha": "e55a019b882c",
+    "workspace_snapshot": "ws_snap_f70_arch",
+    "artifact_hashes": {},
+    "version": "1.2.0",
+    "environment": "production",
+    "created_at": "2026-09-19T18:06:26Z",
+    "provenance": {
+      "entity_id": "rc-jarvis-03-architecture-refactor",
+      "entity_type": "ReleaseCandidate",
+      "content_hash": "3d443bfba02bf43a17fa089ea9f14a417667a7435a796d9f778f930c8c1d8739",
+      "parent_hash": "",
+      "provenance_hash": "aca59aaaf5af27f06df131a928f57f7803fc89f249227222e45ee4a2f9ed54e7",
+      "hash_algorithm": "SHA-256"
+    },
+    "state": "CREATED"
+  },
+  {
+    "release_id": "rc-jarvis-04-security-sensitive",
+    "mission_id": "mission-jarvis-f70",
+    "commit_sha": "b88124cd5190",
+    "workspace_snapshot": "ws_snap_f70_sec",
+    "artifact_hashes": {},
+    "version": "1.2.1-sec",
+    "environment": "production",
+    "created_at": "2026-09-19T18:06:26Z",
+    "provenance": {
+      "entity_id": "rc-jarvis-04-security-sensitive",
+      "entity_type": "ReleaseCandidate",
+      "content_hash": "45decc15fe244bfacf077953458d66b9f9bc5e21062e1e9f239d279d808414ac",
+      "parent_hash": "",
+      "provenance_hash": "47253c65053cae75694925e0e326133546634c5d06b4a6b8999d9b8004c69695",
+      "hash_algorithm": "SHA-256"
+    },
+    "state": "CREATED"
+  },
+  {
+    "release_id": "rc-jarvis-05-degraded-quality",
+    "mission_id": "mission-jarvis-f70",
+    "commit_sha": "d09411fa771a",
+    "workspace_snapshot": "ws_snap_f70_degraded",
+    "artifact_hashes": {},
+    "version": "1.2.2-degraded",
+    "environment": "production",
+    "created_at": "2026-09-19T18:06:26Z",
+    "provenance": {
+      "entity_id": "rc-jarvis-05-degraded-quality",
+      "entity_type": "ReleaseCandidate",
+      "content_hash": "304952f744c34e3b2931c9290a228b8051d6bb6cabc47c8b4eca5f0c51a9eb07",
+      "parent_hash": "",
+      "provenance_hash": "f7c3b1342e8d48d44c2238381bcb78188cd9b1ecedd3c51f8ed6a948079b78bd",
+      "hash_algorithm": "SHA-256"
+    },
+    "state": "CREATED"
+  }
+]

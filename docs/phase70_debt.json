@@ -1,0 +1,90 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "summary": {
+      "status": "READY_WITH_RISK",
+      "critical_security_debts": 0,
+      "critical_quality_debts": 0,
+      "unresolved_unknowns": 0,
+      "deferred_debt_count": 1,
+      "accepted_with_debt": false,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "summary": {
+      "status": "READY",
+      "critical_security_debts": 0,
+      "critical_quality_debts": 0,
+      "unresolved_unknowns": 0,
+      "deferred_debt_count": 0,
+      "accepted_with_debt": false,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "summary": {
+      "status": "READY_WITH_RISK",
+      "critical_security_debts": 0,
+      "critical_quality_debts": 0,
+      "unresolved_unknowns": 0,
+      "deferred_debt_count": 1,
+      "accepted_with_debt": true,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "summary": {
+      "status": "BLOCKED",
+      "critical_security_debts": 1,
+      "critical_quality_debts": 0,
+      "unresolved_unknowns": 0,
+      "deferred_debt_count": 0,
+      "accepted_with_debt": false,
+      "blockers": [
+        {
+          "blocker_id": "blocker-debt-critical-security",
+          "category": "critical_security_violation",
+          "description": "Candidate blocked by 1 critical security technical debts",
+          "evidence": "Active security debt items: 1 require remediation before release.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        }
+      ],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "summary": {
+      "status": "BLOCKED",
+      "critical_security_debts": 0,
+      "critical_quality_debts": 2,
+      "unresolved_unknowns": 0,
+      "deferred_debt_count": 0,
+      "accepted_with_debt": false,
+      "blockers": [
+        {
+          "blocker_id": "blocker-debt-critical-quality",
+          "category": "quality_gate_blocked",
+          "description": "Candidate blocked by 2 critical quality debts",
+          "evidence": "Active quality debt items: 2 breach release budget thresholds.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        }
+      ],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  }
+]

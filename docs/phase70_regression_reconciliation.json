@@ -1,0 +1,327 @@
+{
+  "suite": "Phases 40 to 70 Regression Suite",
+  "source_runner": "scripts/run_regression_phases_40_70.py",
+  "timestamp": 1789841352.7943,
+  "duration_seconds": 22.0,
+  "per_phase": {
+    "Phase 40 (Autonomous Engineering Loop)": 22,
+    "Phase 41 (Decision Calibration & Quality)": 23,
+    "Phase 42 (Engineering Experience Memory)": 17,
+    "Phase 43 (Cross-Mission Generalization)": 22,
+    "Phase 44 (Semantic Contract Graph)": 8,
+    "Phase 45 (Runtime Contract Discovery)": 10,
+    "Phase 46 (Contract Drift Governance)": 17,
+    "Phase 47 (Polymorphic Contract Governance)": 29,
+    "Phase 48 (Contract-Aware Change Management)": 12,
+    "Phase 49 (Build-Time Contract Extraction)": 20,
+    "Phase 50 (Behavioral Contract Proof)": 22,
+    "Phase 51 (Behavioral Proof Exploration)": 24,
+    "Phase 52 (Risk-Directed Boundary Exploration)": 24,
+    "Phase 54 (Verified Repair Synthesis)": 24,
+    "Phase 55 (Multi-Repair Orchestration)": 22,
+    "Phase 57 (Autonomous Task Completion & Zero False Success)": 28,
+    "Phase 58 (Massive Project State & Incremental Monorepo Graph)": 24,
+    "Phase 59 (SCC-Aware Large Scale Dependency Graph)": 24,
+    "Phase 60 (Symbol-Level Fine-Grained Dependency Graph)": 25,
+    "Phase 61 (Autonomous Test Synthesis & Coverage Expansion)": 25,
+    "Phase 62 (Continuous Verification & Regression Prevention)": 40,
+    "Phase 63 (Cross-Project Learning & Repository Adaptation)": 40,
+    "Phase 64 (Autonomous Architecture Evolution & Refactoring)": 20,
+    "Phase 65 (Safe Self-Modification & Transactional Code Engine)": 20,
+    "Phase 66 (Multi-Agent Swarm Coordination & Task Arbitration)": 20,
+    "Phase 67 (Long-Horizon Mission Autonomy & State Management)": 20,
+    "Phase 68 (Engineering Quality Governance & Autonomous Quality Debt Management)": 22,
+    "Phase 69 (Autonomous Quality Debt Remediation & Continuous Engineering Improvement)": 22,
+    "Phase 70 (Autonomous Release Readiness & Production Governance)": 22
+  },
+  "computed_total": 648,
+  "reported_total": 648,
+  "failed_total": 0,
+  "delta": 0,
+  "valid": true,
+  "previous_reported_total": 626,
+  "current_replayed_total": 648,
+  "delta_from_previous": 22,
+  "historical_regression_drift_detected": false,
+  "historical_regression_drift": "NONE",
+  "phase_results": {
+    "Phase 40 (Autonomous Engineering Loop)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_autonomous_loop_models.py",
+        "tests/test_autonomous_loop_policy.py",
+        "tests/test_autonomous_loop_controller.py"
+      ]
+    },
+    "Phase 41 (Decision Calibration & Quality)": {
+      "passed": 23,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_decision_replay.py",
+        "tests/test_decision_outcome.py",
+        "tests/test_decision_error_classification.py",
+        "tests/test_autonomous_decision_engine.py",
+        "tests/test_policy_registry.py",
+        "tests/test_policy_sandbox.py",
+        "tests/test_policy_proposal.py",
+        "tests/test_policy_safety_regression.py",
+        "tests/test_policy_shadow.py",
+        "tests/test_policy_rollback.py"
+      ]
+    },
+    "Phase 42 (Engineering Experience Memory)": {
+      "passed": 17,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_experience_memory.py",
+        "tests/test_experience_signature.py",
+        "tests/test_experience_retrieval.py",
+        "tests/test_experience_applicability.py",
+        "tests/test_experience_reuse.py",
+        "tests/test_experience_conflicts.py",
+        "tests/test_experience_security.py"
+      ]
+    },
+    "Phase 43 (Cross-Mission Generalization)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_memory_transfer.py",
+        "tests/test_memory_generalization.py",
+        "tests/test_memory_conflicts.py",
+        "tests/test_memory_incremental_index.py",
+        "tests/test_memory_temporal_validity.py",
+        "tests/test_memory_temporal_leakage.py",
+        "tests/test_memory_architecture_compatibility.py",
+        "tests/test_memory_policy_compatibility.py",
+        "tests/test_memory_harm.py"
+      ]
+    },
+    "Phase 44 (Semantic Contract Graph)": {
+      "passed": 8,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_semantic_graph.py",
+        "tests/test_semantic_graph_incremental.py",
+        "tests/test_semantic_graph_contract_update.py"
+      ]
+    },
+    "Phase 45 (Runtime Contract Discovery)": {
+      "passed": 10,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_schema_inference.py",
+        "tests/test_consumer_impact.py",
+        "tests/test_consumer_break_detection.py"
+      ]
+    },
+    "Phase 46 (Contract Drift Governance)": {
+      "passed": 17,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_drift_classification.py",
+        "tests/test_drift_predictive_integration.py",
+        "tests/test_drift_policy.py",
+        "tests/test_drift_rollback.py",
+        "tests/test_drift_environment.py",
+        "tests/test_drift_incremental.py",
+        "tests/test_drift_security.py"
+      ]
+    },
+    "Phase 47 (Polymorphic Contract Governance)": {
+      "passed": 29,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_polymorphic_schema.py",
+        "tests/test_polymorphic_diff.py",
+        "tests/test_union_compatibility.py",
+        "tests/test_variant_detection.py",
+        "tests/test_polymorphic_consumers.py",
+        "tests/test_polymorphic_contract_change.py",
+        "tests/test_polymorphic_incremental.py",
+        "tests/test_polymorphic_drift.py",
+        "tests/test_polymorphic_security.py"
+      ]
+    },
+    "Phase 48 (Contract-Aware Change Management)": {
+      "passed": 12,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_contract_change_analyzer.py",
+        "tests/test_contract_diff.py",
+        "tests/test_contract_evolution.py",
+        "tests/test_migration_plan.py"
+      ]
+    },
+    "Phase 49 (Build-Time Contract Extraction)": {
+      "passed": 20,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_build_contract_extraction.py"
+      ]
+    },
+    "Phase 50 (Behavioral Contract Proof)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_behavioral_contract_proof.py"
+      ]
+    },
+    "Phase 51 (Behavioral Proof Exploration)": {
+      "passed": 24,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_behavioral_proof_exploration.py"
+      ]
+    },
+    "Phase 52 (Risk-Directed Boundary Exploration)": {
+      "passed": 24,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_risk_directed_exploration.py"
+      ]
+    },
+    "Phase 54 (Verified Repair Synthesis)": {
+      "passed": 24,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_verified_repair_synthesis.py"
+      ]
+    },
+    "Phase 55 (Multi-Repair Orchestration)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_multi_repair_orchestration.py"
+      ]
+    },
+    "Phase 57 (Autonomous Task Completion & Zero False Success)": {
+      "passed": 28,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_autonomous_task_completion.py"
+      ]
+    },
+    "Phase 58 (Massive Project State & Incremental Monorepo Graph)": {
+      "passed": 24,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_massive_project_state.py"
+      ]
+    },
+    "Phase 59 (SCC-Aware Large Scale Dependency Graph)": {
+      "passed": 24,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_scc_aware_graph.py"
+      ]
+    },
+    "Phase 60 (Symbol-Level Fine-Grained Dependency Graph)": {
+      "passed": 25,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_symbol_fine_grained_graph.py"
+      ]
+    },
+    "Phase 61 (Autonomous Test Synthesis & Coverage Expansion)": {
+      "passed": 25,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_autonomous_test_synthesis.py"
+      ]
+    },
+    "Phase 62 (Continuous Verification & Regression Prevention)": {
+      "passed": 40,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_continuous_verification.py"
+      ]
+    },
+    "Phase 63 (Cross-Project Learning & Repository Adaptation)": {
+      "passed": 40,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_cross_project_learning.py"
+      ]
+    },
+    "Phase 64 (Autonomous Architecture Evolution & Refactoring)": {
+      "passed": 20,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_architecture_evolution.py"
+      ]
+    },
+    "Phase 65 (Safe Self-Modification & Transactional Code Engine)": {
+      "passed": 20,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_safe_self_modification.py"
+      ]
+    },
+    "Phase 66 (Multi-Agent Swarm Coordination & Task Arbitration)": {
+      "passed": 20,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_multi_agent_coordination.py"
+      ]
+    },
+    "Phase 67 (Long-Horizon Mission Autonomy & State Management)": {
+      "passed": 20,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_long_horizon_missions.py"
+      ]
+    },
+    "Phase 68 (Engineering Quality Governance & Autonomous Quality Debt Management)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_engineering_quality_governance.py"
+      ]
+    },
+    "Phase 69 (Autonomous Quality Debt Remediation & Continuous Engineering Improvement)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_quality_debt_remediation.py"
+      ]
+    },
+    "Phase 70 (Autonomous Release Readiness & Production Governance)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_release_readiness.py"
+      ]
+    }
+  }
+}

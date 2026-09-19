@@ -1,0 +1,91 @@
+[
+  {
+    "candidate_id": "rc-jarvis-01-normal-feature",
+    "summary": {
+      "status": "ROLLBACK_READY",
+      "snapshot_available": true,
+      "artifacts_available": true,
+      "db_rollback_strategy": "AVAILABLE",
+      "config_rollback_supported": true,
+      "migration_reversible": true,
+      "checkpoint_verified": true,
+      "drill_tested": true,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-02-contract-change",
+    "summary": {
+      "status": "ROLLBACK_READY",
+      "snapshot_available": true,
+      "artifacts_available": true,
+      "db_rollback_strategy": "AVAILABLE",
+      "config_rollback_supported": true,
+      "migration_reversible": true,
+      "checkpoint_verified": true,
+      "drill_tested": true,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-03-architecture-refactor",
+    "summary": {
+      "status": "ROLLBACK_READY",
+      "snapshot_available": true,
+      "artifacts_available": true,
+      "db_rollback_strategy": "AVAILABLE",
+      "config_rollback_supported": true,
+      "migration_reversible": true,
+      "checkpoint_verified": true,
+      "drill_tested": true,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-04-security-sensitive",
+    "summary": {
+      "status": "ROLLBACK_READY",
+      "snapshot_available": true,
+      "artifacts_available": true,
+      "db_rollback_strategy": "AVAILABLE",
+      "config_rollback_supported": true,
+      "migration_reversible": true,
+      "checkpoint_verified": true,
+      "drill_tested": true,
+      "blockers": [],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  },
+  {
+    "candidate_id": "rc-jarvis-05-degraded-quality",
+    "summary": {
+      "status": "ROLLBACK_BLOCKED",
+      "snapshot_available": true,
+      "artifacts_available": true,
+      "db_rollback_strategy": "AVAILABLE",
+      "config_rollback_supported": true,
+      "migration_reversible": true,
+      "checkpoint_verified": false,
+      "drill_tested": true,
+      "blockers": [
+        {
+          "blocker_id": "blocker-rb-unverified-checkpoint",
+          "category": "missing_rollback_when_required",
+          "description": "Mandatory rollback recovery checkpoint is unverified",
+          "evidence": "Pre-release state checkpoint has not been validated for restoration.",
+          "severity": "CRITICAL",
+          "timestamp": "2026-09-19T18:06:26Z"
+        }
+      ],
+      "requires_human_review": false,
+      "review_reasons": []
+    }
+  }
+]
