@@ -27,6 +27,8 @@ import {
 export interface MissionControlCenterProps {
   onOpenInCode?: (filePath: string, line?: number) => void;
   onOpenArchitecture?: () => void;
+  onBackToList?: () => void;
+  activeMissionId?: string | null;
 }
 
 export type ScenarioKey = 'INTERACTIVE' | 'NORMAL' | 'REPAIR' | 'REPLAN' | 'RECOVERY' | 'BLOCKED';
@@ -250,6 +252,8 @@ export type MissionPrimarySection = 'overview' | 'tasks' | 'agents' | 'activity'
 export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   onOpenInCode,
   onOpenArchitecture,
+  onBackToList,
+  activeMissionId,
 }) => {
   const {
     missionControlState,
@@ -265,6 +269,15 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   const [selectedScenario, setSelectedScenario] = useState<ScenarioKey>('INTERACTIVE');
   const [missionState, setMissionState] = useState<MissionControlStateData>(FALLBACK_INTERACTIVE_STATE);
   const [activeViewSection, setActiveViewSection] = useState<MissionPrimarySection>('overview');
+
+  useEffect(() => {
+    if (activeMissionId) {
+      setMissionState((prev) => ({
+        ...prev,
+        mission_id: activeMissionId,
+      }));
+    }
+  }, [activeMissionId]);
 
   // Interactive Control UI state
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -555,6 +568,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
           clearMissionControlCommandResult();
         }}
         onOpenArchitecture={onOpenArchitecture}
+        onBackToList={onBackToList}
       >
         <MissionControlActions
           status={missionState.status}

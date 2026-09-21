@@ -592,7 +592,7 @@ export function MissionPlanner() {
           {missions.map((mission) => <option key={mission.mission_id} value={mission.mission_id}>{mission.title}</option>)}
         </select>
         <button onClick={() => setCreateMissionOpen(true)} className={ICON_BUTTON} title="Criar missão"><Plus className="h-4 w-4" /></button>
-        <button onClick={getMissions} className={ICON_BUTTON} title="Atualizar missões"><RefreshCw className="h-4 w-4" /></button>
+        <button onClick={() => getMissions()} className={ICON_BUTTON} title="Atualizar missões"><RefreshCw className="h-4 w-4" /></button>
       </div>
 
       {!missionSnapshot ? (

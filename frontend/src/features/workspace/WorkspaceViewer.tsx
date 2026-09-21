@@ -43,7 +43,7 @@ import {
 } from 'lucide-react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import { MissionPlanner } from '../planner';
-import { MissionUnderstandingView, MissionTimelineView, CheckpointTimelineView, RealUserMissionView, MissionControlCenter } from '../missions';
+import { MissionUnderstandingView, MissionTimelineView, CheckpointTimelineView, RealUserMissionView, MissionControlCenter, MissionListView } from '../missions';
 import { LecturesPanel } from '../lectures/LecturesPanel';
 import { SentinelDashboard } from '../sentinel/SentinelDashboard';
 import { Modal } from '../../components/Modal';
@@ -254,12 +254,14 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     applyCodingSession,
     rollbackCodingSession,
     architectureSnapshot,
+    openMission,
   } = useWebSocket();
 
   const [activeTab, setActiveTab] = useState<TabType>('kanban');
   const [selectedFile, setSelectedFile] = useState('');
   const [selectedLine, setSelectedLine] = useState<number | undefined>(undefined);
   const [previewKey, setPreviewKey] = useState(0);
+  const [viewingMissionControlId, setViewingMissionControlId] = useState<string | null>(null);
   const [noteSearch, setNoteSearch] = useState('');
   const [selectedNoteName, setSelectedNoteName] = useState('');
   const [editNoteContent, setEditNoteContent] = useState('');
@@ -306,7 +308,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
       ? 'code'
       : activeTab === 'preview' || activeTab === 'terminal'
         ? 'run'
-        : activeTab === 'planner'
+        : ['mission_control', 'real_user_missions', 'mission_understanding', 'mission_timeline', 'checkpoint_timeline', 'planner'].includes(activeTab)
           ? 'missions'
           : activeTab === 'lectures'
             ? 'learning'
@@ -1078,7 +1080,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                     <h4 className="text-sm font-semibold text-white">Preview Não Iniciado</h4>
                     <p className="max-w-sm text-xs text-gray-500">Inicie a execução do projeto para visualizar a aplicação em tempo real.</p>
                     <button
-                      onClick={runProject}
+                      onClick={() => runProject()}
                       disabled={isProjectRunning || !projectContext}
                       className={`${BUTTON_BASE} border-emerald-400/30 bg-emerald-400/10 text-emerald-200 hover:bg-emerald-400/20`}
                     >
@@ -1099,7 +1101,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                   <h3 className="text-sm font-semibold text-gray-100">Consola</h3>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={runProject} disabled={isProjectRunning || !projectContext} className={`${BUTTON_BASE} border-emerald-400/25 bg-emerald-400/10 text-emerald-200 hover:bg-emerald-400/15`}>
+                  <button onClick={() => runProject()} disabled={isProjectRunning || !projectContext} className={`${BUTTON_BASE} border-emerald-400/25 bg-emerald-400/10 text-emerald-200 hover:bg-emerald-400/15`}>
                     <Play className="h-4 w-4" />
                     <span>Iniciar</span>
                   </button>
@@ -1585,16 +1587,34 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
 
           {activeTab === 'mission_control' && (
             <ViewFrame key="mission_control" className="overflow-hidden">
-              <MissionControlCenter
-                onOpenInCode={(filePath, line) => {
-                  setSelectedFile(filePath);
-                  if (line !== undefined) setSelectedLine(line);
-                  setActiveTab('files');
-                }}
-                onOpenArchitecture={() => {
-                  setActiveTab('architecture');
-                }}
-              />
+              {viewingMissionControlId ? (
+                <MissionControlCenter
+                  activeMissionId={viewingMissionControlId}
+                  onBackToList={() => setViewingMissionControlId(null)}
+                  onOpenInCode={(filePath, line) => {
+                    setSelectedFile(filePath);
+                    if (line !== undefined) setSelectedLine(line);
+                    setActiveTab('files');
+                  }}
+                  onOpenArchitecture={() => {
+                    setActiveTab('architecture');
+                  }}
+                />
+              ) : (
+                <MissionListView
+                  selectedProjectId={projectContext?.project_id}
+                  onSelectProject={(pId) => {
+                    if (pId !== 'ALL') openProject(pId);
+                  }}
+                  onOpenMission={(mId, pId) => {
+                    if (pId && pId !== projectContext?.project_id) {
+                      openProject(pId);
+                    }
+                    openMission(mId);
+                    setViewingMissionControlId(mId);
+                  }}
+                />
+              )}
             </ViewFrame>
           )}
 

@@ -62,6 +62,11 @@ class StaleVersionError(MissionStateError):
     pass
 
 
+class ProjectContextMissingError(MissionStateError):
+    """Raised when project context is missing or invalid for a mission."""
+    pass
+
+
 @dataclass
 class Mission:
     mission_id: str
@@ -78,6 +83,12 @@ class Mission:
     progress: float = 0.0
     metadata: dict[str, Any] = field(default_factory=dict)
     version: int = 1
+    project_name: str = ""
+    project_path: str = ""
+    execution_id: str = "exec_001"
+    current_stage: str = "UNDERSTANDING"
+    last_event_at: float = 0.0
+    last_event_sequence: int = 0
 
 
 @dataclass
@@ -166,8 +177,10 @@ class MissionStateStore:
         workspace_root: str = ".",
         lock_timeout_seconds: float = 5.0,
         storage_backend: str | None = None,
+        project_context: Any = None,
     ):
         self.workspace_root = os.path.realpath(os.path.abspath(workspace_root))
+        self.project_context = project_context
         self.projects_root = os.path.join(self.workspace_root, "workspace", "projects")
         self.metadata_root = os.path.join(self.workspace_root, "workspace", ".jarvis", "projects")
         self.lock_timeout_seconds = lock_timeout_seconds
@@ -192,11 +205,43 @@ class MissionStateStore:
         current_phase: str = "",
         metadata: dict[str, Any] | None = None,
         mission_id: str | None = None,
+        project_name: str | None = None,
+        project_path: str | None = None,
+        execution_id: str | None = None,
     ) -> dict[str, Any]:
+        if not project_id or not str(project_id).strip():
+            raise ProjectContextMissingError("PROJECT_CONTEXT_MISSING: project_id é obrigatório.")
         project_id = self._validate_project(project_id)
+
+        # Resolve project_name and project_path canonically from ProjectContext
+        resolved_name = str(project_name or "").strip()
+        resolved_path = str(project_path or "").strip()
+        if not resolved_name or not resolved_path:
+            try:
+                from intelligence.project_context import ProjectContextService
+                ctx_service = ProjectContextService(self.workspace_root)
+                ctx = ctx_service.load_context(project_id)
+                if not resolved_name:
+                    resolved_name = ctx.project_name
+                if not resolved_path:
+                    resolved_path = ctx.root_path
+            except Exception:
+                p_dir = os.path.join(self.projects_root, project_id)
+                if os.path.isdir(p_dir):
+                    if not resolved_name:
+                        resolved_name = project_id
+                    if not resolved_path:
+                        resolved_path = f"workspace/projects/{project_id}"
+                else:
+                    raise ProjectContextMissingError(
+                        f"PROJECT_CONTEXT_MISSING: O projeto '{project_id}' não existe no ProjectContext."
+                    )
+
         title = self._required_text(title, "title")
         objective = self._required_text(objective, "objective")
         mission_id = self._validate_id(mission_id or uuid.uuid4().hex, "mission_id")
+        exec_id = str(execution_id or f"exec_{uuid.uuid4().hex[:8]}").strip()
+
         mission_dir = self._mission_dir(project_id, mission_id)
         if os.path.exists(mission_dir) and (
             os.path.isfile(os.path.join(mission_dir, "mission.json"))
@@ -207,6 +252,7 @@ class MissionStateStore:
         for name in ("work_packages", "deliverables", "evidence", "criteria", "executions"):
             os.makedirs(os.path.join(mission_dir, name), exist_ok=True)
         now = utc_now()
+        now_ts = time.time()
         mission = Mission(
             mission_id=mission_id,
             project_id=project_id,
@@ -217,33 +263,118 @@ class MissionStateStore:
             metadata=self._metadata(metadata),
             created_at=now,
             updated_at=now,
+            project_name=resolved_name,
+            project_path=resolved_path,
+            execution_id=exec_id,
+            current_stage="UNDERSTANDING",
+            last_event_at=now_ts,
+            last_event_sequence=1,
         )
         self._write_entity(self._mission_path(project_id, mission_id), mission)
         self.persistence.save_mission(project_id, mission_id, asdict(mission))
         self._append_event(project_id, mission_id, "MISSION", mission_id, "MISSION_CREATED", 0, 1, {
             "title": title,
             "objective": objective,
+            "project_id": project_id,
+            "project_name": resolved_name,
+            "execution_id": exec_id,
         })
+        return self.load_mission(project_id, mission_id)
+
+    def delete_mission(self, project_id: str, mission_id: str) -> bool:
+        project_id = self._validate_project(project_id)
+        mission_data = self.load_mission(project_id, mission_id)
+        m_record = mission_data.get("mission") if (isinstance(mission_data, dict) and "mission" in mission_data) else mission_data
+        status = str(m_record.get("status") or "").upper()
+        if status in {"RUNNING", "CANCELLING", "PLANNING", "REPAIRING", "VALIDATING"}:
+            raise MissionStateError(
+                f"Nao e possivel remover a missao '{mission_id}' com estado '{status}'. "
+                f"Pare a execucao antes de a remover do historico."
+            )
+
+        # Remove from persistence
+        try:
+            self.persistence.delete_mission(project_id, mission_id)
+        except Exception:
+            pass
+
+        # Remove from disk
+        mission_dir = self._mission_dir(project_id, mission_id)
+        if os.path.isdir(mission_dir):
+            shutil.rmtree(mission_dir, ignore_errors=True)
+
+        return True
+
+    def update_mission_progress(
+        self,
+        project_id: str,
+        mission_id: str,
+        progress: float,
+        current_stage: str | None = None,
+        status: str | None = None,
+    ) -> dict[str, Any]:
+        with self._locked_mission(project_id, mission_id):
+            mission = self._load_mission_entity(project_id, mission_id)
+            mission.progress = max(0.0, min(100.0, float(progress)))
+            if current_stage:
+                mission.current_stage = str(current_stage).strip()
+            if status:
+                mission.status = str(status).strip()
+            mission.last_event_at = time.time()
+            mission.last_event_sequence = (mission.last_event_sequence or 0) + 1
+            now = utc_now()
+            self._touch(mission, now)
+            self._write_entity(self._mission_path(project_id, mission_id), mission)
+            self.persistence.save_mission(project_id, mission_id, asdict(mission))
         return self.load_mission(project_id, mission_id)
 
     def list_missions(self, project_id: str) -> list[dict[str, Any]]:
         project_id = self._validate_project(project_id)
         persisted = self.persistence.list_missions(project_id)
-        if persisted:
-            return persisted
-        root = self._missions_root(project_id)
-        if not os.path.isdir(root):
-            return []
         missions: list[dict[str, Any]] = []
-        for entry in sorted(os.scandir(root), key=lambda item: item.name.lower()):
-            if not entry.is_dir() or not ID_PATTERN.fullmatch(entry.name):
-                continue
-            try:
-                mission = Mission(**self._read_json(os.path.join(entry.path, "mission.json")))
-                missions.append(asdict(mission))
-            except (MissionStateError, TypeError):
-                continue
+        if persisted:
+            missions = persisted
+        else:
+            root = self._missions_root(project_id)
+            if os.path.isdir(root):
+                for entry in sorted(os.scandir(root), key=lambda item: item.name.lower()):
+                    if not entry.is_dir() or not ID_PATTERN.fullmatch(entry.name):
+                        continue
+                    try:
+                        mission = Mission(**self._read_json(os.path.join(entry.path, "mission.json")))
+                        missions.append(asdict(mission))
+                    except (MissionStateError, TypeError):
+                        continue
+
+        # Canonical project context resolution fallback
+        for m in missions:
+            if not m.get("project_name"):
+                try:
+                    from intelligence.project_context import ProjectContextService
+                    ctx = ProjectContextService(self.workspace_root).load_context(project_id)
+                    m["project_name"] = ctx.project_name
+                    m["project_path"] = ctx.root_path
+                except Exception:
+                    m["project_name"] = project_id
+                    m["project_path"] = f"workspace/projects/{project_id}"
+            if not m.get("execution_id"):
+                m["execution_id"] = "exec_001"
+            if not m.get("current_stage"):
+                m["current_stage"] = "UNDERSTANDING"
+
         return sorted(missions, key=lambda item: item.get("updated_at", ""), reverse=True)
+
+    def list_all_missions(self) -> list[dict[str, Any]]:
+        all_missions: list[dict[str, Any]] = []
+        if os.path.isdir(self.metadata_root):
+            for entry in os.scandir(self.metadata_root):
+                if entry.is_dir() and PROJECT_ID_PATTERN.fullmatch(entry.name):
+                    try:
+                        p_missions = self.list_missions(entry.name)
+                        all_missions.extend(p_missions)
+                    except Exception:
+                        continue
+        return sorted(all_missions, key=lambda item: item.get("updated_at", ""), reverse=True)
 
     def load_mission(self, project_id: str, mission_id: str) -> dict[str, Any]:
         project_id = self._validate_project(project_id)
@@ -271,6 +402,21 @@ class MissionStateStore:
         if mission.project_id != project_id or mission.mission_id != mission_id:
             raise MissionStateError("A identidade persistida da missao nao corresponde ao caminho.")
 
+        # Ensure canonical project info is present
+        if not mission.project_name:
+            try:
+                from intelligence.project_context import ProjectContextService
+                ctx = ProjectContextService(self.workspace_root).load_context(project_id)
+                mission.project_name = ctx.project_name
+                mission.project_path = ctx.root_path
+            except Exception:
+                mission.project_name = project_id
+                mission.project_path = f"workspace/projects/{project_id}"
+        if not mission.execution_id:
+            mission.execution_id = "exec_001"
+        if not mission.current_stage:
+            mission.current_stage = "UNDERSTANDING"
+
         work_packages = self._load_entities(project_id, mission_id, "work_packages", WorkPackage)
         deliverables = self._load_entities(project_id, mission_id, "deliverables", Deliverable)
         evidence = self._load_entities(project_id, mission_id, "evidence", Evidence)
@@ -278,7 +424,7 @@ class MissionStateStore:
         executions = self._load_raw_entities(project_id, mission_id, "executions", "execution_id")
         self._validate_dag(work_packages)
         effective_packages = self._effective_work_packages(work_packages)
-        progress = self._progress(effective_packages)
+        progress = self._progress(effective_packages) if work_packages else mission.progress
         m_dict = asdict(mission)
         m_dict["progress"] = progress
         sorted_packages = sorted(
@@ -1205,8 +1351,8 @@ class MissionStateStore:
 
     def _validate_project(self, project_id: str) -> str:
         clean = str(project_id or "").strip()
-        if not PROJECT_ID_PATTERN.fullmatch(clean):
-            raise MissionStateError("project_id invalido.")
+        if not clean or not PROJECT_ID_PATTERN.fullmatch(clean):
+            raise ProjectContextMissingError(f"PROJECT_CONTEXT_MISSING: project_id inválido ou ausente: '{clean}'.")
         if "obsidian" in clean.lower() or clean.lower() in {"sandbox", "sandbox_dir"}:
             raise MissionStateError("Este diretorio nao pode ser usado por Mission State.")
         root = os.path.realpath(os.path.join(self.projects_root, clean))
@@ -1215,7 +1361,7 @@ class MissionStateStore:
         except ValueError:
             inside = False
         if not inside or not os.path.isdir(root):
-            raise MissionStateError(f"Projeto '{clean}' nao existe em workspace/projects.")
+            raise ProjectContextMissingError(f"PROJECT_CONTEXT_MISSING: Projeto '{clean}' nao existe em workspace/projects.")
         return clean
 
     @staticmethod

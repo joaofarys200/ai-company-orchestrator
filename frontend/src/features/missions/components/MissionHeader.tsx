@@ -9,7 +9,6 @@ import {
   ChevronDown,
   Sparkles,
   Network,
-  Activity,
 } from 'lucide-react';
 import type { MissionControlStateData, MissionControlStatus } from '../../../protocol/websocket';
 
@@ -28,6 +27,7 @@ interface MissionHeaderProps {
   lastCommandFeedback: { status: string; reason: string; timestamp: number } | null;
   onDismissFeedback: () => void;
   onOpenArchitecture?: () => void;
+  onBackToList?: () => void;
   children?: React.ReactNode;
 }
 
@@ -39,6 +39,7 @@ export const MissionHeader: React.FC<MissionHeaderProps> = ({
   lastCommandFeedback,
   onDismissFeedback,
   onOpenArchitecture,
+  onBackToList,
   children,
 }) => {
   const [scenarioMenuOpen, setScenarioMenuOpen] = useState(false);
@@ -110,12 +111,26 @@ export const MissionHeader: React.FC<MissionHeaderProps> = ({
       {/* 1. TOP UTILITY ROW: BREADCRUMB & DEMO SCENARIO SELECTOR */}
       <div className="mb-2.5 flex items-center justify-between gap-3 text-xs text-gray-400">
         <div className="flex items-center gap-2">
-          <Activity className="h-3.5 w-3.5 text-cyan-400" />
-          <span className="font-semibold text-gray-300">Missões</span>
+          {onBackToList && (
+            <button
+              type="button"
+              onClick={onBackToList}
+              className="mr-1 inline-flex items-center gap-1 rounded border border-white/10 bg-white/[0.04] px-2 py-0.5 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/10 hover:border-cyan-500/30"
+              title="Voltar à lista de missões"
+            >
+              ← Missões
+            </button>
+          )}
+          <span className="font-semibold text-gray-400">Projeto:</span>
+          <span className="rounded bg-white/[0.06] px-1.5 py-0.5 font-medium text-cyan-300 border border-white/5">
+            {missionState.project_name || missionState.project_id || 'task-app'}
+          </span>
           <span className="text-gray-600">/</span>
-          <span className="font-mono text-gray-400">{missionState.mission_id}</span>
+          <span className="font-medium text-white">
+            {missionState.interpreted_goal || missionState.mission_id}
+          </span>
           <span className="text-gray-600">·</span>
-          <span className="text-[11px] text-gray-500">v{missionState.mission_version || 1}</span>
+          <span className="font-mono text-[10px] text-gray-500">{missionState.mission_id}</span>
         </div>
 
         {/* Subtle Demo Scenario Picker */}

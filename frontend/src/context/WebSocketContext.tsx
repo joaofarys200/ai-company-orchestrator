@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import { missionRuntimeStore } from '../features/missions/stores/missionRuntimeStore';
 import {
   normalizeServerMessage,
   type ActiveTemplate,
@@ -41,6 +42,24 @@ import {
   type MissionIntentResultMessage,
 } from '../protocol/websocket';
 
+export interface ProjectFileSaveState {
+  ok: boolean;
+  filename: string;
+  sha256: string;
+  error: string;
+}
+
+export interface SafetyRefusalData {
+  is_allowed: boolean;
+  status: string;
+  category: string;
+  policy_rule: string;
+  reason: string;
+  sanitized_intent: string;
+  request_id: string;
+  timestamp: string;
+}
+
 declare global {
   interface Window {
     jarvisIPC?: {
@@ -65,24 +84,6 @@ export type {
   Task,
   TemplateSuggestion,
 } from '../protocol/websocket';
-
-export interface ProjectFileSaveState {
-  ok: boolean;
-  filename: string;
-  sha256: string;
-  error: string;
-}
-
-export interface SafetyRefusalData {
-  is_allowed: boolean;
-  status: string;
-  category: string;
-  policy_rule: string;
-  reason: string;
-  sanitized_intent: string;
-  request_id: string;
-  timestamp: string;
-}
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -111,7 +112,7 @@ interface WebSocketContextType {
   sendDirective: (text: string) => void;
   selectTemplate: (templateName: string) => void;
   toggleVoice: (active: boolean) => void;
-  runProject: () => void;
+  runProject: (projectId?: string) => void;
   stopProject: () => void;
   clearChat: () => void;
   notes: string[];
@@ -131,8 +132,10 @@ interface WebSocketContextType {
   missions: MissionData[];
   missionSnapshot: MissionSnapshot | null;
   architectureSnapshot: ArchitectureSnapshot | null;
-  getMissions: () => void;
+  getMissions: (projectId?: string) => void;
   openMission: (missionId: string) => void;
+  deleteMission: (missionId: string, projectId?: string) => void;
+  cancelMissionExecution: (missionId: string, executionId: string, projectId?: string) => void;
   sendMissionOperation: (operation: MissionClientOperation) => void;
   subdagHistory: ExpansionRecord[];
   getSubDagHistory: (missionId: string) => void;
@@ -583,9 +586,19 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         break;
       case 'mission_list':
         setMissions(msg.missions);
+        missionRuntimeStore.setMissions(msg.missions);
         break;
       case 'mission_snapshot':
         setMissionSnapshot(msg.data);
+        missionRuntimeStore.setMissionSnapshot(msg.data);
+        break;
+      case 'mission_event':
+        missionRuntimeStore.applyEvent(msg.event, (pId, mId) => {
+          sendClientMessage({ type: 'mission_resume_snapshot', project_id: pId, mission_id: mId });
+        });
+        break;
+      case 'mission_deleted':
+        missionRuntimeStore.removeMission(msg.mission_id);
         break;
       case 'mission_subdag_history':
         setSubdagHistory(msg.history);
@@ -820,6 +833,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.log('[WebSocket] Connected');
       setIsConnected(true);
       setSystemStatus('ONLINE');
+      missionRuntimeStore.setConnectionState('CONNECTED');
       if (reconnectTimeoutRef.current) {
         window.clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
@@ -832,6 +846,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           ws.send(JSON.stringify({ type: 'get_notes' } satisfies ClientMessage));
           ws.send(JSON.stringify({ type: 'get_rules' } satisfies ClientMessage));
           ws.send(JSON.stringify({ type: 'get_planner_state' } satisfies ClientMessage));
+          ws.send(JSON.stringify({ type: 'mission_list', project_id: 'ALL' } satisfies ClientMessage));
         }
       }, 50);
 
@@ -852,6 +867,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
       setIsConnected(false);
       setSystemStatus('OFFLINE');
+      missionRuntimeStore.setConnectionState(shouldReconnectRef.current ? 'RECONNECTING' : 'OFFLINE');
       setVoiceStatus('offline');
       setIsProjectRunning(false);
 
@@ -995,19 +1011,68 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [isReady, sendClientMessage]);
 
-  const getMissions = useCallback(() => {
-    if (isReady() && projectContext?.project_id) {
-      sendClientMessage({ type: 'mission_list', project_id: projectContext.project_id });
+  const getMissions = useCallback((projectId?: string) => {
+    if (isReady()) {
+      const pid = projectId || projectContext?.project_id || 'ALL';
+      sendClientMessage({ type: 'mission_list', project_id: pid });
     }
   }, [isReady, projectContext?.project_id, sendClientMessage]);
 
-  const openMission = useCallback((missionId: string) => {
-    if (isReady() && projectContext?.project_id && missionId) {
-      sendClientMessage({ type: 'mission_resume_snapshot', project_id: projectContext.project_id, mission_id: missionId });
-      sendClientMessage({ type: 'mission_subdag_get_history', project_id: projectContext.project_id, mission_id: missionId });
-      sendClientMessage({ type: 'mission_adaptation_get_history', project_id: projectContext.project_id, mission_id: missionId });
+  const openMission = useCallback((missionId: string, projectId?: string) => {
+    const pid = projectId || projectContext?.project_id;
+    if (isReady() && pid && missionId) {
+      missionRuntimeStore.setSelectedMissionId(missionId);
+      sendClientMessage({ type: 'mission_resume_snapshot', project_id: pid, mission_id: missionId });
+      sendClientMessage({ type: 'mission_subdag_get_history', project_id: pid, mission_id: missionId });
+      sendClientMessage({ type: 'mission_adaptation_get_history', project_id: pid, mission_id: missionId });
     }
   }, [isReady, projectContext?.project_id, sendClientMessage]);
+
+  const deleteMission = useCallback(
+    (missionId: string, projectId?: string) => {
+      const pid = projectId || projectContext?.project_id || '';
+      if (isReady() && pid && missionId) {
+        sendClientMessage({
+          type: 'mission_delete',
+          project_id: pid,
+          mission_id: missionId,
+          confirmation: true,
+        });
+        missionRuntimeStore.removeMission(missionId);
+      }
+    },
+    [isReady, projectContext?.project_id, sendClientMessage]
+  );
+
+  const cancelMissionExecution = useCallback(
+    (missionId: string, executionId: string, projectId?: string) => {
+      const pid = projectId || projectContext?.project_id || '';
+      if (isReady() && pid && missionId) {
+        missionRuntimeStore.recordCancelStart(missionId);
+        sendClientMessage({
+          type: 'mission_cancel_execution',
+          project_id: pid,
+          mission_id: missionId,
+          execution_id: executionId,
+          expected_execution_version: 1,
+          confirmed: true,
+        });
+      }
+    },
+    [isReady, projectContext?.project_id, sendClientMessage]
+  );
+
+  useEffect(() => {
+    missionRuntimeStore.registerGapRecoveryHandler((pId, mId) => {
+      sendClientMessage({ type: 'mission_resume_snapshot', project_id: pId, mission_id: mId });
+    });
+  }, [sendClientMessage]);
+
+  useEffect(() => {
+    if (projectContext?.project_id) {
+      missionRuntimeStore.setFilterProjectId(projectContext.project_id);
+    }
+  }, [projectContext?.project_id]);
 
   const getSubDagHistory = useCallback((missionId: string) => {
     if (isReady() && projectContext?.project_id && missionId) {
@@ -1487,6 +1552,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         getPlannerState,
         getMissions,
         openMission,
+        deleteMission,
+        cancelMissionExecution,
         sendMissionOperation,
         subdagHistory,
         getSubDagHistory,

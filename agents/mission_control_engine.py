@@ -1305,6 +1305,12 @@ class MissionControlState:
     last_prediction_report: Optional[dict[str, Any]] = None
     last_prediction_outcome: Optional[dict[str, Any]] = None
     prediction_history: list[dict[str, Any]] = field(default_factory=list)
+    project_id: str = "project_default"
+    project_name: str = "Default Project"
+    project_path: str = ""
+    execution_id: str = "exec_default"
+    last_event_at: float = 0.0
+    last_event_sequence: int = 0
 
     def can_complete(self) -> bool:
         return bool(self.execution_success and self.requirement_satisfaction and self.validation_evidence)
@@ -1357,6 +1363,12 @@ class MissionControlState:
     def to_dict(self) -> dict[str, Any]:
         return {
             "mission_id": self.mission_id,
+            "project_id": self.project_id,
+            "project_name": self.project_name,
+            "project_path": self.project_path,
+            "execution_id": self.execution_id,
+            "last_event_at": self.last_event_at,
+            "last_event_sequence": self.last_event_sequence,
             "user_goal": self.user_goal,
             "interpreted_goal": self.interpreted_goal,
             "status": self.status.value,
@@ -1818,6 +1830,19 @@ class MissionControlEngine:
             outcome_reason = command.reason or "Missão retomada pelo operador; agendamento e leases reativados."
 
         elif cmd_type == CommandType.CANCEL:
+            req_exec_id = command.payload.get("execution_id")
+            if req_exec_id and target_state.execution_id and req_exec_id != target_state.execution_id:
+                res = CommandResult(
+                    command_id=command.command_id,
+                    mission_id=target_state.mission_id,
+                    status=CommandStatus.REJECTED,
+                    reason=f"EXECUTION_MISMATCH: execution_id '{req_exec_id}' não corresponde à execução ativa '{target_state.execution_id}'.",
+                    mission_version=target_state.mission_version,
+                    state_dict=target_state.to_dict(),
+                )
+                cls._processed_commands[idemp_key] = res
+                return res
+
             ok, err = validate_state_transition(target_state.status, MissionControlStatus.CANCELLING)
             if not ok:
                 res = CommandResult(

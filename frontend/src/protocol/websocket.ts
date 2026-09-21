@@ -121,6 +121,12 @@ export interface MissionData {
   progress: number;
   metadata: Record<string, unknown>;
   version: number;
+  project_name?: string;
+  project_path?: string;
+  execution_id?: string;
+  current_stage?: string;
+  last_event_at?: number;
+  last_event_sequence?: number;
 }
 
 export interface MissionWorkPackage {
@@ -355,6 +361,7 @@ export interface MissionSnapshot {
 export type MissionClientOperation =
   | { type: 'mission_list'; project_id: string }
   | { type: 'mission_create'; project_id: string; title: string; objective: string; description?: string; current_phase?: string; metadata?: Record<string, unknown> }
+  | { type: 'mission_delete'; project_id: string; mission_id: string; execution_id?: string; confirmation?: boolean }
   | { type: 'mission_get' | 'mission_resume_snapshot'; project_id: string; mission_id: string }
   | { type: 'mission_update'; project_id: string; mission_id: string; expected_version: number; changes: Record<string, unknown> }
   | { type: 'mission_set_status'; project_id: string; mission_id: string; expected_version: number; status: string }
@@ -733,6 +740,28 @@ export interface MissionListMessage {
 export interface MissionSnapshotMessage {
   type: 'mission_snapshot';
   data: MissionSnapshot | null;
+}
+
+export interface CanonicalMissionEvent {
+  event_id: string;
+  event_type: string;
+  mission_id: string;
+  project_id: string;
+  execution_id: string;
+  sequence: number;
+  timestamp: number;
+  payload: Record<string, unknown>;
+}
+
+export interface MissionEventMessage {
+  type: 'mission_event';
+  event: CanonicalMissionEvent;
+}
+
+export interface MissionDeletedMessage {
+  type: 'mission_deleted';
+  mission_id: string;
+  project_id: string;
 }
 
 export interface AstStateMessage {
@@ -1186,6 +1215,8 @@ export type ServerMessage =
   | MissionIntentPreviewResultMessage
   | MissionIntentResultMessage
   | MissionSnapshotMessage
+  | MissionEventMessage
+  | MissionDeletedMessage
   | AstStateMessage
   | ArchitectureSnapshotMessage
   | ProjectsListMessage
@@ -1376,6 +1407,12 @@ const normalizeMission = (value: Record<string, unknown>): MissionData => ({
   progress: asNumber(value.progress),
   metadata: isRecord(value.metadata) ? value.metadata : {},
   version: asNumber(value.version, 1),
+  project_name: asString(value.project_name) || (isRecord(value.metadata) && typeof value.metadata.project_name === 'string' ? value.metadata.project_name : undefined),
+  project_path: asString(value.project_path) || (isRecord(value.metadata) && typeof value.metadata.project_path === 'string' ? value.metadata.project_path : undefined),
+  execution_id: asString(value.execution_id) || (isRecord(value.metadata) && typeof value.metadata.execution_id === 'string' ? value.metadata.execution_id : undefined),
+  current_stage: asString(value.current_stage) || (isRecord(value.metadata) && typeof value.metadata.current_stage === 'string' ? value.metadata.current_stage : undefined),
+  last_event_at: typeof value.last_event_at === 'number' ? value.last_event_at : (isRecord(value.metadata) && typeof value.metadata.last_event_at === 'number' ? (value.metadata.last_event_at as number) : undefined),
+  last_event_sequence: typeof value.last_event_sequence === 'number' ? value.last_event_sequence : (isRecord(value.metadata) && typeof value.metadata.last_event_sequence === 'number' ? (value.metadata.last_event_sequence as number) : undefined),
 });
 
 const normalizeMissionSnapshot = (value: unknown): MissionSnapshot | null => {
@@ -1713,6 +1750,37 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
       return { type, project_id: asString(raw.project_id), missions: asRecordArray(raw.missions).map(normalizeMission) };
     case 'mission_snapshot':
       return { type, data: normalizeMissionSnapshot(raw.data) };
+    case 'mission_event':
+      return {
+        type: 'mission_event',
+        event: isRecord(raw.event)
+          ? {
+              event_id: asString(raw.event.event_id),
+              event_type: asString(raw.event.event_type),
+              mission_id: asString(raw.event.mission_id),
+              project_id: asString(raw.event.project_id),
+              execution_id: asString(raw.event.execution_id),
+              sequence: asNumber(raw.event.sequence),
+              timestamp: asNumber(raw.event.timestamp),
+              payload: isRecord(raw.event.payload) ? (raw.event.payload as Record<string, unknown>) : {},
+            }
+          : {
+              event_id: '',
+              event_type: '',
+              mission_id: '',
+              project_id: '',
+              execution_id: '',
+              sequence: 0,
+              timestamp: Date.now(),
+              payload: {},
+            },
+      };
+    case 'mission_deleted':
+      return {
+        type: 'mission_deleted',
+        mission_id: asString(raw.mission_id),
+        project_id: asString(raw.project_id),
+      };
     case 'ast_state':
       return { type, data: normalizeAst(raw.data) };
     case 'architecture_snapshot':
@@ -2245,6 +2313,10 @@ export interface MissionControlArtifactData {
 
 export interface MissionControlStateData {
   mission_id: string;
+  project_id?: string;
+  project_name?: string;
+  project_path?: string;
+  execution_id?: string;
   user_goal: string;
   interpreted_goal: string;
   status: MissionControlStatus;

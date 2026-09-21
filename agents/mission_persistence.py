@@ -62,6 +62,10 @@ class MissionStatePersistence(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def delete_mission(self, project_id: str, mission_id: str) -> None:
+        pass
+
+    @abc.abstractmethod
     def save_work_package(self, project_id: str, mission_id: str, wp_data: dict[str, Any]) -> None:
         pass
 
@@ -351,6 +355,11 @@ class SQLiteMissionPersistence(MissionStatePersistence):
             """)
 
     def save_mission(self, project_id: str, mission_id: str, mission_data: dict[str, Any]) -> None:
+        meta = dict(mission_data.get("metadata", {}))
+        for canonical_field in ("project_name", "project_path", "execution_id", "current_stage", "last_event_at", "last_event_sequence"):
+            if canonical_field in mission_data and mission_data[canonical_field] is not None:
+                meta[canonical_field] = mission_data[canonical_field]
+
         with self._connection(project_id, mission_id) as conn:
             with conn:
                 conn.execute("""
@@ -380,7 +389,7 @@ class SQLiteMissionPersistence(MissionStatePersistence):
                     mission_data.get("status", "DRAFT"),
                     mission_data.get("current_phase", ""),
                     float(mission_data.get("progress", 0.0)),
-                    json.dumps(mission_data.get("metadata", {}), ensure_ascii=False),
+                    json.dumps(meta, ensure_ascii=False),
                     mission_data.get("created_at", ""),
                     mission_data.get("updated_at", ""),
                     mission_data.get("started_at"),
@@ -395,7 +404,15 @@ class SQLiteMissionPersistence(MissionStatePersistence):
                 return None
             data = dict(row)
             data["metadata"] = json.loads(data.pop("metadata_json") or "{}")
+            for canonical_field in ("project_name", "project_path", "execution_id", "current_stage", "last_event_at", "last_event_sequence"):
+                if canonical_field in data["metadata"]:
+                    data[canonical_field] = data["metadata"][canonical_field]
             return data
+
+    def delete_mission(self, project_id: str, mission_id: str) -> None:
+        mission_dir = os.path.join(self.metadata_root, project_id, "missions", mission_id)
+        if os.path.isdir(mission_dir):
+            shutil.rmtree(mission_dir, ignore_errors=True)
 
     def list_missions(self, project_id: str) -> list[dict[str, Any]]:
         root = os.path.join(self.metadata_root, project_id, "missions")
@@ -1066,6 +1083,11 @@ class ShardedFilesystemPersistence(MissionStatePersistence):
             return None
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
+
+    def delete_mission(self, project_id: str, mission_id: str) -> None:
+        mission_dir = self._mission_dir(project_id, mission_id)
+        if os.path.isdir(mission_dir):
+            shutil.rmtree(mission_dir, ignore_errors=True)
 
     def list_missions(self, project_id: str) -> list[dict[str, Any]]:
         root = os.path.join(self.metadata_root, project_id, "missions")

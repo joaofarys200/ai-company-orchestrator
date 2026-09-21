@@ -97,10 +97,21 @@ class WebSocketResponder:
         websocket: Any,
         project_id: str,
     ) -> None:
-        missions = await asyncio.to_thread(
-            self.mission_planner.list_missions,
-            project_id,
-        )
+        if not project_id or str(project_id).strip().upper() in ("ALL", "*"):
+            if hasattr(self.mission_planner, "list_all_missions"):
+                missions = await asyncio.to_thread(
+                    self.mission_planner.list_all_missions
+                )
+            else:
+                missions = await asyncio.to_thread(
+                    self.mission_planner.list_missions,
+                    project_id,
+                )
+        else:
+            missions = await asyncio.to_thread(
+                self.mission_planner.list_missions,
+                project_id,
+            )
         await self.connections.send(
             websocket,
             {

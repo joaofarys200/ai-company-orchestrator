@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-09-21 23:50:40",
+  "browser": "Microsoft Edge (msedge.exe)",
+  "edge_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "frontend_url": "http://localhost:8000",
+  "backend_url": "ws://127.0.0.1:8001",
+  "screenshots": {
+    "01_mission_list_view.png": "C:\\Users\\joaor\\.gemini\\antigravity-ide\\brain\\d91618ab-c0e2-4b2a-9a96-cf22d1b77843\\01_mission_list_view.png",
+    "02_mission_control_header.png": "C:\\Users\\joaor\\.gemini\\antigravity-ide\\brain\\d91618ab-c0e2-4b2a-9a96-cf22d1b77843\\02_mission_control_header.png",
+    "03_mission_stop_action.png": "C:\\Users\\joaor\\.gemini\\antigravity-ide\\brain\\d91618ab-c0e2-4b2a-9a96-cf22d1b77843\\03_mission_stop_action.png",
+    "04_mission_remove_modal.png": "C:\\Users\\joaor\\.gemini\\antigravity-ide\\brain\\d91618ab-c0e2-4b2a-9a96-cf22d1b77843\\04_mission_remove_modal.png",
+    "05_mission_removed_success.png": "C:\\Users\\joaor\\.gemini\\antigravity-ide\\brain\\d91618ab-c0e2-4b2a-9a96-cf22d1b77843\\05_mission_removed_success.png"
+  },
+  "horizontal_scroll_detected": false,
+  "console_errors_count": 0,
+  "page_errors_count": 0,
+  "console_errors": [],
+  "status": "PASS"
+}

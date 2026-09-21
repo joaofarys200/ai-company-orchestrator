@@ -17,6 +17,7 @@ from backend.websocket.handlers.common import WebSocketResponder
 MISSION_HANDLERS = {
     "mission_list": "handle",
     "mission_create": "handle",
+    "mission_delete": "handle",
     "mission_get": "handle",
     "mission_update": "handle",
     "mission_set_status": "handle",
@@ -405,6 +406,23 @@ class MissionWebSocketHandler:
                     ),
                 )
             elif operation == "mission_cancel_execution":
+                mid = message.get("mission_id")
+                exec_id = message.get("execution_id") or ""
+                # 1. Emit cancel_requested event immediately
+                cancel_req_event = {
+                    "event_id": f"evt_cr_{uuid.uuid4().hex[:8]}",
+                    "event_type": "mission.cancel_requested",
+                    "mission_id": mid,
+                    "project_id": project_id,
+                    "execution_id": exec_id,
+                    "sequence": int(message.get("expected_execution_version") or 1),
+                    "timestamp": time.time(),
+                    "payload": {"status": "CANCELLING", "reason": message.get("reason", "Cancel requested by user")},
+                }
+                await self.connections.broadcast({
+                    "type": "mission_event",
+                    "event": cancel_req_event,
+                })
                 snapshot = await asyncio.to_thread(
                     executor.cancel_execution,
                     project_id,
@@ -415,6 +433,46 @@ class MissionWebSocketHandler:
                     ),
                     bool(message.get("confirmed")),
                 )
+                # 2. Emit cancelled and status_changed event
+                cancelled_event = {
+                    "event_id": f"evt_can_{uuid.uuid4().hex[:8]}",
+                    "event_type": "mission.cancelled",
+                    "mission_id": mid,
+                    "project_id": project_id,
+                    "execution_id": exec_id,
+                    "sequence": int(message.get("expected_execution_version") or 1) + 1,
+                    "timestamp": time.time(),
+                    "payload": {"status": "CANCELLED", "progress": snapshot.get("mission", {}).get("progress", 0.0) if isinstance(snapshot, dict) else 0.0},
+                }
+                await self.connections.broadcast({
+                    "type": "mission_event",
+                    "event": cancelled_event,
+                })
+            elif operation == "mission_delete":
+                mid = message.get("mission_id")
+                await asyncio.to_thread(planner.delete_mission, project_id, mid)
+                del_event = {
+                    "event_id": f"evt_del_{uuid.uuid4().hex[:8]}",
+                    "event_type": "mission.deleted",
+                    "mission_id": mid,
+                    "project_id": project_id,
+                    "execution_id": message.get("execution_id", ""),
+                    "sequence": 0,
+                    "timestamp": time.time(),
+                    "payload": {"status": "REMOVED", "mission_id": mid},
+                }
+                await self.connections.broadcast({
+                    "type": "mission_event",
+                    "event": del_event,
+                })
+                await self.connections.broadcast({
+                    "type": "mission_deleted",
+                    "mission_id": mid,
+                    "project_id": project_id,
+                })
+                # Refresh mission list for all connected clients
+                await self.responder.send_mission_list(websocket, project_id)
+                return
             elif operation == "mission_release_stale_lock":
                 snapshot = await asyncio.to_thread(
                     executor.release_stale_lock,
@@ -2559,6 +2617,41 @@ class MissionWebSocketHandler:
                     "data": snapshot,
                 },
             )
+            # Emit canonical mission event for real-time stream
+            if isinstance(snapshot, dict) and "mission" in snapshot:
+                m_obj = snapshot["mission"]
+                m_status = m_obj.get("status")
+                evt_type = "mission.created" if operation == "mission_create" else "mission.updated"
+                if m_status == "COMPLETED":
+                    evt_type = "mission.completed"
+                elif m_status == "FAILED":
+                    evt_type = "mission.failed"
+                elif m_status == "CANCELLED":
+                    evt_type = "mission.cancelled"
+                elif m_status == "RUNNING":
+                    evt_type = "mission.execution_progress"
+
+                canon_evt = {
+                    "event_id": f"evt_{uuid.uuid4().hex[:8]}",
+                    "event_type": evt_type,
+                    "mission_id": m_obj.get("mission_id"),
+                    "project_id": project_id,
+                    "execution_id": m_obj.get("execution_id", ""),
+                    "sequence": int(m_obj.get("last_event_sequence") or 1),
+                    "timestamp": time.time(),
+                    "payload": {
+                        "status": m_status,
+                        "progress": float(m_obj.get("progress", 0.0)),
+                        "current_stage": m_obj.get("current_stage", ""),
+                        "project_name": m_obj.get("project_name", ""),
+                        "title": m_obj.get("title", ""),
+                    },
+                }
+                await self.connections.broadcast({
+                    "type": "mission_event",
+                    "event": canon_evt,
+                })
+
             await self.responder.send_mission_list(
                 websocket,
                 project_id,

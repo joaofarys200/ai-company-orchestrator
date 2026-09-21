@@ -38,6 +38,7 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "get_coding_session",
         "mission_list",
         "mission_create",
+        "mission_delete",
         "mission_get",
         "mission_update",
         "mission_set_status",
