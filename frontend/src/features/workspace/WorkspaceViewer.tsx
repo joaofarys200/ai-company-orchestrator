@@ -91,8 +91,8 @@ const SECONDARY_TABS: Record<WorkspaceSection, Array<{ id: TabType; label: strin
     { id: 'terminal', label: 'Consola', icon: Terminal },
   ],
   missions: [
-    { id: 'mission_control', label: 'Mission Control Center (Fase 35)', icon: LayoutDashboard },
-    { id: 'real_user_missions', label: 'Real User Missions (Fase 34)', icon: Sparkles },
+    { id: 'mission_control', label: 'Mission Control Center', icon: LayoutDashboard },
+    { id: 'real_user_missions', label: 'Missões de Utilizador', icon: Sparkles },
     { id: 'mission_understanding', label: 'Mission Understanding', icon: Brain },
     { id: 'mission_timeline', label: 'Timeline de Execução', icon: GitCommit },
     { id: 'checkpoint_timeline', label: 'Checkpoints & State', icon: Database },

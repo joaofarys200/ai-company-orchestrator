@@ -45,3 +45,7 @@ export { QualityDebtRemediationPanel } from './QualityDebtRemediationPanel';
 export { ReleaseReadinessPanel } from './ReleaseReadinessPanel';
 export { ProductionOperationsPanel } from './ProductionOperationsPanel';
 export { ReliabilityIntelligencePanel } from './ReliabilityIntelligencePanel';
+export { MissionTasksView } from './MissionTasksView';
+export { MissionAgentsView } from './MissionAgentsView';
+export { MissionActivityView } from './MissionActivityView';
+export { MissionDiagnosticsView } from './MissionDiagnosticsView';

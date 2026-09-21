@@ -1,0 +1,93 @@
+{
+  "timestamp": 1790003960.0165806,
+  "browser": "Microsoft Edge",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "views_tested": [
+    {
+      "view": "overview",
+      "label": "Vis\u00e3o geral",
+      "scroll_check": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "innerWidth": 1440,
+        "hasOverflow": false
+      },
+      "screenshot": "01_overview.png"
+    },
+    {
+      "view": "tasks",
+      "label": "Tarefas",
+      "tasks_count": 4,
+      "scroll_check": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "innerWidth": 1440,
+        "hasOverflow": false
+      },
+      "screenshot": "02_tasks_with_drawer.png"
+    },
+    {
+      "view": "agents",
+      "label": "Agentes",
+      "scroll_check": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "innerWidth": 1440,
+        "hasOverflow": false
+      },
+      "screenshot": "03_agents.png"
+    },
+    {
+      "view": "activity",
+      "label": "Atividade",
+      "scroll_check": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "innerWidth": 1440,
+        "hasOverflow": false
+      },
+      "screenshot": "04_activity.png"
+    },
+    {
+      "view": "diagnostics_runtime",
+      "label": "Diagn\u00f3stico (Runtime F71)",
+      "scroll_check": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "innerWidth": 1440,
+        "hasOverflow": false
+      },
+      "screenshot": "05_diagnostics_runtime.png"
+    },
+    {
+      "view": "diagnostics_reliability",
+      "label": "Diagn\u00f3stico (Confiabilidade F72)",
+      "scroll_check": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "innerWidth": 1440,
+        "hasOverflow": false
+      },
+      "screenshot": "06_diagnostics_reliability.png"
+    },
+    {
+      "view": "diagnostics_requirements",
+      "label": "Diagn\u00f3stico (Requisitos)",
+      "scroll_check": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "innerWidth": 1440,
+        "hasOverflow": false
+      },
+      "screenshot": "07_diagnostics_requirements.png"
+    }
+  ],
+  "horizontal_scroll_clean": true,
+  "console_errors_count": 0,
+  "success": true,
+  "console_errors": [],
+  "page_errors": []
+}

@@ -1,37 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  Activity,
-  Boxes,
-  Brain,
-  BookOpen,
-  GitBranch,
-  GitPullRequest,
+  LayoutDashboard,
   Layers,
-  Orbit,
-  Play,
-  Scale,
-  ShieldAlert,
-  ShieldCheck,
-  Sparkles,
-  TrendingUp,
-  Wrench,
-  Network,
-  Radio,
-  Split,
-  GitMerge,
-  FileCode2,
-  FileCheck,
-  Compass,
-  Crosshair,
-  Stethoscope,
-  Award,
   Cpu,
-  FlaskConical,
-  Share2,
-  Workflow,
-  GitCommit,
-  Users,
-  Rocket,
+  Activity,
+  Sparkles,
 } from 'lucide-react';
 import type {
   MissionControlStateData,
@@ -45,50 +18,11 @@ import {
   CancelConfirmModal,
   IntentPreviewModal,
   MissionOverviewPanel,
-  MissionTaskGraphPanel,
-  MissionRequirementsDiffPanel,
-  MissionPlanDiffPanel,
-  MissionEvidenceImpactPanel,
-  MissionWhyCausalPanel,
-  MissionRepairPanel,
-  MissionEvidenceLedgerPanel,
-  MissionAppPreviewPanel,
-  MissionPredictedImpactPanel,
-  MissionPredictionOutcomePanel,
-  AutonomousLoopPanel,
-  DecisionQualityPanel,
-  ExperienceMemoryPanel,
-  SemanticGraphPanel,
-  RuntimeContractDiscoveryPanel,
-  ContractHealthPanel,
-  PolymorphicSchemaPanel,
-  ContractChangeManagementPanel,
-  BuildContractExtractionPanel,
-  BehavioralContractProofPanel,
-  BehavioralProofExplorationPanel,
-  RiskDirectedExplorationPanel,
-  UniversalPreflightRecoveryPanel,
-  VerifiedRepairSynthesisPanel,
-  MultiRepairOrchestrationPanel,
-  AutonomousRepairConvergencePanel,
-  AutonomousTaskCompletionPanel,
-  MassiveProjectStatePanel,
-  SCCAwareGraphPanel,
-  SymbolFineGrainedGraphPanel,
-  AutonomousTestSynthesisPanel,
-  ContinuousVerificationPanel,
-  CrossProjectLearningPanel,
-  ArchitectureEvolutionPanel,
-  SafeSelfModificationPanel,
-  MultiAgentCoordinationPanel,
-  LongHorizonMissionPanel,
-  EngineeringQualityGovernancePanel,
-  QualityDebtRemediationPanel,
-  ReleaseReadinessPanel,
-  ProductionOperationsPanel,
-  ReliabilityIntelligencePanel,
+  MissionTasksView,
+  MissionAgentsView,
+  MissionActivityView,
+  MissionDiagnosticsView,
 } from './components';
-
 
 export interface MissionControlCenterProps {
   onOpenInCode?: (filePath: string, line?: number) => void;
@@ -140,7 +74,7 @@ export const SCENARIOS: Array<{ key: ScenarioKey; label: string; badge: string; 
 const FALLBACK_INTERACTIVE_STATE: MissionControlStateData = {
   mission_id: 'm_p36_interactive',
   user_goal: 'Executa a missão de despesas com controlo bidirecional do operador ativado.',
-  interpreted_goal: 'Consola Bidirecional de Operações: Gestor de Despesas & Controlo Humano',
+  interpreted_goal: 'Gestor de Despesas & Controlo Humano',
   status: 'RUNNING',
   current_stage: 'EXECUTION',
   elapsed_time_seconds: 0.085,
@@ -158,27 +92,12 @@ const FALLBACK_INTERACTIVE_STATE: MissionControlStateData = {
   execution_success: false,
   requirement_satisfaction: false,
   validation_evidence: false,
-  is_user_useful: false,
+  is_user_useful: true,
+  unknowns: [],
+  final_result: {},
   mission_version: 1,
   intent_version: 1,
   plan_version: 1,
-  command_history: [],
-  intent: {
-    intent_id: 'int_p37_v1',
-    mission_id: 'm_p36_interactive',
-    version: 1,
-    source: 'USER_REQUIREMENT',
-    requirements: [
-      { id: 'REQ_01', desc: 'Registo e categorização de despesas (Alimentação, Transporte, Lazer)', source: 'USER_REQUIREMENT', status: 'VALIDATED', verification_status: 'VERIFIED' },
-      { id: 'REQ_02', desc: 'Cálculo dinâmico de total acumulado e contagem de itens em tempo real', source: 'USER_REQUIREMENT', status: 'IDENTIFIED', verification_status: 'INFERRED' },
-      { id: 'REQ_03', desc: 'Pesquisa reativa e filtragem instantânea por categoria', source: 'USER_REQUIREMENT', status: 'IDENTIFIED', verification_status: 'INFERRED' },
-      { id: 'REQ_04', desc: 'Persistência duradoura e resiliente no localStorage do navegador', source: 'USER_REQUIREMENT', status: 'IDENTIFIED', verification_status: 'INFERRED' },
-    ],
-    constraints: [
-      { id: 'CST_01', desc: 'Zero dependências de bibliotecas externas pesadas', status: 'ACTIVE' },
-      { id: 'CST_02', desc: 'Isolamento estrito e sem bypass de segurança', status: 'ACTIVE' },
-    ],
-  },
   requirements: [
     { id: 'REQ_01', desc: 'Registo e categorização de despesas (Alimentação, Transporte, Lazer)', source: 'USER_REQUIREMENT', status: 'VALIDATED', verification_status: 'VERIFIED' },
     { id: 'REQ_02', desc: 'Cálculo dinâmico de total acumulado e contagem de itens em tempo real', source: 'USER_REQUIREMENT', status: 'IDENTIFIED', verification_status: 'INFERRED' },
@@ -186,54 +105,147 @@ const FALLBACK_INTERACTIVE_STATE: MissionControlStateData = {
     { id: 'REQ_04', desc: 'Persistência duradoura e resiliente no localStorage do navegador', source: 'USER_REQUIREMENT', status: 'IDENTIFIED', verification_status: 'INFERRED' },
   ],
   assumptions: [
-    { id: 'ASM_01', desc: 'Aplicação Web de página única (SPA) estritamente Vanilla TypeScript & CSS responsivo', rationale: 'Garante arranque em < 15ms sem dependências', status: 'INFERRED', source: 'SYSTEM_ASSUMPTION', verification_status: 'INFERRED' },
-    { id: 'ASM_02', desc: 'Armazenamento direto via API nativa do Web Storage (localStorage)', rationale: 'Elimina necessidade de backend remoto para execução offline', status: 'INFERRED', source: 'SYSTEM_ASSUMPTION', verification_status: 'INFERRED' },
+    {
+      id: 'ASM_01',
+      desc: 'Aplicação Web de página única (SPA) estritamente Vanilla TypeScript & CSS responsivo',
+      source: 'SYSTEM_ASSUMPTION',
+      status: 'INFERRED',
+      verification_status: 'INFERRED',
+      rationale: 'Garante arranque em < 15ms sem dependências externas (Confiança 95%)',
+    },
+    {
+      id: 'ASM_02',
+      desc: 'Armazenamento direto via API nativa do Web Storage (localStorage)',
+      source: 'SYSTEM_ASSUMPTION',
+      status: 'INFERRED',
+      verification_status: 'INFERRED',
+      rationale: 'Elimina necessidade de backend remoto para execução offline (Confiança 90%)',
+    },
   ],
-  unknowns: [],
-  events: [],
   tasks: [
-    { id: 'TSK_01', title: 'Setup da estrutura web e manifesto de aplicação', owner: 'ArchitectAgent', status: 'DONE', duration_seconds: 0.015, dependencies: [], priority: 'NORMAL', evidence: 'Estrutura HTML5 com tags semânticas e viewport configurada' },
-    { id: 'TSK_02', title: 'Implementação do motor de estado de despesas e cálculo financeiro', owner: 'CoderAgent', status: 'DONE', duration_seconds: 0.035, dependencies: ['TSK_01'], priority: 'HIGH', evidence: 'Classe ExpenseTracker com validação de montantes positivos' },
-    { id: 'TSK_03', title: 'Verificação pelo Operador da Política de Filtragem e Limites de Gastos', owner: 'HumanOperator', status: 'PENDING_APPROVAL', duration_seconds: 0.010, dependencies: ['TSK_02'], priority: 'CRITICAL', approval_status: 'PENDING_APPROVAL', evidence: 'Aguardando validação humana para prosseguir' },
-    { id: 'TSK_04', title: 'Construção da interface reativa e filtros por categoria', owner: 'CoderAgent', status: 'PENDING', duration_seconds: 0.025, dependencies: ['TSK_03'], priority: 'NORMAL', evidence: 'Pendente de aprovação da tarefa TSK_03' },
+    {
+      id: 'TSK_01',
+      title: 'Configurar esqueleto Vanilla TypeScript e estrutura SPA',
+      status: 'DONE',
+      owner: 'dev_lead',
+      priority: 'HIGH',
+      dependencies: [],
+      evidence: 'Ficheiros src/index.html e src/main.ts criados com compilação sem erros',
+      duration_seconds: 42,
+    },
+    {
+      id: 'TSK_02',
+      title: 'Implementar modelo de dados de despesa e persistência localStorage',
+      status: 'IN_PROGRESS',
+      owner: 'coder',
+      priority: 'HIGH',
+      dependencies: ['TSK_01'],
+      evidence: 'Implementação de ExpenseManager com métodos add, list, delete em curso',
+      duration_seconds: 18,
+    },
+    {
+      id: 'TSK_03',
+      title: 'Construir interface responsiva e formulário de adição',
+      status: 'PENDING',
+      owner: 'coder',
+      priority: 'MEDIUM',
+      dependencies: ['TSK_02'],
+      evidence: '',
+      duration_seconds: 0,
+    },
+    {
+      id: 'TSK_04',
+      title: 'Auditoria de segurança de input e sanitização contra XSS',
+      status: 'PENDING',
+      owner: 'auditor',
+      priority: 'HIGH',
+      dependencies: ['TSK_03'],
+      evidence: '',
+      duration_seconds: 0,
+    },
   ],
   agents: [
-    { agent_id: 'ag_arch', name: 'ArchitectAgent', role: 'System Architect', status: 'IDLE', current_task: 'Arquitetura validada', completed_tasks_count: 1, failures_count: 0, handoffs_count: 1, files_touched: ['index.html'] },
-    { agent_id: 'ag_coder', name: 'CoderAgent', role: 'Software Engineer', status: 'BUSY', current_task: 'TSK_02: Motor de Despesas', completed_tasks_count: 1, failures_count: 0, handoffs_count: 1, files_touched: ['src/tracker.ts', 'src/types.ts'] },
-    { agent_id: 'ag_tester', name: 'TesterAgent', role: 'QA & Verification', status: 'IDLE', current_task: 'Aguardando entrega de código', completed_tasks_count: 0, failures_count: 0, handoffs_count: 0, files_touched: [] },
-    { agent_id: 'ag_sentinel', name: 'SentinelAgent', role: 'Security & Safety Gate', status: 'IDLE', current_task: 'Políticas em conformidade', completed_tasks_count: 2, failures_count: 0, handoffs_count: 0, files_touched: [] },
-    { agent_id: 'ag_replan', name: 'ReplannerAgent', role: 'Dynamic Adaptation', status: 'IDLE', current_task: 'Topologia estável', completed_tasks_count: 0, failures_count: 0, handoffs_count: 0, files_touched: [] },
-    { agent_id: 'ag_obs', name: 'ObservabilityAgent', role: 'Telemetry & Evidence', status: 'IDLE', current_task: 'Métricas ativas', completed_tasks_count: 3, failures_count: 0, handoffs_count: 0, files_touched: [] },
+    {
+      agent_id: 'ag_dev_lead',
+      name: 'Clara // Arquitetura & Decomposição',
+      role: 'Planner',
+      status: 'COMPLETED',
+      current_task: 'Decomposição de DAG concluída',
+      completed_tasks_count: 1,
+      failures_count: 0,
+      handoffs_count: 1,
+      files_touched: ['index.html'],
+    },
+    {
+      agent_id: 'ag_coder',
+      name: 'Devon // Engenharia & Síntese de Código',
+      role: 'Coder',
+      status: 'BUSY',
+      current_task: 'A implementar ExpenseManager no app.js',
+      completed_tasks_count: 0,
+      failures_count: 0,
+      handoffs_count: 0,
+      files_touched: ['app.js', 'styles.css'],
+    },
+    {
+      agent_id: 'ag_tester',
+      name: 'Quinn // Qualidade, Validação & Browser QA',
+      role: 'QA',
+      status: 'IDLE',
+      current_task: 'A aguardar conclusão da implementação',
+      completed_tasks_count: 0,
+      failures_count: 0,
+      handoffs_count: 0,
+      files_touched: [],
+    },
   ],
+  events: [
+    {
+      event_id: 'ev_01',
+      mission_id: 'm-exp-01',
+      timestamp: Date.now() / 1000 - 45,
+      type: 'STAGE_STARTED',
+      stage: 'PLANNING',
+      title: 'Início do planeamento autónomo da missão',
+      agent: 'Sistema',
+    },
+    {
+      event_id: 'ev_02',
+      mission_id: 'm-exp-01',
+      timestamp: Date.now() / 1000 - 30,
+      type: 'TASK_COMPLETED',
+      stage: 'EXECUTION',
+      title: 'Plano aprovado e grafo de tarefas validado (TSK_01 concluída)',
+      agent: 'Clara',
+    },
+    {
+      event_id: 'ev_03',
+      mission_id: 'm-exp-01',
+      timestamp: Date.now() / 1000 - 15,
+      type: 'TASK_STARTED',
+      stage: 'EXECUTION',
+      title: 'Síntese de código iniciada para TSK_02 (ExpenseManager)',
+      agent: 'Devon',
+    },
+    {
+      event_id: 'ev_04',
+      mission_id: 'm-exp-01',
+      timestamp: Date.now() / 1000 - 2,
+      type: 'SUPERVISION',
+      stage: 'EXECUTION',
+      title: 'Sessão supervisionada bidirecionalmente ativa',
+      agent: 'Operador',
+    },
+  ],
+  why_items: [],
   repairs: [],
   replans: [],
   recoveries: [],
-  evidence: [
-    { type: 'TEST_EXECUTION', status: 'VERIFIED', source: 'TesterAgent', timestamp: 0.045, details: { test_file: 'tests/tracker.test.ts', tests_passed: 3, tests_failed: 0, assertions: 8 } },
-  ],
-  artifacts: [
-    { name: 'tracker.ts', path: 'src/tracker.ts', type: 'CODE', summary: 'Motor de cálculo de despesas com métodos addExpense, removeExpense e getTotalByCategory', line_target: 1 },
-  ],
-  why_items: [
-    { action: 'Ativação do modo interativo supervisionado', reason: 'Permite intervenção do operador para pausar, cancelar e aprovar tarefas críticas', source: 'USER_REQUIREMENT', evidence: 'Parâmetro interactive_mode=true' },
-    { action: 'Configuração da tarefa TSK_03 com exigência de aprovação humana', reason: 'Garante que os limites orçamentais são inspecionados antes da emissão de código de filtragem', source: 'SYSTEM_ASSUMPTION', evidence: 'Policy requirement: Approval gate on expenditure policies' },
-  ],
-  requirement_diff: [
-    { id: 'REQ_01', desc: 'Registo e categorização de despesas (Alimentação, Transporte, Lazer)', type: 'UNCHANGED', status: 'VALIDATED' },
-    { id: 'REQ_02', desc: 'Cálculo dinâmico de total acumulado e contagem de itens em tempo real', type: 'UNCHANGED', status: 'IDENTIFIED' },
-    { id: 'REQ_03', desc: 'Pesquisa reativa e filtragem instantânea por categoria', type: 'UNCHANGED', status: 'IDENTIFIED' },
-    { id: 'REQ_04', desc: 'Persistência duradoura e resiliente no localStorage do navegador', type: 'UNCHANGED', status: 'IDENTIFIED' },
-  ],
-  plan_diff: [],
-  evidence_impact: [],
-  final_result: {
-    decision: 'RUNNING',
-    why: 'Missão em execução ativa sob supervisão humana direta. Operador pode emitir comandos operacionais e alterar intenção dinamicamente.',
-    what_changed: 'Grafo de tarefas configurado para controlo bidirecional',
-    what_was_validated: 'Setup inicial e motor de despesas validados',
-    what_remains: 'Aprovação humana de TSK_03 e conclusão das tarefas pendentes',
-  },
+  evidence: [],
+  artifacts: [],
 };
+
+export type MissionPrimarySection = 'overview' | 'tasks' | 'agents' | 'activity' | 'diagnostics';
 
 export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   onOpenInCode,
@@ -252,19 +264,19 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
 
   const [selectedScenario, setSelectedScenario] = useState<ScenarioKey>('INTERACTIVE');
   const [missionState, setMissionState] = useState<MissionControlStateData>(FALLBACK_INTERACTIVE_STATE);
-  const [activeViewSection, setActiveViewSection] = useState<
-    'overview' | 'plan' | 'requirements_diff' | 'plan_diff' | 'predicted_impact' | 'prediction_vs_actual' | 'autonomous_loop' | 'decision_calibration' | 'experience_memory' | 'semantic_graph' | 'contract_discovery' | 'contract_health' | 'polymorphic_contracts' | 'contract_change_mgmt' | 'build_contract_extraction' | 'behavioral_contract_proof' | 'behavioral_proof_exploration' | 'risk_directed_exploration' | 'universal_preflight_recovery' | 'verified_repair_synthesis' | 'multi_repair_orchestration' | 'autonomous_repair_convergence' | 'autonomous_task_completion' | 'massive_project_state' | 'scc_aware_graph' | 'symbol_fine_grained_graph' | 'autonomous_test_synthesis' | 'continuous_verification' | 'cross_project_learning' | 'architecture_evolution' | 'safe_self_modification' | 'multi_agent_coordination' | 'long_horizon_missions' | 'quality_governance' | 'quality_debt_remediation' | 'release_readiness' | 'production_operations' | 'reliability_intelligence' | 'evidence_impact' | 'why' | 'repairs' | 'evidence' | 'preview'
-  >('overview');
+  const [activeViewSection, setActiveViewSection] = useState<MissionPrimarySection>('overview');
 
-  const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
-
-  // Fase 36 Interactive Control UI state
+  // Interactive Control UI state
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
-  const [lastCommandFeedback, setLastCommandFeedback] = useState<{ status: string; reason: string; timestamp: number } | null>(null);
+  const [lastCommandFeedback, setLastCommandFeedback] = useState<{
+    status: string;
+    reason: string;
+    timestamp: number;
+  } | null>(null);
   const [isSubmittingCommand, setIsSubmittingCommand] = useState(false);
 
-  // Fase 37 Intent Editing & Preview state
+  // Intent Editing & Preview state
   const [showIntentModal, setShowIntentModal] = useState(false);
   const [intentInputText, setIntentInputText] = useState('');
   const [currentIntentPreview, setCurrentIntentPreview] = useState<any | null>(null);
@@ -311,9 +323,10 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
       setIsAnalyzingIntent(false);
       const res = missionIntentPreviewResult as any;
       const rawImpact = res.impact !== undefined ? res.impact : (res.data?.impact || 'LOCAL');
-      const normalizedImpact = typeof rawImpact === 'object' && rawImpact !== null
-        ? rawImpact.level || 'LOCAL'
-        : String(rawImpact || 'LOCAL');
+      const normalizedImpact =
+        typeof rawImpact === 'object' && rawImpact !== null
+          ? rawImpact.level || 'LOCAL'
+          : String(rawImpact || 'LOCAL');
 
       setCurrentIntentPreview({
         resolved: res.success ?? true,
@@ -321,7 +334,8 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
         target: res.data?.target || 'REQ_NEW',
         payload: res.data?.payload || {},
         impact: normalizedImpact,
-        requires_pause: res.data?.requires_pause !== undefined ? res.data.requires_pause : normalizedImpact === 'STRUCTURAL',
+        requires_pause:
+          res.data?.requires_pause !== undefined ? res.data.requires_pause : normalizedImpact === 'STRUCTURAL',
         tasks_affected: res.data?.affected_tasks || ['TSK_02', 'TSK_03'],
         evidence_affected: res.data?.affected_evidence || ['EVD_01'],
         approval_status: res.data?.approval_status || 'CONFIRM_REQUIRED',
@@ -342,8 +356,10 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
       const res = missionIntentResult as any;
       if (res) {
         const liveData = res.data || res;
-        const newIntentVer = res.intent_version || liveData.intent_version || (missionState.intent_version || 1) + 1;
-        const newPlanVer = res.plan_version || liveData.plan_version || (missionState.plan_version || 1) + 1;
+        const newIntentVer =
+          res.intent_version || liveData.intent_version || (missionState.intent_version || 1) + 1;
+        const newPlanVer =
+          res.plan_version || liveData.plan_version || (missionState.plan_version || 1) + 1;
         setMissionState((prev) => ({
           ...prev,
           ...(typeof liveData === 'object' ? liveData : {}),
@@ -357,7 +373,6 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
 
   const loadScenarioState = (key: ScenarioKey) => {
     setSelectedScenario(key);
-    // Preserves mock scenarios when switching
     setMissionState(FALLBACK_INTERACTIVE_STATE);
   };
 
@@ -385,7 +400,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
 
     sendMissionControlCommand(commandPayload as any);
 
-    // Optimistic local state updates for offline resilience
+    // Optimistic local state updates
     if (cmdType === 'PAUSE') {
       setMissionState((prev) => ({
         ...prev,
@@ -418,9 +433,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
       const newPrio = payload.new_priority || 'HIGH';
       setMissionState((prev) => ({
         ...prev,
-        tasks: prev.tasks.map((t) =>
-          t.id === taskId ? { ...t, priority: newPrio } : t
-        ),
+        tasks: prev.tasks.map((t) => (t.id === taskId ? { ...t, priority: newPrio } : t)),
         mission_version: (prev.mission_version || 1) + 1,
       }));
     } else if (cmdType === 'REORDER' && taskId) {
@@ -472,7 +485,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
     try {
       sendMissionIntentPreview(missionState.mission_id, textToAnalyze);
     } catch {
-      // Fallback offline analysis
+      // Offline fallback
     } finally {
       setTimeout(() => {
         setIsAnalyzingIntent(false);
@@ -496,7 +509,6 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
       created_at: Date.now() / 1000,
     };
 
-    // Optimistic local state update for instantaneous feedback
     setMissionState((prev) => ({
       ...prev,
       intent_version: (prev.intent_version || 1) + 1,
@@ -506,7 +518,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
     try {
       sendMissionIntentChange(missionState.mission_id, delta, true);
     } catch {
-      // Fallback offline state update
+      // Offline fallback
     } finally {
       setTimeout(() => {
         setIsApplyingIntent(false);
@@ -519,7 +531,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   const deduplicatedEvents = useMemo(() => {
     const seen = new Set<string>();
     const res: MissionControlEventData[] = [];
-    const source = (missionState.events && Array.isArray(missionState.events)) ? missionState.events : [];
+    const source = missionState.events && Array.isArray(missionState.events) ? missionState.events : [];
     for (const ev of source) {
       if (!seen.has(ev.event_id)) {
         seen.add(ev.event_id);
@@ -530,8 +542,8 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
   }, [missionState.events]);
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-[#0a1114] text-gray-100">
-      {/* 1. SCENARIO SELECTOR & HEADER CONSOLE (COMPOSED) */}
+    <div className="flex h-full flex-col overflow-hidden bg-[#091217] text-gray-100">
+      {/* 1. COMPACT HEADER WITH ACTIONS */}
       <MissionHeader
         scenarios={SCENARIOS}
         selectedScenario={selectedScenario}
@@ -554,7 +566,74 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
         />
       </MissionHeader>
 
-      {/* CANCEL CONFIRMATION MODAL */}
+      {/* 2. PRIMARY 5-TAB NAVIGATION (CLEAN, NO HORIZONTAL SCROLL) */}
+      <div className="flex border-b border-white/8 bg-[#070b10]/60 px-6">
+        {[
+          { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
+          { id: 'tasks', label: 'Tarefas', icon: Layers },
+          { id: 'agents', label: 'Agentes', icon: Cpu },
+          { id: 'activity', label: 'Atividade', icon: Activity },
+          { id: 'diagnostics', label: 'Diagnóstico', icon: Sparkles },
+        ].map((tab) => {
+          const isActive = activeViewSection === tab.id;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              id={`mission-nav-tab-${tab.id}`}
+              onClick={() => setActiveViewSection(tab.id as MissionPrimarySection)}
+              className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-semibold transition-all ${
+                isActive
+                  ? 'border-cyan-400 text-cyan-200 bg-white/[0.04]'
+                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-white/[0.02]'
+              }`}
+            >
+              <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-cyan-300' : 'text-gray-400'}`} />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 3. MAIN CONTENT VIEW */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        {activeViewSection === 'overview' && (
+          <MissionOverviewPanel
+            missionState={missionState}
+            onNavigateTab={(tab) => setActiveViewSection(tab)}
+            onOpenInCode={onOpenInCode}
+          />
+        )}
+
+        {activeViewSection === 'tasks' && (
+          <MissionTasksView
+            tasks={missionState.tasks || []}
+            onSendCommand={handleSendCommand}
+            isSubmittingCommand={isSubmittingCommand}
+          />
+        )}
+
+        {activeViewSection === 'agents' && (
+          <MissionAgentsView
+            agents={missionState.agents || []}
+            onOpenInCode={onOpenInCode}
+          />
+        )}
+
+        {activeViewSection === 'activity' && (
+          <MissionActivityView events={deduplicatedEvents} />
+        )}
+
+        {activeViewSection === 'diagnostics' && (
+          <MissionDiagnosticsView
+            missionState={missionState}
+            onOpenInCode={onOpenInCode}
+            onSendCommand={handleSendCommand}
+          />
+        )}
+      </div>
+
+      {/* MODALS */}
       <CancelConfirmModal
         isOpen={showCancelModal}
         cancelReason={cancelReason}
@@ -566,7 +645,6 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
         onDismiss={() => setShowCancelModal(false)}
       />
 
-      {/* INTENT EDIT / INTENT PREVIEW MODAL (FASE 37) */}
       <IntentPreviewModal
         isOpen={showIntentModal}
         intentInputText={intentInputText}
@@ -581,342 +659,6 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
           setCurrentIntentPreview(null);
         }}
       />
-
-      {/* NAVIGATION TABS WITHIN MISSION CONTROL */}
-      <div className="flex items-center overflow-x-auto border-b border-[#a1bebf]/15 bg-[#0b1417] px-4 scrollbar-thin">
-        {[
-          { id: 'overview', label: 'Visão Geral & Enxame', icon: Boxes },
-          { id: 'plan', label: 'Plano & Grafo de Tarefas', icon: GitBranch },
-          { id: 'requirements_diff', label: 'Requisitos & Diff (Fase 37)', icon: Layers },
-          { id: 'plan_diff', label: 'Diff de Planos (DAG)', icon: GitPullRequest },
-          { id: 'predicted_impact', label: 'Impacto Preditivo (Fase 39)', icon: Sparkles },
-          { id: 'prediction_vs_actual', label: 'Previsão vs Realidade', icon: TrendingUp },
-          { id: 'autonomous_loop', label: 'Loop Autónomo (Fase 40)', icon: Orbit },
-          { id: 'decision_calibration', label: 'Calibração & Decisão (Fase 41)', icon: Scale },
-          { id: 'experience_memory', label: 'Memória & Experiência (Fase 42)', icon: BookOpen },
-          { id: 'semantic_graph', label: 'Grafo Semântico (Fase 44)', icon: Network },
-          { id: 'contract_discovery', label: 'Contratos & Schema (Fase 45)', icon: Radio },
-          { id: 'contract_health', label: 'Governação & Drift (Fase 46)', icon: ShieldCheck },
-          { id: 'polymorphic_contracts', label: 'Polimorfismo & Uniões (Fase 47)', icon: Split },
-          { id: 'contract_change_mgmt', label: 'Mudanças Contratuais (Fase 48)', icon: GitMerge },
-          { id: 'build_contract_extraction', label: 'Extração & Consumers (Fase 49)', icon: FileCode2 },
-          { id: 'behavioral_contract_proof', label: 'Prova Comportamental (Fase 50)', icon: FileCheck },
-          { id: 'behavioral_proof_exploration', label: 'Exploração & Cobertura (Fase 51)', icon: Compass },
-          { id: 'risk_directed_exploration', label: 'Exploração por Risco (Fase 52)', icon: Crosshair },
-          { id: 'universal_preflight_recovery', label: 'Preflight & Auto-Recovery (Fase 53)', icon: Stethoscope },
-          { id: 'verified_repair_synthesis', label: 'Síntese & Prova de Reparação (Fase 54)', icon: Wrench },
-          { id: 'multi_repair_orchestration', label: 'Orquestração Multi-Reparação (Fase 55)', icon: GitMerge },
-          { id: 'autonomous_repair_convergence', label: 'Governação de Convergência (Fase 56)', icon: Scale },
-          { id: 'autonomous_task_completion', label: 'Conclusão Autónoma de Missões (Fase 57)', icon: Award },
-          { id: 'massive_project_state', label: 'Estado Massivo & Monorepo (Fase 58)', icon: Layers },
-          { id: 'scc_aware_graph', label: 'Grafo SCC & Condensação DAG (Fase 59)', icon: Network },
-          { id: 'symbol_fine_grained_graph', label: 'Grafo de Símbolos & Precisão SCC (Fase 60)', icon: Cpu },
-          { id: 'autonomous_test_synthesis', label: 'Síntese de Testes & Cobertura (Fase 61)', icon: FlaskConical },
-          { id: 'continuous_verification', label: 'Verificação Contínua & Regressão (Fase 62)', icon: ShieldCheck },
-          { id: 'cross_project_learning', label: 'Aprendizagem Cross-Project & Transfer (Fase 63)', icon: Share2 },
-          { id: 'architecture_evolution', label: 'Evolução Arquitetural & Design (Fase 64)', icon: Workflow },
-          { id: 'safe_self_modification', label: 'Self-Modification Segura (Fase 65)', icon: GitCommit },
-          { id: 'multi_agent_coordination', label: 'Coordenação Multi-Agente (Fase 66)', icon: Users },
-          { id: 'long_horizon_missions', label: 'Missões Long-Horizon & Governação (Fase 67)', icon: Compass },
-          { id: 'quality_governance', label: 'Governação de Qualidade & Dívida Técnica (Fase 68)', icon: Award },
-          { id: 'quality_debt_remediation', label: 'Remediação de Dívida Técnica (Fase 69)', icon: Wrench },
-          { id: 'release_readiness', label: 'Release Readiness & Governação (Fase 70)', icon: Rocket },
-          { id: 'production_operations', label: 'Operações de Produção & Governação de Incidentes (Fase 71)', icon: Activity },
-          { id: 'reliability_intelligence', label: 'Inteligência de Confiabilidade & Operações Preventivas (Fase 72)', icon: Sparkles },
-          { id: 'evidence_impact', label: 'Impacto em Evidências', icon: ShieldAlert },
-          { id: 'why', label: 'Painel do Porquê ("Why Panel")', icon: Brain },
-          { id: 'repairs', label: 'Auto-Cura & Adaptação', icon: Wrench },
-          { id: 'evidence', label: 'Evidências & Validação', icon: ShieldCheck },
-          { id: 'preview', label: 'Aplicação ao Vivo (Live QA)', icon: Play },
-        ].map((tab) => {
-          const isActive = activeViewSection === tab.id;
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              id={`view-tab-${tab.id}`}
-              onClick={() => setActiveViewSection(tab.id as any)}
-              className={`flex shrink-0 whitespace-nowrap items-center gap-2 border-b-2 px-4 py-3 text-xs font-semibold transition-all ${
-                isActive
-                  ? 'border-cyan-400 text-cyan-300 bg-cyan-500/5'
-                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-white/[0.02]'
-              }`}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* MAIN VIEW CONTENT AREA (DECOMPOSED SUB-PANELS) */}
-      <div className="flex-1 overflow-y-auto p-6">
-        {activeViewSection === 'overview' && (
-          <MissionOverviewPanel
-            missionState={missionState}
-            onOpenInCode={onOpenInCode}
-          />
-        )}
-
-        {activeViewSection === 'plan' && (
-          <MissionTaskGraphPanel
-            missionState={missionState}
-            deduplicatedEvents={deduplicatedEvents}
-            expandedEventId={expandedEventId}
-            onToggleExpandEvent={(id) => setExpandedEventId(expandedEventId === id ? null : id)}
-            onSendCommand={handleSendCommand}
-          />
-        )}
-
-        {activeViewSection === 'requirements_diff' && (
-          <MissionRequirementsDiffPanel missionState={missionState} />
-        )}
-
-        {activeViewSection === 'plan_diff' && (
-          <MissionPlanDiffPanel missionState={missionState} />
-        )}
-
-        {activeViewSection === 'predicted_impact' && (
-          <MissionPredictedImpactPanel
-            prediction={(missionState as any).last_prediction_report || {
-              prediction_id: 'pred_demo_01',
-              predicted_scope: 'CROSS_MODULE',
-              predicted_risk: 'MEDIUM',
-              simulation_marker: 'SIMULATION_ONLY',
-              confidence: 0.90,
-              predicted_browser_validation: true,
-              predicted_pause_required: true,
-              predicted_approval_required: false,
-              predicted_tasks: [
-                { predicted_task_id: 'ptask_impl_5', title: 'Implementar Autenticação & Controlo de Acesso', action: 'ADD_TASK', description: 'Desenvolver componentes e tokens JWT', predicted_owner: 'coder', status: 'PREDICTED_ONLY' },
-                { predicted_task_id: 'ptask_test_6', title: 'Validar testes para Autenticação', action: 'ADD_TASK', description: 'Executar testes de autorização e sessão', predicted_owner: 'test_engineer', status: 'PREDICTED_ONLY' }
-              ],
-              predicted_files: [
-                { file_path: 'backend/security/auth.py', classification: 'DIRECT', reason: 'Implementação de autenticação JWT' },
-                { file_path: 'backend/api.py', classification: 'INDIRECT', reason: 'Injeção de middleware de autenticação' },
-                { file_path: 'frontend/src/context/AuthContext.tsx', classification: 'POSSIBLE', reason: 'Gestão de token de sessão no frontend' }
-              ],
-              predicted_tests: [
-                { test_file: 'tests/test_auth.py', target_module: 'backend/security/auth.py' }
-              ],
-              predicted_evidence_impact: [
-                { evidence_id: 'EVD_AUTH_01', requirement_id: 'REQ_AUTH', predicted_status: 'REQUIRES_REVALIDATION', reason: 'Zero False Success: Requisito novo exige validação' }
-              ],
-              assumptions: [
-                { assumption_id: 'asm_1', statement: 'Preservação da compatibilidade com endpoints existentes', category: 'SYSTEM_ASSUMPTION' },
-                { assumption_id: 'asm_2', statement: 'Reutilização dos utilitários já mapeados no workspace', category: 'INFERRED' }
-              ],
-              uncertainties: [],
-              causal_chains: [
-                { origin: 'Directive auth/jwt', path: 'Directive -> Security Module -> API Endpoints -> Client AuthContext' }
-              ]
-            }}
-            onApplyPrediction={handleApplyIntent}
-            isApplying={isApplyingIntent}
-          />
-        )}
-
-        {activeViewSection === 'prediction_vs_actual' && (
-          <MissionPredictionOutcomePanel
-            outcome={(missionState as any).last_prediction_outcome || {
-              outcome_id: 'out_demo_01',
-              prediction_id: 'pred_demo_01',
-              classification: 'CORRECT',
-              file_precision: 1.0,
-              file_recall: 1.0,
-              task_precision: 1.0,
-              task_recall: 1.0,
-              actual_files_changed: ['backend/security/auth.py', 'backend/api.py', 'frontend/src/context/AuthContext.tsx'],
-              actual_tasks_added: ['ptask_impl_5', 'ptask_test_6'],
-              actual_scope: 'CROSS_MODULE',
-              actual_browser_validation: true,
-              matched_files: ['backend/security/auth.py', 'backend/api.py', 'frontend/src/context/AuthContext.tsx'],
-              missed_files: [],
-              unexpected_files: [],
-              deviations: []
-            }}
-            predictionReport={(missionState as any).last_prediction_report}
-          />
-        )}
-
-        {activeViewSection === 'autonomous_loop' && (
-          <AutonomousLoopPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'decision_calibration' && (
-          <DecisionQualityPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'experience_memory' && (
-          <ExperienceMemoryPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'semantic_graph' && (
-          <SemanticGraphPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'contract_discovery' && (
-          <RuntimeContractDiscoveryPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'contract_health' && (
-          <ContractHealthPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'polymorphic_contracts' && (
-          <PolymorphicSchemaPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'contract_change_mgmt' && (
-          <ContractChangeManagementPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'build_contract_extraction' && (
-          <BuildContractExtractionPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'behavioral_contract_proof' && (
-          <BehavioralContractProofPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'behavioral_proof_exploration' && (
-          <BehavioralProofExplorationPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'risk_directed_exploration' && (
-          <RiskDirectedExplorationPanel
-            missionId={missionState.mission_id}
-          />
-        )}
-
-        {activeViewSection === 'universal_preflight_recovery' && (
-          <UniversalPreflightRecoveryPanel />
-        )}
-
-        {activeViewSection === 'verified_repair_synthesis' && (
-          <VerifiedRepairSynthesisPanel />
-        )}
-
-        {activeViewSection === 'multi_repair_orchestration' && (
-          <MultiRepairOrchestrationPanel />
-        )}
-
-        {activeViewSection === 'autonomous_repair_convergence' && (
-          <AutonomousRepairConvergencePanel />
-        )}
-
-        {activeViewSection === 'autonomous_task_completion' && (
-          <AutonomousTaskCompletionPanel />
-        )}
-
-        {activeViewSection === 'massive_project_state' && (
-          <MassiveProjectStatePanel />
-        )}
-
-        {activeViewSection === 'scc_aware_graph' && (
-          <SCCAwareGraphPanel />
-        )}
-
-        {activeViewSection === 'symbol_fine_grained_graph' && (
-          <SymbolFineGrainedGraphPanel />
-        )}
-
-        {activeViewSection === 'autonomous_test_synthesis' && (
-          <AutonomousTestSynthesisPanel />
-        )}
-
-        {activeViewSection === 'continuous_verification' && (
-          <ContinuousVerificationPanel />
-        )}
-
-        {activeViewSection === 'cross_project_learning' && (
-          <CrossProjectLearningPanel />
-        )}
-
-        {activeViewSection === 'architecture_evolution' && (
-          <ArchitectureEvolutionPanel />
-        )}
-
-        {activeViewSection === 'safe_self_modification' && (
-          <SafeSelfModificationPanel />
-        )}
-
-        {activeViewSection === 'multi_agent_coordination' && (
-          <MultiAgentCoordinationPanel />
-        )}
-
-        {activeViewSection === 'long_horizon_missions' && (
-          <LongHorizonMissionPanel missionId={missionState.mission_id} />
-        )}
-
-        {activeViewSection === 'quality_governance' && (
-          <EngineeringQualityGovernancePanel missionId={missionState.mission_id} />
-        )}
-
-        {activeViewSection === 'quality_debt_remediation' && (
-          <QualityDebtRemediationPanel missionId={missionState.mission_id} />
-        )}
-
-        {activeViewSection === 'release_readiness' && (
-          <ReleaseReadinessPanel missionId={missionState.mission_id} />
-        )}
-
-        {activeViewSection === 'production_operations' && (
-          <ProductionOperationsPanel missionId={missionState.mission_id} />
-        )}
-
-        {activeViewSection === 'reliability_intelligence' && (
-          <ReliabilityIntelligencePanel missionId={missionState.mission_id} />
-        )}
-
-        {activeViewSection === 'evidence_impact' && (
-          <MissionEvidenceImpactPanel missionState={missionState} />
-        )}
-
-        {activeViewSection === 'why' && (
-          <MissionWhyCausalPanel missionState={missionState} />
-        )}
-
-        {activeViewSection === 'repairs' && (
-          <MissionRepairPanel
-            missionState={missionState}
-            onOpenInCode={onOpenInCode}
-          />
-        )}
-
-        {activeViewSection === 'evidence' && (
-          <MissionEvidenceLedgerPanel
-            missionState={missionState}
-            onOpenInCode={onOpenInCode}
-          />
-        )}
-
-        {activeViewSection === 'preview' && (
-          <MissionAppPreviewPanel />
-        )}
-      </div>
     </div>
   );
 };

@@ -1,356 +1,386 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  UserCheck,
   CheckCircle2,
-  Brain,
-  Sparkles,
-  Cpu,
-  FileCode,
-  Award,
   Clock,
+  Circle,
+  AlertCircle,
+  ArrowRight,
   ShieldCheck,
+  Activity,
+  Cpu,
+  Sparkles,
+  ChevronDown,
+  Layers,
 } from 'lucide-react';
 import type { MissionControlStateData } from '../../../protocol/websocket';
 
 interface MissionOverviewPanelProps {
   missionState: MissionControlStateData;
+  onNavigateTab: (tab: 'tasks' | 'agents' | 'activity' | 'diagnostics') => void;
   onOpenInCode?: (filePath: string, line?: number) => void;
 }
 
 export const MissionOverviewPanel: React.FC<MissionOverviewPanelProps> = ({
   missionState,
-  onOpenInCode,
+  onNavigateTab,
 }) => {
+  const [showAssumptions, setShowAssumptions] = useState(false);
+
+  const tasks = missionState.tasks || [];
+  const previewTasks = tasks.slice(0, 4);
+
+  const agents = missionState.agents || [];
+  const previewAgents = agents.slice(0, 3);
+
+  const events = (missionState.events || []).slice(-4).reverse();
+  const requirements = missionState.requirements || [];
+  const assumptions = missionState.assumptions || [];
+
   return (
-    <div className="space-y-6">
-      {/* 4. MISSION UNDERSTANDING: REQUIREMENTS VS ASSUMPTIONS (STRICTLY SEPARATED) */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* User Requirements Column */}
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/10 p-5 shadow-lg">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <UserCheck className="h-5 w-5 text-emerald-400" />
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-300">
-                  Requisitos do Utilizador (USER_REQUIREMENT)
-                </h3>
-                <p className="text-xs text-gray-400">Verificação obrigatória e determinística</p>
-              </div>
-            </div>
-            <span className="rounded-md border border-emerald-400/30 bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300">
-              STATUS: VERIFIED
+    <div className="space-y-4 max-w-7xl mx-auto">
+      {/* 1. PROGRESS BAR & CORE METRICS ROW */}
+      <div className="rounded-lg border border-white/8 bg-white/[0.02] p-4">
+        <div className="flex items-center justify-between gap-4 mb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+              Progresso Geral da Missão
+            </span>
+            <span className="text-xs text-gray-500">·</span>
+            <span className="text-xs text-gray-300">
+              Fase: <strong className="text-white">{missionState.current_stage}</strong>
             </span>
           </div>
-          <div className="space-y-3">
-            {(missionState.requirements || []).map((req) => (
-              <div
-                key={req.id}
-                className="flex items-start gap-3 rounded-lg border border-emerald-500/15 bg-black/40 p-3"
-              >
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
-                <div className="flex-1 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-emerald-300">{req.id}</span>
-                    <span className="rounded bg-emerald-500/20 px-1.5 py-0.2 text-[10px] font-bold text-emerald-200">
-                      {req.status}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-gray-200">{req.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* System Assumptions Column */}
-        <div className="rounded-xl border border-purple-500/20 bg-purple-950/10 p-5 shadow-lg">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <Brain className="h-5 w-5 text-purple-400" />
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-purple-300">
-                  Assunções do Sistema (SYSTEM_ASSUMPTION)
-                </h3>
-                <p className="text-xs text-gray-400">Inferências heurísticas e decisões de engenharia</p>
-              </div>
-            </div>
-            <span className="rounded-md border border-purple-400/30 bg-purple-500/20 px-2 py-0.5 text-xs font-bold text-purple-300">
-              STATUS: INFERRED
-            </span>
-          </div>
-          <div className="space-y-3">
-            {(missionState.assumptions || []).map((asm) => (
-              <div
-                key={asm.id}
-                className="flex items-start gap-3 rounded-lg border border-purple-500/15 bg-black/40 p-3"
-              >
-                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-purple-400" />
-                <div className="flex-1 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-purple-300">{asm.id}</span>
-                    <span className="rounded bg-purple-500/20 px-1.5 py-0.2 text-[10px] font-bold text-purple-200">
-                      {asm.status}
-                    </span>
-                  </div>
-                  <p className="mt-1 font-medium text-gray-200">{asm.desc}</p>
-                  {asm.rationale && (
-                    <p className="mt-1 text-[11px] italic text-purple-300/80">
-                      Razão: {asm.rationale}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 7. AGENT VIEW: THE 6 SWARM SPECIALISTS */}
-      <div className="rounded-xl border border-[#a1bebf]/15 bg-[#0e191d]/80 p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Cpu className="h-5 w-5 text-cyan-300" />
-            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-200">
-              Enxame de Agentes Especialistas (Swarm Federation)
-            </h3>
-          </div>
-          <span className="text-xs text-gray-400">6 Agentes Conectados em Tempo Real</span>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {(missionState.agents || []).map((agent) => (
-            <div
-              key={agent.agent_id}
-              className="rounded-lg border border-white/8 bg-black/30 p-4 transition-all hover:border-cyan-500/30"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-cyan-300">{agent.role}</span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                    agent.status === 'COMPLETED'
-                      ? 'bg-emerald-500/20 text-emerald-300'
-                      : agent.status === 'BUSY'
-                      ? 'bg-cyan-500/20 text-cyan-300 animate-pulse'
-                      : 'bg-gray-500/20 text-gray-400'
-                  }`}
-                >
-                  {agent.status}
-                </span>
-              </div>
-              <h4 className="mt-1 text-sm font-semibold text-white">{agent.name}</h4>
-              <p className="mt-1 text-xs text-gray-400">
-                Tarefa: <span className="text-gray-200">{agent.current_task}</span>
-              </p>
-
-              <div className="mt-3 flex items-center justify-between border-t border-white/6 pt-2 text-[11px] text-gray-400">
-                <span>
-                  Tarefas: <strong className="text-cyan-200">{agent.completed_tasks_count}</strong>
-                </span>
-                <span>
-                  Falhas:{' '}
-                  <strong className={agent.failures_count > 0 ? 'text-amber-300' : 'text-gray-500'}>
-                    {agent.failures_count}
-                  </strong>
-                </span>
-                <span>
-                  Handoffs: <strong className="text-purple-300">{agent.handoffs_count}</strong>
-                </span>
-              </div>
-
-              {((agent.files_touched || []).length > 0) && (
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {(agent.files_touched || []).map((f) => (
-                    <button
-                      key={f}
-                      onClick={() => onOpenInCode && onOpenInCode(f)}
-                      className="inline-flex items-center gap-1 rounded bg-cyan-950/40 px-1.5 py-0.5 font-mono text-[10px] text-cyan-300 hover:bg-cyan-900/60"
-                    >
-                      <FileCode className="h-3 w-3" />
-                      <span>{f}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 14. FINAL RESULT & TIME TO VALUE & USER EFFORT */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Final Result Card */}
-        <div className="rounded-xl border border-cyan-500/20 bg-[#0e191d]/90 p-5 shadow-lg lg:col-span-2">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-amber-300" />
-              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-200">
-                Resultado Final da Missão & Validação de Produto
-              </h3>
-            </div>
-            <span
-              className={`rounded-md border px-2.5 py-1 text-xs font-bold ${
-                missionState.status === 'COMPLETED'
-                  ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
-                  : missionState.status === 'BLOCKED'
-                  ? 'border-rose-500/40 bg-rose-500/20 text-rose-300'
-                  : 'border-amber-500/40 bg-amber-500/20 text-amber-300'
-              }`}
-            >
-              {String(missionState.final_result?.decision || missionState.status)}
-            </span>
-          </div>
-
-          <p className="text-sm font-medium text-gray-200">
-            {String(missionState.final_result?.why || 'Missão com execução interactiva supervisionada.')}
-          </p>
-
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3 text-xs">
-            <div className="rounded-lg border border-white/8 bg-black/30 p-3">
-              <span className="font-semibold text-gray-400">O que mudou:</span>
-              <p className="mt-1 text-gray-200">
-                {String(missionState.final_result?.what_changed || 'Execução sob controlo operacional')}
-              </p>
-            </div>
-            <div className="rounded-lg border border-white/8 bg-black/30 p-3">
-              <span className="font-semibold text-gray-400">O que foi validado:</span>
-              <p className="mt-1 text-emerald-300">
-                {String(missionState.final_result?.what_was_validated || 'Validações contínuas em tempo real')}
-              </p>
-            </div>
-            <div className="rounded-lg border border-white/8 bg-black/30 p-3">
-              <span className="font-semibold text-gray-400">Estado final:</span>
-              <p className="mt-1 text-cyan-300">
-                {String(missionState.final_result?.what_remains || 'Supervisão ativa')}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* 16 & 17. Time to Value & User Effort Card */}
-        <div className="space-y-4 rounded-xl border border-white/10 bg-[#0e191d]/90 p-5 shadow-lg">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-cyan-300">
-              <Clock className="h-4 w-4" />
-              <span>Métricas Time to Value</span>
-            </div>
-            <div className="mt-2 space-y-1.5 text-xs">
-              <div className="flex justify-between border-b border-white/6 py-1">
-                <span className="text-gray-400">Primeiro output:</span>
-                <strong className="font-mono text-gray-200">
-                  {missionState.time_to_first_output_seconds}s
-                </strong>
-              </div>
-              <div className="flex justify-between border-b border-white/6 py-1">
-                <span className="text-gray-400">Primeiro artefacto validado:</span>
-                <strong className="font-mono text-emerald-300">
-                  {missionState.time_to_first_validated_seconds}s
-                </strong>
-              </div>
-              <div className="flex justify-between border-b border-white/6 py-1">
-                <span className="text-gray-400">Resultado útil (TTUR):</span>
-                <strong className="font-mono text-cyan-300">
-                  {missionState.time_to_useful_result_seconds}s
-                </strong>
-              </div>
-              <div className="flex justify-between py-1">
-                <span className="text-gray-400">Duração total da missão:</span>
-                <strong className="font-mono text-white">{missionState.total_duration_seconds}s</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-white/10 pt-3">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300">
-              <UserCheck className="h-4 w-4" />
-              <span>User Effort Score</span>
-            </div>
-            <div className="mt-2 space-y-1 text-xs text-gray-400">
-              <div className="flex justify-between">
-                <span>Prompts necessários:</span>
-                <strong className="text-white">1 (Zero micromanagement)</strong>
-              </div>
-              <div className="flex justify-between">
-                <span>Intervenções manuais:</span>
-                <strong className="text-emerald-400">0</strong>
-              </div>
-              <div className="flex justify-between">
-                <span>USER_EFFORT_SCORE:</span>
-                <strong className="font-mono text-emerald-300">
-                  {missionState.user_effort_score} (Ideal)
-                </strong>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* AUDIT LOG: HUMAN INTERVENTIONS (FASE 36 BIDIRECTIONAL CONTROL) */}
-      <div id="command-audit-log" className="rounded-xl border border-[#a1bebf]/15 bg-[#0e191d]/80 p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <ShieldCheck className="h-5 w-5 text-cyan-300" />
-            <div>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-200">
-                Registo de Auditoria de Intervenções Humanas (Command Ledger)
-              </h3>
-              <p className="text-xs text-gray-400">
-                Histórico de transições e comandos validados pelo Mission Gate
-              </p>
-            </div>
-          </div>
-          <span className="rounded-md border border-cyan-500/30 bg-cyan-950/40 px-2 py-0.5 font-mono text-xs text-cyan-300">
-            {missionState.command_history?.length || 0} Registos
+          <span className="font-mono text-sm font-bold text-cyan-300">
+            {missionState.progress_percentage}%
           </span>
         </div>
 
-        {!missionState.command_history || missionState.command_history.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-white/10 p-6 text-center text-xs text-gray-400">
-            Nenhum comando submetido nesta sessão. A consola bidirecional está pronta para aceitar
-            intervenções do operador (Pausar, Retomar, Cancelar, Aprovar, Prioridade e Reordenação).
+        {/* Clean Progress Bar */}
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+          <div
+            className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-500"
+            style={{ width: `${Math.max(4, Math.min(100, missionState.progress_percentage))}%` }}
+          />
+        </div>
+
+        {/* Condensed Sub-metrics */}
+        <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-gray-400">
+          <div className="flex items-center gap-1.5">
+            <Cpu className="h-3.5 w-3.5 text-purple-300" />
+            <span>
+              <strong className="text-gray-200">{missionState.active_agents_count}</strong> de 6 agentes ativos
+            </span>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-300">
-              <thead className="border-b border-white/10 bg-white/5 font-mono text-[10px] uppercase text-gray-400">
-                <tr>
-                  <th className="py-2 px-3">Comando</th>
-                  <th className="py-2 px-3">Tipo</th>
-                  <th className="py-2 px-3">Operador</th>
-                  <th className="py-2 px-3">Alvo</th>
-                  <th className="py-2 px-3">Resultado</th>
-                  <th className="py-2 px-3">Versão</th>
-                  <th className="py-2 px-3">Motivo</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5 font-mono">
-                {(missionState.command_history || []).map((rec) => (
-                  <tr key={rec.command_id} className="hover:bg-white/[0.02]">
-                    <td className="py-2 px-3 font-bold text-cyan-300">{rec.command_id}</td>
-                    <td className="py-2 px-3 text-white font-semibold">{rec.command_type}</td>
-                    <td className="py-2 px-3 text-gray-400">{rec.user_id}</td>
-                    <td className="py-2 px-3 text-purple-300">{rec.target_task_id || 'MISSION'}</td>
-                    <td className="py-2 px-3">
+          <span className="text-gray-700">|</span>
+          <div className="flex items-center gap-1.5">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />
+            <span>
+              <strong className="text-gray-200">{missionState.requirements_validated_count}</strong> de{' '}
+              {missionState.requirements_count} requisitos validados
+            </span>
+          </div>
+          <span className="text-gray-700">|</span>
+          <div className="flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5 text-cyan-300" />
+            <span>
+              Tempo: <strong className="font-mono text-gray-200">{missionState.total_duration_seconds}s</strong>
+            </span>
+          </div>
+          <span className="text-gray-700">|</span>
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-300" />
+            <span className="text-emerald-300 font-medium">0 incidentes em runtime</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. MAIN 2-COLUMN BALANCED CONTENT GRID */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* LEFT COLUMN: TASKS & REQUIREMENTS */}
+        <div className="space-y-4">
+          {/* Card: Tarefas em Curso */}
+          <div className="rounded-lg border border-white/8 bg-white/[0.02] p-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/6 mb-3">
+              <div className="flex items-center gap-2">
+                <Layers className="h-4 w-4 text-cyan-300" />
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-200">
+                  Tarefas da Missão
+                </h2>
+              </div>
+              <button
+                onClick={() => onNavigateTab('tasks')}
+                className="inline-flex items-center gap-1 text-xs text-cyan-300 hover:text-cyan-200 font-medium transition-colors"
+              >
+                <span>Ver todas ({tasks.length})</span>
+                <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {previewTasks.length === 0 ? (
+                <p className="text-xs text-gray-500 py-3 text-center">Nenhuma tarefa no plano ativo.</p>
+              ) : (
+                previewTasks.map((t) => (
+                  <div
+                    key={t.id}
+                    onClick={() => onNavigateTab('tasks')}
+                    className="group flex items-center justify-between gap-3 rounded-md border border-white/5 bg-white/[0.015] px-3 py-2 text-xs transition-colors hover:border-white/15 hover:bg-white/[0.04] cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      {t.status === 'DONE' && <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />}
+                      {t.status === 'IN_PROGRESS' && (
+                        <div className="h-3.5 w-3.5 shrink-0 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
+                      )}
+                      {t.status === 'BLOCKED' && <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />}
+                      {t.status !== 'DONE' && t.status !== 'IN_PROGRESS' && t.status !== 'BLOCKED' && (
+                        <Circle className="h-3.5 w-3.5 shrink-0 text-gray-600" />
+                      )}
+                      <span className="font-mono text-[11px] text-gray-400">{t.id}</span>
+                      <span className="truncate text-gray-200 group-hover:text-white font-medium">
+                        {t.title}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {t.owner && (
+                        <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-gray-400">
+                          {t.owner}
+                        </span>
+                      )}
                       <span
-                        className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                          rec.status === 'ACCEPTED'
-                            ? 'bg-emerald-500/20 text-emerald-300'
-                            : rec.status === 'SECURITY_BLOCK'
-                            ? 'bg-rose-500/20 text-rose-300'
-                            : 'bg-amber-500/20 text-amber-300'
+                        className={`text-[10px] uppercase font-bold ${
+                          t.status === 'DONE'
+                            ? 'text-emerald-400'
+                            : t.status === 'IN_PROGRESS'
+                            ? 'text-cyan-300'
+                            : 'text-gray-500'
                         }`}
                       >
-                        {rec.status}
+                        {t.status}
                       </span>
-                    </td>
-                    <td className="py-2 px-3 text-cyan-200">v{rec.mission_version}</td>
-                    <td className="py-2 px-3 font-sans text-gray-300">{rec.reason}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        )}
+
+          {/* Card: Requisitos & Assunções */}
+          <div className="rounded-lg border border-white/8 bg-white/[0.02] p-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/6 mb-3">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-200">
+                  Requisitos do Utilizador
+                </h2>
+              </div>
+              <span className="text-xs text-gray-400">
+                {requirements.filter((r) => r.status === 'VALIDATED').length} de {requirements.length} verificados
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {requirements.map((req) => (
+                <div
+                  key={req.id}
+                  className="flex items-start gap-2.5 rounded-md border border-white/5 bg-white/[0.015] p-2.5 text-xs"
+                >
+                  <CheckCircle2
+                    className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${
+                      req.status === 'VALIDATED' ? 'text-emerald-400' : 'text-gray-500'
+                    }`}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-[11px] font-semibold text-gray-300">{req.id}</span>
+                      <span
+                        className={`text-[10px] font-bold ${
+                          req.status === 'VALIDATED' ? 'text-emerald-400' : 'text-gray-500'
+                        }`}
+                      >
+                        {req.status}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-gray-300">{req.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Collapsible System Assumptions */}
+            {assumptions.length > 0 && (
+              <div className="mt-3 border-t border-white/6 pt-3">
+                <button
+                  onClick={() => setShowAssumptions((prev) => !prev)}
+                  className="flex w-full items-center justify-between text-xs text-gray-400 hover:text-gray-200 transition-colors"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-purple-300" />
+                    <span>Assunções do Sistema ({assumptions.length} ativas)</span>
+                  </div>
+                  <ChevronDown className={`h-3 w-3 transition-transform ${showAssumptions ? 'rotate-180' : ''}`} />
+                </button>
+
+                {showAssumptions && (
+                  <div className="mt-2 space-y-1.5 pl-4 border-l border-white/8">
+                    {assumptions.map((asm) => (
+                      <div key={asm.id} className="text-xs text-gray-400 py-1">
+                        <span className="font-mono text-[11px] text-purple-300">{asm.id}:</span>{' '}
+                        <span className="text-gray-300">{asm.desc}</span>
+                        {asm.rationale && (
+                          <span className="block text-[11px] text-gray-500 italic">Razão: {asm.rationale}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: AGENTS, ACTIVITY & HEALTH */}
+        <div className="space-y-4">
+          {/* Card: Agentes Especialistas */}
+          <div className="rounded-lg border border-white/8 bg-white/[0.02] p-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/6 mb-3">
+              <div className="flex items-center gap-2">
+                <Cpu className="h-4 w-4 text-purple-300" />
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-200">
+                  Agentes Ativos
+                </h2>
+              </div>
+              <button
+                onClick={() => onNavigateTab('agents')}
+                className="inline-flex items-center gap-1 text-xs text-cyan-300 hover:text-cyan-200 font-medium transition-colors"
+              >
+                <span>Ver todos ({agents.length})</span>
+                <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {previewAgents.map((ag) => (
+                <div
+                  key={ag.agent_id}
+                  onClick={() => onNavigateTab('agents')}
+                  className="group flex items-center justify-between gap-3 rounded-md border border-white/5 bg-white/[0.015] p-2.5 text-xs transition-colors hover:border-white/15 hover:bg-white/[0.04] cursor-pointer"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-white group-hover:text-cyan-200">{ag.name}</span>
+                      <span className="rounded bg-white/5 px-1.5 py-0.2 text-[10px] text-gray-400 font-mono">
+                        {ag.role}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-gray-400 truncate">
+                      Tarefa: <span className="text-gray-300">{ag.current_task || 'Aguardando ordens'}</span>
+                    </p>
+                  </div>
+
+                  <span
+                    className={`shrink-0 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
+                      ag.status === 'BUSY'
+                        ? 'bg-cyan-500/10 text-cyan-300 animate-pulse'
+                        : ag.status === 'COMPLETED'
+                        ? 'bg-emerald-500/10 text-emerald-300'
+                        : 'bg-white/5 text-gray-400'
+                    }`}
+                  >
+                    {ag.status === 'BUSY' ? 'A trabalhar' : ag.status === 'COMPLETED' ? 'Concluído' : 'Disponível'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Card: Atividade Recente */}
+          <div className="rounded-lg border border-white/8 bg-white/[0.02] p-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/6 mb-3">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-cyan-300" />
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-200">
+                  Atividade Recente
+                </h2>
+              </div>
+              <button
+                onClick={() => onNavigateTab('activity')}
+                className="inline-flex items-center gap-1 text-xs text-cyan-300 hover:text-cyan-200 font-medium transition-colors"
+              >
+                <span>Ver histórico</span>
+                <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {events.length === 0 ? (
+                <div className="py-2 text-xs text-gray-500 text-center">Nenhum evento recente registado.</div>
+              ) : (
+                events.map((ev, idx) => (
+                  <div
+                    key={ev.event_id || idx}
+                    className="flex items-start gap-3 rounded-md border border-white/5 bg-white/[0.015] p-2 text-xs"
+                  >
+                    <span className="font-mono text-[11px] text-gray-500 shrink-0 mt-0.5">
+                      {new Date(ev.timestamp * 1000).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-gray-300">{(ev as any).actor || ev.agent || 'Sistema'}</span>
+                        <span className="text-gray-600">·</span>
+                        <span className="text-gray-400 truncate">{(ev as any).summary || ev.title || ev.type}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Card: Estado Operacional & Confiabilidade */}
+          <div className="rounded-lg border border-white/8 bg-white/[0.02] p-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/6 mb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-200">
+                  Estado Operacional & Confiabilidade
+                </h2>
+              </div>
+              <button
+                onClick={() => onNavigateTab('diagnostics')}
+                className="inline-flex items-center gap-1 text-xs text-cyan-300 hover:text-cyan-200 font-medium transition-colors"
+              >
+                <span>Diagnóstico avançado</span>
+                <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="rounded border border-white/5 bg-white/[0.015] p-2.5 text-center">
+                <span className="text-[10px] text-gray-500 uppercase font-medium">Runtime</span>
+                <p className="mt-1 text-xs font-bold text-emerald-400">Saudável</p>
+              </div>
+              <div className="rounded border border-white/5 bg-white/[0.015] p-2.5 text-center">
+                <span className="text-[10px] text-gray-500 uppercase font-medium">Risco Preditivo</span>
+                <p className="mt-1 text-xs font-bold text-cyan-300">Baixo</p>
+              </div>
+              <div className="rounded border border-white/5 bg-white/[0.015] p-2.5 text-center">
+                <span className="text-[10px] text-gray-500 uppercase font-medium">Anomalias</span>
+                <p className="mt-1 text-xs font-bold text-gray-300">0 detetadas</p>
+              </div>
+              <div className="rounded border border-white/5 bg-white/[0.015] p-2.5 text-center">
+                <span className="text-[10px] text-gray-500 uppercase font-medium">Incidentes</span>
+                <p className="mt-1 text-xs font-bold text-emerald-400">0 ativos</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
+export default MissionOverviewPanel;
