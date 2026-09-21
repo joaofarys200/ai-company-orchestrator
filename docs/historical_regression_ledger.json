@@ -1,7 +1,7 @@
 {
   "title": "JARVIS OS Canonical Historical Regression Ledger",
-  "audited_at": 1789846801.2135992,
-  "total_historical_phases_audited": 6,
+  "audited_at": 1790003049.2247708,
+  "total_historical_phases_audited": 7,
   "historical_regression_drift_detected": true,
   "historical_consistency_status": "HISTORICAL_LEDGER_INCONSISTENCY",
   "inconsistencies": [
@@ -100,6 +100,20 @@
       "replayed_total": 673,
       "delta": 0,
       "previous_reported_total": 648,
+      "historical_consistency": "CONSISTENT",
+      "notes": "Nominal monotonic progression"
+    },
+    {
+      "phase": "Phase 72",
+      "historical_snapshot": "docs\\phase72_regression_reconciliation.json",
+      "source_runner": "scripts/run_regression_phases_40_72.py",
+      "discovered_tests": 33,
+      "missing_tests": 0,
+      "reported_total": 753,
+      "computed_total": 753,
+      "replayed_total": 753,
+      "delta": 0,
+      "previous_reported_total": 673,
       "historical_consistency": "CONSISTENT",
       "notes": "Nominal monotonic progression"
     }

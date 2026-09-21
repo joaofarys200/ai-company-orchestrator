@@ -583,7 +583,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
       />
 
       {/* NAVIGATION TABS WITHIN MISSION CONTROL */}
-      <div className="flex border-b border-[#a1bebf]/15 bg-[#0b1417] px-6">
+      <div className="flex items-center overflow-x-auto border-b border-[#a1bebf]/15 bg-[#0b1417] px-4 scrollbar-thin">
         {[
           { id: 'overview', label: 'Visão Geral & Enxame', icon: Boxes },
           { id: 'plan', label: 'Plano & Grafo de Tarefas', icon: GitBranch },
@@ -636,13 +636,13 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
               key={tab.id}
               id={`view-tab-${tab.id}`}
               onClick={() => setActiveViewSection(tab.id as any)}
-              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-xs font-semibold transition-all ${
+              className={`flex shrink-0 whitespace-nowrap items-center gap-2 border-b-2 px-4 py-3 text-xs font-semibold transition-all ${
                 isActive
                   ? 'border-cyan-400 text-cyan-300 bg-cyan-500/5'
                   : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-white/[0.02]'
               }`}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4 shrink-0" />
               <span>{tab.label}</span>
             </button>
           );

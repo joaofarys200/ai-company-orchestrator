@@ -98,24 +98,16 @@ PHASE_TEST_MAP = {
         "tests/test_migration_plan.py",
     ],
     "Phase 49 (Build-Time Contract Extraction)": [
-        "tests/test_build_contract_extractor.py",
-        "tests/test_static_schema_generator.py",
-        "tests/test_build_break_prediction.py",
+        "tests/test_build_contract_extraction.py",
     ],
     "Phase 50 (Behavioral Contract Proof Engine)": [
-        "tests/test_behavioral_contract_verifier.py",
-        "tests/test_z3_proof_engine.py",
-        "tests/test_counterexample_generator.py",
-        "tests/test_contract_refinement.py",
+        "tests/test_behavioral_contract_proof.py",
     ],
     "Phase 51 (Behavioral Proof Exploration)": [
-        "tests/test_concolic_explorer.py",
-        "tests/test_path_divergence_detector.py",
-        "tests/test_inductive_invariant_synthesizer.py",
-        "tests/test_proof_guided_refinement.py",
+        "tests/test_behavioral_proof_exploration.py",
     ],
     "Phase 52 (Risk-Directed Semantic Exploration)": [
-        "tests/test_risk_directed_semantic_exploration.py",
+        "tests/test_risk_directed_exploration.py",
     ],
     "Phase 53 (Universal Preflight & Auto-Recovery)": [
         "tests/test_project_preflight_recovery.py",
@@ -130,7 +122,7 @@ PHASE_TEST_MAP = {
         "tests/test_repair_convergence_governance.py",
     ],
     "Phase 57 (Autonomous Task Completion Engine)": [
-        "tests/test_task_completion.py",
+        "tests/test_autonomous_task_completion.py",
     ],
     "Phase 58 (Massive Project State & Incremental Monorepo Graphing)": [
         "tests/test_massive_project_state.py",

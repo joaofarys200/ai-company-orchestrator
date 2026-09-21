@@ -1,8 +1,8 @@
 {
   "suite": "Phases 40 to 72 Regression Suite",
   "source_runner": "scripts/run_regression_phases_40_72.py",
-  "timestamp": 1789846825.6312006,
-  "duration_seconds": 21.31,
+  "timestamp": 1790003030.0958612,
+  "duration_seconds": 26.94,
   "per_phase": {
     "Phase 40 (Autonomous Engineering Loop)": 22,
     "Phase 41 (Decision Calibration & Quality)": 23,
@@ -13,15 +13,15 @@
     "Phase 46 (Contract Drift Governance)": 17,
     "Phase 47 (Polymorphic Contract Governance)": 29,
     "Phase 48 (Contract-Aware Change Management)": 12,
-    "Phase 49 (Build-Time Contract Extraction)": 0,
-    "Phase 50 (Behavioral Contract Proof Engine)": 0,
-    "Phase 51 (Behavioral Proof Exploration)": 0,
-    "Phase 52 (Risk-Directed Semantic Exploration)": 0,
+    "Phase 49 (Build-Time Contract Extraction)": 20,
+    "Phase 50 (Behavioral Contract Proof Engine)": 22,
+    "Phase 51 (Behavioral Proof Exploration)": 24,
+    "Phase 52 (Risk-Directed Semantic Exploration)": 24,
     "Phase 53 (Universal Preflight & Auto-Recovery)": 24,
     "Phase 54 (Verified Repair Synthesis)": 24,
     "Phase 55 (Multi-Repair Orchestration & Rollback)": 22,
     "Phase 56 (Repair Convergence Governance)": 24,
-    "Phase 57 (Autonomous Task Completion Engine)": 0,
+    "Phase 57 (Autonomous Task Completion Engine)": 28,
     "Phase 58 (Massive Project State & Incremental Monorepo Graphing)": 24,
     "Phase 59 (SCC-Aware Circular Dependency Graph Decomposition)": 24,
     "Phase 60 (Symbol-Level Fine-Grained Dependency Graph Precision)": 25,
@@ -38,14 +38,14 @@
     "Phase 71 (Autonomous Production Operations & Incident Governance)": 25,
     "Phase 72 (Autonomous Reliability Intelligence & Preventive Operations)": 32
   },
-  "computed_total": 635,
-  "reported_total": 635,
+  "computed_total": 753,
+  "reported_total": 753,
   "failed_total": 0,
   "delta": 0,
   "valid": true,
   "previous_reported_total": 673,
-  "current_replayed_total": 635,
-  "delta_from_previous": -38,
+  "current_replayed_total": 753,
+  "delta_from_previous": 80,
   "historical_regression_drift_detected": true,
   "historical_consistency_status": "HISTORICAL_LEDGER_INCONSISTENCY_DOCUMENTED",
   "phase_results": {
@@ -168,43 +168,35 @@
       ]
     },
     "Phase 49 (Build-Time Contract Extraction)": {
-      "passed": 0,
+      "passed": 20,
       "failed": 0,
-      "status": "SKIPPED_NOT_FOUND",
+      "status": "PASS",
       "test_files": [
-        "tests/test_build_contract_extractor.py",
-        "tests/test_static_schema_generator.py",
-        "tests/test_build_break_prediction.py"
+        "tests/test_build_contract_extraction.py"
       ]
     },
     "Phase 50 (Behavioral Contract Proof Engine)": {
-      "passed": 0,
+      "passed": 22,
       "failed": 0,
-      "status": "SKIPPED_NOT_FOUND",
+      "status": "PASS",
       "test_files": [
-        "tests/test_behavioral_contract_verifier.py",
-        "tests/test_z3_proof_engine.py",
-        "tests/test_counterexample_generator.py",
-        "tests/test_contract_refinement.py"
+        "tests/test_behavioral_contract_proof.py"
       ]
     },
     "Phase 51 (Behavioral Proof Exploration)": {
-      "passed": 0,
+      "passed": 24,
       "failed": 0,
-      "status": "SKIPPED_NOT_FOUND",
+      "status": "PASS",
       "test_files": [
-        "tests/test_concolic_explorer.py",
-        "tests/test_path_divergence_detector.py",
-        "tests/test_inductive_invariant_synthesizer.py",
-        "tests/test_proof_guided_refinement.py"
+        "tests/test_behavioral_proof_exploration.py"
       ]
     },
     "Phase 52 (Risk-Directed Semantic Exploration)": {
-      "passed": 0,
+      "passed": 24,
       "failed": 0,
-      "status": "SKIPPED_NOT_FOUND",
+      "status": "PASS",
       "test_files": [
-        "tests/test_risk_directed_semantic_exploration.py"
+        "tests/test_risk_directed_exploration.py"
       ]
     },
     "Phase 53 (Universal Preflight & Auto-Recovery)": {
@@ -240,11 +232,11 @@
       ]
     },
     "Phase 57 (Autonomous Task Completion Engine)": {
-      "passed": 0,
+      "passed": 28,
       "failed": 0,
-      "status": "SKIPPED_NOT_FOUND",
+      "status": "PASS",
       "test_files": [
-        "tests/test_task_completion.py"
+        "tests/test_autonomous_task_completion.py"
       ]
     },
     "Phase 58 (Massive Project State & Incremental Monorepo Graphing)": {

@@ -3,13 +3,13 @@
 ## Executive Summary
 
 - **F72 tests**: 32 / 32 passed (0 failed)
-- **F40–F72 regression**: 635 / 635 passed across 33 phases (0 failed, $\Delta = 0$)
-- **Historical snapshots**: Canonical ledger verified with `HISTORICAL_LEDGER_INCONSISTENCY` tracked and resolved
+- **F40–F72 regression**: 753 / 753 passed across 33 phases (0 failed, $\Delta = 0$)
+- **Historical snapshots**: Canonical ledger verified; full progression reconciled ($648 \rightarrow 673 \rightarrow 753$)
 - **Real runtime scenarios**: 5 / 5 executed locally, 2 demonstrated prediction → preventive action → verification
 - **Fault-injection scenarios**: 3 / 3 executed and strictly isolated from spontaneous runtime telemetry
 - **Unseen scenarios**: 20 / 20 validated in stress corpus
-- **Prediction precision**: 94.2% (16/17 in calibrated corpus)
-- **Prediction recall**: 91.4% (16/17.5 in calibrated corpus)
+- **Prediction precision**: 94.1% (16/17 in calibrated corpus)
+- **Prediction recall**: 88.9% (16/18 in calibrated corpus; 18/18 under Config D)
 - **False positives**: 0 / 12 under full Phase 72 governance (Config D)
 - **False negatives**: 0 / 18 under full Phase 72 governance (Config D)
 - **Preventive actions**: 11 standard actions governed; autonomous execution blocked for high-risk actions
@@ -344,19 +344,26 @@ Sanitization and defenses verified in `ReliabilitySecurityGuard`:
 ## 27. Regression Suite (F40–F72)
 
 Replayed all 33 phases via `scripts/run_regression_phases_40_72.py`:
-- **Total tests executed**: 635 passed, 0 failed
+- **Total tests executed**: 753 passed, 0 failed
 - **Phase 72 tests**: 32 passed, 0 failed
+- **All 33 phases active**: Zero skipped phases, zero missing test suites
 - **Invariant check**:
-  $$\sum \text{per\_phase} = \text{computed\_total} = \text{reported\_total} = 635 \quad (\Delta = 0)$$
+  $$\sum \text{per\_phase} = \text{computed\_total} = \text{reported\_total} = 753 \quad (\Delta = 0)$$
 
 ---
 
 ## 28. Historical Ledger Reconciliation
 
 The canonical ledger in `docs/historical_regression_ledger.json` audits historical snapshots:
-- Tracks the F68 (652) to F69 (626) discrepancy transparently as `HISTORICAL_LEDGER_INCONSISTENCY`
-- Uses `HISTORICAL_SNAPSHOT_UNAVAILABLE` when historical environments cannot be reproduced, preferring `UNKNOWN` over invented figures
-- Reconciled with Phase 71 and Phase 72 baselines
+- Tracks historical progression across milestones:
+  $$648 \text{ (F70)} \longrightarrow 673 \text{ (F71 reported)} \longrightarrow 753 \text{ (F72 canonical replayed)}$$
+- **Resolution of interim discrepancy (673 vs 635)**:
+  - An interim run of `run_regression_phases_40_72.py` had misnamed test files for 5 phases (Phases 49, 50, 51, 52, 57), dropping 118 tests ($753 - 118 = 635$).
+  - Once corrected to exact repository test paths (`test_build_contract_extraction.py`, `test_behavioral_contract_proof.py`, `test_behavioral_proof_exploration.py`, `test_risk_directed_exploration.py`, `test_autonomous_task_completion.py`), all 118 tests re-engaged.
+  - Phase 53 (`test_project_preflight_recovery.py`, 24 tests) and Phase 56 (`test_repair_convergence_governance.py`, 24 tests) are also confirmed fully active (+48 tests vs the F71 runner where they had been misnamed).
+  - Net reconciliation from F71 reported (673):
+    $$673 + 48 (\text{F53, F56 unblocked}) + 32 (\text{F72}) = 753 \quad (\Delta = 0)$$
+- Preserves `HISTORICAL_SNAPSHOT_UNAVAILABLE` when historical environments cannot be reproduced, preferring `UNKNOWN` over synthetic data.
 
 ---
 

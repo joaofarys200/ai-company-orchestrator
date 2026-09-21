@@ -24,6 +24,7 @@ def audit_historical_ledger() -> Dict[str, Any]:
         ("Phase 69", os.path.join(docs_dir, "phase69_regression_reconciliation.json")),
         ("Phase 70", os.path.join(docs_dir, "phase70_regression_reconciliation.json")),
         ("Phase 71", os.path.join(docs_dir, "phase71_regression_reconciliation.json")),
+        ("Phase 72", os.path.join(docs_dir, "phase72_regression_reconciliation.json")),
     ]
 
     phase_entries = []

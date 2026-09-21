@@ -387,11 +387,11 @@ export const ReliabilityIntelligencePanel: React.FC<ReliabilityIntelligencePanel
             <div className="grid grid-cols-4 gap-4">
               <div className="p-3 bg-slate-900/80 border border-slate-800 rounded">
                 <div className="text-xs text-slate-400">Precision</div>
-                <div className="text-sm font-bold text-emerald-400 mt-1">94.2% (16/17)</div>
+                <div className="text-sm font-bold text-emerald-400 mt-1">94.1% (16/17)</div>
               </div>
               <div className="p-3 bg-slate-900/80 border border-slate-800 rounded">
                 <div className="text-xs text-slate-400">Recall</div>
-                <div className="text-sm font-bold text-emerald-400 mt-1">91.4% (16/17.5)</div>
+                <div className="text-sm font-bold text-emerald-400 mt-1">88.9% (16/18)</div>
               </div>
               <div className="p-3 bg-slate-900/80 border border-slate-800 rounded">
                 <div className="text-xs text-slate-400">Brier Score</div>
