@@ -1,6 +1,7 @@
 import http.server
 import json
 import os
+import socket
 import socketserver
 import threading
 from dataclasses import dataclass
@@ -25,7 +26,27 @@ class FrontendServerHandle:
             self.thread.join(timeout=2)
 
 
+class DualStackThreadingServer(socketserver.ThreadingTCPServer):
+    address_family = socket.AF_INET6
+
+    def server_bind(self):
+        # Enable dual-stack IPv4 and IPv6 so both localhost/127.0.0.1 and [::1] connect with 0ms delay
+        try:
+            self.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+        except (AttributeError, OSError):
+            pass
+        super().server_bind()
+
+
 class NoCacheHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    def address_string(self):
+        # Prevent blocking reverse DNS lookup on Windows (eliminates 2000ms stall)
+        return str(self.client_address[0])
+
+    def log_message(self, format, *args):
+        # Suppress noisy stdout logs during high-frequency asset/page requests
+        pass
+
     def end_headers(self):
         self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
         self.send_header("Pragma", "no-cache")
@@ -63,27 +84,50 @@ def start_frontend_http_server(
                 if len(parts) >= 5:
                     doc_id = parts[3]
                     docs_file = os.path.join(project_root, "data", "study", "documents.json")
+                    file_path = None
                     if os.path.exists(docs_file):
                         try:
                             with open(docs_file, "r", encoding="utf-8") as f:
                                 docs_data = json.load(f)
                             doc_entry = docs_data.get(doc_id)
                             if doc_entry:
-                                file_path = doc_entry.get("metadata", {}).get("file_path")
-                                if file_path and os.path.exists(file_path):
-                                    with open(file_path, "rb") as pf:
-                                        pdf_bytes = pf.read()
-                                    self.send_response(200)
-                                    self.send_header("Content-Type", "application/pdf")
-                                    self.send_header("Content-Length", str(len(pdf_bytes)))
-                                    self.send_header("Access-Control-Allow-Origin", "*")
-                                    self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
-                                    self.send_header("Access-Control-Allow-Headers", "*")
-                                    self.end_headers()
-                                    self.wfile.write(pdf_bytes)
-                                    return
+                                fp = doc_entry.get("metadata", {}).get("file_path")
+                                if fp:
+                                    if os.path.isabs(fp) and os.path.exists(fp):
+                                        file_path = fp
+                                    elif os.path.exists(os.path.join(project_root, fp)):
+                                        file_path = os.path.join(project_root, fp)
                         except Exception:
                             pass
+
+                    # Fallback: procurar por hash prefix em data/study
+                    if not file_path:
+                        hash_prefix = doc_id.replace("doc_", "")
+                        study_dir = os.path.join(project_root, "data", "study")
+                        if os.path.exists(study_dir):
+                            for fname in os.listdir(study_dir):
+                                if fname.startswith(hash_prefix) and fname.lower().endswith(".pdf"):
+                                    candidate = os.path.join(study_dir, fname)
+                                    if os.path.isfile(candidate):
+                                        file_path = candidate
+                                        break
+
+                    if file_path and os.path.exists(file_path):
+                        try:
+                            with open(file_path, "rb") as pf:
+                                pdf_bytes = pf.read()
+                            self.send_response(200)
+                            self.send_header("Content-Type", "application/pdf")
+                            self.send_header("Content-Length", str(len(pdf_bytes)))
+                            self.send_header("Access-Control-Allow-Origin", "*")
+                            self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+                            self.send_header("Access-Control-Allow-Headers", "*")
+                            self.end_headers()
+                            self.wfile.write(pdf_bytes)
+                            return
+                        except Exception:
+                            pass
+
                 self.send_response(404)
                 self.send_header("Content-Type", "text/plain")
                 self.send_header("Access-Control-Allow-Origin", "*")
@@ -123,17 +167,23 @@ def start_frontend_http_server(
         )
 
     socketserver.TCPServer.allow_reuse_address = True
+    server = None
     try:
-        server = socketserver.ThreadingTCPServer(("", port), handler)
-    except Exception as start_error:
-        log_event(
-            logger,
-            "frontend_static.start_error",
-            level="error",
-            port=port,
-            error=str(start_error),
-        )
-        return None
+        # Prefer dual-stack (IPv6 + IPv4) for 0ms localhost latency on Windows
+        server = DualStackThreadingServer(("::", port), handler)
+    except Exception:
+        try:
+            # Fallback to standard IPv4 binding if dual-stack is unavailable
+            server = socketserver.ThreadingTCPServer(("", port), handler)
+        except Exception as start_error:
+            log_event(
+                logger,
+                "frontend_static.start_error",
+                level="error",
+                port=port,
+                error=str(start_error),
+            )
+            return None
 
     def run_server() -> None:
         log_event(

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import 'pdfjs-dist/web/pdf_viewer.css';
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import {
   ChevronLeft,
   ChevronRight,
@@ -32,16 +33,9 @@ import type {
   ExplanationLevel
 } from './types';
 
-// Configure pdf.js worker using ESM URL
-if (typeof window !== 'undefined' && 'Worker' in window) {
-  try {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-      'pdfjs-dist/build/pdf.worker.min.mjs',
-      import.meta.url
-    ).toString();
-  } catch (err) {
-    console.warn('[StudyReader] Failed to initialize PDF.js worker URL:', err);
-  }
+// Configure pdf.js worker using Vite asset URL
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 }
 
 export interface StudyReaderViewProps {
@@ -88,15 +82,36 @@ const PageRenderer: React.FC<PageRendererProps> = ({
   const textLayerRef = useRef<HTMLDivElement | null>(null);
   const renderTaskRef = useRef<any>(null);
   const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
-    width: 612,
-    height: 792,
+    width: Math.floor(612 * scale),
+    height: Math.floor(792 * scale),
   });
+  // Eagerly render pages 1 & 2; lazily render remaining pages as they approach viewport
+  const [isNearViewport, setIsNearViewport] = useState<boolean>(pageNumber <= 2);
 
-  // Track page visibility using IntersectionObserver
+  // Track page visibility and viewport proximity
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const observer = new IntersectionObserver(
+
+    // Proximity observer to trigger render 400px before scrolling into view
+    let proximityObserver: IntersectionObserver | null = null;
+    if (!isNearViewport) {
+      proximityObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              setIsNearViewport(true);
+              proximityObserver?.disconnect();
+            }
+          }
+        },
+        { rootMargin: '400px 0px' }
+      );
+      proximityObserver.observe(el);
+    }
+
+    // Active page observer for reading progress
+    const visibilityObserver = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
@@ -106,12 +121,17 @@ const PageRenderer: React.FC<PageRendererProps> = ({
       },
       { threshold: [0.2, 0.4, 0.6] }
     );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [pageNumber, onVisible]);
+    visibilityObserver.observe(el);
 
-  // Render Canvas and Text Layer
+    return () => {
+      proximityObserver?.disconnect();
+      visibilityObserver.disconnect();
+    };
+  }, [pageNumber, onVisible, isNearViewport]);
+
+  // Render Canvas and Text Layer only when page is near or in viewport
   useEffect(() => {
+    if (!isNearViewport) return;
     let isCancelled = false;
 
     const renderPage = async () => {
@@ -127,7 +147,7 @@ const PageRenderer: React.FC<PageRendererProps> = ({
         const ctx = canvas.getContext('2d', { alpha: false });
         if (!ctx) return;
 
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
         canvas.width = Math.floor(viewport.width * dpr);
         canvas.height = Math.floor(viewport.height * dpr);
         canvas.style.width = `${Math.floor(viewport.width)}px`;
@@ -190,7 +210,7 @@ const PageRenderer: React.FC<PageRendererProps> = ({
         }
       }
     };
-  }, [pdfDoc, pageNumber, scale]);
+  }, [pdfDoc, pageNumber, scale, isNearViewport]);
 
   return (
     <div
@@ -212,6 +232,16 @@ const PageRenderer: React.FC<PageRendererProps> = ({
         p. {pageNumber}
       </div>
     </div>
+  );
+};
+
+const isValidPdfBytes = (bytes: Uint8Array): boolean => {
+  return (
+    bytes.length >= 4 &&
+    bytes[0] === 0x25 && // %
+    bytes[1] === 0x50 && // P
+    bytes[2] === 0x44 && // D
+    bytes[3] === 0x46    // F
   );
 };
 
@@ -295,7 +325,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
     return matches.length > 0 ? matches[matches.length - 1] : document.sections[0];
   }, [document.sections, currentPage]);
 
-  // Load PDF Document (WebSocket base64 -> HTTP Streaming -> Fallback)
+  // Load PDF Document (Direct HTTP Streaming -> WebSocket Fallback)
   useEffect(() => {
     let isCancelled = false;
     setPdfLoading(true);
@@ -305,8 +335,33 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
       try {
         let pdfData: Uint8Array | null = null;
 
-        // Strategy 1: WebSocket binary payload via onGetDocumentFile
-        if (onGetDocumentFile) {
+        // Strategy 1: Direct HTTP streaming from local backend sandbox_service
+        const urlsToTry = [
+          `/api/study/document/${document.document_id}/file`,
+          `http://127.0.0.1:8000/api/study/document/${document.document_id}/file`,
+          `http://localhost:8000/api/study/document/${document.document_id}/file`,
+        ];
+        for (const url of urlsToTry) {
+          try {
+            const res = await fetch(url);
+            if (res.ok) {
+              const contentType = res.headers.get('content-type') || '';
+              if (!contentType.includes('text/html')) {
+                const buffer = await res.arrayBuffer();
+                const bytes = new Uint8Array(buffer);
+                if (isValidPdfBytes(bytes)) {
+                  pdfData = bytes;
+                  break;
+                }
+              }
+            }
+          } catch {
+            // Try next
+          }
+        }
+
+        // Strategy 2: Fast WebSocket binary payload fallback via onGetDocumentFile
+        if (!pdfData && onGetDocumentFile) {
           try {
             const fileRes = await onGetDocumentFile();
             if (fileRes?.contentBase64) {
@@ -315,30 +370,12 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
               for (let i = 0; i < binary.length; i++) {
                 bytes[i] = binary.charCodeAt(i);
               }
-              pdfData = bytes;
+              if (isValidPdfBytes(bytes)) {
+                pdfData = bytes;
+              }
             }
           } catch {
-            // Fallback to HTTP
-          }
-        }
-
-        // Strategy 2: HTTP Streaming endpoint from backend sandbox_service
-        if (!pdfData) {
-          const urlsToTry = [
-            `http://localhost:8000/api/study/document/${document.document_id}/file`,
-            `/api/study/document/${document.document_id}/file`,
-          ];
-          for (const url of urlsToTry) {
-            try {
-              const res = await fetch(url);
-              if (res.ok) {
-                const buffer = await res.arrayBuffer();
-                pdfData = new Uint8Array(buffer);
-                break;
-              }
-            } catch {
-              // Try next
-            }
+            // Fallback
           }
         }
 
@@ -347,8 +384,6 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
         if (pdfData && pdfData.length > 0) {
           const loadingTask = pdfjsLib.getDocument({
             data: pdfData,
-            cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/cmaps/',
-            cMapPacked: true,
           });
           const doc = await loadingTask.promise;
           if (isCancelled) return;
