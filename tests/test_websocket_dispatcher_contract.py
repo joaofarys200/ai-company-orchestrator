@@ -35,6 +35,10 @@ from backend.websocket.handlers.lectures import (
     LECTURE_HANDLERS,
     LectureWebSocketHandler,
 )
+from backend.websocket.handlers.study import (
+    STUDY_HANDLERS,
+    StudyWebSocketHandler,
+)
 from backend.websocket.handlers.missions import (
     MISSION_HANDLERS,
     MissionWebSocketHandler,
@@ -68,6 +72,7 @@ DOMAIN_HANDLER_MAPS = {
     "system": SYSTEM_HANDLERS,
     "mission": MISSION_HANDLERS,
     "lectures": LECTURE_HANDLERS,
+    "study": STUDY_HANDLERS,
     "sentinel": SENTINEL_HANDLERS,
 }
 
@@ -80,6 +85,7 @@ DOMAIN_HANDLER_CLASSES = (
     SystemWebSocketHandler,
     MissionWebSocketHandler,
     LectureWebSocketHandler,
+    StudyWebSocketHandler,
     SentinelWebSocketHandler,
 )
 
@@ -97,6 +103,7 @@ def fake_services() -> ApplicationServices:
         mission_executor=placeholder,
         mission_autonomy=placeholder,
         sentinel_watchdog=placeholder,
+        study_service=placeholder,
     )
 
 

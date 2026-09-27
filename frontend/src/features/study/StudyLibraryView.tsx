@@ -13,7 +13,9 @@ import {
   FileUp,
   ArrowRight,
   RotateCw,
-  X
+  X,
+  Video,
+  Link as LinkIcon
 } from 'lucide-react';
 import type { StudyDocument, SourceType } from './types';
 
@@ -52,7 +54,8 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
   // Upload modal form state
   const [uploadSubject, setUploadSubject] = useState<string>('Inteligência Artificial');
   const [uploadTitle, setUploadTitle] = useState<string>('');
-  const [uploadMode, setUploadMode] = useState<'file' | 'text' | 'lecture'>('file');
+  const [uploadMode, setUploadMode] = useState<'file' | 'video' | 'video_url' | 'text' | 'lecture'>('file');
+  const [videoUrlInput, setVideoUrlInput] = useState<string>('');
   const [rawTextContent, setRawTextContent] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -67,6 +70,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
 
     if (filterType === 'ALL') return true;
     if (filterType === 'DOCS') return ['PDF', 'DOCX', 'PPTX', 'TXT', 'MARKDOWN'].includes(doc.source_type);
+    if (filterType === 'VIDEO') return doc.source_type === 'VIDEO';
     if (filterType === 'IMAGES') return doc.source_type === 'IMAGE';
     if (filterType === 'AUDIO') return doc.source_type === 'AUDIO';
     if (filterType === 'LECTURES') return doc.source_type === 'LECTURE_AUDIO';
@@ -106,6 +110,22 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
       return;
     }
 
+    if (uploadMode === 'video_url') {
+      if (!videoUrlInput.trim()) return;
+      const baseTitle = uploadTitle.trim() || 'Vídeo Online';
+      onUpload({
+        filename: videoUrlInput.trim(),
+        content_text: videoUrlInput.trim(),
+        subject: uploadSubject || 'Geral',
+        source_type: 'VIDEO',
+        title: baseTitle,
+      });
+      setIsUploadModalOpen(false);
+      setVideoUrlInput('');
+      setUploadTitle('');
+      return;
+    }
+
     if (uploadMode === 'text') {
       if (!rawTextContent.trim()) return;
       const baseTitle = uploadTitle.trim() || 'Nota de Estudo';
@@ -126,6 +146,9 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
 
     if (!selectedFile) return;
 
+    const ext = selectedFile.name.split('.').pop()?.toLowerCase() || '';
+    const isVideo = ['mp4', 'webm', 'mkv', 'mov', 'avi'].includes(ext);
+
     const reader = new FileReader();
     reader.onload = () => {
       const resultStr = reader.result as string;
@@ -135,6 +158,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
         filename: selectedFile.name,
         content_base64: b64,
         subject: uploadSubject || 'Geral',
+        source_type: isVideo ? 'VIDEO' : undefined,
         title: uploadTitle || selectedFile.name,
       });
       setIsUploadModalOpen(false);
@@ -158,6 +182,8 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
         return <FileText className="h-4 w-4 text-cyan-400" />;
       case 'IMAGE':
         return <ImageIcon className="h-4 w-4 text-emerald-400" />;
+      case 'VIDEO':
+        return <Video className="h-4 w-4 text-purple-400" />;
       case 'AUDIO':
       case 'LECTURE_AUDIO':
         return <Headphones className="h-4 w-4 text-purple-400" />;
@@ -223,6 +249,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
             {[
               { id: 'ALL', label: 'Todos' },
               { id: 'DOCS', label: 'Documentos' },
+              { id: 'VIDEO', label: 'Vídeos' },
               { id: 'IMAGES', label: 'Imagens' },
               { id: 'AUDIO', label: 'Áudio' },
               { id: 'LECTURES', label: 'Aulas' },
@@ -272,10 +299,10 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
               <BookOpen className="h-6 w-6" />
             </div>
             <p className="text-sm font-semibold text-zinc-300">
-              Começa por carregar um artigo, slides ou gravação.
+              Começa por carregar um artigo, vídeo, slides ou gravação.
             </p>
             <p className="mt-1 text-xs text-zinc-500 max-w-md">
-              Adiciona um artigo científico em PDF, imagem, ficheiro áudio ou nota de texto para iniciar a leitura assistida e retenção pedagógica.
+              Adiciona um artigo científico em PDF, vídeo explicativo (.mp4, .webm), imagem, áudio ou nota de texto para iniciar a aprendizagem multimodal.
             </p>
             <button
               onClick={() => setIsUploadModalOpen(true)}
@@ -290,6 +317,10 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
             {filteredDocs.map((doc) => {
               const progressPct = Math.round(doc.reading_progress?.progress_percent || 0);
               const isEn = (doc.language || 'en').toLowerCase().startsWith('en');
+              const isVideo = doc.source_type === 'VIDEO';
+              const videoDuration = (doc.metadata as any)?.video?.duration_seconds || (doc.metadata as any)?.duration_seconds;
+              const videoDurationStr = videoDuration ? `${Math.floor(videoDuration / 60)}:${Math.floor(videoDuration % 60).toString().padStart(2, '0')}` : null;
+              const lastWatched = (doc.metadata as any)?.video_progress?.last_watched_at;
 
               return (
                 <div
@@ -297,20 +328,28 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
                   className="group relative flex flex-col justify-between rounded-xl border border-white/[0.08] bg-[#0e151b]/80 p-5 transition hover:border-white/20 hover:bg-[#121c24]/90 shadow-sm"
                 >
                   <div>
-                    {/* Top Row: Type & Language & Pages */}
+                    {/* Top Row: Type & Language & Pages / Duration */}
                     <div className="flex items-center justify-between gap-2 mb-2 text-xs">
                       <div className="flex items-center gap-1.5">
-                        <span className="flex items-center gap-1 rounded bg-white/[0.05] px-2 py-0.5 font-medium text-cyan-300 border border-white/5">
+                        <span className={`flex items-center gap-1 rounded px-2 py-0.5 font-medium border ${
+                          isVideo ? 'bg-purple-500/10 text-purple-300 border-purple-500/20' : 'bg-white/[0.05] text-cyan-300 border-white/5'
+                        }`}>
                           {getSourceIcon(doc.source_type)}
                           <span>{doc.source_type}</span>
                         </span>
                         <span className="rounded bg-white/[0.03] px-1.5 py-0.5 font-mono text-[10px] text-zinc-400 border border-white/5">
-                          {isEn ? 'English document' : 'Português'}
+                          {isEn ? 'English' : 'Português'}
                         </span>
                       </div>
-                      <span className="text-[11px] text-zinc-500">
-                        {doc.page_count} {doc.page_count === 1 ? 'página' : 'páginas'}
-                      </span>
+                      {isVideo ? (
+                        <span className="text-[11px] text-zinc-400 font-mono">
+                          ⏱️ {videoDurationStr || 'Vídeo'}
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-zinc-500">
+                          {doc.page_count} {doc.page_count === 1 ? 'página' : 'páginas'}
+                        </span>
+                      )}
                     </div>
 
                     {/* Title & Subject */}
@@ -325,18 +364,25 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
                       <span className="text-zinc-500">Disciplina:</span> {doc.subject}
                     </p>
 
-                    {/* Reading Progress */}
+                    {/* Reading / Watching Progress */}
                     <div className="mt-4">
                       <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-zinc-500">Progresso de Leitura</span>
-                        <span className="font-mono text-zinc-300">{progressPct}%</span>
+                        <span className="text-zinc-500">{isVideo ? 'Visualização' : 'Progresso de Leitura'}</span>
+                        <span className="font-mono text-zinc-300">
+                          {progressPct}% {isVideo ? 'assistido' : ''}
+                        </span>
                       </div>
                       <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
                         <div
-                          className="h-full bg-cyan-400 transition-all duration-300 rounded-full"
+                          className={`h-full transition-all duration-300 rounded-full ${isVideo ? 'bg-purple-400' : 'bg-cyan-400'}`}
                           style={{ width: `${progressPct}%` }}
                         />
                       </div>
+                      {isVideo && lastWatched && (
+                        <p className="mt-1 text-[10px] text-zinc-500 font-mono">
+                          Última visualização: {new Date(lastWatched).toLocaleDateString('pt-PT')}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -396,11 +442,13 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
             </div>
 
             {/* Mode selection */}
-            <div className="grid grid-cols-3 gap-2 my-4">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 my-4">
               {[
-                { id: 'file', label: 'Ficheiro (PDF/DOCX/IMG)', icon: FileText },
-                { id: 'text', label: 'Texto Direto', icon: FileCode },
-                { id: 'lecture', label: 'Gravar Aula (Voz)', icon: Headphones },
+                { id: 'file', label: 'Documento', icon: FileText },
+                { id: 'video', label: 'Vídeo Local', icon: Video },
+                { id: 'video_url', label: 'Vídeo Online', icon: LinkIcon },
+                { id: 'text', label: 'Texto', icon: FileCode },
+                { id: 'lecture', label: 'Gravar Aula', icon: Headphones },
               ].map((m) => {
                 const Icon = m.icon;
                 const isSel = uploadMode === m.id;
@@ -408,7 +456,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
                   <button
                     key={m.id}
                     onClick={() => setUploadMode(m.id as any)}
-                    className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border text-xs font-medium transition ${
+                    className={`flex flex-col items-center gap-1.5 p-2.5 rounded-lg border text-xs font-medium transition ${
                       isSel
                         ? 'border-cyan-400/40 bg-cyan-500/15 text-cyan-200'
                         : 'border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:bg-white/[0.05]'
@@ -441,7 +489,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
                   data-testid="study-upload-title-input"
                   value={uploadTitle}
                   onChange={(e) => setUploadTitle(e.target.value)}
-                  placeholder="ex: Artigo SOTA sobre Domain Adaptation"
+                  placeholder="ex: Aula Teórica Raft Consensus ou Artigo SOTA"
                   className="w-full rounded-lg border border-white/[0.08] bg-black/40 px-3 py-1.5 text-zinc-200 outline-none focus:border-cyan-400/40"
                 />
               </div>
@@ -457,10 +505,10 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
               >
                 <UploadCloud className="h-8 w-8 text-zinc-400 mb-2" />
                 <p className="text-xs font-medium text-zinc-200">
-                  {selectedFile ? selectedFile.name : 'Arrasta o ficheiro para aqui ou clica para procurar'}
+                  {selectedFile ? selectedFile.name : 'Arrasta o documento para aqui ou clica para procurar'}
                 </p>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  PDF, DOCX, PPTX, TXT, Markdown, PNG, JPG (máx. 50 MB)
+                  PDF, DOCX, PPTX, TXT, Markdown, PNG, JPG (máx. 100 MB)
                 </p>
                 <input
                   ref={fileInputRef}
@@ -469,6 +517,46 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
                   accept=".pdf,.docx,.pptx,.txt,.md,.markdown,.png,.jpg,.jpeg,.webp"
                   className="hidden"
                 />
+              </div>
+            )}
+
+            {uploadMode === 'video' && (
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onClick={() => fileInputRef.current?.click()}
+                className="flex flex-col items-center justify-center rounded-xl border border-dashed border-purple-400/30 bg-purple-500/[0.02] p-6 text-center hover:border-purple-400/60 transition cursor-pointer"
+              >
+                <Video className="h-8 w-8 text-purple-400 mb-2" />
+                <p className="text-xs font-medium text-zinc-200">
+                  {selectedFile ? selectedFile.name : 'Arrasta o ficheiro de vídeo para aqui ou clica para procurar'}
+                </p>
+                <p className="mt-1 text-[11px] text-zinc-400">
+                  Formatos suportados: .mp4, .webm, .mkv, .mov, .avi
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  onChange={handleFileChange}
+                  accept=".mp4,.webm,.mkv,.mov,.avi"
+                  className="hidden"
+                />
+              </div>
+            )}
+
+            {uploadMode === 'video_url' && (
+              <div>
+                <label className="block text-zinc-400 text-xs mb-1">URL do Vídeo</label>
+                <input
+                  type="url"
+                  value={videoUrlInput}
+                  onChange={(e) => setVideoUrlInput(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=... ou https://.../aula.mp4"
+                  className="w-full rounded-lg border border-white/[0.08] bg-black/40 p-2.5 text-xs text-zinc-200 outline-none focus:border-cyan-400/40"
+                />
+                <p className="mt-1.5 text-[11px] text-zinc-500">
+                  O Jarvis extrairá os fluxos de áudio e visual para indexação multimodal.
+                </p>
               </div>
             )}
 

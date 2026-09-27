@@ -45,6 +45,15 @@ STUDY_HANDLERS = {
     "study_list_collections": "list_collections",
     "study_create_collection": "create_collection",
     "study_get_document_file": "get_document_file",
+    # Study Video Intelligence
+    "study_get_video_context": "get_video_context",
+    "study_explain_video_moment": "explain_video_moment",
+    "study_explain_video_visual": "explain_video_visual",
+    "study_search_video_transcript": "search_video_transcript",
+    "study_ask_video": "ask_video",
+    "study_save_video_note": "save_video_note",
+    "study_update_video_progress": "update_video_progress",
+    "study_ingest_video_url": "ingest_video_url",
 }
 
 
@@ -171,6 +180,22 @@ class StudyWebSocketHandler:
             "status": "EXTRACTING",
         })
 
+        loop = asyncio.get_running_loop()
+        def on_progress(status: str, percent: float, msg: str):
+            try:
+                asyncio.run_coroutine_threadsafe(
+                    self.connections.broadcast({
+                        "type": "study_document_processing",
+                        "filename": filename,
+                        "status": status,
+                        "percent": percent,
+                        "message": msg,
+                    }),
+                    loop,
+                )
+            except Exception:
+                pass
+
         try:
             if content_b64:
                 raw_bytes = base64.b64decode(content_b64)
@@ -181,6 +206,7 @@ class StudyWebSocketHandler:
                     subject=subject,
                     source_type=source_type,
                     custom_title=custom_title,
+                    progress_callback=on_progress,
                 )
             elif content_text:
                 raw_bytes = content_text.encode("utf-8")
@@ -191,6 +217,7 @@ class StudyWebSocketHandler:
                     subject=subject,
                     source_type=source_type or "TXT",
                     custom_title=custom_title,
+                    progress_callback=on_progress,
                 )
             else:
                 # Verificar se file_path foi passado
@@ -203,6 +230,7 @@ class StudyWebSocketHandler:
                         subject=subject,
                         source_type=source_type,
                         custom_title=custom_title,
+                        progress_callback=on_progress,
                     )
                 else:
                     raise ValueError("Conteúdo do documento não fornecido (content_base64, content_text ou file_path).")
@@ -609,3 +637,252 @@ class StudyWebSocketHandler:
             "type": "study_collection_created",
             "collection": asdict(col),
         })
+
+    # =========================================================================
+    # Video Intelligence Handlers
+    # =========================================================================
+
+    async def get_video_context(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        timestamp = float(message.get("timestamp", 0.0))
+        try:
+            result = self.study_service.get_video_context(doc_id, timestamp)
+            await self.connections.send(websocket, {
+                "type": "study_video_context_result",
+                "document_id": doc_id,
+                "timestamp": timestamp,
+                "context": result,
+                "request_id": message.get("request_id"),
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao obter contexto do vídeo: {str(e)}",
+                "request_id": message.get("request_id"),
+            })
+
+    async def explain_video_moment(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        timestamp = float(message.get("timestamp", 0.0))
+        try:
+            result = await asyncio.to_thread(
+                self.study_service.explain_video_moment,
+                doc_id,
+                timestamp,
+            )
+            await self.connections.send(websocket, {
+                "type": "study_explain_video_moment_result",
+                "document_id": doc_id,
+                "timestamp": timestamp,
+                **result,
+                "request_id": message.get("request_id"),
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao explicar momento do vídeo: {str(e)}",
+                "request_id": message.get("request_id"),
+            })
+
+    async def explain_video_visual(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        timestamp = float(message.get("timestamp", 0.0))
+        try:
+            result = await asyncio.to_thread(
+                self.study_service.explain_video_visual,
+                doc_id,
+                timestamp,
+            )
+            await self.connections.send(websocket, {
+                "type": "study_explain_video_visual_result",
+                "document_id": doc_id,
+                "timestamp": timestamp,
+                **result,
+                "request_id": message.get("request_id"),
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao explicar visual do vídeo: {str(e)}",
+                "request_id": message.get("request_id"),
+            })
+
+    async def search_video_transcript(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        query = message.get("query", "")
+        try:
+            results = self.study_service.search_video_transcript(doc_id, query)
+            await self.connections.send(websocket, {
+                "type": "study_search_video_transcript_result",
+                "document_id": doc_id,
+                "query": query,
+                "occurrences": len(results),
+                "results": results,
+                "request_id": message.get("request_id"),
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro na pesquisa de transcrição: {str(e)}",
+                "request_id": message.get("request_id"),
+            })
+
+    async def ask_video(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        question = message.get("question", "")
+        timestamp = float(message.get("timestamp", 0.0)) if message.get("timestamp") is not None else None
+        try:
+            result = await asyncio.to_thread(
+                self.study_service.ask_video,
+                doc_id,
+                question,
+                timestamp,
+            )
+            await self.connections.send(websocket, {
+                "type": "study_ask_video_result",
+                "document_id": doc_id,
+                "question": question,
+                **result,
+                "request_id": message.get("request_id"),
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao perguntar ao vídeo: {str(e)}",
+                "request_id": message.get("request_id"),
+            })
+
+    async def save_video_note(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        timestamp = float(message.get("timestamp", 0.0))
+        note_text = message.get("note_text", "")
+        frame_id = message.get("frame_id")
+        selected_text = message.get("selected_text")
+        try:
+            note = self.study_service.save_video_note(
+                doc_id, timestamp, note_text, frame_id, selected_text
+            )
+            await self.connections.send(websocket, {
+                "type": "study_video_note_saved",
+                "document_id": doc_id,
+                "note": note,
+                "request_id": message.get("request_id"),
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao salvar nota do vídeo: {str(e)}",
+                "request_id": message.get("request_id"),
+            })
+
+    async def update_video_progress(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        timestamp = float(message.get("timestamp", 0.0))
+        progress_percent = float(message.get("progress_percent", 0.0))
+        try:
+            prog = self.study_service.update_video_progress(doc_id, timestamp, progress_percent)
+            await self.connections.send(websocket, {
+                "type": "study_video_progress_updated",
+                "document_id": doc_id,
+                "progress": prog,
+                "request_id": message.get("request_id"),
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao atualizar progresso do vídeo: {str(e)}",
+                "request_id": message.get("request_id"),
+            })
+
+    async def ingest_video_url(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        url = message.get("url", "")
+        subject = message.get("subject", "Geral")
+        title = message.get("title")
+        loop = asyncio.get_running_loop()
+        def on_progress(status: str, percent: float, msg: str):
+            try:
+                asyncio.run_coroutine_threadsafe(
+                    self.connections.broadcast({
+                        "type": "study_document_processing",
+                        "filename": url,
+                        "status": status,
+                        "percent": percent,
+                        "message": msg,
+                    }),
+                    loop,
+                )
+            except Exception:
+                pass
+
+        try:
+            doc = await asyncio.to_thread(
+                self.study_service.ingest_video_url,
+                url,
+                subject,
+                title,
+                on_progress,
+            )
+            await self.connections.broadcast({
+                "type": "study_document_ready",
+                "event": "study.document_ready",
+                "document": doc.to_dict(),
+            })
+            docs = [d.to_dict() for d in self.study_service.list_documents()]
+            docs.sort(key=lambda d: d.get("updated_at", ""), reverse=True)
+            await self.connections.broadcast({
+                "type": "study_documents_list",
+                "event": "study.document_added",
+                "documents": docs,
+            })
+            await self.connections.send(websocket, {
+                "type": "study_video_url_ingested",
+                "document": doc.to_dict(),
+                "request_id": message.get("request_id"),
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_document_failed",
+                "filename": url,
+                "error": str(e),
+                "request_id": message.get("request_id"),
+            })

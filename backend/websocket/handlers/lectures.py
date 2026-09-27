@@ -424,28 +424,64 @@ tags:
         message: dict,
         _session: WebSocketSessionState,
     ) -> None:
-        """Avalia respostas do quiz e valida a transferência de conhecimento."""
+        """Avalia respostas do quiz e valida a transferência de conhecimento com scoring real."""
         topic = message.get("topic", "Geral")
-        answers = message.get("answers", {})  # e.g. {"q1": 0, "q2": 0, "q3": 0}
+        answers = message.get("answers", {})  # e.g. {"q1": 0, "q2": 1}
         transfer_answer = message.get("transfer_answer", "").strip()
 
-        total = len(answers) if answers else 3
-        correct = len(answers) if answers else 3  # Valid answers
-        score = 100.0 if correct == total else round((correct / total) * 100.0, 1)
+        # Gabarito oficial para as questões padrão geradas
+        official_answers = {"q1": 0, "q2": 0, "q3": 0}
+        total = len(official_answers)
+        correct = 0
+        incorrect = 0
+        unanswered = 0
 
-        transfer_passed = len(transfer_answer) > 5 or True
+        for q_id, correct_idx in official_answers.items():
+            user_choice = answers.get(q_id)
+            if user_choice is None:
+                unanswered += 1
+            elif int(user_choice) == correct_idx:
+                correct += 1
+            else:
+                incorrect += 1
+
+        score = round((correct / total) * 100.0, 1) if total > 0 else 0.0
+
+        # Avaliação de transferência baseada em conceitos essenciais
+        trans_clean = transfer_answer.lower()
+        required_concepts = ["isolamento", "idempotência", "estado", "recuperação", "distribuídos", "tolerância"]
+        matched_concepts = [c for c in required_concepts if c in trans_clean]
+
+        if len(trans_clean) < 10:
+            transfer_passed = False
+            transfer_feedback = "Resposta não fornecida ou insuficiente para demonstrar transferência prática."
+        elif len(matched_concepts) >= 2:
+            transfer_passed = True
+            transfer_feedback = f"Transferência validada! Conceitos articulados: {', '.join(matched_concepts)}."
+        else:
+            transfer_passed = False
+            transfer_feedback = "A resposta ao cenário aplicado não articula conceitos suficientes de tolerância a falhas e isolamento de estado."
+
+        feedback_msg = (
+            f"Compreensão de {score}% ({correct}/{total} corretas"
+            + (f", {unanswered} não respondidas" if unanswered else "")
+            + f") em {topic}."
+        )
 
         result_data = {
             "topic": topic,
             "score": score,
             "total_questions": total,
             "correct_answers": correct,
-            "feedback": f"Compreensão de 100.0% validada nos conceitos centrais de {topic}.",
+            "incorrect_answers": incorrect,
+            "unanswered": unanswered,
+            "feedback": feedback_msg,
             "transfer_passed": transfer_passed,
-            "transfer_feedback": "A resposta ao cenário aplicado demonstrou correta transferência de conhecimento.",
-            "student_mastery": 0.95,
-            "next_review_days": 3,
-            "next_review_timestamp": time.time() + (3 * 86400),
+            "transfer_feedback": transfer_feedback,
+            "student_mastery": round(score / 100.0, 2),
+            "passed": score >= 70.0 and transfer_passed,
+            "next_review_days": 1 if score < 70 else 3,
+            "next_review_timestamp": time.time() + ((1 if score < 70 else 3) * 86400),
         }
 
         await self.connections.broadcast({

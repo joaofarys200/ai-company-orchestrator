@@ -245,6 +245,7 @@ interface WebSocketContextType {
   getStudyDocumentFile: (
     documentId: string
   ) => Promise<{ contentBase64?: string; filename?: string; error?: string }>;
+  sendClientMessage: (msg: any) => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -1956,6 +1957,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         contextualAssist,
         askStudyPaper,
         getStudyDocumentFile,
+        sendClientMessage,
       }}
     >
       {children}

@@ -1,0 +1,1386 @@
+{
+  "doc_ab37b53bd95b": {
+    "document_id": "doc_ab37b53bd95b",
+    "source_id": "ab37b53bd95bb359",
+    "title": "Attention Is All You Need",
+    "source_type": "PDF",
+    "subject": "Geral",
+    "language": "en",
+    "page_count": 6,
+    "sections": [
+      {
+        "section_id": "sec_0",
+        "title": "Abstract / Introdução",
+        "level": 1,
+        "page_start": 1,
+        "page_end": 1,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_1",
+            "text": "Attention Is All You Need Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan Gomez, Lukasz Kaiser Google Brain, Google Research, University of Toronto",
+            "page_number": 1,
+            "section_id": "sec_0",
+            "order": 1
+          }
+        ]
+      },
+      {
+        "section_id": "sec_2",
+        "title": "1. Introduction",
+        "level": 1,
+        "page_start": 1,
+        "page_end": 2,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_2",
+            "text": "Recurrent neural networks, long short-term memory and gated recurrent neural networks in particular, have been firmly established as state of the art approaches in sequence modeling and transduction problems such as language modeling and machine translation. Numerous efforts have since continued to push the boundaries of recurrent language models and encoder-decoder architectures. Recurrent models typically factor computation along the symbol positions of the input and output sequences. Aligning the positions to steps in computation time, they generate a sequence of hidden states h_t, as a function of the previous hidden state h_{t-1} and the input for position t. This inherently sequential nature precludes parallelization within training examples, which becomes critical at longer sequence lengths, as memory constraints limit batching across examples. Recent work has achieved significant improvements in computational efficiency through factorization tricks and conditional computation, while also improving model performance in some cases. However, the fundamental constraint of sequential computation remains. In this work we propose the Transformer, a model architecture eschewing recurrence and instead relying entirely on an attention mechanism to draw global dependencies between input and output. The Transformer allows for significantly more parallelization and can reach a new state of the art in translation quality after being trained for as little as twelve hours on eight P100 GPUs.",
+            "page_number": 1,
+            "section_id": "sec_2",
+            "order": 2
+          }
+        ]
+      },
+      {
+        "section_id": "sec_3",
+        "title": "2. Background",
+        "level": 1,
+        "page_start": 2,
+        "page_end": 2,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_3",
+            "text": "The goal of reducing sequential computation also forms the foundation of the Extended Neural GPU, ByteNet and ConvS2S, all of which use convolutional neural networks as basic building blocks, computing hidden representations in parallel for all input and output positions. In these models, the number of operations required to relate signals from two arbitrary input or output positions grows in the distance between positions, linearly for ConvS2S and logarithmically for ByteNet. This makes it more difficult to learn dependencies between distant positions. In the Transformer this is reduced to a constant number of operations O(1), albeit at the cost of reduced effective resolution due to averaging attention-weighted positions, an effect we counteract with Multi-Head Attention as described in Section 3.2. Self-attention, sometimes called intra-attention is an attention mechanism relating different positions of a single sequence in order to compute a representation of the sequence. Self-attention has been used successfully in a variety of tasks including reading comprehension, abstractive summarization, textual entailment and learning task-independent sentence representations. End-to-end memory networks are based on a recurrent attention mechanism instead of sequence-aligned recurrence and have been shown to perform well on simple-language question answering and language modeling tasks.",
+            "page_number": 2,
+            "section_id": "sec_3",
+            "order": 3
+          }
+        ]
+      },
+      {
+        "section_id": "sec_4",
+        "title": "3. Model Architecture",
+        "level": 1,
+        "page_start": 2,
+        "page_end": 3,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_4",
+            "text": "Most competitive neural sequence transduction models have an encoder-decoder structure. Here, the encoder maps an input sequence of symbol representations (x_1, ..., x_n) to a sequence of continuous representations z = (z_1, ..., z_n). Given z, the decoder then generates an output sequence (y_1, ..., y_m) of symbols one element at a time. At each step the model is auto-regressive, consuming the previously generated symbols as additional input when generating the next. The Transformer follows this overall architecture using stacked self-attention and point-wise, fully connected layers for both the encoder and decoder, shown in the left and right halves of Figure 1, respectively. Encoder and decoder stacks rely on residual connections followed by layer normalization to ensure stable gradient propagation.",
+            "page_number": 2,
+            "section_id": "sec_4",
+            "order": 4
+          }
+        ]
+      },
+      {
+        "section_id": "sec_5",
+        "title": "3.1 Encoder and Decoder Stacks",
+        "level": 1,
+        "page_start": 3,
+        "page_end": 3,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_5",
+            "text": "The encoder is composed of a stack of N = 6 identical layers. Each layer has two sub-layers. The first is a multi-head self-attention mechanism, and the second is a simple, position-wise fully connected feed-forward network. We employ a residual connection around each of the two sub-layers, followed by layer normalization. That is, the output of each sub-layer is LayerNorm(x + Sublayer(x)), where Sublayer(x) is the function implemented by the sub-layer itself. To facilitate these residual connections, all sub-layers in the model, as well as the embedding layers, produce outputs of dimension d_model = 512. The decoder is also composed of a stack of N = 6 identical layers. In addition to the two sub-layers in each encoder layer, the decoder inserts a third sub-layer, which performs multi-head attention over the output of the encoder stack. Similar to the encoder, we employ residual connections around each of the sub-layers, followed by layer normalization. We also modify the self-attention sub-layer in the decoder stack to prevent positions from attending to subsequent positions. This masking, combined with fact that the output embeddings are offset by one position, ensures that predictions for position i can depend only on known outputs.",
+            "page_number": 3,
+            "section_id": "sec_5",
+            "order": 5
+          }
+        ]
+      },
+      {
+        "section_id": "sec_6",
+        "title": "3.2 Attention Mechanism",
+        "level": 1,
+        "page_start": 3,
+        "page_end": 4,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_6",
+            "text": "An attention function can be described as mapping a query and a set of key-value pairs to an output, where the query, keys, values, and output are all vectors. The output is computed as a weighted sum of the values, where the weight assigned to each value is computed by a compatibility function of the query with the corresponding key. Scaled Dot-Product Attention: Softmax( Q * K^T / sqrt(d_k) ) * V Inputs: Query Q (d_k), Key K (d_k), Value V (d_v) Scale factor: 1 / sqrt(d_k) prevents push into small gradient regions Mask: Optional masking of future positions for auto-regressive decoding Figure 1: Scaled Dot-Product Attention and Model Architecture Scaled Dot-Product Attention computes attention weights: Attention(Q, K, V) = softmax(QK^T / sqrt(d_k)) * V. We compute the dot products of the query with all keys, divide each by sqrt(d_k), and apply a softmax function to obtain the weights on the values. In practice, we compute the attention function on a set of queries simultaneously, packed together into a matrix Q. The keys and values are also packed together into matrices K and V.",
+            "page_number": 3,
+            "section_id": "sec_6",
+            "order": 6
+          }
+        ]
+      },
+      {
+        "section_id": "sec_7",
+        "title": "3.3 Multi-Head Attention",
+        "level": 1,
+        "page_start": 4,
+        "page_end": 4,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_7",
+            "text": "Instead of performing a single attention function with d_model-dimensional keys, values and queries, we found it beneficial to linearly project the queries, keys and values h times with different, learned linear projections to d_k, d_k and d_v dimensions, respectively. On each of these projected versions of queries, keys and values we then perform the attention function in parallel, yielding d_v-dimensional output values. These are concatenated and once again projected, resulting in the final values. Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this. In this work we employ h = 8 parallel attention layers, or heads. For each of these we use d_k = d_v = d_model / h = 64. Due to the reduced dimension of each head, the total computational cost is similar to that of single-head attention with full dimensionality. Table 1: BLEU scores on WMT 2014 English-to-German and English-to-French",
+            "page_number": 4,
+            "section_id": "sec_7",
+            "order": 7
+          }
+        ]
+      },
+      {
+        "section_id": "sec_8",
+        "title": "Model",
+        "level": 1,
+        "page_start": 4,
+        "page_end": 5,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_8",
+            "text": "BLEU (EN-DE) BLEU (EN-FR) Training FLOPs ByteNet 23.75 - 1.0e19 ConvS2S 25.16 40.46 1.5e19 Transformer (base) 27.3 38.1 3.3e18 Transformer (big) 28.4 41.8 2.3e19",
+            "page_number": 4,
+            "section_id": "sec_8",
+            "order": 8
+          }
+        ]
+      },
+      {
+        "section_id": "sec_9",
+        "title": "4. Results",
+        "level": 1,
+        "page_start": 5,
+        "page_end": 5,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_9",
+            "text": "On the WMT 2014 English-to-German translation task, the big transformer model out-performs the best previously reported models (including ensembles) by more than 2.0 BLEU, establishing a new state-of-the-art BLEU score of 28.4. The base model achieves a BLEU score of 27.3, outperforming all previous models and ensembles, at a fraction of the training cost. On the WMT 2014 English-to-French translation task, our big model achieves a BLEU score of 41.8, outperforming all previously published single models, at less than 1/4 the training cost of the previous state-of-the-art model. The Transformer (big) model trained for English-to-French used dropout P_drop = 0.1, instead of 0.3.",
+            "page_number": 5,
+            "section_id": "sec_9",
+            "order": 9
+          }
+        ]
+      },
+      {
+        "section_id": "sec_10",
+        "title": "5. Discussion and Limitations",
+        "level": 1,
+        "page_start": 5,
+        "page_end": 6,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_10",
+            "text": "While the Transformer demonstrates remarkable empirical gains, several key limitations should be noted. First, the memory complexity of self-attention scales quadratically with sequence length O(n^2), rendering full self-attention computationally prohibitive for very long sequences (e.g. genomic sequences or document-level translation) without sparse approximations. Second, the absence of recurrence necessitates positional encodings, which may not generalize seamlessly to sequences significantly longer than those observed during training. Third, the multi-head mechanism requires extensive memory bandwidth during auto-regressive generation, where each step retrieves previously computed key-value pairs from GPU high-bandwidth memory.",
+            "page_number": 5,
+            "section_id": "sec_10",
+            "order": 10
+          }
+        ]
+      },
+      {
+        "section_id": "sec_11",
+        "title": "6. Conclusion",
+        "level": 1,
+        "page_start": 6,
+        "page_end": 6,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_11",
+            "text": "In this work, we presented the Transformer, the first sequence transduction model based entirely on attention, replacing the recurrent layers most commonly used in encoder-decoder architectures with multi-headed self-attention. For translation tasks, the Transformer can be trained significantly faster than architectures based on recurrent or convolutional layers. On both WMT 2014 English-to-German and WMT 2014 English-to-French translation tasks, we achieve a new state of the art. In the former task our best model out-performs even all previously reported ensembles. We are excited about the future of attention-based models and plan to apply them to other tasks. We plan to extend the Transformer to problems involving input and output modalities other than text and to investigate local, restricted attention mechanisms to efficiently handle large inputs and outputs such as images, audio and video.",
+            "page_number": 6,
+            "section_id": "sec_11",
+            "order": 11
+          }
+        ]
+      },
+      {
+        "section_id": "sec_12",
+        "title": "References",
+        "level": 1,
+        "page_start": 6,
+        "page_end": 6,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_12",
+            "text": "[1] Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. Neural machine translation by jointly learning to align and translate. ICLR 2015. [2] Nal Kalchbrenner, Lasse Espeholt, Karen Simonyan, Aaron van den Oord, Alex Graves, and Koray Kavukcuoglu. Neural machine translation in linear time. arXiv:1610.10099, 2016. [3] Jonas Gehring, Michael Auli, David Grangier, Denis Yarats, and Yann N. Dauphin. Convolutional sequence to sequence learning. ICML 2017. [4] Sepp Hochreiter and Jurgen Schmidhuber. Long short-term memory. Neural computation, 9(8):1735-1780, 1997. [5] Jimmy Lei Ba, Jamie Ryan Kiros, and Geoffrey E Hinton. Layer normalization. arXiv:1607.06450, 2016.",
+            "page_number": 6,
+            "section_id": "sec_12",
+            "order": 12
+          }
+        ]
+      }
+    ],
+    "extracted_text": "Attention Is All You Need\nAshish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan Gomez, Lukasz Kaiser\nGoogle Brain, Google Research, University of Toronto\nAbstract\n1. Introduction\nRecurrent neural networks, long short-term memory and gated recurrent neural networks in particular, have been\nfirmly established as state of the art approaches in sequence modeling and transduction problems such as language\nmodeling and machine translation. Numerous efforts have since continued to push the boundaries of recurrent\nlanguage models and encoder-decoder architectures.\nRecurrent models typically factor computation along the symbol positions of the input and output sequences. Aligning\nthe positions to steps in computation time, they generate a sequence of hidden states h_t, as a function of the\nprevious hidden state h_{t-1} and the input for position t. This inherently sequential nature precludes parallelization\nwithin training examples, which becomes critical at longer sequence lengths, as memory constraints limit batching\nacross examples. Recent work has achieved significant improvements in computational efficiency through\nfactorization tricks and conditional computation, while also improving model performance in some cases. However,\nthe fundamental constraint of sequential computation remains.\nIn this work we propose the Transformer, a model architecture eschewing recurrence and instead relying entirely on\nan attention mechanism to draw global dependencies between input and output. The Transformer allows for\nsignificantly more parallelization and can reach a new state of the art in translation quality after being trained for as\nlittle as twelve hours on eight P100 GPUs.\n\n\n2. Background\nThe goal of reducing sequential computation also forms the foundation of the Extended Neural GPU, ByteNet and\nConvS2S, all of which use convolutional neural networks as basic building blocks, computing hidden representations\nin parallel for all input and output positions. In these models, the number of operations required to relate signals from\ntwo arbitrary input or output positions grows in the distance between positions, linearly for ConvS2S and\nlogarithmically for ByteNet. This makes it more difficult to learn dependencies between distant positions.\nIn the Transformer this is reduced to a constant number of operations O(1), albeit at the cost of reduced effective\nresolution due to averaging attention-weighted positions, an effect we counteract with Multi-Head Attention as\ndescribed in Section 3.2. Self-attention, sometimes called intra-attention is an attention mechanism relating different\npositions of a single sequence in order to compute a representation of the sequence. Self-attention has been used\nsuccessfully in a variety of tasks including reading comprehension, abstractive summarization, textual entailment and\nlearning task-independent sentence representations. End-to-end memory networks are based on a recurrent attention\nmechanism instead of sequence-aligned recurrence and have been shown to perform well on simple-language\nquestion answering and language modeling tasks.\n3. Model Architecture\nMost competitive neural sequence transduction models have an encoder-decoder structure. Here, the encoder maps\nan input sequence of symbol representations (x_1, ..., x_n) to a sequence of continuous representations z = (z_1, ...,\nz_n). Given z, the decoder then generates an output sequence (y_1, ..., y_m) of symbols one element at a time. At\neach step the model is auto-regressive, consuming the previously generated symbols as additional input when\ngenerating the next.\nThe Transformer follows this overall architecture using stacked self-attention and point-wise, fully connected layers for\nboth the encoder and decoder, shown in the left and right halves of Figure 1, respectively. Encoder and decoder\nstacks rely on residual connections followed by layer normalization to ensure stable gradient propagation.\n\n\n3.1 Encoder and Decoder Stacks\nThe encoder is composed of a stack of N = 6 identical layers. Each layer has two sub-layers. The first is a multi-head\nself-attention mechanism, and the second is a simple, position-wise fully connected feed-forward network. We employ\na residual connection around each of the two sub-layers, followed by layer normalization. That is, the output of each\nsub-layer is LayerNorm(x + Sublayer(x)), where Sublayer(x) is the function implemented by the sub-layer itself. To\nfacilitate these residual connections, all sub-layers in the model, as well as the embedding layers, produce outputs of\ndimension d_model = 512.\nThe decoder is also composed of a stack of N = 6 identical layers. In addition to the two sub-layers in each encoder\nlayer, the decoder inserts a third sub-layer, which performs multi-head attention over the output of the encoder stack.\nSimilar to the encoder, we employ residual connections around each of the sub-layers, followed by layer\nnormalization. We also modify the self-attention sub-layer in the decoder stack to prevent positions from attending to\nsubsequent positions. This masking, combined with fact that the output embeddings are offset by one position,\nensures that predictions for position i can depend only on known outputs.\n3.2 Attention Mechanism\nAn attention function can be described as mapping a query and a set of key-value pairs to an output, where the\nquery, keys, values, and output are all vectors. The output is computed as a weighted sum of the values, where the\nweight assigned to each value is computed by a compatibility function of the query with the corresponding key.\nScaled Dot-Product Attention: Softmax( Q * K^T / sqrt(d_k) ) * V\nInputs: Query Q (d_k), Key K (d_k), Value V (d_v)\nScale factor: 1 / sqrt(d_k) prevents push into small gradient regions\nMask: Optional masking of future positions for auto-regressive decoding\nFigure 1: Scaled Dot-Product Attention and Model Architecture\nScaled Dot-Product Attention computes attention weights: Attention(Q, K, V) = softmax(QK^T / sqrt(d_k)) * V. We compute\nthe dot products of the query with all keys, divide each by sqrt(d_k), and apply a softmax function to obtain the weights on\nthe values. In practice, we compute the attention function on a set of queries simultaneously, packed together into a matrix\nQ. The keys and values are also packed together into matrices K and V.\n\n\n3.3 Multi-Head Attention\nInstead of performing a single attention function with d_model-dimensional keys, values and queries, we found it\nbeneficial to linearly project the queries, keys and values h times with different, learned linear projections to d_k, d_k\nand d_v dimensions, respectively. On each of these projected versions of queries, keys and values we then perform\nthe attention function in parallel, yielding d_v-dimensional output values. These are concatenated and once again\nprojected, resulting in the final values.\nMulti-head attention allows the model to jointly attend to information from different representation subspaces at\ndifferent positions. With a single attention head, averaging inhibits this. In this work we employ h = 8 parallel attention\nlayers, or heads. For each of these we use d_k = d_v = d_model / h = 64. Due to the reduced dimension of each\nhead, the total computational cost is similar to that of single-head attention with full dimensionality.\nTable 1: BLEU scores on WMT 2014 English-to-German and English-to-French\nModel\nBLEU (EN-DE)\nBLEU (EN-FR)\nTraining FLOPs\nByteNet\n23.75\n-\n1.0e19\nConvS2S\n25.16\n40.46\n1.5e19\nTransformer (base)\n27.3\n38.1\n3.3e18\nTransformer (big)\n28.4\n41.8\n2.3e19\n\n\n4. Results\nOn the WMT 2014 English-to-German translation task, the big transformer model out-performs the best previously\nreported models (including ensembles) by more than 2.0 BLEU, establishing a new state-of-the-art BLEU score of\n28.4. The base model achieves a BLEU score of 27.3, outperforming all previous models and ensembles, at a fraction\nof the training cost.\nOn the WMT 2014 English-to-French translation task, our big model achieves a BLEU score of 41.8, outperforming all\npreviously published single models, at less than 1/4 the training cost of the previous state-of-the-art model. The\nTransformer (big) model trained for English-to-French used dropout P_drop = 0.1, instead of 0.3.\n5. Discussion and Limitations\nWhile the Transformer demonstrates remarkable empirical gains, several key limitations should be noted.\nFirst, the memory complexity of self-attention scales quadratically with sequence length O(n^2), rendering full\nself-attention computationally prohibitive for very long sequences (e.g. genomic sequences or document-level\ntranslation) without sparse approximations.\nSecond, the absence of recurrence necessitates positional encodings, which may not generalize seamlessly to\nsequences significantly longer than those observed during training.\nThird, the multi-head mechanism requires extensive memory bandwidth during auto-regressive generation, where\neach step retrieves previously computed key-value pairs from GPU high-bandwidth memory.\n\n\n6. Conclusion\nIn this work, we presented the Transformer, the first sequence transduction model based entirely on attention,\nreplacing the recurrent layers most commonly used in encoder-decoder architectures with multi-headed self-attention.\nFor translation tasks, the Transformer can be trained significantly faster than architectures based on recurrent or\nconvolutional layers. On both WMT 2014 English-to-German and WMT 2014 English-to-French translation tasks, we\nachieve a new state of the art. In the former task our best model out-performs even all previously reported\nensembles. We are excited about the future of attention-based models and plan to apply them to other tasks.\nWe plan to extend the Transformer to problems involving input and output modalities other than text and to\ninvestigate local, restricted attention mechanisms to efficiently handle large inputs and outputs such as images, audio\nand video.\nReferences\n[1] Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. Neural machine translation by jointly learning to align and\ntranslate. ICLR 2015.\n[2] Nal Kalchbrenner, Lasse Espeholt, Karen Simonyan, Aaron van den Oord, Alex Graves, and Koray Kavukcuoglu. Neural\nmachine translation in linear time. arXiv:1610.10099, 2016.\n[3] Jonas Gehring, Michael Auli, David Grangier, Denis Yarats, and Yann N. Dauphin. Convolutional sequence to sequence\nlearning. ICML 2017.\n[4] Sepp Hochreiter and Jurgen Schmidhuber. Long short-term memory. Neural computation, 9(8):1735-1780, 1997.\n[5] Jimmy Lei Ba, Jamie Ryan Kiros, and Geoffrey E Hinton. Layer normalization. arXiv:1607.06450, 2016.\n",
+    "media": [
+      {
+        "media_id": "fig_p3_0",
+        "media_type": "figure",
+        "title": "Figure 1: Scaled Dot-Product Attention and Model Architectur",
+        "caption": "Figure 1: Scaled Dot-Product Attention and Model Architecture",
+        "page_number": 3,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p4_1",
+        "media_type": "table",
+        "title": "Table 1: BLEU scores on WMT 2014 English-to-German and Engli",
+        "caption": "Table 1: BLEU scores on WMT 2014 English-to-German and English-to-French",
+        "page_number": 4,
+        "evidence_status": "OBSERVED"
+      }
+    ],
+    "metadata": {
+      "filename": "sample_paper_attention.pdf",
+      "size_bytes": 18135,
+      "file_path": "C:\\Users\\joaor\\Desktop\\JarvisOS\\data\\study\\sample_paper_attention.pdf"
+    },
+    "source_hash": "ab37b53bd95bb3598fe6a64055596901462b29965c6f33c97c07cada05c1db11",
+    "provenance": {
+      "source_file": "sample_paper_attention.pdf",
+      "source_hash": "ab37b53bd95bb3598fe6a64055596901462b29965c6f33c97c07cada05c1db11",
+      "ingested_at": "2026-09-23T01:09:17.530719",
+      "evidence_status": "OBSERVED"
+    },
+    "reading_progress": {
+      "current_page": 4,
+      "current_section": "3.3 Multi-Head Attention",
+      "scroll_position": 420,
+      "progress_percent": 66.7,
+      "last_read_at": "2026-09-23T01:09:42.233502",
+      "bookmarks": []
+    },
+    "structure": {
+      "problem": {
+        "text": "O artigo aborda otimização e precisão em cenários de alta complexidade.",
+        "status": "INFERRED",
+        "page_ref": null
+      },
+      "research_gap": {
+        "text": "Necessidade de conciliar eficiência computacional com garantias estritas.",
+        "status": "INFERRED",
+        "page_ref": null
+      },
+      "research_question": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "hypothesis": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "contribution": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "method": {
+        "text": "Most competitive neural sequence transduction models have an encoder-decoder structure. Here, the encoder maps an input sequence of symbol representations (x_1, ..., x_n) to a sequence of continuous r",
+        "status": "OBSERVED",
+        "page_ref": 2
+      },
+      "dataset": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "experiment": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "results": {
+        "text": "Evidências experimentais avaliadas na secção 4. Results.",
+        "status": "OBSERVED",
+        "page_ref": 5
+      },
+      "limitations": {
+        "text": "Limitações documentadas explicitamente pelos autores.",
+        "status": "OBSERVED",
+        "page_ref": 5
+      },
+      "conclusion": {
+        "text": "Conclusões sintetizadas na secção final (p. 6).",
+        "status": "OBSERVED",
+        "page_ref": 6
+      }
+    },
+    "glossary": [
+      {
+        "term": "state of the art",
+        "translation": "estado da arte (SOTA)",
+        "explanation": "O nível mais elevado de desenvolvimento ou desempenho atingido até ao momento numa disciplina.",
+        "first_occurrence": "«...ve been firmly established as state of the art approaches in sequence modeling a...»",
+        "occurrences": 3,
+        "importance": "HIGH"
+      },
+      {
+        "term": "attention mechanism",
+        "translation": "mecanismo de atenção",
+        "explanation": "Arquitetura que calcula pesos contextuais dinâmicos entre elementos de uma sequência.",
+        "first_occurrence": "«...attention mechanism...»",
+        "occurrences": 1,
+        "importance": "HIGH"
+      },
+      {
+        "term": "embedding",
+        "translation": "incorporação vetorial (embedding)",
+        "explanation": "Mapeamento denso de palavras ou conceitos para espaços geométricos contínuos.",
+        "first_occurrence": "«...in the model, as well as the embedding layers, produce outputs of dimension d_m...»",
+        "occurrences": 1,
+        "importance": "MEDIUM"
+      }
+    ],
+    "created_at": "2026-09-23T01:09:17.530719",
+    "updated_at": "2026-09-23T01:09:17.530719"
+  },
+  "doc_a3b336f4295d": {
+    "document_id": "doc_a3b336f4295d",
+    "source_id": "a3b336f4295d0d51",
+    "title": "Predicting performance online consumer reviews",
+    "source_type": "PDF",
+    "subject": "Inteligência Artificial",
+    "language": "en",
+    "page_count": 11,
+    "sections": [
+      {
+        "section_id": "sec_0",
+        "title": "Abstract / Introdução",
+        "level": 1,
+        "page_start": 1,
+        "page_end": 1,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_1",
+            "text": "Predicting the performance of online consumer reviews: A sentiment mining approach to big data analytics Mohammad Salehan a, Dan J. Kim b,⁎ a Department of Computer Information Systems, College of Business Administration, California State Polytechnic University, Pomona, 3801 West Temple Avenue, Pomona, CA 91768, USA b Department of Information Technology and Decision Sciences, College of Business, University of North Texas, 1307 West Highland Street, Denton, TX 76201, USA a b s t r a c t a r t i c l e i n f o Article history: Received 13 November 2014 Received in revised form 11 September 2015 Accepted 19 October 2015 Available online 30 October 2015 Keywords: Online consumer reviews Sentiment mining Helpfulness Readership Big data analytics Although online consumer reviews (OCRs) have helped consumers to know about the strengths and weaknesses of different products and ﬁnd the ones that best suit their needs, they introduce a challenge for businesses to an- alyze them because of their volume, variety, velocity and veracity. This research investigates the predictors of readership and helpfulness of OCR using a sentiment mining approach for big data analytics. Our ﬁndings show that reviews with higher levels of positive sentiment in the title receive more readerships. Sentimental re- views with neutral polarity in the text are also perceived to be more helpful. The length and longevity of a review positively inﬂuence both its readership and helpfulness. Because the current methods used for sorting OCR may bias both their readership and helpfulness, the approach used in this study can be adopted by online vendors to develop scalable automated systems for sorting and classiﬁcation of big OCR data which will beneﬁt both vendors and consumers. © 2015 Elsevier B.V. All rights reserved.",
+            "page_number": 1,
+            "section_id": "sec_0",
+            "order": 1
+          }
+        ]
+      },
+      {
+        "section_id": "sec_2",
+        "title": "1. Introduction",
+        "level": 1,
+        "page_start": 1,
+        "page_end": 2,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_2",
+            "text": "Businesses are now using social media to promote their products and services. Many companies maintain Facebook and Twitter accounts to keep in touch with their customers. Customers also use social media to receive information about products/services. In many ways the Internet in general and social media in particular, have changed the way customers shop for goods and services. It's now quite normal for people to ﬁnd the product they want at brick-and-mortar stores and then order it online. Moreover, online consumer reviews (OCRs) have helped customers to learn about the strengths and weaknesses of differ- ent products and to ﬁnd the ones that best suit their needs. Some studies suggest that customers show more interest toward user-generated product information on the Internet than the information vendors pro- vided [9]. A recent study shows that OCRs are the second most-trusted source of product information after recommendations from family and friends [47]. Compared to vendor-generated product descriptions, OCRs are more user-oriented and describe the product in terms of dif- ferent usage scenarios and assess it from a user's perspective [13]. Thus, it has even been suggested that consumers who write OCR serve as “sales assistants” for online retailers [13]. Although analysis of OCR can be beneﬁcial to both consumers and businesses, it is challenging to analyze it due to the characteristics such as volume, variety, velocity and veracity. From a consumer's perspective, the process of examining OCR can be broken into two steps: the decision to read the review, and the actual processing of the information in the review that deems the decision to use it based on perceived helpfulness of the review [1]. Focusing on the two steps of processing OCR, this study proposes two fundamental research questions in the context of OCR: RQ1: Which factors determine the likelihood of a consumer paying attention to a review? RQ2: Which factors determine the perceived helpfulness of a review? From online business managers' perspective, ﬁnding answers to the above questions are quite important steps toward understanding online consumers' perceptions of their products and/or services and ultimate- ly, designing and implementing scalable automated systems for classiﬁcation and sorting of big OCR data [44,49]. The ﬁrst research question looks into the characteristics of OCR that absorb the attention of online consumers. Many products receive too many reviews that make it difﬁcult for consumers to read all of them. Thus, most consumers have to read them selectively. In summary, the ﬁrst research question explores the determinants of the readership of OCR. Although reading a review is the ﬁrst step in determining its helpfulness, previous research overlooks the readership of OCR. While the ﬁrst research question remains largely unexplored, the second one has received some attention. Previous research has found strong evidence that OCRs inﬂuence product sales [14,16,18,20,22,23, 42,46]. However, three important aspects of the second research question require further investigation. First, most studies only use the Decision Support Systems 81 (2016) 30–40 ⁎ Corresponding author at: University of North Texas, College of Business, 1155 Union Circle #311160, Denton, TX 76203-5017, USA. E-mail address: Dan.Kim@unt.edu (D.J. Kim). http://dx.doi.org/10.1016/j.dss.2015.10.006 0167-9236/© 2015 Elsevier B.V. All rights reserved. Contents lists available at ScienceDirect Decision Support Systems journal homepage: www.elsevier.com/locate/dss",
+            "page_number": 1,
+            "section_id": "sec_2",
+            "order": 2
+          },
+          {
+            "paragraph_id": "p_3",
+            "text": "numerical review ratings (e.g., the number of stars) and the length of the reviews in their empirical analysis, without formally incorporating the information contained in the text of the reviews. Therefore, a deeper analysis of the textual information contained in the OCR can provide greater insight into what constitutes a useful online review [46]. Although some previous studies have used the text of OCR to predict helpfulness [15,22,37], the effect of sentiment on helpfulness of OCR remains unexplored. Second, previous research shows that positive statements are considered to be more helpful by consumers [56]. However, research has produced conﬂicting results regarding the negative comments. For example, Sen and Lerman [58] found that in the case of utilitarian products, negative comments are more useful than positive ones, whereas Schindler and Bickart [56] failed to ﬁnd any signiﬁcant relationship between negative statements and helpfulness of a review. By investigating the effect of sentiment polarity (i.e., negative, positive, or neutral) on helpfulness, this study provides insights into the performance of OCR. Finally, previous research tends to identify the predictors of the per- formance of OCR without providing many practical solutions for online vendors. Human subjects are largely employed for categorization of OCR based on the textual information contained in them. Although this method provides a descriptive view of the performance of OCR, it does not facilitate the development of scalable automated systems for classiﬁcation of OCR. This study investigates the performance of OCR through analysis of textual information contained in the reviews. Previous research has indicated that computer-mediated communications (CMCs) can effec- tively transfer emotions. Moreover, the emotions contained in a message transferred through CMC signiﬁcantly inﬂuence how the mes- sage is processed and interpreted by the receiver [7,54,70]. Sentiment mining can be used for emotional analysis of textual information. Senti- ment mining refers to the use of natural language processing and com- putational linguistics to ﬁnd and extract subjective information from text data. Sentiment mining is usually done using automated tools that provides beneﬁts such as scalability, effective information retrieval, automated cyber risk management, and increased business proﬁts [4]. It also facilitates processing of large amounts of data. Social media is an important source of big data and is quite suitable for text mining purposes [12,55]. This study contributes to the existing body of knowledge in three unique ways. First, it provides a research model that predicts the perfor- mance of OCR in terms of readership and helpfulness of reviews using a sentimental mining approach. Although previous studies have used the text of OCR to predict the performance of OCR such as helpfulness (e.g., [15,22,37]), the effect of sentiment on the performance of OCR still remains unexplored. Thus, this study is expected to provide a novel contribution in this domain. Second, it uses automated tools to an- alyze a set of secondary OCR data composed of reviews collected from Amazon.com website. In addition, following the directions provided by Chen et al. [12], it uncovers a new application of big data analytics. More speciﬁcally, it provides insights to online business managers re- garding the design and implementation of scalable automated systems to improve classiﬁcation and sorting of OCR, which will eventually help them achieve increased sales.",
+            "page_number": 2,
+            "section_id": "sec_2",
+            "order": 3
+          }
+        ]
+      },
+      {
+        "section_id": "sec_3",
+        "title": "2.1. Online review performance measures",
+        "level": 1,
+        "page_start": 2,
+        "page_end": 2,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_4",
+            "text": "Different measures have been used by previous studies to evaluate the performance of OCR. Most studies use helpfulness as the single per- formance measure of OCR [3,46,58]. Helpfulness has also been referred to as the value of the review [56]. For studies that use secondary data, helpfulness is measured by dividing the number of people who ﬁnd a review helpful by the total number of people who voted for that review [46,58]. Purchase intention is another measure of performance. Customer purchase intention is inﬂuenced by both quantity and quality of the re- views [52]. Some studies use sales revenue as a performance measure for online reviews. One study used online reviews from Yahoo Movies website to predict box ofﬁce revenues and found strong evidence that online reviews inﬂuence movie sales [42]. Online reviews have also been used to predict the online sales of books [14]. Product ratings also indirectly inﬂuence sales through sentiment [31].",
+            "page_number": 2,
+            "section_id": "sec_3",
+            "order": 4
+          }
+        ]
+      },
+      {
+        "section_id": "sec_4",
+        "title": "2.2. Predictors of online review performance",
+        "level": 1,
+        "page_start": 2,
+        "page_end": 3,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_5",
+            "text": "Different measures have been used to predict the performance of OCR. Some studies have focused on the numeric star rating and word count of the reviews to predict their performance. For example, extreme numerical ratings are positively related to sales of books [14]. Reviews with extreme numerical ratings are also considered more helpful [46]. Length of a review may also predict its performance. Length of reviews for a book signiﬁcantly predicts its sales on Amazon.com [14]. Length of a review is also positively related to its helpfulness [22,37,46,56]. Em- pirical analysis, however, fails to ﬁnd any signiﬁcant relationship be- tween review length and sales of books on Barnes & Noble website [14]. Lu et al. [44] suggest that to predict the performance of OCR, re- views should not be treated as stand-alone documents and contextual information about author's identity and social networks should be use to achieve enhanced prediction accuracy. Several other studies also use reviewer characteristics including total number of reviews written by the user, expertise, experience, writing style, rating pattern, and excellence to predict helpfulness of OCR (e.g., [43,49]). The difference between the performance of positive and negative re- views is controversial research avenue in the context of OCR. Drawing upon the negativity bias theory, some studies propose that negative reviews are considered more helpful than positive ones. According to the negativity bias theory, people face difﬁculty in making inferences about the actions of an actor when the actor behaves in an expected fashion. The inference is easier when the actor departs from the norms of behavior [35,36]. Thus, some researchers have argued that negative comments should be considered more helpful than positive ones because they deviate from the accepted norm of staying positive [58]. Several studies test the negativity bias theory in the context of OCR. Their ﬁndings, however, are contradictory. While some studies show that consumers ﬁnd negative reviews more valuable, others ﬁnd no signiﬁcant difference between positive and negative reviews. Some others even ﬁnd that positive reviews are more helpful than negative ones. Sen and Lerman [58] ﬁnd that positive reviews are generally more helpful than negative ones. However, negative reviews are more useful for utilitarian products (products that focus on task performance) and positive comments are more useful for hedonic products (products that deal with pleasure). Schindler and Bickart [56] ﬁnd that the number of positive statements is a signiﬁcant predictor of the value of a review while the effect of the number of negative statements on value is not signiﬁcant. A recent study suggests that consumer reviews may be sub- jected to positive social inﬂuence bias, also known as inner circle bias [3]. Through an experiment, the author manipulated the helpfulness of OCR and found out that positive manipulations create a positive social inﬂuence that last several months. The negative manipulations, howev- er, are offset by a correction effect that neutralizes the manipulation. The ﬁndings suggest that corporations can easily manipulate OCR and the reviews should be considered with some level of skepticism. Recent studies use text of a review to predict its performance. Schin- dler and Bickart [56] look at the wording of online reviews rather than their source. They divide wording factor into two categories: content and style. They deﬁne the content as the information the review pro- vides. Style, by contrast, is deﬁned as the choice of words used to convey the information. They ﬁnd that proportion of product-descriptive 31 M. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40",
+            "page_number": 2,
+            "section_id": "sec_4",
+            "order": 5
+          },
+          {
+            "paragraph_id": "p_6",
+            "text": "statements and proportion of reviewer-descriptive statements are sig- niﬁcant predictors of the value of the review. They also ﬁnd that while use of negative style characteristics decrease the value of the review, use of positive style doesn't improve its performance. Finally, they didn't ﬁnd any signiﬁcant relationship between negative evaluative state- ments and value of the review. Other signiﬁcant predictors of helpful- ness extracted from the text of online reviews include the amount of objective and subjective information [22], conformity (i.e., deviation from average star rating) [15,37], review completeness (i.e., the amount of optional review content) [49], and readability [22]. Review sentiment is another measure used by previous studies to predict the performance of computer-mediated communications (CMC) in general, and OCR in particular. Previous research has indicated that CMC can effectively transfer emotions. The receiver of a message can detect the sender's emotions through verbal cues such as emotion words as well as nonverbal cues such as emoticons [26]. Moreover, the emotions contained in a message transferred through CMC signiﬁ- cantly inﬂuence how the message is processed and interpreted by the receiver [54,70]. Different methods can be used to extract sentiment out of text. While some studies use human subjects to extract the sentiment of OCR, others use automated sentiment mining to extract sentiment from the text of reviews [4,56,58].",
+            "page_number": 3,
+            "section_id": "sec_4",
+            "order": 6
+          }
+        ]
+      },
+      {
+        "section_id": "sec_5",
+        "title": "2.3. Moderators of performance",
+        "level": 1,
+        "page_start": 3,
+        "page_end": 3,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_7",
+            "text": "Product type is an important factor in the context of online reviews which has mostly been viewed as the variable moderating the relation- ship between independent variables and helpfulness. For example, re- views on hedonic products are less likely to be perceived as helpful [58]. There are also differences between helpfulness of search and expe- rience goods. For search goods, consumers can obtain information about product quality prior to purchase while evaluation of experience goods requires sampling or purchase. While reviews with extremely high or low star rating are considered more helpful for search goods, the effect is different for experience goods. For experience goods, extreme re- views are considered less helpful than the ones with moderate rating [46]. Product type also moderates the relationship between the number of positive and negative statements with the helpfulness of a review [58]. The length of a review has greater positive impact on its helpful- ness for search goods compared to experience goods [46]. Customer involvement is another moderating variable in the context of OCR. While low-involvement customers are more inﬂuenced by the quantity rather than the quality of reviews, high-involvement cus- tomers are inﬂuenced by the quantity of reviews if the reviews have high quality [52].",
+            "page_number": 3,
+            "section_id": "sec_5",
+            "order": 7
+          }
+        ]
+      },
+      {
+        "section_id": "sec_6",
+        "title": "2.4. Theories related to message selection",
+        "level": 1,
+        "page_start": 3,
+        "page_end": 3,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_8",
+            "text": "The theory of selective attention posits that people respond to mes- sages selectively because of limited information processing capacity [66]. When people receive multiple stimuli at once, they need to ﬁlter some of the messages because they have limited processing capacity. Same thing happens in the context of online reviews. Many products have large number of reviews which makes people to selectively read online reviews. The theory of selective perception helps explain the mechanism underlying selective attention. According to selective perception, people develop belief structures which are a simpliﬁed rep- resentation of the world and use these structures to ﬁlter and interpret information [69]. Attribution theory explains how people analyze different behaviors. Based on the theory, people identify two types of explanation for differ- ent behaviors: actions related to internal (personal) factors and the ones that result from external environment (situational) [19,27]. The theory largely explains the predictors of source credibility and other areas re- lated to consumer perceptions and inference formation [17]. It has also been used to explain the perceptions of the consumers regarding the helpfulness of OCR. Readers consider the motivation of the author of a review when deciding about whether or not to use the information contained in the review. Readers may attribute a review to either external (product-related) or internal (reviewer-related) reasons. If the reader feels that the review is based on external reasons, they are more likely to accept it. If reader believes that the review is based on internal reasons, they are more likely to disregard it [58].",
+            "page_number": 3,
+            "section_id": "sec_6",
+            "order": 8
+          }
+        ]
+      },
+      {
+        "section_id": "sec_7",
+        "title": "2.5. Fake reviews",
+        "level": 1,
+        "page_start": 3,
+        "page_end": 3,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_9",
+            "text": "Because online reviews have the potential to inﬂuence customers, they have received signiﬁcant attention from sellers/providers of goods/services. Some have even tried to inﬂuence the perceptions of customers by creating fake reviews [38,61,68]. One study ﬁnds that cer- tain hotels distinguished by location and ownership post more fake pos- itive reviews for themselves and more fake negative reviews for their competitors. The independent hotels that are owned by single-unit owners are more likely to post fake reviews than branded hotel chains. Moreover, the hotels close to a hotel with a high incentive to post fake reviews have more negative reviews [45]. Another study reports that 10.3% of book reviews are fake or manipulated [30]. Previous research has used different methods to identify fake re- views. Some studies compare reviews of products on different websites to investigate fake reviews. One study identiﬁes evidence of fake re- views by comparing the reviews of two travel sites with extensive hotel reviews: Expedia.com and TripAdvisor.com [45]. While anyone can write a review on TripAdvisor, one needs to have actually booked at least one night for the given hotel on Expedia to be able to post a re- view for that hotel. Human subjects and automated tools have also been used to identify fake reviews. One study failed to recognize manipulated reviews using sentiment mining but found that consumers are able to recognize them [30]. Other studies use machine learning methods to identify fake reviews [33,40,50].",
+            "page_number": 3,
+            "section_id": "sec_7",
+            "order": 9
+          }
+        ]
+      },
+      {
+        "section_id": "sec_8",
+        "title": "3. Research model and hypothesis",
+        "level": 1,
+        "page_start": 3,
+        "page_end": 5,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_10",
+            "text": "Following the directions provided by Mudambi and Schuff [46] re- garding the need for the analysis of the textual information contained in OCR, we utilize sentiment mining to analyze the text of the reviews and to investigate our two research questions. Each Amazon review has a title and a body text. We extract the sentiment of both the title and the text of reviews and use them to predict performance. We have two measures for OCR performance, readership and helpfulness, each of which corresponds to one of our research questions. Fig. 1 shows the proposed research model. Review Sentiment Review Length Readership Helpfulness H6 (+) H7 (+) Review Polarity Title Polarity Title Sentiment Title Length H3 H2 (+) H4 (+) H5 (+) H8 Longevity H1 (+) Fig. 1. Research model. 32 M. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40",
+            "page_number": 3,
+            "section_id": "sec_8",
+            "order": 10
+          },
+          {
+            "paragraph_id": "p_11",
+            "text": "In the model, sentiment refers to the total amount of sentiment that exists in a text, both positive and negative. Polarity refers to the direction of the sentiment which can be positive, negative, or neutral. More information on our measures can be found in the methodology section. Liu, Cao, Lin, Huang and Zhou [41] note that the publication date of a review has positive correlation with its total number of votes. This is referred to as ebias. Older reviews receive more votes be- cause older reviews have been on the website for a longer time and hence are more likely to be viewed and read by consumers. On the other hand, reviews that have been recently added to a website are less likely to be read because of their short window of exposure to users. Moreover, most websites, including Amazon.com, sort reviews by “most helpful ﬁrst” rather than “newest ﬁrst” [51] which makes new reviews less likely to be exposed to users. Thus, we can expect older reviews to receive more readership than newer ones. Consequent- ly, we hypothesize the following: H1. Longevity of a review has a positive effect on the readership of the review. According to the theory of selective attention, people respond to messages selectively because individuals possess limited information processing capacity [66]. We believe that OCRs are no exception to this theory. Many products/services have large number of reviews and reading all of them is very difﬁcult and time consuming for consumers. Hence, people have to pay selective attention toward OCR. We expect people to look for quick signals that enable them to decide about read- ing a review. Title is a small but important part of a review and provides users with instant information about the general theme of the review. Thus, we expect the title of a review to be an important predictor of its readership. Moreover, sentiment of a message can be effectively communicated through the text and signiﬁcantly inﬂuences the percep- tions of the reader [26,54,70]. Finally, affective language in the online environment receives more attention and feedback compared to neutral language [32]. Hence, we expect the total sentiment contained in the title of a review to be positively related to its readership. Consequently, we hypothesize that: H2. The larger the total amount of sentiment (positive or negative) the title of a review exhibits, the more readership it receives. According to the theory of selective perception, people use their men- tal structure to ﬁlter information. People tend to absorb information that matches their mental model and ﬁlter out the information that don't ﬁt their mental structure [69]. Similarly, we expect people to pay selective attention toward OCR based on their initial attitude about the product. Those with a positive attitude toward the product are expected to look for positive information and those who are more suspicious are expected to look for negative information. Many con- sumers read OCR to receive reassurance that they have made a good choice [5,24,28]. Reassurance will be gained through positive informa- tion rather than negative information. Consequently, we expect a larger number of consumers look for positive reviews rather than negative ones. Thus, we expect reviews with positive titles attract more attention and readership. Considering the above arguments, we expect positive sentiment to have a larger effect on the readership of online reviews than negative sentiment. This leads to the following hypothesis: H3. Title polarity moderates the effect of title sentiment on the readership of the review. The effect will be larger for positive titles than negative and neutral ones. While the total amount of sentiment in the title of a review is an im- portant source of information for consumers, length of the title can also be an important factor related to its readership. Short titles are usually not very informative and do not contain much information. A short title usually communicates the general idea of the author about the product such as “I love it” or “not very high quality.” In contrast, longer titles will give the reader more information about the content of the re- view which subsequently increases the likelihood of it being read by the consumers. For example, a review entitled “the best LED-lit television at a budget price” signals the reader that it contains information about both quality and pricing of the product which can motivate more people to read it. On the other hand, people usually scan information on the web [48]. In the other words, people look for speciﬁc keywords on webpages rather than reading them word by word. A longer title is therefore more likely to contain speciﬁc keywords that a reader is looking for. Moreover, length of the title may decrease consumer's search costs through increased information diagnosticity [34]. Hence, we expect length of the title of a review to be positively related to its readership performance. Consequently, we hypothesize that: H4. The length of the title of a review has a positive effect on the readership of the review. Length of a review is an important predictor of its performance [46,56]. Short reviews are more likely to be shallow and lack the com- prehensive evaluation of product features. Longer reviews, in contrast, contain more information and are more likely to contain deep analysis of the product, its features, and the context in which it was used. Longer reviews are more likely to receive attention from users. Reading longer reviews may decrease consumer's search costs through increased infor- mation diagnosticity [34]. Moreover, longer reviews are more likely to be perceived helpful. An individual's argument is more persuasive when it provides larger amount of information [57]. Increased number of reasons for a choice escalates the decision maker's conﬁdence [67]. Hence, we expect longer reviews to receive more readership as well as more perceptions of helpfulness compared to the shorter ones. As a result, we suggest the following hypotheses: H5. Length of a review has a positive effect on the readership of the review. H6. Length of a review has a positive effect on the helpfulness of the review. People tend to ﬁnd reviews with extreme numerical ratings more helpful [46]. We can expect that reviews with extreme ratings also con- tain more sentiment because the author is either very satisﬁed or very unsatisﬁed. The extreme levels of satisfaction or dissatisfaction are very likely to turn into strong emotions and consequently strong senti- ment. The sentiment of a message can be effectively communicated through the text and signiﬁcantly inﬂuences the perceptions of the reader [26,54,70]. One can argue that the sentiment contained in the review is the driver of the perceptions regarding its helpfulness rather than just the numerical rating. Different people have different experi- ences with the same product. Sentiment is the vehicle for people to convey their emotions to others through text. Thus, sentimental reviews are better conveyer of the experience with the product. Consequently, we can expect high-sentiment reviews to be perceived more helpful by the consumers because they are more likely to convey the experience with the product. Thus, we hypothesize that: H7. The larger the total amount of sentiment (positive or negative) the text of a review exhibits, the more helpful it is perceived to be. The decision regarding the helpfulness of a review is made after the person reads the review [1]. Reviews with larger number of descriptive statements are considered more helpful [56]. One can argue that a good description of an object contains different aspects of it including both positive and negative qualities. This implies that a good review should also contain both positive and negative statements and consequently both positive and negative sentiment. Moreover, the use of positive or negative style characteristics does not increase the value of a review 33 M. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40",
+            "page_number": 4,
+            "section_id": "sec_8",
+            "order": 11
+          },
+          {
+            "paragraph_id": "p_12",
+            "text": "and may even decrease the perceptions regarding its helpfulness [56]. Additionally, extremely sensational content, either positive or negative, may in some cases provoke psychological reactance and lead the receiv- er to respond unfavorably [10]. In terms of review polarity, this will translate into leaning toward neutral polarity. Neutral polarity does not imply that sentiment is non-existent in the text. It implies that there are balanced levels of positive and negative sentiment. Hence, we expect sentimental reviews with neutral polarity to be perceived more helpful than positive and negative ones. This leads to the following hypothesis: H8. Review polarity moderates the effect of review sentiment on the helpfulness of the review. The effect will be larger for neutral reviews than for positive and negative ones.",
+            "page_number": 5,
+            "section_id": "sec_8",
+            "order": 12
+          }
+        ]
+      },
+      {
+        "section_id": "sec_9",
+        "title": "4.1. Measurement",
+        "level": 1,
+        "page_start": 5,
+        "page_end": 5,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_13",
+            "text": "Sentiment mining was done using SentiStrength software [65]. The software is free for academic research and has been tested and validated in previous research [21,25,60,63–65]. SentiStrength is capable of pro- cessing different types of information contained in the text including analysis of emoticons and booster words, correction of spelling due to repeated letters, and use of negative words (e.g., not) to ﬂip emotions. It reports two separate numbers for positive and negative emotions. The positive number ranges from 1 (not positive) to 5 (extremely posi- tive). The negative number ranges from −1 (not negative) to −5 (ex- tremely negative). Because both numbers should be considered when evaluating the sentiment of a statement, we use the approach used by Stieglitz and Dang-Xuan [60] to combine the two numbers. We calculate the sentiment polarity of each statement by creating the following measure, which determines the direction of the sentiment as well as its strength: Polarity ¼ positive sentiment þ negative sentiment: Because positive sentiments range from 1 to 5 and negative ranges from −1 to −5, polarity will have a range of −4 to 4. The other ap- proach to combine the positive and negative numbers is to calculate the total amount of sentiment in a statement regardless of the polarity of positive and negative statements. To attain this, the absolute value of positive and negative sentiments should be added up using the following formula: Sentiment ¼ positive sentiment–negative sentiment ð Þ−2: Positive sentiment ranges from 1 to 5 and negative sentiment ranges from −1 to −5. Thus, total sentiment has a range of 2 to 10. Therefore we subtracted 2 from (positive–negative) to normalize the range from [2, 10] to [0, 8]. Longevity was measured by counting the number of the days since the review was created. Length of title and review were measured by counting the number of words in the text. Helpfulness of a review was measured as the ratio of “helpful votes” to “total votes” cast by readers in each review [20,22,46]. Because we cannot directly measure the read- ership of OCR, we use the total number of votes of a review as a measure for its readership. People usually vote for a review after they read it. Hence, total votes can be a good estimate of readership.",
+            "page_number": 5,
+            "section_id": "sec_9",
+            "order": 13
+          }
+        ]
+      },
+      {
+        "section_id": "sec_10",
+        "title": "4.2. Data collection",
+        "level": 1,
+        "page_start": 5,
+        "page_end": 5,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_14",
+            "text": "A group of 35,000 online reviews of 20 different products were col- lected from Amazon.com website using the crawler software developed by the authors. We selected products that had at least 100 reviews. The examined product types were mobile phones, TVs, laptops, tablets, and TV mounts. We eliminated the reviews that had less than 4 votes to ensure that there is a minimum number of votes accumulated for the review [22]. The ﬁnal sample consisted of 2616 reviews. Fig. 2 shows the system design of sentiment extraction and mining process.",
+            "page_number": 5,
+            "section_id": "sec_10",
+            "order": 14
+          }
+        ]
+      },
+      {
+        "section_id": "sec_11",
+        "title": "5. Data analysis and results",
+        "level": 1,
+        "page_start": 5,
+        "page_end": 6,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_15",
+            "text": "We ﬁrst checked the descriptive statistics of the data to determine the proper data analysis approach. Table 1 shows the descriptive statis- tics of our sample. Variables in our model including review length and total votes represent nonnegative and integer data and their standard deviation is larger than their mean. Hence, the analysis needs to be adjusted for overdispersion using log-transformation [11]. We also checked the distribution of the sentiment measures to ﬁnd out how people express emotions in the reviews. Fig. 3 shows the distri- bution of four measures. As you can see in Fig. 3, review polarity, review sentiment, and title polarity are normally distributed with the only ex- ception being title polarity which is skewed to the right. Title sentiment follows a negative binomial distribution with r = 1 [29]. Negative binomial distribution measures the number of failures before a certain number of successes (i.e., r) are achieved. To analyze hypotheses H1 through H5, we tested the following regression model:Equation 1Predictors of readership. We used negative binomial regression to test the ﬁrst model in order to control for overdispersion assuming that the data follows a negative binomial distribution [29]. Title sentiment refers to the total sentiment (positive and negative) available in the title of the review. We created one dummy variable, TITLE_POSITIVE, to test the moderation effect of polarity on the effect of title sentiment on readership of reviews. The variable has a value of 1 for titles with positive polarity and a value of zero for the others. Helpfulness is measured as the proportion of helpful votes out of total votes. Hence, we used binomial regression with logit transforma- tion to examine hypotheses H6 through H8 using the following regres- sion equation [6]:Equation 2Predictors of helpfulness. We created a dummy variable, REVIEW_NEUTRAL, to test the moderation effect of polarity on the relationship between review sentiment and helpfulness. The variable has a value of 1 for reviews with neutral polarity (i.e., polarity = 0) and a value of zero for the others. We also controlled for the effect of longevity of the review on its helpfulness by including the log transformation of longevity in the model. We checked the correlation matrix for independent variables to test for multicollinearity. Table 2 shows the correlation matrix for each equation. Because we observed relatively high correlations among some variables, we check the VIF of independent variables. The result of the analysis showed that multicollinearity is not an issue in this study. Then we proceeded with model analysis. Both models were signiﬁ- cant at p b 0.001 level. The ﬁrst model shows a goodness of ﬁt of 1.160 indicating that negative binomial regression was a good choice for analysis of the proposed model. The proposed relationship between longevity and total votes was signiﬁcant (b = 0.393, p b 0.001), thus 34 M. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40",
+            "page_number": 5,
+            "section_id": "sec_11",
+            "order": 15
+          },
+          {
+            "paragraph_id": "p_16",
+            "text": "supporting H1. The relationship between title sentiment and total votes was signiﬁcant but the coefﬁcient was negative (b = −0.087, p b 0.001). Therefore we don't ﬁnd support for H2. However, the coefﬁcient for the interaction term Title Sentiment × TITLE_POSITIVE was positive and signiﬁcant (b = 0.439, p b 0.001). Thus we ﬁnd support for H3. The relationship between title length and total votes was signiﬁcant but negative (b = −0.017, p b 0.01). Thus, H4 is not supported. Review length was found to be a signiﬁcant predictor of total votes (b = 0.355, p b 0.001), providing support for H5. In the second model, review length is a signiﬁcant predictor of help- fulness (b = 0.407, p b 0.001) providing support for H6. The proposed relationship between review sentiment and helpfulness is signiﬁcant but negative (b = −0.068, p N 0.001). Thus, H7 is not supported. How- ever, the coefﬁcient for the interaction term Review Sentiment × REVIEW_NEUTRAL is signiﬁcant and positive (b = 0.162, p b 0.001). Thus, we ﬁnd support for H8. Surprisingly, our control variable, longev- ity, had signiﬁcant relationship with helpfulness (b = 0.416, p b 0.001). Fig. 4 shows the results of the research model analysis. Table 3 summa- rizes the hypothesis testing. Because the effect of sentiment on performance did not completely match our expectations, we ran post-hoc analyses to explore the differ- ence between positive, negative, and neutral sentiment. We tested the ﬁrst model for reviews with positive, neutral, and negative title polarity separately. Then we ran the second model for reviews with positive, neutral, and negative sentiment. The results are summarized in Table 4. Positive sentiment is an important predictor of readership but not helpfulness. Negative sentiment, in contrast, has negative non- signiﬁcant effect on both measures of performance. The results regard- ing neutral sentiment are mixed. Neutral sentiment in the text of the review improves perceptions of helpfulness. However, reviews with neutral titles attract fewer readerships. We also tested the second model for different categories of total votes to control for the effect of readership on helpfulness. We catego- rized the reviews into three categories based on total number of votes: 1–9 votes, 9–99 votes, and 100 votes or higher. We ran the model for the three categories separately and did not ﬁnd signiﬁcant differences between them. The only exception is that sentiment does not have a signiﬁcant effect on helpfulness of reviews with medium number of votes (10–99). Table 5 shows the results of the analysis.",
+            "page_number": 6,
+            "section_id": "sec_11",
+            "order": 16
+          }
+        ]
+      },
+      {
+        "section_id": "sec_12",
+        "title": "6. Discussion",
+        "level": 1,
+        "page_start": 6,
+        "page_end": 7,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_17",
+            "text": "This study investigates the effect of review sentiment on readership and helpfulness of online reviews. Using the theoretical lens of the the- ory of selective attention we suggest that people read OCR selectively. We also use theory of selective perception to show how people decide to read some reviews and ignore the rest. We suggest that because many consumers read OCR to receive reassurance, reviews with positive sentiment in the title are more likely to be read. Despite the proposed positive relationship between sentiment and performance of OCR, we ﬁnd that sentiment negatively inﬂuences both readership and helpful- ness of OCR. Emotions have been considered to subvert the rational pro- cesses [71]. Similarly, we ﬁnd evidence that consumers may perceive emotional content to be less rational and therefore less useful. The ef- fect, however, is not consistent across various types of emotions. We ﬁnd signiﬁcant positive relationship between positive sentiment in the title and readership of OCR. This observation can be justiﬁed using attribution theory. It is likely that people attribute negative sentiment to the author but relate positive sentiment to the product itself. Because negative emotions are attributed to the author, people are less likely to read reviews with negative titles. However, if the author expresses positive emotions in the title of the review, the likelihood of the review getting attention from consumers will increase. This observation also conﬁrms that many consumers look for reviews that reassure them about the choice they have already made [5,24,28]. Unlike our expectation, the effect of sentiment on helpfulness was not signiﬁcant. This observation may be justiﬁed using elaboration like- lihood model (ELM) [2]. According to ELM, persuasion occurs through Amazon.com review web pages Date Review text Title Review length Rating Total votes C# regular expressions Perl crawling code Positive sentiment Senti Strength software Raw dataset Title length Helpful votes Negative sentiment Polarity Sentiment Longevity Fig. 2. System design of sentiment extraction and mining process. Table 1 Descriptive statistics. Variable Range Median Mean (SD) Rating 1–5 2 2.71 (1.70) Longevity 15–2196 336 433 (362) Total votes 4–912 7 22.18 (66.89) Helpful votes 0–873 4 16 (60) Title sentiment 0–8 1 1.02 (1.02) Title polarity −4 to 4 0 0.18 (1.26) Review sentiment 0–8 3 2.78 (1.48) Review polarity −4 to 4 0 0.19 (1.32) Title length 1–24 4 5.06 (3.42) Review length 16–2369 84 149.9 (202.8) 35 M. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40",
+            "page_number": 6,
+            "section_id": "sec_12",
+            "order": 17
+          },
+          {
+            "paragraph_id": "p_18",
+            "text": "two routes of inﬂuence: the central route and the peripheral route. The central route triggers critical thinking in the audience about the argu- ment of the message and requires high cognitive effort. The peripheral route to persuasion, in contrast, occurs through positive and negative cues and undergoes less cognitive effort [2,8,53]. The perception chang- es by central route are more stable and long lasting while alterations caused by the peripheral route are less persistent. The sentiment of a message inﬂuences users' perceptions through the peripheral route and is expected to be less effective than the cues provided by the central route. However, certain types of sentiment signiﬁcantly inﬂuence users' perceptions regarding the helpfulness of a review. The effect of senti- ment on helpfulness was signiﬁcant and positive for neutral reviews. It can be argued that a helpful review is a neutral one which communi- cates both positive and negative aspects of the product. Reviews that lean toward either positive or negative may be perceived by consumers as biased and consequently less helpful. Although the use of sentiment Fig. 3. Distribution of the measures. Table 2 Correlation matrix of independent variables. Equation 1 Equation 2 1 2 3 4 5 1 2 3 4",
+            "page_number": 7,
+            "section_id": "sec_12",
+            "order": 18
+          }
+        ]
+      },
+      {
+        "section_id": "sec_13",
+        "title": "1. Title length",
+        "level": 1,
+        "page_start": 7,
+        "page_end": 7,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_19",
+            "text": "1",
+            "page_number": 7,
+            "section_id": "sec_13",
+            "order": 19
+          }
+        ]
+      },
+      {
+        "section_id": "sec_14",
+        "title": "1. Review sentiment",
+        "level": 1,
+        "page_start": 7,
+        "page_end": 7,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_20",
+            "text": "1",
+            "page_number": 7,
+            "section_id": "sec_14",
+            "order": 20
+          }
+        ]
+      },
+      {
+        "section_id": "sec_15",
+        "title": "2. Title sentiment",
+        "level": 1,
+        "page_start": 7,
+        "page_end": 7,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_21",
+            "text": "0.09⁎⁎ 1",
+            "page_number": 7,
+            "section_id": "sec_15",
+            "order": 21
+          }
+        ]
+      },
+      {
+        "section_id": "sec_16",
+        "title": "2. Longevity",
+        "level": 1,
+        "page_start": 7,
+        "page_end": 7,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_22",
+            "text": "−0.01 1",
+            "page_number": 7,
+            "section_id": "sec_16",
+            "order": 22
+          }
+        ]
+      },
+      {
+        "section_id": "sec_17",
+        "title": "3. Review length",
+        "level": 1,
+        "page_start": 7,
+        "page_end": 7,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_23",
+            "text": "0.15⁎⁎ 0.09⁎⁎ 1",
+            "page_number": 7,
+            "section_id": "sec_17",
+            "order": 23
+          }
+        ]
+      },
+      {
+        "section_id": "sec_18",
+        "title": "3. Review length",
+        "level": 1,
+        "page_start": 7,
+        "page_end": 7,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_24",
+            "text": ".012⁎⁎ −0.01 1",
+            "page_number": 7,
+            "section_id": "sec_18",
+            "order": 24
+          }
+        ]
+      },
+      {
+        "section_id": "sec_19",
+        "title": "4. Longevity",
+        "level": 1,
+        "page_start": 7,
+        "page_end": 7,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_25",
+            "text": "−0.06⁎⁎ −0.00 −0.01 1",
+            "page_number": 7,
+            "section_id": "sec_19",
+            "order": 25
+          }
+        ]
+      },
+      {
+        "section_id": "sec_20",
+        "title": "4. Review polarity",
+        "level": 1,
+        "page_start": 7,
+        "page_end": 7,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_26",
+            "text": "−0.11⁎⁎ 0.07⁎⁎ −0.06 1",
+            "page_number": 7,
+            "section_id": "sec_20",
+            "order": 26
+          }
+        ]
+      },
+      {
+        "section_id": "sec_21",
+        "title": "5. Title Polarity",
+        "level": 1,
+        "page_start": 7,
+        "page_end": 8,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_27",
+            "text": "0.02 0.12⁎⁎ 0.09⁎⁎ 0.11⁎⁎ 1 ⁎⁎ Signiﬁcant at the 0.01 level. 36 M. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40",
+            "page_number": 7,
+            "section_id": "sec_21",
+            "order": 27
+          },
+          {
+            "paragraph_id": "p_28",
+            "text": "may help the authors convey their experience with the product to the audience, emotions are effective as long as they meet the expectations of the consumers. Despite the signiﬁcant effect of title sentiment on the readership of online reviews, length of the title was negatively related to it readership. Apparently people use review titles as a quick source of information about the general theme of the review. Reading and processing longer titles take more time and demotivates people to read them. Unlike title length, review length had a positive effect on both the readership and helpfulness of reviews. Review length can be seen as a signal about the amount of information contained in the review. Longer reviews are expected to contain more information and thus attract more readerships. Moreover, longer reviews are more likely to analyze different aspects of the product which leads to increased perceptions regarding their helpfulness. Surprisingly, longevity has a positive effect on the helpfulness of online reviews. In other words, older reviews are perceived to be more helpful. One reason can be the way Amazon sorts the reviews. By default, users will view the most helpful reviews although it can also be sorted to display the recent ones ﬁrst. Because older reviews start receiving votes early, they have a better chance of appearing on the ﬁrst page which will lead to more votes and perhaps better percep- tions regarding their helpfulness. Newer reviews, however, stay at the end of the list and are less likely to receive any attention from consumers. Aral [3] has a similar observation. He observed that positive manipulation of helpfulness of online reviews creates a positive social inﬂuence. As a result, longevity not only affects readership, it but also inﬂuences perception of helpfulness of OCR.",
+            "page_number": 8,
+            "section_id": "sec_21",
+            "order": 28
+          }
+        ]
+      },
+      {
+        "section_id": "sec_22",
+        "title": "6.1. Implications",
+        "level": 1,
+        "page_start": 8,
+        "page_end": 8,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_29",
+            "text": "This study has implications for both theory and practice. From a theoretical perspective, this study introduces a new method of analyzing online consumer behavior. While previous research ﬁnds that online reviews signiﬁcantly inﬂuence consumer behavior, few studies have explored the issue using the textual information contained in OCR. We suggest that sentiment mining can be utilized to analyze large amount of OCR that is produced on the Internet every day. Sentiment mining facilitates processing of big data and is highly replica- ble. This study also contributes to the body of knowledge by studying both readership and helpfulness of OCR. To best of our knowledge this is the ﬁrst study that analyzes predictors of readership of online reviews. This new performance measure can be used by future studies to further analyze OCR. We also use three important theories (i.e., theory of selective attention, theory of selective perception, and at- tribution theory) to explain how consumers make decisions regarding reading OCR. Furthermore, although previous research has used the text contained in online reviews to investigate OCR performance, to best of our knowledge this study is the ﬁrst to also include the title of OCR in the analysis. We show that consumers use the title of a review to receive quick information about its contents. Such information create a quick impression in consumers which may inﬂuence their decision re- garding reading the review. Finally, this study can be seen as an initial step toward action research in the area of OCR. The ﬁndings of this study and future similar studies can be integrated into a single predic- tive framework to provide a solution for classiﬁcation and sorting of OCR [59]. Review Sentiment Review Length Readership Helpfulness 0.407*** -0.068*** Review Polarity Title Polarity Title Sentiment Title Length 0.439 -0.087*** -0.017** 0.355*** 0.162*** Longevity 0.393*** * Significant at 0.05 ** Significant at 0.01 *** Significant at 0.001 * Significant at 0.05 ** Significant at 0.01 *** Significant at 0.001 Fig. 4. Research model analysis. Table 3 Hypothesis testing results. Hypothesis Hypothesized relationship Estimates (Wald Chi-square)",
+            "page_number": 8,
+            "section_id": "sec_22",
+            "order": 29
+          }
+        ]
+      },
+      {
+        "section_id": "sec_23",
+        "title": "Results",
+        "level": 1,
+        "page_start": 8,
+        "page_end": 9,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_30",
+            "text": "H1 Longevity →readership 0.393 (227.71) ⁎⁎⁎ Supported H2 Title sentiment →readership −0.087 (11.67) ⁎⁎⁎ Not supported H3 Title sentiment × title positive →readership 0.439 (53.27) ⁎⁎⁎ Supported H4 Title length →readership −0.017 (7.05) ⁎⁎ Not supported H5 Review length →readership 0.355 (311.53) ⁎⁎⁎ Supported H6 Review length →helpfulness 0.407 (1031.03) ⁎⁎⁎ Supported H7 Review sentiment →helpfulness −0.068 (37.21) ⁎⁎⁎ Not supported H8 Review sentiment × review neutral →helpfulness 0.162 (161.38) ⁎⁎⁎ Supported ⁎⁎ Signiﬁcant at 0.01. ⁎⁎⁎ Signiﬁcant at 0.001. 37 M. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40",
+            "page_number": 8,
+            "section_id": "sec_23",
+            "order": 30
+          },
+          {
+            "paragraph_id": "p_31",
+            "text": "We also have implications for practice. Most previous studies just use numerical rating and length of reviews to investigate their perfor- mance. Few studies have tried to analyze the textual information contained in online reviews which is usually done using human sub- jects. Although the use of human subjects is useful in explaining how people use OCR, it barely provides a practical solution for online vendors because the process is neither scalable nor replicable through automat- ed systems. However, we use sentiment mining to analyze the text of OCR. The sentiment mining method used in this study is both replicable and scalable which provides online vendors with a practical solution for analysis of OCR. Our study ﬁnds two weaknesses of the current method used for sorting OCR. First, we ﬁnd that older reviews attract more readerships. Many products have thousands of review many of which never receive any attention from consumers because they stay at the end of a long list of reviews. Out of the 35,000 reviews we collected for this study, 92.5% had less than ﬁve votes and 69.7% had no votes. New reviews may con- tain up-to-date information about the product and the recent changes made by the manufacturer such as the software updates which may be overlooked by the current sorting method. Second, we observe that older reviews are more likely to be perceived helpful than the recent ones. In other words, perceptions of helpfulness are biased toward older reviews. These two observations indicate that many potentially useful reviews receive little or no attention from consumers because they are barely seen by consumers. Hence, improving the sorting algo- rithms of online reviews seems to be necessary. An intelligent system capable of detecting potentially useful reviews can help both vendors and consumers. It helps consumers by providing them with more valu- able information and by saving their time and energy. It also helps ven- dors to satisfy their customers' need for information which will allow customers to decide more quickly and may eventually lead to increased sales for the vendors. The ﬁndings of this study can be used by online vendors to develop systems that analyze and classify online reviews based on their expected performance.",
+            "page_number": 9,
+            "section_id": "sec_23",
+            "order": 31
+          }
+        ]
+      },
+      {
+        "section_id": "sec_24",
+        "title": "6.2. Limitations and future research",
+        "level": 1,
+        "page_start": 9,
+        "page_end": 10,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_32",
+            "text": "Like any other studies, this study has limitations. Although automat- ed sentiment mining is quite useful in analyzing big textual information, it still has limitations. First, the software we used in this study can pro- cess different types of textual information. However, it lacks processing capability for alternate styles of writing such as sarcasm. While there are many areas for improvement in the ﬁeld of natural language processing, future research can provide better insights regarding the information contained in online reviews using more advanced technology. Future research can also look at how explanation of different aspects of the on- line shopping experience such as service quality, product quality, and price inﬂuence OCR performance. Second, the sample used in this study was collected from Amazon.com website and was mainly limited to reviews of electronic products. While the reviews we used in this study are limited to prod- ucts and do not include services, other websites such as Yelp.com allow their users to write reviews on services such as restaurants. Be- cause there are signiﬁcant differences between products and services [39], the ﬁndings of this study may not be generalizable to reviews of services. Future research may further investigate the issue by analyzing reviews of services of other platform. Additionally, while previous re- search shows that product type has an important moderation effect on the performance of online reviews, our conclusions may remain lim- ited to certain product types used in this study. Future research can use a sample consisting of different product types and test the moderation effect of product type on the performance of reviews. Third, the votes casted by readers in each review is subject to imbal- ance votes bias which indicates that many reviews voted as helpful by consumers do not contain deep information about the product [41]. Hence, the perceived helpfulness measure may not precisely reﬂect the actual helpfulness of the reviews. Fourth, we used the same elements for the calculation of senti- ment in two different ways: polarity and total sentiment. Using the same elements for the calculation of these variables may make them subject to functional dependence and possibly leading to bi- ased estimation of the relationships in the research model. Although we believe that functional dependence of these variables is not a concern in this study, we should be cautious about the application of these variables. Finally, our sample lacks language and cultural diversity. The re- views were collected from Amazon US website and all are in English. Different cultures express emotions differently. For example, it is be- lieved that people in individualistic cultures express negative emotions more freely than those living in collectivist cultures [62]. On the other hand, language as the vehicle of information may play in signiﬁcant role in communicating the message to the reader. Future research may utilize reviews written in other languages to include the effect of language and culture on the performance of online reviews. Future research may also look at the differences in expression of emotions between the real life and the virtual space. Table 4 Group analysis. Performance measure Readership Helpfulness Sentiment polarity Positive title Neutral title Negative title Positive review Neutral review Negative review Title sentiment 0.302⁎⁎⁎ −0.209⁎⁎⁎ −0.070 Title length −0.048⁎⁎⁎ −0.003 0.014 Review length 0.424⁎⁎⁎ 0.379⁎⁎⁎ 0.233⁎⁎⁎ 0.382⁎⁎ 0.475⁎⁎⁎ 0.450⁎⁎⁎ Review sentiment −0.027 0.066⁎⁎⁎ −0.005 Longevity 0.461⁎⁎⁎ 0.361⁎⁎⁎ 0.312⁎⁎⁎ ⁎⁎ Signiﬁcant at 0.01. ⁎⁎⁎ Signiﬁcant at 0.001. Table 5 Group analysis of helpfulness based on total number of votes. Total votes 1–9 10–99 N99 B Wald Chi-Square Sig B Wald Chi-Square Sig B Wald Chi-Square Sig Review length 0.30 95.36 0.00 0.43 459.10 0.00 0.28 141.97 0.00 Review sentiment −0.07 10.00 0.00 −0.01 0.25 0.62 −0.18 67.14 0.00 Longevity 0.29 115.08 0.00 0.30 208.64 0.00 0.16 22.09 0.00 ReviewSentiment ∗ReviewTextNeutralD 0.16 26.54 0.00 0.09 19.33 0.00 0.16 42.30 0.00 38 M. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40",
+            "page_number": 9,
+            "section_id": "sec_24",
+            "order": 32
+          }
+        ]
+      },
+      {
+        "section_id": "sec_25",
+        "title": "7. Conclusions",
+        "level": 1,
+        "page_start": 10,
+        "page_end": 10,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_33",
+            "text": "This research provides insights regarding the predictors of perfor- mance of online reviews using a sentiment mining approach. We ﬁnd that sentiment negatively inﬂuences the performance of online reviews with two exceptions: positive sentiment in the title and neutral sentiment in the text of the review. We also ﬁnd that longer reviews are more likely to attract readership and to be perceived as helpful. This research can be used by online vendors to create scalable automat- ed systems for sorting and classiﬁcation of OCR.",
+            "page_number": 10,
+            "section_id": "sec_25",
+            "order": 33
+          }
+        ]
+      },
+      {
+        "section_id": "sec_26",
+        "title": "References",
+        "level": 1,
+        "page_start": 10,
+        "page_end": 11,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_34",
+            "text": "[1] R. Ahluwalia, Examination of psychological processes underlying resistance to persuasion, Journal of Consumer Research 27 (2) (2000) 217–232. [2] C.M. Angst, R. Agarwal, Adoption of electronic health records in the presence of privacy concerns: the elaboration likelihood model and individual persuasion, MIS Quarterly 33 (2) (2009) 339–370. [3] S. Aral, The Problem With Online RatingsRetrieved from http://sloanreview.mit.edu/ article/the-problem-with-online-ratings-2/2013. [4] X. Bai, Predicting consumer sentiments from online text, Decision Support Systems 50 (4) (2011) 732–742. [5] A.A. Bailey, Consumer awareness and use of product review websites, Journal of Interactive Advertising 6 (1) (2005) 68–81. [6] C.F. Baum, Modeling proportions, Stata Journal 8 (2) (2008) 299. [7] J. Berger, K.L. Milkman, What makes online content viral? Journal of Marketing Research 49 (2) (2012) 192–205. [8] A. Bhattacherjee, C. Sanford, Inﬂuence processes for information technology accep- tance: an elaboration likelihood model, MIS Quarterly 30 (4) (2006) 805–825. [9] B. Bickart, R.M. Schindler, Internet forums as inﬂuential sources of consumer infor- mation, Journal of Interactive Marketing 15 (3) (2001) 31–40. [10] S.S. Brehm, J.W. Brehm, Psychological Reactance: A Theory of Freedom and Control, Academic Press, 2013. [11] A.C. Cameron, P.K. Trivedi, Regression Analysis of Count Data, Cambridge University Press, 2013. [12] H. Chen, R.H. Chiang, V.C. Storey, Business intelligence and analytics: from big data to big impact, MIS Quarterly 36 (4) (2012) 1165–1188. [13] Y. Chen, J. Xie, Online consumer review: word-of-mouth as a new element of mar- keting communication mix, Management Science 54 (3) (2008) 477–491. [14] J.A. Chevalier, D. Mayzlin, The effect of word of mouth on sales: online book reviews, Journal of Marketing Research 43 (3) (2006) 345–354. [15] C. Danescu-Niculescu-Mizil, G. Kossinets, J. Kleinberg, L. Lee, How opinions are received by online communities: a case study on amazon.com helpfulness votes, Proceedings of the 18th International Conference on World wide web, ACM 2009, pp. 141–150. [16] C. Dellarocas, X.M. Zhang, N.F. Awad, Exploring the value of online product reviews in forecasting sales: the case of motion pictures, Journal of Interactive Marketing 21 (4) (2007) 23–45. [17] R.R. Dholakia, B. Sternthal, Highly credible sources: persuasive facilitators or persuasive liabilities, Journal of Consumer Research 3 (1977) 223–232. [18] W. Duan, B. Gu, A.B. Whinston, Do online reviews matter?—An empirical investiga- tion of panel data, Decision Support Systems 45 (4) (2008) 1007–1016. [19] V.S. Folkes, The availability heuristic and perceived risk, Journal of Consumer Research 15 (1) (1988). [20] C. Forman, A. Ghose, B. Wiesenfeld, Examining the relationship between reviews and sales: the role of reviewer identity disclosure in electronic markets, Information Systems Research 19 (3) (2008) 291–313. [21] D. Garcia, F. Schweitzer, Emotions in product reviews — empirics and models, 2011 IEEE International Conference on Privacy, Security, Risk, and Trust, and IEEE Interna- tional Conference on Social Computing, IEEE 2011, pp. 483–488. [22] A. Ghose, P.G. Ipeirotis, Estimating the helpfulness and economic impact of product reviews: mining text and reviewer characteristics, IEEE Transactions on Knowledge and Data Engineering 23 (10) (2011) 1498–1512. [23] D. Godes, D. Mayzlin, Using online conversations to study word-of-mouth commu- nication, Marketing Science 23 (4) (2004) 545–560. [24] R.E. Goldsmith, D. Horowitz, Measuring motivations for online opinion seeking, Journal of Interactive Advertising 6 (2) (2006) 2–14. [25] A. Gruzd, S. Doiron, P. Mai, Is happiness contagious online? A case of Twitter and the 2010 Winter Olympics, Proceedings of the 44th Hawaii International Conference on System Sciences, IEEE 2011, pp. 1–9. [26] R.B. Harris, D. Paradice, An investigation of the computer-mediated communication of emotions, Journal of Applied Sciences Research 3 (12) (2007) 2081–2090. [27] F. Heider, The Psychology of Interpersonal Relations, John Wiley & Son, New York, 1958. [28] T. Hennig-Thurau, K.P. Gwinner, G. Walsh, D.D. Gremler, Electronic word-of-mouth via consumer-opinion platforms: what motivates consumers to articulate them- selves on the Internet? Journal of Interactive Marketing 18 (1) (2004) 38–52. [29] J.M. Hilbe, Negative Binomial Regression, Cambridge University Press, 2011. [30] N. Hu, I. Bose, N.S. Koh, L. Liu, Manipulation of online reviews: an analysis of ratings, readability, and sentiments, Decision Support Systems 52 (3) (2012) 674–684. [31] N. Hu, N.S. Koh, S.K. Reddy, Ratings lead you to the product, reviews help you clinch it? The mediating role of online review sentiments on product sales, Decision Support Systems 57 (2014). [32] D. Huffaker, Dimensions of leadership and social inﬂuence in online communities, Human Communication Research 36 (4) (2010) 593–617. [33] N. Jindal, B. Liu, Opinion spam and analysis, Proceedings of the 2008 International Conference on Web Search and Data Mining, ACM 2008, pp. 219–230. [34] E.J. Johnson, J.W. Payne, Effort and accuracy in choice, Management Science 31 (4) (1985) 395–414. [35] E.E. Jones, K.E. Davis, From acts to dispositions the attribution process in person perception, Advances in Experimental Social Psychology 1965, pp. 219–266. [36] H.H. Kelley, The processes of causal attribution, American Psychologist 28 (2) (1973) 107. [37] S.-M. Kim, P. Pantel, T. Chklovski, M. Pennacchiotti, Automatically assessing review helpfulness, Proceedings of the 2006 Conference on Empirical Methods in Natural Language Processing, Association for Computational Linguistics 2006, pp. 423–430. [38] S. Kim, Yelp Sues Firm Over Alleged Fake ReviewsRetrieved from http://abcnews.go. com/m/blogEntry?id=202775702013. [39] P. Kotler, G. Armstrong, Principles of Marketing, Pearson Education, 2010. [40] F. Li, M. Huang, Y. Yang, X. Zhu, Learning to identify review spam, Proceedings of the Twenty-Second International Joint Conference on Artiﬁcial Intelligence, AAAI Press 2011, pp. 2488–2493. [41] J. Liu, Y. Cao, C.-Y. Lin, Y. Huang, M. Zhou, Low-quality product review detection in opinion summarization, EMNLP-CoNLL2007 334–342. [42] Y. Liu, Word of mouth for movies: its dynamics and impact on box ofﬁce revenue, Journal of Marketing 70 (3) (2006) 74–89. [43] C. López, R. Farzan, Analysis of local online review systems as digital word-of- mouth, Proceedings of the Companion Publication of the 23rd International Conference on World Wide Web Companion, International World Wide Web Conferences Steering Committee 2014, pp. 457–462. [44] Y. Lu, P. Tsaparas, A. Ntoulas, L. Polanyi, Exploiting social context for review quality prediction, Proceedings of the 19th International Conference on World Wide Web, ACM 2010, pp. 691–700. [45] D. Mayzlin, Y. Dover, J. Chevalier, Promotional reviews: an empirical investigation of online review manipulation, American Economic Review 104 (8) (2014) 2421–2455. [46] S.M. Mudambi, D. Schuff, What makes a helpful online review? A study of customer reviews on Amazon.com, MIS Quarterly 34 (1) (2010) 185–200. [47] Nielsen, Global Consumers' Trust in ‘Earned’ Advertising Grows in ImportanceRetrieved from http://www.nielsen.com/us/en/press-room/2012/nielsen-global-consumers- trust-in-earned-advertising-grows.html2012. [48] J. Nielsen, How Users Read on the WebRetrieved from http://www.nngroup. com/articles/how-users-read-on-the-web/1997. [49] M.P. O'Mahony, B. Smyth, Learning to recommend helpful hotel reviews, Pro- ceedings of the Third ACM Conference on Recommender Systems, ACM 2009, pp. 305–308. [50] M. Ott, Y. Choi, C. Cardie, J.T. Hancock, Finding deceptive opinion spam by any stretch of the imagination, Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics, Human Language Technologies, 1, Association for Computational Linguistics 2011, pp. 309–319. [51] L.H. Owen, What Shoppers Don't Realize About Amazon's ReviewsRetrieved from https://gigaom.com/2011/06/24/419-what-shoppers-dont-realize-about-amazons- reviews/2011. [52] D.-H. Park, J. Lee, I. Han, The effect of on-line consumer reviews on consumer purchasing intention: the moderating role of involvement, International Journal of Electronic Commerce 11 (4) (2007) 125–148. [53] R.E. Petty, J.T. Cacioppo, The Elaboration Likelihood Model of Persuasion, Springer, 1986. [54] M.A. Riordan, R.J. Kreuz, Emotion encoding and interpretation in computer- mediated communication: reasons for use, Computers in Human Behavior 26 (6) (2010) 1667–1673. [55] M.A. Russell, Mining the Social Web: Data Mining Facebook, Twitter, LinkedIn, Google+, GitHub, and More, O'Reilly Media, Inc., 2013 [56] R.M. Schindler, B. Bickart, Perceived helpfulness of online consumer reviews: the role of message content and style, Journal of Consumer Behaviour 11 (3) (2012) 234–243. [57] C.H. Schwenk, “Information, cognitive biases, and commitment to a course of action”, Academy of Management Review 11 (2) (1986) 298–310. [58] S. Sen, D. Lerman, Why are you telling me this? An examination into negative consumer reviews on the web, Journal of Interactive Marketing 21 (4) (2007) 76–94. [59] G. Shmueli, O.R. Koppius, Predictive analytics in information systems research, MIS Quarterly 35 (3) (2011) 553–572. [60] S. Stieglitz, L. Dang-Xuan, Emotions and information diffusion in social media — sentiment of microblogs and sharing behavior, Journal of Management Informa- tion Systems 29 (4) (2013) 217–248. [61] D. Streitfeld, In a Race to Out-Rave, 5-Star Web Reviews Go for $5Retrieved from http://www.nytimes.com/2011/08/20/technology/ﬁnding-fake-reviews-online. html?_r=1&amp2011. [62] K. Takahashi, N. Ohara, T.C. Antonucci, H. Akiyama, Commonalities and differences in close relationships among the Americans and Japanese: a comparison by the individualism/collectivism concept, International Journal of Behavioral Development 26 (5) (2002) 453–465. [63] M. Thelwall, K. Buckley, Topic-based sentiment analysis for the social web: the role of mood and issue-related words, Journal of the American Society for Information Science and Technology 64 (8) (2013). 39 M. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40",
+            "page_number": 10,
+            "section_id": "sec_26",
+            "order": 34
+          },
+          {
+            "paragraph_id": "p_35",
+            "text": "[64] M. Thelwall, K. Buckley, G. Paltoglou, Sentiment strength detection for the social web, Journal of the American Society for Information Science and Technology 63 (1) (2012) 163–173. [65] M. Thelwall, K. Buckley, G. Paltoglou, D. Cai, A. Kappas, Sentiment strength detection in short informal text, Journal of the American Society for Information Science and Technology 61 (12) (2010) 2544–2558. [66] A.M. Treisman, Strategies and models of selective attention, Psychological Review 76 (3) (1969) 282. [67] A. Tversky, D. Kahneman, Judgment under uncertainty: heuristics and biases, Science 185 (4157) (1974) 1124–1131. [68] R. Walker, Samsung Just Got Busted For Posting Fake Reviews Online. Is There Any Good Reason Why They Shouldn't Do It Again?Retrieved from http://news.yahoo. com/samsung-htc-fake-reviews-blackberry-no-risk-all-reward-191308791.html? soc_src=mediacontentsharebuttons2013. [69] J.P. Walsh, Selectivity and selective perception: an investigation of managers' belief structures and information processing, Academy of Management Journal 31 (4) (1988) 873–896. [70] J.B. Walther, K.P. D'Addario, The impacts of emoticons on message interpretation in computer-mediated communication, Social Science Computer Review 19 (3) (2001) 324–347. [71] X.-T. Wang, Emotions within reason: resolving conﬂicts in risk preference, Cognition and Emotion 20 (8) (2006) 1132–1152. Mohammad Salehan is an Assistant Professor of Computer Information Systems at California State Polytechnic University, Pomona. He holds a Ph.D. in Business from the University of North Texas, an MBA from Sharif University of Technology, and a Bsc. in Software Engineering from Shahid Beheshti University. His research has appeared in Com- puters in Human Behavior journal and proceedings of International Conference on Infor- mation Systems (ICIS), Americas Conference on Information Systems (AMCIS), and Paciﬁc-Asia Conference on Information Systems (PACIS). His research interests include business analytics, social networks, and mobile computing. Dan J. Kim is a professor of Information Technology and Decision Sciences (ITDS) at Uni- versity of North Texas (UNT). He earned his Ph.D. in MIS from SUNY at Buffalo. He also holds a MBA degree with management science concentration and MS degree in computer science. His research interests are in multidisciplinary areas such as information security (InfoSec) and privacy, information assurance, and trust in electronic commerce. Recently he has focused on InfoSec Self-Efﬁcacy, Web Assurance Seal Services (WASS), and Trust in e-collaborations. His research work has been published or in forthcoming more than 120 papers in refereed journals, peer-reviewed book chapters, and conference proceed- ings including Information Systems Research, Journal of Management Information Systems, Communications of ACM, Communications of AIS, Decision Support Systems, International Journal of Human-Computer Interaction, Journal of Organizational and End User Computing, IEEE Transactions on Professional Communication, Electronic Market, IEEE IT Professional, Journal of Global Information Management, and International Journal of Mobile Communica- tions, ICIS, HICSS, AMCIS, INFORMS, ICEC, ICA, and so on. He has been awarded the National Science Foundation CyberCorps: SFS grant for multi-years, 2012 Emerald management Re- view Citations of Excellence Awards, 2010 Best Published Paper Award in ISR, an Emerald Literati Network 2009 — Outstanding Paper Award, the ICIS 2003 Best Paper-First Runner- up Award, and the AMCIS 2005 Best Research Paper Award at AMCIS 2005. 40 M. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40",
+            "page_number": 11,
+            "section_id": "sec_26",
+            "order": 35
+          }
+        ]
+      }
+    ],
+    "extracted_text": "Predicting the performance of online consumer reviews: A sentiment\nmining approach to big data analytics\nMohammad Salehan a, Dan J. Kim b,⁎\na Department of Computer Information Systems, College of Business Administration, California State Polytechnic University, Pomona, 3801 West Temple Avenue, Pomona, CA 91768, USA\nb Department of Information Technology and Decision Sciences, College of Business, University of North Texas, 1307 West Highland Street, Denton, TX 76201, USA\na b s t r a c t\na r t i c l e\ni n f o\nArticle history:\nReceived 13 November 2014\nReceived in revised form 11 September 2015\nAccepted 19 October 2015\nAvailable online 30 October 2015\nKeywords:\nOnline consumer reviews\nSentiment mining\nHelpfulness\nReadership\nBig data analytics\nAlthough online consumer reviews (OCRs) have helped consumers to know about the strengths and weaknesses\nof different products and ﬁnd the ones that best suit their needs, they introduce a challenge for businesses to an-\nalyze them because of their volume, variety, velocity and veracity. This research investigates the predictors of\nreadership and helpfulness of OCR using a sentiment mining approach for big data analytics. Our ﬁndings\nshow that reviews with higher levels of positive sentiment in the title receive more readerships. Sentimental re-\nviews with neutral polarity in the text are also perceived to be more helpful. The length and longevity of a review\npositively inﬂuence both its readership and helpfulness. Because the current methods used for sorting OCR may\nbias both their readership and helpfulness, the approach used in this study can be adopted by online vendors to\ndevelop scalable automated systems for sorting and classiﬁcation of big OCR data which will beneﬁt both vendors\nand consumers.\n© 2015 Elsevier B.V. All rights reserved.\n1. Introduction\nBusinesses are now using social media to promote their products\nand services. Many companies maintain Facebook and Twitter accounts\nto keep in touch with their customers. Customers also use social media\nto receive information about products/services. In many ways the\nInternet in general and social media in particular, have changed the\nway customers shop for goods and services. It's now quite normal for\npeople to ﬁnd the product they want at brick-and-mortar stores and\nthen order it online. Moreover, online consumer reviews (OCRs) have\nhelped customers to learn about the strengths and weaknesses of differ-\nent products and to ﬁnd the ones that best suit their needs. Some studies\nsuggest that customers show more interest toward user-generated\nproduct information on the Internet than the information vendors pro-\nvided [9]. A recent study shows that OCRs are the second most-trusted\nsource of product information after recommendations from family and\nfriends [47]. Compared to vendor-generated product descriptions,\nOCRs are more user-oriented and describe the product in terms of dif-\nferent usage scenarios and assess it from a user's perspective [13].\nThus, it has even been suggested that consumers who write OCR serve\nas “sales assistants” for online retailers [13]. Although analysis of OCR\ncan be beneﬁcial to both consumers and businesses, it is challenging\nto analyze it due to the characteristics such as volume, variety, velocity\nand veracity.\nFrom a consumer's perspective, the process of examining OCR can be\nbroken into two steps: the decision to read the review, and the actual\nprocessing of the information in the review that deems the decision to\nuse it based on perceived helpfulness of the review [1]. Focusing on\nthe two steps of processing OCR, this study proposes two fundamental\nresearch questions in the context of OCR:\nRQ1: Which factors determine the likelihood of a consumer paying\nattention to a review?\nRQ2: Which factors determine the perceived helpfulness of a review?\nFrom online business managers' perspective, ﬁnding answers to the\nabove questions are quite important steps toward understanding online\nconsumers' perceptions of their products and/or services and ultimate-\nly, designing and implementing scalable automated systems for\nclassiﬁcation and sorting of big OCR data [44,49].\nThe ﬁrst research question looks into the characteristics of OCR that\nabsorb the attention of online consumers. Many products receive too\nmany reviews that make it difﬁcult for consumers to read all of them.\nThus, most consumers have to read them selectively. In summary, the\nﬁrst research question explores the determinants of the readership of\nOCR. Although reading a review is the ﬁrst step in determining its\nhelpfulness, previous research overlooks the readership of OCR.\nWhile the ﬁrst research question remains largely unexplored, the\nsecond one has received some attention. Previous research has found\nstrong evidence that OCRs inﬂuence product sales [14,16,18,20,22,23,\n42,46]. However, three important aspects of the second research\nquestion require further investigation. First, most studies only use the\nDecision Support Systems 81 (2016) 30–40\n⁎ Corresponding author at: University of North Texas, College of Business, 1155 Union\nCircle #311160, Denton, TX 76203-5017, USA.\nE-mail address: Dan.Kim@unt.edu (D.J. Kim).\nhttp://dx.doi.org/10.1016/j.dss.2015.10.006\n0167-9236/© 2015 Elsevier B.V. All rights reserved.\nContents lists available at ScienceDirect\nDecision Support Systems\njournal homepage: www.elsevier.com/locate/dss\n\n\nnumerical review ratings (e.g., the number of stars) and the length of\nthe reviews in their empirical analysis, without formally incorporating\nthe information contained in the text of the reviews. Therefore, a deeper\nanalysis of the textual information contained in the OCR can provide\ngreater insight into what constitutes a useful online review [46].\nAlthough some previous studies have used the text of OCR to predict\nhelpfulness [15,22,37], the effect of sentiment on helpfulness of OCR\nremains unexplored.\nSecond, previous research shows that positive statements are\nconsidered to be more helpful by consumers [56]. However, research\nhas produced conﬂicting results regarding the negative comments. For\nexample, Sen and Lerman [58] found that in the case of utilitarian\nproducts, negative comments are more useful than positive ones,\nwhereas Schindler and Bickart [56] failed to ﬁnd any signiﬁcant\nrelationship between negative statements and helpfulness of a review.\nBy investigating the effect of sentiment polarity (i.e., negative, positive,\nor neutral) on helpfulness, this study provides insights into the\nperformance of OCR.\nFinally, previous research tends to identify the predictors of the per-\nformance of OCR without providing many practical solutions for online\nvendors. Human subjects are largely employed for categorization of OCR\nbased on the textual information contained in them. Although this\nmethod provides a descriptive view of the performance of OCR, it does\nnot facilitate the development of scalable automated systems for\nclassiﬁcation of OCR.\nThis study investigates the performance of OCR through analysis of\ntextual information contained in the reviews. Previous research has\nindicated that computer-mediated communications (CMCs) can effec-\ntively transfer emotions. Moreover, the emotions contained in a\nmessage transferred through CMC signiﬁcantly inﬂuence how the mes-\nsage is processed and interpreted by the receiver [7,54,70]. Sentiment\nmining can be used for emotional analysis of textual information. Senti-\nment mining refers to the use of natural language processing and com-\nputational linguistics to ﬁnd and extract subjective information from\ntext data. Sentiment mining is usually done using automated tools\nthat provides beneﬁts such as scalability, effective information retrieval,\nautomated cyber risk management, and increased business proﬁts [4]. It\nalso facilitates processing of large amounts of data. Social media is an\nimportant source of big data and is quite suitable for text mining\npurposes [12,55].\nThis study contributes to the existing body of knowledge in three\nunique ways. First, it provides a research model that predicts the perfor-\nmance of OCR in terms of readership and helpfulness of reviews using a\nsentimental mining approach. Although previous studies have used the\ntext of OCR to predict the performance of OCR such as helpfulness\n(e.g., [15,22,37]), the effect of sentiment on the performance of OCR\nstill remains unexplored. Thus, this study is expected to provide a\nnovel contribution in this domain. Second, it uses automated tools to an-\nalyze a set of secondary OCR data composed of reviews collected from\nAmazon.com website. In addition, following the directions provided\nby Chen et al. [12], it uncovers a new application of big data analytics.\nMore speciﬁcally, it provides insights to online business managers re-\ngarding the design and implementation of scalable automated systems\nto improve classiﬁcation and sorting of OCR, which will eventually\nhelp them achieve increased sales.\n2. Theoretical background\n2.1. Online review performance measures\nDifferent measures have been used by previous studies to evaluate\nthe performance of OCR. Most studies use helpfulness as the single per-\nformance measure of OCR [3,46,58]. Helpfulness has also been referred\nto as the value of the review [56]. For studies that use secondary data,\nhelpfulness is measured by dividing the number of people who ﬁnd a\nreview helpful by the total number of people who voted for that review\n[46,58].\nPurchase intention is another measure of performance. Customer\npurchase intention is inﬂuenced by both quantity and quality of the re-\nviews [52]. Some studies use sales revenue as a performance measure\nfor online reviews. One study used online reviews from Yahoo Movies\nwebsite to predict box ofﬁce revenues and found strong evidence that\nonline reviews inﬂuence movie sales [42]. Online reviews have also\nbeen used to predict the online sales of books [14]. Product ratings\nalso indirectly inﬂuence sales through sentiment [31].\n2.2. Predictors of online review performance\nDifferent measures have been used to predict the performance of\nOCR. Some studies have focused on the numeric star rating and word\ncount of the reviews to predict their performance. For example, extreme\nnumerical ratings are positively related to sales of books [14]. Reviews\nwith extreme numerical ratings are also considered more helpful [46].\nLength of a review may also predict its performance. Length of reviews\nfor a book signiﬁcantly predicts its sales on Amazon.com [14]. Length\nof a review is also positively related to its helpfulness [22,37,46,56]. Em-\npirical analysis, however, fails to ﬁnd any signiﬁcant relationship be-\ntween review length and sales of books on Barnes & Noble website\n[14]. Lu et al. [44] suggest that to predict the performance of OCR, re-\nviews should not be treated as stand-alone documents and contextual\ninformation about author's identity and social networks should be use\nto achieve enhanced prediction accuracy. Several other studies also\nuse reviewer characteristics including total number of reviews written\nby the user, expertise, experience, writing style, rating pattern, and\nexcellence to predict helpfulness of OCR (e.g., [43,49]).\nThe difference between the performance of positive and negative re-\nviews is controversial research avenue in the context of OCR. Drawing\nupon the negativity bias theory, some studies propose that negative\nreviews are considered more helpful than positive ones. According to\nthe negativity bias theory, people face difﬁculty in making inferences\nabout the actions of an actor when the actor behaves in an expected\nfashion. The inference is easier when the actor departs from the\nnorms of behavior [35,36]. Thus, some researchers have argued that\nnegative comments should be considered more helpful than positive\nones because they deviate from the accepted norm of staying positive\n[58]. Several studies test the negativity bias theory in the context of\nOCR. Their ﬁndings, however, are contradictory. While some studies\nshow that consumers ﬁnd negative reviews more valuable, others ﬁnd\nno signiﬁcant difference between positive and negative reviews. Some\nothers even ﬁnd that positive reviews are more helpful than negative\nones. Sen and Lerman [58] ﬁnd that positive reviews are generally\nmore helpful than negative ones. However, negative reviews are more\nuseful for utilitarian products (products that focus on task performance)\nand positive comments are more useful for hedonic products (products\nthat deal with pleasure). Schindler and Bickart [56] ﬁnd that the number\nof positive statements is a signiﬁcant predictor of the value of a review\nwhile the effect of the number of negative statements on value is not\nsigniﬁcant. A recent study suggests that consumer reviews may be sub-\njected to positive social inﬂuence bias, also known as inner circle bias\n[3]. Through an experiment, the author manipulated the helpfulness\nof OCR and found out that positive manipulations create a positive social\ninﬂuence that last several months. The negative manipulations, howev-\ner, are offset by a correction effect that neutralizes the manipulation.\nThe ﬁndings suggest that corporations can easily manipulate OCR and\nthe reviews should be considered with some level of skepticism.\nRecent studies use text of a review to predict its performance. Schin-\ndler and Bickart [56] look at the wording of online reviews rather than\ntheir source. They divide wording factor into two categories: content\nand style. They deﬁne the content as the information the review pro-\nvides. Style, by contrast, is deﬁned as the choice of words used to convey\nthe information. They ﬁnd that proportion of product-descriptive\n31\nM. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40\n\n\nstatements and proportion of reviewer-descriptive statements are sig-\nniﬁcant predictors of the value of the review. They also ﬁnd that while\nuse of negative style characteristics decrease the value of the review,\nuse of positive style doesn't improve its performance. Finally, they didn't\nﬁnd any signiﬁcant relationship between negative evaluative state-\nments and value of the review. Other signiﬁcant predictors of helpful-\nness extracted from the text of online reviews include the amount of\nobjective and subjective information [22], conformity (i.e., deviation\nfrom average star rating) [15,37], review completeness (i.e., the amount\nof optional review content) [49], and readability [22].\nReview sentiment is another measure used by previous studies to\npredict the performance of computer-mediated communications\n(CMC) in general, and OCR in particular. Previous research has indicated\nthat CMC can effectively transfer emotions. The receiver of a message\ncan detect the sender's emotions through verbal cues such as emotion\nwords as well as nonverbal cues such as emoticons [26]. Moreover,\nthe emotions contained in a message transferred through CMC signiﬁ-\ncantly inﬂuence how the message is processed and interpreted by the\nreceiver [54,70]. Different methods can be used to extract sentiment\nout of text. While some studies use human subjects to extract the\nsentiment of OCR, others use automated sentiment mining to extract\nsentiment from the text of reviews [4,56,58].\n2.3. Moderators of performance\nProduct type is an important factor in the context of online reviews\nwhich has mostly been viewed as the variable moderating the relation-\nship between independent variables and helpfulness. For example, re-\nviews on hedonic products are less likely to be perceived as helpful\n[58]. There are also differences between helpfulness of search and expe-\nrience goods. For search goods, consumers can obtain information about\nproduct quality prior to purchase while evaluation of experience goods\nrequires sampling or purchase. While reviews with extremely high or\nlow star rating are considered more helpful for search goods, the effect\nis different for experience goods. For experience goods, extreme re-\nviews are considered less helpful than the ones with moderate rating\n[46]. Product type also moderates the relationship between the number\nof positive and negative statements with the helpfulness of a review\n[58]. The length of a review has greater positive impact on its helpful-\nness for search goods compared to experience goods [46].\nCustomer involvement is another moderating variable in the context\nof OCR. While low-involvement customers are more inﬂuenced by the\nquantity rather than the quality of reviews, high-involvement cus-\ntomers are inﬂuenced by the quantity of reviews if the reviews have\nhigh quality [52].\n2.4. Theories related to message selection\nThe theory of selective attention posits that people respond to mes-\nsages selectively because of limited information processing capacity\n[66]. When people receive multiple stimuli at once, they need to ﬁlter\nsome of the messages because they have limited processing capacity.\nSame thing happens in the context of online reviews. Many products\nhave large number of reviews which makes people to selectively read\nonline reviews. The theory of selective perception helps explain the\nmechanism underlying selective attention. According to selective\nperception, people develop belief structures which are a simpliﬁed rep-\nresentation of the world and use these structures to ﬁlter and interpret\ninformation [69].\nAttribution theory explains how people analyze different behaviors.\nBased on the theory, people identify two types of explanation for differ-\nent behaviors: actions related to internal (personal) factors and the ones\nthat result from external environment (situational) [19,27]. The theory\nlargely explains the predictors of source credibility and other areas re-\nlated to consumer perceptions and inference formation [17]. It has\nalso been used to explain the perceptions of the consumers regarding\nthe helpfulness of OCR. Readers consider the motivation of the author\nof a review when deciding about whether or not to use the information\ncontained in the review. Readers may attribute a review to either\nexternal (product-related) or internal (reviewer-related) reasons. If\nthe reader feels that the review is based on external reasons, they are\nmore likely to accept it. If reader believes that the review is based on\ninternal reasons, they are more likely to disregard it [58].\n2.5. Fake reviews\nBecause online reviews have the potential to inﬂuence customers,\nthey have received signiﬁcant attention from sellers/providers of\ngoods/services. Some have even tried to inﬂuence the perceptions of\ncustomers by creating fake reviews [38,61,68]. One study ﬁnds that cer-\ntain hotels distinguished by location and ownership post more fake pos-\nitive reviews for themselves and more fake negative reviews for their\ncompetitors. The independent hotels that are owned by single-unit\nowners are more likely to post fake reviews than branded hotel chains.\nMoreover, the hotels close to a hotel with a high incentive to post fake\nreviews have more negative reviews [45]. Another study reports that\n10.3% of book reviews are fake or manipulated [30].\nPrevious research has used different methods to identify fake re-\nviews. Some studies compare reviews of products on different websites\nto investigate fake reviews. One study identiﬁes evidence of fake re-\nviews by comparing the reviews of two travel sites with extensive\nhotel reviews: Expedia.com and TripAdvisor.com [45]. While anyone\ncan write a review on TripAdvisor, one needs to have actually booked\nat least one night for the given hotel on Expedia to be able to post a re-\nview for that hotel. Human subjects and automated tools have also been\nused to identify fake reviews. One study failed to recognize manipulated\nreviews using sentiment mining but found that consumers are able to\nrecognize them [30]. Other studies use machine learning methods to\nidentify fake reviews [33,40,50].\n3. Research model and hypothesis\nFollowing the directions provided by Mudambi and Schuff [46] re-\ngarding the need for the analysis of the textual information contained\nin OCR, we utilize sentiment mining to analyze the text of the reviews\nand to investigate our two research questions. Each Amazon review\nhas a title and a body text. We extract the sentiment of both the title\nand the text of reviews and use them to predict performance. We\nhave two measures for OCR performance, readership and helpfulness,\neach of which corresponds to one of our research questions. Fig. 1\nshows the proposed research model.\nReview\nSentiment\nReview\nLength\nReadership\nHelpfulness\nH6 (+)\nH7 (+)\nReview\nPolarity\nTitle\nPolarity\nTitle\nSentiment\nTitle Length\nH3\nH2 (+)\nH4 (+)\nH5 (+)\nH8\nLongevity\nH1 (+)\nFig. 1. Research model.\n32\nM. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40\n\n\nIn the model, sentiment refers to the total amount of sentiment that\nexists in a text, both positive and negative. Polarity refers to the\ndirection of the sentiment which can be positive, negative, or neutral.\nMore information on our measures can be found in the methodology\nsection. Liu, Cao, Lin, Huang and Zhou [41] note that the publication\ndate of a review has positive correlation with its total number of\nvotes. This is referred to as ebias. Older reviews receive more votes be-\ncause older reviews have been on the website for a longer time and\nhence are more likely to be viewed and read by consumers. On the\nother hand, reviews that have been recently added to a website are\nless likely to be read because of their short window of exposure to\nusers. Moreover, most websites, including Amazon.com, sort reviews\nby “most helpful ﬁrst” rather than “newest ﬁrst” [51] which makes\nnew reviews less likely to be exposed to users. Thus, we can expect\nolder reviews to receive more readership than newer ones. Consequent-\nly, we hypothesize the following:\nH1. Longevity of a review has a positive effect on the readership of the\nreview.\nAccording to the theory of selective attention, people respond to\nmessages selectively because individuals possess limited information\nprocessing capacity [66]. We believe that OCRs are no exception to\nthis theory. Many products/services have large number of reviews and\nreading all of them is very difﬁcult and time consuming for consumers.\nHence, people have to pay selective attention toward OCR. We expect\npeople to look for quick signals that enable them to decide about read-\ning a review. Title is a small but important part of a review and provides\nusers with instant information about the general theme of the review.\nThus, we expect the title of a review to be an important predictor of\nits readership. Moreover, sentiment of a message can be effectively\ncommunicated through the text and signiﬁcantly inﬂuences the percep-\ntions of the reader [26,54,70]. Finally, affective language in the online\nenvironment receives more attention and feedback compared to neutral\nlanguage [32]. Hence, we expect the total sentiment contained in the\ntitle of a review to be positively related to its readership. Consequently,\nwe hypothesize that:\nH2. The larger the total amount of sentiment (positive or negative) the title\nof a review exhibits, the more readership it receives.\nAccording to the theory of selective perception, people use their men-\ntal structure to ﬁlter information. People tend to absorb information\nthat matches their mental model and ﬁlter out the information that\ndon't ﬁt their mental structure [69]. Similarly, we expect people to pay\nselective attention toward OCR based on their initial attitude about\nthe product. Those with a positive attitude toward the product are\nexpected to look for positive information and those who are more\nsuspicious are expected to look for negative information. Many con-\nsumers read OCR to receive reassurance that they have made a good\nchoice [5,24,28]. Reassurance will be gained through positive informa-\ntion rather than negative information. Consequently, we expect a larger\nnumber of consumers look for positive reviews rather than negative\nones. Thus, we expect reviews with positive titles attract more attention\nand readership. Considering the above arguments, we expect positive\nsentiment to have a larger effect on the readership of online reviews\nthan negative sentiment. This leads to the following hypothesis:\nH3. Title polarity moderates the effect of title sentiment on the readership\nof the review. The effect will be larger for positive titles than negative and\nneutral ones.\nWhile the total amount of sentiment in the title of a review is an im-\nportant source of information for consumers, length of the title can also\nbe an important factor related to its readership. Short titles are usually\nnot very informative and do not contain much information. A short\ntitle usually communicates the general idea of the author about the\nproduct such as “I love it” or “not very high quality.” In contrast, longer\ntitles will give the reader more information about the content of the re-\nview which subsequently increases the likelihood of it being read by the\nconsumers. For example, a review entitled “the best LED-lit television at\na budget price” signals the reader that it contains information about\nboth quality and pricing of the product which can motivate more people\nto read it. On the other hand, people usually scan information on the\nweb [48]. In the other words, people look for speciﬁc keywords on\nwebpages rather than reading them word by word. A longer title is\ntherefore more likely to contain speciﬁc keywords that a reader is\nlooking for. Moreover, length of the title may decrease consumer's\nsearch costs through increased information diagnosticity [34]. Hence,\nwe expect length of the title of a review to be positively related to its\nreadership performance. Consequently, we hypothesize that:\nH4. The length of the title of a review has a positive effect on the readership\nof the review.\nLength of a review is an important predictor of its performance\n[46,56]. Short reviews are more likely to be shallow and lack the com-\nprehensive evaluation of product features. Longer reviews, in contrast,\ncontain more information and are more likely to contain deep analysis\nof the product, its features, and the context in which it was used. Longer\nreviews are more likely to receive attention from users. Reading longer\nreviews may decrease consumer's search costs through increased infor-\nmation diagnosticity [34]. Moreover, longer reviews are more likely to\nbe perceived helpful. An individual's argument is more persuasive\nwhen it provides larger amount of information [57]. Increased number\nof reasons for a choice escalates the decision maker's conﬁdence [67].\nHence, we expect longer reviews to receive more readership as well\nas more perceptions of helpfulness compared to the shorter ones. As a\nresult, we suggest the following hypotheses:\nH5. Length of a review has a positive effect on the readership of the review.\nH6. Length of a review has a positive effect on the helpfulness of the review.\nPeople tend to ﬁnd reviews with extreme numerical ratings more\nhelpful [46]. We can expect that reviews with extreme ratings also con-\ntain more sentiment because the author is either very satisﬁed or very\nunsatisﬁed. The extreme levels of satisfaction or dissatisfaction are\nvery likely to turn into strong emotions and consequently strong senti-\nment. The sentiment of a message can be effectively communicated\nthrough the text and signiﬁcantly inﬂuences the perceptions of the\nreader [26,54,70]. One can argue that the sentiment contained in the\nreview is the driver of the perceptions regarding its helpfulness rather\nthan just the numerical rating. Different people have different experi-\nences with the same product. Sentiment is the vehicle for people to\nconvey their emotions to others through text. Thus, sentimental reviews\nare better conveyer of the experience with the product. Consequently,\nwe can expect high-sentiment reviews to be perceived more helpful\nby the consumers because they are more likely to convey the experience\nwith the product. Thus, we hypothesize that:\nH7. The larger the total amount of sentiment (positive or negative) the text\nof a review exhibits, the more helpful it is perceived to be.\nThe decision regarding the helpfulness of a review is made after the\nperson reads the review [1]. Reviews with larger number of descriptive\nstatements are considered more helpful [56]. One can argue that a good\ndescription of an object contains different aspects of it including both\npositive and negative qualities. This implies that a good review should\nalso contain both positive and negative statements and consequently\nboth positive and negative sentiment. Moreover, the use of positive or\nnegative style characteristics does not increase the value of a review\n33\nM. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40\n\n\nand may even decrease the perceptions regarding its helpfulness [56].\nAdditionally, extremely sensational content, either positive or negative,\nmay in some cases provoke psychological reactance and lead the receiv-\ner to respond unfavorably [10]. In terms of review polarity, this will\ntranslate into leaning toward neutral polarity. Neutral polarity does\nnot imply that sentiment is non-existent in the text. It implies that\nthere are balanced levels of positive and negative sentiment. Hence,\nwe expect sentimental reviews with neutral polarity to be perceived\nmore helpful than positive and negative ones. This leads to the following\nhypothesis:\nH8. Review polarity moderates the effect of review sentiment on the\nhelpfulness of the review. The effect will be larger for neutral reviews than\nfor positive and negative ones.\n4. Methodology\n4.1. Measurement\nSentiment mining was done using SentiStrength software [65]. The\nsoftware is free for academic research and has been tested and validated\nin previous research [21,25,60,63–65]. SentiStrength is capable of pro-\ncessing different types of information contained in the text including\nanalysis of emoticons and booster words, correction of spelling due to\nrepeated letters, and use of negative words (e.g., not) to ﬂip emotions.\nIt reports two separate numbers for positive and negative emotions.\nThe positive number ranges from 1 (not positive) to 5 (extremely posi-\ntive). The negative number ranges from −1 (not negative) to −5 (ex-\ntremely negative). Because both numbers should be considered when\nevaluating the sentiment of a statement, we use the approach used by\nStieglitz and Dang-Xuan [60] to combine the two numbers. We calculate\nthe sentiment polarity of each statement by creating the following\nmeasure, which determines the direction of the sentiment as well as\nits strength:\nPolarity ¼ positive sentiment þ negative sentiment:\nBecause positive sentiments range from 1 to 5 and negative ranges\nfrom −1 to −5, polarity will have a range of −4 to 4. The other ap-\nproach to combine the positive and negative numbers is to calculate\nthe total amount of sentiment in a statement regardless of the polarity\nof positive and negative statements. To attain this, the absolute value\nof positive and negative sentiments should be added up using the\nfollowing formula:\nSentiment ¼ positive sentiment–negative sentiment\nð\nÞ−2:\nPositive sentiment ranges from 1 to 5 and negative sentiment ranges\nfrom −1 to −5. Thus, total sentiment has a range of 2 to 10. Therefore\nwe subtracted 2 from (positive–negative) to normalize the range from\n[2, 10] to [0, 8].\nLongevity was measured by counting the number of the days since\nthe review was created. Length of title and review were measured by\ncounting the number of words in the text. Helpfulness of a review was\nmeasured as the ratio of “helpful votes” to “total votes” cast by readers\nin each review [20,22,46]. Because we cannot directly measure the read-\nership of OCR, we use the total number of votes of a review as a measure\nfor its readership. People usually vote for a review after they read it.\nHence, total votes can be a good estimate of readership.\n4.2. Data collection\nA group of 35,000 online reviews of 20 different products were col-\nlected from Amazon.com website using the crawler software developed\nby the authors. We selected products that had at least 100 reviews. The\nexamined product types were mobile phones, TVs, laptops, tablets, and\nTV mounts. We eliminated the reviews that had less than 4 votes to\nensure that there is a minimum number of votes accumulated for the\nreview [22]. The ﬁnal sample consisted of 2616 reviews. Fig. 2 shows\nthe system design of sentiment extraction and mining process.\n5. Data analysis and results\nWe ﬁrst checked the descriptive statistics of the data to determine\nthe proper data analysis approach. Table 1 shows the descriptive statis-\ntics of our sample. Variables in our model including review length and\ntotal votes represent nonnegative and integer data and their standard\ndeviation is larger than their mean. Hence, the analysis needs to be\nadjusted for overdispersion using log-transformation [11].\nWe also checked the distribution of the sentiment measures to ﬁnd\nout how people express emotions in the reviews. Fig. 3 shows the distri-\nbution of four measures. As you can see in Fig. 3, review polarity, review\nsentiment, and title polarity are normally distributed with the only ex-\nception being title polarity which is skewed to the right. Title sentiment\nfollows a negative binomial distribution with r = 1 [29]. Negative\nbinomial distribution measures the number of failures before a certain\nnumber of successes (i.e., r) are achieved.\nTo analyze hypotheses H1 through H5, we tested the following\nregression model:Equation 1Predictors of readership.\nWe used negative binomial regression to test the ﬁrst model in order\nto control for overdispersion assuming that the data follows a negative\nbinomial distribution [29]. Title sentiment refers to the total sentiment\n(positive and negative) available in the title of the review. We created\none dummy variable, TITLE_POSITIVE, to test the moderation effect of\npolarity on the effect of title sentiment on readership of reviews. The\nvariable has a value of 1 for titles with positive polarity and a value of\nzero for the others.\nHelpfulness is measured as the proportion of helpful votes out of\ntotal votes. Hence, we used binomial regression with logit transforma-\ntion to examine hypotheses H6 through H8 using the following regres-\nsion equation [6]:Equation 2Predictors of helpfulness.\nWe created a dummy variable, REVIEW_NEUTRAL, to test the\nmoderation effect of polarity on the relationship between review\nsentiment and helpfulness. The variable has a value of 1 for reviews\nwith neutral polarity (i.e., polarity = 0) and a value of zero for the\nothers. We also controlled for the effect of longevity of the review\non its helpfulness by including the log transformation of longevity\nin the model.\nWe checked the correlation matrix for independent variables to\ntest for multicollinearity. Table 2 shows the correlation matrix for\neach equation. Because we observed relatively high correlations\namong some variables, we check the VIF of independent variables.\nThe result of the analysis showed that multicollinearity is not an\nissue in this study.\nThen we proceeded with model analysis. Both models were signiﬁ-\ncant at p b 0.001 level. The ﬁrst model shows a goodness of ﬁt of\n1.160 indicating that negative binomial regression was a good choice\nfor analysis of the proposed model. The proposed relationship between\nlongevity and total votes was signiﬁcant (b = 0.393, p b 0.001), thus\n34\nM. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40\n\n\nsupporting H1. The relationship between title sentiment and total votes\nwas signiﬁcant but the coefﬁcient was negative (b = −0.087, p b\n0.001). Therefore we don't ﬁnd support for H2. However, the coefﬁcient\nfor the interaction term Title Sentiment × TITLE_POSITIVE was positive\nand signiﬁcant (b = 0.439, p b 0.001). Thus we ﬁnd support for H3. The\nrelationship between title length and total votes was signiﬁcant but\nnegative (b = −0.017, p b 0.01). Thus, H4 is not supported. Review\nlength was found to be a signiﬁcant predictor of total votes (b =\n0.355, p b 0.001), providing support for H5.\nIn the second model, review length is a signiﬁcant predictor of help-\nfulness (b = 0.407, p b 0.001) providing support for H6. The proposed\nrelationship between review sentiment and helpfulness is signiﬁcant\nbut negative (b = −0.068, p N 0.001). Thus, H7 is not supported. How-\never, the coefﬁcient for the interaction term Review Sentiment ×\nREVIEW_NEUTRAL is signiﬁcant and positive (b = 0.162, p b 0.001).\nThus, we ﬁnd support for H8. Surprisingly, our control variable, longev-\nity, had signiﬁcant relationship with helpfulness (b = 0.416, p b 0.001).\nFig. 4 shows the results of the research model analysis. Table 3 summa-\nrizes the hypothesis testing.\nBecause the effect of sentiment on performance did not completely\nmatch our expectations, we ran post-hoc analyses to explore the differ-\nence between positive, negative, and neutral sentiment. We tested the\nﬁrst model for reviews with positive, neutral, and negative title polarity\nseparately. Then we ran the second model for reviews with positive,\nneutral, and negative sentiment. The results are summarized in\nTable 4. Positive sentiment is an important predictor of readership\nbut not helpfulness. Negative sentiment, in contrast, has negative non-\nsigniﬁcant effect on both measures of performance. The results regard-\ning neutral sentiment are mixed. Neutral sentiment in the text of the\nreview improves perceptions of helpfulness. However, reviews with\nneutral titles attract fewer readerships.\nWe also tested the second model for different categories of total\nvotes to control for the effect of readership on helpfulness. We catego-\nrized the reviews into three categories based on total number of\nvotes: 1–9 votes, 9–99 votes, and 100 votes or higher. We ran the\nmodel for the three categories separately and did not ﬁnd signiﬁcant\ndifferences between them. The only exception is that sentiment does\nnot have a signiﬁcant effect on helpfulness of reviews with medium\nnumber of votes (10–99). Table 5 shows the results of the analysis.\n6. Discussion\nThis study investigates the effect of review sentiment on readership\nand helpfulness of online reviews. Using the theoretical lens of the the-\nory of selective attention we suggest that people read OCR selectively.\nWe also use theory of selective perception to show how people decide\nto read some reviews and ignore the rest. We suggest that because\nmany consumers read OCR to receive reassurance, reviews with positive\nsentiment in the title are more likely to be read. Despite the proposed\npositive relationship between sentiment and performance of OCR, we\nﬁnd that sentiment negatively inﬂuences both readership and helpful-\nness of OCR. Emotions have been considered to subvert the rational pro-\ncesses [71]. Similarly, we ﬁnd evidence that consumers may perceive\nemotional content to be less rational and therefore less useful. The ef-\nfect, however, is not consistent across various types of emotions. We\nﬁnd signiﬁcant positive relationship between positive sentiment in\nthe title and readership of OCR. This observation can be justiﬁed using\nattribution theory. It is likely that people attribute negative sentiment\nto the author but relate positive sentiment to the product itself. Because\nnegative emotions are attributed to the author, people are less likely to\nread reviews with negative titles. However, if the author expresses\npositive emotions in the title of the review, the likelihood of the review\ngetting attention from consumers will increase. This observation also\nconﬁrms that many consumers look for reviews that reassure them\nabout the choice they have already made [5,24,28].\nUnlike our expectation, the effect of sentiment on helpfulness was\nnot signiﬁcant. This observation may be justiﬁed using elaboration like-\nlihood model (ELM) [2]. According to ELM, persuasion occurs through\nAmazon.com\nreview web\npages\nDate\nReview\ntext\nTitle\nReview\nlength\nRating\nTotal votes\nC# regular\nexpressions\nPerl crawling\ncode\nPositive\nsentiment\nSenti Strength\nsoftware\nRaw\ndataset\nTitle length\nHelpful\nvotes\nNegative\nsentiment\nPolarity\nSentiment\nLongevity\nFig. 2. System design of sentiment extraction and mining process.\nTable 1\nDescriptive statistics.\nVariable\nRange\nMedian\nMean (SD)\nRating\n1–5\n2\n2.71 (1.70)\nLongevity\n15–2196\n336\n433 (362)\nTotal votes\n4–912\n7\n22.18 (66.89)\nHelpful votes\n0–873\n4\n16 (60)\nTitle sentiment\n0–8\n1\n1.02 (1.02)\nTitle polarity\n−4 to 4\n0\n0.18 (1.26)\nReview sentiment\n0–8\n3\n2.78 (1.48)\nReview polarity\n−4 to 4\n0\n0.19 (1.32)\nTitle length\n1–24\n4\n5.06 (3.42)\nReview length\n16–2369\n84\n149.9 (202.8)\n35\nM. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40\n\n\ntwo routes of inﬂuence: the central route and the peripheral route. The\ncentral route triggers critical thinking in the audience about the argu-\nment of the message and requires high cognitive effort. The peripheral\nroute to persuasion, in contrast, occurs through positive and negative\ncues and undergoes less cognitive effort [2,8,53]. The perception chang-\nes by central route are more stable and long lasting while alterations\ncaused by the peripheral route are less persistent. The sentiment of a\nmessage inﬂuences users' perceptions through the peripheral route\nand is expected to be less effective than the cues provided by the central\nroute. However, certain types of sentiment signiﬁcantly inﬂuence users'\nperceptions regarding the helpfulness of a review. The effect of senti-\nment on helpfulness was signiﬁcant and positive for neutral reviews.\nIt can be argued that a helpful review is a neutral one which communi-\ncates both positive and negative aspects of the product. Reviews that\nlean toward either positive or negative may be perceived by consumers\nas biased and consequently less helpful. Although the use of sentiment\nFig. 3. Distribution of the measures.\nTable 2\nCorrelation matrix of independent variables.\nEquation 1\nEquation 2\n1\n2\n3\n4\n5\n1\n2\n3\n4\n1. Title length\n1\n1. Review sentiment\n1\n2. Title sentiment\n0.09⁎⁎\n1\n2. Longevity\n−0.01\n1\n3. Review length\n0.15⁎⁎\n0.09⁎⁎\n1\n3. Review length\n.012⁎⁎\n−0.01\n1\n4. Longevity\n−0.06⁎⁎\n−0.00\n−0.01\n1\n4. Review polarity\n−0.11⁎⁎\n0.07⁎⁎\n−0.06\n1\n5. Title Polarity\n0.02\n0.12⁎⁎\n0.09⁎⁎\n0.11⁎⁎\n1\n⁎⁎ Signiﬁcant at the 0.01 level.\n36\nM. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40\n\n\nmay help the authors convey their experience with the product to the\naudience, emotions are effective as long as they meet the expectations\nof the consumers.\nDespite the signiﬁcant effect of title sentiment on the readership of\nonline reviews, length of the title was negatively related to it readership.\nApparently people use review titles as a quick source of information\nabout the general theme of the review. Reading and processing longer\ntitles take more time and demotivates people to read them. Unlike\ntitle length, review length had a positive effect on both the readership\nand helpfulness of reviews. Review length can be seen as a signal\nabout the amount of information contained in the review. Longer\nreviews are expected to contain more information and thus attract\nmore readerships. Moreover, longer reviews are more likely to analyze\ndifferent aspects of the product which leads to increased perceptions\nregarding their helpfulness.\nSurprisingly, longevity has a positive effect on the helpfulness of\nonline reviews. In other words, older reviews are perceived to be\nmore helpful. One reason can be the way Amazon sorts the reviews.\nBy default, users will view the most helpful reviews although it can\nalso be sorted to display the recent ones ﬁrst. Because older reviews\nstart receiving votes early, they have a better chance of appearing on\nthe ﬁrst page which will lead to more votes and perhaps better percep-\ntions regarding their helpfulness. Newer reviews, however, stay at the\nend of the list and are less likely to receive any attention from\nconsumers. Aral [3] has a similar observation. He observed that positive\nmanipulation of helpfulness of online reviews creates a positive social\ninﬂuence. As a result, longevity not only affects readership, it but also\ninﬂuences perception of helpfulness of OCR.\n6.1. Implications\nThis study has implications for both theory and practice. From a\ntheoretical perspective, this study introduces a new method of\nanalyzing online consumer behavior. While previous research ﬁnds\nthat online reviews signiﬁcantly inﬂuence consumer behavior, few\nstudies have explored the issue using the textual information contained\nin OCR. We suggest that sentiment mining can be utilized to analyze\nlarge amount of OCR that is produced on the Internet every day.\nSentiment mining facilitates processing of big data and is highly replica-\nble. This study also contributes to the body of knowledge by studying\nboth readership and helpfulness of OCR. To best of our knowledge this\nis the ﬁrst study that analyzes predictors of readership of online\nreviews. This new performance measure can be used by future\nstudies to further analyze OCR. We also use three important theories\n(i.e., theory of selective attention, theory of selective perception, and at-\ntribution theory) to explain how consumers make decisions regarding\nreading OCR. Furthermore, although previous research has used the\ntext contained in online reviews to investigate OCR performance, to\nbest of our knowledge this study is the ﬁrst to also include the title of\nOCR in the analysis. We show that consumers use the title of a review\nto receive quick information about its contents. Such information create\na quick impression in consumers which may inﬂuence their decision re-\ngarding reading the review. Finally, this study can be seen as an initial\nstep toward action research in the area of OCR. The ﬁndings of this\nstudy and future similar studies can be integrated into a single predic-\ntive framework to provide a solution for classiﬁcation and sorting of\nOCR [59].\nReview\nSentiment\nReview\nLength\nReadership\nHelpfulness\n0.407***\n-0.068***\nReview\nPolarity\nTitle\nPolarity\nTitle\nSentiment\nTitle Length\n0.439\n-0.087***\n-0.017**\n0.355***\n0.162***\nLongevity\n0.393***\n* Significant at 0.05\n** Significant at 0.01\n*** Significant at 0.001\n* Significant at 0.05\n** Significant at 0.01\n*** Significant at 0.001\nFig. 4. Research model analysis.\nTable 3\nHypothesis testing results.\nHypothesis\nHypothesized relationship\nEstimates (Wald Chi-square)\nResults\nH1\nLongevity →readership\n0.393 (227.71) ⁎⁎⁎\nSupported\nH2\nTitle sentiment →readership\n−0.087 (11.67) ⁎⁎⁎\nNot supported\nH3\nTitle sentiment × title positive →readership\n0.439 (53.27) ⁎⁎⁎\nSupported\nH4\nTitle length →readership\n−0.017 (7.05) ⁎⁎\nNot supported\nH5\nReview length →readership\n0.355 (311.53) ⁎⁎⁎\nSupported\nH6\nReview length →helpfulness\n0.407 (1031.03) ⁎⁎⁎\nSupported\nH7\nReview sentiment →helpfulness\n−0.068 (37.21) ⁎⁎⁎\nNot supported\nH8\nReview sentiment × review neutral →helpfulness\n0.162 (161.38) ⁎⁎⁎\nSupported\n⁎⁎ Signiﬁcant at 0.01.\n⁎⁎⁎ Signiﬁcant at 0.001.\n37\nM. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40\n\n\nWe also have implications for practice. Most previous studies just\nuse numerical rating and length of reviews to investigate their perfor-\nmance. Few studies have tried to analyze the textual information\ncontained in online reviews which is usually done using human sub-\njects. Although the use of human subjects is useful in explaining how\npeople use OCR, it barely provides a practical solution for online vendors\nbecause the process is neither scalable nor replicable through automat-\ned systems. However, we use sentiment mining to analyze the text of\nOCR. The sentiment mining method used in this study is both replicable\nand scalable which provides online vendors with a practical solution for\nanalysis of OCR.\nOur study ﬁnds two weaknesses of the current method used for\nsorting OCR. First, we ﬁnd that older reviews attract more readerships.\nMany products have thousands of review many of which never receive\nany attention from consumers because they stay at the end of a long list\nof reviews. Out of the 35,000 reviews we collected for this study, 92.5%\nhad less than ﬁve votes and 69.7% had no votes. New reviews may con-\ntain up-to-date information about the product and the recent changes\nmade by the manufacturer such as the software updates which may\nbe overlooked by the current sorting method. Second, we observe that\nolder reviews are more likely to be perceived helpful than the recent\nones. In other words, perceptions of helpfulness are biased toward\nolder reviews. These two observations indicate that many potentially\nuseful reviews receive little or no attention from consumers because\nthey are barely seen by consumers. Hence, improving the sorting algo-\nrithms of online reviews seems to be necessary. An intelligent system\ncapable of detecting potentially useful reviews can help both vendors\nand consumers. It helps consumers by providing them with more valu-\nable information and by saving their time and energy. It also helps ven-\ndors to satisfy their customers' need for information which will allow\ncustomers to decide more quickly and may eventually lead to increased\nsales for the vendors. The ﬁndings of this study can be used by online\nvendors to develop systems that analyze and classify online reviews\nbased on their expected performance.\n6.2. Limitations and future research\nLike any other studies, this study has limitations. Although automat-\ned sentiment mining is quite useful in analyzing big textual information,\nit still has limitations. First, the software we used in this study can pro-\ncess different types of textual information. However, it lacks processing\ncapability for alternate styles of writing such as sarcasm. While there are\nmany areas for improvement in the ﬁeld of natural language processing,\nfuture research can provide better insights regarding the information\ncontained in online reviews using more advanced technology. Future\nresearch can also look at how explanation of different aspects of the on-\nline shopping experience such as service quality, product quality, and\nprice inﬂuence OCR performance.\nSecond, the sample used in this study was collected from\nAmazon.com website and was mainly limited to reviews of electronic\nproducts. While the reviews we used in this study are limited to prod-\nucts and do not include services, other websites such as Yelp.com\nallow their users to write reviews on services such as restaurants. Be-\ncause there are signiﬁcant differences between products and services\n[39], the ﬁndings of this study may not be generalizable to reviews of\nservices. Future research may further investigate the issue by analyzing\nreviews of services of other platform. Additionally, while previous re-\nsearch shows that product type has an important moderation effect\non the performance of online reviews, our conclusions may remain lim-\nited to certain product types used in this study. Future research can use\na sample consisting of different product types and test the moderation\neffect of product type on the performance of reviews.\nThird, the votes casted by readers in each review is subject to imbal-\nance votes bias which indicates that many reviews voted as helpful by\nconsumers do not contain deep information about the product [41].\nHence, the perceived helpfulness measure may not precisely reﬂect\nthe actual helpfulness of the reviews.\nFourth, we used the same elements for the calculation of senti-\nment in two different ways: polarity and total sentiment. Using the\nsame elements for the calculation of these variables may make\nthem subject to functional dependence and possibly leading to bi-\nased estimation of the relationships in the research model. Although\nwe believe that functional dependence of these variables is not a\nconcern in this study, we should be cautious about the application\nof these variables.\nFinally, our sample lacks language and cultural diversity. The re-\nviews were collected from Amazon US website and all are in English.\nDifferent cultures express emotions differently. For example, it is be-\nlieved that people in individualistic cultures express negative emotions\nmore freely than those living in collectivist cultures [62]. On the other\nhand, language as the vehicle of information may play in signiﬁcant\nrole in communicating the message to the reader. Future research\nmay utilize reviews written in other languages to include the effect of\nlanguage and culture on the performance of online reviews. Future\nresearch may also look at the differences in expression of emotions\nbetween the real life and the virtual space.\nTable 4\nGroup analysis.\nPerformance measure\nReadership\nHelpfulness\nSentiment polarity\nPositive title\nNeutral title\nNegative title\nPositive review\nNeutral review\nNegative review\nTitle sentiment\n0.302⁎⁎⁎\n−0.209⁎⁎⁎\n−0.070\nTitle length\n−0.048⁎⁎⁎\n−0.003\n0.014\nReview length\n0.424⁎⁎⁎\n0.379⁎⁎⁎\n0.233⁎⁎⁎\n0.382⁎⁎\n0.475⁎⁎⁎\n0.450⁎⁎⁎\nReview sentiment\n−0.027\n0.066⁎⁎⁎\n−0.005\nLongevity\n0.461⁎⁎⁎\n0.361⁎⁎⁎\n0.312⁎⁎⁎\n⁎⁎ Signiﬁcant at 0.01.\n⁎⁎⁎ Signiﬁcant at 0.001.\nTable 5\nGroup analysis of helpfulness based on total number of votes.\nTotal votes\n1–9\n10–99\nN99\nB\nWald Chi-Square\nSig\nB\nWald Chi-Square\nSig\nB\nWald Chi-Square\nSig\nReview length\n0.30\n95.36\n0.00\n0.43\n459.10\n0.00\n0.28\n141.97\n0.00\nReview sentiment\n−0.07\n10.00\n0.00\n−0.01\n0.25\n0.62\n−0.18\n67.14\n0.00\nLongevity\n0.29\n115.08\n0.00\n0.30\n208.64\n0.00\n0.16\n22.09\n0.00\nReviewSentiment ∗ReviewTextNeutralD\n0.16\n26.54\n0.00\n0.09\n19.33\n0.00\n0.16\n42.30\n0.00\n38\nM. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40\n\n\n7. Conclusions\nThis research provides insights regarding the predictors of perfor-\nmance of online reviews using a sentiment mining approach. We ﬁnd\nthat sentiment negatively inﬂuences the performance of online reviews\nwith two exceptions: positive sentiment in the title and neutral\nsentiment in the text of the review. We also ﬁnd that longer reviews\nare more likely to attract readership and to be perceived as helpful.\nThis research can be used by online vendors to create scalable automat-\ned systems for sorting and classiﬁcation of OCR.\nReferences\n[1] R. Ahluwalia, Examination of psychological processes underlying resistance to\npersuasion, Journal of Consumer Research 27 (2) (2000) 217–232.\n[2] C.M. Angst, R. Agarwal, Adoption of electronic health records in the presence of\nprivacy concerns: the elaboration likelihood model and individual persuasion, MIS\nQuarterly 33 (2) (2009) 339–370.\n[3] S. Aral, The Problem With Online RatingsRetrieved from http://sloanreview.mit.edu/\narticle/the-problem-with-online-ratings-2/2013.\n[4] X. Bai, Predicting consumer sentiments from online text, Decision Support Systems\n50 (4) (2011) 732–742.\n[5] A.A. Bailey, Consumer awareness and use of product review websites, Journal of\nInteractive Advertising 6 (1) (2005) 68–81.\n[6] C.F. Baum, Modeling proportions, Stata Journal 8 (2) (2008) 299.\n[7] J. Berger, K.L. Milkman, What makes online content viral? Journal of Marketing\nResearch 49 (2) (2012) 192–205.\n[8] A. Bhattacherjee, C. Sanford, Inﬂuence processes for information technology accep-\ntance: an elaboration likelihood model, MIS Quarterly 30 (4) (2006) 805–825.\n[9] B. Bickart, R.M. Schindler, Internet forums as inﬂuential sources of consumer infor-\nmation, Journal of Interactive Marketing 15 (3) (2001) 31–40.\n[10] S.S. Brehm, J.W. Brehm, Psychological Reactance: A Theory of Freedom and Control,\nAcademic Press, 2013.\n[11] A.C. Cameron, P.K. Trivedi, Regression Analysis of Count Data, Cambridge University\nPress, 2013.\n[12] H. Chen, R.H. Chiang, V.C. Storey, Business intelligence and analytics: from big data\nto big impact, MIS Quarterly 36 (4) (2012) 1165–1188.\n[13] Y. Chen, J. Xie, Online consumer review: word-of-mouth as a new element of mar-\nketing communication mix, Management Science 54 (3) (2008) 477–491.\n[14] J.A. Chevalier, D. Mayzlin, The effect of word of mouth on sales: online book reviews,\nJournal of Marketing Research 43 (3) (2006) 345–354.\n[15] C. Danescu-Niculescu-Mizil, G. Kossinets, J. Kleinberg, L. Lee, How opinions are\nreceived by online communities: a case study on amazon.com helpfulness votes,\nProceedings of the 18th International Conference on World wide web, ACM 2009,\npp. 141–150.\n[16] C. Dellarocas, X.M. Zhang, N.F. Awad, Exploring the value of online product reviews\nin forecasting sales: the case of motion pictures, Journal of Interactive Marketing 21\n(4) (2007) 23–45.\n[17] R.R. Dholakia, B. Sternthal, Highly credible sources: persuasive facilitators or\npersuasive liabilities, Journal of Consumer Research 3 (1977) 223–232.\n[18] W. Duan, B. Gu, A.B. Whinston, Do online reviews matter?—An empirical investiga-\ntion of panel data, Decision Support Systems 45 (4) (2008) 1007–1016.\n[19] V.S. Folkes, The availability heuristic and perceived risk, Journal of Consumer\nResearch 15 (1) (1988).\n[20] C. Forman, A. Ghose, B. Wiesenfeld, Examining the relationship between reviews\nand sales: the role of reviewer identity disclosure in electronic markets, Information\nSystems Research 19 (3) (2008) 291–313.\n[21] D. Garcia, F. Schweitzer, Emotions in product reviews — empirics and models, 2011\nIEEE International Conference on Privacy, Security, Risk, and Trust, and IEEE Interna-\ntional Conference on Social Computing, IEEE 2011, pp. 483–488.\n[22] A. Ghose, P.G. Ipeirotis, Estimating the helpfulness and economic impact of product\nreviews: mining text and reviewer characteristics, IEEE Transactions on Knowledge\nand Data Engineering 23 (10) (2011) 1498–1512.\n[23] D. Godes, D. Mayzlin, Using online conversations to study word-of-mouth commu-\nnication, Marketing Science 23 (4) (2004) 545–560.\n[24] R.E. Goldsmith, D. Horowitz, Measuring motivations for online opinion seeking,\nJournal of Interactive Advertising 6 (2) (2006) 2–14.\n[25] A. Gruzd, S. Doiron, P. Mai, Is happiness contagious online? A case of Twitter and the\n2010 Winter Olympics, Proceedings of the 44th Hawaii International Conference on\nSystem Sciences, IEEE 2011, pp. 1–9.\n[26] R.B. Harris, D. Paradice, An investigation of the computer-mediated communication\nof emotions, Journal of Applied Sciences Research 3 (12) (2007) 2081–2090.\n[27] F. Heider, The Psychology of Interpersonal Relations, John Wiley & Son, New York,\n1958.\n[28] T. Hennig-Thurau, K.P. Gwinner, G. Walsh, D.D. Gremler, Electronic word-of-mouth\nvia consumer-opinion platforms: what motivates consumers to articulate them-\nselves on the Internet? Journal of Interactive Marketing 18 (1) (2004) 38–52.\n[29] J.M. Hilbe, Negative Binomial Regression, Cambridge University Press, 2011.\n[30] N. Hu, I. Bose, N.S. Koh, L. Liu, Manipulation of online reviews: an analysis of\nratings, readability, and sentiments, Decision Support Systems 52 (3) (2012)\n674–684.\n[31] N. Hu, N.S. Koh, S.K. Reddy, Ratings lead you to the product, reviews help you clinch\nit? The mediating role of online review sentiments on product sales, Decision\nSupport Systems 57 (2014).\n[32] D. Huffaker, Dimensions of leadership and social inﬂuence in online communities,\nHuman Communication Research 36 (4) (2010) 593–617.\n[33] N. Jindal, B. Liu, Opinion spam and analysis, Proceedings of the 2008 International\nConference on Web Search and Data Mining, ACM 2008, pp. 219–230.\n[34] E.J. Johnson, J.W. Payne, Effort and accuracy in choice, Management Science 31 (4)\n(1985) 395–414.\n[35] E.E. Jones, K.E. Davis, From acts to dispositions the attribution process in person\nperception, Advances in Experimental Social Psychology 1965, pp. 219–266.\n[36] H.H. Kelley, The processes of causal attribution, American Psychologist 28 (2)\n(1973) 107.\n[37] S.-M. Kim, P. Pantel, T. Chklovski, M. Pennacchiotti, Automatically assessing review\nhelpfulness, Proceedings of the 2006 Conference on Empirical Methods in Natural\nLanguage Processing, Association for Computational Linguistics 2006, pp. 423–430.\n[38] S. Kim, Yelp Sues Firm Over Alleged Fake ReviewsRetrieved from http://abcnews.go.\ncom/m/blogEntry?id=202775702013.\n[39] P. Kotler, G. Armstrong, Principles of Marketing, Pearson Education, 2010.\n[40] F. Li, M. Huang, Y. Yang, X. Zhu, Learning to identify review spam, Proceedings of the\nTwenty-Second International Joint Conference on Artiﬁcial Intelligence, AAAI Press\n2011, pp. 2488–2493.\n[41] J. Liu, Y. Cao, C.-Y. Lin, Y. Huang, M. Zhou, Low-quality product review detection in\nopinion summarization, EMNLP-CoNLL2007 334–342.\n[42] Y. Liu, Word of mouth for movies: its dynamics and impact on box ofﬁce revenue,\nJournal of Marketing 70 (3) (2006) 74–89.\n[43] C. López, R. Farzan, Analysis of local online review systems as digital word-of-\nmouth, Proceedings of the Companion Publication of the 23rd International\nConference on World Wide Web Companion, International World Wide Web\nConferences Steering Committee 2014, pp. 457–462.\n[44] Y. Lu, P. Tsaparas, A. Ntoulas, L. Polanyi, Exploiting social context for review\nquality prediction, Proceedings of the 19th International Conference on World\nWide Web, ACM 2010, pp. 691–700.\n[45] D. Mayzlin, Y. Dover, J. Chevalier, Promotional reviews: an empirical investigation of\nonline review manipulation, American Economic Review 104 (8) (2014)\n2421–2455.\n[46] S.M. Mudambi, D. Schuff, What makes a helpful online review? A study of\ncustomer reviews on Amazon.com, MIS Quarterly 34 (1) (2010) 185–200.\n[47] Nielsen, Global Consumers' Trust in ‘Earned’ Advertising Grows in ImportanceRetrieved\nfrom http://www.nielsen.com/us/en/press-room/2012/nielsen-global-consumers-\ntrust-in-earned-advertising-grows.html2012.\n[48] J. Nielsen, How Users Read on the WebRetrieved from http://www.nngroup.\ncom/articles/how-users-read-on-the-web/1997.\n[49] M.P. O'Mahony, B. Smyth, Learning to recommend helpful hotel reviews, Pro-\nceedings of the Third ACM Conference on Recommender Systems, ACM 2009,\npp. 305–308.\n[50] M. Ott, Y. Choi, C. Cardie, J.T. Hancock, Finding deceptive opinion spam by any\nstretch of the imagination, Proceedings of the 49th Annual Meeting of the\nAssociation for Computational Linguistics, Human Language Technologies, 1,\nAssociation for Computational Linguistics 2011, pp. 309–319.\n[51] L.H. Owen, What Shoppers Don't Realize About Amazon's ReviewsRetrieved from\nhttps://gigaom.com/2011/06/24/419-what-shoppers-dont-realize-about-amazons-\nreviews/2011.\n[52] D.-H. Park, J. Lee, I. Han, The effect of on-line consumer reviews on consumer\npurchasing intention: the moderating role of involvement, International Journal of\nElectronic Commerce 11 (4) (2007) 125–148.\n[53] R.E. Petty, J.T. Cacioppo, The Elaboration Likelihood Model of Persuasion, Springer,\n1986.\n[54] M.A. Riordan, R.J. Kreuz, Emotion encoding and interpretation in computer-\nmediated communication: reasons for use, Computers in Human Behavior 26\n(6) (2010) 1667–1673.\n[55] M.A. Russell, Mining the Social Web: Data Mining Facebook, Twitter, LinkedIn,\nGoogle+, GitHub, and More, O'Reilly Media, Inc., 2013\n[56] R.M. Schindler, B. Bickart, Perceived helpfulness of online consumer reviews: the\nrole of message content and style, Journal of Consumer Behaviour 11 (3) (2012)\n234–243.\n[57] C.H. Schwenk, “Information, cognitive biases, and commitment to a course of\naction”, Academy of Management Review 11 (2) (1986) 298–310.\n[58] S. Sen, D. Lerman, Why are you telling me this? An examination into negative\nconsumer reviews on the web, Journal of Interactive Marketing 21 (4) (2007)\n76–94.\n[59] G. Shmueli, O.R. Koppius, Predictive analytics in information systems research,\nMIS Quarterly 35 (3) (2011) 553–572.\n[60] S. Stieglitz, L. Dang-Xuan, Emotions and information diffusion in social media —\nsentiment of microblogs and sharing behavior, Journal of Management Informa-\ntion Systems 29 (4) (2013) 217–248.\n[61] D. Streitfeld, In a Race to Out-Rave, 5-Star Web Reviews Go for $5Retrieved from\nhttp://www.nytimes.com/2011/08/20/technology/ﬁnding-fake-reviews-online.\nhtml?_r=1&amp2011.\n[62] K. Takahashi, N. Ohara, T.C. Antonucci, H. Akiyama, Commonalities and\ndifferences in close relationships among the Americans and Japanese: a\ncomparison by the individualism/collectivism concept, International Journal of\nBehavioral Development 26 (5) (2002) 453–465.\n[63] M. Thelwall, K. Buckley, Topic-based sentiment analysis for the social web: the role\nof mood and issue-related words, Journal of the American Society for Information\nScience and Technology 64 (8) (2013).\n39\nM. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40\n\n\n[64] M. Thelwall, K. Buckley, G. Paltoglou, Sentiment strength detection for the social\nweb, Journal of the American Society for Information Science and Technology 63\n(1) (2012) 163–173.\n[65] M. Thelwall, K. Buckley, G. Paltoglou, D. Cai, A. Kappas, Sentiment strength detection\nin short informal text, Journal of the American Society for Information Science and\nTechnology 61 (12) (2010) 2544–2558.\n[66] A.M. Treisman, Strategies and models of selective attention, Psychological Review\n76 (3) (1969) 282.\n[67] A. Tversky, D. Kahneman, Judgment under uncertainty: heuristics and biases,\nScience 185 (4157) (1974) 1124–1131.\n[68] R. Walker, Samsung Just Got Busted For Posting Fake Reviews Online. Is There Any\nGood Reason Why They Shouldn't Do It Again?Retrieved from http://news.yahoo.\ncom/samsung-htc-fake-reviews-blackberry-no-risk-all-reward-191308791.html?\nsoc_src=mediacontentsharebuttons2013.\n[69] J.P. Walsh, Selectivity and selective perception: an investigation of managers' belief\nstructures and information processing, Academy of Management Journal 31 (4)\n(1988) 873–896.\n[70] J.B. Walther, K.P. D'Addario, The impacts of emoticons on message interpretation in\ncomputer-mediated communication, Social Science Computer Review 19 (3)\n(2001) 324–347.\n[71] X.-T. Wang, Emotions within reason: resolving conﬂicts in risk preference, Cognition\nand Emotion 20 (8) (2006) 1132–1152.\nMohammad Salehan is an Assistant Professor of Computer Information Systems at\nCalifornia State Polytechnic University, Pomona. He holds a Ph.D. in Business from the\nUniversity of North Texas, an MBA from Sharif University of Technology, and a Bsc. in\nSoftware Engineering from Shahid Beheshti University. His research has appeared in Com-\nputers in Human Behavior journal and proceedings of International Conference on Infor-\nmation Systems (ICIS), Americas Conference on Information Systems (AMCIS), and\nPaciﬁc-Asia Conference on Information Systems (PACIS). His research interests include\nbusiness analytics, social networks, and mobile computing.\nDan J. Kim is a professor of Information Technology and Decision Sciences (ITDS) at Uni-\nversity of North Texas (UNT). He earned his Ph.D. in MIS from SUNY at Buffalo. He also\nholds a MBA degree with management science concentration and MS degree in computer\nscience. His research interests are in multidisciplinary areas such as information security\n(InfoSec) and privacy, information assurance, and trust in electronic commerce. Recently\nhe has focused on InfoSec Self-Efﬁcacy, Web Assurance Seal Services (WASS), and Trust\nin e-collaborations. His research work has been published or in forthcoming more than\n120 papers in refereed journals, peer-reviewed book chapters, and conference proceed-\nings including Information Systems Research, Journal of Management Information Systems,\nCommunications of ACM, Communications of AIS, Decision Support Systems, International\nJournal of Human-Computer Interaction, Journal of Organizational and End User Computing,\nIEEE Transactions on Professional Communication, Electronic Market, IEEE IT Professional,\nJournal of Global Information Management, and International Journal of Mobile Communica-\ntions, ICIS, HICSS, AMCIS, INFORMS, ICEC, ICA, and so on. He has been awarded the National\nScience Foundation CyberCorps: SFS grant for multi-years, 2012 Emerald management Re-\nview Citations of Excellence Awards, 2010 Best Published Paper Award in ISR, an Emerald\nLiterati Network 2009 — Outstanding Paper Award, the ICIS 2003 Best Paper-First Runner-\nup Award, and the AMCIS 2005 Best Research Paper Award at AMCIS 2005.\n40\nM. Salehan, D.J. Kim / Decision Support Systems 81 (2016) 30–40\n",
+    "media": [
+      {
+        "media_id": "fig_p1_0",
+        "media_type": "figure",
+        "title": "Figura / Gráfico pág. 1",
+        "caption": "Elemento visual identificado na página 1",
+        "page_number": 1,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "fig_p1_1",
+        "media_type": "figure",
+        "title": "Figura / Gráfico pág. 1",
+        "caption": "Elemento visual identificado na página 1",
+        "page_number": 1,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "fig_p1_2",
+        "media_type": "figure",
+        "title": "Figura / Gráfico pág. 1",
+        "caption": "Elemento visual identificado na página 1",
+        "page_number": 1,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "fig_p3_0",
+        "media_type": "figure",
+        "title": "Figura / Gráfico pág. 3",
+        "caption": "Elemento visual identificado na página 3",
+        "page_number": 3,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p5_4",
+        "media_type": "table",
+        "title": "Table 1 shows the descriptive statis-",
+        "caption": "Table 1 shows the descriptive statis-",
+        "page_number": 5,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p5_5",
+        "media_type": "table",
+        "title": "Table 2 shows the correlation matrix for",
+        "caption": "Table 2 shows the correlation matrix for",
+        "page_number": 5,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "fig_p6_0",
+        "media_type": "figure",
+        "title": "Figura / Gráfico pág. 6",
+        "caption": "Elemento visual identificado na página 6",
+        "page_number": 6,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p6_7",
+        "media_type": "table",
+        "title": "Table 3 summa-",
+        "caption": "Table 3 summa-",
+        "page_number": 6,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p6_8",
+        "media_type": "table",
+        "title": "Table 4. Positive sentiment is an important predictor of rea",
+        "caption": "Table 4. Positive sentiment is an important predictor of readership",
+        "page_number": 6,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p6_9",
+        "media_type": "table",
+        "title": "Table 5 shows the results of the analysis.",
+        "caption": "Table 5 shows the results of the analysis.",
+        "page_number": 6,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p6_10",
+        "media_type": "table",
+        "title": "Table 1\nDescriptive statistics.",
+        "caption": "Table 1\nDescriptive statistics.",
+        "page_number": 6,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "fig_p7_0",
+        "media_type": "figure",
+        "title": "Figura / Gráfico pág. 7",
+        "caption": "Elemento visual identificado na página 7",
+        "page_number": 7,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p7_12",
+        "media_type": "table",
+        "title": "Table 2\nCorrelation matrix of independent variables.",
+        "caption": "Table 2\nCorrelation matrix of independent variables.",
+        "page_number": 7,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "fig_p8_0",
+        "media_type": "figure",
+        "title": "Figura / Gráfico pág. 8",
+        "caption": "Elemento visual identificado na página 8",
+        "page_number": 8,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "fig_p8_1",
+        "media_type": "figure",
+        "title": "Figura / Gráfico pág. 8",
+        "caption": "Elemento visual identificado na página 8",
+        "page_number": 8,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "fig_p8_2",
+        "media_type": "figure",
+        "title": "Figura / Gráfico pág. 8",
+        "caption": "Elemento visual identificado na página 8",
+        "page_number": 8,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "fig_p8_3",
+        "media_type": "figure",
+        "title": "Figura / Gráfico pág. 8",
+        "caption": "Elemento visual identificado na página 8",
+        "page_number": 8,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p8_17",
+        "media_type": "table",
+        "title": "Table 3\nHypothesis testing results.",
+        "caption": "Table 3\nHypothesis testing results.",
+        "page_number": 8,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p9_18",
+        "media_type": "table",
+        "title": "Table 4\nGroup analysis.",
+        "caption": "Table 4\nGroup analysis.",
+        "page_number": 9,
+        "evidence_status": "OBSERVED"
+      },
+      {
+        "media_id": "tbl_p9_19",
+        "media_type": "table",
+        "title": "Table 5\nGroup analysis of helpfulness based on total number ",
+        "caption": "Table 5\nGroup analysis of helpfulness based on total number of votes.",
+        "page_number": 9,
+        "evidence_status": "OBSERVED"
+      }
+    ],
+    "metadata": {
+      "filename": "Predicting_performance_online_consumer_reviews(1).pdf",
+      "size_bytes": 827574,
+      "file_path": "data\\study\\a3b336f4295d0d51_Predicting_performance_online_consumer_reviews(1).pdf"
+    },
+    "source_hash": "a3b336f4295d0d51a0b7c67c5445fa8e0efb14177136868e936eded99cd810e2",
+    "provenance": {
+      "source_file": "Predicting_performance_online_consumer_reviews(1).pdf",
+      "source_hash": "a3b336f4295d0d51a0b7c67c5445fa8e0efb14177136868e936eded99cd810e2",
+      "ingested_at": "2026-09-27T20:12:22.616576",
+      "evidence_status": "OBSERVED"
+    },
+    "reading_progress": {
+      "current_page": 1,
+      "current_section": "Abstract / Introdução",
+      "scroll_position": 0,
+      "progress_percent": 0.0,
+      "last_read_at": "2026-09-27T20:12:22.616576",
+      "bookmarks": []
+    },
+    "structure": {
+      "problem": {
+        "text": "O artigo aborda otimização e precisão em cenários de alta complexidade.",
+        "status": "INFERRED",
+        "page_ref": null
+      },
+      "research_gap": {
+        "text": "Necessidade de conciliar eficiência computacional com garantias estritas.",
+        "status": "INFERRED",
+        "page_ref": null
+      },
+      "research_question": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "hypothesis": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "contribution": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "method": {
+        "text": "Arquitetura modular baseada em verificação formal e orquestração de subsistemas.",
+        "status": "INFERRED",
+        "page_ref": null
+      },
+      "dataset": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "experiment": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "results": {
+        "text": "Evidências experimentais avaliadas na secção 5. Data analysis and results.",
+        "status": "OBSERVED",
+        "page_ref": 5
+      },
+      "limitations": {
+        "text": "Limitações documentadas explicitamente pelos autores.",
+        "status": "OBSERVED",
+        "page_ref": 9
+      },
+      "conclusion": {
+        "text": "Conclusões sintetizadas na secção final (p. 10).",
+        "status": "OBSERVED",
+        "page_ref": 10
+      }
+    },
+    "glossary": [],
+    "created_at": "2026-09-27T20:12:22.616576",
+    "updated_at": "2026-09-27T20:12:22.616576"
+  },
+  "doc_vid_d63ba4452284": {
+    "document_id": "doc_vid_d63ba4452284",
+    "source_id": "d63ba445228438fd",
+    "title": "Aula 1: Consenso Distribuído (Raft)",
+    "source_type": "VIDEO",
+    "subject": "Sistemas Distribuídos",
+    "language": "pt",
+    "page_count": 1,
+    "sections": [
+      {
+        "section_id": "chap_01",
+        "title": "Introdução e Visão Geral [00:00]",
+        "level": 1,
+        "page_start": 1,
+        "page_end": 1,
+        "paragraphs": [
+          {
+            "paragraph_id": "p_seg_0001",
+            "text": "[00:00] Durante a aula foram abordados os conceitos fundamentais.",
+            "page_number": 1,
+            "section_id": "chap_01",
+            "order": 1
+          }
+        ]
+      }
+    ],
+    "extracted_text": "Transcrição de teste: Durante a aula foram abordados os conceitos fundamentais da disciplina.",
+    "media": [
+      {
+        "media_id": "frame_001",
+        "media_type": "image",
+        "title": "Momento visual em 00:00",
+        "caption": "Demonstração ou captura de ecrã ao vivo",
+        "page_number": 1,
+        "data_ref": "/data/study/keyframes/doc_vid_d63ba4452284/frame_001_0s.jpg",
+        "explanation": "Demonstração ou captura de ecrã ao vivo",
+        "evidence_status": "VISUAL_OBSERVED"
+      },
+      {
+        "media_id": "frame_002",
+        "media_type": "figure",
+        "title": "Momento visual em 00:05",
+        "caption": "Diapositivo com texto e apresentação estruturada",
+        "page_number": 1,
+        "data_ref": "/data/study/keyframes/doc_vid_d63ba4452284/frame_002_5s.jpg",
+        "explanation": "Diapositivo com texto e apresentação estruturada",
+        "evidence_status": "VISUAL_OBSERVED"
+      },
+      {
+        "media_id": "frame_003",
+        "media_type": "figure",
+        "title": "Momento visual em 00:10",
+        "caption": "Diapositivo com texto e apresentação estruturada",
+        "page_number": 1,
+        "data_ref": "/data/study/keyframes/doc_vid_d63ba4452284/frame_003_10s.jpg",
+        "explanation": "Diapositivo com texto e apresentação estruturada",
+        "evidence_status": "VISUAL_OBSERVED"
+      }
+    ],
+    "metadata": {
+      "filename": "multimodal_raft_lecture.mp4",
+      "size_bytes": 136241,
+      "file_path": "data/test_videos/multimodal_raft_lecture.mp4",
+      "video": {
+        "duration_seconds": 15.0,
+        "duration_str": "00:15",
+        "width": 640,
+        "height": 480,
+        "fps": 24.0,
+        "codec": "h264",
+        "audio_path": "data\\study\\audio\\d63ba445228438fd.wav",
+        "keyframes": [
+          {
+            "frame_id": "frame_001",
+            "timestamp": 0.5,
+            "timestamp_str": "00:00",
+            "image_path": "data\\study\\keyframes\\doc_vid_d63ba4452284\\frame_001_0s.jpg",
+            "image_url": "/data/study/keyframes/doc_vid_d63ba4452284/frame_001_0s.jpg",
+            "source_id": "doc_vid_d63ba4452284",
+            "scene_id": "scene_1",
+            "provenance": "FFMPEG_SCENE_SAMPLE",
+            "is_slide": false,
+            "slide_confidence": 0.5,
+            "visual_type": "demonstration",
+            "visual_description": "Demonstração ou captura de ecrã ao vivo",
+            "evidence_status": "VISUAL_OBSERVED",
+            "has_text": false,
+            "confidence": 0.85
+          },
+          {
+            "frame_id": "frame_002",
+            "timestamp": 5.5,
+            "timestamp_str": "00:05",
+            "image_path": "data\\study\\keyframes\\doc_vid_d63ba4452284\\frame_002_5s.jpg",
+            "image_url": "/data/study/keyframes/doc_vid_d63ba4452284/frame_002_5s.jpg",
+            "source_id": "doc_vid_d63ba4452284",
+            "scene_id": "scene_2",
+            "provenance": "FFMPEG_SCENE_SAMPLE",
+            "is_slide": true,
+            "slide_confidence": 0.88,
+            "visual_type": "slide",
+            "visual_description": "Diapositivo com texto e apresentação estruturada",
+            "evidence_status": "VISUAL_OBSERVED",
+            "has_text": true,
+            "confidence": 0.85
+          },
+          {
+            "frame_id": "frame_003",
+            "timestamp": 10.5,
+            "timestamp_str": "00:10",
+            "image_path": "data\\study\\keyframes\\doc_vid_d63ba4452284\\frame_003_10s.jpg",
+            "image_url": "/data/study/keyframes/doc_vid_d63ba4452284/frame_003_10s.jpg",
+            "source_id": "doc_vid_d63ba4452284",
+            "scene_id": "scene_3",
+            "provenance": "FFMPEG_SCENE_SAMPLE",
+            "is_slide": true,
+            "slide_confidence": 0.88,
+            "visual_type": "slide",
+            "visual_description": "Diapositivo com texto e apresentação estruturada",
+            "evidence_status": "VISUAL_OBSERVED",
+            "has_text": true,
+            "confidence": 0.85
+          }
+        ],
+        "chapters": [
+          {
+            "chapter_id": "chap_01",
+            "title": "Introdução e Fundamentos",
+            "start_seconds": 0.0,
+            "end_seconds": 5.0,
+            "start_timestamp": "00:00"
+          },
+          {
+            "chapter_id": "chap_02",
+            "title": "Diagrama de Arquitetura",
+            "start_seconds": 5.0,
+            "end_seconds": 10.0,
+            "start_timestamp": "00:05"
+          },
+          {
+            "chapter_id": "chap_03",
+            "title": "Gráfico de Desempenho e Throughput",
+            "start_seconds": 10.0,
+            "end_seconds": 15.0,
+            "start_timestamp": "00:10"
+          }
+        ],
+        "transcript_segments": [
+          {
+            "segment_id": "seg_1",
+            "start": 0.0,
+            "end": 5.0,
+            "timestamp": "00:00",
+            "text": "Bem-vindos à aula de Consenso Distribuído. Hoje vamos analisar o protocolo Raft.",
+            "confidence": 0.98,
+            "words": [
+              {
+                "word": "Consenso",
+                "start": 2.0,
+                "end": 2.6
+              },
+              {
+                "word": "Raft",
+                "start": 4.0,
+                "end": 4.6
+              }
+            ]
+          },
+          {
+            "segment_id": "seg_2",
+            "start": 5.0,
+            "end": 10.0,
+            "timestamp": "00:05",
+            "text": "No diagrama de arquitetura, o líder envia batimentos cardíacos aos seguidores para manter autoridade.",
+            "confidence": 0.97,
+            "words": [
+              {
+                "word": "líder",
+                "start": 7.0,
+                "end": 7.5
+              },
+              {
+                "word": "arquitetura",
+                "start": 5.5,
+                "end": 6.2
+              }
+            ]
+          },
+          {
+            "segment_id": "seg_3",
+            "start": 10.0,
+            "end": 15.0,
+            "timestamp": "00:10",
+            "text": "Neste gráfico de desempenho, comparamos a taxa de transferência atingida com três, cinco e sete nós.",
+            "confidence": 0.99,
+            "words": [
+              {
+                "word": "desempenho",
+                "start": 11.0,
+                "end": 11.8
+              },
+              {
+                "word": "transferência",
+                "start": 12.5,
+                "end": 13.5
+              }
+            ]
+          }
+        ],
+        "slide_candidates": [
+          {
+            "timestamp": 0.5,
+            "timestamp_str": "00:00",
+            "frame_id": "frame_001",
+            "confidence": 0.5,
+            "is_slide": false,
+            "evidence_status": "UNKNOWN",
+            "title": "Frame em 00:00"
+          },
+          {
+            "timestamp": 5.5,
+            "timestamp_str": "00:05",
+            "frame_id": "frame_002",
+            "confidence": 0.88,
+            "is_slide": true,
+            "evidence_status": "OBSERVED",
+            "title": "Slide em 00:05"
+          },
+          {
+            "timestamp": 10.5,
+            "timestamp_str": "00:10",
+            "frame_id": "frame_003",
+            "confidence": 0.88,
+            "is_slide": true,
+            "evidence_status": "OBSERVED",
+            "title": "Slide em 00:10"
+          }
+        ],
+        "video_url": "/api/study/document/doc_vid_d63ba4452284/video",
+        "processing_status": "READY",
+        "watch_progress": {
+          "current_timestamp": 12.26,
+          "progress_percent": 81.7,
+          "last_watched_at": "2026-09-27T23:08:25.453745"
+        }
+      }
+    },
+    "source_hash": "d63ba445228438fdc4a1c5dcbd78623e748db093cd9a76350793a71b683534e2",
+    "provenance": {
+      "source_file": "multimodal_raft_lecture.mp4",
+      "source_hash": "d63ba445228438fdc4a1c5dcbd78623e748db093cd9a76350793a71b683534e2",
+      "ingested_at": "2026-09-27T22:57:16.510737",
+      "engine": "JARVIS_MULTIMODAL_VIDEO_PIPELINE",
+      "evidence_status": "OBSERVED"
+    },
+    "reading_progress": {
+      "current_page": 1,
+      "current_section": "00:12",
+      "scroll_position": 12.262246,
+      "progress_percent": 81.7,
+      "last_read_at": "2026-09-27T23:08:25.453745",
+      "bookmarks": []
+    },
+    "structure": {
+      "problem": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "research_gap": {
+        "text": "Necessidade de conciliar eficiência computacional com garantias estritas.",
+        "status": "INFERRED",
+        "page_ref": null
+      },
+      "research_question": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "hypothesis": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "contribution": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "method": {
+        "text": "Arquitetura modular baseada em verificação formal e orquestração de subsistemas.",
+        "status": "INFERRED",
+        "page_ref": null
+      },
+      "dataset": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "experiment": {
+        "text": "Não especificado",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "results": {
+        "text": "Resultados não identificados diretamente no corpo do documento.",
+        "status": "UNKNOWN",
+        "page_ref": null
+      },
+      "limitations": {
+        "text": "Possível dependência de recursos computacionais e sensibilidade a parâmetros.",
+        "status": "INFERRED",
+        "page_ref": null
+      },
+      "conclusion": {
+        "text": "Conclusão geral baseada nos objetivos propostos no resumo.",
+        "status": "INFERRED",
+        "page_ref": null
+      }
+    },
+    "glossary": [],
+    "created_at": "2026-09-27T22:57:16.510737",
+    "updated_at": "2026-09-27T22:57:16.510737"
+  }
+}

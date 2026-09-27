@@ -67,7 +67,81 @@ def start_frontend_http_server(
             ".js": "application/javascript",
             ".css": "text/css",
             ".pdf": "application/pdf",
+            ".mp4": "video/mp4",
+            ".webm": "video/webm",
+            ".mkv": "video/x-matroska",
+            ".mov": "video/quicktime",
+            ".avi": "video/x-msvideo",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".png": "image/png",
+            ".webp": "image/webp",
         }
+
+        def _serve_file_with_range(self, file_path: str, content_type: str):
+            """Suporta HTTP 206 Partial Content para seek e streaming de vídeo de alto desempenho."""
+            try:
+                file_size = os.path.getsize(file_path)
+            except OSError:
+                self.send_response(404)
+                self.end_headers()
+                return
+
+            range_header = self.headers.get("Range")
+            if range_header and range_header.startswith("bytes="):
+                try:
+                    ranges = range_header.replace("bytes=", "").split("-")
+                    start = int(ranges[0]) if ranges[0] else 0
+                    end = int(ranges[1]) if len(ranges) > 1 and ranges[1] else file_size - 1
+                    start = max(0, min(start, file_size - 1))
+                    end = max(start, min(end, file_size - 1))
+                    content_length = end - start + 1
+
+                    self.send_response(206)
+                    self.send_header("Content-Type", content_type)
+                    self.send_header("Content-Range", f"bytes {start}-{end}/{file_size}")
+                    self.send_header("Content-Length", str(content_length))
+                    self.send_header("Accept-Ranges", "bytes")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+                    self.send_header("Access-Control-Allow-Headers", "*")
+                    self.end_headers()
+
+                    with open(file_path, "rb") as f:
+                        f.seek(start)
+                        remaining = content_length
+                        chunk_size = 64 * 1024
+                        while remaining > 0:
+                            to_read = min(remaining, chunk_size)
+                            chunk = f.read(to_read)
+                            if not chunk:
+                                break
+                            self.wfile.write(chunk)
+                            remaining -= len(chunk)
+                    return
+                except (ConnectionResetError, BrokenPipeError):
+                    return
+                except Exception:
+                    pass
+
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(file_size))
+            self.send_header("Accept-Ranges", "bytes")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "*")
+            self.end_headers()
+            try:
+                with open(file_path, "rb") as f:
+                    chunk_size = 64 * 1024
+                    while True:
+                        chunk = f.read(chunk_size)
+                        if not chunk:
+                            break
+                        self.wfile.write(chunk)
+            except (ConnectionResetError, BrokenPipeError):
+                pass
 
         def do_GET(self):
             if self.path in {"/favicon.ico", "favicon.ico"}:
@@ -143,13 +217,84 @@ def start_frontend_http_server(
                 self.wfile.write(b"PDF not found")
                 return
 
+            # API de documentos de estudo
+            if self.path.startswith("/api/study/documents"):
+                docs_file = os.path.join(project_root, "data", "study", "documents.json")
+                docs_list = []
+                if os.path.exists(docs_file):
+                    try:
+                        with open(docs_file, "r", encoding="utf-8") as f:
+                            docs_dict = json.load(f)
+                            docs_list = list(docs_dict.values())
+                    except Exception:
+                        pass
+                body = json.dumps(docs_list, ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+
+            # Streaming de vídeo por document_id
+            if self.path.startswith("/api/study/document/") and self.path.endswith("/video"):
+                parts = self.path.split("?")[0].strip("/").split("/")
+                if len(parts) >= 5:
+                    doc_id = parts[3]
+                    docs_file = os.path.join(project_root, "data", "study", "documents.json")
+                    file_path = None
+                    if os.path.exists(docs_file):
+                        try:
+                            with open(docs_file, "r", encoding="utf-8") as f:
+                                docs_data = json.load(f)
+                            doc_entry = docs_data.get(doc_id)
+                            if doc_entry:
+                                fp = doc_entry.get("metadata", {}).get("file_path") or doc_entry.get("metadata", {}).get("video", {}).get("file_path")
+                                if fp:
+                                    if os.path.isabs(fp) and os.path.exists(fp):
+                                        file_path = fp
+                                    elif os.path.exists(os.path.join(project_root, fp)):
+                                        file_path = os.path.join(project_root, fp)
+                        except Exception:
+                            pass
+
+                    if not file_path:
+                        # Procurar na pasta de vídeos
+                        vid_dir = os.path.join(project_root, "data", "study", "videos")
+                        if os.path.exists(vid_dir):
+                            hash_prefix = doc_id.replace("doc_", "")
+                            for fname in os.listdir(vid_dir):
+                                if fname.startswith(hash_prefix):
+                                    candidate = os.path.join(vid_dir, fname)
+                                    if os.path.isfile(candidate):
+                                        file_path = candidate
+                                        break
+
+                    if file_path and os.path.exists(file_path):
+                        ext = os.path.splitext(file_path)[1].lower()
+                        mime = self.extensions_map.get(ext, "video/mp4")
+                        self._serve_file_with_range(file_path, mime)
+                        return
+
+                self.send_response(404)
+                self.send_header("Content-Type", "text/plain")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(b"Video not found")
+                return
+
             if self.path.startswith("/data/study/"):
                 subpath = self.path.replace("/data/study/", "").split("?")[0]
                 target_file = os.path.join(project_root, "data", "study", subpath)
                 if os.path.exists(target_file) and os.path.isfile(target_file):
+                    ext = os.path.splitext(target_file)[1].lower()
+                    content_type = self.extensions_map.get(ext, "application/octet-stream")
+                    if content_type.startswith("video/"):
+                        self._serve_file_with_range(target_file, content_type)
+                        return
                     with open(target_file, "rb") as f:
                         file_bytes = f.read()
-                    content_type = "application/pdf" if target_file.lower().endswith(".pdf") else "application/octet-stream"
                     self.send_response(200)
                     self.send_header("Content-Type", content_type)
                     self.send_header("Content-Length", str(len(file_bytes)))

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { StudyLibraryView } from './StudyLibraryView';
 import { StudyReaderView } from './StudyReaderView';
+import { StudyVideoReaderView } from './StudyVideoReaderView';
 import { StudySummaryView } from './StudySummaryView';
 import { StudyNotesView } from './StudyNotesView';
 import { StudyQuizView } from './StudyQuizView';
@@ -369,20 +370,33 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
 
         {activeTab === 'reader' && (
           activeDocument ? (
-            <StudyReaderView
-              document={activeDocument}
-              onUpdateProgress={handleUpdateProgress}
-              onSaveHighlight={handleSaveHighlight}
-              onSaveNote={handleSaveNote}
-              readingNotes={readingNotes}
-              highlights={highlights}
-              onTranslate={onTranslate ? (text) => onTranslate(text, activeDocument.document_id) : undefined}
-              onExplain={onExplain ? (text, level) => onExplain(text, level, activeDocument.document_id) : undefined}
-              onSummarizeSection={onSummarizeSection ? (secId) => onSummarizeSection(secId, activeDocument.document_id) : undefined}
-              onExplainMedia={onExplainMedia ? (mId) => onExplainMedia(mId, activeDocument.document_id) : undefined}
-              onAskPaper={onAskPaper ? (q) => onAskPaper(q, activeDocument.document_id) : undefined}
-              onGetDocumentFile={onGetDocumentFile ? () => onGetDocumentFile(activeDocument.document_id) : undefined}
-            />
+            activeDocument.source_type === 'VIDEO' ? (
+              <StudyVideoReaderView
+                document={activeDocument}
+                onUpdateProgress={handleUpdateProgress}
+                onSaveHighlight={handleSaveHighlight}
+                onSaveNote={handleSaveNote}
+                readingNotes={readingNotes}
+                highlights={highlights}
+                onTranslate={onTranslate ? (text) => onTranslate(text, activeDocument.document_id) : undefined}
+                onExplain={onExplain ? (text, level) => onExplain(text, level, activeDocument.document_id) : undefined}
+              />
+            ) : (
+              <StudyReaderView
+                document={activeDocument}
+                onUpdateProgress={handleUpdateProgress}
+                onSaveHighlight={handleSaveHighlight}
+                onSaveNote={handleSaveNote}
+                readingNotes={readingNotes}
+                highlights={highlights}
+                onTranslate={onTranslate ? (text) => onTranslate(text, activeDocument.document_id) : undefined}
+                onExplain={onExplain ? (text, level) => onExplain(text, level, activeDocument.document_id) : undefined}
+                onSummarizeSection={onSummarizeSection ? (secId) => onSummarizeSection(secId, activeDocument.document_id) : undefined}
+                onExplainMedia={onExplainMedia ? (mId) => onExplainMedia(mId, activeDocument.document_id) : undefined}
+                onAskPaper={onAskPaper ? (q) => onAskPaper(q, activeDocument.document_id) : undefined}
+                onGetDocumentFile={onGetDocumentFile ? () => onGetDocumentFile(activeDocument.document_id) : undefined}
+              />
+            )
           ) : (
             <div className="flex h-full flex-col items-center justify-center p-8 text-center bg-[#0d1217]">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 mb-3 text-cyan-400">

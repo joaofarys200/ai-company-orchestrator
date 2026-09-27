@@ -7,7 +7,8 @@ export type SourceType =
   | 'IMAGE'
   | 'AUDIO'
   | 'LECTURE_AUDIO'
-  | 'NOTE';
+  | 'NOTE'
+  | 'VIDEO';
 
 export type EvidenceStatus = 'OBSERVED' | 'INFERRED' | 'UNKNOWN';
 
@@ -132,6 +133,9 @@ export interface QuizQuestion {
   explanation: string;
   source_ids: string[];
   page_ref?: number;
+  timestamp?: number;
+  timestamp_str?: string;
+  frame_id?: string;
 }
 
 export interface StudyQuiz {
@@ -177,6 +181,8 @@ export interface Flashcard {
   back: string;
   source_ids: string[];
   page_ref?: number;
+  timestamp?: number;
+  frame_id?: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   next_review: number;
   repetitions: number;
@@ -205,3 +211,65 @@ export interface StudyCollection {
 
 export type ExplanationLevel = 'Básico' | 'Intermédio' | 'Académico';
 export type SummaryMode = 'Quick' | 'Study' | 'Detailed' | 'Exam';
+
+export interface VideoTranscriptSegment {
+  id: number;
+  start: number;
+  end: number;
+  text: string;
+  confidence?: number;
+  words?: Array<{ word: string; start: number; end: number }>;
+}
+
+export interface VideoChapter {
+  title: string;
+  start_time: number;
+  end_time: number;
+  summary: string;
+  key_concepts: string[];
+}
+
+export interface VideoKeyframe {
+  frame_id: string;
+  timestamp: number;
+  timestamp_str: string;
+  image_path: string;
+  has_text: boolean;
+  is_slide: boolean;
+  confidence: number;
+}
+
+export interface VideoContextWindow {
+  current_timestamp: number;
+  current_timestamp_str: string;
+  current_segment?: VideoTranscriptSegment;
+  surrounding_transcript: string;
+  current_chapter?: VideoChapter;
+  relevant_frames: VideoKeyframe[];
+  nearest_slide?: VideoKeyframe;
+  video_metadata: {
+    duration_seconds: number;
+    title: string;
+    width: number;
+    height: number;
+  };
+}
+
+export interface VideoNote {
+  note_id: string;
+  document_id: string;
+  timestamp: number;
+  timestamp_str: string;
+  frame_id?: string;
+  note: string;
+  selected_text?: string;
+  created_at: string;
+}
+
+export interface VideoSearchResult {
+  segment_id: number;
+  start: number;
+  end: number;
+  timestamp_str: string;
+  text: string;
+}

@@ -34,9 +34,14 @@ import type {
   ExplanationLevel
 } from './types';
 
-// Configure pdf.js worker using Vite asset URL
+// Configure pdf.js worker using Vite asset URL with absolute origin resolution
 if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+  try {
+    const workerOriginUrl = new URL(pdfWorkerUrl, window.location.href).href;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = workerOriginUrl;
+  } catch {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+  }
 }
 
 export interface StudyReaderViewProps {
@@ -387,21 +392,54 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
         if (isCancelled) return;
 
         if (pdfData && pdfData.length > 0) {
-          const loadingTask = pdfjsLib.getDocument({
-            data: pdfData,
-          });
-          const doc = await Promise.race([
-            loadingTask.promise,
-            new Promise<never>((_, reject) =>
-              setTimeout(() => reject(new Error('Tempo limite ao inicializar motor PDF')), 8000)
-            ),
-          ]);
+          let doc: pdfjsLib.PDFDocumentProxy | null = null;
+
+          // Tier 1: Worker-accelerated parsing
+          try {
+            const loadingTask = pdfjsLib.getDocument({
+              data: pdfData,
+              disableRange: true,
+              disableStream: true,
+              disableAutoFetch: true,
+            });
+            doc = await Promise.race([
+              loadingTask.promise,
+              new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('WORKER_TIMEOUT')), 2500)
+              ),
+            ]);
+          } catch (workerErr: any) {
+            console.warn('[StudyReader] Worker load timed out or errored; switching to direct PDF engine:', workerErr);
+            // Tier 2 Fallback: Direct in-thread PDF engine without stalling or failing
+            try {
+              (pdfjsLib.GlobalWorkerOptions as any).workerPort = null;
+              pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+              const directTask = pdfjsLib.getDocument({
+                data: pdfData,
+                disableRange: true,
+                disableStream: true,
+                disableAutoFetch: true,
+              });
+              doc = await Promise.race([
+                directTask.promise,
+                new Promise<never>((_, reject) =>
+                  setTimeout(() => reject(new Error('Tempo limite ao inicializar motor PDF')), 8000)
+                ),
+              ]);
+            } catch (fallbackErr: any) {
+              throw fallbackErr;
+            }
+          }
+
           if (isCancelled) return;
 
-          setPdfDoc(doc);
-          setNumPages(doc.numPages);
-          setPdfLoading(false);
-          return;
+          if (doc) {
+            setPdfDoc(doc);
+            setNumPages(doc.numPages);
+            setPdfLoading(false);
+            setPdfError(null);
+            return;
+          }
         }
 
         // If no binary PDF found, we enter semantic fallback mode
@@ -1022,11 +1060,26 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             {/* Error fallback alert */}
             {Boolean(pdfError) && (
               <div className="max-w-2xl mx-auto my-4 rounded-lg border border-amber-500/30 bg-amber-950/20 p-4 text-xs text-amber-300">
-                <h4 className="font-semibold mb-1">Aviso de Leitura do Ficheiro</h4>
-                <p className="text-gray-300 mb-2">{pdfError}</p>
-                <p className="text-[11px] text-gray-400">
-                  A carregar a camada semântica com layout de alta densidade.
-                </p>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="font-semibold mb-1">Aviso de Leitura do Ficheiro</h4>
+                    <p className="text-gray-300 mb-2">{pdfError}</p>
+                    <p className="text-[11px] text-gray-400">
+                      A carregar a camada semântica com layout de alta densidade.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPdfError(null);
+                      setReloadKey((k) => k + 1);
+                    }}
+                    className="ml-3 shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/20 px-3 py-1.5 text-xs font-medium text-amber-200 hover:bg-amber-500/30 transition cursor-pointer"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    <span>Tentar Novamente</span>
+                  </button>
+                </div>
               </div>
             )}
 
