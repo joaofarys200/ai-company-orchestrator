@@ -22,7 +22,8 @@ import {
   PanelRightOpen,
   BookOpen,
   HelpCircle,
-  List
+  List,
+  RotateCcw
 } from 'lucide-react';
 import type {
   StudyDocument,
@@ -267,6 +268,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
   const [numPages, setNumPages] = useState<number>(document.page_count || 1);
   const [pdfLoading, setPdfLoading] = useState<boolean>(true);
   const [pdfError, setPdfError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState<number>(0);
 
   // Navigation & Scale State
   const [currentPage, setCurrentPage] = useState<number>(
@@ -343,7 +345,10 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
         ];
         for (const url of urlsToTry) {
           try {
-            const res = await fetch(url);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            const res = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
             if (res.ok) {
               const contentType = res.headers.get('content-type') || '';
               if (!contentType.includes('text/html')) {
@@ -385,7 +390,12 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
           const loadingTask = pdfjsLib.getDocument({
             data: pdfData,
           });
-          const doc = await loadingTask.promise;
+          const doc = await Promise.race([
+            loadingTask.promise,
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('Tempo limite ao inicializar motor PDF')), 8000)
+            ),
+          ]);
           if (isCancelled) return;
 
           setPdfDoc(doc);
@@ -410,7 +420,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
     return () => {
       isCancelled = true;
     };
-  }, [document.document_id, onGetDocumentFile]);
+  }, [document.document_id, onGetDocumentFile, reloadKey]);
 
   // Handle page visibility change and update progress
   const handlePageVisible = useCallback(
@@ -997,6 +1007,15 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
               <div className="flex h-96 flex-col items-center justify-center gap-3 text-cyan-400">
                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent" />
                 <p className="text-xs text-gray-400">A carregar o artigo científico em alta resolução...</p>
+                <button
+                  type="button"
+                  onClick={() => setReloadKey((k) => k + 1)}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-xs text-cyan-300 hover:bg-cyan-500/20 transition cursor-pointer"
+                  title="Tentar recarregar ficheiro"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  <span>Recarregar documento</span>
+                </button>
               </div>
             )}
 

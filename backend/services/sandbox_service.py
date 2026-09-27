@@ -61,6 +61,14 @@ def start_frontend_http_server(
     dist_dir = os.path.join(project_root, "frontend", "dist")
 
     class FrontendHTTPRequestHandler(NoCacheHTTPRequestHandler):
+        extensions_map = {
+            **NoCacheHTTPRequestHandler.extensions_map,
+            ".mjs": "application/javascript",
+            ".js": "application/javascript",
+            ".css": "text/css",
+            ".pdf": "application/pdf",
+        }
+
         def do_GET(self):
             if self.path in {"/favicon.ico", "favicon.ico"}:
                 self.send_response(200)

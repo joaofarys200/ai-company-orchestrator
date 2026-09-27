@@ -1679,7 +1679,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const timer = setTimeout(() => {
           pendingStudyRequestsRef.current.delete(requestId);
           reject(new Error('Get document file timed out'));
-        }, 20000);
+        }, 4000);
 
         pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
 
