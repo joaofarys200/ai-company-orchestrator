@@ -20,6 +20,8 @@ from backend.websocket.handlers.knowledge import (
     KnowledgeWebSocketHandler,
 )
 from backend.websocket.handlers.lectures import LectureWebSocketHandler
+from backend.websocket.handlers.study import StudyWebSocketHandler
+from services.study_service import StudyService
 from backend.websocket.handlers.missions import (
     MissionWebSocketHandler,
 )
@@ -91,6 +93,11 @@ def create_websocket_handlers(
         ).routes(),
         "lecture": LectureWebSocketHandler(
             connections=connections,
+            logger=logger,
+        ).routes(),
+        "study": StudyWebSocketHandler(
+            connections=connections,
+            study_service=getattr(services, "study_service", None) or StudyService(workspace_root=getattr(services, "project_root", ".")),
             logger=logger,
         ).routes(),
         "sentinel": SentinelWebSocketHandler(

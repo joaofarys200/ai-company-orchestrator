@@ -56,7 +56,64 @@ def start_frontend_http_server(
                 self.end_headers()
                 self.wfile.write(body)
                 return
+
+            # Streaming de ficheiro PDF real por document_id
+            if self.path.startswith("/api/study/document/") and self.path.endswith("/file"):
+                parts = self.path.split("?")[0].strip("/").split("/")
+                if len(parts) >= 5:
+                    doc_id = parts[3]
+                    docs_file = os.path.join(project_root, "data", "study", "documents.json")
+                    if os.path.exists(docs_file):
+                        try:
+                            with open(docs_file, "r", encoding="utf-8") as f:
+                                docs_data = json.load(f)
+                            doc_entry = docs_data.get(doc_id)
+                            if doc_entry:
+                                file_path = doc_entry.get("metadata", {}).get("file_path")
+                                if file_path and os.path.exists(file_path):
+                                    with open(file_path, "rb") as pf:
+                                        pdf_bytes = pf.read()
+                                    self.send_response(200)
+                                    self.send_header("Content-Type", "application/pdf")
+                                    self.send_header("Content-Length", str(len(pdf_bytes)))
+                                    self.send_header("Access-Control-Allow-Origin", "*")
+                                    self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+                                    self.send_header("Access-Control-Allow-Headers", "*")
+                                    self.end_headers()
+                                    self.wfile.write(pdf_bytes)
+                                    return
+                        except Exception:
+                            pass
+                self.send_response(404)
+                self.send_header("Content-Type", "text/plain")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(b"PDF not found")
+                return
+
+            if self.path.startswith("/data/study/"):
+                subpath = self.path.replace("/data/study/", "").split("?")[0]
+                target_file = os.path.join(project_root, "data", "study", subpath)
+                if os.path.exists(target_file) and os.path.isfile(target_file):
+                    with open(target_file, "rb") as f:
+                        file_bytes = f.read()
+                    content_type = "application/pdf" if target_file.lower().endswith(".pdf") else "application/octet-stream"
+                    self.send_response(200)
+                    self.send_header("Content-Type", content_type)
+                    self.send_header("Content-Length", str(len(file_bytes)))
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.end_headers()
+                    self.wfile.write(file_bytes)
+                    return
+
             super().do_GET()
+
+        def do_OPTIONS(self):
+            self.send_response(204)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "*")
+            self.end_headers()
 
     def handler(*args, **kwargs):
         return FrontendHTTPRequestHandler(

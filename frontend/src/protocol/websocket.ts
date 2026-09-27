@@ -1253,6 +1253,19 @@ export type ServerMessage =
   | MissionPlanEvaluationResultMessage
   | MissionControlStateMessage
   | MissionControlCommandResultMessage
+  | { type: 'study_documents_list'; documents: any[]; event?: string }
+  | { type: 'study_document_ready'; document: any; event?: string }
+  | { type: 'study_document_uploaded'; document: any; event?: string }
+  | { type: 'study_document_processing'; filename: string; status: string }
+  | { type: 'study_document_details'; document: any; notes?: any[]; highlights?: any[] }
+  | { type: 'study_quiz_ready'; quiz: any }
+  | { type: 'study_quiz_evaluated'; score: number; results?: any; evaluation?: any }
+  | { type: 'study_flashcards_list'; flashcards: any[] }
+  | { type: 'study_flashcard_updated'; flashcard: any }
+  | { type: 'study_document_failed'; filename: string; error: string }
+  | { type: 'study_contextual_assist_result'; document_id: string; request_id?: string; [key: string]: any }
+  | { type: 'study_ask_paper_result'; document_id: string; answer: string; sources?: string[]; request_id?: string }
+  | { type: 'study_document_file_result'; document_id: string; content_base64?: string; filename?: string; error?: string; request_id?: string }
   | UnknownServerMessage;
 
 export type ClientMessage =
@@ -1297,8 +1310,27 @@ export type ClientMessage =
   | { type: 'sentinel_approve_action'; action_id: string; user?: string; session_id?: string; incident_id?: string }
   | { type: 'sentinel_reject_action'; action_id: string; reason?: string; user?: string }
   | { type: 'sentinel_rollback_action'; action_id: string; user?: string; session_id?: string }
-  | { type: 'sentinel_submit_review'; event_id: string; final_classification: string; reason?: string; operator?: string }
   | { type: 'sentinel_get_shadow_telemetry' }
+  | { type: 'sentinel_submit_review'; event_id: string; final_classification: string; reason?: string; operator?: string }
+  | { type: 'study_upload_document'; filename: string; title?: string; subject?: string; content_base64?: string; content_text?: string; source_type?: string; file_path?: string }
+  | { type: 'study_list_documents' }
+  | { type: 'study_get_document'; document_id: string }
+  | { type: 'study_get_document_file'; document_id: string; request_id?: string }
+  | { type: 'study_contextual_assist'; document_id: string; action: string; selected_text?: string; text?: string; section_id?: string; media_id?: string; level?: string; page_number?: number; target_language?: string; request_id?: string }
+  | { type: 'study_ask_paper'; document_id: string; query?: string; question?: string; section_id?: string; request_id?: string }
+  | { type: 'study_generate_summary'; document_id: string; mode?: string }
+  | { type: 'study_synthesize_documents'; document_ids: string[] }
+  | { type: 'study_generate_cornell'; document_id: string }
+  | { type: 'study_save_to_vault'; title: string; content?: string; markdown_content?: string; subject?: string; source_document_ids?: string[] }
+  | { type: 'study_generate_quiz'; document_id: string; question_count?: number }
+  | { type: 'study_submit_quiz'; quiz_id: string; answers: Record<string, number | string>; transfer_answer?: string }
+  | { type: 'study_list_flashcards'; document_id: string }
+  | { type: 'study_review_flashcard'; card_id: string; rating: string }
+  | { type: 'study_save_note'; document_id: string; page: number; section_id: string; note_text: string }
+  | { type: 'study_save_highlight'; document_id: string; page: number; section_id: string; text: string; color?: string }
+  | { type: 'study_get_notes_and_highlights'; document_id: string }
+  | { type: 'study_update_reading_progress'; document_id: string; current_page: number; current_section?: string; completion_percentage?: number }
+  | { type: 'study_prepare_exam'; document_id: string }
   | MissionClientOperation;
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
@@ -2088,6 +2120,88 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
       return { type, action: asString(raw.action) };
     case 'ui_theme':
       return { type, theme: asString(raw.theme) };
+    case 'study_documents_list':
+      return {
+        type: 'study_documents_list',
+        documents: Array.isArray(raw.documents) ? (raw.documents as any[]) : [],
+        event: raw.event ? asString(raw.event) : undefined,
+      };
+    case 'study_document_ready':
+      return {
+        type: 'study_document_ready',
+        document: raw.document,
+        event: raw.event ? asString(raw.event) : undefined,
+      };
+    case 'study_document_uploaded':
+      return {
+        type: 'study_document_uploaded',
+        document: raw.document,
+        event: raw.event ? asString(raw.event) : undefined,
+      };
+    case 'study_document_processing':
+      return {
+        type: 'study_document_processing',
+        filename: asString(raw.filename),
+        status: asString(raw.status),
+      };
+    case 'study_document_details':
+      return {
+        type: 'study_document_details',
+        document: raw.document,
+        notes: Array.isArray(raw.notes) ? raw.notes : [],
+        highlights: Array.isArray(raw.highlights) ? raw.highlights : [],
+      };
+    case 'study_quiz_ready':
+      return {
+        type: 'study_quiz_ready',
+        quiz: raw.quiz,
+      };
+    case 'study_quiz_evaluated':
+      return {
+        type: 'study_quiz_evaluated',
+        score: asNumber(raw.score),
+        results: raw.results,
+        evaluation: raw.evaluation,
+      };
+    case 'study_flashcards_list':
+      return {
+        type: 'study_flashcards_list',
+        flashcards: Array.isArray(raw.flashcards) ? raw.flashcards : [],
+      };
+    case 'study_flashcard_updated':
+      return {
+        type: 'study_flashcard_updated',
+        flashcard: raw.flashcard,
+      };
+    case 'study_document_failed':
+      return {
+        type: 'study_document_failed',
+        filename: asString(raw.filename),
+        error: asString(raw.error),
+      };
+    case 'study_contextual_assist_result':
+      return {
+        type: 'study_contextual_assist_result',
+        document_id: asString(raw.document_id),
+        ...raw,
+      };
+    case 'study_ask_paper_result':
+      return {
+        type: 'study_ask_paper_result',
+        document_id: asString(raw.document_id),
+        answer: asString(raw.answer),
+        sources: Array.isArray(raw.sources) ? (raw.sources as string[]) : [],
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_document_file_result':
+      return {
+        type: 'study_document_file_result',
+        document_id: asString(raw.document_id),
+        content_base64: raw.content_base64 ? asString(raw.content_base64) : undefined,
+        filename: raw.filename ? asString(raw.filename) : undefined,
+        error: raw.error ? asString(raw.error) : undefined,
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
     default:
       return { type: 'unknown', originalType: type, payload: raw };
   }

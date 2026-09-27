@@ -41,6 +41,12 @@ import {
   type MissionIntentPreviewResultMessage,
   type MissionIntentResultMessage,
 } from '../protocol/websocket';
+import type {
+  StudyDocument,
+  StudyQuiz,
+  QuizEvaluationResult,
+  Flashcard,
+} from '../features/study/types';
 
 export interface ProjectFileSaveState {
   ok: boolean;
@@ -202,6 +208,43 @@ interface WebSocketContextType {
   sendMissionIntentChange: (missionId: string, textOrDelta: string | Record<string, unknown>, preApproved?: boolean) => void;
   clearMissionIntentPreviewResult: () => void;
   clearMissionIntentResult: () => void;
+  studyDocuments: StudyDocument[];
+  activeStudyQuiz: StudyQuiz | null;
+  studyQuizResult: QuizEvaluationResult | null;
+  studyFlashcards: Flashcard[];
+  listStudyDocuments: () => void;
+  uploadStudyDocument: (
+    filename: string,
+    title?: string,
+    subject?: string,
+    contentBase64?: string,
+    contentText?: string,
+    sourceType?: string
+  ) => void;
+  generateStudyQuiz: (documentId: string, count?: number) => void;
+  submitStudyQuiz: (quizId: string, answers: Record<string, number | string>, transferAnswer?: string) => void;
+  listStudyFlashcards: (documentId: string) => void;
+  reviewStudyFlashcard: (cardId: string, rating: string) => void;
+  contextualAssist: (
+    documentId: string,
+    action: string,
+    selectedText: string,
+    options?: {
+      sectionId?: string;
+      pageNumber?: number;
+      level?: string;
+      targetLanguage?: string;
+      mediaId?: string;
+    }
+  ) => Promise<any>;
+  askStudyPaper: (
+    documentId: string,
+    question: string,
+    sectionId?: string
+  ) => Promise<{ answer: string; sources: string[] }>;
+  getStudyDocumentFile: (
+    documentId: string
+  ) => Promise<{ contentBase64?: string; filename?: string; error?: string }>;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -275,6 +318,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [missionControlCommandResult, setMissionControlCommandResult] = useState<MissionControlCommandResultData | null>(null);
   const [missionIntentPreviewResult, setMissionIntentPreviewResult] = useState<MissionIntentPreviewResultMessage | null>(null);
   const [missionIntentResult, setMissionIntentResult] = useState<MissionIntentResultMessage | null>(null);
+  const [studyDocuments, setStudyDocuments] = useState<StudyDocument[]>([]);
+  const [activeStudyQuiz, setActiveStudyQuiz] = useState<StudyQuiz | null>(null);
+  const [studyQuizResult, setStudyQuizResult] = useState<QuizEvaluationResult | null>(null);
+  const [studyFlashcards, setStudyFlashcards] = useState<Flashcard[]>([]);
 
   const [kanban, setKanban] = useState<KanbanState>({
     backlog: [],
@@ -294,6 +341,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const reconnectTimeoutRef = useRef<number | null>(null);
   const shouldReconnectRef = useRef(true);
   const recentMessageHashesRef = useRef<Map<string, number>>(new Map());
+  const pendingStudyRequestsRef = useRef<Map<string, {
+    resolve: (value: any) => void;
+    reject: (reason?: any) => void;
+    timer: any;
+  }>>(new Map());
 
   const sendClientMessage = useCallback((message: ClientMessage) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
@@ -489,16 +541,18 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (!msg || !msg.type) return;
 
     // Deduplicate identical messages arriving within 1.5s via dual transport (Electron IPC + WebSocket)
-    const rawKey = `${msg.type}:${msg.sender || ''}:${msg.content || ''}:${msg.card_id || ''}:${msg.status || ''}`;
-    const now = Date.now();
-    const lastSeen = recentMessageHashesRef.current.get(rawKey);
-    if (lastSeen && now - lastSeen < 1500) {
-      return;
-    }
-    recentMessageHashesRef.current.set(rawKey, now);
-    if (recentMessageHashesRef.current.size > 200) {
-      for (const [k, t] of recentMessageHashesRef.current.entries()) {
-        if (now - t > 5000) recentMessageHashesRef.current.delete(k);
+    if (!msg.type.startsWith('study_')) {
+      const rawKey = `${msg.type}:${msg.sender || ''}:${msg.content || ''}:${msg.card_id || ''}:${msg.status || ''}`;
+      const now = Date.now();
+      const lastSeen = recentMessageHashesRef.current.get(rawKey);
+      if (lastSeen && now - lastSeen < 1500) {
+        return;
+      }
+      recentMessageHashesRef.current.set(rawKey, now);
+      if (recentMessageHashesRef.current.size > 200) {
+        for (const [k, t] of recentMessageHashesRef.current.entries()) {
+          if (now - t > 5000) recentMessageHashesRef.current.delete(k);
+        }
       }
     }
 
@@ -712,6 +766,32 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'lecture_status_response':
         setIsRecordingLecture(Boolean(msg.is_recording));
         break;
+      case 'study_documents_list':
+        setStudyDocuments(msg.documents || []);
+        break;
+      case 'study_document_uploaded':
+        setStudyDocuments((prev) => [
+          msg.document,
+          ...prev.filter((d) => d.document_id !== msg.document.document_id),
+        ]);
+        addSystemMessage(`Documento de estudo carregado: ${msg.document.title}`);
+        break;
+      case 'study_quiz_ready':
+        setActiveStudyQuiz(msg.quiz);
+        addSystemMessage(`Quiz pedagógico gerado para: ${msg.quiz.topic}`);
+        break;
+      case 'study_quiz_evaluated':
+        setStudyQuizResult(msg);
+        addSystemMessage(`Quiz de estudo avaliado: ${msg.score}% de aproveitamento.`);
+        break;
+      case 'study_flashcards_list':
+        setStudyFlashcards(msg.flashcards || []);
+        break;
+      case 'study_flashcard_updated':
+        setStudyFlashcards((prev) =>
+          prev.map((fc) => (fc.card_id === msg.flashcard.card_id ? msg.flashcard : fc))
+        );
+        break;
       case 'sandbox_status':
         setSandboxStatus(msg.status);
         break;
@@ -781,6 +861,83 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           addSystemMessage(`[DYNAMIC INTENT: ${msg.status}] ${msg.reason}`);
         }
         break;
+      case 'study_document_ready':
+        if (msg.document) {
+          setStudyDocuments((prev) => [
+            msg.document,
+            ...prev.filter((d) => d.document_id !== msg.document.document_id),
+          ]);
+          addSystemMessage(`Documento de estudo guardado e pronto: ${msg.document.title}`);
+        }
+        break;
+      case 'study_document_failed':
+        addSystemMessage(`Erro ao processar documento ${msg.filename}: ${msg.error}`);
+        break;
+      case 'study_contextual_assist_result': {
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg);
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith(`assist:${msg.document_id}`)) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(msg);
+              break;
+            }
+          }
+        }
+        break;
+      }
+      case 'study_ask_paper_result': {
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve({ answer: msg.answer, sources: msg.sources || [] });
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith(`ask:${msg.document_id}`)) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve({ answer: msg.answer, sources: msg.sources || [] });
+              break;
+            }
+          }
+        }
+        break;
+      }
+      case 'study_document_file_result': {
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve({
+            contentBase64: msg.content_base64,
+            filename: msg.filename,
+            error: msg.error,
+          });
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith(`file:${msg.document_id}`)) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve({
+                contentBase64: msg.content_base64,
+                filename: msg.filename,
+                error: msg.error,
+              });
+              break;
+            }
+          }
+        }
+        break;
+      }
       case 'unknown':
         console.warn('[Transport] Unknown message type:', msg.originalType);
         break;
@@ -847,6 +1004,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           ws.send(JSON.stringify({ type: 'get_rules' } satisfies ClientMessage));
           ws.send(JSON.stringify({ type: 'get_planner_state' } satisfies ClientMessage));
           ws.send(JSON.stringify({ type: 'mission_list', project_id: 'ALL' } satisfies ClientMessage));
+          ws.send(JSON.stringify({ type: 'study_list_documents' } satisfies ClientMessage));
         }
       }, 50);
 
@@ -1374,6 +1532,167 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
   }, [sendClientMessage]);
 
+  const listStudyDocuments = useCallback(() => {
+    sendClientMessage({
+      type: 'study_list_documents',
+    });
+  }, [sendClientMessage]);
+
+  const uploadStudyDocument = useCallback(
+    (
+      filename: string,
+      title?: string,
+      subject?: string,
+      contentBase64?: string,
+      contentText?: string,
+      sourceType?: string
+    ) => {
+      sendClientMessage({
+        type: 'study_upload_document',
+        filename,
+        title,
+        subject,
+        content_base64: contentBase64,
+        content_text: contentText,
+        source_type: sourceType,
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const generateStudyQuiz = useCallback(
+    (documentId: string, count?: number) => {
+      sendClientMessage({
+        type: 'study_generate_quiz',
+        document_id: documentId,
+        question_count: count || 5,
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const submitStudyQuiz = useCallback(
+    (quizId: string, answers: Record<string, number | string>, transferAnswer?: string) => {
+      sendClientMessage({
+        type: 'study_submit_quiz',
+        quiz_id: quizId,
+        answers,
+        transfer_answer: transferAnswer || '',
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const listStudyFlashcards = useCallback(
+    (documentId: string) => {
+      sendClientMessage({
+        type: 'study_list_flashcards',
+        document_id: documentId,
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const reviewStudyFlashcard = useCallback(
+    (cardId: string, rating: string) => {
+      sendClientMessage({
+        type: 'study_review_flashcard',
+        card_id: cardId,
+        rating,
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const contextualAssist = useCallback(
+    (
+      documentId: string,
+      action: string,
+      selectedText: string,
+      options?: {
+        sectionId?: string;
+        pageNumber?: number;
+        level?: string;
+        targetLanguage?: string;
+        mediaId?: string;
+      }
+    ): Promise<any> => {
+      const requestId = `assist:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Assist request timed out'));
+        }, 15000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_contextual_assist',
+          document_id: documentId,
+          action,
+          selected_text: selectedText,
+          section_id: options?.sectionId,
+          page_number: options?.pageNumber,
+          level: options?.level,
+          target_language: options?.targetLanguage || 'pt-PT',
+          media_id: options?.mediaId,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const askStudyPaper = useCallback(
+    (
+      documentId: string,
+      question: string,
+      sectionId?: string
+    ): Promise<{ answer: string; sources: string[] }> => {
+      const requestId = `ask:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Ask paper request timed out'));
+        }, 20000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_ask_paper',
+          document_id: documentId,
+          question,
+          section_id: sectionId,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const getStudyDocumentFile = useCallback(
+    (
+      documentId: string
+    ): Promise<{ contentBase64?: string; filename?: string; error?: string }> => {
+      const requestId = `file:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Get document file timed out'));
+        }, 20000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_get_document_file',
+          document_id: documentId,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
   const getSentinelStatus = useCallback(() => {
     sendClientMessage({
       type: 'sentinel_get_status',
@@ -1624,6 +1943,19 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         sendMissionIntentChange,
         clearMissionIntentPreviewResult,
         clearMissionIntentResult,
+        studyDocuments,
+        activeStudyQuiz,
+        studyQuizResult,
+        studyFlashcards,
+        listStudyDocuments,
+        uploadStudyDocument,
+        generateStudyQuiz,
+        submitStudyQuiz,
+        listStudyFlashcards,
+        reviewStudyFlashcard,
+        contextualAssist,
+        askStudyPaper,
+        getStudyDocumentFile,
       }}
     >
       {children}

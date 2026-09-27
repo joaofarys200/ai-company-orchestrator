@@ -44,7 +44,7 @@ import {
 import { useWebSocket } from '../../context/WebSocketContext';
 import { MissionPlanner } from '../planner';
 import { MissionUnderstandingView, MissionTimelineView, CheckpointTimelineView, RealUserMissionView, MissionControlCenter, MissionListView } from '../missions';
-import { LecturesPanel } from '../lectures/LecturesPanel';
+import { StudyContainer } from '../study';
 import { SentinelDashboard } from '../sentinel/SentinelDashboard';
 import { Modal } from '../../components/Modal';
 import { ProjectArchitectureView } from './ProjectArchitectureView';
@@ -53,7 +53,7 @@ interface WorkspaceViewerProps {
   onClose?: () => void;
 }
 
-type TabType = 'kanban' | 'debates' | 'files' | 'architecture' | 'preview' | 'terminal' | 'coding' | 'knowledge' | 'rules' | 'planner' | 'mission_control' | 'mission_understanding' | 'mission_timeline' | 'checkpoint_timeline' | 'real_user_missions' | 'lectures' | 'sentinel';
+type TabType = 'kanban' | 'debates' | 'files' | 'architecture' | 'preview' | 'terminal' | 'coding' | 'knowledge' | 'rules' | 'planner' | 'mission_control' | 'mission_understanding' | 'mission_timeline' | 'checkpoint_timeline' | 'real_user_missions' | 'lectures' | 'study' | 'sentinel';
 
 const PANEL = 'bg-[#0f1b20]/80 border border-[#a1bebf]/15 rounded-md shadow-[0_16px_50px_rgba(0,0,0,0.28)]';
 const SUBTLE_PANEL = 'bg-[#a1bebf]/[0.045] border border-[#a1bebf]/15 rounded-md';
@@ -67,14 +67,14 @@ const KANBAN_COLUMNS = [
   { id: 'done', label: 'Concluido', tone: 'border-emerald-400/30', dot: 'bg-emerald-400' },
 ] as const;
 
-type WorkspaceSection = 'overview' | 'code' | 'run' | 'missions' | 'learning' | 'sentinel' | 'more';
+type WorkspaceSection = 'overview' | 'code' | 'run' | 'missions' | 'study' | 'sentinel' | 'more';
 
 const PRIMARY_SECTIONS: Array<{ id: WorkspaceSection; label: string; icon: LucideIcon; defaultTab: TabType }> = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard, defaultTab: 'kanban' },
   { id: 'code', label: 'Código', icon: Code2, defaultTab: 'files' },
   { id: 'run', label: 'Executar', icon: Rocket, defaultTab: 'preview' },
   { id: 'missions', label: 'Missões', icon: Activity, defaultTab: 'mission_control' },
-  { id: 'learning', label: 'Aulas', icon: GraduationCap, defaultTab: 'lectures' },
+  { id: 'study', label: 'Estudo', icon: GraduationCap, defaultTab: 'study' },
   { id: 'sentinel', label: 'Segurança', icon: Shield, defaultTab: 'sentinel' },
   { id: 'more', label: 'Mais', icon: MoreHorizontal, defaultTab: 'debates' },
 ];
@@ -98,8 +98,8 @@ const SECONDARY_TABS: Record<WorkspaceSection, Array<{ id: TabType; label: strin
     { id: 'checkpoint_timeline', label: 'Checkpoints & State', icon: Database },
     { id: 'planner', label: 'Execução & DAG', icon: Activity },
   ],
-  learning: [
-    { id: 'lectures', label: 'Aulas & Cornell', icon: GraduationCap },
+  study: [
+    { id: 'study', label: 'Estudo', icon: GraduationCap },
   ],
   sentinel: [
     { id: 'sentinel', label: 'Sentinel Watchdog', icon: Shield },
@@ -255,6 +255,15 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     rollbackCodingSession,
     architectureSnapshot,
     openMission,
+    isRecordingLecture,
+    startLectureRecording,
+    stopLectureRecording,
+    studyDocuments,
+    listStudyDocuments,
+    uploadStudyDocument,
+    contextualAssist,
+    askStudyPaper,
+    getStudyDocumentFile,
   } = useWebSocket();
 
   const [activeTab, setActiveTab] = useState<TabType>('kanban');
@@ -281,6 +290,19 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
 
   // Confirmation Modal State
   const [confirmRollbackOpen, setConfirmRollbackOpen] = useState(false);
+
+  // Automatically synchronize study catalogue when entering study workspace
+  useEffect(() => {
+    if (activeTab === 'study' || activeTab === 'lectures') {
+      listStudyDocuments();
+    }
+    (window as any).__jarvisRefreshStudy = listStudyDocuments;
+    (window as any).__jarvisUploadStudy = uploadStudyDocument;
+    return () => {
+      delete (window as any).__jarvisRefreshStudy;
+      delete (window as any).__jarvisUploadStudy;
+    };
+  }, [activeTab, listStudyDocuments, uploadStudyDocument]);
 
   const filenames = useMemo(() => Object.keys(projectFiles), [projectFiles]);
   const filenamesKey = filenames.join('|');
@@ -310,11 +332,11 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
         ? 'run'
         : ['mission_control', 'real_user_missions', 'mission_understanding', 'mission_timeline', 'checkpoint_timeline', 'planner'].includes(activeTab)
           ? 'missions'
-          : activeTab === 'lectures'
-            ? 'learning'
-            : activeTab === 'sentinel'
-              ? 'sentinel'
-              : 'more';
+          : activeTab === 'study' || activeTab === 'lectures'
+            ? 'study'
+          : activeTab === 'sentinel'
+            ? 'sentinel'
+            : 'more';
 
   const totalAstSymbols = useMemo<number>(() => {
     if (typeof architectureSnapshot?.symbols?.total_count === 'number') {
@@ -353,6 +375,10 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
   }, [listProjects]);
 
   useEffect(() => {
+    listStudyDocuments();
+  }, [listStudyDocuments]);
+
+  useEffect(() => {
     if (projects.length > 0 && !projectContext) {
       const defaultProj = projects.find((p) => p.project_id === 'dina') || projects.find((p) => p.project_id === 'task-app') || projects[0];
       if (defaultProj) {
@@ -360,6 +386,12 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
       }
     }
   }, [projects, projectContext, openProject]);
+
+  useEffect(() => {
+    if (activeTab === 'study' || activeTab === 'lectures') {
+      listStudyDocuments();
+    }
+  }, [activeTab, listStudyDocuments]);
 
   useEffect(() => {
     if (!currentNote) return;
@@ -728,6 +760,8 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
               return (
                 <button
                   key={section.id}
+                  id={`workspace-tab-${section.id}`}
+                  data-testid={`tab-${section.id}`}
                   onClick={() => activateSection(section.id)}
                   className={`workspace-primary-tab flex h-8.5 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-semibold transition-all ${
                     active
@@ -1856,9 +1890,63 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
             </ViewFrame>
           )}
 
-          {activeTab === 'lectures' && (
-            <ViewFrame key="lectures" className="h-full">
-              <LecturesPanel />
+          {(activeTab === 'study' || activeTab === 'lectures') && (
+            <ViewFrame key="study" className="h-full">
+              <StudyContainer
+                documents={studyDocuments}
+                notes={notes.map((n) => ({ filename: n }))}
+                isRecording={isRecordingLecture}
+                onStartRecording={startLectureRecording}
+                onStopRecording={stopLectureRecording}
+                onSaveNoteToObsidian={saveNote}
+                onRefreshDocuments={listStudyDocuments}
+                onUploadDocument={(payload) => {
+                  uploadStudyDocument(
+                    payload.filename,
+                    payload.title,
+                    payload.subject,
+                    payload.content_base64,
+                    payload.content_text,
+                    payload.source_type
+                  );
+                }}
+                onTranslate={async (text, docId) => {
+                  if (!docId) return text;
+                  const res = await contextualAssist(docId, 'translate', text, { targetLanguage: 'pt-PT' });
+                  return res?.translation || text;
+                }}
+                onExplain={async (text, level, docId) => {
+                  if (!docId) return { literal: text, simple: text, context_importance: '' };
+                  const res = await contextualAssist(docId, 'explain', text, { level });
+                  return {
+                    literal: res?.translation || text,
+                    simple: res?.simple_explanation || '',
+                    context_importance: res?.contextual_importance || '',
+                  };
+                }}
+                onSummarizeSection={async (sectionId, docId) => {
+                  if (!docId) return { main_idea: '', key_points: [], terms: [], doubts: [] };
+                  const res = await contextualAssist(docId, 'summarize_section', '', { sectionId });
+                  return {
+                    main_idea: res?.main_idea || '',
+                    key_points: res?.key_points || [],
+                    terms: res?.terms || [],
+                    doubts: res?.open_questions || [],
+                  };
+                }}
+                onExplainMedia={async (mediaId, docId) => {
+                  if (!docId) return '';
+                  const res = await contextualAssist(docId, 'explain_figure', '', { mediaId });
+                  return res?.media_explanation || res?.explanation || '';
+                }}
+                onAskPaper={async (query, docId) => {
+                  if (!docId) return { answer: '', sources: [] };
+                  return askStudyPaper(docId, query);
+                }}
+                onGetDocumentFile={async (docId) => {
+                  return getStudyDocumentFile(docId);
+                }}
+              />
             </ViewFrame>
           )}
 
