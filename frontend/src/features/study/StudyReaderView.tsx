@@ -37,7 +37,13 @@ import type {
 export const ensurePdfWorkerConfigured = () => {
   if (typeof window === 'undefined') return;
   try {
-    const workerOriginUrl = new URL('/pdf.worker.min.mjs', window.location.origin).href;
+    const origin =
+      window.location && window.location.origin && window.location.origin !== 'null'
+        ? window.location.origin
+        : window.location && window.location.href && !window.location.href.startsWith('data:')
+        ? new URL(window.location.href).origin
+        : 'http://localhost:8000';
+    const workerOriginUrl = new URL('/pdf.worker.min.mjs', origin).href;
     pdfjsLib.GlobalWorkerOptions.workerSrc = workerOriginUrl;
   } catch {
     pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -323,6 +329,11 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
 
   // Viewport Container Ref
   const viewerContainerRef = useRef<HTMLDivElement | null>(null);
+  const activeLoadingTaskRef = useRef<any>(null);
+  const onGetDocumentFileRef = useRef(onGetDocumentFile);
+  useEffect(() => {
+    onGetDocumentFileRef.current = onGetDocumentFile;
+  }, [onGetDocumentFile]);
 
   // Active section calculation
   const currentSection = useMemo(() => {
@@ -372,9 +383,9 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
         }
 
         // Strategy 2: Fast WebSocket binary payload fallback via onGetDocumentFile
-        if (!pdfData && onGetDocumentFile) {
+        if (!pdfData && onGetDocumentFileRef.current) {
           try {
-            const fileRes = await onGetDocumentFile();
+            const fileRes = await onGetDocumentFileRef.current();
             if (fileRes?.contentBase64) {
               const binary = atob(fileRes.contentBase64);
               const bytes = new Uint8Array(binary.length);
@@ -393,17 +404,29 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
         if (isCancelled) return;
 
         if (pdfData && pdfData.length > 0) {
+          if (pdfData.byteLength === 0 || !pdfData.buffer || pdfData.buffer.byteLength === 0) {
+            throw new Error('Buffer do documento PDF está vazio ou inacessível.');
+          }
+
           let doc: pdfjsLib.PDFDocumentProxy | null = null;
           ensurePdfWorkerConfigured();
 
           // Tier 1: Worker-accelerated parsing
+          let loadingTask: any = null;
           try {
-            const loadingTask = pdfjsLib.getDocument({
-              data: pdfData,
+            // CRITICAL: Always use .slice(0) to pass an independent ArrayBuffer clone.
+            // PDF.js transfers the buffer to the Web Worker via postMessage, which detaches it.
+            // Passing a fresh slice preserves the master pdfData buffer intact for retries
+            // and completely prevents "ArrayBuffer at index 0 is already detached" errors.
+            const transferBytes = pdfData.slice(0);
+            loadingTask = pdfjsLib.getDocument({
+              data: transferBytes,
               disableRange: true,
               disableStream: true,
               disableAutoFetch: true,
             });
+            activeLoadingTaskRef.current = loadingTask;
+
             doc = await Promise.race([
               loadingTask.promise,
               new Promise<never>((_, reject) =>
@@ -412,15 +435,29 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             ]);
           } catch (workerErr: any) {
             console.warn('[StudyReader] Worker load initial attempt failed, re-verifying worker and retrying:', workerErr);
+            if (loadingTask) {
+              try {
+                loadingTask.destroy();
+              } catch {}
+            }
+            if (isCancelled) return;
+
             ensurePdfWorkerConfigured();
             try {
-              const retryTask = pdfjsLib.getDocument({
-                data: pdfData,
-                disableRange: true,
-                disableStream: true,
-                disableAutoFetch: true,
-              });
-              doc = await retryTask.promise;
+              // Verify master buffer is still intact before attempting retry
+              if (pdfData && pdfData.buffer && pdfData.buffer.byteLength > 0) {
+                const retryBytes = pdfData.slice(0);
+                const retryTask = pdfjsLib.getDocument({
+                  data: retryBytes,
+                  disableRange: true,
+                  disableStream: true,
+                  disableAutoFetch: true,
+                });
+                activeLoadingTaskRef.current = retryTask;
+                doc = await retryTask.promise;
+              } else {
+                throw workerErr;
+              }
             } catch (fallbackErr: any) {
               throw fallbackErr;
             }
@@ -433,6 +470,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             setNumPages(doc.numPages);
             setPdfLoading(false);
             setPdfError(null);
+            activeLoadingTaskRef.current = null;
             return;
           }
         }
@@ -452,8 +490,14 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
 
     return () => {
       isCancelled = true;
+      if (activeLoadingTaskRef.current) {
+        try {
+          activeLoadingTaskRef.current.destroy();
+        } catch {}
+        activeLoadingTaskRef.current = null;
+      }
     };
-  }, [document.document_id, onGetDocumentFile, reloadKey]);
+  }, [document.document_id, reloadKey]);
 
   // Handle page visibility change and update progress
   const handlePageVisible = useCallback(

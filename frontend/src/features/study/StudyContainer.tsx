@@ -219,6 +219,14 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
     setReadingNotes((prev) => prev.filter((n) => n.note_id !== noteId));
   };
 
+  // Handler: Stabilized document file fetcher
+  const handleGetDocumentFile = useCallback(() => {
+    if (onGetDocumentFile && activeDocumentId) {
+      return onGetDocumentFile(activeDocumentId);
+    }
+    return Promise.resolve({ error: 'Nenhum documento ativo' });
+  }, [onGetDocumentFile, activeDocumentId]);
+
   return (
     <div className="flex h-full flex-col overflow-hidden bg-[#0a0f14] text-gray-200">
       {/* ============================================================ */}
@@ -394,7 +402,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
                 onSummarizeSection={onSummarizeSection ? (secId) => onSummarizeSection(secId, activeDocument.document_id) : undefined}
                 onExplainMedia={onExplainMedia ? (mId) => onExplainMedia(mId, activeDocument.document_id) : undefined}
                 onAskPaper={onAskPaper ? (q) => onAskPaper(q, activeDocument.document_id) : undefined}
-                onGetDocumentFile={onGetDocumentFile ? () => onGetDocumentFile(activeDocument.document_id) : undefined}
+                onGetDocumentFile={onGetDocumentFile ? handleGetDocumentFile : undefined}
               />
             )
           ) : (
