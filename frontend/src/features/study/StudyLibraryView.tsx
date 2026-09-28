@@ -15,7 +15,8 @@ import {
   RotateCw,
   X,
   Video,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Trash2,
 } from 'lucide-react';
 import type { StudyDocument, SourceType } from './types';
 
@@ -31,6 +32,7 @@ interface StudyLibraryViewProps {
     title?: string;
   }) => void;
   onRefresh?: () => void;
+  onDeleteDocument?: (docId: string) => void;
   isUploading?: boolean;
   uploadStatus?: string;
   onStartLectureRecording?: () => void;
@@ -46,10 +48,13 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
   isUploading = false,
   uploadStatus = '',
   onStartLectureRecording,
+  onDeleteDocument,
 }) => {
   const [filterType, setFilterType] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
+  const [documentToDelete, setDocumentToDelete] = useState<StudyDocument | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   // Upload modal form state
   const [uploadSubject, setUploadSubject] = useState<string>('Inteligência Artificial');
@@ -101,6 +106,19 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!documentToDelete) return;
+    try {
+      setIsDeleting(true);
+      if (onDeleteDocument) {
+        await onDeleteDocument(documentToDelete.document_id);
+      }
+    } finally {
+      setIsDeleting(false);
+      setDocumentToDelete(null);
+    }
   };
 
   const handleSubmitUpload = () => {
@@ -341,15 +359,28 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
                           {isEn ? 'English' : 'Português'}
                         </span>
                       </div>
-                      {isVideo ? (
-                        <span className="text-[11px] text-zinc-400 font-mono">
-                          ⏱️ {videoDurationStr || 'Vídeo'}
-                        </span>
-                      ) : (
-                        <span className="text-[11px] text-zinc-500">
-                          {doc.page_count} {doc.page_count === 1 ? 'página' : 'páginas'}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {isVideo ? (
+                          <span className="text-[11px] text-zinc-400 font-mono">
+                            ⏱️ {videoDurationStr || 'Vídeo'}
+                          </span>
+                        ) : (
+                          <span className="text-[11px] text-zinc-500">
+                            {doc.page_count} {doc.page_count === 1 ? 'página' : 'páginas'}
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDocumentToDelete(doc);
+                          }}
+                          className="rounded p-1 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition opacity-60 group-hover:opacity-100"
+                          title="Eliminar material da biblioteca"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Title & Subject */}
@@ -599,6 +630,57 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
               >
                 <span>{uploadMode === 'lecture' ? 'Iniciar Gravação' : 'Processar Material'}</span>
                 <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* 5. Delete Confirmation Modal */}
+      {documentToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-md rounded-xl border border-red-500/20 bg-[#0e161c] p-6 shadow-2xl">
+            <div className="flex items-center gap-3 pb-3 border-b border-white/[0.08]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-500/15 text-red-400 border border-red-500/20">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white">Eliminar Material de Estudo</h3>
+                <p className="text-xs text-zinc-400">Esta ação não pode ser desfeita.</p>
+              </div>
+            </div>
+
+            <div className="my-4 rounded-lg border border-white/[0.06] bg-black/30 p-3">
+              <p className="text-xs font-medium text-white line-clamp-2">{documentToDelete.title}</p>
+              <div className="mt-2 flex items-center gap-2 text-[11px] text-zinc-400">
+                <span className="rounded bg-white/[0.05] px-1.5 py-0.5 text-cyan-300 font-mono text-[10px]">
+                  {documentToDelete.source_type}
+                </span>
+                <span>Disciplina: {documentToDelete.subject}</span>
+                {Boolean(documentToDelete.page_count) && <span>• {documentToDelete.page_count} páginas</span>}
+              </div>
+            </div>
+
+            <p className="text-xs text-zinc-400">
+              O ficheiro e todos os apontamentos, destaques e quizzes associados serão removidos da biblioteca.
+            </p>
+
+            <div className="mt-5 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setDocumentToDelete(null)}
+                className="rounded-lg border border-white/[0.08] px-3.5 py-2 text-xs font-medium text-zinc-300 hover:bg-white/[0.05] transition"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleConfirmDelete}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-500/20 px-4 py-2 text-xs font-semibold text-red-300 hover:bg-red-500/30 transition disabled:opacity-50 cursor-pointer"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>{isDeleting ? 'A eliminar...' : 'Eliminar Definitivamente'}</span>
               </button>
             </div>
           </div>

@@ -471,6 +471,62 @@ class StudyService:
             "study_catalog_refresh_latency_ms": round(self.study_catalog_refresh_latency_ms, 3),
         }
 
+    def delete_document(self, document_id: str, delete_file: bool = True) -> bool:
+        """
+        Remove um documento da biblioteca de estudos, limpando metadados,
+        notas, destaques, quizzes, flashcards e referências em coleções.
+        Opcionalmente elimina o ficheiro físico do disco.
+        """
+        with self._documents_lock:
+            doc = self._documents.get(document_id)
+            if not doc:
+                self._sync_documents_if_changed(force=True)
+                doc = self._documents.get(document_id)
+                if not doc:
+                    return False
+
+            # 1. Apagar ficheiro físico se existir e estiver dentro do storage_dir
+            if delete_file:
+                file_path_str = doc.metadata.get("file_path") if doc.metadata else None
+                if file_path_str:
+                    try:
+                        p = Path(file_path_str)
+                        if p.exists() and (self.storage_dir in p.resolve().parents or p.resolve().parent == self.storage_dir.resolve()):
+                            p.unlink()
+                    except Exception as err:
+                        print(f"[Study] Aviso: erro ao apagar ficheiro físico {file_path_str}: {err}", flush=True)
+
+            # 2. Remover do catálogo em memória e persistir
+            self._documents.pop(document_id, None)
+            self._save_documents()
+
+            # 3. Limpar notas associadas
+            self.notes = [n for n in self.notes if n.document_id != document_id]
+            self._save_notes()
+
+            # 4. Limpar destaques associados
+            self.highlights = [h for h in self.highlights if h.document_id != document_id]
+            self._save_highlights()
+
+            # 5. Limpar quizzes associados
+            self.quizzes = {k: v for k, v in self.quizzes.items() if v.document_id != document_id}
+            self._save_quizzes()
+
+            # 6. Limpar flashcards associados
+            self.flashcards = {k: v for k, v in self.flashcards.items() if v.document_id != document_id}
+            self._save_flashcards()
+
+            # 7. Limpar referências em coleções
+            changed_col = False
+            for col in self.collections.values():
+                if document_id in col.document_ids:
+                    col.document_ids.remove(document_id)
+                    changed_col = True
+            if changed_col:
+                self._save_collections()
+
+            return True
+
     def _load_store(self) -> None:
         with self._documents_lock:
             self._documents = {}

@@ -261,6 +261,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     studyDocuments,
     listStudyDocuments,
     uploadStudyDocument,
+    deleteStudyDocument,
     contextualAssist,
     askStudyPaper,
     getStudyDocumentFile,
@@ -1946,6 +1947,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 onGetDocumentFile={async (docId) => {
                   return getStudyDocumentFile(docId);
                 }}
+                onDeleteDocument={deleteStudyDocument}
               />
             </ViewFrame>
           )}

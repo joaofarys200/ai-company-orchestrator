@@ -1256,6 +1256,7 @@ export type ServerMessage =
   | { type: 'study_documents_list'; documents: any[]; event?: string }
   | { type: 'study_document_ready'; document: any; event?: string }
   | { type: 'study_document_uploaded'; document: any; event?: string }
+  | { type: 'study_document_deleted'; document_id: string; success?: boolean; event?: string }
   | { type: 'study_document_processing'; filename: string; status: string }
   | { type: 'study_document_details'; document: any; notes?: any[]; highlights?: any[] }
   | { type: 'study_quiz_ready'; quiz: any }
@@ -1331,6 +1332,7 @@ export type ClientMessage =
   | { type: 'study_get_notes_and_highlights'; document_id: string }
   | { type: 'study_update_reading_progress'; document_id: string; current_page: number; current_section?: string; completion_percentage?: number }
   | { type: 'study_prepare_exam'; document_id: string }
+  | { type: 'study_delete_document'; document_id: string; delete_file?: boolean }
   | MissionClientOperation;
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
@@ -2136,6 +2138,13 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
       return {
         type: 'study_document_uploaded',
         document: raw.document,
+        event: raw.event ? asString(raw.event) : undefined,
+      };
+    case 'study_document_deleted':
+      return {
+        type: 'study_document_deleted',
+        document_id: asString(raw.document_id),
+        success: Boolean(raw.success),
         event: raw.event ? asString(raw.event) : undefined,
       };
     case 'study_document_processing':

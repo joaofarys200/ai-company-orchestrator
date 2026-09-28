@@ -91,6 +91,7 @@ interface StudyContainerProps {
   onGenerateCornell?: (documentId: string) => Promise<CornellNotesData>;
   onSaveNoteToObsidian?: (filename: string, content: string) => void;
   onRefreshDocuments?: () => void;
+  onDeleteDocument?: (docId: string) => Promise<boolean> | void;
 }
 
 export const StudyContainer: React.FC<StudyContainerProps> = ({
@@ -117,6 +118,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   onSaveNoteToObsidian,
   onRefreshDocuments,
   onGetDocumentFile,
+  onDeleteDocument,
 }) => {
   // Navigation
   const [activeTab, setActiveTab] = useState<StudyTab>('library');
@@ -151,6 +153,20 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
     setActiveDocumentId(doc.document_id);
     setActiveTab('reader');
   }, []);
+
+  const handleDeleteDocument = useCallback(
+    async (docId: string) => {
+      if (activeDocumentId === docId) {
+        setActiveDocumentId(null);
+        setActiveTab('library');
+      }
+      setDocuments((prev) => prev.filter((d) => d.document_id !== docId));
+      if (onDeleteDocument) {
+        await onDeleteDocument(docId);
+      }
+    },
+    [activeDocumentId, onDeleteDocument]
+  );
 
   // Handler: Update progress (stabilized with no-op check to prevent infinite re-renders)
   const handleUpdateProgress = useCallback((page: number, section: string, percent: number) => {
@@ -373,6 +389,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             isRecording={isRecording}
             onStopRecording={onStopRecording}
             onRefresh={onRefreshDocuments}
+            onDeleteDocument={handleDeleteDocument}
           />
         )}
 

@@ -343,6 +343,7 @@ CLIENT_MESSAGE_TYPES = {
     "study_list_documents",
     "study_get_document",
     "study_upload_document",
+    "study_delete_document",
     "study_update_progress",
     "study_contextual_assist",
     "study_ask_paper",

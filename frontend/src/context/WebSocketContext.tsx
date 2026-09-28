@@ -221,6 +221,7 @@ interface WebSocketContextType {
     contentText?: string,
     sourceType?: string
   ) => void;
+  deleteStudyDocument: (documentId: string, deleteFile?: boolean) => void;
   generateStudyQuiz: (documentId: string, count?: number) => void;
   submitStudyQuiz: (quizId: string, answers: Record<string, number | string>, transferAnswer?: string) => void;
   listStudyFlashcards: (documentId: string) => void;
@@ -776,6 +777,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           ...prev.filter((d) => d.document_id !== msg.document.document_id),
         ]);
         addSystemMessage(`Documento de estudo carregado: ${msg.document.title}`);
+        break;
+      case 'study_document_deleted':
+        setStudyDocuments((prev) => prev.filter((d) => d.document_id !== msg.document_id));
+        addSystemMessage('Material removido da biblioteca de estudos.');
         break;
       case 'study_quiz_ready':
         setActiveStudyQuiz(msg.quiz);
@@ -1561,6 +1566,18 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [sendClientMessage]
   );
 
+  const deleteStudyDocument = useCallback(
+    (documentId: string, deleteFile = true) => {
+      sendClientMessage({
+        type: 'study_delete_document',
+        document_id: documentId,
+        delete_file: deleteFile,
+      });
+      setStudyDocuments((prev) => prev.filter((d) => d.document_id !== documentId));
+    },
+    [sendClientMessage]
+  );
+
   const generateStudyQuiz = useCallback(
     (documentId: string, count?: number) => {
       sendClientMessage({
@@ -1950,6 +1967,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         studyFlashcards,
         listStudyDocuments,
         uploadStudyDocument,
+        deleteStudyDocument,
         generateStudyQuiz,
         submitStudyQuiz,
         listStudyFlashcards,

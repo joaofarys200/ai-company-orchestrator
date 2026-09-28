@@ -29,6 +29,7 @@ STUDY_HANDLERS = {
     "study_list_documents": "list_documents",
     "study_get_document": "get_document",
     "study_upload_document": "upload_document",
+    "study_delete_document": "delete_document",
     "study_update_progress": "update_progress",
     "study_contextual_assist": "contextual_assist",
     "study_ask_paper": "ask_paper",
@@ -258,6 +259,49 @@ class StudyWebSocketHandler:
                 "type": "study_document_failed",
                 "filename": filename,
                 "error": str(e),
+            })
+
+    async def delete_document(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        delete_file = bool(message.get("delete_file", True))
+        if not doc_id:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": "ID do documento não fornecido para eliminação.",
+            })
+            return
+
+        try:
+            success = await asyncio.to_thread(self.study_service.delete_document, doc_id, delete_file)
+            if success:
+                log_event("study.document_deleted", {"document_id": doc_id})
+                docs = [d.to_dict() for d in self.study_service.list_documents()]
+                docs.sort(key=lambda d: d.get("updated_at", ""), reverse=True)
+                await self.connections.broadcast({
+                    "type": "study_document_deleted",
+                    "document_id": doc_id,
+                    "success": True,
+                })
+                await self.connections.broadcast({
+                    "type": "study_documents_list",
+                    "event": "study.document_deleted",
+                    "documents": docs,
+                })
+            else:
+                await self.connections.send(websocket, {
+                    "type": "study_error",
+                    "message": f"Documento '{doc_id}' não encontrado para eliminação.",
+                })
+        except Exception as e:
+            log_event("study.delete_failed", {"document_id": doc_id, "error": str(e)})
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao eliminar documento '{doc_id}': {e}",
             })
 
     async def update_progress(
