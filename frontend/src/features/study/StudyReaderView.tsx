@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import 'pdfjs-dist/web/pdf_viewer.css';
-import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import {
   ChevronLeft,
   ChevronRight,
@@ -34,15 +33,17 @@ import type {
   ExplanationLevel
 } from './types';
 
-// Configure pdf.js worker using Vite asset URL with absolute origin resolution
-if (typeof window !== 'undefined') {
+// Configure pdf.js worker using stable public asset URL with origin resolution
+export const ensurePdfWorkerConfigured = () => {
+  if (typeof window === 'undefined') return;
   try {
-    const workerOriginUrl = new URL(pdfWorkerUrl, window.location.href).href;
+    const workerOriginUrl = new URL('/pdf.worker.min.mjs', window.location.origin).href;
     pdfjsLib.GlobalWorkerOptions.workerSrc = workerOriginUrl;
   } catch {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
   }
-}
+};
+ensurePdfWorkerConfigured();
 
 export interface StudyReaderViewProps {
   document: StudyDocument;
@@ -393,6 +394,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
 
         if (pdfData && pdfData.length > 0) {
           let doc: pdfjsLib.PDFDocumentProxy | null = null;
+          ensurePdfWorkerConfigured();
 
           // Tier 1: Worker-accelerated parsing
           try {
@@ -405,27 +407,20 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             doc = await Promise.race([
               loadingTask.promise,
               new Promise<never>((_, reject) =>
-                setTimeout(() => reject(new Error('WORKER_TIMEOUT')), 2500)
+                setTimeout(() => reject(new Error('Tempo limite ao inicializar motor PDF (15s)')), 15000)
               ),
             ]);
           } catch (workerErr: any) {
-            console.warn('[StudyReader] Worker load timed out or errored; switching to direct PDF engine:', workerErr);
-            // Tier 2 Fallback: Direct in-thread PDF engine without stalling or failing
+            console.warn('[StudyReader] Worker load initial attempt failed, re-verifying worker and retrying:', workerErr);
+            ensurePdfWorkerConfigured();
             try {
-              (pdfjsLib.GlobalWorkerOptions as any).workerPort = null;
-              pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-              const directTask = pdfjsLib.getDocument({
+              const retryTask = pdfjsLib.getDocument({
                 data: pdfData,
                 disableRange: true,
                 disableStream: true,
                 disableAutoFetch: true,
               });
-              doc = await Promise.race([
-                directTask.promise,
-                new Promise<never>((_, reject) =>
-                  setTimeout(() => reject(new Error('Tempo limite ao inicializar motor PDF')), 8000)
-                ),
-              ]);
+              doc = await retryTask.promise;
             } catch (fallbackErr: any) {
               throw fallbackErr;
             }
@@ -1071,6 +1066,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
                   <button
                     type="button"
                     onClick={() => {
+                      ensurePdfWorkerConfigured();
                       setPdfError(null);
                       setReloadKey((k) => k + 1);
                     }}
