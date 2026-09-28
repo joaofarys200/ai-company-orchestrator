@@ -253,7 +253,7 @@ class StudyWebSocketHandler:
             })
 
         except Exception as e:
-            log_event("study.upload_failed", {"filename": filename, "error": str(e)})
+            log_event(self.logger, "study.upload_failed", filename=filename, error=str(e))
             print(f"[Study] Erro no upload de '{filename}': {e}", flush=True)
             await self.connections.broadcast({
                 "type": "study_document_failed",
@@ -279,7 +279,7 @@ class StudyWebSocketHandler:
         try:
             success = await asyncio.to_thread(self.study_service.delete_document, doc_id, delete_file)
             if success:
-                log_event("study.document_deleted", {"document_id": doc_id})
+                log_event(self.logger, "study.document_deleted", document_id=doc_id)
                 docs = [d.to_dict() for d in self.study_service.list_documents()]
                 docs.sort(key=lambda d: d.get("updated_at", ""), reverse=True)
                 await self.connections.broadcast({
@@ -298,7 +298,7 @@ class StudyWebSocketHandler:
                     "message": f"Documento '{doc_id}' não encontrado para eliminação.",
                 })
         except Exception as e:
-            log_event("study.delete_failed", {"document_id": doc_id, "error": str(e)})
+            log_event(self.logger, "study.delete_failed", document_id=doc_id, error=str(e))
             await self.connections.send(websocket, {
                 "type": "study_error",
                 "message": f"Erro ao eliminar documento '{doc_id}': {e}",

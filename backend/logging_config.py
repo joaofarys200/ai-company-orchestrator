@@ -62,6 +62,16 @@ def get_logger(name: str) -> logging.Logger:
     return logging.getLogger(name)
 
 
-def log_event(logger: logging.Logger, event: str, level: str = "info", **details: Any) -> None:
+def log_event(logger_or_event: Any, event_or_details: Optional[Any] = None, level: str = "info", **details: Any) -> None:
+    if isinstance(logger_or_event, str):
+        logger = logging.getLogger("jarvis")
+        event = logger_or_event
+        if isinstance(event_or_details, dict):
+            details.update(event_or_details)
+        elif isinstance(event_or_details, str):
+            details["context"] = event_or_details
+    else:
+        logger = logger_or_event or logging.getLogger("jarvis")
+        event = str(event_or_details or "")
     levelno = getattr(logging, level.upper(), logging.INFO)
     logger.log(levelno, event, extra={"event": event, "details": details})
