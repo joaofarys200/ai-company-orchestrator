@@ -82,6 +82,7 @@ interface PageRendererProps {
   pageNumber: number;
   scale: number;
   onVisible: (pageNumber: number) => void;
+  onPageRendered?: (pageNumber: number, canvas: HTMLCanvasElement) => void;
 }
 
 const PageRenderer: React.FC<PageRendererProps> = ({
@@ -89,6 +90,7 @@ const PageRenderer: React.FC<PageRendererProps> = ({
   pageNumber,
   scale,
   onVisible,
+  onPageRendered,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -186,6 +188,10 @@ const PageRenderer: React.FC<PageRendererProps> = ({
         await renderTask.promise;
         if (isCancelled) return;
 
+        if (canvas.width > 0 && canvas.height > 0) {
+          onPageRendered?.(pageNumber, canvas);
+        }
+
         // Render TextLayer for high-fidelity native text selection
         const textLayerDiv = textLayerRef.current;
         if (textLayerDiv) {
@@ -258,6 +264,9 @@ const isValidPdfBytes = (bytes: Uint8Array): boolean => {
   );
 };
 
+export const CURRENT_BUILD_ID = 'build_study_pdf_v5_20260928_2330';
+export type PdfLifecycle = 'IDLE' | 'LOADING' | 'LOADED' | 'PAGE_RENDERING' | 'READY' | 'ERROR' | 'CANCELLED';
+
 // ---------------------------------------------------------------------------
 // Main StudyReaderView Component
 // ---------------------------------------------------------------------------
@@ -275,7 +284,11 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
   onExplainMedia,
   onGetDocumentFile,
 }) => {
-  // PDF State
+  // PDF State & Lifecycle
+  const [lifecycle, setLifecycle] = useState<PdfLifecycle>('IDLE');
+  const readerInstanceId = useRef(`reader_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`).current;
+  const loadGenRef = useRef<number>(0);
+
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState<number>(document.page_count || 1);
   const [pdfLoading, setPdfLoading] = useState<boolean>(true);
@@ -335,6 +348,29 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
     onGetDocumentFileRef.current = onGetDocumentFile;
   }, [onGetDocumentFile]);
 
+  // Expose global debug identity for automated and browser inspection
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__JARVIS_BUILD_ID__ = CURRENT_BUILD_ID;
+      (window as any).__JARVIS_PDF_LIFECYCLE__ = () => lifecycle;
+      (window as any).__JARVIS_READER_INSTANCE__ = readerInstanceId;
+    }
+  }, [lifecycle, readerInstanceId]);
+
+  // Page 1 Rendered Callback to finalize visual READY state
+  const handlePageRendered = useCallback(
+    (pageNumber: number, canvas: HTMLCanvasElement) => {
+      if (pageNumber === 1 && canvas && canvas.width > 0 && canvas.height > 0) {
+        setLifecycle('READY');
+        setPdfLoading(false);
+        console.log(
+          `[StudyReader:${readerInstanceId}] LOAD ${loadGenRef.current} PAGE 1 RENDERED (${canvas.width}x${canvas.height}) -> READY`
+        );
+      }
+    },
+    [readerInstanceId]
+  );
+
   // Active section calculation
   const currentSection = useMemo(() => {
     if (!document.sections || document.sections.length === 0) return null;
@@ -347,6 +383,17 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
   // Load PDF Document (Direct HTTP Streaming -> WebSocket Fallback)
   useEffect(() => {
     let isCancelled = false;
+    const currentGen = ++loadGenRef.current;
+
+    // Immediately destroy any previous in-flight loading task
+    if (activeLoadingTaskRef.current) {
+      try {
+        activeLoadingTaskRef.current.destroy();
+      } catch {}
+      activeLoadingTaskRef.current = null;
+    }
+
+    setLifecycle('LOADING');
     setPdfLoading(true);
     setPdfError(null);
 
@@ -401,7 +448,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
           }
         }
 
-        if (isCancelled) return;
+        if (isCancelled || currentGen !== loadGenRef.current) return;
 
         if (pdfData && pdfData.length > 0) {
           if (pdfData.byteLength === 0 || !pdfData.buffer || pdfData.buffer.byteLength === 0) {
@@ -440,7 +487,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
                 loadingTask.destroy();
               } catch {}
             }
-            if (isCancelled) return;
+            if (isCancelled || currentGen !== loadGenRef.current) return;
 
             ensurePdfWorkerConfigured();
             try {
@@ -463,24 +510,34 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             }
           }
 
-          if (isCancelled) return;
+          if (isCancelled || currentGen !== loadGenRef.current) return;
 
           if (doc) {
             setPdfDoc(doc);
             setNumPages(doc.numPages);
-            setPdfLoading(false);
+            setLifecycle('PAGE_RENDERING');
             setPdfError(null);
             activeLoadingTaskRef.current = null;
+
+            // Safety net: after 3.5s in PAGE_RENDERING, ensure READY state and pdfLoading=false
+            setTimeout(() => {
+              if (!isCancelled && currentGen === loadGenRef.current) {
+                setLifecycle((prev) => (prev === 'PAGE_RENDERING' ? 'READY' : prev));
+                setPdfLoading(false);
+              }
+            }, 3500);
             return;
           }
         }
 
         // If no binary PDF found, we enter semantic fallback mode
+        setLifecycle('READY');
         setPdfLoading(false);
       } catch (err: any) {
-        if (!isCancelled) {
+        if (!isCancelled && currentGen === loadGenRef.current) {
           console.warn('[StudyReader] PDF load error:', err);
           setPdfError(err?.message || 'Erro ao carregar o ficheiro PDF.');
+          setLifecycle('ERROR');
           setPdfLoading(false);
         }
       }
@@ -808,7 +865,14 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
   const currentScale = (zoomPercent / 100) * 1.35;
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-[#0d1217] text-gray-200">
+    <div
+      id="study-reader-view"
+      data-build-id={CURRENT_BUILD_ID}
+      data-lifecycle={lifecycle}
+      data-reader-instance-id={readerInstanceId}
+      data-load-generation-id={loadGenRef.current}
+      className="flex h-full w-full overflow-hidden bg-[#0d1217] text-gray-200"
+    >
       {/* ============================================================ */}
       {/* MAIN READER AREA (70% PDF CANVAS + TOP CONTROLS)            */}
       {/* ============================================================ */}
@@ -1080,7 +1144,8 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             onScroll={handleScroll}
             className="flex-1 overflow-y-auto overflow-x-auto bg-[#181d24] p-4 sm:p-6 relative select-text"
           >
-            {pdfLoading && (
+            {/* Show loading spinner ONLY if no pdfDoc is loaded and no error exists */}
+            {pdfLoading && !Boolean(pdfDoc) && (
               <div className="flex h-96 flex-col items-center justify-center gap-3 text-cyan-400">
                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent" />
                 <p className="text-xs text-gray-400">A carregar o artigo científico em alta resolução...</p>
@@ -1124,7 +1189,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             )}
 
             {/* Native PDF Pages Continuous Vertical Rendering */}
-            {Boolean(pdfDoc) && !pdfLoading ? (
+            {Boolean(pdfDoc) ? (
               <div className="flex flex-col items-center select-text">
                 {Array.from({ length: numPages }).map((_, idx) => (
                   <PageRenderer
@@ -1133,6 +1198,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
                     pageNumber={idx + 1}
                     scale={currentScale}
                     onVisible={handlePageVisible}
+                    onPageRendered={handlePageRendered}
                   />
                 ))}
               </div>

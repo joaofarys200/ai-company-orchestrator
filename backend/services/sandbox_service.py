@@ -143,6 +143,55 @@ def start_frontend_http_server(
             except (ConnectionResetError, BrokenPipeError):
                 pass
 
+        def _resolve_pdf_path(self, doc_id: str):
+            docs_file = os.path.join(project_root, "data", "study", "documents.json")
+            file_path = None
+            if os.path.exists(docs_file):
+                try:
+                    with open(docs_file, "r", encoding="utf-8") as f:
+                        docs_data = json.load(f)
+                    doc_entry = docs_data.get(doc_id)
+                    if doc_entry:
+                        fp = doc_entry.get("metadata", {}).get("file_path")
+                        if fp:
+                            if os.path.isabs(fp) and os.path.exists(fp):
+                                file_path = fp
+                            elif os.path.exists(os.path.join(project_root, fp)):
+                                file_path = os.path.join(project_root, fp)
+                except Exception:
+                    pass
+
+            if not file_path:
+                hash_prefix = doc_id.replace("doc_", "")
+                study_dir = os.path.join(project_root, "data", "study")
+                if os.path.exists(study_dir):
+                    for fname in os.listdir(study_dir):
+                        if fname.startswith(hash_prefix) and fname.lower().endswith(".pdf"):
+                            candidate = os.path.join(study_dir, fname)
+                            if os.path.isfile(candidate):
+                                file_path = candidate
+                                break
+            return file_path
+
+        def do_HEAD(self):
+            if self.path.startswith("/api/study/document/") and self.path.endswith("/file"):
+                parts = self.path.split("?")[0].strip("/").split("/")
+                if len(parts) >= 5:
+                    doc_id = parts[3]
+                    fp = self._resolve_pdf_path(doc_id)
+                    if fp and os.path.exists(fp):
+                        size = os.path.getsize(fp)
+                        self.send_response(200)
+                        self.send_header("Content-Type", "application/pdf")
+                        self.send_header("Content-Length", str(size))
+                        self.send_header("Access-Control-Allow-Origin", "*")
+                        self.end_headers()
+                        return
+                self.send_response(404)
+                self.end_headers()
+                return
+            return super().do_HEAD()
+
         def do_GET(self):
             if self.path in {"/favicon.ico", "favicon.ico"}:
                 self.send_response(200)
@@ -165,35 +214,7 @@ def start_frontend_http_server(
                 parts = self.path.split("?")[0].strip("/").split("/")
                 if len(parts) >= 5:
                     doc_id = parts[3]
-                    docs_file = os.path.join(project_root, "data", "study", "documents.json")
-                    file_path = None
-                    if os.path.exists(docs_file):
-                        try:
-                            with open(docs_file, "r", encoding="utf-8") as f:
-                                docs_data = json.load(f)
-                            doc_entry = docs_data.get(doc_id)
-                            if doc_entry:
-                                fp = doc_entry.get("metadata", {}).get("file_path")
-                                if fp:
-                                    if os.path.isabs(fp) and os.path.exists(fp):
-                                        file_path = fp
-                                    elif os.path.exists(os.path.join(project_root, fp)):
-                                        file_path = os.path.join(project_root, fp)
-                        except Exception:
-                            pass
-
-                    # Fallback: procurar por hash prefix em data/study
-                    if not file_path:
-                        hash_prefix = doc_id.replace("doc_", "")
-                        study_dir = os.path.join(project_root, "data", "study")
-                        if os.path.exists(study_dir):
-                            for fname in os.listdir(study_dir):
-                                if fname.startswith(hash_prefix) and fname.lower().endswith(".pdf"):
-                                    candidate = os.path.join(study_dir, fname)
-                                    if os.path.isfile(candidate):
-                                        file_path = candidate
-                                        break
-
+                    file_path = self._resolve_pdf_path(doc_id)
                     if file_path and os.path.exists(file_path):
                         try:
                             with open(file_path, "rb") as pf:
