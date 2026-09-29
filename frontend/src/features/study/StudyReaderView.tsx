@@ -1,3 +1,109 @@
+// Runtime polyfills for environments lacking Map.getOrInsertComputed, Uint8Array hex/base64 methods and Promise.try (e.g. Electron 31 / Chromium 126)
+if (typeof (Map.prototype as any).getOrInsertComputed !== 'function') {
+  (Map.prototype as any).getOrInsertComputed = function (key: any, callbackFn: (k: any) => any) {
+    if (this.has(key)) {
+      return this.get(key);
+    }
+    const value = callbackFn(key);
+    this.set(key, value);
+    return value;
+  };
+}
+if (typeof (Map.prototype as any).getOrInsert !== 'function') {
+  (Map.prototype as any).getOrInsert = function (key: any, defaultValue: any) {
+    if (this.has(key)) {
+      return this.get(key);
+    }
+    this.set(key, defaultValue);
+    return defaultValue;
+  };
+}
+if (typeof (WeakMap.prototype as any).getOrInsertComputed !== 'function') {
+  (WeakMap.prototype as any).getOrInsertComputed = function (key: any, callbackFn: (k: any) => any) {
+    if (this.has(key)) {
+      return this.get(key);
+    }
+    const value = callbackFn(key);
+    this.set(key, value);
+    return value;
+  };
+}
+if (typeof (WeakMap.prototype as any).getOrInsert !== 'function') {
+  (WeakMap.prototype as any).getOrInsert = function (key: any, defaultValue: any) {
+    if (this.has(key)) {
+      return this.get(key);
+    }
+    this.set(key, defaultValue);
+    return defaultValue;
+  };
+}
+
+if (typeof (Math as any).sumPrecise !== 'function') {
+  (Math as any).sumPrecise = function (items: any) {
+    let sum = 0;
+    for (const item of items) {
+      sum += Number(item) || 0;
+    }
+    return sum;
+  };
+}
+
+if (typeof (Uint8Array.prototype as any).toHex !== 'function') {
+  (Uint8Array.prototype as any).toHex = function () {
+    let hex = '';
+    for (let i = 0; i < this.length; i++) {
+      hex += this[i].toString(16).padStart(2, '0');
+    }
+    return hex;
+  };
+}
+if (typeof (Uint8Array as any).fromHex !== 'function') {
+  (Uint8Array as any).fromHex = function (hex: string) {
+    const len = Math.floor(hex.length / 2);
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+    }
+    return bytes;
+  };
+}
+if (typeof (Uint8Array.prototype as any).toBase64 !== 'function') {
+  (Uint8Array.prototype as any).toBase64 = function () {
+    let binary = '';
+    for (let i = 0; i < this.length; i++) {
+      binary += String.fromCharCode(this[i]);
+    }
+    return btoa(binary);
+  };
+}
+if (typeof (Uint8Array as any).fromBase64 !== 'function') {
+  (Uint8Array as any).fromBase64 = function (base64: string) {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  };
+}
+
+if (typeof (Promise as any).try !== 'function') {
+  (Promise as any).try = function (fn: any, ...args: any[]) {
+    return new Promise((resolve) => resolve(fn(...args)));
+  };
+}
+if (typeof (Promise as any).withResolvers !== 'function') {
+  (Promise as any).withResolvers = function () {
+    let resolve: any, reject: any;
+    const promise = new Promise((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  };
+}
+
+
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import 'pdfjs-dist/web/pdf_viewer.css';
@@ -159,7 +265,7 @@ const PageRenderer: React.FC<PageRendererProps> = ({
 
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const ctx = canvas.getContext('2d', { alpha: false });
+        const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -167,8 +273,6 @@ const PageRenderer: React.FC<PageRendererProps> = ({
         canvas.height = Math.floor(viewport.height * dpr);
         canvas.style.width = `${Math.floor(viewport.width)}px`;
         canvas.style.height = `${Math.floor(viewport.height)}px`;
-
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         if (renderTaskRef.current) {
           try {
@@ -182,6 +286,7 @@ const PageRenderer: React.FC<PageRendererProps> = ({
           canvasContext: ctx,
           viewport,
           canvas,
+          transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : undefined,
         });
         renderTaskRef.current = renderTask;
 
@@ -264,7 +369,7 @@ const isValidPdfBytes = (bytes: Uint8Array): boolean => {
   );
 };
 
-export const CURRENT_BUILD_ID = 'build_study_pdf_v5_20260928_2330';
+export const CURRENT_BUILD_ID = 'build_study_pdf_v7_promise_try_polyfilled';
 export type PdfLifecycle = 'IDLE' | 'LOADING' | 'LOADED' | 'PAGE_RENDERING' | 'READY' | 'ERROR' | 'CANCELLED';
 
 // ---------------------------------------------------------------------------
@@ -402,15 +507,22 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
         let pdfData: Uint8Array | null = null;
 
         // Strategy 1: Direct HTTP streaming from local backend sandbox_service
-        const urlsToTry = [
+        const candidateUrls: string[] = [
           `/api/study/document/${document.document_id}/file`,
           `http://127.0.0.1:8000/api/study/document/${document.document_id}/file`,
           `http://localhost:8000/api/study/document/${document.document_id}/file`,
         ];
-        for (const url of urlsToTry) {
+        const metaFilePath = (document.metadata as any)?.file_path;
+        if (metaFilePath && typeof metaFilePath === 'string') {
+          const rawFp = metaFilePath.replace(/\\/g, '/');
+          const normalizedPath = rawFp.startsWith('/') ? rawFp : `/${rawFp}`;
+          candidateUrls.push(normalizedPath);
+          candidateUrls.push(`http://127.0.0.1:8000${normalizedPath}`);
+        }
+        for (const url of candidateUrls) {
           try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
             const res = await fetch(url, { signal: controller.signal });
             clearTimeout(timeoutId);
             if (res.ok) {
@@ -477,7 +589,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             doc = await Promise.race([
               loadingTask.promise,
               new Promise<never>((_, reject) =>
-                setTimeout(() => reject(new Error('Tempo limite ao inicializar motor PDF (15s)')), 15000)
+                setTimeout(() => reject(new Error('Tempo limite ao inicializar motor PDF (10s)')), 10000)
               ),
             ]);
           } catch (workerErr: any) {
@@ -501,7 +613,12 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
                   disableAutoFetch: true,
                 });
                 activeLoadingTaskRef.current = retryTask;
-                doc = await retryTask.promise;
+                doc = await Promise.race([
+                  retryTask.promise,
+                  new Promise<never>((_, reject) =>
+                    setTimeout(() => reject(new Error('Tempo limite retry motor PDF (8s)')), 8000)
+                  ),
+                ]);
               } else {
                 throw workerErr;
               }

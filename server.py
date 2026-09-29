@@ -599,6 +599,8 @@ def _free_port_if_locked(port: int = 8001) -> None:
 
 async def main():
     runtime_state.main_loop = asyncio.get_running_loop()
+    _free_port_if_locked(8000)
+    _free_port_if_locked(8001)
     lifecycle = ApplicationLifecycle(
         services=_current_application_services(),
         initialize_voice=init_voice_service,

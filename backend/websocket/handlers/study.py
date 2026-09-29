@@ -132,7 +132,9 @@ class StudyWebSocketHandler:
             return
 
         file_path = doc.metadata.get("file_path")
-        if not os.path.exists(file_path):
+        if file_path and not os.path.isabs(file_path):
+            file_path = os.path.join(self.study_service.workspace_root, file_path)
+        if not file_path or not os.path.exists(file_path):
             await self.connections.send(websocket, {
                 "type": "study_document_file_result",
                 "document_id": doc_id,

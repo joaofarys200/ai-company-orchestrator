@@ -5,6 +5,7 @@ const fs = require('fs');
 
 // Allow audio autoplay without user gesture requirements in Electron
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+app.commandLine.appendSwitch('disable-http-cache');
 
 let mainWindow;
 let pythonProcess = null;
@@ -16,6 +17,27 @@ let backendRestartCount = 0;
 const MAX_BACKEND_RESTARTS = 3;
 const BACKEND_RESTART_DELAY_MS = 1500;
 const BACKEND_SHUTDOWN_TIMEOUT_MS = 5000;
+
+function freePortIfLocked(port) {
+  try {
+    if (process.platform === 'win32') {
+      const output = execFileSync('netstat', ['-ano', '-p', 'tcp'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      const lines = output.split('\n');
+      for (const line of lines) {
+        if (line.includes(`:${port}`) && line.includes('LISTENING')) {
+          const parts = line.trim().split(/\s+/);
+          const pid = parseInt(parts[parts.length - 1], 10);
+          if (pid && pid !== process.pid) {
+            try {
+              execFileSync('taskkill', ['/pid', String(pid), '/T', '/F'], { stdio: 'ignore' });
+              console.log(`[Electron] Liberada porta ${port} matando processo orfao PID ${pid}`);
+            } catch {}
+          }
+        }
+      }
+    }
+  } catch (e) {}
+}
 
 function logElectron(event, details = {}) {
   console.log(JSON.stringify({
@@ -43,6 +65,10 @@ function startPythonBackend() {
     logElectron('backend.start_skipped', { reason: 'already_running', pid: pythonProcess.pid });
     return;
   }
+
+  // Ensure ports 8000 and 8001 are free from any previous orphan process
+  freePortIfLocked(8000);
+  freePortIfLocked(8001);
 
   // Try to use the virtual environment's python.exe, fall back to global python
   const venvPython = path.join(__dirname, 'venv', 'Scripts', 'python.exe');
@@ -259,6 +285,29 @@ function createWindow() {
     }
   });
 
+  // Clear HTTP/disk cache and code caches immediately on start to prevent loading stale bundles
+  mainWindow.webContents.session.clearCache().catch(() => {});
+  mainWindow.webContents.session.clearStorageData({ storages: ['cachestorage', 'shadercache', 'serviceworkers'] }).catch(() => {});
+  if (mainWindow.webContents.session.clearCodeCaches) {
+    mainWindow.webContents.session.clearCodeCaches({}).catch(() => {});
+  }
+
+  // Enable F5 / Ctrl+R to reload with cache bypass, and F12 for DevTools
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if ((input.control && input.key.toLowerCase() === 'r') || input.key === 'F5') {
+      mainWindow.webContents.session.clearCache().then(() => {
+        mainWindow.webContents.reloadIgnoringCache();
+      }).catch(() => {
+        mainWindow.webContents.reloadIgnoringCache();
+      });
+      event.preventDefault();
+    }
+    if ((input.control && input.shift && input.key.toLowerCase() === 'i') || input.key === 'F12') {
+      mainWindow.webContents.toggleDevTools();
+      event.preventDefault();
+    }
+  });
+
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
     if (validatedURL && (validatedURL.includes('5173') || validatedURL.includes('8000'))) {
       setTimeout(() => {
@@ -269,49 +318,9 @@ function createWindow() {
     }
   });
 
-  // Load a simple loading screen or wait for python server
-  mainWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Jarvis OS // Loading</title>
-      <style>
-        body {
-          background-color: #08090d;
-          color: #66fcf1;
-          font-family: sans-serif;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100vh;
-          margin: 0;
-          overflow: hidden;
-        }
-        .spinner {
-          width: 50px;
-          height: 50px;
-          border: 3px solid rgba(102, 252, 241, 0.1);
-          border-radius: 50%;
-          border-top-color: #66fcf1;
-          animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-        h2 {
-          margin-top: 20px;
-          letter-spacing: 2px;
-          font-weight: 300;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="spinner"></div>
-      <h2>A INICIALIZAR SISTEMA JARVIS OS...</h2>
-    </body>
-    </html>
-  `));
+  const isDev = process.argv.includes('--dev') || process.env.VITE_DEV === '1';
+  const targetUrl = isDev ? 'http://localhost:5173' : 'http://localhost:8000';
+  loadURLWithRetry(targetUrl, 25, 400, 'http://localhost:8000');
 
   mainWindow.on('closed', () => {
     mainWindow = null;

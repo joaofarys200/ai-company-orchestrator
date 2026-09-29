@@ -329,11 +329,16 @@
   "doc_a3b336f4295d": {
     "document_id": "doc_a3b336f4295d",
     "source_id": "a3b336f4295d0d51",
-    "title": "Predicting performance online consumer reviews",
+    "title": "Predicting performance online consumer reviews(1)",
     "source_type": "PDF",
-    "subject": "Inteligência Artificial",
+    "subject": "artigo investigação",
     "language": "en",
     "page_count": 11,
+    "metadata": {
+      "filename": "Predicting_performance_online_consumer_reviews(1).pdf",
+      "size_bytes": 827574,
+      "file_path": "data/study/a3b336f4295d0d51_Predicting_performance_online_consumer_reviews(1).pdf"
+    },
     "sections": [
       {
         "section_id": "sec_0",
@@ -978,16 +983,11 @@
         "evidence_status": "OBSERVED"
       }
     ],
-    "metadata": {
-      "filename": "Predicting_performance_online_consumer_reviews(1).pdf",
-      "size_bytes": 827574,
-      "file_path": "data\\study\\a3b336f4295d0d51_Predicting_performance_online_consumer_reviews(1).pdf"
-    },
     "source_hash": "a3b336f4295d0d51a0b7c67c5445fa8e0efb14177136868e936eded99cd810e2",
     "provenance": {
       "source_file": "Predicting_performance_online_consumer_reviews(1).pdf",
       "source_hash": "a3b336f4295d0d51a0b7c67c5445fa8e0efb14177136868e936eded99cd810e2",
-      "ingested_at": "2026-09-27T20:12:22.616576",
+      "ingested_at": "2026-09-28T23:18:37.092154",
       "evidence_status": "OBSERVED"
     },
     "reading_progress": {
@@ -995,7 +995,7 @@
       "current_section": "Abstract / Introdução",
       "scroll_position": 0,
       "progress_percent": 0.0,
-      "last_read_at": "2026-09-27T20:12:22.616576",
+      "last_read_at": "2026-09-28T23:18:37.092154",
       "bookmarks": []
     },
     "structure": {
@@ -1056,8 +1056,8 @@
       }
     },
     "glossary": [],
-    "created_at": "2026-09-27T20:12:22.616576",
-    "updated_at": "2026-09-27T20:12:22.616576"
+    "created_at": "2026-09-28T23:18:37.092154",
+    "updated_at": "2026-09-28T23:18:37.092154"
   },
   "doc_vid_d63ba4452284": {
     "document_id": "doc_vid_d63ba4452284",

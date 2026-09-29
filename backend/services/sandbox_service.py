@@ -326,6 +326,15 @@ def start_frontend_http_server(
 
             super().do_GET()
 
+        def end_headers(self):
+            # Never cache HTML or SPA entrypoints so changes and builds load immediately
+            raw_path = self.path.split("?")[0]
+            if raw_path == "/" or raw_path.endswith(".html") or not "." in raw_path.split("/")[-1]:
+                self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+                self.send_header("Pragma", "no-cache")
+                self.send_header("Expires", "0")
+            super().end_headers()
+
         def do_OPTIONS(self):
             self.send_response(204)
             self.send_header("Access-Control-Allow-Origin", "*")
