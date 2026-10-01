@@ -252,3 +252,65 @@
     background: rgba(34, 211, 238, 0.04);
   }
 }
+
+/* ========================================================================== */
+/* PDF Reader & TextLayer Performance & Sharpness Styles                      */
+/* ========================================================================== */
+.pdf-reader-scroll-container {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pdf-page-container {
+  contain: layout paint;
+  content-visibility: auto;
+  contain-intrinsic-size: 800px 1100px;
+}
+
+.textLayer {
+  color-scheme: only light;
+  position: absolute;
+  text-align: initial;
+  inset: 0;
+  overflow: clip;
+  opacity: 1;
+  line-height: 1;
+  letter-spacing: normal;
+  word-spacing: normal;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  transform-origin: 0 0;
+  caret-color: #38bdf8;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.textLayer :is(span, br) {
+  color: transparent !important;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+  user-select: text;
+}
+
+.textLayer > :not(.markedContent),
+.textLayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor, 1) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv, 1));
+}
+
+.textLayer ::selection {
+  background: rgba(56, 189, 248, 0.35) !important;
+  color: transparent !important;
+}
+
+.textLayer ::-moz-selection {
+  background: rgba(56, 189, 248, 0.35) !important;
+  color: transparent !important;
+}

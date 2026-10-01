@@ -191,7 +191,7 @@ interface PageRendererProps {
   onPageRendered?: (pageNumber: number, canvas: HTMLCanvasElement) => void;
 }
 
-const PageRenderer: React.FC<PageRendererProps> = ({
+const PageRenderer: React.FC<PageRendererProps> = React.memo(({
   pdfDoc,
   pageNumber,
   scale,
@@ -202,6 +202,17 @@ const PageRenderer: React.FC<PageRendererProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const textLayerRef = useRef<HTMLDivElement | null>(null);
   const renderTaskRef = useRef<any>(null);
+  const onVisibleRef = useRef(onVisible);
+  const onPageRenderedRef = useRef(onPageRendered);
+
+  useEffect(() => {
+    onVisibleRef.current = onVisible;
+  }, [onVisible]);
+
+  useEffect(() => {
+    onPageRenderedRef.current = onPageRendered;
+  }, [onPageRendered]);
+
   const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
     width: Math.floor(612 * scale),
     height: Math.floor(792 * scale),
@@ -209,12 +220,12 @@ const PageRenderer: React.FC<PageRendererProps> = ({
   // Eagerly render pages 1 & 2; lazily render remaining pages as they approach viewport
   const [isNearViewport, setIsNearViewport] = useState<boolean>(pageNumber <= 2);
 
-  // Track page visibility and viewport proximity
+  // Track page visibility and viewport proximity (stable dependencies to prevent observer churn during scroll)
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
-    // Proximity observer to trigger render 400px before scrolling into view
+    // Proximity observer to trigger render 600px before scrolling into view
     let proximityObserver: IntersectionObserver | null = null;
     if (!isNearViewport) {
       proximityObserver = new IntersectionObserver(
@@ -223,24 +234,25 @@ const PageRenderer: React.FC<PageRendererProps> = ({
             if (entry.isIntersecting) {
               setIsNearViewport(true);
               proximityObserver?.disconnect();
+              break;
             }
           }
         },
-        { rootMargin: '400px 0px' }
+        { rootMargin: '600px 0px' }
       );
       proximityObserver.observe(el);
     }
 
-    // Active page observer for reading progress
+    // Active page observer for reading progress (single threshold to avoid re-trigger storm)
     const visibilityObserver = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
-            onVisible(pageNumber);
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            onVisibleRef.current(pageNumber);
           }
         }
       },
-      { threshold: [0.2, 0.4, 0.6] }
+      { threshold: 0.5 }
     );
     visibilityObserver.observe(el);
 
@@ -248,7 +260,7 @@ const PageRenderer: React.FC<PageRendererProps> = ({
       proximityObserver?.disconnect();
       visibilityObserver.disconnect();
     };
-  }, [pageNumber, onVisible, isNearViewport]);
+  }, [pageNumber, isNearViewport]);
 
   // Render Canvas and Text Layer only when page is near or in viewport
   useEffect(() => {
@@ -260,19 +272,26 @@ const PageRenderer: React.FC<PageRendererProps> = ({
         const page = await pdfDoc.getPage(pageNumber);
         if (isCancelled) return;
 
+        // Base CSS viewport at current scale
         const viewport = page.getViewport({ scale });
-        setDimensions({ width: viewport.width, height: viewport.height });
+        const cssWidth = Math.floor(viewport.width);
+        const cssHeight = Math.floor(viewport.height);
+        setDimensions({ width: cssWidth, height: cssHeight });
 
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false });
         if (!ctx) return;
 
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        // Ensure crisp HiDPI rasterization on all displays (minimum 2x supersampling prevents blur on 1080p/1440p)
+        const dpr = Math.min(Math.max(window.devicePixelRatio || 1, 2), 2.5);
         canvas.width = Math.floor(viewport.width * dpr);
         canvas.height = Math.floor(viewport.height * dpr);
-        canvas.style.width = `${Math.floor(viewport.width)}px`;
-        canvas.style.height = `${Math.floor(viewport.height)}px`;
+        canvas.style.width = `${cssWidth}px`;
+        canvas.style.height = `${cssHeight}px`;
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
 
         if (renderTaskRef.current) {
           try {
@@ -286,7 +305,7 @@ const PageRenderer: React.FC<PageRendererProps> = ({
           canvasContext: ctx,
           viewport,
           canvas,
-          transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : undefined,
+          transform: [dpr, 0, 0, dpr, 0, 0],
         });
         renderTaskRef.current = renderTask;
 
@@ -294,16 +313,17 @@ const PageRenderer: React.FC<PageRendererProps> = ({
         if (isCancelled) return;
 
         if (canvas.width > 0 && canvas.height > 0) {
-          onPageRendered?.(pageNumber, canvas);
+          onPageRenderedRef.current?.(pageNumber, canvas);
         }
 
         // Render TextLayer for high-fidelity native text selection
         const textLayerDiv = textLayerRef.current;
         if (textLayerDiv) {
           textLayerDiv.innerHTML = '';
-          textLayerDiv.style.width = `${Math.floor(viewport.width)}px`;
-          textLayerDiv.style.height = `${Math.floor(viewport.height)}px`;
+          textLayerDiv.style.width = `${cssWidth}px`;
+          textLayerDiv.style.height = `${cssHeight}px`;
           textLayerDiv.style.setProperty('--scale-factor', `${scale}`);
+          textLayerDiv.style.setProperty('--total-scale-factor', `${scale}`);
 
           const textContent = await page.getTextContent();
           if (isCancelled) return;
@@ -341,7 +361,7 @@ const PageRenderer: React.FC<PageRendererProps> = ({
       ref={containerRef}
       id={`pdf-page-${pageNumber}`}
       data-page-number={pageNumber}
-      className="pdf-page-container relative mx-auto my-4 bg-white shadow-2xl rounded-sm transition-all select-text border border-neutral-800/20"
+      className="pdf-page-container relative mx-auto my-4 bg-white shadow-2xl rounded-sm select-text border border-neutral-800/20"
       style={{
         width: `${dimensions.width}px`,
         height: `${dimensions.height}px`,
@@ -352,12 +372,12 @@ const PageRenderer: React.FC<PageRendererProps> = ({
         ref={textLayerRef}
         className="textLayer absolute inset-0 select-text pointer-events-auto"
       />
-      <div className="absolute bottom-2 right-3 rounded bg-black/60 px-2 py-0.5 text-[10px] font-mono text-gray-300 pointer-events-none">
+      <div className="absolute bottom-2 right-3 rounded bg-black/60 px-2 py-0.5 text-[10px] font-mono text-gray-300 pointer-events-none z-10">
         p. {pageNumber}
       </div>
     </div>
   );
-};
+});
 
 const isValidPdfBytes = (bytes: Uint8Array): boolean => {
   return (
@@ -369,7 +389,7 @@ const isValidPdfBytes = (bytes: Uint8Array): boolean => {
   );
 };
 
-export const CURRENT_BUILD_ID = 'build_study_pdf_v7_promise_try_polyfilled';
+export const CURRENT_BUILD_ID = 'build_study_pdf_v8_hidpi_smooth_scroll';
 export type PdfLifecycle = 'IDLE' | 'LOADING' | 'LOADED' | 'PAGE_RENDERING' | 'READY' | 'ERROR' | 'CANCELLED';
 
 // ---------------------------------------------------------------------------
@@ -673,11 +693,17 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
     };
   }, [document.document_id, reloadKey]);
 
-  // Handle page visibility change and update progress
+  // Handle page visibility change and update progress (throttled to maintain 60fps scrolling)
+  const lastProgressRef = useRef<{ page: number; time: number }>({ page: 1, time: 0 });
   const handlePageVisible = useCallback(
     (page: number) => {
-      setCurrentPage(page);
-      if (onUpdateProgress) {
+      setCurrentPage((prev) => (prev === page ? prev : page));
+      const now = Date.now();
+      if (
+        onUpdateProgress &&
+        (lastProgressRef.current.page !== page || now - lastProgressRef.current.time > 800)
+      ) {
+        lastProgressRef.current = { page, time: now };
         const total = numPages > 0 ? numPages : 1;
         const percent = Math.min(100, Math.round((page / total) * 100));
         const secTitle = currentSection ? currentSection.title : `Página ${page}`;
@@ -1259,7 +1285,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             ref={viewerContainerRef}
             onMouseUp={handleViewportMouseUp}
             onScroll={handleScroll}
-            className="flex-1 overflow-y-auto overflow-x-auto bg-[#181d24] p-4 sm:p-6 relative select-text"
+            className="pdf-reader-scroll-container flex-1 overflow-y-auto overflow-x-auto bg-[#181d24] p-4 sm:p-6 relative select-text"
           >
             {/* Show loading spinner ONLY if no pdfDoc is loaded and no error exists */}
             {pdfLoading && !Boolean(pdfDoc) && (
