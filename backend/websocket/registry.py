@@ -25,10 +25,12 @@ from services.study_service import StudyService
 from backend.websocket.handlers.missions import (
     MissionWebSocketHandler,
 )
+from backend.websocket.handlers.permissions import PermissionGatewayWebSocketHandler
 from backend.websocket.handlers.projects import ProjectWebSocketHandler
 from backend.websocket.handlers.sentinel import SentinelWebSocketHandler
 from backend.websocket.handlers.system import SystemWebSocketHandler
 from backend.websocket.handlers.voice import VoiceWebSocketHandler
+from security.permission_gateway.gateway import get_permission_gateway_service
 from security.sentinel.watchdog import SentinelWatchdogService
 
 
@@ -102,6 +104,10 @@ def create_websocket_handlers(
         ).routes(),
         "sentinel": SentinelWebSocketHandler(
             watchdog=watchdog,
+            connections=connections,
+        ).routes(),
+        "permissions": PermissionGatewayWebSocketHandler(
+            gateway=get_permission_gateway_service(),
             connections=connections,
         ).routes(),
     }

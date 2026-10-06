@@ -114,6 +114,15 @@ SERVER_MESSAGE_TYPES = {
     "sentinel_action_proposed",
     "sentinel_action_result",
     "sentinel_actions_list",
+    # Human-in-the-Loop Permission Gateway Events
+    "action_confirm_request",
+    "permission_request_created",
+    "permission_request_approved",
+    "permission_request_denied",
+    "permission_request_expired",
+    "permission_capability_result",
+    "permission_execution_result",
+    "permission_pending_list",
     "mission_subdag_proposal_result",
     "mission_subdag_history",
     "mission_subdag_proposed",
@@ -482,9 +491,20 @@ CLIENT_MESSAGE_TYPES = {
     "mission_reliability_plan",
     "mission_reliability_execute",
     "mission_reliability_replay",
+    # Human-in-the-Loop Permission Gateway Operations
+    "action_confirm_response",
+    "permission_get_pending",
+    "permission_approve",
+    "permission_deny",
+    "permission_rollback",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
+    "action_confirm_response": ("request_id", "decision"),
+    "permission_get_pending": (),
+    "permission_approve": ("request_id",),
+    "permission_deny": ("request_id",),
+    "permission_rollback": ("request_id",),
     "mission_long_horizon_status": (),
     "mission_long_horizon_create": (),
     "mission_long_horizon_step": (),

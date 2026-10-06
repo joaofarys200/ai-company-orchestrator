@@ -9,6 +9,7 @@ import {
   ChevronDown,
   Sparkles,
   Network,
+  Lock,
 } from 'lucide-react';
 import type { MissionControlStateData, MissionControlStatus } from '../../../protocol/websocket';
 
@@ -93,6 +94,13 @@ export const MissionHeader: React.FC<MissionHeaderProps> = ({
           <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-500/25 bg-gray-500/10 px-2.5 py-0.5 text-xs font-medium text-gray-300">
             <XCircle className="h-3 w-3 text-gray-400" />
             Cancelada
+          </span>
+        );
+      case 'AWAITING_HUMAN_APPROVAL':
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-400/15 px-2.5 py-0.5 text-xs font-medium text-amber-200 shadow-sm animate-pulse">
+            <Lock className="h-3 w-3 text-amber-400" />
+            É necessária uma autorização
           </span>
         );
       default:

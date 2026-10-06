@@ -5,7 +5,9 @@ import {
   Cpu,
   Activity,
   Sparkles,
+  Lock,
 } from 'lucide-react';
+import { usePermissionStore } from '../permissions/PermissionStore';
 import type {
   MissionControlStateData,
   MissionControlEventData,
@@ -579,6 +581,25 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
           onCancel={() => setShowCancelModal(true)}
         />
       </MissionHeader>
+
+      {/* HITL PERMISSION GATEWAY BANNER */}
+      {missionState.status === 'AWAITING_HUMAN_APPROVAL' && (
+        <div className="mx-6 mt-3 p-3 rounded-lg border border-amber-500/30 bg-amber-500/10 flex items-center justify-between text-amber-200 text-xs">
+          <div className="flex items-center gap-2.5">
+            <Lock className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
+            <div>
+              <span className="font-semibold text-amber-100">É necessária uma autorização.</span>
+              <span className="text-amber-300/80 ml-2">Esta missão solicitou uma ferramenta externa ou privilégio e está pausada a aguardar confirmação.</span>
+            </div>
+          </div>
+          <button
+            onClick={() => usePermissionStore.getState().setModalOpen(true)}
+            className="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/30 rounded text-xs font-medium cursor-pointer transition"
+          >
+            Rever Pedido
+          </button>
+        </div>
+      )}
 
       {/* 2. PRIMARY 5-TAB NAVIGATION (CLEAN, NO HORIZONTAL SCROLL) */}
       <div className="flex border-b border-white/8 bg-[#070b10]/60 px-6">

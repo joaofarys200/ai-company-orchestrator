@@ -217,6 +217,12 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "mission_reliability_plan",
         "mission_reliability_execute",
         "mission_reliability_replay",
+        # Human-in-the-Loop Permission Gateway Operations
+        "action_confirm_response",
+        "permission_get_pending",
+        "permission_approve",
+        "permission_deny",
+        "permission_rollback",
     }
 )
 

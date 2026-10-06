@@ -3,6 +3,7 @@ import { useWebSocket } from './context/WebSocketContext';
 import { ChatPanel } from './features/chat';
 import { AgentLibrary } from './features/settings';
 import { HologramCore, WorkspaceViewer } from './features/workspace';
+import { PermissionApprovalModal } from './features/permissions';
 import { X, Users, BookOpen, Activity, ChevronDown, PanelRightClose } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
@@ -193,6 +194,9 @@ function App() {
 
       {/* Agent Library */}
       <AgentLibrary isOpen={isLibraryOpen} onClose={() => setIsLibraryOpen(false)} />
+
+      {/* Global Human-in-the-Loop Permission Gateway Modal */}
+      <PermissionApprovalModal />
     </div>
   );
 }

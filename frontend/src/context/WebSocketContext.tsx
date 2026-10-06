@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { missionRuntimeStore } from '../features/missions/stores/missionRuntimeStore';
+import { usePermissionStore } from '../features/permissions/PermissionStore';
 import {
   normalizeServerMessage,
   type ActiveTemplate,
@@ -219,7 +220,8 @@ interface WebSocketContextType {
     subject?: string,
     contentBase64?: string,
     contentText?: string,
-    sourceType?: string
+    sourceType?: string,
+    filePath?: string
   ) => void;
   deleteStudyDocument: (documentId: string, deleteFile?: boolean) => void;
   generateStudyQuiz: (documentId: string, count?: number) => void;
@@ -246,6 +248,11 @@ interface WebSocketContextType {
   getStudyDocumentFile: (
     documentId: string
   ) => Promise<{ contentBase64?: string; filename?: string; error?: string }>;
+  generateStudyCornell: (documentId: string) => Promise<any>;
+  approvePermissionRequest: (requestId: string, projectId?: string, missionId?: string) => void;
+  denyPermissionRequest: (requestId: string, reason?: string, projectId?: string, missionId?: string) => void;
+  rollbackPermissionRequest: (requestId: string) => void;
+  getPendingPermissions: () => void;
   sendClientMessage: (msg: any) => void;
 }
 
@@ -917,6 +924,40 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         break;
       }
+      case 'study_notes_ready': {
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg.cornell);
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith(`cornell:${msg.document_id}`)) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(msg.cornell);
+              break;
+            }
+          }
+        }
+        if (msg.cornell && msg.document_id) {
+          setStudyDocuments((prev) =>
+            prev.map((d) =>
+              d.document_id === msg.document_id
+                ? {
+                    ...d,
+                    metadata: {
+                      ...d.metadata,
+                      cornell_notes: msg.cornell,
+                    },
+                  }
+                : d
+            )
+          );
+        }
+        break;
+      }
       case 'study_document_file_result': {
         const reqId = msg.request_id;
         if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
@@ -944,6 +985,81 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         break;
       }
+      case 'permission_pending_list':
+        usePermissionStore.getState().setPendingRequests(msg.data);
+        break;
+      case 'permission_request_created':
+        if (msg.request) {
+          usePermissionStore.getState().addRequest(msg.request);
+          addSystemMessage(`[AUTORIZAÇÃO NECESSÁRIA] ${msg.request.tool_name}: ${msg.request.reason}`);
+        }
+        break;
+      case 'action_confirm_request': {
+        const store = usePermissionStore.getState();
+        const existing = store.pendingRequests.find((r) => r.request_id === msg.request_id);
+        if (!existing) {
+          store.addRequest({
+            request_id: msg.request_id,
+            tool_name: msg.tool_name,
+            tool_type: 'external_tool',
+            risk_level: msg.risk_level,
+            reason: msg.reason,
+            requested_operation: msg.tool_name,
+            required_privileges: msg.required_privileges,
+            affected_resources: msg.affected_resources,
+            installation_required: msg.installation_required,
+            installer_source: null,
+            installer_version: null,
+            alternative_available: Boolean(msg.fallback),
+            fallback_description: msg.fallback,
+            created_at: Date.now() / 1000,
+            expires_at: msg.expiry,
+            status: 'WAITING_FOR_USER',
+            decision_evidence: {},
+          });
+        }
+        addSystemMessage(`[AUTORIZAÇÃO NECESSÁRIA] ${msg.tool_name}: ${msg.reason}`);
+        break;
+      }
+      case 'permission_request_approved':
+        if (msg.request_id) {
+          usePermissionStore.getState().markApproved(msg.request_id, msg.request);
+          addSystemMessage(`[AUTORIZAÇÃO CONCEDIDA] Pedido ${msg.request_id} aprovado.`);
+        }
+        break;
+      case 'permission_request_denied':
+        if (msg.request_id) {
+          usePermissionStore.getState().markDenied(msg.request_id, msg.request);
+          const fbMsg = msg.fallback_available ? ` — fallback aplicado: ${msg.fallback_description || 'alternativa ativada'}` : '';
+          addSystemMessage(`[AUTORIZAÇÃO RECUSADA] Pedido ${msg.request_id} recusado${fbMsg}.`);
+        }
+        break;
+      case 'permission_request_expired':
+        if (msg.request_id) {
+          usePermissionStore.getState().markExpired(msg.request_id);
+          addSystemMessage(`[AUTORIZAÇÃO EXPIRADA] Pedido ${msg.request_id} expirou.`);
+        }
+        break;
+      case 'permission_capability_result':
+        if (msg.status === 'ADMIN_PRIVILEGE_REQUIRED') {
+          addSystemMessage(`[CAPACIDADE TÉCNICA] É necessária autorização administrativa do Windows.`);
+        } else if (msg.status === 'INSTALLATION_REQUIRED') {
+          addSystemMessage(`[CAPACIDADE TÉCNICA] Ferramenta não encontrada no sistema. Instalação necessária.`);
+        } else if (msg.status === 'AVAILABLE') {
+          addSystemMessage(`[CAPACIDADE TÉCNICA] Ferramenta verificada e disponível.`);
+        } else if (msg.status === 'UNSUPPORTED') {
+          addSystemMessage(`[CAPACIDADE TÉCNICA] Plataforma ou arquitetura incompatível.`);
+        } else if (msg.status === 'BLOCKED') {
+          addSystemMessage(`[CAPACIDADE TÉCNICA] Execução bloqueada pela política de segurança.`);
+        }
+        break;
+      case 'permission_execution_result':
+        if (msg.status === 'EXECUTED') {
+          addSystemMessage(`[EXECUÇÃO CONCLUÍDA] Ferramenta executada com sucesso.`);
+        } else if (msg.status === 'FAILED') {
+          addSystemMessage(`[EXECUÇÃO FALHOU] ${msg.error || 'Erro desconhecido'}`);
+        }
+        break;
       case 'unknown':
         console.warn('[Transport] Unknown message type:', msg.originalType);
         break;
@@ -1011,6 +1127,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           ws.send(JSON.stringify({ type: 'get_planner_state' } satisfies ClientMessage));
           ws.send(JSON.stringify({ type: 'mission_list', project_id: 'ALL' } satisfies ClientMessage));
           ws.send(JSON.stringify({ type: 'study_list_documents' } satisfies ClientMessage));
+          ws.send(JSON.stringify({ type: 'permission_get_pending' } satisfies ClientMessage));
         }
       }, 50);
 
@@ -1551,7 +1668,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       subject?: string,
       contentBase64?: string,
       contentText?: string,
-      sourceType?: string
+      sourceType?: string,
+      filePath?: string
     ) => {
       sendClientMessage({
         type: 'study_upload_document',
@@ -1561,6 +1679,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         content_base64: contentBase64,
         content_text: contentText,
         source_type: sourceType,
+        file_path: filePath,
       });
     },
     [sendClientMessage]
@@ -1711,6 +1830,27 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [sendClientMessage]
   );
 
+  const generateStudyCornell = useCallback(
+    (documentId: string): Promise<any> => {
+      const requestId = `cornell:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Generate Cornell notes timed out'));
+        }, 30000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_generate_cornell',
+          document_id: documentId,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
   const getSentinelStatus = useCallback(() => {
     sendClientMessage({
       type: 'sentinel_get_status',
@@ -1841,6 +1981,38 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const clearMissionIntentResult = useCallback(() => {
     setMissionIntentResult(null);
   }, []);
+
+  const approvePermissionRequest = useCallback((requestId: string, projectId?: string, missionId?: string) => {
+    sendClientMessage({
+      type: 'permission_approve',
+      request_id: requestId,
+      project_id: projectId,
+      mission_id: missionId,
+    });
+  }, [sendClientMessage]);
+
+  const denyPermissionRequest = useCallback((requestId: string, reason = 'Recusado pelo operador humano', projectId?: string, missionId?: string) => {
+    sendClientMessage({
+      type: 'permission_deny',
+      request_id: requestId,
+      reason,
+      project_id: projectId,
+      mission_id: missionId,
+    });
+  }, [sendClientMessage]);
+
+  const rollbackPermissionRequest = useCallback((requestId: string) => {
+    sendClientMessage({
+      type: 'permission_rollback',
+      request_id: requestId,
+    });
+  }, [sendClientMessage]);
+
+  const getPendingPermissions = useCallback(() => {
+    sendClientMessage({
+      type: 'permission_get_pending',
+    });
+  }, [sendClientMessage]);
 
   return (
     <WebSocketContext.Provider
@@ -1975,6 +2147,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         contextualAssist,
         askStudyPaper,
         getStudyDocumentFile,
+        generateStudyCornell,
+        approvePermissionRequest,
+        denyPermissionRequest,
+        rollbackPermissionRequest,
+        getPendingPermissions,
         sendClientMessage,
       }}
     >

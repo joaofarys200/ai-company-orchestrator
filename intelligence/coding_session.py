@@ -30,6 +30,8 @@ from backend.model_harness import (
     get_runtime_model_harness,
 )
 from intelligence.project_context import ProjectContextError, ProjectContextService
+from security.permission_gateway.gateway import get_permission_gateway_service
+from security.permission_gateway.models import DependencyRequirement, PermissionRequestStatus
 from security.safety_classifier import SafetyClassifier, SafetyRefusalError, SafetyStatus
 from workspace_policy import validate_local_command
 
@@ -111,11 +113,54 @@ class CodingSession:
     rollback_succeeded: bool = False
     change_plan: dict[str, Any] = field(default_factory=dict)
     auto_repair_logs: list[str] = field(default_factory=list)
+    dependency_requirements: list[dict[str, Any]] = field(default_factory=list)
+    permission_request_id: str | None = None
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+def detect_dependency_requirements(
+    objective: str,
+    changes: list[dict[str, Any]] | None = None,
+) -> list[DependencyRequirement]:
+    reqs: list[DependencyRequirement] = []
+    lower_obj = (objective or "").lower()
+    if re.search(r"\b(nmap|port scan|varredura de rede|network scan)\b", lower_obj):
+        reqs.append(
+            DependencyRequirement(
+                tool_name="Nmap",
+                package_name="nmap",
+                reason="Descoberta e mapeamento de portas e hosts na rede local.",
+                risk_level="HIGH_RISK_MUTATION",
+                required_privileges="Administrador / Npcap",
+                fallback_description="Usar tabela ARP do Windows (arp -a + netstat) e sockets TCP permitidos.",
+            )
+        )
+    if re.search(r"\b(ffmpeg|extrair audio|converter video|transcodific)\b", lower_obj):
+        reqs.append(
+            DependencyRequirement(
+                tool_name="FFmpeg",
+                package_name="ffmpeg",
+                reason="Processamento e extração de multimédia.",
+                risk_level="LOW_RISK_MUTATION",
+                required_privileges="Userland",
+                fallback_description="Processamento nativo limitado sem transcodificação externa.",
+            )
+        )
+    if re.search(r"\b(ocr|tesseract|reconhecer texto de imagem)\b", lower_obj):
+        reqs.append(
+            DependencyRequirement(
+                tool_name="Tesseract",
+                package_name="tesseract-ocr",
+                reason="Extração de texto via OCR de imagens/documentos.",
+                risk_level="LOW_RISK_MUTATION",
+                required_privileges="Userland",
+                fallback_description="Processamento de texto nativo estruturado sem OCR.",
+            )
+        )
+    return reqs
 
 
 class CodingSessionService:
@@ -128,6 +173,13 @@ class CodingSessionService:
         self.projects = project_service or ProjectContextService()
         self.new_file_writer = new_file_writer
         self.plan_requester = plan_requester
+
+    def detect_dependency_requirements(
+        self,
+        objective: str,
+        changes: list[dict[str, Any]] | None = None,
+    ) -> list[DependencyRequirement]:
+        return detect_dependency_requirements(objective, changes)
 
     def create_session(
         self,
@@ -171,6 +223,28 @@ class CodingSessionService:
             "risks": [str(risk) for risk in (risks or []) if str(risk).strip()],
             "validations": validations,
         }
+
+        dependency_reqs = self.detect_dependency_requirements(clean_objective, prepared)
+        perm_request_id = None
+        session_status = "PROPOSED"
+        if dependency_reqs:
+            gateway = get_permission_gateway_service()
+            for dep in dependency_reqs:
+                perm_req = gateway.create_request(
+                    tool_name=dep.tool_name,
+                    requested_operation=f"Execução de {dep.tool_name} para {dep.reason}",
+                    reason=dep.reason,
+                    risk_level=dep.risk_level,
+                    required_privileges=dep.required_privileges,
+                    affected_resources=[project_id],
+                    project_id=project_id,
+                    alternative_available=bool(dep.fallback_description),
+                    fallback_description=dep.fallback_description,
+                )
+                perm_request_id = perm_req.request_id
+                if perm_req.status == PermissionRequestStatus.WAITING_FOR_USER.value:
+                    session_status = "AWAITING_HUMAN_APPROVAL"
+
         session = CodingSession(
             session_id=uuid.uuid4().hex,
             project_id=context.project_id,
@@ -179,6 +253,9 @@ class CodingSessionService:
             affected_files=affected_files,
             proposed_changes=prepared,
             change_plan=plan,
+            dependency_requirements=[dep.to_dict() for dep in dependency_reqs],
+            permission_request_id=perm_request_id,
+            status=session_status,
         )
         self._save(session)
         return session

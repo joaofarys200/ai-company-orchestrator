@@ -1089,6 +1089,128 @@ export interface SentinelActionsListMessage {
   data: SentinelActionData[];
 }
 
+export type PermissionRiskLevel = 'READ_ONLY' | 'LOW_RISK_MUTATION' | 'HIGH_RISK_MUTATION' | 'CRITICAL_MUTATION';
+
+export type PermissionRequestStatus =
+  | 'REQUESTED'
+  | 'WAITING_FOR_USER'
+  | 'APPROVED'
+  | 'DENIED'
+  | 'EXPIRED'
+  | 'CAPABILITY_CHECKING'
+  | 'AVAILABLE'
+  | 'INSTALLATION_REQUIRED'
+  | 'ADMIN_PRIVILEGE_REQUIRED'
+  | 'UNSUPPORTED'
+  | 'BLOCKED_BY_POLICY'
+  | 'EXECUTION_READY'
+  | 'EXECUTED'
+  | 'FAILED';
+
+export interface PermissionRequestData {
+  request_id: string;
+  tool_name: string;
+  requested_operation: string;
+  reason: string;
+  risk_level: PermissionRiskLevel;
+  required_privileges: string;
+  affected_resources: string[];
+  mission_id?: string | null;
+  project_id?: string | null;
+  execution_id?: string | null;
+  agent_id?: string | null;
+  tool_type?: string;
+  installation_required: boolean;
+  installer_source?: string | null;
+  installer_version?: string | null;
+  installer_checksum?: string | null;
+  alternative_available: boolean;
+  fallback_description?: string | null;
+  created_at: number;
+  expires_at: number;
+  status: PermissionRequestStatus;
+  policy_reason?: string | null;
+  decision_evidence?: Record<string, unknown>;
+  user_decision?: string | null;
+  decided_at?: number | null;
+  decided_by?: string | null;
+  session_id?: string | null;
+  rollback_available?: boolean;
+  rollback_plan?: string | null;
+  capability_result?: Record<string, unknown> | null;
+  execution_result?: Record<string, unknown> | null;
+}
+
+export interface ActionConfirmRequestMessage {
+  type: 'action_confirm_request';
+  request_id: string;
+  tool_name: string;
+  reason: string;
+  risk_level: PermissionRiskLevel;
+  required_privileges: string;
+  affected_resources: string[];
+  installation_required: boolean;
+  fallback?: string | null;
+  expiry: number;
+  reversible?: boolean;
+  rollback?: string | null;
+}
+
+export interface PermissionRequestCreatedMessage {
+  type: 'permission_request_created';
+  request: PermissionRequestData;
+}
+
+export interface PermissionRequestApprovedMessage {
+  type: 'permission_request_approved';
+  request_id?: string;
+  request?: PermissionRequestData;
+  success?: boolean;
+  error?: string;
+}
+
+export interface PermissionRequestDeniedMessage {
+  type: 'permission_request_denied';
+  request_id?: string;
+  request?: PermissionRequestData;
+  success?: boolean;
+  reason?: string;
+  fallback_available?: boolean;
+  fallback_description?: string | null;
+}
+
+export interface PermissionRequestExpiredMessage {
+  type: 'permission_request_expired';
+  request_id: string;
+}
+
+export interface PermissionCapabilityResultMessage {
+  type: 'permission_capability_result';
+  request_id: string;
+  mission_id?: string;
+  project_id?: string;
+  execution_id?: string;
+  status: PermissionRequestStatus;
+  capability: Record<string, unknown>;
+}
+
+export interface PermissionExecutionResultMessage {
+  type: 'permission_execution_result';
+  request_id: string;
+  mission_id?: string;
+  project_id?: string;
+  execution_id?: string;
+  status: string;
+  result?: Record<string, unknown>;
+  error?: string;
+  rollback?: Record<string, unknown>;
+}
+
+export interface PermissionPendingListMessage {
+  type: 'permission_pending_list';
+  data: PermissionRequestData[];
+}
+
 export interface MissionSubDagHistoryMessage {
   type: 'mission_subdag_history';
   mission_id: string;
@@ -1246,6 +1368,14 @@ export type ServerMessage =
   | SentinelActionProposedMessage
   | SentinelActionResultMessage
   | SentinelActionsListMessage
+  | ActionConfirmRequestMessage
+  | PermissionRequestCreatedMessage
+  | PermissionRequestApprovedMessage
+  | PermissionRequestDeniedMessage
+  | PermissionRequestExpiredMessage
+  | PermissionCapabilityResultMessage
+  | PermissionExecutionResultMessage
+  | PermissionPendingListMessage
   | MissionSubDagHistoryMessage
   | MissionSubDagProposalResultMessage
   | MissionAdaptationHistoryMessage
@@ -1321,7 +1451,7 @@ export type ClientMessage =
   | { type: 'study_ask_paper'; document_id: string; query?: string; question?: string; section_id?: string; request_id?: string }
   | { type: 'study_generate_summary'; document_id: string; mode?: string }
   | { type: 'study_synthesize_documents'; document_ids: string[] }
-  | { type: 'study_generate_cornell'; document_id: string }
+  | { type: 'study_generate_cornell'; document_id: string; request_id?: string }
   | { type: 'study_save_to_vault'; title: string; content?: string; markdown_content?: string; subject?: string; source_document_ids?: string[] }
   | { type: 'study_generate_quiz'; document_id: string; question_count?: number }
   | { type: 'study_submit_quiz'; quiz_id: string; answers: Record<string, number | string>; transfer_answer?: string }
@@ -1333,6 +1463,11 @@ export type ClientMessage =
   | { type: 'study_update_reading_progress'; document_id: string; current_page: number; current_section?: string; completion_percentage?: number }
   | { type: 'study_prepare_exam'; document_id: string }
   | { type: 'study_delete_document'; document_id: string; delete_file?: boolean }
+  | { type: 'action_confirm_response'; request_id: string; decision: 'APPROVE' | 'DENY' | 'REJECT'; user?: string; session_id?: string }
+  | { type: 'permission_get_pending' }
+  | { type: 'permission_approve'; request_id: string; user?: string; session_id?: string; project_id?: string; mission_id?: string }
+  | { type: 'permission_deny'; request_id: string; reason?: string; user?: string; session_id?: string; project_id?: string; mission_id?: string }
+  | { type: 'permission_rollback'; request_id: string; user?: string; session_id?: string }
   | MissionClientOperation;
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
@@ -1715,6 +1850,43 @@ const normalizeCodingSession = (value: unknown): CodingSessionData | null => {
   };
 };
 
+export const normalizePermissionRequest = (raw: unknown): PermissionRequestData => {
+  const value = isRecord(raw) ? raw : {};
+  return {
+    request_id: asString(value.request_id),
+    tool_name: asString(value.tool_name),
+    requested_operation: asString(value.requested_operation),
+    reason: asString(value.reason),
+    risk_level: asString(value.risk_level, 'LOW_RISK_MUTATION') as PermissionRiskLevel,
+    required_privileges: asString(value.required_privileges, 'Userland'),
+    affected_resources: asStringArray(value.affected_resources),
+    mission_id: value.mission_id ? asString(value.mission_id) : null,
+    project_id: value.project_id ? asString(value.project_id) : null,
+    execution_id: value.execution_id ? asString(value.execution_id) : null,
+    agent_id: value.agent_id ? asString(value.agent_id) : null,
+    tool_type: asString(value.tool_type, 'binary'),
+    installation_required: asBoolean(value.installation_required),
+    installer_source: value.installer_source ? asString(value.installer_source) : null,
+    installer_version: value.installer_version ? asString(value.installer_version) : null,
+    installer_checksum: value.installer_checksum ? asString(value.installer_checksum) : null,
+    alternative_available: asBoolean(value.alternative_available),
+    fallback_description: value.fallback_description ? asString(value.fallback_description) : null,
+    created_at: asNumber(value.created_at, Date.now() / 1000),
+    expires_at: asNumber(value.expires_at, Date.now() / 1000 + 300),
+    status: asString(value.status, 'REQUESTED') as PermissionRequestStatus,
+    policy_reason: value.policy_reason ? asString(value.policy_reason) : null,
+    decision_evidence: isRecord(value.decision_evidence) ? value.decision_evidence : {},
+    user_decision: value.user_decision ? asString(value.user_decision) : null,
+    decided_at: typeof value.decided_at === 'number' ? value.decided_at : null,
+    decided_by: value.decided_by ? asString(value.decided_by) : null,
+    session_id: value.session_id ? asString(value.session_id) : null,
+    rollback_available: asBoolean(value.rollback_available),
+    rollback_plan: value.rollback_plan ? asString(value.rollback_plan) : null,
+    capability_result: isRecord(value.capability_result) ? value.capability_result : null,
+    execution_result: isRecord(value.execution_result) ? value.execution_result : null,
+  };
+};
+
 export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
   if (!isRecord(raw)) return null;
   const type = asString(raw.type, 'unknown');
@@ -2006,6 +2178,76 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         type,
         data: asRecordArray(raw.data).map(normalizeSentinelAction),
       };
+    case 'action_confirm_request':
+      return {
+        type,
+        request_id: asString(raw.request_id),
+        tool_name: asString(raw.tool_name),
+        reason: asString(raw.reason),
+        risk_level: asString(raw.risk_level, 'LOW_RISK_MUTATION') as PermissionRiskLevel,
+        required_privileges: asString(raw.required_privileges),
+        affected_resources: asStringArray(raw.affected_resources),
+        installation_required: asBoolean(raw.installation_required),
+        fallback: raw.fallback ? asString(raw.fallback) : null,
+        expiry: asNumber(raw.expiry, Date.now() / 1000 + 300),
+        reversible: asBoolean(raw.reversible),
+        rollback: raw.rollback ? asString(raw.rollback) : null,
+      };
+    case 'permission_request_created':
+      return {
+        type,
+        request: normalizePermissionRequest(raw.request),
+      };
+    case 'permission_request_approved':
+      return {
+        type,
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+        request: raw.request ? normalizePermissionRequest(raw.request) : undefined,
+        success: asBoolean(raw.success, true),
+        error: raw.error ? asString(raw.error) : undefined,
+      };
+    case 'permission_request_denied':
+      return {
+        type,
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+        request: raw.request ? normalizePermissionRequest(raw.request) : undefined,
+        success: asBoolean(raw.success, true),
+        reason: raw.reason ? asString(raw.reason) : undefined,
+        fallback_available: asBoolean(raw.fallback_available),
+        fallback_description: raw.fallback_description ? asString(raw.fallback_description) : null,
+      };
+    case 'permission_request_expired':
+      return {
+        type,
+        request_id: asString(raw.request_id),
+      };
+    case 'permission_capability_result':
+      return {
+        type,
+        request_id: asString(raw.request_id),
+        mission_id: raw.mission_id ? asString(raw.mission_id) : undefined,
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        execution_id: raw.execution_id ? asString(raw.execution_id) : undefined,
+        status: asString(raw.status, 'AVAILABLE') as PermissionRequestStatus,
+        capability: isRecord(raw.capability) ? raw.capability : {},
+      };
+    case 'permission_execution_result':
+      return {
+        type,
+        request_id: asString(raw.request_id),
+        mission_id: raw.mission_id ? asString(raw.mission_id) : undefined,
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        execution_id: raw.execution_id ? asString(raw.execution_id) : undefined,
+        status: asString(raw.status),
+        result: isRecord(raw.result) ? raw.result : undefined,
+        error: raw.error ? asString(raw.error) : undefined,
+        rollback: isRecord(raw.rollback) ? raw.rollback : undefined,
+      };
+    case 'permission_pending_list':
+      return {
+        type,
+        data: asRecordArray(raw.data).map(normalizePermissionRequest),
+      };
     case 'mission_subdag_history':
       return {
         type,
@@ -2260,7 +2502,8 @@ export type MissionControlStatus =
   | 'CANCELLED'
   | 'COMPLETED'
   | 'FAILED'
-  | 'RECOVERING';
+  | 'RECOVERING'
+  | 'AWAITING_HUMAN_APPROVAL';
 
 export type CommandType =
   | 'APPROVE'
