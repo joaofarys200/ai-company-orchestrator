@@ -24,6 +24,7 @@ class PermissionRequestStatus(str, Enum):
     """Ciclo de vida explícito de uma requisição de permissão humana."""
     REQUESTED = "REQUESTED"
     WAITING_FOR_USER = "WAITING_FOR_USER"
+    AWAITING_HUMAN_APPROVAL = "AWAITING_HUMAN_APPROVAL"
     APPROVED = "APPROVED"
     DENIED = "DENIED"
     EXPIRED = "EXPIRED"
@@ -33,6 +34,9 @@ class PermissionRequestStatus(str, Enum):
     ADMIN_PRIVILEGE_REQUIRED = "ADMIN_PRIVILEGE_REQUIRED"
     UNSUPPORTED = "UNSUPPORTED"
     BLOCKED_BY_POLICY = "BLOCKED_BY_POLICY"
+    BLOCKED_REQUIRED_CAPABILITY = "BLOCKED_REQUIRED_CAPABILITY"
+    WAITING_FOR_CAPABILITY = "WAITING_FOR_CAPABILITY"
+    READY_TO_EXECUTE = "READY_TO_EXECUTE"
     EXECUTION_READY = "EXECUTION_READY"
     EXECUTED = "EXECUTED"
     FAILED = "FAILED"
@@ -47,19 +51,63 @@ class CapabilityStatus(str, Enum):
     BLOCKED = "BLOCKED"
 
 
-@dataclass(slots=True)
+class DependencyClassification(str, Enum):
+    """Classificação rigorosa de necessidade de dependência externa."""
+    REQUIRED = "REQUIRED"        # A solução não cumpre completamente o objetivo sem esta dependência
+    OPTIONAL = "OPTIONAL"        # A solução continua a cumprir o objetivo sem esta ferramenta
+    ALTERNATIVE = "ALTERNATIVE"  # Existe outra implementação equivalente que cumpre os mesmos critérios
+
+
+class ApprovalSemantics(str, Enum):
+    """Semântica explícita de autorização humana."""
+    AUTHORIZE_USE = "AUTHORIZE_USE"
+    AUTHORIZE_INSTALLATION = "AUTHORIZE_INSTALLATION"
+    USE_LIMITED_FALLBACK = "USE_LIMITED_FALLBACK"
+    CANCEL = "CANCEL"
+
+
+@dataclass
 class DependencyRequirement:
     """Requisito formal de dependência externa emitido pelo agente ou sessão."""
     tool_name: str
+    dependency_id: str = field(default_factory=lambda: f"dep-{uuid.uuid4().hex[:8]}")
     package_name: Optional[str] = None
     version_constraint: Optional[str] = None
     registry: Optional[str] = None
     reason: str = ""
+    required_for: str = ""
+    acceptance_criteria: List[str] = field(default_factory=list)
+    classification: str = DependencyClassification.REQUIRED.value
     risk_level: str = PermissionRiskLevel.LOW_RISK_MUTATION.value
     required_privileges: str = "Userland"
+    fallback: Optional[str] = None
     fallback_description: Optional[str] = None
+    fallback_capability: Optional[str] = None
+    fallback_satisfies_acceptance_criteria: bool = False
+    fallback_limitations: Optional[str] = None
     license: Optional[str] = None
     target_command: Optional[str] = None
+    components: List[str] = field(default_factory=list)
+    installer_source: Optional[str] = None
+    installer_version: Optional[str] = None
+    installer_checksum: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class DependencyResolutionReport:
+    """Relatório estruturado de análise e rastreabilidade de dependências."""
+    required_dependencies: List[DependencyRequirement] = field(default_factory=list)
+    optional_dependencies: List[DependencyRequirement] = field(default_factory=list)
+    alternatives: List[DependencyRequirement] = field(default_factory=list)
+    unavailable_required: List[DependencyRequirement] = field(default_factory=list)
+    approval_requests: List[str] = field(default_factory=list)
+    fallback_decisions: Dict[str, Any] = field(default_factory=dict)
+    can_execute_immediately: bool = True
+    blocked_reason: Optional[str] = None
+    status: str = "READY_TO_EXECUTE"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -79,6 +127,10 @@ class AuditLogEntry:
     project_id: Optional[str] = None
     execution_id: Optional[str] = None
     details: Dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def action(self) -> str:
+        return self.event_type
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -104,7 +156,7 @@ class RollbackRecord:
         return asdict(self)
 
 
-@dataclass(slots=True)
+@dataclass
 class PermissionRequest:
     """
     Registo canónico de autorização Just-In-Time com separação estrita entre:
@@ -141,6 +193,17 @@ class PermissionRequest:
     rollback_plan: Optional[str] = None
     capability_result: Optional[Dict[str, Any]] = None
     execution_result: Optional[Dict[str, Any]] = None
+    # Requirement Traceability & Governance Fields
+    dependency_id: Optional[str] = None
+    classification: str = DependencyClassification.REQUIRED.value
+    required_for: Optional[str] = None
+    acceptance_criteria: List[str] = field(default_factory=list)
+    fallback_capability: Optional[str] = None
+    fallback_satisfies_acceptance_criteria: bool = False
+    fallback_limitations: Optional[str] = None
+    components: List[str] = field(default_factory=list)
+    approval_semantic: str = ApprovalSemantics.AUTHORIZE_USE.value
+    capability_status: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -168,6 +231,15 @@ class PermissionRequest:
         ttl_seconds: float = 300.0,
         rollback_available: bool = False,
         rollback_plan: Optional[str] = None,
+        dependency_id: Optional[str] = None,
+        classification: str = DependencyClassification.REQUIRED.value,
+        required_for: Optional[str] = None,
+        acceptance_criteria: Optional[List[str]] = None,
+        fallback_capability: Optional[str] = None,
+        fallback_satisfies_acceptance_criteria: bool = False,
+        fallback_limitations: Optional[str] = None,
+        components: Optional[List[str]] = None,
+        approval_semantic: str = ApprovalSemantics.AUTHORIZE_USE.value,
     ) -> PermissionRequest:
         now = time.time()
         return cls(
@@ -194,4 +266,13 @@ class PermissionRequest:
             status=PermissionRequestStatus.REQUESTED.value,
             rollback_available=rollback_available,
             rollback_plan=rollback_plan,
+            dependency_id=dependency_id,
+            classification=classification,
+            required_for=required_for,
+            acceptance_criteria=acceptance_criteria or [],
+            fallback_capability=fallback_capability,
+            fallback_satisfies_acceptance_criteria=fallback_satisfies_acceptance_criteria,
+            fallback_limitations=fallback_limitations,
+            components=components or [],
+            approval_semantic=approval_semantic,
         )

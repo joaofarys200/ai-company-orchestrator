@@ -497,6 +497,7 @@ CLIENT_MESSAGE_TYPES = {
     "permission_approve",
     "permission_deny",
     "permission_rollback",
+    "permission_resolve_choice",
 }
 
 MISSION_CLIENT_REQUIRED_FIELDS = {
@@ -505,6 +506,7 @@ MISSION_CLIENT_REQUIRED_FIELDS = {
     "permission_approve": ("request_id",),
     "permission_deny": ("request_id",),
     "permission_rollback": ("request_id",),
+    "permission_resolve_choice": ("request_id", "action"),
     "mission_long_horizon_status": (),
     "mission_long_horizon_create": (),
     "mission_long_horizon_step": (),

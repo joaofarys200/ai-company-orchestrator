@@ -31,7 +31,12 @@ from backend.model_harness import (
 )
 from intelligence.project_context import ProjectContextError, ProjectContextService
 from security.permission_gateway.gateway import get_permission_gateway_service
-from security.permission_gateway.models import DependencyRequirement, PermissionRequestStatus
+from security.permission_gateway.models import (
+    ApprovalSemantics,
+    DependencyClassification,
+    DependencyRequirement,
+    PermissionRequestStatus,
+)
 from security.safety_classifier import SafetyClassifier, SafetyRefusalError, SafetyStatus
 from workspace_policy import validate_local_command
 
@@ -127,14 +132,21 @@ def detect_dependency_requirements(
 ) -> list[DependencyRequirement]:
     reqs: list[DependencyRequirement] = []
     lower_obj = (objective or "").lower()
-    if re.search(r"\b(nmap|port scan|varredura de rede|network scan)\b", lower_obj):
+    if re.search(r"\b(nmap|port scan|varredura de rede|network scan|portas abertas)\b", lower_obj):
         reqs.append(
             DependencyRequirement(
                 tool_name="Nmap",
                 package_name="nmap",
-                reason="Descoberta e mapeamento de portas e hosts na rede local.",
+                reason="Descoberta e mapeamento ativo de portas e hosts na rede local.",
+                required_for="varredura ativa de rede e deteção de portas",
+                acceptance_criteria=["discover active hosts", "discover open ports"],
+                classification=DependencyClassification.REQUIRED.value,
                 risk_level="HIGH_RISK_MUTATION",
                 required_privileges="Administrador / Npcap",
+                fallback="arp -a",
+                fallback_capability="passive ARP discovery only",
+                fallback_satisfies_acceptance_criteria=False,
+                fallback_limitations="Não executa varredura ativa de portas nem fornece a mesma cobertura de rede.",
                 fallback_description="Usar tabela ARP do Windows (arp -a + netstat) e sockets TCP permitidos.",
             )
         )
@@ -144,8 +156,15 @@ def detect_dependency_requirements(
                 tool_name="FFmpeg",
                 package_name="ffmpeg",
                 reason="Processamento e extração de multimédia.",
+                required_for="transcodificação e extração de áudio",
+                acceptance_criteria=["extract audio stream", "transcode media format"],
+                classification=DependencyClassification.REQUIRED.value,
                 risk_level="LOW_RISK_MUTATION",
                 required_privileges="Userland",
+                fallback="native_media",
+                fallback_capability="standard media reader",
+                fallback_satisfies_acceptance_criteria=False,
+                fallback_limitations="Formatos avançados ou codecs proprietários não são suportados sem transcodificador.",
                 fallback_description="Processamento nativo limitado sem transcodificação externa.",
             )
         )
@@ -155,8 +174,15 @@ def detect_dependency_requirements(
                 tool_name="Tesseract",
                 package_name="tesseract-ocr",
                 reason="Extração de texto via OCR de imagens/documentos.",
+                required_for="reconhecimento ótico de caracteres",
+                acceptance_criteria=["extract text via OCR"],
+                classification=DependencyClassification.REQUIRED.value,
                 risk_level="LOW_RISK_MUTATION",
                 required_privileges="Userland",
+                fallback="text_extractor",
+                fallback_capability="plain text extractor",
+                fallback_satisfies_acceptance_criteria=False,
+                fallback_limitations="Imagens rasterizadas ou digitalizadas não terão texto reconhecido.",
                 fallback_description="Processamento de texto nativo estruturado sem OCR.",
             )
         )
@@ -240,9 +266,22 @@ class CodingSessionService:
                     project_id=project_id,
                     alternative_available=bool(dep.fallback_description),
                     fallback_description=dep.fallback_description,
+                    dependency_id=dep.dependency_id,
+                    classification=dep.classification,
+                    required_for=dep.required_for,
+                    acceptance_criteria=dep.acceptance_criteria,
+                    fallback_capability=dep.fallback_capability,
+                    fallback_satisfies_acceptance_criteria=dep.fallback_satisfies_acceptance_criteria,
+                    fallback_limitations=dep.fallback_limitations,
+                    approval_semantic=ApprovalSemantics.AUTHORIZE_USE.value,
                 )
                 perm_request_id = perm_req.request_id
-                if perm_req.status == PermissionRequestStatus.WAITING_FOR_USER.value:
+                if perm_req.status in {
+                    PermissionRequestStatus.WAITING_FOR_USER.value,
+                    PermissionRequestStatus.REQUESTED.value,
+                    PermissionRequestStatus.AWAITING_HUMAN_APPROVAL.value,
+                    PermissionRequestStatus.BLOCKED_REQUIRED_CAPABILITY.value,
+                }:
                     session_status = "AWAITING_HUMAN_APPROVAL"
 
         session = CodingSession(

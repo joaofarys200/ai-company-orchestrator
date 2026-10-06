@@ -9,8 +9,8 @@ import {
   Terminal,
   RefreshCw,
   X,
-  CheckCircle,
   HelpCircle,
+  Info,
 } from 'lucide-react';
 import { usePermissionStore } from './PermissionStore';
 import { useWebSocket } from '../../context/WebSocketContext';
@@ -20,6 +20,7 @@ export const PermissionApprovalModal: React.FC = () => {
   const { currentRequest, modalOpen, setModalOpen, markApproved, markDenied } = usePermissionStore();
   const { approvePermissionRequest, denyPermissionRequest } = useWebSocket();
   const [submitting, setSubmitting] = useState(false);
+  const [criteriaWarning, setCriteriaWarning] = useState<string | null>(null);
 
   if (!modalOpen || !currentRequest) {
     return null;
@@ -30,11 +31,14 @@ export const PermissionApprovalModal: React.FC = () => {
     currentRequest.risk_level === 'CRITICAL_MUTATION';
 
   const isAdminRequired = currentRequest.status === 'ADMIN_PRIVILEGE_REQUIRED';
-  const isInstallationRequired = currentRequest.status === 'INSTALLATION_REQUIRED';
+  const isInstallationRequired =
+    currentRequest.status === 'INSTALLATION_REQUIRED' ||
+    currentRequest.installation_required;
 
   const handleApprove = async () => {
     if (submitting || isBlockedByPolicy) return;
     setSubmitting(true);
+    setCriteriaWarning(null);
     const reqId = currentRequest.request_id;
     try {
       approvePermissionRequest(
@@ -53,6 +57,7 @@ export const PermissionApprovalModal: React.FC = () => {
   const handleDeny = async () => {
     if (submitting) return;
     setSubmitting(true);
+    setCriteriaWarning(null);
     const reqId = currentRequest.request_id;
     try {
       denyPermissionRequest(
@@ -67,6 +72,14 @@ export const PermissionApprovalModal: React.FC = () => {
         markDenied(reqId);
       }, 500);
     }
+  };
+
+  const handleUseLimitedFallback = () => {
+    if (currentRequest.fallback_satisfies_acceptance_criteria === false) {
+      setCriteriaWarning('A alternativa não cumpre todos os requisitos.');
+      return;
+    }
+    handleDeny();
   };
 
   const getRiskBadge = (risk: PermissionRiskLevel) => {
@@ -146,7 +159,10 @@ export const PermissionApprovalModal: React.FC = () => {
                 <h3 className="text-base font-semibold text-white tracking-tight">
                   JARVIS precisa da tua autorização
                 </h3>
-                <div className="flex items-center gap-2 text-xs text-stone-400 font-mono mt-0.5">
+                <div className="text-xs text-amber-400/90 font-medium mt-0.5">
+                  Esta alteração requer uma ferramenta externa.
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-stone-400 font-mono mt-0.5">
                   <span>ID: {currentRequest.request_id}</span>
                   {currentRequest.project_id && (
                     <>
@@ -176,7 +192,7 @@ export const PermissionApprovalModal: React.FC = () => {
           </div>
 
           {/* Body */}
-          <div className="p-6 space-y-4.5 text-xs sm:text-sm">
+          <div className="p-6 space-y-4 text-xs sm:text-sm">
             {/* Aviso de Bloqueio por Política */}
             {isBlockedByPolicy && (
               <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-200 text-xs flex items-start gap-3">
@@ -188,6 +204,22 @@ export const PermissionApprovalModal: React.FC = () => {
                   <p className="text-rose-200/90 leading-relaxed font-sans">
                     {currentRequest.policy_reason ||
                       'Mutações críticas ou comandos com impacto estrutural no anfitrião não são permitidos pelo JARVIS Sentinel.'}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Aviso de Critérios Violados pela Alternativa */}
+            {criteriaWarning && (
+              <div className="p-3.5 rounded-lg bg-rose-500/15 border border-rose-500/35 text-rose-200 text-xs flex items-start gap-3">
+                <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-semibold text-rose-300">
+                    A alternativa não cumpre todos os requisitos.
+                  </div>
+                  <p className="text-rose-200/90 leading-relaxed font-sans mt-0.5">
+                    {currentRequest.fallback_limitations ||
+                      'A solução alternativa não executa varredura ativa nem satisfaz a totalidade dos critérios de aceitação. A operação permanece bloqueada.'}
                   </p>
                 </div>
               </div>
@@ -218,15 +250,15 @@ export const PermissionApprovalModal: React.FC = () => {
                     Instalação de Dependência Necessária
                   </div>
                   <p className="text-cyan-200/80 leading-relaxed font-sans">
-                    A ferramenta não foi encontrada localmente. É necessário proceder à instalação
-                    controlada e auditada antes da execução.
+                    A ferramenta não foi encontrada localmente. É necessário autorizar a instalação
+                    oficial antes de prosseguir com a execução.
                   </p>
                 </div>
               </div>
             )}
 
             {/* Tabela de Dados Estruturados */}
-            <div className="bg-black/40 rounded-lg border border-white/8 p-4 space-y-3.5 text-xs font-mono">
+            <div className="bg-black/40 rounded-lg border border-white/8 p-4 space-y-3 text-xs font-mono">
               <div className="flex items-center justify-between">
                 <span className="text-stone-400">Ferramenta:</span>
                 <span className="text-white font-semibold text-sm">
@@ -239,11 +271,29 @@ export const PermissionApprovalModal: React.FC = () => {
                 <div>{getRiskBadge(currentRequest.risk_level)}</div>
               </div>
 
+              {currentRequest.required_for && (
+                <div>
+                  <span className="text-stone-400 block mb-1">Necessidade:</span>
+                  <p className="text-stone-200 font-sans text-xs bg-white/[0.03] p-2.5 rounded border border-white/5 leading-relaxed">
+                    {currentRequest.required_for}
+                  </p>
+                </div>
+              )}
+
               <div>
-                <span className="text-stone-400 block mb-1">Motivo:</span>
+                <span className="text-stone-400 block mb-1">Porque:</span>
                 <p className="text-stone-200 font-sans text-xs bg-white/[0.03] p-2.5 rounded border border-white/5 leading-relaxed">
                   {currentRequest.reason}
                 </p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-stone-400">Estado:</span>
+                <span className="text-amber-300 font-medium">
+                  {isInstallationRequired
+                    ? `${currentRequest.tool_name} não está instalado`
+                    : currentRequest.status}
+                </span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -259,26 +309,25 @@ export const PermissionApprovalModal: React.FC = () => {
                   {currentRequest.affected_resources.length > 0
                     ? currentRequest.affected_resources.join(', ')
                     : 'Sistema local de desenvolvimento'}
-                  {currentRequest.installation_required && (
-                    <span className="text-amber-400 block mt-1">
-                      • Requer instalação de binário / dependência externa.
-                    </span>
-                  )}
-                  {currentRequest.rollback_available && (
-                    <span className="text-emerald-400 block mt-0.5">
-                      • Reversão automática suportada.
-                    </span>
-                  )}
                 </div>
               </div>
 
-              {currentRequest.alternative_available && (
-                <div className="pt-2 border-t border-white/8">
-                  <span className="text-stone-400 block mb-1">Alternativa Disponível (Fallback):</span>
-                  <div className="p-2.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-sans text-xs flex items-center gap-2">
-                    <CheckCircle className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
-                    <span>{currentRequest.fallback_description}</span>
+              {(currentRequest.alternative_available || currentRequest.fallback_description) && (
+                <div className="pt-2 border-t border-white/8 space-y-2">
+                  <span className="text-stone-400 block">Alternativa:</span>
+                  <div className="p-2.5 rounded bg-white/[0.03] border border-white/10 text-stone-300 font-sans text-xs">
+                    <span className="font-mono text-cyan-300">{currentRequest.fallback || currentRequest.fallback_description}</span>
                   </div>
+
+                  {currentRequest.fallback_limitations && (
+                    <div>
+                      <span className="text-stone-400 block mb-1">Limitação da alternativa:</span>
+                      <div className="p-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300 font-sans text-xs flex items-start gap-2">
+                        <Info className="w-3.5 h-3.5 shrink-0 text-amber-400 mt-0.5" />
+                        <span>{currentRequest.fallback_limitations}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -294,7 +343,7 @@ export const PermissionApprovalModal: React.FC = () => {
           </div>
 
           {/* Actions / Buttons */}
-          <div className="px-6 py-4 border-t border-white/10 bg-white/[0.02] flex items-center justify-end gap-3">
+          <div className="px-6 py-4 border-t border-white/10 bg-white/[0.02] flex items-center justify-end gap-2 sm:gap-3 flex-wrap">
             {isBlockedByPolicy ? (
               <button
                 type="button"
@@ -311,8 +360,20 @@ export const PermissionApprovalModal: React.FC = () => {
                   onClick={handleDeny}
                   className="px-4 py-2 text-xs font-semibold rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-stone-300 hover:text-white transition-all disabled:opacity-50 cursor-pointer"
                 >
-                  Recusar
+                  Cancelar
                 </button>
+
+                {(currentRequest.alternative_available || currentRequest.fallback_description) && (
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={handleUseLimitedFallback}
+                    className="px-3.5 py-2 text-xs font-medium rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    Usar alternativa limitada
+                  </button>
+                )}
+
                 <button
                   type="button"
                   disabled={submitting}
@@ -320,7 +381,7 @@ export const PermissionApprovalModal: React.FC = () => {
                   className="px-5 py-2 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black shadow-[0_0_20px_rgba(6,182,212,0.35)] transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
                 >
                   {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                  <span>Autorizar</span>
+                  <span>Autorizar {currentRequest.tool_name}</span>
                 </button>
               </>
             )}

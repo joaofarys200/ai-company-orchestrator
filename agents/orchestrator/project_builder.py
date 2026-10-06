@@ -39,6 +39,7 @@ from agents.orchestrator.flight_recorder import (
     ProjectBuilderFlightRecorder,
     recorder_directory,
 )
+from security.permission_gateway.dependency_governance import get_dependency_governor
 from security.permission_gateway.gateway import get_permission_gateway_service
 from security.permission_gateway.models import PermissionRequestStatus
 from backend.model_harness import (
@@ -7428,44 +7429,31 @@ async def _build_project_impl(
         except Exception:
             pass
 
-        # Human-in-the-Loop Permission Gateway: Check external dependencies
-        lower_prompt = prompt.lower()
-        if re.search(r"\b(nmap|ffmpeg|tesseract|npcap|wireshark|raw-socket)\b", lower_prompt) or any(
-            any(k in str(d).lower() for k in ("nmap", "ffmpeg", "tesseract", "npcap", "raw-socket"))
-            for d in getattr(plan, "dependencies", [])
-        ):
-            target_tool = "Nmap" if "nmap" in lower_prompt else ("FFmpeg" if "ffmpeg" in lower_prompt else "Tesseract")
-            risk = "HIGH_RISK_MUTATION" if target_tool == "Nmap" else "LOW_RISK_MUTATION"
-            privs = "Administrador / Npcap" if target_tool == "Nmap" else "Userland"
-            fallback = "Usar tabela ARP do Windows (arp -a + netstat)." if target_tool == "Nmap" else "Processamento nativo sem transcodificação."
-            perm_gateway = get_permission_gateway_service()
-            perm_req = perm_gateway.create_request(
-                tool_name=target_tool,
-                requested_operation=f"Utilizar ferramenta {target_tool} no projeto {plan.project_name}",
-                reason=f"Necessário para executar a tarefa solicitada: {prompt[:100]}",
-                risk_level=risk,
-                required_privileges=privs,
-                affected_resources=[plan.project_name],
-                project_id=project_id or plan.project_name,
-                mission_id=mission_id,
-                execution_id=execution_id,
-                alternative_available=True,
-                fallback_description=fallback,
+        # Human-in-the-Loop Permission Gateway & Dependency Governance: Check external dependencies
+        governor = get_dependency_governor()
+        proposed_deps = [str(d) for d in getattr(plan, "dependencies", [])]
+        dep_report = governor.analyze_dependencies(
+            prompt,
+            proposed_tools=proposed_deps,
+            project_id=project_id or plan.project_name,
+            mission_id=mission_id,
+            execution_id=execution_id,
+        )
+        if not dep_report.can_execute_immediately and dep_report.status == PermissionRequestStatus.AWAITING_HUMAN_APPROVAL.value:
+            req_id = dep_report.approval_requests[0] if dep_report.approval_requests else None
+            recorder.event("permission_requested", phase="PLANNING", metadata={"request_id": req_id})
+            return ProjectBuildResult(
+                project_name=plan.project_name,
+                project_dir="",
+                project_rel_dir="",
+                files_created=[],
+                commands_executed=[],
+                commands_skipped=[],
+                status="AWAITING_HUMAN_APPROVAL",
+                suggested_fix=f"É necessária autorização humana no ecrã para prosseguir com a dependência externa. {dep_report.blocked_reason or ''}",
+                completion_reason="AWAITING_HUMAN_APPROVAL",
+                permission_request_id=req_id,
             )
-            if perm_req.status == PermissionRequestStatus.WAITING_FOR_USER.value:
-                recorder.event("permission_requested", phase="PLANNING", metadata={"request_id": perm_req.request_id})
-                return ProjectBuildResult(
-                    project_name=plan.project_name,
-                    project_dir="",
-                    project_rel_dir="",
-                    files_created=[],
-                    commands_executed=[],
-                    commands_skipped=[],
-                    status="AWAITING_HUMAN_APPROVAL",
-                    suggested_fix="É necessária autorização humana no ecrã para prosseguir com a dependência externa.",
-                    completion_reason="AWAITING_HUMAN_APPROVAL",
-                    permission_request_id=perm_req.request_id,
-                )
     except ProjectBuilderPlanningError as exc:
         journal.record_planning_failure(exc)
         if exc.category in {"PLAN_SEMANTIC_INVALID", "PLAN_CORRECTION_FAILED"}:

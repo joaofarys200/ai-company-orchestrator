@@ -37,11 +37,18 @@ class CapabilityChecker:
     @classmethod
     def check_capability(
         cls,
-        request: PermissionRequest,
+        request: Union[PermissionRequest, str],
         mock_installed_tools: Optional[Dict[str, str]] = None,
         mock_is_admin: Optional[bool] = None,
+        required_privileges: str = "",
     ) -> Tuple[CapabilityStatus, Dict[str, Any]]:
-        tool_name = request.tool_name.strip()
+        if isinstance(request, str):
+            tool_name = request.strip()
+            priv_text = str(required_privileges or "")
+        else:
+            tool_name = request.tool_name.strip()
+            priv_text = str(getattr(request, "required_privileges", "") or "")
+
         tool_normalized = tool_name.lower()
         is_admin = cls.is_windows_admin() if mock_is_admin is None else mock_is_admin
 
@@ -52,7 +59,7 @@ class CapabilityChecker:
             "admin_granted": is_admin,
             "executable_path": None,
             "version": None,
-            "requires_admin": tool_normalized in cls.TOOLS_REQUIRING_ADMIN or "admin" in request.required_privileges.lower(),
+            "requires_admin": tool_normalized in cls.TOOLS_REQUIRING_ADMIN or "admin" in priv_text.lower(),
         }
 
         # 1. Procura se o binário/executável existe no PATH ou nos mocks
@@ -76,7 +83,8 @@ class CapabilityChecker:
             return CapabilityStatus.AVAILABLE, details
 
         # 3. Se o executável NÃO existe
-        if request.installation_required:
+        is_inst_req = getattr(request, "installation_required", True) if not isinstance(request, str) else True
+        if is_inst_req:
             # Se for uma ferramenta com instalador declarado
             details["message"] = f"Ferramenta '{tool_name}' não está instalada no sistema. Instalação necessária."
             return CapabilityStatus.INSTALLATION_REQUIRED, details

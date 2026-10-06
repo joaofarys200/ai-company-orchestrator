@@ -15,8 +15,10 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from security.permission_gateway.capability_checker import CapabilityChecker
 from security.permission_gateway.models import (
+    ApprovalSemantics,
     AuditLogEntry,
     CapabilityStatus,
+    DependencyClassification,
     DependencyRequirement,
     PermissionRequest,
     PermissionRequestStatus,
@@ -140,6 +142,15 @@ class PermissionGatewayService:
         rollback_available: bool = False,
         rollback_plan: Optional[str] = None,
         ttl_seconds: Optional[float] = None,
+        dependency_id: Optional[str] = None,
+        classification: str = DependencyClassification.REQUIRED.value,
+        required_for: Optional[str] = None,
+        acceptance_criteria: Optional[List[str]] = None,
+        fallback_capability: Optional[str] = None,
+        fallback_satisfies_acceptance_criteria: bool = False,
+        fallback_limitations: Optional[str] = None,
+        components: Optional[List[str]] = None,
+        approval_semantic: str = ApprovalSemantics.AUTHORIZE_USE.value,
     ) -> PermissionRequest:
         with self._lock:
             # 1. Deduplicação: se já existe um pedido ativo idêntico, reutiliza-o
@@ -177,6 +188,15 @@ class PermissionGatewayService:
                         installer_checksum=installer_checksum,
                         alternative_available=alternative_available,
                         fallback_description=fallback_description,
+                        dependency_id=dependency_id,
+                        classification=classification,
+                        required_for=required_for,
+                        acceptance_criteria=acceptance_criteria,
+                        fallback_capability=fallback_capability,
+                        fallback_satisfies_acceptance_criteria=fallback_satisfies_acceptance_criteria,
+                        fallback_limitations=fallback_limitations,
+                        components=components,
+                        approval_semantic=approval_semantic,
                     )
                     req.status = PermissionRequestStatus.BLOCKED_BY_POLICY.value
                     req.policy_reason = f"Violação de Supply Chain: {msg}"
@@ -210,6 +230,15 @@ class PermissionGatewayService:
                 ttl_seconds=effective_ttl,
                 rollback_available=rollback_available,
                 rollback_plan=rollback_plan,
+                dependency_id=dependency_id,
+                classification=classification,
+                required_for=required_for,
+                acceptance_criteria=acceptance_criteria,
+                fallback_capability=fallback_capability,
+                fallback_satisfies_acceptance_criteria=fallback_satisfies_acceptance_criteria,
+                fallback_limitations=fallback_limitations,
+                components=components,
+                approval_semantic=approval_semantic,
             )
 
             # 4. Avaliação estrita da Política Sentinel / Workspace
@@ -252,6 +281,14 @@ class PermissionGatewayService:
                 "expiry": req.expires_at,
                 "reversible": req.rollback_available,
                 "rollback": req.rollback_plan,
+                "classification": req.classification,
+                "required_for": req.required_for,
+                "acceptance_criteria": req.acceptance_criteria,
+                "fallback_capability": req.fallback_capability,
+                "fallback_satisfies_acceptance_criteria": req.fallback_satisfies_acceptance_criteria,
+                "fallback_limitations": req.fallback_limitations,
+                "components": req.components,
+                "approval_semantic": req.approval_semantic,
             })
 
             return req
@@ -260,12 +297,14 @@ class PermissionGatewayService:
         self,
         request_id: str,
         user: str = "human_operator",
+        decided_by: Optional[str] = None,
         session_id: str = "web_session",
         mission_id: Optional[str] = None,
         project_id: Optional[str] = None,
         mock_installed_tools: Optional[Dict[str, str]] = None,
         mock_is_admin: Optional[bool] = None,
     ) -> PermissionRequest:
+        effective_user = decided_by or user
         with self._lock:
             if request_id not in self._requests:
                 raise PermissionNotFoundError(f"Pedido de permissão '{request_id}' não encontrado.")
@@ -305,16 +344,18 @@ class PermissionGatewayService:
                 self._notify_listeners("permission_request_expired", {"request_id": req.request_id})
                 raise PermissionExpiredError("O pedido de autorização expirou e não pode ser aprovado.")
 
-            # Apenas pedidos em WAITING_FOR_USER ou REQUESTED podem ser aprovados
+            # Apenas pedidos em espera ou com capacidade bloqueada podem ser aprovados pelo utilizador
             if req.status not in {
                 PermissionRequestStatus.WAITING_FOR_USER.value,
                 PermissionRequestStatus.REQUESTED.value,
+                PermissionRequestStatus.AWAITING_HUMAN_APPROVAL.value,
+                PermissionRequestStatus.BLOCKED_REQUIRED_CAPABILITY.value,
             }:
                 raise InvalidApprovalStateError(f"Pedido em estado inválido para aprovação: '{req.status}'.")
 
             # 1. Registo de Aprovação Humana
             req.user_decision = "USER_APPROVED"
-            req.decided_by = user
+            req.decided_by = effective_user
             req.session_id = session_id
             req.decided_at = now
             req.status = PermissionRequestStatus.APPROVED.value
@@ -323,14 +364,14 @@ class PermissionGatewayService:
                 req.request_id, "approved", req.risk_level, req.tool_name,
                 req.mission_id, req.project_id, req.execution_id,
                 user_decision="USER_APPROVED",
-                details={"user": user, "session_id": session_id}
+                details={"user": effective_user, "session_id": session_id}
             )
             self._notify_listeners("permission_request_approved", {
                 "request_id": req.request_id,
                 "mission_id": req.mission_id,
                 "project_id": req.project_id,
                 "execution_id": req.execution_id,
-                "user": user,
+                "user": effective_user,
             })
 
             # 2. CAPABILITY CHECK (Nunca salta diretamente para EXECUTED!)
@@ -375,11 +416,13 @@ class PermissionGatewayService:
         self,
         request_id: str,
         user: str = "human_operator",
+        decided_by: Optional[str] = None,
         session_id: str = "web_session",
         reason: str = "Recusado pelo utilizador",
         mission_id: Optional[str] = None,
         project_id: Optional[str] = None,
     ) -> PermissionRequest:
+        effective_user = decided_by or user
         with self._lock:
             if request_id not in self._requests:
                 raise PermissionNotFoundError(f"Pedido de permissão '{request_id}' não encontrado.")
@@ -397,7 +440,7 @@ class PermissionGatewayService:
 
             now = time.time()
             req.user_decision = "USER_DENIED"
-            req.decided_by = user
+            req.decided_by = effective_user
             req.session_id = session_id
             req.decided_at = now
             req.status = PermissionRequestStatus.DENIED.value
@@ -407,7 +450,7 @@ class PermissionGatewayService:
                 req.request_id, "denied", req.risk_level, req.tool_name,
                 req.mission_id, req.project_id, req.execution_id,
                 user_decision="USER_DENIED",
-                details={"reason": reason, "user": user}
+                details={"reason": reason, "user": effective_user}
             )
 
             self._notify_listeners("permission_request_denied", {
@@ -415,7 +458,7 @@ class PermissionGatewayService:
                 "mission_id": req.mission_id,
                 "project_id": req.project_id,
                 "execution_id": req.execution_id,
-                "user": user,
+                "user": effective_user,
                 "reason": reason,
                 "fallback_available": req.alternative_available,
                 "fallback_description": req.fallback_description,
@@ -600,6 +643,9 @@ class PermissionGatewayService:
             if request_id:
                 return [entry for entry in self._audit_log if entry.request_id == request_id]
             return list(self._audit_log)
+
+    def get_audit_events(self, request_id: Optional[str] = None) -> List[AuditLogEntry]:
+        return self.get_audit_log(request_id)
 
 
 _GLOBAL_PERMISSION_GATEWAY: Optional[PermissionGatewayService] = None

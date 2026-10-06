@@ -1103,6 +1103,9 @@ export type PermissionRequestStatus =
   | 'ADMIN_PRIVILEGE_REQUIRED'
   | 'UNSUPPORTED'
   | 'BLOCKED_BY_POLICY'
+  | 'BLOCKED_REQUIRED_CAPABILITY'
+  | 'WAITING_FOR_CAPABILITY'
+  | 'READY_TO_EXECUTE'
   | 'EXECUTION_READY'
   | 'EXECUTED'
   | 'FAILED';
@@ -1139,6 +1142,16 @@ export interface PermissionRequestData {
   rollback_plan?: string | null;
   capability_result?: Record<string, unknown> | null;
   execution_result?: Record<string, unknown> | null;
+  classification?: 'REQUIRED' | 'OPTIONAL' | 'ALTERNATIVE';
+  required_for?: string | null;
+  acceptance_criteria?: string[];
+  fallback?: string | null;
+  fallback_capability?: string | null;
+  fallback_satisfies_acceptance_criteria?: boolean;
+  fallback_limitations?: string | null;
+  components?: string[];
+  approval_semantic?: 'AUTHORIZE_USE' | 'AUTHORIZE_INSTALLATION' | 'USE_LIMITED_FALLBACK' | 'CANCEL';
+  capability_status?: string | null;
 }
 
 export interface ActionConfirmRequestMessage {
@@ -1884,6 +1897,16 @@ export const normalizePermissionRequest = (raw: unknown): PermissionRequestData 
     rollback_plan: value.rollback_plan ? asString(value.rollback_plan) : null,
     capability_result: isRecord(value.capability_result) ? value.capability_result : null,
     execution_result: isRecord(value.execution_result) ? value.execution_result : null,
+    classification: (value.classification ? asString(value.classification) : 'REQUIRED') as 'REQUIRED' | 'OPTIONAL' | 'ALTERNATIVE',
+    required_for: value.required_for ? asString(value.required_for) : null,
+    acceptance_criteria: Array.isArray(value.acceptance_criteria) ? value.acceptance_criteria.map(String) : [],
+    fallback: value.fallback ? asString(value.fallback) : null,
+    fallback_capability: value.fallback_capability ? asString(value.fallback_capability) : null,
+    fallback_satisfies_acceptance_criteria: asBoolean(value.fallback_satisfies_acceptance_criteria),
+    fallback_limitations: value.fallback_limitations ? asString(value.fallback_limitations) : null,
+    components: Array.isArray(value.components) ? value.components.map(String) : [],
+    approval_semantic: (value.approval_semantic ? asString(value.approval_semantic) : 'AUTHORIZE_USE') as 'AUTHORIZE_USE' | 'AUTHORIZE_INSTALLATION' | 'USE_LIMITED_FALLBACK' | 'CANCEL',
+    capability_status: value.capability_status ? asString(value.capability_status) : null,
   };
 };
 

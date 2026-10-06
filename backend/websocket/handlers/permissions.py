@@ -14,6 +14,7 @@ from backend.websocket.context import WebSocketSessionState
 from backend.websocket.contracts import MessageHandler
 from backend.websocket.gateway import ConnectionManager
 from backend.websocket.handlers import bind_handler_methods
+from security.permission_gateway.dependency_governance import get_dependency_governor
 from security.permission_gateway.gateway import (
     CrossProjectApprovalError,
     InvalidApprovalStateError,
@@ -32,6 +33,7 @@ PERMISSION_HANDLERS = {
     "permission_approve": "handle_approve",
     "permission_deny": "handle_deny",
     "permission_rollback": "handle_rollback",
+    "permission_resolve_choice": "handle_resolve_choice",
 }
 
 
@@ -214,6 +216,41 @@ class PermissionGatewayWebSocketHandler:
                         "type": "permission_execution_result",
                         "request_id": request_id,
                         "status": "FAILED",
+                        "error": str(err),
+                    },
+                )
+
+    async def handle_resolve_choice(
+        self,
+        websocket: Any,
+        message: dict,
+        session: WebSocketSessionState,
+    ) -> None:
+        request_id = str(message.get("request_id", "")).strip()
+        action = str(message.get("action", "")).strip()
+        user = str(message.get("user") or getattr(session, "user_id", None) or "human_operator").strip()
+        governor = get_dependency_governor()
+
+        try:
+            result = governor.resolve_user_decision(request_id, action, user_id=user)
+            if self.connections:
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "permission_capability_result",
+                        "request_id": request_id,
+                        **result,
+                    },
+                )
+        except Exception as err:
+            logger.warning(f"Erro ao resolver decisão '{action}' para pedido '{request_id}': {err}")
+            if self.connections:
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "permission_capability_result",
+                        "request_id": request_id,
+                        "status": "ERROR",
                         "error": str(err),
                     },
                 )

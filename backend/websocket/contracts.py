@@ -223,6 +223,7 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "permission_approve",
         "permission_deny",
         "permission_rollback",
+        "permission_resolve_choice",
     }
 )
 
