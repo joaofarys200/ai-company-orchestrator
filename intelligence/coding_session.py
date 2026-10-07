@@ -30,6 +30,16 @@ from backend.model_harness import (
     get_runtime_model_harness,
 )
 from intelligence.project_context import ProjectContextError, ProjectContextService
+from security.delivery_governance import (
+    AcceptanceLevel,
+    AssetIntegrityValidator,
+    DeliveryGateStatus,
+    DestructiveChangeDetector,
+    HtmlDocumentValidator,
+    PreservationAnalyzer,
+    ProductDeliveryGate,
+    RequirementStatus,
+)
 from security.permission_gateway.gateway import get_permission_gateway_service
 from security.permission_gateway.models import (
     ApprovalSemantics,
@@ -120,6 +130,9 @@ class CodingSession:
     auto_repair_logs: list[str] = field(default_factory=list)
     dependency_requirements: list[dict[str, Any]] = field(default_factory=list)
     permission_request_id: str | None = None
+    product_acceptance_report: dict[str, Any] | None = None
+    acceptance_level: str | None = None
+    gate_status: str | None = None
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
@@ -367,6 +380,9 @@ class CodingSessionService:
         session.updated_at = datetime.now(timezone.utc).isoformat()
         self._save(session)
 
+        # Captura baseline de integridade antes da aplicação de alterações
+        before_snapshot = PreservationAnalyzer.snapshot_project_state(root)
+
         try:
             session.checkpoint = self._create_checkpoint(session, root)
             session.checkpoint_created = True
@@ -401,12 +417,43 @@ class CodingSessionService:
             if healed:
                 mandatory_failed = False
 
+        # Avaliação de Aceitação de Produto via ProductDeliveryGate
+        delivery_report = ProductDeliveryGate.evaluate_delivery(
+            project_root=root,
+            project_id=project_id,
+            change_id=session.session_id,
+            user_prompt=session.objective,
+            changes=session.proposed_changes,
+            before_snapshot=before_snapshot,
+            technical_validations_passed=(not mandatory_failed),
+        )
+        session.product_acceptance_report = delivery_report.to_dict()
+        session.gate_status = delivery_report.gate_status
+        session.acceptance_level = (
+            AcceptanceLevel.PRODUCT_ACCEPTED.value
+            if delivery_report.gate_status == DeliveryGateStatus.PRODUCT_ACCEPTED.value
+            else AcceptanceLevel.SYNTAX_VALID.value
+            if not mandatory_failed
+            else "FAILED"
+        )
+
         if mandatory_failed:
             session.status = "VALIDATION_FAILED"
             session.errors.append("Uma ou mais validacoes obrigatorias falharam. O rollback esta disponivel.")
-        else:
+        elif delivery_report.gate_status == DeliveryGateStatus.BLOCKED.value or delivery_report.result == RequirementStatus.FAIL.value:
+            session.status = "BLOCKED_INTEGRITY_REGRESSION"
+            session.errors.append("Aceitação de produto bloqueada por regressão crítica ou integridade comprometida:")
+            session.errors.extend(delivery_report.blockers)
+        elif delivery_report.gate_status == DeliveryGateStatus.HUMAN_REVIEW.value:
+            session.status = "AWAITING_HUMAN_APPROVAL"
+            session.errors.extend(delivery_report.blockers)
+        elif delivery_report.gate_status == DeliveryGateStatus.PRODUCT_ACCEPTED.value:
             session.status = "SUCCEEDED"
             self.projects.index_project(project_id)
+        else:
+            session.status = "ACCEPTANCE_FAILED"
+            session.errors.extend(delivery_report.blockers)
+
         session.updated_at = datetime.now(timezone.utc).isoformat()
         self._save(session)
         return session
@@ -552,9 +599,18 @@ class CodingSessionService:
                         sym_code = self._symbol_code(graph or {}, target, sym_name) if graph else None
                         if sym_code:
                             norm_sym = sym_code.replace("\r\n", "\n")
-                            if norm_sym in current_content:
+                            if not norm_sym.strip().endswith("}"):
+                                norm_sym = self._expand_balanced_block(current_content, norm_sym)
+                            if norm_sym and norm_sym in current_content:
                                 current_content = current_content.replace(norm_sym, new_code, 1)
                                 applied = True
+                        if not applied:
+                            sig_match = re.search(rf'(?:function|class|def|const|let|var)\s+{re.escape(sym_name)}\b[^{{;]*\{{?', current_content)
+                            if sig_match:
+                                expanded = self._expand_balanced_block(current_content, sig_match.group(0))
+                                if expanded and expanded in current_content:
+                                    current_content = current_content.replace(expanded, new_code, 1)
+                                    applied = True
                         if not applied and sym_name in current_content:
                             expanded = self._expand_balanced_block(current_content, sym_name)
                             if expanded and expanded != sym_name and expanded in current_content:
@@ -641,22 +697,24 @@ class CodingSessionService:
                     raise CodingSessionError("replace_symbol requer um simbolo ou old_text.")
             else:
                 old_text = self._symbol_code(graph, relative_path, symbol)
-                if old_text is None:
+                if old_text and not old_text.strip().endswith("}"):
+                    old_text = self._expand_balanced_block(current_content, old_text)
+                if old_text is None or old_text == symbol:
                     raw_old = raw.get("old_text")
                     if isinstance(raw_old, str) and raw_old in current_content:
                         old_text = raw_old
                         operation = "replace_text"
-                    elif symbol in current_content:
-                        if "{" in symbol:
-                            old_text = self._expand_balanced_block(current_content, symbol)
-                        else:
-                            old_text = symbol
-                        operation = "replace_text"
-                    elif current_content:
-                        old_text = current_content
-                        operation = "replace_text"
                     else:
-                        raise CodingSessionError(f"O simbolo {symbol} nao existe no indice de {relative_path}.")
+                        sig_match = re.search(rf'(?:function|class|def|const|let|var)\s+{re.escape(symbol)}\b[^{{;]*\{{?', current_content)
+                        if sig_match:
+                            old_text = self._expand_balanced_block(current_content, sig_match.group(0))
+                        elif symbol in current_content:
+                            old_text = self._expand_balanced_block(current_content, symbol)
+                        elif current_content:
+                            old_text = current_content
+                        else:
+                            raise CodingSessionError(f"O simbolo {symbol} nao existe no indice de {relative_path}.")
+                        operation = "replace_text"
             old_text = old_text.replace("\r\n", "\n")
         elif operation == "replace_text":
             old_text = raw.get("old_text")
@@ -713,9 +771,13 @@ class CodingSessionService:
                 )
             elif suffix in {".js", ".mjs", ".cjs"} and shutil.which("node"):
                 command = f'node --check "{change["file"]}"'
+            elif suffix in {".html", ".htm"}:
+                command = f'__jarvis_html_validation__ "{change["file"]}"'
+            elif suffix == ".css":
+                command = '__jarvis_asset_integrity__'
             if command and command not in existing_commands:
                 validations.append({
-                    "kind": "syntax",
+                    "kind": "html_structure" if suffix in {".html", ".htm"} else "asset_integrity" if suffix == ".css" else "syntax",
                     "command": command,
                     "source": "CodingSession affected file",
                     "required": True,
@@ -1028,6 +1090,24 @@ class CodingSessionService:
                 exit_code, stdout, stderr = self._run_preview_validation(session.project_id)
             elif command == "__jarvis_file_integrity__":
                 exit_code, stdout, stderr = 0, "Integridade de ficheiros verificada com sucesso.", ""
+            elif command.startswith("__jarvis_html_validation__"):
+                match = re.search(r'__jarvis_html_validation__\s+["\']?([^"\']+)["\']?', command)
+                html_rel = match.group(1) if match else "index.html"
+                try:
+                    _, html_abs = self._safe_project_path(root, html_rel)
+                    h_res = HtmlDocumentValidator.validate_html_file(html_abs, root)
+                    if h_res["valid"]:
+                        exit_code, stdout, stderr = 0, f"HTML válido ({html_rel}): {len(h_res.get('checked_assets', []))} assets verificados.", ""
+                    else:
+                        exit_code, stdout, stderr = 1, "", "\n".join(h_res["violations"])
+                except Exception as exc:
+                    exit_code, stdout, stderr = 1, "", f"Erro ao validar HTML {html_rel}: {exc}"
+            elif command == "__jarvis_asset_integrity__":
+                a_res = AssetIntegrityValidator.validate_project_assets(root)
+                if a_res["valid"]:
+                    exit_code, stdout, stderr = 0, f"Integridade de assets confirmada: {a_res.get('total_checked', 0)} referências.", ""
+                else:
+                    exit_code, stdout, stderr = 1, "", "\n".join(a_res["missing_assets"])
             elif command not in allowed_commands and not self._affected_syntax_command(
                 command,
                 session.proposed_changes,
@@ -1139,6 +1219,8 @@ class CodingSessionService:
         changes: list[dict[str, Any]],
         context: dict[str, Any],
     ) -> bool:
+        if command.startswith("__jarvis_html_validation__") or command == "__jarvis_asset_integrity__":
+            return True
         allowed = set()
         python_executable = context.get("python_executable")
         for change in changes:
@@ -1151,6 +1233,10 @@ class CodingSessionService:
                 ))
             elif suffix in {".js", ".mjs", ".cjs"}:
                 allowed.add(f'node --check "{change["file"]}"')
+            elif suffix in {".html", ".htm"}:
+                allowed.add(f'__jarvis_html_validation__ "{change["file"]}"')
+            elif suffix == ".css":
+                allowed.add('__jarvis_asset_integrity__')
         return command in allowed
 
     @staticmethod

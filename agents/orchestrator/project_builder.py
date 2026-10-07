@@ -39,6 +39,11 @@ from agents.orchestrator.flight_recorder import (
     ProjectBuilderFlightRecorder,
     recorder_directory,
 )
+from security.delivery_governance import (
+    DeliveryGateStatus,
+    ProductDeliveryGate,
+    RequirementStatus,
+)
 from security.permission_gateway.dependency_governance import get_dependency_governor
 from security.permission_gateway.gateway import get_permission_gateway_service
 from security.permission_gateway.models import PermissionRequestStatus
@@ -757,6 +762,7 @@ class ProjectBuildResult:
     completion_reason: str = ""
     flight_recorder_path: str = ""
     permission_request_id: str | None = None
+    product_acceptance_report: dict[str, Any] | None = None
 
     def report(self) -> str:
         files = "\n".join(f"- {path}" for path in self.files_created) or "- nenhum"
@@ -7614,6 +7620,20 @@ async def _build_project_impl(
             suggested_fix=validation.suggested_fix,
         )])
 
+    product_report = None
+    if validation.success and os.path.isdir(project_dir):
+        product_report = ProductDeliveryGate.evaluate_delivery(
+            project_root=project_dir,
+            project_id=plan.project_name,
+            mission_id=mission_id,
+            user_prompt=prompt,
+            technical_validations_passed=True,
+            runtime_endpoint=preview_url if preview_started else None,
+        )
+        if product_report.gate_status in {DeliveryGateStatus.BLOCKED.value, DeliveryGateStatus.HUMAN_REVIEW.value} or product_report.blockers:
+            validation.success = False
+            validation.suggested_fix = "; ".join(product_report.blockers) or "Bloqueado pelo portão de aceitação de produto."
+
     return ProjectBuildResult(
         project_name=plan.project_name,
         project_dir=project_dir,
@@ -7636,14 +7656,24 @@ async def _build_project_impl(
         build_run_id=journal.run_id,
         progress_path=journal.relative_path,
         progress_state=journal.snapshot(),
-        status="SUCCEEDED" if validation.success else "VALIDATION_FAILED",
+        status=(
+            "SUCCEEDED" if validation.success
+            else "BLOCKED_INTEGRITY_REGRESSION" if product_report and product_report.gate_status == DeliveryGateStatus.BLOCKED.value
+            else "VALIDATION_FAILED"
+        ),
         error_category=(
             str(runtime_errors[0].get("category") or "VALIDATION_PLAN_INVALID")
             if runtime_errors else ""
         ),
         validation_errors=runtime_errors,
         pre_validation=pre_validation.to_dict(),
-        completion_reason=("TECHNICALLY_VALIDATED" if validation.success else "VALIDATION_FAILED"),
+        completion_reason=(
+            "PRODUCT_ACCEPTED" if validation.success and product_report and product_report.gate_status == DeliveryGateStatus.PRODUCT_ACCEPTED.value
+            else "TECHNICALLY_VALIDATED" if validation.success
+            else "BLOCKED_PRODUCT_ACCEPTANCE" if product_report and product_report.blockers
+            else "VALIDATION_FAILED"
+        ),
+        product_acceptance_report=product_report.to_dict() if product_report else None,
     )
 
 

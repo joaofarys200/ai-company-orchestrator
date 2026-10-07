@@ -162,7 +162,13 @@ function plannerStepTone(status: string | undefined) {
 function codingStatusMeta(status: string) {
   const normalized = status.toUpperCase();
   if (normalized === 'PROPOSED') return { label: 'Pronta para rever', tone: 'bg-cyan-300/10 text-cyan-100' };
-  if (normalized === 'SUCCEEDED') return { label: 'Validada', tone: 'bg-emerald-300/10 text-emerald-200' };
+  if (normalized === 'SUCCEEDED' || normalized === 'PRODUCT_ACCEPTED') return { label: 'Produto Aceite', tone: 'bg-emerald-300/10 text-emerald-200' };
+  if (normalized === 'TECHNICALLY_VALIDATED') return { label: 'Validação Técnica', tone: 'bg-blue-300/10 text-blue-200' };
+  if (normalized === 'VISUALLY_VALIDATED') return { label: 'Validação Visual', tone: 'bg-indigo-300/10 text-indigo-200' };
+  if (normalized === 'BLOCKED_INTEGRITY_REGRESSION') return { label: 'Regressão Detetada', tone: 'bg-rose-400/20 text-rose-200 border border-rose-500/30' };
+  if (normalized === 'ACCEPTANCE_FAILED') return { label: 'Falha de Aceitação', tone: 'bg-rose-300/10 text-rose-200' };
+  if (normalized === 'AWAITING_HUMAN_APPROVAL' || normalized === 'HUMAN_REVIEW') return { label: 'Revisão Humana Necessária', tone: 'bg-amber-300/10 text-amber-200 border border-amber-500/30' };
+  if (normalized === 'INSUFFICIENT_EVIDENCE') return { label: 'Evidência Insuficiente', tone: 'bg-amber-300/10 text-amber-200' };
   if (normalized === 'ROLLED_BACK') return { label: 'Revertida', tone: 'bg-gray-300/10 text-gray-300' };
   if (normalized === 'ERROR_ROLLED_BACK') return { label: 'Erro revertido', tone: 'bg-amber-300/10 text-amber-200' };
   if (normalized === 'VALIDATION_FAILED') return { label: 'Validação falhou', tone: 'bg-rose-300/10 text-rose-200' };
@@ -265,6 +271,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     contextualAssist,
     askStudyPaper,
     getStudyDocumentFile,
+    generateStudyCornell,
   } = useWebSocket();
 
   const [activeTab, setActiveTab] = useState<TabType>('kanban');
@@ -1908,7 +1915,8 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                     payload.subject,
                     payload.content_base64,
                     payload.content_text,
-                    payload.source_type
+                    payload.source_type,
+                    payload.file_path
                   );
                 }}
                 onTranslate={async (text, docId) => {
@@ -1947,7 +1955,12 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 onGetDocumentFile={async (docId) => {
                   return getStudyDocumentFile(docId);
                 }}
+                onGenerateCornell={generateStudyCornell}
                 onDeleteDocument={deleteStudyDocument}
+                onGenerateSummary={async () => {
+                  listStudyDocuments();
+                  return '';
+                }}
               />
             </ViewFrame>
           )}
