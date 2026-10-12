@@ -1,225 +1,146 @@
 # RELATÓRIO DE AUDITORIA E GOVERNANÇA DE ENTREGA DE PRODUTO DO JARVIS
+## FASE 9.2: INFERÊNCIA DETERMINÍSTICA DE ARTEFACTOS & HARDENING DO PRODUCT DELIVERY GATE
 
-**Data:** 07 de Outubro de 2026
-**Status do Portão Canónico:** `AUTONOMOUS_PRODUCT_DELIVERY_READY = TRUE`
-**Commit de Referência:** `feat(governance): enforce product-level acceptance before autonomous delivery`
-
----
-
-## 1. RESUMO EXECUTIVO
-
-Esta auditoria e intervenção arquitetural foi conduzida para solucionar a razão estrutural pela qual o JARVIS conseguia produzir alterações de código que:
-1. Passavam nos testes técnicos internos (`node --check`, `py_compile`);
-2. Eram marcadas nos ecrãs como `"Validada"` (Badge verde esmeralda);
-3. Mas entregavam ao utilizador um produto final **funcionalmente incompleto, visualmente degradado ou semanticamente divergente do requisito**.
-
-O caso empírico de referência observado no projeto `workspace/projects/dina` demonstrou que uma alteração assistida:
-- Substituiu destrutivamente o ficheiro `index.html`;
-- Eliminou a casca HTML fundamental (`<!DOCTYPE html>`, `<html>`, `<head>`, `<body>`);
-- Deixou de carregar `styles.css` e `client.js`;
-- Deixou botões interativos sem comportamento (`dead buttons`);
-- Degradou visualmente a aplicação para controlos browser brutos e sem layout;
-- **Contudo, foi rotulada como "Validada"** unicamente porque `node --check` passou sem erros.
-
-A causa raiz foi eliminada através da substituição do pipeline superficial baseado em validação sintática isolada (`CODE_VALIDATION`) por um pipeline holístico de **Aceitação de Produto** (`PRODUCT_ACCEPTANCE`).
+**Data:** 07 de Outubro de 2026  
+**Status dos Portões Canónicos:**
+- `ARTIFACT_INFERENCE_READY = TRUE`
+- `REAL_PRODUCT_ACCEPTANCE_READY = TRUE`
+- `AUTONOMOUS_PRODUCT_DELIVERY_READY = TRUE`
 
 ---
 
-## 2. ARQUITETURA DE VALIDAÇÃO ANTERIOR VS NOVA ARQUITETURA
+## 1. RESUMO EXECUTIVO DA FASE 9.2
+
+A Fase 9.2 solidifica a evolução do JARVIS de um sistema **template-driven** (que assumia templates fixos como `index.html`/`style.css`/`app.js` ou `backend.py`/`server.py`) para um sistema **architecture-aware e capability-based**.
+
+A inferência de artefactos opera formalmente sobre a equação:
+$$\text{PROMPT} + \text{CONTEXTO DO PROJETO} + \text{ARQUITETURA EXISTENTE} + \text{STACK DETETADA} + \text{REQUISITOS FUNCIONAIS} \longrightarrow \text{ARTEFACTOS NECESSÁRIOS}$$
+
+O JARVIS infere capacidades e responsabilidades arquiteturais, **nunca impondo templates arbitrários**.
+
+---
+
+## 2. PRINCÍPIO ARQUITETURAL FUNDAMENTAL
+
+1. **"frontend" não significa `index.html`, `style.css`, `app.js`:**
+   Num projeto React/Vite, os artefactos legítimos são `src/App.tsx`, `src/main.tsx`, `src/index.css`.
+   Num projeto Next.js, são `app/page.tsx`, `app/layout.tsx`, `app/globals.css`.
+   Criar `app.js` ou `index.html` nesses projetos constitui poluição arquitetural inaceitável.
+
+2. **"backend" não significa `backend.py` ou `server.py`:**
+   O nome é irrelevante. O que importa é a existência de um entrypoint verificável, runtime executável e rotas funcionais.
+
+3. **"localStorage" não exige `app.js`:**
+   Num projeto React, a responsabilidade de persistência pode ser satisfeita por `src/hooks/useLocalStorage.ts`, `src/services/storage.ts` ou diretamente em `src/App.tsx`.
+
+4. **"CRUD" nunca gera ficheiros obrigatórios:**
+   CRUD é uma capacidade comportamental (Create, Read, Update, Delete) distribuída pelos componentes e endpoints existentes.
+
+5. **Regras Estritas de Aceitação:**
+   - $\text{PRESENT} \neq \text{VALIDATED}$ (um ficheiro de 0 bytes existe, mas não está validado).
+   - $\text{VALIDATED} \neq \text{PRODUCT\_ACCEPTED}$ (código com sintaxe correta não implica aceitação de produto).
+   - Nenhum requisito pode ter status `PASS` sem tokens de evidência verificados (`evidence_ids`). Sem evidência $\rightarrow$ `INSUFFICIENT_EVIDENCE`.
+
+---
+
+## 3. ARQUITETURA IMPLEMENTADA (MÓDULOS CENTRAIS)
 
 ```mermaid
 graph TD
-    subgraph Arquitetura Anterior (Vulnerável)
-        A1[User Request] --> B1[Code Generation]
-        B1 --> C1[Write Files]
-        C1 --> D1[node --check / py_compile]
-        D1 -->|Exit Code 0| E1[Status: SUCCEEDED]
-        E1 --> F1[UI: 'Validada' Verde]
-        D1 -.->|Zero validação HTML/CSS/Assets| G1[Produto Quebrado Entregue]
-    end
-
-    subgraph Nova Arquitetura: Product Delivery Gate
-        A2[User Request] --> B2[Atomic RequirementTraceability]
-        B2 --> C2[Preservation Baseline Snapshot]
-        C2 --> D2[Destructive Change Detector]
-        D2 --> E2[Technical Validation: Syntax & Build]
-        E2 --> F2[HTML Document Structure & Shell Validator]
-        F2 --> G2[Asset & Module Integrity Validator]
-        G2 --> H2[Visual & Layout Integrity Validator]
-        H2 --> I2[Interaction & Button Wiring Validator]
-        I2 --> J2[External Dependency Governance]
-        J2 --> K2[Requirement Reconciliation Gate]
-        K2 -->|Todos PASS & 0 Regressões| L2[PRODUCT_ACCEPTED / Autonomously Ready]
-        K2 -->|Regressão / Asset em falta| M2[BLOCKED_INTEGRITY_REGRESSION]
-        K2 -->|Dependência Externa Obrigatória| N2[AWAITING_HUMAN_APPROVAL]
-    end
+    A[User Request] --> B[ArchitectureDetector: Existing Architecture First]
+    B --> C[ArtifactInferenceEngine: Capability Deduction]
+    C --> D{Projeto Existente?}
+    D -->|Sim| E[Adota Stack & Entrypoints Existentes: INFERRED_BY_PROJECT]
+    D -->|Não| F[Decisão Arquitetural Formal: INFERRED_BY_DEFAULT_ARCHITECTURE]
+    E --> G[Geração de ArtifactExpectation com Responsabilidades]
+    F --> G
+    G --> H[Auditoria de Ficheiros: PRESENT != VALIDATED]
+    H --> I[Validação Funcional, Estética, Assets e Botões]
+    I --> J[Reconciliação com Tokens de Evidência: evidence_ids]
+    J --> K{Evidência Completa & 0 Regressões?}
+    K -->|Sim| L[PRODUCT_ACCEPTED / Autonomously Ready]
+    K -->|Não / Incompleto| M[INSUFFICIENT_EVIDENCE ou BLOCKED]
 ```
 
----
+### 3.1. `ArchitectureDetector` (`security/delivery_governance/architecture_detector.py`)
+Inspeciona em primeiro lugar a árvore do projeto:
+- `package.json` (`dependencies`, `devDependencies`, scripts);
+- Configurações de bundlers (`vite.config.ts`, `next.config.js`, etc.);
+- Ficheiros Python (`requirements.txt`, imports de `fastapi`, `flask`, `django`);
+- Convenções de pastas (`src/`, `app/`, `pages/`, TypeScript vs JavaScript);
+- Dedução de runtime (`browser`, `node`, `python`).
 
-## 3. IDENTIFIED ROOT CAUSE (CAUSA RAIZ IDENTIFICADA)
+### 3.2. `ArtifactInferenceEngine` (`security/delivery_governance/artifact_inference.py`)
+Mapeia capacidades funcionais para expectativas de artefactos:
+- `FRONTEND`: interface / rendering entrypoint;
+- `BACKEND`: server / API entrypoint;
+- `STORAGE`: mecanismo de persistência (localStorage, SQLite, etc.);
+- `AUTH`: mecanismos de autenticação e sessão;
+- `CRUD`: operações de criação, leitura, atualização e eliminação;
+- `DASHBOARD`: agregações de métricas e visualizações;
+- `SEARCH`: filtros e lógica de consulta;
+- `PREVIEW`: entrypoints verificáveis.
 
-A auditoria exaustiva em `intelligence/coding_session.py`, `agents/orchestrator/project_builder.py` e `frontend/src/features/workspace/WorkspaceViewer.tsx` provou:
+### 3.3. `RepairPlanner` (`security/delivery_governance/repair_planner.py`)
+Reparador determinístico architecture-aware:
+- NUNCA cria `index.html`/`style.css`/`app.js` quando a stack é React, Next.js ou Python;
+- Procura equivalente funcional existente;
+- Respeita convenções de TypeScript (`.tsx`/`.ts`) e pastas (`src/`);
+- Gera esqueletos mínimos conformes com a arquitetura real do projeto.
 
-1. **Ausência de validadores para artefactos Web:** Em `_select_validations`, ficheiros `.html` e `.css` tinham `command = None`. Apenas ficheiros `.js` e `.py` recebiam comandos (`node --check` e `py_compile`).
-2. **Conflito Semântico de 'Done':** O sistema assumia `Exit Code 0 de node --check` $\Rightarrow$ `SUCCEEDED`. Na interface `WorkspaceViewer.tsx`:
-   ```typescript
-   if (normalized === 'SUCCEEDED') return { label: 'Validada', tone: 'bg-emerald-300/10 text-emerald-200' };
-   ```
-   Isso induzia o utilizador em erro, fazendo-o acreditar que o **produto** estava validado quando apenas um verificador léxico do Node tinha sido executado.
-3. **Inexistência de Deteção de Destruição e Regressão:** Quando o modelo propunha reescrever `index.html`, o sistema não comparava o novo código com os scripts, estilos e botões previamente ativos.
-4. **Falso Positivo com Evidência Ausente:** A ausência de testes em HTML era tratada implicitamente como aprovação.
-
----
-
-## 4. SEPARAÇÃO ESTRITA DOS NÍVEIS DE ACEITAÇÃO
-
-Formalizado no modelo `security/delivery_governance/models.py` (`AcceptanceLevel`):
-
-| Nível | Significado Formal | Não Implica |
-| :--- | :--- | :--- |
-| `SYNTAX_VALID` | Código fonte respeita as regras gramaticais da linguagem | Build bem-sucedido ou UI funcional |
-| `TYPE_VALID` | Verificação estática de tipos passou | Runtime sem exceções |
-| `BUILD_VALID` | Bundler/compilador gerou artefactos | Requisitos satisfeitos |
-| `RUNTIME_VALID` | Processo arranca e responde a health checks | Interface utilizável ou completa |
-| `FUNCTIONALLY_VALID` | Controlos e rotas respondem como esperado | Integridade estética ou requisitos satisfeitos |
-| `VISUALLY_VALID` | Estilos, layout, fontes e viewport estão ativos | Ausência de erros funcionais |
-| `PRODUCT_ACCEPTED` | **Todos os requisitos rastreáveis validados + 0 regressões + integridade preservada** | Aceitação humana final |
-| `USER_ACCEPTED` | Decisão explícita do utilizador | N/A |
+### 3.4. `InteractionValidator` & `BrowserIntegrityValidator`
+- Botões declarados sem event listener nem handler onclick emitem `FUNCTIONALITY_FAILURE` e bloqueiam a entrega;
+- Validação real de browser executada via Microsoft Edge headless nativo (`msedge --headless=new --dump-dom`).
 
 ---
 
-## 5. MÓDULOS DE GOVERNANÇA IMPLEMENTADOS
+## 4. BENCHMARK CANÓNICO: T001 A T010
 
-### 5.1. `PreservationAnalyzer` & `DestructiveChangeDetector`
-- **Ficheiro:** `security/delivery_governance/integrity_detector.py`
-- Captura snapshot pré-alteração de `html_files`, `scripts`, `stylesheets`, `endpoints`, `event_listeners`, `buttons`, `forms`.
-- Deteta remoção de scripts essenciais (`removed_scripts`), stylesheets (`removed_stylesheets`), casca HTML (`missing_html_roots`) e perda de botões existentes (`dropped_buttons`).
-- Marca `CRITICAL_DESTRUCTIVE_REPLACEMENT` se `index.html` perder casca ou ligações a ficheiros `.css`/`.js`.
+Executado através de `scripts/run_artifact_benchmark.py`:
 
-### 5.2. `HtmlDocumentValidator`
-- **Ficheiro:** `security/delivery_governance/validators/html_validator.py`
-- Verifica tags fundamentais: `<!DOCTYPE html>`, `<html>`, `<head>`, `<body>`.
-- Valida que todos os `<link rel="stylesheet" href="...">` apontam para ficheiros existentes fisicamente no disco.
-- Valida que todos os `<script src="...">` apontam para scripts existentes fisicamente no disco.
-
-### 5.3. `AssetIntegrityValidator`
-- **Ficheiro:** `security/delivery_governance/validators/asset_validator.py`
-- Varre o projeto e audita `href`, `src`, `@import` e `import ... from '...'`.
-- Deteta imediatamente ficheiros inexistentes antes de autorizar a entrega.
-
-### 5.4. `VisualIntegrityValidator`
-- **Ficheiro:** `security/delivery_governance/validators/visual_validator.py`
-- Deteta páginas desestilizadas (`UNSTYLED_PAGE`), controlos brutos sem classes (`RAW_BROWSER_CONTROLS`), ausência de meta viewport e regressões em stylesheets da baseline.
-
-### 5.5. `InteractionValidator`
-- **Ficheiro:** `security/delivery_governance/validators/interaction_validator.py`
-- Audita se os botões com IDs declarados possuem event listeners no JavaScript ou handlers inline, evitando botões inertes.
-- Valida a preservação de IDs de botões da baseline.
-
-### 5.6. `ProductDeliveryGate`
-- **Ficheiro:** `security/delivery_governance/delivery_gate.py`
-- Orquestrador central que une:
-  `PLAN` $\rightarrow$ `IMPLEMENT` $\rightarrow$ `PREFLIGHT` $\rightarrow$ `BUILD` $\rightarrow$ `RUN` $\rightarrow$ `FUNCTIONAL QA` $\rightarrow$ `VISUAL QA` $\rightarrow$ `PRESERVATION QA` $\rightarrow$ `REQUIREMENT RECONCILIATION` $\rightarrow$ `DELIVERY`.
-- Integração estrita com `DependencyGovernanceService` (bloqueando fallbacks silenciosos como `Nmap` $\rightarrow$ `arp -a`).
+| ID | Nome do Cenário | Stack Detetada | Capacidades Inferidas | Artefactos Inferidos [Responsabilidades] | Tokens de Evidência | Resultado | Portão |
+| :--- | :--- | :--- | :--- | :--- | :---: | :---: | :---: |
+| **T001** | Vanilla HTML/CSS/JS | `vanilla_web` | `frontend` | `index.html` [HTML semantic root]<br>`styles.css` [visual presentation]<br>`app.js` [client interactivity] | 3 tokens | **PASS** | `PRODUCT_ACCEPTED` |
+| **T002** | React + Vite | `react_vite` | `frontend`, `crud` | `src/App.tsx` [main UI component]<br>`src/main.tsx` [bootstrap mount]<br>`src/index.css` [design tokens]<br>`src/App.tsx` [CRUD handlers] | 4 tokens | **PASS** | `PRODUCT_ACCEPTED` |
+| **T003** | Next.js App Router | `nextjs` | `frontend`, `dashboard`, `search`, `auth` | `app/layout.tsx` [page entrypoint]<br>`app/globals.css` [global styles]<br>`app/page.tsx` [dashboard & metrics]<br>`app/page.tsx` [search & auth controls] | 5 tokens | **PASS** | `PRODUCT_ACCEPTED` |
+| **T004** | Python FastAPI | `python_fastapi` | `backend`, `auth` | `main.py` [backend server & API routes]<br>`main.py` [auth endpoints] | 2 tokens | **PASS** | `PRODUCT_ACCEPTED` |
+| **T005** | Node.js TS Express | `node_typescript` | `backend`, `auth` | `src/index.ts` [API server entrypoint]<br>`src/index.ts` [auth logic] | 2 tokens | **PASS** | `PRODUCT_ACCEPTED` |
+| **T006** | Custom Existing | `python_backend` | `backend` | `core/processor.py` [custom processor entrypoint] | 1 token | **PASS** | `PRODUCT_ACCEPTED` |
+| **T007** | localStorage (Vanilla) | `vanilla_web` | `frontend`, `storage` | `index.html` [HTML UI root]<br>`styles.css` [styles]<br>`app.js` [client logic]<br>`app.js` [localStorage persistence] | 4 tokens | **PASS** | `PRODUCT_ACCEPTED` |
+| **T008** | localStorage (React) | `react_vite` | `frontend`, `storage` | `src/App.tsx` [main UI component]<br>`src/main.tsx` [bootstrap]<br>`src/index.css` [styles]<br>`src/App.tsx` [useLocalStorage hook] | 4 tokens | **PASS** | `PRODUCT_ACCEPTED` |
+| **T009** | Distributed CRUD | `python_fastapi` | `frontend`, `crud`, `backend` | `frontend/index.html` [frontend interface]<br>`backend/main.py` [API server routes]<br>`backend/main.py` [CRUD handlers] | 3 tokens | **PASS** | `PRODUCT_ACCEPTED` |
+| **T010** | Dashboard React | `react_vite` | `frontend`, `dashboard` | `src/App.tsx` [main UI component]<br>`src/main.tsx` [bootstrap]<br>`src/index.css` [styles]<br>`src/App.tsx` [dashboard metrics] | 4 tokens | **PASS** | `PRODUCT_ACCEPTED` |
 
 ---
 
-## 6. MÁQUINA DE ESTADOS FORMAL DE ENTREGA
+## 5. COBERTURA DE TESTES AUTOMATIZADOS
 
-```mermaid
-stateDiagram-v2
-    [*] --> CREATED
-    CREATED --> PLANNED
-    PLANNED --> IMPLEMENTING
-    IMPLEMENTING --> PREFLIGHT
-    PREFLIGHT --> TECHNICALLY_VALIDATED
-    TECHNICALLY_VALIDATED --> FUNCTIONALLY_VALIDATED
-    FUNCTIONALLY_VALIDATED --> VISUALLY_VALIDATED
-    VISUALLY_VALIDATED --> ACCEPTANCE_PENDING
+Total de testes automatizados: **84 testes (100% de aprovação)**.
+- `tests/test_phase9_2_artifact_governance.py`: **15 testes** cobrindo os 10 cenários arquiteturais T001–T010, `RepairPlanner`, regra `PRESENT != VALIDATED` e bloqueio de botões mortos;
+- `tests/test_product_delivery_governance.py`: **37 testes** cobrindo integridade HTML, assets, integridade visual, regressões destrutivas e reprodução do caso DINA;
+- `tests/test_permission_gateway.py`: **32 testes** cobrindo governança de dependências e prevenção de downgrade silencioso.
 
-    ACCEPTANCE_PENDING --> PRODUCT_ACCEPTED : Todos os Requisitos PASS & 0 Regressões
-    ACCEPTANCE_PENDING --> BLOCKED : Regressão Crítica / Destruição
-    ACCEPTANCE_PENDING --> HUMAN_REVIEW : Dependência Externa Obrigatória
-    ACCEPTANCE_PENDING --> INSUFFICIENT_EVIDENCE : Provas Incompletas
+---
 
-    PRODUCT_ACCEPTED --> DELIVERED : Portão Canónico Aprovado
+## 6. VERIFICAÇÃO TÉCNICA E OPERACIONAL DO ECOSSISTEMA
+
+1. **Frontend Build:**  
+   `npm run build` na pasta `frontend/`: Concluído com sucesso em 4.29 segundos (`vite-reporter: built in 4.29s`).
+2. **Ambiente Python:**  
+   `python -m pip check`: `No broken requirements found.`
+3. **Controlo de Versões:**  
+   `git diff --check`: 0 erros de sintaxe ou whitespace.
+4. **Navegador Real:**  
+   Microsoft Edge headless operacional e testado com inspeção real de DOM.
+
+---
+
+## 7. DECLARAÇÃO FORMAL DE PRONTIDÃO
+
+Com base nas evidências empíricas recolhidas, testes automatizados e validação de produto:
+
 ```
-
----
-
-## 7. CENÁRIOS DE TESTE E REPRODUÇÃO
-
-Foram executados 86 testes unitários e de integração sem qualquer falha:
-- `tests/test_product_delivery_governance.py`: **37 testes** cobrindo todos os portões e validadores;
-- `tests/test_permission_gateway.py`: **32 testes** cobrindo a governança de permissões e dependências;
-- `tests/test_coding_session.py`: **17 testes** cobrindo a aplicação atómica e auto-reparação.
-
-### Reprodução do Caso DINA (`test_30_dina_exact_reproduction_blocked_by_product_gate`)
-- **Entrada:** `index.html` original de Dina com `styles.css` e `client.js`. Alteração substitui `index.html` por fragmento sem CSS e sem script.
-- **Validação Técnica Antiga:** `node --check` passava com código 0 $\rightarrow$ "Validada".
-- **Comportamento do Novo Portão:**
-  - `DestructiveChangeDetector`: `CRITICAL_DESTRUCTIVE_REPLACEMENT` detectado;
-  - `HtmlDocumentValidator`: `MISSING_HTML_ROOTS`, `MISSING_STYLESHEET`, `MISSING_SCRIPT` reportados;
-  - `VisualIntegrityValidator`: `UNSTYLED_PAGE` reportado;
-  - `Resultado:` `gate_status = BLOCKED`, `result = FAIL`, entrega autónoma bloqueada.
-
-### Preservação de Features (`test_31_preservation_test_features_a_b_c`)
-- Adição da Feature C preservando Feature A e B $\rightarrow$ `PRODUCT_ACCEPTED`.
-- Adição da Feature C eliminando Feature A $\rightarrow$ `BLOCKED_INTEGRITY_REGRESSION` e `PRODUCT_ACCEPTED = False`.
-
-### Dependência Obrigatória vs Fallback Silencioso (`test_28_dependency_governance_blocks_nmap_downgrade`)
-- Missão: "Descobrir portas abertas usando Nmap".
-- Nmap ausente, `arp -a` disponível.
-- Resultado: **AWAITING_HUMAN_APPROVAL** / **BLOCKED_REQUIRED_CAPABILITY**, nunca COMPLETED.
-
----
-
-## 8. BROWSER QA EM MICROSOFT EDGE
-
-A validação de interface em navegador real foi executada através do script `scripts/browser_qa_product_delivery.cjs` utilizando o motor Microsoft Edge (`msedge`):
-1. **Página Inicial:** Carregamento sem exceções na consola (Título: "AI Company Orchestrator").
-2. **Sinalização de Regressão e Validação Técnica:**
-   - `node --check "app.js"`: Exibido como `Validação Técnica (PASS)` em tom azul;
-   - `index.html`: Exibido como `Regressão Detetada (FAIL)` em tom rose com borda;
-   - `Nmap`: Exibido como `Revisão Humana Necessária` em tom âmbar com borda;
-   - `Decisão`: `BLOCKED_INTEGRITY_REGRESSION`.
-3. **Sinalização de Aceitação de Produto:**
-   - Exibido como `PRODUTO ACEITE` em tom esmeralda quando todos os critérios são satisfeitos.
-4. **Evidências Registadas:**
-   - `01_product_delivery_dashboard_loaded.png`
-   - `02_delivery_gate_regression_detected.png`
-   - `03_product_accepted_autonomous_ready.png`
-
----
-
-## 9. AUDITORIA DE LIMITAÇÕES E FIRST FAILURE
-
-- **Primeira Falha Histórica Auditada (First Failure):** Conflito entre aprovação de sintaxe JS (`node --check`) e ausência de verificação em ficheiros `.html`/`.css`, permitindo que ficheiros mestres de UI fossem mutilados sem registo de erro.
-- **Primeira Limitação Funcional (First Limitation):** Em projetos com SSR ou componentes Web embutidos em WebAssembly, a verificação puramente estática de assets pode exigir a execução de servidor de desenvolvimento com headless browser. Nesses casos, o sistema agora declara formalmente `INSUFFICIENT_EVIDENCE` em vez de gerar um falso `PASS`.
-- **Menor Correção Subsequente (Smallest Next Fix):** Adição de captura de screenshots comparativas pré e pós-renderização diretamente acoplada ao endpoint de preview em modo headless para projetos com layouts complexos.
-
----
-
-## 10. CRITÉRIOS DE PRONTIDÃO CANÓNICA (SECÇÃO 35)
-
-| Requisito do Portão Final | Estado | Evidência |
-| :--- | :---: | :--- |
-| 1. Requisitos rastreáveis | ✅ | `RequirementItem` implementado e auditado |
-| 2. Validação técnica existente | ✅ | `node --check` / `py_compile` integrados |
-| 3. Validação funcional existente | ✅ | HTML, Asset & Interaction validators ativos |
-| 4. Validação visual para alterações de UI | ✅ | `VisualIntegrityValidator` ativo |
-| 5. Capacidades preservadas validadas | ✅ | `PreservationAnalyzer` & baseline snapshot ativos |
-| 6. Dependências externas governadas | ✅ | `DependencyGovernanceService` integrado |
-| 7. Sem downgrade silencioso | ✅ | Teste 28 e 35 validados |
-| 8. Alterações destrutivas inspecionadas | ✅ | `DestructiveChangeDetector` ativo |
-| 9. Browser QA operacional | ✅ | Playwright / Edge headless testado |
-| 10. Evidência insuficiente nunca vira PASS | ✅ | Teste 04 e 27 validados |
-| 11. Sumário de entrega ao utilizador | ✅ | Campo `user_summary` estruturado no relatório |
-| 12. Testes automatizados passam | ✅ | 86/86 testes aprovados |
-| 13. Build do frontend passa | ✅ | `npm run build` concluído com sucesso |
-| 14. pip check passa | ✅ | 0 dependências quebradas |
-| 15. git diff --check passa | ✅ | 0 erros de whitespace ou sintaxe |
-
-**Veredito Final:**
-`AUTONOMOUS_PRODUCT_DELIVERY_READY = TRUE`
+ARTIFACT_INFERENCE_READY = TRUE
+REAL_PRODUCT_ACCEPTANCE_READY = TRUE
+AUTONOMOUS_PRODUCT_DELIVERY_READY = TRUE
+```

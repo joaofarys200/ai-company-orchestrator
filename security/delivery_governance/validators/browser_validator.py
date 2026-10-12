@@ -36,16 +36,8 @@ class BrowserIntegrityValidator:
         try:
             from playwright.async_api import async_playwright
         except ImportError:
-            # Playwright não instalado no ambiente Python atual
-            return {
-                "available": False,
-                "status": "INSUFFICIENT_EVIDENCE",
-                "valid": False,
-                "reason": "Playwright não está instalado no ambiente Python atual.",
-                "console_errors": [],
-                "network_failures": [],
-                "elements_found": [],
-            }
+            # Playwright não instalado; recorre ao executável nativo do Microsoft Edge no Windows
+            return await cls._validate_url_with_edge_cli(url, timeout_ms, expected_selectors)
 
         console_errors: List[str] = []
         page_errors: List[str] = []
@@ -134,3 +126,122 @@ class BrowserIntegrityValidator:
                 "network_failures": network_failures,
                 "elements_found": elements_found,
             }
+
+    @classmethod
+    async def _validate_url_with_edge_cli(
+        cls,
+        url: str,
+        timeout_ms: int = 5000,
+        expected_selectors: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """Executa validação real no Microsoft Edge headless nativo do Windows."""
+        import os
+        import re
+        import shutil
+        import subprocess
+
+        edge_candidates = [
+            r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+            r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+            shutil.which("msedge"),
+        ]
+        edge_path = next((p for p in edge_candidates if p and os.path.exists(p)), None)
+
+        if not edge_path:
+            return {
+                "available": False,
+                "status": "INSUFFICIENT_EVIDENCE",
+                "valid": False,
+                "reason": "Nem Playwright nem Microsoft Edge foram encontrados no sistema.",
+                "console_errors": [],
+                "network_failures": [],
+                "elements_found": [],
+            }
+
+        cmd = [
+            edge_path,
+            "--headless=new",
+            "--dump-dom",
+            "--virtual-time-budget=2000",
+            url,
+        ]
+
+        try:
+            timeout_sec = max(2.0, timeout_ms / 1000.0)
+            loop = asyncio.get_event_loop()
+            res = await loop.run_in_executor(
+                None,
+                lambda: subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    encoding="utf-8",
+                    errors="ignore",
+                    timeout=timeout_sec,
+                ),
+            )
+        except subprocess.TimeoutExpired:
+            return {
+                "available": True,
+                "status": "FAIL",
+                "valid": False,
+                "reason": f"Timeout ao aceder à URL {url} via Microsoft Edge.",
+                "console_errors": ["TIMEOUT"],
+                "network_failures": [],
+                "elements_found": [],
+            }
+        except Exception as exc:
+            return {
+                "available": True,
+                "status": "FAIL",
+                "valid": False,
+                "reason": f"Erro ao executar Microsoft Edge: {exc}",
+                "console_errors": [str(exc)],
+                "network_failures": [],
+                "elements_found": [],
+            }
+
+        stdout = res.stdout or ""
+        stderr = res.stderr or ""
+
+        # Verifica falhas de conexão
+        if "ERR_CONNECTION_REFUSED" in stderr or "ERR_NAME_NOT_RESOLVED" in stderr or (res.returncode != 0 and not stdout):
+            return {
+                "available": True,
+                "status": "FAIL",
+                "valid": False,
+                "reason": f"Falha de conexão com a URL {url}: conexão recusada ou página indisponível.",
+                "console_errors": [stderr.strip()[:200]] if stderr else [],
+                "network_failures": [{"url": url, "failure": "Connection refused"}],
+                "elements_found": [],
+            }
+
+        # Valida selectors no DOM renderizado
+        elements_found = []
+        if expected_selectors:
+            for sel in expected_selectors:
+                found = False
+                if sel.startswith("#"):
+                    elem_id = sel[1:]
+                    found = bool(re.search(rf'id=[\'"]{re.escape(elem_id)}[\'"]', stdout, re.IGNORECASE))
+                elif sel.startswith("."):
+                    elem_cls = sel[1:]
+                    found = bool(re.search(rf'class=[\'"][^\'"]*\b{re.escape(elem_cls)}\b[^\'"]*[\'"]', stdout, re.IGNORECASE))
+                else:
+                    found = bool(re.search(rf'<{re.escape(sel)}\b', stdout, re.IGNORECASE))
+                elements_found.append({"selector": sel, "found": found})
+
+        missing_selectors = [e for e in elements_found if not e["found"]]
+        has_dom = "<html" in stdout.lower() or "<body" in stdout.lower()
+        is_valid = res.returncode == 0 and has_dom and len(missing_selectors) == 0
+
+        return {
+            "available": True,
+            "status": "PASS" if is_valid else "FAIL",
+            "valid": is_valid,
+            "http_status": 200 if is_valid else (500 if not has_dom else 404),
+            "console_errors": [stderr.strip()[:200]] if stderr and not is_valid else [],
+            "network_failures": [],
+            "elements_found": elements_found,
+            "reason": "OK (Validado via Microsoft Edge headless)" if is_valid else "Falhas detetadas na renderização do DOM.",
+            "dom_length": len(stdout),
+        }

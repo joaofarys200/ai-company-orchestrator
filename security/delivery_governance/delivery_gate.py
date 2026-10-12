@@ -14,12 +14,19 @@ import os
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
+from security.delivery_governance.architecture_detector import ArchitectureDetector, DetectedArchitecture
+from security.delivery_governance.artifact_inference import ArtifactInferenceEngine
 from security.delivery_governance.integrity_detector import (
     DestructiveChangeDetector,
     PreservationAnalyzer,
 )
 from security.delivery_governance.models import (
     AcceptanceLevel,
+    ArchitectureDecision,
+    ArtifactCategory,
+    ArtifactEvidence,
+    ArtifactEvidenceStatus,
+    ArtifactExpectation,
     DeliveryGateStatus,
     ProductAcceptanceReport,
     ProductIntegrityDiff,
@@ -70,10 +77,28 @@ class ProductDeliveryGate:
             gate_status=DeliveryGateStatus.PREFLIGHT.value,
         )
 
-        # 1. RASTREABILIDADE DE REQUISITOS (Requirement Traceability)
-        requirements = cls._extract_requirements(user_prompt)
+        # 1. INFERÊNCIA DETERMINÍSTICA DE ARTEFACTOS E CAPACIDADES (Architecture-Aware)
+        arch, decision, expectations, requirements = ArtifactInferenceEngine.infer_architecture_and_artifacts(
+            user_prompt=user_prompt,
+            project_root=project_root,
+        )
+        report.architecture_decision = decision
+        report.artifact_expectations = expectations
+        report.capabilities_detected = decision.expected_capabilities
         report.requirements = requirements
         report.acceptance_criteria = [r.description for r in requirements]
+
+        # 1.1 AVALIAÇÃO DE EVIDÊNCIA DE ARTEFACTOS (PRESENT != VALIDATED)
+        artifact_evidences = ArtifactInferenceEngine.evaluate_artifact_evidence(expectations, project_root)
+        report.artifact_evidence = artifact_evidences
+
+        for ae in artifact_evidences:
+            if ae.status in {ArtifactEvidenceStatus.MISSING.value, ArtifactEvidenceStatus.FAILED.value}:
+                matching_exp = next((e for e in expectations if e.artifact_id == ae.artifact_id), None)
+                if matching_exp and matching_exp.required:
+                    report.blockers.append(
+                        f"MISSING_REQUIRED_ARTIFACT: Artefacto obrigatório '{ae.expected_path}' para capacidade '{ae.category}' ({ae.responsibility}) não verificado."
+                    )
 
         # 2. AUDITORIA DE PRESERVAÇÃO E DESTRUIÇÃO (Preservation & Destructive Analysis)
         integrity_diff = ProductIntegrityDiff(project_id=project_id)
@@ -213,7 +238,7 @@ class ProductDeliveryGate:
         all_reqs_passed = True
         for req in report.requirements:
             # Requisitos falham se houver blocker relacionado ou falta de evidência
-            if has_blocked_dependency and ("porta" in req.description.lower() or "scan" in req.description.lower() or "nmap" in req.description.lower()):
+            if has_blocked_dependency and any(k in req.description.lower() for k in ["porta", "scan", "nmap"]):
                 req.status = RequirementStatus.BLOCKED.value
                 all_reqs_passed = False
             elif report.blockers:
@@ -223,8 +248,32 @@ class ProductDeliveryGate:
                 req.status = RequirementStatus.FAIL.value
                 all_reqs_passed = False
             else:
-                req.status = RequirementStatus.PASS.value
-                req.evidence = {"verified_at_gate": True, "no_regressions": True}
+                # Procura evidências de artefactos associadas
+                matching_evs = [
+                    ae for ae in report.artifact_evidence
+                    if ae.category == req.category or ae.artifact_id in req.required_artifacts
+                ]
+                gathered_ev_ids = []
+                for me in matching_evs:
+                    gathered_ev_ids.extend(me.evidence_ids)
+
+                # Se for requisito funcional do prompt ou genérico
+                if not gathered_ev_ids and (req.category == "functional_prompt" or req.category == "functional"):
+                    gathered_ev_ids = [eid for ae in report.artifact_evidence for eid in ae.evidence_ids if ae.validated]
+                    if not gathered_ev_ids and visual_res.get("valid"):
+                        gathered_ev_ids = ["EVID-VISUAL-VALIDATED"]
+
+                req.evidence_ids = gathered_ev_ids
+                if not req.evidence_ids and req.blocking:
+                    req.status = RequirementStatus.INSUFFICIENT_EVIDENCE.value
+                    all_reqs_passed = False
+                else:
+                    req.status = RequirementStatus.PASS.value
+                    req.evidence = {
+                        "verified_at_gate": True,
+                        "no_regressions": True,
+                        "evidence_ids": req.evidence_ids,
+                    }
 
         # 11. DECISÃO FINAL DO GATE E SCORE QUALITATIVO
         cls._finalize_decision(

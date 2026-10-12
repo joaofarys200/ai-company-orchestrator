@@ -58,6 +58,9 @@ class InteractionValidator:
 
         # 1. Verifica cada botão para assegurar que tem comportamento
         dead_buttons = []
+        dead_critical_buttons = []
+        critical_keywords = {"save", "submit", "delete", "remove", "add", "create", "scan", "login", "search", "run", "calc", "action", "enviar", "guardar", "eliminar", "adicionar", "pesquisar", "executar"}
+
         for btn in html_buttons:
             btn_id = btn.get("id")
             has_onclick = btn.get("has_onclick", False)
@@ -78,13 +81,24 @@ class InteractionValidator:
             })
 
             if btn_id and not is_wired:
-                dead_buttons.append(f"{btn_file} -> #{btn_id} ('{btn_text}')")
+                btn_desc = f"{btn_file} -> #{btn_id} ('{btn_text}')"
+                dead_buttons.append(btn_desc)
+                # Verifica se é botão crítico
+                is_crit = any(kw in (btn_id or "").lower() or kw in (btn_text or "").lower() for kw in critical_keywords)
+                if is_crit:
+                    dead_critical_buttons.append(btn_desc)
 
         if dead_buttons:
             # Botões com ID declarado mas nenhum listener registado em nenhum ficheiro JS
             warnings.append(
                 f"UNWIRED_BUTTONS: Encontrados botões sem event listeners associados em JavaScript: {dead_buttons}"
             )
+
+        if dead_critical_buttons:
+            for dcb in dead_critical_buttons:
+                violations.append(
+                    f"FUNCTIONALITY_FAILURE: Botão crítico sem event listener ou handler funcional associado: {dcb}"
+                )
 
         # 2. Preservação de botões da baseline
         if baseline_buttons:

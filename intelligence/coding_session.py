@@ -1528,7 +1528,11 @@ class CodingSessionService:
             existing_files = {}
 
         # If it's a minor localized symbol replacement on an existing file and entrypoints already exist, do not force-create unrelated files
-        has_entrypoint = any(f.lower() in ("index.html", "server.py", "app.py", "main.py") for f in existing_files)
+        has_entrypoint = any(
+            f.lower() in ("index.html", "server.py", "app.py", "main.py", "src/app.tsx", "src/main.tsx", "app/page.tsx", "src/app.vue", "server.ts", "src/server.ts")
+            or f.endswith((".tsx", ".jsx", ".vue"))
+            for f in existing_files
+        )
         all_symbol_ops = all(c.get("operation") in ("replace_symbol", "replace_text") for c in changes)
         norm_obj = normalize_text(objective)
         is_explicit_creation = any(w in norm_obj for w in ("cria", "criar", "adiciona", "adicionar", "novo", "nova", "create", "add", "new"))

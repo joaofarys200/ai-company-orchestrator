@@ -1,18 +1,24 @@
 """
-JARVIS OS - Deterministic Artifact Inference & Repair Engine (Fase 9.2)
+JARVIS OS - Architecture-Aware Artifact Inference & Deterministic Repair Engine (Fase 9.2)
 
-Fornece uma camada determinística de inferência de capacidades, mapeamento de
-artefactos mínimos obrigatórios, esqueletos de código funcionais e reparação
-automática de planos de alteração e geração de projetos, reduzindo a dependência
-estocástica do LLM para decisões estruturais fundamentais.
+Implementa o Princípio Arquitetural: CAPABILITY-BASED, ARCHITECTURE-AWARE, NÃO TEMPLATE-DRIVEN.
+
+Pipeline formal:
+PROMPT + PROJECT CONTEXT + PROJECT INTAKE + DETECTED STACK + DETECTED FRAMEWORK +
+EXISTING FILE TREE + EXISTING ENTRYPOINTS + BUILD SYSTEM + RUNTIME
+-> ARCHITECTURE MODEL (ProjectArchitecture)
+-> CAPABILITIES (CapabilityDetector)
+-> ARTIFACT RESPONSIBILITIES
+-> RESOLVED ARTIFACTS (InferredArtifact)
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 import unicodedata
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -33,13 +39,112 @@ class Capability(str, Enum):
 
 
 @dataclass
+class ProjectArchitecture:
+    """Modelo explícito da arquitetura técnica do projeto."""
+    architecture_id: str
+    stack: str
+    framework: str = "none"
+    bundler: str = "none"
+    runtime: str = "unknown"  # 'browser', 'node', 'python', 'fullstack', 'unknown'
+    package_manager: str = "npm"
+    frontend_entrypoints: list[str] = field(default_factory=list)
+    backend_entrypoints: list[str] = field(default_factory=list)
+    style_system: str = "none"
+    source_root: str = "."
+    app_root: str = "."
+    conventions: dict[str, Any] = field(default_factory=dict)
+    confidence: float = 1.0
+    evidence: list[str] = field(default_factory=list)
+    is_existing: bool = False
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class ArchitectureDecision:
+    """Decisão arquitetural formal e explícita do JARVIS."""
+    detected: bool = False
+    architecture: str = "vanilla_web"
+    confidence: float = 1.0
+    evidence: list[str] = field(default_factory=list)
+    source: str = "default_architecture"  # "existing_project" ou "default_architecture"
+
+    # Campos de compatibilidade com ProductDeliveryGate e relatórios
+    selected_stack: str = ""
+    rationale: str = ""
+    capabilities_expected: list[str] = field(default_factory=list)
+    inferred_by: str = ""
+    inferred_artifacts: list[str] = field(default_factory=list)
+    is_new_project: bool = False
+    framework: str = ""
+    bundler: str = ""
+    runtime: str = "unknown"
+    entrypoints: dict[str, list[str]] = field(default_factory=dict)
+    conventions: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        if not self.selected_stack:
+            self.selected_stack = self.architecture
+        elif not self.architecture and self.selected_stack:
+            self.architecture = self.selected_stack
+
+        if not self.inferred_by:
+            self.inferred_by = self.source
+        elif not self.source and self.inferred_by:
+            self.source = self.inferred_by
+
+        if not self.rationale:
+            self.rationale = f"Arquitetura selecionada: {self.architecture} via {self.source} (confiança: {self.confidence:.2f})"
+
+        self.is_new_project = not self.detected
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
 class InferredArtifact:
-    relative_path: str
-    component: str
+    """
+    Especificação de artefacto orientada por responsabilidade, stack e contratos funcionais.
+    """
+    artifact_id: str = ""
+    responsibility: str = ""
+    category: str = "frontend"
+    architecture: str = "generic"
+    source: str = "inferred"  # "existing_project", "default_architecture", "inferred"
     required: bool = True
+    existing: bool = False
+    candidate_paths: list[str] = field(default_factory=list)
+    functional_contracts: list[str] = field(default_factory=list)
+    evidence_requirements: list[str] = field(default_factory=list)
+
+    # Campos de compatibilidade para retrocompatibilidade
+    relative_path: str = ""
+    component: str = ""
     description: str = ""
     default_content: str = ""
-    functional_contracts: list[str] = field(default_factory=list)
+
+    def __post_init__(self):
+        if not self.relative_path and self.candidate_paths:
+            self.relative_path = self.candidate_paths[0]
+        elif self.relative_path and not self.candidate_paths:
+            self.candidate_paths = [self.relative_path]
+
+        if not self.category and self.component:
+            self.category = self.component
+        elif not self.component and self.category:
+            self.component = self.category
+
+        if not self.artifact_id:
+            stem = Path(self.relative_path).stem if self.relative_path else "artifact"
+            self.artifact_id = f"{self.category}-{stem}"
+
+        if not self.responsibility:
+            self.responsibility = self.description or f"Responsabilidade para {self.artifact_id}"
+
+        if not self.description:
+            self.description = self.responsibility
 
 
 @dataclass
@@ -50,17 +155,25 @@ class CapabilityInferenceResult:
     entrypoints: list[str]
     contracts_by_file: dict[str, list[str]] = field(default_factory=dict)
     diagnostics: list[str] = field(default_factory=list)
+    architecture: Optional[ProjectArchitecture] = None
+    architecture_decision: Optional[ArchitectureDecision] = None
+    mismatches: list[str] = field(default_factory=list)
 
     def has_capability(self, capability: Capability | str) -> bool:
         cap_val = Capability(capability) if isinstance(capability, str) else capability
         return cap_val in self.detected_capabilities
 
     def get_artifact(self, relative_path: str) -> Optional[InferredArtifact]:
-        normalized = relative_path.replace("\\", "/").strip().lstrip("./")
+        normalized = relative_path.replace("\\", "/").strip().lstrip("./").lower()
         for art in self.required_artifacts:
-            if art.relative_path == normalized:
+            art_norm = art.relative_path.replace("\\", "/").strip().lstrip("./").lower()
+            if art_norm == normalized or any(c.replace("\\", "/").strip().lstrip("./").lower() == normalized for c in art.candidate_paths):
                 return art
         return None
+
+    def get_by_responsibility(self, responsibility_substring: str) -> list[InferredArtifact]:
+        sub = responsibility_substring.lower()
+        return [art for art in self.required_artifacts if sub in art.responsibility.lower() or sub in art.artifact_id.lower()]
 
     def required_paths(self) -> list[str]:
         return [art.relative_path for art in self.required_artifacts if art.required]
@@ -68,7 +181,7 @@ class CapabilityInferenceResult:
 
 @dataclass
 class RepairAction:
-    action_type: str  # "CREATE_FILE", "PATCH_FILE", "INJECT_CONTRACT"
+    action_type: str  # "CREATE_FILE", "PATCH_FILE", "REMOVE_MISMATCH", "INJECT_CONTRACT"
     relative_path: str
     reason: str
     content: str
@@ -83,6 +196,7 @@ class RepairResult:
     diagnostics: list[str] = field(default_factory=list)
     missing_before: list[str] = field(default_factory=list)
     unresolved_contracts: list[str] = field(default_factory=list)
+    architecture: Optional[ProjectArchitecture] = None
 
 
 def normalize_text(text: str) -> str:
@@ -93,6 +207,65 @@ def normalize_text(text: str) -> str:
     return without_accents.lower().strip()
 
 
+def detect_architecture_mismatch(
+    files: dict[str, str] | list[str],
+    architecture: ProjectArchitecture,
+) -> list[str]:
+    """
+    Deteta ficheiros que violam a arquitetura estabelecida do projeto (STACK MISMATCH).
+    Exemplo: LLM introduz 'app.js' ou 'styles.css' de template num projeto React/Vite.
+    """
+    file_list = list(files.keys()) if isinstance(files, dict) else list(files)
+    normalized = [f.replace("\\", "/").strip().lstrip("./") for f in file_list]
+    mismatches: list[str] = []
+
+    if architecture.stack == "react_vite":
+        for f in normalized:
+            f_lower = f.lower()
+            if f_lower == "app.js":
+                mismatches.append(
+                    f"ARTIFACT_ARCHITECTURE_MISMATCH: 'app.js' é um template vanilla incompatível com a stack React/Vite ('src/App.tsx', 'src/main.tsx')."
+                )
+            elif f_lower == "styles.css" and any(rf.startswith("src/") for rf in normalized):
+                mismatches.append(
+                    f"ARTIFACT_ARCHITECTURE_MISMATCH: 'styles.css' na raiz conflita com a convenção de estilos React ('src/index.css' / 'src/App.css')."
+                )
+            elif f_lower == "search.js":
+                mismatches.append(
+                    f"ARTIFACT_ARCHITECTURE_MISMATCH: 'search.js' incompatível com projeto React/TypeScript. Deve ser um componente TSX."
+                )
+
+    elif architecture.stack == "nextjs":
+        for f in normalized:
+            f_lower = f.lower()
+            if f_lower == "index.html":
+                mismatches.append(
+                    f"ARTIFACT_ARCHITECTURE_MISMATCH: 'index.html' é proibido no modelo App Router do Next.js (use 'app/layout.tsx' e 'app/page.tsx')."
+                )
+            elif f_lower in ("app.js", "main.js"):
+                mismatches.append(
+                    f"ARTIFACT_ARCHITECTURE_MISMATCH: '{f}' é incompatível com o modelo de rotas e componentes do Next.js."
+                )
+
+    elif architecture.stack in ("python_fastapi", "python_flask", "custom_python"):
+        # Se for backend puro sem frontend solicitado
+        if not architecture.frontend_entrypoints:
+            for f in normalized:
+                if f.lower() in ("index.html", "app.js", "styles.css"):
+                    mismatches.append(
+                        f"ARTIFACT_ARCHITECTURE_MISMATCH: Artefacto frontend '{f}' incompatível com backend Python puro."
+                    )
+
+    elif architecture.stack in ("node_express", "node_typescript"):
+        for f in normalized:
+            if f.lower() in ("server.py", "database.py"):
+                mismatches.append(
+                    f"ARTIFACT_ARCHITECTURE_MISMATCH: '{f}' incompatível com runtime Node/TypeScript."
+                )
+
+    return mismatches
+
+
 class CapabilityDetector:
     """
     Deteta de forma determinística capacidades a partir de prompts e contexto.
@@ -101,8 +274,8 @@ class CapabilityDetector:
 
     CAPABILITY_PATTERNS: dict[Capability, list[re.Pattern]] = {
         Capability.FRONTEND: [
-            re.compile(r"\b(pagina|site|website|web\s*app|frontend|interface|ui|html|css|ecra|tela|layout|view|react|vue|vanilla|browser|navegador)\b"),
-            re.compile(r"\b(web\s*page|front\s*end|webpage|user\s*interface)\b"),
+            re.compile(r"\b(pagina|site|website|web\s*app|frontend|interface|ui|html|css|ecra|tela|layout|view|react|vue|vanilla|browser|navegador|landing|portal|formulario)\b"),
+            re.compile(r"\b(web\s*page|front\s*end|webpage|user\s*interface|landing\s*page)\b"),
         ],
         Capability.BACKEND: [
             re.compile(r"\b(backend|back\s*end|servidor|server|api|endpoint|rotas|routes|fastapi|flask|express|nodejs|node|python\s*server)\b"),
@@ -161,9 +334,7 @@ class CapabilityDetector:
                     detected.add(capability)
                     break
 
-        # Contextual inferences
         if Capability.CRUD in detected and Capability.FRONTEND not in detected and Capability.BACKEND not in detected and Capability.CLI not in detected:
-            # Default to frontend if CRUD is asked without specific backend/cli context
             detected.add(Capability.FRONTEND)
 
         if Capability.DASHBOARD in detected and Capability.FRONTEND not in detected:
@@ -173,14 +344,11 @@ class CapabilityDetector:
             detected.add(Capability.FRONTEND)
 
         if (Capability.FRONTEND in detected or Capability.BACKEND in detected) and Capability.PREVIEW not in detected:
-            # By default, frontend/backend web requests benefit from preview capability
             detected.add(Capability.PREVIEW)
 
-        # Storage is implied by CRUD or Dashboard persistence unless explicitly negated
         if Capability.CRUD in detected and Capability.STORAGE not in detected and "sem persistencia" not in norm and "sem guardar" not in norm:
             detected.add(Capability.STORAGE)
 
-        # Process explicit negations
         for pattern in self.NEGATION_PATTERNS:
             for neg in pattern.finditer(norm):
                 negated_term = neg.group(2)
@@ -193,38 +361,699 @@ class CapabilityDetector:
                 if negated_term in ("login", "auth", "autenticacao") and Capability.AUTH in detected:
                     detected.remove(Capability.AUTH)
 
-        # Context-based augmentation if project already exists
         if project_context:
             files = project_context.get("files", [])
-            if any("html" in f.lower() for f in files):
+            file_names = [f.lower() for f in files] if isinstance(files, list) else [k.lower() for k in files.keys()]
+            if any(f.endswith((".html", ".tsx", ".jsx", ".vue")) for f in file_names):
                 detected.add(Capability.FRONTEND)
-            if any("server.py" in f.lower() or "app.py" in f.lower() or "server.js" in f.lower() for f in files):
+            if any("server.py" in f or "app.py" in f or "main.py" in f or "server.js" in f or "server.ts" in f for f in file_names):
                 detected.add(Capability.BACKEND)
 
-        # Discard frontend for explicit standalone single-file non-web tasks (e.g. "cria hello.txt", "cria app.js")
         is_single_file = bool(re.search(r"\b(cria|criar|make|write)\s+[a-z0-9_\-]+\.(txt|md|py|sh|json|csv|yaml|yml|js|ts)\b", norm))
         if is_single_file:
             if not any(w in norm for w in ["site", "website", "pagina", "web app", "frontend", "html", "react", "vue"]):
                 detected.discard(Capability.FRONTEND)
                 detected.discard(Capability.PREVIEW)
-        elif not detected and any(re.search(rf"\b{w}\b", norm) for w in ["app", "aplicacao", "site", "web", "pagina", "ui", "painel", "dashboard", "frontend", "jogo", "game"]):
+        elif not detected and any(re.search(rf"\b{w}\b", norm) for w in ["app", "aplicacao", "site", "web", "pagina", "ui", "painel", "dashboard", "frontend", "jogo", "game", "landing", "portal"]):
             detected.add(Capability.FRONTEND)
             detected.add(Capability.PREVIEW)
 
         return detected
 
 
+class ProjectIntakeArchitectureDetector:
+    """
+    Analisa os artefactos e a estrutura real do projeto existente (Princípio: EXISTING ARCHITECTURE FIRST).
+    Inspeciona:
+    1. package.json, scripts de build/dev, dependências e devDependencies
+    2. lockfiles (package-lock, yarn, pnpm, bun)
+    3. requirements.txt / pyproject.toml
+    4. tsconfig.json
+    5. vite.config.*, next.config.*
+    6. estrutura de pastas src/, app/, pages/, backend/, api/, server/
+    7. entrypoints reais e runtime
+    """
+
+    IGNORE_DIRS = {
+        "node_modules", ".git", ".gemini", "dist", "build", ".next",
+        "__pycache__", ".pytest_cache", ".venv", "venv", ".idea", ".vscode"
+    }
+
+    @classmethod
+    def detect_or_choose(
+        cls,
+        prompt: str,
+        files: Optional[dict[str, str] | list[str]] = None,
+        project_root: Optional[str] = None,
+        project_context: Optional[dict[str, Any]] = None,
+    ) -> Tuple[ProjectArchitecture, ArchitectureDecision]:
+        existing_files: dict[str, str] = {}
+
+        if project_root and os.path.exists(project_root):
+            for root, dirs, f_names in os.walk(project_root):
+                dirs[:] = [d for d in dirs if d not in cls.IGNORE_DIRS]
+                for fn in f_names:
+                    full_p = os.path.join(root, fn)
+                    rel = os.path.relpath(full_p, project_root).replace("\\", "/")
+                    try:
+                        # Ler ficheiros de texto para inspeção arquitetural
+                        if os.path.getsize(full_p) < 500_000:
+                            existing_files[rel] = Path(full_p).read_text(encoding="utf-8", errors="ignore")
+                        else:
+                            existing_files[rel] = ""
+                    except Exception:
+                        existing_files[rel] = ""
+
+        if files:
+            if isinstance(files, dict):
+                existing_files.update(files)
+            elif isinstance(files, list):
+                for f in files:
+                    if f not in existing_files:
+                        existing_files[f] = ""
+
+        if project_context:
+            ctx_files = project_context.get("files")
+            if isinstance(ctx_files, dict):
+                existing_files.update(ctx_files)
+            elif isinstance(ctx_files, list):
+                for f in ctx_files:
+                    if f not in existing_files:
+                        existing_files[f] = ""
+
+        # Filtrar ficheiros triviais
+        meaningful_files = [
+            f for f in existing_files.keys()
+            if not f.startswith(".") and f not in ("README.md", ".gitignore", ".gitkeep")
+        ]
+
+        if meaningful_files:
+            return cls._detect_existing(existing_files)
+        else:
+            return cls._choose_default_architecture(prompt)
+
+    @classmethod
+    def _detect_existing(cls, files: dict[str, str]) -> Tuple[ProjectArchitecture, ArchitectureDecision]:
+        file_set = set(f.replace("\\", "/").strip().lstrip("./") for f in files.keys())
+        file_map = {f.lower(): f for f in file_set}
+        evidence: list[str] = []
+
+        # 1. Package.json analysis
+        pkg_json_content = files.get("package.json") or files.get("./package.json")
+        pkg_data: dict[str, Any] = {}
+        all_deps: dict[str, str] = {}
+        scripts: dict[str, str] = {}
+        package_manager = "npm"
+
+        if pkg_json_content:
+            try:
+                pkg_data = json.loads(pkg_json_content)
+                all_deps.update(pkg_data.get("dependencies", {}))
+                all_deps.update(pkg_data.get("devDependencies", {}))
+                scripts = pkg_data.get("scripts", {})
+                evidence.append(f"package.json detetado com {len(all_deps)} dependências")
+            except Exception:
+                pass
+
+        # Lockfiles
+        if "bun.lockb" in file_set:
+            package_manager = "bun"
+            evidence.append("bun.lockb detetado")
+        elif "pnpm-lock.yaml" in file_set:
+            package_manager = "pnpm"
+            evidence.append("pnpm-lock.yaml detetado")
+        elif "yarn.lock" in file_set:
+            package_manager = "yarn"
+            evidence.append("yarn.lock detetado")
+        elif "package-lock.json" in file_set:
+            package_manager = "npm"
+            evidence.append("package-lock.json detetado")
+
+        # Configs
+        has_tsconfig = any(f.startswith("tsconfig") for f in file_set)
+        has_vite_config = any("vite.config" in f for f in file_set)
+        has_next_config = any("next.config" in f for f in file_set)
+        has_tailwind = any("tailwind.config" in f for f in file_set) or "tailwindcss" in all_deps
+
+        # Python manifests
+        py_files = [f for f in file_set if f.endswith(".py")]
+        py_deps: list[str] = []
+        for req_f in ("requirements.txt", "pyproject.toml", "Pipfile"):
+            if req_f in files:
+                evidence.append(f"Manifesto Python detetado: {req_f}")
+                content = files[req_f].lower()
+                for mod in ("fastapi", "uvicorn", "flask", "django", "sqlalchemy", "requests"):
+                    if mod in content:
+                        py_deps.append(mod)
+
+        # Style System
+        style_system = "vanilla_css"
+        if has_tailwind:
+            style_system = "tailwind"
+        elif any(f.endswith(".module.css") for f in file_set):
+            style_system = "css_modules"
+
+        # Check Next.js
+        is_next = (
+            "next" in all_deps
+            or has_next_config
+            or any(f.startswith("app/") or f.startswith("pages/") for f in file_set)
+            and any(f.endswith((".tsx", ".jsx")) for f in file_set)
+        )
+        if is_next:
+            fe = [f for f in file_set if f in ("app/page.tsx", "app/page.jsx", "app/layout.tsx", "pages/index.tsx", "pages/_app.tsx")]
+            be = [f for f in file_set if f.startswith("app/api/") or f.startswith("pages/api/")]
+            evidence.append("Estrutura Next.js identificada (App/Pages Router)")
+            arch = ProjectArchitecture(
+                architecture_id="nextjs",
+                stack="nextjs",
+                framework="Next.js",
+                bundler="Next.js",
+                runtime="node",
+                package_manager=package_manager,
+                frontend_entrypoints=fe or ["app/page.tsx"],
+                backend_entrypoints=be,
+                style_system=style_system,
+                source_root="app" if any(f.startswith("app/") for f in file_set) else "pages",
+                app_root="app" if any(f.startswith("app/") for f in file_set) else "pages",
+                conventions={"typescript": has_tsconfig, "app_router": any(f.startswith("app/") for f in file_set)},
+                confidence=0.98,
+                evidence=evidence,
+                is_existing=True,
+            )
+            decision = ArchitectureDecision(
+                detected=True,
+                architecture="nextjs",
+                confidence=0.98,
+                evidence=evidence,
+                source="existing_project",
+                framework="Next.js",
+                bundler="Next.js",
+                runtime="node",
+            )
+            return arch, decision
+
+        # Check React / Vite
+        is_react = (
+            "react" in all_deps
+            or has_vite_config
+            or any(f.endswith((".tsx", ".jsx")) for f in file_set)
+            or any(f in ("src/App.tsx", "src/App.jsx", "src/main.tsx", "src/main.jsx") for f in file_set)
+        )
+        if is_react:
+            fe = [f for f in file_set if f in ("src/main.tsx", "src/main.jsx", "src/App.tsx", "src/App.jsx", "src/index.tsx", "index.html")]
+            evidence.append("Estrutura React (Vite / SPA) identificada em src/")
+            arch = ProjectArchitecture(
+                architecture_id="react_vite",
+                stack="react_vite",
+                framework="React",
+                bundler="vite" if has_vite_config or "vite" in all_deps else "bundler",
+                runtime="browser",
+                package_manager=package_manager,
+                frontend_entrypoints=fe or ["src/App.tsx", "src/main.tsx"],
+                backend_entrypoints=[],
+                style_system=style_system,
+                source_root="src",
+                app_root="src",
+                conventions={"typescript": has_tsconfig or any(f.endswith(".tsx") for f in file_set)},
+                confidence=0.97,
+                evidence=evidence,
+                is_existing=True,
+            )
+            decision = ArchitectureDecision(
+                detected=True,
+                architecture="react_vite",
+                confidence=0.97,
+                evidence=evidence,
+                source="existing_project",
+                framework="React",
+                bundler="vite",
+                runtime="browser",
+            )
+            return arch, decision
+
+        # Check Vue / Vite
+        is_vue = (
+            "vue" in all_deps
+            or any(f.endswith(".vue") for f in file_set)
+            or "src/App.vue" in file_set
+        )
+        if is_vue:
+            fe = [f for f in file_set if f in ("src/App.vue", "src/main.js", "src/main.ts", "index.html")]
+            evidence.append("Estrutura Vue (Vite / Single File Components) identificada")
+            arch = ProjectArchitecture(
+                architecture_id="vue_vite",
+                stack="vue_vite",
+                framework="Vue",
+                bundler="vite",
+                runtime="browser",
+                package_manager=package_manager,
+                frontend_entrypoints=fe or ["src/App.vue", "src/main.js"],
+                backend_entrypoints=[],
+                style_system=style_system,
+                source_root="src",
+                app_root="src",
+                conventions={"single_file_components": True},
+                confidence=0.96,
+                evidence=evidence,
+                is_existing=True,
+            )
+            decision = ArchitectureDecision(
+                detected=True,
+                architecture="vue_vite",
+                confidence=0.96,
+                evidence=evidence,
+                source="existing_project",
+                framework="Vue",
+                bundler="vite",
+                runtime="browser",
+            )
+            return arch, decision
+
+        # Check Python FastAPI
+        is_fastapi = "fastapi" in py_deps or any("fastapi" in files.get(f, "").lower() for f in py_files)
+        if is_fastapi:
+            be = [f for f in py_files if f in ("main.py", "app.py", "server.py", "backend/main.py", "api/main.py")]
+            evidence.append("Servidor Python FastAPI identificado")
+            arch = ProjectArchitecture(
+                architecture_id="python_fastapi",
+                stack="python_fastapi",
+                framework="FastAPI",
+                bundler="none",
+                runtime="python",
+                package_manager="pip",
+                frontend_entrypoints=[],
+                backend_entrypoints=be or ["main.py"],
+                style_system="none",
+                source_root="." if "main.py" in file_set else "backend",
+                app_root=".",
+                conventions={"framework": "FastAPI", "asgi": "uvicorn"},
+                confidence=0.96,
+                evidence=evidence,
+                is_existing=True,
+            )
+            decision = ArchitectureDecision(
+                detected=True,
+                architecture="python_fastapi",
+                confidence=0.96,
+                evidence=evidence,
+                source="existing_project",
+                framework="FastAPI",
+                runtime="python",
+            )
+            return arch, decision
+
+        # Check Node / Express / TypeScript
+        is_node_express = (
+            "express" in all_deps
+            or any("express" in files.get(f, "").lower() for f in file_set if f.endswith((".js", ".ts")))
+        )
+        if is_node_express:
+            be = [f for f in file_set if f in ("src/server.ts", "src/index.ts", "server.ts", "server.js", "app.js")]
+            evidence.append("Backend Node/Express identificado")
+            arch = ProjectArchitecture(
+                architecture_id="node_express",
+                stack="node_express",
+                framework="Express",
+                bundler="tsc" if has_tsconfig else "none",
+                runtime="node",
+                package_manager=package_manager,
+                frontend_entrypoints=[],
+                backend_entrypoints=be or ["server.js"],
+                style_system="none",
+                source_root="src" if any(f.startswith("src/") for f in file_set) else ".",
+                app_root=".",
+                conventions={"typescript": has_tsconfig},
+                confidence=0.95,
+                evidence=evidence,
+                is_existing=True,
+            )
+            decision = ArchitectureDecision(
+                detected=True,
+                architecture="node_express",
+                confidence=0.95,
+                evidence=evidence,
+                source="existing_project",
+                framework="Express",
+                runtime="node",
+            )
+            return arch, decision
+
+        # Check Vanilla Web
+        is_vanilla = "index.html" in file_set or any(f in file_set for f in ("styles.css", "style.css", "app.js", "main.js"))
+        if is_vanilla:
+            fe = [f for f in ("index.html", "styles.css", "style.css", "app.js", "main.js") if f in file_set]
+            evidence.append("Estrutura Vanilla Web identificada")
+            arch = ProjectArchitecture(
+                architecture_id="vanilla_web",
+                stack="vanilla_web",
+                framework="none",
+                bundler="none",
+                runtime="browser",
+                package_manager="none",
+                frontend_entrypoints=fe,
+                backend_entrypoints=[],
+                style_system="vanilla_css",
+                source_root=".",
+                app_root=".",
+                conventions={"static_html": True},
+                confidence=0.95,
+                evidence=evidence,
+                is_existing=True,
+            )
+            decision = ArchitectureDecision(
+                detected=True,
+                architecture="vanilla_web",
+                confidence=0.95,
+                evidence=evidence,
+                source="existing_project",
+                framework="none",
+                runtime="browser",
+            )
+            return arch, decision
+
+        # Check Generic Python
+        if py_files:
+            be = [f for f in py_files if f in ("main.py", "app.py", "server.py")]
+            evidence.append("Ficheiros Python identificados no projeto")
+            arch = ProjectArchitecture(
+                architecture_id="custom_python",
+                stack="custom_python",
+                framework="python",
+                bundler="none",
+                runtime="python",
+                package_manager="pip",
+                frontend_entrypoints=[],
+                backend_entrypoints=be or py_files[:1],
+                style_system="none",
+                source_root=".",
+                app_root=".",
+                conventions={"python_native": True},
+                confidence=0.90,
+                evidence=evidence,
+                is_existing=True,
+            )
+            decision = ArchitectureDecision(
+                detected=True,
+                architecture="custom_python",
+                confidence=0.90,
+                evidence=evidence,
+                source="existing_project",
+                runtime="python",
+            )
+            return arch, decision
+
+        # Fallback Custom Existing
+        evidence.append("Projeto existente com convenções próprias")
+        arch = ProjectArchitecture(
+            architecture_id="custom",
+            stack="custom",
+            framework="custom",
+            bundler="unknown",
+            runtime="unknown",
+            package_manager="unknown",
+            frontend_entrypoints=[f for f in file_set if f.endswith((".html", ".js", ".ts"))][:2],
+            backend_entrypoints=[f for f in file_set if f.endswith(".py")][:1],
+            style_system="unknown",
+            source_root=".",
+            app_root=".",
+            conventions={"custom_layout": True},
+            confidence=0.85,
+            evidence=evidence,
+            is_existing=True,
+        )
+        decision = ArchitectureDecision(
+            detected=True,
+            architecture="custom",
+            confidence=0.85,
+            evidence=evidence,
+            source="existing_project",
+        )
+        return arch, decision
+
+    @classmethod
+    def _choose_default_architecture(cls, prompt: str) -> Tuple[ProjectArchitecture, ArchitectureDecision]:
+        """
+        Para projeto completamente vazio:
+        JARVIS escolhe arquitetura padrão com base nos requisitos do prompt, complexidade e runtime.
+        NUNCA escolhe de forma silenciosa.
+        """
+        norm = normalize_text(prompt)
+        evidence: list[str] = []
+
+        if any(w in norm for w in ("nextjs", "next.js", "next", "app router")):
+            evidence.append("Requisito explícito de Next.js detetado no prompt")
+            arch = ProjectArchitecture(
+                architecture_id="nextjs",
+                stack="nextjs",
+                framework="Next.js",
+                bundler="Next.js",
+                runtime="node",
+                package_manager="npm",
+                frontend_entrypoints=["app/page.tsx", "app/layout.tsx"],
+                backend_entrypoints=["app/api/health/route.ts"],
+                style_system="tailwind",
+                source_root="app",
+                app_root="app",
+                conventions={"typescript": True, "app_router": True},
+                confidence=0.92,
+                evidence=evidence,
+                is_existing=False,
+            )
+            decision = ArchitectureDecision(
+                detected=False,
+                architecture="nextjs",
+                confidence=0.92,
+                evidence=evidence,
+                source="default_architecture",
+                framework="Next.js",
+                bundler="Next.js",
+                runtime="node",
+            )
+            return arch, decision
+
+        if any(w in norm for w in ("react", "vite", "tsx", "jsx", "componentes react")):
+            evidence.append("Requisito de React / Vite detetado no prompt")
+            arch = ProjectArchitecture(
+                architecture_id="react_vite",
+                stack="react_vite",
+                framework="React",
+                bundler="vite",
+                runtime="browser",
+                package_manager="npm",
+                frontend_entrypoints=["src/App.tsx", "src/main.tsx", "index.html"],
+                backend_entrypoints=[],
+                style_system="vanilla_css",
+                source_root="src",
+                app_root="src",
+                conventions={"typescript": True},
+                confidence=0.94,
+                evidence=evidence,
+                is_existing=False,
+            )
+            decision = ArchitectureDecision(
+                detected=False,
+                architecture="react_vite",
+                confidence=0.94,
+                evidence=evidence,
+                source="default_architecture",
+                framework="React",
+                bundler="vite",
+                runtime="browser",
+            )
+            return arch, decision
+
+        if any(w in norm for w in ("vue", "vuejs", "vue3", "pinia")):
+            evidence.append("Requisito de Vue 3 detetado no prompt")
+            arch = ProjectArchitecture(
+                architecture_id="vue_vite",
+                stack="vue_vite",
+                framework="Vue",
+                bundler="vite",
+                runtime="browser",
+                package_manager="npm",
+                frontend_entrypoints=["src/App.vue", "src/main.js"],
+                backend_entrypoints=[],
+                style_system="vanilla_css",
+                source_root="src",
+                app_root="src",
+                conventions={"single_file_components": True},
+                confidence=0.92,
+                evidence=evidence,
+                is_existing=False,
+            )
+            decision = ArchitectureDecision(
+                detected=False,
+                architecture="vue_vite",
+                confidence=0.92,
+                evidence=evidence,
+                source="default_architecture",
+                framework="Vue",
+                bundler="vite",
+                runtime="browser",
+            )
+            return arch, decision
+
+        if any(w in norm for w in ("fastapi", "uvicorn", "python api", "backend python")):
+            evidence.append("Requisito de API backend em Python FastAPI detetado no prompt")
+            arch = ProjectArchitecture(
+                architecture_id="python_fastapi",
+                stack="python_fastapi",
+                framework="FastAPI",
+                bundler="none",
+                runtime="python",
+                package_manager="pip",
+                frontend_entrypoints=[],
+                backend_entrypoints=["main.py"],
+                style_system="none",
+                source_root=".",
+                app_root=".",
+                conventions={"framework": "FastAPI"},
+                confidence=0.92,
+                evidence=evidence,
+                is_existing=False,
+            )
+            decision = ArchitectureDecision(
+                detected=False,
+                architecture="python_fastapi",
+                confidence=0.92,
+                evidence=evidence,
+                source="default_architecture",
+                framework="FastAPI",
+                runtime="python",
+            )
+            return arch, decision
+
+        if any(w in norm for w in ("express", "nodejs server", "backend node")):
+            evidence.append("Requisito de backend Node Express detetado no prompt")
+            arch = ProjectArchitecture(
+                architecture_id="node_express",
+                stack="node_express",
+                framework="Express",
+                bundler="none",
+                runtime="node",
+                package_manager="npm",
+                frontend_entrypoints=[],
+                backend_entrypoints=["src/server.ts"],
+                style_system="none",
+                source_root="src",
+                app_root=".",
+                conventions={"typescript": True},
+                confidence=0.91,
+                evidence=evidence,
+                is_existing=False,
+            )
+            decision = ArchitectureDecision(
+                detected=False,
+                architecture="node_express",
+                confidence=0.91,
+                evidence=evidence,
+                source="default_architecture",
+                framework="Express",
+                runtime="node",
+            )
+            return arch, decision
+
+        # Pure python CLI / script
+        if any(w in norm for w in ("script", "cli", "terminal", "python")) and not any(w in norm for w in ("web", "site", "pagina", "html", "interface", "app")):
+            evidence.append("Requisito de CLI / Script Python sem frontend detetado")
+            arch = ProjectArchitecture(
+                architecture_id="custom_python",
+                stack="custom_python",
+                framework="python",
+                bundler="none",
+                runtime="python",
+                package_manager="pip",
+                frontend_entrypoints=[],
+                backend_entrypoints=["main.py"],
+                style_system="none",
+                source_root=".",
+                app_root=".",
+                conventions={"cli": True},
+                confidence=0.90,
+                evidence=evidence,
+                is_existing=False,
+            )
+            decision = ArchitectureDecision(
+                detected=False,
+                architecture="custom_python",
+                confidence=0.90,
+                evidence=evidence,
+                source="default_architecture",
+                runtime="python",
+            )
+            return arch, decision
+
+        # Default web application
+        evidence.append("Projeto web novo selecionado com arquitetura Vanilla Web responsiva")
+        arch = ProjectArchitecture(
+            architecture_id="vanilla_web",
+            stack="vanilla_web",
+            framework="none",
+            bundler="none",
+            runtime="browser",
+            package_manager="none",
+            frontend_entrypoints=["index.html", "styles.css", "app.js"],
+            backend_entrypoints=[],
+            style_system="vanilla_css",
+            source_root=".",
+            app_root=".",
+            conventions={"static_html": True},
+            confidence=0.88,
+            evidence=evidence,
+            is_existing=False,
+        )
+        decision = ArchitectureDecision(
+            detected=False,
+            architecture="vanilla_web",
+            confidence=0.88,
+            evidence=evidence,
+            source="default_architecture",
+            framework="none",
+            runtime="browser",
+        )
+        return arch, decision
+
+
 class ArtifactInferenceEngine:
     """
-    Mapeia capacidades detectadas para ficheiros determinísticos,
-    conteúdos padrão (esqueletos funcionais) e contratos estruturais.
+    Motor determinístico de inferência arquitetural de artefactos e capacidades.
+    Opera sobre:
+    PROMPT + CONTEXTO + ARQUITETURA DETETADA + REQUISITOS -> ARTEFACTOS RESOLVIDOS
     """
 
-    def __init__(self, detector: Optional[CapabilityDetector] = None):
+    def __init__(
+        self,
+        detector: Optional[CapabilityDetector] = None,
+        architecture_detector: Optional[ProjectIntakeArchitectureDetector] = None,
+    ):
         self.detector = detector or CapabilityDetector()
+        self.architecture_detector = architecture_detector or ProjectIntakeArchitectureDetector()
 
-    def infer(self, prompt: str, project_name: str = "app", project_context: Optional[dict[str, Any]] = None) -> CapabilityInferenceResult:
+    def infer(
+        self,
+        prompt: str,
+        project_name: str = "app",
+        project_context: Optional[dict[str, Any]] = None,
+        project_root: Optional[str] = None,
+        planned_files: Optional[dict[str, str]] = None,
+    ) -> CapabilityInferenceResult:
+        # 1. EXISTÊNCIA E ARQUITETURA PRIMEIRO
+        arch, decision = self.architecture_detector.detect_or_choose(
+            prompt=prompt,
+            files=planned_files,
+            project_root=project_root,
+            project_context=project_context,
+        )
+
+        # 2. CAPACIDADES
         capabilities = self.detector.detect(prompt, project_context)
+        prompt_norm = normalize_text(prompt)
+        if arch.frontend_entrypoints and "sem frontend" not in prompt_norm and "without frontend" not in prompt_norm:
+            capabilities.add(Capability.FRONTEND)
+        if arch.backend_entrypoints and "sem backend" not in prompt_norm and "without backend" not in prompt_norm:
+            capabilities.add(Capability.BACKEND)
+
         artifacts: list[InferredArtifact] = []
         entrypoints: list[str] = []
         contracts_by_file: dict[str, list[str]] = {}
@@ -239,121 +1068,87 @@ class ArtifactInferenceEngine:
         is_search = Capability.SEARCH in capabilities
         is_preview = Capability.PREVIEW in capabilities
 
-        # 1. FRONTEND ARTIFACTS
+        # Obter ficheiros existentes no projeto para resolução contextual
+        existing_files_dict = self._extract_existing_files(project_root, project_context, planned_files)
+
+        # 3. MAPEAMENTO DE CAPACIDADES PARA RESPONSABILIDADES CONFORME A ARQUITETURA
         if is_frontend:
-            entrypoints.append("index.html")
-            
-            # HTML
-            html_contracts = ["<!DOCTYPE html>", "<div id=\"app\"", "<script"]
-            if is_search:
-                html_contracts.append("id=\"search-input\"")
-            if is_dashboard:
-                html_contracts.append("id=\"dashboard\"")
-            if is_auth:
-                html_contracts.append("id=\"auth-container\"")
-            if is_crud:
-                html_contracts.append("id=\"item-form\"")
+            frontend_arts = self._resolve_frontend_responsibilities(
+                arch=arch,
+                project_name=project_name,
+                capabilities=capabilities,
+                existing_files=existing_files_dict,
+            )
+            for art in frontend_arts:
+                artifacts.append(art)
+                if art.relative_path:
+                    entrypoints.append(art.relative_path)
+                    contracts_by_file[art.relative_path] = art.functional_contracts
 
-            html_content = self._generate_html_skeleton(project_name, capabilities)
-            artifacts.append(InferredArtifact(
-                relative_path="index.html",
-                component="frontend",
-                required=True,
-                description="Ponto de entrada HTML5 responsivo",
-                default_content=html_content,
-                functional_contracts=html_contracts,
-            ))
-            contracts_by_file["index.html"] = html_contracts
-
-            # CSS
-            css_content = self._generate_css_skeleton(capabilities)
-            css_contracts = ["body", "box-sizing"]
-            artifacts.append(InferredArtifact(
-                relative_path="styles.css",
-                component="frontend",
-                required=True,
-                description="Estilos CSS modernos e responsivos",
-                default_content=css_content,
-                functional_contracts=css_contracts,
-            ))
-            contracts_by_file["styles.css"] = css_contracts
-
-            # JS
-            js_contracts = ["document.addEventListener"]
-            if is_storage:
-                js_contracts.append("localStorage")
-            if is_search:
-                js_contracts.append("filter")
-            if is_crud:
-                js_contracts.append("render")
-            if is_auth:
-                js_contracts.append("currentUser")
-
-            js_content = self._generate_js_skeleton(project_name, capabilities)
-            artifacts.append(InferredArtifact(
-                relative_path="app.js",
-                component="frontend",
-                required=True,
-                description="Lógica client-side com gestão de estado e eventos",
-                default_content=js_content,
-                functional_contracts=js_contracts,
-            ))
-            contracts_by_file["app.js"] = js_contracts
-
-        # 2. BACKEND ARTIFACTS
         if is_backend:
-            entrypoints.append("server.py")
-            backend_contracts = ["def", "PORT"]
-            if is_preview:
-                backend_contracts.append("/health")
-            if Capability.API in capabilities:
-                backend_contracts.append("json")
+            backend_arts = self._resolve_backend_responsibilities(
+                arch=arch,
+                project_name=project_name,
+                capabilities=capabilities,
+                existing_files=existing_files_dict,
+            )
+            for art in backend_arts:
+                artifacts.append(art)
+                if art.relative_path:
+                    entrypoints.append(art.relative_path)
+                    contracts_by_file[art.relative_path] = art.functional_contracts
 
-            py_backend_content = self._generate_python_backend_skeleton(project_name, capabilities)
-            artifacts.append(InferredArtifact(
-                relative_path="server.py",
-                component="backend",
-                required=True,
-                description="Servidor HTTP / API REST em Python com rota de healthcheck",
-                default_content=py_backend_content,
-                functional_contracts=backend_contracts,
-            ))
-            contracts_by_file["server.py"] = backend_contracts
+        if is_storage:
+            storage_arts = self._resolve_storage_responsibilities(
+                arch=arch,
+                capabilities=capabilities,
+                existing_files=existing_files_dict,
+            )
+            for art in storage_arts:
+                artifacts.append(art)
+                if art.relative_path and art.functional_contracts:
+                    contracts_by_file[art.relative_path] = art.functional_contracts
 
-        # 3. STORAGE ARTIFACTS (para backend ou persistência dedicada)
-        if is_backend and is_storage:
+        if is_search and not any(art.artifact_id == "search-feature" for art in artifacts):
+            search_arts = self._resolve_search_responsibilities(
+                arch=arch,
+                existing_files=existing_files_dict,
+            )
+            for art in search_arts:
+                artifacts.append(art)
+
+        if is_dashboard and not any(art.artifact_id == "dashboard-feature" for art in artifacts):
+            dash_arts = self._resolve_dashboard_responsibilities(
+                arch=arch,
+                existing_files=existing_files_dict,
+            )
+            for art in dash_arts:
+                artifacts.append(art)
+
+        # Scaffoldings opcionais (package.json / README)
+        if arch.package_manager in ("npm", "yarn", "pnpm", "bun") and "package.json" not in existing_files_dict:
+            pkg_content = self._generate_package_json(project_name, capabilities, arch)
             artifacts.append(InferredArtifact(
-                relative_path="database.py",
-                component="storage",
+                artifact_id="project-manifest",
+                responsibility="project package manifest and scripts",
+                category="scaffolding",
+                architecture=arch.stack,
                 required=False,
-                description="Camada de persistência SQLite",
-                default_content=self._generate_database_skeleton(),
-                functional_contracts=["sqlite3", "CREATE TABLE IF NOT EXISTS"],
+                candidate_paths=["package.json"],
+                functional_contracts=["name", "version"],
+                relative_path="package.json",
+                default_content=pkg_content,
             ))
 
-        # 4. PACKAGE.JSON & README
-        pkg_json = self._generate_package_json(project_name, capabilities)
-        artifacts.append(InferredArtifact(
-            relative_path="package.json",
-            component="scaffolding",
-            required=False,
-            description="Metadados do projeto e scripts de execução",
-            default_content=pkg_json,
-            functional_contracts=["name", "version"],
-        ))
+        # 4. DETEÇÃO DE STACK MISMATCH
+        all_eval_files = list(existing_files_dict.keys())
+        mismatches = detect_architecture_mismatch(all_eval_files, arch)
+        for mm in mismatches:
+            diagnostics.append(f"[Mismatch] {mm}")
 
-        readme_content = f"# {project_name.capitalize()}\n\nAplicação gerada pelo JARVIS OS com capacidades: {', '.join(c.value for c in capabilities)}.\n"
-        artifacts.append(InferredArtifact(
-            relative_path="README.md",
-            component="documentation",
-            required=False,
-            description="Documentação do projeto",
-            default_content=readme_content,
-            functional_contracts=["# "],
-        ))
-
-        diagnostics.append(f"Capacidades detetadas: {', '.join(sorted(c.value for c in capabilities))}")
-        diagnostics.append(f"Artefactos obrigatórios inferidos: {', '.join(a.relative_path for a in artifacts if a.required)}")
+        diagnostics.append(f"Arquitetura: {arch.stack} (fonte: {decision.source}, confiança: {arch.confidence:.2f})")
+        diagnostics.append(f"Capacidades: {', '.join(sorted(c.value for c in capabilities))}")
+        diagnostics.append(f"Artefactos obrigatórios: {', '.join(a.relative_path for a in artifacts if a.required)}")
 
         return CapabilityInferenceResult(
             prompt=prompt,
@@ -362,11 +1157,934 @@ class ArtifactInferenceEngine:
             entrypoints=entrypoints,
             contracts_by_file=contracts_by_file,
             diagnostics=diagnostics,
+            architecture=arch,
+            architecture_decision=decision,
+            mismatches=mismatches,
         )
+
+    def _extract_existing_files(
+        self,
+        project_root: Optional[str],
+        project_context: Optional[dict[str, Any]],
+        planned_files: Optional[dict[str, str]],
+    ) -> dict[str, str]:
+        existing: dict[str, str] = {}
+        if project_root and os.path.exists(project_root):
+            for root, dirs, f_names in os.walk(project_root):
+                dirs[:] = [d for d in dirs if d not in ProjectIntakeArchitectureDetector.IGNORE_DIRS]
+                for fn in f_names:
+                    rel = os.path.relpath(os.path.join(root, fn), project_root).replace("\\", "/")
+                    existing[rel] = ""
+        if project_context:
+            ctx_files = project_context.get("files")
+            if isinstance(ctx_files, dict):
+                existing.update(ctx_files)
+            elif isinstance(ctx_files, list):
+                for f in ctx_files:
+                    existing[f] = ""
+        if planned_files:
+            existing.update(planned_files)
+        return existing
+
+    def _match_existing(self, candidate_paths: list[str], existing_files: dict[str, str]) -> Optional[str]:
+        for c in candidate_paths:
+            c_norm = c.replace("\\", "/").strip().lstrip("./").lower()
+            for ef in existing_files:
+                ef_norm = ef.replace("\\", "/").strip().lstrip("./").lower()
+                if c_norm == ef_norm:
+                    return ef
+        return None
+
+    # -------------------------------------------------------------------------
+    # RESOLUÇÃO ESPECÍFICA POR CAPACIDADE E ARQUITETURA
+    # -------------------------------------------------------------------------
+
+    def _resolve_frontend_responsibilities(
+        self,
+        arch: ProjectArchitecture,
+        project_name: str,
+        capabilities: set[Capability],
+        existing_files: dict[str, str],
+    ) -> list[InferredArtifact]:
+        arts: list[InferredArtifact] = []
+
+        if arch.stack == "react_vite":
+            # 1. Entrypoint React Component
+            cand_entry = ["src/App.tsx", "src/App.jsx", "src/main.tsx"]
+            matched_entry = self._match_existing(cand_entry, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-entrypoint",
+                responsibility="frontend application entrypoint",
+                category="frontend",
+                architecture="react_vite",
+                source="existing_project" if matched_entry else "inferred",
+                required=True,
+                existing=bool(matched_entry),
+                candidate_paths=cand_entry,
+                functional_contracts=["export default", "return", "function", "const"],
+                evidence_requirements=["exists", "non_empty", "contains_component"],
+                relative_path=matched_entry or "src/App.tsx",
+                component="frontend",
+                description="Componente raiz da aplicação React",
+                default_content=self._generate_react_app_skeleton(project_name, capabilities),
+            ))
+
+            # 2. Bootstrap Mount
+            cand_boot = ["src/main.tsx", "src/main.jsx", "index.html"]
+            matched_boot = self._match_existing(cand_boot, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-bootstrap",
+                responsibility="frontend bootstrap mount",
+                category="frontend",
+                architecture="react_vite",
+                source="existing_project" if matched_boot else "inferred",
+                required=True,
+                existing=bool(matched_boot),
+                candidate_paths=cand_boot,
+                functional_contracts=["createRoot", "render"],
+                evidence_requirements=["exists", "non_empty"],
+                relative_path=matched_boot or "src/main.tsx",
+                component="frontend",
+                description="Ponto de montagem React DOM",
+                default_content=self._generate_react_main_skeleton(),
+            ))
+
+            # 3. Style System
+            cand_css = ["src/index.css", "src/App.css", "src/styles.css"]
+            matched_css = self._match_existing(cand_css, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-styling",
+                responsibility="frontend style system",
+                category="frontend",
+                architecture="react_vite",
+                source="existing_project" if matched_css else "inferred",
+                required=True,
+                existing=bool(matched_css),
+                candidate_paths=cand_css,
+                functional_contracts=["body", "box-sizing"],
+                evidence_requirements=["exists", "non_empty"],
+                relative_path=matched_css or "src/index.css",
+                component="frontend",
+                description="Folha de estilos principal da aplicação React",
+                default_content=self._generate_css_skeleton(capabilities),
+            ))
+
+            # 4. Vite HTML container se não existir
+            cand_html = ["index.html"]
+            matched_html = self._match_existing(cand_html, existing_files)
+            if not matched_html and not arch.is_existing:
+                arts.append(InferredArtifact(
+                    artifact_id="frontend-html-shell",
+                    responsibility="Vite host HTML shell",
+                    category="frontend",
+                    architecture="react_vite",
+                    required=False,
+                    candidate_paths=cand_html,
+                    functional_contracts=["<div id=\"root\">", "/src/main.tsx"],
+                    relative_path="index.html",
+                    default_content=self._generate_vite_index_html_skeleton(project_name),
+                ))
+
+        elif arch.stack == "nextjs":
+            # 1. Page Entrypoint
+            cand_page = ["app/page.tsx", "app/page.jsx", "pages/index.tsx"]
+            matched_page = self._match_existing(cand_page, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-entrypoint",
+                responsibility="Next.js page entrypoint",
+                category="frontend",
+                architecture="nextjs",
+                source="existing_project" if matched_page else "inferred",
+                required=True,
+                existing=bool(matched_page),
+                candidate_paths=cand_page,
+                functional_contracts=["export default", "return"],
+                relative_path=matched_page or "app/page.tsx",
+                component="frontend",
+                description="Página principal Next.js",
+                default_content=self._generate_next_page_skeleton(project_name, capabilities),
+            ))
+
+            # 2. Layout
+            cand_layout = ["app/layout.tsx", "app/layout.jsx", "pages/_app.tsx"]
+            matched_layout = self._match_existing(cand_layout, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-layout",
+                responsibility="Next.js root layout",
+                category="frontend",
+                architecture="nextjs",
+                source="existing_project" if matched_layout else "inferred",
+                required=True,
+                existing=bool(matched_layout),
+                candidate_paths=cand_layout,
+                functional_contracts=["RootLayout", "children"],
+                relative_path=matched_layout or "app/layout.tsx",
+                component="frontend",
+                description="Layout raiz da aplicação Next.js",
+                default_content=self._generate_next_layout_skeleton(project_name),
+            ))
+
+            # 3. Global Styling
+            cand_css = ["app/globals.css", "styles/globals.css", "src/app/globals.css"]
+            matched_css = self._match_existing(cand_css, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-styling",
+                responsibility="Next.js global styling",
+                category="frontend",
+                architecture="nextjs",
+                source="existing_project" if matched_css else "inferred",
+                required=True,
+                existing=bool(matched_css),
+                candidate_paths=cand_css,
+                functional_contracts=["body"],
+                relative_path=matched_css or "app/globals.css",
+                component="frontend",
+                description="Estilos globais Next.js",
+                default_content=self._generate_css_skeleton(capabilities),
+            ))
+
+        elif arch.stack == "vue_vite":
+            # 1. Vue App Root
+            cand_app = ["src/App.vue"]
+            matched_app = self._match_existing(cand_app, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-entrypoint",
+                responsibility="Vue root component",
+                category="frontend",
+                architecture="vue_vite",
+                source="existing_project" if matched_app else "inferred",
+                required=True,
+                existing=bool(matched_app),
+                candidate_paths=cand_app,
+                functional_contracts=["<template>", "<script"],
+                relative_path=matched_app or "src/App.vue",
+                component="frontend",
+                description="Componente raiz Vue 3",
+                default_content=self._generate_vue_app_skeleton(project_name, capabilities),
+            ))
+
+            # 2. Vue Bootstrap
+            cand_boot = ["src/main.js", "src/main.ts"]
+            matched_boot = self._match_existing(cand_boot, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-bootstrap",
+                responsibility="Vue main bootstrap",
+                category="frontend",
+                architecture="vue_vite",
+                source="existing_project" if matched_boot else "inferred",
+                required=True,
+                existing=bool(matched_boot),
+                candidate_paths=cand_boot,
+                functional_contracts=["createApp", "mount"],
+                relative_path=matched_boot or "src/main.js",
+                component="frontend",
+                description="Bootstrap da aplicação Vue",
+                default_content=self._generate_vue_main_skeleton(),
+            ))
+
+            # 3. Vue Styling
+            cand_css = ["src/style.css", "src/App.vue"]
+            matched_css = self._match_existing(cand_css, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-styling",
+                responsibility="Vue styling",
+                category="frontend",
+                architecture="vue_vite",
+                source="existing_project" if matched_css else "inferred",
+                required=True,
+                existing=bool(matched_css),
+                candidate_paths=cand_css,
+                functional_contracts=["body"],
+                relative_path=matched_css or "src/style.css",
+                component="frontend",
+                description="Estilos da aplicação Vue",
+                default_content=self._generate_css_skeleton(capabilities),
+            ))
+
+        else:
+            html_contracts = ["<!DOCTYPE html>", "<div id=\"app\"", "<script"]
+            if Capability.SEARCH in capabilities:
+                html_contracts.append("id=\"search-input\"")
+            if Capability.DASHBOARD in capabilities:
+                html_contracts.append("id=\"dashboard\"")
+            if Capability.AUTH in capabilities:
+                html_contracts.append("id=\"auth-container\"")
+            if Capability.CRUD in capabilities:
+                html_contracts.append("id=\"item-form\"")
+
+            cand_html = ["index.html"]
+            matched_html = self._match_existing(cand_html, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-entrypoint",
+                responsibility="HTML5 document structure",
+                category="frontend",
+                architecture="vanilla_web",
+                source="existing_project" if matched_html else "inferred",
+                required=True,
+                existing=bool(matched_html),
+                candidate_paths=cand_html,
+                functional_contracts=html_contracts,
+                relative_path=matched_html or "index.html",
+                component="frontend",
+                description="Ponto de entrada HTML5 responsivo",
+                default_content=self._generate_html_skeleton(project_name, capabilities),
+            ))
+
+            cand_css = ["styles.css", "style.css"]
+            matched_css = self._match_existing(cand_css, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-styling",
+                responsibility="responsive CSS stylesheet",
+                category="frontend",
+                architecture="vanilla_web",
+                source="existing_project" if matched_css else "inferred",
+                required=True,
+                existing=bool(matched_css),
+                candidate_paths=cand_css,
+                functional_contracts=["body", "box-sizing"],
+                relative_path=matched_css or "styles.css",
+                component="frontend",
+                description="Estilos CSS modernos e responsivos",
+                default_content=self._generate_css_skeleton(capabilities),
+            ))
+
+            js_contracts = ["document.addEventListener"]
+            if Capability.STORAGE in capabilities:
+                js_contracts.append("localStorage")
+            if Capability.SEARCH in capabilities:
+                js_contracts.append("filter")
+            if Capability.CRUD in capabilities:
+                js_contracts.append("render")
+            if Capability.AUTH in capabilities:
+                js_contracts.append("currentUser")
+
+            cand_js = ["app.js", "main.js", "index.js"]
+            matched_js = self._match_existing(cand_js, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="frontend-logic",
+                responsibility="client-side DOM script",
+                category="frontend",
+                architecture="vanilla_web",
+                source="existing_project" if matched_js else "inferred",
+                required=True,
+                existing=bool(matched_js),
+                candidate_paths=cand_js,
+                functional_contracts=js_contracts,
+                relative_path=matched_js or "app.js",
+                component="frontend",
+                description="Lógica client-side com gestão de estado e eventos",
+                default_content=self._generate_js_skeleton(project_name, capabilities),
+            ))
+
+        return arts
+
+    def _resolve_backend_responsibilities(
+        self,
+        arch: ProjectArchitecture,
+        project_name: str,
+        capabilities: set[Capability],
+        existing_files: dict[str, str],
+    ) -> list[InferredArtifact]:
+        arts: list[InferredArtifact] = []
+
+        if arch.stack == "python_fastapi":
+            cand_py = ["main.py", "app.py", "server.py", "backend/main.py", "api/main.py"]
+            matched = self._match_existing(cand_py, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="backend-entrypoint",
+                responsibility="backend runtime entrypoint and API routes",
+                category="backend",
+                architecture="python_fastapi",
+                source="existing_project" if matched else "inferred",
+                required=True,
+                existing=bool(matched),
+                candidate_paths=cand_py,
+                functional_contracts=["FastAPI", "/health", "PORT"],
+                relative_path=matched or "main.py",
+                component="backend",
+                description="Servidor HTTP / API REST FastAPI assíncrono",
+                default_content=self._generate_fastapi_backend_skeleton(project_name, capabilities),
+            ))
+
+        elif arch.stack in ("node_express", "node_typescript"):
+            cand_node = ["src/server.ts", "server.ts", "src/index.ts", "server.js", "app.js"]
+            matched = self._match_existing(cand_node, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="backend-entrypoint",
+                responsibility="Node backend API entrypoint",
+                category="backend",
+                architecture=arch.stack,
+                source="existing_project" if matched else "inferred",
+                required=True,
+                existing=bool(matched),
+                candidate_paths=cand_node,
+                functional_contracts=["express", "listen", "PORT"],
+                relative_path=matched or ("src/server.ts" if "src" in arch.source_root else "server.js"),
+                component="backend",
+                description="Servidor Express Node.js",
+                default_content=self._generate_node_express_skeleton(project_name),
+            ))
+
+        elif arch.stack == "nextjs":
+            cand_api = ["app/api/health/route.ts", "app/api/health/route.js", "pages/api/health.ts"]
+            matched = self._match_existing(cand_api, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="backend-entrypoint",
+                responsibility="Next.js API route handler",
+                category="backend",
+                architecture="nextjs",
+                source="existing_project" if matched else "inferred",
+                required=True,
+                existing=bool(matched),
+                candidate_paths=cand_api,
+                functional_contracts=["GET", "Response", "NextResponse"],
+                relative_path=matched or "app/api/health/route.ts",
+                component="backend",
+                description="Rota de API Next.js Route Handler",
+                default_content="""import { NextResponse } from 'next/server';
+
+export async function GET() {
+    return NextResponse.json({ status: 'ok', timestamp: new Date().toISOString() });
+}
+""",
+            ))
+
+        else:
+            # Python Standard HTTP Server
+            cand_py = ["server.py", "main.py", "app.py", "backend.py"]
+            matched = self._match_existing(cand_py, existing_files)
+            arts.append(InferredArtifact(
+                artifact_id="backend-entrypoint",
+                responsibility="backend HTTP server and routes",
+                category="backend",
+                architecture=arch.stack,
+                source="existing_project" if matched else "inferred",
+                required=True,
+                existing=bool(matched),
+                candidate_paths=cand_py,
+                functional_contracts=["PORT", "HTTPServer", "do_GET"],
+                relative_path=matched or "server.py",
+                component="backend",
+                description="Servidor HTTP em Python com rota de healthcheck",
+                default_content=self._generate_python_backend_skeleton(project_name, capabilities),
+            ))
+
+        return arts
+
+    def _resolve_storage_responsibilities(
+        self,
+        arch: ProjectArchitecture,
+        capabilities: set[Capability],
+        existing_files: dict[str, str],
+    ) -> list[InferredArtifact]:
+        """
+        STORAGE significa persistência: NÃO criar database.py automaticamente.
+        Resolve primeiro localStorage/IndexedDB se frontend puro.
+        Só cria ficheiro de base de dados dedicado se for backend.
+        """
+        arts: list[InferredArtifact] = []
+
+        is_backend = Capability.BACKEND in capabilities or arch.runtime in ("python", "node")
+        if not is_backend:
+            # Em arquitetura frontend (Vanilla, React, Vue, Next), persistência é suportada no browser
+            if arch.stack == "react_vite":
+                cand_storage = ["src/services/storage.ts", "src/hooks/useStorage.ts", "src/App.tsx"]
+                matched = self._match_existing(cand_storage, existing_files)
+                arts.append(InferredArtifact(
+                    artifact_id="client-storage",
+                    responsibility="client-side state persistence (localStorage / IndexedDB)",
+                    category="storage",
+                    architecture="react_vite",
+                    source="existing_project" if matched else "inferred",
+                    required=False,
+                    existing=bool(matched),
+                    candidate_paths=cand_storage,
+                    functional_contracts=["localStorage"],
+                    relative_path=matched or "src/App.tsx",
+                    component="storage",
+                    description="Persistência no browser via localStorage / Hook",
+                ))
+            elif arch.stack == "vanilla_web":
+                cand_storage = ["app.js", "main.js"]
+                matched = self._match_existing(cand_storage, existing_files)
+                arts.append(InferredArtifact(
+                    artifact_id="client-storage",
+                    responsibility="client-side storage in browser",
+                    category="storage",
+                    architecture="vanilla_web",
+                    source="existing_project" if matched else "inferred",
+                    required=False,
+                    existing=bool(matched),
+                    candidate_paths=cand_storage,
+                    functional_contracts=["localStorage"],
+                    relative_path=matched or "app.js",
+                    component="storage",
+                    description="Mecanismo de persistência local no browser",
+                ))
+            return arts
+
+        # Backend Storage
+        cand_db = ["database.py", "models.py", "db.py", "db.ts", "schema.sql"]
+        matched_db = self._match_existing(cand_db, existing_files)
+        arts.append(InferredArtifact(
+            artifact_id="backend-database",
+            responsibility="backend persistent database layer",
+            category="storage",
+            architecture=arch.stack,
+            source="existing_project" if matched_db else "inferred",
+            required=False,
+            existing=bool(matched_db),
+            candidate_paths=cand_db,
+            functional_contracts=["sqlite3", "connect"] if "python" in arch.runtime else ["db"],
+            relative_path=matched_db or ("database.py" if "python" in arch.runtime else "src/db.ts"),
+            component="storage",
+            description="Camada de persistência em base de dados",
+            default_content=self._generate_database_skeleton(),
+        ))
+        return arts
+
+    def _resolve_search_responsibilities(
+        self,
+        arch: ProjectArchitecture,
+        existing_files: dict[str, str],
+    ) -> list[InferredArtifact]:
+        """
+        Prompt: 'adiciona pesquisa'.
+        Resolve ficheiro existente primeiro (ex: SearchBar.tsx, App.tsx).
+        NUNCA cria search.js num projeto React/Next.
+        """
+        if arch.stack == "react_vite":
+            cand = ["src/components/SearchBar.tsx", "src/components/Search.tsx", "src/App.tsx"]
+            matched = self._match_existing(cand, existing_files)
+            return [InferredArtifact(
+                artifact_id="search-feature",
+                responsibility="search and filtering component",
+                category="search",
+                architecture="react_vite",
+                source="existing_project" if matched else "inferred",
+                required=True,
+                existing=bool(matched),
+                candidate_paths=cand,
+                functional_contracts=["filter", "search"],
+                relative_path=matched or "src/App.tsx",
+                component="frontend",
+                description="Componente ou rotina de pesquisa em React",
+            )]
+        elif arch.stack == "nextjs":
+            cand = ["app/components/SearchBar.tsx", "app/search/page.tsx", "app/page.tsx"]
+            matched = self._match_existing(cand, existing_files)
+            return [InferredArtifact(
+                artifact_id="search-feature",
+                responsibility="search and filtering component in Next.js",
+                category="search",
+                architecture="nextjs",
+                source="existing_project" if matched else "inferred",
+                required=True,
+                existing=bool(matched),
+                candidate_paths=cand,
+                functional_contracts=["filter"],
+                relative_path=matched or "app/page.tsx",
+                component="frontend",
+                description="Funcionalidade de pesquisa em Next.js",
+            )]
+        else:
+            cand = ["app.js", "index.html"]
+            matched = self._match_existing(cand, existing_files)
+            return [InferredArtifact(
+                artifact_id="search-feature",
+                responsibility="DOM search and filter routines",
+                category="search",
+                architecture="vanilla_web",
+                source="existing_project" if matched else "inferred",
+                required=True,
+                existing=bool(matched),
+                candidate_paths=cand,
+                functional_contracts=["filter"],
+                relative_path=matched or "app.js",
+                component="frontend",
+                description="Rotina de filtragem e pesquisa em app.js",
+            )]
+
+    def _resolve_dashboard_responsibilities(
+        self,
+        arch: ProjectArchitecture,
+        existing_files: dict[str, str],
+    ) -> list[InferredArtifact]:
+        """
+        Prompt: 'adiciona dashboard'.
+        Resolve componente React/Next existente, nunca força templates vanilla.
+        """
+        if arch.stack == "react_vite":
+            cand = ["src/components/Dashboard.tsx", "src/App.tsx"]
+            matched = self._match_existing(cand, existing_files)
+            return [InferredArtifact(
+                artifact_id="dashboard-feature",
+                responsibility="dashboard metric and summary view",
+                category="dashboard",
+                architecture="react_vite",
+                source="existing_project" if matched else "inferred",
+                required=True,
+                existing=bool(matched),
+                candidate_paths=cand,
+                functional_contracts=["dashboard"],
+                relative_path=matched or "src/App.tsx",
+                component="frontend",
+                description="Painel de métricas e KPIs em React",
+            )]
+        elif arch.stack == "nextjs":
+            cand = ["app/dashboard/page.tsx", "app/page.tsx"]
+            matched = self._match_existing(cand, existing_files)
+            return [InferredArtifact(
+                artifact_id="dashboard-feature",
+                responsibility="Next.js dashboard page view",
+                category="dashboard",
+                architecture="nextjs",
+                source="existing_project" if matched else "inferred",
+                required=True,
+                existing=bool(matched),
+                candidate_paths=cand,
+                functional_contracts=["dashboard"],
+                relative_path=matched or "app/page.tsx",
+                component="frontend",
+                description="Painel de dashboard em Next.js",
+            )]
+        else:
+            cand = ["index.html", "app.js"]
+            matched = self._match_existing(cand, existing_files)
+            return [InferredArtifact(
+                artifact_id="dashboard-feature",
+                responsibility="dashboard cards and metrics UI",
+                category="dashboard",
+                architecture="vanilla_web",
+                source="existing_project" if matched else "inferred",
+                required=True,
+                existing=bool(matched),
+                candidate_paths=cand,
+                functional_contracts=["dashboard"],
+                relative_path=matched or "index.html",
+                component="frontend",
+                description="Secção de métricas no index.html e app.js",
+            )]
 
     # -------------------------------------------------------------------------
     # SKELETON GENERATORS
     # -------------------------------------------------------------------------
+
+    def _generate_react_app_skeleton(self, project_name: str, capabilities: set[Capability]) -> str:
+        title = project_name.replace("-", " ").title()
+        has_auth = Capability.AUTH in capabilities
+        has_search = Capability.SEARCH in capabilities
+        has_dashboard = Capability.DASHBOARD in capabilities
+        has_crud = Capability.CRUD in capabilities
+        has_storage = Capability.STORAGE in capabilities
+
+        return f"""import React, {{ useState, useEffect }} from 'react';
+import './index.css';
+
+interface Item {{
+  id: string;
+  title: string;
+  completed: boolean;
+}}
+
+export default function App() {{
+  const [items, setItems] = useState<Item[]>(() => {{
+    {('try { const raw = localStorage.getItem("' + project_name + '_items"); return raw ? JSON.parse(raw) : []; } catch { return []; }') if has_storage else 'return [];'}
+  }});
+  const [newItemTitle, setNewItemTitle] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentUser, setCurrentUser] = useState<string | null>({('localStorage.getItem("' + project_name + '_user") || null') if has_auth else 'null'});
+
+  useEffect(() => {{
+    {('localStorage.setItem("' + project_name + '_items", JSON.stringify(items));') if has_storage else ''}
+  }}, [items]);
+
+  const addItem = (e: React.FormEvent) => {{
+    e.preventDefault();
+    if (!newItemTitle.trim()) return;
+    setItems([{{ id: Date.now().toString(), title: newItemTitle.trim(), completed: false }}, ...items]);
+    setNewItemTitle('');
+  }};
+
+  const toggleItem = (id: string) => {{
+    setItems(items.map(i => i.id === id ? {{ ...i, completed: !i.completed }} : i));
+  }};
+
+  const deleteItem = (id: string) => {{
+    setItems(items.filter(i => i.id !== id));
+  }};
+
+  const filteredItems = items.filter(i => i.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  return (
+    <div className="app-container">
+      <header className="app-header">
+        <h1>{title}</h1>
+        <div className="status-indicator"><span className="dot online"></span> Pronto</div>
+      </header>
+
+      <main className="app-main">
+        {('{/* Dashboard */}\\n        <div id="dashboard" className="dashboard-grid"><div className="stat-card">Total: {items.length}</div></div>') if has_dashboard else ''}
+
+        {('{/* Search */}\\n        <div className="search-bar"><input id="search-input" type="text" placeholder="Pesquisar..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} /></div>') if has_search else ''}
+
+        {('{/* CRUD Form */}\\n        <form id="item-form" className="item-form" onSubmit={addItem}><input id="item-title" type="text" placeholder="Novo item..." value={newItemTitle} onChange={e => setNewItemTitle(e.target.value)} /><button type="submit" className="btn btn-primary">Adicionar</button></form>') if has_crud else ''}
+
+        <ul className="items-list">
+          {{filteredItems.map(item => (
+            <li key={{item.id}} className={{`item-row ${{item.completed ? 'completed' : ''}}`}}>
+              <span>{{item.title}}</span>
+              <div className="item-actions">
+                <button className="btn btn-secondary btn-sm" onClick={{() => toggleItem(item.id)}}>✓</button>
+                <button className="btn btn-secondary btn-sm" onClick={{() => deleteItem(item.id)}}>✕</button>
+              </div>
+            </li>
+          ))}}
+        </ul>
+      </main>
+    </div>
+  );
+}}
+"""
+
+    def _generate_react_main_skeleton(self) -> str:
+        return """import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+"""
+
+    def _generate_vite_index_html_skeleton(self, project_name: str) -> str:
+        title = project_name.replace("-", " ").title()
+        return f"""<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+"""
+
+    def _generate_next_page_skeleton(self, project_name: str, capabilities: set[Capability]) -> str:
+        title = project_name.replace("-", " ").title()
+        return f"""'use client';
+
+import React, {{ useState }} from 'react';
+
+export default function HomePage() {{
+  const [items, setItems] = useState<string[]>([]);
+  const [inputVal, setInputVal] = useState('');
+
+  const addItem = (e: React.FormEvent) => {{
+    e.preventDefault();
+    if (!inputVal.trim()) return;
+    setItems([inputVal.trim(), ...items]);
+    setInputVal('');
+  }};
+
+  return (
+    <main className="container mx-auto p-8 max-w-2xl">
+      <h1 className="text-3xl font-bold mb-6">{title}</h1>
+      <form onSubmit={{addItem}} className="flex gap-4 mb-8">
+        <input
+          type="text"
+          className="border p-2 flex-1 rounded text-black"
+          placeholder="Adicionar tarefa..."
+          value={{inputVal}}
+          onChange={{e => setInputVal(e.target.value)}}
+        />
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          Adicionar
+        </button>
+      </form>
+      <ul className="space-y-2">
+        {{items.map((it, idx) => (
+          <li key={{idx}} className="p-3 bg-gray-100 rounded text-black">
+            {{it}}
+          </li>
+        ))}}
+      </ul>
+    </main>
+  );
+}}
+"""
+
+    def _generate_next_layout_skeleton(self, project_name: str) -> str:
+        title = project_name.replace("-", " ").title()
+        return f"""import './globals.css';
+import type {{ Metadata }} from 'next';
+
+export const metadata: Metadata = {{
+  title: '{title}',
+  description: 'Criado pelo JARVIS OS',
+}};
+
+export default function RootLayout({{
+  children,
+}}: {{
+  children: React.ReactNode;
+}}) {{
+  return (
+    <html lang="pt">
+      <body className="bg-white text-gray-900 min-h-screen">
+        {{children}}
+      </body>
+    </html>
+  );
+}}
+"""
+
+    def _generate_vue_app_skeleton(self, project_name: str, capabilities: set[Capability]) -> str:
+        title = project_name.replace("-", " ").title()
+        return f"""<template>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>{title}</h1>
+    </header>
+    <main class="app-main">
+      <form @submit.prevent="addItem" class="item-form">
+        <input v-model="newTitle" placeholder="Novo item..." required />
+        <button type="submit" class="btn btn-primary">Adicionar</button>
+      </form>
+      <ul class="items-list">
+        <li v-for="it in items" :key="it.id" class="item-row">
+          <span>{{{{ it.title }}}}</span>
+          <button @click="removeItem(it.id)" class="btn btn-secondary btn-sm">✕</button>
+        </li>
+      </ul>
+    </main>
+  </div>
+</template>
+
+<script setup>
+import {{ ref }} from 'vue';
+
+const items = ref([]);
+const newTitle = ref('');
+
+function addItem() {{
+  if (!newTitle.value.trim()) return;
+  items.value.unshift({{ id: Date.now().toString(), title: newTitle.value.trim() }});
+  newTitle.value = '';
+}}
+
+function removeItem(id) {{
+  items.value = items.value.filter(i => i.id !== id);
+}}
+</script>
+"""
+
+    def _generate_vue_main_skeleton(self) -> str:
+        return """import { createApp } from 'vue';
+import App from './App.vue';
+import './style.css';
+
+createApp(App).mount('#app');
+"""
+
+    def _generate_fastapi_backend_skeleton(self, project_name: str, capabilities: set[Capability]) -> str:
+        return f"""\"\"\"
+JARVIS OS - FastAPI Backend ({project_name})
+\"\"\"
+
+import os
+from typing import List, Optional
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+app = FastAPI(title="{project_name.capitalize()} API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+PORT = int(os.environ.get("PORT", 8080))
+
+class Item(BaseModel):
+    id: Optional[str] = None
+    title: str
+    completed: bool = False
+
+db_items: List[Item] = []
+
+@app.get("/health")
+def healthcheck():
+    return {{"status": "ok", "app": "{project_name}", "version": "1.0.0"}}
+
+@app.get("/api/items", response_model=List[Item])
+def get_items():
+    return db_items
+
+@app.post("/api/items", response_model=Item, status_code=201)
+def create_item(item: Item):
+    item.id = str(len(db_items) + 1)
+    db_items.append(item)
+    return item
+
+@app.delete("/api/items/{{item_id}}")
+def delete_item(item_id: str):
+    global db_items
+    db_items = [i for i in db_items if i.id != item_id]
+    return {{"status": "deleted", "id": item_id}}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=True)
+"""
+
+    def _generate_node_express_skeleton(self, project_name: str) -> str:
+        return f"""// JARVIS OS - Express Backend ({project_name})
+import express, {{ Request, Response }} from 'express';
+import cors from 'cors';
+
+const app = express();
+const PORT = process.env.PORT || 8080;
+
+app.use(cors());
+app.use(express.json());
+
+interface Item {{
+  id: string;
+  title: string;
+  completed: boolean;
+}}
+
+let items: Item[] = [];
+
+app.get('/health', (req: Request, res: Response) => {{
+  res.json({{ status: 'ok', app: '{project_name}', timestamp: new Date().toISOString() }});
+}});
+
+app.get('/api/items', (req: Request, res: Response) => {{
+  res.json(items);
+}});
+
+app.post('/api/items', (req: Request, res: Response) => {{
+  const newItem: Item = {{ id: Date.now().toString(), title: req.body.title || '', completed: false }};
+  items.unshift(newItem);
+  res.status(201).json(newItem);
+}});
+
+app.listen(PORT, () => {{
+  console.log(`[JARVIS Backend] Servidor Express ativo na porta ${{PORT}}`);
+}});
+"""
 
     def _generate_html_skeleton(self, project_name: str, capabilities: set[Capability]) -> str:
         title = project_name.replace("-", " ").title()
@@ -570,7 +2288,6 @@ body {
     gap: 1.5rem;
 }
 
-/* Dashboard Grid */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -600,7 +2317,6 @@ body {
     color: var(--accent-primary);
 }
 
-/* Search Bar */
 .search-bar {
     display: flex;
     gap: 0.75rem;
@@ -629,7 +2345,6 @@ body {
     flex: 1;
 }
 
-/* Form & Buttons */
 .item-form {
     display: flex;
     gap: 0.75rem;
@@ -668,7 +2383,6 @@ body {
     background: var(--border-color);
 }
 
-/* Items List */
 .items-list {
     list-style: none;
     display: flex;
@@ -742,7 +2456,6 @@ document.addEventListener('DOMContentLoaded', () => {{
     let items = loadState();
     let currentUser = {('localStorage.getItem("' + project_name + '_user") || ""') if has_auth else 'null'};
 
-    // DOM Elements
     const itemForm = document.getElementById('item-form');
     const itemTitle = document.getElementById('item-title');
     const itemsList = document.getElementById('items-list');
@@ -750,12 +2463,10 @@ document.addEventListener('DOMContentLoaded', () => {{
     const searchInput = document.getElementById('search-input');
     const filterSelect = document.getElementById('filter-select');
 
-    // Dashboard Elements
     const statTotal = document.getElementById('stat-total');
     const statActive = document.getElementById('stat-active');
     const statCompleted = document.getElementById('stat-completed');
 
-    // Auth Elements
     const authBox = document.getElementById('auth-container');
     const loginForm = document.getElementById('login-form');
     const usernameInput = document.getElementById('username-input');
@@ -861,7 +2572,6 @@ document.addEventListener('DOMContentLoaded', () => {{
         renderItems();
     }}
 
-    // Event Listeners
     if (itemForm) {{
         itemForm.addEventListener('submit', (e) => {{
             e.preventDefault();
@@ -880,7 +2590,6 @@ document.addEventListener('DOMContentLoaded', () => {{
         filterSelect.addEventListener('change', renderItems);
     }}
 
-    // Auth Handlers
     function updateAuthUI() {{
         if (!authBox) return;
         if (currentUser) {{
@@ -1014,15 +2723,43 @@ if __name__ == "__main__":
     print("[Database] Tabela 'items' inicializada.")
 """
 
-    def _generate_package_json(self, project_name: str, capabilities: set[Capability]) -> str:
+    def _generate_package_json(
+        self,
+        project_name: str,
+        capabilities: set[Capability],
+        arch: Optional[ProjectArchitecture] = None,
+    ) -> str:
+        stack = arch.stack if arch else "vanilla_web"
+        scripts = {}
+        if stack == "react_vite":
+            scripts = {
+                "dev": "vite",
+                "build": "vite build",
+                "preview": "vite preview",
+            }
+        elif stack == "nextjs":
+            scripts = {
+                "dev": "next dev",
+                "build": "next build",
+                "start": "next start",
+            }
+        elif stack == "vue_vite":
+            scripts = {
+                "dev": "vite",
+                "build": "vite build",
+                "preview": "vite preview",
+            }
+        else:
+            scripts = {
+                "start": "python server.py" if Capability.BACKEND in capabilities else "npx serve ."
+            }
+
         return json.dumps({
             "name": project_name,
             "version": "1.0.0",
             "description": f"Projeto {project_name} gerado pelo JARVIS OS",
-            "scripts": {
-                "start": "python server.py" if Capability.BACKEND in capabilities else "npx serve ."
-            },
-            "dependencies": {}
+            "scripts": scripts,
+            "dependencies": {},
         }, indent=2)
 
 
@@ -1040,7 +2777,6 @@ class DependencyScanner:
     """
 
     KNOWN_CDN_MAP = [
-        # (Pattern, CDN Tag, NPM Package, NPM Version)
         (
             r"(chart\.js|\bChart\b|\bchartjs\b)",
             '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>',
@@ -1116,14 +2852,12 @@ class DependencyScanner:
         full_frontend_code = "\n".join(all_js_html_content)
         full_backend_code = "\n".join(all_py_content)
 
-        # Scan Frontend Dependencies
         for pattern, cdn_tag, npm_pkg, npm_ver in self.KNOWN_CDN_MAP:
             if re.search(pattern, full_frontend_code, re.IGNORECASE):
                 if cdn_tag not in cdn_tags:
                     cdn_tags.append(cdn_tag)
                 npm_packages[npm_pkg] = npm_ver
 
-        # Scan Backend Python Dependencies
         for pattern, pip_spec in self.KNOWN_PYTHON_PACKAGES:
             if re.search(pattern, full_backend_code):
                 if pip_spec not in pip_packages:
@@ -1139,7 +2873,12 @@ class DependencyScanner:
 class DeterministicRepairEngine:
     """
     Inspeciona planos de alteração ou diretórios de projetos,
-    compara com a inferência determinística e repara lacunas estruturais.
+    compara com a inferência arquitetural e repara lacunas estruturais.
+    REGRAS ARQUITETURAIS:
+    1. Resolve a arquitetura primeiro.
+    2. Procura artefactos equivalentes que já cumpram as responsabilidades.
+    3. Só cria responsabilidades inexistentes usando a convenção da stack.
+    4. Corrige STACK MISMATCHES (ex: app.js num projeto React).
     """
 
     def __init__(
@@ -1156,35 +2895,67 @@ class DeterministicRepairEngine:
         planned_files: dict[str, str],
         project_name: str = "app",
         project_context: Optional[dict[str, Any]] = None,
+        project_root: Optional[str] = None,
     ) -> RepairResult:
-        inference = self.inference_engine.infer(prompt, project_name, project_context)
+        inference = self.inference_engine.infer(
+            prompt=prompt,
+            project_name=project_name,
+            project_context=project_context,
+            project_root=project_root,
+            planned_files=planned_files,
+        )
+        arch = inference.architecture
         actions: list[RepairAction] = []
         repaired_files = dict(planned_files)
-        diagnostics: list[str] = []
+        diagnostics: list[str] = list(inference.diagnostics)
         missing_before: list[str] = []
         unresolved_contracts: list[str] = []
 
-        # 1. Verificar artefactos em falta
+        # 1. Tratar STACK MISMATCH (ex: LLM tentou injetar app.js ou styles.css vanilla num React/Next)
+        if arch and arch.stack in ("react_vite", "nextjs", "vue_vite"):
+            for bad_file in list(repaired_files.keys()):
+                bad_norm = bad_file.replace("\\", "/").strip().lstrip("./").lower()
+                if bad_norm in ("app.js", "search.js") and arch.stack in ("react_vite", "nextjs"):
+                    del repaired_files[bad_file]
+                    actions.append(RepairAction(
+                        action_type="REMOVE_MISMATCH",
+                        relative_path=bad_file,
+                        reason=f"Remoção de artefacto incompatível '{bad_file}' para arquitetura {arch.stack}",
+                        content="",
+                    ))
+                    diagnostics.append(f"[Repair] Removido ficheiro incompatível '{bad_file}' para arquitetura {arch.stack}")
+                elif bad_norm in ("styles.css", "style.css") and arch.stack in ("react_vite", "nextjs") and any(rf.startswith("src/") or rf.startswith("app/") for rf in repaired_files):
+                    del repaired_files[bad_file]
+                    actions.append(RepairAction(
+                        action_type="REMOVE_MISMATCH",
+                        relative_path=bad_file,
+                        reason=f"Remoção de folha de estilos na raiz '{bad_file}' incompatível com arquitetura {arch.stack}",
+                        content="",
+                    ))
+                    diagnostics.append(f"[Repair] Removido ficheiro incompatível '{bad_file}' para arquitetura {arch.stack}")
+
+        # 2. Verificar responsabilidades em falta
         for required_art in inference.required_artifacts:
             if not required_art.required:
                 continue
 
-            rel_path = required_art.relative_path
-            # Aceitar aliases comuns (ex: styles.css vs style.css, app.js vs index.js / main.js)
-            existing_match = self._find_matching_path(rel_path, repaired_files)
+            # Procurar se algum ficheiro no plano cumpre a responsabilidade
+            existing_match = self._find_matching_path(required_art, repaired_files)
 
-            if not existing_match:
-                missing_before.append(rel_path)
+            if not existing_match and not required_art.existing:
+                # Responsabilidade ausente: criar com o caminho e convenções da arquitetura detetada
+                target_path = required_art.relative_path
+                missing_before.append(target_path)
                 actions.append(RepairAction(
                     action_type="CREATE_FILE",
-                    relative_path=rel_path,
-                    reason=f"Artefacto obrigatório inferido '{rel_path}' estava ausente no plano.",
+                    relative_path=target_path,
+                    reason=f"Responsabilidade obrigatória '{required_art.responsibility}' em falta para arquitetura {arch.stack if arch else 'generic'}.",
                     content=required_art.default_content,
                 ))
-                repaired_files[rel_path] = required_art.default_content
-                diagnostics.append(f"[Repair] Criado ficheiro obrigatório em falta: {rel_path}")
+                repaired_files[target_path] = required_art.default_content
+                diagnostics.append(f"[Repair] Criado artefacto em falta '{target_path}' ({required_art.responsibility})")
             else:
-                # 2. Verificar contratos funcionais no ficheiro existente
+                # Verificar contratos funcionais no ficheiro existente
                 content = repaired_files[existing_match]
                 missing_contracts = [
                     c for c in required_art.functional_contracts
@@ -1214,26 +2985,27 @@ class DeterministicRepairEngine:
         # 3. Resolução e Injeção Automática de Dependências (Fase 9.3)
         deps = self.dependency_scanner.scan(repaired_files)
 
-        # Injeção de CDN no index.html (se for web app e tiver tags CDN necessárias)
-        html_key = self._find_matching_path("index.html", repaired_files)
-        if html_key and deps.cdn_tags:
-            html_content = repaired_files[html_key]
-            tags_to_inject = [t for t in deps.cdn_tags if t not in html_content]
-            if tags_to_inject:
-                patched_html = self._inject_cdn_tags(html_content, tags_to_inject)
-                if patched_html != html_content:
-                    repaired_files[html_key] = patched_html
-                    actions.append(RepairAction(
-                        action_type="PATCH_FILE",
-                        relative_path=html_key,
-                        reason=f"Injeção automática de bibliotecas CDN: {len(tags_to_inject)} tag(s)",
-                        content=patched_html,
-                    ))
-                    diagnostics.append(f"[Repair] Injetadas {len(tags_to_inject)} tag(s) CDN em '{html_key}'")
+        # Injeção de CDN no index.html (se for web app vanilla e tiver tags CDN necessárias)
+        if arch and arch.stack == "vanilla_web":
+            html_key = self._find_key_in_dict("index.html", repaired_files)
+            if html_key and deps.cdn_tags:
+                html_content = repaired_files[html_key]
+                tags_to_inject = [t for t in deps.cdn_tags if t not in html_content]
+                if tags_to_inject:
+                    patched_html = self._inject_cdn_tags(html_content, tags_to_inject)
+                    if patched_html != html_content:
+                        repaired_files[html_key] = patched_html
+                        actions.append(RepairAction(
+                            action_type="PATCH_FILE",
+                            relative_path=html_key,
+                            reason=f"Injeção automática de bibliotecas CDN: {len(tags_to_inject)} tag(s)",
+                            content=patched_html,
+                        ))
+                        diagnostics.append(f"[Repair] Injetadas {len(tags_to_inject)} tag(s) CDN em '{html_key}'")
 
         # Geração ou Atualização de requirements.txt para Python
         if deps.pip_packages:
-            req_key = self._find_matching_path("requirements.txt", repaired_files)
+            req_key = self._find_key_in_dict("requirements.txt", repaired_files)
             if not req_key:
                 req_content = "\n".join(sorted(deps.pip_packages)) + "\n"
                 repaired_files["requirements.txt"] = req_content
@@ -1260,7 +3032,7 @@ class DeterministicRepairEngine:
 
         # Atualização de package.json se dependências npm foram descobertas
         if deps.npm_packages:
-            pkg_key = self._find_matching_path("package.json", repaired_files)
+            pkg_key = self._find_key_in_dict("package.json", repaired_files)
             if pkg_key:
                 try:
                     pkg_data = json.loads(repaired_files[pkg_key])
@@ -1292,36 +3064,57 @@ class DeterministicRepairEngine:
             diagnostics=diagnostics,
             missing_before=missing_before,
             unresolved_contracts=unresolved_contracts,
+            architecture=arch,
         )
 
-    def _find_matching_path(self, target_path: str, files: dict[str, str]) -> Optional[str]:
-        target_norm = target_path.replace("\\", "/").strip().lstrip("./")
-        if target_norm in files:
-            return target_norm
+    def _find_matching_path(self, art: InferredArtifact, files: dict[str, str]) -> Optional[str]:
+        # 1. Correspondência exata em candidate_paths
+        for c in art.candidate_paths:
+            c_norm = c.replace("\\", "/").strip().lstrip("./").lower()
+            for f in files:
+                f_norm = f.replace("\\", "/").strip().lstrip("./").lower()
+                if f_norm == c_norm:
+                    return f
 
-        target_name = Path(target_norm).name.lower()
-        for f in files:
-            f_norm = f.replace("\\", "/").strip().lstrip("./")
-            f_name = Path(f_norm).name.lower()
+        # 2. Correspondência por nome de ficheiro
+        for c in art.candidate_paths:
+            c_name = Path(c).name.lower()
+            for f in files:
+                f_name = Path(f).name.lower()
+                if f_name == c_name:
+                    return f
 
-            if f_name == target_name:
-                return f
+        # 3. Correspondência por responsabilidade / aliases
+        if art.category == "frontend" and "styling" in art.responsibility.lower():
+            for f in files:
+                if f.lower().endswith((".css", ".scss")) and not f.startswith("."):
+                    return f
 
-            # Aliases
-            if target_name in ("styles.css", "style.css") and f_name in ("styles.css", "style.css", "main.css", "app.css"):
-                return f
-            if target_name in ("app.js", "main.js", "index.js") and f_name in ("app.js", "main.js", "index.js", "script.js"):
-                return f
-            if target_name in ("server.py", "backend.py", "app.py") and f_name in ("server.py", "backend.py", "app.py", "main.py"):
-                return f
+        if art.category == "backend" and "entrypoint" in art.responsibility.lower():
+            for f in files:
+                f_name = Path(f).name.lower()
+                if f_name in ("server.py", "main.py", "app.py", "server.ts", "server.js", "index.py", "index.ts"):
+                    return f
 
         return None
 
-    def _patch_contracts(self, filename: str, current_content: str, missing_contracts: list[str], fallback_content: str) -> str:
+    def _find_key_in_dict(self, target_name: str, files: dict[str, str]) -> Optional[str]:
+        t_low = target_name.lower()
+        for k in files:
+            if k.lower() == t_low or Path(k).name.lower() == t_low:
+                return k
+        return None
+
+    def _patch_contracts(
+        self,
+        filename: str,
+        current_content: str,
+        missing_contracts: list[str],
+        fallback_content: str,
+    ) -> str:
         patched = current_content
         ext = Path(filename).suffix.lower()
 
-        # Se o ficheiro estiver quase vazio, usar o fallback completo
         if len(current_content.strip()) < 20:
             return fallback_content
 
@@ -1352,14 +3145,15 @@ function saveStoredState(key, data) {
 
         elif ext == ".py":
             if "/health" in missing_contracts and "/health" not in patched:
-                # Injetar rota health caso falte
                 if "do_GET" in patched:
-                    patched = patched.replace("def do_GET(self):", "def do_GET(self):\n        if self.path == '/health':\n            self.send_response(200)\n            self.send_header('Content-Type', 'application/json')\n            self.end_headers()\n            self.wfile.write(b'{\"status\": \"ok\"}')\n            return")
+                    patched = patched.replace(
+                        "def do_GET(self):",
+                        "def do_GET(self):\n        if self.path == '/health':\n            self.send_response(200)\n            self.send_header('Content-Type', 'application/json')\n            self.end_headers()\n            self.wfile.write(b'{\"status\": \"ok\"}')\n            return",
+                    )
 
         return patched
 
     def _inject_cdn_tags(self, html: str, cdn_tags: list[str]) -> str:
-        """Injeta tags de CDN no <head> do HTML de forma não-destrutiva."""
         injection = "\n    " + "\n    ".join(cdn_tags)
         if "</head>" in html:
             return html.replace("</head>", f"{injection}\n</head>")
