@@ -3,6 +3,7 @@ import json
 import os
 import socket
 import socketserver
+import sys
 import threading
 from dataclasses import dataclass
 from typing import Any
@@ -26,7 +27,16 @@ class FrontendServerHandle:
             self.thread.join(timeout=2)
 
 
-class DualStackThreadingServer(socketserver.ThreadingTCPServer):
+class GracefulThreadingTCPServer(socketserver.ThreadingTCPServer):
+    def handle_error(self, request, client_address):
+        # Ignore client disconnects/aborts that happen normally during fast navigation or reload
+        exc_type, _, _ = sys.exc_info()
+        if exc_type in (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
+            return
+        super().handle_error(request, client_address)
+
+
+class DualStackThreadingServer(GracefulThreadingTCPServer):
     address_family = socket.AF_INET6
 
     def server_bind(self):
@@ -193,6 +203,12 @@ def start_frontend_http_server(
             return super().do_HEAD()
 
         def do_GET(self):
+            try:
+                self._dispatch_GET()
+            except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
+                pass
+
+        def _dispatch_GET(self):
             if self.path in {"/favicon.ico", "favicon.ico"}:
                 self.send_response(200)
                 self.send_header("Content-Type", "image/x-icon")
@@ -357,7 +373,7 @@ def start_frontend_http_server(
     except Exception:
         try:
             # Fallback to standard IPv4 binding if dual-stack is unavailable
-            server = socketserver.ThreadingTCPServer(("", port), handler)
+            server = GracefulThreadingTCPServer(("", port), handler)
         except Exception as start_error:
             log_event(
                 logger,

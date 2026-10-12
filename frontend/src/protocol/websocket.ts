@@ -39,6 +39,17 @@ export interface ActiveTemplate {
   agents: Agent[];
 }
 
+export interface ChatAttachment {
+  id: string;
+  name: string;
+  type: 'image' | 'document' | 'code';
+  size: number;
+  mimeType: string;
+  dataUrl?: string;
+  textContent?: string;
+  tokenEstimate?: number;
+}
+
 export interface ChatMessage {
   id: string;
   sender: string;
@@ -46,6 +57,7 @@ export interface ChatMessage {
   content: string;
   audio?: string;
   timestamp: string;
+  attachments?: ChatAttachment[];
 }
 
 export interface KanbanCard {
@@ -1413,7 +1425,7 @@ export type ServerMessage =
   | UnknownServerMessage;
 
 export type ClientMessage =
-  | { type: 'directive'; text: string }
+  | { type: 'directive'; text: string; attachments?: ChatAttachment[] }
   | { type: 'select_template'; template: string }
   | { type: 'toggle_voice'; active: boolean }
   | { type: 'run_project'; project_id?: string }
@@ -1466,8 +1478,9 @@ export type ClientMessage =
   | { type: 'study_synthesize_documents'; document_ids: string[] }
   | { type: 'study_generate_cornell'; document_id: string; request_id?: string }
   | { type: 'study_save_to_vault'; title: string; content?: string; markdown_content?: string; subject?: string; source_document_ids?: string[] }
-  | { type: 'study_generate_quiz'; document_id: string; question_count?: number }
-  | { type: 'study_submit_quiz'; quiz_id: string; answers: Record<string, number | string>; transfer_answer?: string }
+  | { type: 'study_generate_quiz'; document_id: string; question_count?: number; request_id?: string }
+  | { type: 'study_submit_quiz'; quiz_id: string; answers: Record<string, number | string>; transfer_answer?: string; request_id?: string }
+  | { type: 'study_search_rag'; query: string; document_id?: string; request_id?: string }
   | { type: 'study_list_flashcards'; document_id: string }
   | { type: 'study_review_flashcard'; card_id: string; rating: string }
   | { type: 'study_save_note'; document_id: string; page: number; section_id: string; note_text: string }

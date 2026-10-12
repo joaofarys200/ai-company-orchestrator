@@ -48,6 +48,22 @@ import type {
   QuizEvaluationResult,
   Flashcard,
 } from '../features/study/types';
+import type {
+  ChatAttachment,
+  ChatSession,
+  SystemLogEntry,
+  LogCategory,
+  LogLevel,
+} from '../features/chat/types';
+import {
+  loadStoredChatSessions,
+  persistChatSessions,
+  loadStoredPromptHistory,
+  persistPromptHistory,
+  createDefaultSession,
+  generateSessionId,
+  generateSmartSessionTitle,
+} from '../features/chat/chatSessionStorage';
 
 export interface ProjectFileSaveState {
   ok: boolean;
@@ -97,6 +113,15 @@ interface WebSocketContextType {
   systemStatus: SystemStatus;
   voiceStatus: string;
   chatMessages: ChatMessage[];
+  systemLogs: SystemLogEntry[];
+  clearSystemLogs: () => void;
+  chatSessions: ChatSession[];
+  activeSessionId: string;
+  switchChatSession: (sessionId: string) => void;
+  createNewChatSession: (title?: string) => string;
+  deleteChatSession: (sessionId: string) => void;
+  renameChatSession: (sessionId: string, newTitle: string) => void;
+  promptHistory: string[];
   debateMessages: ChatMessage[];
   safetyRefusal: SafetyRefusalData | null;
   clearSafetyRefusal: () => void;
@@ -116,7 +141,7 @@ interface WebSocketContextType {
   setChatPanelOpen: (open: boolean) => void;
   devPanelOpen: boolean;
   setDevPanelOpen: (open: boolean) => void;
-  sendDirective: (text: string) => void;
+  sendDirective: (text: string, attachments?: ChatAttachment[]) => void;
   selectTemplate: (templateName: string) => void;
   toggleVoice: (active: boolean) => void;
   runProject: (projectId?: string) => void;
@@ -128,7 +153,7 @@ interface WebSocketContextType {
   decisions: EngineeringDecision[];
   currentNote: { filename: string; content: string } | null;
   getNotes: () => void;
-  readNote: (filename: string) => void;
+  readNote: (filename: string) => Promise<string>;
   saveNote: (filename: string, content: string) => void;
   deleteRule: (key: string) => void;
   deleteArchitecture: (module: string) => void;
@@ -224,8 +249,9 @@ interface WebSocketContextType {
     filePath?: string
   ) => void;
   deleteStudyDocument: (documentId: string, deleteFile?: boolean) => void;
-  generateStudyQuiz: (documentId: string, count?: number) => void;
-  submitStudyQuiz: (quizId: string, answers: Record<string, number | string>, transferAnswer?: string) => void;
+  generateStudyQuiz: (documentId: string, count?: number) => Promise<StudyQuiz>;
+  submitStudyQuiz: (quizId: string, answers: Record<string, number | string>, transferAnswer?: string) => Promise<QuizEvaluationResult>;
+  searchStudyRag: (query: string, documentId?: string) => Promise<Array<{ text: string; source: string; score?: number; title?: string }>>;
   listStudyFlashcards: (documentId: string) => void;
   reviewStudyFlashcard: (cardId: string, rating: string) => void;
   contextualAssist: (
@@ -276,7 +302,20 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isConnected, setIsConnected] = useState(false);
   const [systemStatus, setSystemStatus] = useState<SystemStatus>('OFFLINE');
   const [voiceStatus, setVoiceStatus] = useState('offline');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => {
+    const loaded = loadStoredChatSessions();
+    return loaded.length > 0 ? loaded : [createDefaultSession()];
+  });
+  const [activeSessionId, setActiveSessionId] = useState<string>(() => {
+    const loaded = loadStoredChatSessions();
+    return loaded.length > 0 ? loaded[0].id : generateSessionId();
+  });
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
+    const loaded = loadStoredChatSessions();
+    return loaded.length > 0 ? loaded[0].messages : [];
+  });
+  const [systemLogs, setSystemLogs] = useState<SystemLogEntry[]>([]);
+  const [promptHistory, setPromptHistory] = useState<string[]>(() => loadStoredPromptHistory());
   const [debateMessages, setDebateMessages] = useState<ChatMessage[]>([]);
   const [projectFiles, setProjectFiles] = useState<{ [filename: string]: string }>({});
   const [projectFileHashes, setProjectFileHashes] = useState<{ [filename: string]: string }>({});
@@ -355,6 +394,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     reject: (reason?: any) => void;
     timer: any;
   }>>(new Map());
+  const pendingNoteRequestsRef = useRef<Map<string, {
+    resolve: (value: string) => void;
+    reject: (reason?: any) => void;
+    timer: any;
+  }>>(new Map());
 
   const sendClientMessage = useCallback((message: ClientMessage) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
@@ -364,20 +408,179 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, []);
 
-  function addSystemMessage(content: string) {
-    const timestamp = new Date().toLocaleTimeString('pt-PT', { hour12: false });
-    const sysMsg: ChatMessage = {
-      id: Math.random().toString(),
-      sender: 'SISTEMA',
-      role: 'System',
-      content,
-      timestamp,
+  // Keep active chat session synced in localStorage
+  useEffect(() => {
+    setChatSessions((prev) => {
+      const idx = prev.findIndex((s) => s.id === activeSessionId);
+      if (idx === -1) return prev;
+      const updated = [...prev];
+      updated[idx] = {
+        ...updated[idx],
+        messages: chatMessages,
+        updatedAt: Date.now(),
+      };
+      persistChatSessions(updated);
+      return updated;
+    });
+  }, [chatMessages, activeSessionId]);
+
+  const switchChatSession = useCallback((sessionId: string) => {
+    setChatSessions((currentSessions) => {
+      const target = currentSessions.find((s) => s.id === sessionId);
+      if (target) {
+        setActiveSessionId(sessionId);
+        setChatMessages(target.messages || []);
+      }
+      return currentSessions;
+    });
+  }, []);
+
+  const createNewChatSession = useCallback((title?: string) => {
+    const newSession: ChatSession = {
+      id: generateSessionId(),
+      title: title || 'Nova conversa',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      messages: [],
+      promptHistory: [],
     };
-    setChatMessages((prev) => appendLimited(prev, sysMsg, MAX_CHAT_MESSAGES));
+    setChatSessions((prev) => {
+      const updated = [newSession, ...prev];
+      persistChatSessions(updated);
+      return updated;
+    });
+    setActiveSessionId(newSession.id);
+    setChatMessages([]);
+    return newSession.id;
+  }, []);
+
+  const deleteChatSession = useCallback((sessionId: string) => {
+    setChatSessions((prev) => {
+      const remaining = prev.filter((s) => s.id !== sessionId);
+      const safeList = remaining.length > 0 ? remaining : [createDefaultSession()];
+      persistChatSessions(safeList);
+      if (sessionId === activeSessionId) {
+        setActiveSessionId(safeList[0].id);
+        setChatMessages(safeList[0].messages || []);
+      }
+      return safeList;
+    });
+  }, [activeSessionId]);
+
+  const renameChatSession = useCallback((sessionId: string, newTitle: string) => {
+    setChatSessions((prev) => {
+      const updated = prev.map((s) => (s.id === sessionId ? { ...s, title: newTitle.trim(), updatedAt: Date.now() } : s));
+      persistChatSessions(updated);
+      return updated;
+    });
+  }, []);
+
+  const clearSystemLogs = useCallback(() => {
+    setSystemLogs([]);
+  }, []);
+
+  const addSystemLog = useCallback(
+    (
+      message: string,
+      category: LogCategory = 'SYSTEM',
+      level: LogLevel = 'info',
+      source?: string,
+      details?: Record<string, unknown>
+    ) => {
+      const timestamp = new Date().toLocaleTimeString('pt-PT', { hour12: false });
+      const newEntry: SystemLogEntry = {
+        id: Math.random().toString(36).slice(2, 9),
+        timestamp,
+        category,
+        level,
+        message,
+        source,
+        details,
+      };
+      setSystemLogs((prev) => [...prev.slice(-400), newEntry]);
+    },
+    []
+  );
+
+  function addSystemMessage(content: string) {
+    const clean = content.trim();
+    if (!clean) return;
+
+    let category: LogCategory = 'SYSTEM';
+    let level: LogLevel = 'info';
+
+    if (clean.includes('[SENTINEL') || clean.includes('Sentinel')) {
+      category = 'SENTINEL';
+      level = clean.includes('BENIGN') ? 'benign' : clean.includes('ERRO') || clean.includes('REJEITADA') ? 'error' : 'warning';
+    } else if (clean.includes('WebSocket') || clean.includes('Conectado')) {
+      category = 'WEBSOCKET';
+      level = 'info';
+    } else if (clean.includes('PROJECT_CONTEXT_MISSING') || clean.includes('Projeto')) {
+      category = 'PROJECT';
+      level = clean.includes('MISSING') || clean.includes('Erro') ? 'warning' : 'info';
+    } else if (clean.includes('AUTORIZAÇÃO') || clean.includes('recusado') || clean.includes('Segurança')) {
+      category = 'SECURITY';
+      level = 'warning';
+    } else if (
+      clean.includes('Orquestra') ||
+      clean.includes('Quality Gate') ||
+      clean.includes('TaskState') ||
+      clean.includes('Missão') ||
+      clean.includes('Swarm') ||
+      clean.includes('Fallback')
+    ) {
+      category = 'ORCHESTRATOR';
+      level = clean.includes('sucesso') || clean.includes('[OK]') ? 'success' : clean.includes('erro') || clean.includes('Erro') ? 'error' : 'info';
+    }
+
+    // Always log to Central System Console (Consola Central)
+    addSystemLog(clean, category, level);
   }
 
   function addChatMessage(msg: ChatProtocolMessage) {
     const timestamp = new Date().toLocaleTimeString('pt-PT', { hour12: false });
+    const content = (msg.content || '').trim();
+    const role = (msg.role || '').trim();
+    const sender = (msg.sender || '').trim().toUpperCase();
+
+    // Route internal orchestrator, swarm routing, and mission lifecycle telemetry to Consola Central
+    const isOrchestratorTelemetry =
+      sender === 'OPENCLAW' ||
+      role === 'Orquestrador (Queen)' ||
+      role === 'Queen' ||
+      role === 'Missão' ||
+      role === 'Mission Gate' ||
+      role === 'Mission Understanding' ||
+      (role === 'Orquestrador' && (
+        content.startsWith('Processando pedido:') ||
+        content.startsWith('👑') ||
+        content.startsWith('Rota determinada:') ||
+        content.startsWith('Fallback cloud ativo:') ||
+        content.startsWith('A executar:') ||
+        content.startsWith('[OK]') ||
+        content.startsWith('[WARNING]') ||
+        content.startsWith('🎯') ||
+        content.startsWith('🧠 **Spawning**') ||
+        content.startsWith('Limite atingido')
+      )) ||
+      content.startsWith('🚀 Missão criada:') ||
+      content.startsWith('✅ Missão') ||
+      content.startsWith('⚠️ Missão') ||
+      content.startsWith('⛔ Missão') ||
+      content.startsWith('[OPENCLAW');
+
+    if (isOrchestratorTelemetry) {
+      const level: LogLevel = content.includes('✅') || content.includes('[OK]')
+        ? 'success'
+        : content.includes('⚠️') || content.includes('Fallback')
+        ? 'warning'
+        : content.includes('⛔') || content.includes('Erro') || content.includes('falhou')
+        ? 'error'
+        : 'info';
+      addSystemLog(content, 'ORCHESTRATOR', level);
+      return;
+    }
+
     const newMsg: ChatMessage = {
       id: Math.random().toString(),
       sender: msg.sender,
@@ -387,7 +590,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       timestamp,
     };
 
-    // Always add all messages (including subagents and specialists) to chatMessages so the user sees them
+    // Add genuine conversational messages to chatMessages
     setChatMessages((prev) => appendLimited(prev, newMsg, MAX_CHAT_MESSAGES));
 
     // Check if message is a specialist/subagent or contains multi-agent dialogue tags
@@ -623,9 +826,16 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'notes_list':
         setNotes(msg.notes);
         break;
-      case 'note_content':
+      case 'note_content': {
         setCurrentNote({ filename: msg.filename, content: msg.content });
+        const pending = pendingNoteRequestsRef.current.get(msg.filename);
+        if (pending) {
+          clearTimeout(pending.timer);
+          pendingNoteRequestsRef.current.delete(msg.filename);
+          pending.resolve(msg.content);
+        }
         break;
+      }
       case 'rules_list':
         setRules(msg.rules);
         break;
@@ -789,14 +999,67 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setStudyDocuments((prev) => prev.filter((d) => d.document_id !== msg.document_id));
         addSystemMessage('Material removido da biblioteca de estudos.');
         break;
-      case 'study_quiz_ready':
+      case 'study_quiz_ready': {
         setActiveStudyQuiz(msg.quiz);
         addSystemMessage(`Quiz pedagógico gerado para: ${msg.quiz.topic}`);
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg.quiz);
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith(`quiz:${msg.document_id}`)) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(msg.quiz);
+              break;
+            }
+          }
+        }
         break;
-      case 'study_quiz_evaluated':
+      }
+      case 'study_quiz_evaluated': {
         setStudyQuizResult(msg);
         addSystemMessage(`Quiz de estudo avaliado: ${msg.score}% de aproveitamento.`);
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg);
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith(`eval:${msg.quiz_id}`)) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(msg);
+              break;
+            }
+          }
+        }
         break;
+      }
+      case 'study_search_rag_result': {
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg.results || []);
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith('rag:')) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(msg.results || []);
+              break;
+            }
+          }
+        }
+        break;
+      }
       case 'study_flashcards_list':
         setStudyFlashcards(msg.flashcards || []);
         break;
@@ -1202,20 +1465,47 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [connect]);
 
   // Action senders
-  const sendDirective = (text: string) => {
+  const sendDirective = (text: string, attachments?: ChatAttachment[]) => {
     const cleanText = text.trim();
-    if (!cleanText || !isReady()) return;
+    if (!cleanText && (!attachments || attachments.length === 0)) return;
+    if (!isReady()) return;
 
-    sendClientMessage({ type: 'directive', text: cleanText });
+    sendClientMessage({
+      type: 'directive',
+      text: cleanText,
+      attachments: attachments && attachments.length > 0 ? attachments : undefined,
+    });
     const timestamp = new Date().toLocaleTimeString('pt-PT', { hour12: false });
     const userMsg: ChatMessage = {
       id: Math.random().toString(),
       sender: 'CLIENTE',
       role: 'CEO',
-      content: cleanText,
+      content: cleanText || (attachments && attachments.length > 0 ? `[Enviados ${attachments.length} anexo(s) como contexto]` : ''),
       timestamp,
+      attachments: attachments && attachments.length > 0 ? attachments : undefined,
     };
-    setChatMessages((prev) => appendLimited(prev, userMsg, MAX_CHAT_MESSAGES));
+    setChatMessages((prev) => {
+      const updated = appendLimited(prev, userMsg, MAX_CHAT_MESSAGES);
+      if (cleanText) {
+        setChatSessions((all) =>
+          all.map((s) => {
+            if (s.id === activeSessionId && (s.title === 'Nova conversa' || s.title === 'Conversa')) {
+              return { ...s, title: generateSmartSessionTitle(cleanText), updatedAt: Date.now(), messages: updated };
+            }
+            return s;
+          })
+        );
+      }
+      return updated;
+    });
+
+    if (cleanText) {
+      setPromptHistory((prev) => {
+        const next = [...prev.filter((p) => p !== cleanText), cleanText];
+        persistPromptHistory(next);
+        return next;
+      });
+    }
   };
 
   const selectTemplate = (templateName: string) => {
@@ -1256,10 +1546,20 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [isReady, sendClientMessage]);
 
-  const readNote = useCallback((filename: string) => {
-    if (isReady()) {
-      sendClientMessage({ type: 'read_note', filename });
-    }
+  const readNote = useCallback((filename: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        pendingNoteRequestsRef.current.delete(filename);
+        resolve('');
+      }, 6000);
+      pendingNoteRequestsRef.current.set(filename, { resolve, reject: () => resolve(''), timer });
+      if (isReady()) {
+        sendClientMessage({ type: 'read_note', filename });
+      } else {
+        clearTimeout(timer);
+        resolve('');
+      }
+    });
   }, [isReady, sendClientMessage]);
 
   const saveNote = useCallback((filename: string, content: string) => {
@@ -1698,23 +1998,67 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   );
 
   const generateStudyQuiz = useCallback(
-    (documentId: string, count?: number) => {
-      sendClientMessage({
-        type: 'study_generate_quiz',
-        document_id: documentId,
-        question_count: count || 5,
+    (documentId: string, count?: number): Promise<StudyQuiz> => {
+      const requestId = `quiz:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Generate quiz timed out'));
+        }, 20000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_generate_quiz',
+          document_id: documentId,
+          question_count: count || 5,
+          request_id: requestId,
+        });
       });
     },
     [sendClientMessage]
   );
 
   const submitStudyQuiz = useCallback(
-    (quizId: string, answers: Record<string, number | string>, transferAnswer?: string) => {
-      sendClientMessage({
-        type: 'study_submit_quiz',
-        quiz_id: quizId,
-        answers,
-        transfer_answer: transferAnswer || '',
+    (quizId: string, answers: Record<string, number | string>, transferAnswer?: string): Promise<QuizEvaluationResult> => {
+      const requestId = `eval:${quizId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Submit quiz timed out'));
+        }, 15000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_submit_quiz',
+          quiz_id: quizId,
+          answers,
+          transfer_answer: transferAnswer || '',
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const searchStudyRag = useCallback(
+    (query: string, documentId?: string): Promise<Array<{ text: string; source: string; score?: number; title?: string }>> => {
+      const requestId = `rag:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Search RAG timed out'));
+        }, 15000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_search_rag',
+          query,
+          document_id: documentId || '',
+          request_id: requestId,
+        });
       });
     },
     [sendClientMessage]
@@ -2021,6 +2365,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         systemStatus,
         voiceStatus,
         chatMessages,
+        systemLogs,
+        clearSystemLogs,
+        chatSessions,
+        activeSessionId,
+        switchChatSession,
+        createNewChatSession,
+        deleteChatSession,
+        renameChatSession,
+        promptHistory,
         debateMessages,
         projectFiles,
         projectFileHashes,
@@ -2142,6 +2495,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         deleteStudyDocument,
         generateStudyQuiz,
         submitStudyQuiz,
+        searchStudyRag,
         listStudyFlashcards,
         reviewStudyFlashcard,
         contextualAssist,

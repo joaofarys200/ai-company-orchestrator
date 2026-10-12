@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 /**
  * JARVIS OS - Electron Preload Script
@@ -26,6 +26,17 @@ contextBridge.exposeInMainWorld('jarvisIPC', {
     return () => {
       ipcRenderer.removeListener('jarvis-from-backend', handler);
     };
+  },
+
+  getPathForFile: (file) => {
+    try {
+      if (webUtils && typeof webUtils.getPathForFile === 'function') {
+        return webUtils.getPathForFile(file);
+      }
+    } catch (e) {
+      // Fallback
+    }
+    return file?.path || '';
   },
 
   isNativeIPC: true,

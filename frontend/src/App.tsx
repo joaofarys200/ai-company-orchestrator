@@ -4,9 +4,9 @@ import { ChatPanel } from './features/chat';
 import { AgentLibrary } from './features/settings';
 import { HologramCore, WorkspaceViewer } from './features/workspace';
 import { PermissionApprovalModal } from './features/permissions';
-import { X, Users, BookOpen, Activity, ChevronDown, PanelRightClose } from 'lucide-react';
+import { X, Users, BookOpen, Activity, ChevronDown, PanelRightClose, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const TEMPLATE_OPTIONS = [
   { value: 'builder_swarm', label: 'Builder Swarm' },
@@ -30,6 +30,18 @@ function App() {
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [isTeamOpen, setIsTeamOpen] = useState(false);
 
+  // Global shortcut: Ctrl+J to toggle JARVIS Chat & Central Console
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'j' || e.key === 'J')) {
+        e.preventDefault();
+        setChatPanelOpen(!chatPanelOpen);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [chatPanelOpen, setChatPanelOpen]);
+
   const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     selectTemplate(e.target.value);
   };
@@ -42,45 +54,45 @@ function App() {
         <HologramCore />
       </main>
 
-      {/* ── LEFT DRAWER: Chat Panel (aberto via comando de voz) ── */}
+      {/* ── LEFT DRAWER: Chat Panel & Consola Central ── */}
       <AnimatePresence>
         {chatPanelOpen && (
           <>
-            {/* Backdrop semitransparente — clicável para fechar */}
+            {/* Backdrop semitransparente com alta prioridade z-index */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
+              animate={{ opacity: 0.55 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setChatPanelOpen(false)}
-              className="fixed inset-0 bg-black/70 z-30 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/75 z-50 backdrop-blur-sm"
             />
 
-            {/* Gaveta deslizante da ESQUERDA */}
+            {/* Gaveta deslizante da ESQUERDA com z-[60] (acima do DevPanel z-40) */}
             <motion.div
               initial={{ x: '-100%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: '-100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 30, stiffness: 220 }}
-              className="fixed inset-y-0 left-0 w-full sm:w-[520px] lg:w-[560px] bg-[#05070e]/96 border-r border-white/8 shadow-[18px_0_70px_rgba(0,0,0,0.55)] z-40 flex flex-col backdrop-blur-2xl"
+              className="fixed inset-y-0 left-0 w-full sm:w-[580px] md:w-[720px] lg:w-[840px] xl:w-[960px] bg-[#05070e]/98 border-r border-cyan-400/20 shadow-[24px_0_90px_rgba(0,0,0,0.85)] z-[60] flex flex-col backdrop-blur-2xl"
             >
               {/* Header da gaveta */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-white/8 bg-white/[0.025]">
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-md border border-violet-300/20 bg-violet-300/10 flex items-center justify-center">
-                    <Activity className="w-4 h-4 text-violet-200" />
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8 bg-white/[0.02] shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-7 w-7 rounded-md border border-cyan-300/25 bg-cyan-300/10 flex items-center justify-center">
+                    <Activity className="w-3.5 h-3.5 text-cyan-200" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-white">Conversa ativa</div>
-                    <div className="text-xs text-gray-500">Jarvis OS</div>
+                    <div className="text-xs font-semibold text-white">Assistente & Consola JARVIS</div>
+                    <div className="text-[10px] text-gray-500 font-mono">Jarvis OS • Multimodal AI Workspace</div>
                   </div>
                 </div>
                 <button
                   onClick={() => setChatPanelOpen(false)}
-                  className="text-gray-500 hover:text-white h-9 w-9 rounded-md border border-white/8 bg-white/[0.035] hover:bg-white/[0.08] transition-all cursor-pointer flex items-center justify-center"
-                  title="Fechar chat"
+                  className="text-gray-400 hover:text-white h-7 w-7 rounded-md border border-white/8 bg-white/[0.035] hover:bg-white/[0.08] transition-all cursor-pointer flex items-center justify-center"
+                  title="Fechar painel"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
 
@@ -138,6 +150,18 @@ function App() {
                       </option>
                     ))}
                   </select>
+                  <button
+                    onClick={() => setChatPanelOpen(!chatPanelOpen)}
+                    className={`flex h-9 items-center justify-center gap-2 px-3 border text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                      chatPanelOpen
+                        ? 'border-cyan-300 bg-cyan-400/25 text-white shadow-[0_0_16px_rgba(34,211,238,0.3)]'
+                        : 'border-cyan-400/40 bg-cyan-400/15 hover:bg-cyan-400/25 text-cyan-200 hover:text-white shadow-[0_0_15px_rgba(6,182,212,0.2)]'
+                    }`}
+                    title="Abrir ou fechar Chat JARVIS & Consola Central (Ctrl+J)"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+                    <span>Chat IA & Consola</span>
+                  </button>
                   <button
                     onClick={() => setIsTeamOpen((current) => !current)}
                     className={`flex h-9 items-center justify-center gap-2 border px-2.5 text-xs font-medium rounded-md transition-all cursor-pointer ${

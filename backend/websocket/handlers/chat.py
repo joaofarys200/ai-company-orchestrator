@@ -72,6 +72,37 @@ class ChatWebSocketHandler:
                 },
             )
 
+        attachments = message.get("attachments") or []
+        if isinstance(attachments, list) and attachments:
+            extra_blocks = []
+            for att in attachments:
+                if not isinstance(att, dict):
+                    continue
+                name = str(att.get("name") or "anexo").strip()
+                att_type = str(att.get("type") or "document").lower()
+                size = att.get("size") or 0
+                text_content = att.get("textContent")
+                if text_content and isinstance(text_content, str):
+                    safe_content = text_content[:15000]
+                    if len(text_content) > 15000:
+                        safe_content += "\n... [truncado para 15000 caracteres para preservar orçamento de contexto] ..."
+                    extra_blocks.append(
+                        f"\n--- Conteúdo do Anexo [{att_type.upper()}: {name} ({size} bytes)] ---\n{safe_content}\n--- Fim do Anexo {name} ---"
+                    )
+                elif att_type == "image":
+                    extra_blocks.append(
+                        f"\n--- Anexo [IMAGEM MULTIMODAL: {name} ({size} bytes)] ---\n[Imagem fornecida pelo utilizador como contexto visual da sessão]"
+                    )
+            if extra_blocks:
+                prompt_with_context = prompt_with_context + "\n" + "\n".join(extra_blocks)
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "system",
+                        "content": f"📎 {len(extra_blocks)} anexo(s) integrados com sucesso no contexto do Jarvis.",
+                    },
+                )
+
         history = self.callbacks.conversation_history
         history.append(
             {"role": "user", "content": prompt_with_context}

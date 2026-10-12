@@ -35,6 +35,7 @@ import {
   Square,
   Terminal,
   Trash2,
+  History,
   Undo2,
   WandSparkles,
   X,
@@ -265,6 +266,11 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     startLectureRecording,
     stopLectureRecording,
     studyDocuments,
+    activeStudyQuiz,
+    studyQuizResult,
+    generateStudyQuiz,
+    submitStudyQuiz,
+    searchStudyRag,
     listStudyDocuments,
     uploadStudyDocument,
     deleteStudyDocument,
@@ -272,6 +278,8 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     askStudyPaper,
     getStudyDocumentFile,
     generateStudyCornell,
+    sendDirective,
+    setChatPanelOpen,
   } = useWebSocket();
 
   const [activeTab, setActiveTab] = useState<TabType>('kanban');
@@ -284,6 +292,22 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
   const [editNoteContent, setEditNoteContent] = useState('');
   const [codeSearch, setCodeSearch] = useState('');
   const [codingObjective, setCodingObjective] = useState('');
+  const [codingObjectiveHistory, setCodingObjectiveHistory] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem('jarvis_coding_objectives_history');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return [
+      'e porque nao fazer uma varedura ativa da rede?',
+      'Adicionar autenticação JWT com rotas protegidas',
+      'Implementar pesquisa em tempo real com filtros',
+      'Criar dashboard com métricas do sistema',
+    ];
+  });
+  const [showObjectiveHistory, setShowObjectiveHistory] = useState(false);
   const [projectPickerOpen, setProjectPickerOpen] = useState(false);
   const [projectSearch, setProjectSearch] = useState('');
   const [showTechnicalProjects, setShowTechnicalProjects] = useState(false);
@@ -1182,31 +1206,129 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                   )}
                 </div>
                 <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-                  <label htmlFor="coding-objective" className="block text-xs font-medium text-gray-400">Objetivo</label>
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="coding-objective" className="block text-xs font-medium text-gray-300">
+                      Objetivo
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowObjectiveHistory((prev) => !prev)}
+                      className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[11px] font-medium transition-all cursor-pointer ${
+                        showObjectiveHistory
+                          ? 'border-cyan-300/40 bg-cyan-300/15 text-cyan-200'
+                          : 'border-white/10 bg-white/[0.04] text-cyan-300 hover:bg-white/[0.08] hover:text-white'
+                      }`}
+                      title="Ver e reutilizar objetivos pedidos anteriormente"
+                    >
+                      <History className="h-3 w-3 text-cyan-300" />
+                      <span>Histórico de pedidos ({codingObjectiveHistory.length})</span>
+                    </button>
+                  </div>
+
+                  {/* Sugestões rápidas em chips */}
+                  {codingObjectiveHistory.length > 0 && !codingObjective && (
+                    <div className="flex flex-wrap gap-1.5 pt-0.5">
+                      {codingObjectiveHistory.slice(0, 3).map((item, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setCodingObjective(item)}
+                          className="px-2 py-1 rounded bg-white/[0.03] hover:bg-cyan-300/10 border border-white/8 hover:border-cyan-300/30 text-[10px] text-gray-400 hover:text-cyan-200 font-mono text-left truncate max-w-full transition-all cursor-pointer"
+                          title={`Usar: ${item}`}
+                        >
+                          ↳ {item}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {showObjectiveHistory && (
+                    <div className="rounded-md border border-cyan-400/25 bg-[#070b12]/95 p-2.5 text-xs space-y-1.5 max-h-52 overflow-y-auto backdrop-blur-xl shadow-xl">
+                      <div className="flex items-center justify-between pb-1 mb-1 border-b border-white/8 text-[10px] text-gray-400 font-mono">
+                        <span className="font-semibold text-gray-300">Pedidos Anteriores</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCodingObjectiveHistory([]);
+                            try { localStorage.removeItem('jarvis_coding_objectives_history'); } catch {}
+                          }}
+                          className="hover:text-rose-300 cursor-pointer text-gray-500"
+                        >
+                          Limpar tudo
+                        </button>
+                      </div>
+                      {codingObjectiveHistory.length === 0 ? (
+                        <div className="text-gray-500 text-xs py-2 text-center">Nenhum pedido anterior guardado.</div>
+                      ) : (
+                        codingObjectiveHistory.map((prevObj, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              setCodingObjective(prevObj);
+                              setShowObjectiveHistory(false);
+                            }}
+                            className="p-1.5 rounded hover:bg-cyan-300/10 cursor-pointer text-gray-300 hover:text-cyan-100 font-mono text-[11px] transition-colors flex items-center justify-between group"
+                            title={prevObj}
+                          >
+                            <span className="truncate flex-1">{prevObj}</span>
+                            <span className="text-[10px] text-cyan-400/60 opacity-0 group-hover:opacity-100 transition-opacity ml-2 shrink-0">Usar ↵</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+
                   <textarea
                     id="coding-objective"
                     value={codingObjective}
                     onChange={(event) => setCodingObjective(event.target.value)}
-                    placeholder="Descreva a alteração pretendida"
-                    className="h-28 w-full resize-none rounded-md border border-white/8 bg-black/25 p-3 text-sm leading-relaxed text-gray-200 outline-none focus:border-cyan-300/30"
+                    placeholder="Descreva a alteração pretendida de forma detalhada..."
+                    className="min-h-[160px] w-full resize-y rounded-md border border-white/12 bg-black/45 p-3.5 text-sm leading-relaxed text-gray-100 placeholder:text-gray-600 outline-none focus:border-cyan-300/50 focus:ring-1 focus:ring-cyan-300/25 shadow-inner transition-all font-sans"
                   />
-                  <button
-                    onClick={() => createCodingSession(codingObjective)}
-                    disabled={!projectContext || !codingObjective.trim() || isCodingSessionBusy}
-                    className={`${BUTTON_BASE} w-full border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15 ${isCodingSessionBusy ? 'cursor-wait bg-cyan-300/20' : ''}`}
-                  >
-                    {isCodingSessionBusy ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin text-cyan-300" />
-                        <span>A planear alteração...</span>
-                      </>
-                    ) : (
-                      <>
-                        <WandSparkles className="h-4 w-4" />
-                        <span>Criar plano</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        const obj = codingObjective.trim();
+                        if (!obj) return;
+                        setCodingObjectiveHistory((prev) => {
+                          const next = [obj, ...prev.filter((p) => p !== obj)].slice(0, 30);
+                          try {
+                            localStorage.setItem('jarvis_coding_objectives_history', JSON.stringify(next));
+                          } catch {}
+                          return next;
+                        });
+                        createCodingSession(obj);
+                      }}
+                      disabled={!projectContext || !codingObjective.trim() || isCodingSessionBusy}
+                      className={`${BUTTON_BASE} flex-1 border-cyan-300/30 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/20 ${isCodingSessionBusy ? 'cursor-wait bg-cyan-300/20' : ''}`}
+                    >
+                      {isCodingSessionBusy ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin text-cyan-300" />
+                          <span>A planear alteração...</span>
+                        </>
+                      ) : (
+                        <>
+                          <WandSparkles className="h-4 w-4" />
+                          <span>Criar plano</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (codingObjective.trim()) {
+                          sendDirective(`[Objetivo de Alteração]: ${codingObjective.trim()}`);
+                        }
+                        setChatPanelOpen(true);
+                      }}
+                      className="px-3 border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-gray-300 hover:text-cyan-200 text-xs rounded-md flex items-center gap-1.5 transition-all cursor-pointer"
+                      title="Abrir no Chat com IA"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 text-cyan-300" />
+                      <span className="hidden sm:inline">Discutir no Chat</span>
+                    </button>
+                  </div>
 
                   {safetyRefusal && (
                     <div className="rounded-md border border-rose-500/30 bg-rose-950/40 p-3 text-xs text-rose-200">
@@ -1957,6 +2079,12 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 }}
                 onGenerateCornell={generateStudyCornell}
                 onDeleteDocument={deleteStudyDocument}
+                activeStudyQuiz={activeStudyQuiz}
+                studyQuizResult={studyQuizResult}
+                onGenerateQuiz={generateStudyQuiz}
+                onSubmitQuiz={submitStudyQuiz}
+                onSearchRag={async (query, docId) => searchStudyRag(query, docId)}
+                onReadNote={readNote}
                 onGenerateSummary={async () => {
                   listStudyDocuments();
                   return '';

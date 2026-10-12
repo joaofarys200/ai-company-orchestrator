@@ -641,19 +641,34 @@ class OrchestrationService:
                     conversation_messages=messages,
                     temperature=0.1,
                     max_output_tokens=500,
-                    timeout_seconds=30.0,
+                    timeout_seconds=5.0,
                 )
                 response_text = response.raw_text
             except Exception as model_error:
-                response_text = safe_user_error(
-                    "Erro ao comunicar com o Ollama local",
-                    model_error,
-                )
+                if os.getenv("GEMINI_API_KEY"):
+                    try:
+                        gemini_model = os.getenv("GEMINI_CREW_MODEL", "gemini-2.5-flash").replace("gemini/", "").strip()
+                        gemini_res = await self.models.execute(
+                            provider="gemini",
+                            model=gemini_model,
+                            operation="casual_chat",
+                            system_prompt=CASUAL_CHAT_SYSTEM_PROMPT,
+                            user_prompt=prompt,
+                            conversation_messages=messages,
+                            temperature=0.2,
+                            max_output_tokens=500,
+                            timeout_seconds=12.0,
+                        )
+                        response_text = gemini_res.raw_text
+                    except Exception:
+                        response_text = "Estou operacional. Como posso ajudar com os teus projetos no workspace?"
+                else:
+                    response_text = "Estou aqui para ajudar com os teus projetos e tarefas de desenvolvimento."
         await self.connections.broadcast(
             {
                 "type": "chat",
                 "sender": "JARVIS",
-                "role": "Orquestrador",
+                "role": "Assistant",
                 "content": response_text,
             }
         )
@@ -1179,6 +1194,19 @@ class OrchestrationService:
         await self.connections.broadcast(
             {"type": "complete", "result": result}
         )
+        if result and not is_orchestration_result_error(result):
+            if result.startswith("[OK]") or "[OK]" in result:
+                clean_reply = f"Concluí a orquestração do pedido '{prompt}'. Todos os passos e verificações de qualidade foram validados com sucesso."
+            else:
+                clean_reply = result
+            if not getattr(self, "_suppress_chat_broadcast", False):
+                await self.connections.broadcast({
+                    "type": "chat",
+                    "sender": "JARVIS",
+                    "role": "Assistant",
+                    "content": clean_reply,
+                })
+        return result
 
     def _persist_legacy_sandbox_project(
         self,

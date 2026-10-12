@@ -369,6 +369,7 @@ CLIENT_MESSAGE_TYPES = {
     "study_list_collections",
     "study_create_collection",
     "study_get_document_file",
+    "study_search_rag",
     # Study Video Intelligence
     "study_get_video_context",
     "study_explain_video_moment",

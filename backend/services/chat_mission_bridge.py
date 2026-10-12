@@ -77,15 +77,23 @@ class ChatRequestResolver:
         r"\b(qual a stack|que depend[eê]ncias|quais s[aã]o os servi[cç]os|mostra o snapshot)\b",
         r"\b(explica o c[oó]digo|o que faz o ficheiro|onde est[aá] definid[oa])\b",
         r"\b(diagn[oó]stico|analisa a estrutura|inspeciona o projeto)\b",
+        r"\b(aceder|acedes|acede|acesso|consegues aceder|podes aceder|tens acesso|ver o projeto|abre o projeto|ver projeto|quais os ficheiros|lista os ficheiros)\b",
     ]
 
     ECONOMIC_PATTERNS = [
         r"\b(money|arbitragem|receita|fatura[cç][aã]o|monetiza[cç][aã]o|transa[cç][aã]o econ[oó]mica)\b",
     ]
 
-    CODING_PATTERNS = [
-        r"\b(cria|desenvolve|implementa|constr[oó]i|gera|programa|adiciona|refatora|corrige|testa|build)\b",
-        r"\b(aplica[cç][aã]o|app|website|site|endpoint|componente|api|fun[cç][aã]o|m[oó]dulo|teste|script)\b",
+    RETRY_PATTERNS = [
+        r"^(tenta\s+de\s*novo|tenta\s+outra\s+vez|tenta\s+novamente|tenta\s+a[ií]|tenta|tente\s+de\s*novo|tente\s+outra\s+vez|outra\s+vez|de\s+novo|mais\s+uma\s+vez|repete|repita|faz\s+de\s*novo|fa[cç]a\s+de\s*novo)$",
+    ]
+
+    CODING_VERB_PATTERNS = [
+        r"\b(cria|crie|cria-me|desenvolve|desenvolva|implementa|implemente|constr[oó]i|gera|programa|adiciona|adicione|refatora|refatore|corrige|corrija|build)\b",
+    ]
+
+    CODING_TARGET_PATTERNS = [
+        r"\b(aplica[cç][aã]o|app|website|site|endpoint|componente|api|fun[cç][aã]o|m[oó]dulo|teste|script|ficheiro|arquivo|c[oó]digo|p[aá]gina|tela|view|servi[cç]o|database|banco|sqlite|tabela|bot[aã]o|layout|css|html|js|backend|frontend)\b",
     ]
 
     def resolve_request(
@@ -93,6 +101,7 @@ class ChatRequestResolver:
         prompt: str,
         project_id: str | None = None,
         context: Mapping[str, Any] | None = None,
+        history: list[dict] | None = None,
     ) -> ResolvedChatRequest:
         clean = (prompt or "").strip()
         clean_lower = clean.lower()
@@ -105,6 +114,39 @@ class ChatRequestResolver:
                 objective="",
                 project_id=project_id,
             )
+
+        # 0. Retry / Follow-Up Detection
+        is_retry = any(re.search(pat, clean_lower) for pat in self.RETRY_PATTERNS)
+        if is_retry:
+            prev_prompt = None
+            if history:
+                for msg in reversed(history):
+                    if msg.get("role") == "user":
+                        c = (msg.get("content") or "").strip()
+                        if c and not any(re.search(pat, c.lower()) for pat in self.RETRY_PATTERNS):
+                            prev_prompt = c
+                            break
+            if prev_prompt:
+                log_event(
+                    logger,
+                    "chat_resolver.retry_resolved_from_history",
+                    original_prompt=clean,
+                    resolved_from=prev_prompt,
+                )
+                return self.resolve_request(
+                    prev_prompt,
+                    project_id=project_id,
+                    context=context,
+                    history=None,
+                )
+            else:
+                return ResolvedChatRequest(
+                    raw_prompt=clean,
+                    intent=ChatIntentType.CONVERSATIONAL,
+                    title="Tentativa",
+                    objective="O que gostaria que eu tentasse novamente? Pode indicar o projeto pretendido (ex: 'consegues aceder ao projeto dina') ou uma instrução de desenvolvimento.",
+                    project_id=project_id,
+                )
 
         # 1. Safety & Policy Classifier Check
         safety: SafetyAssessment = SafetyClassifier.evaluate(clean)
@@ -123,23 +165,81 @@ class ChatRequestResolver:
         target_proj = project_id
         if not target_proj and is_econ:
             target_proj = "money"
+        if not target_proj:
+            # 1. Regex check for project / target names
+            proj_match = re.search(r"(?:ao\s+projeto|do\s+projeto|no\s+projeto|projeto|project)\s+[:=]?\s*([a-zA-Z0-9_\-]+)", clean_lower)
+            if proj_match:
+                candidate = proj_match.group(1).strip()
+                if candidate not in {"novo", "atual", "default", "meu", "este", "esse", "qualquer", "web"}:
+                    target_proj = candidate
+            else:
+                # 2. Check for access verbs with target (e.g. "consegues aceder a dina", "ver dina")
+                access_match = re.search(r"\b(?:aceder|acede|acesso|entrar|abrir|ver)\s+(?:a|ao|o|em)?\s+([a-zA-Z0-9_\-]+)", clean_lower)
+                if access_match:
+                    candidate = access_match.group(1).strip()
+                    if candidate not in {"novo", "atual", "default", "meu", "este", "esse", "qualquer", "pasta", "ficheiro", "diretório", "codigo", "código"}:
+                        target_proj = candidate
+                else:
+                    # 3. Check known directories in workspace/projects/
+                    try:
+                        for entry in os.listdir(os.path.join("workspace", "projects")):
+                            if entry.lower() in clean_lower.split() and entry not in {"default-project", "default"}:
+                                target_proj = entry
+                                break
+                    except Exception:
+                        pass
 
-        # 2. Check for Conversational Intent (must not contain coding/execution verbs)
+        # If project still not found, inherit from recent conversation history
+        if not target_proj and history:
+            for msg in reversed(history):
+                content = (msg.get("content") or "").lower()
+                try:
+                    for entry in os.listdir(os.path.join("workspace", "projects")):
+                        if entry.lower() in content.split() and entry not in {"default-project", "default"}:
+                            target_proj = entry
+                            break
+                except Exception:
+                    pass
+                if target_proj:
+                    break
+
+        # Check if prompt is a file request or inspection (e.g. app.js, index.html)
+        is_file_query = False
+        if target_proj:
+            proj_dir = os.path.join("workspace", "projects", target_proj)
+            if os.path.isdir(proj_dir):
+                try:
+                    for entry in os.listdir(proj_dir):
+                        if entry.lower() in clean_lower:
+                            is_file_query = True
+                            break
+                except Exception:
+                    pass
+
+        # Follow-up file queries like "fornece todo", "mostra todo", "não é só isso"
+        is_followup_file_query = any(
+            p in clean_lower
+            for p in [
+                "fornece todo", "fornece tudo", "mostra todo", "mostra tudo",
+                "não é só isso", "nao e so isso", "conteudo todo", "conteúdo todo",
+                "ficheiro todo", "codigo todo", "código todo"
+            ]
+        )
+        if is_followup_file_query and target_proj:
+            is_file_query = True
+
+        # 2. Check for Conversational Intent
         is_conv = any(re.search(pat, clean_lower) for pat in self.CONVERSATIONAL_PATTERNS)
-        is_coding = any(re.search(pat, clean_lower) for pat in self.CODING_PATTERNS)
-
-        if is_conv and not is_coding and len(clean.split()) <= 15:
-            return ResolvedChatRequest(
-                raw_prompt=clean,
-                intent=ChatIntentType.CONVERSATIONAL,
-                title="Conversação",
-                objective=clean,
-                project_id=target_proj,
-            )
+        has_coding_verb = any(re.search(pat, clean_lower) for pat in self.CODING_VERB_PATTERNS)
+        has_coding_target = any(re.search(pat, clean_lower) for pat in self.CODING_TARGET_PATTERNS)
+        is_coding = (has_coding_verb and has_coding_target) or (
+            has_coding_verb and target_proj and target_proj not in {"default-project", "default"}
+        )
 
         # 3. Check for Project Architecture / Analysis Intent
         is_analysis = any(re.search(pat, clean_lower) for pat in self.ANALYSIS_PATTERNS)
-        if is_analysis and not ("cria" in clean_lower or "implementa" in clean_lower or "adiciona" in clean_lower):
+
+        if (is_analysis or is_file_query) and not ("cria" in clean_lower or "implementa" in clean_lower or "adiciona" in clean_lower):
             title = self._generate_title(clean, default="Análise Arquitetural")
             return ResolvedChatRequest(
                 raw_prompt=clean,
@@ -150,7 +250,38 @@ class ChatRequestResolver:
                 task_type="RESEARCH",
             )
 
-        # 4. Default for actionable requests -> EXECUTABLE_DIRECTIVE
+        if is_conv and not is_coding and len(clean.split()) <= 25:
+            return ResolvedChatRequest(
+                raw_prompt=clean,
+                intent=ChatIntentType.CONVERSATIONAL,
+                title="Conversação",
+                objective=clean,
+                project_id=target_proj,
+            )
+
+        # Questions without coding action verbs are conversational questions, NOT heavy software missions!
+        question_words = ["como", "o que", "porque", "porquê", "qual", "quais", "quem", "onde", "quando", "sabes", "podes", "consegues", "tens", "explica", "diz-me"]
+        is_question = clean.endswith("?") or any(clean_lower.startswith(w) for w in question_words)
+        if is_question and not is_coding and not is_econ:
+            return ResolvedChatRequest(
+                raw_prompt=clean,
+                intent=ChatIntentType.CONVERSATIONAL,
+                title="Pergunta Geral",
+                objective=clean,
+                project_id=target_proj,
+            )
+
+        # Strict boundary: only requests with genuine coding action verbs + software target OR economic goals can become EXECUTABLE_DIRECTIVE missions!
+        if not is_coding and not is_econ:
+            return ResolvedChatRequest(
+                raw_prompt=clean,
+                intent=ChatIntentType.CONVERSATIONAL,
+                title="Conversação",
+                objective=clean,
+                project_id=target_proj,
+            )
+
+        # 4. Actionable coding/economic requests -> EXECUTABLE_DIRECTIVE
         task_type = "CODING"
         if is_econ:
             task_type = "EXPERIMENT"
@@ -243,6 +374,8 @@ class ChatMissionBridge:
             await self.connections.broadcast(
                 chat_message(canonical_sender, role, content)
             )
+        if self.orchestration_service and hasattr(self.orchestration_service, "_append_history"):
+            self.orchestration_service._append_history("assistant", content)
 
     async def broadcast_system(self, content: str) -> None:
         if self.connections:
@@ -312,8 +445,15 @@ class ChatMissionBridge:
     ) -> dict[str, Any]:
         """Entry point for incoming chat directives."""
         correlation_id = correlation_id or uuid.uuid4().hex[:12]
+        
+        history = None
+        if self.orchestration_service and hasattr(self.orchestration_service, "conversation_history"):
+            history = self.orchestration_service.conversation_history
+        elif self.callbacks and hasattr(self.callbacks, "conversation_history"):
+            history = self.callbacks.conversation_history
+
         resolved: ResolvedChatRequest = self.resolver.resolve_request(
-            prompt, project_id=project_id
+            prompt, project_id=project_id, history=history
         )
 
         log_event(
@@ -338,13 +478,15 @@ class ChatMissionBridge:
 
         # ── 2. CONVERSATIONAL INTENT ──────────────────────────────────────────
         if resolved.intent == ChatIntentType.CONVERSATIONAL:
-            if self.orchestration_service:
+            if resolved.title == "Tentativa" and resolved.objective:
+                await self.broadcast_chat("JARVIS", "Assistant", resolved.objective)
+            elif self.orchestration_service:
                 await self.orchestration_service.run_casual_chat(prompt)
             else:
                 await self.broadcast_chat(
                     "JARVIS",
-                    "Orquestrador",
-                    f"Olá! Sou o JARVIS. Estou pronto para gerir as tuas missões e projetos.",
+                    "Assistant",
+                    "Olá! Sou o JARVIS. Estou pronto para gerir as tuas missões e projetos.",
                 )
             await self.broadcast_state("idle")
             return {
@@ -357,7 +499,7 @@ class ChatMissionBridge:
         if resolved.intent == ChatIntentType.ANALYSIS:
             target_proj = resolved.project_id or "default-project"
             analysis_text = await self._run_analysis(target_proj, prompt)
-            await self.broadcast_chat("JARVIS", "Arquiteto", analysis_text)
+            await self.broadcast_chat("JARVIS", "Assistant", analysis_text)
             await self.broadcast_state("idle")
             return {
                 "status": "COMPLETED",
@@ -482,9 +624,7 @@ class ChatMissionBridge:
 
         # Broadcast Mission Created WebSocket events
         await self.broadcast_mission_snapshot(target_proj)
-        await self.broadcast_chat(
-            "JARVIS",
-            "Missão",
+        await self.broadcast_system(
             f"🚀 Missão criada: **{resolved.title}** (ID: `{mission_id}`). A submeter ao Mission Gate e iniciar execução...",
         )
 
@@ -511,9 +651,7 @@ class ChatMissionBridge:
                 expected_version=latest_m["mission"]["version"],
             )
             await self.broadcast_mission_snapshot(target_proj)
-            await self.broadcast_chat(
-                "JARVIS",
-                "Mission Gate",
+            await self.broadcast_system(
                 f"⚠️ Missão `{mission_id}` bloqueada pelo Mission Gate: {gate.reason}",
             )
             await self.broadcast_state("idle")
@@ -597,10 +735,16 @@ class ChatMissionBridge:
                 expected_version=latest_m["mission"]["version"],
             )
             await self.broadcast_mission_snapshot(target_proj)
+            await self.broadcast_system(
+                f"✅ Missão **{resolved.title}** concluída com sucesso no MissionStateStore.",
+            )
+            assistant_reply = exec_result.summary
+            if not assistant_reply or assistant_reply.startswith("Trabalho concluído pelos agentes especialistas"):
+                assistant_reply = f"A missão **{resolved.title}** foi executada e validada com sucesso no projeto `{target_proj}`."
             await self.broadcast_chat(
                 "JARVIS",
-                "Missão",
-                f"✅ Missão **{resolved.title}** concluída com sucesso!\n\n{exec_result.summary}",
+                "Assistant",
+                assistant_reply,
             )
         else:
             latest_m = await asyncio.to_thread(self.mission_state.load_mission, target_proj, mission_id)
@@ -612,10 +756,13 @@ class ChatMissionBridge:
                 expected_version=latest_m["mission"]["version"],
             )
             await self.broadcast_mission_snapshot(target_proj)
+            await self.broadcast_system(
+                f"❌ A missão **{resolved.title}** falhou: {exec_result.error or 'Execução sem evidência de sucesso.'}",
+            )
             await self.broadcast_chat(
                 "JARVIS",
-                "Missão",
-                f"❌ A missão **{resolved.title}** falhou: {exec_result.error or 'Execução sem evidência de sucesso.'}",
+                "Assistant",
+                f"Não foi possível concluir a missão **{resolved.title}**: {exec_result.error or 'Verifique os logs na consola central.'}",
             )
 
         await self.broadcast_state("idle")
@@ -647,10 +794,19 @@ class ChatMissionBridge:
 
             # If agent orchestration available
             if self.orchestration_service and hasattr(self.orchestration_service, "_run_agent_orchestration"):
-                await self.orchestration_service._run_agent_orchestration(prompt, session_id)
+                self.orchestration_service._suppress_chat_broadcast = True
+                try:
+                    orch_res = await self.orchestration_service._run_agent_orchestration(prompt, session_id)
+                finally:
+                    self.orchestration_service._suppress_chat_broadcast = False
+                summary_text = (
+                    orch_res
+                    if isinstance(orch_res, str) and orch_res.strip() and not orch_res.startswith("[OK]")
+                    else f"A missão **{resolved.title}** foi concluída e validada com sucesso no projeto `{project_id}`."
+                )
                 return BridgeExecutionResult(
                     success=True,
-                    summary=f"Trabalho concluído pelos agentes especialistas para a missão '{mission_id}'.",
+                    summary=summary_text,
                 )
 
             # Fallback to MissionAutonomyController if registered
@@ -704,25 +860,140 @@ class ChatMissionBridge:
             )
 
     async def _run_analysis(self, project_id: str, prompt: str) -> str:
-        """Runs architectural analysis on target project."""
+        """Runs architectural analysis or project inspection on target project."""
+        clean_prompt = prompt.lower()
+        is_access_query = any(
+            q in clean_prompt
+            for q in [
+                "consegues aceder", "podes aceder", "tens acesso", "acesso ao", "acesso a",
+                "aceder ao", "aceder a", "acede ao", "acede a", "acessar", "ver o projeto",
+                "ver projeto", "abrir projeto", "ficheiros", "lista"
+            ]
+        ) or not any(k in clean_prompt for k in ["arquitetura", "stack", "dependências", "endpoints", "serviços"])
+
+        # Inspect disk directory for this project
+        proj_dir = os.path.join("workspace", "projects", project_id)
+        if not os.path.exists(proj_dir) and hasattr(self, "mission_state") and hasattr(self.mission_state, "projects_root"):
+            proj_dir = os.path.join(self.mission_state.projects_root, project_id)
+
+        file_list = []
+        if os.path.isdir(proj_dir):
+            try:
+                for entry in sorted(os.listdir(proj_dir)):
+                    if entry not in {"__pycache__", "node_modules", ".git"}:
+                        file_list.append(entry)
+            except Exception:
+                pass
+
+        # 1. Check if a specific file in the project is being requested or referenced
+        target_file = None
+        for f in file_list:
+            if f.lower() in clean_prompt:
+                target_file = f
+                break
+
+        # If no explicit file in prompt, check if this is a follow-up ("fornece todo", "não é só isso")
+        if not target_file and any(
+            p in clean_prompt
+            for p in [
+                "fornece todo", "fornece tudo", "mostra todo", "mostra tudo",
+                "não é só isso", "nao e so isso", "conteudo todo", "conteúdo todo",
+                "ficheiro todo", "codigo todo", "código todo"
+            ]
+        ):
+            history = None
+            if self.orchestration_service and hasattr(self.orchestration_service, "conversation_history"):
+                history = self.orchestration_service.conversation_history
+            if history:
+                for msg in reversed(history):
+                    c = (msg.get("content") or "").lower()
+                    for f in file_list:
+                        if f.lower() in c:
+                            target_file = f
+                            break
+                    if target_file:
+                        break
+
+        if target_file and os.path.isdir(proj_dir):
+            file_path = os.path.join(proj_dir, target_file)
+            if os.path.isfile(file_path):
+                try:
+                    with open(file_path, "r", encoding="utf-8", errors="replace") as fh:
+                        file_content = fh.read()
+
+                    ext = target_file.split(".")[-1] if "." in target_file else ""
+                    lang_map = {
+                        "js": "javascript",
+                        "ts": "typescript",
+                        "py": "python",
+                        "html": "html",
+                        "css": "css",
+                        "json": "json",
+                        "md": "markdown",
+                        "sh": "bash",
+                    }
+                    lang = lang_map.get(ext, "")
+                    line_count = len(file_content.splitlines())
+
+                    return (
+                        f"Aqui está o conteúdo real e completo do ficheiro `{target_file}` do projeto **{project_id}** ({line_count} linhas):\n\n"
+                        f"```{lang}\n"
+                        f"{file_content}\n"
+                        f"```"
+                    )
+                except Exception as read_err:
+                    return f"Não foi possível ler o ficheiro `{target_file}`: {read_err}"
+
+        if is_access_query:
+            if os.path.isdir(proj_dir):
+                files_md = "\n".join(f"- `{f}`" for f in file_list) if file_list else "- *(Diretório vazio)*"
+                return (
+                    f"Sim, consigo aceder perfeitamente ao projeto **{project_id}**!\n\n"
+                    f"O projeto está localizado em `{proj_dir}` e contém os seguintes ficheiros principais:\n"
+                    f"{files_md}\n\n"
+                    f"Como posso ajudar com este projeto? Posso explicar a estrutura, criar novas páginas/endpoints ou implementar funcionalidades."
+                )
+            else:
+                return (
+                    f"Procurei pelo projeto **{project_id}** no workspace (`workspace/projects/{project_id}`), mas a pasta ainda não existe.\n\n"
+                    f"Deseja que eu crie a estrutura deste projeto com base nas suas especificações?"
+                )
+
         if self.project_intake:
-            snapshot = await asyncio.to_thread(
-                self.project_intake.ensure_fresh_snapshot,
-                project_id,
-            )
-            arch_dict = self.project_intake.generate_architecture_summary(snapshot) if hasattr(self.project_intake, "generate_architecture_summary") else snapshot.architecture
-            languages = snapshot.stack.get("languages", []) if hasattr(snapshot, "stack") else []
-            frameworks = snapshot.stack.get("frameworks", []) if hasattr(snapshot, "stack") else []
-            entrypoints = [ep.get("path") for ep in snapshot.entrypoints] if hasattr(snapshot, "entrypoints") else []
-            services = [s.get("name") for s in snapshot.services] if hasattr(snapshot, "services") else []
-            
+            try:
+                snapshot = await asyncio.to_thread(
+                    self.project_intake.ensure_fresh_snapshot,
+                    project_id,
+                )
+                arch_dict = self.project_intake.generate_architecture_summary(snapshot) if hasattr(self.project_intake, "generate_architecture_summary") else getattr(snapshot, "architecture", {})
+                languages = snapshot.stack.get("languages", []) if hasattr(snapshot, "stack") and isinstance(snapshot.stack, dict) else []
+                frameworks = snapshot.stack.get("frameworks", []) if hasattr(snapshot, "stack") and isinstance(snapshot.stack, dict) else []
+                entrypoints = [ep.get("path") for ep in snapshot.entrypoints if isinstance(ep, dict)] if hasattr(snapshot, "entrypoints") and isinstance(snapshot.entrypoints, list) else []
+                services = [s.get("name") for s in snapshot.services if isinstance(s, dict)] if hasattr(snapshot, "services") and isinstance(snapshot.services, list) else []
+                
+                files_md = ""
+                if file_list:
+                    files_md = f"\n- **Ficheiros no Diretório**: {', '.join(file_list[:12])}\n"
+
+                return (
+                    f"### Análise de Arquitetura: `{project_id}`\n\n"
+                    f"- **Linguagens Principais**: {', '.join(languages) or 'N/A'}\n"
+                    f"- **Frameworks Detectados**: {', '.join(frameworks) or 'N/A'}\n"
+                    f"- **Serviços / Módulos**: {', '.join(services) or 'Standard Application'}\n"
+                    f"- **Entrypoints**: {', '.join(entrypoints[:5]) or 'Padrão'}\n"
+                    f"{files_md}"
+                    f"- **Padrão Arquitetural**: {arch_dict.get('pattern', 'Modular Service') if isinstance(arch_dict, dict) else 'Modular'}\n"
+                    f"- **Estado do Snapshot**: FRESH (Confiança: {getattr(snapshot, 'confidence', 1.0) * 100:.0f}%)"
+                )
+            except Exception as intake_err:
+                log_event(self.logger, "chat_mission_bridge.intake_error", error=str(intake_err))
+
+        if os.path.isdir(proj_dir):
+            files_md = "\n".join(f"- `{f}`" for f in file_list) if file_list else "- *(Diretório vazio)*"
             return (
-                f"### Análise de Arquitetura: `{project_id}`\n\n"
-                f"- **Linguagens Principais**: {', '.join(languages) or 'N/A'}\n"
-                f"- **Frameworks Detectados**: {', '.join(frameworks) or 'N/A'}\n"
-                f"- **Serviços / Módulos**: {', '.join(services) or 'Standard Application'}\n"
-                f"- **Entrypoints**: {', '.join(entrypoints[:5]) or 'Padrão'}\n"
-                f"- **Padrão Arquitetural**: {arch_dict.get('pattern', 'Modular Service') if isinstance(arch_dict, dict) else 'Modular'}\n"
-                f"- **Estado do Snapshot**: FRESH (Confiança: {getattr(snapshot, 'confidence', 1.0) * 100:.0f}%)"
+                f"### Projeto: `{project_id}`\n\n"
+                f"Diretório: `{proj_dir}`\n\n"
+                f"**Ficheiros principais:**\n{files_md}"
             )
+
         return f"Análise de projeto para '{project_id}' concluída."

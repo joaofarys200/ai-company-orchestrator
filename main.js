@@ -13,6 +13,8 @@ let isQuitting = false;
 let isStoppingBackend = false;
 let backendRestartTimer = null;
 let backendRestartCount = 0;
+let isPageLoaded = false;
+let retryLoadTimer = null;
 
 const MAX_BACKEND_RESTARTS = 3;
 const BACKEND_RESTART_DELAY_MS = 1500;
@@ -248,17 +250,23 @@ function showDiagnosticErrorPage(failedUrls, reason) {
   `)).catch(() => {});
 }
 
-function loadURLWithRetry(url, maxRetries = 20, delayMs = 600, fallbackUrl = 'http://localhost:8000') {
+function loadURLWithRetry(url, maxRetries = 25, delayMs = 500, fallbackUrl = 'http://localhost:8000') {
+  if (isPageLoaded) return;
+  if (retryLoadTimer) {
+    clearTimeout(retryLoadTimer);
+    retryLoadTimer = null;
+  }
   let attempts = 0;
   const attemptedUrls = [url];
   if (fallbackUrl && fallbackUrl !== url) attemptedUrls.push(fallbackUrl);
 
   function tryLoad(currentUrl) {
-    if (!mainWindow || mainWindow.isDestroyed()) return;
+    if (!mainWindow || mainWindow.isDestroyed() || isPageLoaded) return;
     mainWindow.loadURL(currentUrl).catch(() => {
+      if (isPageLoaded) return;
       attempts += 1;
       if (attempts < maxRetries) {
-        setTimeout(() => tryLoad(currentUrl), delayMs);
+        retryLoadTimer = setTimeout(() => tryLoad(currentUrl), delayMs);
       } else if (fallbackUrl && currentUrl !== fallbackUrl) {
         console.log(`[Electron] Falha ao carregar ${currentUrl}. A alternar para fallback: ${fallbackUrl}`);
         attempts = 0;
@@ -285,6 +293,15 @@ function createWindow() {
     }
   });
 
+  // Track successful page loads to stop background retries
+  mainWindow.webContents.on('did-finish-load', () => {
+    isPageLoaded = true;
+    if (retryLoadTimer) {
+      clearTimeout(retryLoadTimer);
+      retryLoadTimer = null;
+    }
+  });
+
   // Clear HTTP/disk cache and code caches immediately on start to prevent loading stale bundles
   mainWindow.webContents.session.clearCache().catch(() => {});
   mainWindow.webContents.session.clearStorageData({ storages: ['cachestorage', 'shadercache', 'serviceworkers'] }).catch(() => {});
@@ -295,6 +312,7 @@ function createWindow() {
   // Enable F5 / Ctrl+R to reload with cache bypass, and F12 for DevTools
   mainWindow.webContents.on('before-input-event', (event, input) => {
     if ((input.control && input.key.toLowerCase() === 'r') || input.key === 'F5') {
+      isPageLoaded = false;
       mainWindow.webContents.session.clearCache().then(() => {
         mainWindow.webContents.reloadIgnoringCache();
       }).catch(() => {
@@ -308,22 +326,13 @@ function createWindow() {
     }
   });
 
-  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-    if (validatedURL && (validatedURL.includes('5173') || validatedURL.includes('8000'))) {
-      setTimeout(() => {
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.loadURL(validatedURL).catch(() => {});
-        }
-      }, 1000);
-    }
-  });
-
   const isDev = process.argv.includes('--dev') || process.env.VITE_DEV === '1';
   const targetUrl = isDev ? 'http://localhost:5173' : 'http://localhost:8000';
   loadURLWithRetry(targetUrl, 25, 400, 'http://localhost:8000');
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+    isPageLoaded = false;
   });
 }
 
