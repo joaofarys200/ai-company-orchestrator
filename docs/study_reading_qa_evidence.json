@@ -1,0 +1,48 @@
+{
+  "timestamp": 1790096872.0,
+  "browser": "Microsoft Edge (Chromium)",
+  "horizontal_overflow_detected": false,
+  "console_errors_count": 0,
+  "console_errors": [],
+  "page_errors_count": 0,
+  "page_errors": [],
+  "failed_requests": [],
+  "screenshots": [
+    {
+      "id": "01_study_library_view",
+      "filename": "01_study_library_view.png",
+      "caption": "Biblioteca de Estudo com filtros por tipo, pesquisa e catálogo de artigos"
+    },
+    {
+      "id": "02_study_reader_view",
+      "filename": "02_study_reader_view.png",
+      "caption": "Leitor Científico de coluna dupla: artigo em inglês original e Assistente Jarvis à direita"
+    },
+    {
+      "id": "06_study_summary_argument_map",
+      "filename": "06_study_summary_argument_map.png",
+      "caption": "Mapa de Argumentação estruturado com selos epistemológicos OBSERVED/INFERRED/UNKNOWN"
+    },
+    {
+      "id": "07_study_notes_cornell_view",
+      "filename": "07_study_notes_cornell_view.png",
+      "caption": "Síntese em Cornell Notes com Resumo Executivo, Cues, Notas, Glossário e exportação Vault"
+    },
+    {
+      "id": "08_study_quiz_scoring_evaluation",
+      "filename": "08_study_quiz_scoring_evaluation.png",
+      "caption": "Quiz com cálculo matemático real (pontuação, corretas, incorretas, em branco) e feedback pedagógico"
+    },
+    {
+      "id": "09_study_spaced_flashcards",
+      "filename": "09_study_spaced_flashcards.png",
+      "caption": "Repetição Espaçada com Flashcards (algoritmo SM-2 com intervalos Again/Hard/Good/Easy)"
+    },
+    {
+      "id": "10_study_knowledge_vault_wikilinks",
+      "filename": "10_study_knowledge_vault_wikilinks.png",
+      "caption": "Explorador do Obsidian Knowledge Vault com suporte a [[Wikilinks]] e busca unificada"
+    }
+  ],
+  "ready": true
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BookOpen,
   CheckCircle2,
@@ -31,6 +31,44 @@ interface StudyNotesViewProps {
   onGenerateCornell?: (documentId: string) => Promise<CornellNotesData>;
 }
 
+const buildDocumentCornell = (doc?: StudyDocument | null): CornellNotesData => {
+  const metaNotes = (doc?.metadata as any)?.cornell_notes;
+  if (metaNotes) {
+    return {
+      document_id: doc?.document_id || '',
+      topic: metaNotes.topic || doc?.title || 'Notas de Estudo',
+      subject: metaNotes.subject || doc?.subject || 'Geral',
+      date: metaNotes.date || new Date().toISOString().split('T')[0],
+      executive_summary: metaNotes.executive_summary || '',
+      cue_column: metaNotes.cue_column || [],
+      detailed_notes: metaNotes.detailed_notes || '',
+      glossary: metaNotes.glossary || '',
+      action_items: metaNotes.action_items || [],
+    };
+  }
+  return {
+    document_id: doc?.document_id || '',
+    topic: doc?.title || 'Notas de Estudo',
+    subject: doc?.subject || 'Geral',
+    date: new Date().toISOString().split('T')[0],
+    executive_summary: doc
+      ? `Síntese estruturada para "${doc.title}". Clica no botão "Gerar Cornell Notes" no canto superior direito para sintetizar este material.`
+      : 'Nenhum documento selecionado.',
+    cue_column: [],
+    detailed_notes: doc
+      ? `### Síntese Pendente\nClica em **Gerar Cornell Notes** para sintetizar automaticamente os conceitos, perguntas-chave e glossário de ${doc.title}.`
+      : '',
+    glossary: '',
+    action_items: doc
+      ? [
+          `Analisar os conceitos principais de ${doc.title}`,
+          'Testar retenção com os quizzes interativos',
+          'Guardar nota final no Knowledge Vault',
+        ]
+      : [],
+  };
+};
+
 export const StudyNotesView: React.FC<StudyNotesViewProps> = ({
   document,
   readingNotes = [],
@@ -44,40 +82,12 @@ export const StudyNotesView: React.FC<StudyNotesViewProps> = ({
   const [vaultSavedMessage, setVaultSavedMessage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
-  // Default or generated Cornell Note
-  const [cornellData, setCornellData] = useState<CornellNotesData>(() => {
-    return {
-      document_id: document?.document_id || 'doc-1',
-      topic: document?.title || 'Metodologia e Arquiteturas Epistémicas',
-      subject: document?.subject || 'Engenharia de Software & IA',
-      date: new Date().toISOString().split('T')[0],
-      executive_summary:
-        'Síntese sistemática dos conceitos centrais abordados no material. Enfatiza a separação entre inferências e dados verificados, garantindo reprodutibilidade.',
-      cue_column: [
-        {
-          cue: 'Qual a tese metodológica central?',
-          idea: 'Estruturação hierárquica por página e parágrafo preservando proveniência auditável.',
-        },
-        {
-          cue: 'Como evitar sobreposições de tradução?',
-          idea: 'Tradução estritamente contextual de segmentos, mantendo os termos científicos originais.',
-        },
-        {
-          cue: 'Como funciona o scoring de quiz?',
-          idea: 'Avaliação matemática real baseada em gabaritos sem presunção de 100% de acerto.',
-        },
-      ],
-      detailed_notes:
-        '### 1. Enquadramento Teórico\nO sistema estabelece limites rigorosos entre observação e inferência epistemológica.\n\n### 2. Mecanismos Operacionais\n- Extração via PyMuPDF e pdfplumber\n- Indexação com Hash SHA-256\n- RAG direcionado com restrição ao corpus atual e Obsidian Vault\n\n### 3. Integração com Obsidian Vault\nOs conceitos são transpostos com [[Wikilinks]] permitindo navegação em grafo.',
-      glossary:
-        '- [[Generalização]]: Capacidade do modelo operar em distribuições não vistas.\n- [[Adaptação de Domínio]]: Transferência entre conjuntos com distribuições divergentes.\n- [[RAG]]: Geração aumentada por recuperação com validação factual.',
-      action_items: [
-        'Rever secção de resultados experimentais (p. 6 a 8)',
-        'Executar quiz de 10 questões para validar retenção',
-        'Sintetizar com o material da aula anterior no Vault',
-      ],
-    };
-  });
+  // Sincronizar dados das notas reais do documento
+  const [cornellData, setCornellData] = useState<CornellNotesData>(() => buildDocumentCornell(document));
+
+  useEffect(() => {
+    setCornellData(buildDocumentCornell(document));
+  }, [document?.document_id, document?.metadata]);
 
   const handleGenerateCornell = async () => {
     if (!document) return;

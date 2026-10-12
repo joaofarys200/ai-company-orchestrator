@@ -257,13 +257,13 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
               {/* Dynamic Summary Content based on Mode */}
               {selectedMode === 'Quick' && (
                 <div className="space-y-3 text-sm">
-                  {[
+                  {(((document.metadata as any)?.summaries?.quick as string[]) || [
                     'Objetivo Central: Estabelecer coordenação robusta e semântica de materiais de estudo sem comprometer o fluxo de leitura.',
                     'Metodologia: Extração de texto preservando estrutura de página, secção e parágrafo com hash criptográfico de integridade.',
                     'Diferencial Chave: O Jarvis assiste contextualmente sem traduzir indiscriminadamente o documento inteiro.',
                     'Resultados Observados: Aumento significativo da compreensão leitora e retenção ativa em sessões com papers em língua inglesa.',
                     'Conclusão: A consolidação pedagógica permite transferir conhecimento direto para o Obsidian Knowledge Vault.',
-                  ].map((pt, idx) => (
+                  ]).map((pt, idx) => (
                     <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-black/30 border border-white/5">
                       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-bold shrink-0">
                         {idx + 1}
@@ -278,17 +278,26 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
                 <div className="space-y-6">
                   {document.sections && document.sections.length > 0 ? (
                     document.sections.map((sec) => (
-                      <div key={sec.section_id} className="rounded-lg border border-white/5 bg-black/20 p-4 space-y-2">
-                        <div className="flex items-center justify-between">
+                      <div key={sec.section_id} className="rounded-lg border border-white/5 bg-black/20 p-4 space-y-3">
+                        <div className="flex items-center justify-between border-b border-white/5 pb-2">
                           <h4 className="text-sm font-semibold text-cyan-300">{sec.title}</h4>
-                          <span className="text-[11px] text-gray-500 font-mono">
-                            pp. {sec.page_start}-{sec.page_end}
-                          </span>
+                          {document.source_type !== 'VIDEO' && (
+                            <span className="text-[11px] text-gray-500 font-mono">
+                              pp. {sec.page_start}-{sec.page_end}
+                            </span>
+                          )}
                         </div>
-                        <p className="text-xs text-gray-300 leading-relaxed">
-                          {sec.paragraphs?.[0]?.text?.slice(0, 300) ||
-                            `Síntese dos tópicos fundamentais e formulação empírica da secção ${sec.title}.`}
-                        </p>
+                        <div className="text-xs text-gray-300 leading-relaxed space-y-2">
+                          {sec.paragraphs && sec.paragraphs.length > 0 ? (
+                            sec.paragraphs.map((p, pIdx) => (
+                              <p key={p.paragraph_id || pIdx} className="text-gray-300">
+                                {p.text}
+                              </p>
+                            ))
+                          ) : (
+                            <p className="text-gray-400">Síntese dos tópicos fundamentais e formulação empírica da secção {sec.title}.</p>
+                          )}
+                        </div>
                       </div>
                     ))
                   ) : (
@@ -299,52 +308,86 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
 
               {selectedMode === 'Detailed' && (
                 <div className="space-y-4 text-xs sm:text-sm text-gray-300 leading-relaxed">
-                  <div className="rounded-lg border border-white/5 bg-black/30 p-4 space-y-2">
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                      Fundamentação Teórica e Formulação
-                    </h4>
-                    <p>
-                      O artigo analisa a transição de leituras passivas para ambientes com auxílio contextual ativo.
-                      Através da decomposição hierárquica (documento → página → secção → parágrafo), cada entidade
-                      mantém proveniência rastreável.
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-white/5 bg-black/30 p-4 space-y-2">
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                      Rigor Metodológico & Protocolo Experimental
-                    </h4>
-                    <p>
-                      As análises são executadas sob invariantes rígidas: o texto original em inglês não é sobreposto
-                      por traduções automáticas completas; a tradução é seletiva e conserva a taxonomia científica.
-                    </p>
-                  </div>
+                  {(((document.metadata as any)?.summaries?.detailed as Array<{ title: string; text: string }>) || [
+                    {
+                      title: 'Fundamentação Teórica e Formulação',
+                      text: 'O artigo analisa a transição de leituras passivas para ambientes com auxílio contextual ativo. Através da decomposição hierárquica (documento → página → secção → parágrafo), cada entidade mantém proveniência rastreável.',
+                    },
+                    {
+                      title: 'Rigor Metodológico & Protocolo Experimental',
+                      text: 'As análises são executadas sob invariantes rígidas: o texto original em inglês não é sobreposto por traduções automáticas completas; a tradução é seletiva e conserva a taxonomia científica.',
+                    },
+                  ]).map((item, idx) => (
+                    <div key={idx} className="rounded-lg border border-white/5 bg-black/30 p-4 space-y-2">
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider text-cyan-300">
+                        {item.title}
+                      </h4>
+                      <p className="text-gray-300">{item.text}</p>
+                    </div>
+                  ))}
                 </div>
               )}
 
               {selectedMode === 'Exam' && (
                 <div className="space-y-4">
-                  <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 p-4 space-y-2">
-                    <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <GraduationCap className="h-4 w-4" /> Conceitos High-Yield (Prováveis em Exame)
-                    </h4>
-                    <ul className="text-xs space-y-1.5 text-gray-200 list-disc list-inside">
-                      <li><strong>Preservação de Proveniência:</strong> Cada afirmação é indexada com [p. X, § Secção].</li>
-                      <li><strong>Scoring Real de Quiz:</strong> Cálculo estrito de TP/total, incorretas e unanswered.</li>
-                      <li><strong>Status Epistemológico:</strong> Distinção obrigatória entre OBSERVED e INFERRED.</li>
-                    </ul>
-                  </div>
+                  {((document.metadata as any)?.summaries?.exam?.high_yield_concepts?.length > 0) ? (
+                    <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 p-4 space-y-3">
+                      <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <GraduationCap className="h-4 w-4" /> Conceitos High-Yield (Prováveis em Exame)
+                      </h4>
+                      <ul className="text-xs space-y-2 text-gray-200">
+                        {((document.metadata as any).summaries.exam.high_yield_concepts as Array<{ concept: string; detail: string }>).map((c, i) => (
+                          <li key={i} className="flex flex-col gap-0.5">
+                            <span className="font-semibold text-amber-300">• {c.concept}:</span>
+                            <span className="text-gray-300 pl-3">{c.detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 p-4 space-y-2">
+                      <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <GraduationCap className="h-4 w-4" /> Conceitos High-Yield (Prováveis em Exame)
+                      </h4>
+                      <ul className="text-xs space-y-1.5 text-gray-200 list-disc list-inside">
+                        <li><strong>Preservação de Proveniência:</strong> Cada afirmação é indexada com [p. X, § Secção].</li>
+                        <li><strong>Scoring Real de Quiz:</strong> Cálculo estrito de TP/total, incorretas e unanswered.</li>
+                        <li><strong>Status Epistemológico:</strong> Distinção obrigatória entre OBSERVED e INFERRED.</li>
+                      </ul>
+                    </div>
+                  )}
 
-                  <div className="rounded-lg border border-white/10 bg-black/30 p-4 space-y-2">
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                      Possíveis Questões de Avaliação
-                    </h4>
-                    <p className="text-xs text-cyan-300 font-medium">
-                      1. "Como difere uma leitura assistida de uma substituição por tradução automática?"
-                    </p>
-                    <p className="text-xs text-cyan-300 font-medium">
-                      2. "Qual o impacto da taxonomia tripla (OBSERVED/INFERRED/UNKNOWN) na confiabilidade do RAG?"
-                    </p>
-                  </div>
+                  {((document.metadata as any)?.summaries?.exam?.likely_questions?.length > 0) ? (
+                    <div className="rounded-lg border border-white/10 bg-black/30 p-4 space-y-3">
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                        Possíveis Questões de Avaliação & Respostas
+                      </h4>
+                      {((document.metadata as any).summaries.exam.likely_questions as Array<{ question: string; answer: string }>).map((q, i) => (
+                        <div key={i} className="space-y-1 text-xs border-b border-white/5 pb-2 last:border-b-0">
+                          <p className="text-cyan-300 font-medium">
+                            {i + 1}. "{q.question}"
+                          </p>
+                          {q.answer && (
+                            <p className="text-gray-300 pl-3 italic">
+                              R: {q.answer}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-white/10 bg-black/30 p-4 space-y-2">
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                        Possíveis Questões de Avaliação
+                      </h4>
+                      <p className="text-xs text-cyan-300 font-medium">
+                        1. "Como difere uma leitura assistida de uma substituição por tradução automática?"
+                      </p>
+                      <p className="text-xs text-cyan-300 font-medium">
+                        2. "Qual o impacto da taxonomia tripla (OBSERVED/INFERRED/UNKNOWN) na confiabilidade do RAG?"
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

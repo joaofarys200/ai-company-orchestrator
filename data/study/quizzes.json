@@ -1,1 +1,76 @@
-{}
+{
+  "quiz_56f35164": {
+    "quiz_id": "quiz_56f35164",
+    "document_id": "doc_a3b336f4295d",
+    "topic": "Predicting performance online consumer reviews(1)",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "No artigo 'Predicting performance online consumer reviews(1)', qual é o objetivo central da investigação com abordagem de sentiment mining?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+          "Construir um classificador para eliminar todas as avaliações com pontuação inferior a 3 estrelas.",
+          "Medir unicamente o tempo de carregamento de páginas de comércio eletrónico em dispositivos móveis.",
+          "Substituir a escrita humana de avaliações por bots generativos de resenhas comerciais."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+        "explanation": "O abstract e a secção 1 estabelecem que o foco é prever readership e helpfulness através de mineração de sentimento e análise de big data (p. 1).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q2",
+        "question": "Quais são as duas questões fundamentais de investigação (RQ1 e RQ2) formuladas no artigo?",
+        "question_type": "multiple_choice",
+        "options": [
+          "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+          "RQ1: Qual o custo de alojamento de avaliações? RQ2: Qual a taxa de devolução de produtos físicos?",
+          "RQ1: Quantas imagens tem cada produto? RQ2: Qual a velocidade média de conexão dos utilizadores?",
+          "RQ1: Como bloquear compradores anónimos? RQ2: Como penalizar avaliações com erros ortográficos?"
+        ],
+        "correct_index": 0,
+        "correct_answer": "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+        "explanation": "Os autores explicitam na Introdução: RQ1 sobre determinantes de readership e RQ2 sobre determinantes de perceived helpfulness (p. 1-2).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q3",
+        "question": "Segundo os resultados empíricos do estudo, qual é o efeito do sentimento presente no TÍTULO de uma avaliação?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+          "O sentimento no título não tem qualquer relação estatística com a atenção dos consumidores.",
+          "Títulos negativos aumentam drasticamente a leitura de todos os tipos de bens de forma idêntica.",
+          "Títulos com sentimento positivo reduzem a credibilidade e são sistematicamente ignorados."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+        "explanation": "Os resultados demonstram que reviews com sentimento positivo no título captam significativamente maior atenção dos consumidores (p. 1, p. 8).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      }
+    ],
+    "transfer_question": {
+      "id": "transfer_applied_ocr_1",
+      "scenario": "Considera que és Lead Data Scientist numa plataforma de comércio eletrónico e pretendes aplicar as conclusões empíricas de 'Predicting performance online consumer reviews(1)' para desenhar um sistema de ordenação automática de avaliações. Como desenharias o algoritmo de classificação ponderando polaridade no título, neutralidade no texto e longevidade para maximizar a utilidade sem enviesar a atenção dos compradores?",
+      "expected_concepts": [
+        "readership",
+        "helpfulness",
+        "polaridade neutra",
+        "sentimento no título",
+        "longevidade",
+        "viés de ordenação"
+      ]
+    },
+    "created_at": "2026-10-12T02:15:20.701421"
+  }
+}

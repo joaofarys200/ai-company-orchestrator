@@ -1,0 +1,381 @@
+{
+  "execution_id": "qa_golden_path_1790122184",
+  "browser": "Microsoft Edge",
+  "document": {
+    "filename": "sample_paper_attention.pdf",
+    "title": "Attention Is All You Need",
+    "pages": 6,
+    "language": "en",
+    "source_hash": "ab37b53bd95bb3598fe6a64055596901462b29965c6f33c97c07cada05c1db11",
+    "sections_count": 12,
+    "media_count": 2,
+    "glossary_count": 3
+  },
+  "golden_path_summary": {
+    "passed_steps": 32,
+    "total_steps": 32,
+    "pass_rate_str": "32/32 casos passaram no golden path",
+    "duration_seconds": 26.66
+  },
+  "browser_qa": {
+    "console_errors_count": 0,
+    "console_errors": [],
+    "page_exceptions_count": 0,
+    "page_exceptions": [],
+    "horizontal_overflow_count": 0
+  },
+  "grounding_tests": {
+    "test_a_supported": {
+      "claim": "Our big model achieves a BLEU score of 41.8 on WMT 2014 English-to-French translation task.",
+      "status": "SUPPORTED",
+      "grounding_status": "SUPPORTED",
+      "evidence_status": "OBSERVED",
+      "source_id": "doc_ab37b53bd95b",
+      "page_number": 5,
+      "section_title": "4. Results",
+      "citation": "p. 5, § 4. Results",
+      "evidence": "On the WMT 2014 English-to-German translation task, the big transformer model out-performs the best previously reported models (including ensembles) by more than 2.0 BLEU, establishing a new state-of-the-art BLEU score of 28.4. The base model achieves a BLEU score of 27.3, outperforming all previous models and ensembles, at a fraction of the training cost. On the WMT 2014 English-to-French translation task, our big model achieves a BLEU score of 41.8, outperforming all previously published single models, at less than 1/4 the training cost of the previous state-of-the-art model. The Transformer (big) model trained for English-to-French used dropout P_drop = 0.1, instead of 0.3.",
+      "reasoning": "Afirmação fundamentada diretamente em p. 5, § 4. Results."
+    },
+    "test_b_insufficient_evidence": {
+      "claim": "A cotação internacional da prata valorizou 18.5% no mercado de futuros em 1985.",
+      "status": "INSUFFICIENT_EVIDENCE",
+      "grounding_status": "INSUFFICIENT_EVIDENCE",
+      "evidence_status": "UNKNOWN",
+      "source_id": "doc_ab37b53bd95b",
+      "evidence": "",
+      "sources": [],
+      "reasoning": "Não foram encontradas passagens no documento que sustentem esta afirmação."
+    },
+    "test_c_inferred": {
+      "claim": "O mecanismo de auto-atenção pode potencialmente ser estendido a dados multidimensionais e sinais contínuos.",
+      "status": "INFERRED",
+      "grounding_status": "INFERRED",
+      "evidence_status": "INFERRED",
+      "source_id": "doc_ab37b53bd95b",
+      "citation": "Inferência contextual a partir dos princípios do artigo",
+      "evidence": "A dedução baseia-se nas propriedades gerais do modelo, mas não foi testada experimentalmente no texto.",
+      "reasoning": "A afirmação constitui uma extrapolação teórica plausível mas não observada explicitamente."
+    },
+    "test_d_contradicted": {
+      "claim": "The Transformer model relies fundamentally on recurrent LSTM layers for sequence alignment.",
+      "status": "CONTRADICTED",
+      "grounding_status": "CONTRADICTED",
+      "evidence_status": "OBSERVED",
+      "source_id": "doc_ab37b53bd95b",
+      "page_number": 1,
+      "section_title": "1. Introduction",
+      "citation": "p. 1, § 1. Introduction",
+      "evidence": "Recurrent neural networks, long short-term memory and gated recurrent neural networks in particular, have been firmly established as state of the art approaches in sequence modeling and transduction problems such as language modeling and machine translation. Numerous efforts have since continued to push the boundaries of recurrent language models and encoder-decoder architectures. Recurrent models typically factor computation along the symbol positions of the input and output sequences. Aligning the positions to steps in computation time, they generate a sequence of hidden states h_t, as a function of the previous hidden state h_{t-1} and the input for position t. This inherently sequential nature precludes parallelization within training examples, which becomes critical at longer sequence lengths, as memory constraints limit batching across examples. Recent work has achieved significant improvements in computational efficiency through factorization tricks and conditional computation, while also improving model performance in some cases. However, the fundamental constraint of sequential computation remains. In this work we propose the Transformer, a model architecture eschewing recurrence and instead relying entirely on an attention mechanism to draw global dependencies between input and output. The Transformer allows for significantly more parallelization and can reach a new state of the art in translation quality after being trained for as little as twelve hours on eight P100 GPUs.",
+      "reasoning": "A afirmação é contradita diretamente pelo texto do artigo em p. 1, § 1. Introduction."
+    },
+    "matrix_status": "ALL_PASSED"
+  },
+  "quiz_validation": {
+    "quiz_id": "quiz_554daa1f",
+    "total_questions": 3,
+    "correct_answers": 1,
+    "incorrect_answers": 1,
+    "unanswered": 1,
+    "backend_score_percent": 33.3,
+    "expected_score_percent": 33.3,
+    "mathematically_correct": true
+  },
+  "provenance_validation": {
+    "records_tested": 5,
+    "records": [
+      {
+        "item_index": 1,
+        "type": "ask_paper_answer",
+        "source_id": "doc_ab37b53bd95b",
+        "page": 5,
+        "section": "4. Results",
+        "evidence": "On the WMT 2014 English-to-German translation task, the big transformer model out-performs the best previously reported ",
+        "citation": "p. 5, § 4. Results",
+        "verified_match": true
+      },
+      {
+        "item_index": 2,
+        "type": "reading_note",
+        "source_id": "doc_ab37b53bd95b",
+        "page": 2,
+        "section": "2. Background",
+        "evidence": "In the Transformer this is reduced to a constant number of operations O(1)",
+        "citation": "p. 2",
+        "verified_match": true
+      },
+      {
+        "item_index": 3,
+        "type": "text_highlight",
+        "source_id": "doc_ab37b53bd95b",
+        "page": 1,
+        "section": "1. Introduction",
+        "evidence": "dispensing with recurrence and convolutions entirely",
+        "citation": "p. 1",
+        "verified_match": true
+      },
+      {
+        "item_index": 4,
+        "type": "grounding_proof_supported",
+        "source_id": "doc_ab37b53bd95b",
+        "page": 5,
+        "section": "4. Results",
+        "evidence": "On the WMT 2014 English-to-German translation task, the big transformer model out-performs the best previously reported ",
+        "citation": "p. 5, § 4. Results",
+        "verified_match": true
+      },
+      {
+        "item_index": 5,
+        "type": "grounding_proof_contradicted",
+        "source_id": "doc_ab37b53bd95b",
+        "page": 1,
+        "section": "1. Introduction",
+        "evidence": "Recurrent neural networks, long short-term memory and gated recurrent neural networks in particular, have been firmly es",
+        "citation": "p. 1, § 1. Introduction",
+        "verified_match": true
+      }
+    ]
+  },
+  "steps_results": [
+    {
+      "step": 1,
+      "name": "importar_pdf",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Document ID doc_ab37b53bd95b, 6 pages extracted from sample_paper_attention.pdf"
+    },
+    {
+      "step": 2,
+      "name": "identificacao_idioma_en",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Detected language: 'en' (EN expected)"
+    },
+    {
+      "step": 3,
+      "name": "abrir_reading_mode",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Dual-column Reading Mode opened successfully"
+    },
+    {
+      "step": 4,
+      "name": "navegar_entre_paginas",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Navigated pages sequence: [1, 2, 3, 2], total pages in PDF: 6"
+    },
+    {
+      "step": 5,
+      "name": "confirmar_estrutura_seccoes",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "12 sections parsed: ['Abstract / Introdução', '1. Introduction', '2. Background', '3. Model Architecture', '3.1 Encoder and Decoder Stacks']..."
+    },
+    {
+      "step": 6,
+      "name": "selecionar_uma_frase",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Selected core claim: 'We propose a new simple network architecture, the Transforme...'"
+    },
+    {
+      "step": 7,
+      "name": "traducao_contextual_pt_pt",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Translation: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'"
+    },
+    {
+      "step": 8,
+      "name": "explicacao_nivel_basico",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Em palavras simples: este trecho afirma que o sistema procura alcançar melhores resultados sem complicações desnecessárias, funcionando como um guia direto para o leitor."
+    },
+    {
+      "step": 9,
+      "name": "explicacao_nivel_academico",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Interpretação formal: A asserção articula o enquadramento metodológico estrito, estabelecendo restrições axiomáticas de consistência entre a hipótese formulada e a validação empírica."
+    },
+    {
+      "step": 10,
+      "name": "selecionar_conceito_tecnico",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Concept: attention mechanism, translation: mecanismo de atenção"
+    },
+    {
+      "step": 11,
+      "name": "adicionar_ao_glossario",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Term 'attention mechanism' present in doc glossary (total 3 terms)"
+    },
+    {
+      "step": 12,
+      "name": "resumir_seccao_atual",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Section '1. Introduction' summary with 3 key points"
+    },
+    {
+      "step": 13,
+      "name": "explicar_figura",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Figure status: OBSERVED, target: Figure 1: Scaled Dot-Product Attention and Model Architectur"
+    },
+    {
+      "step": 14,
+      "name": "interpretar_tabela",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Table status: OBSERVED, target: Table 1: BLEU scores on WMT 2014 English-to-German and Engli"
+    },
+    {
+      "step": 15,
+      "name": "adicionar_highlight",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Highlight ID hl_26ad0e12 on page 1: 'dispensing with recurrence and convolutions entirely'"
+    },
+    {
+      "step": 16,
+      "name": "adicionar_nota_pagina",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Note ID note_d3f006a3 tied to page 2: 'Propriedade crucial: complexidade O(1) para relacionar sinais distantes sem degradar resolução.'"
+    },
+    {
+      "step": 17,
+      "name": "gerar_cornell_notes",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Cornell cues: 3, summary length: 201"
+    },
+    {
+      "step": 18,
+      "name": "gerar_quiz",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Generated quiz ID quiz_554daa1f with 3 questions"
+    },
+    {
+      "step": 19,
+      "name": "responder_quiz_1c_1e_1u",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Correct: 1, Incorrect: 1, Unanswered: 1"
+    },
+    {
+      "step": 20,
+      "name": "verificar_scoring_matematico",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Score: 33.3% (expected ~33.3%)"
+    },
+    {
+      "step": 21,
+      "name": "gerar_flashcards",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "6 flashcards generated from glossary and document structure"
+    },
+    {
+      "step": 22,
+      "name": "executar_revisao_flashcard",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Card fc_7c217375 updated: repetitions=1, interval=2.0d"
+    },
+    {
+      "step": 23,
+      "name": "guardar_no_knowledge_vault",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Saved file: obsidian_vault\\10 - Lectures\\Machine Learning\\2026-09-23 - Attention Is All You Need.md, has [[Wikilinks]]: True, has frontmatter: True"
+    },
+    {
+      "step": 24,
+      "name": "perguntar_algo_suportado",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Answer length: 422, status: SUPPORTED"
+    },
+    {
+      "step": 25,
+      "name": "confirmar_citacoes_pagina_seccao",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Sources: ['p. 5, § 4. Results', 'p. 4, § 3.3 Multi-Head Attention', 'p. 6, § 6. Conclusion', 'Obsidian Vault (Conhecimento Anterior)']"
+    },
+    {
+      "step": 26,
+      "name": "perguntar_algo_nao_suportado",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Sources returned: [] (empty as required)"
+    },
+    {
+      "step": 27,
+      "name": "confirmar_insufficient_evidence",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Status: INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE expected)"
+    },
+    {
+      "step": 28,
+      "name": "perguntar_algo_inferencia",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Status: INFERRED (INFERRED expected)"
+    },
+    {
+      "step": 29,
+      "name": "confirmar_distincao_epistemologica",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Epistemic distribution in paper structure: 4 OBSERVED, 2 INFERRED, 5 UNKNOWN"
+    },
+    {
+      "step": 30,
+      "name": "fechar_artigo",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Article closed and navigated to Library view"
+    },
+    {
+      "step": 31,
+      "name": "reabrir_artigo",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Document reopened from disk: doc_ab37b53bd95b"
+    },
+    {
+      "step": 32,
+      "name": "confirmar_progresso_leitura_preservado",
+      "category": "REAL_DOCUMENT",
+      "passed": true,
+      "detail": "Preserved page: 4 (expected 4), progress: 66.7%"
+    }
+  ],
+  "screenshots": {
+    "01_golden_path_pdf_import": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\01_golden_path_pdf_import.png",
+    "02_golden_path_reading_mode_sections": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\02_golden_path_reading_mode_sections.png",
+    "03_golden_path_contextual_translation_pt": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\03_golden_path_contextual_translation_pt.png",
+    "04_golden_path_explanation_basic_academic": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\04_golden_path_explanation_basic_academic.png",
+    "05_golden_path_glossary_term_added": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\05_golden_path_glossary_term_added.png",
+    "06_golden_path_section_summary": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\06_golden_path_section_summary.png",
+    "07_golden_path_figure_and_table_analysis": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\07_golden_path_figure_and_table_analysis.png",
+    "08_golden_path_highlight_and_page_note": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\08_golden_path_highlight_and_page_note.png",
+    "09_golden_path_cornell_notes_synthesis": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\09_golden_path_cornell_notes_synthesis.png",
+    "10_golden_path_quiz_scoring_evaluation": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\10_golden_path_quiz_scoring_evaluation.png",
+    "11_golden_path_flashcards_spaced_review": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\11_golden_path_flashcards_spaced_review.png",
+    "12_golden_path_knowledge_vault_wikilinks": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\12_golden_path_knowledge_vault_wikilinks.png",
+    "13_golden_path_grounding_citations_rag": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\13_golden_path_grounding_citations_rag.png",
+    "14_golden_path_reading_progress_preserved": "C:\\Users\\joaor\\Desktop\\JarvisOS\\docs\\screenshots\\study_golden_path\\14_golden_path_reading_progress_preserved.png"
+  }
+}

@@ -786,11 +786,15 @@ class VideoIntelligenceService:
             if duration_seconds <= 0:
                 duration_seconds = 60.0
 
-        # Amostragem espaçada
-        step = max(0.5, interval_seconds)
+        # Amostragem espaçada adaptativa para cobrir toda a duração do vídeo
+        if max_frames > 0 and duration_seconds > max_frames * interval_seconds:
+            step = max(0.5, duration_seconds / float(max_frames))
+        else:
+            step = max(0.5, interval_seconds)
+
         sample_timestamps = []
-        cur = 0.5  # Iniciar aos 0.5s para capturar amostras mesmo em clips curtos
-        while cur < duration_seconds:
+        cur = min(0.5, max(0.0, step / 2.0))  # Amostra inicial representativa
+        while cur < duration_seconds and len(sample_timestamps) < max_frames:
             sample_timestamps.append(cur)
             cur += step
 

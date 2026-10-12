@@ -55,12 +55,20 @@ CV -*
 # Logs and temporary files
 logs/
 temp_audio/
+temp_lecture_transcription/
+data/study/audio/*.mp3
+data/study/audio/*.wav
+data/study/audio/*.m4a
+data/study/keyframes/
+docs/debug/
 *.log
 *.tmp
 *.temp
 .cache/
 diagnostics/project_builder_flight_recorder/
 scratch/
+
+
 
 # OS/editor noise
 .DS_Store

@@ -36,6 +36,7 @@ export type StudyTab =
 
 export interface StudyUploadPayload {
   filename: string;
+  file_path?: string;
   content_base64?: string;
   content_text?: string;
   subject?: string;
@@ -80,6 +81,8 @@ interface StudyContainerProps {
     source_document_ids: string[];
     source_hash: string;
   }) => Promise<boolean>;
+  activeStudyQuiz?: StudyQuiz | null;
+  studyQuizResult?: QuizEvaluationResult | null;
   onGenerateQuiz?: (documentId: string, count: number) => Promise<StudyQuiz>;
   onSubmitQuiz?: (
     quizId: string,
@@ -89,6 +92,8 @@ interface StudyContainerProps {
   onReviewFlashcard?: (cardId: string, rating: 'Again' | 'Hard' | 'Good' | 'Easy') => void;
   onPrepareForExam?: (documentId: string) => Promise<void>;
   onGenerateCornell?: (documentId: string) => Promise<CornellNotesData>;
+  onSearchRag?: (query: string, docId?: string) => Promise<Array<{ text: string; source: string; score?: number; title?: string }>>;
+  onReadNote?: (filename: string) => Promise<string>;
   onSaveNoteToObsidian?: (filename: string, content: string) => void;
   onRefreshDocuments?: () => void;
   onDeleteDocument?: (docId: string) => Promise<boolean> | void;
@@ -99,6 +104,8 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   initialActiveDocumentId,
   notes = [],
   isRecording = false,
+  activeStudyQuiz,
+  studyQuizResult,
   onStartRecording,
   onStopRecording,
   onUploadDocument,
@@ -115,6 +122,8 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   onReviewFlashcard,
   onPrepareForExam,
   onGenerateCornell,
+  onSearchRag,
+  onReadNote,
   onSaveNoteToObsidian,
   onRefreshDocuments,
   onGetDocumentFile,
@@ -382,6 +391,16 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
                   setUploadStatus(`Erro: ${err?.message || 'Falha ao processar'}`);
                 }
               }
+              // Timeout de segurança: resetar estado de upload se não houver resposta em 60s
+              setTimeout(() => {
+                setIsUploading((prev) => {
+                  if (prev) {
+                    setUploadStatus('');
+                    return false;
+                  }
+                  return prev;
+                });
+              }, 60000);
             }}
             isUploading={isUploading}
             uploadStatus={uploadStatus}
@@ -464,6 +483,8 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
         {activeTab === 'quiz' && (
           <StudyQuizView
             document={activeDocument}
+            quiz={activeStudyQuiz?.document_id === activeDocument?.document_id ? activeStudyQuiz : null}
+            evaluationResult={studyQuizResult}
             onGenerateQuiz={onGenerateQuiz}
             onSubmitQuiz={onSubmitQuiz}
             onReviewFlashcard={onReviewFlashcard}
@@ -475,6 +496,8 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
           <StudyKnowledgeView
             document={activeDocument}
             notes={notes}
+            onSearchRag={onSearchRag ? (q) => onSearchRag(q, activeDocument?.document_id) : undefined}
+            onReadNote={onReadNote}
             onSaveNote={onSaveNoteToObsidian}
           />
         )}

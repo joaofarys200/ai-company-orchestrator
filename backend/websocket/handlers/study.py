@@ -46,6 +46,7 @@ STUDY_HANDLERS = {
     "study_list_collections": "list_collections",
     "study_create_collection": "create_collection",
     "study_get_document_file": "get_document_file",
+    "study_search_rag": "search_rag",
     # Study Video Intelligence
     "study_get_video_context": "get_video_context",
     "study_explain_video_moment": "explain_video_moment",
@@ -357,6 +358,7 @@ class StudyWebSocketHandler:
             section_id=section_id,
             page_number=page_num,
             level=level,
+            media_id=message.get("media_id"),
         )
 
         await self.connections.send(websocket, {
@@ -487,6 +489,7 @@ class StudyWebSocketHandler:
             await self.connections.send(websocket, {
                 "type": "study_quiz_ready",
                 "document_id": doc_id,
+                "request_id": message.get("request_id"),
                 "quiz": {
                     "quiz_id": quiz.quiz_id,
                     "topic": quiz.topic,
@@ -519,12 +522,44 @@ class StudyWebSocketHandler:
             )
             await self.connections.send(websocket, {
                 "type": "study_quiz_evaluated",
+                "quiz_id": quiz_id,
+                "request_id": message.get("request_id"),
                 **result,
             })
         except Exception as e:
             await self.connections.send(websocket, {
                 "type": "study_error",
                 "message": str(e),
+            })
+
+    async def search_rag(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        query = message.get("query", "")
+        doc_id = message.get("document_id", "")
+        req_id = message.get("request_id")
+        try:
+            results = await asyncio.to_thread(
+                self.study_service.search_study_rag,
+                query,
+                document_id=doc_id,
+            )
+            await self.connections.send(websocket, {
+                "type": "study_search_rag_result",
+                "document_id": doc_id,
+                "request_id": req_id,
+                "results": results,
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_search_rag_result",
+                "document_id": doc_id,
+                "request_id": req_id,
+                "results": [],
+                "error": str(e),
             })
 
     async def list_flashcards(

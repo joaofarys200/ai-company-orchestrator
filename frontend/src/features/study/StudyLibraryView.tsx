@@ -25,6 +25,7 @@ interface StudyLibraryViewProps {
   onOpenDocument: (docId: string, initialTab?: 'reader' | 'summary' | 'notes' | 'quiz') => void;
   onUpload: (payload: {
     filename: string;
+    file_path?: string;
     content_base64?: string;
     content_text?: string;
     subject: string;
@@ -166,6 +167,31 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
 
     const ext = selectedFile.name.split('.').pop()?.toLowerCase() || '';
     const isVideo = ['mp4', 'webm', 'mkv', 'mov', 'avi'].includes(ext);
+
+    // Em ambiente Electron desktop, utilizar o caminho nativo diretamente (zero overhead de memória base64)
+    const localFilePath =
+      (window as any).jarvisIPC?.getPathForFile?.(selectedFile) ||
+      (selectedFile as any).path ||
+      '';
+
+    if (localFilePath) {
+      onUpload({
+        filename: selectedFile.name,
+        file_path: localFilePath,
+        subject: uploadSubject || 'Geral',
+        source_type: isVideo ? 'VIDEO' : undefined,
+        title: uploadTitle || selectedFile.name,
+      });
+      setIsUploadModalOpen(false);
+      setSelectedFile(null);
+      setUploadTitle('');
+      return;
+    }
+
+    if (selectedFile.size > 25 * 1024 * 1024) {
+      alert(`O ficheiro ${selectedFile.name} tem ${(selectedFile.size / (1024 * 1024)).toFixed(1)}MB. No navegador web, uploads base64 estão limitados a 25MB. Abre a aplicação JarvisOS Desktop para processamento local de ficheiros de grande porte.`);
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = () => {

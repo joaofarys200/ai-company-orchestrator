@@ -16,7 +16,8 @@ import {
   Rewind,
   Eye,
   Clock,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Subtitles
 } from 'lucide-react';
 import type {
   StudyDocument,
@@ -127,6 +128,9 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
   const keyframes: VideoKeyframe[] = useMemo(() => {
     return videoMeta?.keyframes || (document.metadata as any)?.keyframes || [];
   }, [videoMeta, document]);
+
+  // Subtitle Overlay Toggle (defaults to false so screen isn't blocked)
+  const [showSubtitles, setShowSubtitles] = useState<boolean>(false);
 
   // Sidebar / Assistant State
   const [assistantPanelOpen, setAssistantPanelOpen] = useState<boolean>(true);
@@ -591,10 +595,10 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
               playsInline
             />
 
-            {/* In-Video Active Subtitle Overlay */}
-            {currentSegment && (
-              <div className="pointer-events-none absolute bottom-14 left-0 right-0 flex justify-center px-6">
-                <p className="max-w-2xl rounded-lg bg-black/80 px-4 py-1.5 text-center text-xs sm:text-sm font-medium text-white shadow-lg backdrop-blur-md border border-white/10">
+            {/* In-Video Active Subtitle Overlay (Optional CC toggle) */}
+            {showSubtitles && currentSegment && (
+              <div className="pointer-events-none absolute bottom-14 left-0 right-0 flex justify-center px-6 z-10">
+                <p className="max-w-xl rounded-lg bg-black/85 px-4 py-1.5 text-center text-xs sm:text-sm font-medium text-white shadow-xl backdrop-blur-md border border-white/20 line-clamp-2">
                   {currentSegment.text}
                 </p>
               </div>
@@ -712,6 +716,18 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
                     <option value={1.5}>1.5x</option>
                     <option value={2}>2.0x</option>
                   </select>
+
+                  {/* Subtitle / CC Toggle */}
+                  <button
+                    onClick={() => setShowSubtitles((prev) => !prev)}
+                    className={`flex h-7 px-2 items-center justify-center rounded transition cursor-pointer font-semibold text-[11px] gap-1 ${
+                      showSubtitles ? 'text-cyan-300 bg-cyan-400/20 border border-cyan-400/40' : 'text-zinc-400 hover:text-white bg-white/5 border border-transparent'
+                    }`}
+                    title={showSubtitles ? 'Ocultar legendas sobre o vídeo' : 'Mostrar legendas sobre o vídeo'}
+                  >
+                    <Subtitles className="h-3.5 w-3.5" />
+                    <span>CC</span>
+                  </button>
 
                   {/* Fullscreen Button */}
                   <button

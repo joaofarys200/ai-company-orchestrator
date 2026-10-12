@@ -1,0 +1,26 @@
+{
+  "topic": "Predicting the Performance of Online Consumer Reviews: Sentiment Analysis",
+  "subject": "Metodologia de Investigação",
+  "date": "2026-10-03",
+  "executive_summary": "Esta aula centra-se na análise metodológica de um artigo académico sobre a previsão da performance de reviews de consumidores online através de técnicas de análise de sentimento. O professor analisa a estrutura do artigo, realçando a importância das questões de investigação (research questions), a caracterização das variáveis e a adequação do modelo empírico utilizado pelos autores. A aula explora a relação entre a teoria e a prática metodológica, discutindo a natureza da evidência, o papel dos dados secundários e a relevância de diferentes abordagens estatísticas.",
+  "cue_column": [
+    {"cue": "Natureza do estudo", "idea": "Estudo de campo observacional que analisa dados secundários."},
+    {"cue": "Quais são as variáveis?", "idea": "Variáveis independentes (ex: características da review) e dependentes (ex: utilidade da review)."},
+    {"cue": "Qual é a base da análise?", "idea": "Uso de técnicas de mineração de dados (data mining) para medir sentimento e performance."},
+    {"cue": "Qual a relevância do estudo?", "idea": "Compreender o comportamento dos consumidores e o impacto das reviews online."},
+    {"cue": "Papel do pesquisador", "idea": "Identificar constructos teóricos a partir de observações empíricas."}
+  ],
+  "detailed_notes": "### Estrutura do Artigo\n- **Introdução e Contextualização:** Importância das reviews online para o comportamento do consumidor.\n- **Questões de Investigação:** Foco em determinar que fatores influenciam a utilidade ('helpfulness') percebida de uma review.\n\n### Metodologia de Investigação\n- **Desenho da Pesquisa:** Uso de dados secundários extraídos de uma plataforma de e-commerce.\n- **Modelização:** Identificação de variáveis dependentes (ex: 'helpfulness', 'sales') e independentes (ex: 'readability', 'sentiment polarity').\n- **Análise de Dados:** Aplicação de modelos estatísticos para validar hipóteses sobre o comportamento do consumidor.\n\n### Debate Crítico\n- Discussão sobre a adequação do termo 'Science' no artigo (ex: 'Science is about falsifiability').\n- Reflexão sobre as limitações dos dados secundários: eles são suficientes para inferir causalidade?\n- O professor enfatiza que a metodologia deve garantir que o constructo medido corresponde realmente ao fenómeno estudado (validade de constructo).",
+  "glossary": "- [[Análise de Sentimento]]: Técnica computacional para identificar a polaridade emocional num texto.\n- [[Dados Secundários]]: Dados recolhidos por terceiros para fins distintos da investigação original.\n- [[Variáveis Dependentes]]: Variáveis de resultado que se pretende explicar.\n- [[Variáveis Independentes]]: Variáveis explicativas que influenciam o resultado.",
+  "action_items": [
+    "Identificar as principais variáveis independentes e dependentes no modelo proposto pelo artigo.",
+    "Avaliar a validade dos dados secundários recolhidos e se estes são adequados para responder às questões de investigação.",
+    "Refletir sobre como a análise de sentimento contribui para a validade do modelo teórico."
+  ],
+  "chapters": [
+    {"title": "Introdução ao Artigo", "start_timestamp": "00:00", "summary": "Apresentação e enquadramento do tema de estudo."},
+    {"title": "Variáveis e Constructos", "start_timestamp": "02:00", "summary": "Análise da definição operacional das variáveis."},
+    {"title": "Análise Estatística e Validação", "start_timestamp": "06:00", "summary": "Discussão sobre os testes estatísticos e a robustez dos resultados."},
+    {"title": "Reflexão Final", "start_timestamp": "09:00", "summary": "Conclusões sobre o rigor científico do estudo."}
+  ]
+}

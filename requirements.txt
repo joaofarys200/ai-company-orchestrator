@@ -8,7 +8,7 @@ chromadb==1.1.1
 composio-core==0.2.22
 crewai==1.14.7
 docker==7.1.0
-faster-whisper==1.2.1
+# faster-whisper==1.2.1  # Opcional (Windows Smart App Control bloqueia DLLs não assinadas do PyAV em utilizadores locais)
 firecrawl-py==4.30.0
 httpx==0.28.1
 markdownify==1.2.2
