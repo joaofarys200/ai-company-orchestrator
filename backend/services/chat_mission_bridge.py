@@ -4,6 +4,7 @@ import asyncio
 import enum
 import os
 import re
+import time
 import uuid
 from dataclasses import dataclass, field
 from typing import Any, Mapping
@@ -28,10 +29,21 @@ logger = get_logger(__name__)
 
 
 class ChatIntentType(str, enum.Enum):
-    CONVERSATIONAL = "CONVERSATIONAL"
-    ANALYSIS = "ANALYSIS"
-    EXECUTABLE_DIRECTIVE = "EXECUTABLE_DIRECTIVE"
+    CHAT = "CHAT"
+    PROJECT_QUERY = "PROJECT_QUERY"
+    PROJECT_INSPECTION = "PROJECT_INSPECTION"
+    FILE_READ = "FILE_READ"
+    FILE_DELIVERY = "FILE_DELIVERY"
+    LOCAL_ACTION = "LOCAL_ACTION"
+    EXECUTION_REQUEST = "EXECUTION_REQUEST"
+    CONTINUATION = "CONTINUATION"
+    AMBIGUOUS = "AMBIGUOUS"
     REFUSED_POLICY = "REFUSED_POLICY"
+
+    # Backward compatibility aliases
+    CONVERSATIONAL = "CHAT"
+    ANALYSIS = "PROJECT_INSPECTION"
+    EXECUTABLE_DIRECTIVE = "EXECUTION_REQUEST"
 
 
 @dataclass
@@ -45,6 +57,28 @@ class ResolvedChatRequest:
     is_economic: bool = False
     task_type: str = "GENERIC"
     confidence: float = 1.0
+    context_reference: dict[str, Any] = field(default_factory=dict)
+    planned_action: str = ""
+    requires_mission: bool = False
+    requires_model: bool = False
+    requires_external_network: bool = False
+    decision_reason: str = ""
+    target_file: str | None = None
+    delivery_mode: str = "content"
+    requires_approval: bool = False
+
+
+@dataclass
+class RequestRecord:
+    correlation_id: str
+    prompt: str
+    intent: str
+    created_at: float
+    user_response: str | None = None
+    technical_events: list[dict[str, Any]] = field(default_factory=list)
+    state_changes: list[str] = field(default_factory=list)
+    operation_result: dict[str, Any] | None = None
+    completion_emitted: bool = False
 
 
 @dataclass
@@ -63,7 +97,7 @@ class MissionGateResult:
 
 
 class ChatRequestResolver:
-    """Classifies user chat prompts deterministically into canonical intent categories."""
+    """Classifies user chat prompts into canonical typed categories with semantic context."""
 
     CONVERSATIONAL_PATTERNS = [
         r"^(ol[aá]|bom dia|boa tarde|boa noite|oi|hey|hello|hi)\b",
@@ -72,24 +106,55 @@ class ChatRequestResolver:
         r"^(adeus|tchau|at[eé] logo|bye)\b",
     ]
 
-    ANALYSIS_PATTERNS = [
-        r"\b(qual [eé] o estado|mostra a arquitetura|quais s[aã]o os endpoints|lista os ficheiros|estrutura do projeto)\b",
-        r"\b(qual a stack|que depend[eê]ncias|quais s[aã]o os servi[cç]os|mostra o snapshot)\b",
-        r"\b(explica o c[oó]digo|o que faz o ficheiro|onde est[aá] definid[oa])\b",
-        r"\b(diagn[oó]stico|analisa a estrutura|inspeciona o projeto)\b",
-        r"\b(aceder|acedes|acede|acesso|consegues aceder|podes aceder|tens acesso|ver o projeto|abre o projeto|ver projeto|quais os ficheiros|lista os ficheiros)\b",
-    ]
-
-    ECONOMIC_PATTERNS = [
-        r"\b(money|arbitragem|receita|fatura[cç][aã]o|monetiza[cç][aã]o|transa[cç][aã]o econ[oó]mica)\b",
+    DESTRUCTIVE_TERMS = [
+        "apaga", "apagar", "elimina", "eliminar", "remove", "remover",
+        "rm ", "rmdir", "delete", "drop table", "format ", "reset --hard",
     ]
 
     RETRY_PATTERNS = [
         r"^(tenta\s+de\s*novo|tenta\s+outra\s+vez|tenta\s+novamente|tenta\s+a[ií]|tenta|tente\s+de\s*novo|tente\s+outra\s+vez|outra\s+vez|de\s+novo|mais\s+uma\s+vez|repete|repita|faz\s+de\s*novo|fa[cç]a\s+de\s*novo)$",
     ]
 
+    FULL_FILE_PATTERNS = [
+        r"\b(fornece\s+tudo|fornece\s+todo|fornece\s+o\s+resto|mostra\s+o\s+resto|mostra\s+tudo|mostra\s+todo|conte[uú]do\s+todo|conte[uú]do\s+completo|ficheiro\s+todo|ficheiro\s+completo|c[oó]digo\s+todo|c[oó]digo\s+completo|n[aã]o\s+[eé]\s+s[oó]\s+isso|nao\s+e\s+so\s+isso|fornece\s+o\s+conte[uú]do\s+completo|d[aá]-me\s+o\s+resto)\b",
+    ]
+
+    ATTACHMENT_PATTERNS = [
+        r"\b(anexa-o|anexa\s+o\s+ficheiro|anexa\s+o\s+arquivo|anexa\s+[aà]\s+conversa|anexa|anexar)\b",
+    ]
+
+    CONTINUATION_PATTERNS = [
+        r"^(continua|segue|avan[cç]a|procede|continua\s+a[ií]|continua\s+o\s+trabalho)$",
+    ]
+
+    LOCAL_ACTION_PATTERNS = [
+        r"\b(abre|abrir|inicia|iniciar|lan[cç]a|lan[cç]ar|executa|executar|open|run)\s+(o\s+|a\s+)?(bloco\s+de\s+notas|notepad|calculadora|calc|paint|explorador|explorer|chrome|edge|browser|navegador|terminal|cmd|powershell)\b",
+    ]
+
+    FILE_EXTENSION_PATTERN = r"\b([a-zA-Z0-9_\-\.\/]+\.(?:js|ts|py|html|css|json|md|txt|sql|yaml|yml|sh|env|jsx|tsx))\b"
+
+    PROJECT_ACCESS_PATTERNS = [
+        r"\b(consegues\s+aceder|podes\s+aceder|tens\s+acesso|aceder\s+ao?|acede\s+ao?|acesso\s+ao?|entrar\s+no|abrir\s+o\s+projeto)\b",
+    ]
+
+    PROJECT_INSPECTION_PATTERNS = [
+        r"\b(mostra\s+os\s+ficheiros|quais\s+os\s+ficheiros|que\s+ficheiros\s+existem|lista\s+os\s+ficheiros|estrutura\s+do\s+projeto|arquitetura\s+do\s+projeto|quais\s+s[aã]o\s+os\s+endpoints|qual\s+a\s+stack|que\s+depend[eê]ncias|mostra\s+a\s+estrutura)\b",
+    ]
+
+    ECONOMIC_PATTERNS = [
+        r"\b(money|arbitragem|receita|fatura[cç][aã]o|monetiza[cç][aã]o|transa[cç][aã]o\s+econ[oó]mica)\b",
+    ]
+
     CODING_VERB_PATTERNS = [
-        r"\b(cria|crie|cria-me|desenvolve|desenvolva|implementa|implemente|constr[oó]i|gera|programa|adiciona|adicione|refatora|refatore|corrige|corrija|build)\b",
+        r"\b(cria|criar|crie|cria-me|desenvolve|desenvolver|desenvolva|implementa|implementar|implemente|constr[oó]i|construir|gera|gerar|programa|programar|adiciona|adicionar|adicione|refatora|refatorar|refatore|corrige|corrigir|corrija|build)\b",
+    ]
+
+    POLITE_EXECUTION_PREFIXES = [
+        r"^(podes|pode|consegues|podias|poderias|seria\s+poss[ií]vel)\s+(criar|desenvolver|implementar|construir|gerar|programar|adicionar|refatorar|corrigir|fazer|executar\s+os\s+testes)\b",
+    ]
+
+    TEST_EXECUTION_PATTERNS = [
+        r"\b(implementa\s+e\s+executa\s+os\s+testes|executa\s+os\s+testes|executar\s+os\s+testes|corre\s+os\s+testes|testa\s+o\s+projeto|corre\s+o\s+pytest)\b",
     ]
 
     CODING_TARGET_PATTERNS = [
@@ -109,46 +174,16 @@ class ChatRequestResolver:
         if not clean:
             return ResolvedChatRequest(
                 raw_prompt="",
-                intent=ChatIntentType.CONVERSATIONAL,
+                intent=ChatIntentType.CHAT,
                 title="Mensagem Vazia",
                 objective="",
                 project_id=project_id,
+                confidence=1.0,
+                planned_action="ignore",
+                decision_reason="Prompt vazio",
             )
 
-        # 0. Retry / Follow-Up Detection
-        is_retry = any(re.search(pat, clean_lower) for pat in self.RETRY_PATTERNS)
-        if is_retry:
-            prev_prompt = None
-            if history:
-                for msg in reversed(history):
-                    if msg.get("role") == "user":
-                        c = (msg.get("content") or "").strip()
-                        if c and not any(re.search(pat, c.lower()) for pat in self.RETRY_PATTERNS):
-                            prev_prompt = c
-                            break
-            if prev_prompt:
-                log_event(
-                    logger,
-                    "chat_resolver.retry_resolved_from_history",
-                    original_prompt=clean,
-                    resolved_from=prev_prompt,
-                )
-                return self.resolve_request(
-                    prev_prompt,
-                    project_id=project_id,
-                    context=context,
-                    history=None,
-                )
-            else:
-                return ResolvedChatRequest(
-                    raw_prompt=clean,
-                    intent=ChatIntentType.CONVERSATIONAL,
-                    title="Tentativa",
-                    objective="O que gostaria que eu tentasse novamente? Pode indicar o projeto pretendido (ex: 'consegues aceder ao projeto dina') ou uma instrução de desenvolvimento.",
-                    project_id=project_id,
-                )
-
-        # 1. Safety & Policy Classifier Check
+        # ── 1. Safety & Policy Classifier Check ───────────────────────────────
         safety: SafetyAssessment = SafetyClassifier.evaluate(clean)
         if safety.status == SafetyStatus.BLOCKED:
             return ResolvedChatRequest(
@@ -158,29 +193,123 @@ class ChatRequestResolver:
                 objective=clean,
                 project_id=project_id,
                 refusal_reason=safety.reason or "Conteúdo viola políticas de segurança.",
+                confidence=1.0,
+                planned_action="policy_refusal",
+                requires_mission=False,
+                requires_model=False,
+                decision_reason="Conteúdo classificado como violação de segurança pelas políticas ativas.",
             )
 
-        # Check for economic mission target
+        # ── 2. Local Action Detection (Open Local App / UI Commands) ───────────
+        from backend.services.local_app_service import find_local_app_request
+        detected_app = find_local_app_request(clean)
+        if detected_app or any(re.search(pat, clean_lower) for pat in self.LOCAL_ACTION_PATTERNS):
+            app_name = detected_app.get("name", "aplicação") if isinstance(detected_app, dict) else "aplicação"
+            if app_name == "aplicação":
+                for target in ["excel", "word", "powerpoint", "outlook", "bloco de notas", "notepad", "calculadora", "calc", "paint", "explorador", "chrome", "edge", "terminal", "cmd", "powershell"]:
+                    if target in clean_lower:
+                        app_name = target
+                        break
+            return ResolvedChatRequest(
+                raw_prompt=clean,
+                intent=ChatIntentType.LOCAL_ACTION,
+                title=f"Abrir {app_name.capitalize()}",
+                objective=clean,
+                project_id=project_id,
+                confidence=0.98,
+                context_reference={"local_app": detected_app or app_name},
+                planned_action="open_local_application",
+                requires_mission=False,
+                requires_model=False,
+                decision_reason="Comando operacional local para abrir aplicação de sistema.",
+            )
+
+        # ── 3. Continuation & Retry Resolution ────────────────────────────────
+        is_retry = any(re.search(pat, clean_lower) for pat in self.RETRY_PATTERNS)
+        if is_retry:
+            prev_user_msg = None
+            if history:
+                for msg in reversed(history):
+                    if msg.get("role") == "user":
+                        c = (msg.get("content") or "").strip()
+                        if c and not any(re.search(pat, c.lower()) for pat in self.RETRY_PATTERNS):
+                            prev_user_msg = c
+                            break
+
+            if prev_user_msg:
+                # Security Check: Never repeat destructive operations automatically
+                is_destructive = any(term in prev_user_msg.lower() for term in self.DESTRUCTIVE_TERMS)
+                if is_destructive:
+                    return ResolvedChatRequest(
+                        raw_prompt=clean,
+                        intent=ChatIntentType.REFUSED_POLICY,
+                        title="Confirmação de Segurança Necessária",
+                        objective=f"Repetição de operação destrutiva bloqueada: '{prev_user_msg}'",
+                        project_id=project_id,
+                        refusal_reason=f"A operação anterior continha ações potencialmente destrutivas ('{prev_user_msg}'). Por segurança, não é repetida automaticamente sem confirmação explícita.",
+                        confidence=1.0,
+                        planned_action="require_confirmation",
+                        requires_mission=False,
+                        requires_model=False,
+                        requires_approval=True,
+                        decision_reason="Operação anterior potencialmente destrutiva. Repetição automática recusada por política de segurança.",
+                    )
+
+                log_event(
+                    logger,
+                    "chat_resolver.retry_resolved_from_history",
+                    original_prompt=clean,
+                    resolved_from=prev_user_msg,
+                )
+                resolved_prev = self.resolve_request(
+                    prev_user_msg,
+                    project_id=project_id,
+                    context=context,
+                    history=None,
+                )
+                resolved_prev.context_reference = {
+                    "is_retry": True,
+                    "retry_prompt": clean,
+                    "original_prompt": prev_user_msg,
+                }
+                resolved_prev.decision_reason = f"Tentativa repetida associada à diretiva anterior '{prev_user_msg}'."
+                return resolved_prev
+            else:
+                return ResolvedChatRequest(
+                    raw_prompt=clean,
+                    intent=ChatIntentType.CHAT,
+                    title="Tentativa",
+                    objective="O que gostaria que eu tentasse novamente? Pode indicar o projeto pretendido (ex: 'consegues aceder ao projeto dina') ou uma instrução de desenvolvimento.",
+                    project_id=project_id,
+                    confidence=0.9,
+                    planned_action="casual_chat",
+                    requires_mission=False,
+                    requires_model=False,
+                    decision_reason="Mensagem de retry sem histórico prévio relevante; pedido de esclarecimento.",
+                )
+
+        # ── 4. Project & File Reference Resolution ────────────────────────────
         is_econ = any(re.search(pat, clean_lower) for pat in self.ECONOMIC_PATTERNS)
         target_proj = project_id
         if not target_proj and is_econ:
             target_proj = "money"
+
         if not target_proj:
-            # 1. Regex check for project / target names
+            # Check explicit project patterns
             proj_match = re.search(r"(?:ao\s+projeto|do\s+projeto|no\s+projeto|projeto|project)\s+[:=]?\s*([a-zA-Z0-9_\-]+)", clean_lower)
             if proj_match:
-                candidate = proj_match.group(1).strip()
-                if candidate not in {"novo", "atual", "default", "meu", "este", "esse", "qualquer", "web"}:
-                    target_proj = candidate
+                cand = proj_match.group(1).strip()
+                if cand not in {"novo", "atual", "default", "meu", "este", "esse", "qualquer", "web"}:
+                    target_proj = cand
             else:
-                # 2. Check for access verbs with target (e.g. "consegues aceder a dina", "ver dina")
+                # Check access verbs
                 access_match = re.search(r"\b(?:aceder|acede|acesso|entrar|abrir|ver)\s+(?:a|ao|o|em)?\s+([a-zA-Z0-9_\-]+)", clean_lower)
                 if access_match:
-                    candidate = access_match.group(1).strip()
-                    if candidate not in {"novo", "atual", "default", "meu", "este", "esse", "qualquer", "pasta", "ficheiro", "diretório", "codigo", "código"}:
-                        target_proj = candidate
+                    cand = access_match.group(1).strip()
+                    if cand not in {"novo", "atual", "default", "meu", "este", "esse", "qualquer", "pasta", "ficheiro", "diretório", "codigo", "código"}:
+                        target_proj = cand
                 else:
-                    # 3. Check known directories in workspace/projects/
+                    # Check known workspace project directories
                     try:
                         for entry in os.listdir(os.path.join("workspace", "projects")):
                             if entry.lower() in clean_lower.split() and entry not in {"default-project", "default"}:
@@ -189,7 +318,7 @@ class ChatRequestResolver:
                     except Exception:
                         pass
 
-        # If project still not found, inherit from recent conversation history
+        # Inherit project from history if still unset
         if not target_proj and history:
             for msg in reversed(history):
                 content = (msg.get("content") or "").lower()
@@ -203,108 +332,274 @@ class ChatRequestResolver:
                 if target_proj:
                     break
 
-        # Check if prompt is a file request or inspection (e.g. app.js, index.html)
-        is_file_query = False
-        if target_proj:
+        # Check explicit file name in prompt
+        target_file = None
+        file_match = re.search(self.FILE_EXTENSION_PATTERN, clean)
+        if file_match:
+            target_file = file_match.group(1).strip()
+        elif target_proj:
+            # Check if any file in project directory is directly referenced
             proj_dir = os.path.join("workspace", "projects", target_proj)
             if os.path.isdir(proj_dir):
                 try:
                     for entry in os.listdir(proj_dir):
-                        if entry.lower() in clean_lower:
-                            is_file_query = True
+                        if entry.lower() in clean_lower and "." in entry:
+                            target_file = entry
                             break
                 except Exception:
                     pass
 
-        # Follow-up file queries like "fornece todo", "mostra todo", "não é só isso"
-        is_followup_file_query = any(
-            p in clean_lower
-            for p in [
-                "fornece todo", "fornece tudo", "mostra todo", "mostra tudo",
-                "não é só isso", "nao e so isso", "conteudo todo", "conteúdo todo",
-                "ficheiro todo", "codigo todo", "código todo"
-            ]
-        )
-        if is_followup_file_query and target_proj:
-            is_file_query = True
+        # ── 5. Full File / Attachment Continuation Resolution ─────────────────
+        is_full_file_request = any(re.search(pat, clean_lower) for pat in self.FULL_FILE_PATTERNS)
+        is_attachment_request = any(re.search(pat, clean_lower) for pat in self.ATTACHMENT_PATTERNS)
 
-        # 2. Check for Conversational Intent
-        is_conv = any(re.search(pat, clean_lower) for pat in self.CONVERSATIONAL_PATTERNS)
-        has_coding_verb = any(re.search(pat, clean_lower) for pat in self.CODING_VERB_PATTERNS)
-        has_coding_target = any(re.search(pat, clean_lower) for pat in self.CODING_TARGET_PATTERNS)
-        is_coding = (has_coding_verb and has_coding_target) or (
-            has_coding_verb and target_proj and target_proj not in {"default-project", "default"}
-        )
+        if (is_full_file_request or is_attachment_request) and not target_file and history:
+            # Recover referenced file from history
+            for msg in reversed(history):
+                c = msg.get("content") or ""
+                m = re.search(self.FILE_EXTENSION_PATTERN, c)
+                if m:
+                    target_file = m.group(1).strip()
+                    break
 
-        # 3. Check for Project Architecture / Analysis Intent
-        is_analysis = any(re.search(pat, clean_lower) for pat in self.ANALYSIS_PATTERNS)
+        if is_full_file_request:
+            target_proj = target_proj or "default-project"
+            if target_file:
+                return ResolvedChatRequest(
+                    raw_prompt=clean,
+                    intent=ChatIntentType.FILE_DELIVERY,
+                    title=f"Entrega Integral: {target_file}",
+                    objective=f"Disponibilizar o conteúdo completo do ficheiro {target_file}",
+                    project_id=target_proj,
+                    confidence=0.98,
+                    context_reference={"target_file": target_file, "is_followup": True},
+                    planned_action="file_delivery",
+                    requires_mission=False,
+                    requires_model=False,
+                    requires_external_network=False,
+                    decision_reason=f"Pedido de conteúdo integral para o ficheiro '{target_file}' identificado no histórico.",
+                    target_file=target_file,
+                    delivery_mode="full",
+                )
+            else:
+                return ResolvedChatRequest(
+                    raw_prompt=clean,
+                    intent=ChatIntentType.AMBIGUOUS,
+                    title="Pedido de Conteúdo Ambigüo",
+                    objective="Indique qual o ficheiro pretendido para fornecer por completo.",
+                    project_id=target_proj,
+                    confidence=0.6,
+                    planned_action="clarification",
+                    requires_mission=False,
+                    requires_model=False,
+                    decision_reason="Pedido de 'fornece tudo' sem referência inequívoca a um ficheiro no histórico.",
+                )
 
-        if (is_analysis or is_file_query) and not ("cria" in clean_lower or "implementa" in clean_lower or "adiciona" in clean_lower):
-            title = self._generate_title(clean, default="Análise Arquitetural")
+        if is_attachment_request:
+            target_proj = target_proj or "default-project"
+            if target_file:
+                return ResolvedChatRequest(
+                    raw_prompt=clean,
+                    intent=ChatIntentType.FILE_DELIVERY,
+                    title=f"Anexo: {target_file}",
+                    objective=f"Anexar o ficheiro {target_file} à conversa",
+                    project_id=target_proj,
+                    confidence=0.98,
+                    context_reference={"target_file": target_file},
+                    planned_action="file_delivery",
+                    requires_mission=False,
+                    requires_model=False,
+                    requires_external_network=False,
+                    decision_reason=f"Pedido de entrega do ficheiro '{target_file}' como anexo à conversa.",
+                    target_file=target_file,
+                    delivery_mode="attachment",
+                )
+
+        # ── 6. Continuation Directive ("continua", "segue") ───────────────────
+        if any(re.search(pat, clean_lower) for pat in self.CONTINUATION_PATTERNS):
+            if history and len(history) >= 2:
+                return ResolvedChatRequest(
+                    raw_prompt=clean,
+                    intent=ChatIntentType.CONTINUATION,
+                    title="Continuação",
+                    objective="Retomar o trabalho anterior do histórico",
+                    project_id=target_proj,
+                    confidence=0.9,
+                    context_reference={"is_continuation": True},
+                    planned_action="resume_work",
+                    requires_mission=False,
+                    requires_model=False,
+                    decision_reason="Pedido de continuação com base no trabalho recente.",
+                )
+            else:
+                return ResolvedChatRequest(
+                    raw_prompt=clean,
+                    intent=ChatIntentType.AMBIGUOUS,
+                    title="Continuação Ambigua",
+                    objective="A que tarefa ou trabalho gostaria que eu desse continuidade? Pode indicar o objetivo ou o projeto.",
+                    project_id=target_proj,
+                    confidence=0.5,
+                    planned_action="clarification",
+                    requires_mission=False,
+                    requires_model=False,
+                    decision_reason="Comando de continuação sem histórico operacional inequívoco.",
+                )
+
+        # ── 7. File Read / Delivery Detection ─────────────────────────────────
+        if target_file:
+            # Check verbs: read vs deliver
+            is_delivery_verb = any(v in clean_lower for v in ["anexa", "entrega", "fornece", "disponibiliza", "anexo"])
+            is_read_verb = any(v in clean_lower for v in ["mostra", "lê", "ler", "ver", "conteúdo", "abre", "exibe", "conteudo", "código", "codigo"])
+            
+            if is_delivery_verb:
+                return ResolvedChatRequest(
+                    raw_prompt=clean,
+                    intent=ChatIntentType.FILE_DELIVERY,
+                    title=f"Entrega de Ficheiro: {target_file}",
+                    objective=f"Disponibilizar o ficheiro {target_file}",
+                    project_id=target_proj,
+                    confidence=0.98,
+                    context_reference={"target_file": target_file},
+                    planned_action="file_delivery",
+                    requires_mission=False,
+                    requires_model=False,
+                    requires_external_network=False,
+                    decision_reason=f"Pedido explícito de entrega do ficheiro '{target_file}' a partir do disco.",
+                    target_file=target_file,
+                    delivery_mode="attachment" if "anex" in clean_lower else "full",
+                )
+            if is_read_verb or len(clean.split()) <= 6:
+                return ResolvedChatRequest(
+                    raw_prompt=clean,
+                    intent=ChatIntentType.FILE_READ,
+                    title=f"Leitura de Ficheiro: {target_file}",
+                    objective=f"Apresentar o conteúdo de {target_file}",
+                    project_id=target_proj,
+                    confidence=0.98,
+                    context_reference={"target_file": target_file},
+                    planned_action="file_read",
+                    requires_mission=False,
+                    requires_model=False,
+                    requires_external_network=False,
+                    decision_reason=f"Pedido local de leitura do ficheiro '{target_file}'.",
+                    target_file=target_file,
+                    delivery_mode="content",
+                )
+
+        # ── 8. Project Queries & Local Inspections ─────────────────────────────
+        is_project_access_query = any(re.search(pat, clean_lower) for pat in self.PROJECT_ACCESS_PATTERNS)
+        is_project_inspection = any(re.search(pat, clean_lower) for pat in self.PROJECT_INSPECTION_PATTERNS)
+
+        if is_project_inspection:
             return ResolvedChatRequest(
                 raw_prompt=clean,
-                intent=ChatIntentType.ANALYSIS,
+                intent=ChatIntentType.PROJECT_INSPECTION,
+                title=f"Inspeção de {target_proj or 'Projeto'}",
+                objective=clean,
+                project_id=target_proj,
+                confidence=0.98,
+                planned_action="project_inspection",
+                requires_mission=False,
+                requires_model=False,
+                requires_external_network=False,
+                decision_reason=f"Inspeção factual da estrutura do projeto '{target_proj}' no disco.",
+            )
+
+        if is_project_access_query:
+            return ResolvedChatRequest(
+                raw_prompt=clean,
+                intent=ChatIntentType.PROJECT_QUERY,
+                title=f"Acesso a {target_proj or 'Projeto'}",
+                objective=clean,
+                project_id=target_proj,
+                confidence=0.98,
+                planned_action="project_query",
+                requires_mission=False,
+                requires_model=False,
+                requires_external_network=False,
+                decision_reason=f"Consulta factual de acesso e existência do projeto '{target_proj}' no workspace.",
+            )
+
+        # ── 9. Execution Requests (Creation, Tests, Refactoring, Economic) ────
+        has_polite_execution = any(re.search(pat, clean_lower) for pat in self.POLITE_EXECUTION_PREFIXES)
+        has_test_execution = any(re.search(pat, clean_lower) for pat in self.TEST_EXECUTION_PATTERNS)
+        has_coding_verb = any(re.search(pat, clean_lower) for pat in self.CODING_VERB_PATTERNS)
+        has_coding_target = any(re.search(pat, clean_lower) for pat in self.CODING_TARGET_PATTERNS)
+
+        is_execution = (
+            has_test_execution
+            or (has_polite_execution and (has_coding_target or target_proj))
+            or (has_coding_verb and has_coding_target)
+            or (has_coding_verb and target_proj and target_proj not in {"default-project", "default"} and not clean.endswith("?"))
+            or is_econ
+        )
+
+        if is_execution:
+            task_type = "CODING"
+            if is_econ:
+                task_type = "EXPERIMENT"
+            elif has_test_execution or "teste" in clean_lower or "pytest" in clean_lower:
+                task_type = "REVIEW"
+            elif "refatora" in clean_lower:
+                task_type = "CODING"
+            elif "investiga" in clean_lower or "pesquisa" in clean_lower:
+                task_type = "RESEARCH"
+
+            title = self._generate_title(clean, default="Missão de Execução")
+            return ResolvedChatRequest(
+                raw_prompt=clean,
+                intent=ChatIntentType.EXECUTION_REQUEST,
                 title=title,
                 objective=clean,
                 project_id=target_proj,
-                task_type="RESEARCH",
+                is_economic=is_econ,
+                task_type=task_type,
+                confidence=0.96,
+                planned_action="mission_execution",
+                requires_mission=True,
+                requires_model=True,
+                requires_external_network=False,
+                decision_reason="Pedido explícito de desenvolvimento ou execução técnica.",
             )
 
-        if is_conv and not is_coding and len(clean.split()) <= 25:
+        # ── 10. Conversational Questions & General Chat ───────────────────────
+        question_words = ["como", "o que", "porque", "porquê", "qual", "quais", "quem", "onde", "quando", "sabes", "explica", "diz-me"]
+        is_conversational_question = any(clean_lower.startswith(w) for w in question_words) or (
+            clean.endswith("?") and not (has_coding_verb and has_coding_target)
+        )
+        is_greeting = any(re.search(pat, clean_lower) for pat in self.CONVERSATIONAL_PATTERNS)
+
+        if is_greeting or is_conversational_question or len(clean.split()) <= 4:
             return ResolvedChatRequest(
                 raw_prompt=clean,
-                intent=ChatIntentType.CONVERSATIONAL,
+                intent=ChatIntentType.CHAT,
                 title="Conversação",
                 objective=clean,
                 project_id=target_proj,
+                confidence=0.95,
+                planned_action="casual_chat",
+                requires_mission=False,
+                requires_model=True,
+                requires_external_network=False,
+                decision_reason="Diálogo conversacional geral ou pergunta sem diretiva de desenvolvimento.",
             )
 
-        # Questions without coding action verbs are conversational questions, NOT heavy software missions!
-        question_words = ["como", "o que", "porque", "porquê", "qual", "quais", "quem", "onde", "quando", "sabes", "podes", "consegues", "tens", "explica", "diz-me"]
-        is_question = clean.endswith("?") or any(clean_lower.startswith(w) for w in question_words)
-        if is_question and not is_coding and not is_econ:
-            return ResolvedChatRequest(
-                raw_prompt=clean,
-                intent=ChatIntentType.CONVERSATIONAL,
-                title="Pergunta Geral",
-                objective=clean,
-                project_id=target_proj,
-            )
-
-        # Strict boundary: only requests with genuine coding action verbs + software target OR economic goals can become EXECUTABLE_DIRECTIVE missions!
-        if not is_coding and not is_econ:
-            return ResolvedChatRequest(
-                raw_prompt=clean,
-                intent=ChatIntentType.CONVERSATIONAL,
-                title="Conversação",
-                objective=clean,
-                project_id=target_proj,
-            )
-
-        # 4. Actionable coding/economic requests -> EXECUTABLE_DIRECTIVE
-        task_type = "CODING"
-        if is_econ:
-            task_type = "EXPERIMENT"
-        elif "teste" in clean_lower or "pytest" in clean_lower:
-            task_type = "REVIEW"
-        elif "refatora" in clean_lower:
-            task_type = "CODING"
-        elif "investiga" in clean_lower or "pesquisa" in clean_lower:
-            task_type = "RESEARCH"
-
-        title = self._generate_title(clean, default="Missão de Execução")
+        # ── 11. Ambiguous Intent Fallback (Never Default to Execution) ─────────
         return ResolvedChatRequest(
             raw_prompt=clean,
-            intent=ChatIntentType.EXECUTABLE_DIRECTIVE,
-            title=title,
-            objective=clean,
+            intent=ChatIntentType.AMBIGUOUS,
+            title="Pedido Não Determinado",
+            objective="Por favor, forneça mais detalhes sobre o que pretende realizar.",
             project_id=target_proj,
-            is_economic=is_econ,
-            task_type=task_type,
+            confidence=0.5,
+            planned_action="clarification",
+            requires_mission=False,
+            requires_model=False,
+            requires_external_network=False,
+            decision_reason="Intenção insuficientemente determinada; pedido de esclarecimento.",
         )
 
     def _generate_title(self, prompt: str, default: str) -> str:
-        # Extract title from action and subject
         cleaned = re.sub(r"^(por favor,?|podes,?|quero que|pf,?|cria um[a]?|desenvolve um[a]?)\s+", "", prompt, flags=re.IGNORECASE).strip()
         first_sentence = cleaned.split(".")[0].split("\n")[0].strip()
         if not first_sentence:
@@ -362,13 +657,34 @@ class ChatMissionBridge:
         self.callbacks = callbacks
         self.logger = logger or get_logger(__name__)
         self.resolver = ChatRequestResolver()
+        self._request_registry: dict[str, RequestRecord] = {}
 
     async def broadcast_chat(
         self,
         sender: str,
         role: str,
         content: str,
+        correlation_id: str | None = None,
     ) -> None:
+        if correlation_id:
+            if correlation_id not in self._request_registry:
+                self._request_registry[correlation_id] = RequestRecord(
+                    correlation_id=correlation_id,
+                    prompt="",
+                    intent="",
+                    created_at=time.time(),
+                )
+            record = self._request_registry[correlation_id]
+            if role == "Assistant":
+                if record.completion_emitted:
+                    log_event(
+                        self.logger,
+                        "chat_mission_bridge.duplicate_completion_suppressed",
+                        correlation_id=correlation_id,
+                    )
+                    return
+                record.completion_emitted = True
+                record.user_response = content
         canonical_sender = normalize_canonical_sender(sender)
         if self.connections:
             await self.connections.broadcast(
@@ -456,37 +772,78 @@ class ChatMissionBridge:
             prompt, project_id=project_id, history=history
         )
 
+        record = RequestRecord(
+            correlation_id=correlation_id,
+            prompt=prompt,
+            intent=resolved.intent.value,
+            created_at=time.time(),
+        )
+        self._request_registry[correlation_id] = record
+
         log_event(
             self.logger,
             "chat_mission_bridge.directive_received",
             intent=resolved.intent.value,
             correlation_id=correlation_id,
             project_id=resolved.project_id,
+            planned_action=resolved.planned_action,
+            requires_mission=resolved.requires_mission,
         )
 
         # ── 1. POLICY REFUSAL ─────────────────────────────────────────────────
         if resolved.intent == ChatIntentType.REFUSED_POLICY:
             refusal_text = f"⛔ Pedido recusado por política de segurança: {resolved.refusal_reason}"
-            await self.broadcast_chat("JARVIS", "Segurança", refusal_text)
+            await self.broadcast_chat("JARVIS", "Segurança", refusal_text, correlation_id=correlation_id)
             await self.broadcast_state("idle")
             return {
                 "status": "REFUSED",
                 "intent": resolved.intent.value,
                 "reason": resolved.refusal_reason,
                 "correlation_id": correlation_id,
+                "requires_approval": resolved.requires_approval,
             }
 
-        # ── 2. CONVERSATIONAL INTENT ──────────────────────────────────────────
-        if resolved.intent == ChatIntentType.CONVERSATIONAL:
+        # ── 2. AMBIGUOUS INTENT ───────────────────────────────────────────────
+        if resolved.intent == ChatIntentType.AMBIGUOUS:
+            clarify_msg = resolved.objective or "Poderia esclarecer o seu pedido? Por favor, indique o projeto pretendido ou uma instrução mais específica."
+            await self.broadcast_chat("JARVIS", "Assistant", clarify_msg, correlation_id=correlation_id)
+            await self.broadcast_state("idle")
+            return {
+                "status": "COMPLETED",
+                "intent": resolved.intent.value,
+                "correlation_id": correlation_id,
+                "result": clarify_msg,
+            }
+
+        # ── 3. LOCAL ACTION ───────────────────────────────────────────────────
+        if resolved.intent == ChatIntentType.LOCAL_ACTION:
+            action_text = f"Operação local solicitada: {resolved.title}"
+            if self.orchestration_service and hasattr(self.orchestration_service, "_open_local_app"):
+                local_app = resolved.context_reference.get("local_app")
+                if local_app:
+                    await self.orchestration_service._open_local_app(local_app)
+                    action_text = f"Aplicação local '{local_app}' iniciada com sucesso."
+            await self.broadcast_chat("JARVIS", "Assistant", action_text, correlation_id=correlation_id)
+            await self.broadcast_state("idle")
+            return {
+                "status": "COMPLETED",
+                "intent": resolved.intent.value,
+                "correlation_id": correlation_id,
+                "result": action_text,
+            }
+
+        # ── 4. CONVERSATIONAL INTENT (CHAT) ───────────────────────────────────
+        if resolved.intent == ChatIntentType.CHAT:
             if resolved.title == "Tentativa" and resolved.objective:
-                await self.broadcast_chat("JARVIS", "Assistant", resolved.objective)
+                await self.broadcast_chat("JARVIS", "Assistant", resolved.objective, correlation_id=correlation_id)
             elif self.orchestration_service:
-                await self.orchestration_service.run_casual_chat(prompt)
+                await self.orchestration_service.run_casual_chat(prompt, correlation_id=correlation_id)
             else:
                 await self.broadcast_chat(
                     "JARVIS",
                     "Assistant",
-                    "Olá! Sou o JARVIS. Estou pronto para gerir as tuas missões e projetos.",
+                    "Olá! Sou o JARVIS. Estou pronto para gerir as tuas tarefas e projetos.",
+                    correlation_id=correlation_id,
                 )
             await self.broadcast_state("idle")
             return {
@@ -495,11 +852,14 @@ class ChatMissionBridge:
                 "correlation_id": correlation_id,
             }
 
-        # ── 3. ANALYSIS INTENT ────────────────────────────────────────────────
-        if resolved.intent == ChatIntentType.ANALYSIS:
+        # ── 5. PROJECT QUERY / INSPECTION ─────────────────────────────────────
+        if resolved.intent in {ChatIntentType.PROJECT_QUERY, ChatIntentType.PROJECT_INSPECTION}:
             target_proj = resolved.project_id or "default-project"
-            analysis_text = await self._run_analysis(target_proj, prompt)
-            await self.broadcast_chat("JARVIS", "Assistant", analysis_text)
+            if resolved.intent == ChatIntentType.PROJECT_INSPECTION and any(k in prompt.lower() for k in ["arquitetura", "stack", "dependências"]):
+                analysis_text = await self._run_analysis(target_proj, prompt)
+            else:
+                _, analysis_text, _ = self._inspect_local_project(target_proj, prompt)
+            await self.broadcast_chat("JARVIS", "Assistant", analysis_text, correlation_id=correlation_id)
             await self.broadcast_state("idle")
             return {
                 "status": "COMPLETED",
@@ -508,7 +868,49 @@ class ChatMissionBridge:
                 "result": analysis_text,
             }
 
-        # ── 4. EXECUTABLE DIRECTIVE → OFFICIAL MISSION PIPELINE ───────────────
+        # ── 6. FILE READ / DELIVERY ───────────────────────────────────────────
+        if resolved.intent in {ChatIntentType.FILE_READ, ChatIntentType.FILE_DELIVERY}:
+            target_proj = resolved.project_id or "default-project"
+            target_file = resolved.target_file or "app.js"
+            is_full = resolved.intent == ChatIntentType.FILE_DELIVERY or resolved.delivery_mode in {"full", "attachment"}
+            _, file_text, meta = self._read_local_file(target_proj, target_file, full=is_full, mode=resolved.delivery_mode)
+            await self.broadcast_chat("JARVIS", "Assistant", file_text, correlation_id=correlation_id)
+            await self.broadcast_state("idle")
+            return {
+                "status": "COMPLETED",
+                "intent": resolved.intent.value,
+                "correlation_id": correlation_id,
+                "result": file_text,
+                "metadata": meta,
+            }
+
+        # ── 7. CONTINUATION ───────────────────────────────────────────────────
+        if resolved.intent == ChatIntentType.CONTINUATION:
+            target_proj = resolved.project_id or "default-project"
+            if resolved.target_file:
+                is_full = resolved.delivery_mode in {"full", "attachment"}
+                _, file_text, meta = self._read_local_file(target_proj, resolved.target_file, full=is_full, mode=resolved.delivery_mode)
+                await self.broadcast_chat("JARVIS", "Assistant", file_text, correlation_id=correlation_id)
+                await self.broadcast_state("idle")
+                return {
+                    "status": "COMPLETED",
+                    "intent": resolved.intent.value,
+                    "correlation_id": correlation_id,
+                    "result": file_text,
+                    "metadata": meta,
+                }
+            elif resolved.context_reference.get("is_continuation"):
+                cont_reply = "A retomar a operação anterior..."
+                await self.broadcast_chat("JARVIS", "Assistant", cont_reply, correlation_id=correlation_id)
+                await self.broadcast_state("idle")
+                return {
+                    "status": "COMPLETED",
+                    "intent": resolved.intent.value,
+                    "correlation_id": correlation_id,
+                    "result": cont_reply,
+                }
+
+        # ── 8. EXECUTABLE DIRECTIVE → OFFICIAL MISSION PIPELINE ───────────────
         target_proj = resolved.project_id or "default-project"
         
         # Ensure project exists in workspace/projects if not present
@@ -745,6 +1147,7 @@ class ChatMissionBridge:
                 "JARVIS",
                 "Assistant",
                 assistant_reply,
+                correlation_id=correlation_id,
             )
         else:
             latest_m = await asyncio.to_thread(self.mission_state.load_mission, target_proj, mission_id)
@@ -763,6 +1166,7 @@ class ChatMissionBridge:
                 "JARVIS",
                 "Assistant",
                 f"Não foi possível concluir a missão **{resolved.title}**: {exec_result.error or 'Verifique os logs na consola central.'}",
+                correlation_id=correlation_id,
             )
 
         await self.broadcast_state("idle")
@@ -859,6 +1263,157 @@ class ChatMissionBridge:
                 error=str(exec_err),
             )
 
+    def _read_local_file(
+        self,
+        project_id: str,
+        filename: str,
+        full: bool = False,
+        mode: str = "content",
+    ) -> tuple[bool, str, dict[str, Any]]:
+        """Reads a physical file from workspace with strict boundary containment and explicit truncation."""
+        root_dir = self.mission_state.projects_root if hasattr(self, "mission_state") and hasattr(self.mission_state, "projects_root") else os.path.join("workspace", "projects")
+        proj_dir = os.path.abspath(os.path.join(root_dir, project_id))
+        if not os.path.isdir(proj_dir):
+            fallback_dir = os.path.abspath(os.path.join("workspace", "projects", project_id))
+            if os.path.isdir(fallback_dir):
+                proj_dir = fallback_dir
+
+        # Boundary containment verification against path traversal attacks
+        safe_rel_path = os.path.normpath(filename).lstrip("\\/")
+        file_path = os.path.abspath(os.path.join(proj_dir, safe_rel_path))
+        try:
+            common = os.path.commonpath([proj_dir, file_path])
+            if common != proj_dir:
+                return (
+                    False,
+                    "⛔ Acesso negado: o caminho solicitado está fora do diretório autorizado do projeto.",
+                    {"error": "PERMISSION_DENIED", "path": filename},
+                )
+        except Exception:
+            return (
+                False,
+                "⛔ Acesso negado: validação de limites do sistema de ficheiros falhou.",
+                {"error": "PERMISSION_DENIED", "path": filename},
+            )
+
+        if not os.path.isfile(file_path):
+            return (
+                False,
+                f"❌ O ficheiro `{filename}` não foi encontrado no projeto **{project_id}**.",
+                {"error": "FILE_NOT_FOUND", "file": filename, "project_id": project_id},
+            )
+
+        try:
+            with open(file_path, "r", encoding="utf-8", errors="replace") as fh:
+                content = fh.read()
+            lines = content.splitlines()
+            total_lines = len(lines)
+            total_bytes = len(content.encode("utf-8"))
+
+            ext = filename.split(".")[-1] if "." in filename else ""
+            lang_map = {
+                "js": "javascript",
+                "ts": "typescript",
+                "py": "python",
+                "html": "html",
+                "css": "css",
+                "json": "json",
+                "md": "markdown",
+                "sh": "bash",
+                "sql": "sql",
+            }
+            lang = lang_map.get(ext.lower(), "")
+
+            if not full and mode not in {"full", "attachment"} and total_lines > 200:
+                shown_content = "\n".join(lines[:200])
+                msg = (
+                    f"Aqui está o conteúdo do ficheiro `{filename}` do projeto **{project_id}** (200/{total_lines} linhas):\n\n"
+                    f"```{lang}\n{shown_content}\n```\n\n"
+                    f"⚠️ *[Conteúdo truncado: a mostrar 200 de {total_lines} linhas ({total_bytes} bytes). "
+                    f"Para obter o ficheiro integral, peça 'fornece tudo' ou 'mostra o resto'.]*"
+                )
+                return (
+                    True,
+                    msg,
+                    {
+                        "file": filename,
+                        "project_id": project_id,
+                        "lines": total_lines,
+                        "bytes": total_bytes,
+                        "truncated": True,
+                        "provenance": "disk",
+                    },
+                )
+            else:
+                msg = (
+                    f"Aqui está o conteúdo integral do ficheiro `{filename}` do projeto **{project_id}** ({total_lines} linhas, {total_bytes} bytes):\n\n"
+                    f"```{lang}\n{content}\n```\n\n"
+                    f"*(Conteúdo obtido diretamente do disco em `{file_path}`. Proveniência: local workspace)*"
+                )
+                return (
+                    True,
+                    msg,
+                    {
+                        "file": filename,
+                        "project_id": project_id,
+                        "lines": total_lines,
+                        "bytes": total_bytes,
+                        "truncated": False,
+                        "provenance": "disk",
+                    },
+                )
+        except Exception as read_err:
+            return (
+                False,
+                f"❌ Erro ao ler o ficheiro `{filename}`: {read_err}",
+                {"error": str(read_err), "file": filename},
+            )
+
+    def _inspect_local_project(
+        self,
+        project_id: str,
+        prompt: str = "",
+    ) -> tuple[bool, str, dict[str, Any]]:
+        """Inspects local workspace project on disk without creating missing folders."""
+        root_dir = self.mission_state.projects_root if hasattr(self, "mission_state") and hasattr(self.mission_state, "projects_root") else os.path.join("workspace", "projects")
+        proj_dir = os.path.abspath(os.path.join(root_dir, project_id))
+        if not os.path.isdir(proj_dir):
+            fallback_dir = os.path.abspath(os.path.join("workspace", "projects", project_id))
+            if os.path.isdir(fallback_dir):
+                proj_dir = fallback_dir
+
+        if not os.path.isdir(proj_dir):
+            return (
+                False,
+                f"Procurei pelo projeto **{project_id}** no workspace (`workspace/projects/{project_id}`), mas a pasta não existe no disco.\n\nDeseja que eu crie a estrutura deste projeto com base nas suas especificações?",
+                {"exists": False, "project_id": project_id, "path": proj_dir},
+            )
+
+        file_list = []
+        try:
+            for entry in sorted(os.listdir(proj_dir)):
+                if entry not in {"__pycache__", "node_modules", ".git"}:
+                    file_list.append(entry)
+        except Exception as list_err:
+            return (
+                False,
+                f"Erro ao listar o diretório do projeto `{project_id}`: {list_err}",
+                {"error": str(list_err), "project_id": project_id},
+            )
+
+        files_md = "\n".join(f"- `{f}`" for f in file_list) if file_list else "- *(Diretório vazio)*"
+        msg = (
+            f"Sim, consigo aceder perfeitamente ao projeto **{project_id}**!\n\n"
+            f"O projeto está localizado em `{proj_dir}` e contém os seguintes ficheiros principais:\n"
+            f"{files_md}\n\n"
+            f"Como posso ajudar com este projeto? Posso explicar a estrutura, criar novas páginas/endpoints ou implementar funcionalidades."
+        )
+        return (
+            True,
+            msg,
+            {"exists": True, "project_id": project_id, "files": file_list, "path": proj_dir},
+        )
+
     async def _run_analysis(self, project_id: str, prompt: str) -> str:
         """Runs architectural analysis or project inspection on target project."""
         clean_prompt = prompt.lower()
@@ -915,34 +1470,9 @@ class ChatMissionBridge:
                         break
 
         if target_file and os.path.isdir(proj_dir):
-            file_path = os.path.join(proj_dir, target_file)
-            if os.path.isfile(file_path):
-                try:
-                    with open(file_path, "r", encoding="utf-8", errors="replace") as fh:
-                        file_content = fh.read()
-
-                    ext = target_file.split(".")[-1] if "." in target_file else ""
-                    lang_map = {
-                        "js": "javascript",
-                        "ts": "typescript",
-                        "py": "python",
-                        "html": "html",
-                        "css": "css",
-                        "json": "json",
-                        "md": "markdown",
-                        "sh": "bash",
-                    }
-                    lang = lang_map.get(ext, "")
-                    line_count = len(file_content.splitlines())
-
-                    return (
-                        f"Aqui está o conteúdo real e completo do ficheiro `{target_file}` do projeto **{project_id}** ({line_count} linhas):\n\n"
-                        f"```{lang}\n"
-                        f"{file_content}\n"
-                        f"```"
-                    )
-                except Exception as read_err:
-                    return f"Não foi possível ler o ficheiro `{target_file}`: {read_err}"
+            is_full = any(p in clean_prompt for p in ["fornece todo", "fornece tudo", "mostra todo", "mostra tudo", "completo"])
+            _, text, _ = self._read_local_file(project_id, target_file, full=is_full)
+            return text
 
         if is_access_query:
             if os.path.isdir(proj_dir):

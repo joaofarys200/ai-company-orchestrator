@@ -218,365 +218,22 @@ class OrchestrationService:
         self,
         prompt: str,
         history: list | None = None,
+        binary: bool = False,
     ) -> str:
+        """Canonical intent classification delegated to ChatMissionBridge resolver."""
+        if self.bridge and hasattr(self.bridge, "resolver"):
+            resolved = self.bridge.resolver.resolve_request(prompt, history=history)
+            canonical = resolved.intent.value
+            if binary:
+                return "CHAT" if canonical in {"CHAT", "CONVERSATIONAL"} else "TASK"
+            return canonical
         clean = prompt.lower().strip(" .?!,")
-        greetings = [
-            "olá",
-            "oi",
-            "bom dia",
-            "boa tarde",
-            "boa noite",
-            "tudo bem",
-            "como estás",
-            "olá jarvis",
-            "como vais",
-            "tavas ai",
-            "estás bem",
-        ]
+        greetings = ["olá", "oi", "bom dia", "boa tarde", "boa noite", "tudo bem", "como estás"]
         if clean in greetings:
             return "CHAT"
-        confirmations = [
-            "sim",
-            "ok",
-            "claro",
-            "avança",
-            "começa",
-            "começa então",
-            "começa já",
-            "vai",
-            "vai em frente",
-            "pode avançar",
-            "pode começar",
-            "pode ir",
-            "trata disso",
-            "trata de tudo",
-            "trata tu",
-            "continua",
-            "segue",
-            "segue em frente",
-            "procede",
-            "faz isso",
-            "faz",
-            "faz tu",
-            "eu quero que trates de tudo",
-            "quero que trates de tudo",
-            "faz tudo tu",
-            "eu vou sair do pc",
-            "quando chegar quero tudo pronto",
-            "avisa quando estiver pronto",
-            "tudo pronto",
-            "quando estiver pronto",
-            "deixa correr",
-            "pode ser",
-            "óptimo",
-            "ótimo",
-        ]
-        if any(
-            clean == item or clean.startswith(item)
-            for item in confirmations
-        ):
-            if history and len(history) >= 2:
-                return "TASK"
-        question_starts = [
-            "como",
-            "o que",
-            "o quê",
-            "porque",
-            "porquê",
-            "quais",
-            "qual",
-            "onde",
-            "quando",
-            "quanto",
-            "quem",
-            "será",
-            "explica",
-            "imagina",
-            "consegues",
-            "sabes",
-            "poderias",
-            "gostarias",
-            "se eu",
-            "conseguirias",
-        ]
-        is_question = prompt.strip().endswith("?") or any(
-            clean.startswith(prefix)
-            for prefix in question_starts
-        )
-        exploratory_patterns = [
-            "que fazes",
-            "o que fazes",
-            "o que é que fazes",
-            "o que podes fazer",
-            "o que consegues",
-            "o que consegues fazer",
-            "o que é que consegues",
-            "da-me ideias",
-            "dá-me ideias",
-            "dá ideias",
-            "dá-me sugestões",
-            "mostra-me os agentes",
-            "mostra os agentes",
-            "quais são os agentes",
-            "quais são as funcionalidades",
-            "quais são as tuas capacidades",
-            "apresenta-te",
-            "apresenta te",
-            "descreve-te",
-            "fala sobre ti",
-            "o que és",
-            "quem és",
-            "quem es tu",
-            "o que sabes fazer",
-            "dá-me exemplos",
-            "da-me exemplos",
-            "dá exemplos",
-            "tens ideias",
-            "dá-me uma ideia",
-            "sugere algo",
-            "sugere alguma coisa",
-            "para testar-te",
-            "para te testar",
-            "como podes ajudar",
-        ]
-        if any(
-            pattern in clean
-            for pattern in exploratory_patterns
-        ):
-            return "CHAT"
-        if not is_question:
-            known_suggestions = [
-                "pomodoro timer minimalista",
-                "landing page para café de especialidade",
-                "app de lista de tarefas futurista",
-                "campanha de lançamento de curso de ia",
-                "estratégia de conteúdo para linkedin de startup",
-                "artigos sobre produtividade com agentes autónomos",
-                "estudo de viabilidade para central de energia solar",
-                "plano de investimento em e-commerce",
-                "análise de risco de abertura de novo ginásio",
-                "ticket: cliente reclama de atraso de 10 dias na entrega",
-                "ticket: dificuldade em recuperar password de administrador",
-                "ticket: dúvida sobre política de reembolso de software",
-            ]
-            if clean in known_suggestions or any(
-                item in clean
-                for item in known_suggestions
-            ):
-                return "TASK"
-            task_keywords = [
-                "pomodoro",
-                "timer",
-                "landing page",
-                "website",
-                "site",
-                "criar",
-                "cria",
-                "desenvolve",
-                "desenvolver",
-                "fazer",
-                "desenha",
-                "desenhar",
-                "gera",
-                "gerar",
-                "constrói",
-                "construir",
-                "programa",
-                "programar",
-                "executa",
-                "executar",
-                "corre",
-                "correr",
-                "escreve",
-                "escrever",
-                "esqueleto",
-                "projeto",
-                "dashboard",
-                "elabora",
-                "elaborar",
-                "planeia",
-                "planejar",
-                "estratégia",
-                "estrategia",
-                "analisa",
-                "analisar",
-                "análise",
-                "estudo",
-                "relatório",
-                "relatorio",
-                "campanha",
-                "investimento",
-                "viabilidade",
-                "negócio",
-                "negocio",
-            ]
-            if any(
-                keyword in clean
-                for keyword in task_keywords
-            ):
-                return "TASK"
-        if find_local_app_request(prompt):
-            return "TASK"
-        action_verbs = [
-            "abre",
-            "abrir",
-            "abro",
-            "abras",
-            "inicia",
-            "iniciar",
-            "executa",
-            "executar",
-            "corre",
-            "correr",
-            "lança",
-            "lançar",
-            "start",
-            "open",
-            "run",
-        ]
-        targets = [
-            "whatsapp",
-            "chrome",
-            "edge",
-            "browser",
-            "navegador",
-            "bloco",
-            "notepad",
-            "calculadora",
-            "calc",
-            "paint",
-            "explorador",
-            "explorer",
-            "terminal",
-            "cmd",
-            "powershell",
-            "excel",
-            "word",
-            "powerpoint",
-            "outlook",
-            "office",
-            "folha de calculo",
-            "spreadsheet",
-            "app",
-            "programa",
-            "jogo",
-            "game",
-            "site",
-            "website",
-            "google",
-            "youtube",
-        ]
-        words = clean.split()
-        if (
-            any(
-                verb in words or clean.startswith(verb)
-                for verb in action_verbs
-            )
-            and any(target in clean for target in targets)
-        ):
-            return "TASK"
-        mode = os.getenv(
-            "ORCHESTRATOR_MODE",
-            "local",
-        ).lower()
-        if (
-            mode == "claude"
-            and os.getenv("ANTHROPIC_API_KEY")
-        ):
-            try:
-                messages = [
-                    {
-                        "role": message["role"],
-                        "content": message["content"],
-                    }
-                    for message in (history or [])[:-1]
-                ]
-                messages.append(
-                    {"role": "user", "content": prompt}
-                )
-                response = await self.models.execute(
-                    provider="anthropic",
-                    model="claude-3-5-haiku-latest",
-                    operation="intent_classification",
-                    system_prompt=(
-                        "Classifica o último input do utilizador. "
-                        "Usa o histórico de conversa para contexto. "
-                        "Se for um pedido ou ordem para realizar uma "
-                        "ação, comando de terminal, criar ficheiro, "
-                        "website, tirar screenshot, ver janelas, ou "
-                        "uma resposta afirmativa/instrução de "
-                        "seguimento para realizar uma tarefa, "
-                        "responde apenas 'TASK'. Se for conversa "
-                        "casual, saudação, agradecimento ou "
-                        "ruído/texto sem sentido, responde apenas "
-                        "'CHAT'."
-                    ),
-                    user_prompt=prompt,
-                    conversation_messages=messages,
-                    temperature=0.0,
-                    max_output_tokens=10,
-                    timeout_seconds=30.0,
-                )
-                return (
-                    "TASK"
-                    if "TASK" in response.raw_text.strip().upper()
-                    else "CHAT"
-                )
-            except Exception:
-                pass
-        try:
-            history_text = ""
-            for message in (history or [])[:-1]:
-                role = (
-                    "Utilizador"
-                    if message["role"] == "user"
-                    else "Jarvis"
-                )
-                history_text += (
-                    f"{role}: {message['content']}\n"
-                )
-            classification_prompt = (
-                "Histórico de conversa:\n"
-                f"{history_text}"
-                f"Ãšltimo input do utilizador: '{prompt}'\n\n"
-                "Classifica o último input do utilizador. Se for "
-                "um pedido ou ordem para realizar uma ação, "
-                "comando de terminal, criar ficheiro, website, "
-                "screenshot, listar pasta, ou uma resposta "
-                "afirmativa/instrução de seguimento para "
-                "realizar uma tarefa, responde apenas com a "
-                "palavra 'TASK'.\nSe for conversa casual, "
-                "saudação, agradecimento ou texto sem "
-                "sentido/ruído de transcrição, responde apenas "
-                "com a palavra 'CHAT'.\nResposta (apenas TASK "
-                "ou CHAT):"
-            )
-            response = await self.models.execute_local(
-                operation="intent_classification",
-                system_prompt=(
-                    "Classifica intencoes de forma deterministica. "
-                    "Responde apenas TASK ou CHAT."
-                ),
-                user_prompt=classification_prompt,
-                temperature=0.0,
-                max_output_tokens=10,
-                timeout_seconds=10.0,
-            )
-            return (
-                "TASK"
-                if "TASK" in response.raw_text.strip().upper()
-                else "CHAT"
-            )
-        except Exception as classification_error:
-            log_event(
-                self.logger,
-                "intent.classification_error",
-                level="error",
-                error=str(classification_error),
-            )
-            return "CHAT"
+        return "TASK"
 
-    async def run_casual_chat(self, prompt: str) -> None:
+    async def run_casual_chat(self, prompt: str, correlation_id: str | None = None) -> None:
         mode = os.getenv(
             "ORCHESTRATOR_MODE",
             "local",
@@ -619,6 +276,7 @@ class OrchestrationService:
                     model_error,
                 )
         if not response_text:
+            local_timeout = float(os.getenv("OLLAMA_CHAT_TIMEOUT", "30.0"))
             try:
                 messages = [
                     {
@@ -641,11 +299,12 @@ class OrchestrationService:
                     conversation_messages=messages,
                     temperature=0.1,
                     max_output_tokens=500,
-                    timeout_seconds=5.0,
+                    timeout_seconds=local_timeout,
                 )
                 response_text = response.raw_text
             except Exception as model_error:
-                if os.getenv("GEMINI_API_KEY"):
+                allow_fallback = env_bool("ALLOW_EXTERNAL_FALLBACK", False) or mode in ("gemini", "cloud")
+                if allow_fallback and os.getenv("GEMINI_API_KEY"):
                     try:
                         gemini_model = os.getenv("GEMINI_CREW_MODEL", "gemini-2.5-flash").replace("gemini/", "").strip()
                         gemini_res = await self.models.execute(
@@ -660,25 +319,34 @@ class OrchestrationService:
                             timeout_seconds=12.0,
                         )
                         response_text = gemini_res.raw_text
-                    except Exception:
-                        response_text = "Estou operacional. Como posso ajudar com os teus projetos no workspace?"
+                    except Exception as gemini_err:
+                        response_text = f"Erro no fallback externo (Gemini): {gemini_err}"
                 else:
-                    response_text = "Estou aqui para ajudar com os teus projetos e tarefas de desenvolvimento."
-        await self.connections.broadcast(
-            {
-                "type": "chat",
-                "sender": "JARVIS",
-                "role": "Assistant",
-                "content": response_text,
-            }
-        )
-        self._append_history("assistant", response_text)
+                    response_text = f"Erro no modelo local: {model_error}. O fallback para fornecedores externos está desativado por política de privacidade."
+        if self.bridge and hasattr(self.bridge, "broadcast_chat"):
+            await self.bridge.broadcast_chat(
+                "JARVIS",
+                "Assistant",
+                response_text,
+                correlation_id=correlation_id,
+            )
+        else:
+            await self.connections.broadcast(
+                {
+                    "type": "chat",
+                    "sender": "JARVIS",
+                    "role": "Assistant",
+                    "content": response_text,
+                }
+            )
+            self._append_history("assistant", response_text)
 
     async def run_task(
         self,
         prompt: str,
         session_id: int,
         project_id: str | None = None,
+        correlation_id: str | None = None,
     ) -> None:
         try:
             clean_prompt = prompt.lower().strip(" .?!,")
@@ -697,11 +365,12 @@ class OrchestrationService:
                 )
 
             # ── Canonical Chat -> Mission Integration ────────────────────────
-            if self.bridge and self.bridge.mission_state:
+            if self.bridge:
                 bridge_res = await self.bridge.handle_directive(
                     prompt=prompt,
                     session_id=session_id,
                     project_id=project_id,
+                    correlation_id=correlation_id,
                 )
                 if bridge_res.get("status") in {"COMPLETED", "FAILED", "REFUSED", "BLOCKED"}:
                     return
@@ -717,7 +386,7 @@ class OrchestrationService:
                 prompt_length=len(prompt),
             )
             if intent == "CHAT":
-                await self.run_casual_chat(prompt)
+                await self.run_casual_chat(prompt, correlation_id=correlation_id)
                 await self.callbacks.broadcast_state("idle")
                 return
 

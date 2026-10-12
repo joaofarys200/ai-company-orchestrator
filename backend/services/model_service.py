@@ -17,7 +17,7 @@ from backend.model_harness import (
 class ModelExecutionService:
     """Productive model boundary backed by the shared ModelHarness."""
 
-    def __init__(self, harness: Any) -> None:
+    def __init__(self, harness: Any = None) -> None:
         self.harness = harness
 
     async def execute(
@@ -129,7 +129,8 @@ class ModelExecutionService:
                 timeout_seconds=timeout_seconds,
             )
         except Exception as e:
-            if os.getenv("GEMINI_API_KEY"):
+            fallback_enabled = os.getenv("ALLOW_EXTERNAL_FALLBACK", "false").strip().lower() in ("true", "1", "yes")
+            if (fallback_enabled or mode in ("gemini", "cloud")) and os.getenv("GEMINI_API_KEY"):
                 gemini_model = os.getenv("GEMINI_CREW_MODEL", "gemini-2.5-flash").replace("gemini/", "").strip()
                 return await self.execute(
                     provider="gemini",
@@ -143,4 +144,6 @@ class ModelExecutionService:
                     max_output_tokens=max_output_tokens,
                     timeout_seconds=timeout_seconds,
                 )
-            raise e
+            raise RuntimeError(
+                f"Erro no modelo local: {e}. O fallback para fornecedores externos está bloqueado por política de segurança e privacidade."
+            ) from e

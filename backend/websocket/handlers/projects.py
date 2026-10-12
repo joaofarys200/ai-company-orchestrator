@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import socket
+import time
+import urllib.parse
 from typing import Any
 
 from backend.errors import safe_user_error
@@ -14,6 +17,23 @@ from backend.websocket.handlers.common import (
     WebSocketRuntimeCallbacks,
 )
 from intelligence.project_context import ProjectContextError
+
+
+def _wait_for_port_ready(url: str, timeout: float = 4.0) -> bool:
+    try:
+        parsed = urllib.parse.urlparse(url)
+        host = parsed.hostname or "127.0.0.1"
+        port = parsed.port or (443 if parsed.scheme == "https" else 80)
+        start = time.time()
+        while time.time() - start < timeout:
+            try:
+                with socket.create_connection((host, port), timeout=0.25):
+                    return True
+            except (OSError, ConnectionRefusedError):
+                time.sleep(0.15)
+        return False
+    except Exception:
+        return False
 
 
 PROJECT_HANDLERS = {
@@ -118,6 +138,18 @@ class ProjectWebSocketHandler:
         else:
             project_running = bool(project_run)
             preview_url = None
+
+        if project_running and preview_url and preview_url != "about:blank":
+            port_ready = await asyncio.to_thread(_wait_for_port_ready, preview_url, 4.0)
+            if port_ready:
+                await self.connections.send(
+                    websocket,
+                    {
+                        "type": "project_output",
+                        "content": f"[Project] Servidor pronto e a escutar em {preview_url}\n",
+                    },
+                )
+
         await self.connections.send(
             websocket,
             {

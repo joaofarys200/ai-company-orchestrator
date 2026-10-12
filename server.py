@@ -515,22 +515,28 @@ async def auto_extract_correction(prompt: str, history: list):
         history,
     )
 
-async def classify_intent(prompt: str, history: list = None) -> str:
-    return await _current_orchestration_service().classify_intent(
+async def classify_intent(prompt: str, history: list = None, binary: bool = False) -> str:
+    res = await _current_orchestration_service().classify_intent(
         prompt,
         history,
+        binary=binary,
     )
+    if not binary and res in {"LOCAL_ACTION", "EXECUTION_REQUEST", "PROJECT_QUERY", "PROJECT_INSPECTION", "FILE_READ", "FILE_DELIVERY", "CONTINUATION"}:
+        return "TASK"
+    return res
 
-async def run_casual_chat(prompt: str):
+async def run_casual_chat(prompt: str, correlation_id: str | None = None):
     await _current_orchestration_service().run_casual_chat(
-        prompt
+        prompt,
+        correlation_id=correlation_id,
     )
 
-async def run_orchestration_task(prompt: str, session_id: int, project_id: str | None = None):
+async def run_orchestration_task(prompt: str, session_id: int, project_id: str | None = None, correlation_id: str | None = None):
     await _current_orchestration_service().run_task(
         prompt,
         session_id,
         project_id,
+        correlation_id=correlation_id,
     )
 
 

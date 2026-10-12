@@ -344,6 +344,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [adaptationHistory, setAdaptationHistory] = useState<AdaptationRecordData[]>([]);
   const [planEvaluationResult, setPlanEvaluationResult] = useState<Record<string, unknown> | null>(null);
   const [astState, setAstState] = useState<AstState | null>(null);
+  const [architectureSnapshot, setArchitectureSnapshot] = useState<ArchitectureSnapshot | null>(null);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [projectContext, setProjectContext] = useState<ProjectContextData | null>(null);
   const [projectReferences, setProjectReferences] = useState<ProjectReferenceResult | null>(null);
@@ -925,9 +926,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setProjectFiles(msg.files);
         setProjectFileHashes(msg.file_hashes);
         setAstState(Object.keys(msg.symbols).length > 0 ? msg.symbols : null);
+        if (msg.architecture_snapshot) {
+          setArchitectureSnapshot(msg.architecture_snapshot);
+        }
         setProjectReferences(null);
         setSemanticResults('');
         setIsIndexingProject(false);
+        break;
+      case 'architecture_snapshot':
+        setArchitectureSnapshot(msg.data);
         break;
       case 'project_file_save_result':
         setProjectFileSaveState({
@@ -1723,6 +1730,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setProjectFileHashes({});
       setProjectFileSaveState(null);
       setAstState(null);
+      setArchitectureSnapshot(null);
       setProjectReferences(null);
       setProjectOutput('');
       setPreviewUrl('about:blank');
@@ -2409,7 +2417,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         plannerState,
         missions,
         missionSnapshot,
-        architectureSnapshot: null,
+        architectureSnapshot,
         astState,
         getPlannerState,
         getMissions,

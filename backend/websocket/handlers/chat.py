@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import uuid
 from typing import Any
 
 from backend.logging_config import log_event
@@ -109,21 +110,17 @@ class ChatWebSocketHandler:
         )
         if len(history) > 100:
             history.pop(0)
+        correlation_id = str(message.get("correlation_id") or "").strip() or uuid.uuid4().hex[:12]
         log_event(
             self.logger,
             "websocket.directive.received",
             prompt_length=len(prompt),
+            correlation_id=correlation_id,
         )
         database_session = self.database.create_session(
             prompt
         )
         await self.callbacks.broadcast_state("processing")
-        await self.connections.broadcast(
-            {
-                "type": "system",
-                "content": f"Orquestração iniciada: {prompt}",
-            }
-        )
         project_id = str(
             message.get("project_id")
             or _session.selected_project_id
@@ -134,6 +131,7 @@ class ChatWebSocketHandler:
                 prompt_with_context,
                 database_session.id,
                 project_id=project_id,
+                correlation_id=correlation_id,
             )
         )
 

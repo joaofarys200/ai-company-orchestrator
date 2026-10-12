@@ -1138,7 +1138,13 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 </button>
               </div>
               <div className="relative min-h-0 flex-1 bg-white">
-                {previewUrl && previewUrl !== 'about:blank' ? (
+                {isProjectRunning && (!previewUrl || previewUrl === 'about:blank') ? (
+                  <div className="flex h-full flex-col items-center justify-center gap-3 bg-[#070a10] p-6 text-center text-gray-300">
+                    <Loader2 className="h-8 w-8 text-cyan-400 animate-spin" />
+                    <h4 className="text-sm font-semibold text-white">A Iniciar Servidor</h4>
+                    <p className="max-w-sm text-xs text-gray-400">A compilar projeto e a aguardar escuta ativa na porta de rede...</p>
+                  </div>
+                ) : previewUrl && previewUrl !== 'about:blank' ? (
                   <iframe key={previewKey} src={previewUrl} className="h-full w-full border-none" title="Project Preview" />
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center gap-3 bg-[#070a10] p-6 text-center text-gray-400">

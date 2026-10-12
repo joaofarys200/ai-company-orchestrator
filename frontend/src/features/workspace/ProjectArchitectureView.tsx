@@ -38,6 +38,7 @@ export const ProjectArchitectureView: React.FC<ProjectArchitectureViewProps> = (
 }) => {
   const {
     projectContext,
+    projectFiles,
     astState,
     architectureSnapshot,
     reindexProject,
@@ -281,7 +282,58 @@ export const ProjectArchitectureView: React.FC<ProjectArchitectureViewProps> = (
 
   // Categorized Dependencies
   const categorizedDependencies = useMemo(() => {
-    const deps = architectureSnapshot?.dependencies || [];
+    let deps = architectureSnapshot?.dependencies || [];
+
+    // Fallback: parse package.json from projectFiles if architecture snapshot dependencies is empty
+    if (deps.length === 0 && projectFiles?.['package.json']) {
+      try {
+        const pkg = JSON.parse(projectFiles['package.json']);
+        const extracted: typeof deps = [];
+        if (pkg.dependencies && typeof pkg.dependencies === 'object') {
+          for (const [name, version] of Object.entries(pkg.dependencies)) {
+            extracted.push({
+              name,
+              version: String(version),
+              source: 'package.json (dependencies)',
+              is_dev: false,
+              category: 'RUNTIME',
+            });
+          }
+        }
+        if (pkg.devDependencies && typeof pkg.devDependencies === 'object') {
+          for (const [name, version] of Object.entries(pkg.devDependencies)) {
+            extracted.push({
+              name,
+              version: String(version),
+              source: 'package.json (devDependencies)',
+              is_dev: true,
+              category: 'DEV',
+            });
+          }
+        }
+        deps = extracted;
+      } catch {}
+    } else if (deps.length === 0 && projectFiles?.['requirements.txt']) {
+      try {
+        const lines = projectFiles['requirements.txt'].split('\n');
+        const extracted: typeof deps = [];
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed && !trimmed.startsWith('#')) {
+            const parts = trimmed.split(/==|>=|<=|~=/);
+            extracted.push({
+              name: parts[0].trim(),
+              version: parts[1] ? parts[1].trim() : 'any',
+              source: 'requirements.txt',
+              is_dev: false,
+              category: 'RUNTIME',
+            });
+          }
+        }
+        deps = extracted;
+      } catch {}
+    }
+
     return deps.map((d) => {
       let category: 'RUNTIME' | 'DEV' | 'BUILD' | 'TOOLS' = d.category || (d.is_dev ? 'DEV' : 'RUNTIME');
       const lower = d.name.toLowerCase();
@@ -292,7 +344,7 @@ export const ProjectArchitectureView: React.FC<ProjectArchitectureViewProps> = (
       }
       return { ...d, category };
     });
-  }, [architectureSnapshot]);
+  }, [architectureSnapshot, projectFiles]);
 
   const filteredDependencies = useMemo(() => {
     if (selectedDepCategory === 'ALL') return categorizedDependencies;
