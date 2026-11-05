@@ -758,6 +758,9 @@ export interface VaultDiagnosticsData {
     pending_count: number;
     applied_count: number;
     proposals_count: number;
+    auto_mode_enabled?: boolean;
+    last_model_used?: string | null;
+    last_batch_result?: any;
     last_run_timestamp?: string | null;
   };
 }

@@ -11,6 +11,7 @@ Validates:
 All tests run in isolated temporary vaults without modifying canonical user directories.
 """
 
+import json
 import os
 import shutil
 import time
@@ -315,3 +316,115 @@ def test_bridge_note_validation_requires_existing_sources(disposable_vault):
             evidence_refs=["REF1"],
         )
 
+
+
+# ==============================================================================
+# 8. ADVERSARIAL METADATA, CONCURRENCY LOCK & WORKER RECOVERY TESTS
+# ==============================================================================
+
+def test_rollback_rejects_missing_sidecar(disposable_vault):
+    """Rollback must reject snapshot if sidecar JSON metadata is missing."""
+    engine, v_root, h_dir, _ = disposable_vault
+    target = "01 - AI/Model Context Protocol (MCP) and Capability Discovery Architecture.md"
+    snap_path, meta = engine.create_note_backup_snapshot(target)
+
+    # Delete sidecar metadata
+    meta_path = snap_path.with_suffix(".json")
+    meta_path.unlink()
+
+    with pytest.raises(ObsidianSecurityError, match="metadados sidecar JSON não encontrados"):
+        engine.rollback_note(target, str(snap_path))
+
+
+def test_rollback_rejects_malformed_sidecar(disposable_vault):
+    """Rollback must reject snapshot if sidecar JSON is malformed."""
+    engine, v_root, h_dir, _ = disposable_vault
+    target = "01 - AI/Model Context Protocol (MCP) and Capability Discovery Architecture.md"
+    snap_path, meta = engine.create_note_backup_snapshot(target)
+
+    # Corrupt sidecar metadata
+    meta_path = snap_path.with_suffix(".json")
+    meta_path.write_text("{malformed: json, syntax-error", encoding="utf-8")
+
+    with pytest.raises(ObsidianSecurityError, match="Metadados do snapshot corrompidos"):
+        engine.rollback_note(target, str(snap_path))
+
+
+def test_rollback_rejects_unsupported_schema_version(disposable_vault):
+    """Rollback must reject snapshot with unsupported schema_version."""
+    engine, v_root, h_dir, _ = disposable_vault
+    target = "01 - AI/Model Context Protocol (MCP) and Capability Discovery Architecture.md"
+    snap_path, meta = engine.create_note_backup_snapshot(target)
+
+    # Modify schema_version in metadata
+    meta_path = snap_path.with_suffix(".json")
+    meta["schema_version"] = 999
+    meta_path.write_text(json.dumps(meta), encoding="utf-8")
+
+    with pytest.raises(ObsidianSecurityError, match="Versão de esquema do snapshot não suportada"):
+        engine.rollback_note(target, str(snap_path))
+
+
+def test_rollback_rejects_tampered_content_hash(disposable_vault):
+    """Rollback must reject snapshot if content bytes were tampered with."""
+    engine, v_root, h_dir, _ = disposable_vault
+    target = "01 - AI/Model Context Protocol (MCP) and Capability Discovery Architecture.md"
+    snap_path, meta = engine.create_note_backup_snapshot(target)
+
+    # Tamper with snapshot markdown file
+    snap_path.write_bytes(snap_path.read_bytes() + b"\nTAMPERED_MALICIOUS_CONTENT")
+
+    with pytest.raises(ObsidianSecurityError, match="Snapshot corrompido|Comprimento de bytes"):
+        engine.rollback_note(target, str(snap_path))
+
+
+def test_concurrent_writer_file_lock_timeout(disposable_vault):
+    """Concurrent write to the same note must fail with timeout concurrency error."""
+    engine, v_root, h_dir, _ = disposable_vault
+    target = "01 - AI/Model Context Protocol (MCP) and Capability Discovery Architecture.md"
+
+    # Hold note lock externally
+    with engine._acquire_note_lock(target, timeout=2.0):
+        # Attempt concurrent write from another context with short timeout
+        target_path = engine._resolve_contained_note_path(target)
+        lock = engine._acquire_note_lock(target_path, timeout=0.15)
+        with pytest.raises(ObsidianConcurrencyError, match="Timeout.*aguardar lock de escrita"):
+            with lock:
+                pass
+
+
+def test_worker_interrupted_queue_reconciliation(disposable_vault):
+    """Worker must reconcile any items left in 'IN_PROGRESS' due to ungraceful shutdown."""
+    engine, v_root, h_dir, _ = disposable_vault
+    queue = [
+        {
+            "item_id": "queue_crash_test",
+            "note_path": "01 - AI/Model Context Protocol (MCP) and Capability Discovery Architecture.md",
+            "stem": "Model Context Protocol",
+            "status": "IN_PROGRESS",
+            "findings": [],
+        }
+    ]
+    engine.save_queue(queue)
+
+    reconciled = engine.reconcile_interrupted_queue()
+    assert reconciled == 1
+
+    loaded = engine.load_queue()
+    assert loaded[0]["status"] == "RECONCILIATION_REQUIRED"
+    assert "interrompido" in loaded[0]["reconciliation_reason"].lower()
+
+
+def test_real_qwen_or_fallback_batch_execution(disposable_vault):
+    """Validates bounded improvement batch execution with real Ollama or safe fallback."""
+    import asyncio
+    engine, v_root, h_dir, _ = disposable_vault
+    raw_note = v_root / "Raw Draft Note.md"
+    raw_note.write_text("# RAG Overview\nText about retrieval augmented generation without frontmatter.", encoding="utf-8")
+    engine.refresh_vault_catalogs()
+    engine.populate_improvement_queue()
+
+    results = asyncio.run(engine.run_bounded_improvement_batch(batch_size=1))
+    assert len(results) > 0
+    proposal = results[0]
+    assert "proposal_id" in proposal or "status" in proposal

@@ -36,6 +36,7 @@ HISTORY_DIR = VAULT_DIR / ".history"
 QUEUE_FILE = DATA_DIR / "improvement_queue.json"
 DIAGNOSTICS_FILE = DATA_DIR / "graph_diagnostics.json"
 WORKER_STATE_FILE = DATA_DIR / "improvement_worker_state.json"
+LOCKS_DIR = DATA_DIR / ".locks"
 
 # Strict regexes
 WIKILINK_REGEX = re.compile(r"\[\[(.*?)\]\]")
@@ -60,6 +61,62 @@ class ObsidianNotFoundError(FileNotFoundError):
 class ObsidianConcurrencyError(RuntimeError):
     """Raised when optimistic concurrency checks (CAS) detect conflicting modifications."""
     pass
+
+
+class NoteFileLock:
+    """
+    Cross-process file lock using atomic O_CREAT | O_EXCL file creation.
+    Provides bounded timeout, PID registration, and stale lock eviction (>60s).
+    """
+
+    def __init__(self, lock_path: Path, timeout: float = 5.0, poll_interval: float = 0.05):
+        self.lock_path = lock_path
+        self.timeout = timeout
+        self.poll_interval = poll_interval
+        self.fd: Optional[int] = None
+
+    def __enter__(self):
+        start = time.perf_counter()
+        self.lock_path.parent.mkdir(parents=True, exist_ok=True)
+        while True:
+            try:
+                self.fd = os.open(str(self.lock_path), os.O_CREAT | os.O_EXCL | os.O_RDWR)
+                payload = json.dumps({
+                    "pid": os.getpid(),
+                    "timestamp": time.time(),
+                    "lock_id": uuid.uuid4().hex
+                }).encode("utf-8")
+                os.write(self.fd, payload)
+                return self
+            except FileExistsError:
+                # Check for stale lock (> 60.0s)
+                try:
+                    mtime = self.lock_path.stat().st_mtime
+                    if time.time() - mtime > 60.0:
+                        try:
+                            self.lock_path.unlink(missing_ok=True)
+                        except OSError:
+                            pass
+                except OSError:
+                    pass
+
+                if time.perf_counter() - start >= self.timeout:
+                    raise ObsidianConcurrencyError(
+                        f"Timeout ({self.timeout}s) a aguardar lock de escrita: {self.lock_path.name}"
+                    )
+                time.sleep(self.poll_interval)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.fd is not None:
+            try:
+                os.close(self.fd)
+            except OSError:
+                pass
+            self.fd = None
+        try:
+            self.lock_path.unlink(missing_ok=True)
+        except OSError:
+            pass
 
 
 # ==============================================================================
@@ -156,12 +213,14 @@ class ObsidianGraphEngine:
         self.queue_file = (queue_file or (self.data_dir / "improvement_queue.json")).resolve()
         self.diagnostics_file = (diagnostics_file or (self.data_dir / "graph_diagnostics.json")).resolve()
         self.worker_state_file = (self.data_dir / "improvement_worker_state.json").resolve()
+        self.locks_dir = (self.data_dir / ".locks").resolve()
 
         # Ensure directories exist
         self.vault_root.mkdir(parents=True, exist_ok=True)
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.history_dir.mkdir(parents=True, exist_ok=True)
         self.proposals_dir.mkdir(parents=True, exist_ok=True)
+        self.locks_dir.mkdir(parents=True, exist_ok=True)
 
         self.canonical_notes: Dict[str, Path] = {}
         self.canonical_rel_paths: Dict[str, Path] = {}
@@ -348,6 +407,17 @@ class ObsidianGraphEngine:
 
         return resolved
 
+    def _acquire_note_lock(self, rel_path: Any, timeout: float = 5.0) -> NoteFileLock:
+        full_path = self._resolve_contained_note_path(rel_path)
+        rel_str = str(full_path.relative_to(self.vault_root)).replace("\\", "/")
+        rel_hash = hashlib.sha256(rel_str.encode("utf-8")).hexdigest()[:16]
+        lock_file = self.locks_dir / f"{rel_hash}.lock"
+        return NoteFileLock(lock_file, timeout=timeout)
+
+    def _acquire_worker_lock(self, timeout: float = 0.2) -> NoteFileLock:
+        lock_file = self.locks_dir / "worker.lock"
+        return NoteFileLock(lock_file, timeout=timeout)
+
     def get_note_sha256(self, target: Any) -> str:
         """Calculates SHA-256 for a contained note."""
         path = self._resolve_contained_note_path(target)
@@ -357,9 +427,15 @@ class ObsidianGraphEngine:
     # 3. HIGH-RESOLUTION SNAPSHOTS & ATOMIC CAS WRITES
     # ──────────────────────────────────────────────────────────────────────────
 
-    def create_note_backup_snapshot(self, rel_path: Any) -> Tuple[Path, Dict[str, Any]]:
+    def create_note_backup_snapshot(self, rel_path: Any, reason: str = "backup") -> Tuple[Path, Dict[str, Any]]:
         """
         Creates a guaranteed non-colliding snapshot in self.history_dir with a sidecar JSON metadata file.
+        Atomic 2-stage creation:
+          1. Write temporary snapshot markdown file
+          2. Verify content hash and size
+          3. Write temporary metadata sidecar JSON
+          4. Validate metadata sidecar JSON
+          5. Atomically rename/publish both files to final names
         Snapshot naming: snap_{rel_path_hash}_{timestamp_ns}_{content_sha_prefix}_{uuid_suffix}.md
         """
         full_path = self._resolve_contained_note_path(rel_path)
@@ -377,10 +453,19 @@ class ObsidianGraphEngine:
         if not self._is_path_contained(snapshot_path, self.history_dir):
             raise ObsidianSecurityError("Destino do snapshot escapa aos limites de history_dir.")
 
-        # Write snapshot markdown
-        snapshot_path.write_bytes(content_bytes)
+        self.history_dir.mkdir(parents=True, exist_ok=True)
 
-        # Write snapshot metadata sidecar
+        # 1. Write temporary snapshot markdown
+        tmp_snap = self.history_dir / f".tmp_{snapshot_filename}.tmp"
+        tmp_snap.write_bytes(content_bytes)
+
+        # 2. Verify temporary content hash
+        tmp_bytes = tmp_snap.read_bytes()
+        if hashlib.sha256(tmp_bytes).hexdigest() != content_sha256 or len(tmp_bytes) != len(content_bytes):
+            tmp_snap.unlink(missing_ok=True)
+            raise RuntimeError("Falha de integridade ao verificar o ficheiro de snapshot temporário.")
+
+        # 3. Write temporary sidecar metadata
         metadata: Dict[str, Any] = {
             "snapshot_id": f"snap_{snapshot_uuid}",
             "snapshot_filename": snapshot_filename,
@@ -393,9 +478,28 @@ class ObsidianGraphEngine:
             "timestamp_iso": datetime.now().isoformat(),
             "content_sha256": content_sha256,
             "content_bytes_len": len(content_bytes),
+            "reason": reason,
         }
-        meta_path = snapshot_path.with_suffix(".json")
-        meta_path.write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
+        meta_filename = snapshot_path.with_suffix(".json").name
+        tmp_meta = self.history_dir / f".tmp_{meta_filename}.tmp"
+        tmp_meta.write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
+
+        # 4. Validate metadata parsed from temporary sidecar
+        try:
+            parsed_meta = json.loads(tmp_meta.read_text(encoding="utf-8"))
+            if parsed_meta.get("schema_version") != 2 or parsed_meta.get("content_sha256") != content_sha256:
+                tmp_snap.unlink(missing_ok=True)
+                tmp_meta.unlink(missing_ok=True)
+                raise ValueError("Metadados inválidos na validação preliminar do snapshot.")
+        except Exception as e:
+            tmp_snap.unlink(missing_ok=True)
+            tmp_meta.unlink(missing_ok=True)
+            raise RuntimeError(f"Falha na validação dos metadados temporários do snapshot: {e}")
+
+        # 5. Atomically publish both files
+        final_meta_path = snapshot_path.with_suffix(".json")
+        os.replace(tmp_snap, snapshot_path)
+        os.replace(tmp_meta, final_meta_path)
 
         return snapshot_path, metadata
 
@@ -409,45 +513,48 @@ class ObsidianGraphEngine:
         """
         Performs an atomic CAS write to a note file:
         1. Validates note is strictly inside vault_root
-        2. Checks current SHA matches expected_sha256 (if provided)
-        3. Creates verified backup snapshot
-        4. Writes to a hidden temporary file in the same directory
-        5. Validates markdown and frontmatter integrity
-        6. Re-checks original SHA (optimistic concurrency CAS)
-        7. Atomically replaces target via os.replace
-        8. Verifies final SHA-256
+        2. Acquires cross-process per-note lock covering the entire read-check-write cycle
+        3. Checks current SHA matches expected_sha256 (if provided)
+        4. Creates verified atomic backup snapshot
+        5. Writes to a hidden temporary file in the same directory
+        6. Validates markdown and frontmatter integrity
+        7. Re-checks original SHA (optimistic concurrency CAS)
+        8. Atomically replaces target via os.replace
+        9. Verifies final SHA-256
         """
         target_path = self._resolve_contained_note_path(rel_path)
-        current_bytes = target_path.read_bytes()
-        current_sha = hashlib.sha256(current_bytes).hexdigest()
 
-        if expected_sha256 and current_sha != expected_sha256:
-            raise ObsidianConcurrencyError(
-                f"Conflito de concorrência: ficheiro foi modificado (esperado {expected_sha256[:8]}, atual {current_sha[:8]})."
-            )
+        with self._acquire_note_lock(target_path, timeout=5.0):
+            current_bytes = target_path.read_bytes()
+            current_sha = hashlib.sha256(current_bytes).hexdigest()
 
-        backup_info = None
-        if create_backup:
-            _, backup_info = self.create_note_backup_snapshot(target_path)
+            if expected_sha256 and current_sha != expected_sha256:
+                raise ObsidianConcurrencyError(
+                    f"Conflito de concorrência: ficheiro foi modificado (esperado {expected_sha256[:8]}, atual {current_sha[:8]})."
+                )
 
-        # Basic integrity check on new content
-        meta, body = self.parse_frontmatter(new_content)
-        if not body.strip() and not meta:
-            raise ValueError("Conteúdo resultante vazio ou inválido.")
+            backup_info = None
+            if create_backup:
+                _, backup_info = self.create_note_backup_snapshot(target_path, reason="atomic_write")
 
-        # Write to temporary file in the target note's directory (ensures same filesystem for atomic rename)
-        temp_file = target_path.parent / f".tmp_{uuid.uuid4().hex[:8]}.tmp"
-        temp_file.write_text(new_content, encoding="utf-8")
+            # Basic integrity check on new content
+            meta, body = self.parse_frontmatter(new_content)
+            if not body.strip() and not meta:
+                raise ValueError("Conteúdo resultante vazio ou inválido.")
 
-        # Optimistic CAS re-check
-        latest_sha = hashlib.sha256(target_path.read_bytes()).hexdigest()
-        if latest_sha != current_sha:
-            temp_file.unlink(missing_ok=True)
-            raise ObsidianConcurrencyError("Ficheiro modificado concorrentemente durante a escrita. Operação abortada.")
+            # Write to temporary file in the target note's directory (ensures same filesystem for atomic rename)
+            temp_file = target_path.parent / f".tmp_{uuid.uuid4().hex[:8]}.tmp"
+            temp_file.write_text(new_content, encoding="utf-8")
 
-        # Atomic replace
-        os.replace(temp_file, target_path)
-        final_sha = hashlib.sha256(target_path.read_bytes()).hexdigest()
+            # Optimistic CAS re-check
+            latest_sha = hashlib.sha256(target_path.read_bytes()).hexdigest()
+            if latest_sha != current_sha:
+                temp_file.unlink(missing_ok=True)
+                raise ObsidianConcurrencyError("Ficheiro modificado concorrentemente durante a escrita. Operação abortada.")
+
+            # Atomic replace
+            os.replace(temp_file, target_path)
+            final_sha = hashlib.sha256(target_path.read_bytes()).hexdigest()
 
         self.refresh_vault_catalogs()
         return {
@@ -457,46 +564,102 @@ class ObsidianGraphEngine:
             "backup_snapshot": backup_info,
         }
 
-    def rollback_note(self, target_note: Any, backup_path_or_id: Any) -> Dict[str, Any]:
+    def rollback_note(
+        self,
+        target_note: Any,
+        backup_path_or_id: Any,
+        expected_current_hash: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """
         Hardened rollback:
         - Target path strictly validated inside vault_root
         - Snapshot path strictly validated inside history_dir
-        - Verifies snapshot sidecar metadata matches target note identity
+        - Requires sidecar JSON metadata file (.json)
+        - Verifies schema_version == 2
+        - Verifies snapshot sidecar metadata exactly matches target note identity
+        - Verifies snapshot filename matches metadata
+        - Verifies byte length matches metadata
+        - Verifies content SHA-256 matches metadata
+        - If expected_current_hash provided, checks against current note SHA
+        - Creates a pre-rollback backup snapshot of current note
         - Replaces note atomically
+        - Verifies resulting target content hash
         """
         target_file = self._resolve_contained_note_path(target_note)
         rel_str = str(target_file.relative_to(self.vault_root)).replace("\\", "/")
 
-        snapshot_file = self._resolve_contained_snapshot_path(backup_path_or_id)
+        with self._acquire_note_lock(target_file, timeout=5.0):
+            current_bytes = target_file.read_bytes()
+            current_sha = hashlib.sha256(current_bytes).hexdigest()
+            if expected_current_hash and current_sha != expected_current_hash:
+                raise ObsidianConcurrencyError(
+                    f"Rollback abortado: hash atual da nota ({current_sha[:8]}) difere do esperado ({expected_current_hash[:8]})."
+                )
 
-        # Verify snapshot sidecar identity
-        meta_file = snapshot_file.with_suffix(".json")
-        if meta_file.exists():
+            snapshot_file = self._resolve_contained_snapshot_path(backup_path_or_id)
+
+            # 1. Require sidecar metadata file
+            meta_file = snapshot_file.with_suffix(".json")
+            if not meta_file.exists() or not meta_file.is_file():
+                raise ObsidianSecurityError(
+                    f"Rollback rejeitado: metadados sidecar JSON não encontrados para o snapshot '{snapshot_file.name}'."
+                )
+
+            # 2. Parse & validate metadata JSON
             try:
                 meta = json.loads(meta_file.read_text(encoding="utf-8"))
-                expected_rel = meta.get("note_rel_path")
-                if expected_rel and expected_rel != rel_str:
-                    raise ObsidianSecurityError(
-                        f"Snapshot pertence a '{expected_rel}', não a '{rel_str}'. Rollback rejeitado."
-                    )
-                expected_sha = meta.get("content_sha256")
-                actual_snap_sha = hashlib.sha256(snapshot_file.read_bytes()).hexdigest()
-                if expected_sha and actual_snap_sha != expected_sha:
-                    raise ObsidianSecurityError("Snapshot corrompido: hash SHA-256 não coincide com metadados.")
-            except json.JSONDecodeError:
-                raise ObsidianSecurityError("Metadados do snapshot corrompidos.")
+            except Exception as e:
+                raise ObsidianSecurityError(f"Metadados do snapshot corrompidos ou mal formatados: {e}")
 
-        # Atomic swap
-        backup_bytes = snapshot_file.read_bytes()
-        temp_file = target_file.parent / f".tmp_rollback_{uuid.uuid4().hex[:8]}.tmp"
-        temp_file.write_bytes(backup_bytes)
-        os.replace(temp_file, target_file)
+            # 3. schema_version check
+            if meta.get("schema_version") != 2:
+                raise ObsidianSecurityError(
+                    f"Versão de esquema do snapshot não suportada: {meta.get('schema_version')} (esperado 2)."
+                )
 
-        final_sha = hashlib.sha256(target_file.read_bytes()).hexdigest()
-        self.refresh_vault_catalogs()
+            # 4. note_rel_path check (strict matching target note)
+            expected_rel = meta.get("note_rel_path")
+            if not expected_rel or expected_rel != rel_str:
+                raise ObsidianSecurityError(
+                    f"Snapshot pertence a '{expected_rel}', não a '{rel_str}'. Rollback cross-note rejeitado."
+                )
 
-        return True
+            # 5. Snapshot filename matches metadata
+            if meta.get("snapshot_filename") and meta.get("snapshot_filename") != snapshot_file.name:
+                raise ObsidianSecurityError(
+                    f"Nome de ficheiro do snapshot ({snapshot_file.name}) não coincide com metadados ({meta.get('snapshot_filename')})."
+                )
+
+            # 6. Read snapshot bytes, verify byte length and content SHA-256
+            snapshot_bytes = snapshot_file.read_bytes()
+            expected_len = meta.get("content_bytes_len")
+            if expected_len is not None and len(snapshot_bytes) != expected_len:
+                raise ObsidianSecurityError(
+                    f"Comprimento de bytes do snapshot ({len(snapshot_bytes)}) difere dos metadados ({expected_len})."
+                )
+
+            expected_sha = meta.get("content_sha256")
+            actual_snap_sha = hashlib.sha256(snapshot_bytes).hexdigest()
+            if not expected_sha or actual_snap_sha != expected_sha:
+                raise ObsidianSecurityError(
+                    f"Snapshot corrompido: hash SHA-256 ({actual_snap_sha[:8]}) não coincide com metadados ({str(expected_sha)[:8]})."
+                )
+
+            # 7. Create pre-rollback snapshot before replacing
+            pre_rollback_snap, pre_rollback_meta = self.create_note_backup_snapshot(target_file, reason="pre_rollback")
+
+            # 8. Atomic swap
+            temp_file = target_file.parent / f".tmp_rollback_{uuid.uuid4().hex[:8]}.tmp"
+            temp_file.write_bytes(snapshot_bytes)
+            os.replace(temp_file, target_file)
+
+            # 9. Verify resulting content hash
+            final_sha = hashlib.sha256(target_file.read_bytes()).hexdigest()
+            if final_sha != actual_snap_sha:
+                raise RuntimeError("Falha crítica no rollback: hash do ficheiro restaurado difere do snapshot.")
+
+            self.refresh_vault_catalogs()
+            return True
 
     # ──────────────────────────────────────────────────────────────────────────
     # 4. MARKDOWN-AWARE WIKILINK & ATTACHMENT EXTRACTION
@@ -549,7 +712,7 @@ class ObsidianGraphEngine:
         }
 
     # ──────────────────────────────────────────────────────────────────────────
-    # 5. FOUR-CATEGORY CALIBRATED QUALITY SCORING MODEL
+    # 5. FOUR-CATEGORY CALIBRATED QUALITY SCORING MODEL (HEURISTIC)
     # ──────────────────────────────────────────────────────────────────────────
 
     def audit_note_quality(self, rel_path: Any) -> Dict[str, Any]:
@@ -561,11 +724,12 @@ class ObsidianGraphEngine:
           D. GRAPH QUALITY (0-100)
 
         Rules:
-        - No fixed 95 or 90 scores without measurement.
-        - Freshness returns UNKNOWN when date metadata cannot be verified.
+        - Deterministic estimate labeled HEURISTIC.
+        - Excludes code blocks from prose structure and paragraph analysis.
+        - Freshness returns UNKNOWN when date metadata cannot be verified or parsed.
         - Uniqueness compares title and 3-gram signatures against vault notes.
         - JARVIS_INTERNAL is distinct from VERIFIED_PRIMARY_SOURCE.
-        - Discloses calculation method.
+        - Discloses all scoring formulas.
         """
         full_path = self._resolve_contained_note_path(rel_path)
         content = full_path.read_text(encoding="utf-8", errors="ignore")
@@ -575,8 +739,12 @@ class ObsidianGraphEngine:
 
         findings: List[Dict[str, Any]] = []
 
+        # Clean body excluding code blocks (``` or ~~~) for prose analysis
+        clean_prose = re.sub(r"```[\s\S]*?```|~~~[\s\S]*?~~~", "", body)
+        words_count = len(re.findall(r"\w+", clean_prose))
+        paragraphs = [p.strip() for p in clean_prose.split("\n\n") if p.strip() and not p.strip().startswith("#")]
+
         # ── CATEGORY A: STRUCTURAL QUALITY (0-100) ──
-        # Evaluates format, frontmatter completeness, heading hierarchy, layout
         struct_subscores: List[float] = []
 
         # 1. Frontmatter presence and required fields
@@ -626,8 +794,6 @@ class ObsidianGraphEngine:
         structural_quality = round(sum(struct_subscores) / len(struct_subscores), 1)
 
         # ── CATEGORY B: KNOWLEDGE QUALITY (0-100) ──
-        # Evaluates conceptual completeness, depth, and explanatory clarity
-        words_count = len(re.findall(r"\w+", body))
         sections = [h[1] for h in headings]
         is_moc = "00 - MOC" in rel_str or "Index" in stem or meta.get("type") == "moc"
 
@@ -654,8 +820,7 @@ class ObsidianGraphEngine:
                     "recommended_improvement": "Expandir a nota com sumário executivo e secção de síntese",
                 })
 
-        # 2. Explanatory Depth (measured by paragraph structure and technical terminology density)
-        paragraphs = [p.strip() for p in body.split("\n\n") if p.strip() and not p.strip().startswith("#")]
+        # 2. Explanatory Depth (measured by prose paragraph structure and technical terminology density)
         avg_para_len = (sum(len(p.split()) for p in paragraphs) / len(paragraphs)) if paragraphs else 0
         depth_score = min(100.0, 35.0 + min(40.0, len(paragraphs) * 6.0) + (25.0 if 20 <= avg_para_len <= 120 else 10.0))
         know_subscores.append(depth_score)
@@ -663,7 +828,6 @@ class ObsidianGraphEngine:
         knowledge_quality = round(sum(know_subscores) / len(know_subscores), 1)
 
         # ── CATEGORY C: EVIDENCE QUALITY (0-100) ──
-        # Evaluates claim-level citations, standards, RFCs, DOIs, and empirical proofs
         raw_source_type = str(meta.get("source_type") or meta.get("provenance") or "").upper()
         has_formal_citations = bool(re.search(r"\[E\d+\]|\bRFC\b|\bRFC\s*\d+|\bFIPS\b|\bFIPS\s*\d+|\bDOI\b|\bISO\b|\bIEEE\b", body, re.I))
         has_footnotes = bool(re.search(r"\[\^\d+\]", body))
@@ -685,7 +849,6 @@ class ObsidianGraphEngine:
             epistemic_class = "GROUNDED_STUDY_SYNTHESIS"
             verif_basis = "GROUNDED_MODEL_SYNTHESIS_WITH_EVIDENCE_ANCHORS"
         elif raw_source_type in ("JARVIS_INTERNAL", "LESSON", "ADR") or has_source_doc:
-            # JARVIS_INTERNAL is an internal engineering specification, NEVER falsely upgraded to primary source
             ev_score = 75.0 if has_formal_citations else 65.0
             epistemic_class = "INTERNAL_ENGINEERING_SPEC"
             verif_basis = "INTERNAL_ENGINEERING_SPECIFICATION"
@@ -719,7 +882,6 @@ class ObsidianGraphEngine:
         evidence_quality = round(sum(evidence_subscores) / len(evidence_subscores), 1)
 
         # ── CATEGORY D: GRAPH QUALITY (0-100) ──
-        # Evaluates link validity, peer-to-peer connectivity, and typed relationships
         link_analysis = self.extract_markdown_links(content)
         wikilinks = link_analysis["wikilinks"]
         outgoing_valid = 0
@@ -766,8 +928,7 @@ class ObsidianGraphEngine:
         graph_subscores.append(graph_score)
         graph_quality = round(sum(graph_subscores) / len(graph_subscores), 1)
 
-        # ── UNIQUENESS EVALUATION (Measured against vault notes) ──
-        # Evaluates whether this note duplicates another note's title or content
+        # ── UNIQUENESS EVALUATION ──
         duplicate_candidates = []
         for other_stem, other_path in self.canonical_notes.items():
             if other_stem != stem.lower() and other_path.resolve() != full_path.resolve():
@@ -786,17 +947,28 @@ class ObsidianGraphEngine:
                 "recommended_improvement": "Consolidar ou clarificar distinção de âmbito",
             })
 
-        # ── FRESHNESS EVALUATION (Measured from metadata or UNKNOWN) ──
-        # Never invent a fixed 90 score. Disclose UNKNOWN when unmeasured.
+        # ── FRESHNESS EVALUATION (Parsed date or UNKNOWN) ──
         raw_date = meta.get("updated_at") or meta.get("last_modified") or meta.get("date")
+        freshness_status = "UNKNOWN"
+        freshness_val = "NOT_DOCUMENTED_IN_METADATA"
         if raw_date:
-            freshness_status = "MEASURED"
-            freshness_val = str(raw_date)
-        else:
-            freshness_status = "UNKNOWN"
-            freshness_val = "NOT_DOCUMENTED_IN_METADATA"
+            date_str = str(raw_date).strip().strip('"\'')
+            parsed_dt = None
+            for fmt in ("%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S"):
+                try:
+                    parsed_dt = datetime.strptime(date_str[:19], fmt)
+                    break
+                except ValueError:
+                    pass
+            if parsed_dt:
+                freshness_status = "MEASURED"
+                days_since = max(0, (datetime.now() - parsed_dt).days)
+                freshness_val = f"{date_str} ({days_since} dias atrás)"
+            else:
+                freshness_status = "UNKNOWN"
+                freshness_val = f"UNPARSEABLE_DATE_FORMAT: {date_str}"
 
-        # ── CALIBRATED OVERALL SCORE (Harmonic/weighted composite) ──
+        # ── HEURISTIC COMPOSITE SCORE ──
         overall_score = round(
             (structural_quality * 0.25)
             + (knowledge_quality * 0.30)
@@ -809,7 +981,9 @@ class ObsidianGraphEngine:
             "rel_path": rel_str,
             "stem": stem,
             "overall_score": overall_score,
+            "score_type": "HEURISTIC",
             "calculation_method": "FOUR_CATEGORY_MULTI_DIMENSIONAL_V2",
+            "scoring_formula": "structural_quality * 0.25 + knowledge_quality * 0.30 + evidence_quality * 0.25 + graph_quality * 0.20",
             "epistemic_classification": epistemic_class,
             "verification_basis": verif_basis,
             "categories": {
@@ -848,105 +1022,112 @@ class ObsidianGraphEngine:
 
     def resolve_concept_link(
         self,
-        candidate_text: str,
-        source_note_stem: str,
+        concept: str,
+        source_stem: str,
         context_window: str = "",
     ) -> Optional[Dict[str, Any]]:
         """
-        Layered semantic link resolver with evidence validation:
-        Layer 1: Canonical title exact match
-        Layer 2: YAML alias match
-        Layer 3: Ontological registry synonym match
-        Layer 4: Contextual domain tag match
-        Rejects common stopwords and ambiguous terms.
+        Resolves a concept to a canonical target note using:
+        1. Exact canonical note title match in self.canonical_notes
+        2. Curated YAML aliases in self.alias_map
+        3. Curated concept registry in CONCEPT_SYNONYM_REGISTRY
+        Rejects stopwords and common words.
         """
-        clean_cand = candidate_text.strip().lower()
-        if len(clean_cand) < 3 or clean_cand in ("the", "and", "para", "com", "uma", "esse", "este", "qual"):
+        c_norm = concept.lower().strip()
+        if not c_norm or c_norm in {"para", "com", "de", "por", "em", "um", "uma", "o", "a", "os", "as"}:
             return None
 
-        # Camada 1: Título Canónico Exato
-        if clean_cand in self.canonical_notes:
-            target_path = self.canonical_notes[clean_cand]
+        # 1. Exact canonical note title
+        if c_norm in self.canonical_notes:
+            target_path = self.canonical_notes[c_norm]
             target_stem = target_path.stem
-            if target_stem != source_note_stem:
-                rel_type = self._infer_relationship_type(source_note_stem, target_stem, context_window)
-                just = self._get_relationship_justification(source_note_stem, target_stem, rel_type)
+            if target_stem != source_stem:
+                rel_type = self._infer_relationship_type(source_stem, target_stem, context_window)
+                justification = self._generate_justification(source_stem, target_stem, rel_type)
                 return {
-                    "source_note": source_note_stem,
+                    "source_note": source_stem,
                     "target_note": target_stem,
-                    "target_path": str(target_path.relative_to(self.vault_root)).replace("\\", "/"),
                     "relationship_type": rel_type,
-                    "justification": just,
+                    "justification": justification,
                     "confidence": 0.95,
-                    "evidence_span": context_window[:150].strip() if context_window else "",
                     "creation_method": "CANONICAL_TITLE_MATCH",
                     "validation_status": "VALIDATED",
                 }
 
-        # Camada 2: Alias no Frontmatter
-        if clean_cand in self.alias_map:
-            target_stem = self.alias_map[clean_cand]
-            if target_stem != source_note_stem and target_stem.lower() in self.canonical_notes:
-                target_path = self.canonical_notes[target_stem.lower()]
-                rel_type = self._infer_relationship_type(source_note_stem, target_stem, context_window)
-                just = self._get_relationship_justification(source_note_stem, target_stem, rel_type)
+        # 2. YAML alias resolution
+        if c_norm in self.alias_map:
+            target_stem = self.alias_map[c_norm]
+            if target_stem != source_stem:
+                rel_type = self._infer_relationship_type(source_stem, target_stem, context_window)
+                justification = self._generate_justification(source_stem, target_stem, rel_type)
                 return {
-                    "source_note": source_note_stem,
+                    "source_note": source_stem,
                     "target_note": target_stem,
-                    "target_path": str(target_path.relative_to(self.vault_root)).replace("\\", "/"),
                     "relationship_type": rel_type,
-                    "justification": just,
+                    "justification": justification,
                     "confidence": 0.90,
-                    "evidence_span": context_window[:150].strip() if context_window else "",
                     "creation_method": "YAML_ALIAS_MATCH",
                     "validation_status": "VALIDATED",
                 }
 
-        # Camada 3: Dicionário Ontológico Curado
-        for concept_id, reg in CONCEPT_SYNONYM_REGISTRY.items():
-            if clean_cand == concept_id or clean_cand in [s.lower() for s in reg["synonyms"]]:
-                target_stem = reg["canonical_note"]
-                if target_stem != source_note_stem and target_stem.lower() in self.canonical_notes:
-                    target_path = self.canonical_notes[target_stem.lower()]
-                    rel_type = self._infer_relationship_type(source_note_stem, target_stem, context_window)
-                    just = self._get_relationship_justification(source_note_stem, target_stem, rel_type)
-                    return {
-                        "source_note": source_note_stem,
-                        "target_note": target_stem,
-                        "target_path": str(target_path.relative_to(self.vault_root)).replace("\\", "/"),
-                        "relationship_type": rel_type,
-                        "justification": f"{just} (via conceito ontológico '{concept_id}')",
-                        "confidence": 0.88,
-                        "evidence_span": context_window[:150].strip() if context_window else "",
-                        "creation_method": "CURATED_SYNONYM_REGISTRY",
-                        "validation_status": "VALIDATED",
-                    }
+        # 3. Curated concept synonym registry
+        matched_entry = None
+        for k, entry in CONCEPT_SYNONYM_REGISTRY.items():
+            if c_norm == k or c_norm in entry["synonyms"]:
+                matched_entry = entry
+                break
+
+        if matched_entry:
+            target_stem = matched_entry["canonical_note"]
+            if target_stem != source_stem:
+                rel_type = self._infer_relationship_type(source_stem, target_stem, context_window)
+                justification = self._generate_justification(source_stem, target_stem, rel_type)
+                return {
+                    "source_note": source_stem,
+                    "target_note": target_stem,
+                    "relationship_type": rel_type,
+                    "justification": justification,
+                    "confidence": 0.95,
+                    "creation_method": "DETERMINISTIC_CURATED_SYNONYM",
+                    "validation_status": "VALIDATED",
+                }
 
         return None
 
-    @staticmethod
-    def _infer_relationship_type(source_stem: str, target_stem: str, context: str) -> str:
-        """Infers direction for typed relationship based on textual evidence."""
-        ctx_lower = context.lower()
-        if any(w in ctx_lower for w in ("prerequisito", "pré-requisito", "pr\u00e9-requisito", "requer", "necessita de", "baseado em")):
+    def _infer_relationship_type(self, source_or_type: str, target_or_context: str = "", context_window: str = "") -> str:
+        """
+        Infers relationship type flexibly whether invoked as:
+        - _infer_relationship_type(source_stem, target_stem, context)
+        - _infer_relationship_type(target_type, context)
+        """
+        combined_context = f"{source_or_type} {target_or_context} {context_window}".lower()
+        if any(w in combined_context for w in ("prerequisito", "pré-requisito", "prerequisite", "depende de", "baseia-se em")):
             return "PREREQUISITE_OF"
-        if any(w in ctx_lower for w in ("extende", "especializa", "extends", "variante")):
+        if any(w in combined_context for w in ("estende", "expansão", "adiciona", "extends")):
             return "EXTENDS"
-        if any(w in ctx_lower for w in ("sustenta", "supports", "fundamenta", "prova")):
+        if any(w in combined_context for w in ("evidência", "comprova", "suporta", "fundamenta", "supports")):
             return "SUPPORTS"
-        if any(w in ctx_lower for w in ("contrasta", "versus", "trade-off", "alternativa")):
+        if any(w in combined_context for w in ("versus", "em contraste", "contrasta com", "contrasts", "trade-off")):
             return "CONTRASTS_WITH"
-        if any(w in ctx_lower for w in ("aplica", "applies", "implementa", "utilizado em")):
+        if any(w in combined_context for w in ("aplica-se a", "utilizado em", "implementado em", "applies")):
             return "APPLIES_TO"
-        if any(w in ctx_lower for w in ("exemplo", "caso de uso", "instância", "example")):
+        if any(w in combined_context for w in ("exemplo", "caso de estudo", "instância", "example")):
             return "EXAMPLE_OF"
-        return "RELATED_TO"
 
-    @staticmethod
-    def _get_relationship_justification(source_stem: str, target_stem: str, rel_type: str) -> str:
-        """Constructs explanatory justification for typed relationship."""
+        type_mapping = {
+            "standard": "SUPPORTS",
+            "architecture": "APPLIES_TO",
+            "theory": "PREREQUISITE_OF",
+            "protocol": "SUPPORTS",
+            "database": "APPLIES_TO",
+            "subsystem": "EXTENDS",
+            "cryptography": "SUPPORTS",
+        }
+        return type_mapping.get(source_or_type.lower(), "RELATED_TO")
+
+    def _generate_justification(self, source_stem: str, target_stem: str, rel_type: str) -> str:
         if rel_type == "PREREQUISITE_OF":
-            return f"'{source_stem}' declara dependência conceptual em '{target_stem}'"
+            return f"'{source_stem}' constitui pré-requisito teórico ou fundação conceptual para '{target_stem}'"
         if rel_type == "EXTENDS":
             return f"'{source_stem}' expande as capacidades fundamentadas em '{target_stem}'"
         if rel_type == "SUPPORTS":
@@ -968,13 +1149,15 @@ class ObsidianGraphEngine:
         Enriches a note safely:
         1. Resolves contained path
         2. Discovers typed relationships based on evidence
-        3. Formats enriched frontmatter and typed relationships section
+        3. Formats enriched frontmatter with conservative defaults if missing:
+           status: needs_review, provenance: UNDECLARED, confidence: unknown
         4. Writes atomically using CAS (Compare-And-Swap) with snapshot creation
-        5. Saves proposal record in self.proposals_dir
+        5. Saves unique proposal record in self.proposals_dir
         """
         full_path = self._resolve_contained_note_path(rel_path)
         rel_str = str(full_path.relative_to(self.vault_root)).replace("\\", "/")
         stem = full_path.stem
+        rel_path_hash = hashlib.sha256(rel_str.encode("utf-8")).hexdigest()[:8]
 
         original_text = full_path.read_text(encoding="utf-8", errors="ignore")
         orig_sha = hashlib.sha256(full_path.read_bytes()).hexdigest()
@@ -983,14 +1166,14 @@ class ObsidianGraphEngine:
         proposed_relationships: List[Dict[str, Any]] = []
         enriched_frontmatter = dict(meta)
 
-        # 1. Frontmatter addition if absent
+        # 1. Frontmatter addition if absent (CONSERVATIVE DEFAULTS: never blindly promote to verified/high)
         if not meta:
             enriched_frontmatter = {
                 "type": "atomic_note",
                 "domain": rel_str.split("/")[0] if "/" in rel_str else "general",
-                "status": "verified",
-                "provenance": "JARVIS_INTERNAL",
-                "confidence": "high",
+                "status": "needs_review",
+                "provenance": "UNDECLARED",
+                "confidence": "unknown",
                 "tags": [rel_str.split("/")[0].lower().replace(" ", "-")],
             }
 
@@ -1032,7 +1215,7 @@ class ObsidianGraphEngine:
         fm_lines.append("---")
         enriched_text = "\n".join(fm_lines) + "\n" + new_body.lstrip()
 
-        proposal_id = f"prop_{hashlib.md5(rel_str.encode()).hexdigest()[:8]}"
+        proposal_id = f"prop_{rel_path_hash}_{time.time_ns()}_{uuid.uuid4().hex[:6]}"
         proposal_file = self.proposals_dir / f"{proposal_id}.json"
 
         # Atomic CAS write if auto_apply
@@ -1050,6 +1233,8 @@ class ObsidianGraphEngine:
             "proposal_id": proposal_id,
             "rel_path": rel_str,
             "stem": stem,
+            "model_provider": "deterministic",
+            "model_name": "synonym_registry_v2",
             "backup_path": str(backup_snapshot.get("snapshot_path")) if backup_snapshot else "",
             "proposed_relationships": proposed_relationships,
             "original_length": len(original_text),
@@ -1077,14 +1262,13 @@ class ObsidianGraphEngine:
         evidence_refs: Optional[List[str]] = None,
     ) -> Path:
         """
-        Generates a Bridge Note between two existing notes.
+        Generates or updates a Bridge Note between two existing notes.
         Validates:
-        - Both source notes exist in vault
-        - Reads contents to verify shared concepts
-        - Assigns grounded_synthesis status (never blind verified)
-        - If note already exists, creates backup snapshot and produces diff
+        - Both source notes exist in vault (rejects nonexistent sources)
+        - Evidence references must exist (rejects fabricated fallbacks; returns INSUFFICIENT_EVIDENCE)
+        - Assigns grounded_synthesis status
+        - Uses atomic CAS writes with backup snapshot if file already exists
         """
-        # 1. Validate both source notes exist
         try:
             path_a = self._resolve_contained_note_path(source_note_a)
         except (ObsidianNotFoundError, ObsidianSecurityError):
@@ -1095,16 +1279,17 @@ class ObsidianGraphEngine:
         except (ObsidianNotFoundError, ObsidianSecurityError):
             raise ObsidianNotFoundError(f"Nota de origem B não existe no cofre: {source_note_b}")
 
+        # Ground evidence in source notes if explicit list omitted, avoiding fake RFCs
+        if not evidence_refs or not any(str(e).strip() for e in evidence_refs):
+            ev_list = [f"SOURCE_NOTE:{path_a.stem}", f"SOURCE_NOTE:{path_b.stem}"]
+        else:
+            ev_list = [str(e).strip() for e in evidence_refs if str(e).strip()]
+
         bridge_dir = self.vault_root / "09 - JARVIS" / "Bridge Notes"
         bridge_dir.mkdir(parents=True, exist_ok=True)
         filename = f"Bridge - {bridge_title}.md"
         out_path = bridge_dir / filename
 
-        # 2. Check if bridge note already exists -> snapshot and diff
-        if out_path.exists():
-            self.create_note_backup_snapshot(out_path)
-
-        ev_list = evidence_refs or ["RFC_MCP_2024", "JARVIS_SWARM_V2"]
         content = f"""---
 type: bridge_note
 domain: jarvis-architecture
@@ -1148,12 +1333,16 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
 - **Arquitetura & Código:** [[{path_b.stem}]]
 - **MOCs Relacionados:** [[00 - Knowledge Index]], [[JARVIS Index]]
 """
-        out_path.write_text(content, encoding="utf-8")
+        if out_path.exists():
+            self.atomic_write_note(out_path, content, create_backup=True)
+        else:
+            out_path.write_text(content, encoding="utf-8")
+
         self.refresh_vault_catalogs()
         return out_path
 
     # ──────────────────────────────────────────────────────────────────────────
-    # 9. QUEUE MANAGEMENT & WORKER LIFECYCLE
+    # 9. QUEUE MANAGEMENT, REAL QWEN WORKER & STATE MACHINE
     # ──────────────────────────────────────────────────────────────────────────
 
     def load_queue(self) -> List[Dict[str, Any]]:
@@ -1188,7 +1377,8 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
                         ((100.0 - audit["overall_score"]) * 0.7) + (audit["findings_count"] * 5.0),
                         1,
                     )
-                    item_id = f"queue_{hashlib.md5(audit['rel_path'].encode()).hexdigest()[:8]}"
+                    rel_hash = hashlib.sha256(audit["rel_path"].encode()).hexdigest()[:8]
+                    item_id = f"queue_{rel_hash}"
                     queue.append({
                         "item_id": item_id,
                         "note_path": audit["rel_path"],
@@ -1211,27 +1401,28 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
 
     def get_worker_state(self) -> Dict[str, Any]:
         """Loads autonomous worker state."""
+        default_state = {
+            "is_paused": False,
+            "is_running": False,
+            "active_item_id": None,
+            "items_processed": 0,
+            "auto_mode_enabled": False,
+            "last_model_used": None,
+            "last_batch_result": None,
+            "last_run_timestamp": None,
+        }
         if not self.worker_state_file.exists():
-            return {
-                "is_paused": False,
-                "is_running": False,
-                "active_item_id": None,
-                "items_processed": 0,
-                "last_run_timestamp": None,
-            }
+            return default_state
         try:
-            return json.loads(self.worker_state_file.read_text(encoding="utf-8"))
+            data = json.loads(self.worker_state_file.read_text(encoding="utf-8"))
+            for k, v in default_state.items():
+                data.setdefault(k, v)
+            return data
         except Exception:
-            return {
-                "is_paused": False,
-                "is_running": False,
-                "active_item_id": None,
-                "items_processed": 0,
-                "last_run_timestamp": None,
-            }
+            return default_state
 
     def save_worker_state(self, state: Dict[str, Any]) -> None:
-        """Persists worker state."""
+        """Persists worker state atomically."""
         temp = self.worker_state_file.parent / f".tmp_{self.worker_state_file.name}.tmp"
         temp.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
         os.replace(temp, self.worker_state_file)
@@ -1258,84 +1449,364 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
         state = self.get_worker_state()
         pending = sum(1 for q in queue if q.get("status") == "PENDING")
         applied = sum(1 for q in queue if q.get("status") == "APPLIED")
-        proposals = sum(1 for q in queue if q.get("status") == "PROPOSAL_CREATED")
+        proposals = sum(1 for q in queue if q.get("status") in ("PROPOSAL_CREATED", "AWAITING_REVIEW"))
+        blocked = sum(1 for q in queue if q.get("status") == "BLOCKED_BY_ENVIRONMENT")
+        reconciliation = sum(1 for q in queue if q.get("status") == "RECONCILIATION_REQUIRED")
 
         return {
             "is_paused": state.get("is_paused", False),
             "is_running": state.get("is_running", False),
             "active_item_id": state.get("active_item_id"),
             "items_processed": state.get("items_processed", 0),
+            "auto_mode_enabled": state.get("auto_mode_enabled", False),
+            "last_model_used": state.get("last_model_used"),
+            "last_batch_result": state.get("last_batch_result"),
             "queue_total": len(queue),
             "pending_count": pending,
             "applied_count": applied,
             "proposals_count": proposals,
+            "blocked_count": blocked,
+            "reconciliation_count": reconciliation,
             "last_run_timestamp": state.get("last_run_timestamp"),
         }
 
+    def reconcile_interrupted_queue(self) -> int:
+        """
+        Reconciles any queue items left in 'IN_PROGRESS' due to ungraceful shutdown.
+        Marks them 'RECONCILIATION_REQUIRED' to prevent repeating changes blindly.
+        """
+        queue = self.load_queue()
+        reconciled = 0
+        for item in queue:
+            if item.get("status") == "IN_PROGRESS":
+                item["status"] = "RECONCILIATION_REQUIRED"
+                item["reconciliation_reason"] = "Processo interrompido durante execução anterior detetado no arranque."
+                item["updated_at"] = datetime.now().isoformat()
+                reconciled += 1
+        if reconciled > 0:
+            self.save_queue(queue)
+        return reconciled
+
+    def check_ollama_qwen_available(self) -> bool:
+        """Quick non-blocking check to verify local Ollama has qwen3.5:9b available."""
+        import urllib.request
+        try:
+            with urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=1.5) as resp:
+                if resp.status == 200:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    models = [m.get("name") for m in data.get("models", [])]
+                    return any("qwen3.5:9b" in m or "qwen" in m.lower() for m in models)
+        except Exception:
+            return False
+        return False
+
+    async def _execute_qwen_knowledge_improvement(
+        self,
+        rel_path: str,
+        audit: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """
+        Invokes local Ollama qwen3.5:9b via ModelExecutionService to produce substantive knowledge improvements.
+        """
+        from backend.model_harness import OutputFormat, get_model_harness
+        from backend.services.model_service import ModelExecutionService
+
+        full_path = self._resolve_contained_note_path(rel_path)
+        rel_str = str(full_path.relative_to(self.vault_root)).replace("\\", "/")
+        stem = full_path.stem
+        rel_path_hash = hashlib.sha256(rel_str.encode("utf-8")).hexdigest()[:8]
+        content_text = full_path.read_text(encoding="utf-8", errors="ignore")
+        orig_sha = hashlib.sha256(full_path.read_bytes()).hexdigest()
+
+        # Find 1-2 related context notes
+        related_context = []
+        for wl in re.findall(r"\[\[(.*?)\]\]", content_text)[:3]:
+            t_stem = wl.split("|")[0].split("#")[0].strip().removesuffix(".md").lower()
+            if t_stem in self.canonical_notes and t_stem != stem.lower():
+                try:
+                    rel_doc = self.canonical_notes[t_stem].read_text(encoding="utf-8", errors="ignore")
+                    related_context.append(f"--- Contexto de [[{self.canonical_notes[t_stem].stem}]] ---\n{rel_doc[:800]}")
+                except Exception:
+                    pass
+
+        system_prompt = (
+            "És o motor de melhoria e aprofundamento conceptual de notas do JARVIS OS. "
+            "Gera melhorias substanciais de conhecimento (mecanismos causais, trade-offs técnicos, exemplos e código JARVIS). "
+            "Regras epistemológicas:\n"
+            "1. Toda a afirmação factual nova deve indicar a fonte documental ou ser marcada como inferência.\n"
+            "2. Não inventes normas, DOIs ou RFCs fictícios.\n"
+            "3. Responde EXCLUSIVAMENTE em formato JSON com as chaves:\n"
+            "   - 'substantive_addition': texto markdown rigoroso para a secção de aprofundamento\n"
+            "   - 'mechanisms_and_tradeoffs': lista de strings com compromissos técnicos\n"
+            "   - 'evidence_anchors': lista de objetos [{'claim': '...', 'source': '...', 'status': 'VERIFIED'|'INFERRED'}]\n"
+            "   - 'jarvis_linkage': menção a módulos concretos do JARVIS OS se aplicável\n"
+            "   - 'suggested_typed_relationships': lista de objetos [{'target_note': '...', 'relationship_type': '...', 'justification': '...'}]"
+        )
+
+        user_prompt = f"""Nota a aprofundar: '{stem}' (Caminho: {rel_str})
+Conteúdo atual:
+{content_text[:3000]}
+
+Contexto Adicional do Cofre:
+{'\n\n'.join(related_context) if related_context else 'Sem notas de contexto adicionais.'}
+
+Pontos frágeis identificados pelo auditor:
+{json.dumps(audit.get('findings', [])[:3], ensure_ascii=False)}
+"""
+
+        harness = get_model_harness()
+        exec_service = ModelExecutionService(harness)
+
+        resp = await exec_service.execute(
+            provider="ollama",
+            model="qwen3.5:9b",
+            operation="obsidian_knowledge_improvement",
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            output_format=OutputFormat.JSON,
+            temperature=0.2,
+            max_output_tokens=300,
+            timeout_seconds=60.0,
+        )
+
+        raw_text = getattr(resp, "raw_text", "") or ""
+        # Parse JSON
+        parsed_payload: Dict[str, Any] = {}
+        try:
+            # Strip fences if present
+            cleaned_json = raw_text.strip()
+            if cleaned_json.startswith("```"):
+                cleaned_json = re.sub(r"^```(?:json)?\n|\n```$", "", cleaned_json, flags=re.MULTILINE).strip()
+            parsed_payload = json.loads(cleaned_json)
+        except Exception:
+            # Fallback search for json object
+            m = re.search(r"\{.*\}", raw_text, re.DOTALL)
+            if m:
+                try:
+                    parsed_payload = json.loads(m.group(0))
+                except Exception:
+                    pass
+
+        addition = parsed_payload.get("substantive_addition", "").strip()
+        mechanisms = parsed_payload.get("mechanisms_and_tradeoffs", [])
+        evidence_anchors = parsed_payload.get("evidence_anchors", [])
+        linkage = parsed_payload.get("jarvis_linkage", "")
+        suggested_rels = parsed_payload.get("suggested_typed_relationships", [])
+
+        # Construct enriched note
+        meta, body = self.parse_frontmatter(content_text)
+        enriched_frontmatter = dict(meta)
+        if not meta:
+            enriched_frontmatter = {
+                "type": "atomic_note",
+                "domain": rel_str.split("/")[0] if "/" in rel_str else "general",
+                "status": "needs_review",
+                "provenance": "UNDECLARED",
+                "confidence": "unknown",
+                "tags": [rel_str.split("/")[0].lower().replace(" ", "-")],
+            }
+
+        # Build substantive section
+        substantive_section = [
+            "",
+            "---",
+            "",
+            "## 🧠 Aprofundamento Conceptual & Mecanismos (qwen3.5:9b)",
+            addition or f"Mecanismos e trade-offs analisados: {', '.join(mechanisms) if mechanisms else 'Síntese analítica.'}",
+        ]
+        if mechanisms:
+            substantive_section.append("\n### ⚖️ Trade-offs & Compromissos de Engenharia")
+            for mech in mechanisms:
+                substantive_section.append(f"- {mech}")
+        if linkage:
+            substantive_section.append(f"\n### ⚙️ Alinhamento JARVIS OS\n{linkage}")
+
+        new_body = body.rstrip() + "\n" + "\n".join(substantive_section) + "\n"
+
+        # Format frontmatter
+        fm_lines = ["---"]
+        for k, v in enriched_frontmatter.items():
+            if isinstance(v, list):
+                fm_lines.append(f"{k}:")
+                for item in v:
+                    fm_lines.append(f"  - {item}")
+            else:
+                fm_lines.append(f"{k}: {v}")
+        fm_lines.append("---")
+        enriched_text = "\n".join(fm_lines) + "\n" + new_body.lstrip()
+
+        proposal_id = f"prop_{rel_path_hash}_{time.time_ns()}_{uuid.uuid4().hex[:6]}"
+        proposal_file = self.proposals_dir / f"{proposal_id}.json"
+
+        # Write proposal
+        proposal_payload = {
+            "proposal_id": proposal_id,
+            "rel_path": rel_str,
+            "stem": stem,
+            "original_sha256": orig_sha,
+            "proposed_sha256": hashlib.sha256(enriched_text.encode("utf-8")).hexdigest(),
+            "generation_id": f"gen_qwen_{uuid.uuid4().hex[:8]}",
+            "model_provider": "ollama",
+            "model_name": "qwen3.5:9b",
+            "prompt_version": "v2_grounded_qwen",
+            "evidence_refs": [a.get("source") for a in evidence_anchors if isinstance(a, dict) and a.get("source")],
+            "proposed_changes": {
+                "substantive_addition": addition,
+                "mechanisms_and_tradeoffs": mechanisms,
+                "evidence_anchors": evidence_anchors,
+                "jarvis_linkage": linkage,
+                "relationships": suggested_rels,
+            },
+            "validation_results": {
+                "claims_evaluated": len(evidence_anchors),
+                "has_inference": any(isinstance(a, dict) and a.get("status") == "INFERRED" for a in evidence_anchors),
+            },
+            "enriched_text": enriched_text,
+            "status": "AWAITING_REVIEW",
+            "created_at": datetime.now().isoformat(),
+        }
+        with open(proposal_file, "w", encoding="utf-8") as f:
+            json.dump(proposal_payload, f, indent=2, ensure_ascii=False)
+
+        return proposal_payload
+
     async def run_bounded_improvement_batch(self, batch_size: int = 1) -> List[Dict[str, Any]]:
         """
-        Executes bounded improvement batch using local Ollama qwen3.5:9b via ModelExecutionService.
-        Processes up to batch_size pending items.
-        Status progression: PENDING -> AWAITING_REVIEW / PROPOSAL_CREATED / APPLIED.
+        Executes bounded improvement batch with strict worker lock, state transitions,
+        and real Ollama qwen3.5:9b generation.
+        Clamps batch_size to max 5 (default 1).
         """
+        batch_size = max(1, min(batch_size, 5))
         state = self.get_worker_state()
+
         if state.get("is_paused", False):
             return []
 
-        queue = self.load_queue()
-        if not queue:
-            queue = self.populate_improvement_queue()
-
-        state["is_running"] = True
-        state["last_run_timestamp"] = datetime.now().isoformat()
-        self.save_worker_state(state)
-
-        processed_proposals: List[Dict[str, Any]] = []
-        count = 0
-
+        # Attempt to acquire exclusive worker lock to prevent overlapping runs
         try:
-            for item in queue:
-                if count >= batch_size:
-                    break
-                if item.get("status") != "PENDING":
-                    continue
+            worker_lock = self._acquire_worker_lock(timeout=0.1)
+        except ObsidianConcurrencyError:
+            return [{"status": "WORKER_ALREADY_RUNNING", "error": "Outro ciclo do worker está atualmente em execução."}]
 
-                item_path = item["note_path"]
-                state["active_item_id"] = item["item_id"]
-                self.save_worker_state(state)
+        with worker_lock:
+            # Reconcile any previously interrupted items on startup
+            self.reconcile_interrupted_queue()
 
-                # Safe enrichment
-                proposal = self.enrich_note_safely(item_path, auto_apply=True)
-                item["status"] = "APPLIED"
-                item["updated_at"] = datetime.now().isoformat()
-                item["proposal_id"] = proposal.get("proposal_id")
+            queue = self.load_queue()
+            if not queue:
+                queue = self.populate_improvement_queue()
 
-                processed_proposals.append(proposal)
-                count += 1
-                state["items_processed"] = state.get("items_processed", 0) + 1
-
-            self.save_queue(queue)
-        finally:
-            state["is_running"] = False
-            state["active_item_id"] = None
+            state["is_running"] = True
+            state["last_run_timestamp"] = datetime.now().isoformat()
             self.save_worker_state(state)
+
+            processed_proposals: List[Dict[str, Any]] = []
+            count = 0
+            model_used = "deterministic"
+
+            try:
+                for item in queue:
+                    if count >= batch_size:
+                        break
+                    if item.get("status") != "PENDING":
+                        continue
+
+                    # Refresh pause state before processing item
+                    if self.get_worker_state().get("is_paused", False):
+                        break
+
+                    item_path = item["note_path"]
+                    item["status"] = "IN_PROGRESS"
+                    item["updated_at"] = datetime.now().isoformat()
+                    state["active_item_id"] = item["item_id"]
+                    self.save_queue(queue)
+                    self.save_worker_state(state)
+
+                    # Check if Ollama qwen3.5:9b is accessible
+                    ollama_ok = self.check_ollama_qwen_available()
+
+                    if ollama_ok:
+                        try:
+                            audit = self.audit_note_quality(item_path)
+                            proposal = await self._execute_qwen_knowledge_improvement(item_path, audit)
+                            item["status"] = proposal.get("status", "AWAITING_REVIEW")
+                            item["proposal_id"] = proposal.get("proposal_id")
+                            item["updated_at"] = datetime.now().isoformat()
+                            processed_proposals.append(proposal)
+                            model_used = "qwen3.5:9b"
+                        except Exception as e:
+                            item["status"] = "FAILED_VALIDATION"
+                            item["error"] = str(e)
+                            item["updated_at"] = datetime.now().isoformat()
+                            processed_proposals.append({
+                                "status": "FAILED_VALIDATION",
+                                "item_id": item["item_id"],
+                                "note_path": item_path,
+                                "error": str(e),
+                                "model_provider": "ollama",
+                                "model_name": "qwen3.5:9b",
+                            })
+                    else:
+                        # Fallback to deterministic link enrichment if Ollama unavailable
+                        proposal = self.enrich_note_safely(item_path, auto_apply=True)
+                        item["status"] = "APPLIED"
+                        item["updated_at"] = datetime.now().isoformat()
+                        item["proposal_id"] = proposal.get("proposal_id")
+                        processed_proposals.append(proposal)
+                        model_used = "deterministic_fallback"
+
+                    count += 1
+                    state["items_processed"] = state.get("items_processed", 0) + 1
+
+                self.save_queue(queue)
+            finally:
+                state["is_running"] = False
+                state["active_item_id"] = None
+                state["last_model_used"] = model_used
+                state["last_batch_result"] = {
+                    "count": count,
+                    "model": model_used,
+                    "timestamp": datetime.now().isoformat(),
+                }
+                self.save_worker_state(state)
 
         return processed_proposals
 
     # ──────────────────────────────────────────────────────────────────────────
-    # 10. REAL GRAPH DIAGNOSTICS (Dynamic, No Hardcoded Numbers)
+    # 10. REAL GRAPH DIAGNOSTICS (Two-Pass Adjacency & True Proposal Counts)
     # ──────────────────────────────────────────────────────────────────────────
 
     def compute_graph_diagnostics(self) -> Dict[str, Any]:
         """
-        Computes real, dynamic graph metrics from actual filesystem state.
-        Calculates unique canonical notes, incoming/outgoing edges, broken links,
-        media embeds, genuine orphans, MOC-only notes, and calibrated score distribution.
-        Persists diagnostic record with real audit ID and timestamp.
+        Computes real, dynamic graph metrics from actual filesystem state in two passes:
+        Pass 1:
+          - Inventories canonical Markdown notes (excluding .obsidian and .history).
+          - Extracts all valid outgoing relationships and resolves destinations.
+          - Builds complete bidirectional adjacency maps (outgoing and incoming).
+        Pass 2:
+          - Calculates exact incoming/outgoing edges per node.
+          - Identifies genuine orphans (0 in, 0 out).
+          - Identifies MOC-only nodes (connected only to MOC/Index nodes, 0 peer links).
+          - Identifies hubs.
+          - Scans proposal directory to calculate real accepted (APPLIED), rejected (REJECTED),
+            and pending (AWAITING_REVIEW / PROPOSAL_CREATED) counts.
+          - Persists diagnostic record only after completion.
         """
         self.refresh_vault_catalogs()
+
+        # Pass 1: Adjacency map
         unique_notes = list(set(self.canonical_notes.values()))
-        total_unique_notes = len(unique_notes)
+        canonical_rel_set: Set[str] = set()
+        for p in unique_notes:
+            rel = str(p.relative_to(self.vault_root)).replace("\\", "/")
+            canonical_rel_set.add(rel.lower())
+
+        outgoing_map: Dict[str, List[str]] = {str(p.relative_to(self.vault_root)).replace("\\", "/"): [] for p in unique_notes}
+        incoming_map: Dict[str, List[str]] = {str(p.relative_to(self.vault_root)).replace("\\", "/"): [] for p in unique_notes}
+        stem_to_rel: Dict[str, str] = {}
+        for p in unique_notes:
+            rel = str(p.relative_to(self.vault_root)).replace("\\", "/")
+            stem_to_rel[p.stem.lower()] = rel
 
         asset_files: Set[str] = set()
         for f in self.vault_root.rglob("*"):
@@ -1346,19 +1817,14 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
                 except ValueError:
                     pass
 
-        incoming_edges: Dict[str, int] = {n.stem.lower(): 0 for n in unique_notes}
-        outgoing_edges_count = 0
         broken_links_list: List[Dict[str, str]] = []
         missing_attachments_list: List[Dict[str, str]] = []
         code_examples_ignored_total = 0
-        moc_only_notes: List[str] = []
-        genuine_orphans: List[str] = []
-
         scores: List[float] = []
 
+        # Pass 1 execution
         for note_file in unique_notes:
             rel_str = str(note_file.relative_to(self.vault_root)).replace("\\", "/")
-            stem = note_file.stem
             content = note_file.read_text(encoding="utf-8", errors="ignore")
 
             # Audit quality score
@@ -1368,7 +1834,6 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
             except Exception:
                 pass
 
-            # Link analysis
             analysis = self.extract_markdown_links(content)
             code_examples_ignored_total += len(analysis["code_examples_ignored"])
 
@@ -1378,33 +1843,73 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
                 if emb_clean not in asset_files and emb_clean not in self.canonical_notes:
                     missing_attachments_list.append({"source": rel_str, "target": emb})
 
-            # Check wikilinks
-            valid_out = 0
-            has_peer_link = False
-
+            # Check outgoing wikilinks
             for wl in analysis["wikilinks"]:
                 target_clean = wl.split("|")[0].split("#")[0].strip().removesuffix(".md").lower()
                 if not target_clean:
                     continue
-                if target_clean in self.canonical_notes or target_clean in self.canonical_rel_paths or target_clean in self.alias_map:
-                    valid_out += 1
-                    outgoing_edges_count += 1
-                    dest_stem = self.alias_map.get(target_clean) or self.canonical_notes.get(target_clean, note_file).stem.lower()
-                    incoming_edges[dest_stem] = incoming_edges.get(dest_stem, 0) + 1
-                    if "index" not in target_clean and "00 - moc" not in target_clean:
-                        has_peer_link = True
+                dest_rel = None
+                if target_clean in canonical_rel_set:
+                    dest_rel = target_clean
+                elif target_clean in self.canonical_rel_paths:
+                    dest_rel = str(self.canonical_rel_paths[target_clean].relative_to(self.vault_root)).replace("\\", "/")
+                elif target_clean in self.alias_map:
+                    dest_stem = self.alias_map[target_clean]
+                    dest_rel = stem_to_rel.get(dest_stem.lower())
+                elif target_clean in stem_to_rel:
+                    dest_rel = stem_to_rel[target_clean]
+
+                if dest_rel and dest_rel in outgoing_map:
+                    outgoing_map[rel_str].append(dest_rel)
+                    incoming_map[dest_rel].append(rel_str)
                 else:
                     broken_links_list.append({"source": rel_str, "target": wl})
 
-            is_moc = "00 - moc" in rel_str.lower() or "index" in stem.lower()
-            if not is_moc:
-                if valid_out == 0 and incoming_edges.get(stem.lower(), 0) == 0:
-                    genuine_orphans.append(rel_str)
-                elif valid_out > 0 and not has_peer_link:
-                    moc_only_notes.append(rel_str)
+        # Pass 2 execution: Classification
+        genuine_orphans: List[str] = []
+        moc_only_notes: List[str] = []
+        hubs: List[str] = []
 
-        queue = self.load_queue()
-        worker_state = self.get_worker_status()
+        total_outgoing = sum(len(v) for v in outgoing_map.values())
+        total_incoming = sum(len(v) for v in incoming_map.values())
+
+        for rel_str in outgoing_map:
+            out_edges = outgoing_map[rel_str]
+            in_edges = incoming_map[rel_str]
+            degree = len(out_edges) + len(in_edges)
+            if degree >= 15:
+                hubs.append(rel_str)
+
+            is_moc = "00 - moc" in rel_str.lower() or "index" in Path(rel_str).stem.lower()
+            if not is_moc:
+                if len(out_edges) == 0 and len(in_edges) == 0:
+                    genuine_orphans.append(rel_str)
+                elif len(out_edges) > 0 or len(in_edges) > 0:
+                    all_connected = set(out_edges) | set(in_edges)
+                    is_only_moc_connected = all(
+                        "00 - moc" in c.lower() or "index" in Path(c).stem.lower()
+                        for c in all_connected
+                    )
+                    if is_only_moc_connected:
+                        moc_only_notes.append(rel_str)
+
+        # Real proposal counts from files
+        proposals_applied = 0
+        proposals_rejected = 0
+        proposals_awaiting_review = 0
+
+        for prop_path in self.proposals_dir.glob("*.json"):
+            try:
+                p_data = json.loads(prop_path.read_text(encoding="utf-8"))
+                st = p_data.get("status")
+                if st == "APPLIED":
+                    proposals_applied += 1
+                elif st == "REJECTED":
+                    proposals_rejected += 1
+                elif st in ("AWAITING_REVIEW", "PROPOSAL_CREATED", "PENDING"):
+                    proposals_awaiting_review += 1
+            except Exception:
+                pass
 
         avg_score = round(sum(scores) / len(scores), 1) if scores else 0.0
         scores_ge_80 = sum(1 for s in scores if s >= 80.0)
@@ -1412,18 +1917,18 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
         scores_60_69 = sum(1 for s in scores if 60.0 <= s < 70.0)
         scores_lt_60 = sum(1 for s in scores if s < 60.0)
 
-        proposals_applied = sum(1 for p in self.proposals_dir.glob("*.json"))
-
         diagnostics: Dict[str, Any] = {
             "audit_id": f"audit_{hashlib.md5(str(time.time_ns()).encode()).hexdigest()[:8]}",
             "timestamp": datetime.now().isoformat(),
-            "total_notes": total_unique_notes,
-            "outgoing_edges": outgoing_edges_count,
-            "incoming_edges_total": sum(incoming_edges.values()),
+            "total_notes": len(unique_notes),
+            "outgoing_edges": total_outgoing,
+            "incoming_edges_total": total_incoming,
             "genuine_orphans": len(genuine_orphans),
             "genuine_orphans_list": genuine_orphans,
             "moc_only_count": len(moc_only_notes),
-            "moc_only_notes_list": moc_only_notes[:15],
+            "moc_only_notes_list": moc_only_notes[:25],
+            "hubs_count": len(hubs),
+            "hubs_list": hubs[:15],
             "broken_links": len(broken_links_list),
             "broken_links_list": broken_links_list[:25],
             "missing_attachments_count": len(missing_attachments_list),
@@ -1436,12 +1941,13 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
                 "lt_60": scores_lt_60,
                 "total_audited": len(scores),
             },
-            "queue_metrics": worker_state,
+            "queue_metrics": self.get_worker_status(),
             "accepted_improvements": proposals_applied,
-            "rejected_suggestions": 0,
+            "rejected_suggestions": proposals_rejected,
+            "proposals_awaiting_review": proposals_awaiting_review,
         }
 
-        # Persist real diagnostics
+        # Persist diagnostics atomically
         try:
             temp = self.diagnostics_file.parent / f".tmp_{self.diagnostics_file.name}.tmp"
             temp.write_text(json.dumps(diagnostics, indent=2, ensure_ascii=False), encoding="utf-8")

@@ -344,7 +344,6 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
   const [noteSavedFeedback, setNoteSavedFeedback] = useState(false);
   const [obsidianViewMode, setObsidianViewMode] = useState<'explorer' | 'quality_graph'>('quality_graph');
   const [selectedQualityNote, setSelectedQualityNote] = useState<string>('');
-  const [isQueuePaused, setIsQueuePaused] = useState(false);
   const [enrichmentFeedback, setEnrichmentFeedback] = useState<string | null>(null);
 
   useEffect(() => {
@@ -1404,6 +1403,12 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
     const filteredNotes = notes.filter((n) => n.toLowerCase().includes(vaultSearch.toLowerCase()));
     const queue = vaultImprovementQueue || [];
     const activeAudit = noteQualityAudit;
+    const queueMetrics = vaultDiagnostics?.queue_metrics;
+    const isQueuePaused = Boolean(queueMetrics?.is_paused);
+    const isQueueRunning = Boolean(queueMetrics?.is_running);
+    const activeItemId = queueMetrics?.active_item_id;
+    const lastModelUsed = queueMetrics?.last_model_used;
+    const lastBatchResult = queueMetrics?.last_batch_result;
 
     return (
       <div className="flex flex-col gap-3 flex-1 min-h-0">
@@ -1692,7 +1697,11 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
             {renderCardShell(
               'card_vault_relationships',
               'Fila de Evolução Autónoma',
-              isQueuePaused ? 'Fila pausada pelo operador' : `${queue.length} notas em melhoria contínua`,
+              isQueueRunning
+                ? `A Executar (${lastModelUsed || 'qwen3.5:9b'}) • Item: ${activeItemId || 'em processamento'}`
+                : isQueuePaused
+                ? 'Fila pausada pelo operador'
+                : `${queue.length} notas em fila • Modelo: ${lastModelUsed || 'qwen3.5:9b'}`,
               <FileCode className="w-3.5 h-3.5" />,
               'lg:col-span-4 min-h-[490px]',
               <div className="flex items-center gap-1.5">
@@ -1703,21 +1712,31 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
                     } else {
                       pauseQueueWorker();
                     }
-                    setIsQueuePaused(!isQueuePaused);
+                    setTimeout(() => getVaultDiagnostics(), 200);
                   }}
                   className={`px-2.5 py-1 rounded-lg text-[10px] font-mono border transition-all cursor-pointer ${
                     isQueuePaused
                       ? 'bg-amber-500/20 border-amber-400/40 text-amber-200'
+                      : isQueueRunning
+                      ? 'bg-cyan-500/20 border-cyan-400/40 text-cyan-200 animate-pulse'
                       : 'bg-emerald-500/20 border-emerald-400/40 text-emerald-200'
                   }`}
                 >
-                  {isQueuePaused ? 'PAUSADA' : 'EM EXECUÇÃO'}
+                  {isQueuePaused ? 'PAUSADA' : isQueueRunning ? 'A EXECUTAR' : 'ATIVA'}
                 </button>
                 <button
                   onClick={() => {
                     startImprovementBatch(1);
-                    setEnrichmentFeedback('Ciclo de melhoria iniciado!');
-                    setTimeout(() => setEnrichmentFeedback(null), 3000);
+                    setEnrichmentFeedback('Ciclo disparado...');
+                    setTimeout(() => {
+                      getVaultDiagnostics();
+                      setEnrichmentFeedback(
+                        lastModelUsed === 'qwen3.5:9b'
+                          ? 'Ciclo executado via local qwen3.5:9b!'
+                          : 'Ciclo executado com sucesso!'
+                      );
+                      setTimeout(() => setEnrichmentFeedback(null), 3500);
+                    }, 1200);
                   }}
                   className="px-2 py-1 rounded-lg text-[10px] font-mono bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-stone-300 hover:text-white transition-all cursor-pointer"
                   title="Executar 1 ciclo limitado de melhoria autónoma"
@@ -1726,8 +1745,21 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
                 </button>
               </div>,
               <div className="flex flex-col h-full p-3.5 gap-2.5 overflow-y-auto">
-                <div className="text-[10px] font-mono uppercase text-stone-400">
-                  Prioridade Ordenada por Défice Epistémico
+                {enrichmentFeedback && (
+                  <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-400/30 text-cyan-200 text-[11px] font-mono flex items-center justify-between">
+                    <span>{enrichmentFeedback}</span>
+                    {lastModelUsed && <span className="text-[9px] bg-cyan-500/20 px-1.5 py-0.5 rounded uppercase">{lastModelUsed}</span>}
+                  </div>
+                )}
+                {lastBatchResult && !enrichmentFeedback && (
+                  <div className="px-2 py-1 rounded-lg bg-white/[0.02] border border-white/5 text-[9px] font-mono text-stone-400 flex items-center justify-between">
+                    <span>Último ciclo: {lastBatchResult.count || 0} nota(s) processada(s)</span>
+                    <span className="uppercase text-[8px] bg-white/5 px-1 py-0.2 rounded">{lastBatchResult.model}</span>
+                  </div>
+                )}
+                <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center justify-between">
+                  <span>Prioridade Ordenada por Défice Epistémico</span>
+                  {activeItemId && <span className="text-cyan-300 text-[9px] font-mono">Ativo: {activeItemId}</span>}
                 </div>
                 <div className="space-y-1.5 flex-1 min-h-0 overflow-y-auto pr-1">
                   {queue.slice(0, 15).map((item) => {

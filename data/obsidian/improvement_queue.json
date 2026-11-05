@@ -1,6 +1,6 @@
 [
   {
-    "item_id": "queue_3159c6b6",
+    "item_id": "queue_b91c31e9",
     "note_path": "10 - Lectures/Lecture - RAG and Agents.md",
     "stem": "Lecture - RAG and Agents",
     "priority_score": 68.8,
@@ -50,11 +50,11 @@
     ],
     "status": "PENDING",
     "retry_count": 0,
-    "created_at": "2026-11-05T01:43:24.108697",
-    "updated_at": "2026-11-05T01:43:24.108701"
+    "created_at": "2026-11-05T10:43:01.375341",
+    "updated_at": "2026-11-05T10:43:01.375365"
   },
   {
-    "item_id": "queue_1ae27269",
+    "item_id": "queue_ebc1c790",
     "note_path": "00 - MOC/AI Index.md",
     "stem": "AI Index",
     "priority_score": 39.1,
@@ -80,11 +80,11 @@
     ],
     "status": "PENDING",
     "retry_count": 0,
-    "created_at": "2026-11-05T01:43:24.104317",
-    "updated_at": "2026-11-05T01:43:24.104323"
+    "created_at": "2026-11-05T10:43:01.405931",
+    "updated_at": "2026-11-05T10:43:01.405951"
   },
   {
-    "item_id": "queue_b12bcf7c",
+    "item_id": "queue_11f63274",
     "note_path": "00 - MOC/00 - Knowledge Index.md",
     "stem": "00 - Knowledge Index",
     "priority_score": 39.1,
@@ -110,11 +110,11 @@
     ],
     "status": "PENDING",
     "retry_count": 0,
-    "created_at": "2026-11-05T01:43:24.105877",
-    "updated_at": "2026-11-05T01:43:24.105881"
+    "created_at": "2026-11-05T10:43:01.437620",
+    "updated_at": "2026-11-05T10:43:01.437639"
   },
   {
-    "item_id": "queue_df160942",
+    "item_id": "queue_29fec61e",
     "note_path": "05 - Security/Post-Quantum Cryptography.md",
     "stem": "Post-Quantum Cryptography",
     "priority_score": 35.8,
@@ -140,7 +140,7 @@
     ],
     "status": "PENDING",
     "retry_count": 0,
-    "created_at": "2026-11-05T01:43:24.107234",
-    "updated_at": "2026-11-05T01:43:24.107237"
+    "created_at": "2026-11-05T10:43:01.451505",
+    "updated_at": "2026-11-05T10:43:01.451522"
   }
 ]
