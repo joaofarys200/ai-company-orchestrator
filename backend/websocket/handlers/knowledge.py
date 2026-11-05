@@ -21,6 +21,10 @@ KNOWLEDGE_HANDLERS = {
     "audit_note_quality": "audit_note_quality",
     "enrich_note": "enrich_note",
     "rollback_note": "rollback_note",
+    "get_queue_status": "get_queue_status",
+    "pause_queue_worker": "pause_queue_worker",
+    "resume_queue_worker": "resume_queue_worker",
+    "start_improvement_batch": "start_improvement_batch",
 }
 
 
@@ -177,29 +181,15 @@ class KnowledgeWebSocketHandler:
         _session: WebSocketSessionState,
     ) -> None:
         from services.obsidian_graph_engine import ObsidianGraphEngine
-        from datetime import datetime
         engine = ObsidianGraphEngine()
+        diagnostics = engine.compute_graph_diagnostics()
         queue = engine.load_queue()
-        if not queue:
-            queue = engine.populate_improvement_queue()
-        
-        diagnostics = {
-            "total_notes": len(engine.canonical_notes),
-            "genuine_orphans": 0,
-            "broken_links": 25,
-            "notes_requiring_improvement": len(queue),
-            "pending_proposals": sum(1 for q in queue if q.get("status") == "PENDING"),
-            "accepted_improvements": 18,
-            "rejected_suggestions": 0,
-            "last_audit": datetime.now().isoformat(),
-            "quality_average": 78.5,
-        }
         await self.connections.send(
             websocket,
             {
                 "type": "vault_diagnostics",
                 "diagnostics": diagnostics,
-                "queue": queue[:20],
+                "queue": queue[:25],
             },
         )
 
@@ -229,16 +219,63 @@ class KnowledgeWebSocketHandler:
     ) -> None:
         filename = message.get("filename") or ""
         auto_apply = bool(message.get("auto_apply", True))
-        from services.obsidian_graph_engine import ObsidianGraphEngine
-        engine = ObsidianGraphEngine()
-        proposal = engine.enrich_note_safely(filename, auto_apply=auto_apply)
-        await self.connections.send(
-            websocket,
-            {
-                "type": "note_enrichment_result",
-                "proposal": proposal,
-            },
+        from services.obsidian_graph_engine import (
+            ObsidianGraphEngine,
+            ObsidianSecurityError,
+            ObsidianNotFoundError,
+            ObsidianConcurrencyError,
         )
+        engine = ObsidianGraphEngine()
+        try:
+            proposal = engine.enrich_note_safely(filename, auto_apply=auto_apply)
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "note_enrichment_result",
+                    "success": True,
+                    "proposal": proposal,
+                },
+            )
+        except ObsidianSecurityError as err:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "note_enrichment_result",
+                    "success": False,
+                    "error": str(err),
+                    "code": "SECURITY_VIOLATION",
+                },
+            )
+        except ObsidianNotFoundError as err:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "note_enrichment_result",
+                    "success": False,
+                    "error": str(err),
+                    "code": "NOT_FOUND",
+                },
+            )
+        except ObsidianConcurrencyError as err:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "note_enrichment_result",
+                    "success": False,
+                    "error": str(err),
+                    "code": "CONCURRENCY_CONFLICT",
+                },
+            )
+        except Exception as err:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "note_enrichment_result",
+                    "success": False,
+                    "error": str(err),
+                    "code": "INTERNAL_ERROR",
+                },
+            )
 
     async def rollback_note(
         self,
@@ -248,15 +285,131 @@ class KnowledgeWebSocketHandler:
     ) -> None:
         filename = message.get("filename") or ""
         backup_path = message.get("backup_path") or ""
+        from services.obsidian_graph_engine import (
+            ObsidianGraphEngine,
+            ObsidianSecurityError,
+            ObsidianNotFoundError,
+        )
+        engine = ObsidianGraphEngine()
+        try:
+            success = engine.rollback_note(filename, backup_path)
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "note_rollback_result",
+                    "success": success,
+                    "filename": filename,
+                },
+            )
+        except ObsidianSecurityError as err:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "note_rollback_result",
+                    "success": False,
+                    "filename": filename,
+                    "error": str(err),
+                    "code": "SECURITY_VIOLATION",
+                },
+            )
+        except ObsidianNotFoundError as err:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "note_rollback_result",
+                    "success": False,
+                    "filename": filename,
+                    "error": str(err),
+                    "code": "NOT_FOUND",
+                },
+            )
+        except Exception as err:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "note_rollback_result",
+                    "success": False,
+                    "filename": filename,
+                    "error": str(err),
+                    "code": "INTERNAL_ERROR",
+                },
+            )
+
+    async def get_queue_status(
+        self,
+        websocket: Any,
+        _message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
         from services.obsidian_graph_engine import ObsidianGraphEngine
         engine = ObsidianGraphEngine()
-        success = engine.rollback_note(filename, backup_path)
+        status = engine.get_worker_status()
+        queue = engine.load_queue()
         await self.connections.send(
             websocket,
             {
-                "type": "note_rollback_result",
-                "success": success,
-                "filename": filename,
+                "type": "queue_worker_status",
+                "worker_state": status,
+                "queue": queue[:25],
+            },
+        )
+
+    async def pause_queue_worker(
+        self,
+        websocket: Any,
+        _message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        from services.obsidian_graph_engine import ObsidianGraphEngine
+        engine = ObsidianGraphEngine()
+        engine.pause_queue_worker()
+        status = engine.get_worker_status()
+        await self.connections.send(
+            websocket,
+            {
+                "type": "queue_worker_status",
+                "worker_state": status,
+                "action": "paused",
+            },
+        )
+
+    async def resume_queue_worker(
+        self,
+        websocket: Any,
+        _message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        from services.obsidian_graph_engine import ObsidianGraphEngine
+        engine = ObsidianGraphEngine()
+        engine.resume_queue_worker()
+        status = engine.get_worker_status()
+        await self.connections.send(
+            websocket,
+            {
+                "type": "queue_worker_status",
+                "worker_state": status,
+                "action": "resumed",
+            },
+        )
+
+    async def start_improvement_batch(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        batch_size = int(message.get("batch_size", 1))
+        from services.obsidian_graph_engine import ObsidianGraphEngine
+        engine = ObsidianGraphEngine()
+        proposals = await engine.run_bounded_improvement_batch(batch_size=batch_size)
+        diagnostics = engine.compute_graph_diagnostics()
+        await self.connections.send(
+            websocket,
+            {
+                "type": "improvement_batch_result",
+                "proposals": proposals,
+                "count_processed": len(proposals),
+                "diagnostics": diagnostics,
             },
         )
 

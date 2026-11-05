@@ -141,14 +141,43 @@ def run_inventory():
             "backlinks": [],
         }
 
-    # Second pass: link resolution
+    # Second pass: markdown-aware link resolution
     all_targets_seen = set()
     broken_links_total = []
+    code_examples_ignored_total = 0
+    missing_attachments_total = []
+
+    asset_files: Set[str] = set()
+    for af in VAULT_DIR.rglob("*"):
+        if af.is_file() and ".obsidian" not in af.parts and ".history" not in af.parts:
+            asset_files.add(af.name.lower())
+            try:
+                asset_files.add(str(af.relative_to(VAULT_DIR)).replace("\\", "/").lower())
+            except ValueError:
+                pass
 
     for rel_path, rec in file_records.items():
         f = VAULT_DIR / rel_path
         text = f.read_text(encoding="utf-8", errors="ignore")
-        raw_links = WIKILINK_REGEX.findall(text)
+        _, body = parse_frontmatter(text)
+
+        # 1. Ignore code blocks
+        clean = re.sub(r"```[\s\S]*?```|~~~[\s\S]*?~~~", "", body)
+        # 2. Ignore inline code & HTML comments
+        clean = re.sub(r"`[^`\n]+`", "", clean)
+        clean = re.sub(r"<!--[\s\S]*?-->", "", clean)
+
+        # 3. Separate embeds ![[...]]
+        embeds = re.findall(r"!\[\[(.*?)\]\]", clean)
+        clean_no_embeds = re.sub(r"!\[\[(.*?)\]\]", "", clean)
+
+        for emb in embeds:
+            emb_core = emb.split("|")[0].split("#")[0].strip().lower()
+            if emb_core not in asset_files and emb_core not in stem_map:
+                missing_attachments_total.append({"source": rel_path, "target": emb})
+
+        # 4. Standard wikilinks [[...]]
+        raw_links = WIKILINK_REGEX.findall(clean_no_embeds)
 
         for raw_target in raw_links:
             # Strip alias [[Target|Alias]]
@@ -335,3 +364,4 @@ def run_inventory():
 
 if __name__ == "__main__":
     run_inventory()
+

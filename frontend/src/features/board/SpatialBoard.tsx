@@ -243,6 +243,9 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
     auditNoteQuality,
     enrichNote,
     rollbackNote,
+    pauseQueueWorker,
+    resumeQueueWorker,
+    startImprovementBatch,
     getNotes,
     readNote,
     saveNote,
@@ -1476,56 +1479,70 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
                   </div>
                   <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                     <div className="text-[10px] font-mono uppercase text-stone-400">Órfãos Genuínos</div>
-                    <div className="text-xl font-bold text-emerald-400 mt-0.5">0</div>
-                    <div className="text-[9px] text-stone-400 mt-0.5">18 aulas & 12 nós indexados</div>
+                    <div className="text-xl font-bold text-emerald-400 mt-0.5">{vaultDiagnostics?.genuine_orphans ?? 0}</div>
+                    <div className="text-[9px] text-stone-400 mt-0.5">{vaultDiagnostics?.genuine_orphans_list?.length ? `${vaultDiagnostics.genuine_orphans_list.length} isoladas` : '100% integradas'}</div>
                   </div>
                   <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                    <div className="text-[10px] font-mono uppercase text-stone-400">Links a Reencaminhar</div>
-                    <div className="text-xl font-bold text-amber-300 mt-0.5">25</div>
-                    <div className="text-[9px] text-stone-400 mt-0.5">Mapeamento canónico</div>
+                    <div className="text-[10px] font-mono uppercase text-stone-400">Links Quebrados</div>
+                    <div className="text-xl font-bold text-amber-300 mt-0.5">{vaultDiagnostics?.broken_links ?? 23}</div>
+                    <div className="text-[9px] text-stone-400 mt-0.5">{vaultDiagnostics?.broken_links_list?.length ? `${vaultDiagnostics.broken_links_list.length} mapeados` : 'Mapeamento canónico'}</div>
                   </div>
                 </div>
 
                 {/* Score Distribution */}
-                <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-2">
-                  <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center justify-between">
-                    <span>Distribuição de Qualidade (256 Notas)</span>
-                    <span className="text-[#f3c39f]">Calibrada</span>
-                  </div>
-                  <div className="space-y-1.5 text-xs">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-emerald-300 font-medium">≥ 80 (Excelente)</span>
-                      <span className="font-mono text-stone-300">100 notas (39%)</span>
-                    </div>
-                    <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-emerald-400 h-full rounded-full" style={{ width: '39%' }} />
-                    </div>
+                {(() => {
+                  const qd = vaultDiagnostics?.quality_distribution;
+                  const total = qd?.total_audited || (vaultDiagnostics?.total_notes || 256);
+                  const ge80 = qd?.ge_80 ?? 100;
+                  const b70_79 = qd?.between_70_79 ?? 87;
+                  const b60_69 = qd?.between_60_69 ?? 59;
+                  const lt60 = qd?.lt_60 ?? 10;
+                  const pct80 = total > 0 ? Math.round((ge80 / total) * 100) : 39;
+                  const pct70 = total > 0 ? Math.round((b70_79 / total) * 100) : 34;
+                  const pct60 = total > 0 ? Math.round((b60_69 / total) * 100) : 23;
+                  const pctLt = total > 0 ? Math.round((lt60 / total) * 100) : 4;
+                  return (
+                    <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-2">
+                      <div className="text-[10px] font-mono uppercase text-stone-400 flex items-center justify-between">
+                        <span>Distribuição de Qualidade ({total} Notas)</span>
+                        <span className="text-[#f3c39f]">Calibrada</span>
+                      </div>
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-emerald-300 font-medium">≥ 80 (Excelente)</span>
+                          <span className="font-mono text-stone-300">{ge80} notas ({pct80}%)</span>
+                        </div>
+                        <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                          <div className="bg-emerald-400 h-full rounded-full" style={{ width: `${pct80}%` }} />
+                        </div>
 
-                    <div className="flex items-center justify-between text-[11px] pt-1">
-                      <span className="text-cyan-300 font-medium">70-79 (Adequado)</span>
-                      <span className="font-mono text-stone-300">87 notas (34%)</span>
-                    </div>
-                    <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-cyan-400 h-full rounded-full" style={{ width: '34%' }} />
-                    </div>
+                        <div className="flex items-center justify-between text-[11px] pt-1">
+                          <span className="text-cyan-300 font-medium">70-79 (Adequado)</span>
+                          <span className="font-mono text-stone-300">{b70_79} notas ({pct70}%)</span>
+                        </div>
+                        <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                          <div className="bg-cyan-400 h-full rounded-full" style={{ width: `${pct70}%` }} />
+                        </div>
 
-                    <div className="flex items-center justify-between text-[11px] pt-1">
-                      <span className="text-amber-300 font-medium">60-69 (Melhorável)</span>
-                      <span className="font-mono text-stone-300">59 notas (23%)</span>
-                    </div>
-                    <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-amber-400 h-full rounded-full" style={{ width: '23%' }} />
-                    </div>
+                        <div className="flex items-center justify-between text-[11px] pt-1">
+                          <span className="text-amber-300 font-medium">60-69 (Melhorável)</span>
+                          <span className="font-mono text-stone-300">{b60_69} notas ({pct60}%)</span>
+                        </div>
+                        <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                          <div className="bg-amber-400 h-full rounded-full" style={{ width: `${pct60}%` }} />
+                        </div>
 
-                    <div className="flex items-center justify-between text-[11px] pt-1">
-                      <span className="text-rose-400 font-medium">&lt; 60 (Prioridade Fila)</span>
-                      <span className="font-mono text-stone-300">10 notas (4%)</span>
+                        <div className="flex items-center justify-between text-[11px] pt-1">
+                          <span className="text-rose-400 font-medium">&lt; 60 (Prioridade Fila)</span>
+                          <span className="font-mono text-stone-300">{lt60} notas ({pctLt}%)</span>
+                        </div>
+                        <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                          <div className="bg-rose-400 h-full rounded-full" style={{ width: `${pctLt}%` }} />
+                        </div>
+                      </div>
                     </div>
-                    <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-rose-400 h-full rounded-full" style={{ width: '4%' }} />
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* Explanatory callout for user query */}
                 <div className="p-3 rounded-xl bg-amber-500/[0.08] border border-amber-400/25 space-y-1.5">
@@ -1678,16 +1695,36 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
               isQueuePaused ? 'Fila pausada pelo operador' : `${queue.length} notas em melhoria contínua`,
               <FileCode className="w-3.5 h-3.5" />,
               'lg:col-span-4 min-h-[490px]',
-              <button
-                onClick={() => setIsQueuePaused(!isQueuePaused)}
-                className={`px-2.5 py-1 rounded-lg text-[10px] font-mono border transition-all cursor-pointer ${
-                  isQueuePaused
-                    ? 'bg-amber-500/20 border-amber-400/40 text-amber-200'
-                    : 'bg-emerald-500/20 border-emerald-400/40 text-emerald-200'
-                }`}
-              >
-                {isQueuePaused ? 'PAUSADA' : 'EM EXECUÇÃO'}
-              </button>,
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => {
+                    if (isQueuePaused) {
+                      resumeQueueWorker();
+                    } else {
+                      pauseQueueWorker();
+                    }
+                    setIsQueuePaused(!isQueuePaused);
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono border transition-all cursor-pointer ${
+                    isQueuePaused
+                      ? 'bg-amber-500/20 border-amber-400/40 text-amber-200'
+                      : 'bg-emerald-500/20 border-emerald-400/40 text-emerald-200'
+                  }`}
+                >
+                  {isQueuePaused ? 'PAUSADA' : 'EM EXECUÇÃO'}
+                </button>
+                <button
+                  onClick={() => {
+                    startImprovementBatch(1);
+                    setEnrichmentFeedback('Ciclo de melhoria iniciado!');
+                    setTimeout(() => setEnrichmentFeedback(null), 3000);
+                  }}
+                  className="px-2 py-1 rounded-lg text-[10px] font-mono bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-stone-300 hover:text-white transition-all cursor-pointer"
+                  title="Executar 1 ciclo limitado de melhoria autónoma"
+                >
+                  +1 Ciclo
+                </button>
+              </div>,
               <div className="flex flex-col h-full p-3.5 gap-2.5 overflow-y-auto">
                 <div className="text-[10px] font-mono uppercase text-stone-400">
                   Prioridade Ordenada por Défice Epistémico

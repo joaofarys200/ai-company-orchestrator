@@ -98,3 +98,4 @@ Com a resolução dos 25 links quebrados e a ativação das relações tipadas:
 - O grafo elimina anéis isolados sem recorrer a ligações forçadas.
 - A navegação entre MOCs, aulas e notas de engenharia passa a refletir relações semânticas autênticas.
 - Todas as mutações preservam a integridade e garantem rollback instantâneo via `.history/`.
+

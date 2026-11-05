@@ -50,3 +50,4 @@ A introdução de Bridge Notes produz três efeitos fundamentais:
 1. **Ponte entre Silos:** Elimina a separação entre as notas teóricas da pasta `01 - AI & LLM` e as notas operacionais da pasta `09 - JARVIS`.
 2. **Densidade Semântica Alta sem Ruído:** Fornece um nó central articulador, reduzindo a necessidade de dezenas de ligações dispersas.
 3. **Reutilização Prática:** Um programador ou agente que consulte a hierarquia de agentes encontra imediatamente o fundamento formal do protocolo sem pesquisa manual.
+

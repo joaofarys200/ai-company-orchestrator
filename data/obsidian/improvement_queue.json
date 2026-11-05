@@ -3,136 +3,144 @@
     "item_id": "queue_3159c6b6",
     "note_path": "10 - Lectures/Lecture - RAG and Agents.md",
     "stem": "Lecture - RAG and Agents",
-    "priority_score": 52.4,
-    "overall_score": 47.6,
-    "epistemic_classification": "UNVERIFIED",
+    "priority_score": 68.8,
+    "overall_score": 37.5,
+    "epistemic_classification": "UNVERIFIED_HEURISTIC",
     "findings": [
       {
-        "dimension": "Provenance",
-        "what_is_missing": "Declaração explícita de fonte primária ou proveniência no YAML frontmatter",
-        "why_it_matters": "Sem proveniência formal, o conteúdo corre o risco de ser tratado como dado não verificado",
-        "evidence_supporting_finding": "Campo 'source_type' e 'provenance' ausentes no frontmatter",
-        "recommended_improvement": "Adicionar 'source_type: PRIMARY_SOURCE' ou 'provenance: JARVIS_INTERNAL' com metadados de origem"
+        "category": "Structural Quality",
+        "dimension": "Frontmatter",
+        "what_is_missing": "YAML Frontmatter ausente ou não estruturado",
+        "why_it_matters": "Impossibilita catalogação automática e indexação de domínio no cofre",
+        "evidence_supporting_finding": "Primeira linha do ficheiro não contém delimitador '---'",
+        "recommended_improvement": "Adicionar cabeçalho YAML com 'type', 'domain' e 'status'"
       },
       {
-        "dimension": "Factual Grounding",
-        "what_is_missing": "Referências bibliográficas formais, normas técnicas ou citações de evidência [E#]",
-        "why_it_matters": "Afirmações conceituais sem âncora textual enfraquecem o rigor epistémico do grafo",
-        "evidence_supporting_finding": "Ausência de marcadores [E#], normas RFC/ISO ou referências bibliográficas explícitas",
-        "recommended_improvement": "Ancorar definições em papers revistos ou especificações oficiais"
-      },
-      {
+        "category": "Knowledge Quality",
         "dimension": "Completeness",
-        "what_is_missing": "Secções estruturais essenciais (Sumário, Detalhes Aprofundados ou Glossário/Cues)",
-        "why_it_matters": "Notas incompletas não fornecem material autossuficiente para estudo e consulta rápida",
-        "evidence_supporting_finding": "Encontradas 0 secções: []",
-        "recommended_improvement": "Completar a nota com estrutura formal de 3 a 5 secções analíticas"
+        "what_is_missing": "Estrutura conceptual completa (Sumário, Desenvolvimento e Síntese/Conclusão)",
+        "why_it_matters": "A nota carece de auto-suficiência pedagógica e analítica",
+        "evidence_supporting_finding": "1 secções presentes: ['Aula de RAG e Agentes']",
+        "recommended_improvement": "Expandir a nota com sumário executivo e secção de síntese"
       },
       {
-        "dimension": "Semantic Connectivity",
+        "category": "Evidence Quality",
+        "dimension": "Provenance",
+        "what_is_missing": "Proveniência de fonte não identificada nos metadados",
+        "why_it_matters": "Não é possível rastrear a origem do conteúdo",
+        "evidence_supporting_finding": "Frontmatter não declara 'source_type' nem 'provenance'",
+        "recommended_improvement": "Adicionar proveniência ou ligar a documento fonte"
+      },
+      {
+        "category": "Evidence Quality",
+        "dimension": "Factual Grounding",
+        "what_is_missing": "Citações formais de evidência [E#], RFC, DOI ou normas",
+        "why_it_matters": "Afirmações sem âncora textual enfraquecem o rigor epistémico do grafo",
+        "evidence_supporting_finding": "Ausência de marcadores de citação ou proveniência documental",
+        "recommended_improvement": "Ancorar as afirmações centrais em especificações ou fontes primárias"
+      },
+      {
+        "category": "Graph Quality",
+        "dimension": "Connectivity",
         "what_is_missing": "Wikilinks para outras notas conceituais do cofre",
         "why_it_matters": "A nota funciona como um silo isolado no grafo",
-        "evidence_supporting_finding": "Zero wikilinks [[...]] encontrados no corpo da nota",
-        "recommended_improvement": "Adicionar 2 a 4 ligações semânticas para conceitos ou MOCs relevantes"
+        "evidence_supporting_finding": "Zero wikilinks válidos encontrados no corpo da nota",
+        "recommended_improvement": "Estabelecer 2 a 4 ligações com conceitos ou MOCs relevantes"
       }
     ],
     "status": "PENDING",
-    "created_at": "2026-11-05T00:30:24.879769",
-    "updated_at": "2026-11-05T00:30:24.879770"
+    "retry_count": 0,
+    "created_at": "2026-11-05T01:28:07.481256",
+    "updated_at": "2026-11-05T01:28:07.481259"
   },
   {
     "item_id": "queue_b12bcf7c",
     "note_path": "00 - MOC/00 - Knowledge Index.md",
     "stem": "00 - Knowledge Index",
-    "priority_score": 40.5,
-    "overall_score": 59.5,
-    "epistemic_classification": "UNVERIFIED",
+    "priority_score": 39.1,
+    "overall_score": 58.4,
+    "epistemic_classification": "UNVERIFIED_HEURISTIC",
     "findings": [
       {
+        "category": "Evidence Quality",
         "dimension": "Provenance",
-        "what_is_missing": "Declaração explícita de fonte primária ou proveniência no YAML frontmatter",
-        "why_it_matters": "Sem proveniência formal, o conteúdo corre o risco de ser tratado como dado não verificado",
-        "evidence_supporting_finding": "Campo 'source_type' e 'provenance' ausentes no frontmatter",
-        "recommended_improvement": "Adicionar 'source_type: PRIMARY_SOURCE' ou 'provenance: JARVIS_INTERNAL' com metadados de origem"
+        "what_is_missing": "Proveniência de fonte não identificada nos metadados",
+        "why_it_matters": "Não é possível rastrear a origem do conteúdo",
+        "evidence_supporting_finding": "Frontmatter não declara 'source_type' nem 'provenance'",
+        "recommended_improvement": "Adicionar proveniência ou ligar a documento fonte"
       },
       {
+        "category": "Evidence Quality",
         "dimension": "Factual Grounding",
-        "what_is_missing": "Referências bibliográficas formais, normas técnicas ou citações de evidência [E#]",
-        "why_it_matters": "Afirmações conceituais sem âncora textual enfraquecem o rigor epistémico do grafo",
-        "evidence_supporting_finding": "Ausência de marcadores [E#], normas RFC/ISO ou referências bibliográficas explícitas",
-        "recommended_improvement": "Ancorar definições em papers revistos ou especificações oficiais"
-      },
-      {
-        "dimension": "Completeness",
-        "what_is_missing": "Secções estruturais essenciais (Sumário, Detalhes Aprofundados ou Glossário/Cues)",
-        "why_it_matters": "Notas incompletas não fornecem material autossuficiente para estudo e consulta rápida",
-        "evidence_supporting_finding": "Encontradas 0 secções: []",
-        "recommended_improvement": "Completar a nota com estrutura formal de 3 a 5 secções analíticas"
+        "what_is_missing": "Citações formais de evidência [E#], RFC, DOI ou normas",
+        "why_it_matters": "Afirmações sem âncora textual enfraquecem o rigor epistémico do grafo",
+        "evidence_supporting_finding": "Ausência de marcadores de citação ou proveniência documental",
+        "recommended_improvement": "Ancorar as afirmações centrais em especificações ou fontes primárias"
       }
     ],
     "status": "PENDING",
-    "created_at": "2026-11-05T00:30:24.879133",
-    "updated_at": "2026-11-05T00:30:24.879134"
+    "retry_count": 0,
+    "created_at": "2026-11-05T01:28:07.483592",
+    "updated_at": "2026-11-05T01:28:07.483595"
   },
   {
     "item_id": "queue_1ae27269",
     "note_path": "00 - MOC/AI Index.md",
     "stem": "AI Index",
-    "priority_score": 40.5,
-    "overall_score": 59.5,
-    "epistemic_classification": "UNVERIFIED",
+    "priority_score": 39.1,
+    "overall_score": 58.4,
+    "epistemic_classification": "UNVERIFIED_HEURISTIC",
     "findings": [
       {
+        "category": "Evidence Quality",
         "dimension": "Provenance",
-        "what_is_missing": "Declaração explícita de fonte primária ou proveniência no YAML frontmatter",
-        "why_it_matters": "Sem proveniência formal, o conteúdo corre o risco de ser tratado como dado não verificado",
-        "evidence_supporting_finding": "Campo 'source_type' e 'provenance' ausentes no frontmatter",
-        "recommended_improvement": "Adicionar 'source_type: PRIMARY_SOURCE' ou 'provenance: JARVIS_INTERNAL' com metadados de origem"
+        "what_is_missing": "Proveniência de fonte não identificada nos metadados",
+        "why_it_matters": "Não é possível rastrear a origem do conteúdo",
+        "evidence_supporting_finding": "Frontmatter não declara 'source_type' nem 'provenance'",
+        "recommended_improvement": "Adicionar proveniência ou ligar a documento fonte"
       },
       {
+        "category": "Evidence Quality",
         "dimension": "Factual Grounding",
-        "what_is_missing": "Referências bibliográficas formais, normas técnicas ou citações de evidência [E#]",
-        "why_it_matters": "Afirmações conceituais sem âncora textual enfraquecem o rigor epistémico do grafo",
-        "evidence_supporting_finding": "Ausência de marcadores [E#], normas RFC/ISO ou referências bibliográficas explícitas",
-        "recommended_improvement": "Ancorar definições em papers revistos ou especificações oficiais"
-      },
-      {
-        "dimension": "Completeness",
-        "what_is_missing": "Secções estruturais essenciais (Sumário, Detalhes Aprofundados ou Glossário/Cues)",
-        "why_it_matters": "Notas incompletas não fornecem material autossuficiente para estudo e consulta rápida",
-        "evidence_supporting_finding": "Encontradas 0 secções: []",
-        "recommended_improvement": "Completar a nota com estrutura formal de 3 a 5 secções analíticas"
+        "what_is_missing": "Citações formais de evidência [E#], RFC, DOI ou normas",
+        "why_it_matters": "Afirmações sem âncora textual enfraquecem o rigor epistémico do grafo",
+        "evidence_supporting_finding": "Ausência de marcadores de citação ou proveniência documental",
+        "recommended_improvement": "Ancorar as afirmações centrais em especificações ou fontes primárias"
       }
     ],
     "status": "PENDING",
-    "created_at": "2026-11-05T00:30:24.879293",
-    "updated_at": "2026-11-05T00:30:24.879294"
+    "retry_count": 0,
+    "created_at": "2026-11-05T01:28:07.484718",
+    "updated_at": "2026-11-05T01:28:07.484720"
   },
   {
     "item_id": "queue_df160942",
     "note_path": "05 - Security/Post-Quantum Cryptography.md",
     "stem": "Post-Quantum Cryptography",
-    "priority_score": 35.0,
-    "overall_score": 65.0,
-    "epistemic_classification": "VERIFIED_SOURCE_CONTENT",
+    "priority_score": 35.8,
+    "overall_score": 63.1,
+    "epistemic_classification": "VERIFIED_PRIMARY_SOURCE",
     "findings": [
       {
+        "category": "Knowledge Quality",
         "dimension": "Completeness",
-        "what_is_missing": "Secções estruturais essenciais (Sumário, Detalhes Aprofundados ou Glossário/Cues)",
-        "why_it_matters": "Notas incompletas não fornecem material autossuficiente para estudo e consulta rápida",
-        "evidence_supporting_finding": "Encontradas 0 secções: []",
-        "recommended_improvement": "Completar a nota com estrutura formal de 3 a 5 secções analíticas"
+        "what_is_missing": "Estrutura conceptual completa (Sumário, Desenvolvimento e Síntese/Conclusão)",
+        "why_it_matters": "A nota carece de auto-suficiência pedagógica e analítica",
+        "evidence_supporting_finding": "1 secções presentes: ['Post-Quantum Cryptography']",
+        "recommended_improvement": "Expandir a nota com sumário executivo e secção de síntese"
       },
       {
-        "dimension": "Semantic Connectivity",
+        "category": "Graph Quality",
+        "dimension": "Connectivity",
         "what_is_missing": "Wikilinks para outras notas conceituais do cofre",
         "why_it_matters": "A nota funciona como um silo isolado no grafo",
-        "evidence_supporting_finding": "Zero wikilinks [[...]] encontrados no corpo da nota",
-        "recommended_improvement": "Adicionar 2 a 4 ligações semânticas para conceitos ou MOCs relevantes"
+        "evidence_supporting_finding": "Zero wikilinks válidos encontrados no corpo da nota",
+        "recommended_improvement": "Estabelecer 2 a 4 ligações com conceitos ou MOCs relevantes"
       }
     ],
     "status": "PENDING",
-    "created_at": "2026-11-05T00:30:24.879622",
-    "updated_at": "2026-11-05T00:30:24.879623"
+    "retry_count": 0,
+    "created_at": "2026-11-05T01:28:07.480074",
+    "updated_at": "2026-11-05T01:28:07.480078"
   }
 ]

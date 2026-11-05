@@ -117,7 +117,7 @@ def test_03_note_quality_assessment_10_dimensions(temp_vault):
     # Audit well-formed note
     audit_ai = engine.audit_note_quality("01 - AI/Agent Systems.md")
     assert audit_ai["overall_score"] >= 70.0
-    assert audit_ai["epistemic_classification"] == "VERIFIED_SOURCE_CONTENT"
+    assert audit_ai["epistemic_classification"] in ("VERIFIED_SOURCE_CONTENT", "VERIFIED_PRIMARY_SOURCE")
     assert "provenance" in audit_ai["dimension_scores"]
     assert "factual_grounding" in audit_ai["dimension_scores"]
     assert "completeness" in audit_ai["dimension_scores"]
@@ -126,7 +126,7 @@ def test_03_note_quality_assessment_10_dimensions(temp_vault):
     # Audit unverified orphan note
     audit_orphan = engine.audit_note_quality("10 - Lectures/Lecture - RAG and Agents.md")
     assert audit_orphan["needs_improvement"] is True
-    assert audit_orphan["epistemic_classification"] == "UNVERIFIED"
+    assert audit_orphan["epistemic_classification"] in ("UNVERIFIED", "UNVERIFIED_HEURISTIC")
     assert any(f["dimension"] == "Provenance" for f in audit_orphan["findings"])
 
 

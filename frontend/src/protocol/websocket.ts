@@ -732,8 +732,58 @@ export interface VaultDiagnosticsData {
   pending_proposals: number;
   accepted_improvements: number;
   rejected_suggestions: number;
-  last_audit: string;
+  last_audit?: string;
   quality_average: number;
+  outgoing_edges?: number;
+  incoming_edges_total?: number;
+  genuine_orphans_list?: string[];
+  moc_only_count?: number;
+  moc_only_notes_list?: string[];
+  broken_links_list?: Array<{ source: string; target: string }>;
+  missing_attachments_count?: number;
+  code_examples_ignored_count?: number;
+  quality_distribution?: {
+    ge_80: number;
+    between_70_79: number;
+    between_60_69: number;
+    lt_60: number;
+    total_audited: number;
+  };
+  queue_metrics?: {
+    is_paused: boolean;
+    is_running: boolean;
+    active_item_id: string | null;
+    items_processed: number;
+    queue_total: number;
+    pending_count: number;
+    applied_count: number;
+    proposals_count: number;
+    last_run_timestamp?: string | null;
+  };
+}
+
+export interface QueueWorkerStatusMessage {
+  type: 'queue_worker_status';
+  worker_state: {
+    is_paused: boolean;
+    is_running: boolean;
+    active_item_id: string | null;
+    items_processed: number;
+    queue_total: number;
+    pending_count: number;
+    applied_count: number;
+    proposals_count: number;
+    last_run_timestamp?: string | null;
+  };
+  queue?: NoteImprovementItem[];
+  action?: string;
+}
+
+export interface ImprovementBatchResultMessage {
+  type: 'improvement_batch_result';
+  proposals: Array<any>;
+  count_processed: number;
+  diagnostics: VaultDiagnosticsData;
 }
 
 export interface NoteImprovementItem {
@@ -1446,6 +1496,8 @@ export type ServerMessage =
   | NoteQualityAuditMessage
   | NoteEnrichmentResultMessage
   | NoteRollbackResultMessage
+  | QueueWorkerStatusMessage
+  | ImprovementBatchResultMessage
   | RulesMessage
   | ArchitectureMessage
   | DecisionsMessage
@@ -1546,6 +1598,10 @@ export type ClientMessage =
   | { type: 'audit_note_quality'; filename: string }
   | { type: 'enrich_note'; filename: string; auto_apply?: boolean }
   | { type: 'rollback_note'; filename: string; backup_path?: string }
+  | { type: 'get_queue_status' }
+  | { type: 'pause_queue_worker' }
+  | { type: 'resume_queue_worker' }
+  | { type: 'start_improvement_batch'; batch_size?: number }
   | { type: 'delete_rule'; key: string }
   | { type: 'delete_architecture'; module: string }
   | { type: 'delete_decision'; decision: string }
@@ -2751,6 +2807,29 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         type: 'note_rollback_result',
         success: Boolean(raw.success),
         filename: asString(raw.filename),
+      };
+    case 'queue_worker_status':
+      return {
+        type: 'queue_worker_status',
+        worker_state: (raw.worker_state as any) || {
+          is_paused: false,
+          is_running: false,
+          active_item_id: null,
+          items_processed: 0,
+          queue_total: 0,
+          pending_count: 0,
+          applied_count: 0,
+          proposals_count: 0,
+        },
+        queue: Array.isArray(raw.queue) ? (raw.queue as NoteImprovementItem[]) : undefined,
+        action: raw.action ? asString(raw.action) : undefined,
+      };
+    case 'improvement_batch_result':
+      return {
+        type: 'improvement_batch_result',
+        proposals: Array.isArray(raw.proposals) ? raw.proposals : [],
+        count_processed: Number(raw.count_processed || 0),
+        diagnostics: raw.diagnostics as VaultDiagnosticsData,
       };
     case 'study_course_details':
       return {

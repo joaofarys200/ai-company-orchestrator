@@ -53,3 +53,4 @@ Todos os artefactos produzidos nesta fase cumprem o modelo de dados local e enco
 - `data/obsidian/proposals/` (Registo estruturado de propostas aplicadas)
 - `obsidian_vault/.history/` (Diretório de snapshots históricos timestamped)
 - `obsidian_vault/09 - JARVIS/Bridge Notes/Bridge - MCP Capability Discovery and Hierarchical Agent Governance.md` (Demonstração de síntese transversal)
+

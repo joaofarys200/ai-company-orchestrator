@@ -52,3 +52,4 @@ A recursive search for `\bfitz\b`, `import fitz`, and `from fitz` was performed 
 | `services/study_service.py` | `import fitz` / `fitz.open()` | `import pymupdf` / `pymupdf.open()` | **ELIMINATED (0 warnings)** |
 | `scripts/pdftotext.py` | `import fitz` / `fitz.open()` | `import pymupdf` / `pymupdf.open()` | **ELIMINATED (0 warnings)** |
 | `backend/document_engine/visual_inspector.py` | `fitz = pymupdf` | `import pymupdf` | **ELIMINATED (0 warnings)** |
+

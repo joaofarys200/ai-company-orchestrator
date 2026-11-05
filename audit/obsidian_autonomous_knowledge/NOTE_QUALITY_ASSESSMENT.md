@@ -82,3 +82,4 @@ Para cada nota auditada, o motor extrai findings estruturados em quatro eixos es
 ## 5. CONCLUSÃO DA AUDITORIA
 
 O auditor demonstrou que 73% do cofre atinge já níveis adequados ou excelentes de qualidade formal (≥ 70 pontos). A minoria restante (27%) foi integrada na **Fila de Melhoria Contínua**, permitindo que o JARVIS OS eleve progressivamente a precisão técnica e a profundidade de cada documento de forma segura e não destrutiva.
+

@@ -96,3 +96,4 @@ No Spatial Board (domínio Obsidian):
 - Cada proposta de relação tipada pode ser inspecionada visualmente antes de ser consolidada.
 - O botão de rollback com o ícone de reversão está acessível diretamente no cartão do inspetor de notas.
 - Todas as operações são executadas localmente, sem dependência de serviços externos ou cloud.
+

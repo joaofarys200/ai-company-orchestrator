@@ -1,12 +1,12 @@
 # VAULT FORENSIC INVENTORY REPORT
 
 ## 1. Executive Summary
-- **Total Markdown Notes:** 256
+- **Total Markdown Notes:** 261
 - **Maps of Content (MOCs):** 17
-- **Total Broken Link Instances:** 25
-- **Genuine Orphan Notes (0 in / 0 out):** 0
-- **MOC-Only Connected Notes (leafs connected only to indices):** 12
-- **High-Centrality Hub Notes (degree >= 15):** 85
+- **Total Broken Link Instances:** 23
+- **Genuine Orphan Notes (0 in / 0 out):** 4
+- **MOC-Only Connected Notes (leafs connected only to indices):** 13
+- **High-Centrality Hub Notes (degree >= 15):** 47
 - **Potential Semantic Duplicate Clusters:** 1
 
 ## 2. Reconciled Discrepancy (255 vs 256)
@@ -15,7 +15,7 @@ Reconciliation Note: Prior to this session, the vault contained 255 notes. Durin
 ## 3. Directory & Domain Breakdown
 | Pasta / Domínio | Contagem de Notas |
 | :--- | :--- |
-| `09 - JARVIS` | 74 |
+| `09 - JARVIS` | 75 |
 | `01 - AI & LLM` | 28 |
 | `02 - Software Engineering` | 28 |
 | `03 - Backend & Distributed Systems` | 23 |
@@ -26,14 +26,19 @@ Reconciliation Note: Prior to this session, the vault contained 255 notes. Durin
 | `07 - Business & SaaS` | 12 |
 | `00 - MOC` | 11 |
 | `04 - Computer Use` | 6 |
+| `.history` | 4 |
 
 ## 4. Frontmatter & Provenance Audit
-- **Notas com YAML Frontmatter Válido:** 204 / 256
-- **Notas Sem Frontmatter:** 52
-- **Proveniência Primária / Verificada:** 123
-- **Proveniência Não Especificada:** 129
+- **Notas com YAML Frontmatter Válido:** 205 / 261
+- **Notas Sem Frontmatter:** 56
+- **Proveniência Primária / Verificada:** 124
+- **Proveniência Não Especificada:** 133
 
 ### Notas Sem Frontmatter:
+- `.history/Lecture - RAG and Agents_1793837494.md`
+- `.history/Lecture - RAG and Agents_1793837509.md`
+- `.history/Lecture - RAG and Agents_1793838061.md`
+- `.history/Lecture - RAG and Agents_1793838624.md`
 - `01 - AI & LLM/Agent Systems/Self-Healing Prompt Loops and Reflective Orchestration (RHO-SHE).md`
 - `01 - AI & LLM/RAG/Comparison - Lexical BM25 vs Dense Vector Embeddings vs Hybrid RAG.md`
 - `02 - Software Engineering/Architecture/DDD_Domain_Driven_Design_and_Enterprise_Patterns.md`
@@ -45,18 +50,13 @@ Reconciliation Note: Prior to this session, the vault contained 255 notes. Durin
 - `03 - Backend & Distributed Systems/Persistence/Comparison - SQLite WAL vs Client-Server PostgreSQL.md`
 - `03 - Backend & Distributed Systems/Persistence/Tratado_Completo_de_Engenharia_de_Sistemas_Distribuidos_e_Bases_de_Dados.md`
 - `03 - Backend & Distributed Systems/WebSockets/Comparison - REST Polling vs WebSocket Full-Duplex Streaming.md`
-- `04 - Computer Use/DOM/DOM State Inspection and Resilient Locators.md`
-- `05 - Security/Cryptography/Tratado_Completo_de_Ciberseguranca_Redes_e_DevSecOps.md`
-- `05 - Security/Sandboxing/Seguranca_Defensiva_DevSecOps_e_Sandboxing.md`
-- `05 - Security/Secrets/Credential Sanitization and Secret Masking.md`
-- *... e mais 37 notas.*
+- *... e mais 41 notas.*
 
 ## 5. Broken Link Occurrences
-Total de referências quebradas: 25
+Total de referências quebradas: 23
 | Ficheiro Origem | Link Inválido / Não Resolvido |
 | :--- | :--- |
 | `00 - MOC/Lectures Index.md` | `[[Agent Systems Architecture]]` |
-| `03 - Backend & Distributed Systems/Caching/Cache Consistency Patterns, Stampede Mitigation and Probabilistic Early Expiration.md` | `[[], Awaitable[T]]` |
 | `05 - Security/Cryptography/Zero-Knowledge Proofs and zk-SNARKs in Autonomous Verification.md` | `[[05 - Security/00 - Security Index]]` |
 | `10 - Lectures/Index.md` | `[[Agent Systems Architecture]]` |
 | `10 - Lectures/Inteligência Artificial/2026-08-18 - Sistemas Multiagente e Arquiteturas RAG.md` | `[[Agent Systems Architecture]]` |
@@ -69,7 +69,6 @@ Total de referências quebradas: 25
 | `10 - Lectures/Inteligência Artificial/2026-09-02 - Sistemas Multiagente e Arquiteturas RAG.md` | `[[Agent Systems Architecture]]` |
 | `10 - Lectures/Inteligência Artificial/2026-09-06 - Sistemas Multiagente e Arquiteturas RAG.md` | `[[Agent Systems Architecture]]` |
 | `10 - Lectures/Inteligência Artificial/2026-09-12 - Sistemas Multiagente e Arquiteturas RAG.md` | `[[Agent Systems Architecture]]` |
-| `10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md` | `[[Metodologia de Investigação]]` |
 | `10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md` | `[[Metodologia de Investigação]]` |
 | `10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md` | `[[video1845185762.mp4]]` |
 | `10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md` | `[[Wikilinks]]` |
@@ -89,18 +88,18 @@ Total de referências quebradas: 25
 ## 7. High-Degree Hubs (Análise de Centralidade)
 | Nota Central | Grau de Conexão Total (In + Out) |
 | :--- | :--- |
-| `09 - JARVIS/Components/JARVIS Component Architecture.md` | 72 links |
-| `00 - MOC/JARVIS Index.md` | 68 links |
+| `00 - MOC/JARVIS Index.md` | 69 links |
 | `00 - MOC/AI Index.md` | 54 links |
-| `09 - JARVIS/Agents/JARVIS Autonomous Agent Hierarchy.md` | 48 links |
 | `00 - MOC/Lectures Index.md` | 42 links |
 | `00 - MOC/Software Engineering Index.md` | 40 links |
-| `01 - AI & LLM/Architecture/Model Harness Architecture.md` | 34 links |
-| `03 - Backend & Distributed Systems/Persistence/Database Crash Consistency and Recovery.md` | 34 links |
-| `05 - Security/Sandboxing/Least-Privilege Process Sandboxing and Execution Jail.md` | 34 links |
-| `09 - JARVIS/Architecture/JARVIS System Architecture.md` | 33 links |
-| `02 - Software Engineering/Coding Agents/Compiler Feedback and Test-Driven Self-Repair.md` | 32 links |
-| `09 - JARVIS/Lessons/Security Lessons/Lesson - Accidental Secret Leaks in Telemetry Broadcast.md` | 31 links |
-| `09 - JARVIS/Lessons/Model Harness Lessons/Lesson - Unhandled Rate Limits and Context Explosion.md` | 30 links |
 | `00 - MOC/Backend Index.md` | 29 links |
-| `09 - JARVIS/Lessons/Coding Agent Lessons/Lesson - Regex Refactoring Syntax Corruption.md` | 29 links |
+| `00 - MOC/Security Index.md` | 27 links |
+| `02 - Software Engineering/Coding Agents/Compiler Feedback and Test-Driven Self-Repair.md` | 27 links |
+| `09 - JARVIS/Components/JARVIS Component Architecture.md` | 27 links |
+| `01 - AI & LLM/Architecture/Model Harness Architecture.md` | 26 links |
+| `10 - Lectures/Index.md` | 26 links |
+| `00 - MOC/Business Index.md` | 25 links |
+| `05 - Security/Sandboxing/Least-Privilege Process Sandboxing and Execution Jail.md` | 25 links |
+| `09 - JARVIS/Agents/JARVIS Autonomous Agent Hierarchy.md` | 25 links |
+| `00 - MOC/Operational Guides Index.md` | 24 links |
+| `03 - Backend & Distributed Systems/Persistence/Database Crash Consistency and Recovery.md` | 23 links |

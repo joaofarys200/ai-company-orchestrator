@@ -179,6 +179,10 @@ interface WebSocketContextType {
   auditNoteQuality: (filename: string) => void;
   enrichNote: (filename: string, autoApply?: boolean) => void;
   rollbackNote: (filename: string, backupPath?: string) => void;
+  pauseQueueWorker: () => void;
+  resumeQueueWorker: () => void;
+  startImprovementBatch: (batchSize?: number) => void;
+  getQueueStatus: () => void;
   getNotes: () => void;
   readNote: (filename: string) => Promise<string>;
   saveNote: (filename: string, content: string) => void;
@@ -945,6 +949,19 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'vault_diagnostics':
         setVaultDiagnostics(msg.diagnostics);
         setVaultImprovementQueue(msg.queue);
+        break;
+      case 'queue_worker_status':
+        if (msg.queue) {
+          setVaultImprovementQueue(msg.queue);
+        }
+        if (msg.worker_state) {
+          setVaultDiagnostics((prev) => (prev ? { ...prev, queue_metrics: msg.worker_state } : null));
+        }
+        break;
+      case 'improvement_batch_result':
+        if (msg.diagnostics) {
+          setVaultDiagnostics(msg.diagnostics);
+        }
         break;
       case 'note_quality_audit':
         setNoteQualityAudit(msg.audit);
@@ -1910,6 +1927,30 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const rollbackNote = useCallback((filename: string, backupPath?: string) => {
     if (isReady()) {
       sendClientMessage({ type: 'rollback_note', filename, backup_path: backupPath });
+    }
+  }, [isReady, sendClientMessage]);
+
+  const pauseQueueWorker = useCallback(() => {
+    if (isReady()) {
+      sendClientMessage({ type: 'pause_queue_worker' });
+    }
+  }, [isReady, sendClientMessage]);
+
+  const resumeQueueWorker = useCallback(() => {
+    if (isReady()) {
+      sendClientMessage({ type: 'resume_queue_worker' });
+    }
+  }, [isReady, sendClientMessage]);
+
+  const startImprovementBatch = useCallback((batchSize: number = 1) => {
+    if (isReady()) {
+      sendClientMessage({ type: 'start_improvement_batch', batch_size: batchSize });
+    }
+  }, [isReady, sendClientMessage]);
+
+  const getQueueStatus = useCallback(() => {
+    if (isReady()) {
+      sendClientMessage({ type: 'get_queue_status' });
     }
   }, [isReady, sendClientMessage]);
 
@@ -3193,6 +3234,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         auditNoteQuality,
         enrichNote,
         rollbackNote,
+        pauseQueueWorker,
+        resumeQueueWorker,
+        startImprovementBatch,
+        getQueueStatus,
         getNotes,
         readNote,
         saveNote,
