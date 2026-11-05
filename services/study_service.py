@@ -22,14 +22,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-# Optional PyMuPDF
+# Modern PyMuPDF integration (official pymupdf API without deprecated fitz fallback)
 try:
-    import pymupdf as fitz
+    import pymupdf
 except ImportError:
-    try:
-        import fitz  # Fallback for older PyMuPDF versions
-    except ImportError:
-        fitz = None
+    pymupdf = None
 
 # Optional pdfplumber
 try:
@@ -1868,13 +1865,13 @@ class StudyService:
         return watch_prog
 
     def _parse_pdf(self, file_path: str) -> Tuple[List[str], List[Dict[str, Any]]]:
-        """Extrai páginas, texto e referências a imagens usando fitz ou pdfplumber."""
+        """Extrai páginas, texto e referências a imagens usando pymupdf ou pdfplumber."""
         pages: List[str] = []
         media: List[Dict[str, Any]] = []
 
-        if fitz is not None:
+        if pymupdf is not None:
             try:
-                doc = fitz.open(file_path)
+                doc = pymupdf.open(file_path)
                 for page_idx, page in enumerate(doc, start=1):
                     text = page.get_text()
                     pages.append(text)

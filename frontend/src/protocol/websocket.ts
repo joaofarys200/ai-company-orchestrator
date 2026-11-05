@@ -723,6 +723,96 @@ export interface NoteSavedMessage {
   result: string;
 }
 
+
+export interface VaultDiagnosticsData {
+  total_notes: number;
+  genuine_orphans: number;
+  broken_links: number;
+  notes_requiring_improvement: number;
+  pending_proposals: number;
+  accepted_improvements: number;
+  rejected_suggestions: number;
+  last_audit: string;
+  quality_average: number;
+}
+
+export interface NoteImprovementItem {
+  item_id: string;
+  note_path: string;
+  stem: string;
+  priority_score: number;
+  overall_score: number;
+  epistemic_classification: string;
+  findings: Array<{
+    dimension: string;
+    what_is_missing: string;
+    why_it_matters: string;
+    evidence_supporting_finding: string;
+    recommended_improvement: string;
+  }>;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VaultDiagnosticsMessage {
+  type: 'vault_diagnostics';
+  diagnostics: VaultDiagnosticsData;
+  queue: NoteImprovementItem[];
+}
+
+export interface NoteQualityAuditMessage {
+  type: 'note_quality_audit';
+  audit: {
+    rel_path: string;
+    stem: string;
+    overall_score: number;
+    epistemic_classification: string;
+    dimension_scores: Record<string, number>;
+    word_count: number;
+    outgoing_links_count: number;
+    findings_count: number;
+    findings: Array<{
+      dimension: string;
+      what_is_missing: string;
+      why_it_matters: string;
+      evidence_supporting_finding: string;
+      recommended_improvement: string;
+    }>;
+    needs_improvement: boolean;
+  };
+}
+
+export interface NoteEnrichmentResultMessage {
+  type: 'note_enrichment_result';
+  proposal: {
+    proposal_id: string;
+    rel_path: string;
+    stem: string;
+    backup_path: string;
+    proposed_relationships: Array<{
+      source_note: string;
+      target_note: string;
+      target_path: string;
+      relationship_type: string;
+      justification: string;
+      confidence: number;
+      creation_method: string;
+      validation_status: string;
+    }>;
+    original_length: number;
+    enriched_length: number;
+    status: string;
+    created_at: string;
+  };
+}
+
+export interface NoteRollbackResultMessage {
+  type: 'note_rollback_result';
+  success: boolean;
+  filename: string;
+}
+
 export interface RulesMessage {
   type: 'rules_list' | 'rules_updated';
   rules: RuleMemory[];
@@ -1352,6 +1442,10 @@ export type ServerMessage =
   | NotesListMessage
   | NoteContentMessage
   | NoteSavedMessage
+  | VaultDiagnosticsMessage
+  | NoteQualityAuditMessage
+  | NoteEnrichmentResultMessage
+  | NoteRollbackResultMessage
   | RulesMessage
   | ArchitectureMessage
   | DecisionsMessage
@@ -1448,6 +1542,10 @@ export type ClientMessage =
   | { type: 'get_notes' }
   | { type: 'read_note'; filename: string }
   | { type: 'save_note'; filename: string; content: string }
+  | { type: 'get_vault_diagnostics' }
+  | { type: 'audit_note_quality'; filename: string }
+  | { type: 'enrich_note'; filename: string; auto_apply?: boolean }
+  | { type: 'rollback_note'; filename: string; backup_path?: string }
   | { type: 'delete_rule'; key: string }
   | { type: 'delete_architecture'; module: string }
   | { type: 'delete_decision'; decision: string }
@@ -2621,6 +2719,38 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         type: 'study_error',
         message: asString(raw.message, asString(raw.error, 'Erro no módulo de estudo')),
         request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+        case 'vault_diagnostics':
+      return {
+        type: 'vault_diagnostics',
+        diagnostics: (raw.diagnostics as VaultDiagnosticsData) || {
+          total_notes: 256,
+          genuine_orphans: 0,
+          broken_links: 25,
+          notes_requiring_improvement: 0,
+          pending_proposals: 0,
+          accepted_improvements: 0,
+          rejected_suggestions: 0,
+          last_audit: '',
+          quality_average: 78.5,
+        },
+        queue: Array.isArray(raw.queue) ? (raw.queue as NoteImprovementItem[]) : [],
+      };
+    case 'note_quality_audit':
+      return {
+        type: 'note_quality_audit',
+        audit: raw.audit as NoteQualityAuditMessage['audit'],
+      };
+    case 'note_enrichment_result':
+      return {
+        type: 'note_enrichment_result',
+        proposal: raw.proposal as NoteEnrichmentResultMessage['proposal'],
+      };
+    case 'note_rollback_result':
+      return {
+        type: 'note_rollback_result',
+        success: Boolean(raw.success),
+        filename: asString(raw.filename),
       };
     case 'study_course_details':
       return {

@@ -41,6 +41,10 @@ import {
   type MissionControlCommandPayload,
   type MissionIntentPreviewResultMessage,
   type MissionIntentResultMessage,
+  type VaultDiagnosticsData,
+  type NoteImprovementItem,
+  type NoteQualityAuditMessage,
+  type NoteEnrichmentResultMessage,
 } from '../protocol/websocket';
 import type {
   StudyDocument,
@@ -115,6 +119,10 @@ export type {
   RuleMemory,
   Task,
   TemplateSuggestion,
+  VaultDiagnosticsData,
+  NoteImprovementItem,
+  NoteQualityAuditMessage,
+  NoteEnrichmentResultMessage,
 } from '../protocol/websocket';
 
 interface WebSocketContextType {
@@ -161,6 +169,16 @@ interface WebSocketContextType {
   architecture: ArchitectureMemory[];
   decisions: EngineeringDecision[];
   currentNote: { filename: string; content: string } | null;
+  vaultDiagnostics: VaultDiagnosticsData | null;
+  vaultImprovementQueue: NoteImprovementItem[];
+  noteQualityAudit: NoteQualityAuditMessage['audit'] | null;
+  noteEnrichmentProposal: NoteEnrichmentResultMessage['proposal'] | null;
+  isAuditingNote: boolean;
+  isEnrichingNote: boolean;
+  getVaultDiagnostics: () => void;
+  auditNoteQuality: (filename: string) => void;
+  enrichNote: (filename: string, autoApply?: boolean) => void;
+  rollbackNote: (filename: string, backupPath?: string) => void;
   getNotes: () => void;
   readNote: (filename: string) => Promise<string>;
   saveNote: (filename: string, content: string) => void;
@@ -379,6 +397,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [architecture, setArchitecture] = useState<ArchitectureMemory[]>([]);
   const [decisions, setDecisions] = useState<EngineeringDecision[]>([]);
   const [currentNote, setCurrentNote] = useState<{ filename: string; content: string } | null>(null);
+  const [vaultDiagnostics, setVaultDiagnostics] = useState<VaultDiagnosticsData | null>(null);
+  const [vaultImprovementQueue, setVaultImprovementQueue] = useState<NoteImprovementItem[]>([]);
+  const [noteQualityAudit, setNoteQualityAudit] = useState<NoteQualityAuditMessage['audit'] | null>(null);
+  const [noteEnrichmentProposal, setNoteEnrichmentProposal] = useState<NoteEnrichmentResultMessage['proposal'] | null>(null);
+  const [isAuditingNote, setIsAuditingNote] = useState(false);
+  const [isEnrichingNote, setIsEnrichingNote] = useState(false);
   const [plannerState, setPlannerState] = useState<PlannerState | null>(null);
   const [missions, setMissions] = useState<MissionData[]>([]);
   const [missionSnapshot, setMissionSnapshot] = useState<MissionSnapshot | null>(null);
@@ -918,6 +942,23 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         break;
       }
+      case 'vault_diagnostics':
+        setVaultDiagnostics(msg.diagnostics);
+        setVaultImprovementQueue(msg.queue);
+        break;
+      case 'note_quality_audit':
+        setNoteQualityAudit(msg.audit);
+        setIsAuditingNote(false);
+        break;
+      case 'note_enrichment_result':
+        setNoteEnrichmentProposal(msg.proposal);
+        setIsEnrichingNote(false);
+        break;
+      case 'note_rollback_result':
+        if (msg.success) {
+          getNotes();
+        }
+        break;
       case 'rules_list':
         setRules(msg.rules);
         break;
@@ -1844,6 +1885,32 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         resolve('');
       }
     });
+  }, [isReady, sendClientMessage]);
+
+  const getVaultDiagnostics = useCallback(() => {
+    if (isReady()) {
+      sendClientMessage({ type: 'get_vault_diagnostics' });
+    }
+  }, [isReady, sendClientMessage]);
+
+  const auditNoteQuality = useCallback((filename: string) => {
+    if (isReady()) {
+      setIsAuditingNote(true);
+      sendClientMessage({ type: 'audit_note_quality', filename });
+    }
+  }, [isReady, sendClientMessage]);
+
+  const enrichNote = useCallback((filename: string, autoApply: boolean = true) => {
+    if (isReady()) {
+      setIsEnrichingNote(true);
+      sendClientMessage({ type: 'enrich_note', filename, auto_apply: autoApply });
+    }
+  }, [isReady, sendClientMessage]);
+
+  const rollbackNote = useCallback((filename: string, backupPath?: string) => {
+    if (isReady()) {
+      sendClientMessage({ type: 'rollback_note', filename, backup_path: backupPath });
+    }
   }, [isReady, sendClientMessage]);
 
   const saveNote = useCallback((filename: string, content: string) => {
@@ -3116,6 +3183,16 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         architecture,
         decisions,
         currentNote,
+        vaultDiagnostics,
+        vaultImprovementQueue,
+        noteQualityAudit,
+        noteEnrichmentProposal,
+        isAuditingNote,
+        isEnrichingNote,
+        getVaultDiagnostics,
+        auditNoteQuality,
+        enrichNote,
+        rollbackNote,
         getNotes,
         readNote,
         saveNote,

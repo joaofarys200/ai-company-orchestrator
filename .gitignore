@@ -37,6 +37,7 @@ database.db
 *.sqlite3
 chroma_db/
 obsidian_vault/.obsidian/
+obsidian_vault/.history/
 sandbox_dir/
 .jarvis_backups/
 .jarvis_plan.json

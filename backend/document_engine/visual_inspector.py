@@ -5,8 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, List, Optional, Sequence, Tuple
 
-import pymupdf  # PyMuPDF
-fitz = pymupdf
+import pymupdf  # PyMuPDF official modern API
 
 from backend.document_engine.render_engine import (
     RenderEngineManager,

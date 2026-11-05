@@ -22,28 +22,31 @@ def main():
         output_path = base + ".txt"
         
     try:
-        try:
-        import pymupdf as fitz
+        import pymupdf
+        use_pymupdf = True
     except ImportError:
-        import fitz  # PyMuPDF
-    except ImportError:
+        use_pymupdf = False
         try:
             import pdfplumber
             use_pdfplumber = True
         except ImportError:
-            print("Error: PyMuPDF (fitz) or pdfplumber is required. Please install PyMuPDF.", file=sys.stderr)
+            print("Error: PyMuPDF (pymupdf) or pdfplumber is required. Please install PyMuPDF via 'pip install pymupdf'.", file=sys.stderr)
             sys.exit(1)
             
     text = ""
     try:
-        # Try to use PyMuPDF first
-        doc = fitz.open(pdf_path)
-        for page in doc:
-            text += page.get_text() + "\n"
-        doc.close()
+        if use_pymupdf:
+            # Modern PyMuPDF API
+            doc = pymupdf.open(pdf_path)
+            for page in doc:
+                text += page.get_text() + "\n"
+            doc.close()
+        else:
+            raise RuntimeError("PyMuPDF unavailable, falling back to pdfplumber")
     except Exception as e:
         # Fallback to pdfplumber
         try:
+            import pdfplumber
             with pdfplumber.open(pdf_path) as pdf:
                 for page in pdf.pages:
                     text += (page.extract_text() or "") + "\n"
