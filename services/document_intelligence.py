@@ -24,6 +24,7 @@ import os
 import re
 import shutil
 import tempfile
+import threading
 import time
 import unicodedata
 import uuid
@@ -262,6 +263,54 @@ class ExtractionReport:
     )
 
 
+class VersionedList(list):
+    """
+    Subclasse de list com sinalização de mutação (inserções, remoções, substituições in-place).
+    Garante consistência automática com os índices secundários da AST sem custo O(N) nas leituras.
+    """
+
+    def __init__(self, iterable=None, on_mutation=None):
+        super().__init__(iterable or [])
+        self.on_mutation = on_mutation
+
+    def _notify(self) -> None:
+        if self.on_mutation is not None:
+            self.on_mutation()
+
+    def append(self, item: Any) -> None:
+        super().append(item)
+        self._notify()
+
+    def extend(self, iterable: Any) -> None:
+        super().extend(iterable)
+        self._notify()
+
+    def insert(self, index: int, item: Any) -> None:
+        super().insert(index, item)
+        self._notify()
+
+    def remove(self, item: Any) -> None:
+        super().remove(item)
+        self._notify()
+
+    def pop(self, index: int = -1) -> Any:
+        res = super().pop(index)
+        self._notify()
+        return res
+
+    def clear(self) -> None:
+        super().clear()
+        self._notify()
+
+    def __setitem__(self, index: Any, item: Any) -> None:
+        super().__setitem__(index, item)
+        self._notify()
+
+    def __delitem__(self, index: Any) -> None:
+        super().__delitem__(index)
+        self._notify()
+
+
 @dataclass
 class AcademicDocumentAST:
     document_id: str
@@ -279,6 +328,29 @@ class AcademicDocumentAST:
     references: List[ASTReference] = field(default_factory=list)
     page_artifacts: List[PageArtifact] = field(default_factory=list)
     report: ExtractionReport = field(default_factory=ExtractionReport)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "_paragraphs_version", 0)
+        object.__setattr__(self, "_sections_version", 0)
+        object.__setattr__(self, "_pages_version", 0)
+        if not isinstance(self.paragraphs, VersionedList):
+            self.paragraphs = VersionedList(self.paragraphs, on_mutation=lambda: self._on_paragraphs_mutated())
+        if not isinstance(self.sections, VersionedList):
+            self.sections = VersionedList(self.sections, on_mutation=lambda: self._on_sections_mutated())
+        if not isinstance(self.pages, VersionedList):
+            self.pages = VersionedList(self.pages, on_mutation=lambda: self._on_pages_mutated())
+
+    def _on_paragraphs_mutated(self) -> None:
+        object.__setattr__(self, "_paragraphs_version", getattr(self, "_paragraphs_version", 0) + 1)
+        self.invalidate_indices()
+
+    def _on_sections_mutated(self) -> None:
+        object.__setattr__(self, "_sections_version", getattr(self, "_sections_version", 0) + 1)
+        self.invalidate_indices()
+
+    def _on_pages_mutated(self) -> None:
+        object.__setattr__(self, "_pages_version", getattr(self, "_pages_version", 0) + 1)
+        self.invalidate_indices()
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -304,45 +376,65 @@ class AcademicDocumentAST:
             report=_from_dict(ExtractionReport, d.get("report")),
         )
 
-    # -- Projeções de compatibilidade com o modelo legado do StudyService --------------
+    # -- Projeções de compatibilidade e índices secundários O(1) consistentes --
+
+    def _get_lock(self) -> threading.RLock:
+        """Lock reentrante para operações thread-safe sobre a AST e os seus índices."""
+        lock = getattr(self, "_lock", None)
+        if lock is None:
+            lock = threading.RLock()
+            object.__setattr__(self, "_lock", lock)
+        return lock
 
     @property
     def paragraphs_by_id(self) -> Dict[str, ASTParagraph]:
-        """Índice secundário O(1) de parágrafos por paragraph_id (em cache privado)."""
+        """Índice secundário O(1) de parágrafos por paragraph_id (com invalidação automática por versionamento)."""
         cached = getattr(self, "_cached_paragraphs_by_id", None)
-        if cached is None or len(cached) != len(self.paragraphs):
+        cached_ver = getattr(self, "_cached_paras_ver", -1)
+        cur_ver = getattr(self, "_paragraphs_version", 0)
+        if cached is None or cached_ver != cur_ver:
             cached = {p.paragraph_id: p for p in self.paragraphs}
             object.__setattr__(self, "_cached_paragraphs_by_id", cached)
+            object.__setattr__(self, "_cached_paras_ver", cur_ver)
         return cached
 
     @property
     def sections_by_id(self) -> Dict[str, ASTSection]:
         """Índice secundário O(1) de secções por section_id."""
         cached = getattr(self, "_cached_sections_by_id", None)
-        if cached is None or len(cached) != len(self.sections):
+        cached_ver = getattr(self, "_cached_sec_ver", -1)
+        cur_ver = getattr(self, "_sections_version", 0)
+        if cached is None or cached_ver != cur_ver:
             cached = {s.section_id: s for s in self.sections}
             object.__setattr__(self, "_cached_sections_by_id", cached)
+            object.__setattr__(self, "_cached_sec_ver", cur_ver)
         return cached
 
     @property
     def paragraphs_by_section_id(self) -> Dict[str, List[ASTParagraph]]:
         """Índice secundário O(1) de agrupamento de parágrafos por section_id."""
         cached = getattr(self, "_cached_paragraphs_by_sec", None)
-        if cached is None:
+        cached_ver = getattr(self, "_cached_paras_sec_ver", -1)
+        cur_ver = getattr(self, "_paragraphs_version", 0)
+        if cached is None or cached_ver != cur_ver:
             group: Dict[str, List[ASTParagraph]] = defaultdict(list)
             for p in self.paragraphs:
                 group[p.section_id].append(p)
             cached = dict(group)
             object.__setattr__(self, "_cached_paragraphs_by_sec", cached)
+            object.__setattr__(self, "_cached_paras_sec_ver", cur_ver)
         return cached
 
     @property
     def pages_by_number(self) -> Dict[int, PageInfo]:
         """Índice secundário O(1) de páginas por page_number."""
         cached = getattr(self, "_cached_pages_by_number", None)
-        if cached is None or len(cached) != len(self.pages):
+        cached_ver = getattr(self, "_cached_pages_ver", -1)
+        cur_ver = getattr(self, "_pages_version", 0)
+        if cached is None or cached_ver != cur_ver:
             cached = {pg.page_number: pg for pg in self.pages}
             object.__setattr__(self, "_cached_pages_by_number", cached)
+            object.__setattr__(self, "_cached_pages_ver", cur_ver)
         return cached
 
     def get_paragraph(self, paragraph_id: str) -> Optional[ASTParagraph]:
@@ -357,14 +449,86 @@ class AcademicDocumentAST:
         """Acesso O(1) a lista de parágrafos de uma secção específica."""
         return self.paragraphs_by_section_id.get(section_id, [])
 
+    def get_page(self, page_number: int) -> Optional[PageInfo]:
+        """Acesso O(1) a página por número."""
+        return self.pages_by_number.get(page_number)
+
     def invalidate_indices(self) -> None:
         """Invalida explicitamente os caches de índices após mutações diretas da AST."""
-        for attr in ("_cached_paragraphs_by_id", "_cached_sections_by_id", "_cached_paragraphs_by_sec", "_cached_pages_by_number"):
+        for attr in (
+            "_cached_paragraphs_by_id",
+            "_cached_sections_by_id",
+            "_cached_paragraphs_by_sec",
+            "_cached_pages_by_number",
+        ):
             if hasattr(self, attr):
                 try:
                     delattr(self, attr)
                 except AttributeError:
                     pass
+
+    # -- Métodos de mutação controlada com invalidação atómica de índices --------------
+
+    def add_paragraph(self, paragraph: ASTParagraph) -> None:
+        """Adiciona um parágrafo e invalida os índices afetados."""
+        self.paragraphs.append(paragraph)
+
+    def remove_paragraph(self, paragraph_id: str) -> bool:
+        """Remove um parágrafo por ID e invalida os índices afetados."""
+        idx = next((i for i, p in enumerate(self.paragraphs) if p.paragraph_id == paragraph_id), None)
+        if idx is not None:
+            self.paragraphs.pop(idx)
+            return True
+        return False
+
+    def update_paragraph(self, target_paragraph_id: str, **kwargs: Any) -> Optional[ASTParagraph]:
+        """Atualiza atributos de um parágrafo existente e invalida os índices."""
+        p = self.get_paragraph(target_paragraph_id)
+        if p is not None:
+            for k, v in kwargs.items():
+                if hasattr(p, k):
+                    setattr(p, k, v)
+            self._on_paragraphs_mutated()
+            return p
+        return None
+
+    def add_section(self, section: ASTSection) -> None:
+        """Adiciona uma secção e invalida os índices afetados."""
+        self.sections.append(section)
+
+    def remove_section(self, section_id: str) -> bool:
+        """Remove uma secção por ID e invalida os índices afetados."""
+        idx = next((i for i, s in enumerate(self.sections) if s.section_id == section_id), None)
+        if idx is not None:
+            self.sections.pop(idx)
+            return True
+        return False
+
+    def update_section(self, target_section_id: str, **kwargs: Any) -> Optional[ASTSection]:
+        """Atualiza atributos de uma secção existente e invalida os índices."""
+        s = self.get_section(target_section_id)
+        if s is not None:
+            for k, v in kwargs.items():
+                if hasattr(s, k):
+                    setattr(s, k, v)
+            self._on_sections_mutated()
+            return s
+        return None
+
+    def add_page(self, page: PageInfo) -> None:
+        """Adiciona uma página e invalida os índices afetados."""
+        self.pages.append(page)
+
+    def update_page(self, target_page_number: int, **kwargs: Any) -> Optional[PageInfo]:
+        """Atualiza atributos de uma página existente e invalida os índices."""
+        pg = self.get_page(target_page_number)
+        if pg is not None:
+            for k, v in kwargs.items():
+                if hasattr(pg, k):
+                    setattr(pg, k, v)
+            self._on_pages_mutated()
+            return pg
+        return None
 
     def to_legacy_sections(self) -> List[Dict[str, Any]]:
         """Projeção ``sections`` legada (section_id/title/level/page_start/page_end/paragraphs)."""

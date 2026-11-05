@@ -20,6 +20,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import math
 import os
 import re
 import time
@@ -51,6 +52,9 @@ PROMPT_VERSIONS = {
     "section_synthesis": "v3.0.0",
     "cross_section_integration": "v3.0.0",
     "methodology_results": "v3.0.0",
+    "methodology_unit": "v3.0.0",
+    "section_intermediate_synthesis": "v3.0.0",
+    "cross_section_cluster": "v3.0.0",
 }
 
 
@@ -229,6 +233,12 @@ class ReasoningTelemetry:
     output_tokens_est: int = 0
     segment_durations_ms: Dict[str, float] = field(default_factory=dict)
     section_durations_ms: Dict[str, float] = field(default_factory=dict)
+    estimated_tokens_by_operation: Dict[str, int] = field(default_factory=dict)
+    available_budget_by_operation: Dict[str, int] = field(default_factory=dict)
+    total_segments_created: int = 0
+    subdivided_paragraphs_count: int = 0
+    intermediate_syntheses_count: int = 0
+    context_limit_failures: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -319,6 +329,10 @@ class CheckpointMismatchError(AcademicReasoningError):
     """Lançado quando o checkpoint em disco é incompatível com o documento atual."""
 
 
+class ContextBudgetExceededError(AcademicReasoningError):
+    """Lançado quando uma unidade indivisível do documento ultrapassa o orçamento de contexto."""
+
+
 # ============================================================================
 # 3. Helpers de Limpeza e Validação JSON para Qwen 3.5
 # ============================================================================
@@ -364,8 +378,49 @@ def clean_qwen_json(raw_text: str) -> Optional[Any]:
 
 
 # ============================================================================
-# 4. Segmentador Semântico Adaptativo (Adaptive Semantic Chunking)
+# 4. Gestão de Orçamento de Contexto e Segmentação Semântica Adaptativa
 # ============================================================================
+
+class ContextBudgetManager:
+    """
+    Gere orçamentos de contexto dinâmicos para inferência no modelo local (Qwen 3.5:9b).
+    Considera:
+      - Limite total de contexto (ex: 8192 tokens no Ollama).
+      - Tokens consumidos pelo system prompt.
+      - Tokens consumidos pelas instruções e templates da operação.
+      - Margem reservada para a resposta do modelo (headroom, ex: 2800 tokens).
+      - Margem de segurança para variação de tokenização (ex: 400 tokens).
+    """
+
+    def __init__(
+        self,
+        total_context_limit: int = 8192,
+        default_max_output_tokens: int = 2800,
+        safety_buffer_tokens: int = 400,
+    ):
+        self.total_context_limit = total_context_limit
+        self.default_max_output_tokens = default_max_output_tokens
+        self.safety_buffer_tokens = safety_buffer_tokens
+
+    @staticmethod
+    def estimate_tokens(text: str) -> int:
+        if not text or not text.strip():
+            return 0
+        return max(1, math.ceil(len(text.strip()) / 3.3))
+
+    def calculate_usable_budget(
+        self,
+        system_prompt: str,
+        instruction_template: str,
+        max_output_tokens: Optional[int] = None,
+    ) -> int:
+        sys_tokens = self.estimate_tokens(system_prompt)
+        inst_tokens = self.estimate_tokens(instruction_template)
+        output_tokens = max_output_tokens or self.default_max_output_tokens
+        used = sys_tokens + inst_tokens + output_tokens + self.safety_buffer_tokens
+        usable = self.total_context_limit - used
+        return max(300, usable)
+
 
 @dataclass
 class SemanticSegment:
@@ -382,30 +437,187 @@ class SemanticSegmenter:
     """
     Divide uma secção em unidades semânticas adaptativas.
     Regras:
-      1. Preserva parágrafos completos (nunca corta frases).
-      2. Orçamento seguro de tokens: ~1500 a 2500 tokens por segmento.
-      3. Sobreposição de 1 parágrafo se a secção necessitar de múltiplos segmentos.
-      4. Preserva metadados de página e paragraph_id.
+      1. Preserva continuidade textual e integridade de frases.
+      2. Orçamento seguro de tokens por segmento (respeitando limites úteis).
+      3. Subdivide parágrafos individuais longos sem perda de conteúdo nem descarte silencioso.
+      4. Preserva paragraph_id, page_number e section_id originais.
+      5. Sobreposição controlada de 1 parágrafo se necessário.
     """
 
-    def __init__(self, max_tokens_per_segment: int = 2200, overlap_paragraphs: int = 1):
+    def __init__(
+        self,
+        max_tokens_per_segment: int = 2200,
+        overlap_paragraphs: int = 1,
+        budget_manager: Optional[ContextBudgetManager] = None,
+    ):
         self.max_tokens_per_segment = max_tokens_per_segment
         self.overlap_paragraphs = overlap_paragraphs
+        self.budget_manager = budget_manager or ContextBudgetManager()
+        self.subdivided_paragraphs_count = 0
 
     def estimate_tokens(self, text: str) -> int:
-        return max(1, len(text.strip()) // 4)
+        return self.budget_manager.estimate_tokens(text)
+
+    def subdivide_paragraph(self, p: ASTParagraph, max_tokens: int) -> List[ASTParagraph]:
+        """
+        Divide um parágrafo longo em subunidades preservando:
+        - paragraph_id original
+        - page_number original
+        - section_id original
+        - order original
+        - integridade textual sem cortes arbitrários
+        """
+        text = (p.text or "").strip()
+        p_tokens = self.estimate_tokens(text)
+        if p_tokens <= max_tokens:
+            return [p]
+
+        self.subdivided_paragraphs_count += 1
+        sentences = re.split(r"(?<=[.!?])\s+", text)
+        sub_paras: List[ASTParagraph] = []
+        current_chunk: List[str] = []
+        current_tokens = 0
+
+        for sentence in sentences:
+            s_tokens = self.estimate_tokens(sentence)
+            if s_tokens > max_tokens:
+                clauses = re.split(r"(?<=[,;:—])\s+", sentence)
+                for clause in clauses:
+                    c_tokens = self.estimate_tokens(clause)
+                    if c_tokens > max_tokens:
+                        if current_chunk:
+                            sub_paras.append(
+                                ASTParagraph(
+                                    paragraph_id=p.paragraph_id,
+                                    section_id=p.section_id,
+                                    text=" ".join(current_chunk),
+                                    page_number=p.page_number,
+                                    page_end=getattr(p, "page_end", p.page_number),
+                                    order=p.order,
+                                    content_type=p.content_type,
+                                    bbox=p.bbox,
+                                )
+                            )
+                            current_chunk = []
+                            current_tokens = 0
+
+                        words = clause.split()
+                        w_chunk: List[str] = []
+                        w_tokens = 0
+                        for w in words:
+                            wt = self.estimate_tokens(w)
+                            if wt > max_tokens:
+                                raise ContextBudgetExceededError(
+                                    f"Unidade indivisível excede o orçamento de contexto ({wt} > {max_tokens} tokens): '{w[:50]}...'"
+                                )
+                            if w_tokens + wt > max_tokens and w_chunk:
+                                sub_paras.append(
+                                    ASTParagraph(
+                                        paragraph_id=p.paragraph_id,
+                                        section_id=p.section_id,
+                                        text=" ".join(w_chunk),
+                                        page_number=p.page_number,
+                                        page_end=getattr(p, "page_end", p.page_number),
+                                        order=p.order,
+                                        content_type=p.content_type,
+                                        bbox=p.bbox,
+                                    )
+                                )
+                                w_chunk = []
+                                w_tokens = 0
+                            w_chunk.append(w)
+                            w_tokens += wt
+                        if w_chunk:
+                            sub_paras.append(
+                                ASTParagraph(
+                                    paragraph_id=p.paragraph_id,
+                                    section_id=p.section_id,
+                                    text=" ".join(w_chunk),
+                                    page_number=p.page_number,
+                                    page_end=getattr(p, "page_end", p.page_number),
+                                    order=p.order,
+                                    content_type=p.content_type,
+                                    bbox=p.bbox,
+                                )
+                            )
+                        continue
+
+                    if current_tokens + c_tokens > max_tokens and current_chunk:
+                        sub_paras.append(
+                            ASTParagraph(
+                                paragraph_id=p.paragraph_id,
+                                section_id=p.section_id,
+                                text=" ".join(current_chunk),
+                                page_number=p.page_number,
+                                page_end=getattr(p, "page_end", p.page_number),
+                                order=p.order,
+                                content_type=p.content_type,
+                                bbox=p.bbox,
+                            )
+                        )
+                        current_chunk = []
+                        current_tokens = 0
+                    current_chunk.append(clause)
+                    current_tokens += c_tokens
+                continue
+
+            if current_tokens + s_tokens > max_tokens and current_chunk:
+                sub_paras.append(
+                    ASTParagraph(
+                        paragraph_id=p.paragraph_id,
+                        section_id=p.section_id,
+                        text=" ".join(current_chunk),
+                        page_number=p.page_number,
+                        page_end=getattr(p, "page_end", p.page_number),
+                        order=p.order,
+                        content_type=p.content_type,
+                        bbox=p.bbox,
+                    )
+                )
+                current_chunk = []
+                current_tokens = 0
+            current_chunk.append(sentence)
+            current_tokens += s_tokens
+
+        if current_chunk:
+            sub_paras.append(
+                ASTParagraph(
+                    paragraph_id=p.paragraph_id,
+                    section_id=p.section_id,
+                    text=" ".join(current_chunk),
+                    page_number=p.page_number,
+                    page_end=getattr(p, "page_end", p.page_number),
+                    order=p.order,
+                    content_type=p.content_type,
+                    bbox=p.bbox,
+                )
+            )
+
+        return sub_paras
 
     def segment_section(self, section: ASTSection, paragraphs: List[ASTParagraph]) -> List[SemanticSegment]:
-        sec_paras = [p for p in paragraphs if p.section_id == section.section_id]
+        sec_paras = (
+            [p for p in paragraphs if p.section_id == section.section_id]
+            if any(p.section_id != section.section_id for p in paragraphs)
+            else list(paragraphs)
+        )
         if not sec_paras:
             return []
+
+        # Subdividir parágrafos individuais que excedam o limite
+        expanded_paras: List[ASTParagraph] = []
+        for p in sec_paras:
+            if self.estimate_tokens(p.text) > self.max_tokens_per_segment:
+                expanded_paras.extend(self.subdivide_paragraph(p, self.max_tokens_per_segment))
+            else:
+                expanded_paras.append(p)
 
         segments: List[SemanticSegment] = []
         current_paras: List[ASTParagraph] = []
         current_tokens = 0
         seg_index = 0
 
-        for p in sec_paras:
+        for p in expanded_paras:
             p_tokens = self.estimate_tokens(p.text)
             # Se adicionar este parágrafo excede o limite e já temos conteúdo:
             if current_paras and (current_tokens + p_tokens > self.max_tokens_per_segment):
@@ -424,10 +636,16 @@ class SemanticSegmenter:
                 )
                 seg_index += 1
 
-                # Sobreposição controlada
+                # Sobreposição controlada (apenas se couber no orçamento junto com o próximo parágrafo)
                 if self.overlap_paragraphs > 0 and len(current_paras) >= self.overlap_paragraphs:
-                    current_paras = current_paras[-self.overlap_paragraphs :]
-                    current_tokens = sum(self.estimate_tokens(cp.text) for cp in current_paras)
+                    candidate_paras = current_paras[-self.overlap_paragraphs :]
+                    candidate_tokens = sum(self.estimate_tokens(cp.text) for cp in candidate_paras)
+                    if candidate_tokens + p_tokens <= self.max_tokens_per_segment:
+                        current_paras = list(candidate_paras)
+                        current_tokens = candidate_tokens
+                    else:
+                        current_paras = []
+                        current_tokens = 0
                 else:
                     current_paras = []
                     current_tokens = 0
@@ -545,6 +763,31 @@ Devolve EXCLUSIVAMENTE o seguinte objeto JSON:
 }}"""
 
 
+PROMPT_SECTION_INTERMEDIATE_SYNTHESIS = """Sintetiza de forma intermédia o seguinte lote de segmentos da secção "{section_title}" (Tipo: {section_type}):
+
+=== DADOS DOS SEGMENTOS DO LOTE ===
+{segments_summary}
+=== FIM DOS DADOS ===
+
+Instruções:
+- Condensa as ideias centrais, argumentos e conceitos deste lote específico.
+- Preserva com rigor as referências probatórias e os conceitos essenciais.
+
+Devolve EXCLUSIVAMENTE o seguinte objeto JSON:
+{{
+  "batch_objective": "Propósito destas passagens na secção.",
+  "batch_synthesis": "Síntese articulada deste lote.",
+  "core_ideas": ["Ideia chave do lote 1", "Ideia chave do lote 2"],
+  "concepts": [
+    {{"name": "Nome do Conceito", "explanation": "Explicação", "paragraph_ids": ["p_X"]}}
+  ],
+  "arguments": [
+    {{"claim": "Afirmação", "evidence": "Evidência", "paragraph_ids": ["p_X"], "status": "SOURCE_FACT"}}
+  ],
+  "limitations": ["Limitação expressa neste lote"]
+}}"""
+
+
 PROMPT_CROSS_SECTION_INTEGRATION = """Executa uma integração transversal (Reduce Global) entre todas as secções do documento "{document_title}".
 
 === SÍNTESES DAS SECÇÕES ===
@@ -580,6 +823,29 @@ Devolve EXCLUSIVAMENTE o seguinte objeto JSON:
     {{"dependent_idea": "Ideia Y", "depends_on": "Ideia X", "reason": "Justificação lógica da dependência"}}
   ],
   "global_synthesis": "Síntese global holística e rigorosa (3 a 5 parágrafos substantivos em PT-PT) que integra o contributo da totalidade do documento."
+}}"""
+
+
+PROMPT_CROSS_SECTION_CLUSTER = """Analisa de forma agregada as relações e articulação lógica entre as seguintes secções do documento "{document_title}":
+
+=== SÍNTESES DO GRUPO DE SECÇÕES ===
+{cluster_summary}
+=== FIM DO GRUPO ===
+
+Instruções:
+- Identifica a articulação argumentativa entre estas secções.
+- Mapeia interdependências conceptuais e eventuais tensões.
+
+Devolve EXCLUSIVAMENTE o seguinte objeto JSON:
+{{
+  "cluster_progression": ["Progressão observada entre estas secções"],
+  "conceptual_links": [
+    {{"concept_a": "Conceito A", "relationship": "relação com", "concept_b": "Conceito B", "explanation": "justificação"}}
+  ],
+  "cluster_synthesis": "Síntese articulada deste cluster de secções.",
+  "coherence_and_tensions": [
+    {{"type": "COHERENCE", "description": "Descrição", "sections_involved": ["sec_A", "sec_B"], "status": "MODEL_INFERENCE"}}
+  ]
 }}"""
 
 
@@ -684,7 +950,8 @@ class AcademicReasoningEngine:
         self.storage_dir = storage_dir or Path("data/study")
         self.llm_caller = llm_caller
         self.max_retries_per_call = max_retries_per_call
-        self.segmenter = SemanticSegmenter()
+        self.budget_manager = ContextBudgetManager()
+        self.segmenter = SemanticSegmenter(budget_manager=self.budget_manager)
 
     def _default_llm_caller(
         self,
@@ -867,7 +1134,7 @@ class AcademicReasoningEngine:
         # 2. Filtrar secções úteis para análise (ignora referências puras e apêndices na análise de fundo)
         analyzable_sections = [
             s for s in ast.sections
-            if s.kind not in ("references", "page_artifact") and any(p.section_id == s.section_id for p in ast.paragraphs)
+            if s.kind not in ("references", "page_artifact") and bool(ast.get_paragraphs_for_section(s.section_id))
         ]
         if not analyzable_sections and ast.sections:
             analyzable_sections = list(ast.sections)
@@ -876,12 +1143,19 @@ class AcademicReasoningEngine:
         all_section_analyses: List[SectionAnalysis] = []
         all_concepts_map: Dict[str, ConceptItem] = {}
 
-        # Carregar conceitos previamente persistidos em checkpoint
+        # Carregar conceitos previamente persistidos em checkpoint com validação estrita
         if checkpoint and "conceptual_analysis" in checkpoint:
             for c_data in checkpoint.get("conceptual_analysis", []):
                 c_item = _from_dict(ConceptItem, c_data)
                 if c_item and c_item.name:
-                    all_concepts_map[c_item.name] = c_item
+                    is_valid_c = True
+                    for er in c_item.evidence_refs:
+                        if er.status == EpistemicStatus.SOURCE_FACT.value:
+                            if not er.paragraph_id or er.paragraph_id not in paragraphs_map:
+                                is_valid_c = False
+                                break
+                    if is_valid_c:
+                        all_concepts_map[c_item.name] = c_item
 
         all_results: List[ResultItem] = []
         failed_operations: List[Dict[str, Any]] = []
@@ -913,25 +1187,85 @@ class AcademicReasoningEngine:
             if section.section_id in completed_sections:
                 sec_data = completed_sections[section.section_id]
                 sec_analysis = _from_dict(SectionAnalysis, sec_data)
-                all_section_analyses.append(sec_analysis)
-                # Reconstruir conceitos deterministicamente se não constavam do checkpoint
-                for c in sec_analysis.concepts:
-                    c_name = (c.get("name") if isinstance(c, dict) else str(c)).strip()
-                    if c_name and c_name not in all_concepts_map:
-                        c_id = (c.get("concept_id") if isinstance(c, dict) else "") or generate_deterministic_concept_id(c_name)
-                        all_concepts_map[c_name] = ConceptItem(
-                            concept_id=c_id,
-                            name=c_name,
-                            definition=c.get("definition", "") if isinstance(c, dict) else "",
-                            explanation=c.get("explanation", "") if isinstance(c, dict) else "",
-                            relationships=c.get("relationships", []) if isinstance(c, dict) else [],
-                            context_of_use=c.get("context_of_use", "") if isinstance(c, dict) else "",
-                            evidence_refs=[EvidenceRef(section_id=section.section_id, status=EpistemicStatus.SOURCE_FACT.value)],
-                        )
-                continue
 
-            # Obter segmentos da secção
-            segments = self.segmenter.segment_section(section, ast.paragraphs)
+                # Validar integridade da proveniência da secção persistida
+                is_corrupted = False
+                for c in sec_analysis.concepts:
+                    if isinstance(c, dict):
+                        for er in c.get("evidence_refs", []):
+                            if isinstance(er, dict) and er.get("status") == EpistemicStatus.SOURCE_FACT.value:
+                                pid = er.get("paragraph_id")
+                                if not pid or pid not in paragraphs_map:
+                                    is_corrupted = True
+                                    break
+                if is_corrupted:
+                    logger.warning(
+                        f"Checkpoint da secção '{section.section_id}' possui referências SOURCE_FACT sem suporte documental. A invalidar secção."
+                    )
+                    completed_sections.pop(section.section_id, None)
+                else:
+                    all_section_analyses.append(sec_analysis)
+                    # Reconstruir conceitos deterministicamente preservando todos os campos e proveniência real
+                    for c in sec_analysis.concepts:
+                        c_name = (c.get("name") if isinstance(c, dict) else str(c)).strip()
+                        if c_name and c_name not in all_concepts_map:
+                            c_id = (c.get("concept_id") if isinstance(c, dict) else "") or generate_deterministic_concept_id(c_name)
+                            c_refs: List[EvidenceRef] = []
+                            if isinstance(c, dict):
+                                for pid in c.get("paragraph_ids", []):
+                                    p_ast = ast.get_paragraph(pid)
+                                    if p_ast is not None:
+                                        c_refs.append(
+                                            EvidenceRef(
+                                                paragraph_id=pid,
+                                                section_id=section.section_id,
+                                                page_number=p_ast.page_number,
+                                                status=EpistemicStatus.SOURCE_FACT.value,
+                                            )
+                                        )
+                                for er in c.get("evidence_refs", []):
+                                    er_obj = er if isinstance(er, EvidenceRef) else _from_dict(EvidenceRef, er)
+                                    if er_obj and er_obj.status == EpistemicStatus.SOURCE_FACT.value:
+                                        if er_obj.paragraph_id and er_obj.paragraph_id in paragraphs_map:
+                                            c_refs.append(er_obj)
+                                    elif er_obj:
+                                        c_refs.append(er_obj)
+                            if not c_refs:
+                                c_refs = [
+                                    EvidenceRef(
+                                        section_id=section.section_id,
+                                        status=EpistemicStatus.MODEL_INFERENCE.value,
+                                    )
+                                ]
+                            all_concepts_map[c_name] = ConceptItem(
+                                concept_id=c_id,
+                                name=c_name,
+                                definition=c.get("definition", "") if isinstance(c, dict) else "",
+                                explanation=c.get("explanation", "") if isinstance(c, dict) else "",
+                                relationships=c.get("relationships", []) if isinstance(c, dict) else [],
+                                context_of_use=c.get("context_of_use", "") if isinstance(c, dict) else "",
+                                evidence_refs=c_refs,
+                            )
+                    continue
+
+            # Obter segmentos da secção usando o índice secundário O(1)
+            sec_paras = ast.get_paragraphs_for_section(section.section_id)
+            try:
+                segments = self.segmenter.segment_section(section, sec_paras)
+            except ContextBudgetExceededError as cbe:
+                err_info = {
+                    "stage": "context_budget_subdivision",
+                    "section_id": section.section_id,
+                    "error": str(cbe),
+                    "reason": "INDIVISIBLE_UNIT_EXCEEDS_BUDGET",
+                }
+                failed_operations.append(err_info)
+                telemetry_metrics.failures_count += 1
+                telemetry_metrics.context_limit_failures.append(err_info)
+                logger.error(f"[Context Budget Exceeded] {err_info}")
+                segments = []
+
+            telemetry_metrics.total_segments_created += len(segments)
             sec_segment_analyses: List[SegmentAnalysis] = []
 
             for seg_idx, segment in enumerate(segments, start=1):
@@ -1043,11 +1377,65 @@ class AcademicReasoningEngine:
             def _format_concept_label(c: Any) -> str:
                 return c.get("name", "") if isinstance(c, dict) else str(c)
 
-            segments_summary_text = "\n\n".join(
-                f"[Segmento {s.segment_id}]\nIdeia: {s.central_idea}\nObjetivo: {s.passage_objective}\n"
-                f"Conceitos: {', '.join(_format_concept_label(c) for c in s.concepts)}\nArgumentos: {json.dumps(s.arguments, ensure_ascii=False)}"
-                for s in valid_segments
+            def _build_segments_summary(segs: List[SegmentAnalysis]) -> str:
+                return "\n\n".join(
+                    f"[Segmento {s.segment_id}]\nIdeia: {s.central_idea}\nObjetivo: {s.passage_objective}\n"
+                    f"Conceitos: {', '.join(_format_concept_label(c) for c in s.concepts)}\nArgumentos: {json.dumps(s.arguments, ensure_ascii=False)}"
+                    for s in segs
+                )
+
+            segments_summary_text = _build_segments_summary(valid_segments)
+            sec_budget = self.budget_manager.calculate_usable_budget(
+                SYSTEM_PROMPT_ACADEMIC_REASONING,
+                PROMPT_SECTION_SYNTHESIS,
             )
+            telemetry_metrics.available_budget_by_operation[f"section_synthesis_{section.section_id}"] = sec_budget
+            telemetry_metrics.estimated_tokens_by_operation[f"section_synthesis_{section.section_id}"] = (
+                self.budget_manager.estimate_tokens(segments_summary_text)
+            )
+
+            # Estratégia hierárquica se o resumo dos segmentos ultrapassar o orçamento útil de contexto:
+            if self.budget_manager.estimate_tokens(segments_summary_text) > sec_budget and len(valid_segments) > 1:
+                logger.info(
+                    f"Resumo de segmentos para secção '{section.section_id}' ({self.budget_manager.estimate_tokens(segments_summary_text)} tokens) "
+                    f"excede o orçamento ({sec_budget} tokens). A aplicar síntese hierárquica por lotes."
+                )
+                batch_size = max(1, len(valid_segments) // 2)
+                intermediate_summaries: List[str] = []
+                for b_idx in range(0, len(valid_segments), batch_size):
+                    batch_segs = valid_segments[b_idx : b_idx + batch_size]
+                    batch_summary_text = _build_segments_summary(batch_segs)
+                    b_prompt = PROMPT_SECTION_INTERMEDIATE_SYNTHESIS.format(
+                        section_title=section.title,
+                        section_type=section.kind,
+                        segments_summary=batch_summary_text,
+                    )
+                    b_meta = {
+                        "operation": "academic_section_intermediate_synthesis",
+                        "document_id": doc_id,
+                        "section_id": section.section_id,
+                        "batch_index": b_idx,
+                        "timeout_seconds": 120.0,
+                    }
+                    parsed_batch, b_telemetry = self._call_model_with_retries(
+                        SYSTEM_PROMPT_ACADEMIC_REASONING,
+                        b_prompt,
+                        b_meta,
+                        cancellation_check=cancellation_check,
+                    )
+                    telemetry_metrics.total_llm_calls += 1
+                    telemetry_metrics.intermediate_syntheses_count += 1
+                    if parsed_batch and isinstance(parsed_batch, dict):
+                        b_synth = parsed_batch.get("batch_synthesis", "")
+                        b_obj = parsed_batch.get("batch_objective", "")
+                        b_ideas = parsed_batch.get("core_ideas", [])
+                        intermediate_summaries.append(
+                            f"[Lote de Segmentos {b_idx // batch_size + 1}]\nObjetivo: {b_obj}\nSíntese: {b_synth}\nIdeias: {json.dumps(b_ideas, ensure_ascii=False)}"
+                        )
+                    else:
+                        intermediate_summaries.append(f"[Lote {b_idx // batch_size + 1}]\n{batch_summary_text[:500]}")
+                segments_summary_text = "\n\n".join(intermediate_summaries)
+
             sec_synth_prompt = PROMPT_SECTION_SYNTHESIS.format(
                 section_title=section.title,
                 section_type=section.kind,
@@ -1124,11 +1512,31 @@ class AcademicReasoningEngine:
             all_section_analyses.append(sec_analysis_obj)
             completed_sections[section.section_id] = asdict(sec_analysis_obj)
 
-            # Agregar conceitos ao mapa global deterministicamente
+            # Agregar conceitos ao mapa global deterministicamente com proveniência factual estrita
             for c in parsed_sec.get("concepts", []):
                 c_name = (c.get("name") if isinstance(c, dict) else str(c)).strip()
                 if c_name and c_name not in all_concepts_map:
                     c_id = (c.get("concept_id") if isinstance(c, dict) else "") or generate_deterministic_concept_id(c_name)
+                    concept_refs: List[EvidenceRef] = []
+                    if isinstance(c, dict):
+                        for pid in c.get("paragraph_ids", []):
+                            p_ast = ast.get_paragraph(pid)
+                            if p_ast is not None:
+                                concept_refs.append(
+                                    EvidenceRef(
+                                        paragraph_id=pid,
+                                        section_id=section.section_id,
+                                        page_number=p_ast.page_number,
+                                        status=EpistemicStatus.SOURCE_FACT.value,
+                                    )
+                                )
+                    if not concept_refs:
+                        concept_refs = [
+                            EvidenceRef(
+                                section_id=section.section_id,
+                                status=EpistemicStatus.MODEL_INFERENCE.value,
+                            )
+                        ]
                     all_concepts_map[c_name] = ConceptItem(
                         concept_id=c_id,
                         name=c_name,
@@ -1136,7 +1544,7 @@ class AcademicReasoningEngine:
                         explanation=c.get("explanation", "") if isinstance(c, dict) else "",
                         relationships=c.get("relationships", []) if isinstance(c, dict) else [],
                         context_of_use=c.get("context_of_use", "") if isinstance(c, dict) else "",
-                        evidence_refs=[EvidenceRef(section_id=section.section_id, status=EpistemicStatus.SOURCE_FACT.value)],
+                        evidence_refs=concept_refs,
                     )
 
             # Atualizar checkpoint com a secção concluída e conceitos agregados
@@ -1289,10 +1697,63 @@ class AcademicReasoningEngine:
         progress("CROSS_SECTION_INTEGRATION", 0.80, "A executar raciocínio transversal e deteção de tensões...")
         valid_synth_sections = [sa for sa in all_section_analyses if sa.in_depth_synthesis]
 
-        sections_summary_text = "\n\n".join(
-            f"Secção: {sa.title} ({sa.section_type})\nObjetivo: {sa.objective}\nSíntese: {sa.in_depth_synthesis[:400]}..."
-            for sa in valid_synth_sections
+        cross_budget = self.budget_manager.calculate_usable_budget(
+            SYSTEM_PROMPT_ACADEMIC_REASONING,
+            PROMPT_CROSS_SECTION_INTEGRATION,
         )
+
+        def _build_cross_summary(sections: List[SectionAnalysis]) -> str:
+            return "\n\n".join(
+                f"Secção: {sa.title} ({sa.section_type})\nObjetivo: {sa.objective}\nSíntese: {sa.in_depth_synthesis[:400]}..."
+                for sa in sections
+            )
+
+        sections_summary_text = _build_cross_summary(valid_synth_sections)
+        telemetry_metrics.available_budget_by_operation["cross_section_integration"] = cross_budget
+        telemetry_metrics.estimated_tokens_by_operation["cross_section_integration"] = (
+            self.budget_manager.estimate_tokens(sections_summary_text)
+        )
+
+        # Estratégia hierárquica se o resumo transversal de secções ultrapassar o orçamento útil de contexto:
+        if self.budget_manager.estimate_tokens(sections_summary_text) > cross_budget and len(valid_synth_sections) > 2:
+            logger.info(
+                f"Resumo transversal de secções ({self.budget_manager.estimate_tokens(sections_summary_text)} tokens) "
+                f"excede orçamento ({cross_budget} tokens). A aplicar clustering transversal."
+            )
+            cluster_size = max(2, len(valid_synth_sections) // 2)
+            cluster_summaries: List[str] = []
+            for c_idx in range(0, len(valid_synth_sections), cluster_size):
+                cluster_secs = valid_synth_sections[c_idx : c_idx + cluster_size]
+                cluster_summary_input = _build_cross_summary(cluster_secs)
+                cl_prompt = PROMPT_CROSS_SECTION_CLUSTER.format(
+                    document_title=ast.metadata.title or ast.filename or doc_id,
+                    cluster_summary=cluster_summary_input,
+                )
+                cl_meta = {
+                    "operation": "academic_cross_section_cluster",
+                    "document_id": doc_id,
+                    "cluster_index": c_idx,
+                    "timeout_seconds": 120.0,
+                }
+                parsed_cluster, cl_telemetry = self._call_model_with_retries(
+                    SYSTEM_PROMPT_ACADEMIC_REASONING,
+                    cl_prompt,
+                    cl_meta,
+                    cancellation_check=cancellation_check,
+                )
+                telemetry_metrics.total_llm_calls += 1
+                telemetry_metrics.intermediate_syntheses_count += 1
+                if parsed_cluster and isinstance(parsed_cluster, dict):
+                    cl_synth = parsed_cluster.get("cluster_synthesis", "")
+                    cl_prog = parsed_cluster.get("cluster_progression", [])
+                    cluster_summaries.append(
+                        f"[Grupo de Secções {c_idx // cluster_size + 1}: {', '.join(s.title for s in cluster_secs)}]\n"
+                        f"Síntese: {cl_synth}\nProgressão: {json.dumps(cl_prog, ensure_ascii=False)}"
+                    )
+                else:
+                    cluster_summaries.append(f"[Grupo {c_idx // cluster_size + 1}]\n{cluster_summary_input[:500]}")
+            sections_summary_text = "\n\n".join(cluster_summaries)
+
         cross_prompt = PROMPT_CROSS_SECTION_INTEGRATION.format(
             document_title=ast.metadata.title or ast.filename or doc_id,
             sections_summary=sections_summary_text or "Nenhuma secção disponível.",
@@ -1379,6 +1840,7 @@ class AcademicReasoningEngine:
             results=all_results,
             cross_synthesis=cross_section_synthesis,
             failed_operations=failed_operations,
+            conceptual_analysis=list(all_concepts_map.values()),
         )
 
         # 10. Determinação Rigorosa do Estado do Dossier
@@ -1392,6 +1854,7 @@ class AcademicReasoningEngine:
 
         total_elapsed = round((time.perf_counter() - start_time) * 1000.0, 2)
         telemetry_metrics.total_duration_ms = total_elapsed
+        telemetry_metrics.subdivided_paragraphs_count = self.segmenter.subdivided_paragraphs_count
 
         dossier = AcademicReasoningDossier(
             dossier_id=f"dossier_{uuid.uuid4().hex[:12]}",
@@ -1444,10 +1907,11 @@ class ReasoningQAEvaluator:
         results: List[ResultItem],
         cross_synthesis: CrossSectionSynthesis,
         failed_operations: Optional[List[Dict[str, Any]]] = None,
+        conceptual_analysis: Optional[List[ConceptItem]] = None,
     ) -> ReasoningQAReport:
-        valid_paras: Dict[str, ASTParagraph] = {p.paragraph_id: p for p in ast.paragraphs}
-        valid_sections: Set[str] = {s.section_id for s in ast.sections}
-        max_page = max([p.page_number for p in ast.pages] or [1])
+        valid_paras: Dict[str, ASTParagraph] = ast.paragraphs_by_id
+        valid_sections: Set[str] = set(ast.sections_by_id.keys())
+        max_page = max(ast.pages_by_number.keys(), default=1)
 
         invalid_paras: List[str] = []
         invalid_pages: List[int] = []
@@ -1556,6 +2020,31 @@ class ReasoningQAEvaluator:
                 if status_val not in fact_counts:
                     status_val = EpistemicStatus.SOURCE_FACT.value
                 fact_counts[status_val] += 1
+
+        # Inspecionar conceitos e integridade das suas evidências
+        if conceptual_analysis:
+            for conc in conceptual_analysis:
+                c_refs = getattr(conc, "evidence_refs", []) or []
+                for ref in c_refs:
+                    total_refs += 1
+                    ref_valid = True
+                    p_id = getattr(ref, "paragraph_id", None) if not isinstance(ref, dict) else ref.get("paragraph_id")
+                    status_val = getattr(ref, "status", EpistemicStatus.MODEL_INFERENCE.value) if not isinstance(ref, dict) else ref.get("status", EpistemicStatus.MODEL_INFERENCE.value)
+                    if status_val == EpistemicStatus.SOURCE_FACT.value:
+                        if not p_id or not str(p_id).strip():
+                            errors.append(f"Conceito SOURCE_FACT '{conc.name}' não possui paragraph_id de suporte válido.")
+                            ref_valid = False
+                        elif p_id not in valid_paras:
+                            invalid_paras.append(p_id)
+                            errors.append(f"Conceito SOURCE_FACT referencia paragraph_id inexistente '{p_id}'.")
+                            ref_valid = False
+
+                    if ref_valid:
+                        valid_refs += 1
+
+                    if status_val not in fact_counts:
+                        status_val = EpistemicStatus.MODEL_INFERENCE.value
+                    fact_counts[status_val] += 1
 
         # Inspecionar tensões
         for tension in cross_synthesis.coherence_and_tensions:
