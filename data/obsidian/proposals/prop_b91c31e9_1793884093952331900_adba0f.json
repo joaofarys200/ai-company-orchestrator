@@ -1,0 +1,32 @@
+{
+  "proposal_id": "prop_b91c31e9_1793884093952331900_adba0f",
+  "rel_path": "10 - Lectures/Lecture - RAG and Agents.md",
+  "stem": "Lecture - RAG and Agents",
+  "model_provider": "deterministic",
+  "model_name": "synonym_registry_v2",
+  "backup_path": "C:\\Users\\joaor\\AppData\\Local\\Temp\\pytest-of-joaor\\pytest-358\\test_05_safe_enrichment_create0\\obsidian_vault\\.history\\snap_b91c31e9ed3a_1793884093961107000_875361b4_e692c3c8.md",
+  "proposed_relationships": [
+    {
+      "source_note": "Lecture - RAG and Agents",
+      "target_note": "Agentic RAG, Query Decomposition and Cross-Encoder Reranking",
+      "relationship_type": "RELATED_TO",
+      "justification": "Associação semântica contextual entre 'Lecture - RAG and Agents' e 'Agentic RAG, Query Decomposition and Cross-Encoder Reranking'",
+      "confidence": 0.95,
+      "creation_method": "DETERMINISTIC_CURATED_SYNONYM",
+      "validation_status": "VALIDATED"
+    },
+    {
+      "source_note": "Lecture - RAG and Agents",
+      "target_note": "Post-Quantum Cryptography",
+      "relationship_type": "RELATED_TO",
+      "justification": "Associação semântica contextual entre 'Lecture - RAG and Agents' e 'Post-Quantum Cryptography'",
+      "confidence": 0.9,
+      "creation_method": "YAML_ALIAS_MATCH",
+      "validation_status": "VALIDATED"
+    }
+  ],
+  "original_length": 108,
+  "enriched_length": 662,
+  "status": "APPLIED",
+  "created_at": "2026-11-05T13:08:13.977174"
+}

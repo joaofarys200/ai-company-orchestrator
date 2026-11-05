@@ -152,7 +152,7 @@ class OllamaChatProvider:
     async def warmup(self, model: str | None = None) -> bool:
         """Sends a lightweight warmup probe to preload model weights into memory/VRAM."""
         target_model = (model or self.default_model).strip()
-        default_ctx = int(os.getenv("OLLAMA_NUM_CTX", "16384"))
+        default_ctx = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
         for attempt in range(2):
             try:
                 timeout = httpx.Timeout(connect=5.0, read=45.0, write=5.0, pool=5.0)
@@ -206,6 +206,26 @@ class OllamaChatProvider:
             except httpx.ConnectError:
                 if attempt == 0 and self._ensure_local_daemon_running():
                     await asyncio.sleep(2.5)
+                    continue
+                raise
+            except httpx.HTTPStatusError as exc:
+                if (
+                    attempt == 0
+                    and exc.response.status_code >= 500
+                    and (payload.get("options") or {}).get("num_ctx", 0) > 4096
+                ):
+                    options.emit(
+                        "ollama_500_retry_with_reduced_context",
+                        {
+                            "old_ctx": payload["options"]["num_ctx"],
+                            "new_ctx": 4096,
+                            "error": str(exc),
+                        },
+                    )
+                    payload = dict(payload)
+                    payload["options"] = dict(payload["options"])
+                    payload["options"]["num_ctx"] = 4096
+                    await asyncio.sleep(1.0)
                     continue
                 raise
         if readiness:
@@ -606,7 +626,7 @@ class OllamaChatProvider:
             ),
             "options": {
                 "temperature": request.temperature,
-                "num_ctx": request.max_context_tokens or int(os.getenv("OLLAMA_NUM_CTX", "16384")),
+                "num_ctx": request.max_context_tokens or int(os.getenv("OLLAMA_NUM_CTX", "8192")),
                 "num_predict": request.max_output_tokens or int(os.getenv("OLLAMA_NUM_PREDICT", "4096")),
                 "num_batch": int(os.getenv("OLLAMA_NUM_BATCH", "512")),
             },

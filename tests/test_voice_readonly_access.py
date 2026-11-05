@@ -55,7 +55,14 @@ class VoiceReadOnlyAccessTests(unittest.IsolatedAsyncioTestCase):
             self.assertIsNone(server.voice_runtime.pending_directive)
 
     async def test_opening_an_application_still_requires_confirmation(self):
-        with patch.dict(os.environ, {"VOICE_AUTO_READONLY": "true"}, clear=False):
+        with patch.dict(
+            os.environ,
+            {
+                "VOICE_AUTO_READONLY": "true",
+                "VOICE_AUTO_EXECUTE_LOCAL_APPS": "false",
+            },
+            clear=False,
+        ):
             with patch.object(
                 server.voice_runtime,
                 "connections",

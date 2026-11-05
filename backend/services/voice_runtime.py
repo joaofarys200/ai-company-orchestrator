@@ -341,6 +341,26 @@ class VoiceDirectiveService:
             return "Sem texto de voz para processar."
         await self.clear_expired()
         if not self.confirmation_enabled():
+            local_app = find_local_app_request(prompt)
+            if local_app:
+                ok, details = (
+                    await self.callbacks.open_local_application(
+                        local_app
+                    )
+                )
+                await self.callbacks.broadcast_state("idle")
+                if ok:
+                    label = str(local_app.get("label") or "")
+                    article = "a" if label.lower().startswith("pasta") else "o"
+                    await self.connections.broadcast(
+                        {
+                            "type": "chat",
+                            "sender": "JARVIS",
+                            "role": "Voz",
+                            "content": f"Abri {article} {label}.",
+                        }
+                    )
+                    return "Aplicacao aberta."
             await self.start_orchestration(prompt)
             return "Orquestracao iniciada sem confirmacao."
         if self.is_confirmation(prompt):
@@ -350,6 +370,27 @@ class VoiceDirectiveService:
         if self.is_read_only_request(prompt):
             await self.start_orchestration(prompt)
             return "Consulta read-only iniciada."
+        if env_bool("VOICE_AUTO_EXECUTE_LOCAL_APPS", False):
+            local_app = find_local_app_request(prompt)
+            if local_app:
+                ok, details = (
+                    await self.callbacks.open_local_application(
+                        local_app
+                    )
+                )
+                await self.callbacks.broadcast_state("idle")
+                if ok:
+                    label = str(local_app.get("label") or "")
+                    article = "a" if label.lower().startswith("pasta") else "o"
+                    await self.connections.broadcast(
+                        {
+                            "type": "chat",
+                            "sender": "JARVIS",
+                            "role": "Voz",
+                            "content": f"Abri {article} {label}.",
+                        }
+                    )
+                    return "Aplicacao aberta."
         self.state.pending_directive = {
             "prompt": prompt,
             "source": source,
@@ -377,7 +418,7 @@ class VoiceDirectiveService:
                 "type": "chat",
                 "sender": "JARVIS",
                 "role": "Voz",
-                "content": f"Entendi esta tarefa: {prompt}",
+                "content": f"Entendi esta tarefa: {prompt}. Diz 'confirma' para executar.",
             }
         )
         log_event(
@@ -451,13 +492,15 @@ class VoiceDirectiveService:
                     app=local_app["id"],
                     source="voice",
                 )
+                label = str(local_app.get("label") or "")
+                article = "a" if label.lower().startswith("pasta") else "o"
                 await self.connections.broadcast(
                     {
                         "type": "chat",
                         "sender": "JARVIS",
                         "role": "Voz",
                         "content": (
-                            f"Abri o {local_app['label']}."
+                            f"Abri {article} {label}."
                         ),
                     }
                 )
@@ -469,13 +512,15 @@ class VoiceDirectiveService:
                 app=local_app["id"],
                 error=details,
             )
+            label = str(local_app.get("label") or "")
+            article = "a" if label.lower().startswith("pasta") else "o"
             await self.connections.broadcast(
                 {
                     "type": "chat",
                     "sender": "JARVIS",
                     "role": "Voz",
                     "content": (
-                        f"Tentei abrir o {local_app['label']}, "
+                        f"Tentei abrir {article} {label}, "
                         "mas o Windows devolveu erro: "
                         f"{details}"
                     ),

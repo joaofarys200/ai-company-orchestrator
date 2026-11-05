@@ -342,6 +342,190 @@ def quote_powershell_single(value: str) -> str:
     return "'" + str(value).replace("'", "''") + "'"
 
 
+FOLDER_TRIGGER_WORDS = {
+    "pasta",
+    "pastas",
+    "diretorio",
+    "diretorios",
+    "directorio",
+    "directorios",
+    "folder",
+    "folders",
+    "directory",
+    "directories",
+}
+
+
+def find_folder_request(prompt: str, working_directory: str | None = None) -> dict | None:
+    normalized = normalize_voice_command_text(prompt)
+    if not normalized:
+        return None
+    words = normalized.split()
+    action_words = {word for word in words if word in LOCAL_APP_ACTION_WORDS}
+    if not action_words and not any(
+        word in words for word in ("mostra", "mostrar", "ver", "ve")
+    ):
+        return None
+
+    idx = next((i for i, w in enumerate(words) if w in FOLDER_TRIGGER_WORDS), -1)
+    if idx < 0:
+        return None
+
+    rest = words[idx + 1 :]
+    filler = {
+        "o",
+        "a",
+        "os",
+        "as",
+        "um",
+        "uma",
+        "de",
+        "do",
+        "da",
+        "dos",
+        "das",
+        "projeto",
+        "projetos",
+        "project",
+        "projects",
+        "meu",
+        "minha",
+    }
+    while rest and rest[0] in filler:
+        rest.pop(0)
+    while rest and rest[-1] in filler:
+        rest.pop()
+    target_query = " ".join(rest).strip()
+
+    base_dir = working_directory or os.getcwd()
+    user_home = os.path.expanduser("~")
+
+    common_targets = {
+        "downloads": os.path.join(user_home, "Downloads"),
+        "transferencias": os.path.join(user_home, "Downloads"),
+        "documentos": os.path.join(user_home, "Documents"),
+        "documents": os.path.join(user_home, "Documents"),
+        "desktop": os.path.join(user_home, "Desktop"),
+        "ambiente de trabalho": os.path.join(user_home, "Desktop"),
+        "imagens": os.path.join(user_home, "Pictures"),
+        "pictures": os.path.join(user_home, "Pictures"),
+        "fotos": os.path.join(user_home, "Pictures"),
+        "musica": os.path.join(user_home, "Music"),
+        "musicas": os.path.join(user_home, "Music"),
+        "videos": os.path.join(user_home, "Videos"),
+        "workspace": os.path.join(base_dir, "workspace"),
+        "projetos": os.path.join(base_dir, "workspace", "projects"),
+        "projects": os.path.join(base_dir, "workspace", "projects"),
+        "jarvis": base_dir,
+        "jarvisos": base_dir,
+    }
+
+    if not target_query:
+        for key, path in common_targets.items():
+            if key in normalized and os.path.isdir(path):
+                return {
+                    "id": f"folder_{key}",
+                    "label": f"pasta '{key}'",
+                    "path": path,
+                    "command": (
+                        "Start-Process explorer.exe -ArgumentList "
+                        f"{quote_powershell_single(path)}"
+                    ),
+                    "source": "folder",
+                }
+        return None
+
+    if target_query in common_targets and os.path.isdir(
+        common_targets[target_query]
+    ):
+        path = common_targets[target_query]
+        return {
+            "id": f"folder_{target_query}",
+            "label": f"pasta '{target_query}'",
+            "path": path,
+            "command": (
+                "Start-Process explorer.exe -ArgumentList "
+                f"{quote_powershell_single(path)}"
+            ),
+            "source": "folder",
+        }
+
+    # Search in workspace/projects/<target_query>
+    projects_dir = os.path.join(base_dir, "workspace", "projects")
+    if os.path.isdir(projects_dir):
+        candidate = os.path.join(projects_dir, target_query)
+        if os.path.isdir(candidate):
+            return {
+                "id": f"folder_{target_query}",
+                "label": f"pasta '{os.path.basename(candidate)}'",
+                "path": candidate,
+                "command": (
+                    "Start-Process explorer.exe -ArgumentList "
+                    f"{quote_powershell_single(candidate)}"
+                ),
+                "source": "folder",
+            }
+        try:
+            for entry in os.listdir(projects_dir):
+                if entry.lower() == target_query:
+                    matched = os.path.join(projects_dir, entry)
+                    if os.path.isdir(matched):
+                        return {
+                            "id": f"folder_{target_query}",
+                            "label": f"pasta '{entry}'",
+                            "path": matched,
+                            "command": (
+                                "Start-Process explorer.exe -ArgumentList "
+                                f"{quote_powershell_single(matched)}"
+                            ),
+                            "source": "folder",
+                        }
+        except OSError:
+            pass
+
+    # Search user folders & repo base
+    for search_root in (
+        os.path.join(user_home, "Desktop"),
+        os.path.join(user_home, "Documents"),
+        os.path.join(user_home, "Downloads"),
+        user_home,
+        base_dir,
+    ):
+        if not os.path.isdir(search_root):
+            continue
+        candidate = os.path.join(search_root, target_query)
+        if os.path.isdir(candidate):
+            return {
+                "id": f"folder_{target_query}",
+                "label": f"pasta '{os.path.basename(candidate)}'",
+                "path": candidate,
+                "command": (
+                    "Start-Process explorer.exe -ArgumentList "
+                    f"{quote_powershell_single(candidate)}"
+                ),
+                "source": "folder",
+            }
+        try:
+            for entry in os.listdir(search_root):
+                if entry.lower() == target_query:
+                    matched = os.path.join(search_root, entry)
+                    if os.path.isdir(matched):
+                        return {
+                            "id": f"folder_{target_query}",
+                            "label": f"pasta '{entry}'",
+                            "path": matched,
+                            "command": (
+                                "Start-Process explorer.exe -ArgumentList "
+                                f"{quote_powershell_single(matched)}"
+                            ),
+                            "source": "folder",
+                        }
+        except OSError:
+            pass
+
+    return None
+
+
 def find_local_app_request(prompt: str):
     normalized = normalize_voice_command_text(prompt)
     if not normalized:
@@ -360,6 +544,9 @@ def find_local_app_request(prompt: str):
             for term in app["terms"]
         ):
             return app
+    folder = find_folder_request(prompt)
+    if folder:
+        return folder
     query = extract_local_app_query(prompt)
     if not query:
         return None

@@ -50,38 +50,8 @@
     ],
     "status": "PENDING",
     "retry_count": 0,
-    "created_at": "2026-11-05T10:43:01.375341",
-    "updated_at": "2026-11-05T10:43:01.375365"
-  },
-  {
-    "item_id": "queue_ebc1c790",
-    "note_path": "00 - MOC/AI Index.md",
-    "stem": "AI Index",
-    "priority_score": 39.1,
-    "overall_score": 58.4,
-    "epistemic_classification": "UNVERIFIED_HEURISTIC",
-    "findings": [
-      {
-        "category": "Evidence Quality",
-        "dimension": "Provenance",
-        "what_is_missing": "Proveniência de fonte não identificada nos metadados",
-        "why_it_matters": "Não é possível rastrear a origem do conteúdo",
-        "evidence_supporting_finding": "Frontmatter não declara 'source_type' nem 'provenance'",
-        "recommended_improvement": "Adicionar proveniência ou ligar a documento fonte"
-      },
-      {
-        "category": "Evidence Quality",
-        "dimension": "Factual Grounding",
-        "what_is_missing": "Citações formais de evidência [E#], RFC, DOI ou normas",
-        "why_it_matters": "Afirmações sem âncora textual enfraquecem o rigor epistémico do grafo",
-        "evidence_supporting_finding": "Ausência de marcadores de citação ou proveniência documental",
-        "recommended_improvement": "Ancorar as afirmações centrais em especificações ou fontes primárias"
-      }
-    ],
-    "status": "PENDING",
-    "retry_count": 0,
-    "created_at": "2026-11-05T10:43:01.405931",
-    "updated_at": "2026-11-05T10:43:01.405951"
+    "created_at": "2026-11-05T13:08:13.888727",
+    "updated_at": "2026-11-05T13:08:13.888750"
   },
   {
     "item_id": "queue_11f63274",
@@ -110,8 +80,38 @@
     ],
     "status": "PENDING",
     "retry_count": 0,
-    "created_at": "2026-11-05T10:43:01.437620",
-    "updated_at": "2026-11-05T10:43:01.437639"
+    "created_at": "2026-11-05T13:08:13.902729",
+    "updated_at": "2026-11-05T13:08:13.902740"
+  },
+  {
+    "item_id": "queue_ebc1c790",
+    "note_path": "00 - MOC/AI Index.md",
+    "stem": "AI Index",
+    "priority_score": 39.1,
+    "overall_score": 58.4,
+    "epistemic_classification": "UNVERIFIED_HEURISTIC",
+    "findings": [
+      {
+        "category": "Evidence Quality",
+        "dimension": "Provenance",
+        "what_is_missing": "Proveniência de fonte não identificada nos metadados",
+        "why_it_matters": "Não é possível rastrear a origem do conteúdo",
+        "evidence_supporting_finding": "Frontmatter não declara 'source_type' nem 'provenance'",
+        "recommended_improvement": "Adicionar proveniência ou ligar a documento fonte"
+      },
+      {
+        "category": "Evidence Quality",
+        "dimension": "Factual Grounding",
+        "what_is_missing": "Citações formais de evidência [E#], RFC, DOI ou normas",
+        "why_it_matters": "Afirmações sem âncora textual enfraquecem o rigor epistémico do grafo",
+        "evidence_supporting_finding": "Ausência de marcadores de citação ou proveniência documental",
+        "recommended_improvement": "Ancorar as afirmações centrais em especificações ou fontes primárias"
+      }
+    ],
+    "status": "PENDING",
+    "retry_count": 0,
+    "created_at": "2026-11-05T13:08:13.909078",
+    "updated_at": "2026-11-05T13:08:13.909090"
   },
   {
     "item_id": "queue_29fec61e",
@@ -140,7 +140,7 @@
     ],
     "status": "PENDING",
     "retry_count": 0,
-    "created_at": "2026-11-05T10:43:01.451505",
-    "updated_at": "2026-11-05T10:43:01.451522"
+    "created_at": "2026-11-05T13:08:13.894703",
+    "updated_at": "2026-11-05T13:08:13.894713"
   }
 ]

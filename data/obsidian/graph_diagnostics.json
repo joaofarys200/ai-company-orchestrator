@@ -1,0 +1,164 @@
+{
+  "audit_id": "audit_e3ad1eb1",
+  "timestamp": "2026-11-05T12:47:57.982574",
+  "total_notes": 255,
+  "outgoing_edges": 1231,
+  "incoming_edges_total": 1231,
+  "genuine_orphans": 1,
+  "genuine_orphans_list": [
+    "09 - JARVIS/Lessons/Economic Lessons/Economic Mission Postmortem - zk-Agent Gateway.md"
+  ],
+  "moc_only_count": 12,
+  "moc_only_notes_list": [
+    "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md",
+    "09 - JARVIS/Knowledge Gaps/Gap - Multi-Modal Continuous Eye Gaze Tracking for Desktop Actions.md",
+    "09 - JARVIS/Decisions/ADR-014 - Automated Defense and Resilience for FINDING-03-WEBSOCKET-PATH-JAIL.md",
+    "09 - JARVIS/Decisions/ADR-015 - AST Streaming Memory Optimization for FINDING-P8-AST-STREAMING-BUFFER.md",
+    "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Transcrição Integral.md",
+    "09 - JARVIS/Lessons/Engineering Lessons/Lesson - FINDING-P8-AST-STREAMING-BUFFER.md",
+    "09 - JARVIS/Lessons/Economic Lessons/Lesson - Synthetic Revenue Rejection.md",
+    "03 - Backend & Distributed Systems/Persistence/Tratado_Completo_de_Engenharia_de_Sistemas_Distribuidos_e_Bases_de_Dados.md",
+    "09 - JARVIS/E2E_Validation_Note.md",
+    "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Notas Cornell.md",
+    "09 - JARVIS/Audits/OBSIDIAN_VAULT_QUALITY_REPORT.md",
+    "09 - JARVIS/Decisions/ADR-014 - Automated Defense and Resilience for FINDING-02-NETWORK-RETRY-JITTER.md"
+  ],
+  "hubs_count": 46,
+  "hubs_list": [
+    "01 - AI & LLM/Agent Systems/Planner-Executor Agent Pattern.md",
+    "01 - AI & LLM/Agent Systems/Self-Healing Prompt Loops and Reflective Orchestration (RHO-SHE).md",
+    "01 - AI & LLM/Agent Systems/Model Context Protocol (MCP) and Capability Discovery Architecture.md",
+    "01 - AI & LLM/Agent Systems/Agent Loop Detection and Circuit Breaker.md",
+    "00 - MOC/Security Index.md",
+    "02 - Software Engineering/AST & Code Analysis/Abstract Syntax Tree (AST) Parsing and Manipulation.md",
+    "01 - AI & LLM/Model Harness/Model Routing and Fallback Strategies.md",
+    "00 - MOC/Lectures Index.md",
+    "09 - JARVIS/Autonomy/JARVIS MissionExecutorService and Autonomy Controller.md",
+    "09 - JARVIS/Lessons/RAG Lessons/Lesson - Low-Score BM25 Pollution in Short Semantic Queries.md",
+    "02 - Software Engineering/Architecture/Idempotency in Software Systems.md",
+    "09 - JARVIS/Agents/JARVIS Autonomous Agent Hierarchy.md",
+    "09 - JARVIS/Components/JARVIS Component Architecture.md",
+    "07 - Business & SaaS/Product/Distinguishing Real vs Synthetic Market Evidence.md",
+    "07 - Business & SaaS/SaaS Economics/SaaS Unit Economics - CAC, LTV and Magic Number.md"
+  ],
+  "broken_links": 22,
+  "broken_links_list": [
+    {
+      "source": "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md",
+      "target": "Metodologia de Investigação"
+    },
+    {
+      "source": "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md",
+      "target": "video1845185762.mp4"
+    },
+    {
+      "source": "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md",
+      "target": "Wikilinks"
+    },
+    {
+      "source": "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md",
+      "target": "Análise de Sentimento"
+    },
+    {
+      "source": "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md",
+      "target": "Dados Secundários"
+    },
+    {
+      "source": "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md",
+      "target": "Variáveis Dependentes"
+    },
+    {
+      "source": "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Aula.md",
+      "target": "Variáveis Independentes"
+    },
+    {
+      "source": "10 - Lectures/Inteligência Artificial/2026-08-31 - Sistemas Multiagente e Arquiteturas RAG.md",
+      "target": "Agent Systems Architecture"
+    },
+    {
+      "source": "10 - Lectures/Inteligência Artificial/2026-08-18 - Sistemas Multiagente e Arquiteturas RAG.md",
+      "target": "Agent Systems Architecture"
+    },
+    {
+      "source": "10 - Lectures/Inteligência Artificial/2026-09-06 - Sistemas Multiagente e Arquiteturas RAG.md",
+      "target": "Agent Systems Architecture"
+    },
+    {
+      "source": "00 - MOC/Lectures Index.md",
+      "target": "Agent Systems Architecture"
+    },
+    {
+      "source": "10 - Lectures/Inteligência Artificial/2026-08-24 - Sistemas Multiagente e Arquiteturas RAG.md",
+      "target": "Agent Systems Architecture"
+    },
+    {
+      "source": "10 - Lectures/Inteligência Artificial/2026-08-19 - Sistemas Multiagente e Arquiteturas RAG.md",
+      "target": "Agent Systems Architecture"
+    },
+    {
+      "source": "10 - Lectures/Inteligência Artificial/2026-09-12 - Sistemas Multiagente e Arquiteturas RAG.md",
+      "target": "Agent Systems Architecture"
+    },
+    {
+      "source": "10 - Lectures/Inteligência Artificial/2026-09-02 - Sistemas Multiagente e Arquiteturas RAG.md",
+      "target": "Agent Systems Architecture"
+    },
+    {
+      "source": "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Notas Cornell.md",
+      "target": "Racional Hipotético-Dedutivo"
+    },
+    {
+      "source": "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Notas Cornell.md",
+      "target": "SentiStrength"
+    },
+    {
+      "source": "10 - Lectures/Metodologia de Investigacao/2026-10-03 - Predicting the Performance of Online Consumer Reviews - Notas Cornell.md",
+      "target": "Rastro Informacional"
+    },
+    {
+      "source": "10 - Lectures/Inteligência Artificial/2026-08-26 - Sistemas Multiagente e Arquiteturas RAG.md",
+      "target": "Agent Systems Architecture"
+    },
+    {
+      "source": "10 - Lectures/Inteligência Artificial/2026-08-29 - Sistemas Multiagente e Arquiteturas RAG.md",
+      "target": "Agent Systems Architecture"
+    },
+    {
+      "source": "05 - Security/Cryptography/Zero-Knowledge Proofs and zk-SNARKs in Autonomous Verification.md",
+      "target": "05 - Security/00 - Security Index"
+    },
+    {
+      "source": "10 - Lectures/Inteligência Artificial/2026-08-23 - Sistemas Multiagente e Arquiteturas RAG.md",
+      "target": "Agent Systems Architecture"
+    }
+  ],
+  "missing_attachments_count": 0,
+  "code_examples_ignored_count": 2,
+  "quality_average": 73.2,
+  "quality_distribution": {
+    "ge_80": 101,
+    "between_70_79": 51,
+    "between_60_69": 72,
+    "lt_60": 31,
+    "total_audited": 255
+  },
+  "queue_metrics": {
+    "is_paused": false,
+    "is_running": false,
+    "active_item_id": null,
+    "items_processed": 0,
+    "auto_mode_enabled": false,
+    "last_model_used": null,
+    "last_batch_result": null,
+    "queue_total": 4,
+    "pending_count": 4,
+    "applied_count": 0,
+    "proposals_count": 0,
+    "blocked_count": 0,
+    "reconciliation_count": 0,
+    "last_run_timestamp": null
+  },
+  "accepted_improvements": 1,
+  "rejected_suggestions": 0,
+  "proposals_awaiting_review": 0
+}
