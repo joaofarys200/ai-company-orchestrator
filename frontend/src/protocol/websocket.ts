@@ -1586,6 +1586,9 @@ export type ServerMessage =
   | { type: 'study_folder_synced'; report: any; request_id?: string }
   | { type: 'study_ask_course_result'; collection_id: string; question: string; answer: string; sources: string[]; evidence?: string; evidence_status?: string; course_name?: string; referenced_documents?: string[]; request_id?: string }
   | { type: 'study_course_details'; collection_id: string; name: string; subject: string; linked_folders: any[]; materials: any[]; request_id?: string }
+  | { type: 'study_document_ast_result'; document_id: string; ast: any; request_id?: string; error?: string }
+  | { type: 'study_academic_reasoning_result'; document_id: string; dossier: any; request_id?: string; error?: string }
+  | { type: 'study_academic_reasoning_progress'; document_id: string; stage: string; progress: number; message: string; request_id?: string }
   | UnknownServerMessage;
 
 export type ClientMessage =
@@ -1670,6 +1673,9 @@ export type ClientMessage =
   | { type: 'study_get_course_details'; collection_id: string; request_id?: string }
   | { type: 'study_retry_document'; document_id: string; request_id?: string }
   | { type: 'study_cancel_generation'; document_id?: string; request_id?: string }
+  | { type: 'study_get_document_ast'; document_id: string; request_id?: string }
+  | { type: 'study_get_academic_reasoning'; document_id: string; request_id?: string }
+  | { type: 'study_generate_academic_reasoning'; document_id: string; force_recompute?: boolean; request_id?: string }
   | { type: 'action_confirm_response'; request_id: string; decision: 'APPROVE' | 'DENY' | 'REJECT'; user?: string; session_id?: string }
   | { type: 'permission_get_pending' }
   | { type: 'permission_approve'; request_id: string; user?: string; session_id?: string; project_id?: string; mission_id?: string }
@@ -2771,6 +2777,31 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         type: 'study_generation_cancelled',
         document_id: raw.document_id ? asString(raw.document_id) : undefined,
         cancelled: asBoolean(raw.cancelled, true),
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_document_ast_result':
+      return {
+        type: 'study_document_ast_result',
+        document_id: asString(raw.document_id),
+        ast: raw.ast,
+        error: raw.error ? asString(raw.error) : undefined,
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_academic_reasoning_result':
+      return {
+        type: 'study_academic_reasoning_result',
+        document_id: asString(raw.document_id),
+        dossier: raw.dossier,
+        error: raw.error ? asString(raw.error) : undefined,
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_academic_reasoning_progress':
+      return {
+        type: 'study_academic_reasoning_progress',
+        document_id: asString(raw.document_id),
+        stage: asString(raw.stage),
+        progress: asNumber(raw.progress, 0),
+        message: asString(raw.message),
         request_id: raw.request_id ? asString(raw.request_id) : undefined,
       };
     case 'study_error':
