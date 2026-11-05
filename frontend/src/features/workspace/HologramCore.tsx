@@ -388,7 +388,7 @@ export const HologramCore: React.FC<HologramCoreProps> = ({
           className={`p-2 rounded-full hover:bg-white/5 transition-all cursor-pointer ${
             voiceStatus !== 'offline' ? 'text-emerald-400' : 'text-gray-500 hover:text-white'
           }`}
-          title={voiceStatus !== 'offline' ? 'Microfone VAD Ativo' : 'Microfone VAD Inativo'}
+          title={voiceStatus !== 'offline' ? 'Comando de Voz Ativo' : 'Ativar Comandos por Voz'}
         >
           {voiceStatus !== 'offline' ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
         </button>

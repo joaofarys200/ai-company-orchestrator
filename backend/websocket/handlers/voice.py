@@ -43,7 +43,7 @@ class VoiceWebSocketHandler:
                             "type": "system",
                             "content": (
                                 "Reconhecimento de Voz Jarvis OS "
-                                "(VAD Python) ativado no Servidor."
+                                "ativado no Servidor."
                             ),
                         },
                     )
@@ -86,7 +86,7 @@ class VoiceWebSocketHandler:
                 "type": "system",
                 "content": (
                     "Reconhecimento de Voz Jarvis OS "
-                    "(VAD Python) desativado."
+                    "desativado."
                 ),
             },
         )
