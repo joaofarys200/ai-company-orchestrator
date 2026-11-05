@@ -50,3 +50,4 @@ Comando executado:
 ============================= 25 passed in 0.91s ==============================
 ```
 Todos os testes de ingestão de PDF, extração de texto, parsing de tabelas e delimitação de secções passaram com 100% de sucesso sem qualquer aviso de depreciação de `fitz`.
+

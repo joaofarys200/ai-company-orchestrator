@@ -47,3 +47,4 @@ Todos os relatórios formais encontram-se gerados e persistidos no diretório [a
 9. [PYMuPDF_FINAL_VALIDATION.md](file:///c:/Users/joaor/Desktop/JarvisOS/audit/obsidian_autonomous_knowledge_hardening/PYMuPDF_FINAL_VALIDATION.md)
 10. [TEST_AND_EVIDENCE_REGISTER.md](file:///c:/Users/joaor/Desktop/JarvisOS/audit/obsidian_autonomous_knowledge_hardening/TEST_AND_EVIDENCE_REGISTER.md)
 11. [FINAL_ACCEPTANCE_REPORT.md](file:///c:/Users/joaor/Desktop/JarvisOS/audit/obsidian_autonomous_knowledge_hardening/FINAL_ACCEPTANCE_REPORT.md)
+

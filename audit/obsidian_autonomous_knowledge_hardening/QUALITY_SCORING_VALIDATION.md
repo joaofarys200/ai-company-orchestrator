@@ -60,3 +60,4 @@ $$\text{Overall Score} = (0.25 \times \text{Structural}) + (0.30 \times \text{Kn
 Os testes executados em `tests/test_obsidian_knowledge_hardening.py` confirmam:
 - `test_quality_scoring_four_categories_no_fixed_scores`: Verifica que o dicionário de auditoria expõe as 4 categorias completas (`structural_quality`, `knowledge_quality`, `evidence_quality`, `graph_quality`).
 - `test_jarvis_internal_never_promoted_to_verified_primary_source`: Testa uma nota com `source_type: JARVIS_INTERNAL`, garantindo que a sua classificação é `INTERNAL_ENGINEERING_SPEC` e que a nota não atinge os 95 pontos de uma norma primária.
+

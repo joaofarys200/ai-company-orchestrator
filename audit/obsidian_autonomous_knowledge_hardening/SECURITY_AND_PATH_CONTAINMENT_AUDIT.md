@@ -92,3 +92,4 @@ No ficheiro `backend/websocket/handlers/knowledge.py`:
 | Rollback com fonte fora do `.history` | `01 - AI/OtherNote.md` | `ObsidianSecurityError` | **PASS (0.01s)** |
 | Rollback de snapshot cruzado | Snapshot de `Nota A` aplicado em `Nota B` | `ObsidianSecurityError` | **PASS (0.01s)** |
 | Escrita com hash CAS desatualizado | `expected_sha256 = stale_hash` | `ObsidianConcurrencyError` | **PASS (0.01s)** |
+

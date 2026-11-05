@@ -64,3 +64,4 @@ Os 23 links quebrados reais detetados no cofre decorrem de ligeiras discrepânci
 - `[[PQC]]` ➔ Resolvido agora via alias YAML para `[[Post-Quantum Cryptography Migration...]]`
 
 O registo de sinónimos ontológicos e a fila de melhoria autónoma fornecem a infraestrutura exata para corrigir e reencaminhar estas 23 referências sem intervenção manual destrutiva.
+

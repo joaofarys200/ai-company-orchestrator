@@ -62,3 +62,4 @@ Quando uma nota é enriquecida, as relações são formatadas numa secção clar
 - **PREREQUISITE_OF** ➔ [[Model Context Protocol (MCP) and Capability Discovery Architecture]] — *'Agent Systems' estabelece os fundamentos necessários para 'Model Context Protocol (MCP) and Capability Discovery Architecture'*
 - **SUPPORTS** ➔ [[Post-Quantum Cryptography Migration - Hybrid ML-KEM (FIPS 203) and ML-DSA (FIPS 204)]] — *'Agent Systems' fornece suporte conceitual ou evidências a 'Post-Quantum Cryptography Migration - Hybrid ML-KEM (FIPS 203) and ML-DSA (FIPS 204)'*
 ```
+

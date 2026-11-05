@@ -384,7 +384,6 @@ class ObsidianGraphEngine:
         metadata: Dict[str, Any] = {
             "snapshot_id": f"snap_{snapshot_uuid}",
             "snapshot_filename": snapshot_filename,
-            "snapshot_path": str(snapshot_path),
             "schema_version": 2,
             "note_rel_path": rel_str,
             "note_stem": stem,
@@ -496,7 +495,12 @@ class ObsidianGraphEngine:
         final_sha = hashlib.sha256(target_file.read_bytes()).hexdigest()
         self.refresh_vault_catalogs()
 
-        return True
+        return {
+            "success": True,
+            "rel_path": rel_str,
+            "restored_from": snapshot_file.name,
+            "sha256": final_sha,
+        }
 
     # ──────────────────────────────────────────────────────────────────────────
     # 4. MARKDOWN-AWARE WIKILINK & ATTACHMENT EXTRACTION
@@ -581,8 +585,8 @@ class ObsidianGraphEngine:
 
         # 1. Frontmatter presence and required fields
         if bool(meta):
-            has_domain = bool(meta.get("domain") or meta.get("subject") or meta.get("tags"))
-            has_type = bool(meta.get("type") or meta.get("source_type"))
+            has_domain = bool(meta.get("domain") or meta.get("subject"))
+            has_type = bool(meta.get("type"))
             fm_score = 70.0 + (15.0 if has_domain else 0.0) + (15.0 if has_type else 0.0)
             struct_subscores.append(fm_score)
         else:
@@ -639,9 +643,9 @@ class ObsidianGraphEngine:
             comp_score = min(100.0, 50.0 + len(moc_links) * 5.0)
             know_subscores.append(comp_score)
         else:
-            has_summary = any(re.search(r"sum[aá]rio|resumo|overview|executive|vis[aã]o geral", s, re.I) for s in sections)
+            has_summary = any(re.search(r"sumário|resumo|overview|executive|visão geral", s, re.I) for s in sections)
             has_technical_core = len(sections) >= 3 or words_count >= 250
-            has_takeaways = any(re.search(r"takeaways?|gloss[aá]rio|cues|quest[oõ]es|conclus[aã]o|a[cç][oõ]es|refer[eê]ncias|trade-offs", s, re.I) for s in sections)
+            has_takeaways = any(re.search(r"cues|questões|conclusão|ações|referências|trade-offs", s, re.I) for s in sections)
             comp_score = 30.0 + (25.0 if has_summary else 0.0) + (25.0 if has_technical_core else 0.0) + (20.0 if has_takeaways else 0.0)
             know_subscores.append(comp_score)
             if comp_score < 75.0:
@@ -665,21 +669,16 @@ class ObsidianGraphEngine:
         # ── CATEGORY C: EVIDENCE QUALITY (0-100) ──
         # Evaluates claim-level citations, standards, RFCs, DOIs, and empirical proofs
         raw_source_type = str(meta.get("source_type") or meta.get("provenance") or "").upper()
-        has_formal_citations = bool(re.search(r"\[E\d+\]|\bRFC\b|\bRFC\s*\d+|\bFIPS\b|\bFIPS\s*\d+|\bDOI\b|\bISO\b|\bIEEE\b", body, re.I))
+        has_formal_citations = bool(re.search(r"\[E\d+\]|RFC\s*\d+|FIPS\s*\d+|DOI:|ISO\s*\d+|IEEE\s*\d+", body))
         has_footnotes = bool(re.search(r"\[\^\d+\]", body))
         has_source_doc = bool(meta.get("source_document_ids") or meta.get("source_notes"))
 
         evidence_subscores: List[float] = []
 
-        if raw_source_type in ("RFC", "NIST", "FIPS", "PAPER", "PRIMARY_SOURCE"):
-            if has_formal_citations:
-                ev_score = 95.0
-                epistemic_class = "VERIFIED_PRIMARY_SOURCE"
-                verif_basis = "PRIMARY_STANDARD_WITH_FORMAL_CITATIONS"
-            else:
-                ev_score = 80.0
-                epistemic_class = "VERIFIED_PRIMARY_SOURCE"
-                verif_basis = "PRIMARY_STANDARD_DECLARATION"
+        if raw_source_type in ("RFC", "NIST", "FIPS", "PAPER", "PRIMARY_SOURCE") and has_formal_citations:
+            ev_score = 95.0
+            epistemic_class = "VERIFIED_PRIMARY_SOURCE"
+            verif_basis = "PRIMARY_STANDARD_WITH_FORMAL_CITATIONS"
         elif meta.get("generation_mode") == "LLM_GROUNDED" and has_formal_citations:
             ev_score = 85.0
             epistemic_class = "GROUNDED_STUDY_SYNTHESIS"
@@ -697,15 +696,6 @@ class ObsidianGraphEngine:
             ev_score = 40.0 if has_footnotes else 25.0
             epistemic_class = "UNVERIFIED_HEURISTIC"
             verif_basis = "UNVERIFIED_HEURISTIC_CONTENT"
-            if not raw_source_type:
-                findings.append({
-                    "category": "Evidence Quality",
-                    "dimension": "Provenance",
-                    "what_is_missing": "Proveniência de fonte não identificada nos metadados",
-                    "why_it_matters": "Não é possível rastrear a origem do conteúdo",
-                    "evidence_supporting_finding": "Frontmatter não declara 'source_type' nem 'provenance'",
-                    "recommended_improvement": "Adicionar proveniência ou ligar a documento fonte",
-                })
             findings.append({
                 "category": "Evidence Quality",
                 "dimension": "Factual Grounding",
@@ -816,14 +806,6 @@ class ObsidianGraphEngine:
                 "structural_quality": structural_quality,
                 "knowledge_quality": knowledge_quality,
                 "evidence_quality": evidence_quality,
-                "graph_quality": graph_quality,
-            },
-            "dimension_scores": {
-                "provenance": evidence_quality,
-                "factual_grounding": evidence_quality,
-                "completeness": knowledge_quality,
-                "technical_depth": knowledge_quality,
-                "structural_quality": structural_quality,
                 "graph_quality": graph_quality,
             },
             "uniqueness": {
@@ -977,7 +959,7 @@ class ObsidianGraphEngine:
         stem = full_path.stem
 
         original_text = full_path.read_text(encoding="utf-8", errors="ignore")
-        orig_sha = hashlib.sha256(full_path.read_bytes()).hexdigest()
+        orig_sha = hashlib.sha256(original_text.encode("utf-8")).hexdigest()
         meta, body = self.parse_frontmatter(original_text)
 
         proposed_relationships: List[Dict[str, Any]] = []
@@ -1050,7 +1032,7 @@ class ObsidianGraphEngine:
             "proposal_id": proposal_id,
             "rel_path": rel_str,
             "stem": stem,
-            "backup_path": str(backup_snapshot.get("snapshot_path")) if backup_snapshot else "",
+            "backup_path": backup_snapshot.get("snapshot_filename") if backup_snapshot else "",
             "proposed_relationships": proposed_relationships,
             "original_length": len(original_text),
             "enriched_length": len(enriched_text),

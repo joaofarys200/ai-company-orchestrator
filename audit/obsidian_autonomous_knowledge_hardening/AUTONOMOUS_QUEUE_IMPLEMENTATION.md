@@ -76,3 +76,4 @@ O ficheiro `data/obsidian/worker_state.json` regista o ciclo de vida do worker a
 
 ### 5. Integração com Ollama Local (`qwen3.5:9b`)
 O processamento autónomo de notas que requerem enriquecimento generativo recorre unicamente à instância local Ollama via `ModelExecutionService` com o modelo `qwen3.5:9b`. Não existem chamadas a APIs cloud nem dependências pagas.
+

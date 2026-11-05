@@ -60,3 +60,4 @@ Em resposta direta à questão colocada pelo utilizador (*"porque alguns nodos n
    - Conecta os nós MOC-only às notas teóricas através de relações tipadas `APPLIES_TO` e `SUPPORTS`.
    - Resolve as 23 variações de nomenclatura através do dicionário ontológico e aliases YAML.
    - Preserva o cofre sem criar ligações acidentais nem alterar conteúdo de utilizador sem backup.
+

@@ -314,3 +314,4 @@ def test_bridge_note_validation_requires_existing_sources(disposable_vault):
             runtime_implementation="Code",
             evidence_refs=["REF1"],
         )
+

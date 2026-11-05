@@ -62,3 +62,4 @@ O ficheiro `frontend/src/protocol/websocket.ts` e o contexto `frontend/src/conte
   - `note_rollback_result`
   - `queue_worker_status`
   - `improvement_batch_result`
+

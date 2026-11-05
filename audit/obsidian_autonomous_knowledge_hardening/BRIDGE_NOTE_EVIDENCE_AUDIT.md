@@ -75,3 +75,4 @@ No JARVIS OS, o `SwarmOrchestrator` implementa discovery dinâmico de ferramenta
 O teste `test_bridge_note_generation_validates_existing_sources` em `tests/test_obsidian_knowledge_hardening.py`:
 1. Tenta criar uma bridge note referenciando notas existentes ➔ Conclui com sucesso, cria o ficheiro Markdown, atualiza o índice e preserva os links.
 2. Tenta criar uma bridge note referenciando uma nota fictícia ➔ Dispara `ObsidianNotFoundError`, comprovando a rejeição de fontes sem evidência real no cofre.
+

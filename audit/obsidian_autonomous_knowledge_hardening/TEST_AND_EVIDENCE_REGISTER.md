@@ -49,3 +49,4 @@ dist/assets/index-DooPX-GI.js                        1,004.40 kB │ gzip: 293.9
 ✓ built in 4.14s
 ```
 Zero erros de compilação TypeScript, zero falhas de lint e zero advertências bloqueantes.
+
