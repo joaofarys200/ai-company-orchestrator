@@ -17,11 +17,13 @@ Arquitetura:
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import logging
 import os
 import re
 import time
+import unicodedata
 import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
@@ -137,6 +139,18 @@ class ConceptItem:
     relationships: List[str] = field(default_factory=list)
     context_of_use: str = ""
     evidence_refs: List[EvidenceRef] = field(default_factory=list)
+
+
+def generate_deterministic_concept_id(name: str) -> str:
+    """
+    Gera um identificador determinístico e imutável para um conceito baseado no seu nome.
+    Ex: 'Grounding Semântico' -> 'concept_grounding_semantico_a1b2c3d4'
+    """
+    clean_name = (name or "").strip().lower()
+    normalized = unicodedata.normalize("NFKD", clean_name).encode("ASCII", "ignore").decode("utf-8")
+    slug = re.sub(r"[^a-z0-9]+", "_", normalized).strip("_")[:24]
+    h = hashlib.sha256(clean_name.encode("utf-8")).hexdigest()[:8]
+    return f"concept_{slug}_{h}" if slug else f"concept_{h}"
 
 
 @dataclass
@@ -605,6 +619,42 @@ Devolve EXCLUSIVAMENTE o seguinte objeto JSON:
 }}"""
 
 
+PROMPT_METHODOLOGY_UNIT = """Examina em pormenor a metodologia e os resultados empíricos presentes no seguinte excerto da secção "{section_title}" ({section_type}) do documento "{document_title}".
+
+=== CONTEÚDO DO EXCETO / SEGMENTO ===
+{method_and_results_content}
+=== FIM DO CONTEÚDO ===
+
+Instruções:
+- Se este excerto NÃO contiver elementos metodológicos nem resultados empíricos (ex: considerações preliminares ou contextualização teórica sem dados), assinala "is_applicable": false e preenche os campos disponíveis como "NOT_APPLICABLE".
+- Se contiver, extrai com rigor: tipo de investigação, desenho metodológico, métodos, amostra/participantes, instrumentos, procedimentos, variáveis, fontes de dados, técnicas analíticas e limitações.
+- Em resultados, isola cada enunciado de resultado acompanhado dos respetivos dados probatórios (quantitativos ou qualitativos) e indica OBRIGATORIAMENTE o 'paragraph_id' (ex: "p_12") correspondente ao parágrafo do texto onde o resultado é afirmado. NUNCA inventes números ou percentagens.
+
+Devolve EXCLUSIVAMENTE o seguinte objeto JSON:
+{{
+  "is_applicable": true,
+  "research_type": "ex: Quantitativo / Qualitativo / Estudo de Caso / Misto / NOT_APPLICABLE",
+  "methodological_design": "Descrição do desenho metodológico ou NOT_APPLICABLE",
+  "methods_used": ["Método 1", "Método 2"],
+  "sample_or_participants": "Descrição detalhada da amostra ou 'NOT_APPLICABLE'",
+  "instruments": ["Instrumentos ou fontes de recolha"],
+  "procedures": ["Passo a passo dos procedimentos"],
+  "variables": ["Variáveis independentes/dependentes analisadas"],
+  "data_sources": ["Fontes dos dados"],
+  "analysis_techniques": ["Técnicas estatísticas ou analíticas"],
+  "methodological_limitations": ["Limitações metodológicas expressas"],
+  "results": [
+    {{
+      "statement": "Enunciado do resultado observado",
+      "evidence_data": "Dados, métricas ou citações de suporte presentes no texto",
+      "relation_to_objectives": "Como este resultado responde à questão do estudo",
+      "interpretation_limitations": "Limitação na interpretação deste resultado",
+      "paragraph_id": "p_X"
+    }}
+  ]
+}}"""
+
+
 # ============================================================================
 # 6. Motor Principal de Execução: AcademicReasoningEngine
 # ============================================================================
@@ -809,9 +859,10 @@ class AcademicReasoningEngine:
 
         completed_segments: Dict[str, Dict[str, Any]] = checkpoint.get("completed_segments", {}) if checkpoint else {}
         completed_sections: Dict[str, Dict[str, Any]] = checkpoint.get("completed_sections", {}) if checkpoint else {}
+        completed_method_segments: Dict[str, Dict[str, Any]] = checkpoint.get("completed_method_segments", {}) if checkpoint else {}
 
-        # Mapeamento rápido de parágrafos da AST
-        paragraphs_map: Dict[str, ASTParagraph] = {p.paragraph_id: p for p in ast.paragraphs}
+        # Mapeamento rápido de parágrafos da AST (usando o índice O(1))
+        paragraphs_map: Dict[str, ASTParagraph] = ast.paragraphs_by_id
 
         # 2. Filtrar secções úteis para análise (ignora referências puras e apêndices na análise de fundo)
         analyzable_sections = [
@@ -824,9 +875,31 @@ class AcademicReasoningEngine:
         total_sections = len(analyzable_sections)
         all_section_analyses: List[SectionAnalysis] = []
         all_concepts_map: Dict[str, ConceptItem] = {}
+
+        # Carregar conceitos previamente persistidos em checkpoint
+        if checkpoint and "conceptual_analysis" in checkpoint:
+            for c_data in checkpoint.get("conceptual_analysis", []):
+                c_item = _from_dict(ConceptItem, c_data)
+                if c_item and c_item.name:
+                    all_concepts_map[c_item.name] = c_item
+
         all_results: List[ResultItem] = []
         failed_operations: List[Dict[str, Any]] = []
         telemetry_metrics = ReasoningTelemetry()
+
+        def _build_checkpoint_payload() -> Dict[str, Any]:
+            return {
+                "document_id": doc_id,
+                "source_sha256": source_sha256,
+                "ast_version": ast_version,
+                "model_name": self.model_name,
+                "prompt_versions": PROMPT_VERSIONS,
+                "completed_segments": completed_segments,
+                "completed_sections": completed_sections,
+                "completed_method_segments": completed_method_segments,
+                "conceptual_analysis": [asdict(c) for c in all_concepts_map.values()],
+                "updated_at": datetime.now().isoformat(),
+            }
 
         # 3. Execução Map por Secção -> Segmentos
         for sec_idx, section in enumerate(analyzable_sections, start=1):
@@ -841,14 +914,18 @@ class AcademicReasoningEngine:
                 sec_data = completed_sections[section.section_id]
                 sec_analysis = _from_dict(SectionAnalysis, sec_data)
                 all_section_analyses.append(sec_analysis)
-                # Reconstruir conceitos no mapa global a partir do checkpoint
+                # Reconstruir conceitos deterministicamente se não constavam do checkpoint
                 for c in sec_analysis.concepts:
-                    c_name = c.get("name") if isinstance(c, dict) else str(c)
+                    c_name = (c.get("name") if isinstance(c, dict) else str(c)).strip()
                     if c_name and c_name not in all_concepts_map:
+                        c_id = (c.get("concept_id") if isinstance(c, dict) else "") or generate_deterministic_concept_id(c_name)
                         all_concepts_map[c_name] = ConceptItem(
-                            concept_id=f"c_{uuid.uuid4().hex[:8]}",
+                            concept_id=c_id,
                             name=c_name,
+                            definition=c.get("definition", "") if isinstance(c, dict) else "",
                             explanation=c.get("explanation", "") if isinstance(c, dict) else "",
+                            relationships=c.get("relationships", []) if isinstance(c, dict) else [],
+                            context_of_use=c.get("context_of_use", "") if isinstance(c, dict) else "",
                             evidence_refs=[EvidenceRef(section_id=section.section_id, status=EpistemicStatus.SOURCE_FACT.value)],
                         )
                 continue
@@ -959,25 +1036,16 @@ class AcademicReasoningEngine:
 
                 # Guardar em checkpoint parcial
                 completed_segments[seg_id] = asdict(seg_obj)
-                self._save_checkpoint(
-                    doc_id,
-                    {
-                        "document_id": doc_id,
-                        "source_sha256": source_sha256,
-                        "ast_version": ast_version,
-                        "model_name": self.model_name,
-                        "prompt_versions": PROMPT_VERSIONS,
-                        "completed_segments": completed_segments,
-                        "completed_sections": completed_sections,
-                        "updated_at": datetime.now().isoformat(),
-                    },
-                )
+                self._save_checkpoint(doc_id, _build_checkpoint_payload())
 
             # 4. Síntese Integrada da Secção (Reduce 1)
             valid_segments = [s for s in sec_segment_analyses if s.central_idea]
+            def _format_concept_label(c: Any) -> str:
+                return c.get("name", "") if isinstance(c, dict) else str(c)
+
             segments_summary_text = "\n\n".join(
                 f"[Segmento {s.segment_id}]\nIdeia: {s.central_idea}\nObjetivo: {s.passage_objective}\n"
-                f"Conceitos: {', '.join(s.concepts)}\nArgumentos: {json.dumps(s.arguments, ensure_ascii=False)}"
+                f"Conceitos: {', '.join(_format_concept_label(c) for c in s.concepts)}\nArgumentos: {json.dumps(s.arguments, ensure_ascii=False)}"
                 for s in valid_segments
             )
             sec_synth_prompt = PROMPT_SECTION_SYNTHESIS.format(
@@ -1056,33 +1124,25 @@ class AcademicReasoningEngine:
             all_section_analyses.append(sec_analysis_obj)
             completed_sections[section.section_id] = asdict(sec_analysis_obj)
 
-            # Agregar conceitos ao mapa global
+            # Agregar conceitos ao mapa global deterministicamente
             for c in parsed_sec.get("concepts", []):
-                c_name = c.get("name") if isinstance(c, dict) else str(c)
+                c_name = (c.get("name") if isinstance(c, dict) else str(c)).strip()
                 if c_name and c_name not in all_concepts_map:
+                    c_id = (c.get("concept_id") if isinstance(c, dict) else "") or generate_deterministic_concept_id(c_name)
                     all_concepts_map[c_name] = ConceptItem(
-                        concept_id=f"c_{uuid.uuid4().hex[:8]}",
+                        concept_id=c_id,
                         name=c_name,
+                        definition=c.get("definition", "") if isinstance(c, dict) else "",
                         explanation=c.get("explanation", "") if isinstance(c, dict) else "",
+                        relationships=c.get("relationships", []) if isinstance(c, dict) else [],
+                        context_of_use=c.get("context_of_use", "") if isinstance(c, dict) else "",
                         evidence_refs=[EvidenceRef(section_id=section.section_id, status=EpistemicStatus.SOURCE_FACT.value)],
                     )
 
-            # Atualizar checkpoint com a secção concluída
-            self._save_checkpoint(
-                doc_id,
-                {
-                    "document_id": doc_id,
-                    "source_sha256": source_sha256,
-                    "ast_version": ast_version,
-                    "model_name": self.model_name,
-                    "prompt_versions": PROMPT_VERSIONS,
-                    "completed_segments": completed_segments,
-                    "completed_sections": completed_sections,
-                    "updated_at": datetime.now().isoformat(),
-                },
-            )
+            # Atualizar checkpoint com a secção concluída e conceitos agregados
+            self._save_checkpoint(doc_id, _build_checkpoint_payload())
 
-        # 5. Análise Específica de Metodologia e Resultados (SEM LIMITAÇÕES ARBITRÁRIAS DE PARÁGRAFOS)
+        # 5. Análise Específica de Metodologia e Resultados com Segmentação Semântica
         progress("METHOD_ANALYSIS", 0.65, "A examinar metodologia empírica e resultados comprovados...")
         method_sections = [
             s for s in ast.sections
@@ -1092,68 +1152,138 @@ class AcademicReasoningEngine:
         methodology_analysis = MethodologyAnalysis(is_applicable=False)
 
         if method_sections:
-            method_text_blocks = []
+            method_segments: List[Tuple[ASTSection, Any]] = []
             for ms in method_sections:
-                paras = [p for p in ast.paragraphs if p.section_id == ms.section_id]
-                # Processa TODOS os parágrafos relevantes da secção sem limite fixo
-                sec_text = "\n".join(f"[{p.paragraph_id}] (p.{p.page_number}) {p.text}" for p in paras)
-                method_text_blocks.append(f"=== Secção: {ms.title} ({ms.kind}) ===\n{sec_text}")
+                sec_paras = ast.get_paragraphs_for_section(ms.section_id)
+                sec_segs = self.segmenter.segment_section(ms, sec_paras)
+                for seg in sec_segs:
+                    method_segments.append((ms, seg))
 
-            method_prompt = PROMPT_METHODOLOGY_AND_RESULTS.format(
-                document_title=ast.metadata.title or ast.filename or doc_id,
-                method_and_results_content="\n\n".join(method_text_blocks),
-            )
-            parsed_method, method_telemetry = self._call_model_with_retries(
-                SYSTEM_PROMPT_ACADEMIC_REASONING,
-                method_prompt,
-                {"operation": "academic_methodology_results", "document_id": doc_id},
-                cancellation_check=cancellation_check,
-            )
-            if not parsed_method or not isinstance(parsed_method, dict):
-                err_info = {
-                    "stage": "methodology_results_analysis",
-                    "reason": method_telemetry.get("status", "INVALID_JSON_AFTER_RETRIES"),
-                    "error": "Falha na análise metodológica após retries.",
-                }
-                failed_operations.append(err_info)
-                telemetry_metrics.failures_count += 1
-                logger.error(f"[Methodology Analysis Failed] {err_info}")
-            else:
-                methodology_analysis = MethodologyAnalysis(
-                    is_applicable=bool(parsed_method.get("is_applicable", True)),
-                    research_type=parsed_method.get("research_type", ""),
-                    methodological_design=parsed_method.get("methodological_design", ""),
-                    methods_used=parsed_method.get("methods_used", []),
-                    sample_or_participants=parsed_method.get("sample_or_participants", ""),
-                    instruments=parsed_method.get("instruments", []),
-                    procedures=parsed_method.get("procedures", []),
-                    variables=parsed_method.get("variables", []),
-                    data_sources=parsed_method.get("data_sources", []),
-                    analysis_techniques=parsed_method.get("analysis_techniques", []),
-                    methodological_limitations=parsed_method.get("methodological_limitations", []),
+            raw_method_results: List[Dict[str, Any]] = []
+
+            for m_sec, seg in method_segments:
+                if cancellation_check and cancellation_check():
+                    raise ReasoningCancelledError(f"Cancelado no segmento metodológico {seg.segment_id}")
+
+                seg_id = seg.segment_id
+                if seg_id in completed_method_segments:
+                    raw_method_results.append(completed_method_segments[seg_id])
+                    continue
+
+                seg_text = "\n".join(f"[{p.paragraph_id}] (p.{p.page_number}) {p.text}" for p in seg.paragraphs)
+                seg_prompt = PROMPT_METHODOLOGY_UNIT.format(
+                    section_title=m_sec.title,
+                    section_type=m_sec.kind,
+                    document_title=ast.metadata.title or ast.filename or doc_id,
+                    method_and_results_content=seg_text,
                 )
-                for r in parsed_method.get("results", []):
-                    if isinstance(r, dict) and r.get("statement"):
-                        r_pid = (r.get("paragraph_id") or "").strip()
-                        p_obj = paragraphs_map.get(r_pid)
-                        sec_id = p_obj.section_id if p_obj else method_sections[0].section_id
-                        p_page = p_obj.page_number if p_obj else 1
-                        all_results.append(
-                            ResultItem(
-                                statement=r["statement"],
-                                evidence_data=r.get("evidence_data", ""),
-                                relation_to_objectives=r.get("relation_to_objectives", ""),
-                                interpretation_limitations=r.get("interpretation_limitations", ""),
-                                evidence_refs=[
-                                    EvidenceRef(
-                                        section_id=sec_id,
-                                        paragraph_id=r_pid if r_pid else None,
-                                        page_number=p_page if r_pid else None,
-                                        status=EpistemicStatus.SOURCE_FACT.value if r_pid else EpistemicStatus.UNVERIFIED.value,
-                                    )
-                                ],
+                seg_meta = {
+                    "operation": "academic_methodology_analysis",
+                    "document_id": doc_id,
+                    "section_id": m_sec.section_id,
+                    "segment_id": seg_id,
+                    "timeout_seconds": 120.0,
+                }
+
+                t_mseg0 = time.perf_counter()
+                parsed_mseg, mseg_telemetry = self._call_model_with_retries(
+                    SYSTEM_PROMPT_ACADEMIC_REASONING,
+                    seg_prompt,
+                    seg_meta,
+                    cancellation_check=cancellation_check,
+                )
+                t_mseg_elapsed = round((time.perf_counter() - t_mseg0) * 1000.0, 2)
+                telemetry_metrics.total_llm_calls += 1
+
+                if not parsed_mseg or not isinstance(parsed_mseg, dict):
+                    err_info = {
+                        "stage": "methodology_results_analysis",
+                        "section_id": m_sec.section_id,
+                        "segment_id": seg_id,
+                        "reason": mseg_telemetry.get("status", "INVALID_JSON_AFTER_RETRIES"),
+                        "error": f"Falha na análise do segmento metodológico '{seg_id}' após retries.",
+                    }
+                    failed_operations.append(err_info)
+                    telemetry_metrics.failures_count += 1
+                    logger.error(f"[Methodology Segment Failed] {err_info}")
+                else:
+                    completed_method_segments[seg_id] = parsed_mseg
+                    raw_method_results.append(parsed_mseg)
+                    self._save_checkpoint(doc_id, _build_checkpoint_payload())
+
+            # Agregação estruturada dos resultados metodológicos
+            if raw_method_results:
+                def _merge_unique_strings(key: str) -> List[str]:
+                    seen = set()
+                    out = []
+                    for r_dict in raw_method_results:
+                        items = r_dict.get(key, [])
+                        if isinstance(items, list):
+                            for it in items:
+                                it_str = str(it).strip()
+                                if it_str and it_str not in seen and it_str.upper() != "NOT_APPLICABLE":
+                                    seen.add(it_str)
+                                    out.append(it_str)
+                    return out
+
+                def _pick_first_meaningful(key: str) -> str:
+                    for r_dict in raw_method_results:
+                        val = (r_dict.get(key) or "").strip()
+                        if val and val.upper() != "NOT_APPLICABLE":
+                            return val
+                    return ""
+
+                is_any_applicable = any(bool(r_dict.get("is_applicable", False)) for r_dict in raw_method_results)
+
+                methodology_analysis = MethodologyAnalysis(
+                    is_applicable=is_any_applicable,
+                    research_type=_pick_first_meaningful("research_type"),
+                    methodological_design=_pick_first_meaningful("methodological_design"),
+                    methods_used=_merge_unique_strings("methods_used"),
+                    sample_or_participants=_pick_first_meaningful("sample_or_participants"),
+                    instruments=_merge_unique_strings("instruments"),
+                    procedures=_merge_unique_strings("procedures"),
+                    variables=_merge_unique_strings("variables"),
+                    data_sources=_merge_unique_strings("data_sources"),
+                    analysis_techniques=_merge_unique_strings("analysis_techniques"),
+                    methodological_limitations=_merge_unique_strings("methodological_limitations"),
+                )
+
+                seen_results: Set[Tuple[str, str]] = set()
+                for r_dict in raw_method_results:
+                    for r in r_dict.get("results", []):
+                        if isinstance(r, dict) and r.get("statement"):
+                            r_stmt = r["statement"].strip()
+                            r_pid = (r.get("paragraph_id") or "").strip()
+                            r_key = (r_stmt, r_pid)
+                            if r_key in seen_results:
+                                continue
+                            seen_results.add(r_key)
+
+                            p_obj = paragraphs_map.get(r_pid)
+                            sec_id = p_obj.section_id if p_obj else (method_sections[0].section_id if method_sections else "")
+                            p_page = p_obj.page_number if p_obj else None
+                            all_results.append(
+                                ResultItem(
+                                    statement=r_stmt,
+                                    evidence_data=r.get("evidence_data", ""),
+                                    relation_to_objectives=r.get("relation_to_objectives", ""),
+                                    interpretation_limitations=r.get("interpretation_limitations", ""),
+                                    evidence_refs=[
+                                        EvidenceRef(
+                                            section_id=sec_id,
+                                            paragraph_id=r_pid if r_pid else None,
+                                            page_number=p_page,
+                                            status=EpistemicStatus.SOURCE_FACT.value if r_pid else EpistemicStatus.UNVERIFIED.value,
+                                        )
+                                    ],
+                                )
                             )
-                        )
+            elif not raw_method_results and failed_operations:
+                methodology_analysis = MethodologyAnalysis(
+                    is_applicable=False,
+                    methodological_limitations=["FALHA: Não foi possível analisar os segmentos metodológicos."],
+                )
 
         # 6. Integração Transversal Global (Reduce 2)
         progress("CROSS_SECTION_INTEGRATION", 0.80, "A executar raciocínio transversal e deteção de tensões...")
@@ -1240,15 +1370,7 @@ class AcademicReasoningEngine:
             ],
         )
 
-        # 9. Determinação Rigorosa do Estado do Dossier
-        if not all_section_analyses or all(not sa.in_depth_synthesis for sa in all_section_analyses):
-            dossier_status = "FAILED"
-        elif failed_operations:
-            dossier_status = "PARTIAL"
-        else:
-            dossier_status = "COMPLETED"
-
-        # 10. Auditoria Forense QA Reforçada
+        # 9. Auditoria Forense QA Reforçada (executada obrigatoriamente antes do status final)
         progress("QA_VALIDATION", 0.95, "A validar integridade das referências e separação epistemológica...")
         qa_evaluator = ReasoningQAEvaluator()
         qa_report = qa_evaluator.evaluate(
@@ -1258,6 +1380,15 @@ class AcademicReasoningEngine:
             cross_synthesis=cross_section_synthesis,
             failed_operations=failed_operations,
         )
+
+        # 10. Determinação Rigorosa do Estado do Dossier
+        has_usable_sections = bool(all_section_analyses) and any(bool(sa.in_depth_synthesis) for sa in all_section_analyses)
+        if not has_usable_sections:
+            dossier_status = "FAILED"
+        elif failed_operations or not qa_report.is_valid:
+            dossier_status = "PARTIAL"
+        else:
+            dossier_status = "COMPLETED"
 
         total_elapsed = round((time.perf_counter() - start_time) * 1000.0, 2)
         telemetry_metrics.total_duration_ms = total_elapsed

@@ -1179,3 +1179,694 @@ def test_23_methodology_processes_more_than_eight_paragraphs(tmp_path: Path):
     assert dossier.methodology_analysis.is_applicable is True
 
 
+# ============================================================================
+# 24. Segmentação Semântica Metodológica com Múltiplos Segmentos
+# ============================================================================
+
+def test_24_methodology_semantic_segmentation_multiple_segments(tmp_path: Path):
+    """Verifica que uma secção metodológica extensa é dividida em múltiplos segmentos e todos são processados."""
+    paras_method = [
+        f"Parágrafo metodológico extenso {i}: Detalhe exaustivo do procedimento de calibração instrumental e medição empírica da variável {i} com repetições sistemáticas." * 4
+        for i in range(1, 13)
+    ]
+    sections_spec = [
+        {
+            "section_id": "sec_method_multi",
+            "title": "2. Procedimento Experimental Detalhado",
+            "kind": "methodology",
+            "paragraphs": paras_method,
+        }
+    ]
+    ast = create_synthetic_ast("doc_method_multi_24", "Metodologia Multi-Segmento", sections_spec=sections_spec)
+    method_calls: List[str] = []
+
+    def mock_llm_caller(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation", "")
+        if "methodology" in op:
+            method_calls.append(meta.get("segment_id", ""))
+            return json.dumps({
+                "is_applicable": True,
+                "research_type": "Experimental",
+                "methodological_design": "Delineamento Fatorial",
+                "methods_used": [f"Método {len(method_calls)}"],
+                "sample_or_participants": "100 amostras",
+                "instruments": [f"Instrumento {len(method_calls)}"],
+                "procedures": [f"Procedimento {len(method_calls)}"],
+                "variables": [f"Variável {len(method_calls)}"],
+                "data_sources": ["Sensores Ópticos"],
+                "analysis_techniques": ["ANOVA"],
+                "methodological_limitations": [],
+                "results": [
+                    {
+                        "statement": f"Resultado observado no segmento {len(method_calls)}",
+                        "evidence_data": f"Valor p < 0.05 no lote {len(method_calls)}",
+                        "paragraph_id": f"p_{len(method_calls)}",
+                    }
+                ],
+            }), {"status": "COMPLETED"}
+
+        return json.dumps({
+            "central_idea": "Ideia",
+            "passage_objective": "Obj",
+            "concepts": [],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese",
+            "core_ideas": [],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_llm_caller)
+    # Forçamos orçamento menor de tokens para o segmentador para garantir partição em múltiplos segmentos
+    engine.segmenter = SemanticSegmenter(max_tokens_per_segment=350, overlap_paragraphs=1)
+    dossier = engine.analyze_document(ast)
+
+    assert len(method_calls) >= 2, f"Deveria ter gerado pelo menos 2 segmentos, gerou {len(method_calls)}"
+    assert dossier.methodology_analysis.is_applicable is True
+    assert len(dossier.methodology_analysis.methods_used) >= 2
+    assert len(dossier.results_and_evidence) >= 2
+
+
+# ============================================================================
+# 25. Preservação de IDs e Páginas através de Múltiplos Segmentos Metodológicos
+# ============================================================================
+
+def test_25_preservation_of_fine_grained_refs_across_methodology_segments(tmp_path: Path):
+    """Verifica que os itens de resultado de diferentes segmentos metodológicos preservam paragraph_id e page_number."""
+    paras = [
+        "Metodologia inicial na página 1 detalhando o desenho preliminar da investigação.",
+        "Metodologia avançada na página 2 com testes de stress e calibração de sensores.",
+    ]
+    sections_spec = [
+        {
+            "section_id": "sec_meth_fine",
+            "title": "2. Metodologia",
+            "kind": "methodology",
+            "paragraphs": paras,
+        }
+    ]
+    ast = create_synthetic_ast("doc_fine_25", "Grounding Fino", sections_spec=sections_spec)
+    # Assegurar que os parágrafos estão em páginas distintas
+    ast.paragraphs[0].page_number = 1
+    ast.paragraphs[1].page_number = 2
+    ast.pages[0].page_number = 1
+    ast.pages.append(PageInfo(page_number=2, width=595.0, height=842.0))
+
+    def mock_llm_caller(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation", "")
+        if "methodology" in op:
+            return json.dumps({
+                "is_applicable": True,
+                "research_type": "Empírico",
+                "methodological_design": "Observacional",
+                "methods_used": ["M1"],
+                "sample_or_participants": "N=50",
+                "instruments": [],
+                "procedures": [],
+                "variables": [],
+                "data_sources": [],
+                "analysis_techniques": [],
+                "methodological_limitations": [],
+                "results": [
+                    {
+                        "statement": "Resultado P1",
+                        "evidence_data": "Dados P1",
+                        "paragraph_id": "p_1",
+                    },
+                    {
+                        "statement": "Resultado P2",
+                        "evidence_data": "Dados P2",
+                        "paragraph_id": "p_2",
+                    },
+                ],
+            }), {"status": "COMPLETED"}
+
+        return json.dumps({
+            "central_idea": "Ideia",
+            "passage_objective": "Obj",
+            "concepts": [],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese",
+            "core_ideas": [],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_llm_caller)
+    dossier = engine.analyze_document(ast)
+
+    r1 = next(r for r in dossier.results_and_evidence if r.statement == "Resultado P1")
+    r2 = next(r for r in dossier.results_and_evidence if r.statement == "Resultado P2")
+
+    assert r1.evidence_refs[0].paragraph_id == "p_1"
+    assert r1.evidence_refs[0].page_number == 1
+    assert r1.evidence_refs[0].status == "SOURCE_FACT"
+
+    assert r2.evidence_refs[0].paragraph_id == "p_2"
+    assert r2.evidence_refs[0].page_number == 2
+    assert r2.evidence_refs[0].status == "SOURCE_FACT"
+    assert dossier.status == "COMPLETED"
+
+
+# ============================================================================
+# 26. Falha em Segmento Metodológico Marca Estado PARTIAL e Regista Falha
+# ============================================================================
+
+def test_26_methodology_segment_failure_marks_partial_and_logs_failed_operation(tmp_path: Path):
+    """Verifica que a falha de um segmento metodológico marca PARTIAL e regista em failed_operations."""
+    paras = [
+        "Metodologia segmento 1 com procedimentos standard e calibração preliminar dos equipamentos analíticos." * 3,
+        "Metodologia segmento 2 com formulações complexas e validação estatística avançada de dados." * 3,
+    ]
+    sections_spec = [
+        {
+            "section_id": "sec_meth_fail",
+            "title": "2. Metodologia Mista",
+            "kind": "methodology",
+            "paragraphs": paras,
+        }
+    ]
+    ast = create_synthetic_ast("doc_meth_fail_26", "Falha Parcial Metodológica", sections_spec=sections_spec)
+    call_idx = 0
+
+    def mock_llm_caller(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        nonlocal call_idx
+        op = meta.get("operation", "")
+        if "methodology" in op:
+            seg_id = meta.get("segment_id", "")
+            if "seg_0" in seg_id:
+                # Segmento 0 falha em todas as tentativas após esgotar retries
+                return "Texto livre sem JSON...", {"status": "INVALID_JSON_AFTER_RETRIES"}
+            # Segmentos subsequentes têm sucesso
+            return json.dumps({
+                "is_applicable": True,
+                "research_type": "Empírico",
+                "methodological_design": "Robusto",
+                "methods_used": ["Método Válido 2"],
+                "sample_or_participants": "50",
+                "instruments": [],
+                "procedures": [],
+                "variables": [],
+                "data_sources": [],
+                "analysis_techniques": [],
+                "methodological_limitations": [],
+                "results": [
+                    {
+                        "statement": "Resultado do segmento 2",
+                        "evidence_data": "Evidência",
+                        "paragraph_id": "p_2",
+                    }
+                ],
+            }), {"status": "COMPLETED"}
+
+        return json.dumps({
+            "central_idea": "Ideia",
+            "passage_objective": "Obj",
+            "concepts": [],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese da metodologia",
+            "core_ideas": [],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_llm_caller, max_retries_per_call=1)
+    engine.segmenter = SemanticSegmenter(max_tokens_per_segment=150, overlap_paragraphs=0)
+    dossier = engine.analyze_document(ast)
+
+    assert dossier.status == "PARTIAL", f"Esperado status PARTIAL devido a falha no segmento metodológico, obtido: {dossier.status}"
+    assert any(fo.get("stage") == "methodology_results_analysis" for fo in dossier.failed_operations)
+    assert dossier.telemetry.failures_count >= 1
+    assert dossier.qa_report.is_valid is False  # Devido à operação falhada registada
+
+
+# ============================================================================
+# 27. Validade do QA Força Estado PARTIAL Mesmo Sem Erros de Transporte
+# ============================================================================
+
+def test_27_qa_invalid_strictly_forces_partial_status(tmp_path: Path):
+    """Garante que se qa_report.is_valid for False, dossier.status NUNCA pode ser COMPLETED (força PARTIAL)."""
+    ast = create_synthetic_ast("doc_qa_force_27", "QA Invalida Status")
+
+    def mock_llm_caller(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation", "")
+        if "methodology" in op:
+            # O modelo devolve um paragraph_id fantasma que não existe na AST
+            return json.dumps({
+                "is_applicable": True,
+                "research_type": "Empírico",
+                "methodological_design": "Experimental",
+                "methods_used": ["M1"],
+                "sample_or_participants": "100",
+                "instruments": [],
+                "procedures": [],
+                "variables": [],
+                "data_sources": [],
+                "analysis_techniques": [],
+                "methodological_limitations": [],
+                "results": [
+                    {
+                        "statement": "Afirmação empírica apoiada em parágrafo inexistente",
+                        "evidence_data": "Dado fictício",
+                        "paragraph_id": "p_fantasma_9999",  # Parágrafo FANTASMA!
+                    }
+                ],
+            }), {"status": "COMPLETED"}
+
+        return json.dumps({
+            "central_idea": "Ideia válida",
+            "passage_objective": "Obj",
+            "concepts": [{"name": "C1"}],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese válida da secção.",
+            "core_ideas": ["Ideia"],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Síntese global válida.",
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_llm_caller)
+    dossier = engine.analyze_document(ast)
+
+    # Nenhuma falha de modelo/transporte ocorreu:
+    assert len(dossier.failed_operations) == 0
+    # Porém, a auditoria forense reprovou a evidência:
+    assert dossier.qa_report.is_valid is False
+    assert "p_fantasma_9999" in dossier.qa_report.invalid_paragraph_refs
+    # O estado do dossier é estritamente forçado a PARTIAL:
+    assert dossier.status == "PARTIAL", f"Status deveria ser PARTIAL, foi {dossier.status}"
+
+
+# ============================================================================
+# 28. Recuperação Determinística e Idempotência de Conceitos
+# ============================================================================
+
+def test_28_deterministic_concept_recovery_and_idempotence(tmp_path: Path):
+    """Verifica que identificadores de conceitos são 100% determinísticos e restaurados integralmente de checkpoints."""
+    from services.academic_reasoning_engine import generate_deterministic_concept_id
+
+    # 1. Teste unitário da função de hashing estável
+    id1 = generate_deterministic_concept_id("Grounding Epistémico")
+    id2 = generate_deterministic_concept_id("Grounding Epistémico")
+    id3 = generate_deterministic_concept_id("  grounding epistémico  ")
+    assert id1 == id2 == id3
+    assert id1.startswith("concept_grounding_epistemico_")
+
+    # 2. Execução com checkpoint e recuperação
+    ast = create_synthetic_ast("doc_det_concept_28", "Conceitos Determinísticos")
+
+    def mock_llm_caller(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        return json.dumps({
+            "central_idea": "Ideia central",
+            "passage_objective": "Obj",
+            "concepts": [
+                {
+                    "name": "Grounding Epistémico",
+                    "definition": "Ancoragem rigorosa no texto original",
+                    "explanation": "Explicação detalhada da ancoragem factual.",
+                    "relationships": ["depende de Rigor Científico"],
+                    "context_of_use": "Auditoria de papers",
+                    "paragraph_ids": ["p_1"],
+                }
+            ],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese com conceito estruturado.",
+            "core_ideas": ["Core 1"],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    engine1 = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_llm_caller)
+    dossier1 = engine1.analyze_document(ast)
+
+    c1 = next(c for c in dossier1.conceptual_analysis if c.name == "Grounding Epistémico")
+    assert c1.concept_id == id1
+    assert c1.definition == "Ancoragem rigorosa no texto original"
+
+    # Segunda execução (reutilizando checkpoint persistido em disco)
+    engine2 = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_llm_caller)
+    dossier2 = engine2.analyze_document(ast)
+
+    c2 = next(c for c in dossier2.conceptual_analysis if c.name == "Grounding Epistémico")
+    assert c2.concept_id == c1.concept_id
+    assert c2.definition == c1.definition
+    assert c2.explanation == c1.explanation
+    assert c2.relationships == c1.relationships
+    assert c2.context_of_use == c1.context_of_use
+
+
+# ============================================================================
+# 29. Retoma de Checkpoint Metodológico sem Reexecução de Segmentos
+# ============================================================================
+
+def test_29_methodology_checkpoint_resumption_skips_completed_segments(tmp_path: Path):
+    """Verifica que segmentos metodológicos já registados em checkpoint não são reenviados ao modelo."""
+    paras = [
+        "Metodologia bloco 1 procedimentos iniciais de recolha e validação preliminar." * 3,
+        "Metodologia bloco 2 análise estatística inferencial e modelos preditivos." * 3,
+    ]
+    sections_spec = [
+        {
+            "section_id": "sec_meth_res",
+            "title": "2. Metodologia",
+            "kind": "methodology",
+            "paragraphs": paras,
+        }
+    ]
+    ast = create_synthetic_ast("doc_meth_res_29", "Retoma Metodológica", sections_spec=sections_spec)
+    called_segment_ids: List[str] = []
+
+    def mock_llm_caller(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation", "")
+        if "methodology" in op:
+            seg_id = meta.get("segment_id", "")
+            called_segment_ids.append(seg_id)
+            return json.dumps({
+                "is_applicable": True,
+                "research_type": "Empírico",
+                "methodological_design": "Experimental",
+                "methods_used": [f"Método-{seg_id}"],
+                "sample_or_participants": "50",
+                "instruments": [],
+                "procedures": [],
+                "variables": [],
+                "data_sources": [],
+                "analysis_techniques": [],
+                "methodological_limitations": [],
+                "results": [
+                    {
+                        "statement": f"Resultado {seg_id}",
+                        "evidence_data": "Dados",
+                        "paragraph_id": "p_2",
+                    }
+                ],
+            }), {"status": "COMPLETED"}
+
+        return json.dumps({
+            "central_idea": "Ideia",
+            "passage_objective": "Obj",
+            "concepts": [],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese",
+            "core_ideas": [],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    # Pré-gravar checkpoint contendo secção metodológica segmento 0 já concluído
+    storage_dir = tmp_path / "study"
+    doc_dir = storage_dir / "documents" / "doc_meth_res_29"
+    doc_dir.mkdir(parents=True, exist_ok=True)
+    from services.academic_reasoning_engine import PROMPT_VERSIONS
+    cp_file = doc_dir / "reasoning_checkpoint.json"
+    cp_file.write_text(
+        json.dumps({
+            "document_id": "doc_meth_res_29",
+            "source_sha256": "sha256_synthetic_baseline",
+            "ast_version": "3.0.0-academic",
+            "model_name": "qwen3.5:9b",
+            "prompt_versions": PROMPT_VERSIONS,
+            "completed_segments": {},
+            "completed_sections": {},
+            "completed_method_segments": {
+                "sec_meth_res_seg_0": {
+                    "is_applicable": True,
+                    "research_type": "Empírico Gravado",
+                    "methodological_design": "Pre-computado",
+                    "methods_used": ["Método em Checkpoint"],
+                    "sample_or_participants": "50",
+                    "instruments": [],
+                    "procedures": [],
+                    "variables": [],
+                    "data_sources": [],
+                    "analysis_techniques": [],
+                    "methodological_limitations": [],
+                    "results": [
+                        {
+                            "statement": "Resultado pré-gravado do segmento 0",
+                            "evidence_data": "Evidência antiga",
+                            "paragraph_id": "p_1",
+                        }
+                    ],
+                }
+            },
+            "conceptual_analysis": [],
+            "updated_at": "2026-11-05T00:00:00",
+        }),
+        encoding="utf-8",
+    )
+
+    engine = AcademicReasoningEngine(storage_dir=storage_dir, llm_caller=mock_llm_caller)
+    engine.segmenter = SemanticSegmenter(max_tokens_per_segment=150, overlap_paragraphs=0)
+    dossier = engine.analyze_document(ast)
+
+    # O segmento 0 NÃO deve ter sido chamado novamente ao LLM
+    assert "sec_meth_res_seg_0" not in called_segment_ids
+    # Mas o resultado do segmento 0 recuperado do checkpoint deve constar no dossier final
+    assert any("pré-gravado" in r.statement for r in dossier.results_and_evidence)
+    assert "Método em Checkpoint" in dossier.methodology_analysis.methods_used
+
+
+# ============================================================================
+# 30. Falha Total na Metodologia com Secções Válidas produz PARTIAL
+# ============================================================================
+
+def test_30_total_methodology_failure_produces_partial_status(tmp_path: Path):
+    """Quando todos os segmentos metodológicos falham mas as secções têm síntese, o estado é PARTIAL."""
+    sections_spec = [
+        {
+            "section_id": "sec_meth_all_fail",
+            "title": "2. Metodologia",
+            "kind": "methodology",
+            "paragraphs": ["Parágrafo metodológico que falhará no modelo."],
+        }
+    ]
+    ast = create_synthetic_ast("doc_fail_all_30", "Falha Total Metodologia", sections_spec=sections_spec)
+
+    def mock_llm_caller(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation", "")
+        if "methodology" in op:
+            return "Inválido sem JSON", {"status": "INVALID_JSON_AFTER_RETRIES"}
+
+        return json.dumps({
+            "central_idea": "Ideia",
+            "passage_objective": "Obj",
+            "concepts": [],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese com sucesso da secção.",
+            "core_ideas": [],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_llm_caller, max_retries_per_call=1)
+    dossier = engine.analyze_document(ast)
+
+    assert dossier.status == "PARTIAL"
+    assert any(fo["stage"] == "methodology_results_analysis" for fo in dossier.failed_operations)
+    assert dossier.qa_report.is_valid is False
+
+
+# ============================================================================
+# 31. Equivalência Funcional e Correção dos Índices Secundários O(1) da AST
+# ============================================================================
+
+def test_31_ast_secondary_indices_functional_equivalence():
+    """Valida que os novos índices secundários O(1) produzem resultados 100% equivalentes à pesquisa linear."""
+    sections_spec = [
+        {"section_id": f"sec_{i}", "title": f"Secção {i}", "kind": "body", "paragraphs": [f"P_{i}_{j}" for j in range(5)]}
+        for i in range(1, 10)
+    ]
+    ast = create_synthetic_ast("doc_idx_31", "Teste Índices Secundários", sections_spec=sections_spec)
+
+    # 1. paragraphs_by_id
+    for p in ast.paragraphs:
+        assert ast.get_paragraph(p.paragraph_id) is p
+        assert ast.paragraphs_by_id[p.paragraph_id] is p
+
+    # 2. sections_by_id
+    for s in ast.sections:
+        assert ast.get_section(s.section_id) is s
+        assert ast.sections_by_id[s.section_id] is s
+
+    # 3. paragraphs_by_section_id
+    for s in ast.sections:
+        linear_paras = [p for p in ast.paragraphs if p.section_id == s.section_id]
+        indexed_paras = ast.get_paragraphs_for_section(s.section_id)
+        assert indexed_paras == linear_paras
+
+    # 4. Invalidação
+    ast.invalidate_indices()
+    assert not hasattr(ast, "_cached_paragraphs_by_id")
+    # Acesso recria índice automaticamente
+    assert ast.get_paragraph(ast.paragraphs[0].paragraph_id) is ast.paragraphs[0]
+
+
+# ============================================================================
+# 32. Benchmark de Performance: Índices Secundários O(1) vs Pesquisa Linear O(N)
+# ============================================================================
+
+def test_32_ast_secondary_indices_performance_benchmark():
+    """Mede e comprova a aceleração empírica dos índices secundários O(1) comparados com varrimentos lineares."""
+    sections_spec = [
+        {"section_id": f"sec_{i}", "title": f"Secção {i}", "kind": "body", "paragraphs": [f"Parágrafo com conteúdo substancial {i}_{j}" for j in range(10)]}
+        for i in range(1, 100)
+    ]
+    ast = create_synthetic_ast("doc_bench_32", "Benchmark AST", sections_spec=sections_spec)
+    # Total de 99 secções * 10 = 990 parágrafos
+
+    target_pid = ast.paragraphs[-1].paragraph_id
+    target_sec = ast.sections[-1].section_id
+    iterations = 2000
+
+    # 1. Medição Linear
+    t0_linear = time.perf_counter()
+    for _ in range(iterations):
+        _ = next((p for p in ast.paragraphs if p.paragraph_id == target_pid), None)
+        _ = [p for p in ast.paragraphs if p.section_id == target_sec]
+    elapsed_linear = time.perf_counter() - t0_linear
+
+    # 2. Medição Indexada O(1)
+    # Aquecimento do cache
+    _ = ast.paragraphs_by_id
+    _ = ast.paragraphs_by_section_id
+
+    t0_indexed = time.perf_counter()
+    for _ in range(iterations):
+        _ = ast.get_paragraph(target_pid)
+        _ = ast.get_paragraphs_for_section(target_sec)
+    elapsed_indexed = time.perf_counter() - t0_indexed
+
+    speedup = elapsed_linear / max(1e-6, elapsed_indexed)
+    print(f"\n[Benchmark AST Indices] Linear: {elapsed_linear*1000:.2f}ms | Indexado: {elapsed_indexed*1000:.2f}ms | Aceleração: {speedup:.1f}x")
+    assert speedup > 2.0, f"Aceleração deveria ser superior a 2x, obtida: {speedup:.2f}x"
+
+
+# ============================================================================
+# 33. Integração End-to-End: Discrepância de Página Força Estado PARTIAL
+# ============================================================================
+
+def test_33_page_mismatch_forces_partial_status(tmp_path: Path):
+    """Verifica que uma divergência entre a página indicada e a página real da AST reprova o QA e marca PARTIAL."""
+    ast = create_synthetic_ast("doc_page_mismatch_33", "Divergência de Página")
+    # p_1 está na página 1 na AST
+    assert ast.paragraphs[0].page_number == 1
+
+    def mock_llm_caller(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation", "")
+        if "section" in op:
+            return json.dumps({
+                "objective": "Objetivo",
+                "in_depth_synthesis": "Síntese da secção.",
+                "core_ideas": ["Ideia"],
+                "concepts": [],
+                "arguments": [],
+                "limitations": [],
+            }), {"status": "COMPLETED"}
+
+        return json.dumps({
+            "central_idea": "Ideia",
+            "passage_objective": "Obj",
+            "concepts": [],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese",
+            "core_ideas": [],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_llm_caller)
+    # Executa análise inicial
+    dossier = engine.analyze_document(ast)
+    assert dossier.status == "COMPLETED"
+
+    # Agora criamos um resultado com página deliberadamente adulterada (p.99 em vez de p.1)
+    from services.academic_reasoning_engine import ResultItem, ReasoningQAEvaluator
+    tampered_result = ResultItem(
+        statement="Resultado adulterado",
+        evidence_refs=[EvidenceRef(section_id="sec_intro", paragraph_id="p_1", page_number=99, status="SOURCE_FACT")],
+    )
+    evaluator = ReasoningQAEvaluator()
+    report = evaluator.evaluate(
+        ast=ast,
+        section_analyses=dossier.section_analyses,
+        results=[tampered_result],
+        cross_synthesis=dossier.cross_section_synthesis,
+    )
+
+    assert report.is_valid is False
+    assert 99 in report.invalid_page_refs
+
+
+

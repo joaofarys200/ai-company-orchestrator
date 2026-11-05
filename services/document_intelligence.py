@@ -306,16 +306,72 @@ class AcademicDocumentAST:
 
     # -- Projeções de compatibilidade com o modelo legado do StudyService --------------
 
+    @property
+    def paragraphs_by_id(self) -> Dict[str, ASTParagraph]:
+        """Índice secundário O(1) de parágrafos por paragraph_id (em cache privado)."""
+        cached = getattr(self, "_cached_paragraphs_by_id", None)
+        if cached is None or len(cached) != len(self.paragraphs):
+            cached = {p.paragraph_id: p for p in self.paragraphs}
+            object.__setattr__(self, "_cached_paragraphs_by_id", cached)
+        return cached
+
+    @property
+    def sections_by_id(self) -> Dict[str, ASTSection]:
+        """Índice secundário O(1) de secções por section_id."""
+        cached = getattr(self, "_cached_sections_by_id", None)
+        if cached is None or len(cached) != len(self.sections):
+            cached = {s.section_id: s for s in self.sections}
+            object.__setattr__(self, "_cached_sections_by_id", cached)
+        return cached
+
+    @property
+    def paragraphs_by_section_id(self) -> Dict[str, List[ASTParagraph]]:
+        """Índice secundário O(1) de agrupamento de parágrafos por section_id."""
+        cached = getattr(self, "_cached_paragraphs_by_sec", None)
+        if cached is None:
+            group: Dict[str, List[ASTParagraph]] = defaultdict(list)
+            for p in self.paragraphs:
+                group[p.section_id].append(p)
+            cached = dict(group)
+            object.__setattr__(self, "_cached_paragraphs_by_sec", cached)
+        return cached
+
+    @property
+    def pages_by_number(self) -> Dict[int, PageInfo]:
+        """Índice secundário O(1) de páginas por page_number."""
+        cached = getattr(self, "_cached_pages_by_number", None)
+        if cached is None or len(cached) != len(self.pages):
+            cached = {pg.page_number: pg for pg in self.pages}
+            object.__setattr__(self, "_cached_pages_by_number", cached)
+        return cached
+
+    def get_paragraph(self, paragraph_id: str) -> Optional[ASTParagraph]:
+        """Acesso O(1) a parágrafo por ID."""
+        return self.paragraphs_by_id.get(paragraph_id)
+
+    def get_section(self, section_id: str) -> Optional[ASTSection]:
+        """Acesso O(1) a secção por ID."""
+        return self.sections_by_id.get(section_id)
+
+    def get_paragraphs_for_section(self, section_id: str) -> List[ASTParagraph]:
+        """Acesso O(1) a lista de parágrafos de uma secção específica."""
+        return self.paragraphs_by_section_id.get(section_id, [])
+
+    def invalidate_indices(self) -> None:
+        """Invalida explicitamente os caches de índices após mutações diretas da AST."""
+        for attr in ("_cached_paragraphs_by_id", "_cached_sections_by_id", "_cached_paragraphs_by_sec", "_cached_pages_by_number"):
+            if hasattr(self, attr):
+                try:
+                    delattr(self, attr)
+                except AttributeError:
+                    pass
+
     def to_legacy_sections(self) -> List[Dict[str, Any]]:
         """Projeção ``sections`` legada (section_id/title/level/page_start/page_end/paragraphs)."""
-        by_sec: Dict[str, List[ASTParagraph]] = defaultdict(list)
-        for p in self.paragraphs:
-            if p.content_type == "front_matter":
-                continue  # autores/afiliações/emails permanecem na AST e nos metadados, não nas evidências
-            by_sec[p.section_id].append(p)
+        by_sec = self.paragraphs_by_section_id
         out: List[Dict[str, Any]] = []
         for s in self.sections:
-            paras = by_sec.get(s.section_id, [])
+            paras = [p for p in by_sec.get(s.section_id, []) if p.content_type != "front_matter"]
             if not paras:
                 continue
             out.append({
