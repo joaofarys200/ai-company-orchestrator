@@ -566,7 +566,8 @@ def test_08_forensic_detection_of_invalid_paragraph_references(tmp_path: Path):
 
     assert "p_9999" in qa_report.invalid_paragraph_refs
     assert qa_report.valid_paragraph_refs_pct < 100.0
-    assert any("p_9999" in w for w in qa_report.warnings)
+    assert any("p_9999" in err for err in qa_report.errors)
+    assert qa_report.is_valid is False
 
 
 # ============================================================================
@@ -788,4 +789,393 @@ def test_13_real_ollama_qwen_live_integration(tmp_path: Path):
     assert dossier.qa_report.is_valid is True
     print(f"\n[Real Live Qwen] Duração total: {dossier.telemetry.total_duration_ms}ms")
     print(f"[Real Live Qwen] Síntese Global: {dossier.cross_section_synthesis.global_synthesis[:200]}...")
+
+
+# ============================================================================
+# 14. Falha de JSON no Segmento Marca Dossier Como PARTIAL (Sem Fallback Silencioso)
+# ============================================================================
+
+def test_14_segment_json_failure_marks_partial(tmp_path: Path):
+    ast = create_synthetic_ast("doc_fail_seg_14", "Falha de JSON no Segmento")
+
+    def mock_broken_segment(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation", "")
+        if "segment" in op:
+            return "Texto livre inválido não-JSON", {"status": "FAILED_VALIDATION"}
+        return json.dumps({
+            "objective": "Obj",
+            "in_depth_synthesis": "Synth",
+            "core_ideas": [],
+            "concepts": [],
+            "arguments": [],
+            "limitations": [],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_broken_segment, max_retries_per_call=1)
+    dossier = engine.analyze_document(ast)
+
+    assert dossier.status == "PARTIAL"
+    assert len(dossier.failed_operations) >= 1
+    assert any(fo["stage"] == "segment_analysis" for fo in dossier.failed_operations)
+    assert dossier.qa_report.is_valid is False
+
+
+# ============================================================================
+# 15. Falha de JSON na Síntese de Secção Marca Dossier Como PARTIAL
+# ============================================================================
+
+def test_15_section_synthesis_json_failure_marks_partial(tmp_path: Path):
+    ast = create_synthetic_ast("doc_fail_sec_15", "Falha na Síntese da Secção")
+
+    def mock_broken_section(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation", "")
+        # Falha apenas na primeira secção
+        if "section" in op and meta.get("section_id") == "sec_intro":
+            return "Inválido sem JSON", {"status": "FAILED_VALIDATION"}
+        return json.dumps({
+            "central_idea": "Ideia central válida",
+            "passage_objective": "Objetivo",
+            "concepts": [],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese válida da secção",
+            "core_ideas": ["Ideia"],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_broken_section, max_retries_per_call=1)
+    dossier = engine.analyze_document(ast)
+
+    assert dossier.status == "PARTIAL"
+    assert any(fo["stage"] == "section_synthesis" for fo in dossier.failed_operations)
+    assert dossier.section_analyses[0].in_depth_synthesis == ""
+    assert dossier.qa_report.is_valid is False
+
+
+# ============================================================================
+# 16. Falha de JSON na Integração Transversal Marca Dossier Como PARTIAL
+# ============================================================================
+
+def test_16_cross_section_json_failure_marks_partial(tmp_path: Path):
+    ast = create_synthetic_ast("doc_fail_cross_16", "Falha na Integração Transversal")
+
+    def mock_broken_cross(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation", "")
+        if "cross" in op:
+            return "Erro JSON Cross", {"status": "FAILED_VALIDATION"}
+        return json.dumps({
+            "central_idea": "Ideia",
+            "passage_objective": "Obj",
+            "concepts": [],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese válida da secção",
+            "core_ideas": ["Ideia A"],
+            "concepts": [],
+            "arguments": [],
+            "limitations": [],
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_broken_cross, max_retries_per_call=1)
+    dossier = engine.analyze_document(ast)
+
+    assert dossier.status == "PARTIAL"
+    assert any(fo["stage"] == "cross_section_integration" for fo in dossier.failed_operations)
+    assert dossier.cross_section_synthesis.global_synthesis == ""
+    assert dossier.qa_report.is_valid is False
+
+
+# ============================================================================
+# 17. QA Inválido Quando Parágrafo Não Existe na AST
+# ============================================================================
+
+def test_17_qa_invalid_when_paragraph_does_not_exist():
+    ast = create_synthetic_ast("doc_qa_para_17", "QA Parágrafo Inexistente")
+    evaluator = ReasoningQAEvaluator()
+
+    from services.academic_reasoning_engine import SectionAnalysis, CrossSectionSynthesis
+    mock_sec = SectionAnalysis(
+        section_id="sec_intro",
+        title="1. Introdução",
+        source_refs=[EvidenceRef(section_id="sec_intro", paragraph_id="p_9999", status="SOURCE_FACT")],
+    )
+    report = evaluator.evaluate(
+        ast=ast,
+        section_analyses=[mock_sec],
+        results=[],
+        cross_synthesis=CrossSectionSynthesis(),
+    )
+
+    assert report.is_valid is False
+    assert "p_9999" in report.invalid_paragraph_refs
+    assert any("p_9999" in err for err in report.errors)
+
+
+# ============================================================================
+# 18. QA Inválido Quando Parágrafo Pertence a Outra Secção
+# ============================================================================
+
+def test_18_qa_invalid_when_paragraph_belongs_to_different_section():
+    ast = create_synthetic_ast("doc_qa_sec_mismatch_18", "QA Secção Incorreta")
+    evaluator = ReasoningQAEvaluator()
+
+    from services.academic_reasoning_engine import SectionAnalysis, CrossSectionSynthesis
+    # p_1 pertence a 'sec_intro' na AST, mas é referenciado sob 'sec_conclusion'
+    mock_sec = SectionAnalysis(
+        section_id="sec_conclusion",
+        title="4. Conclusão",
+        source_refs=[EvidenceRef(section_id="sec_conclusion", paragraph_id="p_1", status="SOURCE_FACT")],
+    )
+    report = evaluator.evaluate(
+        ast=ast,
+        section_analyses=[mock_sec],
+        results=[],
+        cross_synthesis=CrossSectionSynthesis(),
+    )
+
+    assert report.is_valid is False
+    assert any("pertence à secção" in err for err in report.errors)
+
+
+# ============================================================================
+# 19. QA Inválido Quando Número de Página Não Coincide com AST
+# ============================================================================
+
+def test_19_qa_invalid_when_page_number_mismatches_ast():
+    ast = create_synthetic_ast("doc_qa_page_mismatch_19", "QA Página Incorreta")
+    evaluator = ReasoningQAEvaluator()
+
+    from services.academic_reasoning_engine import SectionAnalysis, CrossSectionSynthesis
+    # p_1 está na página 1, mas ref indica página 2
+    mock_sec = SectionAnalysis(
+        section_id="sec_intro",
+        title="1. Introdução",
+        source_refs=[EvidenceRef(section_id="sec_intro", paragraph_id="p_1", page_number=2, status="SOURCE_FACT")],
+    )
+    report = evaluator.evaluate(
+        ast=ast,
+        section_analyses=[mock_sec],
+        results=[],
+        cross_synthesis=CrossSectionSynthesis(),
+    )
+
+    assert report.is_valid is False
+    assert 2 in report.invalid_page_refs
+    assert any("não coincide com a página real" in err for err in report.errors)
+
+
+# ============================================================================
+# 20. QA Inválido Quando Resultado SOURCE_FACT Não Possui Parágrafo de Suporte
+# ============================================================================
+
+def test_20_qa_invalid_when_source_fact_has_empty_paragraph():
+    ast = create_synthetic_ast("doc_qa_res_empty_20", "QA Resultado Vazio")
+    evaluator = ReasoningQAEvaluator()
+
+    from services.academic_reasoning_engine import SectionAnalysis, ResultItem, CrossSectionSynthesis
+    mock_res = ResultItem(
+        statement="Aumento estatisticamente significativo",
+        evidence_data="p < 0.05",
+        evidence_refs=[
+            EvidenceRef(section_id="sec_results", paragraph_id="", status="SOURCE_FACT")
+        ],
+    )
+    report = evaluator.evaluate(
+        ast=ast,
+        section_analyses=[],
+        results=[mock_res],
+        cross_synthesis=CrossSectionSynthesis(),
+    )
+
+    assert report.is_valid is False
+    assert any("não possui paragraph_id de suporte válido" in err for err in report.errors)
+
+
+# ============================================================================
+# 21. Invalidação de Checkpoint por Alteração da Versão dos Prompts
+# ============================================================================
+
+def test_21_checkpoint_invalidation_on_prompt_version_change(tmp_path: Path):
+    storage_dir = tmp_path / "study"
+    ast = create_synthetic_ast("doc_inval_prompt_21", "Invalidação por Versão de Prompt")
+
+    doc_dir = storage_dir / "documents" / ast.document_id
+    doc_dir.mkdir(parents=True, exist_ok=True)
+    cp_path = doc_dir / "reasoning_checkpoint.json"
+    cp_path.write_text(
+        json.dumps({
+            "document_id": ast.document_id,
+            "source_sha256": ast.source_sha256,
+            "ast_version": ast.extractor_version,
+            "model_name": "qwen3.5:9b",
+            "prompt_versions": {"segment_analysis": "v1.0.0-obsoleta"},  # Versão antiga!
+            "completed_sections": {"sec_intro": {"section_id": "sec_intro", "title": "Intro Antiga"}},
+            "completed_segments": {},
+        }),
+        encoding="utf-8",
+    )
+
+    engine = AcademicReasoningEngine(storage_dir=storage_dir)
+    loaded = engine._load_checkpoint(ast.document_id, ast.source_sha256, ast.extractor_version)
+    assert loaded is None  # Checkpoint deve ser rejeitado por discrepância de versão dos prompts
+
+
+# ============================================================================
+# 22. Recuperação de Checkpoint Reconstrói Mapa Global de Conceitos
+# ============================================================================
+
+def test_22_checkpoint_recovery_reconstructs_concepts_map(tmp_path: Path):
+    storage_dir = tmp_path / "study"
+    ast = create_synthetic_ast("doc_concepts_recov_22", "Reconstrução de Conceitos")
+
+    doc_dir = storage_dir / "documents" / ast.document_id
+    doc_dir.mkdir(parents=True, exist_ok=True)
+    cp_path = doc_dir / "reasoning_checkpoint.json"
+    from services.academic_reasoning_engine import PROMPT_VERSIONS
+    cp_path.write_text(
+        json.dumps({
+            "document_id": ast.document_id,
+            "source_sha256": ast.source_sha256,
+            "ast_version": ast.extractor_version,
+            "model_name": "qwen3.5:9b",
+            "prompt_versions": PROMPT_VERSIONS,
+            "completed_sections": {
+                "sec_intro": {
+                    "section_id": "sec_intro",
+                    "title": "1. Introdução",
+                    "section_type": "introduction",
+                    "objective": "Introduzir o tema",
+                    "in_depth_synthesis": "Síntese recuperada do checkpoint",
+                    "core_ideas": ["Ideia X"],
+                    "concepts": [
+                        {"name": "Conceito Recuperado A", "explanation": "Definição do conceito A"}
+                    ],
+                    "arguments": [],
+                    "evidences": [],
+                    "limitations": [],
+                    "source_refs": [
+                        {"section_id": "sec_intro", "paragraph_id": "p_1", "status": "SOURCE_FACT"}
+                    ],
+                    "segment_ids": [],
+                }
+            },
+            "completed_segments": {},
+        }),
+        encoding="utf-8",
+    )
+
+    def mock_llm_caller(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        return json.dumps({
+            "central_idea": "Ideia",
+            "passage_objective": "Obj",
+            "concepts": [],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese",
+            "core_ideas": [],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=storage_dir, llm_caller=mock_llm_caller)
+    dossier = engine.analyze_document(ast)
+
+    assert any(c.name == "Conceito Recuperado A" for c in dossier.conceptual_analysis)
+
+
+# ============================================================================
+# 23. Análise Metodológica Processa Mais de Oito Parágrafos (Sem Limite Fixo)
+# ============================================================================
+
+def test_23_methodology_processes_more_than_eight_paragraphs(tmp_path: Path):
+    paras_method = [
+        f"Parágrafo metodológico {i} descrevendo detalhadamente a variável {i} e respetiva calibração."
+        for i in range(1, 15)
+    ]
+    sections_spec = [
+        {
+            "section_id": "sec_method_long",
+            "title": "2. Metodologia Extensa",
+            "kind": "methodology",
+            "paragraphs": paras_method,
+        }
+    ]
+    ast = create_synthetic_ast("doc_method_long_23", "Metodologia Longa", sections_spec=sections_spec)
+    received_method_prompt = ""
+
+    def mock_llm_caller(system_prompt: str, user_prompt: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        nonlocal received_method_prompt
+        op = meta.get("operation", "")
+        if "methodology" in op:
+            received_method_prompt = user_prompt
+            return json.dumps({
+                "is_applicable": True,
+                "research_type": "Empírico",
+                "methodological_design": "Extenso",
+                "methods_used": ["Método A"],
+                "sample_or_participants": "100",
+                "instruments": [],
+                "procedures": [],
+                "variables": [],
+                "data_sources": [],
+                "analysis_techniques": [],
+                "methodological_limitations": [],
+                "results": [],
+            }), {"status": "COMPLETED"}
+
+        return json.dumps({
+            "central_idea": "Ideia",
+            "passage_objective": "Obj",
+            "concepts": [],
+            "definitions": [],
+            "arguments": [],
+            "assumptions": [],
+            "partial_conclusions": [],
+            "technical_terminology": [],
+            "limitations_or_notices": [],
+            "objective": "Obj",
+            "in_depth_synthesis": "Síntese",
+            "core_ideas": [],
+            "argumentative_progression": [],
+            "conceptual_relationships": [],
+            "coherence_and_tensions": [],
+            "idea_dependencies": [],
+            "global_synthesis": "Global",
+        }), {"status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path / "study", llm_caller=mock_llm_caller)
+    dossier = engine.analyze_document(ast)
+
+    # Verifica que parágrafos além do 8º (ex: p_9, p_10, p_14) estão presentes no prompt recebido
+    assert "p_9" in received_method_prompt or "Parágrafo metodológico 9" in received_method_prompt
+    assert "p_14" in received_method_prompt or "Parágrafo metodológico 14" in received_method_prompt
+    assert dossier.methodology_analysis.is_applicable is True
+
 

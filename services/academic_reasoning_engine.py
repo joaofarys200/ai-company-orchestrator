@@ -230,6 +230,7 @@ class AcademicReasoningDossier:
     prompt_versions: Dict[str, str] = field(default_factory=lambda: dict(PROMPT_VERSIONS))
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     status: str = "COMPLETED"  # COMPLETED | PARTIAL | FAILED | CANCELLED
+    failed_operations: List[Dict[str, Any]] = field(default_factory=list)
     document_analysis: DocumentCoreAnalysis = field(default_factory=lambda: DocumentCoreAnalysis("", ""))
     section_analyses: List[SectionAnalysis] = field(default_factory=list)
     conceptual_analysis: List[ConceptItem] = field(default_factory=list)
@@ -257,6 +258,7 @@ class AcademicReasoningDossier:
             prompt_versions=d.get("prompt_versions", PROMPT_VERSIONS),
             created_at=d.get("created_at", ""),
             status=d.get("status", "COMPLETED"),
+            failed_operations=d.get("failed_operations", []),
             document_analysis=_from_dict(DocumentCoreAnalysis, d.get("document_analysis")),
             section_analyses=[_from_dict(SectionAnalysis, x) for x in d.get("section_analyses", [])],
             conceptual_analysis=[_from_dict(ConceptItem, x) for x in d.get("conceptual_analysis", [])],
@@ -748,6 +750,9 @@ class AcademicReasoningEngine:
             if data.get("model_name") != self.model_name:
                 logger.info("[Checkpoint] Modelo mudou. Invalidação forçada.")
                 return None
+            if data.get("prompt_versions") != PROMPT_VERSIONS:
+                logger.info(f"[Checkpoint] Versão dos prompts mudou ({data.get('prompt_versions')} != {PROMPT_VERSIONS}). Invalidação forçada.")
+                return None
             return data
         except Exception as e:
             logger.warning(f"Erro ao ler checkpoint: {e}")
@@ -820,6 +825,7 @@ class AcademicReasoningEngine:
         all_section_analyses: List[SectionAnalysis] = []
         all_concepts_map: Dict[str, ConceptItem] = {}
         all_results: List[ResultItem] = []
+        failed_operations: List[Dict[str, Any]] = []
         telemetry_metrics = ReasoningTelemetry()
 
         # 3. Execução Map por Secção -> Segmentos
@@ -835,6 +841,16 @@ class AcademicReasoningEngine:
                 sec_data = completed_sections[section.section_id]
                 sec_analysis = _from_dict(SectionAnalysis, sec_data)
                 all_section_analyses.append(sec_analysis)
+                # Reconstruir conceitos no mapa global a partir do checkpoint
+                for c in sec_analysis.concepts:
+                    c_name = c.get("name") if isinstance(c, dict) else str(c)
+                    if c_name and c_name not in all_concepts_map:
+                        all_concepts_map[c_name] = ConceptItem(
+                            concept_id=f"c_{uuid.uuid4().hex[:8]}",
+                            name=c_name,
+                            explanation=c.get("explanation", "") if isinstance(c, dict) else "",
+                            evidence_refs=[EvidenceRef(section_id=section.section_id, status=EpistemicStatus.SOURCE_FACT.value)],
+                        )
                 continue
 
             # Obter segmentos da secção
@@ -877,18 +893,37 @@ class AcademicReasoningEngine:
                 telemetry_metrics.segment_durations_ms[seg_id] = t_seg_elapsed
 
                 if not parsed_seg or not isinstance(parsed_seg, dict):
-                    # Fallback gracioso estruturado quando o modelo falha naquele segmento específico
-                    parsed_seg = {
-                        "central_idea": f"Análise da passagem da secção {section.title}.",
-                        "passage_objective": "Apresentação de evidências textuais.",
-                        "concepts": [],
-                        "definitions": [],
-                        "arguments": [],
-                        "assumptions": [],
-                        "partial_conclusions": [],
-                        "technical_terminology": [],
-                        "limitations_or_notices": ["Segmento analisado com extração factual."],
+                    # Registo explícito de falha no segmento — zero substituição silenciosa por conteúdo inventado
+                    err_info = {
+                        "stage": "segment_analysis",
+                        "section_id": section.section_id,
+                        "segment_id": seg_id,
+                        "reason": seg_telemetry.get("status", "INVALID_JSON_AFTER_RETRIES"),
+                        "error": "Resposta JSON inválida ou vazia do modelo após todas as tentativas.",
                     }
+                    failed_operations.append(err_info)
+                    telemetry_metrics.failures_count += 1
+                    logger.error(f"[Segment Analysis Failed] {err_info}")
+
+                    seg_obj = SegmentAnalysis(
+                        segment_id=seg_id,
+                        section_id=section.section_id,
+                        paragraph_ids=[p.paragraph_id for p in segment.paragraphs],
+                        page_numbers=segment.page_numbers,
+                        central_idea="",
+                        passage_objective="",
+                        concepts=[],
+                        definitions=[],
+                        arguments=[],
+                        assumptions=[],
+                        partial_conclusions=[],
+                        technical_terminology=[],
+                        evidence_refs=[],
+                        limitations_or_notices=[f"FALHA: Análise de segmento não concluída pelo modelo ({err_info['reason']})"],
+                        execution_time_ms=t_seg_elapsed,
+                    )
+                    sec_segment_analyses.append(seg_obj)
+                    continue
 
                 # Construir evidências associadas
                 seg_evidences: List[EvidenceRef] = []
@@ -939,15 +974,16 @@ class AcademicReasoningEngine:
                 )
 
             # 4. Síntese Integrada da Secção (Reduce 1)
+            valid_segments = [s for s in sec_segment_analyses if s.central_idea]
             segments_summary_text = "\n\n".join(
                 f"[Segmento {s.segment_id}]\nIdeia: {s.central_idea}\nObjetivo: {s.passage_objective}\n"
                 f"Conceitos: {', '.join(s.concepts)}\nArgumentos: {json.dumps(s.arguments, ensure_ascii=False)}"
-                for s in sec_segment_analyses
+                for s in valid_segments
             )
             sec_synth_prompt = PROMPT_SECTION_SYNTHESIS.format(
                 section_title=section.title,
                 section_type=section.kind,
-                segments_summary=segments_summary_text or "Sem dados adicionais de segmentos.",
+                segments_summary=segments_summary_text or "Sem dados válidos de segmentos.",
             )
             sec_meta = {
                 "operation": "academic_section_synthesis",
@@ -968,15 +1004,34 @@ class AcademicReasoningEngine:
             telemetry_metrics.section_durations_ms[section.section_id] = t_sec_elapsed
 
             if not parsed_sec or not isinstance(parsed_sec, dict):
-                # Fallback construtivo seguro
-                parsed_sec = {
-                    "objective": f"Apresentar e desenvolver o conteúdo da secção {section.title}.",
-                    "in_depth_synthesis": f"A secção {section.title} articula os conceitos abordados nos seus segmentos, apresentando evidências estruturais suportadas pelo documento.",
-                    "core_ideas": [s.central_idea for s in sec_segment_analyses if s.central_idea],
-                    "concepts": [],
-                    "arguments": [],
-                    "limitations": [],
+                # Registo explícito de falha na síntese da secção — zero texto genérico inventado
+                err_info = {
+                    "stage": "section_synthesis",
+                    "section_id": section.section_id,
+                    "reason": sec_telemetry.get("status", "INVALID_JSON_AFTER_RETRIES"),
+                    "error": "Falha na síntese integrada da secção após todas as tentativas.",
                 }
+                failed_operations.append(err_info)
+                telemetry_metrics.failures_count += 1
+                logger.error(f"[Section Synthesis Failed] {err_info}")
+
+                sec_analysis_obj = SectionAnalysis(
+                    section_id=section.section_id,
+                    title=section.title,
+                    section_type=section.kind,
+                    objective="",
+                    in_depth_synthesis="",
+                    core_ideas=[],
+                    concepts=[],
+                    arguments=[],
+                    evidences=[],
+                    limitations=[f"FALHA: Síntese da secção não concluída ({err_info['reason']})"],
+                    source_refs=[],
+                    segment_ids=[s.segment_id for s in sec_segment_analyses],
+                    execution_time_ms=t_sec_elapsed,
+                )
+                all_section_analyses.append(sec_analysis_obj)
+                continue
 
             # Referências consolidadas
             sec_refs: List[EvidenceRef] = []
@@ -1027,29 +1082,43 @@ class AcademicReasoningEngine:
                 },
             )
 
-        # 5. Análise Específica de Metodologia e Resultados
+        # 5. Análise Específica de Metodologia e Resultados (SEM LIMITAÇÕES ARBITRÁRIAS DE PARÁGRAFOS)
         progress("METHOD_ANALYSIS", 0.65, "A examinar metodologia empírica e resultados comprovados...")
-        method_sections = [s for s in ast.sections if s.kind in ("methodology", "results")]
+        method_sections = [
+            s for s in ast.sections
+            if s.kind in ("methodology", "results")
+            or any(tok in s.title.lower() for tok in ("method", "metod", "result", "experim"))
+        ]
         methodology_analysis = MethodologyAnalysis(is_applicable=False)
 
         if method_sections:
             method_text_blocks = []
             for ms in method_sections:
                 paras = [p for p in ast.paragraphs if p.section_id == ms.section_id]
-                sample_text = "\n".join(f"[{p.paragraph_id}] {p.text}" for p in paras[:8])
-                method_text_blocks.append(f"=== Secção: {ms.title} ({ms.kind}) ===\n{sample_text}")
+                # Processa TODOS os parágrafos relevantes da secção sem limite fixo
+                sec_text = "\n".join(f"[{p.paragraph_id}] (p.{p.page_number}) {p.text}" for p in paras)
+                method_text_blocks.append(f"=== Secção: {ms.title} ({ms.kind}) ===\n{sec_text}")
 
             method_prompt = PROMPT_METHODOLOGY_AND_RESULTS.format(
                 document_title=ast.metadata.title or ast.filename or doc_id,
                 method_and_results_content="\n\n".join(method_text_blocks),
             )
-            parsed_method, _ = self._call_model_with_retries(
+            parsed_method, method_telemetry = self._call_model_with_retries(
                 SYSTEM_PROMPT_ACADEMIC_REASONING,
                 method_prompt,
                 {"operation": "academic_methodology_results", "document_id": doc_id},
                 cancellation_check=cancellation_check,
             )
-            if parsed_method and isinstance(parsed_method, dict):
+            if not parsed_method or not isinstance(parsed_method, dict):
+                err_info = {
+                    "stage": "methodology_results_analysis",
+                    "reason": method_telemetry.get("status", "INVALID_JSON_AFTER_RETRIES"),
+                    "error": "Falha na análise metodológica após retries.",
+                }
+                failed_operations.append(err_info)
+                telemetry_metrics.failures_count += 1
+                logger.error(f"[Methodology Analysis Failed] {err_info}")
+            else:
                 methodology_analysis = MethodologyAnalysis(
                     is_applicable=bool(parsed_method.get("is_applicable", True)),
                     research_type=parsed_method.get("research_type", ""),
@@ -1065,6 +1134,10 @@ class AcademicReasoningEngine:
                 )
                 for r in parsed_method.get("results", []):
                     if isinstance(r, dict) and r.get("statement"):
+                        r_pid = (r.get("paragraph_id") or "").strip()
+                        p_obj = paragraphs_map.get(r_pid)
+                        sec_id = p_obj.section_id if p_obj else method_sections[0].section_id
+                        p_page = p_obj.page_number if p_obj else 1
                         all_results.append(
                             ResultItem(
                                 statement=r["statement"],
@@ -1073,9 +1146,10 @@ class AcademicReasoningEngine:
                                 interpretation_limitations=r.get("interpretation_limitations", ""),
                                 evidence_refs=[
                                     EvidenceRef(
-                                        section_id=method_sections[0].section_id,
-                                        paragraph_id=r.get("paragraph_id"),
-                                        status=EpistemicStatus.SOURCE_FACT.value,
+                                        section_id=sec_id,
+                                        paragraph_id=r_pid if r_pid else None,
+                                        page_number=p_page if r_pid else None,
+                                        status=EpistemicStatus.SOURCE_FACT.value if r_pid else EpistemicStatus.UNVERIFIED.value,
                                     )
                                 ],
                             )
@@ -1083,9 +1157,11 @@ class AcademicReasoningEngine:
 
         # 6. Integração Transversal Global (Reduce 2)
         progress("CROSS_SECTION_INTEGRATION", 0.80, "A executar raciocínio transversal e deteção de tensões...")
+        valid_synth_sections = [sa for sa in all_section_analyses if sa.in_depth_synthesis]
+
         sections_summary_text = "\n\n".join(
             f"Secção: {sa.title} ({sa.section_type})\nObjetivo: {sa.objective}\nSíntese: {sa.in_depth_synthesis[:400]}..."
-            for sa in all_section_analyses
+            for sa in valid_synth_sections
         )
         cross_prompt = PROMPT_CROSS_SECTION_INTEGRATION.format(
             document_title=ast.metadata.title or ast.filename or doc_id,
@@ -1099,36 +1175,42 @@ class AcademicReasoningEngine:
                 ensure_ascii=False,
             ),
         )
-        parsed_cross, _ = self._call_model_with_retries(
+        parsed_cross, cross_telemetry = self._call_model_with_retries(
             SYSTEM_PROMPT_ACADEMIC_REASONING,
             cross_prompt,
             {"operation": "academic_cross_section_integration", "document_id": doc_id},
             cancellation_check=cancellation_check,
         )
         if not parsed_cross or not isinstance(parsed_cross, dict):
-            parsed_cross = {
-                "argumentative_progression": [
-                    f"Apresentação da matéria nas secções iniciais ({', '.join(s.title for s in all_section_analyses[:2])})",
-                    "Desenvolvimento e conclusão nas secções subsequentes.",
-                ],
-                "conceptual_relationships": [],
-                "coherence_and_tensions": [
-                    {"type": "COHERENCE", "description": "Estrutura argumentativa contínua sem quebras lógicas graves.", "status": "MODEL_INFERENCE"}
-                ],
-                "idea_dependencies": [],
-                "global_synthesis": "O documento desenvolve uma exposição estruturada dos temas propostos, articulando as suas secções de forma coerente.",
+            # Registo explícito de falha na integração transversal — zero síntese global inventada
+            err_info = {
+                "stage": "cross_section_integration",
+                "reason": cross_telemetry.get("status", "INVALID_JSON_AFTER_RETRIES"),
+                "error": "Falha na integração transversal global após retries.",
             }
-
-        cross_section_synthesis = CrossSectionSynthesis(
-            section_relationships=parsed_cross.get("section_relationships", []),
-            argumentative_progression=parsed_cross.get("argumentative_progression", []),
-            conceptual_relationships=parsed_cross.get("conceptual_relationships", []),
-            coherence_and_tensions=parsed_cross.get("coherence_and_tensions", []),
-            idea_dependencies=parsed_cross.get("idea_dependencies", []),
-            global_synthesis=parsed_cross.get("global_synthesis", ""),
-        )
+            failed_operations.append(err_info)
+            telemetry_metrics.failures_count += 1
+            logger.error(f"[Cross-Section Integration Failed] {err_info}")
+            cross_section_synthesis = CrossSectionSynthesis(
+                section_relationships=[],
+                argumentative_progression=[],
+                conceptual_relationships=[],
+                coherence_and_tensions=[],
+                idea_dependencies=[],
+                global_synthesis="",
+            )
+        else:
+            cross_section_synthesis = CrossSectionSynthesis(
+                section_relationships=parsed_cross.get("section_relationships", []),
+                argumentative_progression=parsed_cross.get("argumentative_progression", []),
+                conceptual_relationships=parsed_cross.get("conceptual_relationships", []),
+                coherence_and_tensions=parsed_cross.get("coherence_and_tensions", []),
+                idea_dependencies=parsed_cross.get("idea_dependencies", []),
+                global_synthesis=parsed_cross.get("global_synthesis", ""),
+            )
 
         # 7. Document Analysis Core
+        valid_sections_with_obj = [sa for sa in all_section_analyses if sa.objective]
         doc_analysis = DocumentCoreAnalysis(
             document_id=doc_id,
             title=ast.metadata.title or ast.filename or doc_id,
@@ -1138,17 +1220,17 @@ class AcademicReasoningEngine:
                 "keywords": ast.metadata.keywords,
                 "page_count": ast.metadata.page_count,
             },
-            global_objective=all_section_analyses[0].objective if all_section_analyses else "Compreender o documento.",
-            research_problem=(ast.metadata.abstract[:200] if ast.metadata.abstract else "Investigação dos tópicos tratados no artigo."),
+            global_objective=valid_sections_with_obj[0].objective if valid_sections_with_obj else "Análise do documento.",
+            research_problem=(ast.metadata.abstract[:200] if ast.metadata.abstract else "Investigação dos tópicos tratados no documento."),
             research_questions=[],
-            central_thesis=cross_section_synthesis.global_synthesis[:250],
+            central_thesis=cross_section_synthesis.global_synthesis[:250] if cross_section_synthesis.global_synthesis else "",
             main_contributions=[sa.core_ideas[0] for sa in all_section_analyses if sa.core_ideas][:4],
         )
 
         # 8. Análise Crítica
         critical_analysis = CriticalAnalysis(
             epistemic_assumptions=["Assume a fiabilidade das observações e dados apresentados pelo autor."],
-            author_limitations=[lim for sa in all_section_analyses for lim in sa.limitations][:5],
+            author_limitations=[lim for sa in all_section_analyses for lim in sa.limitations if not lim.startswith("FALHA:")][:5],
             literature_gaps=["Lacunas teóricas identificadas nos objetivos do estudo."],
             open_questions=["Necessidade de corroboração empírica adicional em estudos futuros."],
             aspects_requiring_validation=[],
@@ -1158,7 +1240,15 @@ class AcademicReasoningEngine:
             ],
         )
 
-        # 9. Auditoria Forense QA
+        # 9. Determinação Rigorosa do Estado do Dossier
+        if not all_section_analyses or all(not sa.in_depth_synthesis for sa in all_section_analyses):
+            dossier_status = "FAILED"
+        elif failed_operations:
+            dossier_status = "PARTIAL"
+        else:
+            dossier_status = "COMPLETED"
+
+        # 10. Auditoria Forense QA Reforçada
         progress("QA_VALIDATION", 0.95, "A validar integridade das referências e separação epistemológica...")
         qa_evaluator = ReasoningQAEvaluator()
         qa_report = qa_evaluator.evaluate(
@@ -1166,6 +1256,7 @@ class AcademicReasoningEngine:
             section_analyses=all_section_analyses,
             results=all_results,
             cross_synthesis=cross_section_synthesis,
+            failed_operations=failed_operations,
         )
 
         total_elapsed = round((time.perf_counter() - start_time) * 1000.0, 2)
@@ -1174,12 +1265,15 @@ class AcademicReasoningEngine:
         dossier = AcademicReasoningDossier(
             dossier_id=f"dossier_{uuid.uuid4().hex[:12]}",
             document_id=doc_id,
+            schema_version=SCHEMA_VERSION,
+            engine_version=ENGINE_VERSION,
             source_sha256=source_sha256,
             ast_version=ast_version,
             model_name=self.model_name,
             prompt_versions=PROMPT_VERSIONS,
             created_at=datetime.now().isoformat(),
-            status="COMPLETED",
+            status=dossier_status,
+            failed_operations=failed_operations,
             document_analysis=doc_analysis,
             section_analyses=all_section_analyses,
             conceptual_analysis=list(all_concepts_map.values()),
@@ -1191,23 +1285,25 @@ class AcademicReasoningEngine:
             telemetry=telemetry_metrics,
         )
 
-        # 10. Persistência Final e Limpeza de Checkpoint
+        # 11. Persistência Final e Salvaguarda
         self._save_final_dossier(dossier)
-        progress("DONE", 1.0, f"Raciocínio académico concluído em {total_elapsed / 1000.0:.1f}s.")
+        progress("DONE", 1.0, f"Raciocínio académico concluído com estado '{dossier_status}' em {total_elapsed / 1000.0:.1f}s.")
         return dossier
 
 
 # ============================================================================
-# 7. ReasoningQAEvaluator: Auditoria Forense e Integridade
+# 7. ReasoningQAEvaluator: Auditoria Forense e Integridade Reforçada
 # ============================================================================
 
 class ReasoningQAEvaluator:
     """
     Auditor forense do raciocínio académico:
-      1. Garante que todas as referências a parágrafos existem de facto na AST.
-      2. Garante que números de páginas referenciados são válidos.
-      3. Audita a separação entre SOURCE_FACT e MODEL_INFERENCE.
-      4. Verifica a cobertura de secções e ausência de afirmações fantasma.
+      1. Garante que todos os paragraph_id referenciados existem na AST.
+      2. Garante correspondência entre o parágrafo e a section_id indicada.
+      3. Garante correspondência entre a página indicada e a localização real na AST.
+      4. Exige evidência válida (com paragraph_id não vazio) para cada resultado SOURCE_FACT.
+      5. Audita separação coerente entre SOURCE_FACT, MODEL_INFERENCE, NOT_FOUND e UNVERIFIED.
+      6. Define is_valid=False perante qualquer referência inválida ou operação falhada.
     """
 
     def evaluate(
@@ -1216,8 +1312,9 @@ class ReasoningQAEvaluator:
         section_analyses: List[SectionAnalysis],
         results: List[ResultItem],
         cross_synthesis: CrossSectionSynthesis,
+        failed_operations: Optional[List[Dict[str, Any]]] = None,
     ) -> ReasoningQAReport:
-        valid_paras: Set[str] = {p.paragraph_id for p in ast.paragraphs}
+        valid_paras: Dict[str, ASTParagraph] = {p.paragraph_id: p for p in ast.paragraphs}
         valid_sections: Set[str] = {s.section_id for s in ast.sections}
         max_page = max([p.page_number for p in ast.pages] or [1])
 
@@ -1234,28 +1331,56 @@ class ReasoningQAEvaluator:
         warnings: List[str] = []
         errors: List[str] = []
 
+        if failed_operations:
+            for fo in failed_operations:
+                errors.append(f"Operação não concluída na etapa '{fo.get('stage')}': {fo.get('error', 'Falha no modelo')}")
+
         # Inspecionar referências das secções
         for sec in section_analyses:
             refs = getattr(sec, "source_refs", []) or []
             for ref in refs:
                 total_refs += 1
+                ref_valid = True
                 p_id = getattr(ref, "paragraph_id", None) if not isinstance(ref, dict) else ref.get("paragraph_id")
                 s_id = getattr(ref, "section_id", "") if not isinstance(ref, dict) else ref.get("section_id", "")
                 p_num = getattr(ref, "page_number", None) if not isinstance(ref, dict) else ref.get("page_number")
                 status_val = getattr(ref, "status", EpistemicStatus.SOURCE_FACT.value) if not isinstance(ref, dict) else ref.get("status", EpistemicStatus.SOURCE_FACT.value)
 
                 if p_id:
-                    if p_id in valid_paras:
-                        valid_refs += 1
-                    else:
+                    if p_id not in valid_paras:
                         invalid_paras.append(p_id)
-                        warnings.append(f"Referência inválida a paragraph_id '{p_id}' na secção '{s_id}'")
+                        errors.append(f"Referência a paragraph_id inexistente '{p_id}' na secção '{s_id or sec.section_id}'")
+                        ref_valid = False
+                    else:
+                        p_obj = valid_paras[p_id]
+                        # 2. Correspondência entre o parágrafo e a section_id indicada
+                        expected_sec = s_id or sec.section_id
+                        if expected_sec and p_obj.section_id != expected_sec:
+                            errors.append(
+                                f"Parágrafo '{p_id}' pertence à secção '{p_obj.section_id}', mas foi referenciado sob a secção '{expected_sec}'."
+                            )
+                            ref_valid = False
+                        # 3. Correspondência entre a página indicada e a localização efetiva na AST
+                        if p_num is not None and p_num != p_obj.page_number:
+                            invalid_pages.append(p_num)
+                            errors.append(
+                                f"Página indicada ({p_num}) para o parágrafo '{p_id}' não coincide com a página real na AST ({p_obj.page_number})."
+                            )
+                            ref_valid = False
                 elif s_id in valid_sections:
-                    valid_refs += 1
+                    pass
+                else:
+                    errors.append(f"Referência sem parágrafo nem secção válida: {ref}")
+                    ref_valid = False
 
                 if p_num is not None and (p_num < 1 or p_num > max_page):
-                    invalid_pages.append(p_num)
-                    warnings.append(f"Página fora dos limites do documento: {p_num} (máx: {max_page})")
+                    if p_num not in invalid_pages:
+                        invalid_pages.append(p_num)
+                    errors.append(f"Página fora dos limites do documento: {p_num} (máx: {max_page})")
+                    ref_valid = False
+
+                if ref_valid:
+                    valid_refs += 1
 
                 if status_val not in fact_counts:
                     status_val = EpistemicStatus.SOURCE_FACT.value
@@ -1264,14 +1389,39 @@ class ReasoningQAEvaluator:
         # Inspecionar referências dos resultados
         for res in results:
             refs = getattr(res, "evidence_refs", []) or []
+            if not refs:
+                errors.append(f"Resultado '{res.statement[:50]}' não possui evidências associadas.")
             for ref in refs:
                 total_refs += 1
+                ref_valid = True
                 p_id = getattr(ref, "paragraph_id", None) if not isinstance(ref, dict) else ref.get("paragraph_id")
+                p_num = getattr(ref, "page_number", None) if not isinstance(ref, dict) else ref.get("page_number")
                 status_val = getattr(ref, "status", EpistemicStatus.SOURCE_FACT.value) if not isinstance(ref, dict) else ref.get("status", EpistemicStatus.SOURCE_FACT.value)
-                if p_id and p_id not in valid_paras:
-                    invalid_paras.append(p_id)
+
+                # 4. Existência de evidência válida para cada resultado classificado como SOURCE_FACT
+                if status_val == EpistemicStatus.SOURCE_FACT.value:
+                    if not p_id or not str(p_id).strip():
+                        errors.append(f"Resultado SOURCE_FACT '{res.statement[:50]}' não possui paragraph_id de suporte válido.")
+                        ref_valid = False
+                    elif p_id not in valid_paras:
+                        invalid_paras.append(p_id)
+                        errors.append(f"Resultado SOURCE_FACT referencia paragraph_id inexistente '{p_id}'.")
+                        ref_valid = False
+                    else:
+                        p_obj = valid_paras[p_id]
+                        if p_num is not None and p_num != p_obj.page_number:
+                            invalid_pages.append(p_num)
+                            errors.append(f"Página indicada ({p_num}) para resultado no parágrafo '{p_id}' difere da AST ({p_obj.page_number}).")
+                            ref_valid = False
                 else:
+                    if p_id and p_id not in valid_paras:
+                        invalid_paras.append(p_id)
+                        errors.append(f"Referência a paragraph_id inexistente '{p_id}'.")
+                        ref_valid = False
+
+                if ref_valid:
                     valid_refs += 1
+
                 if status_val not in fact_counts:
                     status_val = EpistemicStatus.SOURCE_FACT.value
                 fact_counts[status_val] += 1
@@ -1287,6 +1437,9 @@ class ReasoningQAEvaluator:
         if not section_analyses:
             errors.append("Nenhuma secção foi analisada pelo motor.")
 
+        # REGRA REFORÇADA: is_valid só é True se ZERO erros e ZERO referências inválidas
+        is_strictly_valid = (len(errors) == 0) and (len(invalid_paras) == 0) and (len(invalid_pages) == 0)
+
         return ReasoningQAReport(
             total_sections_analyzed=len(section_analyses),
             total_segments_analyzed=sum(len(sa.segment_ids) for sa in section_analyses),
@@ -1298,5 +1451,5 @@ class ReasoningQAEvaluator:
             coverage_score=min(1.0, coverage_score),
             warnings=warnings,
             errors=errors,
-            is_valid=len(errors) == 0,
+            is_valid=is_strictly_valid,
         )
