@@ -22,6 +22,9 @@ def main():
         output_path = base + ".txt"
         
     try:
+        try:
+        import pymupdf as fitz
+    except ImportError:
         import fitz  # PyMuPDF
     except ImportError:
         try:

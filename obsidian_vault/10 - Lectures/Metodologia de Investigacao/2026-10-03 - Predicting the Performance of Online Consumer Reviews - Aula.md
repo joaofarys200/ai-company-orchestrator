@@ -65,3 +65,10 @@ Esta aula centra-se na análise metodológica de um artigo académico sobre a pr
 - **[02:00] Variáveis e Constructos**: Análise da definição operacional das variáveis.
 - **[06:00] Análise Estatística e Validação**: Discussão sobre os testes estatísticos e a robustez dos resultados.
 - **[09:00] Reflexão Final**: Conclusões sobre o rigor científico do estudo.
+
+
+---
+
+## 🔗 Grafo de Conhecimento & MOC
+- **MOC Central:** [[Lectures Index]]
+- **Tópicos Relacionados:** [[AI Index]], [[Business Index]]

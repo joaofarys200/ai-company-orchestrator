@@ -714,3 +714,10 @@ Professor Luís: Existem. Podem ter como referência a quantidade de peças, tr�
 
 Na verdade são mais, só que algumas são consideradas só uma vez. Por exemplo, temos, digamos, uma série de disquetes. Mas, em termos de inventário, não está lá uma, uma disquete. É, por tipo de disquete. E depois temos peças que são muito pequenas, depois peças que ocupam mais ou menos espaço, dependendo ... [intervenção concluída / pausa de trabalho]
 
+
+
+---
+
+## 🔗 Grafo de Conhecimento & MOC
+- **MOC Central:** [[Lectures Index]] | [[Software Engineering Index]]
+- **Tópicos Relacionados:** [[API Contract Evolution, Backward Compatibility and Schema Versioning]], [[Business Index]]

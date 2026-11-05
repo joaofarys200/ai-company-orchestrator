@@ -25,19 +25,23 @@ Este MOC estabelece os fundamentos económicos, métricas financeiras de SaaS, v
 
 ## 💰 Unit Economics & Financial Modeling
 - [[SaaS Unit Economics - CAC, LTV and Magic Number]] — Definições matemáticas, período de payback e eficiência de vendas.
+- [[AI Inference Unit Economics - Token COGS, Gross Margin Erosion and Routing Arbitrage]] — Equação de COGS multi-turno de tokens, prompt caching e arbitragem entre modelos locais e frontier.
 - [[Churn Rate Analysis and Cohort Retention Curves]] — Modelagem de decaimento de receita e cálculo de Net Revenue Retention (NRR).
 - [[Analise_Financeira_SaaS_e_Algoritmos_Estatisticos]] — Monografia sobre modelagem de MRR e simulações Monte Carlo.
 
 ## 🏷️ Pricing & Monetization
 - [[SaaS Pricing Models and Monetization Strategies]] — Comparativo entre pricing por assento, por uso de tokens e escalonado.
+- [[Outcome-Based vs Usage-Based vs Hybrid Pricing in Agentic SaaS]] — Paradoxo de compressão de assentos, monetização por resultado verificado e modelos híbridos com *spend caps*.
 
-## 🔬 Market Validation & Provenance
+## 🔬 Market Validation, Defensibility & Provenance
+- [[AI Product Defensibility - Data Flywheels, Workflow Lock-In and Evaluation Moats]] — As 4 camadas reais de fosso competitivo além de *thin prompt wrappers*.
 - [[Distinguishing Real vs Synthetic Market Evidence]] — Por que dados gerados por LLMs possuem valor de validação nulo.
 - [[Economic Evidence Provenance - Real vs Synthetic vs Unverified]] — Hierarquia quadripartite de validação factual de mercado.
 - [[Market Opportunity Discovery and Scoring Matrix]] — Matriz RICE e pontuação quantitativa de oportunidades de negócio.
 
 ## ⚖️ Legal & Governance Compliance
 - [[EU AI Act and GDPR Compliance for Autonomous Agent Systems]] — Obrigações de auditoria contínua, kill switches e exclusão seletiva.
+- [[AI Governance, Model Risk Management (NIST AI RMF) and Auditability]] — Funções GOVERN/MAP/MEASURE/MANAGE do NIST AI RMF 1.0, ISO/IEC 42001 e trilhos imutáveis de proveniência.
 
 ---
 

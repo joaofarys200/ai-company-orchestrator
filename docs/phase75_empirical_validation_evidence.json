@@ -1,0 +1,78 @@
+{
+  "validation_id": "empirical_validation_phase_75",
+  "timestamp": 1792706453.734683,
+  "status": "VALIDATION_PASSED",
+  "portfolio_id": "PORTFOLIO-VALIDATION-F75",
+  "initial_roadmap_version": "v1.0.0",
+  "final_roadmap_version": "v1.1.0",
+  "constraints": {
+    "max_budget_usd": 90.0,
+    "max_effort_units": 8.0
+  },
+  "candidates_evaluated": 6,
+  "conflicts_detected": 8,
+  "conflict_types_observed": [
+    "MUTUAL_EXCLUSION",
+    "OVERLAPPING_COMPONENTS",
+    "OVERLAPPING_COMPONENTS",
+    "OVERLAPPING_COMPONENTS",
+    "EVIDENCE_STALENESS",
+    "EVIDENCE_STALENESS",
+    "EVIDENCE_STALENESS",
+    "EVIDENCE_STALENESS"
+  ],
+  "baseline_independent_strategy": {
+    "selected": [
+      "INIT-02-ASYNC-PIPELINE",
+      "INIT-04-TELEMETRY-CIRCUIT-BREAKER",
+      "INIT-03-DEBT-ROUTER-CLEANUP",
+      "INIT-06-REDUNDANT-ROUTER-SHIM"
+    ],
+    "cost": 90.0,
+    "benefit": 220.55
+  },
+  "portfolio_strategy": {
+    "initial_selected": [
+      "INIT-01-CORE-REFACTOR",
+      "INIT-02-ASYNC-PIPELINE",
+      "INIT-04-TELEMETRY-CIRCUIT-BREAKER"
+    ],
+    "initial_rejected": [
+      "INIT-03-DEBT-ROUTER-CLEANUP",
+      "INIT-05-KERNEL-BYPASS-UNAUTH",
+      "INIT-06-REDUNDANT-ROUTER-SHIM"
+    ],
+    "initial_cost": 80.0,
+    "initial_benefit": 272.3,
+    "synergy_bonus": 45.0,
+    "net_utility": 223.3
+  },
+  "replanning_event": {
+    "failed_initiative": "INIT-02-ASYNC-PIPELINE",
+    "trigger": "INITIATIVE_FAILURE",
+    "preserved_initiatives": [
+      "INIT-01-CORE-REFACTOR",
+      "INIT-04-TELEMETRY-CIRCUIT-BREAKER"
+    ],
+    "affected_downstream": [],
+    "new_roadmap_version": "v1.1.0",
+    "reason": "Integration verification failure: memory leak in stream buffer"
+  },
+  "final_metrics": {
+    "portfolio_id": "PORTFOLIO-VALIDATION-F75",
+    "total_initiatives": 6,
+    "completed_initiatives": 1,
+    "failed_initiatives": 1,
+    "deferred_initiatives": 0,
+    "expected_benefit": 348.55,
+    "realized_benefit": 33.25,
+    "budget_allocated": 90.0,
+    "budget_consumed": 22.5,
+    "schedule_estimated_duration": 30.0,
+    "schedule_actual_duration": 30.0,
+    "verification_pass_rate": 0.5,
+    "regression_count": 1,
+    "roi_ratio": 1.4777777777777779,
+    "net_improvement_summary": "Portfolio 'PORTFOLIO-VALIDATION-F75': 1/6 initiatives completed (50.0% success). Realized benefit: 33.2 vs expected 348.6. Budget consumed: $22.5/$90.0. ROI: 1.48x."
+  }
+}

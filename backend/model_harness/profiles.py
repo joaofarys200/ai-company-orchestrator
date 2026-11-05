@@ -129,7 +129,7 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
         TaskProfile(
             name="STRUCTURED_EXTRACTION",
             temperature=0.0,
-            max_context_tokens=32_768,
+            max_context_tokens=16_384,
             max_output_tokens=16_384,
             expected_output=ExpectedOutput(format=OutputFormat.JSON),
             validation_pipeline=structured_stages,
@@ -139,7 +139,7 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
         TaskProfile(
             name="TOOL_SELECTION",
             temperature=0.0,
-            max_context_tokens=32_768,
+            max_context_tokens=16_384,
             max_output_tokens=4_096,
             expected_output=ExpectedOutput(format=OutputFormat.TOOL_CALLS),
             validation_pipeline=structured_stages,
@@ -149,7 +149,7 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
         TaskProfile(
             name="CODE_REASONING",
             temperature=0.1,
-            max_context_tokens=32_768,
+            max_context_tokens=16_384,
             max_output_tokens=8_192,
             expected_output=ExpectedOutput(format=OutputFormat.TEXT),
             validation_pipeline=text_stages,
@@ -159,7 +159,7 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
         TaskProfile(
             name="MISSION_PLANNING",
             temperature=0.0,
-            max_context_tokens=32_768,
+            max_context_tokens=16_384,
             max_output_tokens=8_192,
             expected_output=ExpectedOutput(format=OutputFormat.JSON),
             validation_pipeline=structured_stages,
@@ -169,7 +169,7 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
         TaskProfile(
             name="RESEARCH",
             temperature=0.2,
-            max_context_tokens=32_768,
+            max_context_tokens=16_384,
             max_output_tokens=8_192,
             expected_output=ExpectedOutput(format=OutputFormat.TEXT),
             validation_pipeline=text_stages,
@@ -179,7 +179,7 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
         TaskProfile(
             name="ACADEMIC_RESEARCH",
             temperature=0.2,
-            max_context_tokens=32_768,
+            max_context_tokens=16_384,
             max_output_tokens=16_384,
             expected_output=ExpectedOutput(format=OutputFormat.TOOL_CALLS),
             validation_pipeline=structured_stages,
@@ -189,7 +189,7 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
         TaskProfile(
             name="DOCUMENT",
             temperature=0.3,
-            max_context_tokens=32_768,
+            max_context_tokens=16_384,
             max_output_tokens=12_288,
             expected_output=ExpectedOutput(format=OutputFormat.TEXT),
             validation_pipeline=text_stages,
@@ -199,7 +199,7 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
         TaskProfile(
             name="DOCUMENT_GENERATION",
             temperature=0.1,
-            max_context_tokens=32_768,
+            max_context_tokens=16_384,
             max_output_tokens=16_384,
             expected_output=ExpectedOutput(format=OutputFormat.TOOL_CALLS),
             validation_pipeline=structured_stages,
@@ -209,7 +209,7 @@ def create_default_task_profile_registry() -> TaskProfileRegistry:
         TaskProfile(
             name="DOCUMENT_REVIEW",
             temperature=0.1,
-            max_context_tokens=32_768,
+            max_context_tokens=16_384,
             max_output_tokens=8_192,
             expected_output=ExpectedOutput(format=OutputFormat.JSON),
             validation_pipeline=structured_stages,

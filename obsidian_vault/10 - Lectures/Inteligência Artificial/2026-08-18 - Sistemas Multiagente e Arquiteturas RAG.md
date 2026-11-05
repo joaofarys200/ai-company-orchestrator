@@ -72,3 +72,10 @@ Transcrição de teste: Durante a aula foram abordados os conceitos fundamentais
 ```
 
 </details>
+
+
+---
+
+## 🔗 Grafo de Conhecimento & MOC
+- **MOC Central:** [[Lectures Index]] | [[AI Index]]
+- **Tópicos Relacionados:** [[Agent Systems Architecture]], [[Agentic RAG, Query Decomposition and Cross-Encoder Reranking]], [[Model Context Protocol (MCP) and Capability Discovery Architecture]]

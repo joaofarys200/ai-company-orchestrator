@@ -341,6 +341,8 @@ class CodingSessionService:
             "files": self._limited_files(self.projects.read_project_files(project_id)),
             "safety_assessment": assessment.to_dict(),
         }
+        if _is_visual_only_objective(objective):
+            request_payload = _prune_payload_for_visual_objective(request_payload)
         selected_requester = (
             requester
             or self.plan_requester
@@ -1655,11 +1657,16 @@ class ModelHarnessPlanRequester:
         correction: str | None = None,
     ) -> dict[str, Any]:
         step = len(self.records) + 1
+        system_prompt = self._system_prompt()
+        user_prompt = self._user_prompt(payload, correction)
         response = await self.model_harness.execute(
             ModelRequest(
                 task_profile="STRUCTURED_EXTRACTION",
-                system_prompt=self._system_prompt(),
-                user_prompt=self._user_prompt(payload, correction),
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                max_context_tokens=_estimate_context_tokens(
+                    system_prompt, user_prompt
+                ),
                 expected_output=ExpectedOutput(
                     format=OutputFormat.JSON_SCHEMA,
                     schema=CODE_EDIT_PLAN_SCHEMA,
@@ -1673,7 +1680,7 @@ class ModelHarnessPlanRequester:
                 },
                 execution_constraints=ExecutionConstraints(
                     max_attempts=2,
-                    timeout_seconds=120.0,
+                    timeout_seconds=_plan_timeout_seconds(),
                     streaming=False,
                     thinking=False,
                     allow_recovery=True,
@@ -1744,6 +1751,79 @@ class ModelHarnessPlanRequester:
             f"{json.dumps(payload, ensure_ascii=False)}"
             f"{correction_text}"
         )
+
+
+_VISUAL_FILE_SUFFIXES = (".css", ".scss", ".sass", ".less", ".html", ".htm", ".svg")
+_VISUAL_INTENT = re.compile(
+    r"\b(estetic\w*|visual\w*|design|aspeto|aspecto|aparencia|layout|tema|"
+    r"cores?|tipografia|fontes?|estilo|estilos|css|bonit\w*|moderno|moderna|"
+    r"ui|interface|glassmorphism|dark\s*mode|modo\s+escuro|responsiv\w*|"
+    r"anima\w*|espacamento|sombras?)\b",
+    re.IGNORECASE,
+)
+_FUNCTIONAL_INTENT = re.compile(
+    r"\b(bug|erro|corrig\w*|fix|funcionalidade|endpoint|api|rota|servidor|"
+    r"backend|logica|validac\w*|teste\w*|base\s+de\s+dados|seguranc\w*|"
+    r"performance|botao\s+(?:deve|que)|ao\s+clicar)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_visual_only_objective(objective: str) -> bool:
+    import unicodedata
+
+    text = unicodedata.normalize("NFKD", objective or "")
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    return bool(_VISUAL_INTENT.search(text)) and not _FUNCTIONAL_INTENT.search(text)
+
+
+def _prune_payload_for_visual_objective(payload: dict[str, Any]) -> dict[str, Any]:
+    """Keep only presentational files for purely visual objectives.
+
+    Smaller prompts fit a smaller Ollama context, which stays fully faster on
+    the GPU. Falls back to the full payload if no presentational file exists.
+    """
+    files = payload.get("files") or {}
+    kept = {
+        path: content
+        for path, content in files.items()
+        if str(path).lower().endswith(_VISUAL_FILE_SUFFIXES)
+    }
+    if not kept:
+        return payload
+    pruned = dict(payload)
+    pruned["files"] = kept
+    symbols = payload.get("symbols")
+    if isinstance(symbols, dict):
+        pruned["symbols"] = {k: v for k, v in symbols.items() if k in kept}
+    return pruned
+
+
+def _estimate_context_tokens(*texts: str, output_tokens: int = 4096) -> int:
+    """Smallest 2048-aligned context that fits prompt + output (16k..32k).
+
+    Keeping the floor at 16384 matches TaskProfileRegistry and OLLAMA_NUM_CTX
+    so Ollama does not unload/reload the model when switching between chat,
+    agentic tool calls, and coding plans.
+    """
+    prompt_tokens = sum(len(text) for text in texts) // 3 + 1
+    needed = prompt_tokens + output_tokens
+    aligned = ((needed + 2047) // 2048) * 2048
+    return max(16384, min(32768, aligned))
+
+
+def _plan_timeout_seconds() -> float:
+    """Read-timeout for edit-plan generation.
+
+    A local 9B model generates ~13 tok/s, so large rewrites (e.g. a full
+    visual redesign) need far more than the former fixed 120s. Override with
+    JARVIS_CODING_PLAN_TIMEOUT_SECONDS.
+    """
+    try:
+        value = float(os.getenv("JARVIS_CODING_PLAN_TIMEOUT_SECONDS", "900"))
+    except ValueError:
+        return 900.0
+    return value if value > 0 else 900.0
 
 
 async def request_edit_plan_from_model_harness(

@@ -27,13 +27,23 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from PIL import Image, ImageStat
 
 from services.lecture_synthesizer import LocalTranscriber, VaultLinker
+from services.study_ai_engine import (
+    STOPWORDS as STUDY_STOPWORDS,
+    extract_key_terms_from_text,
+    extract_keyframes_ocr_windows,
+    generate_complete_study_bundle,
+    invoke_study_llm_json,
+    rank_salient_sentences,
+)
 
 
 # ---------------------------------------------------------------------------
 # Formatos Suportados e Capability Detection
 # ---------------------------------------------------------------------------
 
-SUPPORTED_VIDEO_EXTENSIONS = {".mp4", ".webm", ".mkv", ".mov", ".avi"}
+SUPPORTED_VIDEO_EXTENSIONS = {
+    ".mp4", ".webm", ".mkv", ".mov", ".avi", ".wmv", ".m4v", ".flv", ".mpg", ".mpeg"
+}
 SUPPORTED_VIDEO_FORMATS = SUPPORTED_VIDEO_EXTENSIONS
 
 # Regex para sanitização de nomes de ficheiro e proteção contra path traversal
@@ -739,15 +749,15 @@ class VideoIntelligenceService:
                     words=words_list,
                 )
                 structured.append(seg)
-        else:
-            # Fallback se não foram detetados segmentos explícitos
+        elif raw_text and raw_text.strip():
+            # Texto presente sem segmentos granulares explícitos
             structured.append(TranscriptSegment(
                 segment_id="seg_0001",
                 start=0.0,
                 end=max(5.0, duration_seconds),
                 timestamp="00:00",
-                text=raw_text or "Áudio processado sem fala detetada.",
-                confidence=1.0,
+                text=raw_text.strip(),
+                confidence=0.9,
                 language=language or "en",
             ))
 
@@ -767,7 +777,7 @@ class VideoIntelligenceService:
     ) -> List[VideoKeyframe]:
         """
         Extrai keyframes em intervalos adaptativos para não sobrecarregar I/O,
-        analisando propriedades visuais para identificar slides e diagramas.
+        analisando propriedades visuais e OCR local para identificar slides e diagramas reais.
         """
         ffmpeg_bin = get_ffmpeg_binary()
         if not ffmpeg_bin:
@@ -846,6 +856,25 @@ class VideoIntelligenceService:
             )
             keyframes.append(keyframe)
 
+        # Executar OCR local em lote (Windows WinRT OCR) para extrair texto real de slides/diagramas
+        run_ocr = bool(keyframes) and (
+            not os.environ.get("PYTEST_CURRENT_TEST")
+            or os.environ.get("STUDY_FORCE_WINRT_OCR", "").strip().lower() in ("1", "true", "yes")
+        )
+        if run_ocr:
+            ocr_map = extract_keyframes_ocr_windows([kf.image_path for kf in keyframes])
+            for kf in keyframes:
+                ocr_txt = ocr_map.get(os.path.abspath(kf.image_path), "").strip()
+                if len(ocr_txt) >= 12:
+                    lines = [ln.strip() for ln in ocr_txt.splitlines() if ln.strip()]
+                    ocr_clean = " | ".join(lines)
+                    kf.is_slide = True
+                    kf.has_text = True
+                    kf.slide_confidence = max(kf.slide_confidence, 0.94)
+                    kf.confidence = kf.slide_confidence
+                    kf.visual_type = "slide"
+                    kf.visual_description = f"Texto no ecrã ({kf.timestamp_str}): {ocr_clean[:500]}"
+
         return keyframes
 
     def _analyze_frame_visuals(self, image_path: str) -> Tuple[str, bool, float, str]:
@@ -861,8 +890,6 @@ class VideoIntelligenceService:
                 brightness = sum(stat.mean) / 3.0  # 0-255
                 std_dev = sum(stat.stddev) / 3.0   # Contraste
 
-                # Heurística: Apresentações e slides possuem contraste moderado a alto e fundo consistente
-                # Imagens com fundo claro (>180) e alto contraste (>35) tendem a ser slides de aula
                 is_slide = False
                 confidence = 0.5
                 visual_type = "general"
@@ -898,6 +925,14 @@ class VideoIntelligenceService:
             f_id = getattr(k, "frame_id", "frame_001")
             ts = getattr(k, "timestamp", 0.0)
             t_str = getattr(k, "timestamp_str", format_timestamp(ts))
+            v_desc = getattr(k, "visual_description", "") or ""
+            slide_title = f"Slide em {t_str}" if is_slide else f"Frame em {t_str}"
+            if is_slide and v_desc.startswith("Texto no ecrã"):
+                parts = v_desc.split(":", 1)
+                if len(parts) == 2 and parts[1].strip():
+                    headline = parts[1].split("|")[0].strip()
+                    if headline:
+                        slide_title = f"Slide em {t_str}: {headline[:64]}"
             slides.append(SlideCandidate(
                 timestamp=ts,
                 timestamp_str=t_str,
@@ -905,7 +940,7 @@ class VideoIntelligenceService:
                 confidence=conf,
                 is_slide=bool(is_slide),
                 evidence_status="OBSERVED" if is_slide else "UNKNOWN",
-                title=f"Slide em {t_str}" if is_slide else f"Frame em {t_str}",
+                title=slide_title,
             ))
         return slides
 
@@ -919,19 +954,18 @@ class VideoIntelligenceService:
         duration_seconds: float,
     ) -> List[VideoChapter]:
         """
-        Segmenta a aula/vídeo em capítulos temáticos com base nos timestamps e texto.
+        Segmenta a aula/vídeo em capítulos temáticos reais com base nos timestamps e texto extraído.
         """
         if not transcript_segments:
             return [VideoChapter(
                 chapter_id="chap_01",
-                title="Apresentação do Conteúdo",
+                title="Apresentação Visual / Sem Discurso Transcrito",
                 start_seconds=0.0,
                 end_seconds=duration_seconds,
                 start_timestamp="00:00",
                 provenance="DEFAULT_SINGLE_CHAPTER",
             )]
 
-        # Estratégia: dividir a cada ~4-8 minutos ou por mudanças de tópico
         target_chapter_duration = 300.0  # 5 minutos por capítulo
         chapters: List[VideoChapter] = []
 
@@ -939,62 +973,57 @@ class VideoIntelligenceService:
         cur_segments: List[TranscriptSegment] = []
         chap_num = 1
 
+        def _make_chapter(segs: List[TranscriptSegment], c_num: int, c_start: float, c_end: float) -> VideoChapter:
+            block_text = " ".join(s.text for s in segs if s.text).strip()
+            c_title = self._infer_chapter_title(block_text, c_num)
+            c_summary = " ".join(rank_salient_sentences(block_text, top_k=2, preserve_order=True))
+            c_concepts = [t for t, _ in extract_key_terms_from_text(block_text, top_k=4)]
+            return VideoChapter(
+                chapter_id=f"chap_{c_num:02d}",
+                title=c_title,
+                start_seconds=round(c_start, 2),
+                end_seconds=round(max(c_start, c_end), 2),
+                start_timestamp=format_timestamp(c_start),
+                summary=c_summary,
+                key_concepts=c_concepts,
+                provenance="TRANSCRIPT_TEMPORAL_WINDOW",
+            )
+
         for seg in transcript_segments:
             cur_segments.append(seg)
             if (seg.end - cur_start) >= target_chapter_duration:
-                # Extrair título a partir das primeiras palavras ou palavras-chave do bloco
-                block_text = " ".join(s.text for s in cur_segments)
-                title = self._infer_chapter_title(block_text, chap_num)
-
-                chapters.append(VideoChapter(
-                    chapter_id=f"chap_{chap_num:02d}",
-                    title=title,
-                    start_seconds=round(cur_start, 2),
-                    end_seconds=round(seg.end, 2),
-                    start_timestamp=format_timestamp(cur_start),
-                    provenance="TRANSCRIPT_TEMPORAL_WINDOW",
-                ))
+                chapters.append(_make_chapter(cur_segments, chap_num, cur_start, seg.end))
                 chap_num += 1
                 cur_start = seg.end
                 cur_segments = []
 
-        # Adicionar capítulo final se restaram segmentos
         if cur_segments:
-            block_text = " ".join(s.text for s in cur_segments)
-            title = self._infer_chapter_title(block_text, chap_num)
-            chapters.append(VideoChapter(
-                chapter_id=f"chap_{chap_num:02d}",
-                title=title,
-                start_seconds=round(cur_start, 2),
-                end_seconds=round(duration_seconds, 2),
-                start_timestamp=format_timestamp(cur_start),
-                provenance="TRANSCRIPT_TEMPORAL_WINDOW",
-            ))
+            final_end = max(duration_seconds, cur_segments[-1].end)
+            chapters.append(_make_chapter(cur_segments, chap_num, cur_start, final_end))
 
         return chapters
 
     def _infer_chapter_title(self, text: str, chapter_num: int) -> str:
-        """Infere título conciso para o capítulo baseado nos termos dominantes."""
-        if not text:
+        """Infere título conciso para o capítulo exclusivamente a partir dos termos reais do bloco."""
+        if not text or not text.strip():
             return f"Secção {chapter_num}"
 
+        terms = [t for t, _ in extract_key_terms_from_text(text, top_k=3)]
         text_lower = text.lower()
-        if chapter_num == 1 or "welcome" in text_lower or "introdu" in text_lower:
-            return "Introdução e Visão Geral"
-        if "consensus" in text_lower or "raft" in text_lower or "algorithm" in text_lower:
-            return "Fundamentos e Mecanismo de Consenso"
-        if "architecture" in text_lower or "design" in text_lower or "structure" in text_lower:
-            return "Arquitetura e Componentes"
-        if "experiment" in text_lower or "evaluation" in text_lower or "results" in text_lower:
-            return "Resultados e Avaliação Experimental"
-        if "summary" in text_lower or "conclusion" in text_lower or "next" in text_lower:
-            return "Conclusões e Passos Finais"
+        if any(w in text_lower for w in ("welcome", "introdu", "bem-vind")):
+            if terms:
+                return f"Introdução: {', '.join(terms[:2])}"
+            return "Introdução e Contextualização"
 
-        # Pegar primeiros 5 termos relevantes
-        words = [w for w in re.findall(r"\b[a-zA-Z]{4,}\b", text) if w.lower() not in {"this", "that", "with", "from", "have"}]
+        if terms:
+            return " & ".join(terms[:2])
+
+        words = [
+            w for w in re.findall(r"\b[^\W\d_]{4,}\b", text)
+            if w.lower() not in STUDY_STOPWORDS
+        ]
         if words:
-            sample = " ".join(words[:4]).title()
-            return f"{sample}"
+            return " ".join(words[:4]).title()
 
         return f"Capítulo {chapter_num}"
 
@@ -1336,6 +1365,37 @@ class VideoIntelligenceService:
     # Geração Pedagógica: Resumos, Cornell, Quizzes e Flashcards
     # -----------------------------------------------------------------------
 
+    def _compose_multimodal_video_text(
+        self,
+        segments: List[Any],
+        keyframes: Optional[List[Any]] = None,
+        chapters: Optional[List[Any]] = None,
+    ) -> str:
+        """Combina transcrição temporal real e texto OCR dos diapositivos num corpus único fundamentado."""
+        blocks: List[str] = []
+        for s in segments or []:
+            s_txt = (getattr(s, "text", None) or (s.get("text") if isinstance(s, dict) else "") or "").strip()
+            if not s_txt:
+                continue
+            s_ts = getattr(s, "timestamp", None) or (s.get("timestamp") if isinstance(s, dict) else "") or format_timestamp(getattr(s, "start", 0.0))
+            blocks.append(f"[{s_ts}] {s_txt}")
+
+        for k in keyframes or []:
+            is_sl = getattr(k, "is_slide", False) if not isinstance(k, dict) else k.get("is_slide", False)
+            v_desc = (getattr(k, "visual_description", "") if not isinstance(k, dict) else k.get("visual_description", "")) or ""
+            if is_sl and v_desc.startswith("Texto no ecrã"):
+                blocks.append(v_desc)
+
+        if not blocks and chapters:
+            for c in chapters:
+                c_title = getattr(c, "title", "") if not isinstance(c, dict) else c.get("title", "")
+                c_sum = getattr(c, "summary", "") if not isinstance(c, dict) else c.get("summary", "")
+                c_ts = getattr(c, "start_timestamp", "00:00") if not isinstance(c, dict) else c.get("start_timestamp", "00:00")
+                if c_title or c_sum:
+                    blocks.append(f"[{c_ts}] {c_title}: {c_sum}".strip())
+
+        return "\n".join(blocks)
+
     def generate_video_summary(
         self,
         arg1: Any = None,
@@ -1344,41 +1404,61 @@ class VideoIntelligenceService:
         mode: str = "Study",
         **kwargs,
     ) -> str:
-        """Gera resumo multimodal nos 4 modos: Quick, Study, Detailed, Exam."""
+        """Gera resumo multimodal fundamentado nos 4 modos: Quick, Study, Detailed, Exam."""
+        keyframes: List[Any] = kwargs.get("keyframes") or []
         if isinstance(arg1, str) and arg1 in ("Quick", "Study", "Detailed", "Exam"):
             mode = arg1
             segments = arg2 or []
             chapters = arg3 or []
         else:
             segments = arg1 or []
+            if isinstance(arg2, list) and arg2 and hasattr(arg2[0], "frame_id"):
+                keyframes = arg2
             chapters = arg3 or []
             if "mode" in kwargs:
                 mode = kwargs["mode"]
 
-        summary_lines = [
-            f"# Sumário de Vídeo — Modo {mode}",
-            f"Este resumo pedagógico sintetiza os momentos mais relevantes da aula em modo {mode}.",
-            "",
-            f"## Tópicos Nucleares e Estrutura Temporal ({mode})",
-        ]
-        if chapters:
-            for c in chapters:
-                c_title = getattr(c, "title", "Capítulo")
-                c_ts = getattr(c, "start_timestamp", "00:00")
-                summary_lines.append(f"- **[{c_ts}] {c_title}**: Síntese dos fundamentos apresentados.")
-        elif segments:
-            for s in segments[:4]:
-                s_ts = getattr(s, "timestamp", "00:00") or format_timestamp(getattr(s, "start", 0.0))
-                summary_lines.append(f"- **[{s_ts}]**: {getattr(s, 'text', '')}")
-        else:
-            summary_lines.append(f"- **[00:00]**: Introdução e visão geral ({mode}).")
+        title = str(kwargs.get("title") or "Vídeo de Estudo")
+        subject = str(kwargs.get("subject") or "Geral")
+        corpus = self._compose_multimodal_video_text(segments, keyframes, chapters)
 
-        summary_lines.extend([
-            "",
-            f"## Análise Pedagógica e Revisão ({mode})",
-            f"O conteúdo do modo {mode} foi estruturado para assimilação ativa e retenção duradoura.",
-        ])
-        return "\n".join(summary_lines)
+        bundle = generate_complete_study_bundle(
+            title=title,
+            subject=subject,
+            source_type="VIDEO",
+            text=corpus,
+        )
+        summaries = bundle["summaries"]
+        lines = [f"# Sumário de Vídeo — Modo {mode}", ""]
+
+        if mode == "Quick":
+            for pt in summaries.get("quick") or []:
+                lines.append(f"- {pt}")
+        elif mode == "Detailed":
+            for blk in summaries.get("detailed") or []:
+                lines.append(f"## {blk.get('title', 'Tópico')}")
+                lines.append(blk.get("text", ""))
+                lines.append("")
+        elif mode == "Exam":
+            exam = summaries.get("exam") or {}
+            lines.append("## Conceitos de Alto Rendimento")
+            for c in exam.get("high_yield_concepts") or []:
+                lines.append(f"- **{c.get('concept')}**: {c.get('detail')}")
+            lines.append("")
+            lines.append("## Questões Prováveis de Exame")
+            for q in exam.get("likely_questions") or []:
+                lines.append(f"- **P:** {q.get('question')}\n  **R:** {q.get('answer')}")
+        else:
+            # Study mode
+            for sec in summaries.get("study") or []:
+                ref = f" ({sec.get('page_ref')})" if sec.get("page_ref") else ""
+                lines.append(f"## {sec.get('title', 'Secção')}{ref}")
+                lines.append(sec.get("summary", ""))
+                if sec.get("key_concepts"):
+                    lines.append(f"*Conceitos-chave:* {', '.join(sec['key_concepts'])}")
+                lines.append("")
+
+        return "\n".join(lines).strip()
 
     def generate_video_cornell_notes(
         self,
@@ -1388,50 +1468,63 @@ class VideoIntelligenceService:
         chapters: List[VideoChapter],
         keyframes: List[VideoKeyframe],
     ) -> VideoCornellNotes:
-        """Gera notas em formato Cornell Notes com timestamps explícitos na Cue Column."""
+        """Gera notas em formato Cornell Notes fundamentadas no conteúdo real com timestamps explícitos."""
         if isinstance(metadata, str):
             doc_title = metadata
-            doc_subject = "Sistemas"
-            dur_str = "01:00:00"
+            doc_subject = "Geral"
         elif hasattr(metadata, "title"):
             doc_title = metadata.title
-            doc_subject = getattr(metadata, "subject", "Sistemas")
-            dur_str = getattr(metadata, "duration_str", "01:00:00")
+            doc_subject = getattr(metadata, "subject", "Geral")
         elif isinstance(metadata, dict):
             doc_title = metadata.get("title", "Aula de Estudo")
-            doc_subject = metadata.get("subject", "Sistemas")
-            dur_str = metadata.get("duration_str", "01:00:00")
+            doc_subject = metadata.get("subject", "Geral")
         else:
             doc_title = "Aula de Estudo"
-            doc_subject = "Sistemas"
-            dur_str = "01:00:00"
+            doc_subject = "Geral"
 
-        cue_items = []
-        for c in chapters[:4]:
-            t_str = getattr(c, "start_timestamp", "00:00")
-            c_title = getattr(c, "title", "Conceito")
-            cue_items.append({
-                "cue": f"Qual o conceito fundamental abordado em {t_str}?",
-                "idea": f"Em {t_str} ({c_title}), define-se a mecânica operacional.",
-                "timestamp": t_str,
-            })
+        corpus = self._compose_multimodal_video_text(transcript_segments, keyframes, chapters)
+        bundle = generate_complete_study_bundle(
+            title=doc_title,
+            subject=doc_subject,
+            source_type="VIDEO",
+            text=corpus,
+        )
+        cor = bundle["cornell_notes"]
 
-        for s in transcript_segments[:4]:
-            t_str = getattr(s, "timestamp", "") or format_timestamp(getattr(s, "start", 0.0))
-            s_text = getattr(s, "text", "")
-            cue_items.append({
-                "cue": f"Qual é o conceito explicado aos {t_str}?",
-                "idea": f"Aos {t_str}, afirma-se que «{s_text}».",
-                "timestamp": t_str,
-            })
+        cue_items: List[Dict[str, Any]] = []
+        for idx, item in enumerate(cor.get("cue_column") or []):
+            ts = item.get("timestamp")
+            if not ts and transcript_segments:
+                seg_ref = transcript_segments[min(idx, len(transcript_segments) - 1)]
+                ts = getattr(seg_ref, "timestamp", "") or format_timestamp(getattr(seg_ref, "start", 0.0))
+            entry: Dict[str, Any] = {
+                "cue": f"[{ts}] {item['cue']}" if ts and ts not in item["cue"] else item["cue"],
+                "idea": item["idea"],
+            }
+            if ts:
+                entry["timestamp"] = ts
+            cue_items.append(entry)
 
-        for k in keyframes:
+        # Garantir âncoras temporais explícitas dos segmentos caso o corpus seja muito curto (ex: 1 frase)
+        if not any(c.get("timestamp") for c in cue_items) and transcript_segments:
+            for s in transcript_segments[:3]:
+                t_str = getattr(s, "timestamp", "") or format_timestamp(getattr(s, "start", 0.0))
+                s_text = getattr(s, "text", "").strip()
+                if s_text:
+                    cue_items.append({
+                        "cue": f"O que é exposto aos {t_str}?",
+                        "idea": f"[{t_str}] {s_text}",
+                        "timestamp": t_str,
+                    })
+
+        for k in keyframes or []:
             if getattr(k, "is_slide", False):
                 k_ts = getattr(k, "timestamp_str", "00:00")
                 k_id = getattr(k, "frame_id", "frame_001")
+                v_desc = getattr(k, "visual_description", "") or "Diapositivo apresentado no ecrã"
                 cue_items.append({
-                    "cue": f"Que diagrama é apresentado em {k_ts}?",
-                    "idea": f"Em {k_ts} ({k_id}), o diapositivo ilustra a arquitetura.",
+                    "cue": f"Que conteúdo visual aparece no ecrã aos {k_ts}?",
+                    "idea": f"[{k_ts}] ({k_id}) {v_desc[:240]}",
                     "timestamp": k_ts,
                     "frame_id": k_id,
                 })
@@ -1442,14 +1535,11 @@ class VideoIntelligenceService:
             topic=doc_title,
             subject=doc_subject,
             date=datetime.now().strftime("%Y-%m-%d"),
-            executive_summary=f"Síntese Cornell estruturada a partir da aula «{doc_title}» ({dur_str}).",
+            executive_summary=cor.get("executive_summary") or f"Síntese de «{doc_title}».",
             cue_column=cue_items,
-            detailed_notes=f"### Notas Detalhadas [{doc_title}]\n" + "\n".join(f"- [{getattr(s, 'timestamp', format_timestamp(getattr(s, 'start', 0.0)))}]: {getattr(s, 'text', '')}" for s in transcript_segments[:5]),
-            glossary="Consenso: Acordo unificado sobre estado distribuído.\nLatência: Intervalo temporal entre estímulo e resposta.",
-            action_items=[
-                f"Rever os conceitos assinalados na coluna de pistas antes do exame.",
-                "Consolidar as definições e diagramas nos cartões de estudo.",
-            ],
+            detailed_notes=cor.get("detailed_notes") or corpus[:1500],
+            glossary=cor.get("glossary") or "",
+            action_items=cor.get("action_items") or [f"Rever os pontos principais de «{doc_title}»."],
             title=doc_title,
         )
 
@@ -1462,44 +1552,116 @@ class VideoIntelligenceService:
         num_questions: int = 5,
         **kwargs,
     ) -> VideoStudyQuiz:
-        """Gera quiz de autoavaliação com proveniência temporal e frame_id."""
-        segs = segments or []
+        """Gera quiz de autoavaliação fundamentado nos segmentos reais com proveniência temporal e frame_id."""
+        segs = [s for s in (segments or []) if getattr(s, "text", "").strip()]
         kfs = keyframes or []
-        questions = []
-        for i in range(num_questions):
-            seg = segs[i % len(segs)] if segs else None
-            t_str = getattr(seg, "timestamp", "") or format_timestamp(getattr(seg, "start", 0.0)) if seg else f"00:{i*15:02d}"
-            seg_text = getattr(seg, "text", "") if seg else "princípio fundamental"
+        corpus = self._compose_multimodal_video_text(segs, kfs)
 
-            q = VideoStudyQuizQuestion(
+        parsed_llm = None
+        if corpus.strip():
+            parsed_llm = invoke_study_llm_json(
+                operation="study_generate_video_quiz",
+                system_prompt=(
+                    "És um docente universitário em PT-PT. Cria questões de escolha múltipla (4 opções) "
+                    "baseadas EXCLUSIVAMENTE no conteúdo do vídeo fornecido, indicando o timestamp [MM:SS] real. "
+                    "Devolve apenas JSON válido."
+                ),
+                user_prompt=(
+                    f"Vídeo: \"{topic}\"\nConteúdo temporal:\n{corpus[:18000]}\n\n"
+                    f"Gera exatamente {num_questions} questões em JSON:\n"
+                    '{"questions": [{"timestamp": "MM:SS", "question": "...", "options": ["correta", "distrator 1", "distrator 2", "distrator 3"], '
+                    '"correct_index": 0, "explanation": "..."}], '
+                    '"transfer_question": {"scenario": "...", "expected_concepts": ["...", "..."]}}'
+                ),
+                max_output_tokens=3072,
+            )
+
+        questions: List[VideoStudyQuizQuestion] = []
+        if isinstance(parsed_llm, dict) and isinstance(parsed_llm.get("questions"), list):
+            for idx, q_raw in enumerate(parsed_llm["questions"][:num_questions]):
+                if not isinstance(q_raw, dict):
+                    continue
+                opts = [str(o).strip() for o in (q_raw.get("options") or []) if str(o).strip()]
+                if len(opts) < 2 or not q_raw.get("question"):
+                    continue
+                while len(opts) < 4:
+                    opts.append(f"Nenhuma das afirmações anteriores se verifica no excerto analisado ({len(opts)}).")
+                opts = opts[:4]
+                c_idx = int(q_raw.get("correct_index") or 0)
+                if c_idx < 0 or c_idx >= len(opts):
+                    c_idx = 0
+                t_str = str(q_raw.get("timestamp") or "00:00").strip("[] ")
+                questions.append(VideoStudyQuizQuestion(
+                    id=f"vq_{idx+1}",
+                    question=str(q_raw["question"]).strip(),
+                    question_type="multiple_choice",
+                    options=opts,
+                    correct_index=c_idx,
+                    correct_answer=opts[c_idx],
+                    explanation=str(q_raw.get("explanation") or f"Fundamentado no momento {t_str}.").strip(),
+                    source_ids=[f"video @ {t_str}"],
+                    timestamp=t_str,
+                    frame_id=getattr(kfs[0], "frame_id", None) if kfs else None,
+                ))
+
+        # Completar de forma determinística a partir dos segmentos reais (zero strings de Raft inventadas!)
+        all_terms = [t for t, _ in extract_key_terms_from_text(corpus, top_k=12)]
+        while len(questions) < num_questions:
+            i = len(questions)
+            seg = segs[i % len(segs)] if segs else None
+            t_str = (getattr(seg, "timestamp", "") or format_timestamp(getattr(seg, "start", 0.0))) if seg else f"00:{i*15:02d}"
+            seg_text = getattr(seg, "text", "").strip() if seg else f"Conteúdo visual de {topic}"
+            correct_opt = seg_text[:160] if seg_text else f"Conceito apresentado em {topic}."
+
+            other_seg_texts = [
+                getattr(s, "text", "").strip()[:140]
+                for idx_s, s in enumerate(segs)
+                if seg is not None and s is not seg and getattr(s, "text", "").strip()
+            ]
+            distractors: List[str] = []
+            for ost in other_seg_texts[:2]:
+                distractors.append(f"Afirma-se o oposto do exposto noutro ponto: {ost}")
+            fallbacks_neutral = [
+                f"O excerto em {t_str} exclui explicitamente qualquer relação com «{topic}».",
+                f"O autor declara que este ponto não tem aplicabilidade prática no contexto de «{topic}».",
+                f"A evidência em {t_str} contradiz a definição apresentada no vídeo.",
+            ]
+            for fn in fallbacks_neutral:
+                if len(distractors) >= 3:
+                    break
+                distractors.append(fn)
+
+            opts = [correct_opt] + distractors[:3]
+            questions.append(VideoStudyQuizQuestion(
                 id=f"vq_{i+1}",
-                question=f"No minuto {t_str}, que garantia é apresentada relativamente a '{topic}'?",
+                question=f"De acordo com o momento {t_str} de «{topic}», qual das seguintes afirmações reflete fielmente o conteúdo apresentado?",
                 question_type="multiple_choice",
-                options=[
-                    f"Confirma que {seg_text[:40] if seg_text else 'o estado é consistente'}.",
-                    "O líder abdica imediatamente sem qualquer termo de eleição.",
-                    "Os nós secundários ignoram todos os registos anteriores.",
-                    "O cliente executa escritas sem confirmação de maioria.",
-                ],
+                options=opts,
                 correct_index=0,
-                correct_answer=f"Confirma que {seg_text[:40] if seg_text else 'o estado é consistente'}.",
-                explanation=f"Aos {t_str}, a exposição teórica valida este comportamento: «{seg_text}».",
+                correct_answer=correct_opt,
+                explanation=f"Aos {t_str}, o conteúdo estabelece: «{seg_text}».",
                 source_ids=[f"video @ {t_str}"],
                 timestamp=t_str,
                 frame_id=getattr(kfs[0], "frame_id", None) if kfs else None,
-            )
-            questions.append(q)
+            ))
+
+        transfer_q = (
+            parsed_llm.get("transfer_question")
+            if isinstance(parsed_llm, dict) and isinstance(parsed_llm.get("transfer_question"), dict)
+            else {
+                "id": "transfer_q1",
+                "scenario": f"Como aplicarias os conceitos centrais discutidos em «{topic}» a um caso real desta área?",
+                "expected_concepts": all_terms[:4] if all_terms else [topic],
+            }
+        )
+        transfer_q.setdefault("id", "transfer_q1")
 
         return VideoStudyQuiz(
             quiz_id=f"quiz_v_{doc_id}",
             document_id=doc_id,
             topic=topic,
             questions=questions,
-            transfer_question={
-                "id": "transfer_q1",
-                "scenario": f"Como aplicarias as técnicas do vídeo «{topic}» num ambiente de produção com restrições estritas?",
-                "expected_concepts": ["Redução de overhead", "Assincronia", "Validação periódica"],
-            },
+            transfer_question=transfer_q,
             created_at=datetime.now().isoformat(),
         )
 
@@ -1512,36 +1674,83 @@ class VideoIntelligenceService:
         num_cards: int = 5,
         **kwargs,
     ) -> List[VideoStudyFlashcard]:
-        """Gera flashcards pedagógicos associados a timestamps e frames."""
-        segs = segments or []
+        """Gera flashcards pedagógicos fundamentados nos conceitos reais dos segmentos e slides."""
+        segs = [s for s in (segments or []) if getattr(s, "text", "").strip()]
         kfs = keyframes or []
+        corpus = self._compose_multimodal_video_text(segs, kfs, chapters)
         cards: List[VideoStudyFlashcard] = []
 
-        for idx, s in enumerate(segs[:num_cards]):
-            t_str = getattr(s, "timestamp", "") or format_timestamp(getattr(s, "start", 0.0))
-            s_text = getattr(s, "text", "")
-            cards.append(VideoStudyFlashcard(
-                card_id=f"card_v_{document_id}_{idx+1}",
-                document_id=document_id,
-                front=f"Em {t_str}, como é definido o conceito de 'Logical Clock' / Termo em Raft?",
-                back=f"Aos {t_str}: «{s_text}». Funciona como relógio lógico para ordenar estados no sistema.",
-                source_ids=[f"video @ {t_str}"],
-                timestamp=t_str,
-                difficulty="MEDIUM",
-                next_review=time.time() + 86400,
-                repetitions=0,
-                interval_days=1.0,
-            ))
+        parsed_llm = None
+        if corpus.strip():
+            parsed_llm = invoke_study_llm_json(
+                operation="study_generate_video_flashcards",
+                system_prompt=(
+                    "És um especialista pedagógico em PT-PT. Cria flashcards (frente=pergunta concisa, verso=resposta rigorosa) "
+                    "usando EXCLUSIVAMENTE conceitos reais do vídeo e respetivos timestamps [MM:SS]. Devolve apenas JSON válido."
+                ),
+                user_prompt=(
+                    f"Conteúdo do vídeo:\n{corpus[:16000]}\n\n"
+                    f"Devolve JSON: {{\"cards\": [{{\"timestamp\": \"MM:SS\", \"front\": \"...\", \"back\": \"...\"}}]}} com até {num_cards} cartões."
+                ),
+                max_output_tokens=2048,
+            )
+
+        if isinstance(parsed_llm, dict) and isinstance(parsed_llm.get("cards"), list):
+            for idx, item in enumerate(parsed_llm["cards"][:num_cards]):
+                if isinstance(item, dict) and item.get("front") and item.get("back"):
+                    t_str = str(item.get("timestamp") or "00:00").strip("[] ")
+                    cards.append(VideoStudyFlashcard(
+                        card_id=f"card_v_{document_id}_{idx+1}",
+                        document_id=document_id,
+                        front=str(item["front"]).strip(),
+                        back=str(item["back"]).strip(),
+                        source_ids=[f"video @ {t_str}"],
+                        timestamp=t_str,
+                        difficulty="MEDIUM",
+                        next_review=time.time() + 86400,
+                        repetitions=0,
+                        interval_days=1.0,
+                    ))
+
+        if not cards:
+            for idx, s in enumerate(segs[:num_cards]):
+                t_str = getattr(s, "timestamp", "") or format_timestamp(getattr(s, "start", 0.0))
+                s_text = getattr(s, "text", "").strip()
+                # Extrair os termos reais presentes nesta frase específica (sem qualquer termo inventado!)
+                seg_terms = [t for t, _ in extract_key_terms_from_text(s_text, top_k=3)]
+                if not seg_terms:
+                    cap_words = [
+                        w for w in re.findall(r"\b[A-ZÀ-Ý][^\W\d_]{2,}\b", s_text)
+                        if w.lower() not in STUDY_STOPWORDS
+                    ]
+                    sig_words = [
+                        w.title() for w in re.findall(r"\b[^\W\d_]{4,}\b", s_text)
+                        if w.lower() not in STUDY_STOPWORDS
+                    ]
+                    seg_terms = (cap_words + sig_words)[:3]
+                concept_label = ", ".join(dict.fromkeys(seg_terms[:2])) if seg_terms else f"o ponto exposto em {t_str}"
+                cards.append(VideoStudyFlashcard(
+                    card_id=f"card_v_{document_id}_{idx+1}",
+                    document_id=document_id,
+                    front=f"Em {t_str}, o que é explicado sobre {concept_label}?",
+                    back=f"Aos {t_str}: «{s_text}».",
+                    source_ids=[f"video @ {t_str}"],
+                    timestamp=t_str,
+                    difficulty="MEDIUM",
+                    next_review=time.time() + 86400,
+                    repetitions=0,
+                    interval_days=1.0,
+                ))
 
         for idx, k in enumerate([f for f in kfs if getattr(f, "is_slide", False)][:2]):
             k_ts = getattr(k, "timestamp_str", "00:00")
             k_id = getattr(k, "frame_id", "frame_001")
-            k_desc = getattr(k, "visual_description", "Conteúdo visual do slide")
+            k_desc = getattr(k, "visual_description", "") or "Diapositivo visual apresentado neste momento"
             cards.append(VideoStudyFlashcard(
                 card_id=f"card_vf_{document_id}_{idx+1}",
                 document_id=document_id,
-                front=f"Identifica o diagrama visual exibido aos {k_ts} ({k_id}).",
-                back=f"{k_desc}. Constitui âncora visual para a explicação do fluxo.",
+                front=f"Que conteúdo visual é apresentado no diapositivo aos {k_ts} ({k_id})?",
+                back=k_desc,
                 source_ids=[f"frame {k_id} @ {k_ts}"],
                 timestamp=k_ts,
                 frame_id=k_id,

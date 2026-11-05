@@ -1,1 +1,269 @@
-{}
+{
+  "fc_ba0036f4": {
+    "card_id": "fc_ba0036f4",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Como se define e aplica «Validação Empírica vs. Elegância Teórica» em Predicting the Performance of Online Consumer Reviews (Aula)?",
+    "back": "A validade científica depende exclusivamente se as observações batem com as previsões, não da elegância da hipótese ou do prestígio dos autores.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t16:00-00:30:SPEECH",
+      "doc_vid_f76259cd5c4e:t28:00-00:30:SPEECH",
+      "doc_vid_f76259cd5c4e:t04:00-00:30:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793802900.341406,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_d16e4aad": {
+    "card_id": "fc_d16e4aad",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Como se define e aplica «Abordagem Preditiva vs. Explicativa» em Predicting the Performance of Online Consumer Reviews (Aula)?",
+    "back": "O estudo foca-se na previsão ('Predicting') do desempenho, utilizando mineração de sentimentos como mecanismo central para testar hipóteses.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t12:00-00:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793802900.3414311,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_7534eb5b": {
+    "card_id": "fc_7534eb5b",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Como se define e aplica «Processo de Investigação Sequencial» em Predicting the Performance of Online Consumer Reviews (Aula)?",
+    "back": "O fluxo envolve a recolha de dados (crawler), análise de sentimento e comparação estatística dos resultados observados com as previsões teóricas.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t01:00:00-00:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793802900.3414404,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_0626989c": {
+    "card_id": "fc_0626989c",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Qual é o significado de «Readership» no contexto de Predicting the Performance of Online Consumer Reviews (Aula)?",
+    "back": "Readership: A probabilidade de um consumidor prestar atenção ou ler uma review online.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t00:00-00:15:SPEECH",
+      "doc_vid_f76259cd5c4e:t04:00-00:30:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793802900.356448,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_15a554d0": {
+    "card_id": "fc_15a554d0",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Qual é o significado de «Helpfulness» no contexto de Predicting the Performance of Online Consumer Reviews (Aula)?",
+    "back": "Helpfulness: A perceção de utilidade ou quão útil uma review online é para outros consumidores.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t00:00-00:15:SPEECH",
+      "doc_vid_f76259cd5c4e:t01:20:00-00:45:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793802900.370087,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_5bf8f23d": {
+    "card_id": "fc_5bf8f23d",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Qual é o significado de «Racional Hipotético-Dedutivo» no contexto de Predicting the Performance of Online Consumer Reviews (Aula)?",
+    "back": "Racional Hipotético-Dedutivo: Um método científico que envolve a formulação de hipóteses a partir de uma teoria, a dedução de previsões a partir dessas hipóteses e a sua verificação através da observação ou experimentação.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t24:00-00:15:SPEECH",
+      "doc_vid_f76259cd5c4e:t01:08:00-00:45:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793802900.3799405,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_5a518483": {
+    "card_id": "fc_5a518483",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Qual é o significado de «Rastos Informacionais (Digital Traces)» no contexto de Predicting the Performance of Online Consumer Reviews (Aula)?",
+    "back": "Rastos Informacionais (Digital Traces): Dados digitais gerados como subproduto de atividades humanas online (e.g., interações em plataformas, compras, reviews), que podem ser recolhidos e analisados para fins de investigação.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t28:00-00:30:SPEECH",
+      "doc_vid_f76259cd5c4e:t36:00-00:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793802900.3900023,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_ee104100": {
+    "card_id": "fc_ee104100",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Qual é o problema ou tema central abordado em «Predicting the Performance of Online Consumer Reviews (Aula)»?",
+    "back": "Prever o desempenho de reviews online com base no sentimento expresso.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t00:00-00:15:SPEECH",
+      "doc_vid_f76259cd5c4e:t12:00-00:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793802900.3900387,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_e195732f": {
+    "card_id": "fc_e195732f",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Qual é a metodologia ou abordagem apresentada em «Predicting the Performance of Online Consumer Reviews (Aula)»?",
+    "back": "Uso de crawler software para recolha, análise de sentimento e testes estatísticos comparativos.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t56:00-00:45:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793802900.390048,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_73e5144b": {
+    "card_id": "fc_73e5144b",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Quais são os principais resultados ou princípios demonstrados em «Predicting the Performance of Online Consumer Reviews (Aula)»?",
+    "back": "As hipóteses são suportadas ou rejeitadas consoante a batida entre as observações e as previsões calculadas.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t08:00-00:45:SPEECH",
+      "doc_vid_f76259cd5c4e:t24:00-00:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793802900.390054,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_9027e6e8": {
+    "card_id": "fc_9027e6e8",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "front": "Qual a conclusão principal de «Predicting the Performance of Online Consumer Reviews (Aula)»?",
+    "back": "A ciência exige que os resultados observados validem as afirmações teóricas, independentemente da reputação dos investigadores.",
+    "source_ids": [
+      "doc_vid_f76259cd5c4e",
+      "doc_vid_f76259cd5c4e:t12:00-00:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793802900.3900588,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_49065594": {
+    "card_id": "fc_49065594",
+    "document_id": "doc_c778709e44f8",
+    "front": "Como se define e aplica «IT Consumerization» em IT Consumerization?",
+    "back": "É a adoção de tecnologias consumer por utilizadores não-TI, exigindo uma transformação na governação de TI.",
+    "source_ids": [
+      "doc_c778709e44f8",
+      "doc_c778709e44f8:p1:p_1",
+      "doc_c778709e44f8:p29:p_33"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793834276.866648,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_389c939f": {
+    "card_id": "fc_389c939f",
+    "document_id": "doc_c778709e44f8",
+    "front": "Qual é o significado de «embedding» no contexto de IT Consumerization?",
+    "back": "incorporação vetorial (embedding): Mapeamento denso de palavras ou conceitos para espaços geométricos contínuos.",
+    "source_ids": [
+      "doc_c778709e44f8"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793834276.9619474,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_53bdf1a6": {
+    "card_id": "fc_53bdf1a6",
+    "document_id": "doc_c778709e44f8",
+    "front": "Qual é o problema ou tema central abordado em «IT Consumerization»?",
+    "back": "A governação de TI tradicional não consegue responder às mudanças rápidas impulsionadas por tecnologias consumer.",
+    "source_ids": [
+      "doc_c778709e44f8",
+      "doc_c778709e44f8:p6:p_7",
+      "doc_c778709e44f8:p13:p_14"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793834276.9620092,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_176e3856": {
+    "card_id": "fc_176e3856",
+    "document_id": "doc_c778709e44f8",
+    "front": "Qual é a metodologia ou abordagem apresentada em «IT Consumerization»?",
+    "back": "Análise qualitativa baseada em dados de bancos e discussões teóricas sobre governação de TI.",
+    "source_ids": [
+      "doc_c778709e44f8",
+      "doc_c778709e44f8:p12:p_13",
+      "doc_c778709e44f8:p17:p_19"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793834276.9620283,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_57cfe248": {
+    "card_id": "fc_57cfe248",
+    "document_id": "doc_c778709e44f8",
+    "front": "Quais são os principais resultados ou princípios demonstrados em «IT Consumerization»?",
+    "back": "A criação de 'digital factories' e a adaptação de gestores demonstram a viabilidade da nova abordagem.",
+    "source_ids": [
+      "doc_c778709e44f8",
+      "doc_c778709e44f8:p14:p_15",
+      "doc_c778709e44f8:p19:p_21"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793834276.9620392,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_503ccc89": {
+    "card_id": "fc_503ccc89",
+    "document_id": "doc_c778709e44f8",
+    "front": "Qual a conclusão principal de «IT Consumerization»?",
+    "back": "A governação de TI deve evoluir para um papel de broker ou coordenador face à IT Consumerization.",
+    "source_ids": [
+      "doc_c778709e44f8",
+      "doc_c778709e44f8:p26:p_29",
+      "doc_c778709e44f8:p32:p_36"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793834276.9620485,
+    "repetitions": 0,
+    "interval_days": 1.0
+  }
+}

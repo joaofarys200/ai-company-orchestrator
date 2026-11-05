@@ -1,7 +1,7 @@
 {
   "mission_id": "m_ctrl_03",
   "cycle_id": "cycle_1",
-  "timestamp": 1789334125.9035716,
+  "timestamp": 1792971563.6328244,
   "state": {
     "mission_id": "m_ctrl_03",
     "loop_version": 1,
@@ -12,8 +12,8 @@
     "current_stage": "RECORD",
     "current_decision": "FINISH",
     "current_observations": [],
-    "latest_prediction_id": "pred_9990e0f7",
-    "latest_outcome_id": "out_9094bcf0",
+    "latest_prediction_id": "pred_9f5fc700",
+    "latest_outcome_id": "out_a7d34326",
     "latest_evidence_ids": [
       "EVD_DOCS"
     ],
@@ -24,17 +24,17 @@
     "consecutive_successes": 1,
     "consecutive_failures": 0,
     "human_intervention_count": 0,
-    "state_hash": "2c8cc825941a4cc0",
-    "created_at": 1789334125.384802,
-    "updated_at": 1789334125.9035501
+    "state_hash": "130b761e2c82951d",
+    "created_at": 1792971562.6854296,
+    "updated_at": 1792971563.6327991
   },
-  "snapshot_hash": "d05a4deb2f5f0222",
+  "snapshot_hash": "5824238927427da7",
   "decision": "FINISH",
   "adaptation": null,
   "outcome": {
-    "outcome_id": "out_9094bcf0",
+    "outcome_id": "out_a7d34326",
     "cycle_id": "cycle_1",
-    "prediction_id": "pred_9990e0f7",
+    "prediction_id": "pred_9f5fc700",
     "matched": [
       "docs.md"
     ],

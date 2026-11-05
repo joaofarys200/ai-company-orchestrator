@@ -268,3 +268,10 @@ OK, portanto, ah, como terão apercebido, eu, ah, meti aqui um lapso, anunciei u
 
 ### [01:28:00]
 artigo, o que, este forecasting de demand profiles of new products, é um artigo que propõe um algoritmo, um software para fazer esta, este forecasting de, de, portanto, a, vou adiantando já, é um artigo que propõe nova tecnologia. E é algo que aparece, a, vocês, provavelmente, aqueles que trabalharem, muitos de, muitos de vocês, não no âmbito da dissertação, até vão encontrar artigos daquele, daquele tipo e vão-se ver, a, em trabalhos daquele género. Portanto, é importante que olhemos para um artigo de, de, de, desse tipo. A, e, portanto, vou corrigir o lapso, OK, focando nesse artigo. A, portanto, vou, vou-vos pedir para prestarem atenção a, a esses, a, a esses aspectos, a, e, a, portanto, a, OK, e eu depois, a, avanço em termos da, de seguir, de seguir, mais ou menos seguir o guião, mas focando, focando particularmente nesses, a, a, aspectos, a, mais, a, que considero mais, mais, mais relevantes para, para, para, enfim, para,
+
+
+---
+
+## 🔗 Grafo de Conhecimento & MOC
+- **MOC Central:** [[Lectures Index]]
+- **Tópicos Relacionados:** [[AI Index]], [[Business Index]]

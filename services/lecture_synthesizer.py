@@ -18,6 +18,10 @@ except ImportError:
     WhisperModel = None
 
 from services.lecture_recorder import LectureSession
+from services.study_ai_engine import (
+    generate_complete_study_bundle,
+    transcribe_audio_real,
+)
 
 
 class VaultLinker:
@@ -70,13 +74,14 @@ class VaultLinker:
 
 
 class LocalTranscriber:
-    """Executa transcrição de áudio local com Faster-Whisper."""
+    """Executa transcrição real de áudio (Faster-Whisper local ou motor multimodal por blocos, sem texto inventado)."""
 
     def __init__(self, model_size: str = "base", device: str = "auto", compute_type: str = "default"):
         self.model_size = model_size
         self.device = device
         self.compute_type = compute_type
         self._model = None
+        self.last_status: str = ""
 
     def _get_model(self):
         if self._model is None and WhisperModel is not None:
@@ -88,43 +93,17 @@ class LocalTranscriber:
         return self._model
 
     def transcribe(self, audio_path: str, language: Optional[str] = None) -> Tuple[str, List[Dict[str, Any]]]:
-        """Transcreve arquivo WAV gerando texto formatado e segmentos com timestamps."""
+        """Transcreve arquivo de áudio gerando texto real formatado e segmentos com timestamps (nunca devolve transcrições falsas)."""
         if not os.path.exists(audio_path):
             raise FileNotFoundError(f"Arquivo de áudio não encontrado: {audio_path}")
 
         model = self._get_model()
-        if model is None:
-            # Modo fallback mock para ambientes sem faster-whisper instalado
-            return (
-                "Transcrição de teste: Durante a aula foram abordados os conceitos fundamentais da disciplina.",
-                [{"start": 0.0, "end": 10.0, "text": "Durante a aula foram abordados os conceitos fundamentais."}],
-            )
-
-        segments, info = model.transcribe(
+        full_transcript, structured_segments, status = transcribe_audio_real(
             audio_path,
             language=language,
-            beam_size=5,
-            vad_filter=True,
-            vad_parameters=dict(min_silence_duration_ms=500),
+            faster_whisper_model=model,
         )
-
-        full_text_lines = []
-        structured_segments = []
-
-        for seg in segments:
-            start_m, start_s = divmod(int(seg.start), 60)
-            timestamp_str = f"{start_m:02d}:{start_s:02d}"
-            text_cleaned = seg.text.strip()
-            if text_cleaned:
-                full_text_lines.append(f"[{timestamp_str}] {text_cleaned}")
-                structured_segments.append({
-                    "start": seg.start,
-                    "end": seg.end,
-                    "timestamp": timestamp_str,
-                    "text": text_cleaned,
-                })
-
-        full_transcript = "\n".join(full_text_lines)
+        self.last_status = status
         return full_transcript, structured_segments
 
 
@@ -157,16 +136,26 @@ class CornellNoteSynthesizer:
         # 3. Injetar Wikilinks
         linked_markdown = self.linker.link_text(markdown_content)
 
-        # 4. Salvar no diretório da disciplina
+        # 4. Salvar no diretório da disciplina (arquivando versão anterior se existir)
         clean_subject = "".join(c for c in session.subject if c.isalnum() or c in (" ", "-", "_")).strip() or "Geral"
-        clean_title = "".join(c for c in session.title if c.isalnum() or c in (" ", "-", "_")).strip()
-        date_str = datetime.now().strftime("%Y-%m-%d")
+        clean_title = "".join(c for c in session.title if c.isalnum() or c in (" ", "-", "_")).strip() or "Aula"
+        now_dt = datetime.now()
+        date_str = now_dt.strftime("%Y-%m-%d")
 
         subject_dir = self.lectures_dir / clean_subject
         subject_dir.mkdir(parents=True, exist_ok=True)
 
         filename = f"{date_str} - {clean_title}.md"
         output_file = subject_dir / filename
+
+        if output_file.exists():
+            archive_dir = subject_dir / ".archive"
+            archive_dir.mkdir(parents=True, exist_ok=True)
+            ts_suffix = now_dt.strftime("%Y%m%d_%H%M%S_%f")
+            try:
+                (archive_dir / f"{output_file.stem}_{ts_suffix}.md").write_bytes(output_file.read_bytes())
+            except Exception:
+                pass
 
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(linked_markdown)
@@ -182,20 +171,61 @@ class CornellNoteSynthesizer:
         raw_transcript: str,
         segments: List[Dict[str, Any]],
     ) -> str:
-        """Constrói o documento Markdown formatado no padrão Cornell Notes."""
-        date_str = datetime.now().strftime("%Y-%m-%d")
+        """Constrói o documento Markdown formatado no padrão Cornell Notes fundamentado na fala real."""
+        now_dt = datetime.now()
+        date_str = now_dt.strftime("%Y-%m-%d")
+        generated_at = now_dt.isoformat()
         duration_min = round(session.duration_seconds / 60.0, 1)
 
-        # Extração de parágrafos principais da transcrição
-        clean_lines = [s["text"] for s in segments if len(s["text"]) > 10]
-        full_text_sample = " ".join(clean_lines)
+        seg_lines = []
+        for s in segments or []:
+            txt = (s.get("text") or "").strip()
+            if not txt:
+                continue
+            ts = s.get("timestamp") or f"{int(float(s.get('start', 0))) // 60:02d}:{int(float(s.get('start', 0))) % 60:02d}"
+            seg_lines.append(f"[{ts}] {txt}")
+
+        effective_text = "\n".join(seg_lines) if seg_lines else (raw_transcript or "").strip()
+
+        bundle = generate_complete_study_bundle(
+            title=session.title,
+            subject=session.subject,
+            source_type="LECTURE_AUDIO",
+            text=effective_text,
+            document_id=getattr(session, "session_id", "lecture_session"),
+            metadata={"segments": segments or []},
+        )
+        cornell = bundle["cornell_notes"]
+        gen_mode = bundle.get("generation_mode", "EXTRACTIVE_GROUNDED")
+        telem = bundle.get("generation_telemetry") or {}
+        model_used = telem.get("model", "qwen3.5:9b") if gen_mode in ("LLM_GROUNDED", "PARTIAL") else "deterministic_extractor"
+        vault_status = "llm_grounded_verified" if gen_mode == "LLM_GROUNDED" else ("llm_partial_verified" if gen_mode == "PARTIAL" else "extractive_unverified")
+
+        exec_summary = cornell.get("executive_summary") or "Nenhum discurso inteligível detetado na gravação."
+        cue_rows = []
+        for item in cornell.get("cue_column") or []:
+            cue_q = str(item.get("cue") or "").replace("|", "/").strip()
+            idea_a = str(item.get("idea") or "").replace("|", "/").strip()
+            if cue_q and idea_a:
+                cue_rows.append(f"| **{cue_q}** | {idea_a} |")
+        if not cue_rows:
+            cue_rows.append("| **Estado da Gravação** | Áudio sem fala inteligível detetada para extrair conceitos. |")
+        cue_table_body = "\n".join(cue_rows)
+
+        detailed_body = cornell.get("detailed_notes") or self._format_detailed_body(segments)
+        glossary_body = cornell.get("glossary") or "- *(Sem termos técnicos extraídos — gravação sem discurso detetado)*"
+        action_lines = "\n".join(f"- [ ] {act}" for act in (cornell.get("action_items") or []))
+        transcript_block = raw_transcript.strip() if (raw_transcript and raw_transcript.strip()) else "\n".join(seg_lines)
 
         md = f"""---
 type: lecture_notes
 domain: academic
-status: verified
+status: {vault_status}
 source_type: PRIMARY_SOURCE
-confidence: high
+generation_mode: "{gen_mode}"
+model_used: "{model_used}"
+generated_at: "{generated_at}"
+confidence: {"high" if gen_mode == "LLM_GROUNDED" else "extractive"}
 subject: "{session.subject}"
 professor: "{session.professor}"
 date: "{date_str}"
@@ -219,7 +249,7 @@ tags:
 ---
 
 ## 📝 1. Sumário Executivo (Executive Summary)
-Esta aula abordou os conceitos centrais de **{session.title}** no âmbito de **{session.subject}**. Foram explorados os princípios fundamentais, casos práticos de aplicação, fórmulas e convenções metodológicas discutidas pelo professor.
+{exec_summary}
 
 ---
 
@@ -227,29 +257,23 @@ Esta aula abordou os conceitos centrais de **{session.title}** no âmbito de **{
 
 | Perguntas de Revisão & Cues | Ideias Centrais & Respostas Rápidas |
 |---|---|
-| **Qual foi o tema principal da aula?** | Exploração aprofundada de {session.title} e aplicação prática na disciplina. |
-| **Quais foram as definições chave?** | Estruturação teórica e terminologia padronizada apresentada em sala. |
-| **Quais as implicações práticas?** | Metodologias de resolução de problemas e técnicas aplicadas em exercícios. |
+{cue_table_body}
 
 ---
 
 ## 📖 3. Notas Detalhadas de Conteúdo (Detailed Notes)
 
-### 3.1. Tópicos Centrais e Discussão Teórica
-{self._format_detailed_body(segments)}
+{detailed_body}
 
 ---
 
 ## 📚 4. Glossário Técnico & Definições
-- **{session.title}**: Tema central explorado durante a aula expositiva.
-- **{session.subject}**: Contexto curricular e disciplinar das matérias lecionadas.
+{glossary_body}
 
 ---
 
 ## 🎯 5. Ações, Prazos & Avaliações (Action Items & Exam Alerts)
-- [ ] Rever as notas da aula e conectar com a bibliografia recomendada.
-- [ ] Resolver os exercícios práticos propostos pelo professor.
-- [ ] Consolidar dúvidas para a próxima sessão de tutoria.
+{action_lines}
 
 ---
 
@@ -258,7 +282,7 @@ Esta aula abordou os conceitos centrais de **{session.title}** no âmbito de **{
 <summary><b>Clique para expandir a transcrição completa ({len(segments)} segmentos)</b></summary>
 
 ```text
-{raw_transcript}
+{transcript_block}
 ```
 
 </details>

@@ -1,7 +1,7 @@
 {
   "mission_id": "m_ctrl_02",
   "cycle_id": "cycle_1",
-  "timestamp": 1789334125.3814137,
+  "timestamp": 1792971562.682095,
   "state": {
     "mission_id": "m_ctrl_02",
     "loop_version": 1,
@@ -12,8 +12,8 @@
     "current_stage": "RECORD",
     "current_decision": "REPAIR",
     "current_observations": [],
-    "latest_prediction_id": "pred_45a6a2a3",
-    "latest_outcome_id": "out_75e345a5",
+    "latest_prediction_id": "pred_eca9b4ed",
+    "latest_outcome_id": "out_ad159026",
     "latest_evidence_ids": [],
     "active_failures": [
       {
@@ -22,27 +22,27 @@
         "exit_code": 1,
         "is_repairable": true,
         "target_file": "parser.py",
-        "timestamp": 1789334125.3810506
+        "timestamp": 1792971562.6815772
       },
       {
         "validation_type": "BUILD",
         "target": "",
         "error": "IndentationError in parser.py",
         "is_repairable": true,
-        "timestamp": 1789334125.3810601
+        "timestamp": 1792971562.6815886
       }
     ],
     "active_repairs": [
       {
-        "adaptation_id": "adapt_cycle_1_25381",
+        "adaptation_id": "adapt_cycle_1_62681",
         "cycle_id": "cycle_1",
         "adaptation_type": "REPAIR",
         "reason": "Repairable failure encountered: IndentationError: unexpected indent in parser.py line 4; IndentationError in parser.py",
         "source_observation": {
-          "observation_id": "obs_cycle_1_25381",
+          "observation_id": "obs_cycle_1_62681",
           "cycle_id": "cycle_1",
           "mission_id": "m_ctrl_02",
-          "timestamp": 1789334125.3810682,
+          "timestamp": 1792971562.6815975,
           "task_results": [
             {
               "task_id": "t2",
@@ -77,14 +77,14 @@
               "exit_code": 1,
               "is_repairable": true,
               "target_file": "parser.py",
-              "timestamp": 1789334125.3810506
+              "timestamp": 1792971562.6815772
             },
             {
               "validation_type": "BUILD",
               "target": "",
               "error": "IndentationError in parser.py",
               "is_repairable": true,
-              "timestamp": 1789334125.3810601
+              "timestamp": 1792971562.6815886
             }
           ],
           "evidence_ids_collected": [],
@@ -106,14 +106,14 @@
               "exit_code": 1,
               "is_repairable": true,
               "target_file": "parser.py",
-              "timestamp": 1789334125.3810506
+              "timestamp": 1792971562.6815772
             },
             {
               "validation_type": "BUILD",
               "target": "",
               "error": "IndentationError in parser.py",
               "is_repairable": true,
-              "timestamp": 1789334125.3810601
+              "timestamp": 1792971562.6815886
             }
           ],
           "target_files": [
@@ -130,10 +130,10 @@
           "status": "APPROVED",
           "passed": true,
           "reason": "Mission Gate authorized adaptation.",
-          "evaluated_at": 1789334125.3813312
+          "evaluated_at": 1792971562.6819496
         },
         "status": "APPLIED",
-        "applied_at": 1789334125.381334
+        "applied_at": 1792971562.6819546
       }
     ],
     "active_replans": [],
@@ -141,22 +141,22 @@
     "consecutive_successes": 0,
     "consecutive_failures": 1,
     "human_intervention_count": 0,
-    "state_hash": "4d76801decc35eb3",
-    "created_at": 1789334124.8647692,
-    "updated_at": 1789334125.3813918
+    "state_hash": "6ddf70755d2b772e",
+    "created_at": 1792971561.8855798,
+    "updated_at": 1792971562.682054
   },
-  "snapshot_hash": "326836566dd71642",
+  "snapshot_hash": "11008834979858be",
   "decision": "REPAIR",
   "adaptation": {
-    "adaptation_id": "adapt_cycle_1_25381",
+    "adaptation_id": "adapt_cycle_1_62681",
     "cycle_id": "cycle_1",
     "adaptation_type": "REPAIR",
     "reason": "Repairable failure encountered: IndentationError: unexpected indent in parser.py line 4; IndentationError in parser.py",
     "source_observation": {
-      "observation_id": "obs_cycle_1_25381",
+      "observation_id": "obs_cycle_1_62681",
       "cycle_id": "cycle_1",
       "mission_id": "m_ctrl_02",
-      "timestamp": 1789334125.3810682,
+      "timestamp": 1792971562.6815975,
       "task_results": [
         {
           "task_id": "t2",
@@ -191,14 +191,14 @@
           "exit_code": 1,
           "is_repairable": true,
           "target_file": "parser.py",
-          "timestamp": 1789334125.3810506
+          "timestamp": 1792971562.6815772
         },
         {
           "validation_type": "BUILD",
           "target": "",
           "error": "IndentationError in parser.py",
           "is_repairable": true,
-          "timestamp": 1789334125.3810601
+          "timestamp": 1792971562.6815886
         }
       ],
       "evidence_ids_collected": [],
@@ -220,14 +220,14 @@
           "exit_code": 1,
           "is_repairable": true,
           "target_file": "parser.py",
-          "timestamp": 1789334125.3810506
+          "timestamp": 1792971562.6815772
         },
         {
           "validation_type": "BUILD",
           "target": "",
           "error": "IndentationError in parser.py",
           "is_repairable": true,
-          "timestamp": 1789334125.3810601
+          "timestamp": 1792971562.6815886
         }
       ],
       "target_files": [
@@ -244,15 +244,15 @@
       "status": "APPROVED",
       "passed": true,
       "reason": "Mission Gate authorized adaptation.",
-      "evaluated_at": 1789334125.3813312
+      "evaluated_at": 1792971562.6819496
     },
     "status": "APPLIED",
-    "applied_at": 1789334125.381334
+    "applied_at": 1792971562.6819546
   },
   "outcome": {
-    "outcome_id": "out_75e345a5",
+    "outcome_id": "out_ad159026",
     "cycle_id": "cycle_1",
-    "prediction_id": "pred_45a6a2a3",
+    "prediction_id": "pred_eca9b4ed",
     "matched": [
       "parser.py"
     ],

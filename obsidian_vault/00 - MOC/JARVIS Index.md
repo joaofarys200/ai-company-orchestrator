@@ -32,11 +32,13 @@ Este índice centraliza todo o conhecimento técnico específico da implementaç
 - [[JARVIS MissionStateStore and Persistence Engine]] — Especificação profunda do motor de persistência SQLite WAL.
 - [[JARVIS MissionExecutorService and Autonomy Controller]] — Motor de execução de DAG e fiscalização de autonomia.
 - [[JARVIS MissionRecoveryWatchdog and Crash Recovery]] — Processo de recuperação de tarefas zumbis e restauração pós-crash.
+- [[JARVIS Phase 24-25 Durable Mission Lifecycle, Leases and Authorization]] — Persistência atómica de missões, leases exclusivos de ficheiros, `PermissionGatewayService` e recuperação crash-consistent.
 
 ---
 
 ## 🛠️ Subsistemas & Implementações Específicas
 
+- [[JARVIS Multimodal Study Engine and Grounded Synthesis Pipeline]] — Motor unificado `StudyService` + `study_ai_engine` (ASR real, OCR nativo WinRT, síntese `LLM_GROUNDED` e extração `EXTRACTIVE_GROUNDED` TF-MMR).
 - [[JARVIS Voice Service and Audio Streaming Architecture]] — Processamento local de áudio, WebRTC VAD e Whisper STT.
 - [[JARVIS Gemini Live Multimodal WebSocket Protocol]] — Protocolo bidirecional de streaming de voz e barge-in.
 - [[JARVIS AirLLM Layer-by-Layer Offloading Architecture]] — Servidor de modelos 70B com descarregamento camada por camada.
@@ -70,8 +72,11 @@ Este índice centraliza todo o conhecimento técnico específico da implementaç
 - [[Lesson - Stale Preview Port Binding Collision]] — Colisão de portas de preview locais gerando testes em instâncias residuais.
 - [[Lesson - Low-Score BM25 Pollution in Short Semantic Queries]] — Contaminação de contexto em queries curtas por falta de bônus de título.
 - [[Lesson - Unescaped Wikilink Parsing Collisions in Markdown]] — Colisões entre caminhos físicos de arquivos de código e nós conceituais.
+- [[Lesson - FINDING-P8-AST-STREAMING-BUFFER]] — Otimização de streaming de buffers de memória AST.
 
 ---
+
+- [[Lesson - Synthetic Revenue Rejection]] — Rejeição estrita de métricas sintéticas de receita.
 
 ## 📋 Decisões Arquiteturais (ADRs)
 
@@ -88,6 +93,9 @@ Este índice centraliza todo o conhecimento técnico específico da implementaç
 - [[ADR-011 - Mission Crash Recovery and Git Transactional Reset]] — Checkpoints Git pré-mutação e recuperação pós-queda.
 - [[ADR-012 - Context Compression via Structural AST Summarization]] — Esqueletos de AST com corpo de funções omitido.
 - [[ADR-013 - Economic Evidence Provenance and Confidence Capping]] — Teto rígido de $0.20$ de confiança para dados sintéticos.
+- [[ADR-014 - Automated Defense and Resilience for FINDING-02-NETWORK-RETRY-JITTER]] — Resiliência de rede e retry jitter.
+- [[ADR-014 - Automated Defense and Resilience for FINDING-03-WEBSOCKET-PATH-JAIL]] — Isolamento de rotas de WebSocket.
+- [[ADR-015 - AST Streaming Memory Optimization for FINDING-P8-AST-STREAMING-BUFFER]] — Otimização de streaming de buffers AST.
 
 ---
 

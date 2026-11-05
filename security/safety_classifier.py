@@ -65,16 +65,39 @@ class SafetyRefusalError(Exception):
 class SafetyClassifier:
     """Motor determinístico de classificação e barreira de segurança de pedidos."""
 
+    _ACTION_VERBS = (
+        r"(?:fazer|faz|faze|faça|faca|fazem|façam|facam|"
+        r"executar|executa|execute|executam|executem|"
+        r"dar|dá|da|dê|de|dão|dao|dêm|dem|"
+        r"lancar|lançar|lanca|lança|lance|lançam|lancam|lancem|lançem|"
+        r"iniciar|inicia|inicie|iniciam|iniciem|"
+        r"criar|cria|crie|criam|criem|"
+        r"produzir|produz|produza|produzem|produzam|"
+        r"desenvolver|desenvolve|desenvolva|desenvolvem|desenvolvam|"
+        r"disparar|dispara|dispare|disparam|disparem|"
+        r"realizar|realiza|realize|realizam|realizem|"
+        r"montar|monta|monte|montam|montem|"
+        r"gerar|gera|gere|geram|gerem|"
+        r"efetuar|efetua|efetue|efetuam|efetuem|"
+        r"run|launch|execute|start|create|build|perform|conduct|fire)"
+    )
+
     OFFENSIVE_PATTERNS = (
         (
-            r"\b(?:fazer|executar|dar|lancar|lançar|iniciar|criar|produzir|desenvolver)\s+(?:um[a]?\s+)?(?:ataque\s+)?(?:ddos|dos|flooder|syn flood|udp flood|http flood|botnet)\b",
+            rf"\b{_ACTION_VERBS}\s+(?:(?:um|uma|o|a|os|as|a|an|the)\s+)?(?:ataque\s+(?:de\s+)?|attack\s+(?:of\s+)?)?(?:ddos|dos|flooder|flooding|syn\s*flood|udp\s*flood|http\s*flood|botnet|denial\s+of\s+service)(?:\s+(?:attack|ataque|flooder|flooding))?\b",
             "SEC-POLICY-CYBER-001",
             "Solicitação explícita de desenvolvimento ou execução de ferramenta/API ofensiva de negação de serviço (DDoS/Flooding).",
         ),
+
         (
-            r"\b(?:api|script|ferramenta|codigo|código)\s+(?:capaz\s+de|para|que)\s+(?:fazer|dar|executar)\s+ddos\b",
+            r"\b(?:api|script|ferramenta|codigo|código|bot|programa)\s+(?:capaz\s+de|para|que\s+(?:possa\s+)?(?:fazer|faz|dar|da|dá|executar|executa|lancar|lançar|lanca|lança|disparar|dispara|desenvolver|desenvolve))\s+(?:ddos|dos|ataque\s+ddos|flooder|flooding)\b",
             "SEC-POLICY-CYBER-001",
             "Solicitação de desenvolvimento de API com capacidades ofensivas de negação de serviço (DDoS).",
+        ),
+        (
+            r"\b(?:ataque\s+(?:de\s+)?(?:ddos|dos)|(?:ddos|dos)\s+flooder)\s+(?:contra|ao|contra\s+o|em)\b",
+            "SEC-POLICY-CYBER-001",
+            "Solicitação explícita de ataque ofensivo de negação de serviço direccionado a um alvo.",
         ),
         (
             r"\b(?:ransomware|keylogger|trojan|rootkit|credential harvest|exploit payload|c2 server|botnet)\b",
@@ -82,11 +105,12 @@ class SafetyClassifier:
             "Solicitação de criação de artefactos de malware, ransomware ou exfiltração não autorizada.",
         ),
         (
-            r"\b(?:exfiltrat\w*|steal|dump|roubar)\s+.*\b(?:credential|secret|key|password|senha|chave)\w*\b",
+            rf"\b(?:exfiltrat\w*|steal|dump|roubar|rouba|roube|extrair|extrai|extraia)\s+.*\b(?:credential|secret|key|password|senha|chave)\w*\b",
             "SEC-POLICY-CYBER-003",
             "Solicitação de roubo ou exfiltração não autorizada de credenciais e chaves secretas.",
         ),
     )
+
 
     DEFENSIVE_KEYWORDS = (
         "defesa", "defensivo", "proteger", "protecao", "proteção",
@@ -111,8 +135,16 @@ class SafetyClassifier:
         # 1. Check explicit offensive patterns
         for pattern, rule, reason in cls.OFFENSIVE_PATTERNS:
             if re.search(pattern, lower_prompt):
-                # Verify if there is explicit defensive/mitigation framing
-                has_defensive_focus = any(kw in lower_prompt for kw in ("mitigacao", "mitigação", "rate limit", "proteger", "defesa contra", "bloquear ddos", "anti-ddos"))
+                # Verify if there is defensive, local testing, or software engineering framing
+                has_defensive_focus = any(
+                    kw in lower_prompt
+                    for kw in (
+                        "mitigacao", "mitigação", "rate limit", "rate limiting", "proteger",
+                        "defesa contra", "bloquear ddos", "anti-ddos", "resistencia", "resistência",
+                        "teste", "testar", "benchmark", "local", "localhost", "endpoint", "rota",
+                        "dina", "simulação", "simulacao", "laboratório", "laboratorio", "auditoria",
+                    )
+                )
                 if not has_defensive_focus:
                     return SafetyAssessment(
                         is_allowed=False,

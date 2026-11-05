@@ -22,12 +22,15 @@ from backend.services.model_service import ModelExecutionService
 def _setup_dina(tmp_path):
     dina_dir = os.path.join(tmp_path, "workspace", "projects", "dina")
     os.makedirs(dina_dir, exist_ok=True)
-    real_appjs = os.path.join("workspace", "projects", "dina", "app.js")
-    if os.path.isfile(real_appjs):
-        with open(real_appjs, "r", encoding="utf-8") as rf:
-            content = rf.read()
-    else:
-        content = "const express = require('express');\n// arp -a /scan-local-ips\n"
+    content = (
+        "const express = require('express');\n"
+        "const app = express();\n"
+        "// arp -a /scan-local-ips\n"
+        "app.get('/scan-local-ips', (req, res) => {\n"
+        "    res.json({ ips: ['192.168.1.50'] });\n"
+        "});\n"
+        "module.exports = app;\n"
+    )
     with open(os.path.join(dina_dir, "app.js"), "w", encoding="utf-8") as wf:
         wf.write(content)
 
@@ -258,7 +261,7 @@ def test_scenario_14_queda_modelo_local_sem_fallback_autorizado():
         service = ModelExecutionService()
         service.execute = AsyncMock(side_effect=Exception("ConnectionRefusedError: Ollama offline"))
         
-        with patch.dict(os.environ, {"ALLOW_EXTERNAL_FALLBACK": "false", "GEMINI_API_KEY": "fake_secret_key"}):
+        with patch.dict(os.environ, {"ORCHESTRATOR_MODE": "local", "ALLOW_EXTERNAL_FALLBACK": "false", "GEMINI_API_KEY": "fake_secret_key"}):
             with pytest.raises(RuntimeError) as exc_info:
                 await service.execute_local(
                     operation="test_local",

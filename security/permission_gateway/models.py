@@ -135,6 +135,22 @@ class AuditLogEntry:
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> AuditLogEntry:
+        return cls(
+            audit_id=str(data["audit_id"]),
+            request_id=str(data["request_id"]),
+            event_type=str(data["event_type"]),
+            timestamp=float(data.get("timestamp", time.time())),
+            user_decision=data.get("user_decision"),
+            risk_level=str(data.get("risk_level", PermissionRiskLevel.LOW_RISK_MUTATION.value)),
+            tool_name=str(data.get("tool_name", "")),
+            mission_id=data.get("mission_id"),
+            project_id=data.get("project_id"),
+            execution_id=data.get("execution_id"),
+            details=dict(data.get("details", {})),
+        )
+
 
 @dataclass(slots=True)
 class RollbackRecord:
@@ -154,6 +170,23 @@ class RollbackRecord:
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> RollbackRecord:
+        return cls(
+            rollback_id=str(data["rollback_id"]),
+            request_id=str(data["request_id"]),
+            tool_name=str(data.get("tool_name", "")),
+            installer=data.get("installer"),
+            version=data.get("version"),
+            checksum=data.get("checksum"),
+            pre_install_state=dict(data.get("pre_install_state", {})),
+            post_install_state=dict(data.get("post_install_state", {})),
+            is_reversible=bool(data.get("is_reversible", True)),
+            executed=bool(data.get("executed", False)),
+            result=dict(data.get("result", {})),
+            timestamp=float(data.get("timestamp", time.time())),
+        )
 
 
 @dataclass
@@ -276,3 +309,50 @@ class PermissionRequest:
             components=components or [],
             approval_semantic=approval_semantic,
         )
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> PermissionRequest:
+        req = cls(
+            request_id=str(data["request_id"]),
+            tool_name=str(data["tool_name"]),
+            requested_operation=str(data["requested_operation"]),
+            reason=str(data.get("reason", "")),
+            risk_level=str(data.get("risk_level", PermissionRiskLevel.LOW_RISK_MUTATION.value)),
+            required_privileges=str(data.get("required_privileges", "")),
+            affected_resources=list(data.get("affected_resources", [])),
+            mission_id=data.get("mission_id"),
+            project_id=data.get("project_id"),
+            execution_id=data.get("execution_id"),
+            agent_id=data.get("agent_id"),
+            tool_type=str(data.get("tool_type", "binary")),
+            installation_required=bool(data.get("installation_required", False)),
+            installer_source=data.get("installer_source"),
+            installer_version=data.get("installer_version"),
+            installer_checksum=data.get("installer_checksum"),
+            alternative_available=bool(data.get("alternative_available", False)),
+            fallback_description=data.get("fallback_description"),
+            created_at=float(data.get("created_at", time.time())),
+            expires_at=float(data.get("expires_at", time.time() + 300.0)),
+            status=str(data.get("status", PermissionRequestStatus.REQUESTED.value)),
+            decision_evidence=dict(data.get("decision_evidence", {})),
+            policy_reason=data.get("policy_reason"),
+            user_decision=data.get("user_decision"),
+            decided_at=data.get("decided_at"),
+            decided_by=data.get("decided_by"),
+            session_id=data.get("session_id"),
+            rollback_available=bool(data.get("rollback_available", False)),
+            rollback_plan=data.get("rollback_plan"),
+            capability_result=data.get("capability_result"),
+            execution_result=data.get("execution_result"),
+            dependency_id=data.get("dependency_id"),
+            classification=str(data.get("classification", DependencyClassification.REQUIRED.value)),
+            required_for=data.get("required_for"),
+            acceptance_criteria=list(data.get("acceptance_criteria", [])),
+            fallback_capability=data.get("fallback_capability"),
+            fallback_satisfies_acceptance_criteria=bool(data.get("fallback_satisfies_acceptance_criteria", False)),
+            fallback_limitations=data.get("fallback_limitations"),
+            components=list(data.get("components", [])),
+            approval_semantic=str(data.get("approval_semantic", ApprovalSemantics.AUTHORIZE_USE.value)),
+            capability_status=data.get("capability_status"),
+        )
+        return req

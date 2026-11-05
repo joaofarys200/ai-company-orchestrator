@@ -24,11 +24,14 @@ Este MOC estabelece os princípios de segurança ofensiva/defensiva, proteção 
 ---
 
 ## 🔐 Authentication, Nonces & Signatures
+- [[OAuth 2.1, PKCE and Short-Lived Capability Tokens for Agents]] — Fluxo PKCE S256 obrigatório (RFC 7636), DPoP e tokens de capacidade atenuados para agentes autónomos.
 - [[HMAC Signature Verification for Webhooks]] — Validação criptográfica de integridade de eventos e prevenção de timing attacks.
 - [[Replay Attack Prevention with Nonce and Timestamp Windows]] — Prevenção de repetição de webhooks com janelas temporais e nonces.
 - [[Comparison - HMAC Signatures vs Asymmetric Public-Key Signatures]] — Comparativo entre HMAC simétrico e chaves públicas Ed25519.
 
-## 🔑 Cryptography & Networking
+## 🔑 Cryptography, Post-Quantum & Supply Chain
+- [[Post-Quantum Cryptography Migration - Hybrid ML-KEM (FIPS 203) and ML-DSA (FIPS 204)]] — Mitigação HNDL, KEMs híbridos `X25519MLKEM768` e assinaturas pós-quânticas NIST.
+- [[Software Supply Chain Security - SLSA, SBOM and Dependency Pinning]] — Defesa contra slopsquatting, dependency confusion, lockfiles com hash e proveniência SLSA.
 - [[TCP Handshake and BBR Congestion Control]] — Estabelecimento seguro de sessões TCP e controle de congestionamento ótimo.
 - [[Tratado_Completo_de_Ciberseguranca_Redes_e_DevSecOps]] — Monografia sobre redes TCP/IP, criptografia e DevSecOps.
 
@@ -58,6 +61,7 @@ Este MOC estabelece os princípios de segurança ofensiva/defensiva, proteção 
 - [[How to Validate Webhook Cryptographic Signatures]] — Implementação à prova de timing attacks com `hmac.compare_digest`.
 - [[How to Sanitize Secrets Before Logging or Ingestion]] — Filtro de redação de credenciais em pipelines de telemetria.
 - [[Runbook - How to Detect and Mitigate Sandbox Escape Attempts]] — Resposta a incidentes de violação de path jail e SSRF.
+- [[Runbook - How to Audit and Quarantine Untrusted Third-Party Dependencies]] — Triagem pré-instalação, auditoria de lockfiles e quarentena de pacotes maliciosos.
 
 ## 📝 Lições de Produção em 09 - JARVIS/Lessons
 - [[Lesson - Accidental Secret Leaks in Telemetry Broadcast]] — Fuga de Personal Access Token do GitHub pelo WebSocket.

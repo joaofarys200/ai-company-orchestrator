@@ -151,7 +151,7 @@ def create_task_plan(prompt: str) -> TaskPlan:
         TaskPlanStep(
             id="analisar_workspace",
             title="Analisar workspace/sandbox antes de alterar ficheiros",
-            allowed_tools=["list_directory", "read_file"],
+            allowed_tools=["list_directory", "read_file", "diagnosticar_causa_raiz"],
             required_evidence=["workspace listado"],
         ),
     ]
@@ -166,13 +166,13 @@ def create_task_plan(prompt: str) -> TaskPlan:
         steps.append(TaskPlanStep(
             id="validar",
             title="Executar validacao, build ou preview",
-            allowed_tools=["execute_command", "read_file", "list_directory"],
+            allowed_tools=["execute_command", "read_file", "list_directory", "verificar_evidencias_entrega"],
             required_evidence=["comando executado ou sandbox validada"],
         ))
     steps.append(TaskPlanStep(
         id="finalizar",
         title="Verificar qualidade e entregar apenas com evidencia",
-        allowed_tools=["verificar_qualidade", "read_file", "list_directory"],
+        allowed_tools=["verificar_qualidade", "read_file", "list_directory", "verificar_evidencias_entrega"],
         required_evidence=["quality gate"],
     ))
     return TaskPlan(steps=steps)

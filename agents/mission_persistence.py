@@ -857,8 +857,8 @@ class SQLiteMissionPersistence(MissionStatePersistence):
             return [json.loads(r["data_json"]) for r in rows]
 
     def save_checkpoint(self, project_id: str, mission_id: str, cp_data: dict[str, Any]) -> None:
-        seq = int(cp_data["sequence"])
-        cid = cp_data["checkpoint_id"]
+        seq = int(cp_data.get("sequence", 0))
+        cid = str(cp_data.get("checkpoint_id") or f"cp_{seq:04d}_{uuid.uuid4().hex[:6]}")
         with self._connection(project_id, mission_id) as conn:
             with conn:
                 conn.execute("""
@@ -1294,10 +1294,14 @@ class ShardedFilesystemPersistence(MissionStatePersistence):
     def save_checkpoint(self, project_id: str, mission_id: str, cp_data: dict[str, Any]) -> None:
         cp_dir = os.path.join(self._mission_dir(project_id, mission_id), "checkpoints")
         os.makedirs(cp_dir, exist_ok=True)
-        seq = int(cp_data["sequence"])
+        seq = int(cp_data.get("sequence", 0))
         path = os.path.join(cp_dir, f"checkpoint_{seq:04d}.json")
-        with open(path, "w", encoding="utf-8") as f:
+        tmp = f"{path}.tmp.{uuid.uuid4().hex[:8]}"
+        with open(tmp, "w", encoding="utf-8") as f:
             json.dump(cp_data, f, indent=1, ensure_ascii=False)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
 
     def load_checkpoint(self, project_id: str, mission_id: str, sequence: int | None = None, checkpoint_id: str | None = None) -> dict[str, Any] | None:
         cp_dir = os.path.join(self._mission_dir(project_id, mission_id), "checkpoints")
@@ -1310,6 +1314,11 @@ class ShardedFilesystemPersistence(MissionStatePersistence):
                     with open(path, "r", encoding="utf-8") as f:
                         return json.load(f)
                 except Exception:
+                    corrupt_path = f"{path}.corrupt.{int(time.time())}"
+                    try:
+                        os.replace(path, corrupt_path)
+                    except Exception:
+                        pass
                     return None
             return None
         if checkpoint_id:
@@ -1331,11 +1340,18 @@ class ShardedFilesystemPersistence(MissionStatePersistence):
         files = sorted(glob.glob(os.path.join(cp_dir, "checkpoint_*.json")))
         if not files:
             return None
-        try:
-            with open(files[-1], "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return None
+        for fpath in reversed(files):
+            try:
+                with open(fpath, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                return data
+            except Exception:
+                corrupt_path = f"{fpath}.corrupt.{int(time.time())}"
+                try:
+                    os.replace(fpath, corrupt_path)
+                except Exception:
+                    pass
+        return None
 
     def get_storage_stats(self, project_id: str, mission_id: str) -> StorageStats:
         mission_dir = self._mission_dir(project_id, mission_id)
@@ -1418,6 +1434,73 @@ class HybridMissionPersistence(SQLiteMissionPersistence):
                     except Exception:
                         continue
         return sorted(missions, key=lambda item: item.get("updated_at", ""), reverse=True)
+
+    def save_checkpoint(self, project_id: str, mission_id: str, cp_data: dict[str, Any]) -> None:
+        try:
+            super().save_checkpoint(project_id, mission_id, cp_data)
+        except Exception:
+            pass
+        cp_dir = os.path.join(self.metadata_root, project_id, "missions", mission_id, "checkpoints")
+        os.makedirs(cp_dir, exist_ok=True)
+        seq = int(cp_data.get("sequence", 0))
+        path = os.path.join(cp_dir, f"checkpoint_{seq:04d}.json")
+        tmp = f"{path}.tmp.{uuid.uuid4().hex[:8]}"
+        try:
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(cp_data, f, indent=2, ensure_ascii=False)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp, path)
+        except Exception:
+            pass
+
+    def load_checkpoint(self, project_id: str, mission_id: str, sequence: int | None = None, checkpoint_id: str | None = None) -> dict[str, Any] | None:
+        cp_dir = os.path.join(self.metadata_root, project_id, "missions", mission_id, "checkpoints")
+        if os.path.isdir(cp_dir):
+            if sequence is not None:
+                path = os.path.join(cp_dir, f"checkpoint_{sequence:04d}.json")
+                if os.path.isfile(path):
+                    try:
+                        with open(path, "r", encoding="utf-8") as f:
+                            return json.load(f)
+                    except Exception:
+                        corrupt_path = f"{path}.corrupt.{int(time.time())}"
+                        try:
+                            os.replace(path, corrupt_path)
+                        except Exception:
+                            pass
+            elif checkpoint_id:
+                for fpath in sorted(glob.glob(os.path.join(cp_dir, "checkpoint_*.json"))):
+                    try:
+                        with open(fpath, "r", encoding="utf-8") as f:
+                            d = json.load(f)
+                            if d.get("checkpoint_id") == checkpoint_id:
+                                return d
+                    except Exception:
+                        pass
+        try:
+            return super().load_checkpoint(project_id, mission_id, sequence=sequence, checkpoint_id=checkpoint_id)
+        except Exception:
+            return None
+
+    def load_latest_checkpoint(self, project_id: str, mission_id: str) -> dict[str, Any] | None:
+        cp_dir = os.path.join(self.metadata_root, project_id, "missions", mission_id, "checkpoints")
+        if os.path.isdir(cp_dir):
+            files = sorted(glob.glob(os.path.join(cp_dir, "checkpoint_*.json")))
+            for fpath in reversed(files):
+                try:
+                    with open(fpath, "r", encoding="utf-8") as f:
+                        return json.load(f)
+                except Exception:
+                    corrupt_path = f"{fpath}.corrupt.{int(time.time())}"
+                    try:
+                        os.replace(fpath, corrupt_path)
+                    except Exception:
+                        pass
+        try:
+            return super().load_latest_checkpoint(project_id, mission_id)
+        except Exception:
+            return None
 
 
 # ── STORAGE MIGRATION & RECOVERY ENGINE ────────────────────────────────────────

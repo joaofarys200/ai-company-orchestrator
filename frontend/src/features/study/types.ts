@@ -44,6 +44,7 @@ export interface ArgumentItem {
   text: string;
   status: EvidenceStatus;
   page_ref?: number;
+  source_refs?: string[];
 }
 
 export interface ArticleStructure {
@@ -58,6 +59,9 @@ export interface ArticleStructure {
   results: ArgumentItem;
   limitations: ArgumentItem;
   conclusion: ArgumentItem;
+  is_argumentative?: boolean;
+  argumentative_limitation?: string | null;
+  relations?: Array<{ from: string; to: string; type: string; evidence?: string }>;
 }
 
 export interface GlossaryTerm {
@@ -111,10 +115,19 @@ export interface StudyDocument {
   media: StudyMedia[];
   metadata: Record<string, unknown>;
   source_hash: string;
+  collection_id?: string;
+  source_origin?: 'manual_upload' | 'linked_folder';
+  sync_status?: 'synced' | 'pending' | 'failed' | 'processing';
+  sync_error?: string;
   provenance: {
     source_file: string;
     ingested_at: string;
     evidence_status: EvidenceStatus;
+    source_origin?: 'manual_upload' | 'linked_folder';
+    linked_folder_path?: string;
+    rel_path?: string;
+    sync_status?: 'synced' | 'pending' | 'failed' | 'processing';
+    sync_error?: string;
   };
   reading_progress: StudyReadingProgress;
   structure?: ArticleStructure;
@@ -195,10 +208,40 @@ export interface CornellNotesData {
   subject: string;
   date: string;
   executive_summary: string;
-  cue_column: Array<{ cue: string; idea: string }>;
+  cue_column: Array<{ cue: string; idea: string; source_refs?: string[] }>;
   detailed_notes: string;
   glossary: string;
   action_items: string[];
+  generation_mode?: string;
+}
+
+export interface StudyGenerationTelemetry {
+  provider?: string;
+  model?: string;
+  generation_id?: string;
+  input_tokens?: number;
+  output_tokens?: number;
+  ttft_ms?: number;
+  total_ms?: number;
+  tokens_per_sec?: number;
+  context_used?: number;
+  status?: string;
+  grounding_ratio?: number;
+  validation_errors?: string[];
+  attempts?: number;
+  failure_reason?: string;
+}
+
+export interface StudyFolderLink {
+  folder_path: string;
+  sync_enabled: boolean;
+  recursive: boolean;
+  last_synced_at?: string;
+  file_count: number;
+  unsupported_count?: number;
+  status: 'IDLE' | 'SYNCING' | 'ERROR';
+  error?: string;
+  registered_at?: string;
 }
 
 export interface StudyCollection {
@@ -207,10 +250,51 @@ export interface StudyCollection {
   subject: string;
   document_ids: string[];
   created_at: string;
+  linked_folders?: StudyFolderLink[];
+  sync_preferences?: {
+    auto_sync?: boolean;
+    recursive?: boolean;
+  };
 }
 
 export type ExplanationLevel = 'Básico' | 'Intermédio' | 'Académico';
 export type SummaryMode = 'Quick' | 'Study' | 'Detailed' | 'Exam';
+
+export interface StudySectionSummaryItem {
+  section_id: string;
+  title: string;
+  page_ref?: string;
+  summary: string;
+  key_concepts?: string[];
+  source_refs?: string[];
+}
+
+export interface StudyDetailedSummaryItem {
+  title: string;
+  text: string;
+  source_refs?: string[];
+}
+
+export interface StudyExamSummary {
+  high_yield_concepts: Array<{ concept: string; detail: string; source_refs?: string[] }>;
+  likely_questions: Array<{ question: string; answer: string; source_refs?: string[] }>;
+}
+
+export interface StudySummariesBundle {
+  quick?: string[];
+  quick_refs?: string[][];
+  study?: StudySectionSummaryItem[];
+  detailed?: StudyDetailedSummaryItem[] | string;
+  exam?: StudyExamSummary | string[];
+}
+
+export interface MultiDocSynthesisResult {
+  common_points: string[];
+  differences: string[];
+  shared_concepts: string[];
+  contradictions: string[];
+  idea_evolution: string[];
+}
 
 export interface VideoTranscriptSegment {
   id: number;

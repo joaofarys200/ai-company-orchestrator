@@ -1,0 +1,385 @@
+{
+  "suite": "Phases 40 to 73 Regression Suite",
+  "source_runner": "scripts/run_regression_phases_40_73.py",
+  "timestamp": 1792700119.0849462,
+  "duration_seconds": 18.23,
+  "per_phase": {
+    "Phase 40 (Autonomous Engineering Loop)": 22,
+    "Phase 41 (Decision Calibration & Quality)": 23,
+    "Phase 42 (Engineering Experience Memory)": 17,
+    "Phase 43 (Cross-Mission Generalization)": 18,
+    "Phase 44 (Negative Knowledge Registry)": 0,
+    "Phase 45 (Engineering Safety Interlocks)": 0,
+    "Phase 46 (Automated Rollback & Recovery)": 0,
+    "Phase 47 (Adaptive Quality Thresholds)": 0,
+    "Phase 48 (Autonomous Code Inspection)": 0,
+    "Phase 49 (Automated Test Generation)": 0,
+    "Phase 50 (Autonomous Dependency Governance)": 0,
+    "Phase 51 (Performance Profiling & Bottleneck Mitigation)": 0,
+    "Phase 52 (Semantic Architecture Alignment)": 0,
+    "Phase 53 (Self-Healing Configuration Engine)": 0,
+    "Phase 54 (Engineering Documentation Intelligence)": 0,
+    "Phase 55 (Autonomous Migration & Schema Evolution)": 0,
+    "Phase 56 (Failure Diagnostics & Root Cause Analysis)": 0,
+    "Phase 57 (Autonomous Compliance & Policy Auditing)": 0,
+    "Phase 58 (Autonomous System Verification & Integration)": 0,
+    "Phase 59 (Engineering Knowledge Graph & Topology)": 0,
+    "Phase 60 (Self-Evolving Tooling & Workflow Optimization)": 0,
+    "Phase 61 (Autonomous Code Synthesis & Repair)": 0,
+    "Phase 62 (Continuous Verification & Drift Remediation)": 40,
+    "Phase 63 (Cross-Project Pattern Learning & Generalization)": 40,
+    "Phase 64 (Autonomous Architecture Evolution & Refactoring)": 20,
+    "Phase 65 (Safe Self-Modification & Transactional Code Engine)": 20,
+    "Phase 66 (Multi-Agent Swarm Coordination & Task Arbitration)": 20,
+    "Phase 67 (Long-Horizon Mission Autonomy & State Management)": 20,
+    "Phase 68 (Engineering Quality Governance & Autonomous Quality Debt Management)": 22,
+    "Phase 69 (Autonomous Quality Debt Remediation & Continuous Engineering Improvement)": 22,
+    "Phase 70 (Autonomous Release Readiness & Production Governance)": 22,
+    "Phase 71 (Autonomous Production Operations & Incident Governance)": 25,
+    "Phase 72 (Autonomous Reliability Intelligence & Preventive Operations)": 32,
+    "Phase 73 (Autonomous Macro-Refactoring Engine)": 20
+  },
+  "computed_total": 383,
+  "reported_total": 383,
+  "failed_total": 0,
+  "delta": 0,
+  "valid": true,
+  "previous_reported_total": 753,
+  "current_replayed_total": 383,
+  "delta_from_previous": -370,
+  "historical_regression_drift_detected": true,
+  "historical_consistency_status": "HISTORICAL_LEDGER_INCONSISTENCY_DOCUMENTED",
+  "phase_results": {
+    "Phase 40 (Autonomous Engineering Loop)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_autonomous_loop_models.py",
+        "tests/test_autonomous_loop_policy.py",
+        "tests/test_autonomous_loop_controller.py"
+      ]
+    },
+    "Phase 41 (Decision Calibration & Quality)": {
+      "passed": 23,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_decision_replay.py",
+        "tests/test_decision_outcome.py",
+        "tests/test_decision_error_classification.py",
+        "tests/test_autonomous_decision_engine.py",
+        "tests/test_policy_registry.py",
+        "tests/test_policy_sandbox.py",
+        "tests/test_policy_proposal.py",
+        "tests/test_policy_safety_regression.py",
+        "tests/test_policy_shadow.py",
+        "tests/test_policy_rollback.py"
+      ]
+    },
+    "Phase 42 (Engineering Experience Memory)": {
+      "passed": 17,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_experience_memory.py",
+        "tests/test_experience_signature.py",
+        "tests/test_experience_retrieval.py",
+        "tests/test_experience_applicability.py",
+        "tests/test_experience_reuse.py",
+        "tests/test_experience_conflicts.py",
+        "tests/test_experience_security.py"
+      ]
+    },
+    "Phase 43 (Cross-Mission Generalization)": {
+      "passed": 18,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_memory_transfer.py",
+        "tests/test_memory_generalization.py",
+        "tests/test_memory_conflicts.py",
+        "tests/test_memory_incremental_index.py",
+        "tests/test_memory_temporal_validity.py",
+        "tests/test_memory_temporal_leakage.py",
+        "tests/test_memory_architecture_compatibility.py"
+      ]
+    },
+    "Phase 44 (Negative Knowledge Registry)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_negative_knowledge.py",
+        "tests/test_anti_patterns.py",
+        "tests/test_failure_prevention.py",
+        "tests/test_suppression_rules.py"
+      ]
+    },
+    "Phase 45 (Engineering Safety Interlocks)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_safety_interlocks.py",
+        "tests/test_blast_radius.py",
+        "tests/test_dry_run_sandbox.py",
+        "tests/test_critical_boundaries.py"
+      ]
+    },
+    "Phase 46 (Automated Rollback & Recovery)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_automated_rollback.py",
+        "tests/test_health_probes.py",
+        "tests/test_canary_monitoring.py",
+        "tests/test_cascading_rollback.py"
+      ]
+    },
+    "Phase 47 (Adaptive Quality Thresholds)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_adaptive_thresholds.py",
+        "tests/test_risk_calibration.py",
+        "tests/test_environmental_risk.py",
+        "tests/test_gate_escalation.py"
+      ]
+    },
+    "Phase 48 (Autonomous Code Inspection)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_autonomous_inspector.py",
+        "tests/test_code_smells.py",
+        "tests/test_inspection_pipeline.py",
+        "tests/test_inspection_reporting.py"
+      ]
+    },
+    "Phase 49 (Automated Test Generation)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_test_generator.py",
+        "tests/test_edge_case_generation.py",
+        "tests/test_coverage_gap_targeting.py",
+        "tests/test_regression_suite_evolution.py"
+      ]
+    },
+    "Phase 50 (Autonomous Dependency Governance)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_dependency_governance.py",
+        "tests/test_vulnerability_auditing.py",
+        "tests/test_license_compliance.py",
+        "tests/test_dependency_pinning.py"
+      ]
+    },
+    "Phase 51 (Performance Profiling & Bottleneck Mitigation)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_performance_profiler.py",
+        "tests/test_bottleneck_detection.py",
+        "tests/test_autonomous_profiling_loop.py"
+      ]
+    },
+    "Phase 52 (Semantic Architecture Alignment)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_architecture_alignment.py",
+        "tests/test_domain_boundary_enforcement.py",
+        "tests/test_coupling_metrics.py"
+      ]
+    },
+    "Phase 53 (Self-Healing Configuration Engine)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_self_healing_config.py",
+        "tests/test_config_drift_detection.py",
+        "tests/test_env_validation.py"
+      ]
+    },
+    "Phase 54 (Engineering Documentation Intelligence)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_doc_intelligence.py",
+        "tests/test_drift_detection.py",
+        "tests/test_architecture_decision_records.py"
+      ]
+    },
+    "Phase 55 (Autonomous Migration & Schema Evolution)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_schema_migration.py",
+        "tests/test_data_integrity_verification.py",
+        "tests/test_backward_compatibility.py"
+      ]
+    },
+    "Phase 56 (Failure Diagnostics & Root Cause Analysis)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_rca_engine.py",
+        "tests/test_log_analysis.py",
+        "tests/test_diagnostic_trees.py"
+      ]
+    },
+    "Phase 57 (Autonomous Compliance & Policy Auditing)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_compliance_engine.py",
+        "tests/test_security_posture.py",
+        "tests/test_regulatory_frameworks.py"
+      ]
+    },
+    "Phase 58 (Autonomous System Verification & Integration)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_system_verification.py",
+        "tests/test_end_to_end_validation.py"
+      ]
+    },
+    "Phase 59 (Engineering Knowledge Graph & Topology)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_engineering_knowledge_graph.py"
+      ]
+    },
+    "Phase 60 (Self-Evolving Tooling & Workflow Optimization)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_workflow_optimization.py"
+      ]
+    },
+    "Phase 61 (Autonomous Code Synthesis & Repair)": {
+      "passed": 0,
+      "failed": 0,
+      "status": "SKIPPED_NOT_FOUND",
+      "test_files": [
+        "tests/test_autonomous_repair.py"
+      ]
+    },
+    "Phase 62 (Continuous Verification & Drift Remediation)": {
+      "passed": 40,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_continuous_verification.py"
+      ]
+    },
+    "Phase 63 (Cross-Project Pattern Learning & Generalization)": {
+      "passed": 40,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_cross_project_learning.py"
+      ]
+    },
+    "Phase 64 (Autonomous Architecture Evolution & Refactoring)": {
+      "passed": 20,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_architecture_evolution.py"
+      ]
+    },
+    "Phase 65 (Safe Self-Modification & Transactional Code Engine)": {
+      "passed": 20,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_safe_self_modification.py"
+      ]
+    },
+    "Phase 66 (Multi-Agent Swarm Coordination & Task Arbitration)": {
+      "passed": 20,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_multi_agent_coordination.py"
+      ]
+    },
+    "Phase 67 (Long-Horizon Mission Autonomy & State Management)": {
+      "passed": 20,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_long_horizon_missions.py"
+      ]
+    },
+    "Phase 68 (Engineering Quality Governance & Autonomous Quality Debt Management)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_engineering_quality_governance.py"
+      ]
+    },
+    "Phase 69 (Autonomous Quality Debt Remediation & Continuous Engineering Improvement)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_quality_debt_remediation.py"
+      ]
+    },
+    "Phase 70 (Autonomous Release Readiness & Production Governance)": {
+      "passed": 22,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_release_readiness.py"
+      ]
+    },
+    "Phase 71 (Autonomous Production Operations & Incident Governance)": {
+      "passed": 25,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_production_operations.py"
+      ]
+    },
+    "Phase 72 (Autonomous Reliability Intelligence & Preventive Operations)": {
+      "passed": 32,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_reliability_intelligence.py"
+      ]
+    },
+    "Phase 73 (Autonomous Macro-Refactoring Engine)": {
+      "passed": 20,
+      "failed": 0,
+      "status": "PASS",
+      "test_files": [
+        "tests/test_macro_refactoring.py"
+      ]
+    }
+  }
+}

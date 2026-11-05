@@ -1,0 +1,55 @@
+{
+  "validation_id": "empirical_validation_phase_78",
+  "timestamp": 1792971535.002513,
+  "duration_seconds": 0.016,
+  "status": "VALIDATION_PASSED",
+  "metrics": {
+    "total_scenarios_executed": 5,
+    "scenarios_with_ground_truth": 5,
+    "correct_root_cause_identifications": 4,
+    "incorrect_root_cause_identifications": 0,
+    "inconclusive_outcomes": 1,
+    "unsupported_causal_claims": 0,
+    "root_cause_accuracy_pct": 100.0,
+    "false_positive_causal_claim_rate_pct": 0.0
+  },
+  "scenarios": [
+    {
+      "scenario_id": "upstream_dependency_cascade",
+      "ground_truth_root_cause": "node_auth_crash",
+      "diagnosed_root_cause": "node_auth_crash",
+      "outcome": "ROOT_CAUSE_CONFIRMED",
+      "matched_ground_truth": true
+    },
+    {
+      "scenario_id": "misconfiguration_latency_regression",
+      "ground_truth_root_cause": "node_cfg_error",
+      "diagnosed_root_cause": "node_cfg_error",
+      "outcome": "ROOT_CAUSE_CONFIRMED",
+      "matched_ground_truth": true
+    },
+    {
+      "scenario_id": "coincidental_correlation_rejection",
+      "ground_truth_root_cause": "node_true_query",
+      "diagnosed_root_cause": "node_true_query",
+      "outcome": "ROOT_CAUSE_CONFIRMED",
+      "matched_ground_truth": true
+    },
+    {
+      "scenario_id": "diagnostic_experiment_discrimination",
+      "ground_truth_root_cause": "node_gc_pause",
+      "diagnosed_root_cause": "node_gc_pause",
+      "outcome": "ROOT_CAUSE_CONFIRMED",
+      "matched_ground_truth": true
+    },
+    {
+      "scenario_id": "invalidation_by_contradictory_evidence",
+      "ground_truth_root_cause": "UNRESOLVED_CONTRADICTED",
+      "diagnosed_root_cause": null,
+      "outcome": "CONTRADICTED_BY_EVIDENCE",
+      "matched_ground_truth": true
+    }
+  ],
+  "crash_recovery_verified": true,
+  "remediation_reconciliation_verified": true
+}

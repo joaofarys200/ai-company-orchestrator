@@ -47,7 +47,16 @@ import type {
   StudyQuiz,
   QuizEvaluationResult,
   Flashcard,
+  StudyCollection,
 } from '../features/study/types';
+import {
+  buildStudySpatialBoard,
+  buildProjectSpatialBoard,
+  buildObsidianSpatialBoard,
+  buildSentinelSpatialBoard,
+  type SpatialBoardData,
+  type SpatialBoardDomain,
+} from '../features/board/SpatialBoard';
 import type {
   ChatAttachment,
   ChatSession,
@@ -275,6 +284,39 @@ interface WebSocketContextType {
     documentId: string
   ) => Promise<{ contentBase64?: string; filename?: string; error?: string }>;
   generateStudyCornell: (documentId: string) => Promise<any>;
+  generateStudySummary: (
+    documentId: string,
+    mode?: 'Quick' | 'Study' | 'Detailed' | 'Exam',
+    forceRegenerate?: boolean
+  ) => Promise<any>;
+  synthesizeStudyDocuments: (documentIds: string[]) => Promise<{
+    common_points: string[];
+    differences: string[];
+    shared_concepts: string[];
+    contradictions: string[];
+    idea_evolution: string[];
+  }>;
+  saveToStudyVault: (data: {
+    title: string;
+    markdown_content: string;
+    subject?: string;
+    source_document_ids?: string[];
+  }) => Promise<boolean>;
+  studyCollections: StudyCollection[];
+  listStudyCollections: () => void;
+  createStudyCollection: (name: string, subject?: string, documentIds?: string[]) => void;
+  linkStudyFolder: (collectionId: string, folderPath: string, syncEnabled?: boolean, recursive?: boolean) => Promise<any>;
+  unlinkStudyFolder: (collectionId: string, folderPath: string, removeMaterials?: boolean) => Promise<any>;
+  syncStudyFolder: (collectionId: string, folderPath?: string) => Promise<any>;
+  askStudyCourse: (collectionId: string, question: string) => Promise<any>;
+  retryStudyDocument: (documentId: string) => Promise<any>;
+  cancelStudyGeneration: (documentId: string) => void;
+  studyPipelineStage: string;
+  activeBoard: SpatialBoardData | null;
+  focusedCardId: string | null;
+  openSpatialBoard: (domain?: SpatialBoardDomain, query?: string) => void;
+  closeSpatialBoard: () => void;
+  focusSpatialCard: (cardIdOrQuery: string | null) => void;
   approvePermissionRequest: (requestId: string, projectId?: string, missionId?: string) => void;
   denyPermissionRequest: (requestId: string, reason?: string, projectId?: string, missionId?: string) => void;
   rollbackPermissionRequest: (requestId: string) => void;
@@ -324,7 +366,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [activeTemplate, setActiveTemplate] = useState<ActiveTemplate | null>(null);
   const [projectOutput, setProjectOutput] = useState<string>('');
   const [isProjectRunning, setIsProjectRunning] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState('http://localhost:8080/');
+  const [previewUrl, setPreviewUrl] = useState('about:blank');
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
   const [devPanelOpen, setDevPanelOpen] = useState(false);
   const [sentinelStatus, setSentinelStatus] = useState<SentinelStatusData | null>(null);
@@ -368,9 +410,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [missionIntentPreviewResult, setMissionIntentPreviewResult] = useState<MissionIntentPreviewResultMessage | null>(null);
   const [missionIntentResult, setMissionIntentResult] = useState<MissionIntentResultMessage | null>(null);
   const [studyDocuments, setStudyDocuments] = useState<StudyDocument[]>([]);
+  const [studyCollections, setStudyCollections] = useState<StudyCollection[]>([]);
   const [activeStudyQuiz, setActiveStudyQuiz] = useState<StudyQuiz | null>(null);
   const [studyQuizResult, setStudyQuizResult] = useState<QuizEvaluationResult | null>(null);
   const [studyFlashcards, setStudyFlashcards] = useState<Flashcard[]>([]);
+  const [studyPipelineStage, setStudyPipelineStage] = useState<string>('');
+  const [activeBoard, setActiveBoard] = useState<SpatialBoardData | null>(null);
+  const [focusedCardId, setFocusedCardId] = useState<string | null>(null);
 
   const [kanban, setKanban] = useState<KanbanState>({
     backlog: [],
@@ -390,6 +436,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const reconnectTimeoutRef = useRef<number | null>(null);
   const shouldReconnectRef = useRef(true);
   const recentMessageHashesRef = useRef<Map<string, number>>(new Map());
+  const activeProjectIdRef = useRef<string | null>(null);
+  const requestedProjectIdRef = useRef<string | null>(null);
   const pendingStudyRequestsRef = useRef<Map<string, {
     resolve: (value: any) => void;
     reject: (reason?: any) => void;
@@ -712,9 +760,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       agents: msg.agents,
     });
 
-    setProjectFiles({});
-    setProjectOutput('');
-    setIsProjectRunning(false);
+    if (!activeProjectIdRef.current && !requestedProjectIdRef.current) {
+      setProjectFiles({});
+      setProjectOutput('');
+      setIsProjectRunning(false);
+      setPreviewUrl('about:blank');
+    }
 
     const initialBacklog = msg.tasks.map((t) => ({
       id: t.id,
@@ -753,9 +804,37 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const handleServerMessage = useCallback((msg: any) => {
     if (!msg || !msg.type) return;
 
-    // Deduplicate identical messages arriving within 1.5s via dual transport (Electron IPC + WebSocket)
-    if (!msg.type.startsWith('study_')) {
-      const rawKey = `${msg.type}:${msg.sender || ''}:${msg.content || ''}:${msg.card_id || ''}:${msg.status || ''}`;
+    // Deduplicate identical append/event messages arriving within 1.5s via dual transport (Electron IPC + WebSocket).
+    // Never deduplicate idempotent state-hydration snapshots (project_context, coding_session, mission_list, etc.).
+    const DEDUP_EVENT_TYPES = new Set([
+      'system',
+      'chat',
+      'kanban',
+      'project_output',
+      'voice_status',
+      'ui_theme',
+      'complete',
+      'mission_event',
+      'sentinel_event',
+      'sentinel_audit_completed',
+      'sentinel_known_good_updated',
+      'sentinel_action_proposed',
+      'sentinel_action_result',
+      'mission_control_command_result',
+      'mission_intent_result',
+      'permission_request_created',
+      'action_confirm_request',
+      'permission_request_approved',
+      'permission_request_denied',
+      'permission_request_expired',
+      'permission_capability_result',
+      'permission_execution_result',
+      'coding_session_error',
+    ]);
+    if (DEDUP_EVENT_TYPES.has(msg.type)) {
+      const eventKey = msg.event?.sequence ?? msg.event?.fingerprint ?? '';
+      const reqOrActionId = msg.request_id || msg.action_id || msg.action?.action_id || msg.request?.request_id || '';
+      const rawKey = `${msg.type}:${msg.sender || ''}:${msg.content || ''}:${msg.card_id || ''}:${msg.status || ''}:${eventKey}:${reqOrActionId}`;
       const now = Date.now();
       const lastSeen = recentMessageHashesRef.current.get(rawKey);
       if (lastSeen && now - lastSeen < 1500) {
@@ -812,6 +891,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setIsProjectRunning(Boolean(msg.running));
         if (msg.preview_url) {
           setPreviewUrl(msg.preview_url);
+        } else if (!msg.running) {
+          setPreviewUrl('about:blank');
         }
         break;
       case 'ui':
@@ -858,10 +939,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'planner_state':
         setPlannerState(msg.data);
         break;
-      case 'mission_list':
+      case 'mission_list': {
+        const listProjId = msg.project_id ? String(msg.project_id) : '';
+        const isGlobalList = !listProjId || listProjId.toUpperCase() === 'ALL' || listProjId === '*';
+        const targetProjId = requestedProjectIdRef.current || activeProjectIdRef.current;
+        if (!isGlobalList && targetProjId && listProjId !== targetProjId) {
+          break;
+        }
         setMissions(msg.missions);
         missionRuntimeStore.setMissions(msg.missions);
         break;
+      }
       case 'mission_snapshot':
         setMissionSnapshot(msg.data);
         missionRuntimeStore.setMissionSnapshot(msg.data);
@@ -905,7 +993,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setProjects(msg.projects);
         break;
       case 'project_deleted':
-        if (msg.was_active || msg.project_id === projectContext?.project_id) {
+        if (msg.was_active || msg.project_id === projectContext?.project_id || msg.project_id === activeProjectIdRef.current) {
+          activeProjectIdRef.current = null;
+          if (requestedProjectIdRef.current === msg.project_id) {
+            requestedProjectIdRef.current = null;
+          }
           setProjectContext(null);
           setProjectFiles({});
           setProjectFileHashes({});
@@ -921,7 +1013,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'project_file_delete_error':
         addSystemMessage(`[Erro ao eliminar ficheiro] ${msg.error}`);
         break;
-      case 'project_context':
+      case 'project_context': {
+        const incomingProjectId = msg.context?.project_id || null;
+        if (
+          requestedProjectIdRef.current
+          && incomingProjectId
+          && incomingProjectId !== requestedProjectIdRef.current
+        ) {
+          break;
+        }
+        activeProjectIdRef.current = incomingProjectId;
+        requestedProjectIdRef.current = null;
         setProjectContext(msg.context);
         setProjectFiles(msg.files);
         setProjectFileHashes(msg.file_hashes);
@@ -933,6 +1035,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setSemanticResults('');
         setIsIndexingProject(false);
         break;
+      }
       case 'architecture_snapshot':
         setArchitectureSnapshot(msg.data);
         break;
@@ -951,12 +1054,18 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'semantic_results':
         setSemanticResults(msg.content);
         break;
-      case 'coding_session':
+      case 'coding_session': {
+        const sessionProjId = msg.data?.project_id ? String(msg.data.project_id) : '';
+        const targetProjId = requestedProjectIdRef.current || activeProjectIdRef.current;
+        if (sessionProjId && targetProjId && sessionProjId !== targetProjId) {
+          break;
+        }
         setCodingSession(msg.data);
         setSafetyRefusal(null);
         setCodingSessionError(null);
         setIsCodingSessionBusy(false);
         break;
+      }
       case 'coding_session_error':
         setCodingSessionError(msg.error);
         setIsCodingSessionBusy(false);
@@ -1075,6 +1184,58 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           prev.map((fc) => (fc.card_id === msg.flashcard.card_id ? msg.flashcard : fc))
         );
         break;
+      case 'study_collections_list':
+        setStudyCollections((msg as any).collections || []);
+        break;
+      case 'study_collection_created':
+        setStudyCollections((prev) => [
+          (msg as any).collection,
+          ...prev.filter((c) => c.collection_id !== (msg as any).collection?.collection_id),
+        ]);
+        addSystemMessage(`Nova disciplina/coleção criada: ${(msg as any).collection?.name}`);
+        break;
+      case 'study_folder_linked': {
+        const reqId = (msg as any).request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg);
+        }
+        addSystemMessage(`Pasta vinculada com sucesso: ${(msg as any).folder_path}`);
+        break;
+      }
+      case 'study_folder_unlinked': {
+        const reqId = (msg as any).request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg);
+        }
+        addSystemMessage('Pasta desvinculada. Ficheiros originais preservados no disco.');
+        break;
+      }
+      case 'study_folder_synced': {
+        const reqId = (msg as any).request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve((msg as any).report);
+        }
+        break;
+      }
+      case 'study_ask_course_result': {
+        const reqId = (msg as any).request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg);
+        }
+        break;
+      }
       case 'sandbox_status':
         setSandboxStatus(msg.status);
         break;
@@ -1144,7 +1305,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           addSystemMessage(`[DYNAMIC INTENT: ${msg.status}] ${msg.reason}`);
         }
         break;
+      case 'study_document_processing':
+        setStudyPipelineStage(msg.status || 'A processar documento...');
+        break;
       case 'study_document_ready':
+        setStudyPipelineStage('');
         if (msg.document) {
           setStudyDocuments((prev) => [
             msg.document,
@@ -1154,8 +1319,22 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         break;
       case 'study_document_failed':
+        setStudyPipelineStage('');
         addSystemMessage(`Erro ao processar documento ${msg.filename}: ${msg.error}`);
         break;
+      case 'study_generation_cancelled': {
+        setStudyPipelineStage('');
+        const docId = msg.document_id || '';
+        for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+          if (!docId || k.includes(docId)) {
+            clearTimeout(item.timer);
+            pendingStudyRequestsRef.current.delete(k);
+            item.reject(new Error('Geração cancelada pelo utilizador'));
+          }
+        }
+        addSystemMessage(`[Estudo] Geração cancelada pelo utilizador${docId ? ` (${docId})` : ''}.`);
+        break;
+      }
       case 'study_contextual_assist_result': {
         const reqId = msg.request_id;
         if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
@@ -1192,6 +1371,98 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             }
           }
         }
+        break;
+      }
+      case 'study_summary_ready': {
+        const reqId = msg.request_id;
+        const resolvedSummaries = msg.summaries || msg.summary?.summaries;
+        if (resolvedSummaries && msg.document_id) {
+          setStudyDocuments((prev) =>
+            prev.map((d) =>
+              d.document_id === msg.document_id
+                ? {
+                    ...d,
+                    metadata: {
+                      ...d.metadata,
+                      summaries: resolvedSummaries,
+                    },
+                  }
+                : d
+            )
+          );
+        }
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg.summary || resolvedSummaries || '');
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith(`summary:${msg.document_id}`)) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(msg.summary || resolvedSummaries || '');
+              break;
+            }
+          }
+        }
+        break;
+      }
+      case 'study_synthesis_ready': {
+        const reqId = msg.request_id;
+        const payload = {
+          common_points: Array.isArray(msg.common_points) ? msg.common_points : [],
+          differences: Array.isArray(msg.differences) ? msg.differences : [],
+          shared_concepts: Array.isArray(msg.shared_concepts) ? msg.shared_concepts : [],
+          contradictions: Array.isArray(msg.contradictions) ? msg.contradictions : [],
+          idea_evolution: Array.isArray(msg.idea_evolution) ? msg.idea_evolution : [],
+        };
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(payload);
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith('synth:')) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(payload);
+              break;
+            }
+          }
+        }
+        break;
+      }
+      case 'study_knowledge_saved': {
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(true);
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith('vault:')) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(true);
+              break;
+            }
+          }
+        }
+        addSystemMessage(`Nota de estudo guardada no Knowledge Vault: ${msg.title}`);
+        break;
+      }
+      case 'study_error': {
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.reject(new Error(msg.message || 'Erro no módulo de estudo'));
+        }
+        addSystemMessage(`[Estudo] ${msg.message || 'Erro ao processar operação de estudo'}`);
         break;
       }
       case 'study_notes_ready': {
@@ -1397,6 +1668,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           ws.send(JSON.stringify({ type: 'get_planner_state' } satisfies ClientMessage));
           ws.send(JSON.stringify({ type: 'mission_list', project_id: 'ALL' } satisfies ClientMessage));
           ws.send(JSON.stringify({ type: 'study_list_documents' } satisfies ClientMessage));
+          ws.send(JSON.stringify({ type: 'study_list_collections' } satisfies ClientMessage));
           ws.send(JSON.stringify({ type: 'permission_get_pending' } satisfies ClientMessage));
         }
       }, 50);
@@ -1471,10 +1743,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   }, [connect]);
 
+  const handleSpatialBoardIntentRef = useRef<(rawText: string) => void>(() => {});
+
   // Action senders
   const sendDirective = (text: string, attachments?: ChatAttachment[]) => {
     const cleanText = text.trim();
     if (!cleanText && (!attachments || attachments.length === 0)) return;
+    if (cleanText) {
+      handleSpatialBoardIntentRef.current(cleanText);
+    }
     if (!isReady()) return;
 
     sendClientMessage({
@@ -1726,6 +2003,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const openProject = useCallback((projectId: string) => {
     if (isReady() && projectId) {
+      if (activeProjectIdRef.current === projectId && !requestedProjectIdRef.current) {
+        sendClientMessage({ type: 'open_project', project_id: projectId });
+        return;
+      }
+      requestedProjectIdRef.current = projectId;
+      activeProjectIdRef.current = null;
       setProjectFiles({});
       setProjectFileHashes({});
       setProjectFileSaveState(null);
@@ -1744,6 +2027,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const createProject = useCallback((projectId: string, projectName?: string, template?: string) => {
     if (isReady() && projectId.trim()) {
+      const trimmedId = projectId.trim();
+      requestedProjectIdRef.current = trimmedId;
+      activeProjectIdRef.current = null;
       setProjectFiles({});
       setProjectFileHashes({});
       setProjectFileSaveState(null);
@@ -1757,7 +2043,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setMissionSnapshot(null);
       sendClientMessage({
         type: 'create_project',
-        project_id: projectId.trim(),
+        project_id: trimmedId,
         project_name: projectName?.trim(),
         template,
       });
@@ -2203,6 +2489,428 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [sendClientMessage]
   );
 
+  const generateStudySummary = useCallback(
+    (
+      documentId: string,
+      mode: 'Quick' | 'Study' | 'Detailed' | 'Exam' = 'Study',
+      forceRegenerate = false
+    ): Promise<any> => {
+      const requestId = `summary:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Generate summary timed out'));
+        }, 90000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_generate_summary',
+          document_id: documentId,
+          mode,
+          force_regenerate: forceRegenerate,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const synthesizeStudyDocuments = useCallback(
+    (
+      documentIds: string[]
+    ): Promise<{
+      common_points: string[];
+      differences: string[];
+      shared_concepts: string[];
+      contradictions: string[];
+      idea_evolution: string[];
+    }> => {
+      const requestId = `synth:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Synthesize documents timed out'));
+        }, 90000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_synthesize_documents',
+          document_ids: documentIds,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const saveToStudyVault = useCallback(
+    (data: {
+      title: string;
+      markdown_content: string;
+      subject?: string;
+      source_document_ids?: string[];
+    }): Promise<boolean> => {
+      const requestId = `vault:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Save to vault timed out'));
+        }, 20000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_save_to_vault',
+          title: data.title,
+          content: data.markdown_content,
+          markdown_content: data.markdown_content,
+          subject: data.subject || 'Geral',
+          source_document_ids: data.source_document_ids || [],
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const listStudyCollections = useCallback(() => {
+    sendClientMessage({
+      type: 'study_list_collections',
+    });
+  }, [sendClientMessage]);
+
+  const createStudyCollection = useCallback(
+    (name: string, subject?: string, documentIds?: string[]) => {
+      sendClientMessage({
+        type: 'study_create_collection',
+        name,
+        subject: subject || 'Geral',
+        document_ids: documentIds || [],
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const linkStudyFolder = useCallback(
+    (
+      collectionId: string,
+      folderPath: string,
+      syncEnabled = true,
+      recursive = true
+    ): Promise<any> => {
+      const requestId = `link:${collectionId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Link folder request timed out'));
+        }, 30000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_link_folder',
+          collection_id: collectionId,
+          folder_path: folderPath,
+          sync_enabled: syncEnabled,
+          recursive,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const unlinkStudyFolder = useCallback(
+    (
+      collectionId: string,
+      folderPath: string,
+      removeMaterials = false
+    ): Promise<any> => {
+      const requestId = `unlink:${collectionId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Unlink folder request timed out'));
+        }, 15000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_unlink_folder',
+          collection_id: collectionId,
+          folder_path: folderPath,
+          remove_materials: removeMaterials,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const syncStudyFolder = useCallback(
+    (collectionId: string, folderPath?: string): Promise<any> => {
+      const requestId = `sync:${collectionId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Sync folder request timed out'));
+        }, 60000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_sync_folder',
+          collection_id: collectionId,
+          folder_path: folderPath,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const askStudyCourse = useCallback(
+    (collectionId: string, question: string): Promise<any> => {
+      const requestId = `course_ask:${collectionId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Ask course request timed out'));
+        }, 25000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_ask_course',
+          collection_id: collectionId,
+          question,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const retryStudyDocument = useCallback(
+    (documentId: string): Promise<any> => {
+      const requestId = `retry:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Retry document request timed out'));
+        }, 45000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_retry_document',
+          document_id: documentId,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const cancelStudyGeneration = useCallback(
+    (documentId: string) => {
+      setStudyPipelineStage('A cancelar geração...');
+      sendClientMessage({
+        type: 'study_cancel_generation',
+        document_id: documentId,
+        request_id: `cancel:${documentId}:${Date.now()}`,
+      });
+      for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+        if (k.includes(documentId)) {
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(k);
+          item.reject(new Error('Cancelado pelo utilizador'));
+        }
+      }
+    },
+    [sendClientMessage]
+  );
+
+  const openSpatialBoard = useCallback(
+    (domain: SpatialBoardDomain = 'study', query = '') => {
+      const q = query.trim().toLowerCase();
+      setFocusedCardId(null);
+
+      if (domain === 'sentinel') {
+        sendClientMessage({ type: 'sentinel_get_status' });
+        setActiveBoard(buildSentinelSpatialBoard(sentinelStatus, sentinelEvents));
+        return;
+      }
+
+      if (domain === 'obsidian') {
+        if (notes.length === 0) getNotes();
+        setActiveBoard(buildObsidianSpatialBoard(notes, studyDocuments));
+        return;
+      }
+
+      if (domain === 'project') {
+        const targetId =
+          q ||
+          projectContext?.project_id ||
+          projects.find((p) => p.project_id === 'dina')?.project_id ||
+          projects[0]?.project_id ||
+          'dina';
+        if (projectContext?.project_id !== targetId) {
+          openProject(targetId);
+        }
+        setActiveBoard(buildProjectSpatialBoard(targetId, projects, projectContext, projectFiles, previewUrl));
+        return;
+      }
+
+      // Default: study domain
+      if (studyDocuments.length === 0) {
+        listStudyDocuments();
+      }
+      const matchedDoc =
+        (q
+          ? studyDocuments.find(
+              (d) =>
+                d.title.toLowerCase().includes(q) ||
+                d.subject.toLowerCase().includes(q) ||
+                String((d as unknown as Record<string, unknown>).filename || '')
+                  .toLowerCase()
+                  .includes(q)
+            )
+          : undefined) || studyDocuments[0];
+
+      if (matchedDoc) {
+        setActiveBoard(buildStudySpatialBoard(matchedDoc));
+      } else {
+        setActiveBoard(buildObsidianSpatialBoard(notes, studyDocuments));
+      }
+    },
+    [
+      getNotes,
+      listStudyDocuments,
+      notes,
+      openProject,
+      previewUrl,
+      projectContext,
+      projectFiles,
+      projects,
+      sendClientMessage,
+      sentinelEvents,
+      sentinelStatus,
+      studyDocuments,
+    ]
+  );
+
+  const closeSpatialBoard = useCallback(() => {
+    setFocusedCardId(null);
+    setActiveBoard(null);
+  }, []);
+
+  const focusSpatialCard = useCallback(
+    (cardIdOrQuery: string | null) => {
+      if (!cardIdOrQuery) {
+        setFocusedCardId(null);
+        return;
+      }
+      if (!activeBoard) return;
+      const q = cardIdOrQuery.trim().toLowerCase();
+      const exact = activeBoard.cards.find((c) => c.id === cardIdOrQuery);
+      if (exact) {
+        setFocusedCardId(exact.id);
+        return;
+      }
+      const fuzzy = activeBoard.cards.find(
+        (c) =>
+          c.title.toLowerCase().includes(q) ||
+          c.type.toLowerCase().includes(q) ||
+          (q.includes('gráfico') && c.type === 'bar_chart') ||
+          (q.includes('grafico') && c.type === 'bar_chart') ||
+          (q.includes('vídeo') && c.type === 'video') ||
+          (q.includes('video') && c.type === 'video') ||
+          (q.includes('resumo') && c.id.includes('summary')) ||
+          (q.includes('cornell') && c.type === 'study_notes') ||
+          (q.includes('nota') && c.type === 'study_notes') ||
+          (q.includes('código') && c.type === 'code_files') ||
+          (q.includes('ficheiro') && c.type === 'code_files')
+      );
+      if (fuzzy) {
+        setFocusedCardId(fuzzy.id);
+      }
+    },
+    [activeBoard]
+  );
+
+  useEffect(() => {
+    handleSpatialBoardIntentRef.current = (rawText: string) => {
+      const lower = rawText
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+
+      if (
+        lower.includes('podes descansar') ||
+        lower.includes('fecha o quadro') ||
+        lower.includes('fechar o quadro') ||
+        lower.includes('volta ao centro') ||
+        lower.includes('limpa o quadro')
+      ) {
+        closeSpatialBoard();
+        return;
+      }
+
+      const maxMatch = lower.match(
+        /(?:maximiza|foca|amplia)\s+(?:o\s+|a\s+)?(?:grafico|cartao|card|video|resumo|nota|cornell)?\s*(.*)/i
+      );
+      if (maxMatch) {
+        const target = maxMatch[1]?.trim() || rawText;
+        focusSpatialCard(target);
+        return;
+      }
+
+      if (
+        lower.includes('abre o quadro') ||
+        lower.includes('abrir o quadro') ||
+        lower.includes('mostra o quadro') ||
+        lower.includes('monta o quadro') ||
+        lower.includes('spatial board')
+      ) {
+        if (lower.includes('sentinel') || lower.includes('seguranca')) {
+          openSpatialBoard('sentinel');
+        } else if (lower.includes('obsidian') || lower.includes('vault') || lower.includes('cofre')) {
+          openSpatialBoard('obsidian');
+        } else if (lower.includes('projeto') || lower.includes('dina')) {
+          const projMatch = lower.match(/projeto\s+([a-z0-9_-]+)/i);
+          openSpatialBoard('project', projMatch ? projMatch[1] : 'dina');
+        } else {
+          const topicMatch = rawText.match(/(?:tema|documento|aula|sobre|de)\s+([^,.?!]+)/i);
+          openSpatialBoard('study', topicMatch ? topicMatch[1].trim() : '');
+        }
+      }
+    };
+  }, [closeSpatialBoard, focusSpatialCard, openSpatialBoard]);
+
+  // Keep active Spatial Board fresh when underlying data updates
+  useEffect(() => {
+    if (!activeBoard) return;
+    if (activeBoard.domain === 'study' && activeBoard.documentId) {
+      const updatedDoc = studyDocuments.find((d) => d.document_id === activeBoard.documentId);
+      if (updatedDoc) {
+        setActiveBoard(buildStudySpatialBoard(updatedDoc));
+      }
+    } else if (activeBoard.domain === 'project' && activeBoard.projectId) {
+      setActiveBoard(
+        buildProjectSpatialBoard(activeBoard.projectId, projects, projectContext, projectFiles, previewUrl)
+      );
+    } else if (activeBoard.domain === 'obsidian') {
+      setActiveBoard(buildObsidianSpatialBoard(notes, studyDocuments));
+    } else if (activeBoard.domain === 'sentinel') {
+      setActiveBoard(buildSentinelSpatialBoard(sentinelStatus, sentinelEvents));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [studyDocuments, projectFiles, previewUrl, notes, sentinelStatus, sentinelEvents]);
+
   const getSentinelStatus = useCallback(() => {
     sendClientMessage({
       type: 'sentinel_get_status',
@@ -2510,6 +3218,24 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         askStudyPaper,
         getStudyDocumentFile,
         generateStudyCornell,
+        generateStudySummary,
+        synthesizeStudyDocuments,
+        saveToStudyVault,
+        studyCollections,
+        listStudyCollections,
+        createStudyCollection,
+        linkStudyFolder,
+        unlinkStudyFolder,
+        syncStudyFolder,
+        askStudyCourse,
+        retryStudyDocument,
+        cancelStudyGeneration,
+        studyPipelineStage,
+        activeBoard,
+        focusedCardId,
+        openSpatialBoard,
+        closeSpatialBoard,
+        focusSpatialCard,
         approvePermissionRequest,
         denyPermissionRequest,
         rollbackPermissionRequest,

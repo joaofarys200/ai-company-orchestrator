@@ -243,7 +243,14 @@ class PreExecutionUnderstandingEngine:
                 )
 
         # ── 3. MISSING CRITICAL INFORMATION CHECK ─────────────────────────────
-        if len(p_clean.split()) < 2:
+        is_actionable_verb = p_clean.lower() in {
+            "testa", "testar", "refatora", "refatorar", "corrige", "corrigir",
+            "compila", "compilar", "build", "limpa", "limpar", "executa", "executar",
+            "avança", "avanca", "continua", "segue", "faz", "resolver", "corrige-me"
+        }
+        has_proj = bool(project_context and project_context.get("project_id"))
+
+        if len(p_clean.split()) < 2 and not (is_actionable_verb or has_proj):
             return PreExecutionUnderstanding(
                 mission_id=m_id,
                 prompt=prompt,

@@ -498,15 +498,24 @@ class MissionStateStore:
         m = self._load_mission_entity(project_id, mission_id)
         return m.metadata or {}
 
-    def set_mission_status(self, project_id: str, mission_id: str, status: str, expected_version: int) -> dict[str, Any]:
+    def set_mission_status(
+        self,
+        project_id: str,
+        mission_id: str,
+        status: str,
+        expected_version: int | None = None,
+        force: bool = False,
+    ) -> dict[str, Any]:
         target = self._choice(status, MISSION_STATUSES, "status")
         with self._locked_mission(project_id, mission_id):
             mission = self._load_mission_entity(project_id, mission_id)
-            self._expect_version(mission.version, expected_version)
-            if target not in MISSION_TRANSITIONS[mission.status]:
-                raise MissionStateError(f"Transicao de Mission invalida: {mission.status} -> {target}.")
-            if target == "COMPLETED":
-                self._assert_mission_completable(project_id, mission_id)
+            if expected_version is not None:
+                self._expect_version(mission.version, expected_version)
+            if not force and expected_version is not None:
+                if target not in MISSION_TRANSITIONS.get(mission.status, set()):
+                    raise MissionStateError(f"Transicao de Mission invalida: {mission.status} -> {target}.")
+                if target == "COMPLETED":
+                    self._assert_mission_completable(project_id, mission_id)
             previous_status = mission.status
             previous_version = mission.version
             mission.status = target
@@ -523,6 +532,128 @@ class MissionStateStore:
                 "status": target,
             })
         return self.load_mission(project_id, mission_id)
+
+    def update_mission_status(self, project_id: str, mission_id: str, status: str) -> dict[str, Any]:
+        return self.set_mission_status(project_id, mission_id, status, expected_version=None, force=True)
+
+    def update_work_package_status(
+        self,
+        project_id: str,
+        mission_id: str,
+        work_package_id: str,
+        status: str,
+        expected_version: int | None = None,
+        blocked_reason: str = "",
+    ) -> dict[str, Any]:
+        target = "IN_PROGRESS" if status.upper() == "RUNNING" else status.upper()
+        if target not in WORK_PACKAGE_STATUSES:
+            target = self._choice(target, WORK_PACKAGE_STATUSES, "status")
+        with self._locked_mission(project_id, mission_id):
+            item = self._load_work_package(project_id, mission_id, work_package_id)
+            if expected_version is not None:
+                self._expect_version(item.version, expected_version)
+            previous_status = item.status
+            previous = item.version
+            item.status = target
+            now = utc_now()
+            if target == "IN_PROGRESS" and not item.started_at:
+                item.started_at = now
+            elif target == "COMPLETED":
+                item.completed_at = now
+                item.blocked_reason = ""
+            elif target == "BLOCKED" and blocked_reason:
+                item.blocked_reason = blocked_reason
+            self._touch(item)
+            self.persistence.save_work_package(project_id, mission_id, asdict(item))
+            self._write_entity(self._entity_path(project_id, mission_id, "work_packages", work_package_id), item)
+            self._append_event(project_id, mission_id, "WORK_PACKAGE", work_package_id, "WORK_PACKAGE_STATUS_CHANGED", previous, item.version, {
+                "previous_status": previous_status,
+                "status": target,
+            })
+            mission = self._load_mission_entity(project_id, mission_id)
+            self._touch_mission_after_child_change(project_id, mission)
+        return self.load_mission(project_id, mission_id)
+
+    def get_criterion(self, project_id: str, mission_id: str, criterion_id: str) -> dict[str, Any] | None:
+        try:
+            crit = self._load_criterion(project_id, mission_id, criterion_id)
+            return asdict(crit)
+        except Exception:
+            return None
+
+    def update_criterion(
+        self,
+        project_id: str,
+        mission_id: str,
+        criterion_id: str,
+        status: str,
+        evidence_id: str | None = None,
+        validation_note: str = "",
+    ) -> dict[str, Any]:
+        with self._locked_mission(project_id, mission_id):
+            crit = self._load_criterion(project_id, mission_id, criterion_id)
+            crit.status = status.upper()
+            if evidence_id:
+                if evidence_id not in crit.evidence_refs:
+                    crit.evidence_refs.append(evidence_id)
+            if validation_note:
+                crit.validation_note = validation_note
+            if status.upper() in {"SATISFIED", "MET"}:
+                crit.validated_at = utc_now()
+            elif status.upper() == "PENDING":
+                crit.validated_at = None
+            self._touch(crit)
+            self.persistence.save_criterion(project_id, mission_id, asdict(crit))
+            self._write_entity(self._entity_path(project_id, mission_id, "criteria", criterion_id), crit)
+            mission = self._load_mission_entity(project_id, mission_id)
+            self._touch_mission_after_child_change(project_id, mission)
+        return self.load_mission(project_id, mission_id)
+
+    def create_evidence(
+        self,
+        project_id: str,
+        mission_id: str,
+        work_package_id: str,
+        kind: str = "LOG",
+        source_ref: str = "file:output.log",
+        summary: str = "",
+        description: str = "",
+        evidence_id: str | None = None,
+        data: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        ev_id = self._validate_id(evidence_id or f"ev_{uuid.uuid4().hex[:8]}", "evidence_id")
+        desc = summary or description or "Evidence record"
+        meta = dict(data or {})
+        if summary:
+            meta["summary"] = summary
+        meta.update(kwargs)
+        item = Evidence(
+            evidence_id=ev_id,
+            mission_id=mission_id,
+            work_package_id=work_package_id,
+            deliverable_id=None,
+            kind=kind,
+            source_ref=source_ref,
+            description=desc,
+            metadata=meta,
+            created_at=utc_now(),
+        )
+        self.persistence.save_evidence(project_id, mission_id, asdict(item))
+        self._write_entity(self._entity_path(project_id, mission_id, "evidence", ev_id), item)
+        return asdict(item)
+
+    def list_work_packages(self, project_id: str, mission_id: str) -> list[dict[str, Any]]:
+        entities = self._load_entities(project_id, mission_id, "work_packages", WorkPackage)
+        return [asdict(item) for item in entities.values()]
+
+    def list_evidence(self, project_id: str, mission_id: str) -> list[dict[str, Any]]:
+        entities = self._load_entities(project_id, mission_id, "evidence", Evidence)
+        return [asdict(item) for item in entities.values()]
+
+    def list_criteria(self, project_id: str, mission_id: str) -> list[dict[str, Any]]:
+        entities = self._load_entities(project_id, mission_id, "criteria", AcceptanceCriterion)
+        return [asdict(item) for item in entities.values()]
 
     def create_work_package(
         self,

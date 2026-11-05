@@ -33,6 +33,7 @@ interface StudyNotesViewProps {
 
 const buildDocumentCornell = (doc?: StudyDocument | null): CornellNotesData => {
   const metaNotes = (doc?.metadata as any)?.cornell_notes;
+  const genMode = (doc?.metadata as any)?.generation_mode || metaNotes?.generation_mode || '';
   if (metaNotes) {
     return {
       document_id: doc?.document_id || '',
@@ -44,6 +45,7 @@ const buildDocumentCornell = (doc?: StudyDocument | null): CornellNotesData => {
       detailed_notes: metaNotes.detailed_notes || '',
       glossary: metaNotes.glossary || '',
       action_items: metaNotes.action_items || [],
+      generation_mode: genMode,
     };
   }
   return {
@@ -66,6 +68,7 @@ const buildDocumentCornell = (doc?: StudyDocument | null): CornellNotesData => {
           'Guardar nota final no Knowledge Vault',
         ]
       : [],
+    generation_mode: genMode,
   };
 };
 
@@ -240,7 +243,26 @@ export const StudyNotesView: React.FC<StudyNotesViewProps> = ({
             <div className="rounded-xl border border-white/10 bg-[#121921] p-5">
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div>
-                  <h3 className="text-base font-bold text-white">{cornellData.topic}</h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-base font-bold text-white">{cornellData.topic}</h3>
+                    {cornellData.generation_mode && (
+                      <span
+                        className={`rounded px-2 py-0.5 text-[10px] font-mono border ${
+                          cornellData.generation_mode === 'LLM_GROUNDED'
+                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                            : cornellData.generation_mode === 'PARTIAL'
+                              ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                              : 'bg-amber-500/10 text-amber-200 border-amber-400/25'
+                        }`}
+                      >
+                        {cornellData.generation_mode === 'LLM_GROUNDED'
+                          ? 'IA Fundamentada • qwen3.5:9b'
+                          : cornellData.generation_mode === 'PARTIAL'
+                            ? 'Síntese Parcial • qwen3.5:9b'
+                            : 'Extração Local sem Modelo'}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-cyan-400 mt-0.5">
                     Disciplina: {cornellData.subject} • Data: {cornellData.date}
                   </p>
@@ -276,6 +298,18 @@ export const StudyNotesView: React.FC<StudyNotesViewProps> = ({
                     <div key={idx} className="rounded bg-black/30 p-2.5 border border-white/5 space-y-1">
                       <p className="text-xs font-semibold text-amber-300">{item.cue}</p>
                       <p className="text-[11px] text-gray-400 italic">{item.idea}</p>
+                      {item.source_refs && item.source_refs.length > 0 && (
+                        <div className="flex flex-wrap gap-1 pt-0.5">
+                          {item.source_refs.slice(0, 2).map((ref, rIdx) => (
+                            <span
+                              key={rIdx}
+                              className="rounded bg-white/5 px-1.5 py-0.5 text-[9px] font-mono text-gray-400 border border-white/10"
+                            >
+                              [{ref}]
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

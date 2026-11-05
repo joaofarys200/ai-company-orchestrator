@@ -224,58 +224,59 @@ class LectureWebSocketHandler:
         date_str = datetime.now().strftime("%Y-%m-%d")
 
         try:
-            # 1. Gerar notas em formato Cornell
-            cue_column = [
-                {
-                    "cue": f"Qual é o objetivo central de {topic}?",
-                    "idea": f"Desenvolver arquiteturas robustas e modulares para {topic} com alta fidelidade.",
-                },
-                {
-                    "cue": f"Quais são os mecanismos fundamentais de {subject}?",
-                    "idea": "Isolamento de estado, validação estrita de contratos e persistência auditável.",
-                },
-                {
-                    "cue": "Como é avaliada a transferência de conhecimento?",
-                    "idea": "Através da resolução de problemas práticos em novos domínios operacionais.",
-                },
-            ]
+            from services.study_ai_engine import invoke_study_llm_json
 
-            summary = (
-                f"Esta aula estruturada abordou os princípios teóricos e metodologias práticas de "
-                f"**{topic}** na disciplina de **{subject}**. Foram detalhados os fundamentos, "
-                f"estratégias de orquestração, protocolos de verificação e métricas de retenção."
+            parsed_lesson = invoke_study_llm_json(
+                operation="lecture_generate_lesson",
+                system_prompt=(
+                    "És um professor universitário especialista em PT-PT. Prepara uma aula rigorosa, concreta e detalhada "
+                    "em formato Cornell Notes sobre o tópico e disciplina indicados. Devolve apenas JSON válido."
+                ),
+                user_prompt=(
+                    f"Tópico: \"{topic}\"\nDisciplina: \"{subject}\"\nProfessor: \"{professor}\"\n\n"
+                    "Devolve JSON com:\n"
+                    '{\n'
+                    '  "executive_summary": "...",\n'
+                    '  "cue_column": [{"cue": "...", "idea": "..."}],\n'
+                    '  "detailed_notes": "Markdown com ### subtítulos, conceitos, exemplos e explicações concretas sobre o tópico",\n'
+                    '  "glossary": "- **Termo**: Definição\\n...",\n'
+                    '  "action_items": ["...", "...", "..."]\n'
+                    '}'
+                ),
+                max_output_tokens=4096,
             )
 
-            detailed_notes = (
-                f"### 1. Fundamentos e Definições de {topic}\n"
-                f"{topic} define o conjunto de abstrações e interfaces que permitem a coordenação "
-                f"eficiente de subsistemas autónomos, garantindo verificabilidade e observabilidade.\n\n"
-                f"### 2. Arquitetura e Fluxo de Execução\n"
-                f"O fluxo operacional divide-se em 3 camadas:\n"
-                f"- **Ingestão e Análise**: Processamento de fontes de conhecimento e extração atómica.\n"
-                f"- **Síntese e Validação**: Geração de artefactos estruturados com ligações semânticas ao Vault.\n"
-                f"- **Avaliação e Transferência**: Testes de compreensão via Quiz e problemas práticos.\n\n"
-                f"### 3. Integração com Obsidian Knowledge Vault\n"
-                f"A persistência das notas permite a indexação contínua de grafos de conhecimento e "
-                f"recuperação rápida via RAG em sessões subsequentes.\n"
-            )
+            if isinstance(parsed_lesson, dict) and parsed_lesson.get("detailed_notes"):
+                summary = str(parsed_lesson.get("executive_summary") or f"Síntese da aula sobre **{topic}** ({subject}).").strip()
+                cue_column = [
+                    {"cue": str(c.get("cue", "")).strip(), "idea": str(c.get("idea", "")).strip()}
+                    for c in (parsed_lesson.get("cue_column") or [])
+                    if isinstance(c, dict) and c.get("cue") and c.get("idea")
+                ]
+                detailed_notes = str(parsed_lesson.get("detailed_notes")).strip()
+                glossary = str(parsed_lesson.get("glossary") or "").strip()
+                action_items = [str(a).strip() for a in (parsed_lesson.get("action_items") or []) if str(a).strip()]
+            else:
+                cue_column = []
+                summary = f"Estrutura de estudo para o tópico **{topic}** no âmbito de **{subject}**."
+                detailed_notes = f"### Tópico: {topic}\n*(O motor LLM encontra-se offline para expandir o conteúdo expositivo desta aula.)*"
+                glossary = f"- **{topic}**: Tópico selecionado na disciplina de {subject}."
+                action_items = [f"Consultar materiais carregados sobre {topic} na biblioteca de Estudos."]
 
-            glossary = (
-                f"- **{topic}**: Tema nuclear lecionado nesta sessão pedagógica.\n"
-                f"- **{subject}**: Área de especialização e contexto disciplinar.\n"
-                f"- **Cornell Notes**: Sistema pedagógico com Cue Column, sumário executivo e notas detalhadas.\n"
-            )
-
-            action_items = [
-                f"Rever conceitos fundamentais de {topic}.",
-                f"Resolver o quiz de avaliação de {subject}.",
-                "Executar o teste de transferência de conhecimento para o ambiente de produção.",
-            ]
+            if not cue_column:
+                cue_column = [{"cue": f"Qual o foco de estudo de «{topic}»?", "idea": summary}]
+            if not action_items:
+                action_items = [f"Rever conceitos principais de {topic}."]
 
             # Injetar Wikilinks
             linker = VaultLinker()
             linked_summary = linker.link_text(summary)
             linked_notes = linker.link_text(detailed_notes)
+            cue_rows_md = "\n".join(
+                f"| **{c['cue'].replace('|', '/')}** | {c['idea'].replace('|', '/')} |"
+                for c in cue_column
+            )
+            actions_md = "\n".join(f"- [ ] {act}" for act in action_items)
 
             # Construir Markdown completo
             raw_markdown = f"""---
@@ -313,9 +314,7 @@ tags:
 
 | Perguntas de Revisão & Cues | Ideias Centrais & Respostas Rápidas |
 |---|---|
-| **Qual é o objetivo central de {topic}?** | Desenvolver arquiteturas robustas e modulares para {topic} com alta fidelidade. |
-| **Quais são os mecanismos fundamentais de {subject}?** | Isolamento de estado, validação estrita de contratos e persistência auditável. |
-| **Como é avaliada a transferência de conhecimento?** | Através da resolução de problemas práticos em novos domínios operacionais. |
+{cue_rows_md}
 
 ---
 
@@ -330,9 +329,7 @@ tags:
 ---
 
 ## 🎯 5. Ações e Avaliações
-- [ ] {action_items[0]}
-- [ ] {action_items[1]}
-- [ ] {action_items[2]}
+{actions_md}
 """
             # Salvar no Obsidian Vault
             clean_subj = "".join(c for c in subject if c.isalnum() or c in (" ", "-", "_")).strip() or "Geral"

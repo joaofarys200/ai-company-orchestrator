@@ -10,8 +10,10 @@ from __future__ import annotations
 import asyncio
 import base64
 from dataclasses import asdict
+from datetime import datetime
 import os
 import time
+import uuid
 from typing import Any, Dict, List, Optional
 
 from backend.logging_config import log_event
@@ -36,6 +38,7 @@ STUDY_HANDLERS = {
     "study_generate_summary": "generate_summary",
     "study_generate_cornell": "generate_cornell",
     "study_save_to_knowledge": "save_to_knowledge",
+    "study_save_to_vault": "save_to_knowledge",
     "study_generate_quiz": "generate_quiz",
     "study_submit_quiz": "submit_quiz",
     "study_list_flashcards": "list_flashcards",
@@ -47,6 +50,13 @@ STUDY_HANDLERS = {
     "study_create_collection": "create_collection",
     "study_get_document_file": "get_document_file",
     "study_search_rag": "search_rag",
+    # Study Folder Sync & Courses
+    "study_link_folder": "link_folder",
+    "study_unlink_folder": "unlink_folder",
+    "study_sync_folder": "sync_folder",
+    "study_ask_course": "ask_course",
+    "study_get_course_details": "get_course_details",
+    "study_retry_document": "retry_document",
     # Study Video Intelligence
     "study_get_video_context": "get_video_context",
     "study_explain_video_moment": "explain_video_moment",
@@ -56,6 +66,7 @@ STUDY_HANDLERS = {
     "study_save_video_note": "save_video_note",
     "study_update_video_progress": "update_video_progress",
     "study_ingest_video_url": "ingest_video_url",
+    "study_cancel_generation": "cancel_generation",
 }
 
 
@@ -392,6 +403,32 @@ class StudyWebSocketHandler:
             **result,
         })
 
+    async def cancel_generation(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: Optional[WebSocketSessionState] = None,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        from services.study_ai_engine import cancel_study_generation
+        cancelled = cancel_study_generation(doc_id or "global")
+        if hasattr(self.connections, "broadcast"):
+            b_coro = self.connections.broadcast({
+                "type": "study_document_processing",
+                "document_id": doc_id,
+                "status": "CANCELLED",
+                "percent": 100.0,
+                "message": "Geração cancelada pelo utilizador.",
+            })
+            if asyncio.iscoroutine(b_coro):
+                await b_coro
+        await self.connections.send(websocket, {
+            "type": "study_generation_cancelled",
+            "document_id": doc_id,
+            "cancelled": cancelled,
+            "request_id": message.get("request_id"),
+        })
+
     async def generate_summary(
         self,
         websocket: Any,
@@ -400,21 +437,41 @@ class StudyWebSocketHandler:
     ) -> None:
         doc_id = message.get("document_id", "")
         mode = message.get("mode", "Study")
+        force_regenerate = bool(message.get("force_regenerate", False))
 
         try:
             summary = await asyncio.to_thread(
                 self.study_service.generate_summary,
                 doc_id,
                 mode=mode,
+                force_regenerate=force_regenerate,
             )
+            doc = self.study_service.documents.get(doc_id)
+            if doc and hasattr(self.connections, "broadcast"):
+                b_coro = self.connections.broadcast({
+                    "type": "study_document_ready",
+                    "event": "study.document_ready",
+                    "document": doc.to_dict(),
+                })
+                if asyncio.iscoroutine(b_coro):
+                    await b_coro
+
             await self.connections.send(websocket, {
                 "type": "study_summary_ready",
                 "document_id": doc_id,
+                "mode": mode,
+                "request_id": message.get("request_id"),
                 "summary": summary,
+                "summaries": (doc.metadata or {}).get("summaries", {}) if doc else summary.get("summaries", {}),
+                "generation_mode": (doc.metadata or {}).get("generation_mode", "EXTRACTIVE_GROUNDED") if doc else summary.get("generation_mode", "EXTRACTIVE_GROUNDED"),
+                "generation_telemetry": (doc.metadata or {}).get("generation_telemetry", {}) if doc else summary.get("generation_telemetry", {}),
+                "artifact_modes": (doc.metadata or {}).get("artifact_modes", {}) if doc else summary.get("artifact_modes", {}),
+                "unavailable_generative_features": (doc.metadata or {}).get("unavailable_generative_features", []) if doc else summary.get("unavailable_generative_features", []),
             })
         except Exception as e:
             await self.connections.send(websocket, {
                 "type": "study_error",
+                "request_id": message.get("request_id"),
                 "message": str(e),
             })
 
@@ -425,19 +482,34 @@ class StudyWebSocketHandler:
         _session: WebSocketSessionState,
     ) -> None:
         doc_id = message.get("document_id", "")
+        force_regenerate = bool(message.get("force_regenerate", False))
         try:
             cornell = await asyncio.to_thread(
                 self.study_service.generate_cornell_from_document,
                 doc_id,
+                force_regenerate=force_regenerate,
             )
+            doc = self.study_service.documents.get(doc_id)
+            if doc and hasattr(self.connections, "broadcast"):
+                b_coro = self.connections.broadcast({
+                    "type": "study_document_ready",
+                    "event": "study.document_ready",
+                    "document": doc.to_dict(),
+                })
+                if asyncio.iscoroutine(b_coro):
+                    await b_coro
             await self.connections.send(websocket, {
                 "type": "study_notes_ready",
                 "document_id": doc_id,
+                "request_id": message.get("request_id"),
                 "cornell": cornell,
+                "generation_mode": (doc.metadata or {}).get("generation_mode", "EXTRACTIVE_GROUNDED") if doc else cornell.get("generation_mode", "EXTRACTIVE_GROUNDED"),
+                "generation_telemetry": (doc.metadata or {}).get("generation_telemetry", {}) if doc else {},
             })
         except Exception as e:
             await self.connections.send(websocket, {
                 "type": "study_error",
+                "request_id": message.get("request_id"),
                 "message": str(e),
             })
 
@@ -448,7 +520,7 @@ class StudyWebSocketHandler:
         _session: WebSocketSessionState,
     ) -> None:
         title = message.get("title", "Nota de Estudo")
-        content = message.get("content", "")
+        content = message.get("content") or message.get("markdown_content", "")
         subject = message.get("subject", "Geral")
         doc_ids = message.get("source_document_ids", [])
 
@@ -464,10 +536,12 @@ class StudyWebSocketHandler:
                 "type": "study_knowledge_saved",
                 "title": title,
                 "vault_path": path.replace("\\", "/"),
+                "request_id": message.get("request_id"),
             })
         except Exception as e:
             await self.connections.send(websocket, {
                 "type": "study_error",
+                "request_id": message.get("request_id"),
                 "message": str(e),
             })
 
@@ -665,6 +739,7 @@ class StudyWebSocketHandler:
         _session: WebSocketSessionState,
     ) -> None:
         doc_ids = message.get("document_ids", [])
+        req_id = message.get("request_id")
         try:
             result = await asyncio.to_thread(
                 self.study_service.synthesize_documents,
@@ -672,11 +747,13 @@ class StudyWebSocketHandler:
             )
             await self.connections.send(websocket, {
                 "type": "study_synthesis_ready",
+                "request_id": req_id,
                 **result,
             })
         except Exception as e:
             await self.connections.send(websocket, {
                 "type": "study_error",
+                "request_id": req_id,
                 "message": str(e),
             })
 
@@ -701,23 +778,236 @@ class StudyWebSocketHandler:
         name = message.get("name", "Nova Coleção")
         subject = message.get("subject", "Geral")
         doc_ids = message.get("document_ids", [])
-        cid = f"col_{uuid.uuid4().hex[:8]}"
+        req_id = message.get("request_id")
 
-        from services.study_service import StudyCollection
-        col = StudyCollection(
-            collection_id=cid,
+        col = self.study_service.create_collection(
             name=name,
             subject=subject,
             document_ids=doc_ids,
-            created_at=datetime.now().isoformat(),
         )
-        self.study_service.collections[cid] = col
-        self.study_service._save_collections()
 
-        await self.connections.broadcast({
+        res = {
             "type": "study_collection_created",
             "collection": asdict(col),
-        })
+            "request_id": req_id,
+        }
+        await self.connections.send(websocket, res)
+        await self.connections.broadcast(res)
+
+    async def link_folder(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        collection_id = message.get("collection_id", "")
+        folder_path = message.get("folder_path", "")
+        sync_enabled = bool(message.get("sync_enabled", True))
+        recursive = bool(message.get("recursive", True))
+        req_id = message.get("request_id")
+
+        try:
+            result = await asyncio.to_thread(
+                self.study_service.link_folder_to_collection,
+                collection_id,
+                folder_path,
+                sync_enabled=sync_enabled,
+                recursive=recursive,
+            )
+            if hasattr(result.get("report"), "to_dict"):
+                result["report"] = result["report"].to_dict()
+            await self.connections.send(websocket, {
+                "type": "study_folder_linked",
+                "request_id": req_id,
+                **result,
+            })
+            cols = [c.to_dict() for c in self.study_service.list_collections()]
+            await self.connections.broadcast({
+                "type": "study_collections_list",
+                "collections": cols,
+            })
+            docs = [d.to_dict() for d in self.study_service.list_documents()]
+            docs.sort(key=lambda d: d.get("updated_at", ""), reverse=True)
+            await self.connections.broadcast({
+                "type": "study_documents_list",
+                "documents": docs,
+            })
+        except Exception as e:
+            log_event(self.logger, "study.link_folder_failed", collection_id=collection_id, error=str(e))
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao vincular pasta: {e}",
+                "request_id": req_id,
+            })
+
+    async def unlink_folder(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        collection_id = message.get("collection_id", "")
+        folder_path = message.get("folder_path", "")
+        remove_materials = bool(message.get("remove_materials", False))
+        req_id = message.get("request_id")
+
+        try:
+            result = await asyncio.to_thread(
+                self.study_service.unlink_folder_from_collection,
+                collection_id,
+                folder_path,
+                remove_materials=remove_materials,
+            )
+            await self.connections.send(websocket, {
+                "type": "study_folder_unlinked",
+                "request_id": req_id,
+                **result,
+            })
+            cols = [c.to_dict() for c in self.study_service.list_collections()]
+            await self.connections.broadcast({
+                "type": "study_collections_list",
+                "collections": cols,
+            })
+            docs = [d.to_dict() for d in self.study_service.list_documents()]
+            docs.sort(key=lambda d: d.get("updated_at", ""), reverse=True)
+            await self.connections.broadcast({
+                "type": "study_documents_list",
+                "documents": docs,
+            })
+        except Exception as e:
+            log_event(self.logger, "study.unlink_folder_failed", collection_id=collection_id, error=str(e))
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao desvincular pasta: {e}",
+                "request_id": req_id,
+            })
+
+    async def sync_folder(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        collection_id = message.get("collection_id", "")
+        folder_path = message.get("folder_path")
+        req_id = message.get("request_id")
+
+        try:
+            report = await asyncio.to_thread(
+                self.study_service.sync_collection_folder,
+                collection_id,
+                folder_path,
+            )
+            await self.connections.send(websocket, {
+                "type": "study_folder_synced",
+                "request_id": req_id,
+                "report": report.to_dict(),
+            })
+            docs = [d.to_dict() for d in self.study_service.list_documents()]
+            docs.sort(key=lambda d: d.get("updated_at", ""), reverse=True)
+            await self.connections.broadcast({
+                "type": "study_documents_list",
+                "documents": docs,
+            })
+            cols = [c.to_dict() for c in self.study_service.list_collections()]
+            await self.connections.broadcast({
+                "type": "study_collections_list",
+                "collections": cols,
+            })
+        except Exception as e:
+            log_event(self.logger, "study.sync_folder_failed", collection_id=collection_id, error=str(e))
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao sincronizar pasta: {e}",
+                "request_id": req_id,
+            })
+
+    async def ask_course(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        collection_id = message.get("collection_id", "")
+        question = message.get("question", "")
+        req_id = message.get("request_id")
+
+        try:
+            result = await asyncio.to_thread(
+                self.study_service.ask_course,
+                collection_id,
+                question,
+            )
+            await self.connections.send(websocket, {
+                "type": "study_ask_course_result",
+                "collection_id": collection_id,
+                "request_id": req_id,
+                **result,
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro na consulta do curso: {e}",
+                "request_id": req_id,
+            })
+
+    async def get_course_details(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        collection_id = message.get("collection_id", "")
+        req_id = message.get("request_id")
+
+        try:
+            details = await asyncio.to_thread(
+                self.study_service.get_course_details,
+                collection_id,
+            )
+            await self.connections.send(websocket, {
+                "type": "study_course_details",
+                "request_id": req_id,
+                **details,
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro ao obter detalhes do curso: {e}",
+                "request_id": req_id,
+            })
+
+    async def retry_document(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        document_id = message.get("document_id", "")
+        req_id = message.get("request_id")
+
+        try:
+            doc = await asyncio.to_thread(
+                self.study_service.retry_document,
+                document_id,
+            )
+            await self.connections.send(websocket, {
+                "type": "study_document_ready",
+                "request_id": req_id,
+                "document": doc.to_dict(),
+            })
+            docs = [d.to_dict() for d in self.study_service.list_documents()]
+            docs.sort(key=lambda d: d.get("updated_at", ""), reverse=True)
+            await self.connections.broadcast({
+                "type": "study_documents_list",
+                "documents": docs,
+            })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Falha ao retentar processamento de '{document_id}': {e}",
+                "request_id": req_id,
+            })
 
     # =========================================================================
     # Video Intelligence Handlers

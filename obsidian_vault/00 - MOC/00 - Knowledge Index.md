@@ -26,15 +26,16 @@ Este cofre é estruturado sob o princípio de **Ontologia Atómica, Rigor Epist�
 
 | Domínio | MOC Central | Descrição & Escopo |
 |---|---|---|
-| **01. AI & LLM** | [[AI Index]] | Model Harness, Decodificação Restrita, PagedAttention, RAG, Inversão de Logits, Amostragem Estocástica |
-| **02. Software Eng.** | [[Software Engineering Index]] | AST, Tree-sitter, Compiladores, SOLID, DDD, Matriz de Modos de Falha de Agentes, TLA+ |
-| **03. Backend Systems** | [[Backend Index]] | SQLite WAL, PostgreSQL, Isolamento Snapshot, Consenso Raft, Sharding, Outbox, Sagas |
+| **01. AI & LLM** | [[AI Index]] | Model Harness, Test-Time Compute, Multimodal ASR/OCR, MCP, Agentic RAG/RRF/MMR, LLM Evaluation, PagedAttention |
+| **02. Software Eng.** | [[Software Engineering Index]] | AST, Tree-sitter, Asyncio Internals, Evolução de Contratos API, Property-Based Testing & Metamorphic Fuzzing, SOLID, DDD, TLA+ |
+| **03. Backend Systems** | [[Backend Index]] | SQLite WAL, PostgreSQL, LSM-Trees vs B-Trees, Backpressure & Lei de Little, Cache Stampede (Singleflight/XFetch), Raft, Outbox, Sagas |
 | **04. Computer Use** | [[Computer Use Index]] | Protocolo Playwright CDP, Seletores ARIA, Reality Gate, Inspeção DOM, Interceptação de Rede |
-| **05. Security** | [[Security Index]] | Sandboxing, Zero Trust, Namespaces Linux, WASM, Replay Attacks, Entropia de Shannon, HMAC vs Assimétrico |
-| **06. DevOps & SRE** | [[DevOps Index]] | Distributed Tracing W3C, Rate Limiting com Jitter, Chaos Engineering, SLI/SLO, eBPF Tracing |
-| **07. Business & SaaS** | [[Business Index]] | Unit Economics SaaS, Retenção por Cohort, Proveniência de Evidência Económica, EU AI Act, GDPR |
-| **08. Runbooks** | [[Operational Guides Index]] | 20 Runbooks de Diagnóstico e Recuperação Operacional Passo a Passo ("How-to") |
-| **09. JARVIS Internal** | [[JARVIS Index]] | Arquitetura de Componentes, Swarm, State Machine, Voice Service, Gemini Live, AirLLM, 10 Lessons, 13 ADRs, Knowledge Gaps |
+| **05. Security** | [[Security Index]] | Supply Chain (SLSA/SBOM), OAuth 2.1 + PKCE & Capability Tokens, Criptografia Pós-Quântica (ML-KEM/ML-DSA), Sandboxing, Zero Trust |
+| **06. DevOps & SRE** | [[DevOps Index]] | Progressive Delivery (Canary/Feature Flags), Tail Latency P99 & Hedged Requests, Distributed Tracing W3C, Chaos Engineering, SLI/SLO, eBPF |
+| **07. Business & SaaS** | [[Business Index]] | AI Token COGS & Routing Arbitrage, Outcome/Hybrid Pricing, Defensibilidade & Data Flywheels, NIST AI RMF & ISO 42001, EU AI Act, GDPR |
+| **08. Runbooks** | [[Operational Guides Index]] | 22 Runbooks de Diagnóstico e Recuperação Operacional Passo a Passo ("How-to") |
+| **09. JARVIS Internal** | [[JARVIS Index]] | Arquitetura, Swarm, Persistência Durável de Missões (Fases 24–25), Motor Multimodal de Estudos, Voice/Gemini Live, Lessons, ADRs, Gaps |
+| **10. Lectures & Estudo** | [[Lectures Index]] | Aulas universitárias, transcrições com alinhamento temporal, Cornell Notes e sínteses |
 
 ---
 

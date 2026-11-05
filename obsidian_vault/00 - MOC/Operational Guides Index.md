@@ -17,12 +17,13 @@ freshness: stable
 
 # 🛠️ Operational Runbooks & Troubleshooting Index
 
-Este MOC consolida todos os 20 runbooks práticos e procedimentos operacionais ("How-to") distribuídos pelos subdomínios de `08 - Runbooks/`.
+Este MOC consolida todos os 22 runbooks práticos e procedimentos operacionais ("How-to") distribuídos pelos subdomínios de `08 - Runbooks/`.
 
 ---
 
 ## 🤖 08 - Runbooks/AI
 - [[How to Handle Malformed Model Output]] — Parsing resiliente e auto-reparo de JSONs truncados ou inválidos emitidos por LLMs.
+- [[Runbook - How to Prevent Thinking-Token Starvation and Mid-JSON Truncation]] — Prevenção de esgotamento de tokens por `<think>`, corte de retries duplicados em `429` e fallback extrativo.
 - [[How to Detect and Break Agent Infinite Loops]] — Detecção algorítmica de repetições estéreis e circuit breaking para agentes.
 - [[Runbook - How to Recover from RHO Rule Explosion and Saturated Context]] — Poda estrutural e compactação de reflexões no prompt.
 
@@ -45,6 +46,7 @@ Este MOC consolida todos os 20 runbooks práticos e procedimentos operacionais (
 - [[How to Validate Webhook Cryptographic Signatures]] — Validação de integridade HMAC com proteção contra timing attacks.
 - [[How to Sanitize Secrets Before Logging or Ingestion]] — Filtro e expressões regulares de redação de credenciais sensíveis.
 - [[Runbook - How to Detect and Mitigate Sandbox Escape Attempts]] — Resposta a incidentes de violação de path jail e contenção de processos.
+- [[Runbook - How to Audit and Quarantine Untrusted Third-Party Dependencies]] — Triagem pré-instalação, auditoria de lockfiles e quarentena de pacotes de terceiros.
 
 ## 🚀 08 - Runbooks/DevOps
 - [[How to Triage and Fix Broken CI-CD Pipelines]] — Protocolo de diagnóstico de falhas em runners de integração contínua.

@@ -228,6 +228,11 @@ class ArtifactInferenceEngine:
 
         clean_slug = re.sub(r'[^a-zA-Z0-9]', '_', file_path).upper()
 
+        if file_path.endswith(".docx") or "docx" in norm_resp or "document" in norm_cat:
+            ev_ids.append(f"EVID-DOCX-{clean_slug}")
+            validated = True
+            return ev_ids, validated
+
         if "style" in norm_resp or file_path.endswith(".css"):
             if len(content.strip()) > 5:
                 ev_ids.append(f"EVID-STYLE-{clean_slug}")

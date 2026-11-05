@@ -37,3 +37,10 @@ A aula focou na análise crítica de um artigo científico sobre a performance d
 ## 🎯 Tarefas e Ações Recomendadas
 - [ ] Analisar o artigo 'Forecasting Demand Profiles of New Products' para a próxima aula.
 - [ ] Focar na identificação de propostas de nova tecnologia nos próximos artigos.
+
+
+---
+
+## 🔗 Grafo de Conhecimento & MOC
+- **MOC Central:** [[Lectures Index]]
+- **Tópicos Relacionados:** [[AI Index]], [[Business Index]]

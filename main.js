@@ -1,7 +1,23 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const electron = require('electron');
+if (typeof electron === 'string') {
+  // Invoked as Node.js or with ELECTRON_RUN_AS_NODE=1 inherited from IDE/terminal.
+  // Re-spawn the real Electron runtime with ELECTRON_RUN_AS_NODE stripped.
+  const { spawn } = require('child_process');
+  const env = { ...process.env };
+  delete env.ELECTRON_RUN_AS_NODE;
+  const child = spawn(electron, [__filename, ...process.argv.slice(2)], {
+    stdio: 'inherit',
+    env,
+  });
+  child.on('close', (code) => process.exit(code ?? 0));
+  return;
+}
+
+const { app, BrowserWindow, ipcMain, dialog, shell } = electron;
 const path = require('path');
 const { spawn, execFileSync } = require('child_process');
 const fs = require('fs');
+const http = require('http');
 
 // Allow audio autoplay without user gesture requirements in Electron
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
@@ -59,6 +75,37 @@ ipcMain.on('jarvis-to-backend', (event, message) => {
     } catch (err) {
       console.error('[Electron IPC] Error writing to Python stdin:', err);
     }
+  }
+});
+
+// Native folder selection dialog for Study area
+ipcMain.handle('select-folder', async () => {
+  try {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Selecionar Pasta de Materiais de Estudo',
+      properties: ['openDirectory', 'createDirectory'],
+    });
+    if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+      return null;
+    }
+    return result.filePaths[0];
+  } catch (err) {
+    console.error('[Electron IPC] Error in select-folder dialog:', err);
+    return null;
+  }
+});
+
+// Native folder opener in OS file explorer
+ipcMain.handle('open-path', async (event, targetPath) => {
+  try {
+    if (targetPath && typeof targetPath === 'string') {
+      await shell.openPath(targetPath);
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.error('[Electron IPC] Error opening path:', err);
+    return false;
   }
 });
 
@@ -121,7 +168,7 @@ function startPythonBackend() {
         const isDev = process.argv.includes('--dev') || process.env.VITE_DEV === '1';
         const targetUrl = isDev ? 'http://localhost:5173' : 'http://localhost:8000';
         console.log(`[Electron] A carregar UI em ${targetUrl}...`);
-        loadURLWithRetry(targetUrl, 15, 500, 'http://localhost:8000');
+        loadURLWithRetry(targetUrl, 20, 400, 'http://localhost:8000');
       }
     }
   });
@@ -250,8 +297,32 @@ function showDiagnosticErrorPage(failedUrls, reason) {
   `)).catch(() => {});
 }
 
-function loadURLWithRetry(url, maxRetries = 25, delayMs = 500, fallbackUrl = 'http://localhost:8000') {
-  if (isPageLoaded) return;
+function checkUrlReady(targetUrl, timeoutMs = 600) {
+  return new Promise((resolve) => {
+    try {
+      const req = http.get(targetUrl, { timeout: timeoutMs }, (res) => {
+        res.resume();
+        resolve(Boolean(res.statusCode && res.statusCode < 500));
+      });
+      req.on('error', () => resolve(false));
+      req.on('timeout', () => {
+        req.destroy();
+        resolve(false);
+      });
+    } catch {
+      resolve(false);
+    }
+  });
+}
+
+function loadURLWithRetry(url, maxRetries = 35, delayMs = 450, fallbackUrl = 'http://localhost:8000') {
+  if (isPageLoaded && mainWindow && !mainWindow.isDestroyed()) {
+    const currentLoaded = mainWindow.webContents.getURL() || '';
+    if (currentLoaded.startsWith('http://localhost:') || currentLoaded.startsWith('http://127.0.0.1:')) {
+      return;
+    }
+    isPageLoaded = false;
+  }
   if (retryLoadTimer) {
     clearTimeout(retryLoadTimer);
     retryLoadTimer = null;
@@ -260,8 +331,25 @@ function loadURLWithRetry(url, maxRetries = 25, delayMs = 500, fallbackUrl = 'ht
   const attemptedUrls = [url];
   if (fallbackUrl && fallbackUrl !== url) attemptedUrls.push(fallbackUrl);
 
-  function tryLoad(currentUrl) {
+  async function tryLoad(currentUrl) {
     if (!mainWindow || mainWindow.isDestroyed() || isPageLoaded) return;
+    const ready = await checkUrlReady(currentUrl);
+    if (!ready) {
+      if (isPageLoaded) return;
+      attempts += 1;
+      if (attempts < maxRetries) {
+        retryLoadTimer = setTimeout(() => tryLoad(currentUrl), delayMs);
+      } else if (fallbackUrl && currentUrl !== fallbackUrl) {
+        console.log(`[Electron] Falha ao carregar ${currentUrl}. A alternar para fallback: ${fallbackUrl}`);
+        attempts = 0;
+        tryLoad(fallbackUrl);
+      } else {
+        console.error(`[Electron] Não foi possível carregar ${attemptedUrls.join(' ou ')} após múltiplas tentativas.`);
+        showDiagnosticErrorPage(attemptedUrls, 'Timeout na resposta dos servidores locais.');
+      }
+      return;
+    }
+
     mainWindow.loadURL(currentUrl).catch(() => {
       if (isPageLoaded) return;
       attempts += 1;
@@ -293,12 +381,15 @@ function createWindow() {
     }
   });
 
-  // Track successful page loads to stop background retries
+  // Track successful HTTP page loads (ignore chrome-error:// or about:blank) to stop background retries
   mainWindow.webContents.on('did-finish-load', () => {
-    isPageLoaded = true;
-    if (retryLoadTimer) {
-      clearTimeout(retryLoadTimer);
-      retryLoadTimer = null;
+    const loadedUrl = mainWindow ? (mainWindow.webContents.getURL() || '') : '';
+    if (loadedUrl.startsWith('http://localhost:') || loadedUrl.startsWith('http://127.0.0.1:')) {
+      isPageLoaded = true;
+      if (retryLoadTimer) {
+        clearTimeout(retryLoadTimer);
+        retryLoadTimer = null;
+      }
     }
   });
 
@@ -328,7 +419,7 @@ function createWindow() {
 
   const isDev = process.argv.includes('--dev') || process.env.VITE_DEV === '1';
   const targetUrl = isDev ? 'http://localhost:5173' : 'http://localhost:8000';
-  loadURLWithRetry(targetUrl, 25, 400, 'http://localhost:8000');
+  loadURLWithRetry(targetUrl, 35, 450, 'http://localhost:8000');
 
   mainWindow.on('closed', () => {
     mainWindow = null;

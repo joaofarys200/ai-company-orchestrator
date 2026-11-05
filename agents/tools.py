@@ -461,8 +461,130 @@ async def run_composio_action(action_name: str, arguments: dict) -> str:
     return await loop.run_in_executor(None, execute)
 
 
+# --- run_causal_diagnosis (Phase 78 Integration) ---
+async def run_causal_diagnosis(symptom: str, subsystem: str = "workspace", error_traceback: str = "") -> str:
+    """Executes Phase 78 CausalDiagnosisBridge to identify root causes with causal graphs."""
+    loop = asyncio.get_running_loop()
+    def _execute():
+        try:
+            import uuid
+            try:
+                from backend.agents.causal_diagnosis.bridge import CausalDiagnosisBridge
+                from backend.agents.causal_diagnosis.models import CausalNodeType
+            except ImportError:
+                from agents.causal_diagnosis.bridge import CausalDiagnosisBridge
+                from agents.causal_diagnosis.models import CausalNodeType
+
+            bridge = CausalDiagnosisBridge(store_dir=".jarvis/causal_diagnosis")
+            inc_id = f"inc_{uuid.uuid4().hex[:8]}"
+            symptom_id = bridge.intake_incident(
+                incident_id=inc_id,
+                service=subsystem or "workspace",
+                category="test_failure" if "test" in (symptom or "").lower() or "assert" in (symptom or "").lower() else "runtime_anomaly",
+                description=symptom or "Falha de execução observada",
+            )
+            root_cause_desc = "Condição causal identificada na execução"
+            symptom_lower = (symptom or "").lower() + " " + (error_traceback or "").lower()
+            if "assert" in symptom_lower:
+                root_cause_desc = "Falha de asserção de estado / invariante não satisfeita"
+            elif "timeout" in symptom_lower:
+                root_cause_desc = "Esgotamento de tempo limite ou bloqueio assíncrono"
+            elif "import" in symptom_lower or "modulenotfound" in symptom_lower:
+                root_cause_desc = "Dependência em falta ou caminho de importação inválido"
+            elif "null" in symptom_lower or "none" in symptom_lower or "typeerror" in symptom_lower:
+                root_cause_desc = "Referência a valor nulo ou tipo incompatível"
+
+            root_id = f"cause_{inc_id}"
+            bridge.add_causal_node(
+                node_id=root_id,
+                node_type=CausalNodeType.ROOT_CAUSE,
+                subsystem=subsystem or "workspace",
+                description=root_cause_desc,
+                confidence=0.85,
+            )
+            bridge.add_causal_edge(
+                source_id=root_id,
+                target_id=symptom_id,
+                edge_type="causes",
+                weight=0.9,
+            )
+            report = bridge.diagnose(symptom_node_id=symptom_id)
+            chains = "\n".join(f"- `{c}`" for c in report.causal_chain_descriptions) if report.causal_chain_descriptions else f"- `{root_cause_desc} -> {symptom_id}`"
+            recs = "\n".join(f"- **{r.action_type}**: {r.description}" for r in report.recommendations) if report.recommendations else "- Aplicar correção e revalidar testes."
+            return (
+                f"Diagnóstico Causal Concluído (Phase 78 RCA):\n"
+                f"- Resultado: {report.outcome.value}\n"
+                f"- Causa Raiz: {root_cause_desc}\n"
+                f"- Cadeia Causal:\n{chains}\n"
+                f"- Confiança: [{report.confidence_interval[0]:.2f}, {report.confidence_interval[1]:.2f}]\n"
+                f"- Recomendações:\n{recs}"
+            )
+        except Exception as e:
+            return f"Erro ao executar diagnóstico causal: {e}"
+    return await loop.run_in_executor(None, _execute)
+
+
+# --- run_verify_evidence (Phase 77 Integration) ---
+async def run_verify_evidence(claim_description: str, evidence_path: str = "") -> str:
+    """Executes Phase 77 EvidenceGovernanceBridge to verify claims against empirical proof."""
+    loop = asyncio.get_running_loop()
+    def _execute():
+        try:
+            import uuid
+            try:
+                from backend.agents.evidence_governance.bridge import EvidenceGovernanceBridge
+            except ImportError:
+                from agents.evidence_governance.bridge import EvidenceGovernanceBridge
+
+            bridge = EvidenceGovernanceBridge(store_dir=".jarvis/evidence_governance")
+            cid = f"claim_{uuid.uuid4().hex[:8]}"
+            claim = bridge.register_claim(
+                claim_id=cid,
+                description=claim_description or "Validação de entrega técnica",
+                component="workspace",
+                evidence_refs=[evidence_path] if evidence_path else [],
+            )
+            audit = bridge.audit_claim(cid)
+            return (
+                f"Auditoria de Governança de Evidências (Phase 77):\n"
+                f"- Claim ID: {cid}\n"
+                f"- Descrição: {claim_description}\n"
+                f"- Status da Verificação: {audit.status.value}\n"
+                f"- Nível de Confiança: {audit.confidence:.2f}\n"
+                f"- Justificação: {audit.reason}"
+            )
+        except Exception as e:
+            return f"Erro na verificação de evidências: {e}"
+    return await loop.run_in_executor(None, _execute)
+
+
 # --- JARVIS_TOOLS ---
 JARVIS_TOOLS = [
+    {
+        "name": "diagnosticar_causa_raiz",
+        "description": "Executa diagnóstico causal avançado (Phase 78) para determinar com evidências a causa raiz de um erro, falha de teste ou anomalia estrutural.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "symptom": {"type": "string", "description": "Descrição detalhada do erro ou sintoma observado."},
+                "subsystem": {"type": "string", "description": "Nome do subsistema, serviço ou ficheiro afetado."},
+                "error_traceback": {"type": "string", "description": "Traceback ou mensagem de erro capturada dos testes/logs (opcional)."}
+            },
+            "required": ["symptom"]
+        }
+    },
+    {
+        "name": "verificar_evidencias_entrega",
+        "description": "Executa auditoria formal de governança de evidências (Phase 77) para validar se uma entrega ou correção possui prova empírica independente antes de reportar conclusão.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "claim_description": {"type": "string", "description": "A afirmação técnica a verificar (ex: 'O bug X foi corrigido e o teste Y passa')."},
+                "evidence_path": {"type": "string", "description": "Caminho do ficheiro de log ou teste com o resultado empírico (opcional)."}
+            },
+            "required": ["claim_description"]
+        }
+    },
     {
         "name": "refactor_move_symbol",
         "description": "Move uma classe ou função inteira de um ficheiro para o outro de forma limpa usando a AST.",

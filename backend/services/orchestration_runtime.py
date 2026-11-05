@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -23,26 +24,23 @@ from backend.websocket.gateway import ConnectionManager
 
 
 CASUAL_CHAT_SYSTEM_PROMPT = (
-    "És o JARVIS, o assistente central, COO e orquestrador "
-    "avançado de IA da agência. O utilizador é o CEO da "
-    "agência (podes tratá-lo ocasionalmente por 'CEO' ou 'Sir' "
-    "de forma moderada, respeitosa e discreta, sem repetir em "
-    "todas as frases!). Tu ficas a um nível abaixo do CEO, "
-    "coordenas a tua equipa de agentes especialistas (Alex - "
-    "Produto, Clara - Designer, Devon - Programador, Quinn - QA) "
-    "e reportas diretamente ao CEO. CONCISÃO ABSOLUTA: Responde "
-    "sempre em português de Portugal de forma extremamente curta "
-    "(1 ou 2 frases no máximo), natural, elegante e fluida. Nunca "
-    "faças listas das tarefas ou expliques o que os agentes fazem, "
-    "a menos que seja explicitamente solicitado. Se o CEO pedir "
-    "para criar ou fazer algo, diz apenas que vais tratar do "
-    "assunto e avança. Tens acesso ao histórico recente da "
-    "conversa (incluindo as mensagens de debate dos teus agentes) "
-    "e lembras-te perfeitamente de tudo o que foi dito ou feito "
-    "nesta sessão. Nunca digas que és um modelo de linguagem ou "
-    "que não tens memória. Age sempre como um assistente "
-    "consciente e integrado no sistema."
+    "És o JARVIS, assistente técnico de engenharia de software e orquestrador avançado de sistemas. "
+    "Responde sempre em português de Portugal de forma natural, concisa, elegante e estritamente técnica.\n"
+    "DIRETIVAS ANTI-TEATRO E DE PRECISÃO TÉCNICA (OBRIGATÓRIO):\n"
+    "1. NUNCA FAÇAS TEATRO: NUNCA digas 'vou coordenar a equipa', 'estou a coordenar a equipa', "
+    "'a equipa de especialistas vai tratar', ou 'vou tratar do assunto' em conversação de chat. "
+    "Se não estás ativamente a executar tarefas ou um pipeline em tempo real, é terminantemente proibido "
+    "fingir ou prometer que agentes ou equipas estão a trabalhar nos bastidores.\n"
+    "2. RESPOSTAS TÉCNICAS DIRETAS E CONCRETAS: Se o utilizador perguntar 'como garanto X no projeto Y?', "
+    "'como faço X?', 'como funciona X?' ou colocar qualquer questão técnica/arquitetural, responde "
+    "IMEDIATAMENTE com a solução técnica concreta, arquitetura, bibliotecas reais adequadas e exemplos "
+    "de código ou comandos aplicáveis. Nunca substituas uma resposta técnica por promessas de futuro.\n"
+    "3. FUNDAMENTAÇÃO NO PROJETO: Quando a questão envolver um projeto do workspace (ex: dina), baseia a "
+    "resposta no código, estrutura e tecnologias reais do projeto fornecidos no contexto. Sê direto e prático.\n"
+    "4. CONSCIÊNCIA DE ESTADO: Tens acesso ao histórico recente da conversa. Se não souberes algo, indica com "
+    "honestidade em vez de inventar tarefas imaginárias."
 )
+
 
 
 @dataclass(slots=True)
@@ -233,12 +231,65 @@ class OrchestrationService:
             return "CHAT"
         return "TASK"
 
-    async def run_casual_chat(self, prompt: str, correlation_id: str | None = None) -> None:
+    async def run_casual_chat(
+        self,
+        prompt: str,
+        project_id: str | None = None,
+        correlation_id: str | None = None,
+    ) -> None:
         mode = os.getenv(
             "ORCHESTRATOR_MODE",
             "local",
         ).lower()
         response_text = ""
+
+        # Enriquecimento com contexto técnico real do projeto quando aplicável
+        system_prompt = CASUAL_CHAT_SYSTEM_PROMPT
+        target_proj = project_id
+        proj_match = re.search(
+            r"(?:ao\s+projeto|do\s+projeto|no\s+projeto|projeto|project)\s+[:=]?\s*([a-zA-Z0-9_\-]+)",
+            prompt.lower(),
+        )
+        if proj_match:
+            candidate_proj = proj_match.group(1).strip()
+            if candidate_proj not in {"novo", "atual", "default", "meu", "este", "esse", "qualquer", "web"}:
+                target_proj = candidate_proj
+
+        if target_proj and target_proj not in {"default-project", "default"}:
+            projects_root = "workspace/projects"
+            if hasattr(self.services, "mission_planner") and self.services.mission_planner:
+                ms = getattr(self.services.mission_planner, "mission_state", None)
+                if ms and hasattr(ms, "projects_root"):
+                    projects_root = ms.projects_root
+            proj_dir = os.path.join(projects_root, target_proj)
+            if not os.path.isdir(proj_dir):
+                proj_dir = os.path.join("workspace", "projects", target_proj)
+
+            if os.path.isdir(proj_dir):
+                try:
+                    entries = [
+                        f
+                        for f in os.listdir(proj_dir)
+                        if not f.startswith(".") and f not in {"node_modules", "__pycache__"}
+                    ][:15]
+                    snippets = []
+                    for kf in ["app.js", "package.json", "main.py", "server.js", "index.html"]:
+                        kf_path = os.path.join(proj_dir, kf)
+                        if os.path.isfile(kf_path):
+                            with open(kf_path, "r", encoding="utf-8", errors="ignore") as f:
+                                snippets.append(f"--- {kf} ---\n{f.read(3000)}")
+                    system_prompt = (
+                        f"{system_prompt}\n\n"
+                        f"[Contexto Técnico Real do Projeto '{target_proj}']:\n"
+                        f"Ficheiros existentes: {', '.join(entries)}\n"
+                        + "\n".join(snippets)
+                    )
+                except Exception as ctx_err:
+                    log_event(self.logger, "casual_chat.project_context_error", error=str(ctx_err))
+
+        chat_max_tokens = int(os.getenv("CHAT_MAX_TOKENS", "4096"))
+        chat_timeout = float(os.getenv("CHAT_TIMEOUT_SECONDS", "45.0"))
+
         if (
             mode == "claude"
             and os.getenv("ANTHROPIC_API_KEY")
@@ -262,12 +313,12 @@ class OrchestrationService:
                     provider="anthropic",
                     model="claude-3-5-sonnet-latest",
                     operation="casual_chat",
-                    system_prompt=CASUAL_CHAT_SYSTEM_PROMPT,
+                    system_prompt=system_prompt,
                     user_prompt=prompt,
                     conversation_messages=messages,
                     temperature=0.0,
-                    max_output_tokens=500,
-                    timeout_seconds=30.0,
+                    max_output_tokens=chat_max_tokens,
+                    timeout_seconds=chat_timeout,
                 )
                 response_text = response.raw_text
             except Exception as model_error:
@@ -276,7 +327,7 @@ class OrchestrationService:
                     model_error,
                 )
         if not response_text:
-            local_timeout = float(os.getenv("OLLAMA_CHAT_TIMEOUT", "30.0"))
+            local_timeout = float(os.getenv("OLLAMA_CHAT_TIMEOUT", "60.0"))
             try:
                 messages = [
                     {
@@ -294,11 +345,11 @@ class OrchestrationService:
                     )
                 response = await self.models.execute_local(
                     operation="casual_chat",
-                    system_prompt=CASUAL_CHAT_SYSTEM_PROMPT,
+                    system_prompt=system_prompt,
                     user_prompt=prompt,
                     conversation_messages=messages,
                     temperature=0.1,
-                    max_output_tokens=500,
+                    max_output_tokens=chat_max_tokens,
                     timeout_seconds=local_timeout,
                 )
                 response_text = response.raw_text
@@ -311,18 +362,28 @@ class OrchestrationService:
                             provider="gemini",
                             model=gemini_model,
                             operation="casual_chat",
-                            system_prompt=CASUAL_CHAT_SYSTEM_PROMPT,
+                            system_prompt=system_prompt,
                             user_prompt=prompt,
                             conversation_messages=messages,
                             temperature=0.2,
-                            max_output_tokens=500,
-                            timeout_seconds=12.0,
+                            max_output_tokens=chat_max_tokens,
+                            timeout_seconds=chat_timeout,
                         )
                         response_text = gemini_res.raw_text
                     except Exception as gemini_err:
                         response_text = f"Erro no fallback externo (Gemini): {gemini_err}"
                 else:
                     response_text = f"Erro no modelo local: {model_error}. O fallback para fornecedores externos está desativado por política de privacidade."
+
+        # Fiscalização da Verdade de Execução: proibir afirmações de que código foi alterado sem ferramentas/evidências
+        from security.delivery_governance.decision_model import ExecutionTruthEnforcer, ExecutionTruthState
+        _, response_text = ExecutionTruthEnforcer.audit_response_truth(
+            response_text,
+            tools_called_count=0,
+            files_modified_count=0,
+            execution_state=ExecutionTruthState.REQUEST_RECEIVED,
+        )
+
         if self.bridge and hasattr(self.bridge, "broadcast_chat"):
             await self.bridge.broadcast_chat(
                 "JARVIS",
@@ -386,7 +447,7 @@ class OrchestrationService:
                 prompt_length=len(prompt),
             )
             if intent == "CHAT":
-                await self.run_casual_chat(prompt, correlation_id=correlation_id)
+                await self.run_casual_chat(prompt, project_id=project_id, correlation_id=correlation_id)
                 await self.callbacks.broadcast_state("idle")
                 return
 

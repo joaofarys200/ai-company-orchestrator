@@ -1,0 +1,36 @@
+{
+  "col_45c2a9e9": {
+    "collection_id": "col_45c2a9e9",
+    "name": "gestao",
+    "subject": "gestao",
+    "document_ids": [
+      "doc_vid_37691f97c10b",
+      "doc_vid_3e591d4e4540",
+      "doc_vid_2f962e0f2158",
+      "doc_vid_3835adeef512",
+      "doc_vid_2cc2c43e640b",
+      "doc_vid_62bacbb12475",
+      "doc_vid_91c228841b4b",
+      "doc_vid_98aff7821f20",
+      "doc_c6fff1a2ca5a"
+    ],
+    "created_at": "2026-10-21T22:55:43.246437",
+    "linked_folders": [
+      {
+        "folder_path": "C:\\Users\\joaor\\Desktop\\mestrado 2 ano\\gestao\\videos",
+        "sync_enabled": true,
+        "recursive": true,
+        "last_synced_at": "2026-11-04T23:42:43.454679",
+        "file_count": 9,
+        "status": "IDLE",
+        "error": null,
+        "registered_at": "2026-10-21T22:55:53.895538",
+        "unsupported_count": 0
+      }
+    ],
+    "sync_preferences": {
+      "auto_sync": true,
+      "recursive": true
+    }
+  }
+}

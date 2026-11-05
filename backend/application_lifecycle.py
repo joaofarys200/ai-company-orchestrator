@@ -22,6 +22,19 @@ class ApplicationLifecycle:
         self.initialize_voice()
         self.frontend_handle = self.start_frontend()
         self.services.sandbox.start_docker_sandbox()
+
+        # Phase 25: Discover and reconcile interrupted missions on application startup
+        try:
+            from agents.mission_recovery import MissionRecoveryEngine
+            recovery_engine = MissionRecoveryEngine(workspace_root=".")
+            missions = recovery_engine.discover_all_missions()
+            for project_id, mission_id in missions:
+                assessment = recovery_engine.assess_mission(project_id, mission_id)
+                if assessment.classification.value == "REQUIRES_RECONCILIATION":
+                    recovery_engine.reconcile_mission(project_id, mission_id)
+        except Exception:
+            pass
+
         self.started = True
 
     def shutdown(self) -> None:

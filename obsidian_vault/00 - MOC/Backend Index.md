@@ -27,6 +27,8 @@ Este MOC organiza o conhecimento sobre persistência, motores de dados, controle
 
 ## 🗄️ Persistence & Storage Engines
 - [[SQLite WAL Mode and Concurrency]] — Write-Ahead Logging, leitores não-bloqueantes e checkpoints.
+- [[LSM-Trees vs B-Trees - Write Amplification, Compaction and Read Paths]] — Conjetura RUM, amplificação de escrita, SSTables, compactação Leveled vs STCS e Bloom Filters.
+- [[Cache Consistency Patterns, Stampede Mitigation and Probabilistic Early Expiration]] — Cache-Aside, Singleflight request coalescing e expiração probabilística antecipada (XFetch).
 - [[Database Isolation Levels and Phantom Reads in SQLite and Postgres]] — Fenômenos ANSI SQL e Snapshot Isolation no WAL.
 - [[Comparison - SQLite WAL vs Client-Server PostgreSQL]] — Comparativo entre banco in-process e servidor cliente-servidor.
 - [[Database Crash Consistency and Recovery]] — Propriedades ACID, chamadas `fsync` e integridade pós-falha.
@@ -48,6 +50,7 @@ Este MOC organiza o conhecimento sobre persistência, motores de dados, controle
 - [[Message Queues and Event-Driven Architectures]] — Desacoplamento temporal, pub/sub e buffers de tarefas.
 
 ## 🌐 Distributed Systems, Consensus & Sharding
+- [[Backpressure, Load Shedding and Little's Law in Async Pipelines]] — Lei de Little ($L = \lambda W$), fórmula de Kingman, filas delimitadas com deadline e descarte seletivo de carga.
 - [[Consensus and Raft Protocol]] — Eleição de líderes e replicação de logs baseada em quorum majoritário.
 - [[Raft Joint Consensus and Dynamic Membership Changes]] — Transição segura de configurações de cluster via consensos conjuntos.
 - [[Database Sharding and Consistent Hashing Rings]] — Particionamento horizontal de dados e anéis de hash consistentes.

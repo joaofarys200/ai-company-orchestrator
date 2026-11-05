@@ -35,6 +35,11 @@ from security.permission_gateway.models import (
     RollbackRecord,
 )
 from security.permission_gateway.policy_engine import PermissionPolicyEngine, PolicyDecision
+from security.permission_gateway.project_dependency_manager import (
+    InstallationResult,
+    ProjectDependencyManager,
+    ProjectEnvironmentInfo,
+)
 from security.permission_gateway.supply_chain import SupplyChainValidator
 
 __all__ = [
@@ -49,6 +54,7 @@ __all__ = [
     "DependencyRequirement",
     "DependencyResolutionReport",
     "FallbackCriteriaViolationError",
+    "InstallationResult",
     "InvalidApprovalStateError",
     "PermissionBlockedByPolicyError",
     "PermissionExpiredError",
@@ -60,6 +66,9 @@ __all__ = [
     "PermissionRequestStatus",
     "PermissionRiskLevel",
     "PolicyDecision",
+    "ProjectDependencyManager",
+    "ProjectEnvironmentInfo",
+
     "RollbackRecord",
     "SilentDowngradePreventedError",
     "SupplyChainValidator",

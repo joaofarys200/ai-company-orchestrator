@@ -2315,7 +2315,16 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
             
             result_str = ""
             try:
-                if tool_name == "execute_command":
+                if tool_name == "diagnosticar_causa_raiz":
+                    sym = tool_input.get("symptom", prompt_text)
+                    sub = tool_input.get("subsystem", "workspace")
+                    tb = tool_input.get("error_traceback", "")
+                    result_str = await ag_tools.run_causal_diagnosis(sym, subsystem=sub, error_traceback=tb)
+                elif tool_name == "verificar_evidencias_entrega":
+                    claim = tool_input.get("claim_description", prompt_text)
+                    ev_p = tool_input.get("evidence_path", "")
+                    result_str = await ag_tools.run_verify_evidence(claim, evidence_path=ev_p)
+                elif tool_name == "execute_command":
                     cmd = tool_input.get("command")
                     result_str = await ag_tools.run_local_command(cmd)
                 elif tool_name == "chamar_swarm_dominio":

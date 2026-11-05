@@ -23,7 +23,8 @@ import type {
   SummaryMode,
   StudyQuiz,
   QuizEvaluationResult,
-  CornellNotesData
+  CornellNotesData,
+  StudyCollection,
 } from './types';
 
 export type StudyTab =
@@ -67,7 +68,9 @@ interface StudyContainerProps {
   onExplainMedia?: (mediaId: string, docId?: string) => Promise<string>;
   onAskPaper?: (query: string, docId?: string) => Promise<{ answer: string; sources: string[] }>;
   onGetDocumentFile?: (docId: string) => Promise<{ contentBase64?: string; filename?: string; error?: string }>;
-  onGenerateSummary?: (documentId: string, mode: SummaryMode) => Promise<string>;
+  onGenerateSummary?: (documentId: string, mode: SummaryMode, forceRegenerate?: boolean) => Promise<any>;
+  onCancelGeneration?: (documentId: string) => void;
+  pipelineStage?: string;
   onSynthesizeDocuments?: (documentIds: string[]) => Promise<{
     common_points: string[];
     differences: string[];
@@ -97,6 +100,14 @@ interface StudyContainerProps {
   onSaveNoteToObsidian?: (filename: string, content: string) => void;
   onRefreshDocuments?: () => void;
   onDeleteDocument?: (docId: string) => Promise<boolean> | void;
+  collections?: StudyCollection[];
+  onRefreshCollections?: () => void;
+  onCreateCollection?: (name: string, subject?: string) => Promise<any> | void;
+  onLinkFolder?: (collectionId: string, folderPath: string, syncEnabled?: boolean, recursive?: boolean) => Promise<any>;
+  onUnlinkFolder?: (collectionId: string, folderPath: string, removeMaterials?: boolean) => Promise<any>;
+  onSyncFolder?: (collectionId: string, folderPath?: string) => Promise<any>;
+  onAskCourse?: (collectionId: string, question: string) => Promise<{ answer: string; citations: string[]; sources: string[] }>;
+  onRetryDocument?: (documentId: string) => Promise<any>;
 }
 
 export const StudyContainer: React.FC<StudyContainerProps> = ({
@@ -115,6 +126,8 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   onExplainMedia,
   onAskPaper,
   onGenerateSummary,
+  onCancelGeneration,
+  pipelineStage,
   onSynthesizeDocuments,
   onSaveToVault,
   onGenerateQuiz,
@@ -128,6 +141,14 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   onRefreshDocuments,
   onGetDocumentFile,
   onDeleteDocument,
+  collections = [],
+  onRefreshCollections,
+  onCreateCollection,
+  onLinkFolder,
+  onUnlinkFolder,
+  onSyncFolder,
+  onAskCourse,
+  onRetryDocument,
 }) => {
   // Navigation
   const [activeTab, setActiveTab] = useState<StudyTab>('library');
@@ -409,6 +430,14 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             onStopRecording={onStopRecording}
             onRefresh={onRefreshDocuments}
             onDeleteDocument={handleDeleteDocument}
+            collections={collections}
+            onRefreshCollections={onRefreshCollections}
+            onCreateCollection={onCreateCollection}
+            onLinkFolder={onLinkFolder}
+            onUnlinkFolder={onUnlinkFolder}
+            onSyncFolder={onSyncFolder}
+            onAskCourse={onAskCourse}
+            onRetryDocument={onRetryDocument}
           />
         )}
 
@@ -465,6 +494,8 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             document={activeDocument}
             allDocuments={documents}
             onGenerateSummary={onGenerateSummary}
+            onCancelGeneration={onCancelGeneration}
+            pipelineStage={pipelineStage}
             onSynthesizeDocuments={onSynthesizeDocuments}
           />
         )}

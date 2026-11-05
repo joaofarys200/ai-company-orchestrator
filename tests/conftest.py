@@ -7,6 +7,8 @@ possuam stubs para permitir a execução de testes unitários e de governança.
 import sys
 from unittest.mock import MagicMock
 
+import importlib
+
 for mod in [
     "jsonschema",
     "jsonschema.validators",
@@ -22,4 +24,7 @@ for mod in [
     "PIL.Image",
 ]:
     if mod not in sys.modules:
-        sys.modules[mod] = MagicMock()
+        try:
+            importlib.import_module(mod)
+        except ImportError:
+            sys.modules[mod] = MagicMock()

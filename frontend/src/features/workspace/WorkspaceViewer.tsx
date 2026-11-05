@@ -278,6 +278,19 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     askStudyPaper,
     getStudyDocumentFile,
     generateStudyCornell,
+    generateStudySummary,
+    synthesizeStudyDocuments,
+    saveToStudyVault,
+    studyCollections,
+    listStudyCollections,
+    createStudyCollection,
+    linkStudyFolder,
+    unlinkStudyFolder,
+    syncStudyFolder,
+    askStudyCourse,
+    retryStudyDocument,
+    cancelStudyGeneration,
+    studyPipelineStage,
     sendDirective,
     setChatPanelOpen,
   } = useWebSocket();
@@ -2091,10 +2104,19 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 onSubmitQuiz={submitStudyQuiz}
                 onSearchRag={async (query, docId) => searchStudyRag(query, docId)}
                 onReadNote={readNote}
-                onGenerateSummary={async () => {
-                  listStudyDocuments();
-                  return '';
-                }}
+                onGenerateSummary={(docId, mode, forceRegenerate) => generateStudySummary(docId, mode, Boolean(forceRegenerate))}
+                onSynthesizeDocuments={synthesizeStudyDocuments}
+                onSaveToVault={saveToStudyVault}
+                collections={studyCollections}
+                onRefreshCollections={listStudyCollections}
+                onCreateCollection={createStudyCollection}
+                onLinkFolder={linkStudyFolder}
+                onUnlinkFolder={unlinkStudyFolder}
+                onSyncFolder={syncStudyFolder}
+                onAskCourse={askStudyCourse}
+                onRetryDocument={retryStudyDocument}
+                onCancelGeneration={cancelStudyGeneration}
+                pipelineStage={studyPipelineStage}
               />
             </ViewFrame>
           )}

@@ -1,0 +1,89 @@
+{
+  "validation_id": "empirical_validation_phase_76",
+  "timestamp": 1792707315.1681135,
+  "status": "VALIDATION_PASSED",
+  "target_metric": "macro_migration_duration",
+  "baseline_estimator": "step_count * 25.0 + component_count * 10.0",
+  "sample_counts": {
+    "total_observations": 10,
+    "train_set_size": 7,
+    "holdout_test_set_size": 3
+  },
+  "baseline_error_on_all": {
+    "sample_count": 10,
+    "signed_bias": -38.375,
+    "mean_absolute_error": 38.375,
+    "root_mean_squared_error": 40.7515,
+    "mean_percentage_error": 26.3,
+    "brier_score": null,
+    "overestimation_count": 0,
+    "underestimation_count": 10,
+    "exact_count": 0
+  },
+  "holdout_comparison": {
+    "baseline_holdout_mae": 46.0,
+    "calibrated_holdout_mae": 32.4293,
+    "mae_reduction_percentage": 29.5,
+    "baseline_holdout_bias": -46.0,
+    "calibrated_holdout_bias": 32.4293,
+    "promotion_criteria_met": true
+  },
+  "calibrated_version_details": {
+    "version_id": "cal_macro_dur_v1.0.0",
+    "prediction_type": "CONTINUOUS_DURATION",
+    "target_metric": "macro_migration_duration",
+    "state": "PROMOTED",
+    "parameters": {
+      "scale_alpha": 1.4001,
+      "offset_beta": 27.75,
+      "variance_sigma": 31.8709,
+      "sample_count": 7,
+      "min_samples": 6
+    },
+    "train_metrics": {
+      "sample_count": 7,
+      "signed_bias": -35.1071,
+      "mean_absolute_error": 35.1071,
+      "root_mean_squared_error": 37.7609,
+      "mean_percentage_error": 26.22,
+      "brier_score": null,
+      "overestimation_count": 0,
+      "underestimation_count": 7,
+      "exact_count": 0
+    },
+    "holdout_metrics": {
+      "sample_count": 3,
+      "signed_bias": 32.4293,
+      "mean_absolute_error": 32.4293,
+      "root_mean_squared_error": 32.4821,
+      "mean_percentage_error": 19.49,
+      "brier_score": null,
+      "overestimation_count": 3,
+      "underestimation_count": 0,
+      "exact_count": 0
+    },
+    "parent_version": null,
+    "created_at": 1792707315.1564534,
+    "promoted_at": 1792707315.156483,
+    "description": "Affine scaling model calibrated for multi-component locking overhead"
+  },
+  "consumer_adapter_integration": {
+    "consumer": "Phase73MacroRefactoringAdapter",
+    "test_query": {
+      "steps": 4,
+      "components": 3
+    },
+    "raw_baseline_result": 130.0,
+    "calibrated_result": 209.76,
+    "prediction_interval": [
+      147.3,
+      272.23
+    ]
+  },
+  "drift_detection": {
+    "drift_detected": true,
+    "severity": "CRITICAL",
+    "drift_ratio": 2.159,
+    "automatic_suspension_triggered": true
+  }
+}

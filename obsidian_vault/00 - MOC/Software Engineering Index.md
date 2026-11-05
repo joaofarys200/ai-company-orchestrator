@@ -25,6 +25,8 @@ Este MOC organiza os padrões fundamentais de engenharia de software, técnicas 
 
 ## 🏛️ Architecture, Formal Methods & Topologies
 - [[Clean Architecture and Hexagonal Ports]] — Separação estrita do domínio de negócio de adaptadores de I/O externos.
+- [[API Contract Evolution, Backward Compatibility and Schema Versioning]] — Compatibilidade *backward/forward*, padrão Expand-and-Contract e evolução segura de protocolos REST/WebSocket.
+- [[Python Asyncio Event Loop Internals, Backpressure and Thread Offloading]] — Event loop cooperativo, `TaskGroup`, `asyncio.to_thread` e prevenção de bloqueio de WebSockets.
 - [[Domain-Driven Design Tactical Patterns]] — Entidades, Agregados, Value Objects e Repositórios.
 - [[SOLID Principles and Clean Code Metrics]] — Princípios SOLID e cálculo de Complexidade Ciclomática de McCabe.
 - [[TLA+ Formal Verification for Mission State Invariants]] — Model checking com TLC para máquinas de estados sem deadlocks.
@@ -53,6 +55,7 @@ Este MOC organiza os padrões fundamentais de engenharia de software, técnicas 
 
 ## 🧪 Testing & Validation
 - [[Unit Tests vs End-to-End Tests in Agent Validation]] — Pirâmide de testes para validação rápida de agentes autónomos.
+- [[Property-Based Testing, Metamorphic Relations and Fuzzing]] — Invariantes algébricas com Hypothesis/shrinking, relações metamórficas sem oráculo e fuzzing guiado por cobertura.
 
 ## 🩹 Patching & Refactoring
 - [[Patch Generation and Safe Application]] — Aplicação atómica de diffs unificados e substituição de blocos com âncoras.

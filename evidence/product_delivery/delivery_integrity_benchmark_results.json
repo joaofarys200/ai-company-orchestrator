@@ -1,0 +1,80 @@
+[
+  {
+    "project_id": "dina",
+    "architecture": "Vanilla JS + Express REST API (Dina Canonical)",
+    "expected_version": "2936de85820896e2",
+    "served_version": "2a1b1ffa3d6b6663",
+    "runtime_status": "RUNNING",
+    "served_assets_sha256": [
+      "cb9cbbecd7e3ecd8",
+      "ec3d4a39b96e82dd"
+    ],
+    "contract_status": "VALIDATED",
+    "browser_interactions": [],
+    "browser_errors": [],
+    "visual_evidence_screenshots": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\evidence\\product_delivery\\bench_dina_01_before_interaction.png",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\evidence\\product_delivery\\bench_dina_02_after_interaction.png"
+    ],
+    "regressions_found": [],
+    "final_acceptance_level": "PRODUCT_ACCEPTED",
+    "validation_flags": {
+      "RUNTIME_VERSION_VERIFIED": true,
+      "API_FRONTEND_CONTRACT_VERIFIED": true,
+      "REAL_BROWSER_FUNCTIONALITY_VERIFIED": true,
+      "PRODUCT_ACCEPTANCE_GATE_ENFORCED": true
+    }
+  },
+  {
+    "project_id": "synthetic_react_spa",
+    "architecture": "Vite / React SPA Architecture (Ops Monitor)",
+    "expected_version": "ea4fdeeb96343704",
+    "served_version": "711b9480fb45d1f5",
+    "runtime_status": "RUNNING",
+    "served_assets_sha256": [
+      "770bfb07f93385d8",
+      "69713ed12cc8c69b"
+    ],
+    "contract_status": "VALIDATED",
+    "browser_interactions": [],
+    "browser_errors": [],
+    "visual_evidence_screenshots": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\evidence\\product_delivery\\bench_synthetic_react_spa_01_before_interaction.png",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\evidence\\product_delivery\\bench_synthetic_react_spa_02_after_interaction.png"
+    ],
+    "regressions_found": [],
+    "final_acceptance_level": "PRODUCT_ACCEPTED",
+    "validation_flags": {
+      "RUNTIME_VERSION_VERIFIED": true,
+      "API_FRONTEND_CONTRACT_VERIFIED": true,
+      "REAL_BROWSER_FUNCTIONALITY_VERIFIED": true,
+      "PRODUCT_ACCEPTANCE_GATE_ENFORCED": true
+    }
+  },
+  {
+    "project_id": "synthetic_express_ledger",
+    "architecture": "Fullstack Express API + Dynamic HTML5 (Enterprise Audit Ledger)",
+    "expected_version": "5b439ca7c7f45473",
+    "served_version": "bd4ff69f6ec7031f",
+    "runtime_status": "RUNNING",
+    "served_assets_sha256": [
+      "cd5f140596f1064a",
+      "cc01b582e0514b30"
+    ],
+    "contract_status": "VALIDATED",
+    "browser_interactions": [],
+    "browser_errors": [],
+    "visual_evidence_screenshots": [
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\evidence\\product_delivery\\bench_synthetic_express_ledger_01_before_interaction.png",
+      "C:\\Users\\joaor\\Desktop\\JarvisOS\\evidence\\product_delivery\\bench_synthetic_express_ledger_02_after_interaction.png"
+    ],
+    "regressions_found": [],
+    "final_acceptance_level": "PRODUCT_ACCEPTED",
+    "validation_flags": {
+      "RUNTIME_VERSION_VERIFIED": true,
+      "API_FRONTEND_CONTRACT_VERIFIED": true,
+      "REAL_BROWSER_FUNCTIONALITY_VERIFIED": true,
+      "PRODUCT_ACCEPTANCE_GATE_ENFORCED": true
+    }
+  }
+]

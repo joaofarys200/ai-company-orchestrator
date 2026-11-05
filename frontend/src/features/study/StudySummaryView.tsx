@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   FileText,
   Sparkles,
@@ -9,50 +9,280 @@ import {
   HelpCircle,
   Share2,
   RefreshCw,
-  BookOpen
+  BookOpen,
+  Loader2,
 } from 'lucide-react';
 import type {
   StudyDocument,
   SummaryMode,
-  EvidenceStatus
+  EvidenceStatus,
+  StudySectionSummaryItem,
+  StudyDetailedSummaryItem,
+  StudyExamSummary,
+  StudyGenerationTelemetry,
+  MultiDocSynthesisResult,
 } from './types';
 
 interface StudySummaryViewProps {
   document: StudyDocument | null;
   allDocuments?: StudyDocument[];
-  onGenerateSummary?: (documentId: string, mode: SummaryMode) => Promise<string>;
-  onSynthesizeDocuments?: (documentIds: string[]) => Promise<{
-    common_points: string[];
-    differences: string[];
-    shared_concepts: string[];
-    contradictions: string[];
-    idea_evolution: string[];
-  }>;
+  onGenerateSummary?: (
+    documentId: string,
+    mode: SummaryMode,
+    forceRegenerate?: boolean
+  ) => Promise<any>;
+  onCancelGeneration?: (documentId: string) => void;
+  onSynthesizeDocuments?: (documentIds: string[]) => Promise<MultiDocSynthesisResult>;
+  pipelineStage?: string;
+}
+
+const LEGACY_PREFAB_SNIPPETS = [
+  'estabelecer coordenação robusta e semântica de materiais de estudo',
+  'o jarvis assiste contextualmente sem traduzir indiscriminadamente',
+  'scoring real de quiz',
+  'transcrição de teste: durante a aula foram abordados os conceitos fundamentais',
+  'o artigo aborda otimização e precisão em cenários de alta complexidade',
+];
+
+function containsPrefabText(text: string): boolean {
+  const lower = (text || '').toLowerCase();
+  return LEGACY_PREFAB_SNIPPETS.some((marker) => lower.includes(marker));
+}
+
+function normalizeQuickSummary(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    .map((s) => s.trim())
+    .filter((s) => !containsPrefabText(s));
+}
+
+function normalizeStudySummary(raw: unknown): StudySectionSummaryItem[] {
+  if (!Array.isArray(raw)) return [];
+  const items: StudySectionSummaryItem[] = [];
+  for (let i = 0; i < raw.length; i++) {
+    const entry = raw[i];
+    if (entry && typeof entry === 'object') {
+      const rec = entry as Record<string, unknown>;
+      const summary = typeof rec.summary === 'string' ? rec.summary.trim() : '';
+      const title = typeof rec.title === 'string' && rec.title.trim() ? rec.title.trim() : `Secção ${i + 1}`;
+      if (!summary || containsPrefabText(summary)) continue;
+      items.push({
+        section_id: typeof rec.section_id === 'string' ? rec.section_id : `sec_${i}`,
+        title,
+        page_ref: typeof rec.page_ref === 'string' ? rec.page_ref : undefined,
+        summary,
+        key_concepts: Array.isArray(rec.key_concepts)
+          ? rec.key_concepts.filter((c): c is string => typeof c === 'string' && c.trim().length > 0)
+          : [],
+        source_refs: Array.isArray(rec.source_refs)
+          ? rec.source_refs.filter((r): r is string => typeof r === 'string' && r.trim().length > 0)
+          : [],
+      });
+    }
+  }
+  return items;
+}
+
+function normalizeDetailedSummary(raw: unknown): StudyDetailedSummaryItem[] {
+  if (Array.isArray(raw)) {
+    const out: StudyDetailedSummaryItem[] = [];
+    for (let i = 0; i < raw.length; i++) {
+      const entry = raw[i];
+      if (typeof entry === 'string' && entry.trim() && !containsPrefabText(entry)) {
+        out.push({ title: `Análise Aprofundada ${i + 1}`, text: entry.trim() });
+      } else if (entry && typeof entry === 'object') {
+        const rec = entry as Record<string, unknown>;
+        const text = typeof rec.text === 'string' ? rec.text.trim() : '';
+        const title =
+          typeof rec.title === 'string' && rec.title.trim()
+            ? rec.title.trim()
+            : `Análise Aprofundada ${i + 1}`;
+        const source_refs = Array.isArray(rec.source_refs)
+          ? rec.source_refs.filter((r): r is string => typeof r === 'string' && r.trim().length > 0)
+          : [];
+        if (text && !containsPrefabText(text)) {
+          out.push({ title, text, source_refs });
+        }
+      }
+    }
+    return out;
+  }
+  if (typeof raw === 'string' && raw.trim() && !containsPrefabText(raw)) {
+    const blocks = raw
+      .split(/\n{2,}/)
+      .map((b) => b.trim())
+      .filter(Boolean);
+    return blocks.map((block, idx) => ({
+      title: blocks.length === 1 ? 'Síntese Metodológica e Analítica' : `Tópico Aprofundado ${idx + 1}`,
+      text: block,
+    }));
+  }
+  return [];
+}
+
+function normalizeExamSummary(raw: unknown): StudyExamSummary {
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    const rec = raw as Record<string, unknown>;
+    const rawConcepts = Array.isArray(rec.high_yield_concepts) ? rec.high_yield_concepts : [];
+    const rawQuestions = Array.isArray(rec.likely_questions) ? rec.likely_questions : [];
+
+    const high_yield_concepts = rawConcepts
+      .map((item) => {
+        if (typeof item === 'string' && item.trim()) {
+          const [head, ...rest] = item.split(':');
+          return {
+            concept: head.trim(),
+            detail: rest.join(':').trim() || item.trim(),
+          };
+        }
+        if (item && typeof item === 'object') {
+          const cRec = item as Record<string, unknown>;
+          const concept = typeof cRec.concept === 'string' ? cRec.concept.trim() : '';
+          const detail = typeof cRec.detail === 'string' ? cRec.detail.trim() : '';
+          const source_refs = Array.isArray(cRec.source_refs)
+            ? cRec.source_refs.filter((r): r is string => typeof r === 'string' && r.trim().length > 0)
+            : [];
+          if (concept && detail && !containsPrefabText(detail)) {
+            return { concept, detail, source_refs };
+          }
+        }
+        return null;
+      })
+      .filter((x): x is { concept: string; detail: string; source_refs?: string[] } => x !== null);
+
+    const likely_questions = rawQuestions
+      .map((item) => {
+        if (typeof item === 'string' && item.trim()) {
+          return { question: item.trim(), answer: '' };
+        }
+        if (item && typeof item === 'object') {
+          const qRec = item as Record<string, unknown>;
+          const question = typeof qRec.question === 'string' ? qRec.question.trim() : '';
+          const answer =
+            typeof qRec.answer === 'string' && qRec.answer.trim()
+              ? qRec.answer.trim()
+              : typeof qRec.answer_guide === 'string'
+                ? qRec.answer_guide.trim()
+                : '';
+          const source_refs = Array.isArray(qRec.source_refs)
+            ? qRec.source_refs.filter((r): r is string => typeof r === 'string' && r.trim().length > 0)
+            : [];
+          if (question && !containsPrefabText(question)) {
+            return { question, answer, source_refs };
+          }
+        }
+        return null;
+      })
+      .filter((x): x is { question: string; answer: string; source_refs?: string[] } => x !== null);
+
+    return { high_yield_concepts, likely_questions };
+  }
+
+  if (Array.isArray(raw)) {
+    const high_yield_concepts: Array<{ concept: string; detail: string }> = [];
+    const likely_questions: Array<{ question: string; answer: string }> = [];
+    for (const item of raw) {
+      if (typeof item !== 'string' || !item.trim() || containsPrefabText(item)) continue;
+      const trimmed = item.trim();
+      if (trimmed.includes('?')) {
+        likely_questions.push({ question: trimmed, answer: '' });
+      } else {
+        const [head, ...rest] = trimmed.split(':');
+        high_yield_concepts.push({
+          concept: rest.length > 0 ? head.trim() : 'Ponto-Chave de Exame',
+          detail: rest.length > 0 ? rest.join(':').trim() : trimmed,
+        });
+      }
+    }
+    return { high_yield_concepts, likely_questions };
+  }
+
+  return { high_yield_concepts: [], likely_questions: [] };
 }
 
 export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
   document,
   allDocuments = [],
   onGenerateSummary,
+  onCancelGeneration,
   onSynthesizeDocuments,
+  pipelineStage,
 }) => {
   const [selectedMode, setSelectedMode] = useState<SummaryMode>('Study');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'summary' | 'argument_map' | 'multi_doc'>('summary');
+
+  const autoHydratedDocsRef = useRef<Set<string>>(new Set());
 
   // Multi-doc selection
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>(
     document ? [document.document_id] : []
   );
-  const [multiDocResult, setMultiDocResult] = useState<{
-    common_points: string[];
-    differences: string[];
-    shared_concepts: string[];
-    contradictions: string[];
-    idea_evolution: string[];
-  } | null>(null);
+  const [multiDocResult, setMultiDocResult] = useState<MultiDocSynthesisResult | null>(null);
 
-  // Evidence status badge helper
+  useEffect(() => {
+    if (document?.document_id) {
+      setSelectedDocIds((prev) =>
+        prev.length <= 1 ? [document.document_id] : prev
+      );
+      setErrorMessage(null);
+    }
+  }, [document?.document_id]);
+
+  const normalizedSummaries = useMemo(() => {
+    const rawSummaries = ((document?.metadata as Record<string, unknown> | undefined)?.summaries ||
+      {}) as Record<string, unknown>;
+    const rawQuickRefs = Array.isArray(rawSummaries.quick_refs)
+      ? rawSummaries.quick_refs.map((r) => (Array.isArray(r) ? r.filter((x): x is string => typeof x === 'string') : []))
+      : [];
+    return {
+      quick: normalizeQuickSummary(rawSummaries.quick),
+      quick_refs: rawQuickRefs,
+      study: normalizeStudySummary(rawSummaries.study),
+      detailed: normalizeDetailedSummary(rawSummaries.detailed),
+      exam: normalizeExamSummary(rawSummaries.exam),
+    };
+  }, [document?.metadata]);
+
+  const hasCompleteSummaries =
+    normalizedSummaries.quick.length > 0 &&
+    normalizedSummaries.study.length > 0 &&
+    normalizedSummaries.detailed.length > 0 &&
+    (normalizedSummaries.exam.high_yield_concepts.length > 0 ||
+      normalizedSummaries.exam.likely_questions.length > 0);
+
+  // Auto-generate grounded summaries once per document if missing or legacy/incomplete
+  useEffect(() => {
+    if (!document || !onGenerateSummary || isGenerating) return;
+    if (hasCompleteSummaries) return;
+    if (autoHydratedDocsRef.current.has(document.document_id)) return;
+
+    autoHydratedDocsRef.current.add(document.document_id);
+    let cancelled = false;
+
+    (async () => {
+      setIsGenerating(true);
+      setErrorMessage(null);
+      try {
+        await onGenerateSummary(document.document_id, selectedMode, true);
+      } catch (err: any) {
+        if (!cancelled) {
+          setErrorMessage(err?.message || 'Não foi possível sintetizar o resumo deste material.');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsGenerating(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [document?.document_id, hasCompleteSummaries, onGenerateSummary, selectedMode, isGenerating]);
+
   const renderStatusBadge = (status: EvidenceStatus) => {
     switch (status) {
       case 'OBSERVED':
@@ -77,44 +307,57 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
     }
   };
 
-  const handleModeChange = async (mode: SummaryMode) => {
+  const handleSelectMode = async (mode: SummaryMode) => {
     setSelectedMode(mode);
-    if (document && onGenerateSummary) {
+    setErrorMessage(null);
+    if (!document || !onGenerateSummary) return;
+
+    const modeMissing =
+      (mode === 'Quick' && normalizedSummaries.quick.length === 0) ||
+      (mode === 'Study' && normalizedSummaries.study.length === 0) ||
+      (mode === 'Detailed' && normalizedSummaries.detailed.length === 0) ||
+      (mode === 'Exam' &&
+        normalizedSummaries.exam.high_yield_concepts.length === 0 &&
+        normalizedSummaries.exam.likely_questions.length === 0);
+
+    if (modeMissing && !isGenerating) {
       setIsGenerating(true);
       try {
-        await onGenerateSummary(document.document_id, mode);
+        await onGenerateSummary(document.document_id, mode, true);
+      } catch (err: any) {
+        setErrorMessage(err?.message || 'Erro ao gerar resumo.');
       } finally {
         setIsGenerating(false);
       }
     }
   };
 
+  const handleForceRegenerate = async () => {
+    if (!document || !onGenerateSummary || isGenerating) return;
+    setIsGenerating(true);
+    setErrorMessage(null);
+    try {
+      await onGenerateSummary(document.document_id, selectedMode, true);
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Erro ao regenerar resumo.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleSynthesize = async () => {
     if (selectedDocIds.length < 2) return;
+    if (!onSynthesizeDocuments) {
+      setErrorMessage('Serviço de síntese multi-documento indisponível.');
+      return;
+    }
     setIsGenerating(true);
+    setErrorMessage(null);
     try {
-      if (onSynthesizeDocuments) {
-        const res = await onSynthesizeDocuments(selectedDocIds);
-        setMultiDocResult(res);
-      } else {
-        setMultiDocResult({
-          common_points: [
-            'Todos os materiais adotam abordagens orientadas a grafos para representação de conhecimento.',
-            'Concordância na necessidade de avaliação contínua e mitigação de alucinação.',
-          ],
-          differences: [
-            'O artigo A foca em representações latentes densas, enquanto o artigo B propõe extração simbólica explícita.',
-            'O conjunto de dados de teste difere em escala e latência de inferência.',
-          ],
-          shared_concepts: ['RAG Híbrido', 'BM25', 'Embeddings Vetoriais', 'Graph RAG'],
-          contradictions: [
-            'Divergência quanto ao limiar ideal de reranking (0.75 vs 0.60 no baseline).',
-          ],
-          idea_evolution: [
-            'Evolução de pesquisa isolada por palavras-chave para grafos de contexto dinâmicos com Wikilinks.',
-          ],
-        });
-      }
+      const res = await onSynthesizeDocuments(selectedDocIds);
+      setMultiDocResult(res);
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Erro ao sintetizar múltiplos materiais.');
     } finally {
       setIsGenerating(false);
     }
@@ -128,13 +371,66 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
         </div>
         <h3 className="text-sm font-semibold text-white">Nenhum documento selecionado</h3>
         <p className="mt-1 max-w-sm text-xs text-gray-400">
-          Acede à Biblioteca e seleciona um artigo ou gravação para gerar resumos e mapas de argumento.
+          Acede à Biblioteca e seleciona um artigo, apresentação, áudio ou vídeo para gerar resumos e mapas de argumentos fundamentados.
         </p>
       </div>
     );
   }
 
   const structure = document.structure;
+  const docMeta = (document.metadata || {}) as Record<string, unknown>;
+  const generationMode = String(docMeta.generation_mode || '');
+  const generationTelemetry = (docMeta.generation_telemetry || {}) as StudyGenerationTelemetry;
+  const unavailableFeatures = Array.isArray(docMeta.unavailable_generative_features)
+    ? (docMeta.unavailable_generative_features as string[])
+    : [];
+
+  const getGenerationModeBadge = (mode: string) => {
+    switch (mode) {
+      case 'LLM_GROUNDED':
+        return {
+          label: `IA Fundamentada • ${generationTelemetry.model || 'qwen3.5:9b'}`,
+          cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+        };
+      case 'PARTIAL':
+        return {
+          label: `Síntese Parcial • ${generationTelemetry.model || 'qwen3.5:9b'} + Extração`,
+          cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+        };
+      case 'EXTRACTIVE_GROUNDED':
+        return {
+          label: 'Extração Local sem Modelo',
+          cls: 'bg-amber-500/10 text-amber-200 border-amber-400/25',
+        };
+      case 'INSUFFICIENT_CONTENT':
+      case 'UNAVAILABLE':
+        return {
+          label: 'Falhou / Conteúdo Insuficiente',
+          cls: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+        };
+      default:
+        return null;
+    }
+  };
+
+  const modeBadge = getGenerationModeBadge(generationMode);
+
+  const renderSourceRefBadges = (refs?: string[]) => {
+    if (!refs || refs.length === 0) return null;
+    return (
+      <div className="flex flex-wrap items-center gap-1 pt-1">
+        {refs.slice(0, 3).map((ref, idx) => (
+          <span
+            key={idx}
+            className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono text-gray-400 border border-white/10"
+            title={`Evidência de origem: ${ref}`}
+          >
+            [{ref}]
+          </span>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="flex h-full flex-col bg-[#0d1217] text-gray-200 overflow-hidden">
@@ -145,11 +441,23 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
             <FileText className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-white truncate max-w-md">
-              {document.title}
-            </h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-sm font-semibold text-white truncate max-w-md">
+                {document.title}
+              </h2>
+              {modeBadge && (
+                <span className={`rounded px-2 py-0.5 text-[10px] font-mono border ${modeBadge.cls}`}>
+                  {modeBadge.label}
+                </span>
+              )}
+              {generationTelemetry?.tokens_per_sec ? (
+                <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono text-gray-400 border border-white/10">
+                  {generationTelemetry.tokens_per_sec.toFixed(1)} tok/s • {((generationTelemetry.total_ms || 0) / 1000).toFixed(1)}s
+                </span>
+              ) : null}
+            </div>
             <p className="text-[11px] text-gray-400">
-              Síntese Pedagógica & Mapeamento Epistemológico
+              Síntese Pedagógica & Mapeamento Epistemológico ({document.source_type})
             </p>
           </div>
         </div>
@@ -197,6 +505,21 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto p-6">
+        {errorMessage && (
+          <div className="max-w-4xl mx-auto mb-4 rounded-lg border border-rose-500/30 bg-rose-950/30 px-4 py-3 text-xs text-rose-200 flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-rose-400 shrink-0" />
+              <span>{errorMessage}</span>
+            </span>
+            <button
+              onClick={() => setErrorMessage(null)}
+              className="text-rose-300 hover:text-white ml-4"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* ============================================================ */}
         {/* TAB 1: SUMMARY MODES                                         */}
         {/* ============================================================ */}
@@ -207,7 +530,7 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
               {(['Quick', 'Study', 'Detailed', 'Exam'] as SummaryMode[]).map((mode) => (
                 <button
                   key={mode}
-                  onClick={() => handleModeChange(mode)}
+                  onClick={() => handleSelectMode(mode)}
                   className={`flex flex-col items-start p-3 rounded-lg border text-left transition ${
                     selectedMode === mode
                       ? 'border-cyan-400 bg-cyan-950/30 text-white shadow-sm'
@@ -221,8 +544,8 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
                     {mode === 'Exam' && '🎯 Exam Summary'}
                   </span>
                   <span className="text-[11px] text-gray-400">
-                    {mode === 'Quick' && '~5 pontos-chave essenciais'}
-                    {mode === 'Study' && 'Estrutura completa por secção'}
+                    {mode === 'Quick' && 'Pontos-chave essenciais'}
+                    {mode === 'Study' && 'Síntese estruturada por secção'}
                     {mode === 'Detailed' && 'Metodologia e evidências aprofundadas'}
                     {mode === 'Exam' && 'Conceitos high-yield e perguntas'}
                   </span>
@@ -232,162 +555,226 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
 
             {/* Render Summary Output */}
             <div className="rounded-xl border border-white/10 bg-[#121921] p-6 space-y-6">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <div>
                   <h3 className="text-base font-bold text-white">
-                    {selectedMode === 'Quick' && 'Sumário Rápido (5 Pontos de Retenção)'}
-                    {selectedMode === 'Study' && 'Estrutura Pedagógica de Estudo'}
+                    {selectedMode === 'Quick' && 'Sumário Rápido (Pontos de Retenção)'}
+                    {selectedMode === 'Study' && 'Síntese Pedagógica por Secção / Capítulo'}
                     {selectedMode === 'Detailed' && 'Síntese Aprofundada & Detalhe Metodológico'}
                     {selectedMode === 'Exam' && 'Sumário de Preparação para Exame (High-Yield)'}
                   </h3>
                   <p className="text-xs text-gray-400 mt-0.5">
-                    Gerado com fidelidade ao texto original de "{document.title}".
+                    Gerado exclusivamente a partir do conteúdo extraído de &ldquo;{document.title}&rdquo;.
                   </p>
                 </div>
-                <button
-                  onClick={() => handleModeChange(selectedMode)}
-                  disabled={isGenerating}
-                  className="flex items-center gap-1.5 rounded-md border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 hover:bg-cyan-400/20 disabled:opacity-50"
-                >
-                  <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
-                  <span>Atualizar</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  {isGenerating && onCancelGeneration && (
+                    <button
+                      onClick={() => {
+                        onCancelGeneration(document.document_id);
+                        setIsGenerating(false);
+                      }}
+                      className="flex items-center gap-1.5 rounded-md border border-rose-500/40 bg-rose-950/30 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-950/50"
+                    >
+                      <span>Cancelar Geração</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={handleForceRegenerate}
+                    disabled={isGenerating}
+                    className="flex items-center gap-1.5 rounded-md border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 hover:bg-cyan-400/20 disabled:opacity-50"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
+                    <span>{isGenerating ? 'A sintetizar...' : 'Regenerar Resumo'}</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Dynamic Summary Content based on Mode */}
-              {selectedMode === 'Quick' && (
-                <div className="space-y-3 text-sm">
-                  {(((document.metadata as any)?.summaries?.quick as string[]) || [
-                    'Objetivo Central: Estabelecer coordenação robusta e semântica de materiais de estudo sem comprometer o fluxo de leitura.',
-                    'Metodologia: Extração de texto preservando estrutura de página, secção e parágrafo com hash criptográfico de integridade.',
-                    'Diferencial Chave: O Jarvis assiste contextualmente sem traduzir indiscriminadamente o documento inteiro.',
-                    'Resultados Observados: Aumento significativo da compreensão leitora e retenção ativa em sessões com papers em língua inglesa.',
-                    'Conclusão: A consolidação pedagógica permite transferir conhecimento direto para o Obsidian Knowledge Vault.',
-                  ]).map((pt, idx) => (
-                    <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-black/30 border border-white/5">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-bold shrink-0">
-                        {idx + 1}
-                      </span>
-                      <p className="text-gray-200 leading-relaxed text-xs sm:text-sm">{pt}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {selectedMode === 'Study' && (
-                <div className="space-y-6">
-                  {document.sections && document.sections.length > 0 ? (
-                    document.sections.map((sec) => (
-                      <div key={sec.section_id} className="rounded-lg border border-white/5 bg-black/20 p-4 space-y-3">
-                        <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                          <h4 className="text-sm font-semibold text-cyan-300">{sec.title}</h4>
-                          {document.source_type !== 'VIDEO' && (
-                            <span className="text-[11px] text-gray-500 font-mono">
-                              pp. {sec.page_start}-{sec.page_end}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs text-gray-300 leading-relaxed space-y-2">
-                          {sec.paragraphs && sec.paragraphs.length > 0 ? (
-                            sec.paragraphs.map((p, pIdx) => (
-                              <p key={p.paragraph_id || pIdx} className="text-gray-300">
-                                {p.text}
-                              </p>
-                            ))
-                          ) : (
-                            <p className="text-gray-400">Síntese dos tópicos fundamentais e formulação empírica da secção {sec.title}.</p>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-xs text-gray-400">Nenhuma secção estruturada disponível.</p>
+              {/* Aviso honesto caso o documento esteja em modo Extração Local sem Modelo */}
+              {generationMode === 'EXTRACTIVE_GROUNDED' && !isGenerating && (
+                <div className="rounded-lg border border-amber-500/25 bg-amber-950/20 px-4 py-3 text-xs text-amber-200 space-y-1">
+                  <div className="flex items-center gap-2 font-semibold text-amber-300">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <span>Modo Extração Local Determinística (Sem Síntese Generativa IA)</span>
+                  </div>
+                  <p className="text-amber-100/80 leading-relaxed">
+                    Os pontos abaixo são excertos e conceitos extraídos diretamente do documento.
+                    {generationTelemetry?.failure_reason
+                      ? ` Causa da indisponibilidade do modelo: ${generationTelemetry.failure_reason}.`
+                      : ' Clica em "Regenerar Resumo" para executar a síntese generativa com qwen3.5:9b.'}
+                  </p>
+                  {unavailableFeatures.length > 0 && (
+                    <p className="text-[11px] text-amber-300/80 font-mono">
+                      Operações generativas indisponíveis neste modo: {unavailableFeatures.join(', ')}
+                    </p>
                   )}
                 </div>
               )}
 
-              {selectedMode === 'Detailed' && (
-                <div className="space-y-4 text-xs sm:text-sm text-gray-300 leading-relaxed">
-                  {(((document.metadata as any)?.summaries?.detailed as Array<{ title: string; text: string }>) || [
-                    {
-                      title: 'Fundamentação Teórica e Formulação',
-                      text: 'O artigo analisa a transição de leituras passivas para ambientes com auxílio contextual ativo. Através da decomposição hierárquica (documento → página → secção → parágrafo), cada entidade mantém proveniência rastreável.',
-                    },
-                    {
-                      title: 'Rigor Metodológico & Protocolo Experimental',
-                      text: 'As análises são executadas sob invariantes rígidas: o texto original em inglês não é sobreposto por traduções automáticas completas; a tradução é seletiva e conserva a taxonomia científica.',
-                    },
-                  ]).map((item, idx) => (
-                    <div key={idx} className="rounded-lg border border-white/5 bg-black/30 p-4 space-y-2">
-                      <h4 className="text-xs font-bold text-white uppercase tracking-wider text-cyan-300">
-                        {item.title}
-                      </h4>
-                      <p className="text-gray-300">{item.text}</p>
-                    </div>
-                  ))}
+              {isGenerating && (
+                <div className="flex items-center justify-between gap-3 rounded-lg border border-cyan-500/20 bg-cyan-950/20 p-4 text-xs text-cyan-200">
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="h-4 w-4 animate-spin text-cyan-400 shrink-0" />
+                    <span>
+                      {pipelineStage ||
+                        `A analisar o conteúdo real de "${document.title}" e a gerar síntese fundamentada com qwen3.5:9b...`}
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider">
+                    ollama • qwen3.5:9b
+                  </span>
                 </div>
               )}
 
+              {/* QUICK SUMMARY */}
+              {selectedMode === 'Quick' && (
+                <div className="space-y-3 text-sm">
+                  {normalizedSummaries.quick.length > 0 ? (
+                    normalizedSummaries.quick.map((pt, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-start gap-3 p-3.5 rounded-lg bg-black/30 border border-white/5"
+                      >
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-bold shrink-0">
+                          {idx + 1}
+                        </span>
+                        <div className="flex-1 space-y-1">
+                          <p className="text-gray-200 leading-relaxed text-xs sm:text-sm">{pt}</p>
+                          {renderSourceRefBadges(normalizedSummaries.quick_refs?.[idx])}
+                        </div>
+                      </div>
+                    ))
+                  ) : !isGenerating ? (
+                    <div className="rounded-lg border border-white/10 bg-black/20 p-6 text-center text-xs text-gray-400">
+                      Este material ainda não possui pontos de sumário rápido gerados. Clica em{' '}
+                      <strong className="text-cyan-300">Regenerar Resumo</strong> para sintetizar a partir do documento.
+                    </div>
+                  ) : null}
+                </div>
+              )}
+
+              {/* STUDY SUMMARY */}
+              {selectedMode === 'Study' && (
+                <div className="space-y-4">
+                  {normalizedSummaries.study.length > 0 ? (
+                    normalizedSummaries.study.map((sec) => (
+                      <div
+                        key={sec.section_id}
+                        className="rounded-lg border border-white/5 bg-black/25 p-4 space-y-3"
+                      >
+                        <div className="flex items-center justify-between gap-2 border-b border-white/5 pb-2">
+                          <h4 className="text-sm font-semibold text-cyan-300">{sec.title}</h4>
+                          {sec.page_ref && (
+                            <span className="text-[11px] text-gray-500 font-mono shrink-0">
+                              {sec.page_ref}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs sm:text-sm text-gray-200 leading-relaxed whitespace-pre-line">
+                          {sec.summary}
+                        </p>
+                        {sec.key_concepts && sec.key_concepts.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                            {sec.key_concepts.map((concept, cIdx) => (
+                              <span
+                                key={cIdx}
+                                className="rounded bg-cyan-500/10 px-2 py-0.5 text-[10px] font-medium text-cyan-300 border border-cyan-500/20"
+                              >
+                                {concept}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {renderSourceRefBadges(sec.source_refs)}
+                      </div>
+                    ))
+                  ) : !isGenerating ? (
+                    <div className="rounded-lg border border-white/10 bg-black/20 p-6 text-center text-xs text-gray-400">
+                      Síntese estruturada por secção ainda não gerada para este material. Clica em{' '}
+                      <strong className="text-cyan-300">Regenerar Resumo</strong> para sintetizar as secções.
+                    </div>
+                  ) : null}
+                </div>
+              )}
+
+              {/* DETAILED SUMMARY */}
+              {selectedMode === 'Detailed' && (
+                <div className="space-y-4 text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  {normalizedSummaries.detailed.length > 0 ? (
+                    normalizedSummaries.detailed.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="rounded-lg border border-white/5 bg-black/30 p-4 space-y-2"
+                      >
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-300">
+                          {item.title}
+                        </h4>
+                        <p className="text-gray-200 whitespace-pre-line leading-relaxed">{item.text}</p>
+                        {renderSourceRefBadges(item.source_refs)}
+                      </div>
+                    ))
+                  ) : !isGenerating ? (
+                    <div className="rounded-lg border border-white/10 bg-black/20 p-6 text-center text-xs text-gray-400">
+                      Síntese aprofundada ainda não gerada para este material. Clica em{' '}
+                      <strong className="text-cyan-300">Regenerar Resumo</strong> para construir a análise detalhada.
+                    </div>
+                  ) : null}
+                </div>
+              )}
+
+              {/* EXAM SUMMARY */}
               {selectedMode === 'Exam' && (
                 <div className="space-y-4">
-                  {((document.metadata as any)?.summaries?.exam?.high_yield_concepts?.length > 0) ? (
+                  {normalizedSummaries.exam.high_yield_concepts.length > 0 && (
                     <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 p-4 space-y-3">
                       <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                         <GraduationCap className="h-4 w-4" /> Conceitos High-Yield (Prováveis em Exame)
                       </h4>
-                      <ul className="text-xs space-y-2 text-gray-200">
-                        {((document.metadata as any).summaries.exam.high_yield_concepts as Array<{ concept: string; detail: string }>).map((c, i) => (
+                      <ul className="text-xs sm:text-sm space-y-2.5 text-gray-200">
+                        {normalizedSummaries.exam.high_yield_concepts.map((c, i) => (
                           <li key={i} className="flex flex-col gap-0.5">
-                            <span className="font-semibold text-amber-300">• {c.concept}:</span>
-                            <span className="text-gray-300 pl-3">{c.detail}</span>
+                            <span className="font-semibold text-amber-300">• {c.concept}</span>
+                            <span className="text-gray-300 pl-3 leading-relaxed">{c.detail}</span>
+                            <div className="pl-3">{renderSourceRefBadges(c.source_refs)}</div>
                           </li>
                         ))}
                       </ul>
                     </div>
-                  ) : (
-                    <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 p-4 space-y-2">
-                      <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <GraduationCap className="h-4 w-4" /> Conceitos High-Yield (Prováveis em Exame)
-                      </h4>
-                      <ul className="text-xs space-y-1.5 text-gray-200 list-disc list-inside">
-                        <li><strong>Preservação de Proveniência:</strong> Cada afirmação é indexada com [p. X, § Secção].</li>
-                        <li><strong>Scoring Real de Quiz:</strong> Cálculo estrito de TP/total, incorretas e unanswered.</li>
-                        <li><strong>Status Epistemológico:</strong> Distinção obrigatória entre OBSERVED e INFERRED.</li>
-                      </ul>
-                    </div>
                   )}
 
-                  {((document.metadata as any)?.summaries?.exam?.likely_questions?.length > 0) ? (
+                  {normalizedSummaries.exam.likely_questions.length > 0 && (
                     <div className="rounded-lg border border-white/10 bg-black/30 p-4 space-y-3">
                       <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                        Possíveis Questões de Avaliação & Respostas
+                        Possíveis Questões de Avaliação & Respostas-Modelo
                       </h4>
-                      {((document.metadata as any).summaries.exam.likely_questions as Array<{ question: string; answer: string }>).map((q, i) => (
-                        <div key={i} className="space-y-1 text-xs border-b border-white/5 pb-2 last:border-b-0">
+                      {normalizedSummaries.exam.likely_questions.map((q, i) => (
+                        <div
+                          key={i}
+                          className="space-y-1.5 text-xs sm:text-sm border-b border-white/5 pb-3 last:border-b-0 last:pb-0"
+                        >
                           <p className="text-cyan-300 font-medium">
-                            {i + 1}. "{q.question}"
+                            {i + 1}. {q.question}
                           </p>
                           {q.answer && (
-                            <p className="text-gray-300 pl-3 italic">
-                              R: {q.answer}
+                            <p className="text-gray-300 pl-3 leading-relaxed">
+                              <span className="font-semibold text-emerald-300">Resposta: </span>
+                              {q.answer}
                             </p>
                           )}
+                          <div className="pl-3">{renderSourceRefBadges(q.source_refs)}</div>
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <div className="rounded-lg border border-white/10 bg-black/30 p-4 space-y-2">
-                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                        Possíveis Questões de Avaliação
-                      </h4>
-                      <p className="text-xs text-cyan-300 font-medium">
-                        1. "Como difere uma leitura assistida de uma substituição por tradução automática?"
-                      </p>
-                      <p className="text-xs text-cyan-300 font-medium">
-                        2. "Qual o impacto da taxonomia tripla (OBSERVED/INFERRED/UNKNOWN) na confiabilidade do RAG?"
-                      </p>
-                    </div>
                   )}
+
+                  {normalizedSummaries.exam.high_yield_concepts.length === 0 &&
+                    normalizedSummaries.exam.likely_questions.length === 0 &&
+                    !isGenerating && (
+                      <div className="rounded-lg border border-white/10 bg-black/20 p-6 text-center text-xs text-gray-400">
+                        Sumário de preparação para exame ainda não gerado. Clica em{' '}
+                        <strong className="text-cyan-300">Regenerar Resumo</strong> para extrair conceitos e questões de exame.
+                      </div>
+                    )}
                 </div>
               )}
             </div>
@@ -399,28 +786,50 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
         {/* ============================================================ */}
         {activeTab === 'argument_map' && (
           <div className="max-w-4xl mx-auto space-y-6">
-            <div className="border-b border-white/10 pb-3">
-              <h3 className="text-base font-bold text-white">
-                Mapa de Argumentos (Epistemic Structure)
-              </h3>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Classificação rigorosa das asserções do artigo com separação estrita entre observação e inferência.
-              </p>
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div>
+                <h3 className="text-base font-bold text-white">
+                  Mapa de Argumentos (Epistemic Structure)
+                </h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Classificação rigorosa das asserções do material com separação estrita entre OBSERVED, INFERRED e UNKNOWN.
+                </p>
+              </div>
+              <button
+                onClick={handleForceRegenerate}
+                disabled={isGenerating}
+                className="flex items-center gap-1.5 rounded-md border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 hover:bg-cyan-400/20 disabled:opacity-50"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
+                <span>Atualizar Mapa</span>
+              </button>
             </div>
+
+            {structure?.is_argumentative === false && structure?.argumentative_limitation && (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-950/20 px-4 py-3 text-xs text-amber-200 flex items-start gap-2.5">
+                <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-amber-300 block mb-0.5">
+                    Limitação Estrutural (Documento Descritivo / Expositivo)
+                  </span>
+                  <span>{structure.argumentative_limitation}</span>
+                </div>
+              </div>
+            )}
 
             {structure ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
-                  { key: 'problem', label: 'Problem (Problema)', item: structure.problem },
-                  { key: 'research_gap', label: 'Research Gap (Lacuna)', item: structure.research_gap },
-                  { key: 'research_question', label: 'Research Question (Questão de Investigação)', item: structure.research_question },
-                  { key: 'hypothesis', label: 'Hypothesis (Hipótese)', item: structure.hypothesis },
+                  { key: 'problem', label: 'Problem (Problema / Tema Central)', item: structure.problem },
+                  { key: 'research_gap', label: 'Research Gap (Lacuna / Contexto)', item: structure.research_gap },
+                  { key: 'research_question', label: 'Research Question (Questão Central)', item: structure.research_question },
+                  { key: 'hypothesis', label: 'Hypothesis (Hipótese / Tese)', item: structure.hypothesis },
                   { key: 'contribution', label: 'Contribution (Contribuição Principal)', item: structure.contribution },
-                  { key: 'method', label: 'Method (Metodologia Proposta)', item: structure.method },
-                  { key: 'dataset', label: 'Dataset (Dados / Corpuses)', item: structure.dataset },
-                  { key: 'experiment', label: 'Experiment (Configuração Experimental)', item: structure.experiment },
-                  { key: 'results', label: 'Results (Resultados Obtidos)', item: structure.results },
-                  { key: 'limitations', label: 'Limitations (Limitações Identificadas)', item: structure.limitations },
+                  { key: 'method', label: 'Method (Metodologia / Abordagem)', item: structure.method },
+                  { key: 'dataset', label: 'Dataset (Dados / Casos / Corpus)', item: structure.dataset },
+                  { key: 'experiment', label: 'Experiment (Aplicação / Avaliação)', item: structure.experiment },
+                  { key: 'results', label: 'Results (Resultados / Evidências)', item: structure.results },
+                  { key: 'limitations', label: 'Limitations (Limitações / Condições)', item: structure.limitations },
                   { key: 'conclusion', label: 'Conclusion (Conclusão)', item: structure.conclusion },
                 ].map(({ key, label, item }) => (
                   <div
@@ -435,20 +844,26 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
                         {renderStatusBadge(item?.status || 'UNKNOWN')}
                       </div>
                       <p className="text-xs text-gray-300 leading-relaxed">
-                        {item?.text || 'Não especificado diretamente no documento.'}
+                        {item?.text && !containsPrefabText(item.text)
+                          ? item.text
+                          : 'Não especificado diretamente no material.'}
                       </p>
                     </div>
-                    {item?.page_ref && (
-                      <span className="text-[10px] text-gray-500 font-mono self-end">
-                        Ref: p. {item.page_ref}
-                      </span>
-                    )}
+                    <div className="flex items-center justify-between pt-1">
+                      {renderSourceRefBadges(item?.source_refs)}
+                      {item?.page_ref ? (
+                        <span className="text-[10px] text-gray-500 font-mono ml-auto">
+                          Ref: p. {item.page_ref}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="rounded-lg border border-white/10 bg-black/20 p-6 text-center text-xs text-gray-400">
-                A estrutura do artigo está em estado UNKNOWN ou ainda não foi processada.
+                A estrutura argumentativa deste material ainda não foi processada. Clica em{' '}
+                <strong className="text-cyan-300">Atualizar Mapa</strong> para extrair do conteúdo.
               </div>
             )}
           </div>
@@ -461,17 +876,17 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
           <div className="max-w-4xl mx-auto space-y-6">
             <div className="border-b border-white/10 pb-3">
               <h3 className="text-base font-bold text-white">
-                Síntese Cruzada de Múltiplos Documentos
+                Síntese Cruzada de Múltiplos Materiais
               </h3>
               <p className="text-xs text-gray-400 mt-0.5">
-                Compara pontos comuns, contradições e evolução conceitual entre materiais de estudo selecionados.
+                Compara pontos comuns, diferenças metodológicas, conceitos partilhados e evolução conceptual entre materiais reais da tua biblioteca.
               </p>
             </div>
 
             {/* Document Selection Checklist */}
             <div className="rounded-lg border border-white/10 bg-[#121921] p-4 space-y-3">
               <h4 className="text-xs font-semibold text-gray-200">
-                Seleciona materiais para sintetizar ({selectedDocIds.length} selecionados):
+                Seleciona pelo menos 2 materiais para sintetizar ({selectedDocIds.length} selecionados):
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {allDocuments.map((doc) => {
@@ -515,8 +930,16 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
                   disabled={selectedDocIds.length < 2 || isGenerating}
                   className="flex items-center gap-2 rounded-md bg-cyan-600 px-4 py-2 text-xs font-semibold text-white hover:bg-cyan-500 disabled:opacity-40 transition"
                 >
-                  <Sparkles className="h-4 w-4" />
-                  <span>Sintetizar {selectedDocIds.length} Materiais</span>
+                  {isGenerating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                  <span>
+                    {isGenerating
+                      ? 'A comparar materiais...'
+                      : `Sintetizar ${selectedDocIds.length} Materiais`}
+                  </span>
                 </button>
               </div>
             </div>
@@ -524,22 +947,53 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
             {/* Synthesis Results Display */}
             {multiDocResult && (
               <div className="space-y-4 animate-in fade-in">
+                {multiDocResult.shared_concepts && multiDocResult.shared_concepts.length > 0 && (
+                  <div className="rounded-lg border border-white/10 bg-[#121921] p-4 space-y-2">
+                    <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wide">
+                      Conceitos Partilhados
+                    </h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {multiDocResult.shared_concepts.map((concept, idx) => (
+                        <span
+                          key={idx}
+                          className="rounded bg-cyan-500/10 px-2.5 py-1 text-xs font-medium text-cyan-200 border border-cyan-500/20"
+                        >
+                          {concept}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/10 p-4 space-y-2">
                   <h4 className="text-xs font-bold text-emerald-300 uppercase tracking-wide">
                     Pontos Comuns
                   </h4>
-                  <ul className="text-xs text-gray-200 space-y-1 list-disc list-inside">
+                  <ul className="text-xs text-gray-200 space-y-1.5 list-disc list-inside">
                     {multiDocResult.common_points.map((pt, i) => (
                       <li key={i}>{pt}</li>
                     ))}
                   </ul>
                 </div>
 
+                {multiDocResult.differences && multiDocResult.differences.length > 0 && (
+                  <div className="rounded-lg border border-purple-500/20 bg-purple-950/10 p-4 space-y-2">
+                    <h4 className="text-xs font-bold text-purple-300 uppercase tracking-wide">
+                      Diferenças de Enfoque & Metodologia
+                    </h4>
+                    <ul className="text-xs text-gray-200 space-y-1.5 list-disc list-inside">
+                      {multiDocResult.differences.map((d, i) => (
+                        <li key={i}>{d}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 <div className="rounded-lg border border-amber-500/20 bg-amber-950/10 p-4 space-y-2">
                   <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wide">
                     Divergências & Contradições
                   </h4>
-                  <ul className="text-xs text-gray-200 space-y-1 list-disc list-inside">
+                  <ul className="text-xs text-gray-200 space-y-1.5 list-disc list-inside">
                     {multiDocResult.contradictions.map((c, i) => (
                       <li key={i}>{c}</li>
                     ))}
@@ -548,9 +1002,9 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
 
                 <div className="rounded-lg border border-cyan-500/20 bg-cyan-950/10 p-4 space-y-2">
                   <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wide">
-                    Evolução das Ideias
+                    Complementaridade & Evolução Conceptual
                   </h4>
-                  <ul className="text-xs text-gray-200 space-y-1 list-disc list-inside">
+                  <ul className="text-xs text-gray-200 space-y-1.5 list-disc list-inside">
                     {multiDocResult.idea_evolution.map((e, i) => (
                       <li key={i}>{e}</li>
                     ))}

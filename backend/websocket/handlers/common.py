@@ -227,9 +227,13 @@ class InitialSyncHandler:
             for project in projects
         ]
         session.selected_project_id = (
-            "task-app"
-            if "task-app" in project_ids
-            else project_ids[0]
+            "dina"
+            if "dina" in project_ids
+            else (
+                "task-app"
+                if "task-app" in project_ids
+                else project_ids[0]
+            )
         )
         try:
             await self.responder.send_project_context(

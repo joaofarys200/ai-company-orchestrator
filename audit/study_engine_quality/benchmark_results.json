@@ -1,0 +1,121 @@
+{
+  "timestamp": "2026-11-04T01:28:30Z",
+  "total_documents": 13,
+  "valid_grounded_documents": 2,
+  "legacy_extractive_documents": 11,
+  "documents_needing_regeneration": 11,
+  "failed_documents": 0,
+  "extraction_version": "3.0-grounded",
+  "regenerated_sample": [
+    {
+      "document_id": "doc_a3b336f4295d",
+      "title": "Predicting performance online consumer reviews(1)",
+      "subject": "artigo investigação",
+      "source_type": "PDF",
+      "generation_mode": "LLM_GROUNDED",
+      "extraction_version": "3.0-grounded",
+      "evidence_units_count": 35,
+      "wall_clock_ms": 66850.7,
+      "telemetry": {
+        "generation_id": "study_gen_ba5d8959aca5",
+        "operation": "study_generate_complete_bundle",
+        "document_id": "doc_a3b336f4295d",
+        "provider": "ollama",
+        "model": "qwen3.5:9b",
+        "input_tokens": 2281,
+        "output_tokens": 1344,
+        "ttft_ms": null,
+        "total_ms": 66145.28,
+        "tokens_per_sec": 20.32,
+        "context_used": 16384,
+        "status": "COMPLETED",
+        "validation_errors": [],
+        "attempts": 1,
+        "timestamp": "2026-11-04T01:26:33.296946",
+        "grounding_ratio": 0.824,
+        "grounded_claims_count": 14,
+        "unconfirmed_claims_dropped": 3,
+        "artifact_modes": {
+          "quick": "LLM_GROUNDED",
+          "study": "LLM_GROUNDED",
+          "detailed": "LLM_GROUNDED",
+          "exam": "EXTRACTIVE_GROUNDED",
+          "cornell_notes": "EXTRACTIVE_GROUNDED",
+          "structure": "LLM_GROUNDED"
+        }
+      },
+      "scores": {
+        "FIDELITY": 96.8,
+        "COVERAGE": 99.0,
+        "RELEVANCE": 95.0,
+        "STRUCTURE": 100.0,
+        "DEPTH": 70.0,
+        "NON_FABRICATION": 97.4,
+        "SOURCE_TRACEABILITY": 100.0,
+        "LANGUAGE_QUALITY": 94.0,
+        "OVERALL": 94.0
+      },
+      "quick_preview": [
+        "O artigo propõe uma abordagem de mineração de sentimentos para prever o desempenho de avaliações online, analisando dados massivos de reviews.",
+        "As empresas utilizam redes sociais como Facebook e Twitter para promover produtos e manter contacto com os clientes através destas plataformas."
+      ],
+      "cornell_cues_count": 1,
+      "quiz_questions_count": 4
+    },
+    {
+      "document_id": "doc_vid_f76259cd5c4e",
+      "title": "Predicting the Performance of Online Consumer Reviews (Aula)",
+      "subject": "Metodologia de Investigação",
+      "source_type": "VIDEO",
+      "generation_mode": "LLM_GROUNDED",
+      "extraction_version": "3.0-grounded",
+      "evidence_units_count": 23,
+      "wall_clock_ms": 50564.1,
+      "telemetry": {
+        "generation_id": "study_gen_2c4dba5a9b88",
+        "operation": "study_generate_complete_bundle",
+        "document_id": "doc_vid_f76259cd5c4e",
+        "provider": "ollama",
+        "model": "qwen3.5:9b",
+        "input_tokens": 2826,
+        "output_tokens": 1630,
+        "ttft_ms": null,
+        "total_ms": 49985.97,
+        "tokens_per_sec": 32.61,
+        "context_used": 16384,
+        "status": "COMPLETED",
+        "validation_errors": [],
+        "attempts": 1,
+        "timestamp": "2026-11-04T01:27:40.095481",
+        "grounding_ratio": 0.952,
+        "grounded_claims_count": 20,
+        "unconfirmed_claims_dropped": 1,
+        "artifact_modes": {
+          "quick": "LLM_GROUNDED",
+          "study": "LLM_GROUNDED",
+          "detailed": "LLM_GROUNDED",
+          "exam": "LLM_GROUNDED",
+          "cornell_notes": "LLM_GROUNDED",
+          "structure": "LLM_GROUNDED"
+        }
+      },
+      "scores": {
+        "FIDELITY": 99.1,
+        "COVERAGE": 100.0,
+        "RELEVANCE": 95.0,
+        "STRUCTURE": 100.0,
+        "DEPTH": 70.0,
+        "NON_FABRICATION": 99.3,
+        "SOURCE_TRACEABILITY": 100.0,
+        "LANGUAGE_QUALITY": 94.0,
+        "OVERALL": 94.7
+      },
+      "quick_preview": [
+        "O documento analisa o artigo 'Predicting the Performance of Online Consumer Reviews', focando-se numa abordagem de mineração de sentimentos para prever o desempenho de avaliações online.",
+        "A distinção fundamental reside em perceber que, a partir das questões de investigação, é possível identificar imediatamente o modelo de investigação adotado pelos autores."
+      ],
+      "cornell_cues_count": 2,
+      "quiz_questions_count": 4
+    }
+  ]
+}

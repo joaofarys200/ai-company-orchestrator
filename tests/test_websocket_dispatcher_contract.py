@@ -47,6 +47,10 @@ from backend.websocket.handlers.projects import (
     PROJECT_HANDLERS,
     ProjectWebSocketHandler,
 )
+from backend.websocket.handlers.permissions import (
+    PERMISSION_HANDLERS,
+    PermissionGatewayWebSocketHandler,
+)
 from backend.websocket.handlers.sentinel import (
     SENTINEL_HANDLERS,
     SentinelWebSocketHandler,
@@ -74,6 +78,7 @@ DOMAIN_HANDLER_MAPS = {
     "lectures": LECTURE_HANDLERS,
     "study": STUDY_HANDLERS,
     "sentinel": SENTINEL_HANDLERS,
+    "permissions": PERMISSION_HANDLERS,
 }
 
 DOMAIN_HANDLER_CLASSES = (
@@ -87,6 +92,7 @@ DOMAIN_HANDLER_CLASSES = (
     LectureWebSocketHandler,
     StudyWebSocketHandler,
     SentinelWebSocketHandler,
+    PermissionGatewayWebSocketHandler,
 )
 
 

@@ -7,7 +7,10 @@ capability checks, audit trails, and idempotency.
 
 from __future__ import annotations
 
+import glob
+import json
 import logging
+import os
 import threading
 import time
 import uuid
@@ -62,7 +65,7 @@ class PermissionGatewayService:
     Totalmente thread-safe e seguro contra manipulações do cliente.
     """
 
-    def __init__(self, default_ttl_seconds: float = 300.0) -> None:
+    def __init__(self, default_ttl_seconds: float = 300.0, storage_dir: Optional[str] = None) -> None:
         self.default_ttl_seconds = default_ttl_seconds
         self._lock = threading.RLock()
         self._requests: Dict[str, PermissionRequest] = {}
@@ -70,6 +73,60 @@ class PermissionGatewayService:
         self._audit_log: List[AuditLogEntry] = []
         self._rollbacks: Dict[str, RollbackRecord] = {}
         self._broadcast_callbacks: List[Callable[[str, Dict[str, Any]], Any]] = []
+
+        workspace = os.environ.get("JARVIS_WORKSPACE", ".")
+        self._storage_dir = os.path.abspath(
+            storage_dir or os.environ.get("JARVIS_PERMISSIONS_DIR", os.path.join(workspace, ".jarvis", "permissions"))
+        )
+        self._requests_dir = os.path.join(self._storage_dir, "requests")
+        try:
+            os.makedirs(self._requests_dir, exist_ok=True)
+        except Exception:
+            pass
+
+        self.rehydrate_persisted_requests()
+
+    def _persist_request(self, req: PermissionRequest) -> None:
+        try:
+            req_path = os.path.join(self._requests_dir, f"{req.request_id}.json")
+            tmp_path = f"{req_path}.tmp.{uuid.uuid4().hex[:8]}"
+            payload = json.dumps(req.to_dict(), indent=2, ensure_ascii=False)
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                f.write(payload)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp_path, req_path)
+        except Exception as e:
+            logger.warning(f"Erro ao persistir pedido de permissao {req.request_id}: {e}")
+
+    def rehydrate_persisted_requests(self) -> int:
+        count = 0
+        now = time.time()
+        if not os.path.isdir(self._requests_dir):
+            return 0
+        for fpath in glob.glob(os.path.join(self._requests_dir, "*.json")):
+            try:
+                with open(fpath, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                req = PermissionRequest.from_dict(data)
+                # If still pending but time expired, mark expired
+                if req.status in {
+                    PermissionRequestStatus.WAITING_FOR_USER.value,
+                    PermissionRequestStatus.REQUESTED.value,
+                    PermissionRequestStatus.CAPABILITY_CHECKING.value,
+                } and now > req.expires_at:
+                    req.status = PermissionRequestStatus.EXPIRED.value
+                    self._persist_request(req)
+
+                self._requests[req.request_id] = req
+                dedup_key = self._dedup_key(
+                    req.mission_id, req.project_id, req.execution_id, req.tool_name, req.requested_operation
+                )
+                self._dedup_index[dedup_key] = req.request_id
+                count += 1
+            except Exception as e:
+                logger.warning(f"Erro ao carregar pedido de permissao de {fpath}: {e}")
+        return count
 
     def register_broadcast_callback(self, cb: Callable[[str, Dict[str, Any]], Any]) -> None:
         with self._lock:
@@ -118,6 +175,12 @@ class PermissionGatewayService:
             details=details or {},
         )
         self._audit_log.append(entry)
+        try:
+            audit_file = os.path.join(self._storage_dir, "audit_log.jsonl")
+            with open(audit_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(entry.to_dict(), ensure_ascii=False) + "\n")
+        except Exception:
+            pass
         return entry
 
     def create_request(
@@ -201,6 +264,7 @@ class PermissionGatewayService:
                     req.status = PermissionRequestStatus.BLOCKED_BY_POLICY.value
                     req.policy_reason = f"Violação de Supply Chain: {msg}"
                     self._requests[req.request_id] = req
+                    self._persist_request(req)
                     self._log_audit(
                         req.request_id, "blocked", risk_level, tool_name,
                         mission_id, project_id, execution_id, details={"reason": req.policy_reason}
@@ -249,6 +313,7 @@ class PermissionGatewayService:
 
             self._requests[req.request_id] = req
             self._dedup_index[dedup_key] = req.request_id
+            self._persist_request(req)
 
             # 5. Registo no log de auditoria
             if decision.is_blocked_by_policy:
@@ -409,6 +474,7 @@ class PermissionGatewayService:
                 "status": req.status,
                 "capability": cap_details,
             })
+            self._persist_request(req)
 
             return req
 
@@ -463,6 +529,7 @@ class PermissionGatewayService:
                 "fallback_available": req.alternative_available,
                 "fallback_description": req.fallback_description,
             })
+            self._persist_request(req)
 
             return req
 
@@ -499,6 +566,7 @@ class PermissionGatewayService:
                 result = executor_func() if executor_func else {"executed": True, "tool": req.tool_name}
                 req.status = PermissionRequestStatus.EXECUTED.value
                 req.execution_result = {"status": "SUCCESS", "result": result}
+                self._persist_request(req)
 
                 self._log_audit(
                     req.request_id, "execution_completed", req.risk_level, req.tool_name,
@@ -516,6 +584,7 @@ class PermissionGatewayService:
             except Exception as exc:
                 req.status = PermissionRequestStatus.FAILED.value
                 req.execution_result = {"status": "FAILED", "error": str(exc)}
+                self._persist_request(req)
                 self._log_audit(
                     req.request_id, "failed", req.risk_level, req.tool_name,
                     req.mission_id, req.project_id, req.execution_id,
@@ -581,6 +650,7 @@ class PermissionGatewayService:
                 } and now > r.expires_at:
                     r.status = PermissionRequestStatus.EXPIRED.value
                     expired_ids.append(r.request_id)
+                    self._persist_request(r)
                     self._log_audit(
                         r.request_id, "expired", r.risk_level, r.tool_name,
                         r.mission_id, r.project_id, r.execution_id,
@@ -632,6 +702,7 @@ class PermissionGatewayService:
                         pending.append(r)
                     else:
                         r.status = PermissionRequestStatus.EXPIRED.value
+                        self._persist_request(r)
             return pending
 
     def get_request(self, request_id: str) -> Optional[PermissionRequest]:
@@ -652,11 +723,13 @@ _GLOBAL_PERMISSION_GATEWAY: Optional[PermissionGatewayService] = None
 _GLOBAL_GATEWAY_LOCK = threading.Lock()
 
 
-def get_permission_gateway_service() -> PermissionGatewayService:
+def get_permission_gateway_service(storage_dir: Optional[str] = None) -> PermissionGatewayService:
     global _GLOBAL_PERMISSION_GATEWAY
     with _GLOBAL_GATEWAY_LOCK:
         if _GLOBAL_PERMISSION_GATEWAY is None:
-            _GLOBAL_PERMISSION_GATEWAY = PermissionGatewayService()
+            _GLOBAL_PERMISSION_GATEWAY = PermissionGatewayService(storage_dir=storage_dir)
+        elif storage_dir is not None and _GLOBAL_PERMISSION_GATEWAY._storage_dir != os.path.abspath(storage_dir):
+            _GLOBAL_PERMISSION_GATEWAY = PermissionGatewayService(storage_dir=storage_dir)
         return _GLOBAL_PERMISSION_GATEWAY
 
 

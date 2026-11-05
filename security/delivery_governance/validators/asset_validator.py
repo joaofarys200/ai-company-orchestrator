@@ -8,8 +8,11 @@ Verifica:
 
 from __future__ import annotations
 
+import hashlib
 import os
 import re
+import urllib.parse
+import urllib.request
 from pathlib import Path
 from typing import Any, Dict, List, Set
 
@@ -156,3 +159,112 @@ class AssetIntegrityValidator:
             checked.append({"source": rel_source, "reference": imp, "type": "js_import", "exists": exists})
             if not exists:
                 missing.append(f"Em {rel_source}: import relativo '{imp}' não existe no disco.")
+
+    @classmethod
+    def validate_served_assets(cls, project_root: str, base_url: str) -> Dict[str, Any]:
+        """
+        Audita a cadeia completa HTTP:
+        HTML -> scripts/estilos -> hash HTTP vs hash do disco.
+        Garante que o browser recebe efetivamente os assets atualizados do disco.
+        """
+        violations: List[str] = []
+        assets_evaluated: List[Dict[str, Any]] = []
+
+        if not base_url.endswith("/"):
+            base_url += "/"
+
+        # 1. Obter HTML servido pelo servidor
+        html_body = ""
+        try:
+            req = urllib.request.Request(
+                base_url,
+                headers={"User-Agent": "Jarvis-Asset-Validator/1.0", "Cache-Control": "no-cache"},
+            )
+            with urllib.request.urlopen(req, timeout=3.0) as resp:
+                if resp.status >= 400:
+                    return {
+                        "valid": False,
+                        "base_url": base_url,
+                        "violations": [f"HTTP_ENTRYPOINT_ERROR: Endpoint {base_url} devolveu status {resp.status}."],
+                        "assets": [],
+                    }
+                html_body = resp.read().decode("utf-8", errors="ignore")
+        except Exception as e:
+            return {
+                "valid": False,
+                "base_url": base_url,
+                "violations": [f"HTTP_CONNECTION_ERROR: Falha ao ligar ao endpoint {base_url}: {e}"],
+                "assets": [],
+            }
+
+        # 2. Extrair referências de scripts e stylesheets do HTML servido
+        script_srcs = re.findall(r'<script[^>]+src=[\'"]([^\'"]+)[\'"]', html_body, re.IGNORECASE)
+        style_hrefs = re.findall(r'<link[^>]+rel=[\'"]stylesheet[\'"][^>]+href=[\'"]([^\'"]+)[\'"]', html_body, re.IGNORECASE)
+
+        raw_references = [(s, "script") for s in script_srcs] + [(h, "stylesheet") for h in style_hrefs]
+
+        for ref, kind in raw_references:
+            if ref.startswith(("http://", "https://", "//")):
+                # Recurso externo CDN (ex: Google Fonts)
+                continue
+
+            clean_path = ref.split("?")[0].split("#")[0].lstrip("/")
+            disk_path = os.path.join(project_root, clean_path)
+            asset_url = urllib.parse.urljoin(base_url, ref)
+
+            asset_record = {
+                "reference": ref,
+                "kind": kind,
+                "expected_disk_path": clean_path,
+                "requested_url": asset_url,
+                "disk_exists": os.path.isfile(disk_path),
+                "http_status": None,
+                "disk_hash": "",
+                "served_hash": "",
+                "matches": False,
+            }
+
+            if not os.path.isfile(disk_path):
+                violations.append(f"MISSING_DISK_ASSET: Asset '{clean_path}' referenciado no HTML servido não existe no disco.")
+                assets_evaluated.append(asset_record)
+                continue
+
+            try:
+                disk_bytes = Path(disk_path).read_bytes()
+                asset_record["disk_hash"] = hashlib.sha256(disk_bytes).hexdigest()[:16]
+            except Exception as read_err:
+                violations.append(f"DISK_READ_ERROR: Erro ao ler asset '{clean_path}': {read_err}")
+                assets_evaluated.append(asset_record)
+                continue
+
+            try:
+                a_req = urllib.request.Request(
+                    asset_url,
+                    headers={"User-Agent": "Jarvis-Asset-Validator/1.0", "Cache-Control": "no-cache"},
+                )
+                with urllib.request.urlopen(a_req, timeout=3.0) as a_resp:
+                    asset_record["http_status"] = a_resp.status
+                    if a_resp.status >= 400:
+                        violations.append(f"ASSET_HTTP_ERROR: Asset '{ref}' falhou com status {a_resp.status}.")
+                    else:
+                        served_bytes = a_resp.read()
+                        asset_record["served_hash"] = hashlib.sha256(served_bytes).hexdigest()[:16]
+                        asset_record["matches"] = (asset_record["disk_hash"] == asset_record["served_hash"])
+                        if not asset_record["matches"]:
+                            violations.append(
+                                f"STALE_SERVED_ASSET: O asset '{ref}' servido pelo servidor (hash {asset_record['served_hash']}) "
+                                f"não corresponde ao ficheiro atual no disco (hash {asset_record['disk_hash']}). "
+                                f"O servidor ou browser está a utilizar uma versão desatualizada ou em cache."
+                            )
+            except Exception as http_err:
+                violations.append(f"ASSET_NETWORK_FAILURE: Falha de rede ao descarregar '{ref}': {http_err}")
+
+            assets_evaluated.append(asset_record)
+
+        return {
+            "valid": len(violations) == 0,
+            "base_url": base_url,
+            "violations": violations,
+            "assets": assets_evaluated,
+        }
+

@@ -30,6 +30,8 @@ Este MOC organiza o conhecimento sobre confiabilidade de sistemas, observabilida
 ## 🎯 SRE, Reliability & Chaos Engineering
 - [[Google SRE Incident Response and Postmortems]] — Protocolo Blameless, papéis no comando de incidentes e métricas MTTD/MTTR.
 - [[SLI-SLO Metrics and Error Budgets]] — Indicadores de nível de serviço, objetivos e cálculo de queima de error budget.
+- [[Tail Latency Engineering - P99 Amplification, Hedged Requests and GC Pauses]] — Matemática de amplificação de cauda em fan-out, hedged requests no P95 e pausas de GC.
+- [[Progressive Delivery - Canary Analysis, Blue-Green and Feature Flag Governance]] — Julgamento estatístico de canaries (Mann-Whitney U), blue-green e governação de feature flags.
 - [[Healthchecks and Circuit Breakers]] — Estados fechado, aberto e meio-aberto para degradação graciosa.
 - [[Adaptive Rate Limiting and Token Bucket with Jitter]] — Balde de tokens e mitigação de thundering herd com full jitter.
 - [[Chaos Engineering and Fault Injection in Autonomous Swarms]] — Injeção de falhas e prova de invariantes sob interrupções forçadas.

@@ -67,3 +67,10 @@ A persistência das notas permite a indexação contínua de grafos de conhecime
 - [ ] Rever conceitos fundamentais de Sistemas Multiagente e Arquiteturas RAG.
 - [ ] Resolver o quiz de avaliação de Inteligência Artificial.
 - [ ] Executar o teste de transferência de conhecimento para o ambiente de produção.
+
+
+---
+
+## 🔗 Grafo de Conhecimento & MOC
+- **MOC Central:** [[Lectures Index]] | [[AI Index]]
+- **Tópicos Relacionados:** [[Agent Systems Architecture]], [[Agentic RAG, Query Decomposition and Cross-Encoder Reranking]], [[Model Context Protocol (MCP) and Capability Discovery Architecture]]

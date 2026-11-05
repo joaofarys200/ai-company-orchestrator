@@ -72,5 +72,701 @@
       ]
     },
     "created_at": "2026-10-12T02:15:20.701421"
+  },
+  "quiz_889f7ec5": {
+    "quiz_id": "quiz_889f7ec5",
+    "document_id": "doc_c778709e44f8",
+    "topic": "IT Consumerization",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Qual é o objetivo principal e contributo formulado no documento 'IT Consumerization'?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Apresentar uma fundamentação estruturada para investigar os desafios centrais em Artigo 2.",
+          "Rejeitar todos os referenciais teóricos anteriores sem validação de dados.",
+          "Executar testes não reprodutíveis sem documentação de métodos.",
+          "Substituir métodos empíricos por intuições sem evidência."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Apresentar uma fundamentação estruturada para investigar os desafios centrais em Artigo 2.",
+        "explanation": "A introdução e secções iniciais de 'IT Consumerization' delimitam o contributo central da investigação.",
+        "source_ids": [
+          "doc_c778709e44f8"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q2",
+        "question": "No âmbito da secção 'Abstract / Introdução' (Pág. 1), qual o foco analítico central?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Desenvolver a fundamentação teórica e metodológica correspondente a Abstract / Introdução.",
+          "Ignorar os dados experimentais obtidos nas fases preliminares.",
+          "Anular a validade de constructo das variáveis analisadas.",
+          "Eliminar as citações bibliográficas de referência."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Desenvolver a fundamentação teórica e metodológica correspondente a Abstract / Introdução.",
+        "explanation": "A secção 'Abstract / Introdução' analisa: RESEARCH ARTICLE IT CONSUMERIZATION AND THE TRANSFORMATION OF IT GOVERNANCE1 Robert Wayne Gregory and Evgeny Kaganer IES (p. 1).",
+        "source_ids": [
+          "doc_c778709e44f8"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q3",
+        "question": "No âmbito da secção 'Background' (Pág. 3), qual o foco analítico central?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Desenvolver a fundamentação teórica e metodológica correspondente a Background.",
+          "Ignorar os dados experimentais obtidos nas fases preliminares.",
+          "Anular a validade de constructo das variáveis analisadas.",
+          "Eliminar as citações bibliográficas de referência."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Desenvolver a fundamentação teórica e metodológica correspondente a Background.",
+        "explanation": "A secção 'Background' analisa: IT Governance:  A Historical View IT governance is defined as the decision rights and account- ability framework deploye (p. 3).",
+        "source_ids": [
+          "doc_c778709e44f8"
+        ],
+        "page_ref": 3
+      },
+      {
+        "id": "q4",
+        "question": "No âmbito da secção 'architecture' (Pág. 17), qual o foco analítico central?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Desenvolver a fundamentação teórica e metodológica correspondente a architecture.",
+          "Ignorar os dados experimentais obtidos nas fases preliminares.",
+          "Anular a validade de constructo das variáveis analisadas.",
+          "Eliminar as citações bibliográficas de referência."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Desenvolver a fundamentação teórica e metodológica correspondente a architecture.",
+        "explanation": "A secção 'architecture' analisa: arrangements, which is based on the underlying assumption of achieving automated coordination among internal and externa (p. 17).",
+        "source_ids": [
+          "doc_c778709e44f8"
+        ],
+        "page_ref": 17
+      },
+      {
+        "id": "q5",
+        "question": "No âmbito da secção 'Limitations' (Pág. 25), qual o foco analítico central?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Desenvolver a fundamentação teórica e metodológica correspondente a Limitations.",
+          "Ignorar os dados experimentais obtidos nas fases preliminares.",
+          "Anular a validade de constructo das variáveis analisadas.",
+          "Eliminar as citações bibliográficas de referência."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Desenvolver a fundamentação teórica e metodológica correspondente a Limitations.",
+        "explanation": "A secção 'Limitations' analisa: Our case analysis suggests that IT governance transformation in the context of consumerization is accompanied by a trans (p. 25).",
+        "source_ids": [
+          "doc_c778709e44f8"
+        ],
+        "page_ref": 25
+      }
+    ],
+    "transfer_question": {
+      "id": "transfer_applied_1",
+      "scenario": "Considera que pretendes aplicar os métodos e conclusões de 'IT Consumerization' num ambiente operacional real. Que salvaguardas metodológicas adotarias para garantir que a evidência recolhida se mantém válida e auditável?",
+      "expected_concepts": [
+        "validade",
+        "reprodutibilidade",
+        "rastreabilidade",
+        "evidência empírica",
+        "método"
+      ]
+    },
+    "created_at": "2026-10-13T01:52:42.262930"
+  },
+  "quiz_3dfd1110": {
+    "quiz_id": "quiz_3dfd1110",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "topic": "Predicting the Performance of Online Consumer Reviews (Aula)",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "No artigo 'Predicting the Performance of Online Consumer Reviews (Aula)', qual é o objetivo central da investigação com abordagem de sentiment mining?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+          "Construir um classificador para eliminar todas as avaliações com pontuação inferior a 3 estrelas.",
+          "Medir unicamente o tempo de carregamento de páginas de comércio eletrónico em dispositivos móveis.",
+          "Substituir a escrita humana de avaliações por bots generativos de resenhas comerciais."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+        "explanation": "O abstract e a secção 1 estabelecem que o foco é prever readership e helpfulness através de mineração de sentimento e análise de big data (p. 1).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q2",
+        "question": "Quais são as duas questões fundamentais de investigação (RQ1 e RQ2) formuladas no artigo?",
+        "question_type": "multiple_choice",
+        "options": [
+          "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+          "RQ1: Qual o custo de alojamento de avaliações? RQ2: Qual a taxa de devolução de produtos físicos?",
+          "RQ1: Quantas imagens tem cada produto? RQ2: Qual a velocidade média de conexão dos utilizadores?",
+          "RQ1: Como bloquear compradores anónimos? RQ2: Como penalizar avaliações com erros ortográficos?"
+        ],
+        "correct_index": 0,
+        "correct_answer": "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+        "explanation": "Os autores explicitam na Introdução: RQ1 sobre determinantes de readership e RQ2 sobre determinantes de perceived helpfulness (p. 1-2).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q3",
+        "question": "Segundo os resultados empíricos do estudo, qual é o efeito do sentimento presente no TÍTULO de uma avaliação?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+          "O sentimento no título não tem qualquer relação estatística com a atenção dos consumidores.",
+          "Títulos negativos aumentam drasticamente a leitura de todos os tipos de bens de forma idêntica.",
+          "Títulos com sentimento positivo reduzem a credibilidade e são sistematicamente ignorados."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+        "explanation": "Os resultados demonstram que reviews com sentimento positivo no título captam significativamente maior atenção dos consumidores (p. 1, p. 8).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q4",
+        "question": "Relativamente ao CORPO DO TEXTO da avaliação, qual foi a conclusão empírica sobre a polaridade do sentimento?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações sentimentais com polaridade neutra no texto são percecionadas como significativamente mais úteis (helpful).",
+          "Avaliações extremas com 100% de polaridade negativa são sempre consideradas mais úteis sem exceção.",
+          "Apenas avaliações com linguagem emotiva hiperbólica alcançam utilidade estatisticamente relevante.",
+          "A polaridade textual é irrelevante quando comparada exclusivamente com o número de estrelas."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações sentimentais com polaridade neutra no texto são percecionadas como significativamente mais úteis (helpful).",
+        "explanation": "O estudo comprovou que avaliações com tom neutro/balanceado no texto são avaliadas como mais úteis por oferecerem análise ponderada (p. 1, p. 8).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q5",
+        "question": "Como influenciam o comprimento (length/word count) e a longevidade (longevity) o desempenho das avaliações?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Tanto o comprimento como a longevidade da avaliação influenciam positivamente o readership e a helpfulness.",
+          "Avaliações mais longas são penalizadas em utilidade devido à sobrecarga de leitura do consumidor.",
+          "A longevidade reduz a visibilidade e diminui a utilidade percebida de forma linear.",
+          "O comprimento só tem impacto se a avaliação for publicada no primeiro dia de lançamento do produto."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Tanto o comprimento como a longevidade da avaliação influenciam positivamente o readership e a helpfulness.",
+        "explanation": "A análise empírica confirma coeficientes positivos e estatisticamente significativos para length e longevity em ambas as medidas (p. 1, p. 7).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      }
+    ],
+    "transfer_question": {
+      "id": "transfer_applied_ocr_1",
+      "scenario": "Considera que és Lead Data Scientist numa plataforma de comércio eletrónico e pretendes aplicar as conclusões empíricas de 'Predicting the Performance of Online Consumer Reviews (Aula)' para desenhar um sistema de ordenação automática de avaliações. Como desenharias o algoritmo de classificação ponderando polaridade no título, neutralidade no texto e longevidade para maximizar a utilidade sem enviesar a atenção dos compradores?",
+      "expected_concepts": [
+        "readership",
+        "helpfulness",
+        "polaridade neutra",
+        "sentimento no título",
+        "longevidade",
+        "viés de ordenação"
+      ]
+    },
+    "created_at": "2026-10-21T00:02:13.107231"
+  },
+  "quiz_2d0aa722": {
+    "quiz_id": "quiz_2d0aa722",
+    "document_id": "doc_vid_98aff7821f20",
+    "topic": "030 Initiating",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Qual é o objetivo principal e contributo formulado no documento '030 Initiating'?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Apresentar uma fundamentação estruturada para investigar os desafios centrais em gestao.",
+          "Rejeitar todos os referenciais teóricos anteriores sem validação de dados.",
+          "Executar testes não reprodutíveis sem documentação de métodos.",
+          "Substituir métodos empíricos por intuições sem evidência."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Apresentar uma fundamentação estruturada para investigar os desafios centrais em gestao.",
+        "explanation": "A introdução e secções iniciais de '030 Initiating' delimitam o contributo central da investigação.",
+        "source_ids": [
+          "doc_vid_98aff7821f20"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q2",
+        "question": "No âmbito da secção 'Introdução e Visão Geral [00:00]' (Pág. 1), qual o foco analítico central?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Desenvolver a fundamentação teórica e metodológica correspondente a Introdução e Visão Geral [00:00].",
+          "Ignorar os dados experimentais obtidos nas fases preliminares.",
+          "Anular a validade de constructo das variáveis analisadas.",
+          "Eliminar as citações bibliográficas de referência."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Desenvolver a fundamentação teórica e metodológica correspondente a Introdução e Visão Geral [00:00].",
+        "explanation": "A secção 'Introdução e Visão Geral [00:00]' analisa: [00:00] Durante a aula foram abordados os conceitos fundamentais. (p. 1).",
+        "source_ids": [
+          "doc_vid_98aff7821f20"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q3",
+        "question": "Qual a relevância empírica da evidência recolhida em '030 Initiating' para futuras aplicações?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Possibilitar a replicação e generalização dos resultados sob condições de rigor em gestao.",
+          "Impedir que outros investigadores verifiquem os resultados.",
+          "Descartar dados observados a favor de inferências infundadas.",
+          "Eliminar a rastreabilidade metodológica."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Possibilitar a replicação e generalização dos resultados sob condições de rigor em gestao.",
+        "explanation": "A metodologia do estudo visa a reprodutibilidade e avanço científico em gestao.",
+        "source_ids": [
+          "doc_vid_98aff7821f20"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q4",
+        "question": "Qual a relevância empírica da evidência recolhida em '030 Initiating' para futuras aplicações?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Possibilitar a replicação e generalização dos resultados sob condições de rigor em gestao.",
+          "Impedir que outros investigadores verifiquem os resultados.",
+          "Descartar dados observados a favor de inferências infundadas.",
+          "Eliminar a rastreabilidade metodológica."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Possibilitar a replicação e generalização dos resultados sob condições de rigor em gestao.",
+        "explanation": "A metodologia do estudo visa a reprodutibilidade e avanço científico em gestao.",
+        "source_ids": [
+          "doc_vid_98aff7821f20"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q5",
+        "question": "Qual a relevância empírica da evidência recolhida em '030 Initiating' para futuras aplicações?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Possibilitar a replicação e generalização dos resultados sob condições de rigor em gestao.",
+          "Impedir que outros investigadores verifiquem os resultados.",
+          "Descartar dados observados a favor de inferências infundadas.",
+          "Eliminar a rastreabilidade metodológica."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Possibilitar a replicação e generalização dos resultados sob condições de rigor em gestao.",
+        "explanation": "A metodologia do estudo visa a reprodutibilidade e avanço científico em gestao.",
+        "source_ids": [
+          "doc_vid_98aff7821f20"
+        ],
+        "page_ref": 1
+      }
+    ],
+    "transfer_question": {
+      "id": "transfer_applied_1",
+      "scenario": "Considera que pretendes aplicar os métodos e conclusões de '030 Initiating' num ambiente operacional real. Que salvaguardas metodológicas adotarias para garantir que a evidência recolhida se mantém válida e auditável?",
+      "expected_concepts": [
+        "validade",
+        "reprodutibilidade",
+        "rastreabilidade",
+        "evidência empírica",
+        "método"
+      ]
+    },
+    "created_at": "2026-10-21T23:16:15.519228"
+  },
+  "quiz_c454d605": {
+    "quiz_id": "quiz_c454d605",
+    "document_id": "doc_a3b336f4295d",
+    "topic": "Predicting performance online consumer reviews(1)",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "No artigo 'Predicting performance online consumer reviews(1)', qual é o objetivo central da investigação com abordagem de sentiment mining?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+          "Construir um classificador para eliminar todas as avaliações com pontuação inferior a 3 estrelas.",
+          "Medir unicamente o tempo de carregamento de páginas de comércio eletrónico em dispositivos móveis.",
+          "Substituir a escrita humana de avaliações por bots generativos de resenhas comerciais."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+        "explanation": "O abstract e a secção 1 estabelecem que o foco é prever readership e helpfulness através de mineração de sentimento e análise de big data (p. 1).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q2",
+        "question": "Quais são as duas questões fundamentais de investigação (RQ1 e RQ2) formuladas no artigo?",
+        "question_type": "multiple_choice",
+        "options": [
+          "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+          "RQ1: Qual o custo de alojamento de avaliações? RQ2: Qual a taxa de devolução de produtos físicos?",
+          "RQ1: Quantas imagens tem cada produto? RQ2: Qual a velocidade média de conexão dos utilizadores?",
+          "RQ1: Como bloquear compradores anónimos? RQ2: Como penalizar avaliações com erros ortográficos?"
+        ],
+        "correct_index": 0,
+        "correct_answer": "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+        "explanation": "Os autores explicitam na Introdução: RQ1 sobre determinantes de readership e RQ2 sobre determinantes de perceived helpfulness (p. 1-2).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q3",
+        "question": "Segundo os resultados empíricos do estudo, qual é o efeito do sentimento presente no TÍTULO de uma avaliação?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+          "O sentimento no título não tem qualquer relação estatística com a atenção dos consumidores.",
+          "Títulos negativos aumentam drasticamente a leitura de todos os tipos de bens de forma idêntica.",
+          "Títulos com sentimento positivo reduzem a credibilidade e são sistematicamente ignorados."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+        "explanation": "Os resultados demonstram que reviews com sentimento positivo no título captam significativamente maior atenção dos consumidores (p. 1, p. 8).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q4",
+        "question": "Relativamente ao CORPO DO TEXTO da avaliação, qual foi a conclusão empírica sobre a polaridade do sentimento?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações sentimentais com polaridade neutra no texto são percecionadas como significativamente mais úteis (helpful).",
+          "Avaliações extremas com 100% de polaridade negativa são sempre consideradas mais úteis sem exceção.",
+          "Apenas avaliações com linguagem emotiva hiperbólica alcançam utilidade estatisticamente relevante.",
+          "A polaridade textual é irrelevante quando comparada exclusivamente com o número de estrelas."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações sentimentais com polaridade neutra no texto são percecionadas como significativamente mais úteis (helpful).",
+        "explanation": "O estudo comprovou que avaliações com tom neutro/balanceado no texto são avaliadas como mais úteis por oferecerem análise ponderada (p. 1, p. 8).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      }
+    ],
+    "transfer_question": {
+      "id": "transfer_applied_ocr_1",
+      "scenario": "Considera que és Lead Data Scientist numa plataforma de comércio eletrónico e pretendes aplicar as conclusões empíricas de 'Predicting performance online consumer reviews(1)' para desenhar um sistema de ordenação automática de avaliações. Como desenharias o algoritmo de classificação ponderando polaridade no título, neutralidade no texto e longevidade para maximizar a utilidade sem enviesar a atenção dos compradores?",
+      "expected_concepts": [
+        "readership",
+        "helpfulness",
+        "polaridade neutra",
+        "sentimento no título",
+        "longevidade",
+        "viés de ordenação"
+      ]
+    },
+    "created_at": "2026-11-04T01:20:37.970684"
+  },
+  "quiz_f7594177": {
+    "quiz_id": "quiz_f7594177",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "topic": "Predicting the Performance of Online Consumer Reviews (Aula)",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "No artigo 'Predicting the Performance of Online Consumer Reviews (Aula)', qual é o objetivo central da investigação com abordagem de sentiment mining?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+          "Construir um classificador para eliminar todas as avaliações com pontuação inferior a 3 estrelas.",
+          "Medir unicamente o tempo de carregamento de páginas de comércio eletrónico em dispositivos móveis.",
+          "Substituir a escrita humana de avaliações por bots generativos de resenhas comerciais."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+        "explanation": "O abstract e a secção 1 estabelecem que o foco é prever readership e helpfulness através de mineração de sentimento e análise de big data (p. 1).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q2",
+        "question": "Quais são as duas questões fundamentais de investigação (RQ1 e RQ2) formuladas no artigo?",
+        "question_type": "multiple_choice",
+        "options": [
+          "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+          "RQ1: Qual o custo de alojamento de avaliações? RQ2: Qual a taxa de devolução de produtos físicos?",
+          "RQ1: Quantas imagens tem cada produto? RQ2: Qual a velocidade média de conexão dos utilizadores?",
+          "RQ1: Como bloquear compradores anónimos? RQ2: Como penalizar avaliações com erros ortográficos?"
+        ],
+        "correct_index": 0,
+        "correct_answer": "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+        "explanation": "Os autores explicitam na Introdução: RQ1 sobre determinantes de readership e RQ2 sobre determinantes de perceived helpfulness (p. 1-2).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q3",
+        "question": "Segundo os resultados empíricos do estudo, qual é o efeito do sentimento presente no TÍTULO de uma avaliação?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+          "O sentimento no título não tem qualquer relação estatística com a atenção dos consumidores.",
+          "Títulos negativos aumentam drasticamente a leitura de todos os tipos de bens de forma idêntica.",
+          "Títulos com sentimento positivo reduzem a credibilidade e são sistematicamente ignorados."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+        "explanation": "Os resultados demonstram que reviews com sentimento positivo no título captam significativamente maior atenção dos consumidores (p. 1, p. 8).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q4",
+        "question": "Relativamente ao CORPO DO TEXTO da avaliação, qual foi a conclusão empírica sobre a polaridade do sentimento?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações sentimentais com polaridade neutra no texto são percecionadas como significativamente mais úteis (helpful).",
+          "Avaliações extremas com 100% de polaridade negativa são sempre consideradas mais úteis sem exceção.",
+          "Apenas avaliações com linguagem emotiva hiperbólica alcançam utilidade estatisticamente relevante.",
+          "A polaridade textual é irrelevante quando comparada exclusivamente com o número de estrelas."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações sentimentais com polaridade neutra no texto são percecionadas como significativamente mais úteis (helpful).",
+        "explanation": "O estudo comprovou que avaliações com tom neutro/balanceado no texto são avaliadas como mais úteis por oferecerem análise ponderada (p. 1, p. 8).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      }
+    ],
+    "transfer_question": {
+      "id": "transfer_applied_ocr_1",
+      "scenario": "Considera que és Lead Data Scientist numa plataforma de comércio eletrónico e pretendes aplicar as conclusões empíricas de 'Predicting the Performance of Online Consumer Reviews (Aula)' para desenhar um sistema de ordenação automática de avaliações. Como desenharias o algoritmo de classificação ponderando polaridade no título, neutralidade no texto e longevidade para maximizar a utilidade sem enviesar a atenção dos compradores?",
+      "expected_concepts": [
+        "readership",
+        "helpfulness",
+        "polaridade neutra",
+        "sentimento no título",
+        "longevidade",
+        "viés de ordenação"
+      ]
+    },
+    "created_at": "2026-11-04T01:23:32.536422"
+  },
+  "quiz_9fd9feab": {
+    "quiz_id": "quiz_9fd9feab",
+    "document_id": "doc_a3b336f4295d",
+    "topic": "Predicting performance online consumer reviews(1)",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "No artigo 'Predicting performance online consumer reviews(1)', qual é o objetivo central da investigação com abordagem de sentiment mining?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+          "Construir um classificador para eliminar todas as avaliações com pontuação inferior a 3 estrelas.",
+          "Medir unicamente o tempo de carregamento de páginas de comércio eletrónico em dispositivos móveis.",
+          "Substituir a escrita humana de avaliações por bots generativos de resenhas comerciais."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+        "explanation": "O abstract e a secção 1 estabelecem que o foco é prever readership e helpfulness através de mineração de sentimento e análise de big data (p. 1).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q2",
+        "question": "Quais são as duas questões fundamentais de investigação (RQ1 e RQ2) formuladas no artigo?",
+        "question_type": "multiple_choice",
+        "options": [
+          "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+          "RQ1: Qual o custo de alojamento de avaliações? RQ2: Qual a taxa de devolução de produtos físicos?",
+          "RQ1: Quantas imagens tem cada produto? RQ2: Qual a velocidade média de conexão dos utilizadores?",
+          "RQ1: Como bloquear compradores anónimos? RQ2: Como penalizar avaliações com erros ortográficos?"
+        ],
+        "correct_index": 0,
+        "correct_answer": "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+        "explanation": "Os autores explicitam na Introdução: RQ1 sobre determinantes de readership e RQ2 sobre determinantes de perceived helpfulness (p. 1-2).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q3",
+        "question": "Segundo os resultados empíricos do estudo, qual é o efeito do sentimento presente no TÍTULO de uma avaliação?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+          "O sentimento no título não tem qualquer relação estatística com a atenção dos consumidores.",
+          "Títulos negativos aumentam drasticamente a leitura de todos os tipos de bens de forma idêntica.",
+          "Títulos com sentimento positivo reduzem a credibilidade e são sistematicamente ignorados."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+        "explanation": "Os resultados demonstram que reviews com sentimento positivo no título captam significativamente maior atenção dos consumidores (p. 1, p. 8).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q4",
+        "question": "Relativamente ao CORPO DO TEXTO da avaliação, qual foi a conclusão empírica sobre a polaridade do sentimento?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações sentimentais com polaridade neutra no texto são percecionadas como significativamente mais úteis (helpful).",
+          "Avaliações extremas com 100% de polaridade negativa são sempre consideradas mais úteis sem exceção.",
+          "Apenas avaliações com linguagem emotiva hiperbólica alcançam utilidade estatisticamente relevante.",
+          "A polaridade textual é irrelevante quando comparada exclusivamente com o número de estrelas."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações sentimentais com polaridade neutra no texto são percecionadas como significativamente mais úteis (helpful).",
+        "explanation": "O estudo comprovou que avaliações com tom neutro/balanceado no texto são avaliadas como mais úteis por oferecerem análise ponderada (p. 1, p. 8).",
+        "source_ids": [
+          "doc_a3b336f4295d"
+        ],
+        "page_ref": 1
+      }
+    ],
+    "transfer_question": {
+      "id": "transfer_applied_ocr_1",
+      "scenario": "Considera que és Lead Data Scientist numa plataforma de comércio eletrónico e pretendes aplicar as conclusões empíricas de 'Predicting performance online consumer reviews(1)' para desenhar um sistema de ordenação automática de avaliações. Como desenharias o algoritmo de classificação ponderando polaridade no título, neutralidade no texto e longevidade para maximizar a utilidade sem enviesar a atenção dos compradores?",
+      "expected_concepts": [
+        "readership",
+        "helpfulness",
+        "polaridade neutra",
+        "sentimento no título",
+        "longevidade",
+        "viés de ordenação"
+      ]
+    },
+    "created_at": "2026-11-04T01:27:39.718014"
+  },
+  "quiz_a9e26b3d": {
+    "quiz_id": "quiz_a9e26b3d",
+    "document_id": "doc_vid_f76259cd5c4e",
+    "topic": "Predicting the Performance of Online Consumer Reviews (Aula)",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "No artigo 'Predicting the Performance of Online Consumer Reviews (Aula)', qual é o objetivo central da investigação com abordagem de sentiment mining?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+          "Construir um classificador para eliminar todas as avaliações com pontuação inferior a 3 estrelas.",
+          "Medir unicamente o tempo de carregamento de páginas de comércio eletrónico em dispositivos móveis.",
+          "Substituir a escrita humana de avaliações por bots generativos de resenhas comerciais."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Investigar e prever os determinantes da atenção (readership) e da utilidade percebida (helpfulness) de avaliações de consumidores online (OCRs).",
+        "explanation": "O abstract e a secção 1 estabelecem que o foco é prever readership e helpfulness através de mineração de sentimento e análise de big data (p. 1).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q2",
+        "question": "Quais são as duas questões fundamentais de investigação (RQ1 e RQ2) formuladas no artigo?",
+        "question_type": "multiple_choice",
+        "options": [
+          "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+          "RQ1: Qual o custo de alojamento de avaliações? RQ2: Qual a taxa de devolução de produtos físicos?",
+          "RQ1: Quantas imagens tem cada produto? RQ2: Qual a velocidade média de conexão dos utilizadores?",
+          "RQ1: Como bloquear compradores anónimos? RQ2: Como penalizar avaliações com erros ortográficos?"
+        ],
+        "correct_index": 0,
+        "correct_answer": "RQ1: Que fatores determinam a probabilidade de atenção a uma avaliação? RQ2: Que fatores determinam a utilidade percebida de uma avaliação?",
+        "explanation": "Os autores explicitam na Introdução: RQ1 sobre determinantes de readership e RQ2 sobre determinantes de perceived helpfulness (p. 1-2).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q3",
+        "question": "Segundo os resultados empíricos do estudo, qual é o efeito do sentimento presente no TÍTULO de uma avaliação?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+          "O sentimento no título não tem qualquer relação estatística com a atenção dos consumidores.",
+          "Títulos negativos aumentam drasticamente a leitura de todos os tipos de bens de forma idêntica.",
+          "Títulos com sentimento positivo reduzem a credibilidade e são sistematicamente ignorados."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações com níveis mais elevados de sentimento positivo no título recebem maior readership (leituras/atenção).",
+        "explanation": "Os resultados demonstram que reviews com sentimento positivo no título captam significativamente maior atenção dos consumidores (p. 1, p. 8).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      },
+      {
+        "id": "q4",
+        "question": "Relativamente ao CORPO DO TEXTO da avaliação, qual foi a conclusão empírica sobre a polaridade do sentimento?",
+        "question_type": "multiple_choice",
+        "options": [
+          "Avaliações sentimentais com polaridade neutra no texto são percecionadas como significativamente mais úteis (helpful).",
+          "Avaliações extremas com 100% de polaridade negativa são sempre consideradas mais úteis sem exceção.",
+          "Apenas avaliações com linguagem emotiva hiperbólica alcançam utilidade estatisticamente relevante.",
+          "A polaridade textual é irrelevante quando comparada exclusivamente com o número de estrelas."
+        ],
+        "correct_index": 0,
+        "correct_answer": "Avaliações sentimentais com polaridade neutra no texto são percecionadas como significativamente mais úteis (helpful).",
+        "explanation": "O estudo comprovou que avaliações com tom neutro/balanceado no texto são avaliadas como mais úteis por oferecerem análise ponderada (p. 1, p. 8).",
+        "source_ids": [
+          "doc_vid_f76259cd5c4e"
+        ],
+        "page_ref": 1
+      }
+    ],
+    "transfer_question": {
+      "id": "transfer_applied_ocr_1",
+      "scenario": "Considera que és Lead Data Scientist numa plataforma de comércio eletrónico e pretendes aplicar as conclusões empíricas de 'Predicting the Performance of Online Consumer Reviews (Aula)' para desenhar um sistema de ordenação automática de avaliações. Como desenharias o algoritmo de classificação ponderando polaridade no título, neutralidade no texto e longevidade para maximizar a utilidade sem enviesar a atenção dos compradores?",
+      "expected_concepts": [
+        "readership",
+        "helpfulness",
+        "polaridade neutra",
+        "sentimento no título",
+        "longevidade",
+        "viés de ordenação"
+      ]
+    },
+    "created_at": "2026-11-04T01:28:30.282256"
   }
 }

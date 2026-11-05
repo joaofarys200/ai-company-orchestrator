@@ -525,9 +525,10 @@ async def classify_intent(prompt: str, history: list = None, binary: bool = Fals
         return "TASK"
     return res
 
-async def run_casual_chat(prompt: str, correlation_id: str | None = None):
+async def run_casual_chat(prompt: str, project_id: str | None = None, correlation_id: str | None = None):
     await _current_orchestration_service().run_casual_chat(
         prompt,
+        project_id=project_id,
         correlation_id=correlation_id,
     )
 

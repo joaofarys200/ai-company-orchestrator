@@ -39,5 +39,23 @@ contextBridge.exposeInMainWorld('jarvisIPC', {
     return file?.path || '';
   },
 
+  selectFolder: async () => {
+    try {
+      return await ipcRenderer.invoke('select-folder');
+    } catch (e) {
+      console.error('[preload] selectFolder error:', e);
+      return null;
+    }
+  },
+
+  openPath: async (targetPath) => {
+    try {
+      return await ipcRenderer.invoke('open-path', targetPath);
+    } catch (e) {
+      console.error('[preload] openPath error:', e);
+      return null;
+    }
+  },
+
   isNativeIPC: true,
 });

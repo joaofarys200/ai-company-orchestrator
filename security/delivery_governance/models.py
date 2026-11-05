@@ -27,6 +27,14 @@ class AcceptanceLevel(str, Enum):
     PRODUCT_ACCEPTED = "PRODUCT_ACCEPTED"
     USER_ACCEPTED = "USER_ACCEPTED"
 
+    # Níveis explícitos de integridade autónoma (Requisito 7)
+    CODE_VALIDATED = "CODE_VALIDATED"
+    BUILD_VALIDATED = "BUILD_VALIDATED"
+    RUNTIME_VERSION_VALIDATED = "RUNTIME_VERSION_VALIDATED"
+    API_CONTRACT_VALIDATED = "API_CONTRACT_VALIDATED"
+    FUNCTIONAL_BROWSER_VALIDATED = "FUNCTIONAL_BROWSER_VALIDATED"
+    VISUAL_BROWSER_VALIDATED = "VISUAL_BROWSER_VALIDATED"
+
 
 class DeliveryGateStatus(str, Enum):
     """Máquina de estados de governança de entrega autónoma do JARVIS."""
@@ -242,6 +250,11 @@ class ProductAcceptanceReport:
     regression_checks: List[Dict[str, Any]] = field(default_factory=list)
     acceptance_criteria: List[str] = field(default_factory=list)
     evidence: Dict[str, Any] = field(default_factory=dict)
+    validation_levels: Dict[str, bool] = field(default_factory=dict)
+    runtime_identity: Optional[Dict[str, Any]] = None
+    served_assets_check: Optional[Dict[str, Any]] = None
+    contract_check: Optional[Dict[str, Any]] = None
+    browser_qa_result: Optional[Dict[str, Any]] = None
     blockers: List[str] = field(default_factory=list)
     result: str = RequirementStatus.INSUFFICIENT_EVIDENCE.value
     quality_score: str = QualityScoreStatus.INSUFFICIENT_EVIDENCE.value

@@ -97,16 +97,29 @@ class CodingSessionWebSocketHandler:
                 system_message(str(coding_error)),
             )
         except Exception as generic_error:
+            error_name = type(generic_error).__name__
+            detail = str(generic_error).strip() or error_name
+            if "timeout" in error_name.lower():
+                detail = (
+                    "O modelo local demorou demasiado a gerar o plano "
+                    f"({error_name}). Tente um objetivo mais restrito ou "
+                    "aumente JARVIS_CODING_PLAN_TIMEOUT_SECONDS."
+                )
+            elif "connect" in error_name.lower():
+                detail = (
+                    "Nao foi possivel contactar o Ollama em "
+                    "127.0.0.1:11434. Confirme que o Ollama esta a correr."
+                )
             await self.connections.send(
                 websocket,
                 {
                     "type": "coding_session_error",
-                    "error": f"Erro inesperado: {generic_error}",
+                    "error": f"Erro inesperado: {detail}",
                 },
             )
             await self.connections.send(
                 websocket,
-                system_message(f"Erro na alteracao assistida: {generic_error}"),
+                system_message(f"Erro na alteracao assistida: {detail}"),
             )
 
     async def apply_session(

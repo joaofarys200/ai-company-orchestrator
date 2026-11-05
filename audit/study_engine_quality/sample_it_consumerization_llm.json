@@ -1,0 +1,117 @@
+{
+  "quick_summary": [
+    {
+      "text": "Investiga a transformação da governação de TI face à consumerização e implicações teóricas.",
+      "source_refs": [
+        "E1"
+      ]
+    },
+    {
+      "text": "Conceito essencial é a transição de governação homogénea para modelos adaptativos de consumo.",
+      "source_refs": [
+        "E3"
+      ]
+    },
+    {
+      "text": "Conclusões revelam necessidade de governação centrada em autonomia e plataformas digitais.",
+      "source_refs": [
+        "E3"
+      ]
+    }
+  ],
+  "study_sections": [
+    {
+      "section_id": "sec_1",
+      "title": "Enquadramento e Teoria do Equilíbrio Pontuado",
+      "page_ref": "p. 1",
+      "summary": "Fundamentação teórica da consumerização e dinâmicas de governação.",
+      "key_concepts": [
+        "Consumerização de TI",
+        "Equilíbrio Pontuado"
+      ],
+      "source_refs": [
+        "E1"
+      ]
+    }
+  ],
+  "detailed_summary": [
+    {
+      "title": "Mecanismos de Transformação da Governação de TI",
+      "text": "Análise aprofundada dos impactos organizacionais e respostas estruturais.",
+      "source_refs": [
+        "E1",
+        "E3"
+      ]
+    }
+  ],
+  "exam_summary": {
+    "high_yield_concepts": [
+      {
+        "concept": "IT Consumerization",
+        "detail": "Adoção empresarial de dispositivos e serviços orientados ao consumidor.",
+        "source_refs": [
+          "E1"
+        ]
+      }
+    ],
+    "likely_questions": [
+      {
+        "question": "De que modo a consumerização desafia os modelos tradicionais de governação de TI?",
+        "answer": "Exige transição de controlo centralizado para modelos adaptativos.",
+        "source_refs": [
+          "E1",
+          "E3"
+        ]
+      }
+    ]
+  },
+  "cornell_notes": {
+    "executive_summary": "Síntese executiva da governação perante a consumerização digital.",
+    "cue_column": [
+      {
+        "cue": "Que pressupostos teóricos sustentam a transformação?",
+        "idea": "A teoria do equilíbrio pontuado explica períodos de estabilidade e rutura.",
+        "source_refs": [
+          "E2"
+        ]
+      }
+    ]
+  },
+  "structure": {
+    "problem": {
+      "text": "Desalinhamento entre controlos rígidos de TI e práticas de consumo digital.",
+      "status": "OBSERVED",
+      "source_refs": [
+        "E1"
+      ]
+    },
+    "contribution": {
+      "text": "Modelo de transformação da governação perante a consumerização.",
+      "status": "OBSERVED",
+      "source_refs": [
+        "E1"
+      ]
+    },
+    "method": {
+      "text": "Estudo de caso e análise qualitativa em instituição financeira global.",
+      "status": "OBSERVED",
+      "source_refs": [
+        "E2"
+      ]
+    },
+    "results": {
+      "text": "Emergência de novos padrões de coexistência entre TI central e utilizadores.",
+      "status": "OBSERVED",
+      "source_refs": [
+        "E3"
+      ]
+    },
+    "conclusion": {
+      "text": "A governação de TI deve evoluir para acomodar inovação sem comprometer segurança.",
+      "status": "OBSERVED",
+      "source_refs": [
+        "E3"
+      ]
+    }
+  }
+}

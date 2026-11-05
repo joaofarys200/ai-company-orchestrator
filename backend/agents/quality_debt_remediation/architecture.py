@@ -1,7 +1,8 @@
 """
 JARVIS OS — Phase 69: Autonomous Quality Debt Remediation
 Architecture integration engine (Phase 64).
-Evaluates architectural refactoring blast radius and blocks un-governed high-risk changes.
+Evaluates architectural refactoring blast radius and blocks un-governed high-risk changes,
+or delegates high blast-radius changes (>15 nodes) to the Phase 73 Macro-Refactoring Engine.
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ class ArchitectureRefactoringEvaluation:
     permitted_autonomous: bool
     governance_required: bool
     rationale: str
+    macro_refactoring_delegated: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -34,6 +36,7 @@ class DebtArchitectureEvaluator:
     """
     Evaluates proposed architectural debt refactorings against Phase 64 SCC and dependency graphs.
     Blocks automated execution if contracts break, behavior drifts, or security policies are violated.
+    Supports delegation to Phase 73 Autonomous Macro-Refactoring Engine when blast radius > 15 nodes.
     """
 
     def evaluate_refactoring(
@@ -46,6 +49,7 @@ class DebtArchitectureEvaluator:
         behavior_drift: bool = False,
         security_risk: bool = False,
         is_irreversible: bool = False,
+        allow_macro_refactoring: bool = False,
     ) -> ArchitectureRefactoringEvaluation:
         eval_id = f"arch_{uuid.uuid4().hex[:8]}"
 
@@ -63,14 +67,26 @@ class DebtArchitectureEvaluator:
         if blockers:
             permitted = False
             governance_required = True
+            macro_delegated = False
             rationale = f"Automated refactoring blocked due to: {', '.join(blockers)}. Governance approval required."
         elif blast_radius_nodes > 15:
-            permitted = False
-            governance_required = True
-            rationale = f"High blast radius ({blast_radius_nodes} nodes > 15 max autonomous limit). Architectural review required."
+            if allow_macro_refactoring:
+                permitted = True
+                governance_required = False
+                macro_delegated = True
+                rationale = (
+                    f"High blast radius ({blast_radius_nodes} nodes > 15) delegated to "
+                    f"Autonomous Macro-Refactoring Engine (Phase 73) with staged decomposition."
+                )
+            else:
+                permitted = False
+                governance_required = True
+                macro_delegated = False
+                rationale = f"High blast radius ({blast_radius_nodes} nodes > 15 max autonomous limit). Architectural review required."
         else:
             permitted = True
             governance_required = False
+            macro_delegated = False
             rationale = f"Architectural refactoring within safe autonomous limits ({blast_radius_nodes} nodes, zero contract/security breaks)."
 
         return ArchitectureRefactoringEvaluation(
@@ -86,4 +102,5 @@ class DebtArchitectureEvaluator:
             permitted_autonomous=permitted,
             governance_required=governance_required,
             rationale=rationale,
+            macro_refactoring_delegated=macro_delegated,
         )

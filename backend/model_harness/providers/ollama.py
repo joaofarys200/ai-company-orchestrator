@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import time
@@ -111,24 +112,67 @@ class OllamaChatProvider:
             or "30m"
         )
 
+    def _ensure_local_daemon_running(self) -> bool:
+        """Starts local `ollama serve` with Flash Attention & Q8_0 KV cache if not running."""
+        if self.transport is not None:
+            return False
+        if "127.0.0.1" not in self.base_url and "localhost" not in self.base_url:
+            return False
+        import shutil
+        import subprocess
+
+        ollama_bin = shutil.which("ollama")
+        if not ollama_bin:
+            local_appdata = os.getenv("LOCALAPPDATA") or ""
+            candidate = os.path.join(local_appdata, "Programs", "Ollama", "ollama.exe")
+            if os.path.isfile(candidate):
+                ollama_bin = candidate
+        if not ollama_bin:
+            return False
+        env = os.environ.copy()
+        env.setdefault("OLLAMA_FLASH_ATTENTION", "1")
+        env.setdefault("OLLAMA_KV_CACHE_TYPE", "q8_0")
+        creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0) | getattr(
+            subprocess, "DETACHED_PROCESS", 0
+        )
+        try:
+            subprocess.Popen(
+                [ollama_bin, "serve"],
+                env=env,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                close_fds=True,
+                creationflags=creationflags,
+            )
+            return True
+        except Exception:
+            return False
+
     async def warmup(self, model: str | None = None) -> bool:
         """Sends a lightweight warmup probe to preload model weights into memory/VRAM."""
         target_model = (model or self.default_model).strip()
-        try:
-            timeout = httpx.Timeout(connect=5.0, read=30.0, write=5.0, pool=5.0)
-            async with self._client(timeout) as client:
-                resp = await client.post(
-                    "/api/generate",
-                    json={
-                        "model": target_model,
-                        "prompt": "ping",
-                        "keep_alive": self.keep_alive,
-                        "options": {"num_predict": 1},
-                    },
-                )
-                return resp.status_code < 400
-        except Exception:
-            return False
+        default_ctx = int(os.getenv("OLLAMA_NUM_CTX", "16384"))
+        for attempt in range(2):
+            try:
+                timeout = httpx.Timeout(connect=5.0, read=45.0, write=5.0, pool=5.0)
+                async with self._client(timeout) as client:
+                    resp = await client.post(
+                        "/api/generate",
+                        json={
+                            "model": target_model,
+                            "prompt": "ping",
+                            "keep_alive": self.keep_alive,
+                            "options": {"num_predict": 1, "num_ctx": default_ctx},
+                        },
+                    )
+                    return resp.status_code < 400
+            except Exception:
+                if attempt == 0 and self._ensure_local_daemon_running():
+                    await asyncio.sleep(2.5)
+                    continue
+                return False
+        return False
 
     async def generate(
         self,
@@ -143,19 +187,27 @@ class OllamaChatProvider:
 
         payload = self._payload(request, route, options)
         timeout = self._timeout(request, options)
-        async with self._client(timeout) as client:
-            if route.streaming:
-                result = await self._generate_streaming(
-                    client,
-                    payload,
-                    options,
-                )
-            else:
-                result = await self._generate_buffered(
-                    client,
-                    payload,
-                    options,
-                )
+        for attempt in range(2):
+            try:
+                async with self._client(timeout) as client:
+                    if route.streaming:
+                        result = await self._generate_streaming(
+                            client,
+                            payload,
+                            options,
+                        )
+                    else:
+                        result = await self._generate_buffered(
+                            client,
+                            payload,
+                            options,
+                        )
+                break
+            except httpx.ConnectError:
+                if attempt == 0 and self._ensure_local_daemon_running():
+                    await asyncio.sleep(2.5)
+                    continue
+                raise
         if readiness:
             return ProviderResult(
                 raw_text=result.raw_text,

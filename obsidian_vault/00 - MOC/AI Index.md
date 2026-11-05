@@ -23,6 +23,8 @@ Este MOC organiza o conhecimento sobre inferência autoregressiva, infraestrutur
 
 ## 🏛️ Architecture, Serving & GPU Optimization
 - [[Model Harness Architecture]] — Abstração de execução resiliente, timeouts e políticas de retry para LLMs.
+- [[Test-Time Compute Scaling and Reasoning Token Budgeting]] — Escalonamento de computação em inferência (`<think>`), PRMs e partição de orçamento contra truncagem.
+- [[Multimodal Ingestion - Native Audio ASR, Vision Tokens and Document OCR]] — Pipelines multimodais fundamentados com ASR 16kHz, filtro RMS de silêncio e OCR nativo de keyframes.
 - [[Ollama Local Model Serving]] — Execução local de modelos de código aberto com baixa latência e controle de recursos.
 - [[KV-Cache Dynamics and Memory Optimization in Agent Workloads]] — PagedAttention, Prefix Caching e otimização de VRAM.
 - [[GPU Kernel Compilation - CUDA, Triton and Memory Bandwidth]] — Roofline model, intensidade operacional e fusão de kernels em Triton.
@@ -39,6 +41,7 @@ Este MOC organiza o conhecimento sobre inferência autoregressiva, infraestrutur
 
 ## 📚 Retrieval-Augmented Generation (RAG) & Vector Indexes
 - [[RAG Architecture and Retrieval Strategies]] — Chunking semântico, busca híbrida (BM25 + Vetorial) e re-ranking.
+- [[Agentic RAG, Query Decomposition and Cross-Encoder Reranking]] — Decomposição multi-hop, fusão RRF, Cross-Encoder, diversificação MMR e fallback extrativo TF-MMR.
 - [[Vector Indexes - HNSW and Approximate Nearest Neighbor Partitioning]] — Grafos multicamadas HNSW e complexidade $O(\log N)$.
 - [[Semantic Caching for LLM Responses and Invalidation Strategies]] — Cache semântico por embeddings e invalidação por hash de commit.
 - [[Comparison - Lexical BM25 vs Dense Vector Embeddings vs Hybrid RAG]] — Análise comparativa entre métodos de busca e fusão RRF.
@@ -47,10 +50,12 @@ Este MOC organiza o conhecimento sobre inferência autoregressiva, infraestrutur
 - [[Context Engineering and Compression]] — Gestão de janelas de contexto, token budgeting e poda por AST.
 - [[Anti-Pattern - Unbounded Context Accumulation]] — Degradação de atenção e poluição do histórico de mensagens.
 
-## 🎯 Prompt Engineering & Grounding
+## 🎯 Prompt Engineering, Grounding & Evaluation
 - [[Hallucination Mitigation Techniques]] — Grounding com RAG, citações obrigatórias e validação externa de código.
+- [[LLM Evaluation Rigor - LLM-as-a-Judge, Calibration and Regression Gates]] — Pirâmide de avaliação determinística, mitigação de vieses de juiz e calibração com Kappa de Cohen.
 
-## 👥 Agent Systems & Self-Healing
+## 👥 Agent Systems, MCP & Self-Healing
+- [[Model Context Protocol (MCP) and Capability Discovery Architecture]] — Protocolo JSON-RPC 2.0, descoberta de tools/resources e defesa contra tool poisoning.
 - [[Planner-Executor Agent Pattern]] — Desacoplamento entre planeamento estratégico (DAG) e execução tática.
 - [[Self-Healing Prompt Loops and Reflective Orchestration (RHO-SHE)]] — Arquitetura de reflexão e auto-correção delimitada.
 - [[Agent Loop Detection and Circuit Breaker]] — Deteção de oscilações, repetição de ferramentas e circuit breaking.
@@ -62,6 +67,7 @@ Este MOC organiza o conhecimento sobre inferência autoregressiva, infraestrutur
 
 ## 🛠️ Runbooks Relacionados em 08 - Runbooks/AI
 - [[How to Handle Malformed Model Output]] — Procedimento de recuperação de JSON truncado.
+- [[Runbook - How to Prevent Thinking-Token Starvation and Mid-JSON Truncation]] — Orçamentação `max_output_tokens`, bloqueio de retries duplicados em `429` e fallback extrativo.
 - [[How to Detect and Break Agent Infinite Loops]] — Protocolo de intervenção em impasses de agentes.
 - [[Runbook - How to Recover from RHO Rule Explosion and Saturated Context]] — Poda estrutural e compactação de reflexões.
 

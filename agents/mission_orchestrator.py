@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import enum
 import glob
+import hashlib
 import json
 import os
 import time
@@ -130,28 +131,52 @@ class Checkpoint:
     plan_churn_count: int = 0
     swarm_state: dict[str, Any] = field(default_factory=dict)
     federation_state: dict[str, Any] = field(default_factory=dict)
+    # Schema version 2 enrichments
+    schema_version: int = 2
+    checksum: str = ""
+    project_path: str = ""
+    current_stage: str = ""
+    execution_engine: str = "ORCHESTRATOR"
+    execution_id: str = ""
+    last_successful_checkpoint: str = ""
+    work_packages: list[dict[str, Any]] = field(default_factory=list)
+    acceptance_criteria: list[dict[str, Any]] = field(default_factory=list)
+    approval_requests: list[dict[str, Any]] = field(default_factory=list)
+    dependency_results: dict[str, Any] = field(default_factory=dict)
+    recovery_eligibility: dict[str, Any] = field(default_factory=dict)
+    error_details: dict[str, Any] | None = None
+
+    def calculate_checksum(self) -> str:
+        d = asdict(self)
+        d.pop("checksum", None)
+        canonical = json.dumps(d, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        return hashlib.sha256(canonical).hexdigest()
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        d["checksum"] = self.calculate_checksum()
+        return d
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> Checkpoint:
-        return cls(
-            checkpoint_id=data["checkpoint_id"],
+    def from_dict(cls, data: dict[str, Any], verify_checksum: bool = True) -> Checkpoint:
+        schema_ver = int(data.get("schema_version", 1))
+        checksum = str(data.get("checksum", ""))
+        cp = cls(
+            checkpoint_id=str(data["checkpoint_id"]),
             sequence=int(data.get("sequence", 0)),
-            mission_id=data["mission_id"],
-            project_id=data["project_id"],
-            mission_status=data.get("mission_status", "ACTIVE"),
-            task_graph_data=data.get("task_graph_data", {}),
+            mission_id=str(data["mission_id"]),
+            project_id=str(data["project_id"]),
+            mission_status=str(data.get("mission_status", "ACTIVE")),
+            task_graph_data=dict(data.get("task_graph_data", {})),
             completed_task_ids=list(data.get("completed_task_ids", [])),
             pending_task_ids=list(data.get("pending_task_ids", [])),
             running_task_ids=list(data.get("running_task_ids", [])),
             failed_task_ids=list(data.get("failed_task_ids", [])),
             blocked_task_ids=list(data.get("blocked_task_ids", [])),
             evidence_refs=list(data.get("evidence_refs", [])),
-            outputs=data.get("outputs", {}),
-            created_at=data.get("created_at", ""),
-            description=data.get("description", ""),
+            outputs=dict(data.get("outputs", {})),
+            created_at=str(data.get("created_at", "")),
+            description=str(data.get("description", "")),
             graph_version=int(data.get("graph_version", 1)),
             expansion_history=list(data.get("expansion_history", [])),
             plan_version=int(data.get("plan_version", 1)),
@@ -160,7 +185,28 @@ class Checkpoint:
             plan_churn_count=int(data.get("plan_churn_count", 0)),
             swarm_state=dict(data.get("swarm_state", {})),
             federation_state=dict(data.get("federation_state", {})),
+            schema_version=schema_ver,
+            checksum=checksum,
+            project_path=str(data.get("project_path", "")),
+            current_stage=str(data.get("current_stage", "")),
+            execution_engine=str(data.get("execution_engine", "ORCHESTRATOR")),
+            execution_id=str(data.get("execution_id", "")),
+            last_successful_checkpoint=str(data.get("last_successful_checkpoint", "")),
+            work_packages=list(data.get("work_packages", [])),
+            acceptance_criteria=list(data.get("acceptance_criteria", [])),
+            approval_requests=list(data.get("approval_requests", [])),
+            dependency_results=dict(data.get("dependency_results", {})),
+            recovery_eligibility=dict(data.get("recovery_eligibility", {})),
+            error_details=data.get("error_details"),
         )
+        if verify_checksum and schema_ver >= 2 and checksum:
+            computed = cp.calculate_checksum()
+            if computed != checksum:
+                raise ValueError(
+                    f"Corrupted checkpoint: checksum mismatch for {cp.checkpoint_id} "
+                    f"(expected {checksum}, computed {computed})"
+                )
+        return cp
 
 
 @dataclass
@@ -332,6 +378,44 @@ class MissionLifecycleOrchestrator:
         """Persists deterministic snapshot or incremental delta to disk."""
         self.checkpoint_seq += 1
         now = utc_now()
+
+        # Collect schema v2 enrichments
+        proj_path = ""
+        current_stage = ""
+        exec_id = ""
+        work_packages_list = []
+        criteria_list = []
+        try:
+            m_entity = self.mission_state.get_mission(self.project_id, self.mission_id)
+            if m_entity:
+                proj_path = m_entity.get("project_path", "")
+                current_stage = m_entity.get("current_stage", "")
+                exec_id = m_entity.get("execution_id", "")
+        except Exception:
+            pass
+
+        try:
+            pkgs = self.mission_state.list_work_packages(self.project_id, self.mission_id)
+            work_packages_list = [asdict(p) if hasattr(p, "__dataclass_fields__") else dict(p) for p in pkgs]
+        except Exception:
+            pass
+
+        try:
+            crits = self.mission_state.list_criteria(self.project_id, self.mission_id)
+            criteria_list = [asdict(c) if hasattr(c, "__dataclass_fields__") else dict(c) for c in crits]
+        except Exception:
+            pass
+
+        approval_reqs_list = []
+        try:
+            from security.permission_gateway.gateway import get_permission_gateway_service
+            gw = get_permission_gateway_service()
+            for r in gw._requests.values():
+                if r.mission_id == self.mission_id:
+                    approval_reqs_list.append(r.to_dict())
+        except Exception:
+            pass
+
         cp = Checkpoint(
             checkpoint_id=f"cp_{self.checkpoint_seq:04d}_{uuid.uuid4().hex[:6]}",
             sequence=self.checkpoint_seq,
@@ -356,6 +440,16 @@ class MissionLifecycleOrchestrator:
             plan_churn_count=self.plan_churn_count,
             swarm_state=self.swarm_coordinator.export_state() if self.use_swarm else {},
             federation_state=self.swarm_federation.save_checkpoint().to_dict() if self.swarm_federation else {},
+            schema_version=2,
+            project_path=proj_path,
+            current_stage=current_stage,
+            execution_engine="ORCHESTRATOR",
+            execution_id=exec_id,
+            last_successful_checkpoint=f"cp_{self.checkpoint_seq - 1:04d}" if self.checkpoint_seq > 1 else "",
+            work_packages=work_packages_list,
+            acceptance_criteria=criteria_list,
+            approval_requests=approval_reqs_list,
+            recovery_eligibility={"resumable": self.status != MissionLifecycleStatus.FAILED},
         )
 
         cp_dict = cp.to_dict()
@@ -375,11 +469,15 @@ class MissionLifecycleOrchestrator:
                 except Exception as e:
                     log_event(self.logger, "mission_orchestrator.checkpoint_persistence_error", error=str(e))
 
-            # Maintain local file in full mode
+            # Maintain local file in full mode with ATOMIC write
             path = os.path.join(self.checkpoints_dir, f"checkpoint_{self.checkpoint_seq:04d}.json")
+            tmp_path = f"{path}.tmp.{uuid.uuid4().hex[:8]}"
             try:
-                with open(path, "w", encoding="utf-8") as f:
+                with open(tmp_path, "w", encoding="utf-8") as f:
                     f.write(json.dumps(cp_dict, indent=2, ensure_ascii=False))
+                    f.flush()
+                    os.fsync(f.fileno())
+                os.replace(tmp_path, path)
             except Exception:
                 pass
 
@@ -413,14 +511,19 @@ class MissionLifecycleOrchestrator:
         files = sorted(glob.glob(os.path.join(self.checkpoints_dir, "checkpoint_*.json")))
         if not files:
             return None
-        latest_file = files[-1]
-        try:
-            with open(latest_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            return Checkpoint.from_dict(data)
-        except Exception as e:
-            log_event(self.logger, "mission_orchestrator.checkpoint_load_error", error=str(e))
-            return None
+        for fpath in reversed(files):
+            try:
+                with open(fpath, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                return Checkpoint.from_dict(data)
+            except Exception as e:
+                log_event(self.logger, "mission_orchestrator.checkpoint_corrupt_quarantine", file=fpath, error=str(e))
+                corrupt_path = f"{fpath}.corrupt.{int(time.time())}"
+                try:
+                    os.replace(fpath, corrupt_path)
+                except Exception:
+                    pass
+        return None
 
     def load_checkpoint(self, sequence: int | None = None, checkpoint_id: str | None = None) -> Checkpoint | None:
         """Loads and returns checkpoint by sequence number or checkpoint_id, or latest if both None."""

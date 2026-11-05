@@ -1,0 +1,134 @@
+{
+  "1": {
+    "chunk": {
+      "index": 1,
+      "start_sec": 0,
+      "end_sec": 180,
+      "duration": 180,
+      "start_str": "00:00:00",
+      "end_str": "00:03:00"
+    },
+    "text": "\"apenas o sistema de informação que nós temos, posso dar aqui\"\n\"Eu vou dar-vos a definição de um sistema de informação, mas, por exemplo, um sistema de informação\"\n\"seria, eu posso dar uma definição formal, que é\"\n\"Projeto SIUM, é S-I-U-M\"\n\"tem como finalidade conceber\"\n\"desenvolver e implementar\"\n\"um sistema integrado de informação\"\n\"capaz de suportar de forma eficiente e sustentável\"\n\"todas as áreas de atividade do museu.\"\n\"E, de um modo geral,\"\n\"o sistema deverá assegurar\"\n\"a gestão da operação museológica\"\n\"das coleções\"\n\"dos visitantes\"\n\"das atividades"
+  },
+  "2": {
+    "chunk": {
+      "index": 2,
+      "start_sec": 180,
+      "end_sec": 360,
+      "duration": 180,
+      "start_str": "00:03:00",
+      "end_str": "00:06:00"
+    },
+    "text": "**Professor Luís:** Arquitetura de dados. Arquitetura tecnológica. Arquitetura de segurança. Arquitetura de integração. E a arquitetura de informação. E a arquitetura de informação. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de dados. O modelo de"
+  },
+  "3": {
+    "chunk": {
+      "index": 3,
+      "start_sec": 360,
+      "end_sec": 540,
+      "duration": 180,
+      "start_str": "00:06:00",
+      "end_str": "00:09:00"
+    },
+    "text": "**Professor Luís:** infraestrutura. [pausa] deve suportar escalabilidade e evolução futura. [pausa] e deve ser desenvolvido tendo como referência o TOGAF.\n**Estudante:** Okay. E deve ser desenvolvido...\n**Professor Luís:** ...na parte do TOGAF.\n**Estudante:** TOGAF.\n**Professor Luís:** TOGAF. Aquilo é a parte dos colegas da LNEC. [pausa] Podem ir buscar referências para essas coisas. No terceiro ano, implementação de aplicações informáticas também no terceiro ano.\n**Professor Luís:** Os colegas podem ir buscar referências para essas coisas.\n**Professor Luís:** Entendido? A parte do TOGAF. O nosso processo é o TOGAF. Pronto.\n**Estudante:** Hum.\n**Professor Luís:** Grupo 2, estão de acordo?\n**Estudante:** Sim.\n**Professor Luís:** Qual é que é a vossa questão?\n**Estudante:** Se o orçamento não chegar para tudo, qual é que é a ordem de corte?\n**Professor Luís:** Portanto: se o orçamento não chegar para tudo, qual é a ordem de corte? É a vossa pergunta. Podem pressupor que haverá financiamento. No caso extremo de não acontecer, seria deixado de seguir a parte correspondente àquela que seria a Loja.\n**Estudante:** Okay.\n**Professor Luís:** Grupo 3?\n**Estudante:** Nós temos a questão de se equipamentos já existentes vão ser reutilizados ou não.\n**Professor Luís:** Podem ser reutilizados? Não existe nada que possa ser reutilizado, está? É mesmo a criação de raiz."
+  },
+  "4": {
+    "chunk": {
+      "index": 4,
+      "start_sec": 540,
+      "end_sec": 720,
+      "duration": 180,
+      "start_str": "00:09:00",
+      "end_str": "00:12:00"
+    },
+    "text": "**Estudante:** Sim.\n**Professor Luís:** ...considerar que todos os processos que identificaram até agora são identificados numa base de prioridade.\n**Estudante:** Sim.\n**Professor Luís:** A resposta seria sobre todos.\n**Estudante:** Sim.\n**Professor Luís:** Portanto, considerar que são todos.\n**Estudante:** Sim.\n**Professor Luís:** A resposta é que seria sobre todos.\n**Estudante:** Sim.\n**Professor Luís:** Portanto, considerar que são todos.\n**Estudante:** Sim.\n**Professor Luís:** A resposta é que seria sobre todos.\n**Estudante:** Sim.\n**Professor Luís:** Portanto, considerar que são todos.\n**Estudante:** Sim"
+  },
+  "5": {
+    "chunk": {
+      "index": 5,
+      "start_sec": 720,
+      "end_sec": 900,
+      "duration": 180,
+      "start_str": "00:12:00",
+      "end_str": "00:15:00"
+    },
+    "text": "**Professor Luís:** No projeto já que vocês têm uma restrição, certo?\n**Estudante:** 200.000.\n**Professor Luís:** A restrição passa a ser 200.000."
+  },
+  "6": {
+    "chunk": {
+      "index": 6,
+      "start_sec": 900,
+      "end_sec": 1080,
+      "duration": 180,
+      "start_str": "00:15:00",
+      "end_str": "00:18:00"
+    },
+    "text": "**Estudante:** E se, se quiséssemos fazer, por exemplo, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um, um"
+  },
+  "7": {
+    "chunk": {
+      "index": 7,
+      "start_sec": 1080,
+      "end_sec": 1260,
+      "duration": 180,
+      "start_str": "00:18:00",
+      "end_str": "00:21:00"
+    },
+    "text": "**Estudante:** diria que é o Ema.\n**Estudante:** SGM.\n**Estudante:** E a CCB."
+  },
+  "8": {
+    "chunk": {
+      "index": 8,
+      "start_sec": 1260,
+      "end_sec": 1440,
+      "duration": 180,
+      "start_str": "00:21:00",
+      "end_str": "00:24:00"
+    },
+    "text": "**Estudante:** Grupo 4. Eh, mais, eh, mais uma questão, mas está sobre a lista de aplicações que temos para o SIUM. Eh, nas entrevistas, nós falamos sobre a lista de aplicações identificadas. Eu gostava de saber, tanto os requisitos funcionais de cada um, o problema é que nós temos 12, cada um. Pois eu posso escolher um. Eh, pode ser a gestão de coleções, incluindo o inventário e a catalogação. Cada um assim.\n\n**Professor Luís:** Portanto, a gestão de coleções deverá ter mínimo, eh, gerir o inventário e a catalogação de peças. Registar informação histórica e documental. Gerir a localização e a movimentação de objetos. Gerir a localização e a movimentação de objetos. E finalmente, suportar os processos de conservação e restauro. Suportar os processos de conservação e restauro."
+  },
+  "9": {
+    "chunk": {
+      "index": 9,
+      "start_sec": 1440,
+      "end_sec": 1620,
+      "duration": 180,
+      "start_str": "00:24:00",
+      "end_str": "00:27:00"
+    },
+    "text": "**Professor Luís:** Vou repetir, integrar pagamentos eletrónicos. Emitir bilhetes digitais e produzir estatísticas de utilização. Vou repetir, de forma mais, mais. Gerir vendas presenciais e online. Gerir reservas individuais e de grupos. Integrar pagamentos eletrónicos. Emitir bilhetes digitais e produzir estatísticas de utilização.\n\n**Estudante:** Professor Luís, só uma questão.\n\n**Professor Luís:** Sim.\n\n**Estudante:** A questão da migração de dados.\n\n**Professor Luís:** Migração de dados.\n\n**Estudante:** Com a margem de erro tolerável.\n\n**Professor Luís:** Na migração, inventário e Excel.\n\n**Estudante:** Exatamente.\n\n**Professor Luís:** Relacionado"
+  },
+  "10": {
+    "chunk": {
+      "index": 10,
+      "start_sec": 1620,
+      "end_sec": 1800,
+      "duration": 180,
+      "start_str": "00:27:00",
+      "end_str": "00:30:00"
+    },
+    "text": "**Professor Luís:** Deixa-me só fazer aqui uma nota, para quando no quarto, aqui nos contadores do ano. O que é que é o SIUM? É um website. Ou seja, já conhecido como fonte de dados, segundo não existia, dois"
+  },
+  "11": {
+    "chunk": {
+      "index": 11,
+      "start_sec": 1800,
+      "end_sec": 1980,
+      "duration": 180,
+      "start_str": "00:30:00",
+      "end_str": "00:33:00"
+    },
+    "text": "**Professor Luís:** comunicação. E vão fazer a comunicação."
+  },
+  "12": {
+    "chunk": {
+      "index": 12,
+      "start_sec": 1980,
+      "end_sec": 2019,
+      "duration": 39,
+      "start_str": "00:33:00",
+      "end_str": "00:33:39"
+    },
+    "text": "**Professor Luís:** ...muito obrigado por esta apresentação. Vemos que na próxima semana, o que é que eu vos pedia para pensarem? Devem ter a possibilidade de pagar, pagar a..."
+  }
+}

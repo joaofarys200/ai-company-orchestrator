@@ -1,0 +1,104 @@
+{
+  "validation_id": "empirical_validation_phase_77",
+  "timestamp": 1792967974.321507,
+  "status": "VALIDATION_PASSED",
+  "evaluation_metrics": {
+    "total_claims_evaluated": 7,
+    "correctly_classified": 7,
+    "classification_accuracy_pct": 100.0,
+    "false_acceptance_count": 0,
+    "false_acceptance_rate_pct": 0.0,
+    "false_rejection_count": 0,
+    "false_rejection_rate_pct": 0.0
+  },
+  "scenarios_demonstrated": {
+    "genuine_claim_supported": {
+      "claim_id": "claim_empirical_01",
+      "status": "VERIFIED"
+    },
+    "missing_evidence": {
+      "claim_id": "claim_empirical_02",
+      "status": "UNVERIFIED"
+    },
+    "contradicted_evidence": {
+      "claim_id": "claim_empirical_03",
+      "status": "CONTRADICTED"
+    },
+    "invalidated_by_code_change": {
+      "claim_id": "claim_empirical_04",
+      "status": "STALE"
+    },
+    "synthetic_data_caveat": {
+      "claim_id": "claim_empirical_05",
+      "status": "PARTIALLY_VERIFIED",
+      "caveats": [
+        "SYNTHETIC_FIXTURE_ONLY"
+      ]
+    },
+    "conflicting_reports_reconciliation": {
+      "claim_id": "claim_empirical_07",
+      "status": "CONTRADICTED"
+    },
+    "security_authorization_governance": {
+      "claim_id": "claim_empirical_08",
+      "status": "VERIFIED"
+    }
+  },
+  "report_audit_outcome": {
+    "report_path": "docs/PHASE_SAMPLE_REPORT.md",
+    "total_claims": 5,
+    "verified_count": 1,
+    "unverified_count": 2,
+    "contradicted_count": 1,
+    "stale_count": 1,
+    "claims_details": [
+      {
+        "claim_id": "claim_empirical_01",
+        "type": "TEST_EXECUTION",
+        "proposition": "Phase 76 predictive calibration suite passed 30/30 tests.",
+        "status": "VERIFIED",
+        "tier": "TIER_2_OPERATIONAL",
+        "explanation": "Test runner confirmed 30/30 tests passed with 0 failures."
+      },
+      {
+        "claim_id": "claim_empirical_02",
+        "type": "PERFORMANCE_BENCHMARK",
+        "proposition": "Database query latency reduced by 50%.",
+        "status": "UNVERIFIED",
+        "tier": "TIER_3_ARCHITECTURAL",
+        "explanation": "No evidence artifacts attached to claim."
+      },
+      {
+        "claim_id": "claim_empirical_03",
+        "type": "TEST_EXECUTION",
+        "proposition": "All 25 integration tests passed without error.",
+        "status": "CONTRADICTED",
+        "tier": "TIER_2_OPERATIONAL",
+        "explanation": "Test execution failed: 1 test(s) failed out of 25."
+      },
+      {
+        "claim_id": "claim_empirical_04",
+        "type": "REPOSITORY_STATE",
+        "proposition": "Security gateway middleware is fully patched and verified.",
+        "status": "STALE",
+        "tier": "TIER_3_ARCHITECTURAL",
+        "explanation": "Previously verified evidence invalidated by modifications to ['security/gateway.py']."
+      },
+      {
+        "claim_id": "claim_empirical_05",
+        "type": "PERFORMANCE_BENCHMARK",
+        "proposition": "Production network throughput scaled to 10k req/s.",
+        "status": "PARTIALLY_VERIFIED",
+        "tier": "TIER_3_ARCHITECTURAL",
+        "explanation": "Benchmark demonstrates algorithmic behavior on synthetic fixtures, not real-world workload."
+      }
+    ],
+    "is_acceptable": false,
+    "rejection_reasons": [
+      "Report contains 1 CONTRADICTED claim(s): ['claim_empirical_03']",
+      "Report contains 1 STALE claim(s): ['claim_empirical_04']",
+      "Report contains 2 UNVERIFIED claim(s): ['claim_empirical_02', 'claim_empirical_05']"
+    ]
+  },
+  "crash_recovery_verified": true
+}

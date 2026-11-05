@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, MessageSquare, Terminal, Mic, MicOff, Info } from 'lucide-react';
+import { Globe, MessageSquare, Mic, MicOff, BookOpen, Code2, Database, Shield } from 'lucide-react';
 
-export const HologramCore: React.FC = () => {
+interface HologramCoreProps {
+  docked?: boolean;
+  onToggleBoard?: () => void;
+}
+
+export const HologramCore: React.FC<HologramCoreProps> = ({
+  docked = false,
+  onToggleBoard,
+}) => {
   const {
     systemStatus,
     voiceStatus,
     chatPanelOpen,
     setChatPanelOpen,
-    devPanelOpen,
-    setDevPanelOpen,
     toggleVoice,
     isConnected,
+    activeBoard,
+    openSpatialBoard,
+    closeSpatialBoard,
   } = useWebSocket();
 
   const [timeStr, setTimeStr] = useState('00:00:00');
@@ -23,67 +32,66 @@ export const HologramCore: React.FC = () => {
     const timer = setInterval(() => {
       const now = new Date();
       setTimeStr(now.toLocaleTimeString('pt-PT', { hour12: false }));
-      
+
       const options: Intl.DateTimeFormatOptions = { weekday: 'short', day: '2-digit', month: 'short' };
       setDateStr(now.toLocaleDateString('pt-PT', options).toUpperCase() + ' // JARVIS OS');
     }, 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Define responsive color themes for each app status
   const getTheme = () => {
     if (voiceStatus === 'listening') {
       return {
-        hex: '#10b981', // emerald
+        hex: '#10b981',
         rgba: 'rgba(16, 185, 129, 0.15)',
         glow: 'shadow-[0_0_35px_rgba(16,185,129,0.4)]',
         glowRgb: 'rgba(16, 185, 129, 0.45)',
         border: 'border-emerald-500/40',
         text: 'text-emerald-400',
-        coreBg: 'from-[#022c22]/90 via-[#020617]/95 to-[#05070e]/98'
+        coreBg: 'from-[#022c22]/90 via-[#020617]/95 to-[#05070e]/98',
       };
     }
     if (voiceStatus === 'transcribing') {
       return {
-        hex: '#f59e0b', // amber
+        hex: '#f59e0b',
         rgba: 'rgba(245, 158, 11, 0.15)',
         glow: 'shadow-[0_0_35px_rgba(245,158,11,0.4)]',
         glowRgb: 'rgba(245, 158, 11, 0.45)',
         border: 'border-amber-500/40',
         text: 'text-amber-400',
-        coreBg: 'from-[#78350f]/80 via-[#020617]/95 to-[#05070e]/98'
+        coreBg: 'from-[#78350f]/80 via-[#020617]/95 to-[#05070e]/98',
       };
     }
     if (systemStatus === 'PROCESSING') {
       return {
-        hex: '#d99a6c', // terracotta
+        hex: '#d99a6c',
         rgba: 'rgba(217, 154, 108, 0.15)',
         glow: 'shadow-[0_0_40px_rgba(217,154,108,0.32)]',
         glowRgb: 'rgba(217, 154, 108, 0.34)',
         border: 'border-orange-300/35',
         text: 'text-orange-200',
-        coreBg: 'from-[#3a2117]/80 via-[#141311]/95 to-[#0b0b0a]/98'
+        coreBg: 'from-[#3a2117]/80 via-[#141311]/95 to-[#0b0b0a]/98',
       };
     }
     if (systemStatus === 'ONLINE') {
       return {
-        hex: '#d99a6c', // terracotta
+        hex: '#d99a6c',
         rgba: 'rgba(217, 154, 108, 0.12)',
         glow: 'shadow-[0_0_30px_rgba(217,154,108,0.24)]',
         glowRgb: 'rgba(217, 154, 108, 0.28)',
         border: 'border-orange-300/30',
         text: 'text-orange-200',
-        coreBg: 'from-[#2a1c15]/80 via-[#141311]/95 to-[#0b0b0a]/98'
+        coreBg: 'from-[#2a1c15]/80 via-[#141311]/95 to-[#0b0b0a]/98',
       };
     }
     return {
-      hex: '#64748b', // slate/offline
+      hex: '#64748b',
       rgba: 'rgba(100, 116, 139, 0.1)',
       glow: 'shadow-[0_0_15px_rgba(100,116,139,0.15)]',
       glowRgb: 'rgba(100, 116, 139, 0.15)',
       border: 'border-slate-500/20',
       text: 'text-slate-500',
-      coreBg: 'from-[#0f172a]/80 via-[#020617]/95 to-[#05070e]/98'
+      coreBg: 'from-[#0f172a]/80 via-[#020617]/95 to-[#05070e]/98',
     };
   };
 
@@ -97,9 +105,8 @@ export const HologramCore: React.FC = () => {
     return 'SISTEMA DESCONECTADO';
   };
 
-  // Generate dynamic compass/HUD ticks
   const ticks = Array.from({ length: 60 }).map((_, idx) => {
-    const angle = idx * 6; // 360 / 60 = 6 degrees
+    const angle = idx * 6;
     const isMajor = idx % 5 === 0;
     return (
       <line
@@ -107,8 +114,8 @@ export const HologramCore: React.FC = () => {
         x1="180"
         y1="38"
         x2="180"
-        y2={isMajor ? "48" : "43"}
-        stroke={isMajor ? theme.hex : theme.hex}
+        y2={isMajor ? '48' : '43'}
+        stroke={theme.hex}
         strokeWidth={isMajor ? 1.5 : 0.8}
         opacity={isMajor ? 0.6 : 0.2}
         transform={`rotate(${angle} 180 180)`}
@@ -116,9 +123,8 @@ export const HologramCore: React.FC = () => {
     );
   });
 
-  // Generate dynamic compass dots
   const compassDots = Array.from({ length: 12 }).map((_, idx) => {
-    const angle = idx * 30; // 360 / 12 = 30 degrees
+    const angle = idx * 30;
     return (
       <circle
         key={idx}
@@ -132,163 +138,171 @@ export const HologramCore: React.FC = () => {
     );
   });
 
+  const handleBoardToggle = () => {
+    if (onToggleBoard) {
+      onToggleBoard();
+      return;
+    }
+    if (activeBoard) {
+      closeSpatialBoard();
+    } else {
+      openSpatialBoard('study');
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-6 relative z-10 w-full select-none">
-      
-      {/* ── CENTRAL HUD GRAPHIC CONTAINER ── */}
-      <div className="relative w-[360px] h-[360px] flex items-center justify-center rounded-full">
-        
-        {/* Dynamic Glowing Halo behind core */}
-        <div className={`absolute w-44 h-44 rounded-full transition-all duration-700 bg-transparent ${theme.glow} -z-10`} />
-
-        {/* 1. Compass / Ticks / Dots Ring (Rotating slowly) */}
-        <motion.g
-          animate={{ rotate: 360 }}
-          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-          className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
+    <>
+      <motion.div
+        layout
+        transition={{ type: 'spring', damping: 26, stiffness: 210 }}
+        onClick={docked ? handleBoardToggle : undefined}
+        title={docked ? 'Clica no Orbe para descansar o Quadro Espacial e voltar ao centro' : undefined}
+        className={
+          docked
+            ? 'fixed bottom-20 right-6 z-40 flex flex-col items-center justify-center select-none cursor-pointer group'
+            : 'flex flex-col items-center justify-center py-12 px-6 relative z-10 w-full select-none'
+        }
+      >
+        <motion.div
+          layoutId="jarvis-hologram-orb"
+          animate={{ scale: docked ? 0.34 : 1 }}
+          transition={{ type: 'spring', damping: 26, stiffness: 210 }}
+          className={`relative w-[360px] h-[360px] flex items-center justify-center rounded-full ${
+            docked ? '-m-[118px]' : ''
+          }`}
         >
-          <svg width="360" height="360" viewBox="0 0 360 360" className="absolute">
-            {/* Outer Dotted ring track */}
-            <circle cx="180" cy="180" r="152" stroke={theme.hex} strokeWidth="0.5" fill="none" strokeDasharray="2 8" opacity="0.15" />
-            
-            {/* Grid circle ticks */}
-            {ticks}
-            {compassDots}
+          <div className={`absolute w-44 h-44 rounded-full transition-all duration-700 bg-transparent ${theme.glow} -z-10`} />
+
+          <motion.g
+            animate={{ rotate: 360 }}
+            transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+            className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
+          >
+            <svg width="360" height="360" viewBox="0 0 360 360" className="absolute">
+              <circle cx="180" cy="180" r="152" stroke={theme.hex} strokeWidth="0.5" fill="none" strokeDasharray="2 8" opacity="0.15" />
+              {ticks}
+              {compassDots}
+            </svg>
+          </motion.g>
+
+          <svg width="360" height="360" viewBox="0 0 360 360" className="absolute pointer-events-none">
+            <line x1="180" y1="12" x2="180" y2="22" stroke={theme.hex} strokeWidth="1.5" opacity="0.7" />
+            <line x1="180" y1="338" x2="180" y2="348" stroke={theme.hex} strokeWidth="1.5" opacity="0.7" />
+            <line x1="12" y1="180" x2="22" y2="180" stroke={theme.hex} strokeWidth="1.5" opacity="0.7" />
+            <line x1="338" y1="180" x2="348" y2="180" stroke={theme.hex} strokeWidth="1.5" opacity="0.7" />
+            <circle cx="180" cy="180" r="112" stroke={theme.hex} strokeWidth="0.8" fill="none" opacity="0.2" />
           </svg>
-        </motion.g>
 
-        {/* 2. Technical Ticks & Cardinal Markers */}
-        <svg width="360" height="360" viewBox="0 0 360 360" className="absolute pointer-events-none">
-          {/* Main crosshair lines */}
-          <line x1="180" y1="12" x2="180" y2="22" stroke={theme.hex} strokeWidth="1.5" opacity="0.7" />
-          <line x1="180" y1="338" x2="180" y2="348" stroke={theme.hex} strokeWidth="1.5" opacity="0.7" />
-          <line x1="12" y1="180" x2="22" y2="180" stroke={theme.hex} strokeWidth="1.5" opacity="0.7" />
-          <line x1="338" y1="180" x2="348" y2="180" stroke={theme.hex} strokeWidth="1.5" opacity="0.7" />
-          
-          {/* Inner ring track */}
-          <circle cx="180" cy="180" r="112" stroke={theme.hex} strokeWidth="0.8" fill="none" opacity="0.2" />
-        </svg>
+          <svg width="360" height="360" viewBox="0 0 360 360" className="absolute pointer-events-none">
+            <motion.circle
+              cx="180"
+              cy="180"
+              r="124"
+              stroke="rgba(255, 255, 255, 0.85)"
+              strokeWidth="2.5"
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray="140 650"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 32, repeat: Infinity, ease: 'linear' }}
+              style={{ transformOrigin: '180px 180px' }}
+            />
 
-        {/* 3. Outer Concentric Arcs (Rotating in opposite directions) */}
-        <svg width="360" height="360" viewBox="0 0 360 360" className="absolute pointer-events-none">
-          {/* Main bold white arc (Bottom-Left in reference image) */}
-          <motion.circle
-            cx="180"
-            cy="180"
-            r="124"
-            stroke="rgba(255, 255, 255, 0.85)"
-            strokeWidth="2.5"
-            fill="none"
-            strokeLinecap="round"
-            strokeDasharray="140 650"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 32, repeat: Infinity, ease: 'linear' }}
-            style={{ transformOrigin: '180px 180px' }}
-          />
+            <motion.circle
+              cx="180"
+              cy="180"
+              r="124"
+              stroke={theme.hex}
+              strokeWidth="1.2"
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray="90 690"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
+              style={{ transformOrigin: '180px 180px' }}
+            />
 
-          {/* Thin colored arc (Top-Right in reference image) */}
-          <motion.circle
-            cx="180"
-            cy="180"
-            r="124"
-            stroke={theme.hex}
-            strokeWidth="1.2"
-            fill="none"
-            strokeLinecap="round"
-            strokeDasharray="90 690"
-            animate={{ rotate: -360 }}
-            transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
-            style={{ transformOrigin: '180px 180px' }}
-          />
+            <motion.circle
+              cx="180"
+              cy="56"
+              r="3"
+              fill="#ffffff"
+              className="shadow-lg"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+              style={{ transformOrigin: '180px 180px' }}
+            />
+          </svg>
 
-          {/* Tiny orbiting dot */}
-          <motion.circle
-            cx="180"
-            cy="56"
-            r="3"
-            fill="#ffffff"
-            className="shadow-lg"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-            style={{ transformOrigin: '180px 180px' }}
-          />
-        </svg>
-
-        {/* 4. SOLID CENTRAL CORE CIRCLE */}
-        <motion.div
-          animate={voiceStatus === 'listening' ? { scale: [1, 1.04, 1] } : { scale: 1 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          className={`w-44 h-44 rounded-full bg-[#05070e] border border-white/10 flex flex-col items-center justify-center relative z-10 transition-all duration-700 shadow-2xl`}
-          style={{
-            boxShadow: `0 0 35px ${theme.glowRgb}, inset 0 0 20px ${theme.rgba}`
-          }}
-        >
-          {/* Inner thin border layer */}
-          <div className="absolute inset-1.5 rounded-full border border-white/5 pointer-events-none" />
-
-          {/* Rotating tech rings inside core */}
           <motion.div
-            animate={{ rotate: -360 }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-4 rounded-full border border-dashed border-white/5 pointer-events-none"
-          />
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            className={`absolute inset-6 rounded-full border-t border-b border-r border-transparent pointer-events-none`}
-            style={{ borderTopColor: theme.hex, borderBottomColor: theme.hex, opacity: 0.4 }}
-          />
+            animate={voiceStatus === 'listening' ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-44 h-44 rounded-full bg-[#05070e] border border-white/10 flex flex-col items-center justify-center relative z-10 transition-all duration-700 shadow-2xl"
+            style={{
+              boxShadow: `0 0 35px ${theme.glowRgb}, inset 0 0 20px ${theme.rgba}`,
+            }}
+          >
+            <div className="absolute inset-1.5 rounded-full border border-white/5 pointer-events-none" />
+            <motion.div
+              animate={{ rotate: -360 }}
+              transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+              className="absolute inset-4 rounded-full border border-dashed border-white/5 pointer-events-none"
+            />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+              className="absolute inset-6 rounded-full border-t border-b border-r border-transparent pointer-events-none"
+              style={{ borderTopColor: theme.hex, borderBottomColor: theme.hex, opacity: 0.4 }}
+            />
 
-          {/* JARVIS Text Center */}
-          <span className="font-sans text-[22px] font-light tracking-[0.22em] text-white font-bold ml-[0.22em] z-10">
-            JARVIS
-          </span>
+            <span className="font-sans text-[22px] font-light tracking-[0.22em] text-white font-bold ml-[0.22em] z-10">
+              JARVIS
+            </span>
 
-          {/* Tiny center pulsing core dot */}
-          <motion.div
-            animate={{ scale: [1, 1.6, 1], opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2.5, repeat: Infinity }}
-            className={`w-1.5 h-1.5 rounded-full mt-3 ${
-              voiceStatus === 'listening' ? 'bg-emerald-400 shadow-[0_0_8px_#10b981]' :
-              voiceStatus === 'transcribing' ? 'bg-amber-400 shadow-[0_0_8px_#f59e0b]' :
-              systemStatus === 'PROCESSING' ? 'bg-orange-300 shadow-[0_0_8px_#d99a6c]' :
-              'bg-orange-300 shadow-[0_0_8px_#d99a6c]'
-            }`}
-          />
+            <motion.div
+              animate={{ scale: [1, 1.6, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 2.5, repeat: Infinity }}
+              className={`w-1.5 h-1.5 rounded-full mt-3 ${
+                voiceStatus === 'listening'
+                  ? 'bg-emerald-400 shadow-[0_0_8px_#10b981]'
+                  : voiceStatus === 'transcribing'
+                    ? 'bg-amber-400 shadow-[0_0_8px_#f59e0b]'
+                    : 'bg-orange-300 shadow-[0_0_8px_#d99a6c]'
+              }`}
+            />
+          </motion.div>
         </motion.div>
 
-      </div>
+        {!docked && (
+          <div className="mt-8 text-center select-none flex flex-col items-center z-10">
+            <motion.div
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 3, repeat: Infinity }}
+              className={`font-mono text-[11px] tracking-[0.25em] ${theme.text} font-bold uppercase transition-colors duration-500`}
+            >
+              {getStatusText()}
+            </motion.div>
 
-      {/* ── STATUS LABEL & CLOCK ── */}
-      <div className="mt-8 text-center select-none flex flex-col items-center z-10">
-        <motion.div
-          animate={{ opacity: [0.7, 1, 0.7] }}
-          transition={{ duration: 3, repeat: Infinity }}
-          className={`font-mono text-[11px] tracking-[0.25em] ${theme.text} font-bold uppercase transition-colors duration-500`}
-        >
-          {getStatusText()}
-        </motion.div>
-        
-        {/* Tech Pill Clock */}
-        <div className="mt-4.5 py-1.5 px-4 rounded-full bg-[#05070e]/80 border border-white/5 inline-flex items-center gap-3 backdrop-blur-md">
-          <div className="font-mono text-sm text-gray-200 tracking-widest font-semibold">{timeStr}</div>
-          <div className="w-[1px] h-3 bg-white/10" />
-          <div className="font-mono text-[9px] text-gray-500 tracking-wider uppercase">{dateStr.split(' // ')[0]}</div>
-        </div>
-      </div>
+            <div className="mt-4.5 py-1.5 px-4 rounded-full bg-[#05070e]/80 border border-white/5 inline-flex items-center gap-3 backdrop-blur-md">
+              <div className="font-mono text-sm text-gray-200 tracking-widest font-semibold">{timeStr}</div>
+              <div className="w-[1px] h-3 bg-white/10" />
+              <div className="font-mono text-[9px] text-gray-500 tracking-wider uppercase">{dateStr.split(' // ')[0]}</div>
+            </div>
+          </div>
+        )}
+      </motion.div>
 
-      {/* ── FLOATING BOTTOM HUD DOCK ── */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-5 px-5 py-2.5 bg-[#05070e]/75 border border-white/5 rounded-full backdrop-blur-lg shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all">
-        {/* Globe Connection Indicator */}
+      {/* ── FLOATING BOTTOM HUD DOCK (Direct Spatial Domain Triggers) ── */}
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 sm:gap-4 px-4 py-2 bg-[#05070e]/85 border border-white/10 rounded-full backdrop-blur-xl shadow-[0_12px_35px_rgba(0,0,0,0.65)] transition-all">
         <button
           onClick={() => {
             setShowStatusAlert(true);
             setTimeout(() => setShowStatusAlert(false), 3000);
           }}
-          className={`relative p-2 rounded-full hover:bg-white/5 transition-all text-gray-500 hover:text-white cursor-pointer`}
-          title={isConnected ? "WebSocket Conectado (Porta 8001)" : "WebSocket Desconectado"}
+          className="relative p-2 rounded-full hover:bg-white/5 transition-all text-gray-500 hover:text-white cursor-pointer"
+          title={isConnected ? 'WebSocket Conectado (Porta 8001)' : 'WebSocket Desconectado'}
         >
-          <Globe className={`w-4.5 h-4.5 transition-colors ${isConnected ? 'text-emerald-400 drop-shadow-[0_0_4px_rgba(16,185,129,0.5)]' : 'text-rose-500'}`} />
+          <Globe className={`w-4 h-4 transition-colors ${isConnected ? 'text-emerald-400' : 'text-rose-500'}`} />
           {isConnected && (
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
           )}
@@ -296,50 +310,89 @@ export const HologramCore: React.FC = () => {
 
         <div className="w-[1px] h-4 bg-white/10" />
 
-        {/* Chat Drawer Toggle button */}
+        {/* Estudos */}
         <button
-          onClick={() => setChatPanelOpen(!chatPanelOpen)}
-          className={`p-2 rounded-full hover:bg-white/5 transition-all cursor-pointer ${
-            chatPanelOpen ? 'text-orange-200 drop-shadow-[0_0_4px_rgba(217,154,108,0.42)]' : 'text-gray-400 hover:text-white'
+          onClick={() => (activeBoard?.domain === 'study' ? closeSpatialBoard() : openSpatialBoard('study'))}
+          className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+            activeBoard?.domain === 'study'
+              ? 'bg-[#d99a6c]/25 text-[#f3c39f] border border-[#d99a6c]/45'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
           }`}
-          title="Abrir Chat (ou diz 'abre o chat')"
+          title="Quadro de Estudos & Aulas"
         >
-          <MessageSquare className="w-4.5 h-4.5" />
+          <BookOpen className="w-4 h-4" />
+          <span className="hidden sm:inline">Estudos</span>
         </button>
 
-        {/* Dev Panel Toggle button */}
+        {/* Projetos & Código */}
         <button
-          onClick={() => setDevPanelOpen(!devPanelOpen)}
-          className={`p-2 rounded-full hover:bg-white/5 transition-all cursor-pointer ${
-            devPanelOpen ? 'text-orange-200 drop-shadow-[0_0_4px_rgba(217,154,108,0.42)]' : 'text-gray-400 hover:text-white'
+          onClick={() => (activeBoard?.domain === 'project' ? closeSpatialBoard() : openSpatialBoard('project'))}
+          className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+            activeBoard?.domain === 'project'
+              ? 'bg-[#d99a6c]/25 text-[#f3c39f] border border-[#d99a6c]/45'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
           }`}
-          title="Abrir Painel Dev (ou diz 'painel dev')"
+          title="Quadro de Projetos, Editor de Código & Live Preview"
         >
-          <Terminal className="w-4.5 h-4.5" />
+          <Code2 className="w-4 h-4" />
+          <span className="hidden sm:inline">Projetos</span>
         </button>
 
-        {/* Microphone Toggle (Auto VAD indicator) */}
+        {/* Obsidian Vault */}
         <button
-          onClick={() => toggleVoice(voiceStatus === 'offline')}
-          className={`p-2 rounded-full hover:bg-white/5 transition-all cursor-pointer ${
-            voiceStatus !== 'offline' ? 'text-emerald-400 drop-shadow-[0_0_4px_rgba(16,185,129,0.5)]' : 'text-gray-500 hover:text-white'
+          onClick={() => (activeBoard?.domain === 'obsidian' ? closeSpatialBoard() : openSpatialBoard('obsidian'))}
+          className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+            activeBoard?.domain === 'obsidian'
+              ? 'bg-[#d99a6c]/25 text-[#f3c39f] border border-[#d99a6c]/45'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
           }`}
-          title={voiceStatus !== 'offline' ? "Microfone VAD Ativo" : "Microfone VAD Inativo"}
+          title="Quadro do Obsidian Knowledge Vault"
         >
-          {voiceStatus !== 'offline' ? <Mic className="w-4.5 h-4.5" /> : <MicOff className="w-4.5 h-4.5" />}
+          <Database className="w-4 h-4" />
+          <span className="hidden sm:inline">Obsidian</span>
+        </button>
+
+        {/* Sentinel */}
+        <button
+          onClick={() => (activeBoard?.domain === 'sentinel' ? closeSpatialBoard() : openSpatialBoard('sentinel'))}
+          className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+            activeBoard?.domain === 'sentinel'
+              ? 'bg-[#d99a6c]/25 text-[#f3c39f] border border-[#d99a6c]/45'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          }`}
+          title="Quadro de Segurança Sentinel"
+        >
+          <Shield className="w-4 h-4" />
+          <span className="hidden sm:inline">Sentinel</span>
         </button>
 
         <div className="w-[1px] h-4 bg-white/10" />
 
-        {/* Info button */}
+        {/* Chat IA Drawer */}
         <button
-          className="p-2 rounded-full hover:bg-white/5 transition-all text-gray-400 hover:text-white cursor-pointer"
-          title="Jarvis OS v1.0.0"
+          onClick={() => setChatPanelOpen(!chatPanelOpen)}
+          className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+            chatPanelOpen
+              ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-400/40'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          }`}
+          title="Abrir Chat & Consola IA (Ctrl+J)"
         >
-          <Info className="w-4.5 h-4.5" />
+          <MessageSquare className="w-4 h-4" />
+          <span className="hidden sm:inline">Chat IA</span>
         </button>
 
-        {/* Connection status notification pop-up */}
+        {/* Microphone Toggle */}
+        <button
+          onClick={() => toggleVoice(voiceStatus === 'offline')}
+          className={`p-2 rounded-full hover:bg-white/5 transition-all cursor-pointer ${
+            voiceStatus !== 'offline' ? 'text-emerald-400' : 'text-gray-500 hover:text-white'
+          }`}
+          title={voiceStatus !== 'offline' ? 'Microfone VAD Ativo' : 'Microfone VAD Inativo'}
+        >
+          {voiceStatus !== 'offline' ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
+        </button>
+
         <AnimatePresence>
           {showStatusAlert && (
             <motion.div
@@ -348,12 +401,11 @@ export const HologramCore: React.FC = () => {
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               className="absolute bottom-14 left-1/2 -translate-x-1/2 px-3.5 py-1.5 rounded-lg bg-[#05070e] border border-white/10 text-gray-300 text-[10px] font-mono whitespace-nowrap shadow-xl"
             >
-              {isConnected ? "LIGAÇÃO ESTÁVEL: WS 8001" : "SEM SINAL DE BACKEND"}
+              {isConnected ? 'LIGAÇÃO ESTÁVEL: WS 8001' : 'SEM SINAL DE BACKEND'}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
-    </div>
+    </>
   );
 };
