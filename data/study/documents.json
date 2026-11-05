@@ -4911,8 +4911,8 @@
       "summaries": {
         "quick": [
           "O artigo analisa a 'IT Consumerization' e como ela transforma a governação de TI em grandes organizações.",
-          "A evolução histórica da governação de TI manteve-se homogénea até à chegada de tecnologias consumer.",
-          "Bancos enfrentam mudanças ambientais rápidas impulsionadas pelo desenvolvimento de tecnologias consumer.",
+          "A evolução histórica da governação de TI manteve-se homogénea, focada no setor científico e militar.",
+          "As mudanças tecnológicas dos consumidores forçam as organizações a adaptar as suas estratégias de IT.",
           "A nova governação deve centrar-se na coordenação autónoma entre partes interessadas internas e externas."
         ],
         "quick_items": [
@@ -4926,20 +4926,21 @@
             "evidence_status": "OBSERVED"
           },
           {
-            "text": "A evolução histórica da governação de TI manteve-se homogénea até à chegada de tecnologias consumer.",
+            "text": "A evolução histórica da governação de TI manteve-se homogénea, focada no setor científico e militar.",
             "source_refs": [
               "doc_c778709e44f8:p4:p_5"
             ],
-            "grounding_score": 0.674,
+            "grounding_score": 0.453,
             "evidence_status": "OBSERVED"
           },
           {
-            "text": "Bancos enfrentam mudanças ambientais rápidas impulsionadas pelo desenvolvimento de tecnologias consumer.",
+            "text": "As mudanças tecnológicas dos consumidores forçam as organizações a adaptar as suas estratégias de IT.",
             "source_refs": [
-              "doc_c778709e44f8:p6:p_7"
+              "doc_c778709e44f8:p6:p_7",
+              "doc_c778709e44f8:p19:p_21"
             ],
-            "grounding_score": 0.368,
-            "evidence_status": "OBSERVED"
+            "grounding_score": 0.308,
+            "evidence_status": "INFERRED"
           },
           {
             "text": "A nova governação deve centrar-se na coordenação autónoma entre partes interessadas internas e externas.",
@@ -4955,59 +4956,60 @@
             "section_id": "sec_1",
             "title": "Fundamentos da IT Consumerization",
             "page_ref": "p. 4",
-            "summary": "A secção descreve a transição histórica da governação de TI homogénea para um modelo adaptado às tecnologias consumer.",
+            "summary": "A secção descreve a transição histórica da governação de TI e o impacto das tecnologias de consumo.",
             "key_concepts": [
-              "IT Consumerization",
-              "Governança de TI"
+              "Governança de TI",
+              "IT Consumerization"
             ],
             "source_refs": [
-              "doc_c778709e44f8:p6:p_7",
               "doc_c778709e44f8:p4:p_5",
-              "doc_c778709e44f8:p23:p_25"
+              "doc_c778709e44f8:p6:p_7"
             ],
-            "grounding_score": 0.68,
+            "grounding_score": 0.637,
             "evidence_status": "OBSERVED"
           },
           {
             "section_id": "sec_2",
-            "title": "Implicações Práticas e Organizacionais",
-            "page_ref": "p. 16",
-            "summary": "Estabelece-se uma 'digital factory' para fomentar novas atividades de TI relacionadas com plataformas digitais.",
+            "title": "Arquitetura e Novos Papéis",
+            "page_ref": "p. 17",
+            "summary": "Apresenta a 'digital factory' e o conceito de 'Everyone's IT' para facilitar a coordenação automatizada.",
             "key_concepts": [
               "Digital Factory",
-              "Plataformas Digitais"
+              "E's IT"
             ],
             "source_refs": [
-              "doc_c778709e44f8:p16:p_17"
+              "doc_c778709e44f8:p16:p_17",
+              "doc_c778709e44f8:p19:p_21"
             ],
-            "grounding_score": 0.621,
+            "grounding_score": 0.956,
             "evidence_status": "OBSERVED"
           },
           {
             "section_id": "sec_3",
-            "title": "Implicações Teóricas e Futuras",
+            "title": "Implicações Teóricas",
             "page_ref": "p. 25",
-            "summary": "O estudo oferece contribuições teóricas sobre a transformação do acesso direto de não-TI à tecnologia.",
+            "summary": "Discute as contribuições teóricas e a necessidade de redefinir o escopo da governação de TI.",
             "key_concepts": [
-              "Acesso Não-Mediado",
-              "Papel da TI"
+              "Implicações Teóricas",
+              "Coordenação Autónoma"
             ],
             "source_refs": [
-              "doc_c778709e44f8:p25:p_27"
+              "doc_c778709e44f8:p25:p_27",
+              "doc_c778709e44f8:p23:p_25"
             ],
-            "grounding_score": 0.295,
-            "evidence_status": "INFERRED"
+            "grounding_score": 0.364,
+            "evidence_status": "OBSERVED"
           }
         ],
         "detailed": [
           {
             "title": "Mecanismos, Distinções e Pressupostos",
-            "text": "A 'IT Consumerization' redefine o foco da governação de TI, deslocando-o do controlo centralizado para a coordenação autónoma entre stakeholders. A criação de uma 'digital factory' exemplifica a necessidade de novas estruturas organizacionais para suportar plataformas digitais e serviços automatizados.",
+            "text": "A 'IT Consumerization' exige uma mudança de paradigma onde a governação deixa de ser homogénea para permitir coordenação autónoma entre stakeholders. A criação de plataformas digitais e 'digital factories' permite embutir regras de governação diretamente no design, facilitando o acesso não mediado por pessoal não-IT.",
             "source_refs": [
               "doc_c778709e44f8:p25:p_27",
               "doc_c778709e44f8:p16:p_17"
             ],
-            "grounding_score": 0.501,
+            "grounding_score": 0.509,
             "evidence_status": "OBSERVED"
           }
         ],
@@ -5015,21 +5017,21 @@
           "high_yield_concepts": [
             {
               "concept": "IT Consumerization",
-              "detail": "É a adoção de tecnologias consumer por utilizadores não-TI, exigindo uma transformação na governação de TI.",
+              "detail": "É a adoção de tecnologias e práticas de consumo por parte dos utilizadores, forçando uma transformação na governação de TI.",
               "source_refs": [
                 "doc_c778709e44f8:p1:p_1",
-                "doc_c778709e44f8:p29:p_33"
+                "doc_c778709e44f8:p3:p_3"
               ],
               "evidence_status": "OBSERVED"
             }
           ],
           "likely_questions": [
             {
-              "question": "Como a IT Consumerization altera o papel da governação de TI?",
-              "answer": "Muda o foco do controlo centralizado para a coordenação autónoma entre stakeholders internos e externos.",
+              "question": "Como a IT Consumerization altera o papel do CIO?",
+              "answer": "O CIO deve evoluir de provedor para coordenador ou broker, gerindo plataformas que suportam atividades autónomas.",
               "source_refs": [
-                "doc_c778709e44f8:p25:p_27",
-                "doc_c778709e44f8:p31:p_35"
+                "doc_c778709e44f8:p14:p_15",
+                "doc_c778709e44f8:p26:p_29"
               ],
               "evidence_status": "OBSERVED"
             }
@@ -5040,19 +5042,20 @@
       "cornell_notes": {
         "topic": "IT Consumerization",
         "subject": "Artigo 2",
-        "date": "2026-11-04",
-        "executive_summary": "A 'IT Consumerization' obriga as organizações a repensarem a governação de TI, passando de um modelo centralizado para um de coordenação autónoma.",
+        "date": "2026-11-05",
+        "executive_summary": "A IT Consumerization obriga as organizações a redesenhar a governação de TI para suportar o acesso autónomo e a coordenação entre stakeholders diversos.",
         "cue_column": [
           {
-            "cue": "O que é IT Consumerization?",
-            "idea": "É a difusão de tecnologias consumer para além do setor científico/militar, afetando a governação de TI.",
+            "cue": "O que é 'Everyone's IT'?",
+            "idea": "Refere-se à democratização do uso de IT por todos os colaboradores, não apenas pelo departamento técnico.",
             "source_refs": [
-              "doc_c778709e44f8:p10:p_11"
+              "doc_c778709e44f8:p19:p_21",
+              "doc_c778709e44f8:p15:p_16"
             ],
             "evidence_status": "OBSERVED"
           }
         ],
-        "detailed_notes": "### Mecanismos, Distinções e Pressupostos\nA 'IT Consumerization' redefine o foco da governação de TI, deslocando-o do controlo centralizado para a coordenação autónoma entre stakeholders. A criação de uma 'digital factory' exemplifica a necessidade de novas estruturas organizacionais para suportar plataformas digitais e serviços automatizados.",
+        "detailed_notes": "### Mecanismos, Distinções e Pressupostos\nA 'IT Consumerization' exige uma mudança de paradigma onde a governação deixa de ser homogénea para permitir coordenação autónoma entre stakeholders. A criação de plataformas digitais e 'digital factories' permite embutir regras de governação diretamente no design, facilitando o acesso não mediado por pessoal não-IT.",
         "glossary": "- **Keywords**: IT consumerization, IT governance transformation, digital transformation, punctuated equilibrium\n- **DOI**: 10.25300/MISQ/2018/13703\n- **Information Systems note**: Information technology (IT) has spawned previously\n- **Business/IT leader Responsible for**: the design, implementation, and maintenance of the\n- **We told ourselves**: mobile is so important today that\n- **We thought**: how could we rebuild the bank’s\n- **A senior manager explained**: A lot of the governance increasingly focuses on\n- **A business manager explained**: How do you reduce complexity? …The answer is to",
         "action_items": [
           "Rever os conceitos extraídos de «IT Consumerization»: Keywords, DOI, Information Systems note, Business/IT leader Responsible for.",
@@ -5060,8 +5063,8 @@
           "Executar regeneração com modelo local qwen3.5:9b para obter síntese interpretativa profunda."
         ],
         "source_refs": [
-          "doc_c778709e44f8:p27:p_31",
-          "doc_c778709e44f8:p35:p_39"
+          "doc_c778709e44f8:p36:p_40",
+          "doc_c778709e44f8:p25:p_27"
         ],
         "document_id": "doc_c778709e44f8",
         "generation_mode": "LLM_GROUNDED"
@@ -6041,21 +6044,21 @@
         null
       ],
       "generation_telemetry": {
-        "generation_id": "study_gen_f220e65132ec",
+        "generation_id": "study_gen_8e3961b594f7",
         "operation": "study_generate_complete_bundle",
         "document_id": "doc_c778709e44f8",
         "provider": "ollama",
         "model": "qwen3.5:9b",
-        "input_tokens": 2316,
-        "output_tokens": 1200,
+        "input_tokens": 2322,
+        "output_tokens": 1216,
         "ttft_ms": null,
-        "total_ms": 56920.38,
-        "tokens_per_sec": 21.08,
-        "context_used": 16384,
+        "total_ms": 160606.5,
+        "tokens_per_sec": 7.57,
+        "context_used": 8192,
         "status": "COMPLETED",
         "validation_errors": [],
         "attempts": 1,
-        "timestamp": "2026-11-04T23:15:32.572698",
+        "timestamp": "2026-11-05T15:19:28.916308",
         "grounding_ratio": 1.0,
         "grounded_claims_count": 17,
         "unconfirmed_claims_dropped": 0,
@@ -6095,13 +6098,13 @@
     },
     "structure": {
       "problem": {
-        "text": "A governação de TI tradicional não consegue responder às mudanças rápidas impulsionadas por tecnologias consumer.",
+        "text": "A governação de TI tradicional era homogénea e inadequada face às rápidas mudanças tecnológicas dos consumidores.",
         "status": "OBSERVED",
         "evidence_status": "OBSERVED",
         "page_ref": null,
         "source_refs": [
-          "doc_c778709e44f8:p6:p_7",
-          "doc_c778709e44f8:p13:p_14"
+          "doc_c778709e44f8:p4:p_5",
+          "doc_c778709e44f8:p14:p_15"
         ]
       },
       "research_gap": {
@@ -6131,7 +6134,7 @@
         "source_refs": []
       },
       "contribution": {
-        "text": "Propõe-se uma nova abordagem de governação centrada na coordenação autónoma e plataformas digitais.",
+        "text": "Propõe uma nova estrutura de governação centrada na coordenação autónoma através de plataformas digitais.",
         "status": "OBSERVED",
         "evidence_status": "OBSERVED",
         "page_ref": null,
@@ -6141,13 +6144,12 @@
         ]
       },
       "method": {
-        "text": "Análise qualitativa baseada em dados de bancos e discussões teóricas sobre governação de TI.",
+        "text": "Utilização de dados qualitativos e análise teórica para discutir implicações práticas e teóricas.",
         "status": "INFERRED",
         "evidence_status": "INFERRED",
         "page_ref": null,
         "source_refs": [
-          "doc_c778709e44f8:p12:p_13",
-          "doc_c778709e44f8:p17:p_19"
+          "doc_c778709e44f8:p3:p_3"
         ]
       },
       "dataset": {
@@ -6167,13 +6169,12 @@
         ]
       },
       "results": {
-        "text": "A criação de 'digital factories' e a adaptação de gestores demonstram a viabilidade da nova abordagem.",
+        "text": "A transformação exige a criação de novas unidades organizacionais como 'digital factories' para fomentar atividades digitais.",
         "status": "OBSERVED",
         "evidence_status": "OBSERVED",
         "page_ref": null,
         "source_refs": [
-          "doc_c778709e44f8:p14:p_15",
-          "doc_c778709e44f8:p19:p_21"
+          "doc_c778709e44f8:p16:p_17"
         ]
       },
       "limitations": {
@@ -6187,13 +6188,13 @@
         ]
       },
       "conclusion": {
-        "text": "A governação de TI deve evoluir para um papel de broker ou coordenador face à IT Consumerization.",
+        "text": "A nova governação deve centrar-se na coordenação autónoma entre stakeholders internos e externos via design de plataforma.",
         "status": "OBSERVED",
         "evidence_status": "OBSERVED",
         "page_ref": null,
         "source_refs": [
-          "doc_c778709e44f8:p26:p_29",
-          "doc_c778709e44f8:p32:p_36"
+          "doc_c778709e44f8:p25:p_27",
+          "doc_c778709e44f8:p3:p_4"
         ]
       },
       "is_argumentative": true,
@@ -6211,7 +6212,7 @@
       }
     ],
     "created_at": "2026-10-13T01:52:09.896412",
-    "updated_at": "2026-11-04T23:16:30.207063"
+    "updated_at": "2026-11-05T15:22:10.192946"
   },
   "doc_vid_37691f97c10b": {
     "document_id": "doc_vid_37691f97c10b",

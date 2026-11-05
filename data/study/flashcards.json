@@ -265,5 +265,493 @@
     "next_review": 1793834276.9620485,
     "repetitions": 0,
     "interval_days": 1.0
+  },
+  "fc_139eb5f1": {
+    "card_id": "fc_139eb5f1",
+    "document_id": "doc_a3b336f4295d",
+    "front": "Como se define e aplica «Helpfulness como métrica de desempenho» em Predicting performance online consumer reviews(1)?",
+    "back": "É a medida única mais utilizada em estudos anteriores para avaliar o desempenho das avaliações online (OCR).",
+    "source_ids": [
+      "doc_a3b336f4295d",
+      "doc_a3b336f4295d:p2:p_4"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2420719,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_c7855588": {
+    "card_id": "fc_c7855588",
+    "document_id": "doc_a3b336f4295d",
+    "front": "Qual é o problema ou tema central abordado em «Predicting performance online consumer reviews(1)»?",
+    "back": "A necessidade de analisar o conteúdo textual das avaliações online para prever o seu desempenho real, indo além das métricas superficiais.",
+    "source_ids": [
+      "doc_a3b336f4295d",
+      "doc_a3b336f4295d:p1:p_1",
+      "doc_a3b336f4295d:p9:p_32"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793892130.2420993,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_6810c494": {
+    "card_id": "fc_6810c494",
+    "document_id": "doc_a3b336f4295d",
+    "front": "Qual é a metodologia ou abordagem apresentada em «Predicting performance online consumer reviews(1)»?",
+    "back": "Coleta de 35.000 reviews da Amazon usando software crawler e análise via SentiStrength para processar texto, emoção e polaridade.",
+    "source_ids": [
+      "doc_a3b336f4295d",
+      "doc_a3b336f4295d:p5:p_14",
+      "doc_a3b336f4295d:p1:p_2"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2421107,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_4f817ac4": {
+    "card_id": "fc_4f817ac4",
+    "document_id": "doc_a3b336f4295d",
+    "front": "Quais são os principais resultados ou princípios demonstrados em «Predicting performance online consumer reviews(1)»?",
+    "back": "A relação entre título sentimental e votos é negativa; características negativas diminuem o valor da review, enquanto o estilo positivo o aumenta.",
+    "source_ids": [
+      "doc_a3b336f4295d",
+      "doc_a3b336f4295d:p2:p_3"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2421186,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_6ea88b06": {
+    "card_id": "fc_6ea88b06",
+    "document_id": "doc_a3b336f4295d",
+    "front": "Qual a conclusão principal de «Predicting performance online consumer reviews(1)»?",
+    "back": "A análise textual profunda permite prever melhor a utilidade das reviews do que as métricas tradicionais de estrelas e comprimento.",
+    "source_ids": [
+      "doc_a3b336f4295d",
+      "doc_a3b336f4295d:p2:p_4"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793892130.242126,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_1ed96523": {
+    "card_id": "fc_1ed96523",
+    "document_id": "doc_vid_62bacbb12475",
+    "front": "Como se define e aplica «Fatores de Ambiente da Empresa (EEFs)» em 010 Projects   Part Ii?",
+    "back": "| **Iniciação:** Desenvolver o Termo de Abertura do Projeto, Identificar Partes Interessadas | - Projeto Alinhado com o Contexto <br/> - Riscos e Oportunidades Identificados <br/> - Expectativas Geridas |",
+    "source_ids": [
+      "doc_vid_62bacbb12475",
+      "doc_vid_62bacbb12475:t01:45-02:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2474835,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_d9b2c0ea": {
+    "card_id": "fc_d9b2c0ea",
+    "document_id": "doc_vid_62bacbb12475",
+    "front": "Como se define e aplica «Estruturas Organizacionais (EEFs)» em 010 Projects   Part Ii?",
+    "back": "<br/> (Funcional, Matricial (fraca, equilibrada, forte), Projetizada, Composta, Virtual, Híbrida, PMO) | **Planeamento:** Planear a Gestão de Recursos, Planear a Gestão de Comunicações, Planear a Gestão das Partes Interessadas, Estimar Recursos da Atividade |",
+    "source_ids": [
+      "doc_vid_62bacbb12475",
+      "doc_vid_62bacbb12475:t01:45-02:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2505648,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_8fd95fd3": {
+    "card_id": "fc_8fd95fd3",
+    "document_id": "doc_vid_62bacbb12475",
+    "front": "Como se define e aplica «Projeto» em 010 Projects   Part Ii?",
+    "back": "O tema principal destes diapositivos é o **Ambiente do Projeto (Project Environment)** e as **Estruturas Organizacionais (Organizational Structures)** que impactam a gestão de projetos.",
+    "source_ids": [
+      "doc_vid_62bacbb12475",
+      "doc_vid_62bacbb12475:t00:15-00:30:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2541916,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_715361e7": {
+    "card_id": "fc_715361e7",
+    "document_id": "doc_vid_62bacbb12475",
+    "front": "Como se define e aplica «Projetos» em 010 Projects   Part Ii?",
+    "back": "O tema principal destes diapositivos é o **Ambiente do Projeto (Project Environment)** e as **Estruturas Organizacionais (Organizational Structures)** que impactam a gestão de projetos.",
+    "source_ids": [
+      "doc_vid_62bacbb12475",
+      "doc_vid_62bacbb12475:t00:15-00:30:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2582827,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_f3860c0c": {
+    "card_id": "fc_f3860c0c",
+    "document_id": "doc_vid_62bacbb12475",
+    "front": "Como se define e aplica «Organização» em 010 Projects   Part Ii?",
+    "back": "Abrange os fatores internos e externos que influenciam um projeto, a forma como os projetos se inserem na organização (programas e portfólios) e os diferentes modelos de organização que determinam a autoridade do gestor de projeto e a disponibilidade de recursos.",
+    "source_ids": [
+      "doc_vid_62bacbb12475",
+      "doc_vid_62bacbb12475:t00:15-00:30:SPEECH",
+      "doc_vid_62bacbb12475:t02:45-03:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.261494,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_0fbfe9e4": {
+    "card_id": "fc_0fbfe9e4",
+    "document_id": "doc_vid_62bacbb12475",
+    "front": "Qual é o problema ou tema central abordado em «010 Projects   Part Ii»?",
+    "back": "| **Fatores de Ambiente da Empresa (EEFs)**: | **Iniciação:** Desenvolver o Termo de Abertura do Projeto, Identificar Partes Interessadas | - Projeto Alinhado com o Contexto <br/> - Riscos e Oportunidades Identificados <br/> - Expectativas Geridas |",
+    "source_ids": [
+      "doc_vid_62bacbb12475",
+      "doc_vid_62bacbb12475:t01:45-02:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793892130.2660577,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_8f1f6aa7": {
+    "card_id": "fc_8f1f6aa7",
+    "document_id": "doc_vid_62bacbb12475",
+    "front": "Qual é a metodologia ou abordagem apresentada em «010 Projects   Part Ii»?",
+    "back": "Abrange os fatores internos e externos que influenciam um projeto, a forma como os projetos se inserem na organização (programas e portfólios) e os diferentes modelos de organização que determinam a autoridade do gestor de projeto e a disponibilidade de recursos.",
+    "source_ids": [
+      "doc_vid_62bacbb12475",
+      "doc_vid_62bacbb12475:t00:15-00:30:SPEECH",
+      "doc_vid_62bacbb12475:t02:45-03:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2695367,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_bf75385a": {
+    "card_id": "fc_bf75385a",
+    "document_id": "doc_vid_62bacbb12475",
+    "front": "Quais são os principais resultados ou princípios demonstrados em «010 Projects   Part Ii»?",
+    "back": "| Conceito Apresentado nos Diapositivos (PMBOK/ISO Categoria) | Exemplos de Processos PMBOK/ISO 21500 onde é um Input Primário/Crítico | Natureza do Output (Não um Output de um Processo Único, mas um Resultado da Compreensão) |",
+    "source_ids": [
+      "doc_vid_62bacbb12475",
+      "doc_vid_62bacbb12475:t01:45-02:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.272629,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_0febafc6": {
+    "card_id": "fc_0febafc6",
+    "document_id": "doc_vid_62bacbb12475",
+    "front": "Qual a conclusão principal de «010 Projects   Part Ii»?",
+    "back": "Em suma, estes diapositivos fornecem uma base essencial para a compreensão de como o contexto externo e interno de uma organização molda e influencia a gestão de projetos, detalhando as estruturas organizacionais que definem a governança e a dinâmica de um projeto.",
+    "source_ids": [
+      "doc_vid_62bacbb12475",
+      "doc_vid_62bacbb12475:t05:00-05:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793892130.2760224,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_1f5a0de1": {
+    "card_id": "fc_1f5a0de1",
+    "document_id": "doc_vid_98aff7821f20",
+    "front": "Como se define e aplica «Projeto» em 030 Initiating?",
+    "back": "O tema principal do vídeo é a **Fase de Iniciação de Projetos (Initiating Phase)** em Gestão de Projetos.",
+    "source_ids": [
+      "doc_vid_98aff7821f20",
+      "doc_vid_98aff7821f20:t00:00-00:15:SPEECH",
+      "doc_vid_98aff7821f20:t01:45-02:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2812252,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_ff90dec1": {
+    "card_id": "fc_ff90dec1",
+    "document_id": "doc_vid_98aff7821f20",
+    "front": "Como se define e aplica «Business Case» em 030 Initiating?",
+    "back": "Os diapositivos focam nas atividades fundamentais, documentos-chave (como o Business Case e o Project Charter) e os pontos de decisão (Phase Gates) que marcam o início formal de um projeto.",
+    "source_ids": [
+      "doc_vid_98aff7821f20",
+      "doc_vid_98aff7821f20:t00:00-00:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2849631,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_d7bcce03": {
+    "card_id": "fc_d7bcce03",
+    "document_id": "doc_vid_98aff7821f20",
+    "front": "Como se define e aplica «Project Charter» em 030 Initiating?",
+    "back": "Os diapositivos focam nas atividades fundamentais, documentos-chave (como o Business Case e o Project Charter) e os pontos de decisão (Phase Gates) que marcam o início formal de um projeto.",
+    "source_ids": [
+      "doc_vid_98aff7821f20",
+      "doc_vid_98aff7821f20:t00:00-00:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2885015,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_20c53195": {
+    "card_id": "fc_20c53195",
+    "document_id": "doc_vid_98aff7821f20",
+    "front": "Como se define e aplica «Project» em 030 Initiating?",
+    "back": "Os diapositivos focam nas atividades fundamentais, documentos-chave (como o Business Case e o Project Charter) e os pontos de decisão (Phase Gates) que marcam o início formal de um projeto.",
+    "source_ids": [
+      "doc_vid_98aff7821f20",
+      "doc_vid_98aff7821f20:t00:00-00:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.291531,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_47286881": {
+    "card_id": "fc_47286881",
+    "document_id": "doc_vid_98aff7821f20",
+    "front": "Como se define e aplica «Fase» em 030 Initiating?",
+    "back": "O tema principal do vídeo é a **Fase de Iniciação de Projetos (Initiating Phase)** em Gestão de Projetos.",
+    "source_ids": [
+      "doc_vid_98aff7821f20",
+      "doc_vid_98aff7821f20:t00:00-00:15:SPEECH",
+      "doc_vid_98aff7821f20:t01:45-02:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.29408,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_24b1376c": {
+    "card_id": "fc_24b1376c",
+    "document_id": "doc_vid_98aff7821f20",
+    "front": "Qual é o problema ou tema central abordado em «030 Initiating»?",
+    "back": "Desenvolvimento do Termo de Abertura do Projeto (Project Charter)**<br>(PMBOK: \"Develop Project Charter\" / ISO 21500: \"Develop project brief\") | - Ideia / Necessidade (Idea / Need) <br> - Documentação da Ideia / Necessidade (Document the idea/need)<br> - Pedido de Iniciação do Projeto (Project Initiation Request) <br> - Justificação de Negócio (Business Case) <br> - Stakeholders Chave Identificados (Identified key stakeholders and their needs) | - **Termo de Abertura do Projeto (Project Charter)** |",
+    "source_ids": [
+      "doc_vid_98aff7821f20",
+      "doc_vid_98aff7821f20:t00:45-01:00:SPEECH",
+      "doc_vid_98aff7821f20:t01:15-01:30:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793892130.2967885,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_ce629e4b": {
+    "card_id": "fc_ce629e4b",
+    "document_id": "doc_vid_98aff7821f20",
+    "front": "Qual é a metodologia ou abordagem apresentada em «030 Initiating»?",
+    "back": "Adicionalmente, aborda um processo específico de Gestão de Recursos Humanos relevante nesta fase inicial, a criação da equipa de projeto.",
+    "source_ids": [
+      "doc_vid_98aff7821f20",
+      "doc_vid_98aff7821f20:t00:00-00:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.2990365,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_13f8fdfa": {
+    "card_id": "fc_13f8fdfa",
+    "document_id": "doc_vid_98aff7821f20",
+    "front": "Quais são os principais resultados ou princípios demonstrados em «030 Initiating»?",
+    "back": "É descrito como um **\"documento vivo\" (living document)** que deve ser reexaminado em marcos críticos do projeto para verificar se os benefícios esperados ainda são alcançáveis, se os custos/cronogramas se mantêm dentro do orçamento/prazo, e se o projeto continua relevante para a organização.",
+    "source_ids": [
+      "doc_vid_98aff7821f20",
+      "doc_vid_98aff7821f20:t01:15-01:30:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892130.3012197,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_20bcd7c5": {
+    "card_id": "fc_20bcd7c5",
+    "document_id": "doc_vid_98aff7821f20",
+    "front": "Qual a conclusão principal de «030 Initiating»?",
+    "back": "Em suma, a aula oferece uma visão abrangente da fase de iniciação, destacando os documentos essenciais, os pontos de decisão e um processo fundamental de gestão de recursos, tudo alinhado com as melhores práticas e padrões da gestão de projetos.",
+    "source_ids": [
+      "doc_vid_98aff7821f20",
+      "doc_vid_98aff7821f20:t02:45-03:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793892130.3034694,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_c905ec48": {
+    "card_id": "fc_c905ec48",
+    "document_id": "doc_vid_3835adeef512",
+    "front": "Como se define e aplica «Diretos ou Indiretos» em 000 Planning   Part Iv?",
+    "back": "Relacionados diretamente com o trabalho ou custos gerais.",
+    "source_ids": [
+      "doc_vid_3835adeef512",
+      "doc_vid_3835adeef512:t06:00-06:15:SPEECH",
+      "doc_vid_3835adeef512:t02:45-03:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892258.1147428,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_fa1cf741": {
+    "card_id": "fc_fa1cf741",
+    "document_id": "doc_vid_3835adeef512",
+    "front": "Como se define e aplica «Fixos ou Variáveis» em 000 Planning   Part Iv?",
+    "back": "Independentes ou dependentes do volume de trabalho.",
+    "source_ids": [
+      "doc_vid_3835adeef512",
+      "doc_vid_3835adeef512:t06:00-06:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892258.1181006,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_90452e0f": {
+    "card_id": "fc_90452e0f",
+    "document_id": "doc_vid_3835adeef512",
+    "front": "Como se define e aplica «Tangíveis ou Intangíveis» em 000 Planning   Part Iv?",
+    "back": "Com ou sem forma física (ex: reputação).",
+    "source_ids": [
+      "doc_vid_3835adeef512",
+      "doc_vid_3835adeef512:t06:00-06:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892258.1213567,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_11cb9033": {
+    "card_id": "fc_11cb9033",
+    "document_id": "doc_vid_3835adeef512",
+    "front": "Como se define e aplica «Recorrentes ou Não-recorrentes» em 000 Planning   Part Iv?",
+    "back": "Que se repetem ou são únicos.",
+    "source_ids": [
+      "doc_vid_3835adeef512",
+      "doc_vid_3835adeef512:t06:00-06:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892258.1247158,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_4b77f053": {
+    "card_id": "fc_4b77f053",
+    "document_id": "doc_vid_3835adeef512",
+    "front": "Como se define e aplica «Custos» em 000 Planning   Part Iv?",
+    "back": "O tema principal dos diapositivos é a **Gestão de Custos do Projeto na Fase de Planeamento**, focando-se especificamente nos processos de **Estimativa de Custos** e **Desenvolvimento do Orçamento**.",
+    "source_ids": [
+      "doc_vid_3835adeef512",
+      "doc_vid_3835adeef512:t00:45-01:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892258.1275132,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_6b97bc0e": {
+    "card_id": "fc_6b97bc0e",
+    "document_id": "doc_vid_3835adeef512",
+    "front": "Qual é o problema ou tema central abordado em «000 Planning   Part Iv»?",
+    "back": "**Reservas de Contingência/Gestão:** Custos adicionados para lidar com riscos e incertezas, devendo ser claramente identificados.",
+    "source_ids": [
+      "doc_vid_3835adeef512",
+      "doc_vid_3835adeef512:t03:45-04:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793892258.130497,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_7b750d7c": {
+    "card_id": "fc_7b750d7c",
+    "document_id": "doc_vid_3835adeef512",
+    "front": "Qual é a metodologia ou abordagem apresentada em «000 Planning   Part Iv»?",
+    "back": "O tema principal dos diapositivos é a **Gestão de Custos do Projeto na Fase de Planeamento**, focando-se especificamente nos processos de **Estimativa de Custos** e **Desenvolvimento do Orçamento**.",
+    "source_ids": [
+      "doc_vid_3835adeef512",
+      "doc_vid_3835adeef512:t00:45-01:00:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892258.1363094,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_9da99b72": {
+    "card_id": "fc_9da99b72",
+    "document_id": "doc_vid_3835adeef512",
+    "front": "Quais são os principais resultados ou princípios demonstrados em «000 Planning   Part Iv»?",
+    "back": "Começa com estimativas de \"Order of Magnitude\" na triagem de projetos (com ampla margem de erro, -50% a +100%) e avança até estimativas \"Control / Detailed\" na fase de execução (com alta precisão, ±2%), demonstrando que a precisão aumenta à medida que o projeto avança e mais informações se tornam disponíveis.",
+    "source_ids": [
+      "doc_vid_3835adeef512",
+      "doc_vid_3835adeef512:t06:00-06:15:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "MEDIUM",
+    "next_review": 1793892258.1394985,
+    "repetitions": 0,
+    "interval_days": 1.0
+  },
+  "fc_8e6bfe3a": {
+    "card_id": "fc_8e6bfe3a",
+    "document_id": "doc_vid_3835adeef512",
+    "front": "Qual a conclusão principal de «000 Planning   Part Iv»?",
+    "back": "Em suma, a aula articula a importância de uma estimativa de custos rigorosa e sistemática, a utilização de modelos de precisão baseados na fase do projeto, e a subsequente consolidação dessas estimativas num orçamento detalhado, faseado no tempo e estruturado pela WBS, que inclui as necessárias reservas para incertezas, conforme as boas práticas da gestão de projetos.",
+    "source_ids": [
+      "doc_vid_3835adeef512",
+      "doc_vid_3835adeef512:t06:30-06:45:SPEECH"
+    ],
+    "page_ref": null,
+    "difficulty": "EASY",
+    "next_review": 1793892258.1443124,
+    "repetitions": 0,
+    "interval_days": 1.0
   }
 }

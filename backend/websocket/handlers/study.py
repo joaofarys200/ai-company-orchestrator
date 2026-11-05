@@ -49,6 +49,7 @@ STUDY_HANDLERS = {
     "study_list_collections": "list_collections",
     "study_create_collection": "create_collection",
     "study_get_document_file": "get_document_file",
+    "study_get_document_ast": "get_document_ast",
     "study_search_rag": "search_rag",
     # Study Folder Sync & Courses
     "study_link_folder": "link_folder",
@@ -172,6 +173,28 @@ class StudyWebSocketHandler:
                 "type": "study_document_file_result",
                 "document_id": doc_id,
                 "error": str(e),
+                "request_id": message.get("request_id"),
+            })
+
+    async def get_document_ast(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        ast_dict = await asyncio.to_thread(self.study_service.get_document_ast, doc_id)
+        if ast_dict:
+            await self.connections.send(websocket, {
+                "type": "study_document_ast_result",
+                "document_id": doc_id,
+                "ast": ast_dict,
+                "request_id": message.get("request_id"),
+            })
+        else:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"AST não disponível para o documento '{doc_id}'.",
                 "request_id": message.get("request_id"),
             })
 

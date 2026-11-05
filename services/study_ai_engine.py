@@ -1467,7 +1467,17 @@ def prepare_evidence_dossier(
         header = f"[{sid}] ({sec_t} {loc}): ".strip()
         txt = re.sub(r"\s+", " ", u.get("text", "")).strip()
         if len(txt) > per_unit_chars:
-            txt = txt[:per_unit_chars] + "..."
+            # Preservar frases completas - nunca cortar frases no meio
+            u_sents = split_clean_sentences(txt)
+            kept_sents = []
+            acc_len = 0
+            for st in u_sents:
+                if acc_len + len(st) + 1 <= per_unit_chars or not kept_sents:
+                    kept_sents.append(st)
+                    acc_len += len(st) + 1
+                else:
+                    break
+            txt = " ".join(kept_sents) if kept_sents else txt
         entry = f"{header} {txt}"
         if cur_len + len(entry) > max_chars and lines:
             break
@@ -2274,9 +2284,9 @@ def generate_complete_study_bundle(
         return fallback_bundle
 
     evidence_units = fallback_bundle.get("evidence_units") or []
-    dossier_text, _short_map = prepare_evidence_dossier(evidence_units, max_chars=4500)
+    dossier_text, _short_map = prepare_evidence_dossier(evidence_units, max_chars=22000)
     if len(dossier_text.strip()) < 50:
-        dossier_text = build_representative_excerpt(text, sections=sections, max_chars=4500)
+        dossier_text = build_representative_excerpt(text, sections=sections, max_chars=22000)
     if len(dossier_text.strip()) < 50:
         return fallback_bundle
 

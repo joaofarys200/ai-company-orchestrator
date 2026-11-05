@@ -12,6 +12,7 @@ import json
 import math
 import os
 import re
+import shutil
 import threading
 import time
 import uuid
@@ -35,6 +36,11 @@ except ImportError:
     pdfplumber = None
 
 from services.lecture_synthesizer import CornellNoteSynthesizer, VaultLinker
+from services.document_intelligence import (
+    AcademicDocumentAST,
+    DocumentIntelligenceExtractor,
+    DocumentExtractionError,
+)
 from services.video_intelligence_service import (
     VideoIntelligenceService,
     check_video_capabilities,
@@ -829,15 +835,53 @@ class StudyService:
         # Extração de texto, páginas e seções
         pages_text: List[str] = []
         media_items: List[Dict[str, Any]] = []
+        sections: List[Dict[str, Any]] = []
+        ast_data: Optional[AcademicDocumentAST] = None
+        doc_dir = self.storage_dir / "documents" / document_id
+        assets_dir = doc_dir / "assets"
 
         if source_type == "PDF":
-            pages_text, media_items = self._parse_pdf(file_path)
+            try:
+                doc_dir.mkdir(parents=True, exist_ok=True)
+                assets_dir.mkdir(parents=True, exist_ok=True)
+                orig_pdf_copy = doc_dir / "original.pdf"
+                if not orig_pdf_copy.exists() or orig_pdf_copy.stat().st_size != os.path.getsize(file_path):
+                    try:
+                        shutil.copyfile(file_path, orig_pdf_copy)
+                    except Exception:
+                        pass
+
+                extractor = DocumentIntelligenceExtractor(assets_dir=assets_dir)
+                ast_data = extractor.extract(file_path, document_id, filename=filename, source_hash=source_hash)
+
+                # Persistir AST e Relatório estruturado em data/study/documents/{doc_id}/
+                (doc_dir / "ast.json").write_text(
+                    json.dumps(ast_data.to_dict(), indent=2, ensure_ascii=False),
+                    encoding="utf-8",
+                )
+                (doc_dir / "extraction_report.json").write_text(
+                    json.dumps(asdict(ast_data.report), indent=2, ensure_ascii=False),
+                    encoding="utf-8",
+                )
+
+                if ast_data.metadata.title and not custom_title:
+                    title = ast_data.metadata.title
+
+                pages_text = ast_data.to_pages_text()
+                sections = ast_data.to_legacy_sections()
+                media_items = ast_data.to_legacy_media()
+            except Exception as pdf_err:
+                print(f"[StudyService] Aviso na extração avançada do PDF ({pdf_err}), usando parser de contingência: {file_path}", flush=True)
+                pages_text, media_items = self._parse_pdf(file_path)
+                sections = self._extract_sections_and_paragraphs(pages_text)
         elif source_type in ("MARKDOWN", "TXT"):
             text = raw_bytes.decode("utf-8", errors="replace")
             chunk_size = 3000
             pages_text = [text[i:i+chunk_size] for i in range(0, max(len(text), 1), chunk_size)]
+            sections = self._extract_sections_and_paragraphs(pages_text)
         elif source_type == "PPTX":
             pages_text = self._parse_pptx(file_path)
+            sections = self._extract_sections_and_paragraphs(pages_text)
         elif source_type == "IMAGE":
             ocr_text = ""
             if not os.environ.get("PYTEST_CURRENT_TEST") or os.environ.get("STUDY_FORCE_WINRT_OCR") == "1":
@@ -853,6 +897,7 @@ class StudyService:
                 "data_ref": file_path,
                 "evidence_status": "OBSERVED",
             })
+            sections = self._extract_sections_and_paragraphs(pages_text)
         elif source_type == "DOCX":
             from backend.document_engine.word_ast import extract_ast_from_docx
             docx_ast = extract_ast_from_docx(file_path)
@@ -869,14 +914,15 @@ class StudyService:
                     "data_ref": file_path,
                     "evidence_status": "OBSERVED",
                 })
+            sections = self._extract_sections_and_paragraphs(pages_text)
         else:
             pages_text = [f"[Ficheiro binário/multimédia: {filename}]"]
+            sections = self._extract_sections_and_paragraphs(pages_text)
 
         full_extracted_text = "\n\n".join(pages_text)
         detected_lang = detect_language(full_extracted_text)
-
-        # Estruturação em seções e parágrafos
-        sections = self._extract_sections_and_paragraphs(pages_text)
+        if not sections:
+            sections = self._extract_sections_and_paragraphs(pages_text)
 
         # Síntese pedagógica completa e fundamentada no conteúdo real (LLM + fallback extrativo sem templates)
         bundle = generate_complete_study_bundle(
@@ -926,6 +972,17 @@ class StudyService:
                 "evidence_units": bundle.get("evidence_units", []),
                 "summaries": bundle["summaries"],
                 "cornell_notes": cornell_payload,
+                "ast_available": bool(ast_data),
+                "ast_path": f"documents/{document_id}/ast.json" if ast_data else None,
+                "ast_schema_version": ast_data.schema_version if ast_data else None,
+                "ast_extractor_version": ast_data.extractor_version if ast_data else None,
+                "extraction_report": asdict(ast_data.report) if ast_data else None,
+                "doi": ast_data.metadata.doi if ast_data else None,
+                "authors": ast_data.metadata.authors if ast_data else [],
+                "affiliations": ast_data.metadata.affiliations if ast_data else [],
+                "publication_date": ast_data.metadata.publication_date if ast_data else None,
+                "abstract": ast_data.metadata.abstract if ast_data else None,
+                "keywords": ast_data.metadata.keywords if ast_data else [],
             },
             source_hash=source_hash,
             provenance={
@@ -1864,8 +1921,62 @@ class StudyService:
         self._save_documents()
         return watch_prog
 
+    def get_document_ast(self, document_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Retorna a AST estruturada do documento (AcademicDocumentAST).
+        Se já existir em disco (data/study/documents/{doc_id}/ast.json), carrega-a.
+        Se for um PDF e ainda não tiver AST, extrai-a a frio e persiste-a.
+        """
+        doc = self.get_document(document_id)
+        if not doc:
+            return None
+
+        ast_path = self.storage_dir / "documents" / document_id / "ast.json"
+        if ast_path.exists():
+            try:
+                return json.loads(ast_path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+
+        if doc.source_type == "PDF" and doc.metadata.get("file_path"):
+            fpath = doc.metadata.get("file_path")
+            if fpath and not os.path.isabs(fpath):
+                fpath = os.path.join(self.workspace_root, fpath)
+            if fpath and os.path.exists(fpath):
+                try:
+                    doc_dir = self.storage_dir / "documents" / document_id
+                    assets_dir = doc_dir / "assets"
+                    doc_dir.mkdir(parents=True, exist_ok=True)
+                    assets_dir.mkdir(parents=True, exist_ok=True)
+                    extractor = DocumentIntelligenceExtractor(assets_dir=assets_dir)
+                    ast_obj = extractor.extract(
+                        fpath,
+                        document_id,
+                        filename=doc.metadata.get("filename", Path(fpath).name),
+                        source_hash=doc.source_hash,
+                    )
+                    ast_dict = ast_obj.to_dict()
+                    ast_path.write_text(json.dumps(ast_dict, indent=2, ensure_ascii=False), encoding="utf-8")
+                    (doc_dir / "extraction_report.json").write_text(
+                        json.dumps(asdict(ast_obj.report), indent=2, ensure_ascii=False), encoding="utf-8"
+                    )
+                    return ast_dict
+                except Exception as e:
+                    print(f"[StudyService] Erro ao extrair AST para {document_id}: {e}", flush=True)
+        return None
+
     def _parse_pdf(self, file_path: str) -> Tuple[List[str], List[Dict[str, Any]]]:
-        """Extrai páginas, texto e referências a imagens usando pymupdf ou pdfplumber."""
+        """Extrai páginas, texto e referências a imagens usando DocumentIntelligenceExtractor com fallback."""
+        try:
+            extractor = DocumentIntelligenceExtractor()
+            ast_res = extractor.extract(file_path, "preview_doc")
+            p_text = ast_res.to_pages_text()
+            m_items = ast_res.to_legacy_media()
+            if p_text and any(p.strip() for p in p_text):
+                return p_text, m_items
+        except Exception:
+            pass
+
         pages: List[str] = []
         media: List[Dict[str, Any]] = []
 
