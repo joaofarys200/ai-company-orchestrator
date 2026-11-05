@@ -229,9 +229,9 @@ def test_05_section_synthesis_with_many_segments_hierarchical_reduce(tmp_path: P
         return "{}", {}
 
     engine = AcademicReasoningEngine(storage_dir=tmp_path, llm_caller=mock_llm_caller)
-    # Forçar múltiplos segmentos na secção e orçamento reduzido para ativar a síntese hierárquica em lote
+    # Forçar múltiplos segmentos na secção e limite total ajustado para acionar redução hierárquica respeitando limites estritos
     engine.segmenter.max_tokens_per_segment = 40
-    engine.budget_manager.default_max_output_tokens = 7800  # deixa ~200 tokens úteis
+    engine.budget_manager.total_context_limit = 4500
     dossier = engine.analyze_document(ast)
 
     assert "academic_section_intermediate_synthesis" in operations_called
@@ -290,8 +290,8 @@ def test_06_cross_section_integration_with_many_sections_cluster_reduce(tmp_path
         return "{}", {}
 
     engine = AcademicReasoningEngine(storage_dir=tmp_path, llm_caller=mock_llm_caller)
-    # Forçar orçamento útil transversal reduzido para acionar clustering
-    engine.budget_manager.default_max_output_tokens = 7900
+    # Forçar limite total ajustado para acionar clustering transversal respeitando limites estritos
+    engine.budget_manager.total_context_limit = 4300
     dossier = engine.analyze_document(ast)
 
     assert "academic_cross_section_cluster" in operations_called
@@ -905,3 +905,390 @@ def test_30_phase2_phase3_regression_suite():
 
     assert EXTRACTOR_VERSION == "2.0.0"
     assert ENGINE_VERSION.startswith("3.0.0")
+
+
+# ============================================================================
+# 6.5. TESTES ADICIONAIS DE ORÇAMENTO ESTRITO, REDUCE RECURSIVO E MUTAÇÃO AST (Testes 31 a 46)
+# ============================================================================
+
+def test_31_context_negative_or_insufficient_budget_raises_error():
+    """31. Orçamento negativo ou insuficiente lança ContextBudgetExceededError e elimina mínimo de 300."""
+    bm = ContextBudgetManager(total_context_limit=4000, default_max_output_tokens=2800, safety_buffer_tokens=400)
+    # 2800 + 400 = 3200. Restam 800 para sys + inst.
+    sys_large = "S" * 2000  # ~606 tokens
+    inst_large = "I" * 1500  # ~455 tokens
+    # 606 + 455 = 1061. 4000 - (3200 + 1061) = -261 tokens (negativo!)
+
+    with pytest.raises(ContextBudgetExceededError) as exc_info:
+        bm.calculate_usable_budget(sys_large, inst_large)
+    assert "Orçamento utilizável insuficiente ou negativo" in str(exc_info.value)
+
+    # Testar que quando usable é menor que 300 (ex: ~150), devolve o valor real e NÃO 300!
+    bm_small = ContextBudgetManager(total_context_limit=4000, default_max_output_tokens=2800, safety_buffer_tokens=400)
+    text_sys_exact = "A" * 1000  # ~304 tokens
+    text_inst_exact = "B" * 1145  # ~347 tokens
+    budget_small = bm_small.calculate_usable_budget(text_sys_exact, text_inst_exact)
+    assert budget_small < 300, f"Mínimo artificial de 300 ainda presente: {budget_small}"
+    assert 100 < budget_small < 300
+
+
+def test_32_context_system_prompt_consuming_all_budget():
+    """32. Prompt de sistema que consome praticamente todo o contexto falha explicitamente."""
+    bm = ContextBudgetManager(total_context_limit=4000, default_max_output_tokens=2800, safety_buffer_tokens=400)
+    huge_sys = "System" * 1000  # 6000 chars -> ~1818 tokens
+    # 1818 + 2800 + 400 = 5018 > 4000
+    with pytest.raises(ContextBudgetExceededError):
+        bm.calculate_usable_budget(huge_sys, "Template normal")
+
+
+def test_33_context_pre_call_validation_rejects_without_calling_model():
+    """33. Validação imediata antes de enviar rejeita prompt com défice sem invocar transport."""
+    called = []
+    def dummy_caller(s, u, m):
+        called.append(True)
+        return "{}", {}
+
+    engine = AcademicReasoningEngine(llm_caller=dummy_caller)
+    # Montar prompt de utilizador que ultrapassa a capacidade útil
+    huge_user_prompt = "Excesso " * 4000  # 32000 chars -> ~9697 tokens
+    with pytest.raises(ContextBudgetExceededError) as exc_info:
+        engine._call_model_with_retries("System", huge_user_prompt, {"operation": "test_precall"})
+
+    assert not called, "O transport/caller nunca deve ser executado quando o prompt excede o contexto!"
+    assert "Prompt final excede o limite de contexto" in str(exc_info.value)
+
+
+def test_34_context_exact_text_reconstruction_with_offsets():
+    """34. Reconstrução textual exatamente igual ao original (caractere a caractere) e preservação de offsets."""
+    text = (
+        "Parágrafo com múltiplos períodos sintáticos. Segunda oração, com pontuação interna; "
+        "e várias quebras de linha:\nLinha 2 com dados empíricos.\nLinha 3 com conclusão final."
+    )
+    p = ASTParagraph(paragraph_id="p_recon", section_id="sec_test", text=text, page_number=1, page_end=1, order=1)
+    segmenter = SemanticSegmenter(max_tokens_per_segment=25)
+    sub_paras = segmenter.subdivide_paragraph(p, max_tokens=25)
+
+    assert len(sub_paras) > 1
+    # Concatenação pura sem separadores adicionais deve ser IDÊNTICA ao original
+    reconstructed = "".join(sp.text for sp in sub_paras)
+    assert reconstructed == text, "Reconstrução textual deve ser idêntica até ao último caractere!"
+
+    # Verificar que cada span corresponde exatamente ao slice do texto original
+    for sp in sub_paras:
+        assert sp.sentence_spans, "sentence_spans deve conter os offsets de cada subunidade"
+        start, end = sp.sentence_spans[0]
+        assert text[start:end] == sp.text, f"Offset [{start}:{end}] não corresponde ao texto '{sp.text}'"
+
+
+def test_35_context_actual_vs_estimated_tokens_telemetry():
+    """35. Distinção clara na telemetria entre estimated_input_tokens e actual_input_tokens."""
+    def mock_caller_with_actual(s, u, m):
+        # Simula resposta do provider Ollama com usage real
+        return json.dumps({"test": "ok"}), {"input_tokens": 142, "output_tokens": 58, "status": "COMPLETED"}
+
+    engine = AcademicReasoningEngine(llm_caller=mock_caller_with_actual)
+    parsed, telem = engine._call_model_with_retries("Sys", "User Prompt de Teste", {"operation": "test_tokens"})
+
+    assert parsed == {"test": "ok"}
+    assert telem["actual_input_tokens"] == 142
+    assert telem["estimated_input_tokens"] > 0
+    assert telem["reserved_output_tokens"] == engine.budget_manager.default_max_output_tokens
+    assert telem["safety_margin_tokens"] == engine.budget_manager.safety_buffer_tokens
+    assert "available_context_tokens" in telem
+
+
+def test_36_hierarchical_reduce_multi_level_recursion():
+    """36. Reduce 1 aplicando recursão adaptativa em múltiplos níveis (profundidade >= 2)."""
+    items = [f"Resumo analítico profundo do segmento {i} com detalhe metodológico expressivo e evidências robustas." for i in range(1, 25)]
+    bm = ContextBudgetManager(total_context_limit=4500, default_max_output_tokens=2800, safety_buffer_tokens=400)
+    engine = AcademicReasoningEngine()
+    engine.budget_manager = bm
+
+    levels_seen = set()
+
+    def mock_level_reducer(s, u, m):
+        depth = m.get("batch_depth", 1)
+        levels_seen.add(depth)
+        if depth == 1:
+            return json.dumps({
+                "batch_synthesis": f"Síntese detalhada de nível 1 para lote {m.get('batch_index')}: informação substancial preservada com conceitos e argumentos densos.",
+                "batch_objective": "Obj Nível 1",
+                "core_ideas": ["Ideia A", "Ideia B"],
+            }), {}
+        else:
+            return json.dumps({
+                "batch_synthesis": "Síntese consolidada final de nível 2.",
+                "batch_objective": "Obj Nível 2",
+                "core_ideas": ["Ideia Central"],
+            }), {}
+
+    engine.llm_caller = mock_level_reducer
+    telemetry = ReasoningTelemetry()
+
+    # Orçamento de 180 tokens força o nível 1 (~260 tokens) a recursar para o nível 2 (~70 tokens)
+    reduced_text, errs = engine._hierarchical_adaptive_reduce(
+        items=items,
+        format_item_fn=lambda x: str(x),
+        prompt_template="Resuma:\n{segments_summary}",
+        template_kwargs={},
+        prompt_content_key="segments_summary",
+        parse_result_fn=engine._parse_section_intermediate_result,
+        operation_name="test_multi_level",
+        meta_base={"document_id": "doc_test"},
+        usable_budget=180,
+        telemetry_metrics=telemetry,
+        max_depth=4,
+    )
+
+    assert errs == []
+    assert reduced_text is not None
+    assert len(levels_seen) >= 2, f"Deveria ter executado múltiplos níveis de redução, executou: {levels_seen}"
+    assert telemetry.intermediate_syntheses_count >= 2
+    assert any(ha["depth"] >= 2 for ha in telemetry.hierarchical_aggregations)
+
+
+def test_37_hierarchical_reduce_batch_failure_stops_cleanly_without_silent_truncation():
+    """37. Falha num lote intermédio aborta a redução honestamente sem fallback de truncagem [:500]."""
+    items = [f"Item volumoso {i} para teste de falha com texto analítico bastante extenso e detalhado." for i in range(1, 15)]
+    engine = AcademicReasoningEngine()
+    engine.budget_manager.total_context_limit = 4500
+
+    def mock_failing_batch(s, u, m):
+        if m.get("batch_index") == 2:
+            return "RESPOSTA CORROMPIDA NÃO JSON", {"status": "INVALID_JSON_SYNTAX"}
+        return json.dumps({"batch_synthesis": "OK", "batch_objective": "Obj", "core_ideas": []}), {}
+
+    engine.llm_caller = mock_failing_batch
+    telemetry = ReasoningTelemetry()
+
+    # Usable budget de 100 tokens força a criação de lotes (input ~350 tokens > 100)
+    reduced_text, errs = engine._hierarchical_adaptive_reduce(
+        items=items,
+        format_item_fn=lambda x: str(x),
+        prompt_template="Prompt:\n{segments_summary}",
+        template_kwargs={},
+        prompt_content_key="segments_summary",
+        parse_result_fn=engine._parse_section_intermediate_result,
+        operation_name="test_batch_failure",
+        meta_base={"document_id": "doc_fail"},
+        usable_budget=100,
+        telemetry_metrics=telemetry,
+    )
+
+    assert reduced_text is None, "Em caso de falha de lote, a síntese não deve prosseguir com dados parciais truncados!"
+    assert len(errs) > 0
+    assert errs[0]["batch_index"] == 2
+
+
+def test_38_hierarchical_reduce_no_volume_reduction_protection():
+    """38. Proteção contra ausência de redução de volume deteta ciclo e interrompe execução."""
+    items = [f"Item com dados descritivos para teste número {i}." for i in range(1, 10)]
+    engine = AcademicReasoningEngine()
+    engine.budget_manager.total_context_limit = 4500
+
+    def mock_expanding_model(s, u, m):
+        return json.dumps({
+            "batch_synthesis": "Texto hiper-expandido com prolixidade extrema e volume superior ao original " * 10,
+            "batch_objective": "Obj",
+            "core_ideas": [],
+        }), {}
+
+    engine.llm_caller = mock_expanding_model
+    telemetry = ReasoningTelemetry()
+
+    # Usable budget de 50 tokens força redução (input ~130 tokens > 50)
+    reduced_text, errs = engine._hierarchical_adaptive_reduce(
+        items=items,
+        format_item_fn=lambda x: str(x),
+        prompt_template="Prompt:\n{segments_summary}",
+        template_kwargs={},
+        prompt_content_key="segments_summary",
+        parse_result_fn=engine._parse_section_intermediate_result,
+        operation_name="test_expansion_loop",
+        meta_base={"document_id": "doc_loop"},
+        usable_budget=50,
+        telemetry_metrics=telemetry,
+    )
+
+    assert reduced_text is None
+    assert any(e.get("reason") == "NO_VOLUME_REDUCTION" for e in errs)
+
+
+def test_39_hierarchical_reduce_all_sent_prompts_within_budget(tmp_path: Path):
+    """39. Todos os prompts efetivamente enviados durante a redução hierárquica respeitam o orçamento."""
+    paras = [f"Parágrafo descritivo denso {i} com vocabulário técnico e epistemológico de ponta." for i in range(1, 20)]
+    ast = create_synthetic_ast(
+        "doc_check_prompts",
+        "Documento de Auditoria de Prompts",
+        sections_spec=[{"section_id": "sec_1", "title": "Secção", "kind": "body", "paragraphs": paras}],
+    )
+
+    prompts_inspected = []
+
+    def mock_tracking_caller(s: str, u: str, m: Dict[str, Any]):
+        op = m.get("operation", "")
+        prompts_inspected.append((s, u, op))
+        if "segment" in op:
+            return json.dumps({"central_idea": "Ideia", "passage_objective": "Obj", "concepts": [], "arguments": []}), {}
+        if "intermediate" in op:
+            return json.dumps({"batch_synthesis": "Síntese do lote", "batch_objective": "Obj", "core_ideas": []}), {}
+        if "section_synthesis" in op:
+            return json.dumps({"objective": "Obj", "in_depth_synthesis": "Síntese Secção", "core_ideas": [], "concepts": [], "arguments": [], "limitations": []}), {}
+        return json.dumps({"argumentative_progression": [], "global_synthesis": "Global"}), {}
+
+    engine = AcademicReasoningEngine(storage_dir=tmp_path, llm_caller=mock_tracking_caller)
+    engine.segmenter.max_tokens_per_segment = 40
+    engine.budget_manager.total_context_limit = 4500
+    engine.analyze_document(ast)
+
+    # Verificar que cada prompt enviado coube comprovadamente no limite de 4500
+    assert len(prompts_inspected) > 0
+    for s_p, u_p, op_name in prompts_inspected:
+        insp = engine.budget_manager.inspect_budget(s_p, u_p, max_output_tokens=engine.budget_manager.default_max_output_tokens)
+        assert insp["fits"] is True, f"Prompt da operação {op_name} excedeu o contexto ({insp['total_required_tokens']} > 4500)"
+
+
+def test_40_ast_versioned_list_sort_and_reverse():
+    """40. Métodos sort() e reverse() de VersionedList incrementam a versão e mantêm consistência."""
+    ast = create_synthetic_ast("doc_sort_rev", "Teste Sort Reverse")
+    initial_ver = ast.paragraphs.version
+
+    ast.paragraphs.reverse()
+    assert ast.paragraphs.version == initial_ver + 1
+    assert ast.paragraphs_by_id[ast.paragraphs[0].paragraph_id] is ast.paragraphs[0]
+
+    ast.paragraphs.sort(key=lambda p: p.paragraph_id)
+    assert ast.paragraphs.version == initial_ver + 2
+    assert ast.paragraphs_by_id[ast.paragraphs[0].paragraph_id] is ast.paragraphs[0]
+
+
+def test_41_ast_versioned_list_iadd_and_imul():
+    """41. Operações += (__iadd__) e *= (__imul__) de VersionedList hookam nós e invalidam índices."""
+    ast = create_synthetic_ast("doc_iadd_imul", "Teste iadd imul")
+    new_p = ASTParagraph(paragraph_id="p_added_extra", section_id="sec_intro", text="Texto extra", page_number=1, page_end=1, order=10)
+
+    initial_ver = ast.paragraphs.version
+    ast.paragraphs += [new_p]
+
+    assert ast.paragraphs.version == initial_ver + 1
+    assert ast.get_paragraph("p_added_extra") is new_p
+
+    # Testar mutação do parágrafo recém-adicionado via +=
+    new_p.section_id = "sec_shifted"
+    assert new_p in ast.get_paragraphs_for_section("sec_shifted")
+
+
+def test_42_ast_direct_attribute_mutation_paragraph_id():
+    """42. Alteração direta de p.paragraph_id invalida imediatamente o índice secundário."""
+    ast = create_synthetic_ast("doc_direct_pid", "Teste Mutação Direta PID")
+    p = ast.paragraphs[0]
+    old_pid = p.paragraph_id
+    new_pid = "p_directly_mutated_999"
+
+    # Aquecimento de índice
+    _ = ast.paragraphs_by_id
+
+    # Mutação DIRETA no atributo do objeto
+    p.paragraph_id = new_pid
+
+    assert ast.get_paragraph(old_pid) is None, f"ID antigo {old_pid} ainda está presente no índice!"
+    assert ast.get_paragraph(new_pid) is p, f"Novo ID {new_pid} não foi indexado após mutação direta!"
+
+
+def test_43_ast_direct_attribute_mutation_section_id():
+    """43. Alteração direta de p.section_id atualiza paragraphs_by_section_id."""
+    ast = create_synthetic_ast("doc_direct_secid", "Teste Mutação Direta Section ID")
+    p = ast.paragraphs[0]
+    old_sec = p.section_id
+    new_sec = "sec_novel_destination"
+
+    # Aquecimento
+    _ = ast.paragraphs_by_section_id
+
+    # Mutação DIRETA
+    p.section_id = new_sec
+
+    assert p in ast.get_paragraphs_for_section(new_sec)
+    assert p not in ast.get_paragraphs_for_section(old_sec)
+
+
+def test_44_ast_direct_attribute_mutation_section_and_page():
+    """44. Alteração direta de s.section_id e pg.page_number atualiza os respetivos índices."""
+    ast = create_synthetic_ast("doc_direct_sec_page", "Teste Mutação Secção e Página")
+    sec = ast.sections[0]
+    old_sid = sec.section_id
+    new_sid = "sec_renamed_direct"
+
+    # Mutação direta na secção
+    sec.section_id = new_sid
+    assert ast.get_section(old_sid) is None
+    assert ast.get_section(new_sid) is sec
+
+    # Mutação direta na página
+    pg = ast.pages[0]
+    old_pnum = pg.page_number
+    new_pnum = 888
+    pg.page_number = new_pnum
+    assert ast.get_page(old_pnum) is None
+    assert ast.get_page(new_pnum) is pg
+
+
+def test_45_ast_concurrent_mutation_and_query():
+    """45. Acessos concorrentes de mutação e consulta não causam corrupção nem deadlocks."""
+    import threading
+
+    ast = create_synthetic_ast("doc_concurrency", "Teste Concorrência")
+    errors = []
+
+    def reader():
+        try:
+            for _ in range(500):
+                _ = ast.paragraphs_by_id
+                _ = ast.sections_by_id
+                _ = ast.paragraphs_by_section_id
+        except Exception as e:
+            errors.append(e)
+
+    def writer():
+        try:
+            for i in range(100):
+                new_p = ASTParagraph(paragraph_id=f"p_thread_{i}", section_id="sec_intro", text="T", page_number=1, page_end=1, order=i)
+                ast.add_paragraph(new_p)
+                ast.paragraphs[0].section_id = f"sec_mut_{i % 3}"
+        except Exception as e:
+            errors.append(e)
+
+    t1 = threading.Thread(target=reader)
+    t2 = threading.Thread(target=writer)
+    t3 = threading.Thread(target=reader)
+
+    t1.start()
+    t2.start()
+    t3.start()
+
+    t1.join()
+    t2.join()
+    t3.join()
+
+    assert not errors, f"Erros durante execução concorrente: {errors}"
+    assert "p_thread_99" in ast.paragraphs_by_id
+
+
+def test_46_ast_serialization_roundtrip_with_indices():
+    """46. Serialização to_dict() e restauração from_dict() mantêm índices e observabilidade consistentes."""
+    ast = create_synthetic_ast("doc_serial_roundtrip", "Teste Serialização")
+    # Construir índices pré-serialização
+    _ = ast.paragraphs_by_id
+
+    d = ast.to_dict()
+    restored = AcademicDocumentAST.from_dict(d)
+
+    # Verificar funcionamento de índices na AST restaurada
+    assert len(restored.paragraphs_by_id) == len(ast.paragraphs)
+    assert restored.get_paragraph("p_1") is not None
+
+    # Verificar que a observabilidade continua ativa após from_dict
+    p = restored.paragraphs[0]
+    p.paragraph_id = "p_mutated_after_restore"
+    assert restored.get_paragraph("p_mutated_after_restore") is p
+

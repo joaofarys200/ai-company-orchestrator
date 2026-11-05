@@ -239,6 +239,8 @@ class ReasoningTelemetry:
     subdivided_paragraphs_count: int = 0
     intermediate_syntheses_count: int = 0
     context_limit_failures: List[Dict[str, Any]] = field(default_factory=list)
+    hierarchical_aggregations: List[Dict[str, Any]] = field(default_factory=list)
+    token_details_by_operation: Dict[str, Dict[str, Any]] = field(default_factory=dict)
 
 
 @dataclass
@@ -381,10 +383,15 @@ def clean_qwen_json(raw_text: str) -> Optional[Any]:
 # 4. Gestão de Orçamento de Contexto e Segmentação Semântica Adaptativa
 # ============================================================================
 
+DEFAULT_TOTAL_CONTEXT_LIMIT = 8192
+DEFAULT_MAX_OUTPUT_TOKENS = 2800
+DEFAULT_SAFETY_BUFFER_TOKENS = 400
+
+
 class ContextBudgetManager:
     """
-    Gere orçamentos de contexto dinâmicos para inferência no modelo local (Qwen 3.5:9b).
-    Considera:
+    Gere orçamentos de contexto estritos para inferência no modelo local (Qwen 3.5:9b).
+    Elimina mínimos artificiais e valida rigorosamente todos os componentes antes da execução:
       - Limite total de contexto (ex: 8192 tokens no Ollama).
       - Tokens consumidos pelo system prompt.
       - Tokens consumidos pelas instruções e templates da operação.
@@ -394,9 +401,9 @@ class ContextBudgetManager:
 
     def __init__(
         self,
-        total_context_limit: int = 8192,
-        default_max_output_tokens: int = 2800,
-        safety_buffer_tokens: int = 400,
+        total_context_limit: int = DEFAULT_TOTAL_CONTEXT_LIMIT,
+        default_max_output_tokens: int = DEFAULT_MAX_OUTPUT_TOKENS,
+        safety_buffer_tokens: int = DEFAULT_SAFETY_BUFFER_TOKENS,
     ):
         self.total_context_limit = total_context_limit
         self.default_max_output_tokens = default_max_output_tokens
@@ -414,12 +421,61 @@ class ContextBudgetManager:
         instruction_template: str,
         max_output_tokens: Optional[int] = None,
     ) -> int:
+        """
+        Calcula o orçamento estrito utilizável para o conteúdo documental.
+        NÃO UTILIZA MÍNIMOS ARTIFICIAIS. Lança ContextBudgetExceededError se usable <= 0.
+        """
         sys_tokens = self.estimate_tokens(system_prompt)
         inst_tokens = self.estimate_tokens(instruction_template)
-        output_tokens = max_output_tokens or self.default_max_output_tokens
+        output_tokens = max_output_tokens if max_output_tokens is not None else self.default_max_output_tokens
         used = sys_tokens + inst_tokens + output_tokens + self.safety_buffer_tokens
         usable = self.total_context_limit - used
-        return max(300, usable)
+        if usable <= 0:
+            raise ContextBudgetExceededError(
+                f"Orçamento utilizável insuficiente ou negativo ({usable} tokens restantes). "
+                f"Limite total: {self.total_context_limit}, Utilizado pelos componentes fixos: {used} "
+                f"(system: {sys_tokens}, template: {inst_tokens}, reserva saída: {output_tokens}, margem segurança: {self.safety_buffer_tokens})"
+            )
+        return usable
+
+    def inspect_budget(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        max_output_tokens: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Inspeciona e decompõe todos os custos de contexto do prompt completo imediatamente antes da chamada.
+        Distingue claramente:
+          - estimated_system_tokens
+          - estimated_user_tokens
+          - estimated_input_tokens
+          - reserved_output_tokens
+          - safety_margin_tokens
+          - available_context_tokens
+          - remaining_input_budget
+        """
+        est_sys = self.estimate_tokens(system_prompt)
+        est_user = self.estimate_tokens(user_prompt)
+        est_input = est_sys + est_user
+        res_out = max_output_tokens if max_output_tokens is not None else self.default_max_output_tokens
+        safety = self.safety_buffer_tokens
+        total_required = est_input + res_out + safety
+        avail_ctx = self.total_context_limit - total_required
+        remaining_input = self.total_context_limit - (res_out + safety + est_sys)
+
+        return {
+            "estimated_system_tokens": est_sys,
+            "estimated_user_tokens": est_user,
+            "estimated_input_tokens": est_input,
+            "reserved_output_tokens": res_out,
+            "safety_margin_tokens": safety,
+            "total_context_limit": self.total_context_limit,
+            "total_required_tokens": total_required,
+            "available_context_tokens": avail_ctx,
+            "remaining_input_budget": remaining_input,
+            "fits": avail_ctx >= 0,
+        }
 
 
 @dataclass
@@ -463,133 +519,125 @@ class SemanticSegmenter:
         Divide um parágrafo longo em subunidades preservando:
         - paragraph_id original
         - page_number original
+        - page_end original
         - section_id original
         - order original
-        - integridade textual sem cortes arbitrários
+        - offsets de caracteres exatos (char_offset_start / char_offset_end)
+        - texto original integralmente (permite "".join(sp.text for sp in sub_paras) == p.text)
+        - pontuação, quebras de linha e espaços sem qualquer descarte
+        - falha explícita via ContextBudgetExceededError se uma unidade indivisível exceder max_tokens
         """
-        text = (p.text or "").strip()
+        text = p.text or ""
         p_tokens = self.estimate_tokens(text)
         if p_tokens <= max_tokens:
             return [p]
 
         self.subdivided_paragraphs_count += 1
-        sentences = re.split(r"(?<=[.!?])\s+", text)
-        sub_paras: List[ASTParagraph] = []
-        current_chunk: List[str] = []
-        current_tokens = 0
 
-        for sentence in sentences:
-            s_tokens = self.estimate_tokens(sentence)
-            if s_tokens > max_tokens:
-                clauses = re.split(r"(?<=[,;:—])\s+", sentence)
-                for clause in clauses:
-                    c_tokens = self.estimate_tokens(clause)
-                    if c_tokens > max_tokens:
-                        if current_chunk:
-                            sub_paras.append(
-                                ASTParagraph(
-                                    paragraph_id=p.paragraph_id,
-                                    section_id=p.section_id,
-                                    text=" ".join(current_chunk),
-                                    page_number=p.page_number,
-                                    page_end=getattr(p, "page_end", p.page_number),
-                                    order=p.order,
-                                    content_type=p.content_type,
-                                    bbox=p.bbox,
-                                )
-                            )
-                            current_chunk = []
-                            current_tokens = 0
+        # 1. Obter spans de frases sem perder delimitadores ou whitespace
+        raw_sentence_matches = list(re.finditer(r"(?<=[.!?])(\s+|$)", text))
+        sentence_spans: List[Tuple[int, int]] = []
+        cur_pos = 0
+        for m in raw_sentence_matches:
+            end_pos = m.end()
+            if end_pos > cur_pos:
+                sentence_spans.append((cur_pos, end_pos))
+                cur_pos = end_pos
+        if cur_pos < len(text):
+            sentence_spans.append((cur_pos, len(text)))
 
-                        words = clause.split()
-                        w_chunk: List[str] = []
-                        w_tokens = 0
-                        for w in words:
-                            wt = self.estimate_tokens(w)
-                            if wt > max_tokens:
-                                raise ContextBudgetExceededError(
-                                    f"Unidade indivisível excede o orçamento de contexto ({wt} > {max_tokens} tokens): '{w[:50]}...'"
-                                )
-                            if w_tokens + wt > max_tokens and w_chunk:
-                                sub_paras.append(
-                                    ASTParagraph(
-                                        paragraph_id=p.paragraph_id,
-                                        section_id=p.section_id,
-                                        text=" ".join(w_chunk),
-                                        page_number=p.page_number,
-                                        page_end=getattr(p, "page_end", p.page_number),
-                                        order=p.order,
-                                        content_type=p.content_type,
-                                        bbox=p.bbox,
-                                    )
-                                )
-                                w_chunk = []
-                                w_tokens = 0
-                            w_chunk.append(w)
-                            w_tokens += wt
-                        if w_chunk:
-                            sub_paras.append(
-                                ASTParagraph(
-                                    paragraph_id=p.paragraph_id,
-                                    section_id=p.section_id,
-                                    text=" ".join(w_chunk),
-                                    page_number=p.page_number,
-                                    page_end=getattr(p, "page_end", p.page_number),
-                                    order=p.order,
-                                    content_type=p.content_type,
-                                    bbox=p.bbox,
-                                )
-                            )
-                        continue
+        if not sentence_spans:
+            sentence_spans = [(0, len(text))]
 
-                    if current_tokens + c_tokens > max_tokens and current_chunk:
-                        sub_paras.append(
-                            ASTParagraph(
-                                paragraph_id=p.paragraph_id,
-                                section_id=p.section_id,
-                                text=" ".join(current_chunk),
-                                page_number=p.page_number,
-                                page_end=getattr(p, "page_end", p.page_number),
-                                order=p.order,
-                                content_type=p.content_type,
-                                bbox=p.bbox,
-                            )
-                        )
-                        current_chunk = []
-                        current_tokens = 0
-                    current_chunk.append(clause)
-                    current_tokens += c_tokens
+        # 2. Decomposição de spans longos em orações e palavras quando necessário
+        atomic_spans: List[Tuple[int, int]] = []
+        for s_start, s_end in sentence_spans:
+            s_text = text[s_start:s_end]
+            if self.estimate_tokens(s_text) <= max_tokens:
+                atomic_spans.append((s_start, s_end))
                 continue
 
-            if current_tokens + s_tokens > max_tokens and current_chunk:
+            raw_clause_matches = list(re.finditer(r"(?<=[,;:—])(\s+|$)", s_text))
+            clause_spans: List[Tuple[int, int]] = []
+            c_pos = 0
+            for cm in raw_clause_matches:
+                c_end = cm.end()
+                if c_end > c_pos:
+                    clause_spans.append((s_start + c_pos, s_start + c_end))
+                    c_pos = c_end
+            if c_pos < len(s_text):
+                clause_spans.append((s_start + c_pos, s_start + len(s_text)))
+
+            if not clause_spans:
+                clause_spans = [(s_start, s_end)]
+
+            for c_start, c_end in clause_spans:
+                c_text = text[c_start:c_end]
+                if self.estimate_tokens(c_text) <= max_tokens:
+                    atomic_spans.append((c_start, c_end))
+                    continue
+
+                raw_word_matches = list(re.finditer(r"\S+(\s+|$)", c_text))
+                w_pos = 0
+                for wm in raw_word_matches:
+                    w_start = c_start + wm.start()
+                    w_end = c_start + wm.end()
+                    w_text = text[w_start:w_end]
+                    w_tok = self.estimate_tokens(w_text.strip())
+                    if w_tok > max_tokens:
+                        raise ContextBudgetExceededError(
+                            f"Unidade indivisível excede o orçamento de contexto ({w_tok} > {max_tokens} tokens): '{w_text[:50]}...'"
+                        )
+                    atomic_spans.append((w_start, w_end))
+                    w_pos = wm.end()
+                if c_start + w_pos < c_end:
+                    atomic_spans.append((c_start + w_pos, c_end))
+
+        # 3. Agrupar atomic_spans contíguos até atingir o limite max_tokens
+        sub_paras: List[ASTParagraph] = []
+        chunk_start: Optional[int] = None
+        chunk_end: Optional[int] = None
+
+        for a_start, a_end in atomic_spans:
+            if chunk_start is None:
+                chunk_start = a_start
+                chunk_end = a_end
+                continue
+
+            candidate_text = text[chunk_start:a_end]
+            if self.estimate_tokens(candidate_text) <= max_tokens:
+                chunk_end = a_end
+            else:
+                sub_text = text[chunk_start:chunk_end]
                 sub_paras.append(
                     ASTParagraph(
                         paragraph_id=p.paragraph_id,
                         section_id=p.section_id,
-                        text=" ".join(current_chunk),
+                        text=sub_text,
                         page_number=p.page_number,
                         page_end=getattr(p, "page_end", p.page_number),
                         order=p.order,
                         content_type=p.content_type,
                         bbox=p.bbox,
+                        sentence_spans=[[chunk_start, chunk_end]],
                     )
                 )
-                current_chunk = []
-                current_tokens = 0
-            current_chunk.append(sentence)
-            current_tokens += s_tokens
+                chunk_start = a_start
+                chunk_end = a_end
 
-        if current_chunk:
+        if chunk_start is not None and chunk_end is not None:
+            sub_text = text[chunk_start:chunk_end]
             sub_paras.append(
                 ASTParagraph(
                     paragraph_id=p.paragraph_id,
                     section_id=p.section_id,
-                    text=" ".join(current_chunk),
+                    text=sub_text,
                     page_number=p.page_number,
                     page_end=getattr(p, "page_end", p.page_number),
                     order=p.order,
                     content_type=p.content_type,
                     bbox=p.bbox,
+                    sentence_spans=[[chunk_start, chunk_end]],
                 )
             )
 
@@ -965,6 +1013,7 @@ class AcademicReasoningEngine:
         operation = metadata.get("operation", "academic_reasoning")
         doc_id = metadata.get("document_id", "")
         timeout = float(metadata.get("timeout_seconds", 180.0))
+        max_out = int(metadata.get("max_output_tokens", self.budget_manager.default_max_output_tokens))
 
         raw_obj, telemetry = invoke_study_llm_observable(
             operation=operation,
@@ -972,12 +1021,11 @@ class AcademicReasoningEngine:
             user_prompt=user_prompt,
             expect_json=True,
             temperature=0.15,
-            max_output_tokens=3000,
+            max_output_tokens=max_out,
             timeout_seconds=timeout,
             document_id=doc_id,
         )
         if raw_obj is None:
-            # Verifica se falhou por indisponibilidade real
             status = telemetry.get("status", "")
             if status in ("UNAVAILABLE", "TIMEOUT", "FAILED_VALIDATION", "SKIPPED_LIVE_LLM_DISABLED"):
                 err_msg = f"Invocação do modelo local '{self.model_name}' falhou com estado '{status}'"
@@ -994,10 +1042,38 @@ class AcademicReasoningEngine:
         metadata: Dict[str, Any],
         cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> Tuple[Optional[Dict[str, Any]], Dict[str, Any]]:
-        """Executa a chamada ao modelo com tentativas limitadas e validação JSON."""
+        """Executa a chamada ao modelo com validação prévia estrita do prompt final e tentativas com validação JSON."""
+        # 1. Validação estrita do prompt efetivamente enviado antes de qualquer invocação
+        max_out = int(metadata.get("max_output_tokens", self.budget_manager.default_max_output_tokens))
+        inspection = self.budget_manager.inspect_budget(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            max_output_tokens=max_out,
+        )
+        if not inspection["fits"]:
+            raise ContextBudgetExceededError(
+                f"Prompt final excede o limite de contexto antes da chamada ao modelo: "
+                f"estimated_input_tokens={inspection['estimated_input_tokens']} "
+                f"(sys={inspection['estimated_system_tokens']}, user={inspection['estimated_user_tokens']}), "
+                f"reserved_output={inspection['reserved_output_tokens']}, "
+                f"safety_margin={inspection['safety_margin_tokens']}, "
+                f"total={inspection['total_required_tokens']} > limit={inspection['total_context_limit']}. "
+                f"Défice de {-inspection['available_context_tokens']} tokens."
+            )
+
         caller = self.llm_caller or self._default_llm_caller
         attempts = 0
         last_telemetry: Dict[str, Any] = {}
+
+        def _enrich_telemetry(t: Dict[str, Any]) -> Dict[str, Any]:
+            enriched = dict(t or {})
+            enriched["estimated_input_tokens"] = inspection["estimated_input_tokens"]
+            enriched["actual_input_tokens"] = enriched.get("input_tokens")
+            enriched["reserved_output_tokens"] = inspection["reserved_output_tokens"]
+            enriched["safety_margin_tokens"] = inspection["safety_margin_tokens"]
+            enriched["available_context_tokens"] = inspection["available_context_tokens"]
+            enriched["remaining_input_budget"] = inspection["remaining_input_budget"]
+            return enriched
 
         while attempts <= self.max_retries_per_call:
             if cancellation_check and cancellation_check():
@@ -1009,15 +1085,14 @@ class AcademicReasoningEngine:
 
             try:
                 raw_resp, telemetry = caller(system_prompt, user_prompt, metadata)
-                last_telemetry = telemetry or {}
+                last_telemetry = _enrich_telemetry(telemetry)
             except Exception as e:
                 logger.warning(f"Tentativa {attempts} gerou exceção no transport: {e}")
                 if "unavailable" in str(e).lower() or "connecterror" in str(e).lower():
                     raise OllamaInferenceUnavailableError(f"Ollama ou modelo '{self.model_name}' inacessível: {e}")
-                # Erros fatais (ex: RuntimeError, crash ou interrupção de execução) devem interromper a pipeline
                 if isinstance(e, (RuntimeError, KeyboardInterrupt)) and not isinstance(e, AcademicReasoningError):
                     raise e
-                last_telemetry = {"status": "ERROR", "error": str(e)}
+                last_telemetry = _enrich_telemetry({"status": "ERROR", "error": str(e)})
                 raw_resp = None
 
             if raw_resp:
@@ -1034,6 +1109,184 @@ class AcademicReasoningEngine:
                 f"Ollama local qwen3.5:9b indisponível após {attempts} tentativas ({status})."
             )
         return None, last_telemetry
+
+    @staticmethod
+    def _parse_section_intermediate_result(parsed_batch: Dict[str, Any]) -> str:
+        b_synth = parsed_batch.get("batch_synthesis", "")
+        b_obj = parsed_batch.get("batch_objective", "")
+        b_ideas = parsed_batch.get("core_ideas", [])
+        return f"[Síntese Intermédia]\nObjetivo: {b_obj}\nSíntese: {b_synth}\nIdeias: {json.dumps(b_ideas, ensure_ascii=False)}"
+
+    @staticmethod
+    def _parse_cross_section_cluster_result(parsed_cluster: Dict[str, Any]) -> str:
+        cl_synth = parsed_cluster.get("cluster_synthesis", "")
+        cl_prog = parsed_cluster.get("cluster_progression", [])
+        return f"[Grupo de Secções]\nSíntese: {cl_synth}\nProgressão: {json.dumps(cl_prog, ensure_ascii=False)}"
+
+    def _hierarchical_adaptive_reduce(
+        self,
+        items: List[Any],
+        format_item_fn: Callable[[Any], str],
+        prompt_template: str,
+        template_kwargs: Dict[str, Any],
+        prompt_content_key: str,
+        parse_result_fn: Callable[[Dict[str, Any]], str],
+        operation_name: str,
+        meta_base: Dict[str, Any],
+        usable_budget: int,
+        telemetry_metrics: ReasoningTelemetry,
+        cancellation_check: Optional[Callable[[], bool]] = None,
+        depth: int = 1,
+        max_depth: int = 6,
+    ) -> Tuple[Optional[str], List[Dict[str, Any]]]:
+        """
+        Agregação hierárquica adaptativa e recursiva para coleções que excedam o orçamento de contexto.
+        Elimina perdas silenciosas, faz retries e protege contra ausência de redução de volume.
+        """
+        if not items:
+            return "", []
+
+        combined_input = "\n\n".join(format_item_fn(it) for it in items)
+        input_tokens = self.budget_manager.estimate_tokens(combined_input)
+
+        if input_tokens <= usable_budget:
+            return combined_input, []
+
+        batches: List[List[Any]] = []
+        cur_batch: List[Any] = []
+        batch_target_tokens = max(50, usable_budget // 2) if len(items) > 2 else usable_budget
+
+        for it in items:
+            cand_batch = cur_batch + [it]
+            cand_text = "\n\n".join(format_item_fn(x) for x in cand_batch)
+            cand_tokens = self.budget_manager.estimate_tokens(cand_text)
+            cand_kwargs = dict(template_kwargs)
+            cand_kwargs[prompt_content_key] = cand_text
+            cand_prompt = prompt_template.format(**cand_kwargs)
+            cand_budget = self.budget_manager.inspect_budget(
+                system_prompt=SYSTEM_PROMPT_ACADEMIC_REASONING,
+                user_prompt=cand_prompt,
+                max_output_tokens=self.budget_manager.default_max_output_tokens,
+            )
+            if (cand_tokens <= batch_target_tokens and cand_budget["fits"]) or not cur_batch:
+                cur_batch.append(it)
+            else:
+                batches.append(cur_batch)
+                cur_batch = [it]
+
+        if cur_batch:
+            batches.append(cur_batch)
+
+        if len(batches) == 1 and len(items) > 1:
+            mid = len(items) // 2
+            batches = [items[:mid], items[mid:]]
+
+        reduced_items: List[str] = []
+        batch_prompts: List[str] = []
+        batch_failures = 0
+        failed_operations: List[Dict[str, Any]] = []
+
+        for b_idx, batch in enumerate(batches, start=1):
+            if cancellation_check and cancellation_check():
+                raise ReasoningCancelledError(f"Cancelado durante agregação hierárquica no nível {depth}, lote {b_idx}")
+
+            batch_text = "\n\n".join(format_item_fn(x) for x in batch)
+            b_kwargs = dict(template_kwargs)
+            b_kwargs[prompt_content_key] = batch_text
+            b_prompt = prompt_template.format(**b_kwargs)
+            batch_prompts.append(b_prompt)
+
+            b_meta = dict(meta_base)
+            b_meta.update({
+                "operation": operation_name,
+                "batch_depth": depth,
+                "batch_index": b_idx,
+                "total_batches": len(batches),
+            })
+
+            parsed_batch, b_telemetry = self._call_model_with_retries(
+                SYSTEM_PROMPT_ACADEMIC_REASONING,
+                b_prompt,
+                b_meta,
+                cancellation_check=cancellation_check,
+            )
+            telemetry_metrics.total_llm_calls += 1
+            telemetry_metrics.intermediate_syntheses_count += 1
+
+            if not parsed_batch or not isinstance(parsed_batch, dict):
+                batch_failures += 1
+                err_info = {
+                    "stage": operation_name,
+                    "depth": depth,
+                    "batch_index": b_idx,
+                    "reason": b_telemetry.get("status", "INVALID_JSON_AFTER_RETRIES"),
+                    "error": f"Falha na síntese intermédia do lote {b_idx} no nível {depth}.",
+                }
+                failed_operations.append(err_info)
+                logger.error(f"[Hierarchical Reduce Batch Failed] {err_info}")
+                return None, failed_operations
+
+            summary_str = parse_result_fn(parsed_batch)
+            reduced_items.append(summary_str)
+
+        reduced_combined = "\n\n".join(reduced_items)
+        reduced_tokens = self.budget_manager.estimate_tokens(reduced_combined)
+
+        reduction_ratio = round(reduced_tokens / max(1, input_tokens), 4)
+        telemetry_metrics.hierarchical_aggregations.append({
+            "operation": operation_name,
+            "depth": depth,
+            "units_received": len(items),
+            "batches_created": len(batches),
+            "tokens_estimated_per_prompt": [self.budget_manager.estimate_tokens(bp) for bp in batch_prompts],
+            "budget_available": usable_budget,
+            "llm_calls_count": len(batches),
+            "failures_and_retries": batch_failures,
+            "volume_reduction_ratio": reduction_ratio,
+        })
+
+        if reduced_tokens >= input_tokens and len(reduced_items) >= len(items):
+            err_info = {
+                "stage": operation_name,
+                "depth": depth,
+                "reason": "NO_VOLUME_REDUCTION",
+                "error": f"Nível {depth} não reduziu o volume de tokens ({reduced_tokens} >= {input_tokens}).",
+            }
+            failed_operations.append(err_info)
+            return None, failed_operations
+
+        if reduced_tokens <= usable_budget:
+            return reduced_combined, []
+
+        if depth >= max_depth:
+            err_info = {
+                "stage": operation_name,
+                "depth": depth,
+                "reason": "MAX_DEPTH_EXCEEDED",
+                "error": f"Profundidade máxima de redução ({max_depth}) atingida sem convergir para o orçamento ({reduced_tokens} > {usable_budget}).",
+            }
+            failed_operations.append(err_info)
+            return None, failed_operations
+
+        logger.info(
+            f"Agregação nível {depth} produziu {reduced_tokens} tokens (orçamento: {usable_budget}). "
+            f"A avançar recursivamente para o nível {depth + 1}."
+        )
+        return self._hierarchical_adaptive_reduce(
+            items=reduced_items,
+            format_item_fn=lambda x: str(x),
+            prompt_template=prompt_template,
+            template_kwargs=template_kwargs,
+            prompt_content_key=prompt_content_key,
+            parse_result_fn=parse_result_fn,
+            operation_name=operation_name,
+            meta_base=meta_base,
+            usable_budget=usable_budget,
+            telemetry_metrics=telemetry_metrics,
+            cancellation_check=cancellation_check,
+            depth=depth + 1,
+            max_depth=max_depth,
+        )
 
     # ------------------------------------------------------------------------
     # Gestão de Checkpoint e Persistência Incrementais
@@ -1394,47 +1647,59 @@ class AcademicReasoningEngine:
                 self.budget_manager.estimate_tokens(segments_summary_text)
             )
 
-            # Estratégia hierárquica se o resumo dos segmentos ultrapassar o orçamento útil de contexto:
+            # Estratégia hierárquica adaptativa se o resumo dos segmentos ultrapassar o orçamento útil:
             if self.budget_manager.estimate_tokens(segments_summary_text) > sec_budget and len(valid_segments) > 1:
                 logger.info(
                     f"Resumo de segmentos para secção '{section.section_id}' ({self.budget_manager.estimate_tokens(segments_summary_text)} tokens) "
-                    f"excede o orçamento ({sec_budget} tokens). A aplicar síntese hierárquica por lotes."
+                    f"excede o orçamento ({sec_budget} tokens). A aplicar síntese hierárquica recursiva por lotes."
                 )
-                batch_size = max(1, len(valid_segments) // 2)
-                intermediate_summaries: List[str] = []
-                for b_idx in range(0, len(valid_segments), batch_size):
-                    batch_segs = valid_segments[b_idx : b_idx + batch_size]
-                    batch_summary_text = _build_segments_summary(batch_segs)
-                    b_prompt = PROMPT_SECTION_INTERMEDIATE_SYNTHESIS.format(
-                        section_title=section.title,
-                        section_type=section.kind,
-                        segments_summary=batch_summary_text,
+                def _fmt_segment_summary(s: Any) -> str:
+                    if isinstance(s, str):
+                        return s
+                    return (
+                        f"[Segmento {s.segment_id}]\nIdeia: {s.central_idea}\nObjetivo: {s.passage_objective}\n"
+                        f"Conceitos: {', '.join(_format_concept_label(c) for c in s.concepts)}\nArgumentos: {json.dumps(s.arguments, ensure_ascii=False)}"
                     )
-                    b_meta = {
-                        "operation": "academic_section_intermediate_synthesis",
+
+                reduced_summary, h_errs = self._hierarchical_adaptive_reduce(
+                    items=valid_segments,
+                    format_item_fn=_fmt_segment_summary,
+                    prompt_template=PROMPT_SECTION_INTERMEDIATE_SYNTHESIS,
+                    template_kwargs={"section_title": section.title, "section_type": section.kind},
+                    prompt_content_key="segments_summary",
+                    parse_result_fn=self._parse_section_intermediate_result,
+                    operation_name="academic_section_intermediate_synthesis",
+                    meta_base={
                         "document_id": doc_id,
                         "section_id": section.section_id,
-                        "batch_index": b_idx,
                         "timeout_seconds": 120.0,
-                    }
-                    parsed_batch, b_telemetry = self._call_model_with_retries(
-                        SYSTEM_PROMPT_ACADEMIC_REASONING,
-                        b_prompt,
-                        b_meta,
-                        cancellation_check=cancellation_check,
+                    },
+                    usable_budget=sec_budget,
+                    telemetry_metrics=telemetry_metrics,
+                    cancellation_check=cancellation_check,
+                )
+                if h_errs or reduced_summary is None:
+                    failed_operations.extend(h_errs)
+                    telemetry_metrics.failures_count += len(h_errs)
+                    sec_analysis_obj = SectionAnalysis(
+                        section_id=section.section_id,
+                        title=section.title,
+                        section_type=section.kind,
+                        objective="",
+                        in_depth_synthesis="",
+                        core_ideas=[],
+                        concepts=[],
+                        arguments=[],
+                        evidences=[],
+                        limitations=[f"FALHA: Redução hierárquica de segmentos não concluída ({err.get('reason', 'UNKNOWN')})" for err in h_errs],
+                        source_refs=[],
+                        segment_ids=[s.segment_id for s in sec_segment_analyses],
+                        execution_time_ms=0.0,
                     )
-                    telemetry_metrics.total_llm_calls += 1
-                    telemetry_metrics.intermediate_syntheses_count += 1
-                    if parsed_batch and isinstance(parsed_batch, dict):
-                        b_synth = parsed_batch.get("batch_synthesis", "")
-                        b_obj = parsed_batch.get("batch_objective", "")
-                        b_ideas = parsed_batch.get("core_ideas", [])
-                        intermediate_summaries.append(
-                            f"[Lote de Segmentos {b_idx // batch_size + 1}]\nObjetivo: {b_obj}\nSíntese: {b_synth}\nIdeias: {json.dumps(b_ideas, ensure_ascii=False)}"
-                        )
-                    else:
-                        intermediate_summaries.append(f"[Lote {b_idx // batch_size + 1}]\n{batch_summary_text[:500]}")
-                segments_summary_text = "\n\n".join(intermediate_summaries)
+                    all_section_analyses.append(sec_analysis_obj)
+                    continue
+
+                segments_summary_text = reduced_summary
 
             sec_synth_prompt = PROMPT_SECTION_SYNTHESIS.format(
                 section_title=section.title,
@@ -1702,86 +1967,55 @@ class AcademicReasoningEngine:
             PROMPT_CROSS_SECTION_INTEGRATION,
         )
 
-        def _build_cross_summary(sections: List[SectionAnalysis]) -> str:
-            return "\n\n".join(
-                f"Secção: {sa.title} ({sa.section_type})\nObjetivo: {sa.objective}\nSíntese: {sa.in_depth_synthesis[:400]}..."
-                for sa in sections
-            )
+        def _build_cross_summary_single(sa: Any) -> str:
+            if isinstance(sa, str):
+                return sa
+            return f"Secção: {sa.title} ({sa.section_type})\nObjetivo: {sa.objective}\nSíntese: {sa.in_depth_synthesis}"
 
-        sections_summary_text = _build_cross_summary(valid_synth_sections)
+        sections_summary_text = "\n\n".join(_build_cross_summary_single(sa) for sa in valid_synth_sections)
         telemetry_metrics.available_budget_by_operation["cross_section_integration"] = cross_budget
         telemetry_metrics.estimated_tokens_by_operation["cross_section_integration"] = (
             self.budget_manager.estimate_tokens(sections_summary_text)
         )
 
-        # Estratégia hierárquica se o resumo transversal de secções ultrapassar o orçamento útil de contexto:
-        if self.budget_manager.estimate_tokens(sections_summary_text) > cross_budget and len(valid_synth_sections) > 2:
+        # Estratégia hierárquica adaptativa se o resumo transversal de secções ultrapassar o orçamento útil de contexto:
+        if self.budget_manager.estimate_tokens(sections_summary_text) > cross_budget and len(valid_synth_sections) > 1:
             logger.info(
                 f"Resumo transversal de secções ({self.budget_manager.estimate_tokens(sections_summary_text)} tokens) "
-                f"excede orçamento ({cross_budget} tokens). A aplicar clustering transversal."
+                f"excede orçamento ({cross_budget} tokens). A aplicar clustering transversal recursivo."
             )
-            cluster_size = max(2, len(valid_synth_sections) // 2)
-            cluster_summaries: List[str] = []
-            for c_idx in range(0, len(valid_synth_sections), cluster_size):
-                cluster_secs = valid_synth_sections[c_idx : c_idx + cluster_size]
-                cluster_summary_input = _build_cross_summary(cluster_secs)
-                cl_prompt = PROMPT_CROSS_SECTION_CLUSTER.format(
-                    document_title=ast.metadata.title or ast.filename or doc_id,
-                    cluster_summary=cluster_summary_input,
-                )
-                cl_meta = {
-                    "operation": "academic_cross_section_cluster",
+            reduced_cross_summary, cl_errs = self._hierarchical_adaptive_reduce(
+                items=valid_synth_sections,
+                format_item_fn=_build_cross_summary_single,
+                prompt_template=PROMPT_CROSS_SECTION_CLUSTER,
+                template_kwargs={"document_title": ast.metadata.title or ast.filename or doc_id},
+                prompt_content_key="cluster_summary",
+                parse_result_fn=self._parse_cross_section_cluster_result,
+                operation_name="academic_cross_section_cluster",
+                meta_base={
                     "document_id": doc_id,
-                    "cluster_index": c_idx,
                     "timeout_seconds": 120.0,
-                }
-                parsed_cluster, cl_telemetry = self._call_model_with_retries(
-                    SYSTEM_PROMPT_ACADEMIC_REASONING,
-                    cl_prompt,
-                    cl_meta,
-                    cancellation_check=cancellation_check,
-                )
-                telemetry_metrics.total_llm_calls += 1
-                telemetry_metrics.intermediate_syntheses_count += 1
-                if parsed_cluster and isinstance(parsed_cluster, dict):
-                    cl_synth = parsed_cluster.get("cluster_synthesis", "")
-                    cl_prog = parsed_cluster.get("cluster_progression", [])
-                    cluster_summaries.append(
-                        f"[Grupo de Secções {c_idx // cluster_size + 1}: {', '.join(s.title for s in cluster_secs)}]\n"
-                        f"Síntese: {cl_synth}\nProgressão: {json.dumps(cl_prog, ensure_ascii=False)}"
-                    )
-                else:
-                    cluster_summaries.append(f"[Grupo {c_idx // cluster_size + 1}]\n{cluster_summary_input[:500]}")
-            sections_summary_text = "\n\n".join(cluster_summaries)
-
-        cross_prompt = PROMPT_CROSS_SECTION_INTEGRATION.format(
-            document_title=ast.metadata.title or ast.filename or doc_id,
-            sections_summary=sections_summary_text or "Nenhuma secção disponível.",
-            metadata_summary=json.dumps(
-                {
-                    "abstract": (ast.metadata.abstract or "")[:400],
-                    "keywords": ast.metadata.keywords,
-                    "total_pages": ast.metadata.page_count,
                 },
-                ensure_ascii=False,
-            ),
-        )
-        parsed_cross, cross_telemetry = self._call_model_with_retries(
-            SYSTEM_PROMPT_ACADEMIC_REASONING,
-            cross_prompt,
-            {"operation": "academic_cross_section_integration", "document_id": doc_id},
-            cancellation_check=cancellation_check,
-        )
-        if not parsed_cross or not isinstance(parsed_cross, dict):
-            # Registo explícito de falha na integração transversal — zero síntese global inventada
+                usable_budget=cross_budget,
+                telemetry_metrics=telemetry_metrics,
+                cancellation_check=cancellation_check,
+            )
+            if cl_errs or reduced_cross_summary is None:
+                failed_operations.extend(cl_errs)
+                telemetry_metrics.failures_count += len(cl_errs)
+                sections_summary_text = ""
+            else:
+                sections_summary_text = reduced_cross_summary
+
+        cross_telemetry: Dict[str, Any] = {}
+        if not sections_summary_text:
             err_info = {
                 "stage": "cross_section_integration",
-                "reason": cross_telemetry.get("status", "INVALID_JSON_AFTER_RETRIES"),
-                "error": "Falha na integração transversal global após retries.",
+                "reason": "PREREQUISITE_FAILED",
+                "error": "Não é possível executar integração transversal: secções sintetizadas insuficientes ou falha na redução hierárquica.",
             }
             failed_operations.append(err_info)
             telemetry_metrics.failures_count += 1
-            logger.error(f"[Cross-Section Integration Failed] {err_info}")
             cross_section_synthesis = CrossSectionSynthesis(
                 section_relationships=[],
                 argumentative_progression=[],
@@ -1790,15 +2024,53 @@ class AcademicReasoningEngine:
                 idea_dependencies=[],
                 global_synthesis="",
             )
+            parsed_cross = None
         else:
-            cross_section_synthesis = CrossSectionSynthesis(
-                section_relationships=parsed_cross.get("section_relationships", []),
-                argumentative_progression=parsed_cross.get("argumentative_progression", []),
-                conceptual_relationships=parsed_cross.get("conceptual_relationships", []),
-                coherence_and_tensions=parsed_cross.get("coherence_and_tensions", []),
-                idea_dependencies=parsed_cross.get("idea_dependencies", []),
-                global_synthesis=parsed_cross.get("global_synthesis", ""),
+            cross_prompt = PROMPT_CROSS_SECTION_INTEGRATION.format(
+                document_title=ast.metadata.title or ast.filename or doc_id,
+                sections_summary=sections_summary_text,
+                metadata_summary=json.dumps(
+                    {
+                        "abstract": ast.metadata.abstract or "",
+                        "keywords": ast.metadata.keywords,
+                        "total_pages": ast.metadata.page_count,
+                    },
+                    ensure_ascii=False,
+                ),
             )
+            parsed_cross, cross_telemetry = self._call_model_with_retries(
+                SYSTEM_PROMPT_ACADEMIC_REASONING,
+                cross_prompt,
+                {"operation": "academic_cross_section_integration", "document_id": doc_id},
+                cancellation_check=cancellation_check,
+            )
+            if not parsed_cross or not isinstance(parsed_cross, dict):
+                # Registo explícito de falha na integração transversal — zero síntese global inventada
+                err_info = {
+                    "stage": "cross_section_integration",
+                    "reason": cross_telemetry.get("status", "INVALID_JSON_AFTER_RETRIES"),
+                    "error": "Falha na integração transversal global após retries.",
+                }
+                failed_operations.append(err_info)
+                telemetry_metrics.failures_count += 1
+                logger.error(f"[Cross-Section Integration Failed] {err_info}")
+                cross_section_synthesis = CrossSectionSynthesis(
+                    section_relationships=[],
+                    argumentative_progression=[],
+                    conceptual_relationships=[],
+                    coherence_and_tensions=[],
+                    idea_dependencies=[],
+                    global_synthesis="",
+                )
+            else:
+                cross_section_synthesis = CrossSectionSynthesis(
+                    section_relationships=parsed_cross.get("section_relationships", []),
+                    argumentative_progression=parsed_cross.get("argumentative_progression", []),
+                    conceptual_relationships=parsed_cross.get("conceptual_relationships", []),
+                    coherence_and_tensions=parsed_cross.get("coherence_and_tensions", []),
+                    idea_dependencies=parsed_cross.get("idea_dependencies", []),
+                    global_synthesis=parsed_cross.get("global_synthesis", ""),
+                )
 
         # 7. Document Analysis Core
         valid_sections_with_obj = [sa for sa in all_section_analyses if sa.objective]
