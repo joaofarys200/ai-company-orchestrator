@@ -41,6 +41,10 @@ from services.document_intelligence import (
     DocumentIntelligenceExtractor,
     DocumentExtractionError,
 )
+from services.academic_reasoning_engine import (
+    AcademicReasoningEngine,
+    AcademicReasoningDossier,
+)
 from services.video_intelligence_service import (
     VideoIntelligenceService,
     check_video_capabilities,
@@ -1964,6 +1968,47 @@ class StudyService:
                 except Exception as e:
                     print(f"[StudyService] Erro ao extrair AST para {document_id}: {e}", flush=True)
         return None
+
+    def get_academic_reasoning_dossier(self, document_id: str) -> Optional[Dict[str, Any]]:
+        """Carrega o dossier de raciocínio académico persistido (AcademicReasoningDossier)."""
+        dossier_path = self.storage_dir / "documents" / document_id / "reasoning_dossier.json"
+        if dossier_path.exists():
+            try:
+                return json.loads(dossier_path.read_text(encoding="utf-8"))
+            except Exception as e:
+                print(f"[StudyService] Erro ao ler dossier de raciocínio para {document_id}: {e}", flush=True)
+        return None
+
+    def generate_academic_reasoning(
+        self,
+        document_id: str,
+        *,
+        force_recompute: bool = False,
+        on_progress: Optional[Callable[[str, float, str], None]] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
+        llm_caller: Optional[Callable] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Executa a pipeline de raciocínio académico (Fase 3: Hierarchical Map-Reduce).
+        Consome a AcademicDocumentAST e produz um AcademicReasoningDossier fundamentado.
+        """
+        ast_dict = self.get_document_ast(document_id)
+        if not ast_dict:
+            print(f"[StudyService] AST não disponível para documento {document_id}", flush=True)
+            return None
+
+        ast = AcademicDocumentAST.from_dict(ast_dict)
+        engine = AcademicReasoningEngine(
+            storage_dir=self.storage_dir,
+            llm_caller=llm_caller,
+        )
+        dossier = engine.analyze_document(
+            ast,
+            on_progress=on_progress,
+            cancellation_check=cancellation_check,
+            force_recompute=force_recompute,
+        )
+        return dossier.to_dict()
 
     def _parse_pdf(self, file_path: str) -> Tuple[List[str], List[Dict[str, Any]]]:
         """Extrai páginas, texto e referências a imagens usando DocumentIntelligenceExtractor com fallback."""

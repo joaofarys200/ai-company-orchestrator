@@ -50,6 +50,8 @@ STUDY_HANDLERS = {
     "study_create_collection": "create_collection",
     "study_get_document_file": "get_document_file",
     "study_get_document_ast": "get_document_ast",
+    "study_get_academic_reasoning": "get_academic_reasoning",
+    "study_generate_academic_reasoning": "generate_academic_reasoning",
     "study_search_rag": "search_rag",
     # Study Folder Sync & Courses
     "study_link_folder": "link_folder",
@@ -196,6 +198,80 @@ class StudyWebSocketHandler:
                 "type": "study_error",
                 "message": f"AST não disponível para o documento '{doc_id}'.",
                 "request_id": message.get("request_id"),
+            })
+
+    async def get_academic_reasoning(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        dossier = await asyncio.to_thread(self.study_service.get_academic_reasoning_dossier, doc_id)
+        if dossier:
+            await self.connections.send(websocket, {
+                "type": "study_academic_reasoning_result",
+                "document_id": doc_id,
+                "dossier": dossier,
+                "request_id": message.get("request_id"),
+            })
+        else:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Dossier de raciocínio académico não disponível para '{doc_id}'.",
+                "request_id": message.get("request_id"),
+            })
+
+    async def generate_academic_reasoning(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        force_recompute = bool(message.get("force_recompute", False))
+        req_id = message.get("request_id")
+
+        loop = asyncio.get_running_loop()
+
+        def on_prog(stage: str, pct: float, msg: str):
+            asyncio.run_coroutine_threadsafe(
+                self.connections.send(websocket, {
+                    "type": "study_academic_reasoning_progress",
+                    "document_id": doc_id,
+                    "stage": stage,
+                    "progress": pct,
+                    "message": msg,
+                    "request_id": req_id,
+                }),
+                loop,
+            )
+
+        try:
+            dossier = await asyncio.to_thread(
+                self.study_service.generate_academic_reasoning,
+                doc_id,
+                force_recompute=force_recompute,
+                on_progress=on_prog,
+            )
+            if dossier:
+                await self.connections.send(websocket, {
+                    "type": "study_academic_reasoning_result",
+                    "document_id": doc_id,
+                    "dossier": dossier,
+                    "request_id": req_id,
+                })
+            else:
+                await self.connections.send(websocket, {
+                    "type": "study_error",
+                    "message": f"Não foi possível gerar raciocínio académico para '{doc_id}'.",
+                    "request_id": req_id,
+                })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro durante raciocínio académico: {e}",
+                "request_id": req_id,
             })
 
     async def upload_document(
