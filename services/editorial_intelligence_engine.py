@@ -1414,23 +1414,157 @@ class PedagogicalExplanationPlanner:
     VALID_DEPTHS: Set[str] = {"FOUNDATIONAL", "IN_DEPTH", "SYNTHETIC"}
 
     @classmethod
+    def validate_pedagogical_sections_identity(
+        cls,
+        raw_sections_payload: Any,
+        expected_section_ids: List[str] | Set[str],
+    ) -> Tuple[bool, str, Dict[str, Any]]:
+        """
+        Valida correspondência estrita um-para-um entre os objetos de secção recebidos
+        e os identificadores de secção esperados, independentemente da ordem:
+          1. Todos os elementos da resposta são dicionários válidos.
+          2. Todos possuem um `section_id` textual não vazio (e não placeholder).
+          3. Não existem identificadores duplicados.
+          4. Não existem identificadores desconhecidos ou inesperados.
+          5. Todos os identificadores esperados estão presentes.
+          6. Cada secção esperada aparece exatamente uma vez.
+        """
+        expected_list = [str(s).strip() for s in expected_section_ids if str(s).strip()]
+        expected_set = set(expected_list)
+
+        if not isinstance(raw_sections_payload, list) or len(raw_sections_payload) == 0:
+            diag = {
+                "expected_section_ids": sorted(expected_set),
+                "received_section_ids": [],
+                "missing_section_ids": sorted(expected_set),
+                "duplicate_section_ids": [],
+                "unexpected_section_ids": [],
+                "missing_id_indices": [],
+                "invalid_item_indices": [],
+            }
+            return False, "Devolve uma lista não vazia 'sections' de objetos válidos para este lote.", diag
+
+        received_ids: List[str] = []
+        counts_by_sid: Dict[str, int] = {}
+        duplicate_ids: List[str] = []
+        unexpected_ids: List[str] = []
+        missing_id_indices: List[int] = []
+        invalid_item_indices: List[int] = []
+
+        for idx, item in enumerate(raw_sections_payload):
+            if not isinstance(item, dict):
+                invalid_item_indices.append(idx)
+                continue
+            raw_sid = item.get("section_id")
+            sid = raw_sid.strip() if isinstance(raw_sid, str) else ""
+            if not sid or sid.lower() in _SCHEMA_PLACEHOLDERS:
+                missing_id_indices.append(idx)
+                continue
+
+            received_ids.append(sid)
+            counts_by_sid[sid] = counts_by_sid.get(sid, 0) + 1
+            if counts_by_sid[sid] > 1 and sid not in duplicate_ids:
+                duplicate_ids.append(sid)
+            if sid not in expected_set and sid not in unexpected_ids:
+                unexpected_ids.append(sid)
+
+        missing_ids = sorted(expected_set - set(received_ids))
+        diag = {
+            "expected_section_ids": sorted(expected_set),
+            "received_section_ids": received_ids,
+            "missing_section_ids": missing_ids,
+            "duplicate_section_ids": duplicate_ids,
+            "unexpected_section_ids": unexpected_ids,
+            "missing_id_indices": missing_id_indices,
+            "invalid_item_indices": invalid_item_indices,
+        }
+
+        reasons: List[str] = []
+        if invalid_item_indices:
+            reasons.append(f"elementos inválidos (não objeto) nos índices {invalid_item_indices}")
+        if missing_id_indices:
+            reasons.append(f"elementos sem 'section_id' válido nos índices {missing_id_indices}")
+        if duplicate_ids:
+            reasons.append(f"identificadores 'section_id' duplicados: {', '.join(duplicate_ids)}")
+        if unexpected_ids:
+            reasons.append(f"identificadores 'section_id' desconhecidos/inesperados: {', '.join(unexpected_ids)}")
+        if missing_ids:
+            reasons.append(f"secções esperadas em falta: {', '.join(missing_ids)}")
+        if not reasons and len(raw_sections_payload) != len(expected_set):
+            reasons.append(
+                f"número de secções recebidas ({len(raw_sections_payload)}) difere do esperado ({len(expected_set)})"
+            )
+
+        if reasons:
+            msg = (
+                "Validação estrita de identidade das secções falhou ("
+                + "; ".join(reasons)
+                + f"). Devolve exatamente uma entrada por cada section_id esperado: {', '.join(sorted(expected_set))}."
+            )
+            return False, msg, diag
+
+        return True, "", diag
+
+    @classmethod
     def enrich_chapter_sections(
         cls,
         chapter: EditorialChapter,
         raw_sections_payload: List[Any],
         grounding: _GroundingContext,
         all_editorial_section_ids: Set[str],
-    ) -> None:
-        by_sec_id: Dict[str, Dict[str, Any]] = {}
-        for item in raw_sections_payload or []:
-            if isinstance(item, dict) and item.get("section_id"):
-                by_sec_id[str(item["section_id"]).strip()] = item
+        failed_operations: Optional[List[Dict[str, Any]]] = None,
+    ) -> List[Dict[str, Any]]:
+        expected_sec_ids = [sec.section_id for sec in chapter.sections]
+        expected_set = set(expected_sec_ids)
+        mapping_failures: List[Dict[str, Any]] = []
 
-        for idx, sec in enumerate(chapter.sections):
-            raw = by_sec_id.get(sec.section_id)
-            if raw is None and idx < len(raw_sections_payload or []) and isinstance(raw_sections_payload[idx], dict):
-                raw = raw_sections_payload[idx]
-            if not raw:
+        id_ok, id_err, id_diag = cls.validate_pedagogical_sections_identity(
+            raw_sections_payload, expected_sec_ids
+        )
+        if not id_ok:
+            err_entry: Dict[str, Any] = {
+                "stage": "editorial_chapter_pedagogy",
+                "chapter_id": chapter.chapter_id,
+                "reason": "SECTION_IDENTITY_MISMATCH",
+                "expected_section_ids": id_diag["expected_section_ids"],
+                "received_section_ids": id_diag["received_section_ids"],
+                "missing_section_ids": id_diag["missing_section_ids"],
+                "duplicate_section_ids": id_diag["duplicate_section_ids"],
+                "unexpected_section_ids": id_diag["unexpected_section_ids"],
+                "missing_id_indices": id_diag["missing_id_indices"],
+                "invalid_item_indices": id_diag["invalid_item_indices"],
+                "error": id_err,
+            }
+            logger.warning(
+                "Falha de identidade na associação pedagógica do capítulo '%s': %s",
+                chapter.chapter_id,
+                id_err,
+            )
+            mapping_failures.append(err_entry)
+            if failed_operations is not None:
+                failed_operations.append(err_entry)
+
+        # Associação exclusivamente por section_id inequívoco (contagem == 1 e pertencente ao capítulo)
+        counts_by_sid: Dict[str, int] = {}
+        items_by_sid: Dict[str, Dict[str, Any]] = {}
+        if isinstance(raw_sections_payload, list):
+            for item in raw_sections_payload:
+                if not isinstance(item, dict):
+                    continue
+                raw_sid = item.get("section_id")
+                sid = raw_sid.strip() if isinstance(raw_sid, str) else ""
+                if not sid or sid.lower() in _SCHEMA_PLACEHOLDERS or sid not in expected_set:
+                    continue
+                counts_by_sid[sid] = counts_by_sid.get(sid, 0) + 1
+                items_by_sid[sid] = item
+
+        unequivocal_by_sec_id: Dict[str, Dict[str, Any]] = {
+            sid: item for sid, item in items_by_sid.items() if counts_by_sid.get(sid) == 1
+        }
+
+        for sec in chapter.sections:
+            raw = unequivocal_by_sec_id.get(sec.section_id)
+            if raw is None:
                 continue
 
             sec.explanation_strategy = str(raw.get("explanation_strategy") or sec.explanation_strategy).strip()
@@ -1588,6 +1722,7 @@ class PedagogicalExplanationPlanner:
                 if len(chap_refs) < 8 and r not in chap_refs:
                     chap_refs.append(r)
         chapter.evidence_refs = chap_refs
+        return mapping_failures
 
 
 class VisualContentPlanner:
@@ -2261,6 +2396,7 @@ class EditorialIntelligenceEngine:
         storage_dir: Optional[Path] = None,
         llm_caller: Optional[LLMCaller] = None,
         max_retries_per_call: int = 2,
+        max_sections_per_pedagogy_batch: Optional[int] = None,
         total_context_limit: int = DEFAULT_TOTAL_CONTEXT_LIMIT,
         default_max_output_tokens: int = DEFAULT_EDITORIAL_MAX_OUTPUT_TOKENS,
         safety_buffer_tokens: int = DEFAULT_SAFETY_BUFFER_TOKENS,
@@ -2269,6 +2405,7 @@ class EditorialIntelligenceEngine:
         self.storage_dir = Path(storage_dir) if storage_dir else Path("data/study")
         self.llm_caller = llm_caller
         self.max_retries_per_call = max_retries_per_call
+        self.max_sections_per_pedagogy_batch = max_sections_per_pedagogy_batch
         self.budget_manager = ContextBudgetManager(
             total_context_limit=total_context_limit,
             default_max_output_tokens=default_max_output_tokens,
@@ -2317,6 +2454,7 @@ class EditorialIntelligenceEngine:
         *,
         telemetry_metrics: EditorialTelemetry,
         validator_fn: Optional[Callable[[Dict[str, Any]], Tuple[bool, str]]] = None,
+        strict_validation: bool = False,
         cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> Tuple[Optional[Dict[str, Any]], Dict[str, Any]]:
         """Executa chamada ao modelo com validação prévia de contexto, limpeza JSON e validação estrutural."""
@@ -2405,9 +2543,12 @@ class EditorialIntelligenceEngine:
                 f"Ollama local '{self.model_name}' indisponível durante planeamento editorial ({status})."
             )
 
-        # Se o JSON tinha estrutura base mas manteve avisos/referências inválidas após retries,
-        # devolvemos o dicionário para que o EditorialConsistencyEngine registe os erros forenses com precisão.
+        # Se strict_validation=True, nunca devolver uma estrutura que falhou o validator_fn após esgotar retries.
         if last_valid_shape_dict is not None:
+            if strict_validation:
+                last_telemetry["status"] = "VALIDATION_FAILED_AFTER_RETRIES"
+                last_telemetry["validation_error"] = validation_hint
+                return None, last_telemetry
             last_telemetry["post_retry_validation_warning"] = validation_hint
             return last_valid_shape_dict, last_telemetry
 
@@ -3020,10 +3161,22 @@ class EditorialIntelligenceEngine:
             progress("CHAPTER_PEDAGOGY", pct, f"A estruturar pedagogia do capítulo {idx}/{total_chaps}: {chap.title}")
 
             if chap.chapter_id in completed_chapters:
-                PedagogicalExplanationPlanner.enrich_chapter_sections(
-                    chap, completed_chapters[chap.chapter_id], grounding, all_ed_sec_ids
+                cp_ok, _, _ = PedagogicalExplanationPlanner.validate_pedagogical_sections_identity(
+                    completed_chapters[chap.chapter_id],
+                    [s.section_id for s in chap.sections],
                 )
-                continue
+                if cp_ok:
+                    map_errs = PedagogicalExplanationPlanner.enrich_chapter_sections(
+                        chap,
+                        completed_chapters[chap.chapter_id],
+                        grounding,
+                        all_ed_sec_ids,
+                        failed_operations=failed_operations,
+                    )
+                    if map_errs:
+                        telemetry_metrics.failures_count += len(map_errs)
+                    continue
+                completed_chapters.pop(chap.chapter_id, None)
 
             t_ch0 = time.perf_counter()
             raw_chap_sections = self._plan_single_chapter_pedagogy(
@@ -3041,11 +3194,18 @@ class EditorialIntelligenceEngine:
             )
 
             if raw_chap_sections is not None:
-                PedagogicalExplanationPlanner.enrich_chapter_sections(
-                    chap, raw_chap_sections, grounding, all_ed_sec_ids
+                map_errs = PedagogicalExplanationPlanner.enrich_chapter_sections(
+                    chap,
+                    raw_chap_sections,
+                    grounding,
+                    all_ed_sec_ids,
+                    failed_operations=failed_operations,
                 )
-                completed_chapters[chap.chapter_id] = raw_chap_sections
-                _save_cp()
+                if map_errs:
+                    telemetry_metrics.failures_count += len(map_errs)
+                else:
+                    completed_chapters[chap.chapter_id] = raw_chap_sections
+                    _save_cp()
 
         # --------------------------------------------------------------------
         # ETAPA 3: Planeamento de Conteúdo Visual Fundamentado
@@ -3228,7 +3388,11 @@ class EditorialIntelligenceEngine:
             )
 
         # Dividir secções do capítulo em lotes que caibam estritamente no orçamento
-        max_secs_per_batch = 1 if len(chap.sections) >= 3 else 2
+        max_secs_per_batch = (
+            max(1, int(self.max_sections_per_pedagogy_batch))
+            if self.max_sections_per_pedagogy_batch is not None
+            else (1 if len(chap.sections) >= 3 else 2)
+        )
         batches: List[List[EditorialSection]] = []
         cur_secs: List[EditorialSection] = []
         for s in chap.sections:
@@ -3303,25 +3467,30 @@ class EditorialIntelligenceEngine:
             op_key = f"pedagogy_{chap.chapter_id}_b{b_idx}"
             telemetry_metrics.estimated_tokens_by_operation[op_key] = self.budget_manager.estimate_tokens(prompt)
 
-            expected_sec_ids = {s.section_id for s in sec_batch}
+            expected_sec_ids = [s.section_id for s in sec_batch]
+            last_identity_diag: Dict[str, Any] = {}
+            last_identity_failed = False
 
             def _validate_chap(d: Dict[str, Any]) -> Tuple[bool, str]:
+                nonlocal last_identity_failed
                 s_list = d.get("sections")
-                if not isinstance(s_list, list) or len(s_list) == 0:
-                    return False, "Devolve uma lista não vazia 'sections' para este capítulo."
+                id_ok, id_err, id_diag = PedagogicalExplanationPlanner.validate_pedagogical_sections_identity(
+                    s_list, expected_sec_ids
+                )
+                last_identity_diag.clear()
+                last_identity_diag.update(id_diag)
+                if not id_ok:
+                    last_identity_failed = True
+                    return False, id_err
+
+                last_identity_failed = False
                 for s_item in s_list:
-                    if not isinstance(s_item, dict):
-                        continue
                     for c_cov in s_item.get("contents_to_cover") or []:
                         if isinstance(c_cov, dict):
                             for pid in c_cov.get("paragraph_ids") or []:
                                 ps = _clean_ref_id(pid)
                                 if ps and ps.lower() not in _SCHEMA_PLACEHOLDERS and ps not in grounding.paragraphs_index:
                                     return False, f"O paragraph_id '{ps}' não existe nas evidências fornecidas. Usa apenas IDs reais."
-                returned_ids = {str(x.get("section_id", "")).strip() for x in s_list if isinstance(x, dict)}
-                missing_s = expected_sec_ids - returned_ids
-                if missing_s and len(s_list) != len(sec_batch):
-                    return False, f"Faltam secções esperadas na resposta: {', '.join(sorted(missing_s))}."
                 return True, ""
 
             parsed_ch, ch_tel = self._call_model_with_retries(
@@ -3336,16 +3505,42 @@ class EditorialIntelligenceEngine:
                 },
                 telemetry_metrics=telemetry_metrics,
                 validator_fn=_validate_chap,
+                strict_validation=True,
                 cancellation_check=cancellation_check,
             )
 
-            if not parsed_ch or not isinstance(parsed_ch.get("sections"), list):
-                err_info = {
+            post_id_ok = False
+            post_id_err = ""
+            post_id_diag: Dict[str, Any] = {}
+            if isinstance(parsed_ch, dict):
+                post_id_ok, post_id_err, post_id_diag = PedagogicalExplanationPlanner.validate_pedagogical_sections_identity(
+                    parsed_ch.get("sections"), expected_sec_ids
+                )
+
+            if not parsed_ch or not post_id_ok:
+                eff_diag = post_id_diag or last_identity_diag
+                eff_reason = (
+                    "SECTION_IDENTITY_VALIDATION_FAILED"
+                    if (last_identity_failed or (parsed_ch is not None and not post_id_ok))
+                    else ch_tel.get("status", "INVALID_JSON_AFTER_RETRIES")
+                )
+                eff_val_err = ch_tel.get("validation_error") or post_id_err
+                err_info: Dict[str, Any] = {
                     "stage": "editorial_chapter_pedagogy",
                     "chapter_id": chap.chapter_id,
                     "batch_index": b_idx,
-                    "reason": ch_tel.get("status", "INVALID_JSON_AFTER_RETRIES"),
-                    "error": f"Falha no planeamento pedagógico do capítulo '{chap.chapter_id}' (lote {b_idx}).",
+                    "reason": eff_reason,
+                    "expected_section_ids": eff_diag.get("expected_section_ids", sorted(expected_sec_ids)),
+                    "received_section_ids": eff_diag.get("received_section_ids", []),
+                    "missing_section_ids": eff_diag.get("missing_section_ids", []),
+                    "duplicate_section_ids": eff_diag.get("duplicate_section_ids", []),
+                    "unexpected_section_ids": eff_diag.get("unexpected_section_ids", []),
+                    "missing_id_indices": eff_diag.get("missing_id_indices", []),
+                    "invalid_item_indices": eff_diag.get("invalid_item_indices", []),
+                    "error": (
+                        f"Falha no planeamento pedagógico do capítulo '{chap.chapter_id}' (lote {b_idx}): "
+                        f"{eff_val_err or 'resposta inválida após esgotar tentativas.'}"
+                    ),
                 }
                 failed_operations.append(err_info)
                 telemetry_metrics.failures_count += 1

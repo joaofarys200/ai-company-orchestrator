@@ -75,6 +75,7 @@ from services.editorial_intelligence_engine import (
     VisualElementType,
     VisualFeasibilityStatus,
     VisualPlanItem,
+    _GroundingContext,
     compute_dossier_fingerprint,
 )
 from services.study_service import StudyService
@@ -1816,5 +1817,486 @@ def test_18_dense_10_section_33_concept_dossier_hierarchical_convergence(tmp_pat
     assert all(agg["depth"] == 1 for agg in plan.telemetry.hierarchical_aggregations)
     assert plan.qa_report.dossier_section_coverage_pct == 100.0
     assert plan.qa_report.blocking_errors_count == 0
+
+
+# ============================================================================
+# Patch Estrito de Identidade Pedagógica Um-Para-Um (Testes Obrigatórios A–F)
+# ============================================================================
+
+def _make_single_chapter_macro_payload(section_ids: List[str], dossier: AcademicReasoningDossier) -> Dict[str, Any]:
+    """Constrói uma resposta macro válida de 1 capítulo com as secções esperadas (sec_01, sec_02, ...)."""
+    all_orig = [sa.section_id for sa in dossier.section_analyses]
+    c0 = dossier.conceptual_analysis[0].concept_id
+    sections_spec: List[Dict[str, Any]] = []
+    for idx, sid in enumerate(section_ids, start=1):
+        # Distribuir todas as secções originais para manter 100% de cobertura substantiva
+        if idx < len(section_ids):
+            orig_slice = [all_orig[(idx - 1) % len(all_orig)]]
+        else:
+            covered = {all_orig[(k - 1) % len(all_orig)] for k in range(1, len(section_ids))}
+            rem = [o for o in all_orig if o not in covered]
+            orig_slice = rem if rem else [all_orig[-1]]
+        sections_spec.append(
+            {
+                "section_id": sid,
+                "title": f"Secção Editorial {sid}",
+                "order": idx,
+                "content_role": "CORE",
+                "pedagogical_objective": f"Objetivo pedagógico específico de {sid}",
+                "original_section_ids": orig_slice,
+                "associated_concept_ids": [c0],
+                "introduced_concept_ids": [c0] if idx == 1 else [],
+            }
+        )
+    return {
+        "document_nature": StudyDocumentNature.EMPIRICAL_RESEARCH_ARTICLE.value,
+        "central_theme": "Validação estrita um-para-um de identidade pedagógica",
+        "central_theme_status": "SOURCE_FACT",
+        "target_audience": "Investigadores de engenharia de software",
+        "target_audience_basis": "MODEL_INFERENCE",
+        "recommended_structure_rationale": "Capítulo único coeso com secções distintas.",
+        "editorial_strategy": "Progressão analítica verificada",
+        "global_organization_summary": "1 capítulo estruturado",
+        "learning_objectives": [
+            {
+                "objective_id": "lo_1",
+                "description": "Garantir correspondência estrita por section_id",
+                "epistemic_status": "SOURCE_FACT",
+                "source_section_ids": ["sec_intro"],
+                "paragraph_ids": ["p_1"],
+            }
+        ],
+        "conceptual_relationships": [],
+        "chapters": [
+            {
+                "chapter_id": "ed_chap_01",
+                "title": "Capítulo Único de Teste de Identidade",
+                "pedagogical_objective": "Testar associação estrita por section_id",
+                "order": 1,
+                "original_section_ids": all_orig,
+                "key_concept_ids": [c0],
+                "sections": sections_spec,
+            }
+        ],
+    }
+
+
+def _make_pedagogy_section_item(section_id: Optional[str], label: str, paragraph_id: str = "p_1") -> Dict[str, Any]:
+    item: Dict[str, Any] = {
+        "explanation_strategy": f"Estratégia exclusiva para {label}",
+        "planned_pedagogical_elements": [PedagogicalElementType.DEFINITION.value],
+        "contents_to_cover": [
+            {
+                "summary": f"Conteúdo pedagógico exclusivo de {label}",
+                "epistemic_status": "SOURCE_FACT",
+                "source_section_id": "sec_intro",
+                "paragraph_ids": [paragraph_id],
+            }
+        ],
+        "pedagogical_treatments": [],
+    }
+    if section_id is not None:
+        item["section_id"] = section_id
+    return item
+
+
+def test_19_patch_a_duplicate_section_ids_rejected_and_retried(tmp_path: Path):
+    """
+    Teste A — Identificadores duplicados:
+      Esperado: sec_01, sec_02, sec_03.
+      Recebido: sec_01, sec_01, sec_03.
+      Verifica rejeição, retry, ausência de associação posicional e estado PARTIAL após esgotar retries.
+    """
+    ast, dossier = build_empirical_ast_and_dossier("doc_patch_a")
+    grounding = _GroundingContext(dossier, ast)
+    expected = ["sec_01", "sec_02", "sec_03"]
+    dup_payload = [
+        _make_pedagogy_section_item("sec_01", "SEC_01_COPIA_A", "p_1"),
+        _make_pedagogy_section_item("sec_01", "SEC_01_COPIA_B", "p_2"),
+        _make_pedagogy_section_item("sec_03", "SEC_03_VALIDA", "p_3"),
+    ]
+
+    # 1. Validação direta da função de identidade e ausência de fallback posicional em enrich_chapter_sections
+    ok, err_msg, diag = PedagogicalExplanationPlanner.validate_pedagogical_sections_identity(dup_payload, expected)
+    assert ok is False
+    assert diag["duplicate_section_ids"] == ["sec_01"]
+    assert diag["missing_section_ids"] == ["sec_02"]
+    assert "sec_01" in err_msg and "sec_02" in err_msg
+
+    direct_chap = EditorialChapter(
+        chapter_id="ed_chap_01",
+        title="Cap Direto",
+        pedagogical_objective="Obj",
+        sections=[
+            EditorialSection(section_id="sec_01", chapter_id="ed_chap_01", title="S1", pedagogical_objective="O1", original_section_ids=["sec_intro"]),
+            EditorialSection(section_id="sec_02", chapter_id="ed_chap_01", title="S2", pedagogical_objective="O2", original_section_ids=["sec_bg"]),
+            EditorialSection(section_id="sec_03", chapter_id="ed_chap_01", title="S3", pedagogical_objective="O3", original_section_ids=["sec_method"]),
+        ],
+    )
+    direct_failures: List[Dict[str, Any]] = []
+    PedagogicalExplanationPlanner.enrich_chapter_sections(
+        direct_chap, dup_payload, grounding, set(expected), failed_operations=direct_failures
+    )
+    assert len(direct_failures) == 1
+    assert direct_failures[0]["duplicate_section_ids"] == ["sec_01"]
+    assert direct_failures[0]["missing_section_ids"] == ["sec_02"]
+    # Nenhuma associação posicional a sec_02 nem escolha arbitrária entre as cópias ambíguas de sec_01
+    assert direct_chap.sections[0].explanation_strategy == ""
+    assert direct_chap.sections[1].explanation_strategy == ""
+    assert direct_chap.sections[1].contents_to_cover == []
+    assert direct_chap.sections[2].explanation_strategy == "Estratégia exclusiva para SEC_03_VALIDA"
+
+    # 2. Pipeline completo com esgotamento de retries -> rejeição, retries e estado PARTIAL explícito
+    pedagogy_attempts: List[int] = []
+
+    def always_dup_caller(sys_p: str, usr_p: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation")
+        if op == "editorial_macro_planning":
+            return json.dumps(_make_single_chapter_macro_payload(expected, dossier), ensure_ascii=False), {"status": "COMPLETED"}
+        if op == "editorial_chapter_pedagogy":
+            pedagogy_attempts.append(int(meta.get("attempt", 1)))
+            return json.dumps({"sections": dup_payload}, ensure_ascii=False), {"status": "COMPLETED"}
+        return json.dumps({"visual_plans": []}), {"status": "COMPLETED"}
+
+    engine = EditorialIntelligenceEngine(
+        storage_dir=tmp_path / "study_a",
+        llm_caller=always_dup_caller,
+        max_retries_per_call=2,
+        max_sections_per_pedagogy_batch=3,
+    )
+    plan = engine.plan_study_document(dossier, ast=ast)
+
+    assert pedagogy_attempts == [1, 2, 3]  # 1 tentativa inicial + 2 retries
+    assert plan.telemetry.retries_count == 2
+    assert plan.telemetry.failures_count == 1
+    assert plan.metadata.status == "PARTIAL"
+    assert len(plan.failed_operations) == 1
+    f_op = plan.failed_operations[0]
+    assert f_op["reason"] == "SECTION_IDENTITY_VALIDATION_FAILED"
+    assert f_op["duplicate_section_ids"] == ["sec_01"]
+    assert f_op["missing_section_ids"] == ["sec_02"]
+    # A resposta inválida nunca foi consumida como se fosse válida
+    for s in plan.chapters[0].sections:
+        assert s.explanation_strategy == ""
+        assert s.contents_to_cover == []
+
+
+def test_20_patch_b_unknown_section_id_rejected_and_logged(tmp_path: Path):
+    """
+    Teste B — Identificador desconhecido:
+      Esperado: sec_01, sec_02.
+      Recebido: sec_01, sec_99.
+      Verifica rejeição, registo da secção inesperada e ausência de associação indevida.
+    """
+    ast, dossier = build_empirical_ast_and_dossier("doc_patch_b")
+    grounding = _GroundingContext(dossier, ast)
+    expected = ["sec_01", "sec_02"]
+    unknown_payload = [
+        _make_pedagogy_section_item("sec_01", "SEC_01_CORRETA", "p_1"),
+        _make_pedagogy_section_item("sec_99", "SEC_99_INTRUSA", "p_2"),
+    ]
+
+    ok, err_msg, diag = PedagogicalExplanationPlanner.validate_pedagogical_sections_identity(unknown_payload, expected)
+    assert ok is False
+    assert diag["unexpected_section_ids"] == ["sec_99"]
+    assert diag["missing_section_ids"] == ["sec_02"]
+    assert "sec_99" in err_msg
+
+    # Chamada direta a enrich_chapter_sections nunca associa sec_99 a sec_02
+    direct_chap = EditorialChapter(
+        chapter_id="ed_chap_01",
+        title="Cap B",
+        pedagogical_objective="Obj",
+        sections=[
+            EditorialSection(section_id="sec_01", chapter_id="ed_chap_01", title="S1", pedagogical_objective="O1", original_section_ids=["sec_intro"]),
+            EditorialSection(section_id="sec_02", chapter_id="ed_chap_01", title="S2", pedagogical_objective="O2", original_section_ids=["sec_bg"]),
+        ],
+    )
+    direct_failures: List[Dict[str, Any]] = []
+    PedagogicalExplanationPlanner.enrich_chapter_sections(
+        direct_chap, unknown_payload, grounding, set(expected), failed_operations=direct_failures
+    )
+    assert len(direct_failures) == 1
+    assert direct_failures[0]["unexpected_section_ids"] == ["sec_99"]
+    assert direct_chap.sections[1].explanation_strategy == ""
+    assert all("SEC_99_INTRUSA" not in str(c) for c in direct_chap.sections[1].contents_to_cover)
+
+    # Pipeline completo (com configuração default de lote = 2 secções)
+    def unknown_id_caller(sys_p: str, usr_p: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation")
+        if op == "editorial_macro_planning":
+            return json.dumps(_make_single_chapter_macro_payload(expected, dossier), ensure_ascii=False), {"status": "COMPLETED"}
+        if op == "editorial_chapter_pedagogy":
+            return json.dumps({"sections": unknown_payload}, ensure_ascii=False), {"status": "COMPLETED"}
+        return json.dumps({"visual_plans": []}), {"status": "COMPLETED"}
+
+    engine = EditorialIntelligenceEngine(
+        storage_dir=tmp_path / "study_b",
+        llm_caller=unknown_id_caller,
+        max_retries_per_call=1,
+    )
+    plan = engine.plan_study_document(dossier, ast=ast)
+
+    assert plan.metadata.status == "PARTIAL"
+    assert plan.telemetry.retries_count == 1
+    assert len(plan.failed_operations) == 1
+    assert plan.failed_operations[0]["unexpected_section_ids"] == ["sec_99"]
+    assert "sec_99" in plan.failed_operations[0]["error"]
+    for s in plan.chapters[0].sections:
+        assert s.explanation_strategy == ""
+        assert s.contents_to_cover == []
+
+
+def test_21_patch_c_missing_section_with_equal_length_rejected(tmp_path: Path):
+    """
+    Teste C — Secção em falta com número igual de elementos:
+      Esperado: sec_01, sec_02, sec_03.
+      Recebido: sec_01, sec_03, sec_03.
+      Verifica rejeição, deteção simultânea da omissão de sec_02 e da duplicação de sec_03.
+    """
+    ast, dossier = build_empirical_ast_and_dossier("doc_patch_c")
+    expected = ["sec_01", "sec_02", "sec_03"]
+    equal_len_bad_payload = [
+        _make_pedagogy_section_item("sec_01", "SEC_01", "p_1"),
+        _make_pedagogy_section_item("sec_03", "SEC_03_A", "p_3"),
+        _make_pedagogy_section_item("sec_03", "SEC_03_B", "p_4"),
+    ]
+    assert len(equal_len_bad_payload) == len(expected) == 3
+
+    ok, err_msg, diag = PedagogicalExplanationPlanner.validate_pedagogical_sections_identity(
+        equal_len_bad_payload, expected
+    )
+    assert ok is False
+    assert diag["missing_section_ids"] == ["sec_02"]
+    assert diag["duplicate_section_ids"] == ["sec_03"]
+    assert "sec_02" in err_msg
+    assert "sec_03" in err_msg
+
+    prompts_received: List[str] = []
+
+    def equal_len_bad_caller(sys_p: str, usr_p: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation")
+        if op == "editorial_macro_planning":
+            return json.dumps(_make_single_chapter_macro_payload(expected, dossier), ensure_ascii=False), {"status": "COMPLETED"}
+        if op == "editorial_chapter_pedagogy":
+            prompts_received.append(usr_p)
+            return json.dumps({"sections": equal_len_bad_payload}, ensure_ascii=False), {"status": "COMPLETED"}
+        return json.dumps({"visual_plans": []}), {"status": "COMPLETED"}
+
+    engine = EditorialIntelligenceEngine(
+        storage_dir=tmp_path / "study_c",
+        llm_caller=equal_len_bad_caller,
+        max_retries_per_call=1,
+        max_sections_per_pedagogy_batch=3,
+    )
+    plan = engine.plan_study_document(dossier, ast=ast)
+
+    assert len(prompts_received) == 2
+    # A pista de retry inclui explicitamente tanto a omissão de sec_02 como a duplicação de sec_03
+    assert "sec_02" in prompts_received[1] and "sec_03" in prompts_received[1]
+    assert plan.metadata.status == "PARTIAL"
+    assert len(plan.failed_operations) == 1
+    f_op = plan.failed_operations[0]
+    assert f_op["missing_section_ids"] == ["sec_02"]
+    assert f_op["duplicate_section_ids"] == ["sec_03"]
+    for s in plan.chapters[0].sections:
+        assert s.explanation_strategy == ""
+
+
+def test_22_patch_d_out_of_order_valid_section_ids_accepted_one_to_one(tmp_path: Path):
+    """
+    Teste D — Ordem diferente, mas identificadores corretos:
+      Esperado: sec_01, sec_02, sec_03.
+      Recebido: sec_03, sec_01, sec_02.
+      Verifica aceitação imediata, associação exata por section_id e preservação da identidade/ordem das secções.
+    """
+    ast, dossier = build_empirical_ast_and_dossier("doc_patch_d")
+    expected = ["sec_01", "sec_02", "sec_03"]
+    reordered_payload = [
+        _make_pedagogy_section_item("sec_03", "CONTEUDO_DA_TRES", "p_5"),
+        _make_pedagogy_section_item("sec_01", "CONTEUDO_DA_UM", "p_1"),
+        _make_pedagogy_section_item("sec_02", "CONTEUDO_DA_DOIS", "p_3"),
+    ]
+
+    ok, err_msg, diag = PedagogicalExplanationPlanner.validate_pedagogical_sections_identity(
+        reordered_payload, expected
+    )
+    assert ok is True
+    assert err_msg == ""
+    assert diag["missing_section_ids"] == []
+    assert diag["duplicate_section_ids"] == []
+    assert diag["unexpected_section_ids"] == []
+
+    def reordered_caller(sys_p: str, usr_p: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation")
+        if op == "editorial_macro_planning":
+            return json.dumps(_make_single_chapter_macro_payload(expected, dossier), ensure_ascii=False), {"status": "COMPLETED"}
+        if op == "editorial_chapter_pedagogy":
+            return json.dumps({"sections": reordered_payload}, ensure_ascii=False), {"status": "COMPLETED"}
+        return json.dumps({"visual_plans": []}), {"status": "COMPLETED"}
+
+    engine = EditorialIntelligenceEngine(
+        storage_dir=tmp_path / "study_d",
+        llm_caller=reordered_caller,
+        max_retries_per_call=2,
+        max_sections_per_pedagogy_batch=3,
+    )
+    plan = engine.plan_study_document(dossier, ast=ast)
+
+    assert plan.metadata.status == "COMPLETED"
+    assert plan.telemetry.retries_count == 0
+    assert plan.telemetry.failures_count == 0
+    assert plan.failed_operations == []
+    assert plan.qa_report.is_valid is True
+
+    secs = plan.chapters[0].sections
+    # Identidade e ordem original das secções do capítulo permanecem inalteradas
+    assert [s.section_id for s in secs] == ["sec_01", "sec_02", "sec_03"]
+    assert [s.order for s in secs] == [1, 2, 3]
+    # Conteúdos associados estritamente por section_id (nunca pela posição 0, 1, 2 da resposta)
+    assert secs[0].explanation_strategy == "Estratégia exclusiva para CONTEUDO_DA_UM"
+    assert secs[0].contents_to_cover[0]["summary"] == "Conteúdo pedagógico exclusivo de CONTEUDO_DA_UM"
+    assert secs[1].explanation_strategy == "Estratégia exclusiva para CONTEUDO_DA_DOIS"
+    assert secs[1].contents_to_cover[0]["summary"] == "Conteúdo pedagógico exclusivo de CONTEUDO_DA_DOIS"
+    assert secs[2].explanation_strategy == "Estratégia exclusiva para CONTEUDO_DA_TRES"
+    assert secs[2].contents_to_cover[0]["summary"] == "Conteúdo pedagógico exclusivo de CONTEUDO_DA_TRES"
+
+
+def test_23_patch_e_missing_section_id_rejected_without_positional_fallback(tmp_path: Path):
+    """
+    Teste E — Ausência de section_id:
+      Recebido um elemento sem section_id (e variante com section_id vazio).
+      Verifica rejeição e proibição absoluta de usar a posição na lista para compensar o ID em falta.
+    """
+    ast, dossier = build_empirical_ast_and_dossier("doc_patch_e")
+    grounding = _GroundingContext(dossier, ast)
+    expected = ["sec_01", "sec_02"]
+    no_id_payload = [
+        _make_pedagogy_section_item(None, "ITEM_ANONIMO_POSICAO_ZERO", "p_1"),
+        _make_pedagogy_section_item("sec_02", "SEC_02_IDENTIFICADA", "p_3"),
+    ]
+    empty_id_payload = [
+        _make_pedagogy_section_item("   ", "ITEM_VAZIO_POSICAO_ZERO", "p_1"),
+        _make_pedagogy_section_item("sec_02", "SEC_02_IDENTIFICADA", "p_3"),
+    ]
+
+    for bad_payload in (no_id_payload, empty_id_payload):
+        ok, err_msg, diag = PedagogicalExplanationPlanner.validate_pedagogical_sections_identity(bad_payload, expected)
+        assert ok is False
+        assert diag["missing_id_indices"] == [0]
+        assert diag["missing_section_ids"] == ["sec_01"]
+        assert "section_id" in err_msg
+
+    # Verificar diretamente em enrich_chapter_sections que sec_01 (índice 0) NÃO recebe o item sem ID na posição 0
+    direct_chap = EditorialChapter(
+        chapter_id="ed_chap_01",
+        title="Cap E",
+        pedagogical_objective="Obj",
+        sections=[
+            EditorialSection(section_id="sec_01", chapter_id="ed_chap_01", title="S1", pedagogical_objective="O1", original_section_ids=["sec_intro"]),
+            EditorialSection(section_id="sec_02", chapter_id="ed_chap_01", title="S2", pedagogical_objective="O2", original_section_ids=["sec_bg"]),
+        ],
+    )
+    direct_failures: List[Dict[str, Any]] = []
+    PedagogicalExplanationPlanner.enrich_chapter_sections(
+        direct_chap, no_id_payload, grounding, set(expected), failed_operations=direct_failures
+    )
+    assert len(direct_failures) == 1
+    assert direct_failures[0]["missing_id_indices"] == [0]
+    assert direct_chap.sections[0].explanation_strategy == ""
+    assert direct_chap.sections[0].contents_to_cover == []
+    assert direct_chap.sections[1].explanation_strategy == "Estratégia exclusiva para SEC_02_IDENTIFICADA"
+
+    # Pipeline completo -> rejeição, retry, zero compensação posicional e estado PARTIAL
+    def missing_id_caller(sys_p: str, usr_p: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        op = meta.get("operation")
+        if op == "editorial_macro_planning":
+            return json.dumps(_make_single_chapter_macro_payload(expected, dossier), ensure_ascii=False), {"status": "COMPLETED"}
+        if op == "editorial_chapter_pedagogy":
+            return json.dumps({"sections": no_id_payload}, ensure_ascii=False), {"status": "COMPLETED"}
+        return json.dumps({"visual_plans": []}), {"status": "COMPLETED"}
+
+    engine = EditorialIntelligenceEngine(
+        storage_dir=tmp_path / "study_e",
+        llm_caller=missing_id_caller,
+        max_retries_per_call=1,
+    )
+    plan = engine.plan_study_document(dossier, ast=ast)
+
+    assert plan.metadata.status == "PARTIAL"
+    assert plan.telemetry.retries_count == 1
+    assert len(plan.failed_operations) == 1
+    assert plan.failed_operations[0]["missing_id_indices"] == [0]
+    assert plan.chapters[0].sections[0].explanation_strategy == ""
+    assert plan.chapters[0].sections[0].contents_to_cover == []
+
+
+def test_24_patch_f_pipeline_regression_checkpoint_qa_and_traceability(tmp_path: Path):
+    """
+    Teste F — Regressão da pipeline:
+      Confirma geração editorial completa, recuperação e higienização de checkpoints,
+      QA editorial e rastreabilidade integral de referências após o patch corretivo.
+    """
+    storage_dir = tmp_path / "study_f"
+    ast, dossier = build_empirical_ast_and_dossier("doc_patch_f", "sha_patch_f")
+    base_caller = make_mock_editorial_llm_caller(ast, dossier)
+
+    # 1. Simular primeira tentativa onde ed_chap_02 falha na 1ª tentativa por duplicação de ID
+    #    mas recupera no retry, enquanto ed_chap_03 é interrompido para testar checkpoint recovery!
+    chap2_attempts = 0
+
+    def transient_and_interrupted_caller(sys_p: str, usr_p: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        nonlocal chap2_attempts
+        op = meta.get("operation")
+        chap = meta.get("chapter_id")
+        if op == "editorial_chapter_pedagogy" and chap == "ed_chap_01" and int(meta.get("attempt", 1)) == 1:
+            chap2_attempts += 1
+            # Devolver secções em ordem invertida no ed_chap_01 (ed_sec_01_02, ed_sec_01_01) -> aceite à 1ª!
+            raw_ok, tel = base_caller(sys_p, usr_p, meta)
+            obj = json.loads(raw_ok)
+            obj["sections"] = list(reversed(obj["sections"]))
+            return json.dumps(obj, ensure_ascii=False), tel
+        if op == "editorial_chapter_pedagogy" and chap == "ed_chap_03":
+            raise RuntimeError("Interrupção controlada antes do capítulo 3")
+        return base_caller(sys_p, usr_p, meta)
+
+    engine_1 = EditorialIntelligenceEngine(storage_dir=storage_dir, llm_caller=transient_and_interrupted_caller)
+    with pytest.raises(RuntimeError):
+        engine_1.plan_study_document(dossier, ast=ast)
+
+    cp_path = storage_dir / "documents" / dossier.document_id / "editorial_checkpoint.json"
+    assert cp_path.exists()
+
+    # 2. Corromper deliberadamente ed_chap_02 no checkpoint (removendo section_id) para provar
+    #    que o motor não consome um checkpoint sem identidade inequívoca e o reprocessa!
+    cp_data = json.loads(cp_path.read_text(encoding="utf-8"))
+    cp_data["completed_chapters"]["ed_chap_02"] = [{"explanation_strategy": "Checkpoint corrompido sem section_id"}]
+    cp_path.write_text(json.dumps(cp_data, ensure_ascii=False), encoding="utf-8")
+
+    resumed_ops: List[str] = []
+
+    def clean_resumed_caller(sys_p: str, usr_p: str, meta: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        resumed_ops.append(f"{meta.get('operation')}:{meta.get('chapter_id', '')}")
+        return base_caller(sys_p, usr_p, meta)
+
+    engine_2 = EditorialIntelligenceEngine(storage_dir=storage_dir, llm_caller=clean_resumed_caller)
+    plan = engine_2.plan_study_document(dossier, ast=ast)
+
+    assert plan.metadata.status == "COMPLETED"
+    assert plan.failed_operations == []
+    # ed_chap_01 válido no checkpoint (mesmo em ordem invertida) NÃO foi repetido;
+    # ed_chap_02 corrompido sem section_id FOI descartado e reprocessado; ed_chap_03 foi concluído!
+    assert "editorial_chapter_pedagogy:ed_chap_01" not in resumed_ops
+    assert "editorial_chapter_pedagogy:ed_chap_02" in resumed_ops
+    assert "editorial_chapter_pedagogy:ed_chap_03" in resumed_ops
+
+    # QA editorial e rastreabilidade 100% íntegros
+    assert plan.qa_report.is_valid is True
+    assert plan.qa_report.validation_status == "VALID"
+    assert plan.qa_report.blocking_errors_count == 0
+    assert plan.qa_report.dossier_section_coverage_pct == 100.0
+    assert plan.qa_report.valid_evidence_refs_pct == 100.0
+    assert not cp_path.exists()
+
 
 
