@@ -290,6 +290,8 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     askStudyCourse,
     retryStudyDocument,
     cancelStudyGeneration,
+    getStudyEditorialPlan,
+    generateStudyEditorialPlan,
     studyPipelineStage,
     sendDirective,
     setChatPanelOpen,
@@ -2116,6 +2118,8 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 onAskCourse={askStudyCourse}
                 onRetryDocument={retryStudyDocument}
                 onCancelGeneration={cancelStudyGeneration}
+                onGetEditorialPlan={getStudyEditorialPlan}
+                onGenerateEditorialPlan={generateStudyEditorialPlan}
                 pipelineStage={studyPipelineStage}
               />
             </ViewFrame>

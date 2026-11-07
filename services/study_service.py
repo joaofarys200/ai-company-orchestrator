@@ -45,6 +45,11 @@ from services.academic_reasoning_engine import (
     AcademicReasoningEngine,
     AcademicReasoningDossier,
 )
+from services.editorial_intelligence_engine import (
+    EditorialIntelligenceEngine,
+    EditorialStudyPlan,
+    compute_dossier_fingerprint,
+)
 from services.video_intelligence_service import (
     VideoIntelligenceService,
     check_video_capabilities,
@@ -2009,6 +2014,134 @@ class StudyService:
             force_recompute=force_recompute,
         )
         return dossier.to_dict()
+
+    def get_editorial_study_plan(self, document_id: str) -> Optional[Dict[str, Any]]:
+        """Carrega o plano editorial persistido (EditorialStudyPlan — Fase 4) sem alterar artefactos anteriores."""
+        plan_path = self.storage_dir / "documents" / document_id / "editorial_study_plan.json"
+        if plan_path.exists():
+            try:
+                raw = json.loads(plan_path.read_text(encoding="utf-8"))
+                return EditorialStudyPlan.from_dict(raw).to_dict()
+            except Exception as e:
+                print(f"[StudyService] Erro ao ler plano editorial para {document_id}: {e}", flush=True)
+        return None
+
+    def get_editorial_plan_status(self, document_id: str) -> Dict[str, Any]:
+        """Consulta o estado do planeamento editorial, checkpoints e sincronização face ao dossier."""
+        doc_dir = self.storage_dir / "documents" / document_id
+        ast_path = doc_dir / "ast.json"
+        dossier_path = doc_dir / "reasoning_dossier.json"
+        cp_path = doc_dir / "editorial_checkpoint.json"
+        plan_path = doc_dir / "editorial_study_plan.json"
+
+        has_ast = ast_path.exists()
+        has_dossier = dossier_path.exists()
+        has_checkpoint = cp_path.exists()
+        has_plan = plan_path.exists()
+
+        plan_obj: Optional[EditorialStudyPlan] = None
+        if has_plan:
+            try:
+                plan_obj = EditorialStudyPlan.from_dict(json.loads(plan_path.read_text(encoding="utf-8")))
+            except Exception:
+                plan_obj = None
+
+        is_stale = False
+        stale_reason = "UP_TO_DATE"
+        if plan_obj is not None and has_dossier:
+            try:
+                dossier_obj = AcademicReasoningDossier.from_dict(
+                    json.loads(dossier_path.read_text(encoding="utf-8"))
+                )
+                engine = EditorialIntelligenceEngine(storage_dir=self.storage_dir)
+                up_to_date, reason = engine.is_plan_up_to_date(plan_obj, dossier_obj)
+                is_stale = not up_to_date
+                stale_reason = reason
+            except Exception:
+                pass
+
+        if plan_obj is not None:
+            state = plan_obj.metadata.status
+        elif has_checkpoint:
+            state = "IN_PROGRESS_CHECKPOINT"
+        else:
+            state = "NOT_GENERATED"
+
+        return {
+            "document_id": document_id,
+            "state": state,
+            "has_ast": has_ast,
+            "has_dossier": has_dossier,
+            "has_checkpoint": has_checkpoint,
+            "has_plan": plan_obj is not None,
+            "is_stale": is_stale,
+            "stale_reason": stale_reason,
+            "plan_id": plan_obj.metadata.plan_id if plan_obj else None,
+            "plan_version": plan_obj.metadata.plan_version if plan_obj else None,
+            "validation_status": plan_obj.qa_report.validation_status if plan_obj else None,
+            "updated_at": plan_obj.metadata.created_at if plan_obj else None,
+        }
+
+    def generate_editorial_study_plan(
+        self,
+        document_id: str,
+        *,
+        force_recompute: bool = False,
+        auto_generate_dossier: bool = False,
+        on_progress: Optional[Callable[[str, float, str], None]] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
+        llm_caller: Optional[Callable] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Executa a pipeline de Inteligência Editorial (Fase 4).
+        Consome o AcademicReasoningDossier persistido (e a AcademicDocumentAST quando disponível)
+        e produz um EditorialStudyPlan validado e independente.
+        """
+        from services.study_ai_engine import is_study_generation_cancelled, register_study_generation_start
+
+        register_study_generation_start(document_id)
+
+        def _combined_cancel() -> bool:
+            if cancellation_check and cancellation_check():
+                return True
+            return is_study_generation_cancelled(document_id) or is_study_generation_cancelled("global")
+
+        dossier_dict = self.get_academic_reasoning_dossier(document_id)
+        if not dossier_dict and auto_generate_dossier:
+            dossier_dict = self.generate_academic_reasoning(
+                document_id,
+                force_recompute=False,
+                on_progress=on_progress,
+                cancellation_check=_combined_cancel,
+                llm_caller=llm_caller,
+            )
+
+        if not dossier_dict:
+            print(f"[StudyService] Dossier de raciocínio não disponível para planeamento editorial de {document_id}", flush=True)
+            return None
+
+        dossier = AcademicReasoningDossier.from_dict(dossier_dict)
+
+        ast_obj: Optional[AcademicDocumentAST] = None
+        ast_path = self.storage_dir / "documents" / document_id / "ast.json"
+        if ast_path.exists():
+            try:
+                ast_obj = AcademicDocumentAST.from_dict(json.loads(ast_path.read_text(encoding="utf-8")))
+            except Exception as e:
+                print(f"[StudyService] Aviso ao ler AST opcional para {document_id}: {e}", flush=True)
+
+        engine = EditorialIntelligenceEngine(
+            storage_dir=self.storage_dir,
+            llm_caller=llm_caller,
+        )
+        plan = engine.plan_study_document(
+            dossier,
+            ast=ast_obj,
+            on_progress=on_progress,
+            cancellation_check=_combined_cancel,
+            force_recompute=force_recompute,
+        )
+        return plan.to_dict()
 
     def _parse_pdf(self, file_path: str) -> Tuple[List[str], List[Dict[str, Any]]]:
         """Extrai páginas, texto e referências a imagens usando DocumentIntelligenceExtractor com fallback."""

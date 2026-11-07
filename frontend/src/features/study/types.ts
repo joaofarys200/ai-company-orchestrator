@@ -357,3 +357,206 @@ export interface VideoSearchResult {
   timestamp_str: string;
   text: string;
 }
+
+// ============================================================================
+// Phase 4 — Editorial Intelligence & Academic Study Document Design
+// ============================================================================
+
+export type EpistemicStatusCode = 'SOURCE_FACT' | 'MODEL_INFERENCE' | 'NOT_FOUND' | 'UNVERIFIED';
+
+export interface EditorialEvidenceRef {
+  section_id: string;
+  paragraph_id?: string | null;
+  page_number?: number | null;
+  excerpt?: string;
+  status: EpistemicStatusCode | string;
+}
+
+export interface EditorialPlanMetadata {
+  plan_id: string;
+  document_id: string;
+  source_sha256: string;
+  ast_version: string;
+  dossier_id: string;
+  dossier_schema_version: string;
+  dossier_engine_version: string;
+  dossier_fingerprint: string;
+  plan_version: number;
+  previous_plan_id?: string | null;
+  schema_version: string;
+  engine_version: string;
+  model_name: string;
+  prompt_versions: Record<string, string>;
+  created_at: string;
+  status: 'COMPLETED' | 'PARTIAL' | 'FAILED' | 'CANCELLED' | string;
+}
+
+export interface EditorialLearningObjective {
+  objective_id: string;
+  description: string;
+  epistemic_status: EpistemicStatusCode | string;
+  source_section_ids: string[];
+  evidence_refs?: EditorialEvidenceRef[];
+}
+
+export interface EditorialOverview {
+  central_theme: string;
+  central_theme_status: EpistemicStatusCode | string;
+  learning_objectives: EditorialLearningObjective[];
+  target_audience: string;
+  target_audience_basis: EpistemicStatusCode | string;
+  document_nature: string;
+  recommended_structure_rationale: string;
+  editorial_strategy: string;
+  global_organization_summary: string;
+  core_contents: string[];
+  complementary_contents: string[];
+  transversal_synthesis_opportunities: string[];
+  evidence_refs: EditorialEvidenceRef[];
+}
+
+export interface PedagogicalExplanationSpec {
+  target_topic_or_concept: string;
+  concept_id?: string | null;
+  depth_level: 'FOUNDATIONAL' | 'IN_DEPTH' | 'SYNTHETIC' | string;
+  depth_justification: string;
+  required_elements: string[];
+  pedagogical_focus: Record<string, string>;
+  epistemic_status: EpistemicStatusCode | string;
+  evidence_refs: EditorialEvidenceRef[];
+}
+
+export interface EditorialSection {
+  section_id: string;
+  chapter_id: string;
+  title: string;
+  pedagogical_objective: string;
+  parent_section_id?: string | null;
+  level: number;
+  order: number;
+  content_role: string;
+  contents_to_cover: Array<{
+    summary: string;
+    epistemic_status: string;
+    source_section_id?: string;
+    paragraph_ids?: string[];
+    page_numbers?: number[];
+  }>;
+  associated_concept_ids: string[];
+  introduced_concept_ids: string[];
+  prerequisite_concept_ids: string[];
+  explanation_strategy: string;
+  planned_pedagogical_elements: string[];
+  pedagogical_treatments: PedagogicalExplanationSpec[];
+  original_section_ids: string[];
+  merged_or_deduplicated_notes: string[];
+  evidence_refs: EditorialEvidenceRef[];
+  related_section_ids: Array<{
+    target_section_id: string;
+    relation_type: string;
+    rationale: string;
+  }>;
+  visual_plan_ids: string[];
+  editorial_recommendations: string[];
+  limitations_and_uncertainties: string[];
+}
+
+export interface EditorialChapter {
+  chapter_id: string;
+  title: string;
+  pedagogical_objective: string;
+  description: string;
+  order: number;
+  role_in_progression: string;
+  editorial_justification: string;
+  sections: EditorialSection[];
+  key_concept_ids: string[];
+  original_section_ids: string[];
+  evidence_refs: EditorialEvidenceRef[];
+  learning_dependencies: string[];
+}
+
+export interface EditorialConceptRelationship {
+  relationship_id: string;
+  source_concept_id: string;
+  source_concept_name: string;
+  target_concept_id: string;
+  target_concept_name: string;
+  relation_type: string;
+  is_hierarchical: boolean;
+  pedagogical_dependency: string;
+  justification: string;
+  epistemic_status: string;
+  evidence_refs: EditorialEvidenceRef[];
+}
+
+export interface VisualPlanItem {
+  visual_id: string;
+  target_chapter_id: string;
+  target_section_id: string;
+  visual_type: string;
+  title: string;
+  pedagogical_objective: string;
+  content_to_explain: string;
+  required_concepts_or_data: string[];
+  information_to_represent: string[];
+  feasibility_status: string;
+  source_table_ids: string[];
+  source_figure_ids: string[];
+  evidence_refs: EditorialEvidenceRef[];
+  inclusion_justification: string;
+  constraints_and_limitations: string[];
+  epistemic_status: string;
+}
+
+export interface EditorialQAFinding {
+  finding_id: string;
+  code: string;
+  severity: 'BLOCKING_ERROR' | 'WARNING' | 'RECOMMENDATION' | string;
+  message: string;
+  affected_elements: string[];
+  evidence_refs: EditorialEvidenceRef[];
+  recommendation: string;
+}
+
+export interface EditorialQAReport {
+  validation_status: 'VALID' | 'VALID_WITH_WARNINGS' | 'INVALID_BLOCKING' | string;
+  is_valid: boolean;
+  blocking_errors_count: number;
+  warnings_count: number;
+  recommendations_count: number;
+  dossier_section_coverage_pct: number;
+  dossier_concept_coverage_pct: number;
+  valid_evidence_refs_pct: number;
+  invalid_paragraph_refs: string[];
+  invalid_section_refs: string[];
+  invalid_page_refs: number[];
+  epistemic_distribution: Record<string, number>;
+  findings: EditorialQAFinding[];
+}
+
+export interface EditorialStudyPlan {
+  metadata: EditorialPlanMetadata;
+  overview: EditorialOverview;
+  chapters: EditorialChapter[];
+  conceptual_relationships: EditorialConceptRelationship[];
+  visual_plans: VisualPlanItem[];
+  qa_report: EditorialQAReport;
+  telemetry?: Record<string, unknown>;
+  failed_operations?: Array<Record<string, unknown>>;
+}
+
+export interface EditorialPlanStatus {
+  document_id: string;
+  state: 'NOT_GENERATED' | 'IN_PROGRESS_CHECKPOINT' | 'COMPLETED' | 'PARTIAL' | 'FAILED' | string;
+  has_ast: boolean;
+  has_dossier: boolean;
+  has_checkpoint: boolean;
+  has_plan: boolean;
+  is_stale: boolean;
+  stale_reason: string;
+  plan_id?: string | null;
+  plan_version?: number | null;
+  validation_status?: string | null;
+  updated_at?: string | null;
+}

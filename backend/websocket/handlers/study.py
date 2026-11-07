@@ -52,6 +52,8 @@ STUDY_HANDLERS = {
     "study_get_document_ast": "get_document_ast",
     "study_get_academic_reasoning": "get_academic_reasoning",
     "study_generate_academic_reasoning": "generate_academic_reasoning",
+    "study_get_editorial_plan": "get_editorial_plan",
+    "study_generate_editorial_plan": "generate_editorial_plan",
     "study_search_rag": "search_rag",
     # Study Folder Sync & Courses
     "study_link_folder": "link_folder",
@@ -271,6 +273,86 @@ class StudyWebSocketHandler:
             await self.connections.send(websocket, {
                 "type": "study_error",
                 "message": f"Erro durante raciocínio académico: {e}",
+                "request_id": req_id,
+            })
+
+    async def get_editorial_plan(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        req_id = message.get("request_id")
+        plan = await asyncio.to_thread(self.study_service.get_editorial_study_plan, doc_id)
+        plan_status = await asyncio.to_thread(self.study_service.get_editorial_plan_status, doc_id)
+        await self.connections.send(websocket, {
+            "type": "study_editorial_plan_result",
+            "document_id": doc_id,
+            "plan": plan,
+            "plan_status": plan_status,
+            "request_id": req_id,
+        })
+
+    async def generate_editorial_plan(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        force_recompute = bool(message.get("force_recompute", False))
+        auto_generate_dossier = bool(message.get("auto_generate_dossier", False))
+        req_id = message.get("request_id")
+
+        loop = asyncio.get_running_loop()
+
+        def on_prog(stage: str, pct: float, msg: str):
+            try:
+                asyncio.run_coroutine_threadsafe(
+                    self.connections.send(websocket, {
+                        "type": "study_editorial_plan_progress",
+                        "document_id": doc_id,
+                        "stage": stage,
+                        "progress": pct,
+                        "message": msg,
+                        "request_id": req_id,
+                    }),
+                    loop,
+                )
+            except Exception:
+                pass
+
+        try:
+            plan = await asyncio.to_thread(
+                self.study_service.generate_editorial_study_plan,
+                doc_id,
+                force_recompute=force_recompute,
+                auto_generate_dossier=auto_generate_dossier,
+                on_progress=on_prog,
+            )
+            plan_status = await asyncio.to_thread(self.study_service.get_editorial_plan_status, doc_id)
+            if plan:
+                await self.connections.send(websocket, {
+                    "type": "study_editorial_plan_result",
+                    "document_id": doc_id,
+                    "plan": plan,
+                    "plan_status": plan_status,
+                    "request_id": req_id,
+                })
+            else:
+                await self.connections.send(websocket, {
+                    "type": "study_error",
+                    "message": (
+                        f"Não foi possível gerar o plano editorial para '{doc_id}': "
+                        "dossier de raciocínio académico (Fase 3) não encontrado."
+                    ),
+                    "request_id": req_id,
+                })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro durante planeamento editorial: {e}",
                 "request_id": req_id,
             })
 

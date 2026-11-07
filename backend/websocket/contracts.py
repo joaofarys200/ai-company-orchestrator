@@ -136,6 +136,8 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "study_get_document_ast",
         "study_get_academic_reasoning",
         "study_generate_academic_reasoning",
+        "study_get_editorial_plan",
+        "study_generate_editorial_plan",
         "sentinel_get_status",
         "sentinel_run_audit",
         "sentinel_get_baseline",
