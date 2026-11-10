@@ -5,4 +5,6 @@ export * from './StudySummaryView';
 export * from './StudyNotesView';
 export * from './StudyQuizView';
 export * from './StudyKnowledgeView';
+export * from './StudyEditorialPlanView';
+export * from './StudyGeneratedDocumentView';
 export * from './StudyContainer';

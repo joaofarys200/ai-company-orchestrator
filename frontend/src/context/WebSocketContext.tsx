@@ -54,6 +54,9 @@ import type {
   StudyCollection,
   EditorialStudyPlan,
   EditorialPlanStatus,
+  StudyDocumentGenerationStatus,
+  StudyDocumentGenerationResult,
+  StudyDocumentFilePayload,
 } from '../features/study/types';
 import {
   buildStudySpatialBoard,
@@ -347,6 +350,24 @@ interface WebSocketContextType {
     plan: EditorialStudyPlan | null;
     plan_status: EditorialPlanStatus | null;
   }>;
+  getGeneratedStudyDocumentStatus: (documentId: string) => Promise<StudyDocumentGenerationStatus | null>;
+  generateStudyDocument: (
+    documentId: string,
+    options?: {
+      forceRecompute?: boolean;
+      autoGeneratePlan?: boolean;
+      designProfileId?: string;
+      exportDocx?: boolean;
+    }
+  ) => Promise<{
+    result: StudyDocumentGenerationResult | null;
+    status: StudyDocumentGenerationStatus | null;
+  }>;
+  getGeneratedStudyDocumentFile: (
+    documentId: string,
+    format?: 'pdf' | 'docx',
+    version?: number
+  ) => Promise<StudyDocumentFilePayload | null>;
   studyPipelineStage: string;
   activeBoard: SpatialBoardData | null;
   focusedCardId: string | null;
@@ -1558,6 +1579,75 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         } else {
           for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
             if (k.startsWith(`editorial_plan:${msg.document_id}`)) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(payload);
+              break;
+            }
+          }
+        }
+        break;
+      }
+      case 'study_generated_document_progress': {
+        const pctLabel = typeof msg.progress === 'number' ? ` (${Math.round(msg.progress * 100)}%)` : '';
+        setStudyPipelineStage(`${msg.message || msg.stage || 'Geração documental em curso'}${pctLabel}`);
+        break;
+      }
+      case 'study_generated_document_status_result': {
+        const reqId = msg.request_id;
+        const payload = (msg.status as StudyDocumentGenerationStatus | null) ?? null;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(payload);
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith(`doc_gen_status:${msg.document_id}`)) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(payload);
+              break;
+            }
+          }
+        }
+        break;
+      }
+      case 'study_generated_document_result': {
+        setStudyPipelineStage('');
+        const reqId = msg.request_id;
+        const payload = {
+          result: (msg.result as StudyDocumentGenerationResult | null) ?? null,
+          status: (msg.status as StudyDocumentGenerationStatus | null) ?? null,
+        };
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(payload);
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith(`doc_gen:${msg.document_id}`)) {
+              clearTimeout(item.timer);
+              pendingStudyRequestsRef.current.delete(k);
+              item.resolve(payload);
+              break;
+            }
+          }
+        }
+        break;
+      }
+      case 'study_generated_document_file_result': {
+        const reqId = msg.request_id;
+        const payload = msg as StudyDocumentFilePayload;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(payload);
+        } else {
+          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
+            if (k.startsWith(`doc_gen_file:${msg.document_id}`)) {
               clearTimeout(item.timer);
               pendingStudyRequestsRef.current.delete(k);
               item.resolve(payload);
@@ -2937,6 +3027,84 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [sendClientMessage]
   );
 
+  const getGeneratedStudyDocumentStatus = useCallback(
+    (documentId: string): Promise<StudyDocumentGenerationStatus | null> => {
+      const requestId = `doc_gen_status:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 6)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Tempo limite excedido ao consultar o estado documental.'));
+        }, 30000);
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+        sendClientMessage({
+          type: 'study_get_generated_document_status',
+          document_id: documentId,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const generateStudyDocument = useCallback(
+    (
+      documentId: string,
+      options?: {
+        forceRecompute?: boolean;
+        autoGeneratePlan?: boolean;
+        designProfileId?: string;
+        exportDocx?: boolean;
+      }
+    ): Promise<{
+      result: StudyDocumentGenerationResult | null;
+      status: StudyDocumentGenerationStatus | null;
+    }> => {
+      const requestId = `doc_gen:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 6)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Tempo limite excedido na composição e geração documental local.'));
+        }, 900000);
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+        sendClientMessage({
+          type: 'study_generate_study_document',
+          document_id: documentId,
+          force_recompute: options?.forceRecompute ?? false,
+          auto_generate_plan: options?.autoGeneratePlan ?? false,
+          design_profile_id: options?.designProfileId ?? 'ACADEMIC_EDITORIAL_CLASSIC',
+          export_docx: options?.exportDocx ?? true,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const getGeneratedStudyDocumentFile = useCallback(
+    (
+      documentId: string,
+      format: 'pdf' | 'docx' = 'pdf',
+      version?: number
+    ): Promise<StudyDocumentFilePayload | null> => {
+      const requestId = `doc_gen_file:${documentId}:${format}:${Date.now()}:${Math.random().toString(36).slice(2, 6)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error(`Tempo limite excedido ao descarregar o ficheiro ${format}.`));
+        }, 60000);
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+        sendClientMessage({
+          type: 'study_get_generated_document_file',
+          document_id: documentId,
+          format,
+          version,
+          request_id: requestId,
+        });
+      });
+    },
+    [sendClientMessage]
+  );
+
   const openSpatialBoard = useCallback(
     (domain: SpatialBoardDomain = 'study', query = '') => {
       const q = query.trim().toLowerCase();
@@ -3450,6 +3618,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         cancelStudyGeneration,
         getStudyEditorialPlan,
         generateStudyEditorialPlan,
+        getGeneratedStudyDocumentStatus,
+        generateStudyDocument,
+        getGeneratedStudyDocumentFile,
         studyPipelineStage,
         activeBoard,
         focusedCardId,

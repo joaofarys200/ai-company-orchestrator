@@ -54,6 +54,9 @@ STUDY_HANDLERS = {
     "study_generate_academic_reasoning": "generate_academic_reasoning",
     "study_get_editorial_plan": "get_editorial_plan",
     "study_generate_editorial_plan": "generate_editorial_plan",
+    "study_get_generated_document_status": "get_generated_document_status",
+    "study_generate_study_document": "generate_study_document",
+    "study_get_generated_document_file": "get_generated_document_file",
     "study_search_rag": "search_rag",
     # Study Folder Sync & Courses
     "study_link_folder": "link_folder",
@@ -353,6 +356,124 @@ class StudyWebSocketHandler:
             await self.connections.send(websocket, {
                 "type": "study_error",
                 "message": f"Erro durante planeamento editorial: {e}",
+                "request_id": req_id,
+            })
+
+    async def get_generated_document_status(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        req_id = message.get("request_id")
+        status = await asyncio.to_thread(self.study_service.get_study_document_generation_status, doc_id)
+        await self.connections.send(websocket, {
+            "type": "study_generated_document_status_result",
+            "document_id": doc_id,
+            "status": status,
+            "request_id": req_id,
+        })
+
+    async def generate_study_document(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        req_id = message.get("request_id")
+        force_recompute = bool(message.get("force_recompute", False))
+        auto_generate_plan = bool(message.get("auto_generate_plan", False))
+        design_profile_id = str(message.get("design_profile_id", "ACADEMIC_EDITORIAL_CLASSIC"))
+        export_docx = bool(message.get("export_docx", True))
+
+        loop = asyncio.get_running_loop()
+
+        def on_prog(stage: str, pct: float, msg: str):
+            try:
+                asyncio.run_coroutine_threadsafe(
+                    self.connections.send(websocket, {
+                        "type": "study_generated_document_progress",
+                        "document_id": doc_id,
+                        "stage": stage,
+                        "progress": pct,
+                        "message": msg,
+                        "request_id": req_id,
+                    }),
+                    loop,
+                )
+            except Exception:
+                pass
+
+        try:
+            result = await asyncio.to_thread(
+                self.study_service.generate_study_document,
+                doc_id,
+                design_profile_id=design_profile_id,
+                export_docx=export_docx,
+                force_recompute=force_recompute,
+                auto_generate_plan=auto_generate_plan,
+                on_progress=on_prog,
+            )
+            status = await asyncio.to_thread(self.study_service.get_study_document_generation_status, doc_id)
+            if result:
+                await self.connections.send(websocket, {
+                    "type": "study_generated_document_result",
+                    "document_id": doc_id,
+                    "result": result,
+                    "status": status,
+                    "request_id": req_id,
+                })
+            else:
+                await self.connections.send(websocket, {
+                    "type": "study_error",
+                    "message": (
+                        f"Não foi possível gerar o documento de estudo para '{doc_id}': "
+                        "plano editorial (Fase 4) ou dossier de raciocínio (Fase 3) não encontrados."
+                    ),
+                    "request_id": req_id,
+                })
+        except Exception as e:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Erro durante geração do documento de estudo: {e}",
+                "request_id": req_id,
+            })
+
+    async def get_generated_document_file(
+        self,
+        websocket: Any,
+        message: dict,
+        _session: WebSocketSessionState,
+    ) -> None:
+        doc_id = message.get("document_id", "")
+        req_id = message.get("request_id")
+        fmt = message.get("format", "pdf")
+        version = message.get("version")
+        if version is not None:
+            try:
+                version = int(version)
+            except (ValueError, TypeError):
+                version = None
+
+        file_payload = await asyncio.to_thread(
+            self.study_service.get_generated_study_document_file,
+            doc_id,
+            format_type=fmt,
+            version=version,
+        )
+        if file_payload:
+            await self.connections.send(websocket, {
+                "type": "study_generated_document_file_result",
+                "document_id": doc_id,
+                "request_id": req_id,
+                **file_payload,
+            })
+        else:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "message": f"Ficheiro do documento de estudo ({fmt}) não encontrado para '{doc_id}'.",
                 "request_id": req_id,
             })
 

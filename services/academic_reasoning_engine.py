@@ -267,6 +267,12 @@ class AcademicReasoningDossier:
     qa_report: ReasoningQAReport = field(default_factory=ReasoningQAReport)
     telemetry: ReasoningTelemetry = field(default_factory=ReasoningTelemetry)
 
+    @property
+    def document_title(self) -> str:
+        if hasattr(self, "document_analysis") and self.document_analysis and getattr(self.document_analysis, "title", None):
+            return self.document_analysis.title
+        return self.document_id
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 

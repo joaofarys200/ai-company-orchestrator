@@ -56,6 +56,9 @@ from services.academic_reasoning_engine import (
     generate_deterministic_concept_id,
 )
 
+# Alias de proveniência editorial (compatibilidade Fase 4 e Fase 5)
+EditorialEvidenceRef = EvidenceRef
+
 logger = logging.getLogger("editorial_intelligence_engine")
 
 SCHEMA_VERSION = "4.0.0"

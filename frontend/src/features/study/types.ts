@@ -560,3 +560,106 @@ export interface EditorialPlanStatus {
   validation_status?: string | null;
   updated_at?: string | null;
 }
+
+// ============================================================================
+// Phase 5 — Document Generation Engine & Academic Document Composition
+// ============================================================================
+
+export interface StudyDocumentQAFinding {
+  finding_id: string;
+  axis: 'CONTENT_INTEGRITY' | 'VISUAL_INTEGRITY' | 'DOCUMENT_INTEGRITY' | 'PEDAGOGICAL_QUALITY' | string;
+  severity: 'BLOCKING_ERROR' | 'WARNING' | 'RECOMMENDATION' | string;
+  code: string;
+  message: string;
+  element_id?: string | null;
+  page_number?: number | null;
+  details?: Record<string, unknown>;
+}
+
+export interface StudyDocumentQAReport {
+  validation_status: 'VALID' | 'VALID_WITH_WARNINGS' | 'INVALID_BLOCKING' | string;
+  is_valid: boolean;
+  overall_score: number;
+  content_integrity_score: number;
+  visual_integrity_score: number;
+  document_integrity_score: number;
+  pedagogical_quality_score: number;
+  findings: StudyDocumentQAFinding[];
+  blocking_count: number;
+  warning_count: number;
+  recommendation_count: number;
+  verified_at: string;
+}
+
+export interface StudyDocumentTelemetry {
+  llm_calls_count: number;
+  llm_total_time_ms: number;
+  visuals_rendered_count: number;
+  ir_compilation_time_ms: number;
+  pdf_generation_time_ms: number;
+  docx_generation_time_ms: number;
+  qa_verification_time_ms: number;
+  total_pipeline_time_ms: number;
+  pdf_pages_count: number;
+  total_words_count: number;
+  peak_ram_mb: number;
+}
+
+export interface StudyDocumentVersionRecord {
+  version: number;
+  document_id: string;
+  created_at: string;
+  plan_fingerprint: string;
+  pdf_sha256: string;
+  docx_sha256?: string | null;
+  pdf_size_bytes: number;
+  docx_size_bytes: number;
+  pdf_pages_count: number;
+  qa_status: string;
+  design_profile_id: string;
+}
+
+export interface StudyDocumentGenerationStatus {
+  document_id: string;
+  state: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'PARTIAL' | 'FAILED' | string;
+  has_pdf: boolean;
+  has_docx: boolean;
+  has_checkpoint: boolean;
+  version: number;
+  pdf_path?: string | null;
+  docx_path?: string | null;
+  pdf_size_bytes: number;
+  docx_size_bytes: number;
+  qa_validation_status: string;
+  qa_report?: StudyDocumentQAReport | null;
+  telemetry?: StudyDocumentTelemetry | null;
+  versions_count: number;
+  updated_at?: string | null;
+  is_stale?: boolean;
+  stale_reason?: string;
+}
+
+export interface StudyDocumentGenerationResult {
+  document_id: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'PARTIAL' | 'FAILED' | string;
+  version: number;
+  pdf_path: string;
+  docx_path?: string | null;
+  pdf_size_bytes: number;
+  docx_size_bytes: number;
+  qa_report: StudyDocumentQAReport;
+  telemetry: StudyDocumentTelemetry;
+  failed_operations: Array<Record<string, unknown>>;
+  created_at: string;
+}
+
+export interface StudyDocumentFilePayload {
+  document_id: string;
+  format: 'pdf' | 'docx';
+  filename: string;
+  file_path: string;
+  size_bytes: number;
+  mime_type: string;
+  base64_data: string;
+}
+

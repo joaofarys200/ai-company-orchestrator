@@ -1591,6 +1591,10 @@ export type ServerMessage =
   | { type: 'study_academic_reasoning_progress'; document_id: string; stage: string; progress: number; message: string; request_id?: string }
   | { type: 'study_editorial_plan_result'; document_id: string; plan: any; plan_status?: any; request_id?: string; error?: string }
   | { type: 'study_editorial_plan_progress'; document_id: string; stage: string; progress: number; message: string; request_id?: string }
+  | { type: 'study_generated_document_status_result'; document_id: string; status: any; request_id?: string; error?: string }
+  | { type: 'study_generated_document_progress'; document_id: string; stage: string; progress: number; message: string; request_id?: string }
+  | { type: 'study_generated_document_result'; document_id: string; result: any; status?: any; request_id?: string; error?: string }
+  | { type: 'study_generated_document_file_result'; document_id: string; format: string; filename: string; file_path: string; size_bytes: number; mime_type: string; base64_data: string; request_id?: string; error?: string }
   | UnknownServerMessage;
 
 export type ClientMessage =
@@ -1680,6 +1684,9 @@ export type ClientMessage =
   | { type: 'study_generate_academic_reasoning'; document_id: string; force_recompute?: boolean; request_id?: string }
   | { type: 'study_get_editorial_plan'; document_id: string; request_id?: string }
   | { type: 'study_generate_editorial_plan'; document_id: string; force_recompute?: boolean; auto_generate_dossier?: boolean; request_id?: string }
+  | { type: 'study_get_generated_document_status'; document_id: string; request_id?: string }
+  | { type: 'study_generate_study_document'; document_id: string; force_recompute?: boolean; auto_generate_plan?: boolean; design_profile_id?: string; export_docx?: boolean; request_id?: string }
+  | { type: 'study_get_generated_document_file'; document_id: string; format?: string; version?: number; request_id?: string }
   | { type: 'action_confirm_response'; request_id: string; decision: 'APPROVE' | 'DENY' | 'REJECT'; user?: string; session_id?: string }
   | { type: 'permission_get_pending' }
   | { type: 'permission_approve'; request_id: string; user?: string; session_id?: string; project_id?: string; mission_id?: string }
@@ -2824,6 +2831,42 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         stage: asString(raw.stage),
         progress: asNumber(raw.progress, 0),
         message: asString(raw.message),
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_generated_document_status_result':
+      return {
+        type: 'study_generated_document_status_result',
+        document_id: asString(raw.document_id),
+        status: raw.status ?? null,
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_generated_document_progress':
+      return {
+        type: 'study_generated_document_progress',
+        document_id: asString(raw.document_id),
+        stage: asString(raw.stage),
+        progress: asNumber(raw.progress, 0),
+        message: asString(raw.message),
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_generated_document_result':
+      return {
+        type: 'study_generated_document_result',
+        document_id: asString(raw.document_id),
+        result: raw.result ?? null,
+        status: raw.status ?? null,
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_generated_document_file_result':
+      return {
+        type: 'study_generated_document_file_result',
+        document_id: asString(raw.document_id),
+        format: asString(raw.format, 'pdf'),
+        filename: asString(raw.filename, 'documento.pdf'),
+        file_path: asString(raw.file_path),
+        size_bytes: asNumber(raw.size_bytes, 0),
+        mime_type: asString(raw.mime_type, 'application/pdf'),
+        base64_data: asString(raw.base64_data),
         request_id: raw.request_id ? asString(raw.request_id) : undefined,
       };
     case 'study_error':

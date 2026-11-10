@@ -50,6 +50,11 @@ from services.editorial_intelligence_engine import (
     EditorialStudyPlan,
     compute_dossier_fingerprint,
 )
+from services.document_generation_engine import (
+    DocumentGenerationEngine,
+    StudyDocumentGenerationResult,
+    compute_plan_fingerprint,
+)
 from services.video_intelligence_service import (
     VideoIntelligenceService,
     check_video_capabilities,
@@ -2142,6 +2147,153 @@ class StudyService:
             force_recompute=force_recompute,
         )
         return plan.to_dict()
+
+    def get_study_document_generation_status(self, document_id: str) -> Dict[str, Any]:
+        """
+        Consulta o estado da geração documental (Fase 5), ficheiros e versão ativa.
+        Verifica também se o documento está sincronizado face ao plano editorial persistido.
+        """
+        engine = DocumentGenerationEngine(storage_dir=self.storage_dir)
+        status = engine.get_document_generation_status(document_id)
+
+        plan_dict = self.get_editorial_study_plan(document_id)
+        if plan_dict and status.get("has_pdf"):
+            try:
+                plan_obj = EditorialStudyPlan.from_dict(plan_dict)
+                up_to_date, reason = engine.is_document_up_to_date(document_id, plan_obj)
+                status["is_stale"] = not up_to_date
+                status["stale_reason"] = reason
+            except Exception:
+                status["is_stale"] = False
+                status["stale_reason"] = "VERIFICATION_ERROR"
+        else:
+            status["is_stale"] = False
+            status["stale_reason"] = "NO_PLAN_OR_PDF"
+
+        return status
+
+    def generate_study_document(
+        self,
+        document_id: str,
+        *,
+        design_profile_id: str = "ACADEMIC_EDITORIAL_CLASSIC",
+        export_docx: bool = True,
+        force_recompute: bool = False,
+        auto_generate_plan: bool = False,
+        on_progress: Optional[Callable[[str, float, str], None]] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
+        llm_caller: Optional[Callable] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Executa a pipeline da Fase 5 — Document Generation Engine & Academic Document Composition.
+        Transforma o EditorialStudyPlan (e dados da Fase 3 e Fase 2) num documento de estudo final
+        (PDF de alta tipografia e DOCX equivalente), com síntese visual fundamentada e auditoria QA.
+        """
+        from services.study_ai_engine import is_study_generation_cancelled, register_study_generation_start
+
+        register_study_generation_start(document_id)
+
+        def _combined_cancel() -> bool:
+            if cancellation_check and cancellation_check():
+                return True
+            return is_study_generation_cancelled(document_id) or is_study_generation_cancelled("global")
+
+        plan_dict = self.get_editorial_study_plan(document_id)
+        if not plan_dict and auto_generate_plan:
+            plan_dict = self.generate_editorial_study_plan(
+                document_id,
+                force_recompute=False,
+                auto_generate_dossier=True,
+                on_progress=on_progress,
+                cancellation_check=_combined_cancel,
+                llm_caller=llm_caller,
+            )
+
+        if not plan_dict:
+            print(f"[StudyService] Plano editorial não disponível para geração documental de {document_id}", flush=True)
+            return None
+
+        plan = EditorialStudyPlan.from_dict(plan_dict)
+
+        dossier_dict = self.get_academic_reasoning_dossier(document_id)
+        if not dossier_dict:
+            print(f"[StudyService] Dossier de raciocínio não disponível para geração documental de {document_id}", flush=True)
+            return None
+        dossier = AcademicReasoningDossier.from_dict(dossier_dict)
+
+        ast_obj: Optional[AcademicDocumentAST] = None
+        ast_path = self.storage_dir / "documents" / document_id / "ast.json"
+        if ast_path.exists():
+            try:
+                ast_obj = AcademicDocumentAST.from_dict(json.loads(ast_path.read_text(encoding="utf-8")))
+            except Exception as e:
+                print(f"[StudyService] Aviso ao ler AST para geração documental de {document_id}: {e}", flush=True)
+
+        engine = DocumentGenerationEngine(
+            storage_dir=self.storage_dir,
+            llm_caller=llm_caller,
+        )
+
+        result = engine.generate_study_document(
+            plan=plan,
+            dossier=dossier,
+            ast=ast_obj,
+            design_profile_id=design_profile_id,
+            export_docx=export_docx,
+            force_recompute=force_recompute,
+            on_progress=on_progress,
+            cancellation_check=_combined_cancel,
+        )
+        return result.to_dict()
+
+    def get_generated_study_document_file(
+        self,
+        document_id: str,
+        format_type: str = "pdf",
+        version: Optional[int] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Devolve o ficheiro do documento de estudo gerado (PDF ou DOCX),
+        em formato base64 e caminho físico no sistema de ficheiros para consumo pelo desktop / frontend.
+        """
+        doc_dir = self.storage_dir / "documents" / document_id
+        fmt = format_type.lower().strip()
+        if fmt not in ("pdf", "docx"):
+            fmt = "pdf"
+
+        if version is not None and version > 0:
+            target_file = doc_dir / "generated_documents_history" / f"v{version}" / f"study_document_v{version}.{fmt}"
+        else:
+            target_file = doc_dir / f"study_document_final.{fmt}"
+
+        if not target_file.exists() or target_file.stat().st_size == 0:
+            return None
+
+        # Determinar nome amigável para download
+        clean_name = re.sub(r'[^a-zA-Z0-9_\-]', '_', document_id)
+        ast_path = doc_dir / "ast.json"
+        if ast_path.exists():
+            try:
+                ast_data = json.loads(ast_path.read_text(encoding="utf-8"))
+                title = ast_data.get("metadata", {}).get("title", "")
+                if title:
+                    clean_name = re.sub(r'[^a-zA-Z0-9_\-]', '_', title)[:50]
+            except Exception:
+                pass
+
+        filename = f"{clean_name}_documento_estudo.{fmt}"
+        file_bytes = target_file.read_bytes()
+        mime_type = "application/pdf" if fmt == "pdf" else "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+        return {
+            "document_id": document_id,
+            "format": fmt,
+            "filename": filename,
+            "file_path": str(target_file),
+            "size_bytes": len(file_bytes),
+            "mime_type": mime_type,
+            "base64_data": base64.b64encode(file_bytes).decode("utf-8"),
+        }
 
     def _parse_pdf(self, file_path: str) -> Tuple[List[str], List[Dict[str, Any]]]:
         """Extrai páginas, texto e referências a imagens usando DocumentIntelligenceExtractor com fallback."""

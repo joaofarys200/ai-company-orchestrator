@@ -27,6 +27,9 @@ import type {
   StudyCollection,
   EditorialStudyPlan,
   EditorialPlanStatus,
+  StudyDocumentGenerationStatus,
+  StudyDocumentGenerationResult,
+  StudyDocumentFilePayload,
 } from './types';
 
 export type StudyTab =
@@ -122,6 +125,24 @@ interface StudyContainerProps {
     plan: EditorialStudyPlan | null;
     plan_status: EditorialPlanStatus | null;
   }>;
+  onGetGeneratedDocumentStatus?: (documentId: string) => Promise<StudyDocumentGenerationStatus | null>;
+  onGenerateStudyDocument?: (
+    documentId: string,
+    options?: {
+      forceRecompute?: boolean;
+      autoGeneratePlan?: boolean;
+      designProfileId?: string;
+      exportDocx?: boolean;
+    }
+  ) => Promise<{
+    result: StudyDocumentGenerationResult | null;
+    status: StudyDocumentGenerationStatus | null;
+  }>;
+  onGetGeneratedDocumentFile?: (
+    documentId: string,
+    format?: 'pdf' | 'docx',
+    version?: number
+  ) => Promise<StudyDocumentFilePayload | null>;
 }
 
 export const StudyContainer: React.FC<StudyContainerProps> = ({
@@ -165,6 +186,9 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   onRetryDocument,
   onGetEditorialPlan,
   onGenerateEditorialPlan,
+  onGetGeneratedDocumentStatus,
+  onGenerateStudyDocument,
+  onGetGeneratedDocumentFile,
 }) => {
   // Navigation
   const [activeTab, setActiveTab] = useState<StudyTab>('library');
@@ -515,6 +539,9 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             onSynthesizeDocuments={onSynthesizeDocuments}
             onGetEditorialPlan={onGetEditorialPlan}
             onGenerateEditorialPlan={onGenerateEditorialPlan}
+            onGetGeneratedDocumentStatus={onGetGeneratedDocumentStatus}
+            onGenerateStudyDocument={onGenerateStudyDocument}
+            onGetGeneratedDocumentFile={onGetGeneratedDocumentFile}
           />
         )}
 

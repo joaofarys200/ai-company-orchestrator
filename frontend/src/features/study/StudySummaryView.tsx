@@ -23,8 +23,12 @@ import type {
   MultiDocSynthesisResult,
   EditorialStudyPlan,
   EditorialPlanStatus,
+  StudyDocumentGenerationStatus,
+  StudyDocumentGenerationResult,
+  StudyDocumentFilePayload,
 } from './types';
 import { StudyEditorialPlanView } from './StudyEditorialPlanView';
+import { StudyGeneratedDocumentView } from './StudyGeneratedDocumentView';
 
 interface StudySummaryViewProps {
   document: StudyDocument | null;
@@ -48,6 +52,24 @@ interface StudySummaryViewProps {
     plan: EditorialStudyPlan | null;
     plan_status: EditorialPlanStatus | null;
   }>;
+  onGetGeneratedDocumentStatus?: (documentId: string) => Promise<StudyDocumentGenerationStatus | null>;
+  onGenerateStudyDocument?: (
+    documentId: string,
+    options?: {
+      forceRecompute?: boolean;
+      autoGeneratePlan?: boolean;
+      designProfileId?: string;
+      exportDocx?: boolean;
+    }
+  ) => Promise<{
+    result: StudyDocumentGenerationResult | null;
+    status: StudyDocumentGenerationStatus | null;
+  }>;
+  onGetGeneratedDocumentFile?: (
+    documentId: string,
+    format?: 'pdf' | 'docx',
+    version?: number
+  ) => Promise<StudyDocumentFilePayload | null>;
   pipelineStage?: string;
 }
 
@@ -224,12 +246,15 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
   onSynthesizeDocuments,
   onGetEditorialPlan,
   onGenerateEditorialPlan,
+  onGetGeneratedDocumentStatus,
+  onGenerateStudyDocument,
+  onGetGeneratedDocumentFile,
   pipelineStage,
 }) => {
   const [selectedMode, setSelectedMode] = useState<SummaryMode>('Study');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'summary' | 'argument_map' | 'multi_doc' | 'editorial_plan'>('summary');
+  const [activeTab, setActiveTab] = useState<'summary' | 'argument_map' | 'multi_doc' | 'editorial_plan' | 'study_document'>('summary');
 
   const autoHydratedDocsRef = useRef<Set<string>>(new Set());
 
@@ -529,6 +554,19 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
           >
             <BookOpen className="h-3.5 w-3.5" />
             <span>Plano Editorial</span>
+          </button>
+
+          <button
+            id="study-tab-generated-document"
+            onClick={() => setActiveTab('study_document')}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-medium transition ${
+              activeTab === 'study_document'
+                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            <FileText className="h-3.5 w-3.5" />
+            <span>Documento de Estudo</span>
           </button>
         </div>
       </header>
@@ -1053,6 +1091,20 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
             document={document}
             onGetEditorialPlan={onGetEditorialPlan}
             onGenerateEditorialPlan={onGenerateEditorialPlan}
+            onCancelGeneration={onCancelGeneration}
+            pipelineStage={pipelineStage}
+          />
+        )}
+
+        {/* ============================================================ */}
+        {/* TAB 5: STUDY DOCUMENT COMPOSITION (PHASE 5)                 */}
+        {/* ============================================================ */}
+        {activeTab === 'study_document' && (
+          <StudyGeneratedDocumentView
+            document={document}
+            onGetGeneratedDocumentStatus={onGetGeneratedDocumentStatus}
+            onGenerateStudyDocument={onGenerateStudyDocument}
+            onGetGeneratedDocumentFile={onGetGeneratedDocumentFile}
             onCancelGeneration={onCancelGeneration}
             pipelineStage={pipelineStage}
           />
