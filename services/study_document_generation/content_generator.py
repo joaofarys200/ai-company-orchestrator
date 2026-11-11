@@ -36,7 +36,10 @@ from services.study_document_generation.contracts import (
     DevelopedSectionContent,
     DevelopedStudyDocumentContent,
     DocumentGenerationTelemetry,
+    ElaborationType,
+    VALID_EPISTEMIC_STATUSES,
     compute_plan_fingerprint,
+    normalize_epistemic_status,
 )
 from services.study_document_generation.provenance_renderer import ReferenceAndProvenanceRenderer
 
@@ -44,8 +47,8 @@ from services.study_document_generation.provenance_renderer import ReferenceAndP
 DEFAULT_CONTENT_GEN_MAX_OUTPUT_TOKENS = 3000
 
 PROMPT_VERSIONS_PHASE5 = {
-    "section_content_development": "v5.0.0-sec-content",
-    "chapter_synthesis_enrichment": "v5.0.0-chap-synth",
+    "section_content_development": "v5.1.0-sec-content",
+    "chapter_synthesis_enrichment": "v5.1.0-chap-synth",
 }
 
 
@@ -196,6 +199,89 @@ class AcademicContentEnricher:
             sec_refs=sec_refs,
         )
 
+    @staticmethod
+    def _infer_elaboration_type(block_type: str, is_hyp: bool, ep_status: str) -> str:
+        if is_hyp or block_type == ContentBlockType.HYPOTHETICAL_EXAMPLE.value:
+            return ElaborationType.HYPOTHETICAL_EXAMPLE.value
+        if block_type in (
+            ContentBlockType.CAUSE_EFFECT_ANALYSIS.value,
+            ContentBlockType.RESULTS_INTERPRETATION.value,
+            ContentBlockType.CONCEPT_COMPARISON.value,
+        ):
+            return ElaborationType.ANALYTICAL_INFERENCE.value
+        if block_type in (
+            ContentBlockType.SECTION_SYNTHESIS.value,
+            ContentBlockType.CHAPTER_SYNTHESIS.value,
+        ):
+            return ElaborationType.EDITORIAL_SYNTHESIS.value
+        if ep_status == "UNVERIFIED":
+            return ElaborationType.UNVERIFIED_CLAIM.value
+        if ep_status == "SOURCE_FACT":
+            return ElaborationType.SOURCE_EXTRACTED.value
+        return ElaborationType.PEDAGOGICAL_EXPLANATION.value
+
+    @staticmethod
+    def _extract_candidate_refs_from_raw(
+        raw_item: Dict[str, Any],
+        plan_sec: EditorialSection,
+        provenance: ReferenceAndProvenanceRenderer,
+        default_status: str,
+    ) -> Tuple[List[EditorialEvidenceRef], List[str], bool]:
+        """
+        Extrai referências explícitas de um objeto gerado pelo LLM sem fallback silencioso para `sec_refs`.
+        Devolve (valid_refs, rejected_ref_labels, explicitly_cited_any).
+        """
+        cand_refs: List[EditorialEvidenceRef] = []
+        raw_pids = [str(x).strip() for x in (raw_item.get("paragraph_ids") or []) if str(x).strip()]
+        raw_pages = [
+            int(x) for x in (raw_item.get("page_numbers") or [])
+            if isinstance(x, (int, float)) and not isinstance(x, bool) and int(x) > 0
+        ]
+        raw_ev_objs = raw_item.get("evidence_refs") or []
+        explicitly_cited = bool(raw_pids or raw_pages or raw_ev_objs)
+
+        for ev in raw_ev_objs:
+            if isinstance(ev, dict):
+                ev_pid = str(ev.get("paragraph_id") or "").strip()
+                ev_sid = str(ev.get("section_id") or "").strip()
+                if not ev_sid and ev_pid and ev_pid in provenance.para_to_section:
+                    ev_sid = provenance.para_to_section[ev_pid]
+                cand_refs.append(
+                    EditorialEvidenceRef(
+                        paragraph_id=ev_pid,
+                        section_id=ev_sid,
+                        page_number=ev.get("page_number"),
+                        status=default_status,
+                        excerpt=str(ev.get("excerpt") or ""),
+                    )
+                )
+        for pid in raw_pids[:6]:
+            cand_refs.append(
+                EditorialEvidenceRef(
+                    paragraph_id=pid,
+                    section_id=provenance.para_to_section.get(pid, ""),
+                    page_number=provenance.para_to_page.get(pid),
+                    status=default_status,
+                )
+            )
+        for pg in raw_pages[:4]:
+            cand_refs.append(
+                EditorialEvidenceRef(
+                    paragraph_id="",
+                    section_id="",
+                    page_number=pg,
+                    status=default_status,
+                )
+            )
+
+        valid_refs, rej_pids, rej_pages, rej_sids = provenance.validate_evidence_refs(
+            cand_refs,
+            allow_section_fallback=False,
+            default_status=default_status,
+        )
+        rejected = list(rej_pids) + [f"p.{p}" for p in rej_pages] + list(rej_sids)
+        return valid_refs, rejected, explicitly_cited
+
     @classmethod
     def _parse_and_enrich_llm_section(
         cls,
@@ -247,43 +333,74 @@ class AcademicContentEnricher:
                     is_hyp = True
                     b_type_raw = ContentBlockType.HYPOTHETICAL_EXAMPLE.value
 
-                ep_status = str(rb.get("epistemic_status") or "SOURCE_FACT").upper().strip()
-                if ep_status not in ("SOURCE_FACT", "MODEL_INFERENCE", "NOT_FOUND", "UNVERIFIED"):
-                    ep_status = "SOURCE_FACT"
+                # 1. Política explícita: nunca assumir SOURCE_FACT por omissão em conteúdo gerado pelo LLM
+                raw_ep = str(rb.get("epistemic_status") or "").upper().strip()
+                if raw_ep not in VALID_EPISTEMIC_STATUSES:
+                    ep_status = "UNVERIFIED"
+                else:
+                    ep_status = raw_ep
+
+                # 2. Validar referências explícitas sem fallback silencioso para sec_refs
+                valid_refs, rejected_refs, explicitly_cited = cls._extract_candidate_refs_from_raw(
+                    rb,
+                    plan_sec=plan_sec,
+                    provenance=provenance,
+                    default_status=ep_status,
+                )
+                claim_corpus = " ".join([b_title] + paras + bullets + steps)
+
                 if is_hyp:
-                    # Regra 4.2 e 5.2: Exemplos hipotéticos criados pelo modelo nunca são SOURCE_FACT
+                    # Regra 4.2 e 5.2: Exemplos hipotéticos criados pelo modelo são sempre MODEL_INFERENCE
                     ep_status = "MODEL_INFERENCE"
                     if "hipotético" not in b_title.lower() and "ilustrativo" not in b_title.lower():
                         b_title = f"Exemplo Ilustrativo Hipotético: {b_title}"
+                    elab_type = ElaborationType.HYPOTHETICAL_EXAMPLE.value
+                elif ep_status == "SOURCE_FACT":
+                    # Bloco gerado pelo LLM reivindicando SOURCE_FACT exige referência explícita válida
+                    # e rastreabilidade textual plausível na evidência citada.
+                    has_concrete_ref = any(r.paragraph_id or r.page_number for r in valid_refs)
+                    if not valid_refs or not has_concrete_ref:
+                        ep_status = "UNVERIFIED"
+                        elab_type = ElaborationType.UNVERIFIED_CLAIM.value
+                    elif b_type_raw in (
+                        ContentBlockType.STEP_BY_STEP_MECHANISM.value,
+                        ContentBlockType.THEORETICAL_CONTEXT.value,
+                        ContentBlockType.CAUSE_EFFECT_ANALYSIS.value,
+                        ContentBlockType.RESULTS_INTERPRETATION.value,
+                        ContentBlockType.METHODOLOGY_EXPLANATION.value,
+                        ContentBlockType.LIMITATIONS_DISCUSSION.value,
+                        ContentBlockType.CONCEPT_COMPARISON.value,
+                    ):
+                        # Explicações, mecanismos e interpretações produzidos pelo LLM são MODEL_INFERENCE
+                        # fundamentados na fonte (nunca herdam automaticamente SOURCE_FACT).
+                        ep_status = "MODEL_INFERENCE"
+                        elab_type = cls._infer_elaboration_type(b_type_raw, False, ep_status)
+                    elif not provenance.has_minimal_source_overlap(claim_corpus, valid_refs):
+                        # Uma referência existente não transforma texto sem suporte verificável em SOURCE_FACT
+                        ep_status = "UNVERIFIED"
+                        elab_type = ElaborationType.UNVERIFIED_CLAIM.value
+                    else:
+                        elab_type = ElaborationType.SOURCE_EXTRACTED.value
+                else:
+                    elab_type = cls._infer_elaboration_type(b_type_raw, False, ep_status)
 
-                # Mapear referências de parágrafos/secções indicadas pelo bloco
-                b_refs: List[EditorialEvidenceRef] = []
-                raw_pids = [str(x).strip() for x in (rb.get("paragraph_ids") or []) if str(x).strip()]
-                raw_pages = [
-                    int(x) for x in (rb.get("page_numbers") or []) if isinstance(x, (int, float)) and int(x) > 0
+                # Se nenhuma ref explícita foi citada num bloco pedagógico, manter apenas contexto não factual (ou vazio se UNVERIFIED/rejeitado)
+                final_refs = valid_refs
+                if not explicitly_cited and ep_status == "MODEL_INFERENCE" and not is_hyp and sec_refs:
+                    final_refs = provenance.sanitize_evidence_refs(
+                        sec_refs[:2],
+                        allow_section_fallback=False,
+                        default_status="MODEL_INFERENCE",
+                    )
+
+                for ref in final_refs:
+                    ref.status = ep_status
+
+                ev_ids = [
+                    r.paragraph_id or f"{r.section_id}:p{r.page_number or 0}"
+                    for r in final_refs
+                    if r.paragraph_id or r.section_id
                 ]
-                for pid in raw_pids[:4]:
-                    b_refs.append(
-                        EditorialEvidenceRef(
-                            paragraph_id=pid,
-                            section_id=plan_sec.original_section_ids[0] if plan_sec.original_section_ids else "",
-                            page_number=provenance.para_to_page.get(pid),
-                            status=ep_status,
-                        )
-                    )
-                for pg in raw_pages[:3]:
-                    b_refs.append(
-                        EditorialEvidenceRef(
-                            paragraph_id="",
-                            section_id=plan_sec.original_section_ids[0] if plan_sec.original_section_ids else "",
-                            page_number=pg,
-                            status=ep_status,
-                        )
-                    )
-                b_refs = provenance.sanitize_evidence_refs(
-                    b_refs or sec_refs,
-                    fallback_section_ids=plan_sec.original_section_ids,
-                )
 
                 blocks.append(
                     DevelopedContentBlock(
@@ -295,7 +412,10 @@ class AcademicContentEnricher:
                         steps=steps,
                         is_hypothetical_example=is_hyp,
                         epistemic_status=ep_status,
-                        evidence_refs=b_refs,
+                        elaboration_type=elab_type,
+                        evidence_ids=ev_ids,
+                        evidence_refs=final_refs,
+                        rejected_reference_ids=rejected_refs,
                         source_table_refs=[str(x) for x in (rb.get("source_table_refs") or []) if str(x).strip()],
                         source_figure_refs=[str(x) for x in (rb.get("source_figure_refs") or []) if str(x).strip()],
                         source_formula_refs=[str(x) for x in (rb.get("source_formula_refs") or []) if str(x).strip()],
@@ -309,6 +429,10 @@ class AcademicContentEnricher:
         concept_defs: List[DevelopedConceptDefinition] = []
         raw_cdefs = raw.get("concept_definitions")
         seen_terms: Set[str] = set()
+        phase3_concepts_by_name = {
+            getattr(c, "name", "").strip().lower(): c for c in relevant_concepts if getattr(c, "name", "").strip()
+        }
+
         if isinstance(raw_cdefs, list):
             for c_idx, rc in enumerate(raw_cdefs, start=1):
                 if not isinstance(rc, dict):
@@ -318,9 +442,40 @@ class AcademicContentEnricher:
                 if not term or not c_def or term.lower() in seen_terms:
                     continue
                 seen_terms.add(term.lower())
-                c_st = str(rc.get("epistemic_status") or "SOURCE_FACT").upper().strip()
-                if c_st not in ("SOURCE_FACT", "MODEL_INFERENCE", "NOT_FOUND", "UNVERIFIED"):
-                    c_st = "SOURCE_FACT"
+
+                raw_c_st = str(rc.get("epistemic_status") or "").upper().strip()
+                c_st = raw_c_st if raw_c_st in VALID_EPISTEMIC_STATUSES else "UNVERIFIED"
+                c_valid_refs, _, c_explicitly_cited = cls._extract_candidate_refs_from_raw(
+                    rc,
+                    plan_sec=plan_sec,
+                    provenance=provenance,
+                    default_status=c_st,
+                )
+
+                matched_cnode = phase3_concepts_by_name.get(term.lower())
+                if not c_explicitly_cited and matched_cnode is not None:
+                    matched_refs = provenance.sanitize_evidence_refs(
+                        getattr(matched_cnode, "evidence_refs", []) or [],
+                        allow_section_fallback=False,
+                        default_status=c_st,
+                    )
+                    if matched_refs:
+                        c_valid_refs = matched_refs
+
+                if c_st == "SOURCE_FACT":
+                    has_concrete = any(r.paragraph_id or r.page_number for r in c_valid_refs)
+                    if not has_concrete or not provenance.has_minimal_source_overlap(f"{term} {c_def}", c_valid_refs):
+                        c_st = "UNVERIFIED"
+
+                for r in c_valid_refs:
+                    r.status = c_st
+
+                c_elab = (
+                    ElaborationType.SOURCE_EXTRACTED.value
+                    if c_st == "SOURCE_FACT"
+                    else (ElaborationType.UNVERIFIED_CLAIM.value if c_st == "UNVERIFIED" else ElaborationType.PEDAGOGICAL_EXPLANATION.value)
+                )
+                c_ev_ids = [r.paragraph_id or f"{r.section_id}:p{r.page_number or 0}" for r in c_valid_refs]
                 concept_defs.append(
                     DevelopedConceptDefinition(
                         concept_id=str(rc.get("concept_id") or f"cdef_{plan_sec.section_id}_{c_idx}"),
@@ -329,27 +484,51 @@ class AcademicContentEnricher:
                         theoretical_context=str(rc.get("theoretical_context") or "").strip(),
                         relationships_explained=str(rc.get("relationships_explained") or "").strip(),
                         epistemic_status=c_st,
-                        evidence_refs=sec_refs[:3],
+                        elaboration_type=c_elab,
+                        evidence_ids=c_ev_ids,
+                        evidence_refs=c_valid_refs,
                     )
                 )
 
-        # Complementar com conceitos da secção que não tenham sido incluídos pelo modelo
+        # Complementar com conceitos verificados do Dossier (Fase 3) que não tenham sido incluídos pelo modelo
         for c_node in relevant_concepts[:5]:
             c_name = getattr(c_node, "name", "")
-            c_desc = getattr(c_node, "definition_or_description", "")
+            c_desc = (
+                getattr(c_node, "definition", "")
+                or getattr(c_node, "definition_or_description", "")
+                or getattr(c_node, "explanation", "")
+            )
             if c_name and c_desc and c_name.lower() not in seen_terms:
                 seen_terms.add(c_name.lower())
+                raw_node_refs = getattr(c_node, "evidence_refs", []) or []
+                node_valid_refs = provenance.sanitize_evidence_refs(
+                    raw_node_refs,
+                    allow_section_fallback=False,
+                    default_status="UNVERIFIED",
+                )
+                explicit_node_status = getattr(getattr(c_node, "epistemic_status", None), "value", getattr(c_node, "epistemic_status", None))
+                if explicit_node_status:
+                    node_st = normalize_epistemic_status(explicit_node_status, default="UNVERIFIED")
+                elif node_valid_refs and all(r.status == "SOURCE_FACT" for r in node_valid_refs):
+                    node_st = "SOURCE_FACT"
+                elif node_valid_refs and any(r.status == "MODEL_INFERENCE" for r in node_valid_refs):
+                    node_st = "MODEL_INFERENCE"
+                else:
+                    node_st = "UNVERIFIED"
+
                 concept_defs.append(
                     DevelopedConceptDefinition(
                         concept_id=getattr(c_node, "concept_id", f"cdef_{len(concept_defs)+1}"),
                         term=c_name,
                         developed_definition=c_desc,
-                        theoretical_context=getattr(c_node, "academic_relevance", ""),
+                        theoretical_context=getattr(c_node, "academic_relevance", "") or getattr(c_node, "context_of_use", ""),
                         relationships_explained="",
-                        epistemic_status=getattr(
-                            getattr(c_node, "epistemic_status", None), "value", str(getattr(c_node, "epistemic_status", "SOURCE_FACT"))
+                        epistemic_status=node_st,
+                        elaboration_type=(
+                            ElaborationType.SOURCE_EXTRACTED.value if node_st == "SOURCE_FACT" else ElaborationType.PEDAGOGICAL_EXPLANATION.value
                         ),
-                        evidence_refs=sec_refs[:2],
+                        evidence_ids=[r.paragraph_id or f"{r.section_id}:p{r.page_number or 0}" for r in node_valid_refs],
+                        evidence_refs=node_valid_refs,
                     )
                 )
 
@@ -366,6 +545,22 @@ class AcademicContentEnricher:
                 b_lbl = str(rc.get("item_b_label") or "").strip()
                 b_desc = str(rc.get("item_b_description") or "").strip()
                 if dim and a_desc and b_desc:
+                    raw_cmp_st = str(rc.get("epistemic_status") or "").upper().strip()
+                    cmp_st = raw_cmp_st if raw_cmp_st in VALID_EPISTEMIC_STATUSES else "UNVERIFIED"
+                    cmp_valid_refs, _, _ = cls._extract_candidate_refs_from_raw(
+                        rc,
+                        plan_sec=plan_sec,
+                        provenance=provenance,
+                        default_status=cmp_st,
+                    )
+                    if cmp_st == "SOURCE_FACT":
+                        has_concrete = any(r.paragraph_id or r.page_number for r in cmp_valid_refs)
+                        if not has_concrete or not provenance.has_minimal_source_overlap(
+                            f"{dim} {a_lbl} {a_desc} {b_lbl} {b_desc}", cmp_valid_refs
+                        ):
+                            cmp_st = "UNVERIFIED"
+                    for r in cmp_valid_refs:
+                        r.status = cmp_st
                     comparisons.append(
                         DevelopedComparisonItem(
                             dimension=dim,
@@ -374,8 +569,14 @@ class AcademicContentEnricher:
                             item_b_label=b_lbl or "Elemento B",
                             item_b_description=b_desc,
                             synthesis_note=str(rc.get("synthesis_note") or "").strip(),
-                            epistemic_status=str(rc.get("epistemic_status") or "SOURCE_FACT"),
-                            evidence_refs=sec_refs[:2],
+                            epistemic_status=cmp_st,
+                            elaboration_type=(
+                                ElaborationType.SOURCE_EXTRACTED.value
+                                if cmp_st == "SOURCE_FACT"
+                                else (ElaborationType.UNVERIFIED_CLAIM.value if cmp_st == "UNVERIFIED" else ElaborationType.ANALYTICAL_INFERENCE.value)
+                            ),
+                            evidence_ids=[r.paragraph_id or f"{r.section_id}:p{r.page_number or 0}" for r in cmp_valid_refs],
+                            evidence_refs=cmp_valid_refs,
                         )
                     )
 
@@ -395,6 +596,7 @@ class AcademicContentEnricher:
                 f"pedagógica do documento."
             )
 
+        # O invólucro pedagógico da secção desenvolvida é elaboração editorial (nunca herda SOURCE_FACT automaticamente)
         return DevelopedSectionContent(
             section_id=plan_sec.section_id,
             chapter_id=plan_sec.chapter_id,
@@ -410,7 +612,9 @@ class AcademicContentEnricher:
             comparisons=comparisons,
             limitations_and_caveats=limitations,
             section_synthesis=sec_synth,
-            epistemic_status="SOURCE_FACT",
+            epistemic_status="MODEL_INFERENCE",
+            elaboration_type=ElaborationType.PEDAGOGICAL_EXPLANATION.value,
+            evidence_ids=[r.paragraph_id or f"{r.section_id}:p{r.page_number or 0}" for r in sec_refs],
             evidence_refs=sec_refs,
             generation_status="COMPLETED",
         )
@@ -426,10 +630,10 @@ class AcademicContentEnricher:
     ) -> None:
         """
         Garante proteção contra perda silenciosa de conteúdo (Secção 7 / Critério A):
-        todos os pontos de `plan_sec.contents_to_cover` e análises nucleares têm de estar representados.
+        todos os pontos de `plan_sec.contents_to_cover` e análises nucleares têm de estar representados,
+        preservando estritamente a classificação epistémica sem promoção automática a SOURCE_FACT.
         """
         if not blocks:
-            # Construir bloco a partir de `contents_to_cover` e `linked_analyses`
             paras: List[str] = []
             for sa in linked_analyses:
                 synth = getattr(sa, "in_depth_synthesis", "") or getattr(sa, "argumentative_synthesis", "")
@@ -456,7 +660,8 @@ class AcademicContentEnricher:
                     block_type=ContentBlockType.EXPLANATORY_PARAGRAPH.value,
                     title=f"Análise e Desenvolvimento: {plan_sec.title}",
                     body_paragraphs=paras,
-                    epistemic_status="SOURCE_FACT",
+                    epistemic_status="MODEL_INFERENCE",
+                    elaboration_type=ElaborationType.PEDAGOGICAL_EXPLANATION.value,
                     evidence_refs=sec_refs,
                 )
             )
@@ -468,22 +673,49 @@ class AcademicContentEnricher:
         ).lower()
         uncovered_facts: List[str] = []
         uncovered_inferences: List[str] = []
+        uncovered_unverified: List[str] = []
+        fact_refs: List[EditorialEvidenceRef] = []
 
         for item in plan_sec.contents_to_cover:
             summary = str(item.get("summary") or "").strip()
             if not summary:
                 continue
-            # Verificar sobreposição de palavras-chave significativas
             words = [w.lower().strip(".,;:()[]«»\"'") for w in summary.split() if len(w) > 4]
             if words:
                 matched = sum(1 for w in words[:8] if w in existing_corpus)
                 if matched >= max(1, min(2, len(words) // 3)):
                     continue
-            st = str(item.get("epistemic_status") or "SOURCE_FACT").upper()
-            if st == "MODEL_INFERENCE":
+            st = normalize_epistemic_status(item.get("epistemic_status"), default="UNVERIFIED")
+            item_pids = [str(x).strip() for x in (item.get("paragraph_ids") or []) if str(x).strip()]
+            item_pgs = [int(x) for x in (item.get("page_numbers") or []) if isinstance(x, (int, float)) and int(x) > 0]
+            if st == "SOURCE_FACT":
+                cands = [
+                    EditorialEvidenceRef(
+                        paragraph_id=pid,
+                        section_id=plan_sec.original_section_ids[0] if plan_sec.original_section_ids else "",
+                        page_number=provenance.para_to_page.get(pid),
+                        status="SOURCE_FACT",
+                    )
+                    for pid in item_pids
+                ] + [
+                    EditorialEvidenceRef(
+                        paragraph_id="",
+                        section_id=plan_sec.original_section_ids[0] if plan_sec.original_section_ids else "",
+                        page_number=pg,
+                        status="SOURCE_FACT",
+                    )
+                    for pg in item_pgs
+                ]
+                v_refs, _, _, _ = provenance.validate_evidence_refs(cands or sec_refs, allow_section_fallback=False, default_status="SOURCE_FACT")
+                if v_refs:
+                    uncovered_facts.append(summary)
+                    fact_refs.extend(v_refs)
+                else:
+                    uncovered_unverified.append(summary)
+            elif st == "MODEL_INFERENCE":
                 uncovered_inferences.append(summary)
             else:
-                uncovered_facts.append(summary)
+                uncovered_unverified.append(summary)
 
         if uncovered_facts:
             blocks.append(
@@ -497,7 +729,8 @@ class AcademicContentEnricher:
                     ],
                     bullet_points=uncovered_facts,
                     epistemic_status="SOURCE_FACT",
-                    evidence_refs=sec_refs,
+                    elaboration_type=ElaborationType.SOURCE_EXTRACTED.value,
+                    evidence_refs=fact_refs or sec_refs,
                 )
             )
 
@@ -513,7 +746,25 @@ class AcademicContentEnricher:
                     ],
                     bullet_points=uncovered_inferences,
                     epistemic_status="MODEL_INFERENCE",
+                    elaboration_type=ElaborationType.ANALYTICAL_INFERENCE.value,
                     evidence_refs=sec_refs,
+                )
+            )
+
+        if uncovered_unverified:
+            blocks.append(
+                DevelopedContentBlock(
+                    block_id=f"{plan_sec.section_id}_blk_cov_unv",
+                    block_type=ContentBlockType.EXPLANATORY_PARAGRAPH.value,
+                    title="Tópicos Planeados Sem Confirmação Factual Direta (UNVERIFIED)",
+                    body_paragraphs=[
+                        "Tópicos previstos no roteiro editorial cuja sustentação factual literal não pôde ser "
+                        "confirmada diretamente na evidência validada:"
+                    ],
+                    bullet_points=uncovered_unverified,
+                    epistemic_status="UNVERIFIED",
+                    elaboration_type=ElaborationType.UNVERIFIED_CLAIM.value,
+                    evidence_refs=[],
                 )
             )
 
@@ -531,7 +782,7 @@ class AcademicContentEnricher:
         """
         Constrói determinísticamente o conteúdo desenvolvido da secção a partir do Dossier (Fase 3),
         do Plano Editorial (Fase 4) e dos parágrafos/tabelas da AST (Fase 2), garantindo que nenhuma
-        secção fica vazia mesmo quando o modelo local esgota as tentativas.
+        secção fica vazia e separando estritamente factos da fonte de elaborações pedagógicas.
         """
         opening = (
             f"Esta secção desenvolve «{plan_sec.title}», visando {plan_sec.pedagogical_objective}. "
@@ -541,8 +792,37 @@ class AcademicContentEnricher:
         blocks: List[DevelopedContentBlock] = []
         blk_counter = 1
 
-        # 1. Contextualização e Análise das Secções Originais
+        # 1. Factos explícitos vs Contextualização pedagógica das Secções Originais
         for sa in linked_analyses:
+            verified_sa_refs = provenance.sanitize_evidence_refs(
+                getattr(sa, "source_refs", []) or [],
+                allow_section_fallback=False,
+                default_status="UNVERIFIED",
+            )
+            fact_bullets = [getattr(f, "statement", str(f)) for f in getattr(sa, "explicit_facts", []) if f]
+            if not fact_bullets and getattr(sa, "evidences", []):
+                fact_bullets = [str(ev.get("claim") or ev) if isinstance(ev, dict) else str(ev) for ev in sa.evidences[:4]]
+
+            verified_fact_refs = [r for r in verified_sa_refs if r.status == "SOURCE_FACT"]
+            if fact_bullets and (verified_fact_refs or verified_sa_refs):
+                blocks.append(
+                    DevelopedContentBlock(
+                        block_id=f"{plan_sec.section_id}_blk_{blk_counter:02d}_facts",
+                        block_type=ContentBlockType.EXPLANATORY_PARAGRAPH.value,
+                        title=f"Factos e Evidências Diretas: {sa.title}",
+                        body_paragraphs=[
+                            f"Elementos factuais extraídos e referenciados da secção original «{sa.title}»:"
+                        ],
+                        bullet_points=fact_bullets,
+                        epistemic_status="SOURCE_FACT" if verified_fact_refs else "MODEL_INFERENCE",
+                        elaboration_type=(
+                            ElaborationType.SOURCE_EXTRACTED.value if verified_fact_refs else ElaborationType.PEDAGOGICAL_EXPLANATION.value
+                        ),
+                        evidence_refs=verified_fact_refs or verified_sa_refs,
+                    )
+                )
+                blk_counter += 1
+
             paras: List[str] = []
             obj = getattr(sa, "objective", "") or getattr(sa, "central_objective", "")
             if obj:
@@ -557,20 +837,17 @@ class AcademicContentEnricher:
                 if idea not in paras:
                     paras.append(idea)
 
-            fact_bullets = [getattr(f, "statement", str(f)) for f in getattr(sa, "explicit_facts", []) if f]
-            if not fact_bullets and getattr(sa, "evidences", []):
-                fact_bullets = [str(ev.get("claim") or ev) if isinstance(ev, dict) else str(ev) for ev in sa.evidences[:4]]
-
-            if paras or fact_bullets:
+            if paras:
+                # Síntese e desenvolvimento analítico da secção (MODEL_INFERENCE fundamentado na fonte)
                 blocks.append(
                     DevelopedContentBlock(
                         block_id=f"{plan_sec.section_id}_blk_{blk_counter:02d}",
                         block_type=ContentBlockType.EXPLANATORY_PARAGRAPH.value,
-                        title=f"Fundamentação e Análise: {sa.title}",
+                        title=f"Análise e Enquadramento Académico: {sa.title}",
                         body_paragraphs=paras,
-                        bullet_points=fact_bullets,
-                        epistemic_status="SOURCE_FACT",
-                        evidence_refs=sec_refs,
+                        epistemic_status="MODEL_INFERENCE",
+                        elaboration_type=ElaborationType.PEDAGOGICAL_EXPLANATION.value,
+                        evidence_refs=verified_sa_refs or sec_refs,
                     )
                 )
                 blk_counter += 1
@@ -590,6 +867,7 @@ class AcademicContentEnricher:
                         ],
                         bullet_points=inf_bullets,
                         epistemic_status="MODEL_INFERENCE",
+                        elaboration_type=ElaborationType.ANALYTICAL_INFERENCE.value,
                         evidence_refs=sec_refs,
                     )
                 )
@@ -598,7 +876,7 @@ class AcademicContentEnricher:
         # 2. Garantir cobertura de `contents_to_cover`
         cls._ensure_mandatory_contents_covered(plan_sec, blocks, linked_analyses, provenance, sec_refs)
 
-        # 3. Tratamentos pedagógicos planeados na Fase 4
+        # 3. Tratamentos pedagógicos planeados na Fase 4 (desenvolvimento pedagógico = MODEL_INFERENCE)
         for pt_idx, pt in enumerate(plan_sec.pedagogical_treatments, start=1):
             focus_lines = [f"{k}: {v}" for k, v in (pt.pedagogical_focus or {}).items() if v]
             b_type = (
@@ -606,6 +884,7 @@ class AcademicContentEnricher:
                 if any("BOX" in str(el).upper() or "CALLOUT" in str(el).upper() for el in (pt.required_elements or []))
                 else ContentBlockType.STEP_BY_STEP_MECHANISM.value
             )
+            pt_refs = provenance.sanitize_evidence_refs(pt.evidence_refs or [], allow_section_fallback=False, default_status="MODEL_INFERENCE")
             blocks.append(
                 DevelopedContentBlock(
                     block_id=f"{plan_sec.section_id}_blk_pt_{pt_idx:02d}",
@@ -615,8 +894,9 @@ class AcademicContentEnricher:
                         f"Nível de profundidade ({pt.depth_level}): {pt.depth_justification or pt.target_topic_or_concept}"
                     ],
                     steps=focus_lines or pt.required_elements,
-                    epistemic_status=pt.epistemic_status or "SOURCE_FACT",
-                    evidence_refs=pt.evidence_refs or sec_refs,
+                    epistemic_status="MODEL_INFERENCE",
+                    elaboration_type=ElaborationType.PEDAGOGICAL_EXPLANATION.value,
+                    evidence_refs=pt_refs or sec_refs,
                 )
             )
 
@@ -632,29 +912,52 @@ class AcademicContentEnricher:
                             body_paragraphs=[
                                 f"Enquadramento temático segundo o modelo {p_elem}: consolidação de princípios chave da secção."
                             ],
-                            epistemic_status="SOURCE_FACT",
+                            epistemic_status="MODEL_INFERENCE",
+                            elaboration_type=ElaborationType.PEDAGOGICAL_EXPLANATION.value,
                             evidence_refs=sec_refs,
                         )
                     )
 
-        # 4. Definições de conceitos
+        # 4. Definições de conceitos verificados do Dossier
         concept_defs: List[DevelopedConceptDefinition] = []
         seen_terms: Set[str] = set()
         for c_node in relevant_concepts[:6]:
             c_name = getattr(c_node, "name", "")
-            c_desc = getattr(c_node, "definition_or_description", "")
+            c_desc = (
+                getattr(c_node, "definition", "")
+                or getattr(c_node, "definition_or_description", "")
+                or getattr(c_node, "explanation", "")
+            )
             if c_name and c_desc and c_name.lower() not in seen_terms:
                 seen_terms.add(c_name.lower())
+                raw_node_refs = getattr(c_node, "evidence_refs", []) or []
+                node_valid_refs = provenance.sanitize_evidence_refs(
+                    raw_node_refs,
+                    allow_section_fallback=False,
+                    default_status="UNVERIFIED",
+                )
+                explicit_node_status = getattr(getattr(c_node, "epistemic_status", None), "value", getattr(c_node, "epistemic_status", None))
+                if explicit_node_status:
+                    node_st = normalize_epistemic_status(explicit_node_status, default="UNVERIFIED")
+                elif node_valid_refs and all(r.status == "SOURCE_FACT" for r in node_valid_refs):
+                    node_st = "SOURCE_FACT"
+                elif node_valid_refs and any(r.status == "MODEL_INFERENCE" for r in node_valid_refs):
+                    node_st = "MODEL_INFERENCE"
+                else:
+                    node_st = "UNVERIFIED"
+
                 concept_defs.append(
                     DevelopedConceptDefinition(
                         concept_id=getattr(c_node, "concept_id", f"cdef_{len(concept_defs)+1}"),
                         term=c_name,
                         developed_definition=c_desc,
-                        theoretical_context=getattr(c_node, "academic_relevance", ""),
-                        epistemic_status=getattr(
-                            getattr(c_node, "epistemic_status", None), "value", str(getattr(c_node, "epistemic_status", "SOURCE_FACT"))
+                        theoretical_context=getattr(c_node, "academic_relevance", "") or getattr(c_node, "context_of_use", ""),
+                        epistemic_status=node_st,
+                        elaboration_type=(
+                            ElaborationType.SOURCE_EXTRACTED.value if node_st == "SOURCE_FACT" else ElaborationType.PEDAGOGICAL_EXPLANATION.value
                         ),
-                        evidence_refs=sec_refs[:2],
+                        evidence_ids=[r.paragraph_id or f"{r.section_id}:p{r.page_number or 0}" for r in node_valid_refs],
+                        evidence_refs=node_valid_refs,
                     )
                 )
 
@@ -686,7 +989,9 @@ class AcademicContentEnricher:
             comparisons=[],
             limitations_and_caveats=limitations,
             section_synthesis=sec_synth,
-            epistemic_status="SOURCE_FACT",
+            epistemic_status="MODEL_INFERENCE",
+            elaboration_type=ElaborationType.PEDAGOGICAL_EXPLANATION.value,
+            evidence_ids=[r.paragraph_id or f"{r.section_id}:p{r.page_number or 0}" for r in sec_refs],
             evidence_refs=sec_refs,
             generation_status="FALLBACK_GROUNDED",
         )
@@ -705,6 +1010,7 @@ class DocumentContentGenerationEngine:
         llm_caller: Optional[Callable[..., Dict[str, Any]]] = None,
         budget_manager: Optional[ContextBudgetManager] = None,
         max_retries: int = 2,
+        model_name: str = "qwen3.5:9b",
     ) -> None:
         self.llm_caller = llm_caller or invoke_study_llm_observable
         self.budget = budget_manager or ContextBudgetManager(
@@ -712,6 +1018,7 @@ class DocumentContentGenerationEngine:
             safety_buffer_tokens=600,
         )
         self.max_retries = max_retries
+        self.model_name = model_name
 
     def develop_content(
         self,
@@ -763,6 +1070,7 @@ class DocumentContentGenerationEngine:
             executive_study_overview=plan.overview.global_organization_summary or plan.overview.editorial_strategy,
             chapters=completed_chapters,
             global_integrative_synthesis=getattr(dossier.cross_section_synthesis, "global_synthesis", ""),
+            model_name=self.model_name,
         )
 
     def generate_section_content(
@@ -790,8 +1098,9 @@ class DocumentContentGenerationEngine:
             "1. Devolve APENAS um objeto JSON válido com a chave 'sections' contendo exatamente a secção pedida.\n"
             "2. Preserva o 'section_id' EXATO fornecido. Não alteres nem omitas o 'section_id'.\n"
             "3. Desenvolve explicações académicas completas, claras e rigorosas (não faças apenas resumos telegráficos).\n"
-            "4. Distingue rigorosamente factos explícitos da fonte ('SOURCE_FACT') de inferências analíticas ('MODEL_INFERENCE').\n"
-            "5. NUNCA inventes dados empíricos, resultados estatísticos, citações ou páginas que não constem no contexto.\n"
+            "4. Distingue rigorosamente factos literais da fonte ('SOURCE_FACT', exigindo 'paragraph_ids' reais do contexto) "
+            "de explicações pedagógicas, interpretações ou relações ('MODEL_INFERENCE') e afirmações sem suporte ('UNVERIFIED').\n"
+            "5. NUNCA inventes dados empíricos, resultados estatísticos, citações, 'paragraph_ids' ou páginas que não constem no contexto.\n"
             "6. Se criares um exemplo ilustrativo para facilitar a compreensão, marca 'block_type': 'HYPOTHETICAL_EXAMPLE', "
             "'is_hypothetical_example': true e 'epistemic_status': 'MODEL_INFERENCE', identificando-o como exemplo hipotético."
         )
@@ -819,7 +1128,7 @@ class DocumentContentGenerationEngine:
             '          "bullet_points": ["Ponto analítico detalhado (opcional)"],\n'
             '          "steps": ["Passo 1 do mecanismo/processo (opcional)"],\n'
             '          "is_hypothetical_example": false,\n'
-            '          "epistemic_status": "SOURCE_FACT | MODEL_INFERENCE",\n'
+            '          "epistemic_status": "MODEL_INFERENCE | SOURCE_FACT | UNVERIFIED",\n'
             '          "paragraph_ids": ["p_0001"],\n'
             '          "page_numbers": [1]\n'
             '        }\n'
@@ -831,7 +1140,7 @@ class DocumentContentGenerationEngine:
             '          "developed_definition": "Definição académica desenvolvida...",\n'
             '          "theoretical_context": "Papel teórico e importância no documento...",\n'
             '          "relationships_explained": "Como se relaciona com outros conceitos...",\n'
-            '          "epistemic_status": "SOURCE_FACT | MODEL_INFERENCE"\n'
+            '          "epistemic_status": "MODEL_INFERENCE | SOURCE_FACT | UNVERIFIED"\n'
             '        }\n'
             '      ],\n'
             '      "comparisons": [\n'
@@ -842,7 +1151,7 @@ class DocumentContentGenerationEngine:
             '          "item_b_label": "Conceito/Método B",\n'
             '          "item_b_description": "Caracterização B",\n'
             '          "synthesis_note": "Conclusão comparativa",\n'
-            '          "epistemic_status": "SOURCE_FACT"\n'
+            '          "epistemic_status": "MODEL_INFERENCE | SOURCE_FACT | UNVERIFIED"\n'
             '        }\n'
             '      ],\n'
             '      "limitations_and_caveats": ["Limitação ou fronteira de validade..."],\n'
@@ -989,7 +1298,7 @@ class DocumentContentGenerationEngine:
         if section.contents_to_cover:
             header_lines.append("\nCONTEÚDOS OBRIGATÓRIOS A COBRIR NESTA SECÇÃO:")
             for idx, item in enumerate(section.contents_to_cover, start=1):
-                st = item.get("epistemic_status", "SOURCE_FACT")
+                st = normalize_epistemic_status(item.get("epistemic_status"), default="UNVERIFIED")
                 pids = ", ".join(item.get("paragraph_ids") or [])
                 pgs = ", ".join(str(p) for p in (item.get("page_numbers") or []))
                 loc = f" [¶{pids} | p.{pgs}]" if (pids or pgs) else ""

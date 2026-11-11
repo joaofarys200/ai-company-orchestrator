@@ -15,7 +15,11 @@ from services.academic_reasoning_engine import (
     ContextBudgetManager,
 )
 from services.document_intelligence import AcademicDocumentAST
-from services.editorial_intelligence_engine import EditorialStudyPlan
+from services.editorial_intelligence_engine import (
+    EditorialStudyPlan,
+    compute_dossier_fingerprint,
+)
+from services.study_document_generation.content_generator import PROMPT_VERSIONS_PHASE5
 from services.study_document_generation.contracts import (
     DevelopedChapterContent,
     DevelopedSectionContent,
@@ -27,6 +31,7 @@ from services.study_document_generation.contracts import (
     StudyDocumentIR,
     StudyDocumentQAReport,
     StudyDocumentVersionRecord,
+    compute_ast_fingerprint,
     compute_plan_fingerprint,
 )
 from services.study_document_generation.design_system import (
@@ -52,14 +57,20 @@ class DocumentGenerationEngine:
         *,
         llm_caller: Optional[Callable] = None,
         budget_manager: Optional[ContextBudgetManager] = None,
+        prompt_versions: Optional[Dict[str, str]] = None,
+        model_name: str = "qwen3.5:9b",
     ) -> None:
         self.storage_dir = Path(storage_dir)
         self.llm_caller = llm_caller
         self.budget_manager = budget_manager or ContextBudgetManager()
+        self.prompt_versions = dict(prompt_versions) if prompt_versions is not None else None
+        self.model_name = model_name
         self.orchestrator = DocumentGenerationOrchestrator(
             storage_dir=self.storage_dir,
             llm_caller=self.llm_caller,
             budget_manager=self.budget_manager,
+            prompt_versions=self.prompt_versions,
+            model_name=self.model_name,
         )
 
     def generate_study_document(
@@ -93,8 +104,14 @@ class DocumentGenerationEngine:
         """Consulta o estado da geração documental, ficheiros e versão ativa."""
         return self.orchestrator.get_document_generation_status(document_id)
 
-    def is_document_up_to_date(self, document_id: str, plan: EditorialStudyPlan) -> Tuple[bool, str]:
-        """Verifica se o documento gerado em disco está sincronizado com o plano editorial atual."""
+    def is_document_up_to_date(
+        self,
+        document_id: str,
+        plan: EditorialStudyPlan,
+        dossier: Optional[AcademicReasoningDossier] = None,
+        ast: Optional[AcademicDocumentAST] = None,
+    ) -> Tuple[bool, str]:
+        """Verifica se o documento gerado em disco está sincronizado com o plano, dossier, AST e prompts atuais."""
         status = self.get_document_generation_status(document_id)
         if not status.get("has_pdf"):
             return False, "DOCUMENT_NOT_FOUND"
@@ -110,6 +127,17 @@ class DocumentGenerationEngine:
             current_fp = compute_plan_fingerprint(plan)
             if res.source_plan_fingerprint != current_fp:
                 return False, "PLAN_FINGERPRINT_MISMATCH"
+            if res.plan_version != getattr(plan.metadata, "plan_version", 1):
+                return False, "PLAN_VERSION_MISMATCH"
+            if dossier is not None and res.dossier_fingerprint != compute_dossier_fingerprint(dossier):
+                return False, "DOSSIER_FINGERPRINT_MISMATCH"
+            if ast is not None and res.ast_fingerprint and res.ast_fingerprint != compute_ast_fingerprint(ast):
+                return False, "AST_FINGERPRINT_MISMATCH"
+            active_prompts = self.prompt_versions if self.prompt_versions is not None else dict(PROMPT_VERSIONS_PHASE5)
+            if res.prompt_versions and res.prompt_versions != active_prompts:
+                return False, "PROMPT_VERSIONS_MISMATCH"
+            if res.model_name and res.model_name != self.model_name:
+                return False, "MODEL_MISMATCH"
             return True, "UP_TO_DATE"
         except Exception as e:
             return False, f"VERIFICATION_ERROR: {e}"

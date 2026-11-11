@@ -6,12 +6,27 @@ e referências bibliográficas sem invenção de metadados.
 
 from __future__ import annotations
 
+import re
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from services.academic_reasoning_engine import AcademicReasoningDossier
 from services.document_intelligence import AcademicDocumentAST
 from services.editorial_intelligence_engine import EditorialEvidenceRef
-from services.study_document_generation.contracts import IRBibliographyEntry
+from services.study_document_generation.contracts import (
+    ElaborationType,
+    IRBibliographyEntry,
+    VALID_EPISTEMIC_STATUSES,
+    normalize_epistemic_status,
+)
+
+_STOP_WORDS = frozenset({
+    "para", "como", "sobre", "entre", "com", "sem", "uma", "umas", "uns", "dos", "das",
+    "nos", "nas", "pelo", "pela", "pelos", "pelas", "este", "esta", "estes", "estas",
+    "esse", "essa", "isso", "isto", "aquilo", "mais", "menos", "muito", "muita", "muitos",
+    "onde", "quando", "porque", "pois", "que", "qual", "quais", "sendo", "foram", "esta",
+    "está", "estão", "pode", "podem", "the", "and", "for", "with", "from", "that", "this",
+    "were", "was", "are", "have", "has", "been", "into", "about", "which", "their",
+})
 
 
 class ReferenceAndProvenanceRenderer:
@@ -31,9 +46,14 @@ class ReferenceAndProvenanceRenderer:
         self.valid_paragraphs: Set[str] = set()
         self.valid_sections: Set[str] = set()
         self.para_to_page: Dict[str, int] = {}
+        self.para_to_section: Dict[str, str] = {}
+        self.para_texts: Dict[str, str] = {}
+        self.sec_texts: Dict[str, str] = {}
+        self.page_texts: Dict[int, str] = {}
         self.sec_to_pages: Dict[str, List[int]] = {}
         self.tables_by_id: Dict[str, Tuple[str, int]] = {}
         self.figures_by_id: Dict[str, Tuple[str, int]] = {}
+        self.verified_source_excerpts: Dict[str, str] = {}
         self._index_sources()
 
     def _index_sources(self) -> None:
@@ -48,6 +68,14 @@ class ReferenceAndProvenanceRenderer:
                 self.valid_pages.update(pages)
             for para in self.ast.paragraphs:
                 self.valid_paragraphs.add(para.paragraph_id)
+                if para.text:
+                    self.para_texts[para.paragraph_id] = para.text
+                    if para.section_id:
+                        self.sec_texts[para.section_id] = (self.sec_texts.get(para.section_id, "") + " " + para.text).strip()
+                    if para.page_number > 0:
+                        self.page_texts[para.page_number] = (self.page_texts.get(para.page_number, "") + " " + para.text).strip()
+                if para.section_id:
+                    self.para_to_section[para.paragraph_id] = para.section_id
                 if para.page_number > 0:
                     self.para_to_page[para.paragraph_id] = para.page_number
                     self.valid_pages.add(para.page_number)
@@ -55,6 +83,9 @@ class ReferenceAndProvenanceRenderer:
                 self.tables_by_id[tbl.table_id] = (tbl.caption or tbl.table_id, tbl.page_number)
                 if tbl.page_number > 0:
                     self.valid_pages.add(tbl.page_number)
+                tbl_flat = " ".join(" ".join(str(c) for c in row) for row in (tbl.rows or []))
+                if tbl.section_id and tbl_flat:
+                    self.sec_texts[tbl.section_id] = (self.sec_texts.get(tbl.section_id, "") + " " + tbl_flat).strip()
             for fig in self.ast.figures:
                 self.figures_by_id[fig.figure_id] = (fig.caption or fig.figure_id, fig.page_number)
                 if fig.page_number > 0:
@@ -71,8 +102,13 @@ class ReferenceAndProvenanceRenderer:
                 self.valid_pages.update(pages)
 
             for ref in getattr(sa, "source_refs", []):
-                if getattr(ref, "paragraph_id", None):
-                    self.valid_paragraphs.add(ref.paragraph_id)
+                pid = getattr(ref, "paragraph_id", None)
+                if pid:
+                    self.valid_paragraphs.add(pid)
+                    if getattr(ref, "excerpt", ""):
+                        self.verified_source_excerpts[pid] = ref.excerpt
+                        if pid not in self.para_texts:
+                            self.para_texts[pid] = ref.excerpt
                 if getattr(ref, "page_number", None) and ref.page_number > 0:
                     self.valid_pages.add(ref.page_number)
                     if sa.section_id not in self.sec_to_pages:
@@ -90,41 +126,54 @@ class ReferenceAndProvenanceRenderer:
                             if pg and pg > 0:
                                 self.valid_pages.add(pg)
 
-    def sanitize_evidence_refs(
+    def validate_evidence_refs(
         self,
         refs: Sequence[EditorialEvidenceRef],
+        *,
         fallback_section_ids: Optional[Sequence[str]] = None,
-    ) -> List[EditorialEvidenceRef]:
+        allow_section_fallback: bool = False,
+        default_status: str = "UNVERIFIED",
+    ) -> Tuple[List[EditorialEvidenceRef], List[str], List[int], List[str]]:
         """
-        Filtra e valida referências de evidência contra o documento original,
-        impedindo a citação de páginas, secções ou parágrafos inexistentes.
+        Valida rigorosamente referências de evidência contra AST e Dossier.
+        Devolve: (valid_refs, rejected_paragraph_ids, rejected_pages, rejected_section_ids).
+        Nunca aceita parágrafos inexistentes e nunca promove referências não validadas para SOURCE_FACT.
         """
         cleaned: List[EditorialEvidenceRef] = []
+        rejected_pids: List[str] = []
+        rejected_pages: List[int] = []
+        rejected_sids: List[str] = []
         seen: Set[Tuple[str, str, int, str]] = set()
 
         for r in refs or []:
-            pid = str(r.paragraph_id or "").strip()
-            sid = str(r.section_id or "").strip()
-            pg = int(r.page_number) if r.page_number and int(r.page_number) > 0 else None
+            pid = str(getattr(r, "paragraph_id", "") or "").strip()
+            sid = str(getattr(r, "section_id", "") or "").strip()
+            raw_pg = getattr(r, "page_number", None)
+            pg = int(raw_pg) if raw_pg and int(raw_pg) > 0 else None
 
-            if pid and self.valid_paragraphs and pid not in self.valid_paragraphs:
-                pid = ""
+            if pid:
+                if not self.valid_paragraphs or pid not in self.valid_paragraphs:
+                    rejected_pids.append(pid)
+                    pid = ""
             if sid and self.valid_sections and sid not in self.valid_sections:
+                rejected_sids.append(sid)
                 sid = ""
-            if pg is not None and self.valid_pages and pg not in self.valid_pages:
-                pg = None
+            if pg is not None:
+                if self.valid_pages and pg not in self.valid_pages:
+                    rejected_pages.append(pg)
+                    pg = None
 
             if pg is None and pid and pid in self.para_to_page:
                 pg = self.para_to_page[pid]
+            if not sid and pid and pid in self.para_to_section:
+                sid = self.para_to_section[pid]
             if pg is None and sid and sid in self.sec_to_pages and self.sec_to_pages[sid]:
                 pg = self.sec_to_pages[sid][0]
 
             if not pid and not sid and pg is None:
                 continue
 
-            st = str(r.status or "SOURCE_FACT").strip()
-            if st not in ("SOURCE_FACT", "MODEL_INFERENCE", "NOT_FOUND", "UNVERIFIED"):
-                st = "SOURCE_FACT"
+            st = normalize_epistemic_status(getattr(r, "status", None), default=default_status)
 
             key = (pid, sid, pg or 0, st)
             if key in seen:
@@ -136,11 +185,11 @@ class ReferenceAndProvenanceRenderer:
                     section_id=sid,
                     page_number=pg,
                     status=st,
-                    excerpt=str(r.excerpt or "")[:180],
+                    excerpt=str(getattr(r, "excerpt", "") or "")[:180],
                 )
             )
 
-        if not cleaned and fallback_section_ids:
+        if not cleaned and allow_section_fallback and fallback_section_ids:
             for f_sid in fallback_section_ids:
                 s_clean = str(f_sid).strip()
                 if not s_clean or (self.valid_sections and s_clean not in self.valid_sections):
@@ -152,13 +201,75 @@ class ReferenceAndProvenanceRenderer:
                         paragraph_id="",
                         section_id=s_clean,
                         page_number=pg,
-                        status="SOURCE_FACT",
+                        status=default_status if default_status in VALID_EPISTEMIC_STATUSES else "UNVERIFIED",
                         excerpt="",
                     )
                 )
                 break
 
+        return cleaned, rejected_pids, rejected_pages, rejected_sids
+
+    def sanitize_evidence_refs(
+        self,
+        refs: Sequence[EditorialEvidenceRef],
+        fallback_section_ids: Optional[Sequence[str]] = None,
+        *,
+        allow_section_fallback: bool = True,
+        default_status: str = "UNVERIFIED",
+    ) -> List[EditorialEvidenceRef]:
+        """
+        Filtra e valida referências de evidência contra o documento original,
+        impedindo a citação de páginas, secções ou parágrafos inexistentes.
+        """
+        cleaned, _, _, _ = self.validate_evidence_refs(
+            refs,
+            fallback_section_ids=fallback_section_ids,
+            allow_section_fallback=allow_section_fallback,
+            default_status=default_status,
+        )
         return cleaned
+
+    def has_minimal_source_overlap(
+        self,
+        claim_text: str,
+        refs: Sequence[EditorialEvidenceRef],
+    ) -> bool:
+        """
+        Verificação lexical de rastreabilidade: confirma apenas se o texto reivindica termos
+        presentes nos parágrafos/excertos citados. NÃO constitui garantia semântica absoluta
+        e serve exclusivamente para detetar reivindicações desconexas rotuladas como SOURCE_FACT.
+        """
+        if not claim_text or not refs:
+            return False
+
+        source_chunks: List[str] = []
+        for r in refs:
+            if r.paragraph_id and r.paragraph_id in self.para_texts:
+                source_chunks.append(self.para_texts[r.paragraph_id])
+            if getattr(r, "excerpt", ""):
+                source_chunks.append(r.excerpt)
+            if r.page_number and r.page_number in self.page_texts and not r.paragraph_id:
+                source_chunks.append(self.page_texts[r.page_number])
+            elif r.section_id and r.section_id in self.sec_texts and not r.paragraph_id:
+                source_chunks.append(self.sec_texts[r.section_id])
+
+        if not source_chunks:
+            return False
+
+        def _tokens(txt: str) -> Set[str]:
+            return {
+                tok for tok in re.findall(r"[0-9a-zà-öø-ÿ]{4,}", txt.lower())
+                if tok not in _STOP_WORDS
+            }
+
+        claim_toks = _tokens(claim_text)
+        source_toks = _tokens(" ".join(source_chunks))
+        if not claim_toks or not source_toks:
+            return False
+
+        overlap = claim_toks & source_toks
+        min_needed = 1 if len(claim_toks) <= 4 else 2
+        return len(overlap) >= min_needed
 
     def format_provenance_summary(
         self,
@@ -166,30 +277,46 @@ class ReferenceAndProvenanceRenderer:
         evidence_refs: Sequence[EditorialEvidenceRef],
         *,
         is_hypothetical_example: bool = False,
+        elaboration_type: str = "",
         source_table_refs: Optional[Sequence[str]] = None,
         source_figure_refs: Optional[Sequence[str]] = None,
+        rejected_refs_count: int = 0,
     ) -> str:
         """
         Gera uma linha de proveniência clara e auditável para um bloco ou secção.
-        Distingue explicitamente factos da fonte de inferências do modelo e de exemplos hipotéticos.
+        Distingue explicitamente factos da fonte de inferências do modelo, conteúdo não verificado
+        e exemplos hipotéticos, sem nunca promover referências ausentes/inválidas a SOURCE_FACT.
         """
-        valid_refs = self.sanitize_evidence_refs(evidence_refs)
+        norm_status = normalize_epistemic_status(epistemic_status, default="UNVERIFIED")
+        valid_refs = self.sanitize_evidence_refs(evidence_refs, allow_section_fallback=False)
         pages = sorted({r.page_number for r in valid_refs if r.page_number and r.page_number > 0})
         paras = [r.paragraph_id for r in valid_refs if r.paragraph_id]
         paras_unique = list(dict.fromkeys(paras))[:5]
         secs = [r.section_id for r in valid_refs if r.section_id]
         secs_unique = list(dict.fromkeys(secs))[:3]
 
-        if is_hypothetical_example:
-            status_badge = "Elaboração Pedagógica (Exemplo Ilustrativo Hipotético — não constitui evidência empírica da fonte)"
-        elif epistemic_status == "MODEL_INFERENCE":
-            status_badge = "Inferência Analítica e Pedagógica (MODEL_INFERENCE) fundamentada na fonte"
-        elif epistemic_status == "UNVERIFIED":
-            status_badge = "Informação Não Verificada na Fonte (UNVERIFIED)"
-        elif epistemic_status == "NOT_FOUND":
-            status_badge = "Informação Ausente na Fonte (NOT_FOUND)"
+        if is_hypothetical_example or elaboration_type == ElaborationType.HYPOTHETICAL_EXAMPLE.value:
+            status_badge = (
+                "Elaboração Pedagógica: Exemplo Ilustrativo Hipotético [MODEL_INFERENCE] "
+                "— não constitui evidência empírica da fonte"
+            )
+        elif norm_status == "SOURCE_FACT" and elaboration_type in (
+            ElaborationType.PEDAGOGICAL_EXPLANATION.value,
+            ElaborationType.ANALYTICAL_INFERENCE.value,
+            ElaborationType.EDITORIAL_SYNTHESIS.value,
+        ):
+            status_badge = (
+                "Elaboração Pedagógica fundamentada na fonte [MODEL_INFERENCE] "
+                "— baseada em evidências originais (não literal)"
+            )
+        elif norm_status == "SOURCE_FACT":
+            status_badge = "Facto Confirmado na Fonte Original [SOURCE_FACT]"
+        elif norm_status == "MODEL_INFERENCE":
+            status_badge = "Inferência / Explicação do Modelo [MODEL_INFERENCE] fundamentada na fonte"
+        elif norm_status == "NOT_FOUND":
+            status_badge = "Informação Ausente na Fonte [NOT_FOUND]"
         else:
-            status_badge = "Facto Confirmado na Fonte Original (SOURCE_FACT)"
+            status_badge = "Informação Não Verificada na Fonte [UNVERIFIED]"
 
         loc_parts: List[str] = []
         if pages:
@@ -213,9 +340,18 @@ class ReferenceAndProvenanceRenderer:
                 media_parts.append(f"Figura original {fid} (p. {f_pg})")
 
         all_details = loc_parts + media_parts
+        extra_notes: List[str] = []
+        if rejected_refs_count > 0:
+            extra_notes.append(f"{rejected_refs_count} ref(s) inexistente(s) rejeitada(s)")
+        if norm_status in ("MODEL_INFERENCE", "UNVERIFIED") and all_details:
+            extra_notes.append("referência contextual (cada frase não está literalmente comprovada)")
+
+        summary = f"Proveniência: {status_badge}"
         if all_details:
-            return f"Proveniência: {status_badge} | Origem: {' • '.join(all_details)}"
-        return f"Proveniência: {status_badge}"
+            summary += f" | Origem: {' • '.join(all_details)}"
+        if extra_notes:
+            summary += f" | Nota: {'; '.join(extra_notes)}"
+        return summary
 
     def compile_bibliography(self) -> Tuple[List[IRBibliographyEntry], List[str]]:
         """

@@ -30,6 +30,35 @@ class DocumentGenerationState(str, Enum):
     FAILED = "FAILED"
 
 
+class EpistemicClassification(str, Enum):
+    """Estados epistémicos canónicos do JARVIS OS."""
+    SOURCE_FACT = "SOURCE_FACT"
+    MODEL_INFERENCE = "MODEL_INFERENCE"
+    NOT_FOUND = "NOT_FOUND"
+    UNVERIFIED = "UNVERIFIED"
+
+
+VALID_EPISTEMIC_STATUSES = frozenset(e.value for e in EpistemicClassification)
+
+
+def normalize_epistemic_status(raw: Any, default: str = "UNVERIFIED") -> str:
+    """Normaliza classificação epistémica garantindo zero promoção silenciosa para SOURCE_FACT."""
+    val = str(raw or "").upper().strip()
+    if val in VALID_EPISTEMIC_STATUSES:
+        return val
+    return default
+
+
+class ElaborationType(str, Enum):
+    """Distinção entre factos da fonte e tipos de elaboração editorial/LLM."""
+    SOURCE_EXTRACTED = "SOURCE_EXTRACTED"
+    PEDAGOGICAL_EXPLANATION = "PEDAGOGICAL_EXPLANATION"
+    ANALYTICAL_INFERENCE = "ANALYTICAL_INFERENCE"
+    HYPOTHETICAL_EXAMPLE = "HYPOTHETICAL_EXAMPLE"
+    EDITORIAL_SYNTHESIS = "EDITORIAL_SYNTHESIS"
+    UNVERIFIED_CLAIM = "UNVERIFIED_CLAIM"
+
+
 class ContentBlockType(str, Enum):
     """Tipos de blocos de enriquecimento e explicação académica (Componentes 5.1 e 5.2)."""
     EXPLANATORY_PARAGRAPH = "EXPLANATORY_PARAGRAPH"
@@ -69,6 +98,7 @@ class CalloutBoxKind(str, Enum):
     HYPOTHETICAL_EXAMPLE_BOX = "HYPOTHETICAL_EXAMPLE_BOX"
     LIMITATION_BOX = "LIMITATION_BOX"
     SYNTHESIS_BOX = "SYNTHESIS_BOX"
+    METHODOLOGY_NOTE_BOX = "METHODOLOGY_NOTE_BOX"
 
 
 class VisualRenderStatus(str, Enum):
@@ -95,24 +125,153 @@ class QASeverity(str, Enum):
     RECOMMENDATION = "RECOMMENDATION"
 
 
-def compute_plan_fingerprint(plan: EditorialStudyPlan) -> str:
-    """Calcula impressão digital determinística do EditorialStudyPlan para controlo de sincronização."""
+def _safe_json_serialize(obj: Any) -> Any:
+    """Converte estruturas dataclass/Enum aninhadas em primitivos serializáveis para hashing determinístico."""
+    if isinstance(obj, Enum):
+        return obj.value
+    if hasattr(obj, "to_dict") and callable(obj.to_dict):
+        return _safe_json_serialize(obj.to_dict())
+    if hasattr(obj, "__dataclass_fields__"):
+        return {k: _safe_json_serialize(getattr(obj, k)) for k in obj.__dataclass_fields__}
+    if isinstance(obj, dict):
+        return {str(k): _safe_json_serialize(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_safe_json_serialize(x) for x in obj]
+    if isinstance(obj, (str, int, float, bool)) or obj is None:
+        return obj
+    return str(obj)
+
+
+def compute_plan_overview_fingerprint(plan: EditorialStudyPlan) -> str:
+    """Calcula impressão digital determinística da visão geral e metadados base do plano editorial."""
+    ov = getattr(plan, "overview", None)
     payload = {
         "document_id": plan.metadata.document_id,
         "plan_id": plan.metadata.plan_id,
         "plan_version": plan.metadata.plan_version,
-        "dossier_fingerprint": plan.metadata.dossier_fingerprint,
-        "status": plan.metadata.status,
-        "chapters": [
-            {
-                "chapter_id": c.chapter_id,
-                "title": c.title,
-                "order": c.order,
-                "sections": [s.section_id for s in c.sections],
-            }
-            for c in plan.chapters
+        "dossier_id": getattr(plan.metadata, "dossier_id", ""),
+        "dossier_fingerprint": getattr(plan.metadata, "dossier_fingerprint", ""),
+        "source_sha256": getattr(plan.metadata, "source_sha256", ""),
+        "overview": _safe_json_serialize(ov) if ov else {},
+        "conceptual_relationships": _safe_json_serialize(getattr(plan, "conceptual_relationships", [])),
+    }
+    raw = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
+
+
+def compute_section_plan_fingerprint(
+    chapter: Any,
+    section: Any,
+    dossier: Any = None,
+    ast: Any = None,
+) -> str:
+    """
+    Calcula fingerprint unitário determinístico de uma secção editorial e das respetivas dependências
+    (capítulo pai, secção editorial completa, análises de secção/conceitos do dossier e parágrafos da AST).
+    Permite recuperação parcial segura quando apenas secções específicas são alteradas.
+    """
+    orig_sids = set(getattr(section, "original_section_ids", []) or [])
+    target_cids = set((getattr(section, "associated_concept_ids", []) or []) + (getattr(section, "introduced_concept_ids", []) or []))
+    target_pids = {
+        getattr(r, "paragraph_id", "")
+        for r in (getattr(section, "evidence_refs", []) or [])
+        if getattr(r, "paragraph_id", "")
+    }
+
+    linked_analyses = []
+    linked_concepts = []
+    if dossier is not None:
+        for sa in getattr(dossier, "section_analyses", []) or []:
+            if getattr(sa, "section_id", "") in orig_sids:
+                linked_analyses.append(_safe_json_serialize(sa))
+        for c in getattr(dossier, "conceptual_analysis", []) or []:
+            if getattr(c, "concept_id", "") in target_cids:
+                linked_concepts.append(_safe_json_serialize(c))
+
+    linked_paras = []
+    if ast is not None:
+        for p in getattr(ast, "paragraphs", []) or []:
+            pid = getattr(p, "paragraph_id", "")
+            sid = getattr(p, "section_id", "")
+            if pid in target_pids or sid in orig_sids:
+                linked_paras.append({
+                    "id": pid,
+                    "sid": sid,
+                    "pg": getattr(p, "page_number", 0),
+                    "sha1": getattr(p, "content_sha1", "") or hashlib.sha256(str(getattr(p, "text", "")).encode("utf-8")).hexdigest(),
+                })
+
+    payload = {
+        "chapter": {
+            "chapter_id": getattr(chapter, "chapter_id", ""),
+            "title": getattr(chapter, "title", ""),
+            "order": getattr(chapter, "order", 0),
+            "pedagogical_objective": getattr(chapter, "pedagogical_objective", ""),
+            "role_in_progression": getattr(chapter, "role_in_progression", ""),
+            "description": getattr(chapter, "description", ""),
+        },
+        "section": _safe_json_serialize(section),
+        "linked_analyses": linked_analyses,
+        "linked_concepts": linked_concepts,
+        "linked_paras": linked_paras,
+    }
+    raw = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
+
+
+def compute_ast_fingerprint(ast: Any) -> str:
+    """
+    Calcula fingerprint determinístico da AcademicDocumentAST utilizando `source_sha256`
+    e o conteúdo estruturado efetivo (secções, parágrafos com content_sha1/hash, tabelas e referências).
+    """
+    if ast is None:
+        return "AST_ABSENT"
+    paras = []
+    for p in getattr(ast, "paragraphs", []) or []:
+        txt = str(getattr(p, "text", "") or "")
+        paras.append({
+            "id": getattr(p, "paragraph_id", ""),
+            "sid": getattr(p, "section_id", ""),
+            "pg": getattr(p, "page_number", 0),
+            "hash": getattr(p, "content_sha1", "") or hashlib.sha256(txt.encode("utf-8")).hexdigest()[:16],
+        })
+    payload = {
+        "document_id": getattr(ast, "document_id", ""),
+        "schema_version": getattr(ast, "schema_version", ""),
+        "source_sha256": getattr(ast, "source_sha256", ""),
+        "metadata": _safe_json_serialize(getattr(ast, "metadata", None)),
+        "sections": [
+            {"id": getattr(s, "section_id", ""), "title": getattr(s, "title", ""), "p0": getattr(s, "page_start", 0)}
+            for s in (getattr(ast, "sections", []) or [])
         ],
-        "visuals": [v.visual_id for v in plan.visual_plans],
+        "paragraphs": paras,
+        "tables": [
+            {"id": getattr(t, "table_id", ""), "rows": getattr(t, "rows", [])}
+            for t in (getattr(ast, "tables", []) or [])
+        ],
+        "references": [
+            str(getattr(r, "raw", "") or getattr(r, "raw_text", "") or "")
+            for r in (getattr(ast, "references", []) or [])
+        ],
+    }
+    raw = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
+
+
+def compute_plan_fingerprint(plan: EditorialStudyPlan) -> str:
+    """Calcula impressão digital determinística completa do EditorialStudyPlan (incluindo texto e objetivos)."""
+    payload = {
+        "document_id": plan.metadata.document_id,
+        "plan_id": plan.metadata.plan_id,
+        "plan_version": plan.metadata.plan_version,
+        "dossier_id": getattr(plan.metadata, "dossier_id", ""),
+        "dossier_fingerprint": getattr(plan.metadata, "dossier_fingerprint", ""),
+        "source_sha256": getattr(plan.metadata, "source_sha256", ""),
+        "status": plan.metadata.status,
+        "overview": _safe_json_serialize(getattr(plan, "overview", None)),
+        "chapters": _safe_json_serialize(getattr(plan, "chapters", [])),
+        "conceptual_relationships": _safe_json_serialize(getattr(plan, "conceptual_relationships", [])),
+        "visuals": _safe_json_serialize(getattr(plan, "visual_plans", [])),
     }
     raw = json.dumps(payload, sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
@@ -129,7 +288,9 @@ class DevelopedConceptDefinition:
     developed_definition: str
     theoretical_context: str = ""
     relationships_explained: str = ""
-    epistemic_status: str = "SOURCE_FACT"
+    epistemic_status: str = "UNVERIFIED"
+    elaboration_type: str = ElaborationType.PEDAGOGICAL_EXPLANATION.value
+    evidence_ids: List[str] = field(default_factory=list)
     evidence_refs: List[EditorialEvidenceRef] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -143,7 +304,9 @@ class DevelopedConceptDefinition:
             developed_definition=str(data.get("developed_definition", "")),
             theoretical_context=str(data.get("theoretical_context", "")),
             relationships_explained=str(data.get("relationships_explained", "")),
-            epistemic_status=str(data.get("epistemic_status", "SOURCE_FACT")),
+            epistemic_status=normalize_epistemic_status(data.get("epistemic_status"), default="UNVERIFIED"),
+            elaboration_type=str(data.get("elaboration_type") or ElaborationType.PEDAGOGICAL_EXPLANATION.value),
+            evidence_ids=[str(x) for x in (data.get("evidence_ids") or []) if str(x).strip()],
             evidence_refs=[
                 EditorialEvidenceRef.from_dict(r)
                 for r in (data.get("evidence_refs") or [])
@@ -160,7 +323,9 @@ class DevelopedComparisonItem:
     item_b_label: str
     item_b_description: str
     synthesis_note: str = ""
-    epistemic_status: str = "SOURCE_FACT"
+    epistemic_status: str = "UNVERIFIED"
+    elaboration_type: str = ElaborationType.ANALYTICAL_INFERENCE.value
+    evidence_ids: List[str] = field(default_factory=list)
     evidence_refs: List[EditorialEvidenceRef] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -175,7 +340,9 @@ class DevelopedComparisonItem:
             item_b_label=str(data.get("item_b_label", "")),
             item_b_description=str(data.get("item_b_description", "")),
             synthesis_note=str(data.get("synthesis_note", "")),
-            epistemic_status=str(data.get("epistemic_status", "SOURCE_FACT")),
+            epistemic_status=normalize_epistemic_status(data.get("epistemic_status"), default="UNVERIFIED"),
+            elaboration_type=str(data.get("elaboration_type") or ElaborationType.ANALYTICAL_INFERENCE.value),
+            evidence_ids=[str(x) for x in (data.get("evidence_ids") or []) if str(x).strip()],
             evidence_refs=[
                 EditorialEvidenceRef.from_dict(r)
                 for r in (data.get("evidence_refs") or [])
@@ -193,8 +360,11 @@ class DevelopedContentBlock:
     bullet_points: List[str] = field(default_factory=list)
     steps: List[str] = field(default_factory=list)
     is_hypothetical_example: bool = False
-    epistemic_status: str = "SOURCE_FACT"
+    epistemic_status: str = "UNVERIFIED"
+    elaboration_type: str = ElaborationType.PEDAGOGICAL_EXPLANATION.value
+    evidence_ids: List[str] = field(default_factory=list)
     evidence_refs: List[EditorialEvidenceRef] = field(default_factory=list)
+    rejected_reference_ids: List[str] = field(default_factory=list)
     source_table_refs: List[str] = field(default_factory=list)
     source_figure_refs: List[str] = field(default_factory=list)
     source_formula_refs: List[str] = field(default_factory=list)
@@ -212,12 +382,15 @@ class DevelopedContentBlock:
             bullet_points=[str(x) for x in (data.get("bullet_points") or []) if str(x).strip()],
             steps=[str(x) for x in (data.get("steps") or []) if str(x).strip()],
             is_hypothetical_example=bool(data.get("is_hypothetical_example", False)),
-            epistemic_status=str(data.get("epistemic_status", "SOURCE_FACT")),
+            epistemic_status=normalize_epistemic_status(data.get("epistemic_status"), default="UNVERIFIED"),
+            elaboration_type=str(data.get("elaboration_type") or ElaborationType.PEDAGOGICAL_EXPLANATION.value),
+            evidence_ids=[str(x) for x in (data.get("evidence_ids") or []) if str(x).strip()],
             evidence_refs=[
                 EditorialEvidenceRef.from_dict(r)
                 for r in (data.get("evidence_refs") or [])
                 if isinstance(r, dict)
             ],
+            rejected_reference_ids=[str(x) for x in (data.get("rejected_reference_ids") or []) if str(x).strip()],
             source_table_refs=[str(x) for x in (data.get("source_table_refs") or []) if str(x).strip()],
             source_figure_refs=[str(x) for x in (data.get("source_figure_refs") or []) if str(x).strip()],
             source_formula_refs=[str(x) for x in (data.get("source_formula_refs") or []) if str(x).strip()],
@@ -240,7 +413,9 @@ class DevelopedSectionContent:
     comparisons: List[DevelopedComparisonItem] = field(default_factory=list)
     limitations_and_caveats: List[str] = field(default_factory=list)
     section_synthesis: str = ""
-    epistemic_status: str = "SOURCE_FACT"
+    epistemic_status: str = "MODEL_INFERENCE"
+    elaboration_type: str = ElaborationType.PEDAGOGICAL_EXPLANATION.value
+    evidence_ids: List[str] = field(default_factory=list)
     evidence_refs: List[EditorialEvidenceRef] = field(default_factory=list)
     generation_status: str = "COMPLETED"  # COMPLETED, PARTIAL, FALLBACK_GROUNDED
 
@@ -278,7 +453,9 @@ class DevelopedSectionContent:
                 str(x) for x in (data.get("limitations_and_caveats") or []) if str(x).strip()
             ],
             section_synthesis=str(data.get("section_synthesis", "")),
-            epistemic_status=str(data.get("epistemic_status", "SOURCE_FACT")),
+            epistemic_status=normalize_epistemic_status(data.get("epistemic_status"), default="MODEL_INFERENCE"),
+            elaboration_type=str(data.get("elaboration_type") or ElaborationType.PEDAGOGICAL_EXPLANATION.value),
+            evidence_ids=[str(x) for x in (data.get("evidence_ids") or []) if str(x).strip()],
             evidence_refs=[
                 EditorialEvidenceRef.from_dict(r)
                 for r in (data.get("evidence_refs") or [])
@@ -649,9 +826,11 @@ class IRBlock:
     image_path: Optional[str] = None
     image_width_px: int = 0
     image_height_px: int = 0
-    epistemic_status: str = "SOURCE_FACT"
+    epistemic_status: str = "UNVERIFIED"
+    elaboration_type: str = ""
     is_hypothetical_example: bool = False
     provenance_summary: str = ""
+    evidence_ids: List[str] = field(default_factory=list)
     evidence_refs: List[EditorialEvidenceRef] = field(default_factory=list)
     pagination: IRPaginationHint = field(default_factory=IRPaginationHint)
 
@@ -685,9 +864,11 @@ class IRBlock:
             image_path=data.get("image_path"),
             image_width_px=int(data.get("image_width_px", 0)),
             image_height_px=int(data.get("image_height_px", 0)),
-            epistemic_status=str(data.get("epistemic_status", "SOURCE_FACT")),
+            epistemic_status=normalize_epistemic_status(data.get("epistemic_status"), default="UNVERIFIED"),
+            elaboration_type=str(data.get("elaboration_type", "")),
             is_hypothetical_example=bool(data.get("is_hypothetical_example", False)),
             provenance_summary=str(data.get("provenance_summary", "")),
+            evidence_ids=[str(x) for x in (data.get("evidence_ids") or []) if str(x).strip()],
             evidence_refs=[
                 EditorialEvidenceRef.from_dict(r)
                 for r in (data.get("evidence_refs") or [])
@@ -1063,6 +1244,10 @@ class StudyDocumentGenerationResult:
     qa_report: StudyDocumentQAReport
     plan_fingerprint: str = ""
     dossier_fingerprint: str = ""
+    ast_fingerprint: str = ""
+    plan_version: int = 1
+    model_name: str = "qwen3.5:9b"
+    prompt_versions: Dict[str, str] = field(default_factory=dict)
     telemetry: DocumentGenerationTelemetry = field(default_factory=DocumentGenerationTelemetry)
     visual_assets: List[GeneratedVisualAsset] = field(default_factory=list)
     versions_history: List[StudyDocumentVersionRecord] = field(default_factory=list)
@@ -1097,6 +1282,10 @@ class StudyDocumentGenerationResult:
             qa_report=StudyDocumentQAReport.from_dict(data.get("qa_report") or {}),
             plan_fingerprint=str(data.get("plan_fingerprint") or data.get("source_plan_fingerprint") or ""),
             dossier_fingerprint=str(data.get("dossier_fingerprint") or ""),
+            ast_fingerprint=str(data.get("ast_fingerprint") or ""),
+            plan_version=int(data.get("plan_version", 1)),
+            model_name=str(data.get("model_name") or "qwen3.5:9b"),
+            prompt_versions={str(k): str(v) for k, v in (data.get("prompt_versions") or {}).items()},
             telemetry=DocumentGenerationTelemetry.from_dict(data.get("telemetry") or {}),
             visual_assets=[
                 GeneratedVisualAsset.from_dict(v)

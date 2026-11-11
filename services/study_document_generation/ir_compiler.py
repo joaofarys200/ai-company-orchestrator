@@ -19,6 +19,7 @@ from services.study_document_generation.contracts import (
     DevelopedContentBlock,
     DevelopedSectionContent,
     DevelopedStudyDocumentContent,
+    ElaborationType,
     GeneratedVisualAsset,
     IRBibliographyEntry,
     IRBlock,
@@ -30,6 +31,7 @@ from services.study_document_generation.contracts import (
     IRSection,
     IRTOCEntry,
     StudyDocumentIR,
+    normalize_epistemic_status,
 )
 from services.study_document_generation.design_system import DesignStyleProfile
 from services.study_document_generation.provenance_renderer import ReferenceAndProvenanceRenderer
@@ -112,11 +114,11 @@ class DocumentStructureCompiler:
             if isinstance(lo, dict):
                 oid = str(lo.get("objective_id", "")).strip()
                 desc = str(lo.get("description", "")).strip()
-                st = str(lo.get("epistemic_status", "SOURCE_FACT")).strip()
+                st = normalize_epistemic_status(lo.get("epistemic_status"), default="UNVERIFIED")
             else:
                 oid = str(getattr(lo, "objective_id", "")).strip()
                 desc = str(getattr(lo, "description", "")).strip()
-                st = str(getattr(lo, "epistemic_status", "SOURCE_FACT")).strip()
+                st = normalize_epistemic_status(getattr(lo, "epistemic_status", None), default="UNVERIFIED")
             if desc:
                 learning_objs.append(f"{oid}: {desc} [{st}]" if oid else f"{desc} [{st}]")
         if not learning_objs:
@@ -249,7 +251,8 @@ class DocumentStructureCompiler:
                 title="Âmbito & Visão Geral do Documento de Estudo",
                 callout_kind=CalloutBoxKind.CONCEPT_BOX.value,
                 paragraphs=[theme_txt, strat_txt, aud_txt],
-                epistemic_status=plan.overview.central_theme_status or "SOURCE_FACT",
+                epistemic_status=normalize_epistemic_status(plan.overview.central_theme_status, default="MODEL_INFERENCE"),
+                elaboration_type=ElaborationType.EDITORIAL_SYNTHESIS.value,
                 provenance_summary="Visão Editorial & Metadados do Estudo (Fase 4)",
                 pagination=IRPaginationHint(keep_together=True),
             )
@@ -310,7 +313,7 @@ class DocumentStructureCompiler:
             )
         )
 
-        # Introdução e Objetivo Pedagógico do Capítulo
+        # Introdução e Objetivo Pedagógico do Capítulo (elaboração editorial = MODEL_INFERENCE)
         if ch.chapter_introduction:
             intro_blocks.append(
                 IRBlock(
@@ -318,7 +321,14 @@ class DocumentStructureCompiler:
                     kind=IRBlockKind.PARAGRAPH.value,
                     chapter_id=ch.chapter_id,
                     paragraphs=[ch.chapter_introduction],
-                    epistemic_status="SOURCE_FACT",
+                    epistemic_status="MODEL_INFERENCE",
+                    elaboration_type=ElaborationType.PEDAGOGICAL_EXPLANATION.value,
+                    evidence_refs=ch.evidence_refs,
+                    provenance_summary=self.provenance.format_provenance_summary(
+                        "MODEL_INFERENCE",
+                        ch.evidence_refs,
+                        elaboration_type=ElaborationType.PEDAGOGICAL_EXPLANATION.value,
+                    ),
                     pagination=IRPaginationHint(prevent_widow_orphan=True),
                 )
             )
@@ -413,8 +423,10 @@ class DocumentStructureCompiler:
             )
         )
 
-        # Abertura / Enquadramento da Secção
+        # Abertura / Enquadramento da Secção (desenvolvimento pedagógico não herda SOURCE_FACT)
         if sec.opening_contextualization:
+            open_st = normalize_epistemic_status(sec.epistemic_status, default="MODEL_INFERENCE")
+            open_elab = sec.elaboration_type or ElaborationType.PEDAGOGICAL_EXPLANATION.value
             blocks.append(
                 IRBlock(
                     block_id=f"open_{sec.section_id}",
@@ -422,7 +434,13 @@ class DocumentStructureCompiler:
                     chapter_id=ch_id,
                     section_id=sec.section_id,
                     paragraphs=[sec.opening_contextualization],
-                    epistemic_status=sec.epistemic_status or "SOURCE_FACT",
+                    epistemic_status=open_st,
+                    elaboration_type=open_elab,
+                    evidence_ids=list(sec.evidence_ids),
+                    evidence_refs=sec.evidence_refs,
+                    provenance_summary=self.provenance.format_provenance_summary(
+                        open_st, sec.evidence_refs, elaboration_type=open_elab
+                    ),
                     pagination=IRPaginationHint(prevent_widow_orphan=True),
                 )
             )
@@ -435,7 +453,10 @@ class DocumentStructureCompiler:
             if cdef.relationships_explained:
                 c_paras.append(f"Articulação Conceptual: {cdef.relationships_explained}")
 
-            prov_lbl = self.provenance.format_provenance_summary(cdef.epistemic_status, cdef.evidence_refs)
+            c_ep = normalize_epistemic_status(cdef.epistemic_status, default="UNVERIFIED")
+            prov_lbl = self.provenance.format_provenance_summary(
+                c_ep, cdef.evidence_refs, elaboration_type=cdef.elaboration_type
+            )
             blocks.append(
                 IRBlock(
                     block_id=f"cbox_{cdef.concept_id}",
@@ -445,8 +466,10 @@ class DocumentStructureCompiler:
                     title=f"Conceito: {cdef.term}",
                     callout_kind=CalloutBoxKind.CONCEPT_BOX.value,
                     paragraphs=c_paras,
-                    epistemic_status=cdef.epistemic_status,
+                    epistemic_status=c_ep,
+                    elaboration_type=cdef.elaboration_type,
                     provenance_summary=prov_lbl,
+                    evidence_ids=list(cdef.evidence_ids),
                     evidence_refs=cdef.evidence_refs,
                     pagination=IRPaginationHint(keep_together=True),
                 )
@@ -458,15 +481,31 @@ class DocumentStructureCompiler:
 
         # Quadros de Comparação entre Conceitos / Métodos
         if sec.comparisons:
-            comp_headers = ["Dimensão de Análise", "Elemento A", "Elemento B", "Síntese"]
+            comp_headers = ["Dimensão de Análise", "Elemento A", "Elemento B", "Síntese", "Estado"]
             comp_rows: List[List[str]] = []
+            cmp_statuses: List[str] = []
+            cmp_refs = []
             for cmp_item in sec.comparisons:
+                c_st = normalize_epistemic_status(cmp_item.epistemic_status, default="UNVERIFIED")
+                cmp_statuses.append(c_st)
+                cmp_refs.extend(cmp_item.evidence_refs or [])
                 comp_rows.append([
                     cmp_item.dimension,
-                    f"{cmp_item.item_a_label}: {cmp_item.item_a_description[:100]}",
-                    f"{cmp_item.item_b_label}: {cmp_item.item_b_description[:100]}",
-                    cmp_item.synthesis_note[:100] or "Conforme reportado",
+                    f"{cmp_item.item_a_label}: {cmp_item.item_a_description}",
+                    f"{cmp_item.item_b_label}: {cmp_item.item_b_description}",
+                    cmp_item.synthesis_note or "Síntese comparativa",
+                    c_st,
                 ])
+            if all(s == "SOURCE_FACT" for s in cmp_statuses) and cmp_refs:
+                tbl_st = "SOURCE_FACT"
+                tbl_elab = ElaborationType.SOURCE_EXTRACTED.value
+            elif "UNVERIFIED" in cmp_statuses or "NOT_FOUND" in cmp_statuses:
+                tbl_st = "UNVERIFIED"
+                tbl_elab = ElaborationType.UNVERIFIED_CLAIM.value
+            else:
+                tbl_st = "MODEL_INFERENCE"
+                tbl_elab = ElaborationType.ANALYTICAL_INFERENCE.value
+
             blocks.append(
                 IRBlock(
                     block_id=f"tbl_cmp_{sec.section_id}",
@@ -474,10 +513,15 @@ class DocumentStructureCompiler:
                     chapter_id=ch_id,
                     section_id=sec.section_id,
                     title=f"Quadro Comparativo: {sec.title}",
-                    caption="Comparação sistemática baseada nos parâmetros da fonte original.",
+                    caption="Comparação sistemática com preservação do estado epistémico por dimensão.",
                     table_headers=comp_headers,
                     table_rows=comp_rows,
-                    epistemic_status="SOURCE_FACT",
+                    epistemic_status=tbl_st,
+                    elaboration_type=tbl_elab,
+                    evidence_refs=cmp_refs[:6],
+                    provenance_summary=self.provenance.format_provenance_summary(
+                        tbl_st, cmp_refs, elaboration_type=tbl_elab
+                    ),
                     pagination=IRPaginationHint(keep_together=False),
                 )
             )
@@ -488,6 +532,7 @@ class DocumentStructureCompiler:
 
         # Limitações e Fronteiras de Validade
         if sec.limitations_and_caveats:
+            lim_st = "SOURCE_FACT" if sec.evidence_refs and any(r.status == "SOURCE_FACT" for r in sec.evidence_refs) else "MODEL_INFERENCE"
             blocks.append(
                 IRBlock(
                     block_id=f"lim_box_{sec.section_id}",
@@ -497,7 +542,12 @@ class DocumentStructureCompiler:
                     title="Limitações & Fronteiras de Validade da Secção",
                     callout_kind=CalloutBoxKind.LIMITATION_BOX.value,
                     items=sec.limitations_and_caveats,
-                    epistemic_status="SOURCE_FACT",
+                    epistemic_status=lim_st,
+                    elaboration_type=ElaborationType.SOURCE_EXTRACTED.value if lim_st == "SOURCE_FACT" else ElaborationType.ANALYTICAL_INFERENCE.value,
+                    evidence_refs=sec.evidence_refs[:4],
+                    provenance_summary=self.provenance.format_provenance_summary(
+                        lim_st, sec.evidence_refs[:4]
+                    ),
                     pagination=IRPaginationHint(keep_together=True),
                 )
             )
@@ -512,6 +562,10 @@ class DocumentStructureCompiler:
                     section_id=sec.section_id,
                     paragraphs=[f"Síntese: {sec.section_synthesis}"],
                     epistemic_status="MODEL_INFERENCE",
+                    elaboration_type=ElaborationType.EDITORIAL_SYNTHESIS.value,
+                    provenance_summary=self.provenance.format_provenance_summary(
+                        "MODEL_INFERENCE", sec.evidence_refs[:2], elaboration_type=ElaborationType.EDITORIAL_SYNTHESIS.value
+                    ),
                     pagination=IRPaginationHint(prevent_widow_orphan=True),
                 )
             )
@@ -537,12 +591,17 @@ class DocumentStructureCompiler:
         sec_id: str,
     ) -> List[IRBlock]:
         blocks: List[IRBlock] = []
+        ep_status = normalize_epistemic_status(b.epistemic_status, default="UNVERIFIED")
+        elab_type = b.elaboration_type or ""
+        rej_cnt = len(getattr(b, "rejected_reference_ids", []) or [])
         prov_lbl = self.provenance.format_provenance_summary(
-            b.epistemic_status,
+            ep_status,
             b.evidence_refs,
             is_hypothetical_example=b.is_hypothetical_example,
+            elaboration_type=elab_type,
             source_table_refs=b.source_table_refs,
             source_figure_refs=b.source_figure_refs,
+            rejected_refs_count=rej_cnt,
         )
 
         # Se for Exemplo Hipotético -> Caixa semântica HYPOTHETICAL_EXAMPLE_BOX
@@ -558,8 +617,10 @@ class DocumentStructureCompiler:
                     paragraphs=b.body_paragraphs,
                     items=b.bullet_points or b.steps,
                     epistemic_status="MODEL_INFERENCE",
+                    elaboration_type=ElaborationType.HYPOTHETICAL_EXAMPLE.value,
                     is_hypothetical_example=True,
                     provenance_summary=prov_lbl,
+                    evidence_ids=list(b.evidence_ids),
                     evidence_refs=b.evidence_refs,
                     pagination=IRPaginationHint(keep_together=True),
                 )
@@ -585,8 +646,10 @@ class DocumentStructureCompiler:
                     callout_kind=callout_k,
                     paragraphs=b.body_paragraphs,
                     items=b.bullet_points or b.steps,
-                    epistemic_status=b.epistemic_status,
+                    epistemic_status=ep_status,
+                    elaboration_type=elab_type,
                     provenance_summary=prov_lbl,
+                    evidence_ids=list(b.evidence_ids),
                     evidence_refs=b.evidence_refs,
                     pagination=IRPaginationHint(keep_together=True),
                 )
@@ -605,8 +668,10 @@ class DocumentStructureCompiler:
                     callout_kind=CalloutBoxKind.MECHANISM_BOX.value,
                     paragraphs=b.body_paragraphs,
                     items=[f"Passo {idx}: {st}" for idx, st in enumerate(b.steps, start=1)],
-                    epistemic_status=b.epistemic_status,
+                    epistemic_status=ep_status,
+                    elaboration_type=elab_type,
                     provenance_summary=prov_lbl,
+                    evidence_ids=list(b.evidence_ids),
                     evidence_refs=b.evidence_refs,
                     pagination=IRPaginationHint(keep_together=True),
                 )
@@ -623,6 +688,7 @@ class DocumentStructureCompiler:
                     section_id=sec_id,
                     level=3,
                     title=b.title,
+                    epistemic_status=ep_status,
                     pagination=IRPaginationHint(
                         keep_with_next=True,
                         min_follow_height_pt=self.profile.geometry.min_heading_follow_pt,
@@ -638,8 +704,10 @@ class DocumentStructureCompiler:
                     chapter_id=ch_id,
                     section_id=sec_id,
                     paragraphs=b.body_paragraphs,
-                    epistemic_status=b.epistemic_status,
-                    provenance_summary=prov_lbl,
+                    epistemic_status=ep_status,
+                    elaboration_type=elab_type,
+                    provenance_summary="" if b.bullet_points else prov_lbl,
+                    evidence_ids=list(b.evidence_ids),
                     evidence_refs=b.evidence_refs,
                     pagination=IRPaginationHint(prevent_widow_orphan=True),
                 )
@@ -653,7 +721,11 @@ class DocumentStructureCompiler:
                     chapter_id=ch_id,
                     section_id=sec_id,
                     items=b.bullet_points,
-                    epistemic_status=b.epistemic_status,
+                    epistemic_status=ep_status,
+                    elaboration_type=elab_type,
+                    provenance_summary=prov_lbl,
+                    evidence_ids=list(b.evidence_ids),
+                    evidence_refs=b.evidence_refs,
                     pagination=IRPaginationHint(prevent_widow_orphan=True),
                 )
             )
@@ -666,6 +738,7 @@ class DocumentStructureCompiler:
         ch_id: str,
         sec_id: str,
     ) -> IRBlock:
+        va_ep = normalize_epistemic_status(va.epistemic_status, default="UNVERIFIED")
         if va.render_status == "RENDERED_AS_TABLE" and va.table_headers and va.table_rows:
             return IRBlock(
                 block_id=f"vis_tbl_{va.visual_id}",
@@ -677,7 +750,7 @@ class DocumentStructureCompiler:
                 table_headers=va.table_headers,
                 table_rows=va.table_rows,
                 visual_id=va.visual_id,
-                epistemic_status=va.epistemic_status,
+                epistemic_status=va_ep,
                 provenance_summary=va.provenance_label,
                 evidence_refs=va.evidence_refs,
                 pagination=IRPaginationHint(keep_together=False),
@@ -695,7 +768,7 @@ class DocumentStructureCompiler:
                 image_path=va.image_path,
                 image_width_px=va.width_px,
                 image_height_px=va.height_px,
-                epistemic_status=va.epistemic_status,
+                epistemic_status=va_ep,
                 provenance_summary=va.provenance_label,
                 evidence_refs=va.evidence_refs,
                 pagination=IRPaginationHint(keep_together=True),
@@ -712,7 +785,9 @@ class DocumentStructureCompiler:
             paragraphs=[
                 f"Justificação de rigor: {va.omission_or_fallback_reason or 'Dados insuficientes para renderização.'}"
             ],
-            epistemic_status=va.epistemic_status,
+            epistemic_status="MODEL_INFERENCE",
+            elaboration_type=ElaborationType.EDITORIAL_SYNTHESIS.value,
+            provenance_summary=va.provenance_label,
             pagination=IRPaginationHint(keep_together=True),
         )
 

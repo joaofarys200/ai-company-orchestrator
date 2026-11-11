@@ -23,6 +23,7 @@ from services.study_document_generation.contracts import (
     VisualEdge,
     VisualNode,
     VisualRenderStatus,
+    normalize_epistemic_status,
 )
 from services.study_document_generation.design_system import (
     ACADEMIC_EDITORIAL_CLASSIC,
@@ -86,9 +87,10 @@ class VisualGenerationEngine:
         provenance: ReferenceAndProvenanceRenderer,
     ) -> GeneratedVisualAsset:
         v_type = vp.visual_type.upper().strip()
-        sec_refs = provenance.sanitize_evidence_refs(vp.evidence_refs)
+        vp_ep = normalize_epistemic_status(getattr(vp, "epistemic_status", None), default="UNVERIFIED")
+        sec_refs = provenance.sanitize_evidence_refs(vp.evidence_refs, allow_section_fallback=False, default_status=vp_ep)
         prov_label = provenance.format_provenance_summary(
-            vp.epistemic_status or "SOURCE_FACT",
+            vp_ep,
             sec_refs,
             source_table_refs=vp.source_table_ids,
             source_figure_refs=vp.source_figure_ids,
@@ -143,7 +145,7 @@ class VisualGenerationEngine:
                         height_px=img.height,
                         table_headers=table_headers,
                         table_rows=table_rows,
-                        epistemic_status=vp.epistemic_status or "SOURCE_FACT",
+                        epistemic_status=vp_ep,
                         provenance_label=prov_label,
                         evidence_refs=sec_refs,
                         omission_or_fallback_reason=(
@@ -162,7 +164,7 @@ class VisualGenerationEngine:
                         pedagogical_objective=vp.pedagogical_objective,
                         render_status=VisualRenderStatus.OMITTED_INSUFFICIENT_DATA.value,
                         image_path=None,
-                        epistemic_status=vp.epistemic_status or "SOURCE_FACT",
+                        epistemic_status=vp_ep,
                         provenance_label=prov_label,
                         evidence_refs=sec_refs,
                         omission_or_fallback_reason=(
@@ -313,15 +315,16 @@ class VisualGenerationEngine:
                     if clean_headers and clean_rows:
                         return clean_headers, clean_rows
 
-        headers = ["Elemento / Aspeto", "Descrição na Fonte", "Classificação Epistémica"]
+        vp_ep = normalize_epistemic_status(getattr(vp, "epistemic_status", None), default="UNVERIFIED")
+        headers = ["Elemento / Aspeto", "Descrição Editorial", "Classificação Epistémica"]
         rows: List[List[str]] = []
         for req in vp.required_concepts_or_data[:5]:
-            rows.append([req[:30], f"Propriedade documentada para {req[:30]}", "SOURCE_FACT"])
+            rows.append([req[:30], f"Aspeto estruturado: {req[:30]}", vp_ep])
         for info in vp.information_to_represent[:3]:
-            rows.append([info[:30], "Evidência verificada", vp.epistemic_status or "SOURCE_FACT"])
+            rows.append([info[:30], "Conteúdo representado", vp_ep])
 
         if not rows:
-            rows.append(["Âmbito Analítico", vp.pedagogical_objective[:60], "SOURCE_FACT"])
+            rows.append(["Âmbito Analítico", vp.pedagogical_objective[:60], "MODEL_INFERENCE"])
 
         return headers, rows
 
@@ -339,6 +342,7 @@ class VisualGenerationEngine:
         plan: EditorialStudyPlan,
         dossier: AcademicReasoningDossier,
     ) -> Tuple[List[VisualNode], List[VisualEdge]]:
+        vp_ep = normalize_epistemic_status(getattr(vp, "epistemic_status", None), default="UNVERIFIED")
         nodes: List[VisualNode] = []
         edges: List[VisualEdge] = []
         node_map: Dict[str, VisualNode] = {}
@@ -355,24 +359,25 @@ class VisualGenerationEngine:
         for rel in relevant_rels[:6]:
             s_id = rel.source_concept_id or f"c_{len(node_map)+1}"
             t_id = rel.target_concept_id or f"c_{len(node_map)+2}"
+            rel_ep = normalize_epistemic_status(getattr(rel, "epistemic_status", None), default="UNVERIFIED")
             if s_id not in node_map:
                 node_map[s_id] = VisualNode(
                     node_id=s_id,
                     label=rel.source_concept_name or s_id,
-                    epistemic_status=rel.epistemic_status or "SOURCE_FACT",
+                    epistemic_status=rel_ep,
                 )
             if t_id not in node_map:
                 node_map[t_id] = VisualNode(
                     node_id=t_id,
                     label=rel.target_concept_name or t_id,
-                    epistemic_status=rel.epistemic_status or "SOURCE_FACT",
+                    epistemic_status=rel_ep,
                 )
             edges.append(
                 VisualEdge(
                     source_id=s_id,
                     target_id=t_id,
                     label=rel.relation_type,
-                    epistemic_status=rel.epistemic_status or "SOURCE_FACT",
+                    epistemic_status=rel_ep,
                     is_directed=True,
                 )
             )
@@ -384,7 +389,7 @@ class VisualGenerationEngine:
                 node_map[req_id] = VisualNode(
                     node_id=req_id,
                     label=req,
-                    epistemic_status=vp.epistemic_status or "SOURCE_FACT",
+                    epistemic_status=vp_ep,
                 )
                 if len(node_map) >= 2:
                     first_id = next(iter(node_map))
@@ -394,17 +399,17 @@ class VisualGenerationEngine:
                                 source_id=first_id,
                                 target_id=req_id,
                                 label="relaciona-se",
-                                epistemic_status=vp.epistemic_status or "SOURCE_FACT",
+                                epistemic_status="MODEL_INFERENCE",
                             )
                         )
 
         if not node_map:
-            # Fallback seguro com nós nucleares da secção
-            n1 = VisualNode("core_1", vp.title[:30], epistemic_status="SOURCE_FACT")
+            # Fallback seguro sem forçar SOURCE_FACT quando não há dados extraídos
+            n1 = VisualNode("core_1", vp.title[:30], epistemic_status=vp_ep)
             n2 = VisualNode("core_2", vp.pedagogical_objective[:30], epistemic_status="MODEL_INFERENCE")
             node_map["core_1"] = n1
             node_map["core_2"] = n2
-            edges.append(VisualEdge("core_1", "core_2", "fundamenta", epistemic_status="SOURCE_FACT"))
+            edges.append(VisualEdge("core_1", "core_2", "articula", epistemic_status="MODEL_INFERENCE"))
 
         nodes = list(node_map.values())[:8]
         return nodes, edges[:10]

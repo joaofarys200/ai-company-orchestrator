@@ -144,6 +144,23 @@ class DesignStyleProfile:
             return self.callout_themes[key]
         return self.callout_themes[CalloutBoxKind.CONCEPT_BOX.value]
 
+    def get_epistemic_style(
+        self,
+        epistemic_status: Optional[str],
+        is_hypothetical_example: bool = False,
+    ) -> Tuple[str, str, str]:
+        """Devolve (etiqueta_pt, accent_hex, bg_hex) rigorosamente fiel à classificação epistémica."""
+        if is_hypothetical_example:
+            return ("EXEMPLO HIPOTÉTICO (MODEL_INFERENCE)", self.hypothetical_accent_hex, self.hypothetical_bg_hex)
+        st = str(epistemic_status or "UNVERIFIED").upper().strip()
+        if st == "SOURCE_FACT":
+            return ("FACTO DA FONTE [SOURCE_FACT]", self.fact_accent_hex, self.fact_bg_hex)
+        if st == "MODEL_INFERENCE":
+            return ("INFERÊNCIA / PEDAGÓGICO [MODEL_INFERENCE]", self.inference_accent_hex, self.inference_bg_hex)
+        if st == "NOT_FOUND":
+            return ("AUSENTE NA FONTE [NOT_FOUND]", self.limitation_accent_hex, self.limitation_bg_hex)
+        return ("NÃO VERIFICADO [UNVERIFIED]", self.limitation_accent_hex, "#F8FAFC")
+
     def resolve_font_path(self, variant: str = "regular") -> Optional[str]:
         """Resolve caminho para fonte TrueType instalada no sistema Windows, se disponível."""
         candidates = {
@@ -213,11 +230,19 @@ def _build_default_callout_themes(
         ),
         CalloutBoxKind.SYNTHESIS_BOX.value: CalloutBoxTheme(
             kind=CalloutBoxKind.SYNTHESIS_BOX.value,
-            badge_label="SÍNTESE PEDAGÓGICA & CONSOLIDAÇÃO",
-            border_hex=fact_hex,
-            background_hex=fact_bg,
-            title_hex=fact_hex,
-            text_hex="#064E3B",
+            badge_label="SÍNTESE PEDAGÓGICA & CONSOLIDAÇÃO (MODEL_INFERENCE)",
+            border_hex=inference_hex,
+            background_hex=inference_bg,
+            title_hex=inference_hex,
+            text_hex="#292524",
+        ),
+        CalloutBoxKind.METHODOLOGY_NOTE_BOX.value: CalloutBoxTheme(
+            kind=CalloutBoxKind.METHODOLOGY_NOTE_BOX.value,
+            badge_label="NOTA METODOLÓGICA & DESENHO EXPERIMENTAL",
+            border_hex=secondary_hex,
+            background_hex="#F1F5F9",
+            title_hex=secondary_hex,
+            text_hex="#1E293B",
         ),
     }
 
@@ -233,19 +258,22 @@ ACADEMIC_EDITORIAL_CLASSIC = DesignStyleProfile(
     docx_font_headings="Calibri",
     docx_font_mono="Consolas",
     ttf_regular_candidates=(
-        "C:/Windows/Fonts/segoeui.ttf",
-        "C:/Windows/Fonts/calibri.ttf",
+        "C:/Windows/Fonts/trebuc.ttf",
         "C:/Windows/Fonts/arial.ttf",
+        "C:/Windows/Fonts/calibri.ttf",
+        "C:/Windows/Fonts/segoeui.ttf",
     ),
     ttf_bold_candidates=(
-        "C:/Windows/Fonts/segoeuib.ttf",
-        "C:/Windows/Fonts/calibrib.ttf",
+        "C:/Windows/Fonts/trebucbd.ttf",
         "C:/Windows/Fonts/arialbd.ttf",
+        "C:/Windows/Fonts/calibrib.ttf",
+        "C:/Windows/Fonts/segoeuib.ttf",
     ),
     ttf_italic_candidates=(
-        "C:/Windows/Fonts/segoeuii.ttf",
-        "C:/Windows/Fonts/calibrii.ttf",
+        "C:/Windows/Fonts/trebucit.ttf",
         "C:/Windows/Fonts/ariali.ttf",
+        "C:/Windows/Fonts/calibrii.ttf",
+        "C:/Windows/Fonts/segoeuii.ttf",
     ),
     ttf_mono_candidates=(
         "C:/Windows/Fonts/consola.ttf",
@@ -293,16 +321,22 @@ TECHNICAL_SCIENTIFIC_MODERN = DesignStyleProfile(
     docx_font_headings="Segoe UI",
     docx_font_mono="Consolas",
     ttf_regular_candidates=(
-        "C:/Windows/Fonts/segoeui.ttf",
+        "C:/Windows/Fonts/trebuc.ttf",
+        "C:/Windows/Fonts/arial.ttf",
         "C:/Windows/Fonts/calibri.ttf",
+        "C:/Windows/Fonts/segoeui.ttf",
     ),
     ttf_bold_candidates=(
-        "C:/Windows/Fonts/segoeuib.ttf",
+        "C:/Windows/Fonts/trebucbd.ttf",
+        "C:/Windows/Fonts/arialbd.ttf",
         "C:/Windows/Fonts/calibrib.ttf",
+        "C:/Windows/Fonts/segoeuib.ttf",
     ),
     ttf_italic_candidates=(
-        "C:/Windows/Fonts/segoeuii.ttf",
+        "C:/Windows/Fonts/trebucit.ttf",
+        "C:/Windows/Fonts/ariali.ttf",
         "C:/Windows/Fonts/calibrii.ttf",
+        "C:/Windows/Fonts/segoeuii.ttf",
     ),
     ttf_mono_candidates=(
         "C:/Windows/Fonts/consola.ttf",
