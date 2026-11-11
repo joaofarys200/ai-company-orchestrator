@@ -75,6 +75,35 @@ STUDY_HANDLERS = {
     "study_update_video_progress": "update_video_progress",
     "study_ingest_video_url": "ingest_video_url",
     "study_cancel_generation": "cancel_generation",
+    # Phase 6 — Study Modes, Active Recall & Adaptive Learning
+    "study_mode_get_readiness": "phase6_get_readiness",
+    "study_mode_get_flashcards": "phase6_get_flashcards",
+    "study_mode_generate_flashcards": "phase6_generate_flashcards",
+    "study_mode_edit_flashcard": "phase6_edit_flashcard",
+    "study_mode_delete_flashcard": "phase6_delete_flashcard",
+    "study_mode_create_flashcard": "phase6_create_flashcard",
+    "study_mode_regenerate_flashcard": "phase6_regenerate_flashcard",
+    "study_mode_review_flashcard": "phase6_review_flashcard",
+    "study_mode_get_cornell": "phase6_get_cornell",
+    "study_mode_generate_cornell": "phase6_generate_cornell",
+    "study_mode_edit_cornell_entry": "phase6_edit_cornell_entry",
+    "study_mode_add_cornell_note": "phase6_add_cornell_note",
+    "study_mode_export_cornell_vault": "phase6_export_cornell_vault",
+    "study_mode_get_assessments": "phase6_get_assessments",
+    "study_mode_generate_assessment": "phase6_generate_assessment",
+    "study_mode_check_question": "phase6_check_question",
+    "study_mode_submit_assessment": "phase6_submit_assessment",
+    "study_mode_get_active_recall": "phase6_get_active_recall",
+    "study_mode_generate_active_recall": "phase6_generate_active_recall",
+    "study_mode_submit_active_recall": "phase6_submit_active_recall",
+    "study_mode_get_daily_queue": "phase6_get_daily_queue",
+    "study_mode_get_progress": "phase6_get_progress",
+    "study_mode_start_session": "phase6_start_session",
+    "study_mode_update_session": "phase6_update_session",
+    "study_mode_pause_session": "phase6_pause_session",
+    "study_mode_resume_session": "phase6_resume_session",
+    "study_mode_complete_session": "phase6_complete_session",
+    "study_mode_list_sessions": "phase6_list_sessions",
 }
 
 
@@ -966,7 +995,7 @@ class StudyWebSocketHandler:
         _session: WebSocketSessionState,
     ) -> None:
         card_id = message.get("card_id", "")
-        action = message.get("action", "Good")  # Again, Hard, Good, Easy
+        action = message.get("rating") or message.get("action") or "Good"  # Again, Hard, Good, Easy
 
         try:
             fc = await asyncio.to_thread(
@@ -977,6 +1006,7 @@ class StudyWebSocketHandler:
             await self.connections.send(websocket, {
                 "type": "study_flashcard_reviewed",
                 "flashcard": asdict(fc),
+                "request_id": message.get("request_id"),
             })
         except Exception as e:
             await self.connections.send(websocket, {
@@ -1559,3 +1589,382 @@ class StudyWebSocketHandler:
                 "error": str(e),
                 "request_id": message.get("request_id"),
             })
+
+    # ------------------------------------------------------------------
+    # Phase 6 — Study Modes, Active Recall & Adaptive Learning Handlers
+    # ------------------------------------------------------------------
+
+    async def _dispatch_phase6(
+        self,
+        websocket: Any,
+        message: dict,
+        result_type: str,
+        fn: Any,
+        *,
+        extra_fields: Optional[Dict[str, Any]] = None,
+        with_progress: bool = False,
+    ) -> None:
+        req_id = message.get("request_id")
+        doc_id = str(message.get("document_id") or "")
+        loop = asyncio.get_running_loop()
+
+        def on_prog(stage: str, pct: float, msg_txt: str) -> None:
+            if not with_progress:
+                return
+            try:
+                asyncio.run_coroutine_threadsafe(
+                    self.connections.send(websocket, {
+                        "type": "study_mode_progress_event",
+                        "document_id": doc_id,
+                        "stage": stage,
+                        "progress": pct,
+                        "message": msg_txt,
+                        "request_id": req_id,
+                    }),
+                    loop,
+                )
+            except Exception:
+                pass
+
+        try:
+            res = await asyncio.to_thread(fn, on_prog) if with_progress else await asyncio.to_thread(fn)
+            payload: Dict[str, Any] = {
+                "type": result_type,
+                "document_id": doc_id,
+                "request_id": req_id,
+            }
+            if isinstance(res, dict):
+                payload.update(res)
+            else:
+                payload["data"] = res
+            if extra_fields:
+                payload.update(extra_fields)
+            await self.connections.send(websocket, payload)
+        except Exception as exc:
+            await self.connections.send(websocket, {
+                "type": "study_error",
+                "document_id": doc_id,
+                "message": str(exc),
+                "request_id": req_id,
+            })
+
+    async def phase6_get_readiness(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_readiness_result",
+            lambda: {"readiness": self.study_service.get_study_mode_readiness(doc_id)},
+        )
+
+    async def phase6_get_flashcards(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_flashcards_result",
+            lambda: self.study_service.get_adaptive_flashcards(doc_id),
+        )
+
+    async def phase6_generate_flashcards(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        force = bool(msg.get("force_regenerate", False))
+        target = int(msg.get("target_cards", 16))
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_flashcards_result",
+            lambda on_p: self.study_service.generate_adaptive_flashcards(
+                doc_id, force_regenerate=force, target_cards=target, on_progress=on_p
+            ),
+            with_progress=True,
+        )
+
+    async def phase6_edit_flashcard(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        card_id = str(msg.get("card_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_flashcard_saved",
+            lambda: {
+                "flashcard": self.study_service.edit_adaptive_flashcard(
+                    doc_id,
+                    card_id,
+                    front=msg.get("front"),
+                    back=msg.get("back"),
+                    topic=msg.get("topic"),
+                    question_difficulty=msg.get("question_difficulty"),
+                )
+            },
+        )
+
+    async def phase6_delete_flashcard(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        card_id = str(msg.get("card_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_flashcard_deleted",
+            lambda: {"card_id": card_id, "deleted": self.study_service.delete_adaptive_flashcard(doc_id, card_id)},
+        )
+
+    async def phase6_create_flashcard(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_flashcard_saved",
+            lambda: {
+                "flashcard": self.study_service.create_adaptive_flashcard(
+                    doc_id,
+                    front=str(msg.get("front") or ""),
+                    back=str(msg.get("back") or ""),
+                    chapter_id=str(msg.get("chapter_id") or ""),
+                    section_id=str(msg.get("section_id") or ""),
+                    topic=str(msg.get("topic") or ""),
+                    question_difficulty=str(msg.get("question_difficulty") or "MEDIUM"),
+                    card_type=str(msg.get("card_type") or "CONCEPTUAL_UNDERSTANDING"),
+                )
+            },
+        )
+
+    async def phase6_regenerate_flashcard(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        card_id = str(msg.get("card_id") or "")
+        overwrite = bool(msg.get("allow_overwrite_edited", False))
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_flashcard_saved",
+            lambda: {
+                "flashcard": self.study_service.regenerate_adaptive_flashcard(
+                    doc_id, card_id, allow_overwrite_edited=overwrite
+                )
+            },
+        )
+
+    async def phase6_review_flashcard(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        card_id = str(msg.get("card_id") or "")
+        rating = str(msg.get("rating") or "Good")
+        confidence = int(msg.get("confidence", 3))
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_flashcard_reviewed",
+            lambda: self.study_service.review_adaptive_flashcard(doc_id, card_id, rating, confidence=confidence),
+        )
+
+    async def phase6_get_cornell(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_cornell_result",
+            lambda: {
+                "cornell": self.study_service.get_phase6_cornell(doc_id),
+                "readiness": self.study_service.get_study_mode_readiness(doc_id),
+            },
+        )
+
+    async def phase6_generate_cornell(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        force = bool(msg.get("force_regenerate", False))
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_cornell_result",
+            lambda on_p: {
+                "cornell": self.study_service.generate_phase6_cornell(
+                    doc_id, force_regenerate=force, on_progress=on_p
+                ),
+                "readiness": self.study_service.get_study_mode_readiness(doc_id),
+            },
+            with_progress=True,
+        )
+
+    async def phase6_edit_cornell_entry(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        sec_id = str(msg.get("section_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_cornell_entry_saved",
+            lambda: {
+                "entry": self.study_service.edit_phase6_cornell_entry(
+                    doc_id,
+                    sec_id,
+                    summary_section=msg.get("summary_section"),
+                    explanations=msg.get("explanations"),
+                    supporting_details=msg.get("supporting_details"),
+                    cue_column=msg.get("cue_column"),
+                    is_important=msg.get("is_important"),
+                )
+            },
+        )
+
+    async def phase6_add_cornell_note(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        sec_id = str(msg.get("section_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_cornell_note_saved",
+            lambda: {
+                "section_id": sec_id,
+                "personal_note": self.study_service.add_phase6_cornell_personal_note(
+                    doc_id,
+                    sec_id,
+                    str(msg.get("content") or ""),
+                    is_important=bool(msg.get("is_important", False)),
+                ),
+            },
+        )
+
+    async def phase6_export_cornell_vault(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_cornell_exported",
+            lambda: self.study_service.export_phase6_cornell_to_vault(doc_id),
+        )
+
+    async def phase6_get_assessments(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_assessments_result",
+            lambda: self.study_service.get_phase6_assessments(doc_id),
+        )
+
+    async def phase6_generate_assessment(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        cfg = msg.get("config") or {}
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_assessment_generated",
+            lambda on_p: {"assessment": self.study_service.generate_phase6_assessment(doc_id, cfg, on_progress=on_p)},
+            with_progress=True,
+        )
+
+    async def phase6_check_question(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_question_checked",
+            lambda: {
+                "outcome": self.study_service.check_phase6_question(
+                    doc_id,
+                    str(msg.get("assessment_id") or ""),
+                    str(msg.get("question_id") or ""),
+                    msg.get("answer"),
+                    use_llm_for_open=bool(msg.get("use_llm_for_open", False)),
+                )
+            },
+        )
+
+    async def phase6_submit_assessment(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_assessment_submitted",
+            lambda: self.study_service.submit_phase6_assessment(
+                doc_id,
+                str(msg.get("assessment_id") or ""),
+                dict(msg.get("answers") or {}),
+                use_llm_for_open=bool(msg.get("use_llm_for_open", False)),
+            ),
+        )
+
+    async def phase6_get_active_recall(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_active_recall_result",
+            lambda: self.study_service.get_active_recall_prompts(doc_id),
+        )
+
+    async def phase6_generate_active_recall(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        force = bool(msg.get("force_regenerate", False))
+        target = int(msg.get("target_prompts", 8))
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_active_recall_result",
+            lambda on_p: self.study_service.generate_active_recall(
+                doc_id, force_regenerate=force, target_prompts=target, on_progress=on_p
+            ),
+            with_progress=True,
+        )
+
+    async def phase6_submit_active_recall(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_active_recall_submitted",
+            lambda: self.study_service.submit_active_recall_attempt(
+                doc_id,
+                str(msg.get("prompt_id") or ""),
+                student_response=str(msg.get("student_response") or ""),
+                self_confidence=int(msg.get("self_confidence", 3)),
+                outline_used=bool(msg.get("outline_used", False)),
+                use_llm=bool(msg.get("use_llm", False)),
+            ),
+        )
+
+    async def phase6_get_daily_queue(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_daily_queue_result",
+            lambda: {
+                "queue": self.study_service.get_daily_review_queue(
+                    doc_id,
+                    daily_new_limit=int(msg.get("daily_new_limit", 10)),
+                    daily_review_limit=int(msg.get("daily_review_limit", 30)),
+                )
+            },
+        )
+
+    async def phase6_get_progress(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_progress_result",
+            lambda: {
+                "progress": self.study_service.get_learning_progress(
+                    doc_id, recompute=bool(msg.get("recompute", True))
+                )
+            },
+        )
+
+    async def phase6_start_session(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = str(msg.get("document_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_session_updated",
+            lambda: {
+                "session": self.study_service.start_study_session(
+                    document_id=doc_id,
+                    mode=str(msg.get("mode") or "FLASHCARD_REVIEW"),
+                    title=str(msg.get("title") or ""),
+                    item_ids=msg.get("item_ids") or [],
+                    config=msg.get("config") or {},
+                )
+            },
+        )
+
+    async def phase6_update_session(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        sid = str(msg.get("session_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_session_updated",
+            lambda: {
+                "session": self.study_service.record_study_session_step(
+                    sid,
+                    item_id=msg.get("item_id"),
+                    partial_response=msg.get("partial_response"),
+                    outcome=msg.get("outcome"),
+                    next_index=msg.get("next_index"),
+                    mark_completed=bool(msg.get("mark_completed", False)),
+                )
+            },
+        )
+
+    async def phase6_pause_session(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        sid = str(msg.get("session_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_session_updated",
+            lambda: {"session": self.study_service.pause_study_session(sid)},
+        )
+
+    async def phase6_resume_session(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        sid = str(msg.get("session_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_session_updated",
+            lambda: {"session": self.study_service.resume_study_session(sid)},
+        )
+
+    async def phase6_complete_session(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        sid = str(msg.get("session_id") or "")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_session_updated",
+            lambda: {
+                "session": self.study_service.complete_study_session(
+                    sid, summary_stats=msg.get("summary_stats")
+                )
+            },
+        )
+
+    async def phase6_list_sessions(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        doc_id = msg.get("document_id")
+        status = msg.get("status")
+        await self._dispatch_phase6(
+            ws, msg, "study_mode_sessions_list",
+            lambda: {"sessions": self.study_service.list_study_sessions(document_id=doc_id, status=status)},
+        )

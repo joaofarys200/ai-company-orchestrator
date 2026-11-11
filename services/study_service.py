@@ -55,6 +55,10 @@ from services.document_generation_engine import (
     StudyDocumentGenerationResult,
     compute_plan_fingerprint,
 )
+from services.study_modes_engine import (
+    AssessmentConfig,
+    StudyModesEngine,
+)
 from services.video_intelligence_service import (
     VideoIntelligenceService,
     check_video_capabilities,
@@ -419,6 +423,7 @@ class StudyService:
 
         self.synthesizer = CornellNoteSynthesizer(vault_root=str(self.vault_root))
         self.linker = VaultLinker(vault_root=str(self.vault_root))
+        self.study_modes = StudyModesEngine(storage_dir=self.storage_dir)
         self.video_service = VideoIntelligenceService(
             workspace_root=str(self.workspace_root),
             storage_dir=str(self.storage_dir),
@@ -729,28 +734,28 @@ class StudyService:
         """Alias para persistir documentos no armazenamento."""
         self._save_documents()
 
+    def _atomic_write_json(self, path: Path, payload: Any) -> None:
+        tmp_path = path.with_suffix(".tmp")
+        tmp_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        os.replace(tmp_path, path)
+
     def _save_notes(self) -> None:
-        serialized = [asdict(n) for n in self.notes]
-        self.notes_file.write_text(json.dumps(serialized, indent=2, ensure_ascii=False), encoding="utf-8")
+        self._atomic_write_json(self.notes_file, [asdict(n) for n in self.notes])
 
     def _save_highlights(self) -> None:
-        serialized = [asdict(h) for h in self.highlights]
-        self.highlights_file.write_text(json.dumps(serialized, indent=2, ensure_ascii=False), encoding="utf-8")
+        self._atomic_write_json(self.highlights_file, [asdict(h) for h in self.highlights])
 
     def _save_quizzes(self) -> None:
-        serialized = {k: asdict(v) for k, v in self.quizzes.items()}
-        self.quizzes_file.write_text(json.dumps(serialized, indent=2, ensure_ascii=False), encoding="utf-8")
+        self._atomic_write_json(self.quizzes_file, {k: asdict(v) for k, v in self.quizzes.items()})
 
     def _save_quiz_results(self) -> None:
-        self.quiz_results_file.write_text(json.dumps(self.quiz_results, indent=2, ensure_ascii=False), encoding="utf-8")
+        self._atomic_write_json(self.quiz_results_file, self.quiz_results)
 
     def _save_flashcards(self) -> None:
-        serialized = {k: asdict(v) for k, v in self.flashcards.items()}
-        self.flashcards_file.write_text(json.dumps(serialized, indent=2, ensure_ascii=False), encoding="utf-8")
+        self._atomic_write_json(self.flashcards_file, {k: asdict(v) for k, v in self.flashcards.items()})
 
     def _save_collections(self) -> None:
-        serialized = {k: asdict(v) for k, v in self.collections.items()}
-        self.collections_file.write_text(json.dumps(serialized, indent=2, ensure_ascii=False), encoding="utf-8")
+        self._atomic_write_json(self.collections_file, {k: asdict(v) for k, v in self.collections.items()})
 
     # -----------------------------------------------------------------------
     # Document Ingestion & Parsing
@@ -4994,3 +4999,262 @@ date: "{date_str}"
             sync_status="READY",
             existing_doc_id=document_id,
         )
+
+    # -----------------------------------------------------------------------
+    # Phase 6 — Study Modes, Active Recall & Adaptive Learning
+    # -----------------------------------------------------------------------
+
+    def get_study_mode_readiness(self, document_id: str) -> Dict[str, Any]:
+        """Verifica se o documento tem artefactos válidos das Fases 2–4 para os modos de estudo."""
+        return self.study_modes.check_readiness(document_id).to_dict()
+
+    def _phase6_engine(self, llm_caller: Optional[Callable] = None) -> StudyModesEngine:
+        if llm_caller is not None:
+            return StudyModesEngine(storage_dir=self.storage_dir, llm_caller=llm_caller)
+        return self.study_modes
+
+    def generate_adaptive_flashcards(
+        self,
+        document_id: str,
+        *,
+        force_regenerate: bool = False,
+        target_cards: int = 16,
+        on_progress: Optional[Callable[[str, float, str], None]] = None,
+        llm_caller: Optional[Callable] = None,
+    ) -> Dict[str, Any]:
+        eng = self._phase6_engine(llm_caller)
+        deck = eng.generate_flashcards(
+            document_id,
+            force_regenerate=force_regenerate,
+            target_cards=target_cards,
+            on_progress=on_progress,
+        )
+        payload = eng.get_flashcards(document_id)
+        payload["readiness"] = eng.check_readiness(document_id).to_dict()
+        return payload
+
+    def get_adaptive_flashcards(self, document_id: str) -> Dict[str, Any]:
+        payload = self.study_modes.get_flashcards(document_id)
+        payload["readiness"] = self.study_modes.check_readiness(document_id).to_dict()
+        return payload
+
+    def edit_adaptive_flashcard(self, document_id: str, card_id: str, **updates: Any) -> Dict[str, Any]:
+        return self.study_modes.edit_flashcard(document_id, card_id, **updates).to_dict()
+
+    def delete_adaptive_flashcard(self, document_id: str, card_id: str) -> bool:
+        return self.study_modes.delete_flashcard(document_id, card_id)
+
+    def create_adaptive_flashcard(self, document_id: str, **fields: Any) -> Dict[str, Any]:
+        return self.study_modes.create_flashcard(document_id, **fields).to_dict()
+
+    def regenerate_adaptive_flashcard(
+        self,
+        document_id: str,
+        card_id: str,
+        *,
+        allow_overwrite_edited: bool = False,
+        llm_caller: Optional[Callable] = None,
+    ) -> Dict[str, Any]:
+        eng = self._phase6_engine(llm_caller)
+        return eng.regenerate_flashcard(
+            document_id,
+            card_id,
+            allow_overwrite_edited=allow_overwrite_edited,
+        ).to_dict()
+
+    def review_adaptive_flashcard(
+        self,
+        document_id: str,
+        card_id: str,
+        rating: str,
+        *,
+        confidence: int = 3,
+    ) -> Dict[str, Any]:
+        return self.study_modes.review_flashcard(
+            document_id, card_id, rating, confidence=confidence
+        )
+
+    def generate_phase6_cornell(
+        self,
+        document_id: str,
+        *,
+        force_regenerate: bool = False,
+        on_progress: Optional[Callable[[str, float, str], None]] = None,
+        llm_caller: Optional[Callable] = None,
+    ) -> Dict[str, Any]:
+        eng = self._phase6_engine(llm_caller)
+        return eng.generate_cornell_notes(
+            document_id,
+            force_regenerate=force_regenerate,
+            on_progress=on_progress,
+        ).to_dict()
+
+    def get_phase6_cornell(self, document_id: str) -> Optional[Dict[str, Any]]:
+        doc = self.study_modes.get_cornell_notes(document_id)
+        return doc.to_dict() if doc else None
+
+    def edit_phase6_cornell_entry(self, document_id: str, section_id: str, **updates: Any) -> Dict[str, Any]:
+        return self.study_modes.edit_cornell_entry(document_id, section_id, **updates).to_dict()
+
+    def add_phase6_cornell_personal_note(
+        self,
+        document_id: str,
+        section_id: str,
+        content: str,
+        *,
+        is_important: bool = False,
+    ) -> Dict[str, Any]:
+        return self.study_modes.add_cornell_personal_note(
+            document_id, section_id, content, is_important=is_important
+        ).to_dict()
+
+    def export_phase6_cornell_to_vault(self, document_id: str) -> Dict[str, Any]:
+        cornell_doc = self.study_modes.get_cornell_notes(document_id)
+        if not cornell_doc:
+            raise ValueError(f"Notas Cornell estruturadas não encontradas para '{document_id}'.")
+        md = self.study_modes.export_cornell_markdown(document_id, vault_root=str(self.vault_root))
+        doc = self.documents.get(document_id)
+        vpath = self.save_to_knowledge_vault(
+            title=f"Cornell Notes — {cornell_doc.title}",
+            content=md,
+            subject=doc.subject if doc else cornell_doc.subject,
+            source_document_ids=[document_id],
+        )
+        return {"vault_path": vpath.replace("\\", "/"), "markdown": md}
+
+    def generate_phase6_assessment(
+        self,
+        document_id: str,
+        config: Optional[Dict[str, Any]] = None,
+        *,
+        on_progress: Optional[Callable[[str, float, str], None]] = None,
+        llm_caller: Optional[Callable] = None,
+    ) -> Dict[str, Any]:
+        eng = self._phase6_engine(llm_caller)
+        cfg = AssessmentConfig.from_dict(config or {})
+        return eng.generate_assessment(document_id, config=cfg, on_progress=on_progress).to_dict()
+
+    def get_phase6_assessments(self, document_id: str) -> Dict[str, Any]:
+        assessments = [a.to_dict() for a in self.study_modes.get_assessments(document_id)]
+        history = [h.to_dict() for h in self.study_modes.progress.get_assessment_history(document_id)]
+        return {
+            "document_id": document_id,
+            "assessments": assessments,
+            "history": history,
+            "readiness": self.study_modes.check_readiness(document_id).to_dict(),
+        }
+
+    def check_phase6_question(
+        self,
+        document_id: str,
+        assessment_id: str,
+        question_id: str,
+        answer: Any,
+        *,
+        use_llm_for_open: bool = False,
+        llm_caller: Optional[Callable] = None,
+    ) -> Dict[str, Any]:
+        eng = self._phase6_engine(llm_caller)
+        return eng.check_single_question(
+            document_id,
+            assessment_id,
+            question_id,
+            answer,
+            use_llm_for_open=use_llm_for_open,
+        ).to_dict()
+
+    def submit_phase6_assessment(
+        self,
+        document_id: str,
+        assessment_id: str,
+        answers: Dict[str, Any],
+        *,
+        use_llm_for_open: bool = False,
+        llm_caller: Optional[Callable] = None,
+    ) -> Dict[str, Any]:
+        eng = self._phase6_engine(llm_caller)
+        return eng.submit_assessment(
+            document_id,
+            assessment_id,
+            answers,
+            use_llm_for_open=use_llm_for_open,
+        )
+
+    def generate_active_recall(
+        self,
+        document_id: str,
+        *,
+        force_regenerate: bool = False,
+        target_prompts: int = 8,
+        on_progress: Optional[Callable[[str, float, str], None]] = None,
+        llm_caller: Optional[Callable] = None,
+    ) -> Dict[str, Any]:
+        eng = self._phase6_engine(llm_caller)
+        eng.generate_active_recall(
+            document_id,
+            force_regenerate=force_regenerate,
+            target_prompts=target_prompts,
+            on_progress=on_progress,
+        )
+        return eng.get_active_recall_prompts(document_id, reveal_answers=False)
+
+    def get_active_recall_prompts(self, document_id: str) -> Dict[str, Any]:
+        res = self.study_modes.get_active_recall_prompts(document_id, reveal_answers=False)
+        res["history"] = [h.to_dict() for h in self.study_modes.progress.get_recall_history(document_id)]
+        res["readiness"] = self.study_modes.check_readiness(document_id).to_dict()
+        return res
+
+    def submit_active_recall_attempt(
+        self,
+        document_id: str,
+        prompt_id: str,
+        *,
+        student_response: str,
+        self_confidence: int = 3,
+        outline_used: bool = False,
+        use_llm: bool = False,
+        llm_caller: Optional[Callable] = None,
+    ) -> Dict[str, Any]:
+        eng = self._phase6_engine(llm_caller)
+        return eng.submit_active_recall(
+            document_id,
+            prompt_id,
+            student_response=student_response,
+            self_confidence=self_confidence,
+            outline_used=outline_used,
+            use_llm=use_llm,
+        )
+
+    def get_daily_review_queue(
+        self,
+        document_id: str,
+        *,
+        daily_new_limit: int = 10,
+        daily_review_limit: int = 30,
+    ) -> Dict[str, Any]:
+        return self.study_modes.get_daily_review_queue(
+            document_id,
+            daily_new_limit=daily_new_limit,
+            daily_review_limit=daily_review_limit,
+        ).to_dict()
+
+    def get_learning_progress(self, document_id: str, *, recompute: bool = True) -> Dict[str, Any]:
+        return self.study_modes.get_learning_progress(document_id, recompute=recompute).to_dict()
+
+    def start_study_session(self, **kwargs: Any) -> Dict[str, Any]:
+        return self.study_modes.start_study_session(**kwargs).to_dict()
+
+    def record_study_session_step(self, session_id: str, **kwargs: Any) -> Dict[str, Any]:
+        return self.study_modes.record_session_step(session_id, **kwargs).to_dict()
+
+    def pause_study_session(self, session_id: str) -> Dict[str, Any]:
+        return self.study_modes.pause_study_session(session_id).to_dict()
+
+    def resume_study_session(self, session_id: str) -> Dict[str, Any]:
+        return self.study_modes.resume_study_session(session_id).to_dict()
+
+    def complete_study_session(self, session_id: str, *, summary_stats: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        return self.study_modes.complete_study_session(session_id, summary_stats=summary_stats).to_dict()
+
+    def list_study_sessions(self, *, document_id: Optional[str] = None, status: Optional[str] = None) -> List[Dict[str, Any]]:
+        return [s.to_dict() for s in self.study_modes.list_study_sessions(document_id=document_id, status=status)]

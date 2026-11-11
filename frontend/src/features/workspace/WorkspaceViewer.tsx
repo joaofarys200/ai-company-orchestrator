@@ -295,6 +295,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     getGeneratedStudyDocumentStatus,
     generateStudyDocument,
     getGeneratedStudyDocumentFile,
+    studyModesApi,
     studyPipelineStage,
     sendDirective,
     setChatPanelOpen,
@@ -2126,6 +2127,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 onGetGeneratedDocumentStatus={getGeneratedStudyDocumentStatus}
                 onGenerateStudyDocument={generateStudyDocument}
                 onGetGeneratedDocumentFile={getGeneratedStudyDocumentFile}
+                studyModesApi={studyModesApi}
                 pipelineStage={studyPipelineStage}
               />
             </ViewFrame>

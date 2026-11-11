@@ -663,3 +663,408 @@ export interface StudyDocumentFilePayload {
   base64_data: string;
 }
 
+// ============================================================================
+// Phase 6 — Study Modes, Active Recall & Adaptive Learning
+// ============================================================================
+
+export interface StudyModeReadiness {
+  document_id: string;
+  status: string;
+  is_ready: boolean;
+  has_ast: boolean;
+  has_dossier: boolean;
+  has_plan: boolean;
+  has_study_document: boolean;
+  is_stale: boolean;
+  stale_reasons: string[];
+  missing_artifacts: string[];
+  actionable_message: string;
+}
+
+export interface ReviewSchedulingState {
+  item_id: string;
+  item_type: string;
+  document_id: string;
+  chapter_id?: string;
+  section_id?: string;
+  topic?: string;
+  content_difficulty: string;
+  question_difficulty: string;
+  last_reviewed_ts: number;
+  next_review_ts: number;
+  reviews_count: number;
+  successful_recalls: number;
+  failed_recalls: number;
+  consecutive_successes: number;
+  consecutive_failures: number;
+  last_confidence: number;
+  last_performance_quality: number;
+  learning_state: 'NEW' | 'LEARNING' | 'DUE' | 'LAPSED' | 'MATURE' | 'SUSPENDED' | string;
+  interval_days: number;
+  ease_factor: number;
+  algorithm_version: string;
+}
+
+export interface AdaptiveFlashcard {
+  card_id: string;
+  document_id: string;
+  front: string;
+  back: string;
+  card_type: string;
+  content_difficulty: string;
+  question_difficulty: 'EASY' | 'MEDIUM' | 'HARD' | string;
+  chapter_id: string;
+  chapter_title: string;
+  section_id: string;
+  section_title: string;
+  topic: string;
+  learning_objective_id: string;
+  learning_objective_text: string;
+  concept_ids: string[];
+  evidence_refs: EditorialEvidenceRef[];
+  source_pages: number[];
+  epistemic_status: EpistemicStatusCode | string;
+  is_hypothetical_scenario: boolean;
+  generation_mode: string;
+  review_status: string;
+  user_edited: boolean;
+  edited_at?: string | null;
+  is_deleted: boolean;
+  srs?: ReviewSchedulingState;
+}
+
+export interface StudyDeckPayload {
+  document_id: string;
+  deck: {
+    deck_id: string;
+    title: string;
+    document_nature: string;
+    generation_mode: string;
+    status: string;
+    updated_at: string;
+  } | null;
+  cards: AdaptiveFlashcard[];
+  readiness?: StudyModeReadiness;
+}
+
+export interface CornellCueItem {
+  cue_id: string;
+  cue_prompt: string;
+  cue_type: string;
+  answer_hint: string;
+  epistemic_status: string;
+  concept_ids: string[];
+  evidence_refs: EditorialEvidenceRef[];
+  is_important: boolean;
+  user_edited: boolean;
+}
+
+export interface CornellPersonalNote {
+  note_id: string;
+  section_id: string;
+  content: string;
+  is_important: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CornellNoteEntry {
+  entry_id: string;
+  chapter_id: string;
+  chapter_title: string;
+  section_id: string;
+  section_title: string;
+  sufficient_evidence: boolean;
+  insufficiency_reason: string;
+  main_concepts: Array<{ name: string; note: string }>;
+  explanations: string[];
+  supporting_details: string[];
+  examples: string[];
+  concept_relationships: string[];
+  methodology_notes: string;
+  results_and_conclusions_notes: string;
+  cue_column: CornellCueItem[];
+  summary_section: string;
+  source_pages: number[];
+  evidence_refs: EditorialEvidenceRef[];
+  epistemic_status: string;
+  is_important: boolean;
+  personal_notes: CornellPersonalNote[];
+  user_edited: boolean;
+  edited_fields: string[];
+  generation_mode: string;
+}
+
+export interface CornellStudyDocument {
+  cornell_id: string;
+  document_id: string;
+  title: string;
+  subject: string;
+  global_summary: string;
+  entries: CornellNoteEntry[];
+  generation_mode: string;
+  status: string;
+  updated_at: string;
+}
+
+export interface ScoringCriterion {
+  criterion_id: string;
+  description: string;
+  weight: number;
+  required_concepts: string[];
+  factual_anchors: string[];
+}
+
+export interface AssessmentQuestion {
+  question_id: string;
+  document_id: string;
+  question_text: string;
+  question_type: string;
+  content_difficulty: string;
+  question_difficulty: string;
+  options: string[];
+  correct_index?: number | null;
+  correct_answer: string;
+  explanation: string;
+  topic: string;
+  chapter_id: string;
+  section_id: string;
+  learning_objective_id: string;
+  learning_objective_text: string;
+  related_concept_ids: string[];
+  related_concept_names: string[];
+  evidence_refs: EditorialEvidenceRef[];
+  epistemic_status: string;
+  is_hypothetical_scenario: boolean;
+  scoring_criteria: ScoringCriterion[];
+  generation_mode: string;
+}
+
+export interface AssessmentConfig {
+  question_count: number;
+  chapter_ids: string[];
+  topics: string[];
+  difficulty: string;
+  question_types: string[];
+  session_mode: 'PRACTICE' | 'ASSESSMENT' | string;
+  feedback_mode: 'IMMEDIATE' | 'DEFERRED' | string;
+}
+
+export interface StudyAssessment {
+  assessment_id: string;
+  document_id: string;
+  title: string;
+  config: AssessmentConfig;
+  questions: AssessmentQuestion[];
+  generation_mode: string;
+  status: string;
+  created_at: string;
+}
+
+export interface OpenAnswerEvaluation {
+  question_id: string;
+  student_answer: string;
+  verdict: string;
+  score_ratio: number;
+  is_correct: boolean;
+  is_uncertain: boolean;
+  factual_errors: string[];
+  missing_points: string[];
+  covered_points: string[];
+  reasoning: string;
+  evaluation_mode: string;
+}
+
+export interface QuestionAttemptOutcome {
+  question_id: string;
+  question_type: string;
+  topic: string;
+  chapter_id: string;
+  section_id: string;
+  question_difficulty: string;
+  student_answer: any;
+  correct_answer: string;
+  is_correct: boolean;
+  score_ratio: number;
+  verdict: string;
+  explanation: string;
+  open_evaluation?: OpenAnswerEvaluation | null;
+  evidence_refs: EditorialEvidenceRef[];
+  epistemic_status: string;
+}
+
+export interface AssessmentAttempt {
+  attempt_id: string;
+  assessment_id: string;
+  document_id: string;
+  session_mode: string;
+  feedback_mode: string;
+  total_questions: number;
+  answered_count: number;
+  correct_count: number;
+  partial_count: number;
+  incorrect_count: number;
+  unanswered_count: number;
+  score_pct: number;
+  passed: boolean;
+  outcomes: QuestionAttemptOutcome[];
+  by_topic: Record<string, { total: number; correct: number; accuracy_pct: number }>;
+  by_difficulty: Record<string, { total: number; correct: number; accuracy_pct: number }>;
+  incorrect_question_ids: string[];
+  submitted_at: string;
+}
+
+export interface ActiveRecallPrompt {
+  prompt_id: string;
+  document_id: string;
+  prompt_text: string;
+  prompt_type: string;
+  content_difficulty: string;
+  question_difficulty: string;
+  chapter_id: string;
+  chapter_title: string;
+  section_id: string;
+  section_title: string;
+  topic: string;
+  learning_objective_id: string;
+  learning_objective_text: string;
+  concept_ids: string[];
+  optional_outline: string[];
+  grounded_reference_answer: string;
+  evidence_refs: EditorialEvidenceRef[];
+  source_pages: number[];
+  epistemic_status: string;
+  answer_hidden?: boolean;
+}
+
+export interface ActiveRecallAttempt {
+  attempt_id: string;
+  prompt_id: string;
+  document_id: string;
+  student_response: string;
+  self_confidence: number;
+  self_rating: string;
+  outline_used: boolean;
+  evaluation?: OpenAnswerEvaluation | null;
+  score_ratio: number;
+  revealed_reference: string;
+  evidence_refs: EditorialEvidenceRef[];
+  identified_gap_triggered: boolean;
+  scheduled_next_review_ts: number;
+  created_at: string;
+}
+
+export interface DailyQueueItem {
+  item_id: string;
+  item_type: 'flashcard' | 'active_recall' | string;
+  title: string;
+  topic: string;
+  chapter_id: string;
+  section_id: string;
+  srs_state: string;
+  interval_days: number;
+  ease_factor: number;
+  last_confidence?: number;
+  epistemic_status: string;
+}
+
+export interface DailyReviewQueue {
+  document_id: string;
+  generated_at: string;
+  daily_new_limit: number;
+  daily_review_limit: number;
+  due_items: DailyQueueItem[];
+  lapsed_items: DailyQueueItem[];
+  low_confidence_items: DailyQueueItem[];
+  new_items: DailyQueueItem[];
+  weak_topics: string[];
+  total_queue_count: number;
+}
+
+export interface KnowledgeGap {
+  gap_id: string;
+  document_id: string;
+  gap_type: string;
+  concept_id: string;
+  concept_name: string;
+  section_id: string;
+  chapter_id: string;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | string;
+  failure_count: number;
+  attempts_count: number;
+  description: string;
+  evidence_refs: EditorialEvidenceRef[];
+  suggested_activities: Array<{ mode: string; label: string; target: string }>;
+}
+
+export interface LearningProgressSnapshot {
+  document_id: string;
+  questions_answered: number;
+  correct_answers: number;
+  partial_answers: number;
+  incorrect_answers: number;
+  flashcard_reviews_total: number;
+  active_recall_attempts_total: number;
+  overall_accuracy_pct: number | null;
+  avg_recall_confidence: number | null;
+  mastery_level: 'INSUFFICIENT_EVIDENCE' | 'EMERGING' | 'DEVELOPING' | 'PROFICIENT' | string;
+  by_chapter: Record<string, { id: string; label: string; attempts: number; accuracy_pct: number; mastery_level: string }>;
+  by_section: Record<string, { id: string; label: string; attempts: number; accuracy_pct: number; mastery_level: string }>;
+  by_concept: Record<string, { id: string; label: string; attempts: number; failures: number; accuracy_pct: number; mastery_level: string }>;
+  by_objective: Record<string, { id: string; label: string; attempts: number; accuracy_pct: number; mastery_level: string }>;
+  repeatedly_missed_concepts: string[];
+  consistently_recalled_concepts: string[];
+  insufficient_evidence_objectives: string[];
+  knowledge_gaps: KnowledgeGap[];
+  updated_at: string;
+}
+
+export interface StudySessionState {
+  session_id: string;
+  document_id: string;
+  mode: string;
+  status: 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED' | 'ABANDONED' | string;
+  title: string;
+  item_ids: string[];
+  current_index: number;
+  completed_item_ids: string[];
+  partial_responses: Record<string, any>;
+  config: Record<string, any>;
+  summary_stats: Record<string, any>;
+  started_at: string;
+  last_activity_at: string;
+  paused_at?: string | null;
+  completed_at?: string | null;
+}
+
+export interface StudyModesBridge {
+  getReadiness: (documentId: string) => Promise<StudyModeReadiness>;
+  getFlashcards: (documentId: string) => Promise<StudyDeckPayload>;
+  generateFlashcards: (documentId: string, forceRegenerate?: boolean, targetCards?: number) => Promise<StudyDeckPayload>;
+  editFlashcard: (documentId: string, cardId: string, updates: { front?: string; back?: string; topic?: string; question_difficulty?: string }) => Promise<AdaptiveFlashcard>;
+  deleteFlashcard: (documentId: string, cardId: string) => Promise<boolean>;
+  createFlashcard: (documentId: string, fields: { front: string; back: string; topic?: string; chapter_id?: string; section_id?: string; question_difficulty?: string; card_type?: string }) => Promise<AdaptiveFlashcard>;
+  regenerateFlashcard: (documentId: string, cardId: string, allowOverwriteEdited?: boolean) => Promise<AdaptiveFlashcard>;
+  reviewFlashcard: (documentId: string, cardId: string, rating: string, confidence?: number) => Promise<{ flashcard: AdaptiveFlashcard; srs_state: ReviewSchedulingState; progress: LearningProgressSnapshot }>;
+  getCornell: (documentId: string) => Promise<{ cornell: CornellStudyDocument | null; readiness: StudyModeReadiness }>;
+  generateCornell: (documentId: string, forceRegenerate?: boolean) => Promise<{ cornell: CornellStudyDocument | null; readiness: StudyModeReadiness }>;
+  editCornellEntry: (documentId: string, sectionId: string, updates: { summary_section?: string; explanations?: string[]; supporting_details?: string[]; cue_column?: CornellCueItem[]; is_important?: boolean }) => Promise<CornellNoteEntry>;
+  addCornellNote: (documentId: string, sectionId: string, content: string, isImportant?: boolean) => Promise<CornellPersonalNote>;
+  exportCornellVault: (documentId: string) => Promise<{ vault_path: string; markdown: string }>;
+  getAssessments: (documentId: string) => Promise<{ assessments: StudyAssessment[]; history: AssessmentAttempt[]; readiness: StudyModeReadiness }>;
+  generateAssessment: (documentId: string, config: Partial<AssessmentConfig>) => Promise<StudyAssessment>;
+  checkQuestion: (documentId: string, assessmentId: string, questionId: string, answer: any, useLlmForOpen?: boolean) => Promise<QuestionAttemptOutcome>;
+  submitAssessment: (documentId: string, assessmentId: string, answers: Record<string, any>, useLlmForOpen?: boolean) => Promise<{ attempt: AssessmentAttempt; progress: LearningProgressSnapshot }>;
+  getActiveRecall: (documentId: string) => Promise<{ prompts: ActiveRecallPrompt[]; history: ActiveRecallAttempt[]; readiness: StudyModeReadiness }>;
+  generateActiveRecall: (documentId: string, forceRegenerate?: boolean, targetPrompts?: number) => Promise<{ prompts: ActiveRecallPrompt[] }>;
+  submitActiveRecall: (documentId: string, promptId: string, payload: { student_response: string; self_confidence: number; outline_used?: boolean; use_llm?: boolean }) => Promise<{ attempt: ActiveRecallAttempt; srs_state: ReviewSchedulingState; progress: LearningProgressSnapshot }>;
+  getDailyQueue: (documentId: string, dailyNewLimit?: number, dailyReviewLimit?: number) => Promise<DailyReviewQueue>;
+  getProgress: (documentId: string, recompute?: boolean) => Promise<LearningProgressSnapshot>;
+  startSession: (payload: { document_id: string; mode: string; title?: string; item_ids?: string[]; config?: Record<string, any> }) => Promise<StudySessionState>;
+  updateSession: (sessionId: string, payload: { item_id?: string; partial_response?: any; outcome?: any; next_index?: number; mark_completed?: boolean }) => Promise<StudySessionState>;
+  pauseSession: (sessionId: string) => Promise<StudySessionState>;
+  resumeSession: (sessionId: string) => Promise<StudySessionState>;
+  completeSession: (sessionId: string, summaryStats?: Record<string, any>) => Promise<StudySessionState>;
+  listSessions: (documentId?: string, status?: string) => Promise<StudySessionState[]>;
+}
+

@@ -1595,6 +1595,27 @@ export type ServerMessage =
   | { type: 'study_generated_document_progress'; document_id: string; stage: string; progress: number; message: string; request_id?: string }
   | { type: 'study_generated_document_result'; document_id: string; result: any; status?: any; request_id?: string; error?: string }
   | { type: 'study_generated_document_file_result'; document_id: string; format: string; filename: string; file_path: string; size_bytes: number; mime_type: string; base64_data: string; request_id?: string; error?: string }
+  | { type: 'study_flashcard_reviewed'; flashcard: any; request_id?: string }
+  | { type: 'study_mode_progress_event'; document_id: string; stage: string; progress: number; message: string; request_id?: string }
+  | { type: 'study_mode_readiness_result'; document_id: string; readiness: any; request_id?: string }
+  | { type: 'study_mode_flashcards_result'; document_id: string; deck: any; cards: any[]; readiness?: any; request_id?: string }
+  | { type: 'study_mode_flashcard_saved'; document_id: string; flashcard: any; request_id?: string }
+  | { type: 'study_mode_flashcard_deleted'; document_id: string; card_id: string; deleted: boolean; request_id?: string }
+  | { type: 'study_mode_flashcard_reviewed'; document_id: string; flashcard: any; srs_state: any; progress: any; request_id?: string }
+  | { type: 'study_mode_cornell_result'; document_id: string; cornell: any; readiness?: any; request_id?: string }
+  | { type: 'study_mode_cornell_entry_saved'; document_id: string; entry: any; request_id?: string }
+  | { type: 'study_mode_cornell_note_saved'; document_id: string; section_id: string; personal_note: any; request_id?: string }
+  | { type: 'study_mode_cornell_exported'; document_id: string; vault_path: string; markdown: string; request_id?: string }
+  | { type: 'study_mode_assessments_result'; document_id: string; assessments: any[]; history: any[]; readiness?: any; request_id?: string }
+  | { type: 'study_mode_assessment_generated'; document_id: string; assessment: any; request_id?: string }
+  | { type: 'study_mode_question_checked'; document_id: string; outcome: any; request_id?: string }
+  | { type: 'study_mode_assessment_submitted'; document_id: string; attempt: any; progress: any; request_id?: string }
+  | { type: 'study_mode_active_recall_result'; document_id: string; prompts: any[]; history?: any[]; readiness?: any; request_id?: string }
+  | { type: 'study_mode_active_recall_submitted'; document_id: string; attempt: any; srs_state: any; progress: any; request_id?: string }
+  | { type: 'study_mode_daily_queue_result'; document_id: string; queue: any; request_id?: string }
+  | { type: 'study_mode_progress_result'; document_id: string; progress: any; request_id?: string }
+  | { type: 'study_mode_session_updated'; document_id: string; session: any; request_id?: string }
+  | { type: 'study_mode_sessions_list'; document_id?: string; sessions: any[]; request_id?: string }
   | UnknownServerMessage;
 
 export type ClientMessage =
@@ -1687,6 +1708,34 @@ export type ClientMessage =
   | { type: 'study_get_generated_document_status'; document_id: string; request_id?: string }
   | { type: 'study_generate_study_document'; document_id: string; force_recompute?: boolean; auto_generate_plan?: boolean; design_profile_id?: string; export_docx?: boolean; request_id?: string }
   | { type: 'study_get_generated_document_file'; document_id: string; format?: string; version?: number; request_id?: string }
+  | { type: 'study_mode_get_readiness'; document_id: string; request_id?: string }
+  | { type: 'study_mode_get_flashcards'; document_id: string; request_id?: string }
+  | { type: 'study_mode_generate_flashcards'; document_id: string; force_regenerate?: boolean; target_cards?: number; request_id?: string }
+  | { type: 'study_mode_edit_flashcard'; document_id: string; card_id: string; front?: string; back?: string; topic?: string; question_difficulty?: string; request_id?: string }
+  | { type: 'study_mode_delete_flashcard'; document_id: string; card_id: string; request_id?: string }
+  | { type: 'study_mode_create_flashcard'; document_id: string; front: string; back: string; topic?: string; chapter_id?: string; section_id?: string; question_difficulty?: string; card_type?: string; request_id?: string }
+  | { type: 'study_mode_regenerate_flashcard'; document_id: string; card_id: string; allow_overwrite_edited?: boolean; request_id?: string }
+  | { type: 'study_mode_review_flashcard'; document_id: string; card_id: string; rating: string; confidence?: number; request_id?: string }
+  | { type: 'study_mode_get_cornell'; document_id: string; request_id?: string }
+  | { type: 'study_mode_generate_cornell'; document_id: string; force_regenerate?: boolean; request_id?: string }
+  | { type: 'study_mode_edit_cornell_entry'; document_id: string; section_id: string; summary_section?: string; explanations?: string[]; supporting_details?: string[]; cue_column?: any[]; is_important?: boolean; request_id?: string }
+  | { type: 'study_mode_add_cornell_note'; document_id: string; section_id: string; content: string; is_important?: boolean; request_id?: string }
+  | { type: 'study_mode_export_cornell_vault'; document_id: string; request_id?: string }
+  | { type: 'study_mode_get_assessments'; document_id: string; request_id?: string }
+  | { type: 'study_mode_generate_assessment'; document_id: string; config?: Record<string, unknown>; request_id?: string }
+  | { type: 'study_mode_check_question'; document_id: string; assessment_id: string; question_id: string; answer: unknown; use_llm_for_open?: boolean; request_id?: string }
+  | { type: 'study_mode_submit_assessment'; document_id: string; assessment_id: string; answers: Record<string, unknown>; use_llm_for_open?: boolean; request_id?: string }
+  | { type: 'study_mode_get_active_recall'; document_id: string; request_id?: string }
+  | { type: 'study_mode_generate_active_recall'; document_id: string; force_regenerate?: boolean; target_prompts?: number; request_id?: string }
+  | { type: 'study_mode_submit_active_recall'; document_id: string; prompt_id: string; student_response: string; self_confidence: number; outline_used?: boolean; use_llm?: boolean; request_id?: string }
+  | { type: 'study_mode_get_daily_queue'; document_id: string; daily_new_limit?: number; daily_review_limit?: number; request_id?: string }
+  | { type: 'study_mode_get_progress'; document_id: string; recompute?: boolean; request_id?: string }
+  | { type: 'study_mode_start_session'; document_id: string; mode: string; title?: string; item_ids?: string[]; config?: Record<string, unknown>; request_id?: string }
+  | { type: 'study_mode_update_session'; session_id: string; document_id?: string; item_id?: string; partial_response?: unknown; outcome?: unknown; next_index?: number; mark_completed?: boolean; request_id?: string }
+  | { type: 'study_mode_pause_session'; session_id: string; document_id?: string; request_id?: string }
+  | { type: 'study_mode_resume_session'; session_id: string; document_id?: string; request_id?: string }
+  | { type: 'study_mode_complete_session'; session_id: string; document_id?: string; summary_stats?: Record<string, unknown>; request_id?: string }
+  | { type: 'study_mode_list_sessions'; document_id?: string; status?: string; request_id?: string }
   | { type: 'action_confirm_response'; request_id: string; decision: 'APPROVE' | 'DENY' | 'REJECT'; user?: string; session_id?: string }
   | { type: 'permission_get_pending' }
   | { type: 'permission_approve'; request_id: string; user?: string; session_id?: string; project_id?: string; mission_id?: string }
@@ -2940,6 +2989,44 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         materials: Array.isArray(raw.materials) ? raw.materials : [],
         request_id: raw.request_id ? asString(raw.request_id) : undefined,
       };
+    case 'study_flashcard_reviewed':
+      return {
+        type: 'study_flashcard_reviewed',
+        flashcard: raw.flashcard,
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_mode_progress_event':
+      return {
+        type: 'study_mode_progress_event',
+        document_id: asString(raw.document_id),
+        stage: asString(raw.stage),
+        progress: asNumber(raw.progress, 0),
+        message: asString(raw.message),
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_mode_readiness_result':
+    case 'study_mode_flashcards_result':
+    case 'study_mode_flashcard_saved':
+    case 'study_mode_flashcard_deleted':
+    case 'study_mode_flashcard_reviewed':
+    case 'study_mode_cornell_result':
+    case 'study_mode_cornell_entry_saved':
+    case 'study_mode_cornell_note_saved':
+    case 'study_mode_cornell_exported':
+    case 'study_mode_assessments_result':
+    case 'study_mode_assessment_generated':
+    case 'study_mode_question_checked':
+    case 'study_mode_assessment_submitted':
+    case 'study_mode_active_recall_result':
+    case 'study_mode_active_recall_submitted':
+    case 'study_mode_daily_queue_result':
+    case 'study_mode_progress_result':
+    case 'study_mode_session_updated':
+    case 'study_mode_sessions_list':
+      return {
+        ...(raw as Record<string, unknown>),
+        type,
+      } as ServerMessage;
     default:
       return { type: 'unknown', originalType: type, payload: raw };
   }

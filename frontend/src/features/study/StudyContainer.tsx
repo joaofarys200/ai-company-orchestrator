@@ -6,7 +6,10 @@ import {
   Bookmark,
   HelpCircle,
   Database,
-  ArrowLeft
+  ArrowLeft,
+  Layers,
+  Brain,
+  Activity
 } from 'lucide-react';
 import { StudyLibraryView } from './StudyLibraryView';
 import { StudyReaderView } from './StudyReaderView';
@@ -15,6 +18,9 @@ import { StudySummaryView } from './StudySummaryView';
 import { StudyNotesView } from './StudyNotesView';
 import { StudyQuizView } from './StudyQuizView';
 import { StudyKnowledgeView } from './StudyKnowledgeView';
+import { StudyFlashcardsView } from './StudyFlashcardsView';
+import { StudyActiveRecallView } from './StudyActiveRecallView';
+import { StudyAdaptiveHubView } from './StudyAdaptiveHubView';
 import type {
   StudyDocument,
   StudyReadingNote,
@@ -30,6 +36,7 @@ import type {
   StudyDocumentGenerationStatus,
   StudyDocumentGenerationResult,
   StudyDocumentFilePayload,
+  StudyModesBridge,
 } from './types';
 
 export type StudyTab =
@@ -37,7 +44,10 @@ export type StudyTab =
   | 'reader'
   | 'summary'
   | 'notes'
+  | 'flashcards'
+  | 'active_recall'
   | 'quiz'
+  | 'adaptive'
   | 'knowledge';
 
 export interface StudyUploadPayload {
@@ -143,6 +153,7 @@ interface StudyContainerProps {
     format?: 'pdf' | 'docx',
     version?: number
   ) => Promise<StudyDocumentFilePayload | null>;
+  studyModesApi?: StudyModesBridge;
 }
 
 export const StudyContainer: React.FC<StudyContainerProps> = ({
@@ -189,9 +200,11 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   onGetGeneratedDocumentStatus,
   onGenerateStudyDocument,
   onGetGeneratedDocumentFile,
+  studyModesApi,
 }) => {
   // Navigation
   const [activeTab, setActiveTab] = useState<StudyTab>('library');
+  const [topicFilterHint, setTopicFilterHint] = useState<string>('');
   const [documents, setDocuments] = useState<StudyDocument[]>(initialDocuments);
   const [activeDocumentId, setActiveDocumentId] = useState<string | null>(
     initialActiveDocumentId || (initialDocuments[0]?.document_id ?? null)
@@ -402,8 +415,40 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
           </button>
 
           <button
+            id="study-nav-flashcards-btn"
+            onClick={() => {
+              setTopicFilterHint('');
+              setActiveTab('flashcards');
+            }}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
+              activeTab === 'flashcards'
+                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            <Layers className="h-3.5 w-3.5" />
+            <span>Flashcards</span>
+          </button>
+
+          <button
+            id="study-nav-recall-btn"
+            onClick={() => setActiveTab('active_recall')}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
+              activeTab === 'active_recall'
+                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            <Brain className="h-3.5 w-3.5" />
+            <span>Recordação Ativa</span>
+          </button>
+
+          <button
             id="study-nav-quiz-btn"
-            onClick={() => setActiveTab('quiz')}
+            onClick={() => {
+              setTopicFilterHint('');
+              setActiveTab('quiz');
+            }}
             className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
               activeTab === 'quiz'
                 ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
@@ -411,7 +456,20 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             }`}
           >
             <HelpCircle className="h-3.5 w-3.5" />
-            <span>Quiz & Rever</span>
+            <span>Avaliações</span>
+          </button>
+
+          <button
+            id="study-nav-adaptive-btn"
+            onClick={() => setActiveTab('adaptive')}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
+              activeTab === 'adaptive'
+                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            <Activity className="h-3.5 w-3.5" />
+            <span>Progresso</span>
           </button>
 
           <button
@@ -550,21 +608,54 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             document={activeDocument}
             readingNotes={readingNotes}
             highlights={highlights}
+            studyModes={studyModesApi}
+            onGoToSummary={() => setActiveTab('summary')}
             onSaveToVault={onSaveToVault}
             onDeleteNote={handleDeleteNote}
             onGenerateCornell={onGenerateCornell}
           />
         )}
 
+        {activeTab === 'flashcards' && (
+          <StudyFlashcardsView
+            document={activeDocument}
+            studyModes={studyModesApi}
+            onGoToSummary={() => setActiveTab('summary')}
+            initialFilterTopic={topicFilterHint}
+          />
+        )}
+
+        {activeTab === 'active_recall' && (
+          <StudyActiveRecallView
+            document={activeDocument}
+            studyModes={studyModesApi}
+            onGoToSummary={() => setActiveTab('summary')}
+          />
+        )}
+
         {activeTab === 'quiz' && (
           <StudyQuizView
             document={activeDocument}
+            studyModes={studyModesApi}
+            onGoToSummary={() => setActiveTab('summary')}
+            initialTopicFilter={topicFilterHint}
             quiz={activeStudyQuiz?.document_id === activeDocument?.document_id ? activeStudyQuiz : null}
             evaluationResult={studyQuizResult}
             onGenerateQuiz={onGenerateQuiz}
             onSubmitQuiz={onSubmitQuiz}
             onReviewFlashcard={onReviewFlashcard}
             onPrepareForExam={onPrepareForExam}
+          />
+        )}
+
+        {activeTab === 'adaptive' && (
+          <StudyAdaptiveHubView
+            document={activeDocument}
+            studyModes={studyModesApi}
+            onNavigateTab={(tab, topicHint) => {
+              setTopicFilterHint(topicHint || '');
+              setActiveTab(tab);
+            }}
           />
         )}
 

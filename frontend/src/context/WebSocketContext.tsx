@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { missionRuntimeStore } from '../features/missions/stores/missionRuntimeStore';
 import { usePermissionStore } from '../features/permissions/PermissionStore';
 import {
@@ -57,6 +57,7 @@ import type {
   StudyDocumentGenerationStatus,
   StudyDocumentGenerationResult,
   StudyDocumentFilePayload,
+  StudyModesBridge,
 } from '../features/study/types';
 import {
   buildStudySpatialBoard,
@@ -368,6 +369,7 @@ interface WebSocketContextType {
     format?: 'pdf' | 'docx',
     version?: number
   ) => Promise<StudyDocumentFilePayload | null>;
+  studyModesApi: StudyModesBridge;
   studyPipelineStage: string;
   activeBoard: SpatialBoardData | null;
   focusedCardId: string | null;
@@ -1272,11 +1274,46 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'study_flashcards_list':
         setStudyFlashcards(msg.flashcards || []);
         break;
+      case 'study_flashcard_reviewed':
       case 'study_flashcard_updated':
         setStudyFlashcards((prev) =>
           prev.map((fc) => (fc.card_id === msg.flashcard.card_id ? msg.flashcard : fc))
         );
         break;
+      case 'study_mode_progress_event': {
+        const pctLabel = typeof (msg as any).progress === 'number' ? ` (${Math.round((msg as any).progress * 100)}%)` : '';
+        setStudyPipelineStage(`${(msg as any).message || (msg as any).stage || 'Modo de estudo em curso'}${pctLabel}`);
+        break;
+      }
+      case 'study_mode_readiness_result':
+      case 'study_mode_flashcards_result':
+      case 'study_mode_flashcard_saved':
+      case 'study_mode_flashcard_deleted':
+      case 'study_mode_flashcard_reviewed':
+      case 'study_mode_cornell_result':
+      case 'study_mode_cornell_entry_saved':
+      case 'study_mode_cornell_note_saved':
+      case 'study_mode_cornell_exported':
+      case 'study_mode_assessments_result':
+      case 'study_mode_assessment_generated':
+      case 'study_mode_question_checked':
+      case 'study_mode_assessment_submitted':
+      case 'study_mode_active_recall_result':
+      case 'study_mode_active_recall_submitted':
+      case 'study_mode_daily_queue_result':
+      case 'study_mode_progress_result':
+      case 'study_mode_session_updated':
+      case 'study_mode_sessions_list': {
+        setStudyPipelineStage('');
+        const reqId = (msg as any).request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg);
+        }
+        break;
+      }
       case 'study_collections_list':
         setStudyCollections((msg as any).collections || []);
         break;
@@ -3105,6 +3142,234 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [sendClientMessage]
   );
 
+  const sendStudyModeRpc = useCallback(
+    <T,>(
+      prefix: string,
+      payloadBuilder: (requestId: string) => ClientMessage,
+      timeoutMs = 120000
+    ): Promise<T> => {
+      const requestId = `sm_${prefix}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error(`Tempo limite excedido (${prefix}).`));
+        }, timeoutMs);
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+        sendClientMessage(payloadBuilder(requestId));
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const studyModesApi: StudyModesBridge = useMemo(
+    () => ({
+      getReadiness: (documentId) =>
+        sendStudyModeRpc<any>('readiness', (reqId) => ({
+          type: 'study_mode_get_readiness',
+          document_id: documentId,
+          request_id: reqId,
+        }), 30000).then((r) => r.readiness),
+      getFlashcards: (documentId) =>
+        sendStudyModeRpc<any>('get_fc', (reqId) => ({
+          type: 'study_mode_get_flashcards',
+          document_id: documentId,
+          request_id: reqId,
+        }), 30000),
+      generateFlashcards: (documentId, forceRegenerate = false, targetCards = 16) =>
+        sendStudyModeRpc<any>('gen_fc', (reqId) => ({
+          type: 'study_mode_generate_flashcards',
+          document_id: documentId,
+          force_regenerate: forceRegenerate,
+          target_cards: targetCards,
+          request_id: reqId,
+        }), 300000),
+      editFlashcard: (documentId, cardId, updates) =>
+        sendStudyModeRpc<any>('edit_fc', (reqId) => ({
+          type: 'study_mode_edit_flashcard',
+          document_id: documentId,
+          card_id: cardId,
+          ...updates,
+          request_id: reqId,
+        }), 30000).then((r) => r.flashcard),
+      deleteFlashcard: (documentId, cardId) =>
+        sendStudyModeRpc<any>('del_fc', (reqId) => ({
+          type: 'study_mode_delete_flashcard',
+          document_id: documentId,
+          card_id: cardId,
+          request_id: reqId,
+        }), 30000).then((r) => Boolean(r.deleted)),
+      createFlashcard: (documentId, fields) =>
+        sendStudyModeRpc<any>('new_fc', (reqId) => ({
+          type: 'study_mode_create_flashcard',
+          document_id: documentId,
+          ...fields,
+          request_id: reqId,
+        }), 30000).then((r) => r.flashcard),
+      regenerateFlashcard: (documentId, cardId, allowOverwriteEdited = false) =>
+        sendStudyModeRpc<any>('regen_fc', (reqId) => ({
+          type: 'study_mode_regenerate_flashcard',
+          document_id: documentId,
+          card_id: cardId,
+          allow_overwrite_edited: allowOverwriteEdited,
+          request_id: reqId,
+        }), 120000).then((r) => r.flashcard),
+      reviewFlashcard: (documentId, cardId, rating, confidence = 3) =>
+        sendStudyModeRpc<any>('rev_fc', (reqId) => ({
+          type: 'study_mode_review_flashcard',
+          document_id: documentId,
+          card_id: cardId,
+          rating,
+          confidence,
+          request_id: reqId,
+        }), 30000),
+      getCornell: (documentId) =>
+        sendStudyModeRpc<any>('get_cn', (reqId) => ({
+          type: 'study_mode_get_cornell',
+          document_id: documentId,
+          request_id: reqId,
+        }), 30000),
+      generateCornell: (documentId, forceRegenerate = false) =>
+        sendStudyModeRpc<any>('gen_cn', (reqId) => ({
+          type: 'study_mode_generate_cornell',
+          document_id: documentId,
+          force_regenerate: forceRegenerate,
+          request_id: reqId,
+        }), 300000),
+      editCornellEntry: (documentId, sectionId, updates) =>
+        sendStudyModeRpc<any>('edit_cn', (reqId) => ({
+          type: 'study_mode_edit_cornell_entry',
+          document_id: documentId,
+          section_id: sectionId,
+          ...updates,
+          request_id: reqId,
+        }), 30000).then((r) => r.entry),
+      addCornellNote: (documentId, sectionId, content, isImportant = false) =>
+        sendStudyModeRpc<any>('note_cn', (reqId) => ({
+          type: 'study_mode_add_cornell_note',
+          document_id: documentId,
+          section_id: sectionId,
+          content,
+          is_important: isImportant,
+          request_id: reqId,
+        }), 30000).then((r) => r.personal_note),
+      exportCornellVault: (documentId) =>
+        sendStudyModeRpc<any>('exp_cn', (reqId) => ({
+          type: 'study_mode_export_cornell_vault',
+          document_id: documentId,
+          request_id: reqId,
+        }), 30000),
+      getAssessments: (documentId) =>
+        sendStudyModeRpc<any>('get_ass', (reqId) => ({
+          type: 'study_mode_get_assessments',
+          document_id: documentId,
+          request_id: reqId,
+        }), 30000),
+      generateAssessment: (documentId, config) =>
+        sendStudyModeRpc<any>('gen_ass', (reqId) => ({
+          type: 'study_mode_generate_assessment',
+          document_id: documentId,
+          config,
+          request_id: reqId,
+        }), 300000).then((r) => r.assessment),
+      checkQuestion: (documentId, assessmentId, questionId, answer, useLlmForOpen = false) =>
+        sendStudyModeRpc<any>('chk_q', (reqId) => ({
+          type: 'study_mode_check_question',
+          document_id: documentId,
+          assessment_id: assessmentId,
+          question_id: questionId,
+          answer,
+          use_llm_for_open: useLlmForOpen,
+          request_id: reqId,
+        }), 90000).then((r) => r.outcome),
+      submitAssessment: (documentId, assessmentId, answers, useLlmForOpen = false) =>
+        sendStudyModeRpc<any>('sub_ass', (reqId) => ({
+          type: 'study_mode_submit_assessment',
+          document_id: documentId,
+          assessment_id: assessmentId,
+          answers,
+          use_llm_for_open: useLlmForOpen,
+          request_id: reqId,
+        }), 120000),
+      getActiveRecall: (documentId) =>
+        sendStudyModeRpc<any>('get_ar', (reqId) => ({
+          type: 'study_mode_get_active_recall',
+          document_id: documentId,
+          request_id: reqId,
+        }), 30000),
+      generateActiveRecall: (documentId, forceRegenerate = false, targetPrompts = 8) =>
+        sendStudyModeRpc<any>('gen_ar', (reqId) => ({
+          type: 'study_mode_generate_active_recall',
+          document_id: documentId,
+          force_regenerate: forceRegenerate,
+          target_prompts: targetPrompts,
+          request_id: reqId,
+        }), 300000),
+      submitActiveRecall: (documentId, promptId, payload) =>
+        sendStudyModeRpc<any>('sub_ar', (reqId) => ({
+          type: 'study_mode_submit_active_recall',
+          document_id: documentId,
+          prompt_id: promptId,
+          ...payload,
+          request_id: reqId,
+        }), 120000),
+      getDailyQueue: (documentId, dailyNewLimit = 10, dailyReviewLimit = 30) =>
+        sendStudyModeRpc<any>('dq', (reqId) => ({
+          type: 'study_mode_get_daily_queue',
+          document_id: documentId,
+          daily_new_limit: dailyNewLimit,
+          daily_review_limit: dailyReviewLimit,
+          request_id: reqId,
+        }), 30000).then((r) => r.queue),
+      getProgress: (documentId, recompute = true) =>
+        sendStudyModeRpc<any>('prog', (reqId) => ({
+          type: 'study_mode_get_progress',
+          document_id: documentId,
+          recompute,
+          request_id: reqId,
+        }), 30000).then((r) => r.progress),
+      startSession: (payload) =>
+        sendStudyModeRpc<any>('sess_start', (reqId) => ({
+          type: 'study_mode_start_session',
+          ...payload,
+          request_id: reqId,
+        }), 30000).then((r) => r.session),
+      updateSession: (sessionId, payload) =>
+        sendStudyModeRpc<any>('sess_upd', (reqId) => ({
+          type: 'study_mode_update_session',
+          session_id: sessionId,
+          ...payload,
+          request_id: reqId,
+        }), 30000).then((r) => r.session),
+      pauseSession: (sessionId) =>
+        sendStudyModeRpc<any>('sess_pause', (reqId) => ({
+          type: 'study_mode_pause_session',
+          session_id: sessionId,
+          request_id: reqId,
+        }), 30000).then((r) => r.session),
+      resumeSession: (sessionId) =>
+        sendStudyModeRpc<any>('sess_res', (reqId) => ({
+          type: 'study_mode_resume_session',
+          session_id: sessionId,
+          request_id: reqId,
+        }), 30000).then((r) => r.session),
+      completeSession: (sessionId, summaryStats) =>
+        sendStudyModeRpc<any>('sess_comp', (reqId) => ({
+          type: 'study_mode_complete_session',
+          session_id: sessionId,
+          summary_stats: summaryStats,
+          request_id: reqId,
+        }), 30000).then((r) => r.session),
+      listSessions: (documentId, status) =>
+        sendStudyModeRpc<any>('sess_list', (reqId) => ({
+          type: 'study_mode_list_sessions',
+          document_id: documentId,
+          status,
+          request_id: reqId,
+        }), 30000).then((r) => r.sessions || []),
+    }),
+    [sendStudyModeRpc]
+  );
+
   const openSpatialBoard = useCallback(
     (domain: SpatialBoardDomain = 'study', query = '') => {
       const q = query.trim().toLowerCase();
@@ -3621,6 +3886,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         getGeneratedStudyDocumentStatus,
         generateStudyDocument,
         getGeneratedStudyDocumentFile,
+        studyModesApi,
         studyPipelineStage,
         activeBoard,
         focusedCardId,
