@@ -50,13 +50,18 @@ from services.study_modes.contracts import (
     StudyModeQAReport,
     StudyModeReadiness,
     StudyModeReadinessStatus,
+    StudySessionItemRef,
     StudySessionMode,
     StudySessionState,
     StudySessionStatus,
 )
 from services.study_modes.cornell_notes_engine import CornellNotesEngine
 from services.study_modes.flashcards_engine import FlashcardEngine
-from services.study_modes.grounding import Phase6GroundingHelper, compute_source_fingerprints
+from services.study_modes.grounding import (
+    Phase6GroundingHelper,
+    compute_source_fingerprints,
+    fingerprints_match,
+)
 from services.study_modes.learning_progress_engine import LearningProgressEngine
 from services.study_modes.orchestrator import StudyModeOrchestrator
 from services.study_modes.persistence import StudyModePersistence
@@ -80,6 +85,8 @@ __all__ = [
     "StudySessionManager",
     "StudyModeQA",
     "compute_source_fingerprints",
+    "fingerprints_match",
+    "StudySessionItemRef",
     "StudyDeck",
     "AdaptiveFlashcard",
     "FlashcardType",

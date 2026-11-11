@@ -1914,6 +1914,7 @@ class StudyWebSocketHandler:
                     document_id=doc_id,
                     mode=str(msg.get("mode") or "FLASHCARD_REVIEW"),
                     title=str(msg.get("title") or ""),
+                    items=msg.get("items"),
                     item_ids=msg.get("item_ids") or [],
                     config=msg.get("config") or {},
                 )
@@ -1928,6 +1929,7 @@ class StudyWebSocketHandler:
                 "session": self.study_service.record_study_session_step(
                     sid,
                     item_id=msg.get("item_id"),
+                    item_type=msg.get("item_type"),
                     partial_response=msg.get("partial_response"),
                     outcome=msg.get("outcome"),
                     next_index=msg.get("next_index"),

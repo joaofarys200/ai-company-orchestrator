@@ -15,6 +15,8 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import shutil
+import subprocess
 import tempfile
 import time
 from pathlib import Path
@@ -57,6 +59,7 @@ from services.editorial_intelligence_engine import (
     PedagogicalExplanationSpec,
 )
 from services.study_modes_engine import (
+    ActiveRecallDeck,
     ActiveRecallPrompt,
     AdaptiveFlashcard,
     AssessmentConfig,
@@ -69,9 +72,11 @@ from services.study_modes_engine import (
     ReviewSchedulingState,
     SRS_ALGORITHM_VERSION,
     ScoringCriterion,
+    StudyDeck,
     StudyModeQA,
     StudyModeReadinessStatus,
     StudyModesEngine,
+    StudySessionItemRef,
     StudySessionMode,
     StudySessionStatus,
 )
@@ -1436,3 +1441,528 @@ class TestEndToEndPipelinePhase6:
         ar = engine.generate_active_recall(doc_id, target_prompts=2)
         assert ar.prompts
         assert ar.generation_mode in ("LLM_GROUNDED", "PARTIAL")
+
+
+# ===========================================================================
+# Passe Corretivo — Secção 3.1: Sessões Mistas de Revisão Diária Tipadas
+# ===========================================================================
+
+class TestMixedDailyReviewSessionPhase6:
+    def _seed_mixed_queue_with_all_4_categories(self, engine: StudyModesEngine, doc_id: str, *, active_recall_first: bool = False):
+        """
+        Cria 2 flashcards + 2 prompts de Active Recall com IDs opacos (sem prefixos 'fc_' ou 'ar_')
+        distribuídos pelas 4 categorias: lapsed, due, low_confidence e new.
+        """
+        c_lapsed = AdaptiveFlashcard(
+            card_id="opaque_item_alpha",
+            document_id=doc_id,
+            front="Flashcard A (Lapso): O que garante a inferência local?",
+            back="Execução direta no hardware do utilizador sem servidores cloud.",
+            chapter_id="chap_01",
+            section_id="sec_01",
+            topic="Inferência Local Soberana",
+        )
+        c_new = AdaptiveFlashcard(
+            card_id="opaque_item_beta",
+            document_id=doc_id,
+            front="Flashcard B (Novo): Qual foi a latência média registada?",
+            back="72ms no modelo local otimizado.",
+            chapter_id="chap_02",
+            section_id="sec_03",
+            topic="Resultados Empíricos",
+        )
+        p_due = ActiveRecallPrompt(
+            prompt_id="opaque_item_gamma",
+            document_id=doc_id,
+            prompt_text="Prompt C (Due): Explica o protocolo experimental k-fold.",
+            grounded_reference_answer="Validação cruzada k-fold (k=10) sobre 15.000 amostras isoladas.",
+            chapter_id="chap_02",
+            section_id="sec_02",
+            topic="Metodologia k-fold",
+        )
+        p_low_conf = ActiveRecallPrompt(
+            prompt_id="opaque_item_delta",
+            document_id=doc_id,
+            prompt_text="Prompt D (Low Conf): Articula latência e orçamento de contexto.",
+            grounded_reference_answer="O controlo do orçamento de contexto previne degradação mantendo 94.8% de precisão em 72ms.",
+            chapter_id="chap_02",
+            section_id="sec_02",
+            topic="Calibração Latência-Precisão",
+        )
+
+        engine.flashcards.save_deck(
+            StudyDeck(deck_id="deck_opaque", document_id=doc_id, title="Baralho Misto", cards=[c_lapsed, c_new])
+        )
+        engine.active_recall.save_deck(
+            ActiveRecallDeck(document_id=doc_id, prompts=[p_due, p_low_conf])
+        )
+
+        now_ts = 1_700_100_000.0
+        # Estados SRS distribuídos pelas 4 categorias explícitas:
+        states = {
+            c_lapsed.card_id: ReviewSchedulingState(
+                item_id=c_lapsed.card_id,
+                item_type="flashcard",
+                document_id=doc_id,
+                reviews_count=2,
+                consecutive_failures=1 if not active_recall_first else 0,
+                failed_recalls=1,
+                last_confidence=1 if not active_recall_first else 4,
+                next_review_ts=(now_ts - 3600.0) if not active_recall_first else (now_ts - 600.0),
+                learning_state=ReviewLearningState.LAPSED.value if not active_recall_first else ReviewLearningState.DUE.value,
+            ),
+            p_due.prompt_id: ReviewSchedulingState(
+                item_id=p_due.prompt_id,
+                item_type="active_recall",
+                document_id=doc_id,
+                reviews_count=2,
+                consecutive_failures=1 if active_recall_first else 0,
+                failed_recalls=1 if active_recall_first else 0,
+                last_confidence=4,
+                next_review_ts=(now_ts - 7200.0),
+                learning_state=ReviewLearningState.LAPSED.value if active_recall_first else ReviewLearningState.DUE.value,
+            ),
+            p_low_conf.prompt_id: ReviewSchedulingState(
+                item_id=p_low_conf.prompt_id,
+                item_type="active_recall",
+                document_id=doc_id,
+                reviews_count=1,
+                last_confidence=1,
+                next_review_ts=now_ts + 86400.0,
+                learning_state=ReviewLearningState.LEARNING.value,
+            ),
+            c_new.card_id: ReviewSchedulingState(
+                item_id=c_new.card_id,
+                item_type="flashcard",
+                document_id=doc_id,
+                reviews_count=0,
+                learning_state=ReviewLearningState.NEW.value,
+            ),
+        }
+        engine.srs.persistence.save_state_file(
+            engine.srs.STATES_FILE,
+            {k: v.to_dict() for k, v in states.items()},
+        )
+        return now_ts, (c_lapsed, p_due, p_low_conf, c_new)
+
+    def test_mixed_daily_queue_ordering_limits_and_both_transitions(self, temp_study_workspace):
+        engine = StudyModesEngine(temp_study_workspace["storage_dir"], llm_caller=_mock_phase6_llm_caller)
+        doc_id = temp_study_workspace["doc_id"]
+
+        # 1) Transição Flashcard -> Active Recall (lapsed=flashcard, due=active_recall, low_conf=active_recall, new=flashcard)
+        now_ts, _ = self._seed_mixed_queue_with_all_4_categories(engine, doc_id, active_recall_first=False)
+        queue = engine.get_daily_review_queue(doc_id, daily_new_limit=5, daily_review_limit=5, now_ts=now_ts)
+
+        assert len(queue.lapsed_items) == 1 and queue.lapsed_items[0]["queue_category"] == "lapsed"
+        assert len(queue.due_items) == 1 and queue.due_items[0]["queue_category"] == "due"
+        assert len(queue.low_confidence_items) == 1 and queue.low_confidence_items[0]["queue_category"] == "low_confidence"
+        assert len(queue.new_items) == 1 and queue.new_items[0]["queue_category"] == "new"
+
+        ordered_queue_items = (
+            queue.lapsed_items + queue.due_items + queue.low_confidence_items + queue.new_items
+        )
+        assert [it["item_id"] for it in ordered_queue_items] == [
+            "opaque_item_alpha",
+            "opaque_item_gamma",
+            "opaque_item_delta",
+            "opaque_item_beta",
+        ]
+        assert {it["item_type"] for it in ordered_queue_items} == {"flashcard", "active_recall"}
+        assert len({it["item_id"] for it in ordered_queue_items}) == len(ordered_queue_items)
+
+        # Limites diários configurados respeitados
+        limited_q = engine.get_daily_review_queue(doc_id, daily_new_limit=0, daily_review_limit=2, now_ts=now_ts)
+        assert len(limited_q.new_items) == 0
+        assert len(limited_q.lapsed_items) + len(limited_q.due_items) + len(limited_q.low_confidence_items) == 2
+
+        # Iniciar sessão mista tipada preservando ordem e tipos explícitos
+        typed_items = [
+            {
+                "item_id": it["item_id"],
+                "item_type": it["item_type"],
+                "queue_category": it["queue_category"],
+                "title": it["title"],
+                "topic": it["topic"],
+            }
+            for it in ordered_queue_items
+        ]
+        # Inserir duplicado propositado para validar deduplicação determinística no StudySessionManager
+        typed_items_with_dup = typed_items + [typed_items[1]]
+        sess = engine.start_study_session(
+            document_id=doc_id,
+            mode=StudySessionMode.DAILY_REVIEW.value,
+            title="Sessão Diária Mista",
+            items=typed_items_with_dup,
+        )
+        assert [it.item_id for it in sess.items] == [
+            "opaque_item_alpha",
+            "opaque_item_gamma",
+            "opaque_item_delta",
+            "opaque_item_beta",
+        ]
+        assert [it.item_type for it in sess.items] == [
+            "flashcard",
+            "active_recall",
+            "active_recall",
+            "flashcard",
+        ]
+        assert sess.current_item() is not None and sess.current_item().item_type == "flashcard"
+
+        # Concluir item 0 (flashcard) -> avança automaticamente para item 1 (active_recall!)
+        after_fc = engine.record_session_step(
+            sess.session_id,
+            item_id="opaque_item_alpha",
+            outcome={"rating": "Good"},
+            mark_completed=True,
+        )
+        assert after_fc.current_index == 1
+        assert after_fc.current_item().item_id == "opaque_item_gamma"
+        assert after_fc.current_item().item_type == "active_recall"
+
+        # Pausar no meio da sessão mista e retomar após reinício do motor -> mantém posição e item_type active_recall
+        paused = engine.pause_study_session(sess.session_id)
+        assert paused.status == StudySessionStatus.PAUSED.value
+        assert paused.current_index == 1
+
+        restarted = StudyModesEngine(temp_study_workspace["storage_dir"])
+        resumed = restarted.resume_study_session(sess.session_id)
+        assert resumed.status == StudySessionStatus.IN_PROGRESS.value
+        assert resumed.current_index == 1
+        assert resumed.current_item().item_id == "opaque_item_gamma"
+        assert resumed.current_item().item_type == "active_recall"
+
+        # 2) Transição inversa: Active Recall (item 1 & 2) -> Flashcard (item 3)
+        after_ar1 = restarted.record_session_step(sess.session_id, item_id="opaque_item_gamma", mark_completed=True)
+        assert after_ar1.current_index == 2
+        assert after_ar1.current_item().item_type == "active_recall"
+
+        after_ar2 = restarted.record_session_step(sess.session_id, item_id="opaque_item_delta", mark_completed=True)
+        assert after_ar2.current_index == 3
+        assert after_ar2.current_item().item_id == "opaque_item_beta"
+        assert after_ar2.current_item().item_type == "flashcard"
+
+        after_last = restarted.record_session_step(sess.session_id, item_id="opaque_item_beta", mark_completed=True)
+        done = restarted.complete_study_session(sess.session_id)
+        assert done.status == StudySessionStatus.COMPLETED.value
+        assert len(done.completed_item_ids) == 4
+        assert done.summary_stats["completed_items"] == 4
+        assert done.summary_stats["total_items"] == 4
+
+        # 3) Ordem alternativa onde Active Recall é logo o item 0 (lapsed) -> abre primeiro em Active Recall
+        now_ts_rev, _ = self._seed_mixed_queue_with_all_4_categories(engine, doc_id, active_recall_first=True)
+        rev_q = engine.get_daily_review_queue(doc_id, daily_new_limit=5, daily_review_limit=5, now_ts=now_ts_rev)
+        assert rev_q.lapsed_items[0]["item_type"] == "active_recall"
+        assert rev_q.lapsed_items[0]["item_id"] == "opaque_item_gamma"
+
+    def test_legacy_item_ids_only_session_backward_compatibility_and_websocket(self, temp_study_workspace):
+        storage_dir = temp_study_workspace["storage_dir"]
+        doc_id = temp_study_workspace["doc_id"]
+        legacy_file = storage_dir / "study_modes_state" / "study_sessions.json"
+        legacy_file.parent.mkdir(parents=True, exist_ok=True)
+        legacy_payload = {
+            "sess_legacy_01": {
+                "session_id": "sess_legacy_01",
+                "document_id": doc_id,
+                "mode": "ACTIVE_RECALL",
+                "status": "PAUSED",
+                "title": "Sessão Legada AR",
+                "item_ids": ["legacy_opaque_1", "legacy_opaque_2"],
+                "current_index": 1,
+                "completed_item_ids": ["legacy_opaque_1"],
+                "partial_responses": {"legacy_opaque_2": "rascunho legado"},
+                "started_at": "2026-11-10T10:00:00",
+                "last_activity_at": "2026-11-10T10:05:00",
+            },
+            "sess_legacy_fc": {
+                "session_id": "sess_legacy_fc",
+                "document_id": doc_id,
+                "mode": "FLASHCARD_REVIEW",
+                "status": "IN_PROGRESS",
+                "title": "Sessão Legada FC",
+                "item_ids": ["legacy_opaque_3"],
+                "current_index": 0,
+                "completed_item_ids": [],
+                "started_at": "2026-11-10T10:00:00",
+                "last_activity_at": "2026-11-10T10:00:00",
+            },
+        }
+        legacy_file.write_text(json.dumps(legacy_payload, indent=2), encoding="utf-8")
+
+        engine = StudyModesEngine(storage_dir)
+        s_ar = engine.resume_study_session("sess_legacy_01")
+        assert s_ar.status == StudySessionStatus.IN_PROGRESS.value
+        assert s_ar.current_index == 1
+        assert [it.item_type for it in s_ar.items] == ["active_recall", "active_recall"]
+        assert s_ar.current_item().item_id == "legacy_opaque_2"
+
+        s_fc = engine.get_study_session("sess_legacy_fc")
+        assert s_fc is not None
+        assert [it.item_type for it in s_fc.items] == ["flashcard"]
+
+        # Round-trip WebSocket com `study_mode_start_session` tipado e `study_mode_update_session`
+        service = StudyService(
+            workspace_root=str(temp_study_workspace["tmp_path"]),
+            storage_dir=str(storage_dir),
+            vault_root=str(temp_study_workspace["tmp_path"] / "vault_mixed"),
+        )
+        sent: List[Dict[str, Any]] = []
+
+        class _Conn:
+            async def send(self, ws: Any, payload: Dict[str, Any]) -> None:
+                sent.append(payload)
+
+        handler = StudyWebSocketHandler(_Conn(), service)
+        routes = handler.routes()
+        ws_sess = WebSocketSessionState()
+
+        async def _run_ws():
+            ctx1 = WebSocketHandlerContext(services=None, runtime=ws_sess, client=object(), request_id="m1")  # type: ignore[arg-type]
+            await routes["study_mode_start_session"](
+                ctx1,
+                {
+                    "type": "study_mode_start_session",
+                    "document_id": doc_id,
+                    "mode": "DAILY_REVIEW",
+                    "title": "Revisão Diária WS",
+                    "items": [
+                        {"item_id": "x_fc_1", "item_type": "flashcard", "queue_category": "lapsed"},
+                        {"item_id": "y_ar_1", "item_type": "active_recall", "queue_category": "new"},
+                    ],
+                    "request_id": "m1",
+                },
+            )
+            created_sid = sent[-1]["session"]["session_id"]
+            ctx2 = WebSocketHandlerContext(services=None, runtime=ws_sess, client=object(), request_id="m2")  # type: ignore[arg-type]
+            await routes["study_mode_update_session"](
+                ctx2,
+                {
+                    "type": "study_mode_update_session",
+                    "session_id": created_sid,
+                    "item_id": "x_fc_1",
+                    "item_type": "flashcard",
+                    "outcome": {"rating": "Good"},
+                    "mark_completed": True,
+                    "request_id": "m2",
+                },
+            )
+
+        asyncio.run(_run_ws())
+        assert sent[-1]["session"]["current_index"] == 1
+        assert sent[-1]["session"]["items"][1]["item_type"] == "active_recall"
+        assert sent[-1]["session"]["items"][1]["item_id"] == "y_ar_1"
+
+    def test_frontend_daily_review_controller_dispatch_and_recovery(self):
+        """Executa o módulo TypeScript real `dailyReviewSession.ts` no Node v24 validando dispatch misto e compatibilidade."""
+        if not shutil.which("node"):
+            pytest.skip("Node.js não disponível para executar o controlador TypeScript diretamente.")
+
+        ts_mod_uri = Path("frontend/src/features/study/dailyReviewSession.ts").resolve().as_uri()
+        script = f"""
+import assert from 'node:assert/strict';
+import {{
+  buildDailySessionItems,
+  getCurrentSessionItem,
+  getSessionItems,
+  isSessionAllItemsCompleted,
+  resolveTabForSessionItem,
+}} from '{ts_mod_uri}';
+
+const queue = {{
+  document_id: 'doc_1',
+  generated_at: '2026-11-11T21:00:00',
+  daily_new_limit: 1,
+  daily_review_limit: 3,
+  lapsed_items: [{{ item_id: 'opaque_1', item_type: 'active_recall', title: 'AR Lapsed', topic: 'T1', chapter_id: 'c1', section_id: 's1', srs_state: 'LAPSED', interval_days: 1, ease_factor: 2.3, epistemic_status: 'SOURCE_FACT' }}],
+  due_items: [{{ item_id: 'opaque_2', item_type: 'flashcard', title: 'FC Due', topic: 'T2', chapter_id: 'c1', section_id: 's1', srs_state: 'DUE', interval_days: 6, ease_factor: 2.5, epistemic_status: 'SOURCE_FACT' }}],
+  low_confidence_items: [{{ item_id: 'opaque_3', item_type: 'active_recall', title: 'AR Low', topic: 'T3', chapter_id: 'c1', section_id: 's1', srs_state: 'LEARNING', interval_days: 1, ease_factor: 2.4, epistemic_status: 'MODEL_INFERENCE' }}],
+  new_items: [
+    {{ item_id: 'opaque_2', item_type: 'flashcard', title: 'Duplicate should drop', topic: 'T2', chapter_id: 'c1', section_id: 's1', srs_state: 'NEW', interval_days: 0, ease_factor: 2.5, epistemic_status: 'SOURCE_FACT' }},
+    {{ item_id: 'opaque_4', item_type: 'flashcard', title: 'FC New', topic: 'T4', chapter_id: 'c1', section_id: 's1', srs_state: 'NEW', interval_days: 0, ease_factor: 2.5, epistemic_status: 'SOURCE_FACT' }},
+    {{ item_id: 'opaque_5', item_type: 'active_recall', title: 'Exceeds daily_new_limit=1', topic: 'T5', chapter_id: 'c1', section_id: 's1', srs_state: 'NEW', interval_days: 0, ease_factor: 2.5, epistemic_status: 'SOURCE_FACT' }}
+  ],
+  weak_topics: [],
+  total_queue_count: 5,
+}};
+
+const built = buildDailySessionItems(queue);
+assert.deepEqual(built.map((x) => x.item_id), ['opaque_1', 'opaque_2', 'opaque_3', 'opaque_4']);
+assert.deepEqual(built.map((x) => x.item_type), ['active_recall', 'flashcard', 'active_recall', 'flashcard']);
+assert.deepEqual(built.map((x) => x.queue_category), ['lapsed', 'due', 'low_confidence', 'new']);
+
+// Transição 1: item 0 (Active Recall) -> completar -> item 1 (Flashcard) -> pausar & retomar -> item 2 (Active Recall)
+const session = {{
+  session_id: 's_mix',
+  document_id: 'doc_1',
+  mode: 'DAILY_REVIEW',
+  status: 'IN_PROGRESS',
+  title: 'Mista',
+  items: built,
+  item_ids: built.map((x) => x.item_id),
+  current_index: 0,
+  completed_item_ids: [],
+  partial_responses: {{}},
+  config: {{}},
+  summary_stats: {{}},
+  started_at: '',
+  last_activity_at: '',
+}};
+
+assert.equal(resolveTabForSessionItem(getCurrentSessionItem(session), session.mode), 'active_recall');
+session.completed_item_ids.push('opaque_1');
+session.current_index = 1;
+assert.equal(resolveTabForSessionItem(getCurrentSessionItem(session), session.mode), 'flashcards');
+
+session.status = 'PAUSED';
+assert.equal(getCurrentSessionItem(session)?.item_id, 'opaque_2');
+session.status = 'IN_PROGRESS';
+assert.equal(resolveTabForSessionItem(getCurrentSessionItem(session), session.mode), 'flashcards');
+
+session.completed_item_ids.push('opaque_2');
+session.current_index = 2;
+assert.equal(resolveTabForSessionItem(getCurrentSessionItem(session), session.mode), 'active_recall');
+
+session.completed_item_ids.push('opaque_3', 'opaque_4');
+assert.equal(isSessionAllItemsCompleted(session), true);
+
+// Retrocompatibilidade com sessões legadas que têm apenas item_ids
+const legacySess = {{
+  session_id: 's_leg',
+  document_id: 'doc_1',
+  mode: 'ACTIVE_RECALL',
+  status: 'IN_PROGRESS',
+  title: 'Legacy AR',
+  item_ids: ['no_prefix_id_1'],
+  current_index: 0,
+  completed_item_ids: [],
+  partial_responses: {{}},
+  config: {{}},
+  summary_stats: {{}},
+  started_at: '',
+  last_activity_at: '',
+}};
+assert.equal(getSessionItems(legacySess)[0].item_type, 'active_recall');
+assert.equal(resolveTabForSessionItem(getCurrentSessionItem(legacySess), legacySess.mode), 'active_recall');
+console.log('FRONTEND_CONTROLLER_OK');
+"""
+        proc = subprocess.run(
+            ["node", "--experimental-strip-types", "--input-type=module", "-e", script],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert proc.returncode == 0, f"STDERR: {proc.stderr}\nSTDOUT: {proc.stdout}"
+        assert "FRONTEND_CONTROLLER_OK" in proc.stdout
+
+
+# ===========================================================================
+# Passe Corretivo — Secção 3.2: Invalidação por Fingerprint do AST
+# ===========================================================================
+
+class TestASTInvalidationPhase6:
+    def test_cornell_notes_invalidate_on_ast_change_preserving_edits_and_reuse_cache(self, temp_study_workspace):
+        calls: List[str] = []
+
+        def counting_llm(**kwargs):
+            calls.append(kwargs.get("operation", ""))
+            return _mock_phase6_llm_caller(**kwargs)
+
+        storage_dir = temp_study_workspace["storage_dir"]
+        doc_id = temp_study_workspace["doc_id"]
+        engine = StudyModesEngine(storage_dir, llm_caller=counting_llm)
+
+        c1 = engine.generate_cornell_notes(doc_id)
+        initial_calls = len(calls)
+        assert initial_calls > 0
+        assert c1.fingerprints is not None
+
+        # Edição manual e nota pessoal pelo estudante antes de atualizar AST
+        engine.edit_cornell_entry(doc_id, "sec_01", summary_section="Edição manual do estudante no AST v1.")
+        engine.add_cornell_personal_note(doc_id, "sec_01", "Nota pessoal que sobrevive à regeneração.")
+
+        # Pedido subsequente com AST, Dossier e Plano inalterados -> DEVE reutilizar cache sem chamar LLM
+        calls.clear()
+        c_cached = engine.generate_cornell_notes(doc_id, force_regenerate=False)
+        assert len(calls) == 0
+        assert c_cached.fingerprints.ast_fingerprint == c1.fingerprints.ast_fingerprint
+
+        # Alterar APENAS o AST (mantendo dossier e plano editorial intocados!)
+        ast_mod = _build_phase2_ast(doc_id)
+        ast_mod.paragraphs[0].text += " [Conteúdo fonte revisto e expandido na nova extração AST]"
+        (storage_dir / "documents" / doc_id / "ast.json").write_text(
+            json.dumps(ast_mod.to_dict(), indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+        # Sem force_regenerate=True, Cornell Notes DEVEM detetar AST desatualizado e regenerar!
+        calls.clear()
+        c_regen = engine.generate_cornell_notes(doc_id, force_regenerate=False)
+        assert len(calls) > 0
+        assert c_regen.fingerprints.ast_fingerprint != c1.fingerprints.ast_fingerprint
+        assert c_regen.fingerprints.plan_fingerprint == c1.fingerprints.plan_fingerprint
+        assert c_regen.fingerprints.dossier_fingerprint == c1.fingerprints.dossier_fingerprint
+
+        sec1 = next(e for e in c_regen.entries if e.section_id == "sec_01")
+        assert sec1.summary_section == "Edição manual do estudante no AST v1."
+        assert len(sec1.personal_notes) == 1
+
+    def test_active_recall_invalidates_on_ast_change_preserving_history_and_reuse_cache(self, temp_study_workspace):
+        calls: List[str] = []
+
+        def counting_llm(**kwargs):
+            calls.append(kwargs.get("operation", ""))
+            return _mock_phase6_llm_caller(**kwargs)
+
+        storage_dir = temp_study_workspace["storage_dir"]
+        doc_id = temp_study_workspace["doc_id"]
+        engine = StudyModesEngine(storage_dir, llm_caller=counting_llm)
+
+        ar1 = engine.generate_active_recall(doc_id, target_prompts=4)
+        assert len(calls) > 0
+        assert ar1.fingerprints is not None
+
+        # Registar tentativa real e histórico SRS do estudante antes da alteração ao AST
+        first_prompt = ar1.prompts[0]
+        engine.submit_active_recall(
+            doc_id,
+            first_prompt.prompt_id,
+            student_response=first_prompt.grounded_reference_answer,
+            self_confidence=4,
+            now_ts=1_700_000_000.0,
+        )
+        srs_before = engine.srs.get_all_states(document_id=doc_id)[first_prompt.prompt_id]
+        hist_before = engine.srs.get_history(document_id=doc_id, item_id=first_prompt.prompt_id)
+        recall_hist_before = engine.progress.get_recall_history(doc_id)
+        assert srs_before.reviews_count == 1
+        assert len(hist_before) == 1
+        assert len(recall_hist_before) == 1
+
+        # Pedido subsequente com AST, Dossier e Plano inalterados -> DEVE reutilizar cache sem chamar LLM
+        calls.clear()
+        ar_cached = engine.generate_active_recall(doc_id, force_regenerate=False, target_prompts=4)
+        assert len(calls) == 0
+        assert ar_cached.fingerprints.ast_fingerprint == ar1.fingerprints.ast_fingerprint
+
+        # Alterar APENAS o AST (mantendo dossier e plano editorial inalterados!)
+        ast_mod = _build_phase2_ast(doc_id)
+        ast_mod.paragraphs[1].text += " [Parágrafo adicional extraído de revisão do PDF]"
+        (storage_dir / "documents" / doc_id / "ast.json").write_text(
+            json.dumps(ast_mod.to_dict(), indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+        # Sem force_regenerate=True, Active Recall DEVE invalidar o cache por alteração do AST
+        calls.clear()
+        ar_regen = engine.generate_active_recall(doc_id, force_regenerate=False, target_prompts=4)
+        assert len(calls) > 0
+        assert ar_regen.fingerprints.ast_fingerprint != ar1.fingerprints.ast_fingerprint
+        assert ar_regen.fingerprints.plan_fingerprint == ar1.fingerprints.plan_fingerprint
+        assert ar_regen.fingerprints.dossier_fingerprint == ar1.fingerprints.dossier_fingerprint
+
+        # Progresso SRS e histórico de tentativas do estudante têm de permanecer intactos
+        srs_after = engine.srs.get_all_states(document_id=doc_id)[first_prompt.prompt_id]
+        hist_after = engine.srs.get_history(document_id=doc_id, item_id=first_prompt.prompt_id)
+        recall_hist_after = engine.progress.get_recall_history(doc_id)
+        assert srs_after.reviews_count == 1
+        assert len(hist_after) == 1
+        assert len(recall_hist_after) == 1
+

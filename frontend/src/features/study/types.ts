@@ -957,6 +957,7 @@ export interface ActiveRecallAttempt {
 export interface DailyQueueItem {
   item_id: string;
   item_type: 'flashcard' | 'active_recall' | string;
+  queue_category?: 'lapsed' | 'due' | 'low_confidence' | 'new' | string;
   title: string;
   topic: string;
   chapter_id: string;
@@ -1019,12 +1020,23 @@ export interface LearningProgressSnapshot {
   updated_at: string;
 }
 
+export interface StudySessionItemRef {
+  item_id: string;
+  item_type: 'flashcard' | 'active_recall' | string;
+  queue_category?: 'lapsed' | 'due' | 'low_confidence' | 'new' | string;
+  title?: string;
+  topic?: string;
+  chapter_id?: string;
+  section_id?: string;
+}
+
 export interface StudySessionState {
   session_id: string;
   document_id: string;
   mode: string;
   status: 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED' | 'ABANDONED' | string;
   title: string;
+  items?: StudySessionItemRef[];
   item_ids: string[];
   current_index: number;
   completed_item_ids: string[];
@@ -1060,8 +1072,8 @@ export interface StudyModesBridge {
   submitActiveRecall: (documentId: string, promptId: string, payload: { student_response: string; self_confidence: number; outline_used?: boolean; use_llm?: boolean }) => Promise<{ attempt: ActiveRecallAttempt; srs_state: ReviewSchedulingState; progress: LearningProgressSnapshot }>;
   getDailyQueue: (documentId: string, dailyNewLimit?: number, dailyReviewLimit?: number) => Promise<DailyReviewQueue>;
   getProgress: (documentId: string, recompute?: boolean) => Promise<LearningProgressSnapshot>;
-  startSession: (payload: { document_id: string; mode: string; title?: string; item_ids?: string[]; config?: Record<string, any> }) => Promise<StudySessionState>;
-  updateSession: (sessionId: string, payload: { item_id?: string; partial_response?: any; outcome?: any; next_index?: number; mark_completed?: boolean }) => Promise<StudySessionState>;
+  startSession: (payload: { document_id: string; mode: string; title?: string; items?: StudySessionItemRef[]; item_ids?: string[]; config?: Record<string, any> }) => Promise<StudySessionState>;
+  updateSession: (sessionId: string, payload: { item_id?: string; item_type?: string; partial_response?: any; outcome?: any; next_index?: number; mark_completed?: boolean }) => Promise<StudySessionState>;
   pauseSession: (sessionId: string) => Promise<StudySessionState>;
   resumeSession: (sessionId: string) => Promise<StudySessionState>;
   completeSession: (sessionId: string, summaryStats?: Record<string, any>) => Promise<StudySessionState>;

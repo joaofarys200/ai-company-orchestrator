@@ -379,17 +379,20 @@ class SpacedRepetitionEngine:
         due: List[Dict[str, Any]] = []
         low_conf: List[Dict[str, Any]] = []
         new_items: List[Dict[str, Any]] = []
+        seen_ids: set[str] = set()
 
         for item in available_items:
             iid = str(item.get("item_id") or "")
-            if not iid:
+            if not iid or iid in seen_ids:
                 continue
+            seen_ids.add(iid)
             st = states.get(iid)
             if st and st.learning_state == ReviewLearningState.SUSPENDED.value:
                 continue
             enriched = dict(item)
             if st is None or st.reviews_count == 0:
                 enriched["srs_state"] = ReviewLearningState.NEW.value
+                enriched["queue_category"] = "new"
                 enriched["interval_days"] = 0.0
                 enriched["ease_factor"] = self.DEFAULT_EASE_FACTOR
                 new_items.append(enriched)
@@ -407,10 +410,13 @@ class SpacedRepetitionEngine:
 
             topic_low = str(item.get("topic") or "").lower() in weak_set
             if st.learning_state == ReviewLearningState.LAPSED.value or st.consecutive_failures > 0:
+                enriched["queue_category"] = "lapsed"
                 lapsed.append(enriched)
             elif st.next_review_ts <= ts:
+                enriched["queue_category"] = "due"
                 due.append(enriched)
             elif st.last_confidence <= 2 or topic_low:
+                enriched["queue_category"] = "low_confidence"
                 low_conf.append(enriched)
 
         # Priorizar lapsos > devidos (mais atrasados/tópicos fracos primeiro) > baixa confiança > novos limitados

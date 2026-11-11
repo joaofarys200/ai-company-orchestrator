@@ -18,11 +18,18 @@ import type {
   StudySessionState,
 } from './types';
 import { EvidenceRefChips } from './StudyEpistemicBadge';
+import {
+  buildDailySessionItems,
+  getCurrentSessionItem,
+  getSessionItems,
+  resolveTabForSessionItem,
+} from './dailyReviewSession';
 
 interface StudyAdaptiveHubViewProps {
   document: StudyDocument | null;
   studyModes?: StudyModesBridge;
   onNavigateTab?: (tab: 'flashcards' | 'active_recall' | 'notes' | 'quiz', topicHint?: string) => void;
+  onStartOrResumeSession?: (session: StudySessionState) => void;
 }
 
 const MASTERY_LABELS: Record<string, { label: string; style: string }> = {
@@ -48,6 +55,7 @@ export const StudyAdaptiveHubView: React.FC<StudyAdaptiveHubViewProps> = ({
   document,
   studyModes,
   onNavigateTab,
+  onStartOrResumeSession,
 }) => {
   const [queue, setQueue] = useState<DailyReviewQueue | null>(null);
   const [progress, setProgress] = useState<LearningProgressSnapshot | null>(null);
@@ -83,25 +91,25 @@ export const StudyAdaptiveHubView: React.FC<StudyAdaptiveHubViewProps> = ({
 
   const handleStartDailySession = async () => {
     if (!document || !studyModes || !queue) return;
-    const itemIds = [
-      ...queue.lapsed_items,
-      ...queue.due_items,
-      ...queue.low_confidence_items,
-      ...queue.new_items,
-    ].map((i) => i.item_id);
+    const typedItems = buildDailySessionItems(queue);
+    if (typedItems.length === 0) return;
+    const itemIds = typedItems.map((i) => i.item_id);
     try {
       const s = await studyModes.startSession({
         document_id: document.document_id,
         mode: 'DAILY_REVIEW',
-        title: `Revisão Diária (${itemIds.length} itens)`,
+        title: `Revisão Diária (${typedItems.length} itens)`,
+        items: typedItems,
         item_ids: itemIds,
         config: { dailyNewLimit, dailyReviewLimit },
       });
       setSessions((prev) => [s, ...prev]);
-      if (queue.lapsed_items.some((i) => i.item_type === 'active_recall') || queue.due_items.some((i) => i.item_type === 'active_recall')) {
-        onNavigateTab?.('active_recall');
+      if (onStartOrResumeSession) {
+        onStartOrResumeSession(s);
       } else {
-        onNavigateTab?.('flashcards');
+        const curItem = getCurrentSessionItem(s);
+        const target = resolveTabForSessionItem(curItem, s.mode);
+        onNavigateTab?.(target);
       }
     } catch (err: any) {
       setError(err?.message || 'Erro ao iniciar sessão diária.');
@@ -119,9 +127,13 @@ export const StudyAdaptiveHubView: React.FC<StudyAdaptiveHubViewProps> = ({
             : await studyModes.completeSession(sess.session_id);
       setSessions((prev) => prev.map((s) => (s.session_id === updated.session_id ? updated : s)));
       if (action === 'resume') {
-        if (updated.mode === 'ACTIVE_RECALL') onNavigateTab?.('active_recall');
-        else if (updated.mode === 'ASSESSMENT') onNavigateTab?.('quiz');
-        else onNavigateTab?.('flashcards');
+        if (onStartOrResumeSession) {
+          onStartOrResumeSession(updated);
+        } else {
+          const curItem = getCurrentSessionItem(updated);
+          const target = resolveTabForSessionItem(curItem, updated.mode);
+          onNavigateTab?.(target);
+        }
       }
     } catch (err: any) {
       setError(err?.message || 'Erro ao atualizar sessão.');
@@ -379,15 +391,29 @@ export const StudyAdaptiveHubView: React.FC<StudyAdaptiveHubViewProps> = ({
                   <p className="text-xs text-gray-400">Nenhuma sessão iniciada para este documento.</p>
                 ) : (
                   <div className="space-y-2">
-                    {sessions.slice(0, 8).map((s) => (
+                    {sessions.slice(0, 8).map((s) => {
+                      const resolvedItems = getSessionItems(s);
+                      const curItem = getCurrentSessionItem(s);
+                      const totalCount = resolvedItems.length || s.item_ids.length;
+                      return (
                       <div key={s.session_id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-black/30 px-3.5 py-2.5 border border-white/5 text-xs">
                         <div>
                           <p className="font-semibold text-white">{s.title}</p>
                           <p className="text-[11px] text-gray-400">
-                            Modo: {s.mode} • Estado: <span className="text-cyan-300">{s.status}</span> • Progresso: {s.completed_item_ids.length}/{s.item_ids.length} itens
+                            Modo: {s.mode} • Estado: <span className="text-cyan-300">{s.status}</span> • Progresso: {s.completed_item_ids.length}/{totalCount} itens
+                            {curItem ? ` • Próximo: ${curItem.item_type === 'active_recall' ? 'Active Recall' : 'Flashcard'}` : ''}
                           </p>
                         </div>
                         <div className="flex items-center gap-1.5">
+                          {(s.status === 'IN_PROGRESS' || s.status === 'PAUSED') && onStartOrResumeSession && (
+                            <button
+                              type="button"
+                              onClick={() => (s.status === 'PAUSED' ? handleSessionAction(s, 'resume') : onStartOrResumeSession(s))}
+                              className="flex items-center gap-1 rounded border border-emerald-500/30 px-2.5 py-1 text-[11px] text-emerald-300 hover:bg-emerald-950/30"
+                            >
+                              <Play className="h-3 w-3" /> {s.status === 'PAUSED' ? 'Retomar' : 'Continuar'}
+                            </button>
+                          )}
                           {s.status === 'IN_PROGRESS' && (
                             <button
                               type="button"
@@ -397,7 +423,7 @@ export const StudyAdaptiveHubView: React.FC<StudyAdaptiveHubViewProps> = ({
                               <Pause className="h-3 w-3" /> Pausar
                             </button>
                           )}
-                          {s.status === 'PAUSED' && (
+                          {s.status === 'PAUSED' && !onStartOrResumeSession && (
                             <button
                               type="button"
                               onClick={() => handleSessionAction(s, 'resume')}
@@ -417,7 +443,7 @@ export const StudyAdaptiveHubView: React.FC<StudyAdaptiveHubViewProps> = ({
                           )}
                         </div>
                       </div>
-                    ))}
+                    );})}
                   </div>
                 )}
               </section>

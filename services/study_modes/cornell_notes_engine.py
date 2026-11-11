@@ -23,6 +23,7 @@ from services.study_modes.grounding import (
     LLMCaller,
     Phase6GroundingHelper,
     compute_source_fingerprints,
+    fingerprints_match,
     invoke_phase6_json_llm,
 )
 from services.study_modes.persistence import StudyModePersistence
@@ -84,9 +85,7 @@ class CornellNotesEngine:
         if (
             not force_regenerate
             and existing is not None
-            and existing.fingerprints is not None
-            and existing.fingerprints.plan_fingerprint == current_fp.plan_fingerprint
-            and existing.fingerprints.dossier_fingerprint == current_fp.dossier_fingerprint
+            and fingerprints_match(existing.fingerprints, current_fp)
             and existing.entries
         ):
             return existing

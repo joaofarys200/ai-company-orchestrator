@@ -21,6 +21,11 @@ import { StudyKnowledgeView } from './StudyKnowledgeView';
 import { StudyFlashcardsView } from './StudyFlashcardsView';
 import { StudyActiveRecallView } from './StudyActiveRecallView';
 import { StudyAdaptiveHubView } from './StudyAdaptiveHubView';
+import {
+  getCurrentSessionItem,
+  isSessionAllItemsCompleted,
+  resolveTabForSessionItem,
+} from './dailyReviewSession';
 import type {
   StudyDocument,
   StudyReadingNote,
@@ -37,6 +42,7 @@ import type {
   StudyDocumentGenerationResult,
   StudyDocumentFilePayload,
   StudyModesBridge,
+  StudySessionState,
 } from './types';
 
 export type StudyTab =
@@ -205,10 +211,72 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   // Navigation
   const [activeTab, setActiveTab] = useState<StudyTab>('library');
   const [topicFilterHint, setTopicFilterHint] = useState<string>('');
+  const [activeDailySession, setActiveDailySession] = useState<StudySessionState | null>(null);
   const [documents, setDocuments] = useState<StudyDocument[]>(initialDocuments);
   const [activeDocumentId, setActiveDocumentId] = useState<string | null>(
     initialActiveDocumentId || (initialDocuments[0]?.document_id ?? null)
   );
+
+  // Reset active mixed daily session when switching document
+  useEffect(() => {
+    setActiveDailySession((prev) =>
+      prev && prev.document_id === activeDocumentId ? prev : null
+    );
+  }, [activeDocumentId]);
+
+  const handleStartOrResumeDailySession = useCallback((session: StudySessionState) => {
+    setActiveDailySession(session);
+    const curItem = getCurrentSessionItem(session);
+    const targetTab = resolveTabForSessionItem(curItem, session.mode);
+    setTopicFilterHint('');
+    setActiveTab(targetTab);
+  }, []);
+
+  const handleDailySessionUpdated = useCallback(
+    async (session: StudySessionState, options?: { navigateNext?: boolean }) => {
+      const shouldNavigate = options?.navigateNext !== false;
+      if (isSessionAllItemsCompleted(session) && shouldNavigate) {
+        if (studyModesApi && session.status !== 'COMPLETED') {
+          await studyModesApi.completeSession(session.session_id);
+        }
+        setActiveDailySession(null);
+        setActiveTab('adaptive');
+        return;
+      }
+      setActiveDailySession(session);
+      if (shouldNavigate) {
+        const nextItem = getCurrentSessionItem(session);
+        const targetTab = resolveTabForSessionItem(nextItem, session.mode);
+        setTopicFilterHint('');
+        setActiveTab(targetTab);
+      }
+    },
+    [studyModesApi]
+  );
+
+  const handlePauseDailySession = useCallback(
+    async (draft?: { itemId: string; response: string }) => {
+      if (!activeDailySession || !studyModesApi) return;
+      if (draft?.itemId && draft.response.trim()) {
+        await studyModesApi.updateSession(activeDailySession.session_id, {
+          item_id: draft.itemId,
+          partial_response: draft.response,
+          mark_completed: false,
+        });
+      }
+      await studyModesApi.pauseSession(activeDailySession.session_id);
+      setActiveDailySession(null);
+      setActiveTab('adaptive');
+    },
+    [activeDailySession, studyModesApi]
+  );
+
+  const handleCompleteDailySession = useCallback(async () => {
+    if (!activeDailySession || !studyModesApi) return;
+    await studyModesApi.completeSession(activeDailySession.session_id);
+    setActiveDailySession(null);
+    setActiveTab('adaptive');
+  }, [activeDailySession, studyModesApi]);
 
   // Upload progress state
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -622,6 +690,10 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             studyModes={studyModesApi}
             onGoToSummary={() => setActiveTab('summary')}
             initialFilterTopic={topicFilterHint}
+            activeDailySession={activeDailySession}
+            onDailySessionUpdated={handleDailySessionUpdated}
+            onPauseDailySession={() => handlePauseDailySession()}
+            onCompleteDailySession={handleCompleteDailySession}
           />
         )}
 
@@ -630,6 +702,10 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             document={activeDocument}
             studyModes={studyModesApi}
             onGoToSummary={() => setActiveTab('summary')}
+            activeDailySession={activeDailySession}
+            onDailySessionUpdated={handleDailySessionUpdated}
+            onPauseDailySession={handlePauseDailySession}
+            onCompleteDailySession={handleCompleteDailySession}
           />
         )}
 
@@ -652,6 +728,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
           <StudyAdaptiveHubView
             document={activeDocument}
             studyModes={studyModesApi}
+            onStartOrResumeSession={handleStartOrResumeDailySession}
             onNavigateTab={(tab, topicHint) => {
               setTopicFilterHint(topicHint || '');
               setActiveTab(tab);

@@ -1165,6 +1165,41 @@ class LearningProgressSnapshot:
 # 7. Gestor de Sessões de Estudo & QA
 # ---------------------------------------------------------------------------
 
+VALID_SESSION_ITEM_TYPES = ("flashcard", "active_recall")
+
+
+@dataclass
+class StudySessionItemRef:
+    item_id: str
+    item_type: str = "flashcard"  # flashcard | active_recall
+    queue_category: str = ""      # lapsed | due | low_confidence | new
+    title: str = ""
+    topic: str = ""
+    chapter_id: str = ""
+    section_id: str = ""
+
+    def __post_init__(self) -> None:
+        self.item_id = str(self.item_id or "").strip()
+        norm_type = str(self.item_type or "flashcard").strip().lower()
+        self.item_type = norm_type if norm_type in VALID_SESSION_ITEM_TYPES else "flashcard"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "StudySessionItemRef":
+        d = data or {}
+        return cls(
+            item_id=str(d.get("item_id", "")),
+            item_type=str(d.get("item_type", "flashcard")),
+            queue_category=str(d.get("queue_category", "")),
+            title=str(d.get("title", "")),
+            topic=str(d.get("topic", "")),
+            chapter_id=str(d.get("chapter_id", "")),
+            section_id=str(d.get("section_id", "")),
+        )
+
+
 @dataclass
 class StudySessionState:
     session_id: str
@@ -1172,6 +1207,7 @@ class StudySessionState:
     mode: str = StudySessionMode.FLASHCARD_REVIEW.value
     status: str = StudySessionStatus.IN_PROGRESS.value
     title: str = ""
+    items: List[StudySessionItemRef] = field(default_factory=list)
     item_ids: List[str] = field(default_factory=list)
     current_index: int = 0
     completed_item_ids: List[str] = field(default_factory=list)
@@ -1184,18 +1220,67 @@ class StudySessionState:
     paused_at: Optional[str] = None
     completed_at: Optional[str] = None
 
+    def __post_init__(self) -> None:
+        seen: set[str] = set()
+        if self.items:
+            deduped_items: List[StudySessionItemRef] = []
+            for raw_it in self.items:
+                it = (
+                    raw_it
+                    if isinstance(raw_it, StudySessionItemRef)
+                    else StudySessionItemRef.from_dict(dict(raw_it) if isinstance(raw_it, dict) else {})
+                )
+                if it.item_id and it.item_id not in seen:
+                    seen.add(it.item_id)
+                    deduped_items.append(it)
+            self.items = deduped_items
+            self.item_ids = [it.item_id for it in deduped_items]
+        elif self.item_ids:
+            # Retrocompatibilidade com sessões legadas que guardavam apenas `item_ids`
+            fallback_type = (
+                "active_recall"
+                if self.mode == StudySessionMode.ACTIVE_RECALL.value
+                else "flashcard"
+            )
+            deduped_ids: List[str] = []
+            for raw_id in self.item_ids:
+                iid = str(raw_id or "").strip()
+                if iid and iid not in seen:
+                    seen.add(iid)
+                    deduped_ids.append(iid)
+            self.item_ids = deduped_ids
+            self.items = [
+                StudySessionItemRef(item_id=iid, item_type=fallback_type)
+                for iid in deduped_ids
+            ]
+
+    def resolved_items(self) -> List[StudySessionItemRef]:
+        return list(self.items)
+
+    def current_item(self) -> Optional[StudySessionItemRef]:
+        if 0 <= self.current_index < len(self.items):
+            return self.items[self.current_index]
+        return None
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "StudySessionState":
         d = data or {}
+        raw_items = d.get("items") or []
+        parsed_items = [
+            StudySessionItemRef.from_dict(x)
+            for x in raw_items
+            if isinstance(x, dict) and str(x.get("item_id", "")).strip()
+        ]
         return cls(
             session_id=str(d.get("session_id", "")),
             document_id=str(d.get("document_id", "")),
             mode=str(d.get("mode", StudySessionMode.FLASHCARD_REVIEW.value)),
             status=str(d.get("status", StudySessionStatus.IN_PROGRESS.value)),
             title=str(d.get("title", "")),
+            items=parsed_items,
             item_ids=[str(x) for x in (d.get("item_ids") or [])],
             current_index=int(d.get("current_index", 0)),
             completed_item_ids=[str(x) for x in (d.get("completed_item_ids") or [])],

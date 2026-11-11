@@ -20,14 +20,20 @@ import type {
   StudyDocument,
   StudyModeReadiness,
   StudyModesBridge,
+  StudySessionState,
 } from './types';
 import { EpistemicBadge, EvidenceRefChips, ReadinessBanner } from './StudyEpistemicBadge';
+import { getCurrentSessionItem, getSessionItems } from './dailyReviewSession';
 
 interface StudyFlashcardsViewProps {
   document: StudyDocument | null;
   studyModes?: StudyModesBridge;
   onGoToSummary?: () => void;
   initialFilterTopic?: string;
+  activeDailySession?: StudySessionState | null;
+  onDailySessionUpdated?: (session: StudySessionState, options?: { navigateNext?: boolean }) => void;
+  onPauseDailySession?: () => Promise<void>;
+  onCompleteDailySession?: () => Promise<void>;
 }
 
 const CARD_TYPE_LABELS: Record<string, string> = {
@@ -45,6 +51,10 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
   studyModes,
   onGoToSummary,
   initialFilterTopic = '',
+  activeDailySession,
+  onDailySessionUpdated,
+  onPauseDailySession,
+  onCompleteDailySession,
 }) => {
   const [cards, setCards] = useState<AdaptiveFlashcard[]>([]);
   const [readiness, setReadiness] = useState<StudyModeReadiness | null>(null);
@@ -132,6 +142,25 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
     }
   }, [filteredCards.length, currentIdx]);
 
+  const dailyCurrentItem = getCurrentSessionItem(activeDailySession);
+  const isDailyFlashcardStep = Boolean(
+    activeDailySession && dailyCurrentItem && dailyCurrentItem.item_type === 'flashcard'
+  );
+
+  // Sync card focus when a mixed Daily Review session targets a specific flashcard
+  useEffect(() => {
+    if (!isDailyFlashcardStep || !dailyCurrentItem) return;
+    setFilterChapter('ALL');
+    setFilterDifficulty('ALL');
+    setFilterType('ALL');
+    setTopicSearch('');
+    const idx = cards.findIndex((c) => !c.is_deleted && c.card_id === dailyCurrentItem.item_id);
+    if (idx >= 0) {
+      setCurrentIdx(idx);
+      setFlipped(false);
+    }
+  }, [isDailyFlashcardStep, dailyCurrentItem?.item_id, cards]);
+
   const activeCard = filteredCards[currentIdx] || null;
 
   const handleGenerate = async (force = false) => {
@@ -156,18 +185,6 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
       if (!document || !studyModes || !activeCard) return;
       setError(null);
       try {
-        let activeSessId = sessionId;
-        if (!activeSessId) {
-          const s = await studyModes.startSession({
-            document_id: document.document_id,
-            mode: 'FLASHCARD_REVIEW',
-            title: `Revisão de Flashcards: ${document.title}`,
-            item_ids: filteredCards.map((c) => c.card_id),
-          });
-          activeSessId = s.session_id;
-          setSessionId(s.session_id);
-        }
-
         const res = await studyModes.reviewFlashcard(
           document.document_id,
           activeCard.card_id,
@@ -184,8 +201,40 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
         setLastSrsNotice(
           `Agendado para ${res.srs_state.interval_days}d (EF ${res.srs_state.ease_factor}, estado: ${res.srs_state.learning_state})`
         );
+
+        if (activeDailySession && isDailyFlashcardStep) {
+          const updatedSess = await studyModes.updateSession(activeDailySession.session_id, {
+            item_id: activeCard.card_id,
+            item_type: 'flashcard',
+            outcome: { rating, interval_days: res.srs_state.interval_days },
+            mark_completed: true,
+          });
+          setFlipped(false);
+          onDailySessionUpdated?.(updatedSess, { navigateNext: true });
+          return;
+        }
+
+        let activeSessId = sessionId;
+        if (!activeSessId) {
+          const s = await studyModes.startSession({
+            document_id: document.document_id,
+            mode: 'FLASHCARD_REVIEW',
+            title: `Revisão de Flashcards: ${document.title}`,
+            items: filteredCards.map((c) => ({
+              item_id: c.card_id,
+              item_type: 'flashcard',
+              title: c.front,
+              topic: c.topic,
+            })),
+            item_ids: filteredCards.map((c) => c.card_id),
+          });
+          activeSessId = s.session_id;
+          setSessionId(s.session_id);
+        }
+
         await studyModes.updateSession(activeSessId, {
           item_id: activeCard.card_id,
+          item_type: 'flashcard',
           outcome: { rating, interval_days: res.srs_state.interval_days },
           next_index: Math.min(filteredCards.length - 1, currentIdx + 1),
           mark_completed: true,
@@ -198,7 +247,18 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
         setError(err?.message || 'Erro ao registar revisão.');
       }
     },
-    [document, studyModes, activeCard, sessionId, filteredCards, confidence, currentIdx]
+    [
+      document,
+      studyModes,
+      activeCard,
+      sessionId,
+      filteredCards,
+      confidence,
+      currentIdx,
+      activeDailySession,
+      isDailyFlashcardStep,
+      onDailySessionUpdated,
+    ]
   );
 
   // Keyboard shortcuts for study flow
@@ -344,6 +404,41 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
       <div className="flex-1 overflow-y-auto p-6 space-y-5">
         <div className="max-w-4xl mx-auto space-y-4">
           <ReadinessBanner readiness={readiness} onGoToSummary={onGoToSummary} />
+
+          {activeDailySession && isDailyFlashcardStep && dailyCurrentItem && (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-cyan-500/30 bg-cyan-950/25 px-4 py-2.5 text-xs">
+              <div className="space-y-0.5">
+                <p className="font-semibold text-cyan-200">
+                  Sessão Diária Mista • Item {activeDailySession.current_index + 1} /{' '}
+                  {getSessionItems(activeDailySession).length} (Flashcard)
+                </p>
+                <p className="text-[11px] text-cyan-300/80">
+                  {activeDailySession.completed_item_ids.length} concluídos
+                  {dailyCurrentItem.queue_category ? ` • Categoria: ${dailyCurrentItem.queue_category}` : ''}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {onPauseDailySession && (
+                  <button
+                    type="button"
+                    onClick={() => onPauseDailySession()}
+                    className="rounded border border-amber-400/40 bg-amber-500/15 px-2.5 py-1 text-[11px] font-medium text-amber-200 hover:bg-amber-500/25"
+                  >
+                    Pausar Sessão
+                  </button>
+                )}
+                {onCompleteDailySession && (
+                  <button
+                    type="button"
+                    onClick={() => onCompleteDailySession()}
+                    className="rounded border border-white/20 bg-black/30 px-2.5 py-1 text-[11px] font-medium text-gray-200 hover:text-white"
+                  >
+                    Concluir Sessão
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="rounded-lg border border-rose-500/30 bg-rose-950/30 px-4 py-2.5 text-xs text-rose-200">

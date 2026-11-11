@@ -1730,8 +1730,8 @@ export type ClientMessage =
   | { type: 'study_mode_submit_active_recall'; document_id: string; prompt_id: string; student_response: string; self_confidence: number; outline_used?: boolean; use_llm?: boolean; request_id?: string }
   | { type: 'study_mode_get_daily_queue'; document_id: string; daily_new_limit?: number; daily_review_limit?: number; request_id?: string }
   | { type: 'study_mode_get_progress'; document_id: string; recompute?: boolean; request_id?: string }
-  | { type: 'study_mode_start_session'; document_id: string; mode: string; title?: string; item_ids?: string[]; config?: Record<string, unknown>; request_id?: string }
-  | { type: 'study_mode_update_session'; session_id: string; document_id?: string; item_id?: string; partial_response?: unknown; outcome?: unknown; next_index?: number; mark_completed?: boolean; request_id?: string }
+  | { type: 'study_mode_start_session'; document_id: string; mode: string; title?: string; items?: Array<{ item_id: string; item_type: string; queue_category?: string; title?: string; topic?: string; chapter_id?: string; section_id?: string }>; item_ids?: string[]; config?: Record<string, unknown>; request_id?: string }
+  | { type: 'study_mode_update_session'; session_id: string; document_id?: string; item_id?: string; item_type?: string; partial_response?: unknown; outcome?: unknown; next_index?: number; mark_completed?: boolean; request_id?: string }
   | { type: 'study_mode_pause_session'; session_id: string; document_id?: string; request_id?: string }
   | { type: 'study_mode_resume_session'; session_id: string; document_id?: string; request_id?: string }
   | { type: 'study_mode_complete_session'; session_id: string; document_id?: string; summary_stats?: Record<string, unknown>; request_id?: string }

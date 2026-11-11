@@ -16,13 +16,23 @@ import type {
   StudyDocument,
   StudyModeReadiness,
   StudyModesBridge,
+  StudySessionState,
 } from './types';
 import { EpistemicBadge, EvidenceRefChips, ReadinessBanner } from './StudyEpistemicBadge';
+import {
+  getCurrentSessionItem,
+  getSessionItems,
+  isSessionAllItemsCompleted,
+} from './dailyReviewSession';
 
 interface StudyActiveRecallViewProps {
   document: StudyDocument | null;
   studyModes?: StudyModesBridge;
   onGoToSummary?: () => void;
+  activeDailySession?: StudySessionState | null;
+  onDailySessionUpdated?: (session: StudySessionState, options?: { navigateNext?: boolean }) => void;
+  onPauseDailySession?: (draft?: { itemId: string; response: string }) => Promise<void>;
+  onCompleteDailySession?: () => Promise<void>;
 }
 
 const PROMPT_TYPE_LABELS: Record<string, string> = {
@@ -38,6 +48,10 @@ export const StudyActiveRecallView: React.FC<StudyActiveRecallViewProps> = ({
   document,
   studyModes,
   onGoToSummary,
+  activeDailySession,
+  onDailySessionUpdated,
+  onPauseDailySession,
+  onCompleteDailySession,
 }) => {
   const [prompts, setPrompts] = useState<ActiveRecallPrompt[]>([]);
   const [history, setHistory] = useState<ActiveRecallAttempt[]>([]);
@@ -47,6 +61,7 @@ export const StudyActiveRecallView: React.FC<StudyActiveRecallViewProps> = ({
   const [responseText, setResponseText] = useState('');
   const [confidence, setConfidence] = useState(3);
   const [lastAttempt, setLastAttempt] = useState<ActiveRecallAttempt | null>(null);
+  const [pendingAdvanceSession, setPendingAdvanceSession] = useState<StudySessionState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,8 +87,33 @@ export const StudyActiveRecallView: React.FC<StudyActiveRecallViewProps> = ({
   }, [document?.document_id, studyModes]);
 
   useEffect(() => {
+    setPendingAdvanceSession(null);
     loadData();
   }, [loadData]);
+
+  const dailyCurrentItem = !pendingAdvanceSession ? getCurrentSessionItem(activeDailySession) : null;
+  const isDailyActiveRecallStep = Boolean(
+    activeDailySession && dailyCurrentItem && dailyCurrentItem.item_type === 'active_recall'
+  );
+
+  // Focus prompt matching the active Daily Review step and restore any paused draft
+  useEffect(() => {
+    if (!isDailyActiveRecallStep || !dailyCurrentItem || prompts.length === 0) return;
+    const idx = prompts.findIndex((p) => p.prompt_id === dailyCurrentItem.item_id);
+    if (idx >= 0) {
+      setActiveIdx(idx);
+      const savedDraft = activeDailySession?.partial_responses?.[dailyCurrentItem.item_id];
+      setResponseText(typeof savedDraft === 'string' ? savedDraft : '');
+      setLastAttempt(null);
+      setShowOutline(false);
+    }
+  }, [
+    isDailyActiveRecallStep,
+    dailyCurrentItem?.item_id,
+    activeDailySession?.session_id,
+    activeDailySession?.partial_responses,
+    prompts,
+  ]);
 
   const activePrompt = prompts[activeIdx] || null;
 
@@ -107,6 +147,21 @@ export const StudyActiveRecallView: React.FC<StudyActiveRecallViewProps> = ({
       });
       setLastAttempt(res.attempt);
       setHistory((prev) => [res.attempt, ...prev]);
+      if (activeDailySession && isDailyActiveRecallStep) {
+        const updatedSess = await studyModes.updateSession(activeDailySession.session_id, {
+          item_id: activePrompt.prompt_id,
+          item_type: 'active_recall',
+          partial_response: responseText,
+          outcome: {
+            self_rating: res.attempt.self_rating,
+            score_ratio: res.attempt.score_ratio,
+            self_confidence: confidence,
+          },
+          mark_completed: true,
+        });
+        setPendingAdvanceSession(updatedSess);
+        onDailySessionUpdated?.(updatedSess, { navigateNext: false });
+      }
     } catch (err: any) {
       setError(err?.message || 'Erro ao registar tentativa de recuperação.');
     } finally {
@@ -152,6 +207,69 @@ export const StudyActiveRecallView: React.FC<StudyActiveRecallViewProps> = ({
       <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-4xl mx-auto space-y-5">
           <ReadinessBanner readiness={readiness} onGoToSummary={onGoToSummary} />
+
+          {(pendingAdvanceSession || (activeDailySession && isDailyActiveRecallStep && dailyCurrentItem)) && (() => {
+            const bannerSess = (pendingAdvanceSession || activeDailySession)!;
+            const totalItems = getSessionItems(bannerSess).length;
+            const doneAll = isSessionAllItemsCompleted(bannerSess);
+            return (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-400/35 bg-indigo-950/30 px-4 py-2.5 text-xs">
+                <div className="space-y-0.5">
+                  <p className="font-semibold text-indigo-200">
+                    Sessão Diária Mista • {bannerSess.completed_item_ids.length}/{totalItems} concluídos (Active Recall)
+                  </p>
+                  <p className="text-[11px] text-indigo-300/80">
+                    {pendingAdvanceSession
+                      ? doneAll
+                        ? 'Todos os itens da fila diária foram concluídos.'
+                        : 'Item registado! Podes rever a referência abaixo e avançar para o próximo item.'
+                      : `Item atual ${bannerSess.current_index + 1} / ${totalItems}${
+                          dailyCurrentItem?.queue_category ? ` • Categoria: ${dailyCurrentItem.queue_category}` : ''
+                        }`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {pendingAdvanceSession && onDailySessionUpdated && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const sessToAdvance = pendingAdvanceSession;
+                        setPendingAdvanceSession(null);
+                        onDailySessionUpdated(sessToAdvance, { navigateNext: true });
+                      }}
+                      className="rounded bg-indigo-600 px-3 py-1 text-[11px] font-semibold text-white hover:bg-indigo-500"
+                    >
+                      {doneAll ? 'Concluir Sessão Diária ✓' : 'Próximo Item da Sessão →'}
+                    </button>
+                  )}
+                  {onPauseDailySession && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onPauseDailySession(
+                          !pendingAdvanceSession && activePrompt && responseText.trim()
+                            ? { itemId: activePrompt.prompt_id, response: responseText }
+                            : undefined
+                        )
+                      }
+                      className="rounded border border-amber-400/40 bg-amber-500/15 px-2.5 py-1 text-[11px] font-medium text-amber-200 hover:bg-amber-500/25"
+                    >
+                      Pausar Sessão
+                    </button>
+                  )}
+                  {onCompleteDailySession && !pendingAdvanceSession && (
+                    <button
+                      type="button"
+                      onClick={() => onCompleteDailySession()}
+                      className="rounded border border-white/20 bg-black/30 px-2.5 py-1 text-[11px] font-medium text-gray-200 hover:text-white"
+                    >
+                      Concluir
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
 
           {error && (
             <div className="rounded-lg border border-rose-500/30 bg-rose-950/30 px-4 py-2.5 text-xs text-rose-200">
@@ -345,6 +463,24 @@ export const StudyActiveRecallView: React.FC<StudyActiveRecallViewProps> = ({
                   )}
 
                   <EvidenceRefChips refs={lastAttempt.evidence_refs} />
+
+                  {pendingAdvanceSession && onDailySessionUpdated && (
+                    <div className="flex justify-end pt-2 border-t border-white/10">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const sessToAdvance = pendingAdvanceSession;
+                          setPendingAdvanceSession(null);
+                          onDailySessionUpdated(sessToAdvance, { navigateNext: true });
+                        }}
+                        className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500"
+                      >
+                        {isSessionAllItemsCompleted(pendingAdvanceSession)
+                          ? 'Concluir Sessão Diária ✓'
+                          : 'Avançar para Próximo Item da Sessão →'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 

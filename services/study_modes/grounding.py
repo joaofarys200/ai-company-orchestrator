@@ -61,6 +61,20 @@ def compute_source_fingerprints(
     )
 
 
+def fingerprints_match(
+    saved: Optional[SourceFingerprintSnapshot],
+    current: SourceFingerprintSnapshot,
+) -> bool:
+    """Verifica validade de cache exigindo correspondência integral de AST, Dossier e Plano."""
+    if saved is None:
+        return False
+    return (
+        saved.plan_fingerprint == current.plan_fingerprint
+        and saved.dossier_fingerprint == current.dossier_fingerprint
+        and saved.ast_fingerprint == current.ast_fingerprint
+    )
+
+
 def map_depth_to_content_difficulty(depth_level: str, role: str = "") -> str:
     d = str(depth_level or "").upper()
     r = str(role or "").upper()

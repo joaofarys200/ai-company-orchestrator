@@ -11,6 +11,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Sequence
 
 from services.study_modes.contracts import (
+    StudySessionItemRef,
     StudySessionMode,
     StudySessionState,
     StudySessionStatus,
@@ -26,6 +27,38 @@ class StudySessionManager:
     def __init__(self, persistence: StudyModePersistence) -> None:
         self.persistence = persistence
 
+    @staticmethod
+    def _normalize_items(
+        mode: str,
+        item_ids: Optional[Sequence[str]],
+        items: Optional[Sequence[Any]],
+    ) -> List[StudySessionItemRef]:
+        seen: set[str] = set()
+        out: List[StudySessionItemRef] = []
+        if items:
+            for raw in items:
+                it = (
+                    raw
+                    if isinstance(raw, StudySessionItemRef)
+                    else StudySessionItemRef.from_dict(dict(raw) if isinstance(raw, dict) else {})
+                )
+                if it.item_id and it.item_id not in seen:
+                    seen.add(it.item_id)
+                    out.append(it)
+            return out
+
+        fallback_type = (
+            "active_recall"
+            if mode == StudySessionMode.ACTIVE_RECALL.value
+            else "flashcard"
+        )
+        for raw_id in (item_ids or []):
+            iid = str(raw_id or "").strip()
+            if iid and iid not in seen:
+                seen.add(iid)
+                out.append(StudySessionItemRef(item_id=iid, item_type=fallback_type))
+        return out
+
     def start_session(
         self,
         *,
@@ -33,17 +66,20 @@ class StudySessionManager:
         mode: str = StudySessionMode.FLASHCARD_REVIEW.value,
         title: str = "",
         item_ids: Optional[Sequence[str]] = None,
+        items: Optional[Sequence[Any]] = None,
         config: Optional[Dict[str, Any]] = None,
     ) -> StudySessionState:
         now = datetime.now().isoformat()
         sid = f"sess_{uuid.uuid4().hex[:10]}"
+        norm_items = self._normalize_items(mode, item_ids, items)
         session = StudySessionState(
             session_id=sid,
             document_id=document_id,
             mode=mode,
             status=StudySessionStatus.IN_PROGRESS.value,
             title=title or f"Sessão {mode}",
-            item_ids=[str(x) for x in (item_ids or []) if str(x).strip()],
+            items=norm_items,
+            item_ids=[it.item_id for it in norm_items],
             current_index=0,
             config=dict(config or {}),
             started_at=now,
@@ -90,6 +126,7 @@ class StudySessionManager:
         session_id: str,
         *,
         item_id: Optional[str] = None,
+        item_type: Optional[str] = None,
         partial_response: Any = None,
         outcome: Optional[Dict[str, Any]] = None,
         next_index: Optional[int] = None,
@@ -105,15 +142,43 @@ class StudySessionManager:
                 raise ValueError(f"Sessão de estudo '{session_id}' não encontrada.")
             sess = StudySessionState.from_dict(raw)
             sess.last_activity_at = now
+            resolved_type = str(item_type or "").strip().lower()
+            if item_id and not resolved_type:
+                matched = next((it for it in sess.items if it.item_id == item_id), None)
+                if matched is not None:
+                    resolved_type = matched.item_type
             if item_id:
                 if partial_response is not None:
                     sess.partial_responses[item_id] = partial_response
                 if mark_completed and item_id not in sess.completed_item_ids:
                     sess.completed_item_ids.append(item_id)
             if outcome is not None:
-                sess.item_outcomes.append(outcome)
+                enriched_outcome = dict(outcome)
+                if item_id and "item_id" not in enriched_outcome:
+                    enriched_outcome["item_id"] = item_id
+                if resolved_type and "item_type" not in enriched_outcome:
+                    enriched_outcome["item_type"] = resolved_type
+                sess.item_outcomes.append(enriched_outcome)
             if next_index is not None:
-                sess.current_index = max(0, int(next_index))
+                max_idx = max(0, len(sess.items or sess.item_ids) - 1)
+                sess.current_index = min(max_idx, max(0, int(next_index)))
+            elif mark_completed and sess.items:
+                completed_set = set(sess.completed_item_ids)
+                total = len(sess.items)
+                # Avançar para o próximo item ainda não concluído preservando a ordem da fila
+                next_uncompleted = next(
+                    (idx for idx in range(sess.current_index + 1, total) if sess.items[idx].item_id not in completed_set),
+                    None,
+                )
+                if next_uncompleted is None:
+                    next_uncompleted = next(
+                        (idx for idx in range(0, sess.current_index + 1) if sess.items[idx].item_id not in completed_set),
+                        None,
+                    )
+                if next_uncompleted is not None:
+                    sess.current_index = next_uncompleted
+                else:
+                    sess.current_index = min(total - 1, sess.current_index)
             elif mark_completed and sess.item_ids:
                 sess.current_index = min(len(sess.item_ids) - 1, sess.current_index + 1)
             store[session_id] = sess.to_dict()
@@ -190,7 +255,7 @@ class StudySessionManager:
                 sess.summary_stats.update(summary_stats)
             else:
                 sess.summary_stats.setdefault("completed_items", len(sess.completed_item_ids))
-                sess.summary_stats.setdefault("total_items", len(sess.item_ids))
+                sess.summary_stats.setdefault("total_items", len(sess.items or sess.item_ids))
             store[session_id] = sess.to_dict()
             holder[0] = sess
             return store

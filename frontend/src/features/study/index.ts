@@ -11,4 +11,5 @@ export * from './StudyEpistemicBadge';
 export * from './StudyFlashcardsView';
 export * from './StudyActiveRecallView';
 export * from './StudyAdaptiveHubView';
+export * from './dailyReviewSession';
 export * from './StudyContainer';
