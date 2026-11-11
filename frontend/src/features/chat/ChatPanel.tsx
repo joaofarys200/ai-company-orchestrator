@@ -20,6 +20,7 @@ import { ChatSidebar } from './ChatSidebar';
 import { SystemConsolePanel } from './SystemConsolePanel';
 import { ChatPromptInput } from './ChatPromptInput';
 import { ChatAttachmentBar } from './ChatAttachmentBar';
+import { ChatStudyResultCard } from './ChatStudyResultCard';
 import type { ChatMessage } from '../../protocol/websocket';
 import type { ChatAttachment } from './types';
 
@@ -50,6 +51,9 @@ export const ChatPanel: React.FC = () => {
     toggleVoice,
     clearChat,
     isConnected,
+    studyOperations,
+    navigateToStudyTarget,
+    cancelStudyOperation,
   } = useWebSocket();
 
   const [activeTab, setActiveTab] = useState<'chat' | 'system'>('chat');
@@ -386,6 +390,14 @@ export const ChatPanel: React.FC = () => {
                             )}
 
                             <div className="select-text cursor-text">{renderMessageContent(msg)}</div>
+                            {msg.study_card && (
+                              <ChatStudyResultCard
+                                card={msg.study_card}
+                                liveOp={studyOperations[msg.study_card.operation_id]}
+                                onNavigate={navigateToStudyTarget}
+                                onCancelOperation={cancelStudyOperation}
+                              />
+                            )}
                           </div>
                         </div>
                       </motion.div>

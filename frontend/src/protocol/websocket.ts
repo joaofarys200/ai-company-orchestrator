@@ -50,6 +50,82 @@ export interface ChatAttachment {
   tokenEstimate?: number;
 }
 
+export interface StudyChatCardAction {
+  target?: string;
+  document_id?: string;
+  tab: string;
+  chapter_id?: string;
+  section_id?: string;
+  assessment_id?: string;
+  session_id?: string;
+  topic?: string;
+  label?: string;
+}
+
+export interface StudyChatCard {
+  operation_id: string;
+  capability: string;
+  status: string;
+  document_id?: string | null;
+  document_title?: string | null;
+  study_session_id?: string | null;
+  summary?: string;
+  result_ref?: Record<string, unknown>;
+  citations?: string[];
+  epistemic_breakdown?: {
+    primary_status?: string;
+    claims?: Array<{
+      statement: string;
+      epistemic_status: string;
+      citations?: string[];
+    }>;
+  };
+  progress?: {
+    stage?: string;
+    percent?: number | null;
+    message?: string;
+  };
+  error_code?: string;
+  error_message?: string;
+  actions?: StudyChatCardAction[];
+}
+
+export interface StudyOperationStatusPayload {
+  operation_id: string;
+  correlation_id?: string;
+  chat_session_id?: string;
+  capability?: string;
+  document_id?: string | null;
+  status: string;
+  stage?: string;
+  progress_percent?: number | null;
+  message?: string;
+  result_summary?: Record<string, unknown>;
+  error?: string | null;
+  updated_at?: string;
+}
+
+export interface StudyNavigatePayload {
+  target?: string;
+  document_id?: string;
+  tab: string;
+  chapter_id?: string;
+  section_id?: string;
+  assessment_id?: string;
+  session_id?: string;
+  topic?: string;
+  label?: string;
+}
+
+export interface StudyUiContextPayload {
+  chat_session_id?: string;
+  document_id?: string | null;
+  tab?: string;
+  chapter_id?: string | null;
+  section_id?: string | null;
+  session_id?: string | null;
+}
+
 export interface ChatMessage {
   id: string;
   sender: string;
@@ -58,6 +134,7 @@ export interface ChatMessage {
   audio?: string;
   timestamp: string;
   attachments?: ChatAttachment[];
+  study_card?: StudyChatCard;
 }
 
 export interface KanbanCard {
@@ -646,6 +723,7 @@ export interface ChatProtocolMessage {
   role: string;
   content: string;
   audio?: string;
+  study_card?: StudyChatCard;
 }
 
 export interface StateMessage {
@@ -1616,10 +1694,12 @@ export type ServerMessage =
   | { type: 'study_mode_progress_result'; document_id: string; progress: any; request_id?: string }
   | { type: 'study_mode_session_updated'; document_id: string; session: any; request_id?: string }
   | { type: 'study_mode_sessions_list'; document_id?: string; sessions: any[]; request_id?: string }
+  | { type: 'study_operation_status'; operation: StudyOperationStatusPayload; request_id?: string }
+  | { type: 'study_navigate'; navigation: StudyNavigatePayload }
   | UnknownServerMessage;
 
 export type ClientMessage =
-  | { type: 'directive'; text: string; attachments?: ChatAttachment[] }
+  | { type: 'directive'; text: string; attachments?: ChatAttachment[]; study_context?: StudyUiContextPayload }
   | { type: 'select_template'; template: string }
   | { type: 'toggle_voice'; active: boolean }
   | { type: 'run_project'; project_id?: string }
@@ -1736,6 +1816,8 @@ export type ClientMessage =
   | { type: 'study_mode_resume_session'; session_id: string; document_id?: string; request_id?: string }
   | { type: 'study_mode_complete_session'; session_id: string; document_id?: string; summary_stats?: Record<string, unknown>; request_id?: string }
   | { type: 'study_mode_list_sessions'; document_id?: string; status?: string; request_id?: string }
+  | { type: 'study_cancel_operation'; operation_id?: string; document_id?: string; request_id?: string }
+  | { type: 'study_get_operation_status'; operation_id: string; request_id?: string }
   | { type: 'action_confirm_response'; request_id: string; decision: 'APPROVE' | 'DENY' | 'REJECT'; user?: string; session_id?: string }
   | { type: 'permission_get_pending' }
   | { type: 'permission_approve'; request_id: string; user?: string; session_id?: string; project_id?: string; mission_id?: string }
@@ -2184,6 +2266,7 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         role: asString(raw.role, 'System'),
         content: asString(raw.content),
         audio: raw.audio ? asString(raw.audio) : undefined,
+        study_card: isRecord(raw.study_card) ? (raw.study_card as unknown as StudyChatCard) : undefined,
       };
     case 'state':
       return { type, value: asString(raw.value, 'idle') };
@@ -3027,6 +3110,21 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         ...(raw as Record<string, unknown>),
         type,
       } as ServerMessage;
+    case 'study_operation_status':
+      return {
+        type: 'study_operation_status',
+        operation: isRecord(raw.operation)
+          ? (raw.operation as unknown as StudyOperationStatusPayload)
+          : ({ operation_id: '', status: 'UNKNOWN' } as StudyOperationStatusPayload),
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_navigate':
+      return {
+        type: 'study_navigate',
+        navigation: isRecord(raw.navigation)
+          ? (raw.navigation as unknown as StudyNavigatePayload)
+          : ({ tab: 'library' } as StudyNavigatePayload),
+      };
     default:
       return { type: 'unknown', originalType: type, payload: raw };
   }

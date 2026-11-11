@@ -86,6 +86,12 @@ def create_default_agent_profile_registry() -> AgentProfileRegistry:
             allowed_tools=(
                 "semantic_code_search",
                 "read_file",
+                "study_list_documents",
+                "study_get_document_status",
+                "study_explain_topic",
+                "study_get_learning_progress",
+                "study_start_daily_review",
+                "study_resume_session",
             ),
             task_profiles=("MISSION_PLANNING", "RESEARCH", "DOCUMENT"),
         ),

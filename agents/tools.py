@@ -1100,6 +1100,9 @@ JARVIS_TOOLS = [
     }
 ]
 
+from agents.study_tools import STUDY_TOOL_DEFINITIONS as _STUDY_TOOL_DEFINITIONS
+JARVIS_TOOLS.extend(_STUDY_TOOL_DEFINITIONS)
+
 
 def get_tool_registry():
     from agents.tool_registry import build_registry

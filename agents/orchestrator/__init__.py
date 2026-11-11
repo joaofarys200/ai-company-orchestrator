@@ -1046,6 +1046,10 @@ Sê honesto. Se não tiveres a certeza de algo, diz-o. Uma resposta honesta com 
                     import database
                     database.add_compounding_rule(chave, descricao, correcao)
                     result_str = f"✅ Regra de Compounding Memory '{chave}' gravada com sucesso no SQLite."
+                elif tool_name.startswith("study_"):
+                    from agents.study_tools import execute_study_tool
+
+                    result_str = await execute_study_tool(tool_name, tool_input)
                 else:
                     result_str = f"Erro: Ferramenta desconhecida '{tool_name}'"
                     
@@ -2544,6 +2548,14 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     import database
                     database.add_compounding_rule(chave, descricao, correcao)
                     result_str = f"✅ Regra de Compounding Memory '{chave}' gravada com sucesso no SQLite."
+                elif tool_name.startswith("study_"):
+                    from agents.study_tools import execute_study_tool
+
+                    result_str = await execute_study_tool(
+                        tool_name,
+                        tool_input,
+                        chat_session_id=str(session_id or "global"),
+                    )
                 else:
                     result_str = f"Erro: Ferramenta desconhecida '{tool_name}'"
             except Exception as e:

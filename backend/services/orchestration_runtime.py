@@ -72,6 +72,9 @@ class OrchestrationService:
         self.conversation_history = conversation_history
         self.logger = logger
         from backend.services.chat_mission_bridge import ChatMissionBridge
+        from services.study_integration import get_study_coordinator
+        study_service = getattr(services, "study_service", None)
+        study_coordinator = get_study_coordinator(study_service, model_service=models)
         self.bridge = ChatMissionBridge(
             mission_state=getattr(services.mission_planner, "mission_state", None) if services.mission_planner else None,
             mission_planner=services.mission_planner,
@@ -83,6 +86,8 @@ class OrchestrationService:
             connections=connections,
             callbacks=callbacks,
             logger=logger,
+            study_service=study_service,
+            study_coordinator=study_coordinator,
         )
 
     async def auto_extract_correction(
@@ -408,6 +413,7 @@ class OrchestrationService:
         session_id: int,
         project_id: str | None = None,
         correlation_id: str | None = None,
+        study_context: dict | None = None,
     ) -> None:
         try:
             clean_prompt = prompt.lower().strip(" .?!,")
@@ -427,13 +433,16 @@ class OrchestrationService:
 
             # ── Canonical Chat -> Mission Integration ────────────────────────
             if self.bridge:
-                bridge_res = await self.bridge.handle_directive(
-                    prompt=prompt,
-                    session_id=session_id,
-                    project_id=project_id,
-                    correlation_id=correlation_id,
-                )
-                if bridge_res.get("status") in {"COMPLETED", "FAILED", "REFUSED", "BLOCKED"}:
+                bridge_kwargs: dict[str, Any] = {
+                    "prompt": prompt,
+                    "session_id": session_id,
+                    "project_id": project_id,
+                    "correlation_id": correlation_id,
+                }
+                if study_context is not None:
+                    bridge_kwargs["study_context"] = study_context
+                bridge_res = await self.bridge.handle_directive(**bridge_kwargs)
+                if bridge_res.get("status") in {"COMPLETED", "FAILED", "REFUSED", "BLOCKED", "NEEDS_CLARIFICATION", "RUNNING"}:
                     return
 
             intent = await self.classify_intent(

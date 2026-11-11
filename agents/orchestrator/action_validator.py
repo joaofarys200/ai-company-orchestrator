@@ -48,6 +48,8 @@ def classify_tool(tool_name: str) -> str:
         return "externa"
     if tool_name in ENGINEERING_TOOLS:
         return "engenharia"
+    if tool_name.startswith("study_"):
+        return "estudo"
     if tool_name == "declarar_objetivo":
         return "objetivo"
     return "outra"
@@ -213,6 +215,20 @@ def validate_next_tool_decision(prompt: str, task_state: TaskState, tool_name: s
             task_state.missing_evidence(prompt),
             "Chamar `read_file` com caminho relativo existente.",
         )
+
+    if tool_name.startswith("study_"):
+        from agents.study_tools import validate_study_tool_arguments
+
+        try:
+            validate_study_tool_arguments(tool_name, tool_input)
+        except ValueError as err:
+            return ToolDecision(
+                INVALID_WITH_CORRECTION,
+                f"Argumentos inválidos em '{tool_name}': {err}",
+                "contrato",
+                task_state.missing_evidence(prompt),
+                "Fornecer document_id e parâmetros conformes ao contrato da tool de estudo.",
+            )
 
     if tool_name == "obsidian_write_note":
         filename = str(tool_input.get("filename") or "")

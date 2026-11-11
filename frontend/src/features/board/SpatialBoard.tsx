@@ -194,6 +194,7 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
   onFocusCard,
   onCloseBoard,
   onSwitchDomain,
+  onOpenFullWorkspace,
 }) => {
   const {
     // Study state & actions
@@ -212,6 +213,7 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
     listStudyFlashcards,
     reviewStudyFlashcard,
     saveToStudyVault,
+    navigateToStudyTarget,
     // Project state & actions
     projects,
     projectContext,
@@ -2108,6 +2110,24 @@ export const SpatialBoard: React.FC<SpatialBoardProps> = ({
                   title="Remover documento atual da biblioteca"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+
+              {(onOpenFullWorkspace || selectedDoc) && (
+                <button
+                  onClick={() =>
+                    selectedDoc
+                      ? navigateToStudyTarget({
+                          document_id: selectedDoc.document_id,
+                          tab: 'reader',
+                        })
+                      : onOpenFullWorkspace?.()
+                  }
+                  className="h-9 px-3 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/35 text-cyan-200 text-xs font-medium flex items-center gap-1.5 cursor-pointer"
+                  title="Abrir Study Engine completo (Leitor, Resumos, Cornell, Flashcards, Active Recall, Hub Adaptativo)"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Workspace Estudo</span>
                 </button>
               )}
             </div>

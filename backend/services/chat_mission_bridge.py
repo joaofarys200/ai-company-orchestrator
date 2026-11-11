@@ -46,6 +46,7 @@ class ChatIntentType(str, enum.Enum):
     FILE_READ = "FILE_READ"
     FILE_DELIVERY = "FILE_DELIVERY"
     LOCAL_ACTION = "LOCAL_ACTION"
+    STUDY_OPERATION = "STUDY_OPERATION"
     EXECUTION_REQUEST = "EXECUTION_REQUEST"
     CONTINUATION = "CONTINUATION"
     AMBIGUOUS = "AMBIGUOUS"
@@ -182,6 +183,72 @@ class ChatRequestResolver:
         r"\b(implementa\s+e\s+executa\s+os\s+testes|executa\s+os\s+testes|executar\s+os\s+testes|corre\s+os\s+testes|testa\s+o\s+projeto|corre\s+o\s+pytest|testa\s+a\s+aplica[cç][aã]o|testa|testar)\b",
     ]
 
+    STUDY_EXPLICIT_PATTERNS = [
+        r"\b(flashcards?|cornell|active\s+recall|revis[aã]o\s+di[aá]ria|daily\s+review|material\s+de\s+estudo|materiais\s+de\s+estudo|documento\s+de\s+estudo|[aá]rea\s+de\s+estudo|biblioteca\s+de\s+estudo|sess[aã]o\s+de\s+estudo|sess[aã]o\s+que\s+deixei|progresso\s+de\s+aprendizagem|progresso\s+de\s+estudo|racioc[ií]nio\s+acad[eé]mico|plano\s+editorial|cart[oõ]es\s+de\s+estudo|cart[oõ]es\s+(?:que\s+tenho\s+)?pendentes|rever\s+os?\s+cart[oõ]es|knowledge\s+gaps?|lacunas(\s+de\s+conhecimento)?)\b",
+        r"\b(analisa\s+este\s+pdf|analisa\s+o\s+pdf|analisa\s+este\s+documento|quero\s+estudar|explica-me\s+o\s+(?:primeiro|segundo|terceiro|quarto|quinto|\d+[oº]?)\s+cap[ií]tulo|explica\s+o\s+(?:primeiro|segundo|terceiro|quarto|quinto|\d+[oº]?)\s+cap[ií]tulo|conceitos\s+mais\s+importantes\s+(?:deste|do)\s+documento|diferen[cç]a\s+entre\s+estes\s+dois\s+conceitos|testar\s+se\s+(?:realmente\s+)?compreendi|faz-me\s+um\s+teste\s+sobre|cria\s+um\s+teste\s+sobre|assuntos\s+em\s+que\s+tenho\s+mais\s+dificuldades|que\s+documentos\s+de\s+estudo|lista\s+os\s+documentos\s+de\s+estudo|mostra-me\s+os\s+assuntos)\b",
+        r"\b(cap[ií]tulo\s+\d+|metodologia\s+(?:deste|do)\s+(?:documento|artigo|paper|pdf)|resultados\s+(?:deste|do)\s+(?:documento|artigo|paper|pdf)|conclus[oõ]es\s+(?:deste|do)\s+(?:documento|artigo|paper|pdf))\b",
+    ]
+
+    STUDY_FOLLOWUP_PATTERNS = [
+        r"\b(faz\s+o\s+mesmo|o\s+mesmo,?\s+mas|mais\s+(?:\d+|duas|tr[eê]s|quatro|cinco|seis|sete|oito|nove|dez)\s+perguntas|algo\s+mais\s+dif[ií]cil|mais\s+dif[ií]cil|explica\s+melhor\s+essa\s+parte|testa-me\s+sobre\s+isso|mostra-me\s+a\s+resposta|continua(\s+a\s+sess[aã]o)?|retoma|compara\s+|comparar\s+|diferen[cç]a\s+entre)\b",
+    ]
+
+    CODING_ONLY_DISQUALIFIERS = [
+        r"\b(pytest|unittest|vitest|endpoint|backend|frontend|componente|react|fastapi|servidor|porta\s+\d+|database|sqlite|migra[cç][aã]o|docker|git\s+push|git\s+commit|\.(?:py|js|jsx|ts|tsx|html|css|json|sql))\b",
+    ]
+
+    def _has_active_study_signal(
+        self,
+        clean_lower: str,
+        project_id: str | None,
+        context: Mapping[str, Any] | None,
+        history: list[dict] | None,
+    ) -> bool:
+        # Never hijack explicit technical/coding projects or source code files
+        if any(re.search(pat, clean_lower) for pat in self.CODING_ONLY_DISQUALIFIERS):
+            # Unless unmistakable Study Engine nouns like flashcards/cornell/active recall appear
+            if not re.search(r"\b(flashcards?|cornell|active\s+recall|sess[aã]o\s+de\s+estudo|material\s+de\s+estudo|revis[aã]o\s+di[aá]ria)\b", clean_lower):
+                return False
+
+        explicit_project_mention = re.search(
+            r"\b(?:ao\s+projeto|do\s+projeto|no\s+projeto)\s+([a-zA-Z0-9_\-]+)",
+            clean_lower,
+        )
+        if explicit_project_mention:
+            return False
+
+        if any(re.search(pat, clean_lower) for pat in self.STUDY_EXPLICIT_PATTERNS):
+            return True
+
+        # Contexto ativo vindo da UI ou sessão de conversa recente sobre estudo
+        has_ui_ctx = bool(isinstance(context, Mapping) and (context.get("has_active_study_context") or context.get("study_context")))
+        has_hist_study = False
+        if history:
+            recent_txt = " ".join(str(m.get("content") or "")[:300].lower() for m in history[-4:] if isinstance(m, dict))
+            if any(
+                marker in recent_txt
+                for marker in (
+                    "flashcard", "cornell", "active recall", "revisão diária", "revisao diaria",
+                    "sessão de estudo", "sessao de estudo", "biblioteca de estudo", "source_fact",
+                    "model_inference", "documento de estudo", "progresso", "capítulo", "capitulo",
+                )
+            ):
+                has_hist_study = True
+
+        if (has_ui_ctx or has_hist_study) and any(
+            re.search(pat, clean_lower) for pat in self.STUDY_FOLLOWUP_PATTERNS
+        ):
+            return True
+
+        # Perguntas académicas genéricas sobre "este documento/artigo/paper/capítulo" com contexto ativo
+        if (has_ui_ctx or has_hist_study) and re.search(
+            r"\b(este\s+documento|deste\s+documento|este\s+artigo|deste\s+artigo|este\s+paper|deste\s+paper|este\s+pdf|deste\s+pdf|este\s+cap[ií]tulo|deste\s+cap[ií]tulo|essa\s+parte|este\s+tema)\b",
+            clean_lower,
+        ):
+            return True
+
+        return False
+
     CODING_TARGET_PATTERNS = [
         r"\b(aplica[cç][aã]o|app|website|site|endpoint|componente|api|fun[cç][aã]o|m[oó]dulo|teste|script|ficheiro|arquivo|c[oó]digo|p[aá]gina|tela|view|servi[cç]o|database|banco|sqlite|tabela|bot[aã]o|layout|css|html|js|backend|frontend|porta|logger|timeout|cors|middleware|filtro|rota|autentica[cç][aã]o|jwt)\b",
     ]
@@ -247,6 +314,27 @@ class ChatRequestResolver:
                 requires_mission=False,
                 requires_model=False,
                 decision_reason="Comando operacional local para abrir aplicação de sistema.",
+            )
+
+        # ── 2.5. Study Engine Intent & Context Continuity Detection ───────────
+        if self._has_active_study_signal(clean_lower, project_id, context, history):
+            return ResolvedChatRequest(
+                raw_prompt=clean,
+                intent=ChatIntentType.STUDY_OPERATION,
+                title=self._generate_title(clean, default="Operação de Estudo"),
+                objective=clean,
+                project_id=project_id,
+                confidence=0.96,
+                context_reference={
+                    "study_context": dict(context.get("study_context") or {})
+                    if isinstance(context, Mapping) and isinstance(context.get("study_context"), dict)
+                    else {},
+                },
+                planned_action="study_operation",
+                requires_mission=False,
+                requires_model=True,
+                requires_external_network=False,
+                decision_reason="Pedido ou continuação conversacional direcionada ao Study Engine integrado.",
             )
 
         # ── 3. Continuation & Retry Resolution ────────────────────────────────
@@ -870,6 +958,8 @@ class ChatMissionBridge:
         connections: Any = None,
         callbacks: Any = None,
         logger: Any = None,
+        study_service: Any = None,
+        study_coordinator: Any = None,
     ) -> None:
         self.mission_state = mission_state
         self.mission_planner = mission_planner
@@ -883,6 +973,8 @@ class ChatMissionBridge:
         self.connections = connections
         self.callbacks = callbacks
         self.logger = logger or get_logger(__name__)
+        self.study_service = study_service
+        self.study_coordinator = study_coordinator
         self.resolver = ChatRequestResolver()
         self._request_registry: dict[str, RequestRecord] = {}
 
@@ -949,12 +1041,31 @@ class ChatMissionBridge:
             logger.warning(f"Erro ao salvar checkpoint no bridge: {e}")
 
 
+    def _get_study_coordinator(self):
+        if self.study_coordinator is not None:
+            return self.study_coordinator
+        svc = self.study_service
+        if svc is None and self.orchestration_service is not None:
+            app_services = getattr(self.orchestration_service, "services", None)
+            if app_services is not None:
+                svc = getattr(app_services, "study_service", None)
+                self.study_service = svc
+        if svc is not None:
+            from services.study_integration import get_study_coordinator
+
+            models = getattr(self.orchestration_service, "models", None) if self.orchestration_service else None
+            self.study_coordinator = get_study_coordinator(svc, model_service=models)
+            return self.study_coordinator
+        return None
+
     async def broadcast_chat(
         self,
         sender: str,
         role: str,
         content: str,
         correlation_id: str | None = None,
+        study_card: dict[str, Any] | None = None,
+        suppress_completion_mark: bool = False,
     ) -> None:
         if correlation_id:
             if correlation_id not in self._request_registry:
@@ -981,12 +1092,13 @@ class ChatMissionBridge:
                         correlation_id=correlation_id,
                     )
                     return
-                record.completion_emitted = True
-                record.user_response = content
+                if not suppress_completion_mark:
+                    record.completion_emitted = True
+                    record.user_response = content
         canonical_sender = normalize_canonical_sender(sender)
         if self.connections:
             await self.connections.broadcast(
-                chat_message(canonical_sender, role, content)
+                chat_message(canonical_sender, role, content, study_card=study_card)
             )
         if self.orchestration_service and hasattr(self.orchestration_service, "_append_history"):
             self.orchestration_service._append_history("assistant", content)
@@ -1056,6 +1168,7 @@ class ChatMissionBridge:
         project_id: str | None = None,
         websocket: Any = None,
         correlation_id: str | None = None,
+        study_context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Entry point for incoming chat directives."""
         correlation_id = correlation_id or uuid.uuid4().hex[:12]
@@ -1066,8 +1179,21 @@ class ChatMissionBridge:
         elif self.callbacks and hasattr(self.callbacks, "conversation_history"):
             history = self.callbacks.conversation_history
 
+        coord = self._get_study_coordinator()
+        chat_study_sid = str((study_context or {}).get("chat_session_id") or "default_study_chat")
+        has_persisted_study_ctx = bool(
+            coord and coord.context_manager.get_context(chat_study_sid).active_document_id
+        )
+        resolver_ctx = {
+            "study_context": dict(study_context) if isinstance(study_context, dict) else {},
+            "has_active_study_context": bool(study_context) or has_persisted_study_ctx,
+        }
+
         resolved: ResolvedChatRequest = self.resolver.resolve_request(
-            prompt, project_id=project_id, history=history
+            prompt,
+            project_id=project_id,
+            context=resolver_ctx,
+            history=history,
         )
 
         record = RequestRecord(
@@ -1303,6 +1429,87 @@ class ChatMissionBridge:
                 "intent": resolved.intent.value,
                 "correlation_id": correlation_id,
                 "result": action_text,
+            }
+
+        # ── 3.5. STUDY ENGINE ORCHESTRATION (Phase 7 Integration) ─────────────
+        if resolved.intent == ChatIntentType.STUDY_OPERATION:
+            coord = self._get_study_coordinator()
+            if coord is None:
+                err_msg = "O Study Engine não está disponível nesta sessão de servidor."
+                await self.broadcast_chat("JARVIS", "Assistant", err_msg, correlation_id=correlation_id)
+                await self.broadcast_state("idle")
+                return {
+                    "status": "FAILED",
+                    "intent": resolved.intent.value,
+                    "correlation_id": correlation_id,
+                    "error": err_msg,
+                }
+
+            async def _on_study_op_status(op_record: Any) -> None:
+                op_dict = op_record.to_dict()
+                if self.connections:
+                    await self.connections.broadcast({
+                        "type": "study_operation_status",
+                        "operation": op_dict,
+                    })
+                if op_dict.get("status") in {"FAILED", "CANCELLED"}:
+                    await self.broadcast_chat(
+                        "JARVIS",
+                        "Tutor Académico",
+                        str(op_dict.get("message") or f"Operação terminada ({op_dict.get('status')})."),
+                        correlation_id=correlation_id,
+                    )
+                    await self.broadcast_state("idle")
+
+            async def _on_study_async_done(done_res: Any) -> None:
+                await self.broadcast_chat(
+                    "JARVIS",
+                    "Tutor Académico",
+                    done_res.summary_markdown,
+                    correlation_id=correlation_id,
+                    study_card=done_res.to_study_card(),
+                )
+                if done_res.auto_navigate and done_res.navigation and self.connections:
+                    await self.connections.broadcast({
+                        "type": "study_navigate",
+                        "navigation": done_res.navigation.to_dict(),
+                    })
+                await self.broadcast_state("idle")
+
+            study_res = await coord.handle_directive(
+                prompt=prompt,
+                chat_session_id=chat_study_sid,
+                correlation_id=correlation_id,
+                ui_study_context=study_context,
+                history=history,
+                on_status_event=_on_study_op_status,
+                on_async_complete=_on_study_async_done,
+                allow_background=True,
+            )
+
+            is_running = study_res.status == "RUNNING"
+            await self.broadcast_chat(
+                "JARVIS",
+                "Tutor Académico",
+                study_res.summary_markdown,
+                correlation_id=correlation_id,
+                study_card=study_res.to_study_card(),
+                suppress_completion_mark=is_running,
+            )
+            if study_res.auto_navigate and study_res.navigation and self.connections:
+                await self.connections.broadcast({
+                    "type": "study_navigate",
+                    "navigation": study_res.navigation.to_dict(),
+                })
+            if not is_running:
+                await self.broadcast_state("idle")
+            return {
+                "status": study_res.status,
+                "intent": resolved.intent.value,
+                "operation_id": study_res.operation_id,
+                "document_id": study_res.document_id,
+                "correlation_id": correlation_id,
+                "result": study_res.to_dict(),
             }
 
         # ── 4. CONVERSATIONAL INTENT (CHAT) ───────────────────────────────────

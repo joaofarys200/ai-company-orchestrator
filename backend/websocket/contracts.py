@@ -170,6 +170,9 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "study_mode_resume_session",
         "study_mode_complete_session",
         "study_mode_list_sessions",
+        # Phase 7 — JARVIS Study Integration
+        "study_cancel_operation",
+        "study_get_operation_status",
         "sentinel_get_status",
         "sentinel_run_audit",
         "sentinel_get_baseline",

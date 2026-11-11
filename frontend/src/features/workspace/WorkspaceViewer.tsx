@@ -297,6 +297,8 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     getGeneratedStudyDocumentFile,
     studyModesApi,
     studyPipelineStage,
+    studyNavigationTarget,
+    updateActiveStudyContext,
     sendDirective,
     setChatPanelOpen,
   } = useWebSocket();
@@ -354,6 +356,11 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
       delete (window as any).__jarvisUploadStudy;
     };
   }, [activeTab, listStudyDocuments, uploadStudyDocument]);
+
+  useEffect(() => {
+    if (!studyNavigationTarget) return;
+    setActiveTab('study');
+  }, [studyNavigationTarget]);
 
   const filenames = useMemo(() => Object.keys(projectFiles), [projectFiles]);
   const filenamesKey = filenames.join('|');
@@ -2129,6 +2136,8 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 onGetGeneratedDocumentFile={getGeneratedStudyDocumentFile}
                 studyModesApi={studyModesApi}
                 pipelineStage={studyPipelineStage}
+                externalNavigationTarget={studyNavigationTarget}
+                onStudyContextChange={updateActiveStudyContext}
               />
             </ViewFrame>
           )}

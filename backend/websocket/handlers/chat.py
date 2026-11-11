@@ -126,12 +126,19 @@ class ChatWebSocketHandler:
             or _session.selected_project_id
             or ""
         ).strip() or None
+        raw_study_ctx = message.get("study_context")
+        study_context = dict(raw_study_ctx) if isinstance(raw_study_ctx, dict) else None
+        task_kwargs: dict[str, Any] = {
+            "project_id": project_id,
+            "correlation_id": correlation_id,
+        }
+        if study_context is not None:
+            task_kwargs["study_context"] = study_context
         asyncio.create_task(
             self.callbacks.run_orchestration_task(
                 prompt_with_context,
                 database_session.id,
-                project_id=project_id,
-                correlation_id=correlation_id,
+                **task_kwargs,
             )
         )
 

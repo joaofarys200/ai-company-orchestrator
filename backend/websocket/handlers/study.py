@@ -104,6 +104,9 @@ STUDY_HANDLERS = {
     "study_mode_resume_session": "phase6_resume_session",
     "study_mode_complete_session": "phase6_complete_session",
     "study_mode_list_sessions": "phase6_list_sessions",
+    # Phase 7 — JARVIS Study Integration
+    "study_cancel_operation": "cancel_operation",
+    "study_get_operation_status": "get_operation_status",
 }
 
 
@@ -1970,3 +1973,46 @@ class StudyWebSocketHandler:
             ws, msg, "study_mode_sessions_list",
             lambda: {"sessions": self.study_service.list_study_sessions(document_id=doc_id, status=status)},
         )
+
+    def _get_operation_manager(self):
+        coord = getattr(self.study_service, "_study_coordinator", None)
+        if coord is not None:
+            return coord.operation_manager
+        from services.study_integration import StudyOperationManager
+
+        return StudyOperationManager(storage_dir=getattr(self.study_service, "storage_dir", "data/study"))
+
+    async def cancel_operation(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        op_id = str(msg.get("operation_id") or "").strip() or None
+        doc_id = str(msg.get("document_id") or "").strip() or None
+        mgr = self._get_operation_manager()
+        res = mgr.request_cancel(operation_id=op_id, document_id=doc_id)
+        op_obj = mgr.get_operation(op_id) if op_id else None
+        payload = op_obj.to_dict() if op_obj else {
+            "operation_id": op_id or "",
+            "document_id": doc_id,
+            "status": res.get("status", "NOT_FOUND"),
+            "stage": res.get("status", "NOT_FOUND"),
+            "message": res.get("message", ""),
+        }
+        await self.connections.send(ws, {
+            "type": "study_operation_status",
+            "operation": payload,
+            "request_id": msg.get("request_id"),
+        })
+
+    async def get_operation_status(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
+        op_id = str(msg.get("operation_id") or "").strip()
+        mgr = self._get_operation_manager()
+        op_obj = mgr.get_operation(op_id) if op_id else None
+        payload = op_obj.to_dict() if op_obj else {
+            "operation_id": op_id,
+            "status": "NOT_FOUND",
+            "stage": "NOT_FOUND",
+            "message": "Operação não encontrada.",
+        }
+        await self.connections.send(ws, {
+            "type": "study_operation_status",
+            "operation": payload,
+            "request_id": msg.get("request_id"),
+        })

@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useWebSocket } from './context/WebSocketContext';
 import { ChatPanel } from './features/chat';
-import { HologramCore } from './features/workspace';
+import { HologramCore, WorkspaceViewer } from './features/workspace';
 import { SpatialBoard } from './features/board/SpatialBoard';
 import { PermissionApprovalModal } from './features/permissions';
 import { X, Activity } from 'lucide-react';
@@ -18,7 +18,14 @@ function App() {
     openSpatialBoard,
     closeSpatialBoard,
     focusSpatialCard,
+    studyNavigationTarget,
+    navigateToStudyTarget,
   } = useWebSocket();
+
+  const [dismissedNavNonce, setDismissedNavNonce] = useState<number | null>(null);
+  const fullWorkspaceOpen = Boolean(
+    studyNavigationTarget && dismissedNavNonce !== studyNavigationTarget.nonce
+  );
 
   // Global shortcut: Ctrl+J to toggle JARVIS Chat & Central Console, Escape to unfocus card
   useEffect(() => {
@@ -57,6 +64,7 @@ function App() {
               onFocusCard={focusSpatialCard}
               onCloseBoard={closeSpatialBoard}
               onSwitchDomain={(domain) => openSpatialBoard(domain)}
+              onOpenFullWorkspace={() => navigateToStudyTarget({ tab: 'library' })}
             />
           )}
         </AnimatePresence>
@@ -71,6 +79,28 @@ function App() {
           }}
         />
       </main>
+
+      {/* ── FULL WORKSPACE OVERLAY (Study Engine Phases 2-7, Adaptive Hub, Reader, Flashcards) ── */}
+      <AnimatePresence>
+        {fullWorkspaceOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.985 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.985 }}
+            transition={{ duration: 0.18 }}
+            data-testid="full-workspace-overlay"
+            className="fixed inset-0 z-40 p-2 sm:p-4 bg-[#05070e]/92 backdrop-blur-xl"
+          >
+            <WorkspaceViewer
+              onClose={() => {
+                if (studyNavigationTarget) {
+                  setDismissedNavNonce(studyNavigationTarget.nonce);
+                }
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── LEFT DRAWER: Chat Panel & Consola Central ── */}
       <AnimatePresence>

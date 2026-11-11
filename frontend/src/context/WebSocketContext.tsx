@@ -43,6 +43,9 @@ import {
   type MissionIntentResultMessage,
   type VaultDiagnosticsData,
   type NoteImprovementItem,
+  type StudyOperationStatusPayload,
+  type StudyNavigatePayload,
+  type StudyUiContextPayload,
   type NoteQualityAuditMessage,
   type NoteEnrichmentResultMessage,
 } from '../protocol/websocket';
@@ -371,6 +374,11 @@ interface WebSocketContextType {
   ) => Promise<StudyDocumentFilePayload | null>;
   studyModesApi: StudyModesBridge;
   studyPipelineStage: string;
+  studyOperations: Record<string, StudyOperationStatusPayload>;
+  studyNavigationTarget: (StudyNavigatePayload & { nonce: number }) | null;
+  updateActiveStudyContext: (ctx: StudyUiContextPayload) => void;
+  navigateToStudyTarget: (target: Partial<StudyNavigatePayload>) => void;
+  cancelStudyOperation: (operationId: string, documentId?: string) => void;
   activeBoard: SpatialBoardData | null;
   focusedCardId: string | null;
   openSpatialBoard: (domain?: SpatialBoardDomain, query?: string) => void;
@@ -480,6 +488,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [studyQuizResult, setStudyQuizResult] = useState<QuizEvaluationResult | null>(null);
   const [studyFlashcards, setStudyFlashcards] = useState<Flashcard[]>([]);
   const [studyPipelineStage, setStudyPipelineStage] = useState<string>('');
+  const [studyOperations, setStudyOperations] = useState<Record<string, StudyOperationStatusPayload>>({});
+  const [studyNavigationTarget, setStudyNavigationTarget] = useState<(StudyNavigatePayload & { nonce: number }) | null>(null);
+  const activeStudyContextRef = useRef<StudyUiContextPayload>({});
   const [activeBoard, setActiveBoard] = useState<SpatialBoardData | null>(null);
   const [focusedCardId, setFocusedCardId] = useState<string | null>(null);
 
@@ -702,6 +713,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       content: msg.content,
       audio: msg.audio,
       timestamp,
+      study_card: msg.study_card,
     };
 
     // Add genuine conversational messages to chatMessages
@@ -1366,6 +1378,32 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         break;
       }
+      case 'study_operation_status': {
+        const op = (msg as any).operation as StudyOperationStatusPayload | undefined;
+        if (op?.operation_id) {
+          setStudyOperations((prev) => ({
+            ...prev,
+            [op.operation_id]: op,
+          }));
+          if (op.status === 'COMPLETED') {
+            sendClientMessage({ type: 'study_list_documents' });
+          }
+        }
+        break;
+      }
+      case 'study_navigate': {
+        const nav = (msg as any).navigation as StudyNavigatePayload | undefined;
+        if (nav && nav.tab) {
+          if (nav.document_id) {
+            sendClientMessage({ type: 'study_list_documents' });
+          }
+          setStudyNavigationTarget({
+            ...nav,
+            nonce: Date.now() + Math.random(),
+          });
+        }
+        break;
+      }
       case 'sandbox_status':
         setSandboxStatus(msg.status);
         break;
@@ -1987,6 +2025,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       type: 'directive',
       text: cleanText,
       attachments: attachments && attachments.length > 0 ? attachments : undefined,
+      study_context: {
+        ...activeStudyContextRef.current,
+        chat_session_id: activeSessionId,
+      },
     });
     const timestamp = new Date().toLocaleTimeString('pt-PT', { hour12: false });
     const userMsg: ChatMessage = {
@@ -3370,6 +3412,53 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [sendStudyModeRpc]
   );
 
+  const updateActiveStudyContext = useCallback((ctx: StudyUiContextPayload) => {
+    activeStudyContextRef.current = {
+      ...activeStudyContextRef.current,
+      ...ctx,
+    };
+  }, []);
+
+  const navigateToStudyTarget = useCallback(
+    (target: Partial<StudyNavigatePayload>) => {
+      const validTabs = new Set([
+        'library',
+        'reader',
+        'summary',
+        'notes',
+        'flashcards',
+        'active_recall',
+        'quiz',
+        'adaptive',
+        'knowledge',
+      ]);
+      const safeTab = target.tab && validTabs.has(target.tab) ? target.tab : 'library';
+      setChatPanelOpen(false);
+      if (target.document_id && !studyDocuments.some((d) => d.document_id === target.document_id)) {
+        listStudyDocuments();
+      }
+      setStudyNavigationTarget({
+        target: 'study',
+        ...target,
+        tab: safeTab,
+        nonce: Date.now() + Math.random(),
+      });
+    },
+    [listStudyDocuments, studyDocuments]
+  );
+
+  const cancelStudyOperation = useCallback(
+    (operationId: string, documentId?: string) => {
+      if (!isReady()) return;
+      sendClientMessage({
+        type: 'study_cancel_operation',
+        operation_id: operationId,
+        document_id: documentId,
+      });
+    },
+    [isReady, sendClientMessage]
+  );
+
   const openSpatialBoard = useCallback(
     (domain: SpatialBoardDomain = 'study', query = '') => {
       const q = query.trim().toLowerCase();
@@ -3888,6 +3977,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         getGeneratedStudyDocumentFile,
         studyModesApi,
         studyPipelineStage,
+        studyOperations,
+        studyNavigationTarget,
+        updateActiveStudyContext,
+        navigateToStudyTarget,
+        cancelStudyOperation,
         activeBoard,
         focusedCardId,
         openSpatialBoard,

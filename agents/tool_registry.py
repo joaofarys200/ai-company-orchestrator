@@ -103,6 +103,12 @@ def infer_permissions(tool_name: str) -> tuple[str, ...]:
         return ("network", "external")
     if tool_name in {"chamar_swarm_dominio", "criar_agente_especialista"}:
         return ("orchestration",)
+    if tool_name.startswith("study_"):
+        from agents.study_tools import STUDY_READ_TOOLS
+
+        if tool_name in STUDY_READ_TOOLS:
+            return ("study",)
+        return ("study", "study_write")
     return ()
 
 

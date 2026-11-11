@@ -63,6 +63,10 @@ def create_application_services(
         executor_service=mission_executor,
     )
     study_service = StudyService(workspace_root=project_root)
+    from services.study_integration import StudyOrchestrationCoordinator
+
+    study_coordinator = StudyOrchestrationCoordinator(study_service)
+    setattr(study_service, "_study_coordinator", study_coordinator)
     return ApplicationServices(
         database=database_module,
         agents=agents_module,

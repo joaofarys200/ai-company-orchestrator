@@ -532,12 +532,19 @@ async def run_casual_chat(prompt: str, project_id: str | None = None, correlatio
         correlation_id=correlation_id,
     )
 
-async def run_orchestration_task(prompt: str, session_id: int, project_id: str | None = None, correlation_id: str | None = None):
+async def run_orchestration_task(
+    prompt: str,
+    session_id: int,
+    project_id: str | None = None,
+    correlation_id: str | None = None,
+    study_context: dict | None = None,
+):
     await _current_orchestration_service().run_task(
         prompt,
         session_id,
         project_id,
         correlation_id=correlation_id,
+        study_context=study_context,
     )
 
 

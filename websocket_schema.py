@@ -151,6 +151,9 @@ SERVER_MESSAGE_TYPES = {
     "study_mode_progress_result",
     "study_mode_session_updated",
     "study_mode_sessions_list",
+    # Phase 7 — JARVIS Study Integration
+    "study_operation_status",
+    "study_navigate",
     "sentinel_status",
     "sentinel_audit_completed",
     "sentinel_event",
@@ -478,6 +481,9 @@ CLIENT_MESSAGE_TYPES = {
     "study_mode_resume_session",
     "study_mode_complete_session",
     "study_mode_list_sessions",
+    # Phase 7 — JARVIS Study Integration
+    "study_cancel_operation",
+    "study_get_operation_status",
     "sentinel_get_status",
     "sentinel_run_audit",
     "sentinel_get_baseline",
@@ -891,7 +897,7 @@ def normalize_ws_message(message: Mapping[str, Any]) -> dict[str, Any]:
         return {"type": "system", "content": _as_str(message.get("content"))}
 
     if message_type == "chat":
-        normalized = {
+        normalized: dict[str, Any] = {
             "type": "chat",
             "sender": normalize_canonical_sender(message.get("sender")),
             "role": _as_str(message.get("role"), "System"),
@@ -899,7 +905,23 @@ def normalize_ws_message(message: Mapping[str, Any]) -> dict[str, Any]:
         }
         if message.get("audio"):
             normalized["audio"] = _as_str(message.get("audio"))
+        if isinstance(message.get("study_card"), dict):
+            normalized["study_card"] = dict(message["study_card"])
         return normalized
+
+    if message_type == "study_operation_status":
+        op = message.get("operation")
+        return {
+            "type": "study_operation_status",
+            "operation": dict(op) if isinstance(op, dict) else {},
+        }
+
+    if message_type == "study_navigate":
+        nav = message.get("navigation")
+        return {
+            "type": "study_navigate",
+            "navigation": dict(nav) if isinstance(nav, dict) else {},
+        }
 
     if message_type == "state":
         return {"type": "state", "value": _as_str(message.get("value"), "idle")}
@@ -1086,10 +1108,18 @@ def system_message(content: Any) -> dict[str, Any]:
     return normalize_ws_message({"type": "system", "content": content})
 
 
-def chat_message(sender: Any, role: Any, content: Any, audio: Any = None) -> dict[str, Any]:
+def chat_message(
+    sender: Any,
+    role: Any,
+    content: Any,
+    audio: Any = None,
+    study_card: Any = None,
+) -> dict[str, Any]:
     message: dict[str, Any] = {"type": "chat", "sender": sender, "role": role, "content": content}
     if audio:
         message["audio"] = audio
+    if isinstance(study_card, dict):
+        message["study_card"] = dict(study_card)
     return normalize_ws_message(message)
 
 

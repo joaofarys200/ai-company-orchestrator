@@ -45,6 +45,11 @@ import type {
   StudySessionState,
 } from './types';
 
+import type {
+  StudyNavigatePayload,
+  StudyUiContextPayload,
+} from '../../protocol/websocket';
+
 export type StudyTab =
   | 'library'
   | 'reader'
@@ -160,6 +165,8 @@ interface StudyContainerProps {
     version?: number
   ) => Promise<StudyDocumentFilePayload | null>;
   studyModesApi?: StudyModesBridge;
+  externalNavigationTarget?: (StudyNavigatePayload & { nonce?: number }) | null;
+  onStudyContextChange?: (ctx: StudyUiContextPayload) => void;
 }
 
 export const StudyContainer: React.FC<StudyContainerProps> = ({
@@ -207,6 +214,8 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   onGenerateStudyDocument,
   onGetGeneratedDocumentFile,
   studyModesApi,
+  externalNavigationTarget,
+  onStudyContextChange,
 }) => {
   // Navigation
   const [activeTab, setActiveTab] = useState<StudyTab>('library');
@@ -281,6 +290,91 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   // Upload progress state
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
+
+  // Report light active study context to JARVIS chat orchestration
+  useEffect(() => {
+    if (!onStudyContextChange) return;
+    onStudyContextChange({
+      document_id: activeDocumentId,
+      tab: activeTab,
+      session_id: activeDailySession?.session_id || null,
+    });
+  }, [activeDocumentId, activeTab, activeDailySession?.session_id, onStudyContextChange]);
+
+  // Apply external validated deep-link navigation from JARVIS conversation
+  const lastHandledNavNonceRef = React.useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (!externalNavigationTarget) return;
+    const navNonce = externalNavigationTarget.nonce;
+    if (navNonce !== undefined && lastHandledNavNonceRef.current === navNonce) return;
+    lastHandledNavNonceRef.current = navNonce;
+
+    const validTabs = new Set<StudyTab>([
+      'library',
+      'reader',
+      'summary',
+      'notes',
+      'flashcards',
+      'active_recall',
+      'quiz',
+      'adaptive',
+      'knowledge',
+    ]);
+    const requestedTab: StudyTab = validTabs.has(externalNavigationTarget.tab as StudyTab)
+      ? (externalNavigationTarget.tab as StudyTab)
+      : 'library';
+
+    const targetDocId = externalNavigationTarget.document_id;
+    if (targetDocId) {
+      const exists = documents.some((d) => d.document_id === targetDocId);
+      if (exists) {
+        setActiveDocumentId(targetDocId);
+      } else {
+        onRefreshDocuments?.();
+        setTopicFilterHint('');
+        setActiveTab('library');
+        return;
+      }
+    }
+
+    if (externalNavigationTarget.topic) {
+      setTopicFilterHint(externalNavigationTarget.topic);
+    } else {
+      setTopicFilterHint('');
+    }
+
+    if (externalNavigationTarget.session_id && studyModesApi && targetDocId) {
+      let cancelled = false;
+      studyModesApi
+        .listSessions(targetDocId)
+        .then((res) => {
+          if (cancelled) return;
+          const sessions = Array.isArray(res) ? res : [];
+          const found = sessions.find(
+            (s) => s.session_id === externalNavigationTarget.session_id
+          );
+          if (found) {
+            handleStartOrResumeDailySession(found);
+            return;
+          }
+          setActiveTab(requestedTab);
+        })
+        .catch(() => {
+          if (!cancelled) setActiveTab(requestedTab);
+        });
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    setActiveTab(requestedTab);
+  }, [
+    externalNavigationTarget,
+    documents,
+    studyModesApi,
+    onRefreshDocuments,
+    handleStartOrResumeDailySession,
+  ]);
 
   // Synced documents prop
   useEffect(() => {
