@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from contextlib import closing
+import hashlib
+import os
 from pathlib import Path
 import sqlite3
 import subprocess
@@ -19,6 +21,7 @@ from scripts.migrate_rho_db import (
     TRAJECTORY_COLUMNS,
     RhoMigrationError,
     RhoMigrationSafetyError,
+    assert_sandbox_target_path,
     compute_table_snapshot,
     migrate_rho_db,
 )
@@ -70,40 +73,169 @@ class RhoMigrationSandboxTests(unittest.TestCase):
                 ],
             )
 
-    def test_safety_guard_blocks_production_and_data_paths(self) -> None:
+    def _create_protected_sqlite_db(self, path: Path) -> str:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with closing(sqlite3.connect(path)) as conn:
+            conn.execute("CREATE TABLE protected_guard (id INTEGER PRIMARY KEY, marker TEXT NOT NULL)")
+            conn.execute("INSERT INTO protected_guard (id, marker) VALUES (1, 'untouched-sentinel')")
+            conn.commit()
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+
+    def _assert_rejected_cli_and_python(
+        self,
+        target: Path | str,
+        *,
+        sandbox_root: Path | None = None,
+    ) -> None:
+        with self.assertRaises(RhoMigrationSafetyError):
+            assert_sandbox_target_path(target, self.source_db, sandbox_root=sandbox_root)
+        with self.assertRaises(RhoMigrationSafetyError):
+            migrate_rho_db(self.source_db, target, sandbox_root=sandbox_root)
+        if sandbox_root is None:
+            python_exe = getattr(sys, "_base_executable", sys.executable)
+            proc = subprocess.run(
+                [
+                    python_exe,
+                    str(PROJECT_ROOT / "scripts" / "migrate_rho_db.py"),
+                    "--source",
+                    str(self.source_db),
+                    "--target",
+                    str(target),
+                ],
+                capture_output=True,
+                text=True,
+                timeout=15,
+            )
+            self.assertNotEqual(proc.returncode, 0)
+
+    def test_rejects_production_database_db(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        existed = CANONICAL_DB_PATH.exists()
+        pre_stat = CANONICAL_DB_PATH.stat() if existed else None
+        self._assert_rejected_cli_and_python(CANONICAL_DB_PATH)
+        self.assertEqual(CANONICAL_DB_PATH.exists(), existed)
+        if pre_stat is not None:
+            post_stat = CANONICAL_DB_PATH.stat()
+            self.assertEqual((post_stat.st_size, post_stat.st_mtime_ns), (pre_stat.st_size, pre_stat.st_mtime_ns))
+
+    def test_rejects_production_backup_db(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        bak_path = PROJECT_ROOT / "database.db.pre-tauri.bak"
+        existed = bak_path.exists()
+        pre_sha = hashlib.sha256(bak_path.read_bytes()).hexdigest() if existed else None
+        self._assert_rejected_cli_and_python(bak_path)
+        self.assertEqual(bak_path.exists(), existed)
+        if pre_sha is not None:
+            self.assertEqual(hashlib.sha256(bak_path.read_bytes()).hexdigest(), pre_sha)
+
+    def test_rejects_project_root_state_db(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        state_db = PROJECT_ROOT / "state.db"
+        existed = state_db.exists()
+        pre_sha = hashlib.sha256(state_db.read_bytes()).hexdigest() if existed else None
+        self._assert_rejected_cli_and_python(state_db)
+        self.assertEqual(state_db.exists(), existed)
+        if pre_sha is not None:
+            self.assertEqual(hashlib.sha256(state_db.read_bytes()).hexdigest(), pre_sha)
+
+    def test_rejects_production_data_rho_db(self) -> None:
         self._create_synthetic_source_db(self.source_db)
         prod_rho = PROJECT_ROOT / "data" / "rho.db"
-        prod_rho_existed = prod_rho.exists()
+        existed = prod_rho.exists()
+        self._assert_rejected_cli_and_python(prod_rho)
+        self.assertEqual(prod_rho.exists(), existed)
 
-        forbidden_targets = [
-            CANONICAL_DB_PATH,
-            prod_rho,
-            PROJECT_ROOT / "data" / "sandbox_inside_data.db",
-            PROJECT_ROOT / "database.db.pre-tauri.bak",
-            self.source_db,
-        ]
-        for forbidden in forbidden_targets:
-            with self.subTest(target=str(forbidden)):
-                with self.assertRaises(RhoMigrationSafetyError):
-                    migrate_rho_db(self.source_db, forbidden)
+    def test_rejects_other_files_inside_data_dir(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        for rel in ("data/other_db.db", "data/obsidian/graph_diagnostics.json"):
+            candidate = PROJECT_ROOT / rel
+            existed = candidate.exists()
+            pre_sha = hashlib.sha256(candidate.read_bytes()).hexdigest() if existed else None
+            with self.subTest(target=str(candidate)):
+                self._assert_rejected_cli_and_python(candidate)
+                self.assertEqual(candidate.exists(), existed)
+                if pre_sha is not None:
+                    self.assertEqual(hashlib.sha256(candidate.read_bytes()).hexdigest(), pre_sha)
 
-        # CLI must also fail non-zero without touching production data/rho.db
-        python_exe = getattr(sys, "_base_executable", sys.executable)
-        proc = subprocess.run(
-            [
-                python_exe,
-                str(PROJECT_ROOT / "scripts" / "migrate_rho_db.py"),
-                "--source",
-                str(self.source_db),
-                "--target",
-                str(prod_rho),
-            ],
-            capture_output=True,
-            text=True,
-            timeout=15,
+    def test_rejects_arbitrary_existing_sqlite_db_outside_sandbox(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        allowed_sandbox = self.tmp_path / "approved_sandbox"
+        allowed_sandbox.mkdir()
+        outside_db = self.tmp_path / "outside_area" / "arbitrary_existing.db"
+        pre_sha = self._create_protected_sqlite_db(outside_db)
+
+        self._assert_rejected_cli_and_python(outside_db, sandbox_root=allowed_sandbox)
+        # Default allowlist (tempfile.gettempdir()) also blocks any arbitrary filename outside temp
+        arbitrary_non_temp = PROJECT_ROOT / "arbitrary_non_sandbox.sqlite"
+        self.assertFalse(arbitrary_non_temp.exists())
+        self._assert_rejected_cli_and_python(arbitrary_non_temp)
+        self.assertFalse(arbitrary_non_temp.exists())
+
+        self.assertEqual(hashlib.sha256(outside_db.read_bytes()).hexdigest(), pre_sha)
+        self.assertFalse(Path(f"{outside_db}-wal").exists())
+        self.assertFalse(Path(f"{outside_db}-shm").exists())
+        with closing(sqlite3.connect(outside_db)) as conn:
+            self.assertEqual(
+                conn.execute("SELECT id, marker FROM protected_guard").fetchall(),
+                [(1, "untouched-sentinel")],
+            )
+
+    def test_rejects_sandbox_root_parent_traversal_and_equal_source(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        sandbox_root = Path(tempfile.gettempdir())
+        allowed_sandbox = self.tmp_path / "approved_sandbox"
+        allowed_sandbox.mkdir()
+        self._assert_rejected_cli_and_python(
+            allowed_sandbox / ".." / "outside_traversal.db",
+            sandbox_root=allowed_sandbox,
         )
-        self.assertNotEqual(proc.returncode, 0)
-        self.assertEqual(prod_rho.exists(), prod_rho_existed)
+        traversal_outside = self.tmp_path / ".." / ".." / "outside_traversal.db"
+        if not traversal_outside.resolve(strict=False).is_relative_to(sandbox_root.resolve(strict=False)):
+            self._assert_rejected_cli_and_python(traversal_outside)
+        self._assert_rejected_cli_and_python(sandbox_root)
+        self._assert_rejected_cli_and_python(self.source_db)
+
+    def test_rejects_symlink_pointing_to_protected_database(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        allowed_sandbox = self.tmp_path / "approved_sandbox"
+        allowed_sandbox.mkdir()
+        outside_db = self.tmp_path / "outside_area" / "protected_target.db"
+        pre_sha = self._create_protected_sqlite_db(outside_db)
+
+        symlink_target = allowed_sandbox / "symlink_to_protected.db"
+        try:
+            os.symlink(outside_db, symlink_target)
+        except (OSError, NotImplementedError) as exc:
+            self.skipTest(f"OS does not permit unprivileged symlinks in this environment: {exc}")
+
+        self._assert_rejected_cli_and_python(symlink_target, sandbox_root=allowed_sandbox)
+        self.assertEqual(hashlib.sha256(outside_db.read_bytes()).hexdigest(), pre_sha)
+        with closing(sqlite3.connect(outside_db)) as conn:
+            self.assertEqual(
+                conn.execute("SELECT id, marker FROM protected_guard").fetchall(),
+                [(1, "untouched-sentinel")],
+            )
+
+    def test_rejects_hardlink_to_protected_database(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        allowed_sandbox = self.tmp_path / "approved_sandbox"
+        allowed_sandbox.mkdir()
+        outside_db = self.tmp_path / "outside_area" / "protected_hardlink_target.db"
+        pre_sha = self._create_protected_sqlite_db(outside_db)
+
+        hardlink_target = allowed_sandbox / "hardlink_to_protected.db"
+        try:
+            os.link(outside_db, hardlink_target)
+        except (OSError, NotImplementedError) as exc:
+            self.skipTest(f"OS/filesystem does not support hard links here: {exc}")
+
+        self._assert_rejected_cli_and_python(hardlink_target, sandbox_root=allowed_sandbox)
+        self.assertEqual(hashlib.sha256(outside_db.read_bytes()).hexdigest(), pre_sha)
+        with closing(sqlite3.connect(outside_db)) as conn:
+            self.assertEqual(
+                conn.execute("SELECT id, marker FROM protected_guard").fetchall(),
+                [(1, "untouched-sentinel")],
+            )
 
     def test_synthetic_sandbox_migration_full_parity_indexes_and_rollback(self) -> None:
         self._create_synthetic_source_db(self.source_db)

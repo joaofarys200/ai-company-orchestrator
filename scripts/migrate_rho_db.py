@@ -6,8 +6,10 @@ from dataclasses import asdict, dataclass
 import hashlib
 import json
 from pathlib import Path
+import os
 import sqlite3
 import sys
+import tempfile
 from typing import Callable, Iterable
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -131,16 +133,52 @@ class RhoMigrationReport:
         return asdict(self)
 
 
-def assert_sandbox_target_path(target_path: Path | str, source_path: Path | str) -> Path:
-    """Enforce Stage 1 sandbox-only restriction: never write to production DB paths."""
-    resolved_target = Path(target_path).expanduser().resolve(strict=False)
-    resolved_source = Path(source_path).expanduser().resolve(strict=False)
-    forbidden_paths = (
-        CANONICAL_DB_PATH.resolve(strict=False),
-        (PROJECT_ROOT / "database.db.pre-tauri.bak").resolve(strict=False),
-        (PROJECT_ROOT / "data" / "rho.db").resolve(strict=False),
+def get_default_sandbox_root() -> Path:
+    """Return the canonical absolute path of the Stage 1 temporary sandbox root."""
+    return Path(os.path.realpath(tempfile.gettempdir()))
+
+
+def _collect_protected_file_ids(paths: Iterable[Path]) -> set[tuple[int, int]]:
+    file_ids: set[tuple[int, int]] = set()
+    for path in paths:
+        try:
+            st = os.stat(path)
+        except OSError:
+            continue
+        if st.st_ino:
+            file_ids.add((st.st_dev, st.st_ino))
+    return file_ids
+
+
+def assert_sandbox_target_path(
+    target_path: Path | str,
+    source_path: Path | str,
+    *,
+    sandbox_root: Path | str | None = None,
+) -> Path:
+    """
+    Enforce Stage 1 sandbox-only allowlist:
+    - Target must resolve canonically inside the approved temporary sandbox root.
+    - Target cannot equal the source path or protected production paths/directories.
+    - Symlinks and hard-linked file aliases (`st_nlink > 1` or matching inode) are rejected.
+    """
+    raw_target = Path(target_path).expanduser()
+    raw_source = Path(source_path).expanduser()
+
+    resolved_root = Path(
+        os.path.realpath(
+            str(Path(sandbox_root).expanduser() if sandbox_root is not None else tempfile.gettempdir())
+        )
     )
-    data_dir = (PROJECT_ROOT / "data").resolve(strict=False)
+    resolved_target = Path(os.path.realpath(str(raw_target)))
+    resolved_source = Path(os.path.realpath(str(raw_source)))
+
+    forbidden_paths = (
+        Path(os.path.realpath(str(CANONICAL_DB_PATH))),
+        Path(os.path.realpath(str(PROJECT_ROOT / "database.db.pre-tauri.bak"))),
+        Path(os.path.realpath(str(PROJECT_ROOT / "data" / "rho.db"))),
+    )
+    data_dir = Path(os.path.realpath(str(PROJECT_ROOT / "data")))
 
     if resolved_target == resolved_source:
         raise RhoMigrationSafetyError(
@@ -151,6 +189,34 @@ def assert_sandbox_target_path(target_path: Path | str, source_path: Path | str)
             f"Stage 1 safety guard blocked non-sandbox target path: {resolved_target}. "
             "Production RHO migration is forbidden in Stage 1."
         )
+    if resolved_target == resolved_root or not resolved_target.is_relative_to(resolved_root):
+        raise RhoMigrationSafetyError(
+            f"Stage 1 safety guard blocked target outside approved sandbox root ({resolved_root}): "
+            f"{resolved_target}. Stage 1 RHO migration requires a temporary sandbox destination."
+        )
+
+    protected_ids = _collect_protected_file_ids((*forbidden_paths, resolved_source))
+    for suffix in ("", "-wal", "-shm"):
+        candidate_raw = Path(f"{raw_target}{suffix}")
+        candidate_resolved = Path(f"{resolved_target}{suffix}")
+        if candidate_raw.is_symlink() or candidate_resolved.is_symlink():
+            raise RhoMigrationSafetyError(
+                f"Stage 1 safety guard blocked symlink target or WAL sidecar: {candidate_raw}"
+            )
+        try:
+            st = os.stat(candidate_resolved)
+        except FileNotFoundError:
+            continue
+        except OSError as exc:
+            raise RhoMigrationSafetyError(
+                f"Stage 1 safety guard could not inspect target path {candidate_resolved}: {exc}"
+            ) from exc
+        if st.st_nlink > 1 or (st.st_ino and (st.st_dev, st.st_ino) in protected_ids):
+            raise RhoMigrationSafetyError(
+                f"Stage 1 safety guard blocked hard-linked or protected inode alias: "
+                f"{candidate_resolved} (st_nlink={st.st_nlink})."
+            )
+
     return resolved_target
 
 
@@ -223,14 +289,19 @@ def migrate_rho_db(
     target_path: Path | str,
     *,
     verify_sha256: bool = True,
+    sandbox_root: Path | str | None = None,
     fault_hook: Callable[[str, sqlite3.Connection], None] | None = None,
 ) -> RhoMigrationReport:
     """
     Atomically extract `model_trajectories` and `rho_compounding_rules` from a source
     SQLite database into a sandbox target SQLite database with full integrity and SHA256 parity.
     """
-    resolved_source = Path(source_path).expanduser().resolve(strict=False)
-    resolved_target = assert_sandbox_target_path(target_path, resolved_source)
+    resolved_source = Path(os.path.realpath(str(Path(source_path).expanduser())))
+    resolved_target = assert_sandbox_target_path(
+        target_path,
+        resolved_source,
+        sandbox_root=sandbox_root,
+    )
     resolved_target.parent.mkdir(parents=True, exist_ok=True)
     target_existed_before = resolved_target.exists()
 
