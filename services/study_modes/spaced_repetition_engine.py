@@ -327,6 +327,91 @@ class SpacedRepetitionEngine:
         self.persistence.update_state_file_atomic(self.HISTORY_FILE, [], _append_hist)
         return updated, event
 
+    def record_reviews_batch(
+        self,
+        reviews: Sequence[Dict[str, Any]],
+        *,
+        now_ts: Optional[float] = None,
+    ) -> List[TupleResult]:
+        """Regista um lote de revisões numa única escrita atómica de estados e histórico."""
+        import time as _time
+
+        items = list(reviews or ())
+        if not items:
+            return []
+
+        default_ts = float(now_ts if now_ts is not None else _time.time())
+        prepared: List[Dict[str, Any]] = []
+        for rev in items:
+            rating = rev.get("rating")
+            score_ratio = rev.get("score_ratio")
+            confidence = int(rev.get("confidence", 3) or 3)
+            q = self.map_outcome_to_quality(rating=rating, score_ratio=score_ratio, confidence=confidence)
+            label = rating or (f"SCORE_{round((score_ratio or 0.0) * 100)}")
+            prepared.append({
+                "item_id": str(rev["item_id"]),
+                "item_type": str(rev["item_type"]),
+                "document_id": str(rev["document_id"]),
+                "quality_score": q,
+                "rating_label": label,
+                "confidence": confidence,
+                "content_difficulty": str(rev.get("content_difficulty", ContentDifficulty.INTERMEDIATE.value)),
+                "question_difficulty": str(rev.get("question_difficulty", QuestionDifficulty.MEDIUM.value)),
+                "chapter_id": str(rev.get("chapter_id", "")),
+                "section_id": str(rev.get("section_id", "")),
+                "topic": str(rev.get("topic", "")),
+                "concept_ids": list(rev.get("concept_ids") or ()),
+                "learning_objective_id": str(rev.get("learning_objective_id", "")),
+                "ts": float(rev["now_ts"] if rev.get("now_ts") is not None else default_ts),
+            })
+
+        batch_results: List[TupleResult] = []
+        events_payload: List[Dict[str, Any]] = []
+
+        def _mutate_states_batch(cur: Any) -> Dict[str, Any]:
+            store = dict(cur) if isinstance(cur, dict) else {}
+            batch_results.clear()
+            events_payload.clear()
+            for entry in prepared:
+                item_id = entry["item_id"]
+                existing_raw = store.get(item_id)
+                if isinstance(existing_raw, dict):
+                    base_state = ReviewSchedulingState.from_dict(existing_raw)
+                else:
+                    base_state = ReviewSchedulingState(
+                        item_id=item_id,
+                        item_type=entry["item_type"],
+                        document_id=entry["document_id"],
+                        chapter_id=entry["chapter_id"],
+                        section_id=entry["section_id"],
+                        topic=entry["topic"],
+                        concept_ids=entry["concept_ids"],
+                        learning_objective_id=entry["learning_objective_id"],
+                        content_difficulty=entry["content_difficulty"],
+                        question_difficulty=entry["question_difficulty"],
+                    )
+                updated, event = self.compute_next_schedule(
+                    base_state,
+                    quality_score=entry["quality_score"],
+                    rating_label=entry["rating_label"],
+                    confidence=entry["confidence"],
+                    now_ts=entry["ts"],
+                )
+                store[item_id] = updated.to_dict()
+                batch_results.append((updated, event))
+                events_payload.append(event.to_dict())
+            return store
+
+        self.persistence.update_state_file_atomic(self.STATES_FILE, {}, _mutate_states_batch)
+
+        def _append_hist_batch(cur: Any) -> List[Any]:
+            hist = list(cur) if isinstance(cur, list) else []
+            hist.extend(events_payload)
+            return hist
+
+        self.persistence.update_state_file_atomic(self.HISTORY_FILE, [], _append_hist_batch)
+        return batch_results
+
     def set_suspended(self, item_id: str, suspended: bool) -> Optional[ReviewSchedulingState]:
         holder: List[Optional[ReviewSchedulingState]] = [None]
 

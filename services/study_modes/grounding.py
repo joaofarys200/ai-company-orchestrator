@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 from services.academic_reasoning_engine import (
@@ -41,6 +42,10 @@ from services.study_modes.contracts import (
 
 
 LLMCaller = Callable[..., Tuple[Optional[Any], Dict[str, Any]] | Dict[str, Any]]
+
+
+class StudyModeCancelledError(RuntimeError):
+    """Raised when a Phase 6 generation operation is cancelled cooperatively."""
 
 
 def compute_source_fingerprints(
@@ -427,6 +432,30 @@ class Phase6GroundingHelper:
         )
 
 
+_TERMINAL_LLM_STATUSES = {
+    "UNAVAILABLE",
+    "TIMEOUT",
+    "CANCELLED",
+    "SKIPPED_LIVE_LLM_DISABLED",
+}
+
+
+def _coerce_parsed_json_dict(raw_val: Any) -> Optional[Dict[str, Any]]:
+    """Extrai um dicionário JSON válido quer de dict direto quer de texto com `<think>`/markdown fences."""
+    if isinstance(raw_val, dict):
+        return raw_val
+    if not isinstance(raw_val, str):
+        return None
+    cleaned = clean_qwen_json(raw_val)
+    if isinstance(cleaned, dict):
+        return cleaned
+    if isinstance(cleaned, str):
+        candidate = json.loads(cleaned)
+        if isinstance(candidate, dict):
+            return candidate
+    return None
+
+
 def invoke_phase6_json_llm(
     *,
     llm_caller: Optional[LLMCaller],
@@ -437,19 +466,33 @@ def invoke_phase6_json_llm(
     validator: Callable[[Dict[str, Any]], Tuple[bool, str]],
     max_output_tokens: int = 2400,
     max_retries: int = 2,
+    cancellation_check: Optional[Callable[[], bool]] = None,
 ) -> Tuple[Optional[Dict[str, Any]], Dict[str, Any]]:
     """
     Executa chamada ao modelo local qwen3.5:9b (ou llm_caller injetado em testes)
     com validação JSON estrita e retries limitados. Nunca recorre a serviços cloud.
     """
+    from services.study_ai_engine import is_study_generation_cancelled
+
     caller = llm_caller
     cur_prompt = user_prompt
     last_err = ""
     total_calls = 0
     prompt_tokens = 0
     completion_tokens = 0
+    terminal_status = ""
+
+    def _is_cancelled() -> bool:
+        if cancellation_check and cancellation_check():
+            return True
+        return bool(document_id and is_study_generation_cancelled(document_id)) or is_study_generation_cancelled("global")
 
     for attempt in range(max_retries + 1):
+        if _is_cancelled():
+            terminal_status = "CANCELLED"
+            last_err = "Geração cancelada pelo utilizador."
+            break
+
         total_calls += 1
         if caller is not None:
             res = caller(
@@ -468,9 +511,14 @@ def invoke_phase6_json_llm(
                     parsed = res.get("raw_text")
             else:
                 obs = {}
-                parsed = None
-            prompt_tokens += int(obs.get("prompt_tokens") or 0)
-            completion_tokens += int(obs.get("completion_tokens") or 0)
+                parsed = res if isinstance(res, str) else None
+            prompt_tokens += int(obs.get("prompt_tokens") or obs.get("input_tokens") or 0)
+            completion_tokens += int(obs.get("completion_tokens") or obs.get("output_tokens") or 0)
+            obs_status = str(obs.get("status") or "").upper()
+            if obs_status in _TERMINAL_LLM_STATUSES or obs.get("cancelled") is True:
+                terminal_status = obs_status or "CANCELLED"
+                last_err = str(obs.get("error") or ", ".join(obs.get("validation_errors") or []) or terminal_status)
+                break
             if isinstance(obs, dict) and obs.get("ok") is False:
                 last_err = str(obs.get("error") or "Erro reportado pelo invocador LLM.")
                 cur_prompt = f"{user_prompt}\n\n[CORREÇÃO TENTATIVA {attempt + 2}]: {last_err}"
@@ -483,14 +531,23 @@ def invoke_phase6_json_llm(
                 expect_json=True,
                 max_output_tokens=max_output_tokens,
                 document_id=document_id,
+                cancellation_check=_is_cancelled,
             )
-            prompt_tokens += int(obs.get("input_tokens") or 0)
-            completion_tokens += int(obs.get("output_tokens") or 0)
+            prompt_tokens += int(obs.get("input_tokens") or obs.get("prompt_tokens") or 0)
+            completion_tokens += int(obs.get("output_tokens") or obs.get("completion_tokens") or 0)
+            obs_status = str(obs.get("status") or "").upper()
+            if obs_status in _TERMINAL_LLM_STATUSES or obs.get("cancelled") is True:
+                terminal_status = obs_status or "CANCELLED"
+                last_err = str(obs.get("error") or ", ".join(obs.get("validation_errors") or []) or terminal_status)
+                break
             parsed = raw_text
 
         if isinstance(parsed, str):
             try:
-                parsed = json.loads(clean_qwen_json(parsed))
+                coerced = _coerce_parsed_json_dict(parsed)
+                if coerced is None:
+                    last_err = "JSON inválido ou objeto não encontrado."
+                parsed = coerced
             except Exception as exc:
                 last_err = f"JSON inválido: {exc}"
                 parsed = None
@@ -500,6 +557,8 @@ def invoke_phase6_json_llm(
                 f"{user_prompt}\n\n[CORREÇÃO OBRIGATÓRIA TENTATIVA {attempt + 2}]: "
                 f"Devolve exclusivamente um objeto JSON válido ({last_err or 'objeto não encontrado'})."
             )
+            if caller is None and attempt < max_retries:
+                time.sleep(min(0.25 * (attempt + 1), 0.75))
             continue
 
         ok, reason = validator(parsed)
@@ -515,9 +574,13 @@ def invoke_phase6_json_llm(
             f"{user_prompt}\n\n[CORREÇÃO OBRIGATÓRIA TENTATIVA {attempt + 2}]: "
             f"O JSON anterior falhou validação: {reason}."
         )
+        if caller is None and attempt < max_retries:
+            time.sleep(min(0.25 * (attempt + 1), 0.75))
 
     return None, {
         "ok": False,
+        "status": terminal_status or "FAILED_VALIDATION",
+        "cancelled": terminal_status == "CANCELLED",
         "attempts": total_calls,
         "error": last_err or "Falha de geração estruturada com qwen3.5:9b.",
         "prompt_tokens": prompt_tokens,

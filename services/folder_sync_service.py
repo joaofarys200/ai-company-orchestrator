@@ -171,11 +171,15 @@ def validate_and_normalize_folder_path(folder_path: str) -> Path:
         raise ValueError("O caminho da pasta não pode estar vazio.")
 
     raw_str = str(folder_path).strip()
-    # Detetar path traversal deliberado com '..' antes da normalização
+    # Detetar path traversal deliberado com '..' ou symlink direto antes da normalização
     if ".." in raw_str.replace("\\", "/").split("/"):
         raise ValueError(f"PATH_TRAVERSAL_DETECTED: Caminho contém componentes ilegais: '{raw_str}'")
 
-    path_obj = Path(raw_str).resolve()
+    raw_path = Path(raw_str)
+    if raw_path.is_symlink():
+        raise PermissionError(f"SECURITY_VIOLATION: Não é permitido vincular symlinks: '{raw_str}'")
+
+    path_obj = raw_path.resolve()
 
     if not path_obj.exists():
         raise FileNotFoundError(f"A pasta especificada não existe: '{path_obj}'")
@@ -183,16 +187,32 @@ def validate_and_normalize_folder_path(folder_path: str) -> Path:
     if not path_obj.is_dir():
         raise NotADirectoryError(f"O caminho especificado não é uma pasta: '{path_obj}'")
 
-    # Proteger contra raízes críticas do sistema (Windows / Linux)
+    # Proteger contra raízes críticas do sistema (Windows / POSIX) e suas subárvores
     root_path = Path(path_obj.anchor)
     if path_obj == root_path:
         raise PermissionError("A vinculação da raiz do sistema de ficheiros (drive root) não é permitida.")
 
-    sys_dirs = ["windows", "system32", "program files", "program files (x86)", "/etc", "/bin", "/sbin", "/usr"]
-    lower_p = str(path_obj).lower()
-    for sd in sys_dirs:
-        if lower_p.endswith(f"\\{sd}") or lower_p.endswith(f"/{sd}"):
-            raise PermissionError(f"Acesso a pastas críticas do sistema ({sd}) é proibido.")
+    if os.name == "nt":
+        win_dir = Path(os.environ.get("SystemRoot", r"C:\Windows")).resolve()
+        pf_dir = Path(os.environ.get("ProgramFiles", r"C:\Program Files")).resolve()
+        pf86_dir = Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")).resolve()
+        forbidden_roots = [win_dir, pf_dir, pf86_dir, Path(r"C:\System Volume Information")]
+        for fr in forbidden_roots:
+            if path_obj == fr or path_obj.is_relative_to(fr):
+                raise PermissionError(f"Acesso a pastas críticas do sistema ({fr}) é proibido.")
+        lower_parts = [p.lower() for p in path_obj.parts]
+        if any(seg in ("windows", "system32", "syswow64", "program files", "program files (x86)") for seg in lower_parts):
+            raise PermissionError(f"Acesso a pastas críticas do sistema ({path_obj}) é proibido.")
+    else:
+        posix_forbidden = [
+            Path("/etc"), Path("/bin"), Path("/sbin"), Path("/usr"),
+            Path("/var"), Path("/lib"), Path("/lib64"), Path("/boot"),
+            Path("/root"), Path("/proc"), Path("/sys"), Path("/dev"),
+            Path("/System"), Path("/Library"),
+        ]
+        for fr in posix_forbidden:
+            if path_obj == fr or path_obj.is_relative_to(fr):
+                raise PermissionError(f"Acesso a pastas críticas do sistema ({fr}) é proibido.")
 
     return path_obj
 
@@ -319,11 +339,16 @@ class FolderSyncManager:
         results: Dict[str, ScannedFileInfo] = {}
         now = time.time()
 
-        for root, dirs, files in os.walk(str(target)):
-            # Filtrar pastas ignoradas in-place
-            dirs[:] = [d for d in dirs if d not in IGNORED_DIRECTORIES and not d.startswith(".")]
-
+        for root, dirs, files in os.walk(str(target), followlinks=False):
             root_path = Path(root)
+            # Rejeitar diretórios symlinked para fora ou dentro da árvore
+            dirs[:] = [
+                d for d in dirs
+                if d not in IGNORED_DIRECTORIES
+                and not d.startswith(".")
+                and not (root_path / d).is_symlink()
+            ]
+
             for fname in files:
                 # Ignorar ficheiros temporários / ocultos
                 if any(fname.startswith(p) for p in IGNORED_FILE_PREFIXES):
@@ -332,7 +357,12 @@ class FolderSyncManager:
                     continue
 
                 abs_file = root_path / fname
+                if abs_file.is_symlink():
+                    continue
                 try:
+                    resolved_file = abs_file.resolve()
+                    if not resolved_file.is_relative_to(target):
+                        continue
                     rel_p = str(abs_file.relative_to(target)).replace("\\", "/")
                     stat = abs_file.stat()
                     size_bytes = stat.st_size
@@ -340,8 +370,10 @@ class FolderSyncManager:
                 except (OSError, ValueError):
                     continue
 
-                # Debounce de escrita: se o ficheiro foi alterado há menos de debounce_seconds,
-                # e o tamanho for 0, pode estar ainda em cópia.
+                # Debounce de escrita: ignorar ficheiros de 0 bytes recém-criados ainda em escrita.
+                if size_bytes == 0 and (now - mtime) < self.debounce_seconds:
+                    continue
+
                 ext = abs_file.suffix.lower()
                 is_supported = ext in ALL_SUPPORTED_EXTENSIONS
                 stype = determine_source_type(ext)

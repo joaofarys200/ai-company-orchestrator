@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen,
@@ -82,6 +82,8 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
   const [editDiff, setEditDiff] = useState('MEDIUM');
   const [isCreating, setIsCreating] = useState(false);
   const [lastSrsNotice, setLastSrsNotice] = useState<string | null>(null);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const reviewInFlightRef = useRef(false);
 
   useEffect(() => {
     setTopicSearch(initialFilterTopic);
@@ -154,7 +156,8 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
     setFilterDifficulty('ALL');
     setFilterType('ALL');
     setTopicSearch('');
-    const idx = cards.findIndex((c) => !c.is_deleted && c.card_id === dailyCurrentItem.item_id);
+    const visibleCards = cards.filter((c) => !c.is_deleted);
+    const idx = visibleCards.findIndex((c) => c.card_id === dailyCurrentItem.item_id);
     if (idx >= 0) {
       setCurrentIdx(idx);
       setFlipped(false);
@@ -182,7 +185,9 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
 
   const handleReview = useCallback(
     async (rating: 'Again' | 'Hard' | 'Good' | 'Easy') => {
-      if (!document || !studyModes || !activeCard) return;
+      if (!document || !studyModes || !activeCard || reviewInFlightRef.current) return;
+      reviewInFlightRef.current = true;
+      setIsSubmittingReview(true);
       setError(null);
       try {
         const res = await studyModes.reviewFlashcard(
@@ -245,6 +250,9 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
         }
       } catch (err: any) {
         setError(err?.message || 'Erro ao registar revisão.');
+      } finally {
+        reviewInFlightRef.current = false;
+        setIsSubmittingReview(false);
       }
     },
     [
@@ -736,29 +744,33 @@ export const StudyFlashcardsView: React.FC<StudyFlashcardsViewProps> = ({
                   <div className="grid grid-cols-4 gap-2">
                     <button
                       type="button"
+                      disabled={isSubmittingReview}
                       onClick={() => handleReview('Again')}
-                      className="rounded-lg border border-rose-500/30 bg-rose-950/20 p-2.5 text-center text-xs font-semibold text-rose-300 hover:bg-rose-950/40 transition"
+                      className="rounded-lg border border-rose-500/30 bg-rose-950/20 p-2.5 text-center text-xs font-semibold text-rose-300 hover:bg-rose-950/40 transition disabled:opacity-50"
                     >
                       1 • Rever Agora (Again)
                     </button>
                     <button
                       type="button"
+                      disabled={isSubmittingReview}
                       onClick={() => handleReview('Hard')}
-                      className="rounded-lg border border-amber-500/30 bg-amber-950/20 p-2.5 text-center text-xs font-semibold text-amber-300 hover:bg-amber-950/40 transition"
+                      className="rounded-lg border border-amber-500/30 bg-amber-950/20 p-2.5 text-center text-xs font-semibold text-amber-300 hover:bg-amber-950/40 transition disabled:opacity-50"
                     >
                       2 • Difícil (Hard)
                     </button>
                     <button
                       type="button"
+                      disabled={isSubmittingReview}
                       onClick={() => handleReview('Good')}
-                      className="rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-2.5 text-center text-xs font-semibold text-cyan-300 hover:bg-cyan-950/40 transition"
+                      className="rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-2.5 text-center text-xs font-semibold text-cyan-300 hover:bg-cyan-950/40 transition disabled:opacity-50"
                     >
                       3 • Bom (Good)
                     </button>
                     <button
                       type="button"
+                      disabled={isSubmittingReview}
                       onClick={() => handleReview('Easy')}
-                      className="rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-2.5 text-center text-xs font-semibold text-emerald-300 hover:bg-emerald-950/40 transition"
+                      className="rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-2.5 text-center text-xs font-semibold text-emerald-300 hover:bg-emerald-950/40 transition disabled:opacity-50"
                     >
                       4 • Fácil (Easy)
                     </button>

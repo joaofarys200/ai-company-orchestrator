@@ -18,6 +18,7 @@ import time
 import uuid
 import xml.etree.ElementTree as ET
 import zipfile
+from collections import OrderedDict
 from dataclasses import asdict, dataclass, field, fields
 from datetime import datetime
 from pathlib import Path
@@ -79,6 +80,15 @@ from services.folder_sync_service import (
     compute_file_sha256,
     determine_source_type,
     validate_and_normalize_folder_path,
+)
+from services.study_fs import (
+    atomic_write_bytes,
+    atomic_write_json,
+    is_path_within_roots,
+    read_json_safe,
+    resolve_confined_path,
+    safe_document_id,
+    safe_filename,
 )
 from services.study_ai_engine import (
     _extract_grounded_structure_from_text,
@@ -412,6 +422,9 @@ class StudyService:
 
         # Concorrência e sincronização de documentos
         self._documents_lock = threading.RLock()
+        self._ast_cache: "OrderedDict[Tuple[str, int, int], Dict[str, Any]]" = OrderedDict()
+        self._dossier_cache: "OrderedDict[Tuple[str, int, int], Dict[str, Any]]" = OrderedDict()
+        self._artifact_cache_max = 16
         self._documents_mtime: float = 0.0
         self._documents_size: int = -1
         self._documents: Dict[str, StudyDocument] = {}
@@ -590,21 +603,41 @@ class StudyService:
                 if not doc:
                     return False
 
-            # 1. Apagar ficheiro físico se existir e estiver dentro do storage_dir
+            # 1. Apagar ficheiro físico e artefactos derivados dentro do storage_dir
             # GARANTIA NÃO-DESTRUTIVA: Ficheiros de pastas vinculadas (linked_folder) NUNCA são apagados do disco!
             is_linked_folder_file = doc.metadata and doc.metadata.get("source_origin") == "linked_folder"
-            if delete_file and not is_linked_folder_file:
-                file_path_str = doc.metadata.get("file_path") if doc.metadata else None
-                if file_path_str:
-                    try:
-                        p = Path(file_path_str)
-                        if p.exists() and (self.storage_dir in p.resolve().parents or p.resolve().parent == self.storage_dir.resolve()):
-                            p.unlink()
-                    except Exception as err:
-                        print(f"[Study] Aviso: erro ao apagar ficheiro físico {file_path_str}: {err}", flush=True)
+            if delete_file:
+                if not is_linked_folder_file:
+                    candidate_paths = []
+                    if doc.metadata:
+                        candidate_paths.append(doc.metadata.get("file_path"))
+                        vid_meta = doc.metadata.get("video") or {}
+                        if isinstance(vid_meta, dict):
+                            candidate_paths.append(vid_meta.get("audio_path"))
+                    for fp_str in candidate_paths:
+                        if not fp_str:
+                            continue
+                        try:
+                            p = Path(fp_str)
+                            if p.exists() and p.is_file() and is_path_within_roots(p, [self.storage_dir]):
+                                p.unlink()
+                        except Exception as err:
+                            print(f"[Study] Aviso: erro ao apagar ficheiro físico {fp_str}: {err}", flush=True)
+
+                try:
+                    clean_id = safe_document_id(document_id)
+                    doc_art_dir = resolve_confined_path(self.storage_dir / "documents", clean_id)
+                    if doc_art_dir.exists() and doc_art_dir.is_dir():
+                        shutil.rmtree(doc_art_dir, ignore_errors=True)
+                    kf_dir = resolve_confined_path(self.video_service.keyframes_dir, clean_id)
+                    if kf_dir.exists() and kf_dir.is_dir():
+                        shutil.rmtree(kf_dir, ignore_errors=True)
+                except Exception as err:
+                    print(f"[Study] Aviso: erro ao limpar artefactos de {document_id}: {err}", flush=True)
 
             # 2. Remover do catálogo em memória e persistir
             self._documents.pop(document_id, None)
+            self._invalidate_doc_artifact_cache(document_id)
             self._save_documents()
 
             # 3. Limpar notas associadas
@@ -645,10 +678,17 @@ class StudyService:
             self.collections = {}
 
             if self.documents_file.exists():
-                try:
-                    data = json.loads(self.documents_file.read_text(encoding="utf-8"))
+                data, corrupt = read_json_safe(
+                    self.documents_file,
+                    default={},
+                    expected_type=dict,
+                    backup_on_corrupt=True,
+                )
+                if not corrupt and isinstance(data, dict):
                     valid_fields = {f.name for f in fields(StudyDocument)}
                     for doc_id, doc_dict in data.items():
+                        if not isinstance(doc_dict, dict):
+                            continue
                         filtered = {k: v for k, v in doc_dict.items() if k in valid_fields}
                         filtered.setdefault("document_id", doc_id)
                         filtered.setdefault("source_id", doc_id)
@@ -658,53 +698,62 @@ class StudyService:
                         filtered.setdefault("language", "en")
                         filtered.setdefault("page_count", 1)
                         self._documents[doc_id] = StudyDocument(**filtered)
-                    stat = self.documents_file.stat()
-                    self._documents_mtime = stat.st_mtime
-                    self._documents_size = stat.st_size
-                except Exception:
-                    pass
+                    try:
+                        stat = self.documents_file.stat()
+                        self._documents_mtime = stat.st_mtime
+                        self._documents_size = stat.st_size
+                    except OSError:
+                        pass
 
             if self.notes_file.exists():
-                try:
-                    notes_data = json.loads(self.notes_file.read_text(encoding="utf-8"))
-                    self.notes = [StudyReadingNote(**n) for n in notes_data]
-                except Exception:
-                    pass
+                notes_data, corrupt = read_json_safe(
+                    self.notes_file, default=[], expected_type=list, backup_on_corrupt=True
+                )
+                if not corrupt:
+                    self.notes = [StudyReadingNote(**n) for n in notes_data if isinstance(n, dict)]
 
             if self.highlights_file.exists():
-                try:
-                    hl_data = json.loads(self.highlights_file.read_text(encoding="utf-8"))
-                    self.highlights = [StudyHighlight(**h) for h in hl_data]
-                except Exception:
-                    pass
+                hl_data, corrupt = read_json_safe(
+                    self.highlights_file, default=[], expected_type=list, backup_on_corrupt=True
+                )
+                if not corrupt:
+                    self.highlights = [StudyHighlight(**h) for h in hl_data if isinstance(h, dict)]
 
             if self.quizzes_file.exists():
-                try:
-                    q_data = json.loads(self.quizzes_file.read_text(encoding="utf-8"))
+                q_data, corrupt = read_json_safe(
+                    self.quizzes_file, default={}, expected_type=dict, backup_on_corrupt=True
+                )
+                if not corrupt:
                     for q_id, q_dict in q_data.items():
-                        self.quizzes[q_id] = StudyQuiz(**q_dict)
-                except Exception:
-                    pass
+                        if isinstance(q_dict, dict):
+                            self.quizzes[q_id] = StudyQuiz(**q_dict)
 
             if self.quiz_results_file.exists():
-                try:
-                    self.quiz_results = json.loads(self.quiz_results_file.read_text(encoding="utf-8"))
-                except Exception:
-                    pass
+                qr_data, corrupt = read_json_safe(
+                    self.quiz_results_file, default=[], expected_type=list, backup_on_corrupt=True
+                )
+                if not corrupt:
+                    self.quiz_results = qr_data
 
             if self.flashcards_file.exists():
-                try:
-                    fc_data = json.loads(self.flashcards_file.read_text(encoding="utf-8"))
-                    self.flashcards = {c_id: Flashcard(**c) for c_id, c in fc_data.items()}
-                except Exception:
-                    self.flashcards = {}
+                fc_data, corrupt = read_json_safe(
+                    self.flashcards_file, default={}, expected_type=dict, backup_on_corrupt=True
+                )
+                if not corrupt:
+                    self.flashcards = {
+                        c_id: Flashcard(**c) for c_id, c in fc_data.items() if isinstance(c, dict)
+                    }
 
             if self.collections_file.exists():
-                try:
-                    col_data = json.loads(self.collections_file.read_text(encoding="utf-8"))
+                col_data, corrupt = read_json_safe(
+                    self.collections_file, default={}, expected_type=dict, backup_on_corrupt=True
+                )
+                if not corrupt:
                     valid_col_fields = {f.name for f in fields(StudyCollection)}
                     self.collections = {}
                     for c_id, c in col_data.items():
+                        if not isinstance(c, dict):
+                            continue
                         filtered_c = {k: v for k, v in c.items() if k in valid_col_fields}
                         filtered_c.setdefault("collection_id", c_id)
                         filtered_c.setdefault("name", "Nova Coleção")
@@ -714,15 +763,11 @@ class StudyService:
                         filtered_c.setdefault("linked_folders", [])
                         filtered_c.setdefault("sync_preferences", {})
                         self.collections[c_id] = StudyCollection(**filtered_c)
-                except Exception:
-                    self.collections = {}
 
     def _save_documents(self) -> None:
         with self._documents_lock:
             serialized = {k: v.to_dict() for k, v in self._documents.items()}
-            tmp_path = self.documents_file.with_suffix(".tmp")
-            tmp_path.write_text(json.dumps(serialized, indent=2, ensure_ascii=False), encoding="utf-8")
-            os.replace(tmp_path, self.documents_file)
+            atomic_write_json(self.documents_file, serialized, indent=2)
             try:
                 stat = self.documents_file.stat()
                 self._documents_mtime = stat.st_mtime
@@ -735,27 +780,31 @@ class StudyService:
         self._save_documents()
 
     def _atomic_write_json(self, path: Path, payload: Any) -> None:
-        tmp_path = path.with_suffix(".tmp")
-        tmp_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-        os.replace(tmp_path, path)
+        atomic_write_json(path, payload, indent=2)
 
     def _save_notes(self) -> None:
-        self._atomic_write_json(self.notes_file, [asdict(n) for n in self.notes])
+        with self._documents_lock:
+            self._atomic_write_json(self.notes_file, [asdict(n) for n in self.notes])
 
     def _save_highlights(self) -> None:
-        self._atomic_write_json(self.highlights_file, [asdict(h) for h in self.highlights])
+        with self._documents_lock:
+            self._atomic_write_json(self.highlights_file, [asdict(h) for h in self.highlights])
 
     def _save_quizzes(self) -> None:
-        self._atomic_write_json(self.quizzes_file, {k: asdict(v) for k, v in self.quizzes.items()})
+        with self._documents_lock:
+            self._atomic_write_json(self.quizzes_file, {k: asdict(v) for k, v in self.quizzes.items()})
 
     def _save_quiz_results(self) -> None:
-        self._atomic_write_json(self.quiz_results_file, self.quiz_results)
+        with self._documents_lock:
+            self._atomic_write_json(self.quiz_results_file, self.quiz_results)
 
     def _save_flashcards(self) -> None:
-        self._atomic_write_json(self.flashcards_file, {k: asdict(v) for k, v in self.flashcards.items()})
+        with self._documents_lock:
+            self._atomic_write_json(self.flashcards_file, {k: asdict(v) for k, v in self.flashcards.items()})
 
     def _save_collections(self) -> None:
-        self._atomic_write_json(self.collections_file, {k: asdict(v) for k, v in self.collections.items()})
+        with self._documents_lock:
+            self._atomic_write_json(self.collections_file, {k: asdict(v) for k, v in self.collections.items()})
 
     # -----------------------------------------------------------------------
     # Document Ingestion & Parsing
@@ -775,11 +824,16 @@ class StudyService:
         sync_status: str = "READY",
         collection_id: Optional[str] = None,
         existing_doc_id: Optional[str] = None,
+        defer_save: bool = False,
     ) -> StudyDocument:
         """
         Ingesta um documento (PDF, DOCX, TXT, MD, Áudio, Imagem, Vídeo), preservando
         a hierarquia document -> page -> section -> paragraph.
         """
+        filename = safe_filename(filename)
+        if existing_doc_id is not None:
+            existing_doc_id = safe_document_id(existing_doc_id)
+
         # Determinar tipo de fonte antes de salvar em disco para encaminhar vídeos
         ext = Path(filename).suffix.lower().lstrip(".")
         if not source_type:
@@ -837,8 +891,8 @@ class StudyService:
         if isinstance(file_path_or_content, bytes):
             raw_bytes = file_path_or_content
             source_hash = hashlib.sha256(raw_bytes).hexdigest()
-            local_path = self.storage_dir / f"{source_hash[:16]}_{filename}"
-            local_path.write_bytes(raw_bytes)
+            local_path = resolve_confined_path(self.storage_dir, f"{source_hash[:16]}_{filename}")
+            atomic_write_bytes(local_path, raw_bytes)
             file_path = str(local_path)
         else:
             file_path = str(file_path_or_content)
@@ -848,7 +902,7 @@ class StudyService:
                 raw_bytes = f.read()
             source_hash = hashlib.sha256(raw_bytes).hexdigest()
 
-        document_id = existing_doc_id or f"doc_{source_hash[:12]}"
+        document_id = safe_document_id(existing_doc_id or f"doc_{source_hash[:12]}")
         title = custom_title or Path(filename).stem.replace("_", " ").replace("-", " ").title()
 
         # Extração de texto, páginas e seções
@@ -856,8 +910,8 @@ class StudyService:
         media_items: List[Dict[str, Any]] = []
         sections: List[Dict[str, Any]] = []
         ast_data: Optional[AcademicDocumentAST] = None
-        doc_dir = self.storage_dir / "documents" / document_id
-        assets_dir = doc_dir / "assets"
+        doc_dir = resolve_confined_path(self.storage_dir / "documents", document_id)
+        assets_dir = resolve_confined_path(doc_dir, "assets")
 
         if source_type == "PDF":
             try:
@@ -873,15 +927,10 @@ class StudyService:
                 extractor = DocumentIntelligenceExtractor(assets_dir=assets_dir)
                 ast_data = extractor.extract(file_path, document_id, filename=filename, source_hash=source_hash)
 
-                # Persistir AST e Relatório estruturado em data/study/documents/{doc_id}/
-                (doc_dir / "ast.json").write_text(
-                    json.dumps(ast_data.to_dict(), indent=2, ensure_ascii=False),
-                    encoding="utf-8",
-                )
-                (doc_dir / "extraction_report.json").write_text(
-                    json.dumps(asdict(ast_data.report), indent=2, ensure_ascii=False),
-                    encoding="utf-8",
-                )
+                # Persistir AST e Relatório estruturado atomicamente em data/study/documents/{doc_id}/
+                atomic_write_json(doc_dir / "ast.json", ast_data.to_dict(), indent=2)
+                atomic_write_json(doc_dir / "extraction_report.json", asdict(ast_data.report), indent=2)
+                self._invalidate_doc_artifact_cache(document_id)
 
                 if ast_data.metadata.title and not custom_title:
                     title = ast_data.metadata.title
@@ -1028,14 +1077,17 @@ class StudyService:
             updated_at=now,
         )
 
-        self.documents[document_id] = study_doc
-        self._save_documents()
+        with self._documents_lock:
+            self._documents[document_id] = study_doc
+            if not defer_save:
+                self._save_documents()
 
-        if collection_id and collection_id in self.collections:
-            col = self.collections[collection_id]
-            if document_id not in col.document_ids:
-                col.document_ids.append(document_id)
-                self._save_collections()
+            if collection_id and collection_id in self.collections:
+                col = self.collections[collection_id]
+                if document_id not in col.document_ids:
+                    col.document_ids.append(document_id)
+                    if not defer_save:
+                        self._save_collections()
 
         return study_doc
 
@@ -1126,12 +1178,16 @@ class StudyService:
                 except Exception:
                     pass
 
+        filename = safe_filename(filename)
+        if existing_doc_id is not None:
+            existing_doc_id = safe_document_id(existing_doc_id)
+
         notify("VALIDATING", 1)
         if isinstance(file_path_or_content, bytes):
             raw_bytes = file_path_or_content
             source_hash = hashlib.sha256(raw_bytes).hexdigest()
-            local_aud_path = self.video_service.audio_dir / f"{source_hash[:16]}_{filename}"
-            local_aud_path.write_bytes(raw_bytes)
+            local_aud_path = resolve_confined_path(self.video_service.audio_dir, f"{source_hash[:16]}_{filename}")
+            atomic_write_bytes(local_aud_path, raw_bytes)
             audio_file_path = str(local_aud_path)
             file_size = len(raw_bytes)
         else:
@@ -1141,7 +1197,7 @@ class StudyService:
             file_size = os.path.getsize(audio_file_path)
             source_hash = compute_file_sha256(audio_file_path)
 
-        document_id = existing_doc_id or f"doc_aud_{source_hash[:12]}"
+        document_id = safe_document_id(existing_doc_id or f"doc_aud_{source_hash[:12]}")
         title = custom_title or Path(filename).stem.replace("_", " ").replace("-", " ").title()
 
         notify("EXTRACTING_AUDIO", 2)
@@ -1350,14 +1406,18 @@ class StudyService:
                 except Exception:
                     pass
 
+        filename = safe_filename(filename)
+        if existing_doc_id is not None:
+            existing_doc_id = safe_document_id(existing_doc_id)
+
         notify("VALIDATING", 1)
         self.video_service.validate_video_file(filename)
 
         if isinstance(file_path_or_content, bytes):
             raw_bytes = file_path_or_content
             source_hash = hashlib.sha256(raw_bytes).hexdigest()
-            local_vid_path = self.video_service.videos_dir / f"{source_hash[:16]}_{filename}"
-            local_vid_path.write_bytes(raw_bytes)
+            local_vid_path = resolve_confined_path(self.video_service.videos_dir, f"{source_hash[:16]}_{filename}")
+            atomic_write_bytes(local_vid_path, raw_bytes)
             video_path = str(local_vid_path)
             file_size = len(raw_bytes)
         else:
@@ -1372,7 +1432,7 @@ class StudyService:
             source_hash = h.hexdigest()
             raw_bytes = None
 
-        document_id = existing_doc_id or f"doc_vid_{source_hash[:12]}"
+        document_id = safe_document_id(existing_doc_id or f"doc_vid_{source_hash[:12]}")
         title = custom_title or Path(filename).stem.replace("_", " ").replace("-", " ").title()
 
         notify("EXTRACTING_AUDIO", 2)
@@ -1623,13 +1683,23 @@ class StudyService:
         url: str,
         subject: str = "Geral",
         custom_title: Optional[str] = None,
+        progress_callback: Optional[Callable[[str, float, str], None]] = None,
     ) -> StudyDocument:
         """Ingesta vídeo a partir de URL online suportada extraindo legendas/transcrição reais (sem texto falso)."""
+        def _notify(status: str, pct: float, msg: str) -> None:
+            if progress_callback:
+                try:
+                    progress_callback(status, pct, msg)
+                except Exception:
+                    pass
+
+        _notify("VALIDATING", 15.0, "A validar URL de vídeo online...")
         validated = self.video_service.validate_online_url(url)
         provider = validated["provider"]
         source_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()
-        document_id = f"doc_vid_{source_hash[:12]}"
+        document_id = safe_document_id(f"doc_vid_{source_hash[:12]}")
         title = custom_title or f"Vídeo Online ({provider}) - {source_hash[:8]}"
+        _notify("FETCHING_TRANSCRIPT", 40.0, f"A obter legendas reais via {provider}...")
 
         raw_transcript = ""
         transcript_segments: List[TranscriptSegment] = []
@@ -1718,6 +1788,7 @@ class StudyService:
                 paragraphs=paragraphs,
             ))
 
+        _notify("INDEXING", 75.0, "A gerar estrutura de capítulos e notas...")
         bundle = generate_complete_study_bundle(
             title=title,
             subject=subject,
@@ -1750,6 +1821,8 @@ class StudyService:
                 "source_url": url,
                 "provider": provider,
                 "generation_mode": bundle["generation_mode"],
+                "llm_fallback_reason": bundle.get("llm_fallback_reason"),
+                "generation_telemetry": bundle.get("generation_telemetry"),
                 "summaries": bundle["summaries"],
                 "cornell_notes": cornell_payload,
                 "video": {
@@ -1841,7 +1914,12 @@ class StudyService:
         segments = [TranscriptSegment(**s) for s in raw_segs]
         return self.video_service.search_transcript(query, segments)
 
-    def ask_video(self, document_id: str, query: str) -> Dict[str, Any]:
+    def ask_video(
+        self,
+        document_id: str,
+        query: str,
+        timestamp: Optional[float] = None,
+    ) -> Dict[str, Any]:
         """Q&A Grounded sobre o vídeo com citações de timestamp e frame."""
         doc = self.documents.get(document_id)
         if not doc or doc.source_type != "VIDEO":
@@ -1875,7 +1953,9 @@ class StudyService:
             processing_status=vid_data.get("processing_status", "READY"),
         )
 
-        return self.video_service.ask_the_video(query, segments, keyframes, chapters, v_meta)
+        return self.video_service.ask_the_video(
+            query, segments, keyframes, chapters, v_meta, timestamp=timestamp
+        )
 
     def save_video_note(
         self,
@@ -1883,6 +1963,7 @@ class StudyService:
         timestamp: float,
         note_text: str,
         frame_id: Optional[str] = None,
+        selected_text: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Cria e persiste nota vinculada ao momento temporal e frame do vídeo."""
         doc = self.documents.get(document_id)
@@ -1891,6 +1972,8 @@ class StudyService:
 
         t_str = format_timestamp(timestamp)
         selection = f"Momento em {t_str}" + (f" (Frame {frame_id})" if frame_id else "")
+        if selected_text and str(selected_text).strip():
+            selection = f"{selection}: «{str(selected_text).strip()[:200]}»"
         note = self.add_reading_note(
             document_id=document_id,
             page=1,
@@ -1903,6 +1986,7 @@ class StudyService:
             "timestamp": t_str,
             "timestamp_seconds": timestamp,
             "frame_id": frame_id,
+            "selected_text": selected_text,
             "note": note_text,
             "saved_at": note.created_at,
         }
@@ -1940,22 +2024,75 @@ class StudyService:
         self._save_documents()
         return watch_prog
 
+    def _invalidate_doc_artifact_cache(self, document_id: Optional[str] = None) -> None:
+        with self._documents_lock:
+            if not document_id:
+                self._ast_cache.clear()
+                self._dossier_cache.clear()
+                return
+            try:
+                clean_id = safe_document_id(document_id)
+            except Exception:
+                clean_id = str(document_id)
+            for cache in (self._ast_cache, self._dossier_cache):
+                stale_keys = [k for k in cache if k[0] == clean_id]
+                for k in stale_keys:
+                    cache.pop(k, None)
+
+    def _read_cached_doc_artifact(
+        self,
+        cache: "OrderedDict[Tuple[str, int, int], Dict[str, Any]]",
+        clean_id: str,
+        artifact_path: Path,
+        *,
+        backup_on_corrupt: bool,
+    ) -> Optional[Dict[str, Any]]:
+        try:
+            st = artifact_path.stat()
+        except OSError:
+            return None
+        cache_key = (clean_id, int(getattr(st, "st_mtime_ns", int(st.st_mtime * 1e9))), int(st.st_size))
+        with self._documents_lock:
+            cached = cache.get(cache_key)
+            if cached is not None:
+                cache.move_to_end(cache_key)
+                return cached
+        data, corrupt = read_json_safe(
+            artifact_path,
+            default=None,
+            expected_type=dict,
+            backup_on_corrupt=backup_on_corrupt,
+        )
+        if corrupt or data is None:
+            return None
+        with self._documents_lock:
+            for k in [k for k in cache if k[0] == clean_id and k != cache_key]:
+                cache.pop(k, None)
+            cache[cache_key] = data
+            cache.move_to_end(cache_key)
+            while len(cache) > self._artifact_cache_max:
+                cache.popitem(last=False)
+        return data
+
     def get_document_ast(self, document_id: str) -> Optional[Dict[str, Any]]:
         """
         Retorna a AST estruturada do documento (AcademicDocumentAST).
         Se já existir em disco (data/study/documents/{doc_id}/ast.json), carrega-a.
         Se for um PDF e ainda não tiver AST, extrai-a a frio e persiste-a.
         """
-        doc = self.get_document(document_id)
+        clean_id = safe_document_id(document_id)
+        doc = self.get_document(clean_id)
         if not doc:
             return None
 
-        ast_path = self.storage_dir / "documents" / document_id / "ast.json"
+        doc_dir = resolve_confined_path(self.storage_dir / "documents", clean_id)
+        ast_path = doc_dir / "ast.json"
         if ast_path.exists():
-            try:
-                return json.loads(ast_path.read_text(encoding="utf-8"))
-            except Exception:
-                pass
+            cached = self._read_cached_doc_artifact(
+                self._ast_cache, clean_id, ast_path, backup_on_corrupt=True
+            )
+            if cached is not None:
+                return cached
 
         if doc.source_type == "PDF" and doc.metadata.get("file_path"):
             fpath = doc.metadata.get("file_path")
@@ -1963,35 +2100,35 @@ class StudyService:
                 fpath = os.path.join(self.workspace_root, fpath)
             if fpath and os.path.exists(fpath):
                 try:
-                    doc_dir = self.storage_dir / "documents" / document_id
-                    assets_dir = doc_dir / "assets"
+                    assets_dir = resolve_confined_path(doc_dir, "assets")
                     doc_dir.mkdir(parents=True, exist_ok=True)
                     assets_dir.mkdir(parents=True, exist_ok=True)
                     extractor = DocumentIntelligenceExtractor(assets_dir=assets_dir)
                     ast_obj = extractor.extract(
                         fpath,
-                        document_id,
+                        clean_id,
                         filename=doc.metadata.get("filename", Path(fpath).name),
                         source_hash=doc.source_hash,
                     )
                     ast_dict = ast_obj.to_dict()
-                    ast_path.write_text(json.dumps(ast_dict, indent=2, ensure_ascii=False), encoding="utf-8")
-                    (doc_dir / "extraction_report.json").write_text(
-                        json.dumps(asdict(ast_obj.report), indent=2, ensure_ascii=False), encoding="utf-8"
-                    )
-                    return ast_dict
+                    atomic_write_json(ast_path, ast_dict, indent=2)
+                    atomic_write_json(doc_dir / "extraction_report.json", asdict(ast_obj.report), indent=2)
+                    self._invalidate_doc_artifact_cache(clean_id)
+                    return self._read_cached_doc_artifact(
+                        self._ast_cache, clean_id, ast_path, backup_on_corrupt=True
+                    ) or ast_dict
                 except Exception as e:
-                    print(f"[StudyService] Erro ao extrair AST para {document_id}: {e}", flush=True)
+                    print(f"[StudyService] Erro ao extrair AST para {clean_id}: {e}", flush=True)
         return None
 
     def get_academic_reasoning_dossier(self, document_id: str) -> Optional[Dict[str, Any]]:
         """Carrega o dossier de raciocínio académico persistido (AcademicReasoningDossier)."""
-        dossier_path = self.storage_dir / "documents" / document_id / "reasoning_dossier.json"
+        clean_id = safe_document_id(document_id)
+        dossier_path = resolve_confined_path(self.storage_dir / "documents", clean_id, "reasoning_dossier.json")
         if dossier_path.exists():
-            try:
-                return json.loads(dossier_path.read_text(encoding="utf-8"))
-            except Exception as e:
-                print(f"[StudyService] Erro ao ler dossier de raciocínio para {document_id}: {e}", flush=True)
+            return self._read_cached_doc_artifact(
+                self._dossier_cache, clean_id, dossier_path, backup_on_corrupt=False
+            )
         return None
 
     def generate_academic_reasoning(
@@ -2023,6 +2160,7 @@ class StudyService:
             cancellation_check=cancellation_check,
             force_recompute=force_recompute,
         )
+        self._invalidate_doc_artifact_cache(document_id)
         return dossier.to_dict()
 
     def get_editorial_study_plan(self, document_id: str) -> Optional[Dict[str, Any]]:
@@ -2261,15 +2399,19 @@ class StudyService:
         Devolve o ficheiro do documento de estudo gerado (PDF ou DOCX),
         em formato base64 e caminho físico no sistema de ficheiros para consumo pelo desktop / frontend.
         """
-        doc_dir = self.storage_dir / "documents" / document_id
+        clean_id = safe_document_id(document_id)
+        doc_dir = resolve_confined_path(self.storage_dir / "documents", clean_id)
         fmt = format_type.lower().strip()
         if fmt not in ("pdf", "docx"):
             fmt = "pdf"
 
         if version is not None and version > 0:
-            target_file = doc_dir / "generated_documents_history" / f"v{version}" / f"study_document_v{version}.{fmt}"
+            v_int = int(version)
+            target_file = resolve_confined_path(
+                doc_dir, "generated_documents_history", f"v{v_int}", f"study_document_v{v_int}.{fmt}"
+            )
         else:
-            target_file = doc_dir / f"study_document_final.{fmt}"
+            target_file = resolve_confined_path(doc_dir, f"study_document_final.{fmt}")
 
         if not target_file.exists() or target_file.stat().st_size == 0:
             return None
@@ -4710,99 +4852,73 @@ date: "{date_str}"
             synced_at=datetime.now().isoformat(),
         )
 
-        for link in target_links:
-            fpath = link.get("folder_path", "")
-            recursive = link.get("recursive", True)
-            link["status"] = "SYNCING"
+        try:
+            for link in target_links:
+                fpath = link.get("folder_path", "")
+                recursive = link.get("recursive", True)
+                link["status"] = "SYNCING"
 
-            try:
-                scanned = self.folder_sync_manager.scan_folder(fpath, recursive=recursive)
-                combined_report.scanned_count += len(scanned)
+                try:
+                    scanned = self.folder_sync_manager.scan_folder(fpath, recursive=recursive)
+                    combined_report.scanned_count += len(scanned)
 
-                existing_docs_by_rel: Dict[str, StudyDocument] = {}
-                existing_docs_by_hash: Dict[str, StudyDocument] = {}
-                renamed_doc_ids: Set[str] = set()
+                    existing_docs_by_rel: Dict[str, StudyDocument] = {}
+                    existing_docs_by_hash: Dict[str, StudyDocument] = {}
+                    renamed_doc_ids: Set[str] = set()
 
-                for did in list(col.document_ids):
-                    doc = self.documents.get(did)
-                    if (
-                        doc
-                        and doc.metadata
-                        and doc.metadata.get("linked_folder_path")
-                        and os.path.normcase(os.path.normpath(doc.metadata.get("linked_folder_path"))) == os.path.normcase(os.path.normpath(fpath))
-                    ):
-                        rel = doc.metadata.get("rel_path")
-                        if rel:
-                            existing_docs_by_rel[rel] = doc
-                        if doc.source_hash:
-                            existing_docs_by_hash[doc.source_hash] = doc
+                    for did in list(col.document_ids):
+                        doc = self.documents.get(did)
+                        if (
+                            doc
+                            and doc.metadata
+                            and doc.metadata.get("linked_folder_path")
+                            and os.path.normcase(os.path.normpath(doc.metadata.get("linked_folder_path"))) == os.path.normcase(os.path.normpath(fpath))
+                        ):
+                            rel = doc.metadata.get("rel_path")
+                            if rel:
+                                existing_docs_by_rel[rel] = doc
+                            if doc.source_hash:
+                                existing_docs_by_hash[doc.source_hash] = doc
 
-                # A. Identificar Ficheiros Novos ou Modificados no Disco
-                for rel_p, finfo in scanned.items():
-                    if not finfo.is_supported:
-                        combined_report.unsupported_count += 1
-                        combined_report.unsupported_files.append({
-                            "filename": finfo.filename,
-                            "rel_path": rel_p,
-                            "reason": finfo.unsupported_reason or "Formato não suportado",
-                        })
-                        continue
+                    # A. Identificar Ficheiros Novos ou Modificados no Disco
+                    for rel_p, finfo in scanned.items():
+                        if not finfo.is_supported:
+                            combined_report.unsupported_count += 1
+                            combined_report.unsupported_files.append({
+                                "filename": finfo.filename,
+                                "rel_path": rel_p,
+                                "reason": finfo.unsupported_reason or "Formato não suportado",
+                            })
+                            continue
 
-                    existing_doc = existing_docs_by_rel.get(rel_p)
+                        existing_doc = existing_docs_by_rel.get(rel_p)
 
-                    if existing_doc is None:
-                        # Verificar se é ficheiro renomeado (mesmo tamanho e hash)
-                        try:
-                            f_hash = compute_file_sha256(finfo.abs_path)
-                        except Exception:
-                            f_hash = ""
-
-                        if f_hash and f_hash in existing_docs_by_hash:
-                            renamed_doc = existing_docs_by_hash[f_hash]
-                            renamed_doc_ids.add(renamed_doc.document_id)
-                            renamed_doc.metadata["rel_path"] = rel_p
-                            renamed_doc.metadata["filename"] = finfo.filename
-                            renamed_doc.metadata["file_path"] = finfo.abs_path
-                            renamed_doc.metadata["file_mtime"] = finfo.mtime
-                            renamed_doc.metadata["size_bytes"] = finfo.size_bytes
-                            if renamed_doc.provenance:
-                                renamed_doc.provenance["rel_path"] = rel_p
-                                renamed_doc.provenance["source_file"] = finfo.abs_path
-                            renamed_doc.title = finfo.filename
-                            renamed_doc.updated_at = datetime.now().isoformat()
-                            combined_report.renamed_count += 1
-                            combined_report.updated_count += 1
-                            combined_report.updated_documents.append(rel_p)
-                        else:
+                        if existing_doc is None:
+                            # Verificar se é ficheiro renomeado (mesmo tamanho e hash)
                             try:
-                                new_doc = self.ingest_document(
-                                    finfo.abs_path,
-                                    finfo.filename,
-                                    subject=col.subject,
-                                    source_origin="linked_folder",
-                                    linked_folder_path=fpath,
-                                    rel_path=rel_p,
-                                    sync_status="READY",
-                                    collection_id=collection_id,
-                                )
-                                combined_report.added_count += 1
-                                combined_report.added_documents.append(rel_p)
-                            except Exception as ingest_err:
-                                combined_report.failed_count += 1
-                                combined_report.errors.append(f"Erro ao ingestar '{rel_p}': {ingest_err}")
-                    else:
-                        prev_mtime = float(existing_doc.metadata.get("file_mtime") or 0.0)
-                        prev_size = int(existing_doc.metadata.get("size_bytes") or 0)
-
-                        if finfo.mtime != prev_mtime or finfo.size_bytes != prev_size:
-                            try:
-                                current_hash = compute_file_sha256(finfo.abs_path)
+                                f_hash = compute_file_sha256(finfo.abs_path)
                             except Exception:
-                                current_hash = ""
+                                f_hash = ""
 
-                            if current_hash and current_hash != existing_doc.source_hash:
+                            if f_hash and f_hash in existing_docs_by_hash:
+                                renamed_doc = existing_docs_by_hash[f_hash]
+                                renamed_doc_ids.add(renamed_doc.document_id)
+                                renamed_doc.metadata["rel_path"] = rel_p
+                                renamed_doc.metadata["filename"] = finfo.filename
+                                renamed_doc.metadata["file_path"] = finfo.abs_path
+                                renamed_doc.metadata["file_mtime"] = finfo.mtime
+                                renamed_doc.metadata["size_bytes"] = finfo.size_bytes
+                                if renamed_doc.provenance:
+                                    renamed_doc.provenance["rel_path"] = rel_p
+                                    renamed_doc.provenance["source_file"] = finfo.abs_path
+                                renamed_doc.title = finfo.filename
+                                renamed_doc.updated_at = datetime.now().isoformat()
+                                combined_report.renamed_count += 1
+                                combined_report.updated_count += 1
+                                combined_report.updated_documents.append(rel_p)
+                            else:
                                 try:
-                                    self.ingest_document(
+                                    new_doc = self.ingest_document(
                                         finfo.abs_path,
                                         finfo.filename,
                                         subject=col.subject,
@@ -4811,36 +4927,65 @@ date: "{date_str}"
                                         rel_path=rel_p,
                                         sync_status="READY",
                                         collection_id=collection_id,
-                                        existing_doc_id=existing_doc.document_id,
+                                        defer_save=True,
                                     )
-                                    combined_report.updated_count += 1
-                                    combined_report.updated_documents.append(rel_p)
-                                except Exception as update_err:
+                                    combined_report.added_count += 1
+                                    combined_report.added_documents.append(rel_p)
+                                except Exception as ingest_err:
                                     combined_report.failed_count += 1
-                                    combined_report.errors.append(f"Erro ao atualizar '{rel_p}': {update_err}")
-                            else:
-                                existing_doc.metadata["file_mtime"] = finfo.mtime
+                                    combined_report.errors.append(f"Erro ao ingestar '{rel_p}': {ingest_err}")
+                        else:
+                            prev_mtime = float(existing_doc.metadata.get("file_mtime") or 0.0)
+                            prev_size = int(existing_doc.metadata.get("size_bytes") or 0)
 
-                # B. Identificar Ficheiros Eliminados do Disco
-                for rel_p, old_doc in existing_docs_by_rel.items():
-                    if rel_p not in scanned and old_doc.document_id not in renamed_doc_ids:
-                        if old_doc.document_id in col.document_ids:
-                            col.document_ids.remove(old_doc.document_id)
-                        combined_report.removed_count += 1
-                        combined_report.removed_documents.append(rel_p)
+                            if finfo.mtime != prev_mtime or finfo.size_bytes != prev_size:
+                                try:
+                                    current_hash = compute_file_sha256(finfo.abs_path)
+                                except Exception:
+                                    current_hash = ""
 
-                link["last_synced_at"] = datetime.now().isoformat()
-                link["file_count"] = len(scanned)
-                link["unsupported_count"] = combined_report.unsupported_count
-                link["status"] = "IDLE"
-                link["error"] = None
-            except Exception as link_err:
-                link["status"] = "ERROR"
-                link["error"] = str(link_err)
-                combined_report.errors.append(f"Erro na pasta {fpath}: {link_err}")
+                                if current_hash and current_hash != existing_doc.source_hash:
+                                    try:
+                                        self.ingest_document(
+                                            finfo.abs_path,
+                                            finfo.filename,
+                                            subject=col.subject,
+                                            source_origin="linked_folder",
+                                            linked_folder_path=fpath,
+                                            rel_path=rel_p,
+                                            sync_status="READY",
+                                            collection_id=collection_id,
+                                            existing_doc_id=existing_doc.document_id,
+                                            defer_save=True,
+                                        )
+                                        combined_report.updated_count += 1
+                                        combined_report.updated_documents.append(rel_p)
+                                    except Exception as update_err:
+                                        combined_report.failed_count += 1
+                                        combined_report.errors.append(f"Erro ao atualizar '{rel_p}': {update_err}")
+                                else:
+                                    existing_doc.metadata["file_mtime"] = finfo.mtime
 
-        self._save_collections()
-        self._save_documents()
+                    # B. Identificar Ficheiros Eliminados do Disco
+                    for rel_p, old_doc in existing_docs_by_rel.items():
+                        if rel_p not in scanned and old_doc.document_id not in renamed_doc_ids:
+                            if old_doc.document_id in col.document_ids:
+                                col.document_ids.remove(old_doc.document_id)
+                            combined_report.removed_count += 1
+                            combined_report.removed_documents.append(rel_p)
+
+                    link["last_synced_at"] = datetime.now().isoformat()
+                    link["file_count"] = len(scanned)
+                    link["unsupported_count"] = combined_report.unsupported_count
+                    link["status"] = "IDLE"
+                    link["error"] = None
+                except Exception as link_err:
+                    link["status"] = "ERROR"
+                    link["error"] = str(link_err)
+                    combined_report.errors.append(f"Erro na pasta {fpath}: {link_err}")
+        finally:
+            self._save_collections()
+            self._save_documents()
         return combined_report
 
     def ask_course(self, collection_id: str, question: str) -> Dict[str, Any]:
@@ -5021,6 +5166,7 @@ date: "{date_str}"
         target_cards: int = 16,
         on_progress: Optional[Callable[[str, float, str], None]] = None,
         llm_caller: Optional[Callable] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> Dict[str, Any]:
         eng = self._phase6_engine(llm_caller)
         deck = eng.generate_flashcards(
@@ -5028,6 +5174,7 @@ date: "{date_str}"
             force_regenerate=force_regenerate,
             target_cards=target_cards,
             on_progress=on_progress,
+            cancellation_check=cancellation_check,
         )
         payload = eng.get_flashcards(document_id)
         payload["readiness"] = eng.check_readiness(document_id).to_dict()
@@ -5081,12 +5228,14 @@ date: "{date_str}"
         force_regenerate: bool = False,
         on_progress: Optional[Callable[[str, float, str], None]] = None,
         llm_caller: Optional[Callable] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> Dict[str, Any]:
         eng = self._phase6_engine(llm_caller)
         return eng.generate_cornell_notes(
             document_id,
             force_regenerate=force_regenerate,
             on_progress=on_progress,
+            cancellation_check=cancellation_check,
         ).to_dict()
 
     def get_phase6_cornell(self, document_id: str) -> Optional[Dict[str, Any]]:
@@ -5129,10 +5278,16 @@ date: "{date_str}"
         *,
         on_progress: Optional[Callable[[str, float, str], None]] = None,
         llm_caller: Optional[Callable] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> Dict[str, Any]:
         eng = self._phase6_engine(llm_caller)
         cfg = AssessmentConfig.from_dict(config or {})
-        return eng.generate_assessment(document_id, config=cfg, on_progress=on_progress).to_dict()
+        return eng.generate_assessment(
+            document_id,
+            config=cfg,
+            on_progress=on_progress,
+            cancellation_check=cancellation_check,
+        ).to_dict()
 
     def get_phase6_assessments(self, document_id: str) -> Dict[str, Any]:
         assessments = [a.to_dict() for a in self.study_modes.get_assessments(document_id)]
@@ -5188,6 +5343,7 @@ date: "{date_str}"
         target_prompts: int = 8,
         on_progress: Optional[Callable[[str, float, str], None]] = None,
         llm_caller: Optional[Callable] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> Dict[str, Any]:
         eng = self._phase6_engine(llm_caller)
         eng.generate_active_recall(
@@ -5195,6 +5351,7 @@ date: "{date_str}"
             force_regenerate=force_regenerate,
             target_prompts=target_prompts,
             on_progress=on_progress,
+            cancellation_check=cancellation_check,
         )
         return eng.get_active_recall_prompts(document_id, reveal_answers=False)
 

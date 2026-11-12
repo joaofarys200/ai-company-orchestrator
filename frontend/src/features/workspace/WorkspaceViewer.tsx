@@ -273,6 +273,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     searchStudyRag,
     listStudyDocuments,
     uploadStudyDocument,
+    ingestStudyVideoUrl,
     deleteStudyDocument,
     contextualAssist,
     askStudyPaper,
@@ -297,6 +298,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     getGeneratedStudyDocumentFile,
     studyModesApi,
     studyPipelineStage,
+    lastStudyDocumentError,
     studyNavigationTarget,
     updateActiveStudyContext,
     sendDirective,
@@ -2062,7 +2064,22 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 onStopRecording={stopLectureRecording}
                 onSaveNoteToObsidian={saveNote}
                 onRefreshDocuments={listStudyDocuments}
-                onUploadDocument={(payload) => {
+                onUploadDocument={async (payload) => {
+                  const candidateVideoUrl =
+                    payload.video_url ||
+                    (payload.source_type === 'VIDEO' &&
+                    /^https?:\/\//i.test(payload.content_text || payload.filename || '')
+                      ? (payload.content_text || payload.filename)
+                      : undefined);
+                  if (candidateVideoUrl) {
+                    await ingestStudyVideoUrl(
+                      candidateVideoUrl,
+                      payload.title,
+                      payload.subject,
+                      payload.collection_id
+                    );
+                    return;
+                  }
                   uploadStudyDocument(
                     payload.filename,
                     payload.title,
@@ -2136,6 +2153,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                 onGetGeneratedDocumentFile={getGeneratedStudyDocumentFile}
                 studyModesApi={studyModesApi}
                 pipelineStage={studyPipelineStage}
+                lastDocumentError={lastStudyDocumentError}
                 externalNavigationTarget={studyNavigationTarget}
                 onStudyContextChange={updateActiveStudyContext}
               />

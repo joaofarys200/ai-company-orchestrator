@@ -100,10 +100,13 @@ class StudyContextManager:
     def _load_contexts(self) -> Dict[str, StudyConversationContext]:
         if not self.context_path.exists():
             return {}
+        from services.study_fs import read_json_safe
+        raw, corrupt = read_json_safe(
+            self.context_path, default={}, expected_type=dict, backup_on_corrupt=True
+        )
+        if corrupt or not isinstance(raw, dict):
+            return {}
         try:
-            raw = json.loads(self.context_path.read_text(encoding="utf-8"))
-            if not isinstance(raw, dict):
-                return {}
             loaded: Dict[str, StudyConversationContext] = {}
             for sid, item in raw.items():
                 norm_sid = normalize_chat_session_id(sid)
@@ -116,13 +119,9 @@ class StudyContextManager:
             return {}
 
     def _save_contexts(self) -> None:
+        from services.study_fs import atomic_write_json
         payload = {sid: ctx.to_dict() for sid, ctx in self._contexts.items()}
-        tmp_path = self.context_path.with_suffix(".tmp")
-        tmp_path.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        os.replace(tmp_path, self.context_path)
+        atomic_write_json(self.context_path, payload, indent=2)
 
     def get_context(self, chat_session_id: Optional[str] = None) -> StudyConversationContext:
         sid = normalize_chat_session_id(chat_session_id)

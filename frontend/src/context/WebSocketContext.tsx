@@ -288,6 +288,13 @@ interface WebSocketContextType {
     sourceType?: string,
     filePath?: string
   ) => void;
+  ingestStudyVideoUrl: (
+    url: string,
+    title?: string,
+    subject?: string,
+    collectionId?: string
+  ) => Promise<any>;
+  lastStudyDocumentError: { filename: string; error: string; ts: number } | null;
   deleteStudyDocument: (documentId: string, deleteFile?: boolean) => void;
   generateStudyQuiz: (documentId: string, count?: number) => Promise<StudyQuiz>;
   submitStudyQuiz: (quizId: string, answers: Record<string, number | string>, transferAnswer?: string) => Promise<QuizEvaluationResult>;
@@ -488,6 +495,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [studyQuizResult, setStudyQuizResult] = useState<QuizEvaluationResult | null>(null);
   const [studyFlashcards, setStudyFlashcards] = useState<Flashcard[]>([]);
   const [studyPipelineStage, setStudyPipelineStage] = useState<string>('');
+  const [lastStudyDocumentError, setLastStudyDocumentError] = useState<{ filename: string; error: string; ts: number } | null>(null);
   const [studyOperations, setStudyOperations] = useState<Record<string, StudyOperationStatusPayload>>({});
   const [studyNavigationTarget, setStudyNavigationTarget] = useState<(StudyNavigatePayload & { nonce: number }) | null>(null);
   const activeStudyContextRef = useRef<StudyUiContextPayload>({});
@@ -907,11 +915,20 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       'permission_capability_result',
       'permission_execution_result',
       'coding_session_error',
+      'study_document_ready',
+      'study_document_uploaded',
+      'study_document_deleted',
+      'study_document_processing',
+      'study_document_failed',
+      'study_video_url_ingested',
+      'study_generation_cancelled',
+      'study_error',
     ]);
     if (DEDUP_EVENT_TYPES.has(msg.type)) {
       const eventKey = msg.event?.sequence ?? msg.event?.fingerprint ?? '';
       const reqOrActionId = msg.request_id || msg.action_id || msg.action?.action_id || msg.request?.request_id || '';
-      const rawKey = `${msg.type}:${msg.sender || ''}:${msg.content || ''}:${msg.card_id || ''}:${msg.status || ''}:${eventKey}:${reqOrActionId}`;
+      const docOrFileKey = msg.document?.document_id || msg.document_id || msg.filename || '';
+      const rawKey = `${msg.type}:${msg.sender || ''}:${msg.content || ''}:${msg.card_id || ''}:${msg.status || ''}:${eventKey}:${reqOrActionId}:${docOrFileKey}`;
       const now = Date.now();
       const lastSeen = recentMessageHashesRef.current.get(rawKey);
       if (lastSeen && now - lastSeen < 1500) {
@@ -1478,6 +1495,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         break;
       case 'study_document_ready':
         setStudyPipelineStage('');
+        setLastStudyDocumentError(null);
         if (msg.document) {
           setStudyDocuments((prev) => [
             msg.document,
@@ -1486,10 +1504,41 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           addSystemMessage(`Documento de estudo guardado e pronto: ${msg.document.title}`);
         }
         break;
-      case 'study_document_failed':
+      case 'study_video_url_ingested': {
         setStudyPipelineStage('');
+        setLastStudyDocumentError(null);
+        if (msg.document) {
+          setStudyDocuments((prev) => [
+            msg.document,
+            ...prev.filter((d) => d.document_id !== msg.document.document_id),
+          ]);
+        }
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.resolve(msg);
+        }
+        break;
+      }
+      case 'study_document_failed': {
+        setStudyPipelineStage('');
+        const reqId = msg.request_id;
+        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
+          const item = pendingStudyRequestsRef.current.get(reqId)!;
+          clearTimeout(item.timer);
+          pendingStudyRequestsRef.current.delete(reqId);
+          item.reject(new Error(msg.error || 'Falha ao processar documento'));
+        }
+        setLastStudyDocumentError({
+          filename: msg.filename || '',
+          error: msg.error || 'Falha ao processar documento',
+          ts: Date.now(),
+        });
         addSystemMessage(`Erro ao processar documento ${msg.filename}: ${msg.error}`);
         break;
+      }
       case 'study_generation_cancelled': {
         setStudyPipelineStage('');
         const docId = msg.document_id || '';
@@ -1886,28 +1935,31 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return Boolean(socketRef.current?.readyState === WebSocket.OPEN || (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC));
   }, []);
 
-  const connect = useCallback(function connectSocket() {
-    // 1. Electron Native IPC Listener (if running inside Electron)
-    let ipcUnsubscribe: (() => void) | undefined;
-    if (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) {
-      console.log('[Transport] Initializing Native Electron IPC Listener');
-      ipcUnsubscribe = window.jarvisIPC.onMessage((rawData) => {
-        try {
-          const msg = normalizeServerMessage(rawData);
-          if (msg) {
-            handleServerMessageRef.current(msg);
-          }
-        } catch (e) {
-          console.error('[Native IPC] Error processing message:', e);
-        }
-      });
+  // Register Native Electron IPC listener once so WebSocket reconnects do not leak duplicate listeners
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.jarvisIPC?.isNativeIPC) {
+      return;
     }
+    console.log('[Transport] Initializing Native Electron IPC Listener');
+    const ipcUnsubscribe = window.jarvisIPC.onMessage((rawData) => {
+      try {
+        const msg = normalizeServerMessage(rawData);
+        if (msg) {
+          handleServerMessageRef.current(msg);
+        }
+      } catch (e) {
+        console.error('[Native IPC] Error processing message:', e);
+      }
+    });
+    return () => {
+      if (ipcUnsubscribe) ipcUnsubscribe();
+    };
+  }, []);
 
-    // 2. Primary Realtime WebSocket on ws://127.0.0.1:8001
+  const connect = useCallback(function connectSocket() {
+    // Primary Realtime WebSocket on ws://127.0.0.1:8001
     if (socketRef.current && (socketRef.current.readyState === WebSocket.OPEN || socketRef.current.readyState === WebSocket.CONNECTING)) {
-      return () => {
-        if (ipcUnsubscribe) ipcUnsubscribe();
-      };
+      return;
     }
 
     const wsToken = import.meta.env.VITE_JARVIS_WS_TOKEN || 'local-dev-token';
@@ -1992,13 +2044,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     shouldReconnectRef.current = true;
-    const cleanup = connect();
+    connect();
 
     return () => {
       shouldReconnectRef.current = false;
-      if (cleanup && typeof cleanup === 'function') {
-        cleanup();
-      }
       if (socketRef.current) {
         socketRef.current.close();
         socketRef.current = null;
@@ -2586,6 +2635,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       sourceType?: string,
       filePath?: string
     ) => {
+      setLastStudyDocumentError(null);
       sendClientMessage({
         type: 'study_upload_document',
         filename,
@@ -2595,6 +2645,31 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         content_text: contentText,
         source_type: sourceType,
         file_path: filePath,
+      });
+    },
+    [sendClientMessage]
+  );
+
+  const ingestStudyVideoUrl = useCallback(
+    (url: string, title?: string, subject?: string, collectionId?: string): Promise<any> => {
+      setLastStudyDocumentError(null);
+      const requestId = `video:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          pendingStudyRequestsRef.current.delete(requestId);
+          reject(new Error('Tempo limite ao ingerir URL de vídeo.'));
+        }, 300000);
+
+        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
+
+        sendClientMessage({
+          type: 'study_ingest_video_url',
+          url,
+          title,
+          subject,
+          collection_id: collectionId,
+          request_id: requestId,
+        });
       });
     },
     [sendClientMessage]
@@ -3948,6 +4023,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         studyFlashcards,
         listStudyDocuments,
         uploadStudyDocument,
+        ingestStudyVideoUrl,
+        lastStudyDocumentError,
         deleteStudyDocument,
         generateStudyQuiz,
         submitStudyQuiz,

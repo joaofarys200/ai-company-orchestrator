@@ -468,7 +468,22 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
   // Viewport Container Ref
   const viewerContainerRef = useRef<HTMLDivElement | null>(null);
   const activeLoadingTaskRef = useRef<any>(null);
+  const activePdfDocRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null);
   const onGetDocumentFileRef = useRef(onGetDocumentFile);
+  const disposePdfDoc = useCallback((doc: pdfjsLib.PDFDocumentProxy | null | undefined) => {
+    if (!doc) return;
+    try {
+      const maybeDestroy = (doc as unknown as { destroy?: () => Promise<void> | void }).destroy;
+      if (typeof maybeDestroy === 'function') {
+        const res = maybeDestroy.call(doc);
+        if (res && typeof (res as Promise<void>).catch === 'function') {
+          (res as Promise<void>).catch(() => {});
+        }
+      }
+    } catch {
+      // Ignore cleanup errors on already-destroyed PDF documents
+    }
+  }, []);
   useEffect(() => {
     onGetDocumentFileRef.current = onGetDocumentFile;
   }, [onGetDocumentFile]);
@@ -527,17 +542,25 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
         let pdfData: Uint8Array | null = null;
 
         // Strategy 1: Direct HTTP streaming from local backend sandbox_service
+        const docIdEncoded = encodeURIComponent(document.document_id);
         const candidateUrls: string[] = [
-          `/api/study/document/${document.document_id}/file`,
-          `http://127.0.0.1:8000/api/study/document/${document.document_id}/file`,
-          `http://localhost:8000/api/study/document/${document.document_id}/file`,
+          `/api/study/document/${docIdEncoded}/file`,
+          `http://127.0.0.1:8000/api/study/document/${docIdEncoded}/file`,
+          `http://localhost:8000/api/study/document/${docIdEncoded}/file`,
         ];
         const metaFilePath = (document.metadata as any)?.file_path;
         if (metaFilePath && typeof metaFilePath === 'string') {
           const rawFp = metaFilePath.replace(/\\/g, '/');
-          const normalizedPath = rawFp.startsWith('/') ? rawFp : `/${rawFp}`;
-          candidateUrls.push(normalizedPath);
-          candidateUrls.push(`http://127.0.0.1:8000${normalizedPath}`);
+          const dataStudyMatch = rawFp.match(/(?:^|\/)(data\/study\/.+)$/i);
+          if (dataStudyMatch && dataStudyMatch[1]) {
+            const relUrl = encodeURI(`/${dataStudyMatch[1].replace(/^\/+/, '')}`);
+            candidateUrls.push(relUrl);
+            candidateUrls.push(`http://127.0.0.1:8000${relUrl}`);
+          } else if (rawFp.startsWith('/api/') || rawFp.startsWith('api/')) {
+            const relApi = encodeURI(rawFp.startsWith('/') ? rawFp : `/${rawFp}`);
+            candidateUrls.push(relApi);
+            candidateUrls.push(`http://127.0.0.1:8000${relApi}`);
+          }
         }
         for (const url of candidateUrls) {
           try {
@@ -647,9 +670,16 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             }
           }
 
-          if (isCancelled || currentGen !== loadGenRef.current) return;
+          if (isCancelled || currentGen !== loadGenRef.current) {
+            disposePdfDoc(doc);
+            return;
+          }
 
           if (doc) {
+            if (activePdfDocRef.current && activePdfDocRef.current !== doc) {
+              disposePdfDoc(activePdfDocRef.current);
+            }
+            activePdfDocRef.current = doc;
             setPdfDoc(doc);
             setNumPages(doc.numPages);
             setLifecycle('PAGE_RENDERING');
@@ -690,8 +720,13 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
         } catch {}
         activeLoadingTaskRef.current = null;
       }
+      if (activePdfDocRef.current) {
+        disposePdfDoc(activePdfDocRef.current);
+        activePdfDocRef.current = null;
+      }
+      setPdfDoc(null);
     };
-  }, [document.document_id, reloadKey]);
+  }, [document.document_id, reloadKey, disposePdfDoc]);
 
   // Handle page visibility change and update progress (throttled to maintain 60fps scrolling)
   const lastProgressRef = useRef<{ page: number; time: number }>({ page: 1, time: 0 });

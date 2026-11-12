@@ -296,9 +296,12 @@ export const StudyQuizView: React.FC<StudyQuizViewProps> = ({
   const handleLegacySubmit = async () => {
     if (!legacyQuiz || !onSubmitQuiz) return;
     setIsSubmitting(true);
+    setErrorMsg(null);
     try {
       const res = await onSubmitQuiz(legacyQuiz.quiz_id, legacyAnswers, '');
       setLegacyEval(res);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Erro ao submeter quiz.');
     } finally {
       setIsSubmitting(false);
     }
@@ -339,6 +342,14 @@ export const StudyQuizView: React.FC<StudyQuizViewProps> = ({
             </button>
           )}
         </header>
+        {errorMsg && (
+          <div className="bg-rose-950/40 border-b border-rose-500/30 px-6 py-2 text-xs text-rose-300 flex items-center justify-between shrink-0">
+            <span>{errorMsg}</span>
+            <button type="button" onClick={() => setErrorMsg(null)}>
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
         <div className="flex-1 overflow-y-auto p-6">
           {!legacyQuiz ? (
             <div className="max-w-xl mx-auto rounded-xl border border-white/10 bg-[#121921] p-8 text-center text-xs text-gray-400">

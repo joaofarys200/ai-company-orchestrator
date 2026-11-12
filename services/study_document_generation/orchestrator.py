@@ -42,6 +42,7 @@ from services.study_document_generation.contracts import (
     DocumentGenerationTelemetry,
     StudyDocumentGenerationResult,
     StudyDocumentVersionRecord,
+    build_section_fingerprint_index,
     compute_ast_fingerprint,
     compute_plan_fingerprint,
     compute_plan_overview_fingerprint,
@@ -58,6 +59,7 @@ from services.study_document_generation.layout_composer import (
 from services.study_document_generation.provenance_renderer import ReferenceAndProvenanceRenderer
 from services.study_document_generation.qa_engine import DocumentQualityAssuranceEngine
 from services.study_document_generation.visual_generator import VisualGenerationEngine
+from services.study_fs import resolve_confined_path, safe_document_id
 
 logger = logging.getLogger("document_generation_orchestrator")
 
@@ -309,13 +311,13 @@ class DocumentGenerationOrchestrator:
         cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> StudyDocumentGenerationResult:
         start_time = time.time()
-        doc_id = plan.metadata.document_id
+        doc_id = safe_document_id(plan.metadata.document_id)
 
-        doc_dir = self.storage_dir / "documents" / doc_id
+        doc_dir = resolve_confined_path(self.storage_dir / "documents", doc_id)
         doc_dir.mkdir(parents=True, exist_ok=True)
-        visuals_dir = doc_dir / "generated_visuals"
+        visuals_dir = resolve_confined_path(doc_dir, "generated_visuals")
         visuals_dir.mkdir(parents=True, exist_ok=True)
-        history_dir = doc_dir / "generated_documents_history"
+        history_dir = resolve_confined_path(doc_dir, "generated_documents_history")
         history_dir.mkdir(parents=True, exist_ok=True)
 
         checkpoint_path = doc_dir / "document_generation_checkpoint.json"
@@ -380,6 +382,7 @@ class DocumentGenerationOrchestrator:
         section_records_for_cp: Dict[str, Dict[str, Any]] = {}
         total_sections = sum(len(c.sections) for c in plan.chapters)
         processed_sections = 0
+        fp_index = build_section_fingerprint_index(dossier, ast)
 
         _notify(
             "CONTENT_GENERATION",
@@ -418,7 +421,9 @@ class DocumentGenerationOrchestrator:
                 developed_sections.append(dev_sec)
                 section_records_for_cp[sec.section_id] = {
                     "chapter_id": ch.chapter_id,
-                    "section_fingerprint": compute_section_plan_fingerprint(ch, sec, dossier=dossier, ast=ast),
+                    "section_fingerprint": compute_section_plan_fingerprint(
+                        ch, sec, dossier=dossier, ast=ast, context_index=fp_index
+                    ),
                     "section_data": dev_sec.to_dict(),
                 }
                 processed_sections += 1
@@ -499,12 +504,21 @@ class DocumentGenerationOrchestrator:
         )
         _atomic_write_json(ir_path, doc_ir.to_dict())
 
-        # 5. Etapa 5.5: Composição e Layout do PDF
+        # 5. Etapa 5.5: Composição e Layout do PDF em staging (promovido a final apenas após passar QA)
         _notify("PDF_COMPOSITION", 0.78, "A compilar layout e tipografia do PDF com medição real e fragmentação...")
         _check_cancelled()
+        staging_pdf_path = doc_dir / ".staging_study_document.pdf"
+        staging_docx_path = doc_dir / ".staging_study_document.docx"
+        for st_p in (staging_pdf_path, staging_docx_path):
+            if st_p.exists():
+                try:
+                    st_p.unlink()
+                except OSError:
+                    pass
+
         t_pdf0 = time.time()
         pdf_composer = PDFDocumentComposer(profile=profile)
-        pdf_render_result = pdf_composer.compose_to_pdf(doc_ir, final_pdf_path)
+        pdf_render_result = pdf_composer.compose_to_pdf(doc_ir, staging_pdf_path)
         telemetry.stage_timings_ms["pdf_composition"] = (time.time() - t_pdf0) * 1000.0
 
         pdf_p = Path(pdf_render_result.file_path)
@@ -512,13 +526,12 @@ class DocumentGenerationOrchestrator:
         telemetry.pdf_size_bytes = pdf_p.stat().st_size if pdf_p.exists() else 0
 
         try:
-            doc_probe = pymupdf.open(str(pdf_p))
-            telemetry.pdf_pages_count = len(doc_probe)
-            doc_probe.close()
+            with pymupdf.open(str(pdf_p)) as doc_probe:
+                telemetry.pdf_pages_count = len(doc_probe)
         except Exception:
             pass
 
-        # 6. Etapa 5.5: Exportação DOCX (se solicitada)
+        # 6. Etapa 5.5: Exportação DOCX em staging (se solicitada)
         docx_render_result = None
         docx_sha: Optional[str] = None
         if export_docx:
@@ -526,7 +539,7 @@ class DocumentGenerationOrchestrator:
             try:
                 t_docx0 = time.time()
                 docx_composer = DOCXDocumentComposer(profile=profile)
-                docx_render_result = docx_composer.compose_to_docx(doc_ir, final_docx_path)
+                docx_render_result = docx_composer.compose_to_docx(doc_ir, staging_docx_path)
                 telemetry.stage_timings_ms["docx_export"] = (time.time() - t_docx0) * 1000.0
                 docx_p = Path(docx_render_result.file_path)
                 docx_sha = compute_file_sha256(docx_p)
@@ -538,37 +551,56 @@ class DocumentGenerationOrchestrator:
                     "timestamp": datetime.now().isoformat(),
                 })
 
-        # 7. Etapa 5.8: Quality Assurance Documental em 4 Eixos (incluindo overflow e IR->PDF)
+        # 7. Etapa 5.8: Quality Assurance Documental em 4 Eixos antes da promoção final
         _notify("QUALITY_ASSURANCE", 0.94, "A auditar integridade física, visual, pedagógica e epistémica...")
         qa_engine = DocumentQualityAssuranceEngine()
         qa_report = qa_engine.audit(
             ir=doc_ir,
             plan=plan,
             dossier=dossier,
-            pdf_path=final_pdf_path,
-            docx_path=final_docx_path if export_docx else None,
+            pdf_path=staging_pdf_path,
+            docx_path=staging_docx_path if export_docx and docx_render_result else None,
             design_profile=profile,
             render_result=pdf_render_result,
         )
         _atomic_write_json(qa_path, qa_report.to_dict())
 
-        if not qa_report.is_valid:
-            final_status = DocumentGenerationState.FAILED.value
-        else:
-            final_status = DocumentGenerationState.COMPLETED.value
-
-        # 8. Versionamento Seguro (generated_documents_history/)
+        # 8. Versionamento Seguro e Promoção Condicional (preserva final válido se QA falhar!)
         new_version = self._determine_next_version(history_dir)
-        v_sub_dir = history_dir / f"v{new_version}"
+        v_sub_dir = resolve_confined_path(history_dir, f"v{new_version}")
         v_sub_dir.mkdir(parents=True, exist_ok=True)
         hist_pdf_path = v_sub_dir / f"study_document_v{new_version}.pdf"
-        shutil.copy2(final_pdf_path, hist_pdf_path)
+        shutil.copy2(staging_pdf_path, hist_pdf_path)
 
         hist_docx_path_str = None
-        if docx_render_result and os.path.exists(docx_render_result.file_path):
+        if docx_render_result and staging_docx_path.exists():
             hist_docx_path = v_sub_dir / f"study_document_v{new_version}.docx"
-            shutil.copy2(docx_render_result.file_path, hist_docx_path)
+            shutil.copy2(staging_docx_path, hist_docx_path)
             hist_docx_path_str = str(hist_docx_path)
+
+        if not qa_report.is_valid:
+            final_status = DocumentGenerationState.FAILED.value
+            for st_p in (staging_pdf_path, staging_docx_path):
+                if st_p.exists():
+                    try:
+                        st_p.unlink()
+                    except OSError:
+                        pass
+            published_pdf_path = str(final_pdf_path) if final_pdf_path.exists() else str(hist_pdf_path)
+            published_docx_path = (
+                str(final_docx_path)
+                if (export_docx and final_docx_path.exists())
+                else hist_docx_path_str
+            )
+        else:
+            final_status = DocumentGenerationState.COMPLETED.value
+            os.replace(staging_pdf_path, final_pdf_path)
+            published_pdf_path = str(final_pdf_path)
+            if docx_render_result and staging_docx_path.exists():
+                os.replace(staging_docx_path, final_docx_path)
+                published_docx_path = str(final_docx_path)
+            else:
+                published_docx_path = None
 
         versions_manifest = self._load_versions_history(history_dir)
         version_record = StudyDocumentVersionRecord(
@@ -602,8 +634,8 @@ class DocumentGenerationOrchestrator:
             version=new_version,
             status=final_status,
             design_profile=profile.profile_id,
-            pdf_path=str(final_pdf_path),
-            docx_path=str(final_docx_path) if export_docx and docx_render_result else None,
+            pdf_path=published_pdf_path,
+            docx_path=published_docx_path,
             pdf_sha256=pdf_sha,
             docx_sha256=docx_sha,
             ir_path=str(ir_path),
@@ -630,7 +662,8 @@ class DocumentGenerationOrchestrator:
 
     def get_document_generation_status(self, document_id: str) -> Dict[str, Any]:
         """Consulta o estado da geração documental, ficheiros e versão ativa."""
-        doc_dir = self.storage_dir / "documents" / document_id
+        clean_id = safe_document_id(document_id)
+        doc_dir = resolve_confined_path(self.storage_dir / "documents", clean_id)
         meta_res_path = doc_dir / "document_generation_result.json"
         checkpoint_path = doc_dir / "document_generation_checkpoint.json"
         pdf_path = doc_dir / "study_document_final.pdf"

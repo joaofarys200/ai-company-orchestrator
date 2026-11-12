@@ -223,8 +223,14 @@ def validate_study_tool_arguments(tool_name: str, tool_input: Any) -> Dict[str, 
         if expected_type == "string":
             if not isinstance(val, str):
                 raise ValueError(f"O argumento '{key}' deve ser texto.")
-            if any(bad in val for bad in ("..", "\x00", ";", "|", "`")) and key == "document_id":
-                raise ValueError(f"O identificador '{key}' contém caracteres inválidos.")
+            if key == "document_id":
+                from services.study_fs import safe_document_id
+                try:
+                    safe_document_id(val)
+                except ValueError:
+                    raise ValueError(f"O identificador '{key}' contém caracteres inválidos.")
+                if any(bad in val for bad in (";", "|", "`")):
+                    raise ValueError(f"O identificador '{key}' contém caracteres inválidos.")
         elif expected_type == "integer":
             if isinstance(val, bool) or not isinstance(val, int):
                 raise ValueError(f"O argumento '{key}' deve ser um inteiro.")

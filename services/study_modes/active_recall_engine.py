@@ -27,6 +27,7 @@ from services.study_modes.contracts import (
 from services.study_modes.grounding import (
     LLMCaller,
     Phase6GroundingHelper,
+    StudyModeCancelledError,
     compute_source_fingerprints,
     fingerprints_match,
     invoke_phase6_json_llm,
@@ -62,6 +63,7 @@ class ActiveRecallEngine:
         target_prompts: int = 8,
         llm_caller: Optional[LLMCaller] = None,
         on_progress: Optional[Callable[[str, float, str], None]] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> ActiveRecallDeck:
         doc_id = grounding.plan.metadata.document_id or grounding.dossier.document_id
         current_fp = compute_source_fingerprints(grounding.plan, grounding.dossier, grounding.ast)
@@ -82,6 +84,8 @@ class ActiveRecallEngine:
         per_chap = max(2, (target_prompts + max(1, len(chapters)) - 1) // max(1, len(chapters)))
 
         for idx, chapter in enumerate(chapters):
+            if cancellation_check and cancellation_check():
+                raise StudyModeCancelledError("Geração de Active Recall cancelada pelo utilizador.")
             if on_progress:
                 on_progress(
                     "ACTIVE_RECALL",
@@ -116,7 +120,10 @@ class ActiveRecallEngine:
                 user_prompt=user_prompt,
                 document_id=doc_id,
                 validator=_validate,
+                cancellation_check=cancellation_check,
             )
+            if meta.get("cancelled") or (cancellation_check and cancellation_check()):
+                raise StudyModeCancelledError("Geração de Active Recall cancelada pelo utilizador.")
             if parsed and isinstance(parsed.get("prompts"), list):
                 llm_used = True
                 prompts.extend(self._parse_llm_prompts(parsed["prompts"], grounding=grounding, chapter=chapter))

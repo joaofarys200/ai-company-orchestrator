@@ -268,17 +268,20 @@ class VisualGenerationEngine:
 
         # Tentar extrair métricas do Dossier (Results and Evidence)
         if not series_list and dossier.results_and_evidence:
-            re_an = dossier.results_and_evidence
+            import re
             cand_cats: List[str] = []
             cand_vals: List[float] = []
-            for rf in re_an.main_empirical_findings:
-                import re
-                m = re.search(r"(\b[0-9]+(?:\.[0-9]+)?%?\b)", rf.statement)
+            for rf in dossier.results_and_evidence:
+                rf_statement = str(getattr(rf, "statement", "") or "")
+                rf_evidence = str(getattr(rf, "evidence_data", "") or "")
+                search_blob = f"{rf_statement} {rf_evidence}".strip()
+                m = re.search(r"(\b[0-9]+(?:\.[0-9]+)?%?\b)", search_blob)
                 if m:
                     num_str = m.group(1).rstrip("%")
                     try:
                         v = float(num_str)
-                        c_label = rf.statement.split(":")[0][:24] if ":" in rf.statement else rf.statement[:24]
+                        base_label = rf_statement or rf_evidence or "Resultado"
+                        c_label = base_label.split(":")[0][:24] if ":" in base_label else base_label[:24]
                         cand_cats.append(c_label)
                         cand_vals.append(v)
                     except ValueError:

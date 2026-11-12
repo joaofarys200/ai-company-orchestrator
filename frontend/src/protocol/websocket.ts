@@ -1646,7 +1646,8 @@ export type ServerMessage =
 
   | { type: 'study_flashcards_list'; flashcards: any[] }
   | { type: 'study_flashcard_updated'; flashcard: any }
-  | { type: 'study_document_failed'; filename: string; error: string }
+  | { type: 'study_document_failed'; filename: string; error: string; request_id?: string }
+  | { type: 'study_video_url_ingested'; document: any; request_id?: string }
   | { type: 'study_contextual_assist_result'; document_id: string; request_id?: string; [key: string]: any }
   | { type: 'study_ask_paper_result'; document_id: string; answer: string; sources?: string[]; request_id?: string }
   | { type: 'study_document_file_result'; document_id: string; content_base64?: string; filename?: string; error?: string; request_id?: string }
@@ -1751,6 +1752,7 @@ export type ClientMessage =
   | { type: 'sentinel_get_shadow_telemetry' }
   | { type: 'sentinel_submit_review'; event_id: string; final_classification: string; reason?: string; operator?: string }
   | { type: 'study_upload_document'; filename: string; title?: string; subject?: string; content_base64?: string; content_text?: string; source_type?: string; file_path?: string }
+  | { type: 'study_ingest_video_url'; url: string; title?: string; subject?: string; collection_id?: string; request_id?: string }
   | { type: 'study_list_documents' }
   | { type: 'study_get_document'; document_id: string }
   | { type: 'study_get_document_file'; document_id: string; request_id?: string }
@@ -2800,6 +2802,13 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         type: 'study_document_failed',
         filename: asString(raw.filename),
         error: asString(raw.error),
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_video_url_ingested':
+      return {
+        type: 'study_video_url_ingested',
+        document: raw.document,
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
       };
     case 'study_contextual_assist_result':
       return {

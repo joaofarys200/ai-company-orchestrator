@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import threading
 import time
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
@@ -39,6 +40,7 @@ class OllamaExecutionOptions:
     require_done: bool = False
     output_character_limit: int | None = None
     event_callback: ProviderEventCallback | None = None
+    cancellation_check: Callable[[], bool] | None = None
 
     def emit(
         self,
@@ -77,6 +79,65 @@ class OllamaStructuredOutputUnsupportedError(
     OllamaProviderResponseError
 ):
     pass
+
+
+_OLLAMA_GPU_SEM = threading.Semaphore(1)
+
+
+class _IncrementalJsonTracker:
+    """Tracks top-level JSON object/array closure in O(N) over streamed chunks."""
+
+    def __init__(self) -> None:
+        self._started = False
+        self._depth = 0
+        self._in_string = False
+        self._escape = False
+        self._open_char = ""
+        self._close_char = ""
+
+    def reset(self) -> None:
+        self._started = False
+        self._depth = 0
+        self._in_string = False
+        self._escape = False
+        self._open_char = ""
+        self._close_char = ""
+
+    def feed(self, chunk: str) -> bool:
+        """Returns True when a top-level `{...}` or `[...]` structure closes."""
+        closed = False
+        for ch in chunk:
+            if not self._started:
+                if ch == "{":
+                    self._started = True
+                    self._depth = 1
+                    self._open_char, self._close_char = "{", "}"
+                elif ch == "[":
+                    self._started = True
+                    self._depth = 1
+                    self._open_char, self._close_char = "[", "]"
+                continue
+
+            if self._escape:
+                self._escape = False
+                continue
+            if ch == "\\" and self._in_string:
+                self._escape = True
+                continue
+            if ch == '"':
+                self._in_string = not self._in_string
+                continue
+            if self._in_string:
+                continue
+
+            if ch == self._open_char:
+                self._depth += 1
+            elif ch == self._close_char:
+                self._depth -= 1
+                if self._depth == 0:
+                    self._started = False
+                    closed = True
+        return closed
 
 
 class OllamaChatProvider:
@@ -150,6 +211,14 @@ class OllamaChatProvider:
             return False
 
     async def warmup(self, model: str | None = None) -> bool:
+        if not _OLLAMA_GPU_SEM.acquire(blocking=False):
+            return True
+        try:
+            return await self._warmup_unlocked(model=model)
+        finally:
+            _OLLAMA_GPU_SEM.release()
+
+    async def _warmup_unlocked(self, model: str | None = None) -> bool:
         """Sends a lightweight warmup probe to preload model weights into memory/VRAM."""
         target_model = (model or self.default_model).strip()
         default_ctx = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
@@ -175,6 +244,28 @@ class OllamaChatProvider:
         return False
 
     async def generate(
+        self,
+        request: ModelRequest,
+        route: ModelRoute,
+        _progress,
+    ) -> ProviderResult:
+        options = self._execution_options(request)
+        timeout_budget = float(request.execution_constraints.timeout_seconds or 300.0)
+        deadline = time.monotonic() + max(timeout_budget, 30.0)
+        while True:
+            if options.cancellation_check is not None and options.cancellation_check():
+                raise asyncio.CancelledError("Ollama generation cancelled before GPU lock.")
+            if _OLLAMA_GPU_SEM.acquire(blocking=False):
+                break
+            if time.monotonic() >= deadline:
+                raise TimeoutError("Timed out waiting for local Ollama GPU lock.")
+            await asyncio.sleep(0.05)
+        try:
+            return await self._generate_unlocked(request, route, _progress)
+        finally:
+            _OLLAMA_GPU_SEM.release()
+
+    async def _generate_unlocked(
         self,
         request: ModelRequest,
         route: ModelRoute,
@@ -380,6 +471,8 @@ class OllamaChatProvider:
         first_chunk_at: float | None = None
         first_content_at: float | None = None
         first_valid_json_at: float | None = None
+        json_tracker = _IncrementalJsonTracker()
+        output_length = 0
         last_chunk_at: float | None = None
         max_chunk_gap = 0.0
         chunk_count = 0
@@ -429,6 +522,8 @@ class OllamaChatProvider:
                         "Ollama devolveu erro durante a geracao.",
                         partial_response=bool(parts),
                     )
+                if options.cancellation_check is not None and options.cancellation_check():
+                    raise asyncio.CancelledError("Ollama stream cancelled by caller.")
                 message = chunk.get("message") or {}
                 content = str(message.get("content") or "")
                 if content:
@@ -436,11 +531,12 @@ class OllamaChatProvider:
                         first_content_at = now
                         options.emit("first_nonempty_content")
                     parts.append(content)
-                    if first_valid_json_at is None:
+                    output_length += len(content)
+                    if first_valid_json_at is None and json_tracker.feed(content):
                         try:
                             json.loads("".join(parts))
                         except (TypeError, ValueError):
-                            pass
+                            json_tracker.reset()
                         else:
                             first_valid_json_at = now
                             options.emit("first_valid_json_object")
@@ -451,7 +547,6 @@ class OllamaChatProvider:
                         for item in raw_calls
                         if isinstance(item, Mapping)
                     )
-                output_length = sum(len(part) for part in parts)
                 options.emit(
                     "stream_progress",
                     {

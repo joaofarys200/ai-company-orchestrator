@@ -546,7 +546,11 @@ class StudyOrchestrationCoordinator:
         if self.model_service is not None:
             from backend.model_harness.contracts import OutputFormat
 
-            model_name = os.getenv("OLLAMA_STUDY_MODEL", os.getenv("OLLAMA_MODEL", "qwen3.5:9b"))
+            model_name = (
+                os.getenv("OLLAMA_MODEL")
+                or os.getenv("OLLAMA_STUDY_MODEL")
+                or "qwen3.5:9b"
+            ).strip() or "qwen3.5:9b"
             try:
                 resp = await self.model_service.execute(
                     provider="ollama",

@@ -12,6 +12,7 @@ import base64
 from dataclasses import asdict
 from datetime import datetime
 import os
+from pathlib import Path
 import time
 import uuid
 from typing import Any, Dict, List, Optional
@@ -24,6 +25,7 @@ try:
 except ImportError:
     ConnectionManager = Any
 from backend.websocket.handlers import bind_handler_methods
+from services.study_fs import is_path_within_roots, safe_document_id, safe_filename
 from services.study_service import StudyService
 
 
@@ -124,6 +126,11 @@ class StudyWebSocketHandler:
     def routes(self) -> dict[str, MessageHandler]:
         return bind_handler_methods(self, STUDY_HANDLERS)
 
+    def _allowed_ingest_roots(self) -> List[Path]:
+        ws_root = Path(getattr(self.study_service, "workspace_root", ".")).resolve()
+        st_root = Path(getattr(self.study_service, "storage_dir", ws_root / "data" / "study")).resolve()
+        return [ws_root, ws_root / "sandbox_dir", ws_root / "data", st_root]
+
     async def list_documents(
         self,
         websocket: Any,
@@ -172,7 +179,18 @@ class StudyWebSocketHandler:
         message: dict,
         _session: WebSocketSessionState,
     ) -> None:
-        doc_id = message.get("document_id", "")
+        raw_doc_id = message.get("document_id", "")
+        try:
+            doc_id = safe_document_id(raw_doc_id)
+        except ValueError:
+            await self.connections.send(websocket, {
+                "type": "study_document_file_result",
+                "document_id": raw_doc_id,
+                "error": "SECURITY_VIOLATION: Identificador de documento inválido.",
+                "request_id": message.get("request_id"),
+            })
+            return
+
         doc = self.study_service.get_document(doc_id)
         if not doc or not doc.metadata.get("file_path"):
             await self.connections.send(websocket, {
@@ -186,7 +204,8 @@ class StudyWebSocketHandler:
         file_path = doc.metadata.get("file_path")
         if file_path and not os.path.isabs(file_path):
             file_path = os.path.join(self.study_service.workspace_root, file_path)
-        if not file_path or not os.path.exists(file_path):
+        fpath_obj = Path(file_path) if file_path else None
+        if not fpath_obj or fpath_obj.is_symlink() or not fpath_obj.is_file():
             await self.connections.send(websocket, {
                 "type": "study_document_file_result",
                 "document_id": doc_id,
@@ -196,15 +215,28 @@ class StudyWebSocketHandler:
             return
 
         try:
-            with open(file_path, "rb") as f:
-                raw_bytes = f.read()
-            b64 = base64.b64encode(raw_bytes).decode("ascii")
+            max_ws_bytes = 50 * 1024 * 1024
+            size_bytes = fpath_obj.stat().st_size
+            if size_bytes > max_ws_bytes:
+                await self.connections.send(websocket, {
+                    "type": "study_document_file_result",
+                    "document_id": doc_id,
+                    "error": f"Ficheiro demasiado grande ({size_bytes} bytes) para base64 WebSocket; usar HTTP /api/study/document/{doc_id}/file.",
+                    "request_id": message.get("request_id"),
+                })
+                return
+
+            def _read_b64() -> tuple[str, int]:
+                raw_bytes = fpath_obj.read_bytes()
+                return base64.b64encode(raw_bytes).decode("ascii"), len(raw_bytes)
+
+            b64, actual_len = await asyncio.to_thread(_read_b64)
             await self.connections.send(websocket, {
                 "type": "study_document_file_result",
                 "document_id": doc_id,
                 "filename": doc.metadata.get("filename", "document.pdf"),
                 "content_base64": b64,
-                "size_bytes": len(raw_bytes),
+                "size_bytes": actual_len,
                 "request_id": message.get("request_id"),
             })
         except Exception as e:
@@ -546,12 +578,13 @@ class StudyWebSocketHandler:
                 pass
 
         try:
+            clean_filename = safe_filename(filename)
             if content_b64:
                 raw_bytes = base64.b64decode(content_b64)
                 doc = await asyncio.to_thread(
                     self.study_service.ingest_document,
                     raw_bytes,
-                    filename,
+                    clean_filename,
                     subject=subject,
                     source_type=source_type,
                     custom_title=custom_title,
@@ -562,20 +595,29 @@ class StudyWebSocketHandler:
                 doc = await asyncio.to_thread(
                     self.study_service.ingest_document,
                     raw_bytes,
-                    filename,
+                    clean_filename,
                     subject=subject,
                     source_type=source_type or "TXT",
                     custom_title=custom_title,
                     progress_callback=on_progress,
                 )
             else:
-                # Verificar se file_path foi passado
+                # Verificar se file_path foi passado e se reside estritamente nas raízes permitidas
                 file_path = message.get("file_path")
-                if file_path and os.path.exists(file_path):
+                if file_path:
+                    cand = Path(file_path)
+                    if not cand.is_absolute():
+                        cand = Path(getattr(self.study_service, "workspace_root", ".")) / cand
+                    if not is_path_within_roots(cand, self._allowed_ingest_roots()):
+                        raise PermissionError(
+                            f"SECURITY_VIOLATION: Caminho '{file_path}' fora das pastas autorizadas para importação."
+                        )
+                    if not cand.is_file():
+                        raise FileNotFoundError(f"Ficheiro não encontrado: {file_path}")
                     doc = await asyncio.to_thread(
                         self.study_service.ingest_document,
-                        file_path,
-                        filename,
+                        str(cand.resolve()),
+                        clean_filename,
                         subject=subject,
                         source_type=source_type,
                         custom_title=custom_title,
@@ -746,12 +788,15 @@ class StudyWebSocketHandler:
         doc_id = message.get("document_id", "")
         from services.study_ai_engine import cancel_study_generation
         cancelled = cancel_study_generation(doc_id or "global")
+        try:
+            self._get_operation_manager().request_cancel(document_id=doc_id or None)
+        except Exception:
+            pass
         if hasattr(self.connections, "broadcast"):
             b_coro = self.connections.broadcast({
                 "type": "study_document_processing",
                 "document_id": doc_id,
                 "status": "CANCELLED",
-                "percent": 100.0,
                 "message": "Geração cancelada pelo utilizador.",
             })
             if asyncio.iscoroutine(b_coro):
@@ -1495,8 +1540,13 @@ class StudyWebSocketHandler:
         frame_id = message.get("frame_id")
         selected_text = message.get("selected_text")
         try:
-            note = self.study_service.save_video_note(
-                doc_id, timestamp, note_text, frame_id, selected_text
+            note = await asyncio.to_thread(
+                self.study_service.save_video_note,
+                doc_id,
+                timestamp,
+                note_text,
+                frame_id,
+                selected_text,
             )
             await self.connections.send(websocket, {
                 "type": "study_video_note_saved",
@@ -1521,7 +1571,12 @@ class StudyWebSocketHandler:
         timestamp = float(message.get("timestamp", 0.0))
         progress_percent = float(message.get("progress_percent", 0.0))
         try:
-            prog = self.study_service.update_video_progress(doc_id, timestamp, progress_percent)
+            prog = await asyncio.to_thread(
+                self.study_service.update_video_progress,
+                doc_id,
+                timestamp,
+                progress_percent,
+            )
             await self.connections.send(websocket, {
                 "type": "study_video_progress_updated",
                 "document_id": doc_id,
@@ -1978,9 +2033,9 @@ class StudyWebSocketHandler:
         coord = getattr(self.study_service, "_study_coordinator", None)
         if coord is not None:
             return coord.operation_manager
-        from services.study_integration import StudyOperationManager
+        from services.study_integration import get_study_coordinator
 
-        return StudyOperationManager(storage_dir=getattr(self.study_service, "storage_dir", "data/study"))
+        return get_study_coordinator(self.study_service).operation_manager
 
     async def cancel_operation(self, ws: Any, msg: dict, _: WebSocketSessionState) -> None:
         op_id = str(msg.get("operation_id") or "").strip() or None

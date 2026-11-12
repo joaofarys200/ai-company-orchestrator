@@ -159,11 +159,53 @@ def compute_plan_overview_fingerprint(plan: EditorialStudyPlan) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
 
 
+def build_section_fingerprint_index(dossier: Any = None, ast: Any = None) -> Dict[str, Any]:
+    """Pré-indexa análises, conceitos e parágrafos por ID e ordem original para cálculo O(1) de fingerprints."""
+    analyses_by_sid: Dict[str, List[Tuple[int, Dict[str, Any]]]] = {}
+    concepts_by_cid: Dict[str, List[Tuple[int, Dict[str, Any]]]] = {}
+    if dossier is not None:
+        for idx, sa in enumerate(getattr(dossier, "section_analyses", []) or []):
+            sid = getattr(sa, "section_id", "")
+            analyses_by_sid.setdefault(sid, []).append((idx, _safe_json_serialize(sa)))
+        for idx, c in enumerate(getattr(dossier, "conceptual_analysis", []) or []):
+            cid = getattr(c, "concept_id", "")
+            concepts_by_cid.setdefault(cid, []).append((idx, _safe_json_serialize(c)))
+
+    paras_list: List[Dict[str, Any]] = []
+    paras_by_pid: Dict[str, List[int]] = {}
+    paras_by_sid: Dict[str, List[int]] = {}
+    if ast is not None:
+        for p in getattr(ast, "paragraphs", []) or []:
+            pid = getattr(p, "paragraph_id", "")
+            sid = getattr(p, "section_id", "")
+            entry = {
+                "id": pid,
+                "sid": sid,
+                "pg": getattr(p, "page_number", 0),
+                "sha1": getattr(p, "content_sha1", "")
+                or hashlib.sha256(str(getattr(p, "text", "")).encode("utf-8")).hexdigest(),
+            }
+            idx = len(paras_list)
+            paras_list.append(entry)
+            paras_by_pid.setdefault(pid, []).append(idx)
+            paras_by_sid.setdefault(sid, []).append(idx)
+
+    return {
+        "analyses_by_sid": analyses_by_sid,
+        "concepts_by_cid": concepts_by_cid,
+        "paras_list": paras_list,
+        "paras_by_pid": paras_by_pid,
+        "paras_by_sid": paras_by_sid,
+    }
+
+
 def compute_section_plan_fingerprint(
     chapter: Any,
     section: Any,
     dossier: Any = None,
     ast: Any = None,
+    *,
+    context_index: Optional[Dict[str, Any]] = None,
 ) -> str:
     """
     Calcula fingerprint unitário determinístico de uma secção editorial e das respetivas dependências
@@ -180,26 +222,56 @@ def compute_section_plan_fingerprint(
 
     linked_analyses = []
     linked_concepts = []
-    if dossier is not None:
-        for sa in getattr(dossier, "section_analyses", []) or []:
-            if getattr(sa, "section_id", "") in orig_sids:
-                linked_analyses.append(_safe_json_serialize(sa))
-        for c in getattr(dossier, "conceptual_analysis", []) or []:
-            if getattr(c, "concept_id", "") in target_cids:
-                linked_concepts.append(_safe_json_serialize(c))
-
     linked_paras = []
-    if ast is not None:
-        for p in getattr(ast, "paragraphs", []) or []:
-            pid = getattr(p, "paragraph_id", "")
-            sid = getattr(p, "section_id", "")
-            if pid in target_pids or sid in orig_sids:
-                linked_paras.append({
-                    "id": pid,
-                    "sid": sid,
-                    "pg": getattr(p, "page_number", 0),
-                    "sha1": getattr(p, "content_sha1", "") or hashlib.sha256(str(getattr(p, "text", "")).encode("utf-8")).hexdigest(),
-                })
+
+    if context_index is not None:
+        if dossier is not None:
+            analyses_by_sid = context_index["analyses_by_sid"]
+            matched_a: Dict[int, Dict[str, Any]] = {}
+            for sid in orig_sids:
+                for pos, item in analyses_by_sid.get(sid, ()):
+                    matched_a[pos] = item
+            linked_analyses = [matched_a[k] for k in sorted(matched_a)]
+
+            concepts_by_cid = context_index["concepts_by_cid"]
+            matched_c: Dict[int, Dict[str, Any]] = {}
+            for cid in target_cids:
+                for pos, item in concepts_by_cid.get(cid, ()):
+                    matched_c[pos] = item
+            linked_concepts = [matched_c[k] for k in sorted(matched_c)]
+
+        if ast is not None:
+            paras_by_pid = context_index["paras_by_pid"]
+            paras_by_sid = context_index["paras_by_sid"]
+            paras_list = context_index["paras_list"]
+            seen_idxs: set = set()
+            for pid in target_pids:
+                for idx in paras_by_pid.get(pid, ()):
+                    seen_idxs.add(idx)
+            for sid in orig_sids:
+                for idx in paras_by_sid.get(sid, ()):
+                    seen_idxs.add(idx)
+            linked_paras = [paras_list[i] for i in sorted(seen_idxs)]
+    else:
+        if dossier is not None:
+            for sa in getattr(dossier, "section_analyses", []) or []:
+                if getattr(sa, "section_id", "") in orig_sids:
+                    linked_analyses.append(_safe_json_serialize(sa))
+            for c in getattr(dossier, "conceptual_analysis", []) or []:
+                if getattr(c, "concept_id", "") in target_cids:
+                    linked_concepts.append(_safe_json_serialize(c))
+
+        if ast is not None:
+            for p in getattr(ast, "paragraphs", []) or []:
+                pid = getattr(p, "paragraph_id", "")
+                sid = getattr(p, "section_id", "")
+                if pid in target_pids or sid in orig_sids:
+                    linked_paras.append({
+                        "id": pid,
+                        "sid": sid,
+                        "pg": getattr(p, "page_number", 0),
+                        "sha1": getattr(p, "content_sha1", "") or hashlib.sha256(str(getattr(p, "text", "")).encode("utf-8")).hexdigest(),
+                    })
 
     payload = {
         "chapter": {

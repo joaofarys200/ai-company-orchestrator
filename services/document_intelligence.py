@@ -1056,7 +1056,14 @@ class DocumentIntelligenceExtractor:
             raise DocumentExtractionError("PyMuPDF não está instalado; não é possível extrair PDFs.")
         t0 = time.perf_counter()
         pdf_path = Path(pdf_path)
+        max_bytes = int(os.environ.get("STUDY_MAX_PDF_BYTES", str(256 * 1024 * 1024)) or (256 * 1024 * 1024))
+        max_pages = int(os.environ.get("STUDY_MAX_PDF_PAGES", "1500") or 1500)
         try:
+            file_size = pdf_path.stat().st_size
+            if file_size > max_bytes:
+                raise DocumentExtractionError(
+                    f"PDF excede o limite de tamanho configurado ({file_size} > {max_bytes} bytes)."
+                )
             raw_bytes = pdf_path.read_bytes()
         except OSError as e:
             raise DocumentExtractionError(f"Não foi possível ler o ficheiro: {e}") from e
@@ -1070,6 +1077,10 @@ class DocumentIntelligenceExtractor:
                 raise DocumentExtractionError("PDF protegido por palavra-passe.")
             if pdf.page_count == 0:
                 raise DocumentExtractionError("PDF sem páginas.")
+            if pdf.page_count > max_pages:
+                raise DocumentExtractionError(
+                    f"PDF excede o limite de páginas configurado ({pdf.page_count} > {max_pages})."
+                )
             return self._extract(pdf, pdf_path, document_id, filename or pdf_path.name, sha, len(raw_bytes), t0)
         finally:
             pdf.close()
@@ -1474,17 +1485,68 @@ class DocumentIntelligenceExtractor:
 
     # ----------------------------------------------------------------- tabelas
 
+    @staticmethod
+    def _has_table_grid_drawings(page) -> bool:
+        """Verifica rapidamente se a página tem traços ortogonais mínimos para tabelas com linhas."""
+        try:
+            drawings = page.get_cdrawings()
+        except Exception:
+            return True
+        if not drawings:
+            return False
+        horiz = 0
+        vert = 0
+        for d in drawings:
+            for item in d.get("items") or ():
+                if not item:
+                    continue
+                kind = item[0]
+                if kind in ("re", "qu"):
+                    if kind == "re" and len(item) >= 2:
+                        r = item[1]
+                        if isinstance(r, (tuple, list)):
+                            x0, y0, x1, y1 = float(r[0]), float(r[1]), float(r[2]), float(r[3])
+                        else:
+                            x0, y0, x1, y1 = float(r.x0), float(r.y0), float(r.x1), float(r.y1)
+                        w = abs(x1 - x0)
+                        h = abs(y1 - y0)
+                        if h <= 3.5 and w >= 8.0:
+                            horiz += 1
+                        elif w <= 3.5 and h >= 8.0:
+                            vert += 1
+                        else:
+                            horiz += 2
+                            vert += 2
+                    else:
+                        horiz += 2
+                        vert += 2
+                elif kind == "l" and len(item) >= 3:
+                    p1, p2 = item[1], item[2]
+                    x1, y1 = (float(p1[0]), float(p1[1])) if isinstance(p1, (tuple, list)) else (float(p1.x), float(p1.y))
+                    x2, y2 = (float(p2[0]), float(p2[1])) if isinstance(p2, (tuple, list)) else (float(p2.x), float(p2.y))
+                    dx = abs(x2 - x1)
+                    dy = abs(y2 - y1)
+                    if dy <= 2.5 and dx >= 8.0:
+                        horiz += 1
+                    elif dx <= 2.5 and dy >= 8.0:
+                        vert += 1
+                # Tabelas académicas (ex.: Elsevier/APA) podem usar apenas linhas horizontais (toprule/midrule/bottomrule)
+                if horiz >= 2 or (horiz >= 1 and vert >= 1):
+                    return True
+        return False
+
     def _find_tables(self, page, pn, blocks, captions, figures, rep) -> List[Dict[str, Any]]:
         result: List[Dict[str, Any]] = []
         table_caps = [c for c in captions if c["kind"] == "table"]
         candidates: List[Dict[str, Any]] = []
-        try:
-            for t in page.find_tables(strategy="lines").tables:
-                rows = _clean_rows(t.extract())
-                if self._table_acceptable(rows, [float(x) for x in t.bbox], table_caps, figures):
-                    candidates.append({"bbox": [float(x) for x in t.bbox], "rows": rows, "method": "PYMUPDF_LINES"})
-        except Exception:
-            pass
+        if self._has_table_grid_drawings(page):
+            try:
+                for t in page.find_tables(strategy="lines").tables:
+                    rows = _clean_rows(t.extract())
+                    if self._table_acceptable(rows, [float(x) for x in t.bbox], table_caps, figures):
+                        candidates.append({"bbox": [float(x) for x in t.bbox], "rows": rows, "method": "PYMUPDF_LINES"})
+            except Exception:
+                pass
         if not candidates and pdfplumber is not None and table_caps:
             try:
                 with pdfplumber.open(page.parent.name) as _p:  # pragma: no cover - raramente usado
@@ -1588,6 +1650,19 @@ class DocumentIntelligenceExtractor:
 
     # ---------------------------------------------------------------- figuras
 
+    def _next_asset_seq(self, pn: int, prefix: str, glob_pattern: str) -> int:
+        counters = getattr(self, "_page_asset_counters", None)
+        if counters is None:
+            counters = {}
+            self._page_asset_counters = counters
+        key = (str(self.assets_dir or ""), pn, prefix)
+        cur = counters.get(key)
+        if cur is None and self.assets_dir is not None:
+            cur = len(list(self.assets_dir.glob(glob_pattern)))
+        nxt = (cur or 0) + 1
+        counters[key] = nxt
+        return nxt
+
     def _save_figure_asset(self, pdf, page, pn, f: Dict[str, Any], cache: Dict[int, Tuple[str, str]], rep) -> None:
         f["asset_ref"], f["asset_sha"], f["asset_status"] = None, None, "NOT_FOUND"
         if f["kind"] == "CAPTION_ONLY":
@@ -1596,6 +1671,7 @@ class DocumentIntelligenceExtractor:
             f["asset_status"] = "NOT_PERSISTED"
             return
         self.assets_dir.mkdir(parents=True, exist_ok=True)
+        pix = None
         try:
             if f["kind"] == "RASTER_IMAGE" and f["xref"]:
                 if f["xref"] in cache:
@@ -1609,8 +1685,9 @@ class DocumentIntelligenceExtractor:
                     pix = pymupdf.Pixmap(pix, 0)
                 name = f"fig_p{pn:03d}_x{f['xref']}.png"
                 path = self.assets_dir / name
-                pix.save(str(path))
-                sha = hashlib.sha256(path.read_bytes()).hexdigest()
+                png_bytes = pix.tobytes("png")
+                sha = hashlib.sha256(png_bytes).hexdigest()
+                path.write_bytes(png_bytes)
                 f["asset_ref"], f["asset_sha"], f["asset_status"] = f"assets/{name}", sha, "EXTRACTED"
                 f["w"], f["h"] = pix.width, pix.height
                 cache[f["xref"]] = (f["asset_ref"], sha)
@@ -1622,36 +1699,45 @@ class DocumentIntelligenceExtractor:
             if longest > 3200:
                 dpi = int(dpi * 3200 / longest)
             pix = page.get_pixmap(clip=clip, dpi=max(dpi, 60))
-            idx = len([k for k in self.assets_dir.glob(f"fig_p{pn:03d}_r*.png")]) + 1
+            idx = self._next_asset_seq(pn, "fig_r", f"fig_p{pn:03d}_r*.png")
             name = f"fig_p{pn:03d}_r{idx}.png"
             path = self.assets_dir / name
-            pix.save(str(path))
+            png_bytes = pix.tobytes("png")
+            sha = hashlib.sha256(png_bytes).hexdigest()
+            path.write_bytes(png_bytes)
             f["asset_ref"] = f"assets/{name}"
-            f["asset_sha"] = hashlib.sha256(path.read_bytes()).hexdigest()
+            f["asset_sha"] = sha
             f["asset_status"] = "RENDERED_FROM_PAGE"
             f["w"], f["h"] = pix.width, pix.height
         except Exception as e:
             f["asset_status"] = "EXTRACTION_FAILED"
             f["error"] = str(e)
             rep.warnings.append(f"Página {pn}: falha ao guardar imagem ({e})")
+        finally:
+            pix = None
 
     def _save_formula_crop(self, page, pn, fm: Dict[str, Any]) -> None:
         fm["asset_ref"], fm["asset_sha"] = None, None
         if self.assets_dir is None:
             return
+        pix = None
         try:
             self.assets_dir.mkdir(parents=True, exist_ok=True)
             b = fm["block"]["bbox"]
             clip = pymupdf.Rect(b[0] - 2, b[1] - 2, b[2] + 2, b[3] + 2)
             pix = page.get_pixmap(clip=clip, dpi=200)
-            idx = len(list(self.assets_dir.glob(f"eq_p{pn:03d}_*.png"))) + 1
+            idx = self._next_asset_seq(pn, "eq", f"eq_p{pn:03d}_*.png")
             name = f"eq_p{pn:03d}_{idx}.png"
             path = self.assets_dir / name
-            pix.save(str(path))
+            png_bytes = pix.tobytes("png")
+            sha = hashlib.sha256(png_bytes).hexdigest()
+            path.write_bytes(png_bytes)
             fm["asset_ref"] = f"assets/{name}"
-            fm["asset_sha"] = hashlib.sha256(path.read_bytes()).hexdigest()
+            fm["asset_sha"] = sha
         except Exception:
             pass
+        finally:
+            pix = None
 
     # ---------------------------------------------------------------- fórmulas
 

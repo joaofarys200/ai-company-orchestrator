@@ -226,7 +226,8 @@ class LectureWebSocketHandler:
         try:
             from services.study_ai_engine import invoke_study_llm_json
 
-            parsed_lesson = invoke_study_llm_json(
+            parsed_lesson = await asyncio.to_thread(
+                invoke_study_llm_json,
                 operation="lecture_generate_lesson",
                 system_prompt=(
                     "És um professor universitário especialista em PT-PT. Prepara uma aula rigorosa, concreta e detalhada "
@@ -245,6 +246,7 @@ class LectureWebSocketHandler:
                 ),
                 max_output_tokens=4096,
             )
+            offline_fallback = not (isinstance(parsed_lesson, dict) and parsed_lesson.get("detailed_notes"))
 
             if isinstance(parsed_lesson, dict) and parsed_lesson.get("detailed_notes"):
                 summary = str(parsed_lesson.get("executive_summary") or f"Síntese da aula sobre **{topic}** ({subject}).").strip()
@@ -331,16 +333,22 @@ tags:
 ## 🎯 5. Ações e Avaliações
 {actions_md}
 """
-            # Salvar no Obsidian Vault
+            # Salvar no Obsidian Vault fora do loop async
+            from services.study_fs import atomic_write_text, safe_filename
+
             clean_subj = "".join(c for c in subject if c.isalnum() or c in (" ", "-", "_")).strip() or "Geral"
             clean_top = "".join(c for c in topic if c.isalnum() or c in (" ", "-", "_")).strip()
+            safe_fname = safe_filename(f"{date_str} - {clean_top}.md")
             dest_dir = Path("obsidian_vault/10 - Lectures") / clean_subj
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            output_path = dest_dir / f"{date_str} - {clean_top}.md"
-            with open(output_path, "w", encoding="utf-8") as f:
-                f.write(raw_markdown)
+            output_path = dest_dir / safe_fname
 
-            # 2. Gerar Perguntas de Quiz Interativo
+            def _persist_lesson_md() -> None:
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                atomic_write_text(output_path, raw_markdown)
+
+            await asyncio.to_thread(_persist_lesson_md)
+
+            # 2. Gerar Perguntas de Quiz Interativo (marcando explicitamente modo offline se fallback)
             quiz_questions = [
                 {
                     "id": "q1",
@@ -352,6 +360,7 @@ tags:
                     ],
                     "correct_index": 0,
                     "explanation": f"{topic} estabelece princípios de modularidade, isolamento e validação.",
+                    "offline_fallback": offline_fallback,
                 },
                 {
                     "id": "q2",
@@ -363,6 +372,7 @@ tags:
                     ],
                     "correct_index": 0,
                     "explanation": "A coluna de pistas e o sumário promovem recordação ativa e síntese.",
+                    "offline_fallback": offline_fallback,
                 },
                 {
                     "id": "q3",
@@ -374,6 +384,7 @@ tags:
                     ],
                     "correct_index": 0,
                     "explanation": "Os wikilinks criam conexões semânticas bidirecionais entre conceitos.",
+                    "offline_fallback": offline_fallback,
                 },
             ]
 
@@ -385,6 +396,7 @@ tags:
                     f"de {topic} para assegurar que falhas parciais não comprometem a integridade das operações?"
                 ),
                 "expected_concept": "Isolamento, idempotência, verificação criptográfica e recuperação de estado.",
+                "offline_fallback": offline_fallback,
             }
 
             lesson_data = {
@@ -398,6 +410,7 @@ tags:
                 "cue_column": cue_column,
                 "quiz": quiz_questions,
                 "transfer_question": transfer_question,
+                "offline_fallback": offline_fallback,
             }
 
             if self.logger:

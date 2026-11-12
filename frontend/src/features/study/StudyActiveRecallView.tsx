@@ -91,6 +91,16 @@ export const StudyActiveRecallView: React.FC<StudyActiveRecallViewProps> = ({
     loadData();
   }, [loadData]);
 
+  useEffect(() => {
+    if (!activeDailySession) {
+      setPendingAdvanceSession(null);
+    }
+  }, [activeDailySession]);
+
+  useEffect(() => {
+    setPendingAdvanceSession(null);
+  }, [activeDailySession?.session_id]);
+
   const dailyCurrentItem = !pendingAdvanceSession ? getCurrentSessionItem(activeDailySession) : null;
   const isDailyActiveRecallStep = Boolean(
     activeDailySession && dailyCurrentItem && dailyCurrentItem.item_type === 'active_recall'
@@ -121,6 +131,7 @@ export const StudyActiveRecallView: React.FC<StudyActiveRecallViewProps> = ({
     if (!document || !studyModes) return;
     setIsGenerating(true);
     setError(null);
+    setPendingAdvanceSession(null);
     try {
       const res = await studyModes.generateActiveRecall(document.document_id, prompts.length > 0, 8);
       setPrompts(res.prompts || []);
@@ -299,6 +310,7 @@ export const StudyActiveRecallView: React.FC<StudyActiveRecallViewProps> = ({
                     key={p.prompt_id}
                     type="button"
                     onClick={() => {
+                      setPendingAdvanceSession(null);
                       setActiveIdx(idx);
                       setLastAttempt(null);
                       setResponseText('');

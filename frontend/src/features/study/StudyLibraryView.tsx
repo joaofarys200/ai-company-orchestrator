@@ -43,6 +43,7 @@ interface StudyLibraryViewProps {
     source_type?: SourceType;
     title?: string;
     collection_id?: string;
+    video_url?: string;
   }) => void;
   onRefresh?: () => void;
   onDeleteDocument?: (docId: string) => void;
@@ -387,6 +388,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
       onUpload({
         filename: videoUrlInput.trim(),
         content_text: videoUrlInput.trim(),
+        video_url: videoUrlInput.trim(),
         subject: finalSubject,
         source_type: 'VIDEO',
         title: baseTitle,
@@ -824,6 +826,12 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
         <div className="border-b border-cyan-400/30 bg-cyan-950/40 px-6 py-2.5 flex items-center gap-3 text-xs text-cyan-200 animate-pulse">
           <UploadCloud className="h-4 w-4 animate-bounce text-cyan-300" />
           <span>A processar documento: {uploadStatus || 'A extrair páginas e secções...'}</span>
+        </div>
+      )}
+      {!isUploading && uploadStatus.startsWith('Erro:') && (
+        <div className="border-b border-rose-500/30 bg-rose-950/40 px-6 py-2.5 flex items-center gap-3 text-xs text-rose-200">
+          <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+          <span>{uploadStatus}</span>
         </div>
       )}
 

@@ -38,10 +38,14 @@ class StudyOperationManager:
     def _load_and_mark_interrupted(self) -> None:
         if not self.ops_path.exists():
             return
+        from services.study_fs import read_json_safe
+        raw, corrupt = read_json_safe(
+            self.ops_path, default=[], expected_type=list, backup_on_corrupt=True
+        )
+        if corrupt or not isinstance(raw, list):
+            self._operations = {}
+            return
         try:
-            raw = json.loads(self.ops_path.read_text(encoding="utf-8"))
-            if not isinstance(raw, list):
-                return
             changed = False
             for item in raw[-150:]:
                 if not isinstance(item, dict):
@@ -65,10 +69,9 @@ class StudyOperationManager:
             self._operations = {}
 
     def _save_operations(self) -> None:
+        from services.study_fs import atomic_write_json
         items = [op.to_dict() for op in list(self._operations.values())[-150:]]
-        tmp_path = self.ops_path.with_suffix(".tmp")
-        tmp_path.write_text(json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8")
-        os.replace(tmp_path, self.ops_path)
+        atomic_write_json(self.ops_path, items, indent=2)
 
     def get_operation(self, operation_id: str) -> Optional[StudyOperationRecord]:
         with self._lock:
@@ -141,6 +144,10 @@ class StudyOperationManager:
             self._operations[op_id] = rec
             self._cancel_events[op_id] = cancel_ev
             self._save_operations()
+        if document_id:
+            from services.study_ai_engine import register_study_generation_start
+
+            register_study_generation_start(document_id, op_id)
 
         loop = asyncio.get_running_loop()
 
@@ -243,6 +250,18 @@ class StudyOperationManager:
                 with self._lock:
                     self._tasks.pop(op_id, None)
                     self._cancel_events.pop(op_id, None)
+                    still_active = bool(
+                        document_id
+                        and any(
+                            o.document_id == document_id
+                            and o.status in {StudyOperationState.RUNNING.value, StudyOperationState.QUEUED.value}
+                            for o in self._operations.values()
+                        )
+                    )
+                if document_id and not still_active:
+                    from services.study_ai_engine import register_study_generation_start
+
+                    register_study_generation_start(document_id, op_id)
 
         task = asyncio.create_task(_runner())
         with self._lock:

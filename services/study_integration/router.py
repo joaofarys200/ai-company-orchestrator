@@ -6,6 +6,7 @@ autoritativos do Study Engine (Fases 2–6), sem duplicar lógica de domínio.
 
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 import threading
 from typing import Any, Callable, Dict, List, Optional
@@ -88,7 +89,8 @@ class StudyCapabilityRouter:
             )
 
         req_chat_sid = normalize_chat_session_id(request.chat_session_id)
-        ctx = self.context_manager.sync_ui_context(
+        ctx = await asyncio.to_thread(
+            self.context_manager.sync_ui_context,
             req_chat_sid,
             self.study_service,
             ui_context,
@@ -96,13 +98,13 @@ class StudyCapabilityRouter:
 
         # Capacidades globais / independentes de um único documento
         if request.capability == StudyCapabilityType.LIST_DOCUMENTS:
-            return self._handle_list_documents(request)
+            return await asyncio.to_thread(self._handle_list_documents, request)
 
         if request.capability == StudyCapabilityType.CANCEL_STUDY_OPERATION:
-            return self._handle_cancel_operation(request, ctx.active_document_id)
+            return await asyncio.to_thread(self._handle_cancel_operation, request, ctx.active_document_id)
 
         if request.capability == StudyCapabilityType.INGEST_DOCUMENT:
-            return self._handle_ingest_document(request)
+            return await asyncio.to_thread(self._handle_ingest_document, request)
 
         if (
             request.capability == StudyCapabilityType.MANAGE_STUDY_SESSION
@@ -110,12 +112,13 @@ class StudyCapabilityRouter:
             and not request.document_query
             and (request.session_action in {"resume", "pause", "complete", "list"} or request.study_session_id)
         ):
-            resumed = self._try_session_without_explicit_doc(request, ctx)
+            resumed = await asyncio.to_thread(self._try_session_without_explicit_doc, request, ctx)
             if resumed is not None:
                 return resumed
 
         # Resolver documento alvo com desambiguação e isolamento estrito
-        doc_res = self.context_manager.resolve_document(
+        doc_res = await asyncio.to_thread(
+            self.context_manager.resolve_document,
             self.study_service,
             chat_session_id=req_chat_sid or "",
             explicit_document_id=request.document_id,
@@ -173,10 +176,11 @@ class StudyCapabilityRouter:
             )
 
         if request.study_session_id and hasattr(self.study_service, "list_study_sessions"):
+            sessions_list = await asyncio.to_thread(self.study_service.list_study_sessions)
             explicit_sess = next(
                 (
                     s
-                    for s in (self.study_service.list_study_sessions() or [])
+                    for s in (sessions_list or [])
                     if s.get("session_id") == request.study_session_id
                 ),
                 None,
@@ -209,7 +213,8 @@ class StudyCapabilityRouter:
                 )
 
         # Resolver capítulo / secção estritamente dentro deste documento
-        chap_res = self.context_manager.resolve_chapter_or_section(
+        chap_res = await asyncio.to_thread(
+            self.context_manager.resolve_chapter_or_section,
             self.study_service,
             doc_id,
             chapter_id=request.chapter_id,
@@ -243,10 +248,16 @@ class StudyCapabilityRouter:
 
         # Operações síncronas / rápidas ou explicação local LLM
         if request.capability == StudyCapabilityType.GET_DOCUMENT_STATUS:
-            res = self._handle_document_status(request, doc)
+            res = await asyncio.to_thread(self._handle_document_status, request, doc)
         elif request.capability == StudyCapabilityType.OPEN_STUDY_WORKSPACE:
-            res = self._handle_open_workspace(
-                request, doc, effective_chapter_id, effective_section_id, effective_topic, ctx
+            res = await asyncio.to_thread(
+                self._handle_open_workspace,
+                request,
+                doc,
+                effective_chapter_id,
+                effective_section_id,
+                effective_topic,
+                ctx,
             )
         elif request.capability == StudyCapabilityType.EXPLAIN_CONCEPT_OR_CHAPTER:
             res = await self._handle_explain(
@@ -263,18 +274,18 @@ class StudyCapabilityRouter:
                 recent_concepts=ctx.recent_concepts if ctx.active_document_id == doc_id else [],
             )
         elif request.capability == StudyCapabilityType.START_ACTIVE_RECALL:
-            res = self._handle_start_active_recall(request, doc)
+            res = await asyncio.to_thread(self._handle_start_active_recall, request, doc)
         elif request.capability == StudyCapabilityType.SUBMIT_ACTIVE_RECALL:
-            res = self._handle_submit_active_recall(request, doc, ctx)
+            res = await asyncio.to_thread(self._handle_submit_active_recall, request, doc, ctx)
         elif request.capability == StudyCapabilityType.START_DAILY_REVIEW:
-            res = self._handle_start_daily_review(request, doc)
+            res = await asyncio.to_thread(self._handle_start_daily_review, request, doc)
         elif request.capability in {
             StudyCapabilityType.GET_LEARNING_PROGRESS,
             StudyCapabilityType.GET_KNOWLEDGE_GAPS,
         }:
-            res = self._handle_learning_progress(request, doc)
+            res = await asyncio.to_thread(self._handle_learning_progress, request, doc)
         elif request.capability == StudyCapabilityType.MANAGE_STUDY_SESSION:
-            res = self._handle_manage_session(request, doc, ctx)
+            res = await asyncio.to_thread(self._handle_manage_session, request, doc, ctx)
         elif request.capability in ASYNC_HEAVY_CAPABILITIES:
             res = await self._dispatch_heavy_capability(
                 request,
@@ -299,7 +310,8 @@ class StudyCapabilityRouter:
         # Atualizar contexto conversacional apenas em resultados bem-sucedidos / em curso
         if res.status in {"COMPLETED", "RUNNING"} and res.document_id and req_chat_sid:
             concepts = list((res.result_ref or {}).get("concepts_used") or [])
-            self.context_manager.update_context(
+            await asyncio.to_thread(
+                self.context_manager.update_context,
                 req_chat_sid,
                 document_id=res.document_id,
                 document_title=res.document_title or doc_title,
@@ -874,7 +886,10 @@ class StudyCapabilityRouter:
                     force_regenerate=request.force_recompute,
                     target_cards=target_cards,
                     on_progress=emit_progress,
+                    cancellation_check=cancel_ev.is_set,
                 )
+                if cancel_ev.is_set():
+                    return {"cancelled": True}
                 cards = self._extract_cards(payload)
                 matched_cards = self._filter_cards_by_scope(cards, chap_res, effective_topic)
                 scope_note = f" (âmbito: *{effective_topic}* — {len(matched_cards)} cartões correspondentes)" if effective_topic else ""
@@ -901,7 +916,10 @@ class StudyCapabilityRouter:
                     doc_id,
                     force_regenerate=request.force_recompute,
                     on_progress=emit_progress,
+                    cancellation_check=cancel_ev.is_set,
                 )
+                if cancel_ev.is_set():
+                    return {"cancelled": True}
                 entries = list((cornell or {}).get("entries") or [])
                 return {
                     "summary_markdown": f"Cornell Notes estruturadas geradas para **{doc_title}** ({len(entries)} secções).",
@@ -930,7 +948,10 @@ class StudyCapabilityRouter:
                     doc_id,
                     cfg,
                     on_progress=emit_progress,
+                    cancellation_check=cancel_ev.is_set,
                 )
+                if cancel_ev.is_set():
+                    return {"cancelled": True}
                 qs = list((assessment or {}).get("questions") or [])
                 ass_id = str((assessment or {}).get("assessment_id") or "")
                 return {

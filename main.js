@@ -18,6 +18,11 @@ const path = require('path');
 const { spawn, execFileSync } = require('child_process');
 const fs = require('fs');
 const http = require('http');
+const crypto = require('crypto');
+const os = require('os');
+
+// Per-launch ephemeral HTTP auth token for local backend HTTP routes (/api/study/*, /data/study/*)
+const SESSION_HTTP_TOKEN = (process.env.JARVIS_HTTP_TOKEN || '').trim() || crypto.randomBytes(24).toString('hex');
 
 // Allow audio autoplay without user gesture requirements in Electron
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
@@ -40,10 +45,14 @@ function freePortIfLocked(port) {
   try {
     if (process.platform === 'win32') {
       const output = execFileSync('netstat', ['-ano', '-p', 'tcp'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      const portSuffixRe = new RegExp(`:${Number(port)}$`);
       const lines = output.split('\n');
       for (const line of lines) {
-        if (line.includes(`:${port}`) && line.includes('LISTENING')) {
-          const parts = line.trim().split(/\s+/);
+        const parts = line.trim().split(/\s+/);
+        if (parts.length < 5) continue;
+        const localAddr = parts[1] || '';
+        const state = parts[3] || '';
+        if (state === 'LISTENING' && portSuffixRe.test(localAddr)) {
           const pid = parseInt(parts[parts.length - 1], 10);
           if (pid && pid !== process.pid) {
             try {
@@ -95,17 +104,57 @@ ipcMain.handle('select-folder', async () => {
   }
 });
 
+function isPathWithinAllowedRoots(targetPath) {
+  if (!targetPath || typeof targetPath !== 'string' || targetPath.includes('\0')) {
+    return { allowed: false, resolved: '', error: 'Caminho inválido.' };
+  }
+  const allowedRootsRaw = [
+    __dirname,
+    path.join(__dirname, 'data'),
+    path.join(__dirname, 'obsidian_vault'),
+    os.tmpdir(),
+  ];
+  const resolveCanonical = (p) => {
+    const abs = path.resolve(p);
+    try {
+      return fs.realpathSync(abs);
+    } catch {
+      return abs;
+    }
+  };
+  const norm = (p) => (process.platform === 'win32' ? p.toLowerCase() : p);
+  const candidate = resolveCanonical(targetPath);
+  const candNorm = norm(candidate);
+  const inRoot = allowedRootsRaw.some((root) => {
+    const rootNorm = norm(resolveCanonical(root));
+    const sep = rootNorm.endsWith(path.sep) ? '' : path.sep;
+    return candNorm === rootNorm || candNorm.startsWith(rootNorm + sep);
+  });
+  if (!inRoot) {
+    return {
+      allowed: false,
+      resolved: candidate,
+      error: 'Acesso negado: caminho fora das raízes permitidas (workspace, data, obsidian_vault, temp).',
+    };
+  }
+  return { allowed: true, resolved: candidate, error: '' };
+}
+
 // Native folder opener in OS file explorer
 ipcMain.handle('open-path', async (event, targetPath) => {
   try {
-    if (targetPath && typeof targetPath === 'string') {
-      await shell.openPath(targetPath);
-      return true;
+    const check = isPathWithinAllowedRoots(targetPath);
+    if (!check.allowed) {
+      return { ok: false, error: check.error };
     }
-    return false;
+    const openError = await shell.openPath(check.resolved);
+    if (openError && typeof openError === 'string' && openError.trim().length > 0) {
+      return { ok: false, error: openError };
+    }
+    return { ok: true, error: '' };
   } catch (err) {
     console.error('[Electron IPC] Error opening path:', err);
-    return false;
+    return { ok: false, error: err?.message || 'Erro ao abrir caminho.' };
   }
 });
 
@@ -133,7 +182,8 @@ function startPythonBackend() {
       ...process.env, 
       PYTHONUNBUFFERED: '1',
       PYTHONIOENCODING: 'utf-8',
-      PYTHONUTF8: '1'
+      PYTHONUTF8: '1',
+      JARVIS_HTTP_TOKEN: SESSION_HTTP_TOKEN,
     },
     shell: false
   });
@@ -400,6 +450,32 @@ function createWindow() {
     mainWindow.webContents.session.clearCodeCaches({}).catch(() => {});
   }
 
+  // Inject ephemeral per-launch HTTP token on local backend requests from this Electron window
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    {
+      urls: [
+        'http://127.0.0.1:8000/*',
+        'http://localhost:8000/*',
+        'http://127.0.0.1:5173/api/*',
+        'http://localhost:5173/api/*',
+        'http://127.0.0.1:5173/data/*',
+        'http://localhost:5173/data/*',
+      ],
+    },
+    (details, callback) => {
+      if (mainWindow && !mainWindow.isDestroyed() && details.webContentsId === mainWindow.webContents.id) {
+        callback({
+          requestHeaders: {
+            ...details.requestHeaders,
+            'X-Jarvis-Token': SESSION_HTTP_TOKEN,
+          },
+        });
+      } else {
+        callback({ requestHeaders: details.requestHeaders });
+      }
+    }
+  );
+
   // Enable F5 / Ctrl+R to reload with cache bypass, and F12 for DevTools
   mainWindow.webContents.on('before-input-event', (event, input) => {
     if ((input.control && input.key.toLowerCase() === 'r') || input.key === 'F5') {
@@ -493,3 +569,20 @@ app.on('before-quit', (event) => {
     stopPythonBackend(() => app.quit());
   }
 });
+
+app.on('will-quit', () => {
+  isQuitting = true;
+  if (pythonProcess) {
+    try {
+      forceKillOwnBackendProcess(pythonProcess);
+    } catch {}
+    pythonProcess = null;
+  }
+});
+
+for (const sig of ['SIGINT', 'SIGTERM']) {
+  process.on(sig, () => {
+    isQuitting = true;
+    stopPythonBackend(() => process.exit(0));
+  });
+}

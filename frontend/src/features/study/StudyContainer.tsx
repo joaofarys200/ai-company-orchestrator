@@ -66,6 +66,8 @@ export interface StudyUploadPayload {
   file_path?: string;
   content_base64?: string;
   content_text?: string;
+  video_url?: string;
+  collection_id?: string;
   subject?: string;
   source_type?: string;
   title?: string;
@@ -97,6 +99,7 @@ interface StudyContainerProps {
   onGenerateSummary?: (documentId: string, mode: SummaryMode, forceRegenerate?: boolean) => Promise<any>;
   onCancelGeneration?: (documentId: string) => void;
   pipelineStage?: string;
+  lastDocumentError?: { filename: string; error: string; ts: number } | null;
   onSynthesizeDocuments?: (documentIds: string[]) => Promise<{
     common_points: string[];
     differences: string[];
@@ -187,6 +190,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   onGenerateSummary,
   onCancelGeneration,
   pipelineStage,
+  lastDocumentError,
   onSynthesizeDocuments,
   onSaveToVault,
   onGenerateQuiz,
@@ -303,11 +307,11 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
 
   // Apply external validated deep-link navigation from JARVIS conversation
   const lastHandledNavNonceRef = React.useRef<number | undefined>(undefined);
+  const retriedNavNonceRef = React.useRef<number | undefined>(undefined);
   useEffect(() => {
     if (!externalNavigationTarget) return;
     const navNonce = externalNavigationTarget.nonce;
     if (navNonce !== undefined && lastHandledNavNonceRef.current === navNonce) return;
-    lastHandledNavNonceRef.current = navNonce;
 
     const validTabs = new Set<StudyTab>([
       'library',
@@ -330,12 +334,18 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
       if (exists) {
         setActiveDocumentId(targetDocId);
       } else {
-        onRefreshDocuments?.();
         setTopicFilterHint('');
         setActiveTab('library');
+        if (retriedNavNonceRef.current !== navNonce) {
+          retriedNavNonceRef.current = navNonce;
+          onRefreshDocuments?.();
+          return;
+        }
+        lastHandledNavNonceRef.current = navNonce;
         return;
       }
     }
+    lastHandledNavNonceRef.current = navNonce;
 
     if (externalNavigationTarget.topic) {
       setTopicFilterHint(externalNavigationTarget.topic);
@@ -385,6 +395,14 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
       setUploadStatus('');
     }
   }, [initialDocuments]);
+
+  useEffect(() => {
+    if (!lastDocumentError) return;
+    setIsUploading(false);
+    setUploadStatus(
+      `Erro: ${lastDocumentError.error || `Falha ao processar ${lastDocumentError.filename}`}`
+    );
+  }, [lastDocumentError]);
 
   // Reading Notes & Highlights state
   const [readingNotes, setReadingNotes] = useState<StudyReadingNote[]>([]);
@@ -716,6 +734,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
               />
             ) : (
               <StudyReaderView
+                key={activeDocument.document_id}
                 document={activeDocument}
                 onUpdateProgress={handleUpdateProgress}
                 onSaveHighlight={handleSaveHighlight}

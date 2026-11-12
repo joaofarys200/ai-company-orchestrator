@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 from backend.websocket.context import WebSocketSessionState
@@ -182,8 +183,8 @@ class KnowledgeWebSocketHandler:
     ) -> None:
         from services.obsidian_graph_engine import ObsidianGraphEngine
         engine = ObsidianGraphEngine()
-        diagnostics = engine.compute_graph_diagnostics()
-        queue = engine.load_queue()
+        diagnostics = await asyncio.to_thread(engine.compute_graph_diagnostics)
+        queue = await asyncio.to_thread(engine.load_queue)
         await self.connections.send(
             websocket,
             {
@@ -202,7 +203,7 @@ class KnowledgeWebSocketHandler:
         filename = message.get("filename") or ""
         from services.obsidian_graph_engine import ObsidianGraphEngine
         engine = ObsidianGraphEngine()
-        audit_res = engine.audit_note_quality(filename)
+        audit_res = await asyncio.to_thread(engine.audit_note_quality, filename)
         await self.connections.send(
             websocket,
             {
@@ -227,7 +228,7 @@ class KnowledgeWebSocketHandler:
         )
         engine = ObsidianGraphEngine()
         try:
-            proposal = engine.enrich_note_safely(filename, auto_apply=auto_apply)
+            proposal = await asyncio.to_thread(engine.enrich_note_safely, filename, auto_apply=auto_apply)
             await self.connections.send(
                 websocket,
                 {
@@ -343,8 +344,8 @@ class KnowledgeWebSocketHandler:
     ) -> None:
         from services.obsidian_graph_engine import ObsidianGraphEngine
         engine = ObsidianGraphEngine()
-        status = engine.get_worker_status()
-        queue = engine.load_queue()
+        status = await asyncio.to_thread(engine.get_worker_status)
+        queue = await asyncio.to_thread(engine.load_queue)
         await self.connections.send(
             websocket,
             {
@@ -362,8 +363,8 @@ class KnowledgeWebSocketHandler:
     ) -> None:
         from services.obsidian_graph_engine import ObsidianGraphEngine
         engine = ObsidianGraphEngine()
-        engine.pause_queue_worker()
-        status = engine.get_worker_status()
+        await asyncio.to_thread(engine.pause_queue_worker)
+        status = await asyncio.to_thread(engine.get_worker_status)
         await self.connections.send(
             websocket,
             {
@@ -381,8 +382,8 @@ class KnowledgeWebSocketHandler:
     ) -> None:
         from services.obsidian_graph_engine import ObsidianGraphEngine
         engine = ObsidianGraphEngine()
-        engine.resume_queue_worker()
-        status = engine.get_worker_status()
+        await asyncio.to_thread(engine.resume_queue_worker)
+        status = await asyncio.to_thread(engine.get_worker_status)
         await self.connections.send(
             websocket,
             {
@@ -402,7 +403,7 @@ class KnowledgeWebSocketHandler:
         from services.obsidian_graph_engine import ObsidianGraphEngine
         engine = ObsidianGraphEngine()
         proposals = await engine.run_bounded_improvement_batch(batch_size=batch_size)
-        diagnostics = engine.compute_graph_diagnostics()
+        diagnostics = await asyncio.to_thread(engine.compute_graph_diagnostics)
         await self.connections.send(
             websocket,
             {

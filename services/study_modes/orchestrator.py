@@ -244,12 +244,12 @@ class StudyModeOrchestrator:
         dossier: Optional[AcademicReasoningDossier] = None,
         ast: Optional[AcademicDocumentAST] = None,
     ) -> Phase6GroundingHelper:
-        readiness = self.check_readiness(document_id, plan=plan, dossier=dossier, ast=ast)
-        if not readiness.is_ready:
-            raise ValueError(f"[{readiness.status}] {readiness.actionable_message}")
         r_plan, r_dossier, r_ast, raw = self._resolve_upstream(
             document_id, plan=plan, dossier=dossier, ast=ast
         )
+        readiness = self.check_readiness(document_id, plan=r_plan, dossier=r_dossier, ast=r_ast)
+        if not readiness.is_ready:
+            raise ValueError(f"[{readiness.status}] {readiness.actionable_message}")
         assert r_plan is not None and r_dossier is not None
         return Phase6GroundingHelper(
             r_plan,
@@ -272,6 +272,7 @@ class StudyModeOrchestrator:
         force_regenerate: bool = False,
         target_cards: int = 16,
         on_progress: Optional[Callable[[str, float, str], None]] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> StudyDeck:
         grounding = self._require_grounding(document_id, plan=plan, dossier=dossier, ast=ast)
         deck = self.flashcards.generate_deck(
@@ -280,6 +281,7 @@ class StudyModeOrchestrator:
             target_cards=target_cards,
             llm_caller=self.llm_caller,
             on_progress=on_progress,
+            cancellation_check=cancellation_check,
         )
         # Registar cartões ativos no SRS sem sobrescrever histórico existente
         srs_items = [
@@ -420,6 +422,7 @@ class StudyModeOrchestrator:
         ast: Optional[AcademicDocumentAST] = None,
         force_regenerate: bool = False,
         on_progress: Optional[Callable[[str, float, str], None]] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> CornellStudyDocument:
         grounding = self._require_grounding(document_id, plan=plan, dossier=dossier, ast=ast)
         doc = self.cornell.generate_cornell(
@@ -427,6 +430,7 @@ class StudyModeOrchestrator:
             force_regenerate=force_regenerate,
             llm_caller=self.llm_caller,
             on_progress=on_progress,
+            cancellation_check=cancellation_check,
         )
         if doc.fingerprints:
             self._update_meta_fingerprints(document_id, doc.fingerprints)
@@ -467,6 +471,7 @@ class StudyModeOrchestrator:
         dossier: Optional[AcademicReasoningDossier] = None,
         ast: Optional[AcademicDocumentAST] = None,
         on_progress: Optional[Callable[[str, float, str], None]] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> StudyAssessment:
         grounding = self._require_grounding(document_id, plan=plan, dossier=dossier, ast=ast)
         assessment = self.assessments.generate_assessment(
@@ -474,6 +479,7 @@ class StudyModeOrchestrator:
             config=config,
             llm_caller=self.llm_caller,
             on_progress=on_progress,
+            cancellation_check=cancellation_check,
         )
         if assessment.fingerprints:
             self._update_meta_fingerprints(document_id, assessment.fingerprints)
@@ -525,25 +531,28 @@ class StudyModeOrchestrator:
         )
         self.progress.record_assessment_attempt(attempt)
 
-        # Alimentar repetição espaçada por questão respondida
-        for out in attempt.outcomes:
-            if out.verdict == "UNANSWERED":
-                continue
-            self.srs.record_review(
-                item_id=out.question_id,
-                item_type="assessment_question",
-                document_id=document_id,
-                score_ratio=out.score_ratio,
-                confidence=4 if out.is_correct else 2,
-                content_difficulty=out.content_difficulty,
-                question_difficulty=out.question_difficulty,
-                chapter_id=out.chapter_id,
-                section_id=out.section_id,
-                topic=out.topic,
-                concept_ids=out.related_concept_ids,
-                learning_objective_id=out.learning_objective_id,
-                now_ts=now_ts,
-            )
+        # Alimentar repetição espaçada por questão respondida numa escrita em lote
+        batch_reviews = [
+            {
+                "item_id": out.question_id,
+                "item_type": "assessment_question",
+                "document_id": document_id,
+                "score_ratio": out.score_ratio,
+                "confidence": 4 if out.is_correct else 2,
+                "content_difficulty": out.content_difficulty,
+                "question_difficulty": out.question_difficulty,
+                "chapter_id": out.chapter_id,
+                "section_id": out.section_id,
+                "topic": out.topic,
+                "concept_ids": out.related_concept_ids,
+                "learning_objective_id": out.learning_objective_id,
+                "now_ts": now_ts,
+            }
+            for out in attempt.outcomes
+            if out.verdict != "UNANSWERED"
+        ]
+        if batch_reviews:
+            self.srs.record_reviews_batch(batch_reviews, now_ts=now_ts)
 
         prog = self.get_learning_progress(document_id, recompute=True)
         return {
@@ -565,6 +574,7 @@ class StudyModeOrchestrator:
         force_regenerate: bool = False,
         target_prompts: int = 8,
         on_progress: Optional[Callable[[str, float, str], None]] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> ActiveRecallDeck:
         grounding = self._require_grounding(document_id, plan=plan, dossier=dossier, ast=ast)
         deck = self.active_recall.generate_prompts(
@@ -573,6 +583,7 @@ class StudyModeOrchestrator:
             target_prompts=target_prompts,
             llm_caller=self.llm_caller,
             on_progress=on_progress,
+            cancellation_check=cancellation_check,
         )
         self.srs.register_items([
             ReviewSchedulingState(

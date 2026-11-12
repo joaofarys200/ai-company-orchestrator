@@ -11,11 +11,13 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import ipaddress
 import json
 import math
 import os
 import re
 import shutil
+import socket
 import subprocess
 import time
 import urllib.parse
@@ -541,6 +543,26 @@ class VideoIntelligenceService:
 
         return ext
 
+    @staticmethod
+    def _is_forbidden_ip(addr_str: str) -> bool:
+        try:
+            ip = ipaddress.ip_address(addr_str.split("%")[0])
+            return bool(
+                ip.is_private
+                or ip.is_loopback
+                or ip.is_link_local
+                or ip.is_multicast
+                or ip.is_reserved
+                or ip.is_unspecified
+            )
+        except ValueError:
+            return False
+
+    @staticmethod
+    def _host_matches_domain(hostname: str, allowed_domains: Tuple[str, ...]) -> bool:
+        host = hostname.strip().lower().rstrip(".")
+        return any(host == dom or host.endswith(f".{dom}") for dom in allowed_domains)
+
     def validate_online_url(self, url: str) -> Dict[str, Any]:
         """
         Valida URL de vídeo online com proteção estrita contra SSRF.
@@ -550,28 +572,45 @@ class VideoIntelligenceService:
         if parsed.scheme not in ("http", "https"):
             raise ValueError("VIDEO_URL_NOT_SUPPORTED: Apenas URLs HTTP e HTTPS são suportadas.")
 
-        hostname = (parsed.hostname or "").lower()
-        # Prevenir SSRF em localhost, IPs privados e metadados de nuvem
-        private_patterns = [
-            "localhost", "127.", "0.0.0.0", "::1", "10.", "192.168.",
-            "172.16.", "172.17.", "172.18.", "172.19.", "172.20.", "172.21.",
-            "172.22.", "172.23.", "172.24.", "172.25.", "172.26.", "172.27.",
-            "172.28.", "172.29.", "172.30.", "172.31.", "169.254."
-        ]
-        for priv in private_patterns:
-            if hostname.startswith(priv) or hostname == priv:
-                raise ValueError("SECURITY_VIOLATION: Acesso a endereços locais ou de rede privada bloqueado por SSRF guard.")
+        hostname = (parsed.hostname or "").strip().lower().rstrip(".")
+        if not hostname:
+            raise ValueError("SECURITY_VIOLATION: Hostname ausente no URL.")
 
-        # Identificar provedor suportado
-        provider = "DIRECT_URL"
-        if "youtube.com" in hostname or "youtu.be" in hostname:
+        if hostname in ("localhost", "localhost.localdomain") or hostname.endswith(".localhost"):
+            raise ValueError("SECURITY_VIOLATION: Acesso a endereços locais bloqueado por SSRF guard.")
+
+        # Bloquear literais IPv4/IPv6 privados ou formas numéricas obfuscadas (decimal/hex/octal)
+        if self._is_forbidden_ip(hostname):
+            raise ValueError("SECURITY_VIOLATION: Acesso a IP privado ou loopback bloqueado por SSRF guard.")
+        try:
+            packed = socket.inet_aton(hostname)
+            normalized_ip = socket.inet_ntoa(packed)
+            if self._is_forbidden_ip(normalized_ip):
+                raise ValueError("SECURITY_VIOLATION: Endereço IP numérico privado bloqueado por SSRF guard.")
+        except OSError:
+            pass
+
+        # Resolução DNS para bloquear rebinding/internos se DNS estiver disponível
+        try:
+            infos = socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM)
+            for info in infos:
+                resolved_ip = info[4][0]
+                if self._is_forbidden_ip(resolved_ip):
+                    raise ValueError(
+                        f"SECURITY_VIOLATION: Host '{hostname}' resolve para IP interno/reservado ({resolved_ip})."
+                    )
+        except socket.gaierror:
+            pass
+
+        # Identificar provedor suportado com verificação estrita de sufixo de domínio
+        if self._host_matches_domain(hostname, ("youtube.com", "youtu.be", "youtube-nocookie.com")):
             provider = "YOUTUBE"
-        elif "vimeo.com" in hostname:
+        elif self._host_matches_domain(hostname, ("vimeo.com",)):
             provider = "VIMEO"
         elif any(parsed.path.lower().endswith(ext) for ext in SUPPORTED_VIDEO_EXTENSIONS):
             provider = "DIRECT_STREAM"
         else:
-            # Rejeitar esquemas arbitrários não verificados
+            # Rejeitar domínios arbitrários não verificados (inclui spoofed como youtube.com.evil.com)
             raise ValueError("VIDEO_URL_NOT_SUPPORTED: Provedor ou formato de stream online não suportado.")
 
         return {
@@ -1299,6 +1338,7 @@ class VideoIntelligenceService:
         chapters: Optional[List[VideoChapter]] = None,
         metadata: Optional[Any] = None,
         question: Optional[str] = None,
+        timestamp: Optional[float] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """
@@ -1318,7 +1358,8 @@ class VideoIntelligenceService:
             s_lower = s_text.lower()
             score = sum(1 for t in tokens if t in s_lower)
             if score > 0:
-                matched_segs.append((score, s))
+                proximity = -abs(float(getattr(s, "start", 0.0)) - float(timestamp)) if timestamp is not None else 0.0
+                matched_segs.append(((score, proximity), s))
 
         matched_segs.sort(key=lambda x: x[0], reverse=True)
 

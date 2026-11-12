@@ -22,6 +22,7 @@ from services.study_modes.contracts import (
 from services.study_modes.grounding import (
     LLMCaller,
     Phase6GroundingHelper,
+    StudyModeCancelledError,
     compute_source_fingerprints,
     fingerprints_match,
     invoke_phase6_json_llm,
@@ -77,6 +78,7 @@ class CornellNotesEngine:
         force_regenerate: bool = False,
         llm_caller: Optional[LLMCaller] = None,
         on_progress: Optional[Callable[[str, float, str], None]] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None,
     ) -> CornellStudyDocument:
         doc_id = grounding.plan.metadata.document_id or grounding.dossier.document_id
         current_fp = compute_source_fingerprints(grounding.plan, grounding.dossier, grounding.ast)
@@ -100,6 +102,8 @@ class CornellNotesEngine:
         chapters = list(grounding.plan.chapters or [])
 
         for c_idx, chapter in enumerate(chapters):
+            if cancellation_check and cancellation_check():
+                raise StudyModeCancelledError("Geração de Cornell Notes cancelada pelo utilizador.")
             if on_progress:
                 on_progress(
                     "CORNELL_NOTES",
@@ -150,7 +154,10 @@ class CornellNotesEngine:
                     document_id=doc_id,
                     validator=_validate,
                     max_output_tokens=2600,
+                    cancellation_check=cancellation_check,
                 )
+                if meta.get("cancelled") or (cancellation_check and cancellation_check()):
+                    raise StudyModeCancelledError("Geração de Cornell Notes cancelada pelo utilizador.")
                 if parsed and isinstance(parsed.get("sections"), list):
                     llm_used = True
                     for item in parsed["sections"]:
@@ -188,7 +195,11 @@ class CornellNotesEngine:
                 else:
                     entry = self._build_deterministic_entry(grounding, chapter, sec)
 
-                # Preservar anotações pessoais, importância e campos editados pelo utilizador
+                ok_qa, _ = StudyModeQA(grounding).validate_cornell_entry(entry)
+                if not ok_qa:
+                    entry = self._build_deterministic_entry(grounding, chapter, sec)
+
+                # Aplicar sempre anotações pessoais, importância e edições manuais do estudante após validação base
                 if prev is not None:
                     entry.is_important = prev.is_important
                     entry.personal_notes = list(prev.personal_notes)
@@ -206,9 +217,6 @@ class CornellNotesEngine:
                                 c for c in entry.cue_column if c.cue_prompt.lower() not in existing_prompts
                             ]
 
-                ok_qa, _ = StudyModeQA(grounding).validate_cornell_entry(entry)
-                if not ok_qa:
-                    entry = self._build_deterministic_entry(grounding, chapter, sec)
                 entries.append(entry)
 
         doc = CornellStudyDocument(

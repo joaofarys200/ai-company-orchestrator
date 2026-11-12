@@ -116,7 +116,13 @@ class DocumentGenerationEngine:
         if not status.get("has_pdf"):
             return False, "DOCUMENT_NOT_FOUND"
 
-        doc_dir = self.storage_dir / "documents" / document_id
+        try:
+            from services.study_fs import resolve_confined_path, safe_document_id
+            clean_id = safe_document_id(document_id)
+            doc_dir = resolve_confined_path(self.storage_dir / "documents", clean_id)
+        except ValueError as err:
+            return False, f"INVALID_DOCUMENT_ID: {err}"
+
         meta_res_path = doc_dir / "document_generation_result.json"
         if not meta_res_path.exists():
             return False, "METADATA_NOT_FOUND"
@@ -124,6 +130,10 @@ class DocumentGenerationEngine:
         try:
             raw = json.loads(meta_res_path.read_text(encoding="utf-8"))
             res = StudyDocumentGenerationResult.from_dict(raw)
+            if res.status != DocumentGenerationState.COMPLETED.value:
+                return False, f"GENERATION_STATUS_{res.status or 'UNKNOWN'}"
+            if not res.qa_report or not res.qa_report.is_valid:
+                return False, "QA_VALIDATION_FAILED"
             current_fp = compute_plan_fingerprint(plan)
             if res.source_plan_fingerprint != current_fp:
                 return False, "PLAN_FINGERPRINT_MISMATCH"
@@ -131,8 +141,10 @@ class DocumentGenerationEngine:
                 return False, "PLAN_VERSION_MISMATCH"
             if dossier is not None and res.dossier_fingerprint != compute_dossier_fingerprint(dossier):
                 return False, "DOSSIER_FINGERPRINT_MISMATCH"
-            if ast is not None and res.ast_fingerprint and res.ast_fingerprint != compute_ast_fingerprint(ast):
-                return False, "AST_FINGERPRINT_MISMATCH"
+            if ast is not None:
+                expected_ast_fp = compute_ast_fingerprint(ast)
+                if not res.ast_fingerprint or res.ast_fingerprint != expected_ast_fp:
+                    return False, "AST_FINGERPRINT_MISMATCH"
             active_prompts = self.prompt_versions if self.prompt_versions is not None else dict(PROMPT_VERSIONS_PHASE5)
             if res.prompt_versions and res.prompt_versions != active_prompts:
                 return False, "PROMPT_VERSIONS_MISMATCH"

@@ -129,6 +129,25 @@ class ModelValidationPipeline:
         try:
             return json.loads(provider_result.raw_text), []
         except (TypeError, json.JSONDecodeError) as exc:
+            if isinstance(provider_result.raw_text, str):
+                stripped = re.sub(
+                    r"<think>.*?(?:</think>|$)",
+                    "",
+                    provider_result.raw_text,
+                    flags=re.DOTALL | re.IGNORECASE,
+                ).strip()
+                fence_match = re.search(
+                    r"```(?:json)?\s*(.*?)\s*```",
+                    stripped,
+                    flags=re.DOTALL | re.IGNORECASE,
+                )
+                if fence_match:
+                    stripped = fence_match.group(1).strip()
+                if stripped and stripped != provider_result.raw_text:
+                    try:
+                        return json.loads(stripped), []
+                    except (TypeError, json.JSONDecodeError):
+                        pass
             return None, [ValidationIssue(
                 stage=ValidationStage.PARSING,
                 code="JSON_PARSE_FAILED",

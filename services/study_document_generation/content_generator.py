@@ -1395,6 +1395,12 @@ class DocumentContentGenerationEngine:
     ) -> Optional[Dict[str, Any]]:
         last_error = "Sem resposta do modelo local."
         cur_user_prompt = user_prompt
+        terminal_statuses = {
+            "UNAVAILABLE",
+            "TIMEOUT",
+            "CANCELLED",
+            "SKIPPED_LIVE_LLM_DISABLED",
+        }
 
         for attempt in range(self.max_retries + 1):
             if attempt > 0:
@@ -1419,29 +1425,48 @@ class DocumentContentGenerationEngine:
                     obs = {}
                 if parsed is not None and "parsed" not in obs:
                     obs["parsed"] = parsed
-                    obs["ok"] = True
+                    obs.setdefault("ok", True)
             elif isinstance(caller_res, dict):
                 obs = caller_res
                 parsed = obs.get("parsed")
             else:
                 obs = {"ok": False, "error": "Resposta de formato inesperado do LLM caller."}
 
-            telemetry.prompt_tokens_total += int(obs.get("prompt_tokens") or 0)
-            telemetry.completion_tokens_total += int(obs.get("completion_tokens") or 0)
+            telemetry.prompt_tokens_total += int(obs.get("prompt_tokens") or obs.get("input_tokens") or 0)
+            telemetry.completion_tokens_total += int(obs.get("completion_tokens") or obs.get("output_tokens") or 0)
 
-            if not obs.get("ok"):
-                last_error = str(obs.get("error") or "Erro na chamada ao modelo Ollama local.")
+            obs_status = str(obs.get("status") or "").upper()
+            if obs_status in terminal_statuses or obs.get("cancelled") is True:
+                last_error = str(
+                    obs.get("error")
+                    or ", ".join(obs.get("validation_errors") or [])
+                    or obs_status
+                    or "CANCELLED"
+                )
+                break
+
+            if obs.get("ok") is False or (parsed is None and not obs.get("raw_text") and not obs.get("ok")):
+                last_error = str(
+                    obs.get("error")
+                    or ", ".join(obs.get("validation_errors") or [])
+                    or "Erro na chamada ao modelo Ollama local."
+                )
                 continue
 
-            parsed = obs.get("parsed")
+            parsed = obs.get("parsed") if obs.get("parsed") is not None else parsed
             if not isinstance(parsed, dict):
-                raw_text = str(obs.get("raw_text") or "")
-                cleaned = clean_qwen_json(raw_text)
+                raw_text = str(parsed if isinstance(parsed, str) else (obs.get("raw_text") or ""))
                 try:
-                    import json
-                    candidate = json.loads(cleaned)
-                    if isinstance(candidate, dict):
-                        parsed = candidate
+                    import json as _json
+                    cleaned = clean_qwen_json(raw_text)
+                    if isinstance(cleaned, dict):
+                        parsed = cleaned
+                    elif isinstance(cleaned, str):
+                        candidate = _json.loads(cleaned)
+                        if isinstance(candidate, dict):
+                            parsed = candidate
+                    else:
+                        parsed = None
                 except Exception as exc:
                     last_error = f"JSON inválido ({exc})"
                     parsed = None

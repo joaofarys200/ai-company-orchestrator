@@ -21,7 +21,7 @@ import wave
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -83,6 +83,31 @@ LEGACY_PREFABRICATED_MARKERS = (
 _TELEMETRY_LOCK = threading.Lock()
 _LAST_STUDY_TELEMETRY: Dict[str, Any] = {}
 _CANCELLED_GENERATIONS: set[str] = set()
+_ENV_LOADED = False
+_ENV_LOAD_LOCK = threading.Lock()
+
+
+def _ensure_dotenv_loaded() -> None:
+    global _ENV_LOADED
+    if _ENV_LOADED:
+        return
+    with _ENV_LOAD_LOCK:
+        if _ENV_LOADED:
+            return
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(".env")
+        except Exception:
+            pass
+        _ENV_LOADED = True
+
+
+def wrap_untrusted_text(text: Any, tag: str = "document_excerpt") -> str:
+    """Delimit untrusted document or student text to reduce prompt-injection risk."""
+    safe_tag = re.sub(r"[^A-Za-z0-9_:-]", "_", str(tag or "untrusted_text"))
+    raw = "" if text is None else str(text)
+    escaped = raw.replace(f"</{safe_tag}>", f"&lt;/{safe_tag}&gt;")
+    return f"<{safe_tag}>\n{escaped}\n</{safe_tag}>"
 
 
 def register_study_generation_start(document_id: str, generation_id: Optional[str] = None) -> None:
@@ -215,7 +240,7 @@ def _should_use_live_llm() -> bool:
     return True
 
 
-def _run_coro_sync(coro: Any) -> Any:
+def _run_coro_sync(coro: Any, timeout_seconds: Optional[float] = None) -> Any:
     """Executa uma coroutine de forma segura quer exista ou não um event loop ativo na thread atual."""
     try:
         asyncio.get_running_loop()
@@ -241,7 +266,10 @@ def _run_coro_sync(coro: Any) -> Any:
 
     t = threading.Thread(target=_runner, daemon=True)
     t.start()
-    t.join(timeout=150.0)
+    join_timeout = max(float(timeout_seconds or 180.0) + 30.0, 210.0)
+    t.join(timeout=join_timeout)
+    if t.is_alive():
+        raise TimeoutError(f"Study coroutine thread timed out after {join_timeout:.1f}s")
     if "err" in error_box:
         raise error_box["err"]
     return result_box.get("value")
@@ -257,6 +285,7 @@ async def _async_invoke_llm(
     max_output_tokens: int = 4096,
     timeout_seconds: float = 90.0,
     document_id: Optional[str] = None,
+    cancellation_check: Optional[Callable[[], bool]] = None,
 ) -> Tuple[Optional[str], Dict[str, Any]]:
     """
     Invoca o modelo local exclusivamente através do Ollama + qwen3.5:9b via ModelExecutionService / ModelHarness.
@@ -264,15 +293,14 @@ async def _async_invoke_llm(
     """
     import time
     import uuid
-    from dotenv import load_dotenv
-    load_dotenv(".env")
+    _ensure_dotenv_loaded()
     from backend.model_harness import OutputFormat, get_model_harness
     from backend.services.model_service import ModelExecutionService
 
     gen_id = f"study_gen_{uuid.uuid4().hex[:12]}"
     provider = "ollama"
     ollama_model = os.getenv("OLLAMA_MODEL", "qwen3.5:9b").strip() or "qwen3.5:9b"
-    num_ctx = int(os.getenv("OLLAMA_NUM_CTX", "16384") or "16384")
+    num_ctx = int(os.getenv("OLLAMA_NUM_CTX", "8192") or "8192")
     est_in_tokens = max(1, (len(system_prompt or "") + len(user_prompt or "")) // 4)
 
     telemetry: Dict[str, Any] = {
@@ -293,7 +321,12 @@ async def _async_invoke_llm(
         "timestamp": datetime.now().isoformat(),
     }
 
-    if is_study_generation_cancelled(document_id):
+    def _is_cancelled() -> bool:
+        if is_study_generation_cancelled(document_id):
+            return True
+        return bool(cancellation_check is not None and cancellation_check())
+
+    if _is_cancelled():
         telemetry["status"] = "CANCELLED"
         telemetry["validation_errors"].append("GENERATION_CANCELLED_BY_USER")
         _record_study_telemetry(telemetry)
@@ -307,13 +340,14 @@ async def _async_invoke_llm(
     validation_errors: List[str] = []
 
     for attempt_idx, fmt in enumerate(([out_fmt, OutputFormat.TEXT] if expect_json else [OutputFormat.TEXT]), start=1):
-        if is_study_generation_cancelled(document_id):
+        if _is_cancelled():
             telemetry["status"] = "CANCELLED"
             validation_errors.append("GENERATION_CANCELLED_BY_USER")
             break
 
         telemetry["attempts"] = attempt_idx
         op_name = operation if attempt_idx == 1 else f"{operation}_text_json"
+        cancel_cb = _is_cancelled if (document_id or cancellation_check is not None) else None
         try:
             resp = await exec_service.execute(
                 provider=provider,
@@ -323,8 +357,10 @@ async def _async_invoke_llm(
                 user_prompt=user_prompt,
                 output_format=fmt,
                 temperature=temperature,
+                max_context_tokens=num_ctx,
                 max_output_tokens=max_output_tokens,
                 timeout_seconds=timeout_seconds,
+                cancellation_check=cancel_cb,
             )
             elapsed_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
             telemetry["total_ms"] = elapsed_ms
@@ -345,8 +381,14 @@ async def _async_invoke_llm(
                         telemetry["output_tokens"] / (elapsed_ms / 1000.0), 2
                     )
                 meta = getattr(resp, "metadata", None) or {}
-                if isinstance(meta, dict) and meta.get("ttft_ms") is not None:
-                    telemetry["ttft_ms"] = round(float(meta["ttft_ms"]), 2)
+                if isinstance(meta, dict):
+                    raw_ttft = meta.get("ttft_ms")
+                    if raw_ttft is None:
+                        raw_ttft = meta.get("first_content_ms")
+                    if raw_ttft is None:
+                        raw_ttft = meta.get("first_response_byte_ms")
+                    if raw_ttft is not None:
+                        telemetry["ttft_ms"] = round(float(raw_ttft), 2)
 
                 if raw_txt and raw_txt.strip():
                     cleaned_txt = strip_thinking_and_fences(raw_txt)
@@ -370,6 +412,11 @@ async def _async_invoke_llm(
                         validation_errors.append("INVALID_JSON_SYNTAX")
                 else:
                     validation_errors.append("EMPTY_MODEL_RESPONSE")
+        except asyncio.CancelledError:
+            telemetry["total_ms"] = round((time.perf_counter() - t_start) * 1000.0, 2)
+            telemetry["status"] = "CANCELLED"
+            validation_errors.append("GENERATION_CANCELLED_BY_USER")
+            break
         except Exception as err:
             elapsed_ms = round((time.perf_counter() - t_start) * 1000.0, 2)
             telemetry["total_ms"] = elapsed_ms
@@ -400,6 +447,7 @@ def invoke_study_llm_observable(
     max_output_tokens: int = 4096,
     timeout_seconds: float = 90.0,
     document_id: Optional[str] = None,
+    cancellation_check: Optional[Callable[[], bool]] = None,
 ) -> Tuple[Optional[Any], Dict[str, Any]]:
     """
     Executa geração observável via qwen3.5:9b local e devolve (resultado_parseado, telemetria).
@@ -417,7 +465,7 @@ def invoke_study_llm_observable(
             "ttft_ms": None,
             "total_ms": 0.0,
             "tokens_per_sec": 0.0,
-            "context_used": int(os.getenv("OLLAMA_NUM_CTX", "16384") or "16384"),
+            "context_used": int(os.getenv("OLLAMA_NUM_CTX", "8192") or "8192"),
             "status": "SKIPPED_LIVE_LLM_DISABLED",
             "validation_errors": ["LIVE_LLM_DISABLED_IN_ENV"],
             "attempts": 0,
@@ -437,7 +485,9 @@ def invoke_study_llm_observable(
                 max_output_tokens=max_output_tokens,
                 timeout_seconds=timeout_seconds,
                 document_id=document_id,
-            )
+                cancellation_check=cancellation_check,
+            ),
+            timeout_seconds=max(timeout_seconds * 2.0 + 30.0, 210.0),
         )
         if not raw:
             return None, telemetry
@@ -462,8 +512,8 @@ def invoke_study_llm_observable(
             "ttft_ms": None,
             "total_ms": 0.0,
             "tokens_per_sec": 0.0,
-            "context_used": 16384,
-            "status": "FAILED",
+            "context_used": int(os.getenv("OLLAMA_NUM_CTX", "8192") or "8192"),
+            "status": "TIMEOUT" if isinstance(exc, TimeoutError) else "FAILED",
             "validation_errors": [f"{type(exc).__name__}: {exc}"],
             "attempts": 1,
             "timestamp": datetime.now().isoformat(),
@@ -481,6 +531,7 @@ def invoke_study_llm_json(
     max_output_tokens: int = 4096,
     timeout_seconds: float = 90.0,
     document_id: Optional[str] = None,
+    cancellation_check: Optional[Callable[[], bool]] = None,
 ) -> Optional[Any]:
     parsed, _telemetry = invoke_study_llm_observable(
         operation=operation,
@@ -491,6 +542,7 @@ def invoke_study_llm_json(
         max_output_tokens=max_output_tokens,
         timeout_seconds=timeout_seconds,
         document_id=document_id,
+        cancellation_check=cancellation_check,
     )
     return parsed
 

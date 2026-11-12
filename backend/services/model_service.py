@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, Callable
 
 from backend.model_harness import (
     ExecutionConstraints,
@@ -10,6 +10,7 @@ from backend.model_harness import (
     ModelRequest,
     ModelResponse,
     ModelResponseStatus,
+    OllamaExecutionOptions,
     OutputFormat,
 )
 
@@ -33,12 +34,31 @@ class ModelExecutionService:
         temperature: float = 0.0,
         max_output_tokens: int = 512,
         timeout_seconds: float = 30.0,
+        max_context_tokens: int | None = None,
+        streaming: bool | None = None,
+        cancellation_check: Callable[[], bool] | None = None,
     ) -> ModelResponse:
         profile = (
             "STRUCTURED_EXTRACTION"
             if output_format
             in {OutputFormat.JSON, OutputFormat.JSON_SCHEMA}
             else "CODE_REASONING"
+        )
+        effective_num_ctx = max_context_tokens
+        if effective_num_ctx is None and provider == "ollama":
+            try:
+                effective_num_ctx = max(1024, int(os.getenv("OLLAMA_NUM_CTX", "8192")))
+            except (TypeError, ValueError):
+                effective_num_ctx = 8192
+        effective_streaming = (
+            bool(streaming)
+            if streaming is not None
+            else (provider == "ollama" and output_format != OutputFormat.TOOL_CALLS)
+        )
+        provider_payload = (
+            OllamaExecutionOptions(cancellation_check=cancellation_check)
+            if provider == "ollama" and cancellation_check is not None
+            else None
         )
         request = ModelRequest(
             task_profile=profile,
@@ -48,6 +68,7 @@ class ModelExecutionService:
                 format=output_format
             ),
             temperature=temperature,
+            max_context_tokens=effective_num_ctx,
             max_output_tokens=max_output_tokens,
             metadata={
                 "consumer": "server",
@@ -64,10 +85,11 @@ class ModelExecutionService:
             execution_constraints=ExecutionConstraints(
                 max_attempts=1,
                 timeout_seconds=timeout_seconds,
-                streaming=False,
+                streaming=effective_streaming,
                 thinking=False,
                 allow_recovery=False,
                 stop_on_no_progress=False,
+                provider_payload=provider_payload,
             ),
         )
         response = await self.harness.execute(request)

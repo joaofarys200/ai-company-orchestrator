@@ -1,6 +1,8 @@
 import os
 import json
 import asyncio
+import subprocess
+from typing import Optional
 import websockets
 from backend.health import build_local_health_report
 from backend.logging_config import get_logger, log_event
@@ -608,13 +610,18 @@ def _free_port_if_locked(port: int = 8001) -> None:
         pass
     try:
         if os.name == "nt":
-            cmd = (
-                f'powershell.exe -NoProfile -Command "'
-                f'Get-NetTCPConnection -LocalPort {port} -State Listen -ErrorAction SilentlyContinue | '
-                f'Where-Object {{ $_.OwningProcess -ne {current_pid} }} | '
-                f'ForEach-Object {{ Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }}"'
+            ps_script = (
+                f"Get-NetTCPConnection -LocalPort {int(port)} -State Listen -ErrorAction SilentlyContinue | "
+                f"Where-Object {{ $_.OwningProcess -ne {int(current_pid)} }} | "
+                "ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"
             )
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=2.0)
+            subprocess.run(
+                ["powershell.exe", "-NoProfile", "-Command", ps_script],
+                shell=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=2.0,
+            )
     except Exception:
         pass
 
@@ -635,13 +642,13 @@ async def main():
     async def _async_warmup():
         try:
             harness = _current_application_services().model_harness
-            provider = harness.registry.get("ollama")
+            provider = harness.providers.get("ollama")
             if provider and hasattr(provider, "warmup"):
                 warmed = await provider.warmup()
                 if warmed:
                     log_event(logger, "model_harness.ollama.warmup_succeeded")
-        except Exception:
-            pass
+        except Exception as exc:
+            log_event(logger, "model_harness.ollama.warmup_failed", level="warning", error=str(exc))
 
     asyncio.create_task(_async_warmup())
 

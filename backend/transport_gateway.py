@@ -146,21 +146,38 @@ class StdioTransportGateway:
                 break
 
     async def _handle_raw_line(self, line: str) -> None:
-        """Processa e despacha a linha JSON recebida."""
+        """Processa, valida minimamente e despacha a linha JSON recebida."""
         if not line.startswith("{") or not line.endswith("}"):
             return
 
         try:
             data = json.loads(line)
-        except Exception:
+        except Exception as exc:
+            await self.send_message({
+                "type": "error",
+                "message": f"Payload IPC JSON inválido: {exc}",
+            })
             return
 
         if not isinstance(data, dict):
+            await self.send_message({
+                "type": "error",
+                "message": "Payload IPC deve ser um objeto JSON.",
+            })
             return
 
         msg_type = data.get("type")
-        if not msg_type:
+        req_id = data.get("request_id")
+        if not isinstance(msg_type, str) or not msg_type.strip():
+            err_payload: Dict[str, Any] = {
+                "type": "error",
+                "message": "Campo 'type' obrigatório e em falta no payload IPC.",
+            }
+            if req_id is not None:
+                err_payload["request_id"] = req_id
+            await self.send_message(err_payload)
             return
+        msg_type = msg_type.strip()
 
         try:
             # Despachar para o WebSocketDispatcher unificado
@@ -173,7 +190,16 @@ class StdioTransportGateway:
             elif hasattr(self.dispatcher, "handle"):
                 await self.dispatcher.handle(self.virtual_client, data)
         except Exception as e:
-            await self.send_message({
-                "type": "error",
-                "message": f"Erro no processamento IPC: {e}",
-            })
+            if msg_type.startswith("study_"):
+                err_msg: Dict[str, Any] = {
+                    "type": "study_error",
+                    "message": f"Erro no processamento IPC de estudo: {e}",
+                }
+            else:
+                err_msg = {
+                    "type": "error",
+                    "message": f"Erro no processamento IPC: {e}",
+                }
+            if req_id is not None:
+                err_msg["request_id"] = req_id
+            await self.send_message(err_msg)

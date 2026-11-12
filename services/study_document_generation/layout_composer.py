@@ -83,11 +83,17 @@ class _TypographicMetrics:
             except Exception:
                 self.font_objs[fname] = pymupdf.Font("helv")
 
-        self._probe_doc = pymupdf.open()
-        self._probe_page = self._new_probe_page()
+        self._probe_doc: Optional[pymupdf.Document] = None
+        self._probe_page: Optional[pymupdf.Page] = None
         self._probe_ops = 0
+        # Caches tipográficos em memória por compilação de PDF (eliminam O(W^2) em wrap_text_lines)
+        self._unit_width_cache: Dict[Tuple[str, str], float] = {}
+        self._space_unit_widths: Dict[str, float] = {}
+        self._wrap_cache: Dict[Tuple[str, str, float, float], Tuple[str, ...]] = {}
 
     def _new_probe_page(self) -> pymupdf.Page:
+        if self._probe_doc is None:
+            self._probe_doc = pymupdf.open()
         p = self._probe_doc.new_page(width=595.28, height=4000.0)
         for fname, fpath in self.fonts_dict.items():
             if fpath and os.path.exists(fpath):
@@ -102,7 +108,32 @@ class _TypographicMetrics:
             return self.font_objs[fontname]
         return next(iter(self.font_objs.values()))
 
+    def _unit_width(self, fontname: str, text: str) -> float:
+        if not text:
+            return 0.0
+        key = (fontname, text)
+        cached = self._unit_width_cache.get(key)
+        if cached is not None:
+            return cached
+        f = self.get_font(fontname)
+        w = float(f.text_length(text, fontsize=1.0))
+        if len(self._unit_width_cache) >= 8192:
+            self._unit_width_cache.clear()
+        self._unit_width_cache[key] = w
+        return w
+
+    def _space_width(self, fontname: str, fontsize: float) -> float:
+        uw = self._space_unit_widths.get(fontname)
+        if uw is None:
+            uw = float(self.get_font(fontname).text_length(" ", fontsize=1.0))
+            self._space_unit_widths[fontname] = uw
+        return uw * fontsize
+
     def text_width(self, text: str, fontname: str, fontsize: float) -> float:
+        if not text or fontsize <= 0.0:
+            return 0.0
+        if len(text) <= 240:
+            return self._unit_width(fontname, text) * fontsize
         f = self.get_font(fontname)
         return float(f.text_length(text, fontsize=fontsize))
 
@@ -110,8 +141,16 @@ class _TypographicMetrics:
         """Quebra texto em linhas visuais segundo a largura real dos glifos da fonte ativa."""
         if not text:
             return []
+        cache_key = (text, fontname, round(float(fontsize), 4), round(float(max_width), 4))
+        cached_wrap = self._wrap_cache.get(cache_key)
+        if cached_wrap is not None:
+            return list(cached_wrap)
+
         safe_w = max(24.0, max_width - 2.0)
         f = self.get_font(fontname)
+        space_w = self._space_width(fontname, fontsize)
+        # Banda de tolerância para confirmar kerning exato apenas na vizinhança de `safe_w`
+        tol = max(1.5, fontsize * 0.25)
         out_lines: List[str] = []
 
         for raw_para in text.split("\n"):
@@ -120,32 +159,60 @@ class _TypographicMetrics:
                 continue
             words = raw_para.split(" ")
             cur_line = ""
+            cur_w = 0.0
             for word in words:
+                word_w = self._unit_width(fontname, word) * fontsize if word else 0.0
                 # Se uma palavra única exceder a largura útil, partir por caracteres
-                if word and f.text_length(word, fontsize=fontsize) > safe_w:
+                if word and word_w > (safe_w - tol) and f.text_length(word, fontsize=fontsize) > safe_w:
                     if cur_line:
                         out_lines.append(cur_line)
                         cur_line = ""
+                        cur_w = 0.0
                     chunk = ""
+                    chunk_w = 0.0
                     for ch in word:
-                        if chunk and f.text_length(chunk + ch, fontsize=fontsize) > safe_w:
+                        ch_w = self._unit_width(fontname, ch) * fontsize
+                        next_w = chunk_w + ch_w
+                        if chunk and next_w > (safe_w - tol) and f.text_length(chunk + ch, fontsize=fontsize) > safe_w:
                             out_lines.append(chunk)
                             chunk = ch
+                            chunk_w = ch_w
                         else:
                             chunk += ch
+                            chunk_w = next_w
                     cur_line = chunk
+                    cur_w = float(f.text_length(cur_line, fontsize=fontsize)) if cur_line else 0.0
                     continue
 
-                cand = word if not cur_line else f"{cur_line} {word}"
-                if f.text_length(cand, fontsize=fontsize) <= safe_w:
-                    cur_line = cand
-                else:
-                    if cur_line:
-                        out_lines.append(cur_line)
+                if not cur_line:
                     cur_line = word
+                    cur_w = word_w
+                    continue
+
+                cand_w = cur_w + space_w + word_w
+                if cand_w <= (safe_w - tol):
+                    cur_line = f"{cur_line} {word}"
+                    cur_w = cand_w
+                elif cand_w > (safe_w + tol):
+                    out_lines.append(cur_line)
+                    cur_line = word
+                    cur_w = word_w
+                else:
+                    cand = f"{cur_line} {word}"
+                    exact_w = float(f.text_length(cand, fontsize=fontsize))
+                    if exact_w <= safe_w:
+                        cur_line = cand
+                        cur_w = exact_w
+                    else:
+                        out_lines.append(cur_line)
+                        cur_line = word
+                        cur_w = word_w
             if cur_line:
                 out_lines.append(cur_line)
 
+        if len(self._wrap_cache) >= 4096:
+            self._wrap_cache.clear()
+        self._wrap_cache[cache_key] = tuple(out_lines)
         return out_lines
 
     def measure_text_height(
@@ -169,9 +236,13 @@ class _TypographicMetrics:
 
     def close(self) -> None:
         try:
-            self._probe_doc.close()
+            if self._probe_doc is not None:
+                self._probe_doc.close()
+                self._probe_doc = None
         except Exception:
             pass
+        self._unit_width_cache.clear()
+        self._wrap_cache.clear()
 
 
 class PDFDocumentComposer:

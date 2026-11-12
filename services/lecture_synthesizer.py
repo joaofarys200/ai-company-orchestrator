@@ -76,10 +76,15 @@ class VaultLinker:
 class LocalTranscriber:
     """Executa transcrição real de áudio (Faster-Whisper local ou motor multimodal por blocos, sem texto inventado)."""
 
-    def __init__(self, model_size: str = "base", device: str = "auto", compute_type: str = "default"):
+    def __init__(
+        self,
+        model_size: str = "base",
+        device: Optional[str] = None,
+        compute_type: Optional[str] = None,
+    ):
         self.model_size = model_size
-        self.device = device
-        self.compute_type = compute_type
+        self.device = (device or os.getenv("WHISPER_DEVICE") or "cpu").strip() or "cpu"
+        self.compute_type = (compute_type or os.getenv("WHISPER_COMPUTE_TYPE") or "int8").strip() or "int8"
         self._model = None
         self.last_status: str = ""
 
