@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass, field
 
@@ -141,6 +142,9 @@ class TaskPlan:
 def create_task_plan(prompt: str) -> TaskPlan:
     requires_creation = task_requires_creation(prompt)
     requires_execution = task_requires_execution(prompt)
+    analyze_allowed_tools = ["list_directory", "read_file", "diagnosticar_causa_raiz"]
+    if not requires_creation:
+        analyze_allowed_tools.append("criar_agente_especialista")
     steps = [
         TaskPlanStep(
             id="objetivo",
@@ -151,7 +155,7 @@ def create_task_plan(prompt: str) -> TaskPlan:
         TaskPlanStep(
             id="analisar_workspace",
             title="Analisar workspace/sandbox antes de alterar ficheiros",
-            allowed_tools=["list_directory", "read_file", "diagnosticar_causa_raiz"],
+            allowed_tools=analyze_allowed_tools,
             required_evidence=["workspace listado"],
         ),
     ]
@@ -169,10 +173,13 @@ def create_task_plan(prompt: str) -> TaskPlan:
             allowed_tools=["execute_command", "read_file", "list_directory", "verificar_evidencias_entrega"],
             required_evidence=["comando executado ou sandbox validada"],
         ))
+    final_allowed_tools = ["verificar_qualidade", "read_file", "list_directory", "verificar_evidencias_entrega"]
+    if not requires_creation:
+        final_allowed_tools.append("criar_agente_especialista")
     steps.append(TaskPlanStep(
         id="finalizar",
         title="Verificar qualidade e entregar apenas com evidencia",
-        allowed_tools=["verificar_qualidade", "read_file", "list_directory", "verificar_evidencias_entrega"],
+        allowed_tools=final_allowed_tools,
         required_evidence=["quality gate"],
     ))
     return TaskPlan(steps=steps)
@@ -202,10 +209,21 @@ def format_operational_error(stage: str, state: TaskState, decision: ToolDecisio
 def update_task_state_after_tool(task_state: TaskState, tool_name: str, tool_input: dict | None, result: str) -> None:
     tool_input = tool_input or {}
     result_text = normalize_text(str(result or ""))
-    failed = any(
-        marker in result_text
-        for marker in ["erro", "error", "falhou", "failed", "failure", "bloqueado", "indisponivel", "recusado"]
-    ) or bool(re.search(r"codigo\s+(?!0\b)\d+", result_text))
+    if tool_name.startswith("study_"):
+        try:
+            parsed_study = json.loads(str(result or ""))
+            status_val = str(parsed_study.get("status") or "").upper()
+            failed = status_val in {"FAILED", "ERROR", "CANCELLED"}
+        except Exception:
+            failed = any(
+                marker in result_text
+                for marker in ["erro", "error", "falhou", "failed", "failure", "bloqueado", "indisponivel", "recusado"]
+            )
+    else:
+        failed = any(
+            marker in result_text
+            for marker in ["erro", "error", "falhou", "failed", "failure", "bloqueado", "indisponivel", "recusado"]
+        ) or bool(re.search(r"codigo\s+(?!0\b)\d+", result_text))
     progressed = False
 
     if task_state.last_tool == tool_name and task_state.last_tool_input == tool_input:
@@ -252,6 +270,9 @@ def update_task_state_after_tool(task_state: TaskState, tool_name: str, tool_inp
         })
         progressed = not failed
         task_state.last_stage = "quality_gate"
+    elif tool_name.startswith("study_") and not failed:
+        progressed = True
+        task_state.last_stage = "estudo"
     elif tool_name in STRATEGIC_TOOLS and not failed:
         progressed = True
         task_state.last_stage = "estrategia"

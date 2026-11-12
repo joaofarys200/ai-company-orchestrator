@@ -24,6 +24,7 @@ from backend.message_protocol import (
     system_message,
 )
 from security.safety_classifier import SafetyAssessment, SafetyClassifier, SafetyStatus
+from services.study_integration.contracts import normalize_chat_session_id
 from security.delivery_governance.decision_model import (
     DecisionAssessment,
     DecisionEngine,
@@ -1169,6 +1170,7 @@ class ChatMissionBridge:
         websocket: Any = None,
         correlation_id: str | None = None,
         study_context: dict[str, Any] | None = None,
+        chat_session_id: str | None = None,
     ) -> dict[str, Any]:
         """Entry point for incoming chat directives."""
         correlation_id = correlation_id or uuid.uuid4().hex[:12]
@@ -1180,9 +1182,11 @@ class ChatMissionBridge:
             history = self.callbacks.conversation_history
 
         coord = self._get_study_coordinator()
-        chat_study_sid = str((study_context or {}).get("chat_session_id") or "default_study_chat")
+        chat_study_sid = normalize_chat_session_id(
+            chat_session_id or ((study_context or {}).get("chat_session_id") if isinstance(study_context, dict) else None)
+        )
         has_persisted_study_ctx = bool(
-            coord and coord.context_manager.get_context(chat_study_sid).active_document_id
+            coord and chat_study_sid and coord.context_manager.get_context(chat_study_sid).active_document_id
         )
         resolver_ctx = {
             "study_context": dict(study_context) if isinstance(study_context, dict) else {},

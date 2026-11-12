@@ -449,11 +449,17 @@ async def query_model_for_arena(model_id: str, model_name: str, prompt: str):
 async def run_arena_comparison(prompt: str):
     await _current_chat_command_service().run_arena(prompt)
 
-async def handle_slash_command(command_str: str, websocket, session_id: int):
+async def handle_slash_command(
+    command_str: str,
+    websocket,
+    session_id: int,
+    chat_session_id: str | None = None,
+):
     await _current_chat_command_service().handle(
         command_str,
         websocket,
         session_id,
+        chat_session_id=chat_session_id,
     )
 
 async def handle_client(websocket, *args):
@@ -538,6 +544,7 @@ async def run_orchestration_task(
     project_id: str | None = None,
     correlation_id: str | None = None,
     study_context: dict | None = None,
+    chat_session_id: str | None = None,
 ):
     await _current_orchestration_service().run_task(
         prompt,
@@ -545,6 +552,7 @@ async def run_orchestration_task(
         project_id,
         correlation_id=correlation_id,
         study_context=study_context,
+        chat_session_id=chat_session_id,
     )
 
 

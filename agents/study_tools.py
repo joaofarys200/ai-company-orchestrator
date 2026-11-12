@@ -15,6 +15,7 @@ from services.study_integration.contracts import (
     StudyCapabilityRequest,
     StudyCapabilityType,
     VALID_DIFFICULTIES,
+    normalize_chat_session_id,
 )
 from services.study_integration.router import StudyCapabilityRouter
 
@@ -267,19 +268,38 @@ async def execute_study_tool(
     *,
     study_service: Any = None,
     router: Optional[StudyCapabilityRouter] = None,
-    chat_session_id: str = "global",
+    chat_session_id: Optional[str] = None,
+    require_chat_session: bool = False,
     timeout_seconds: float = 120.0,
 ) -> str:
     """Executa uma tool de estudo de forma segura e validada via StudyCapabilityRouter."""
     try:
         args = validate_study_tool_arguments(tool_name, tool_input)
+        capability = _TOOL_TO_CAPABILITY[tool_name]
+        normalized_sid = normalize_chat_session_id(chat_session_id)
+        if require_chat_session and normalized_sid is None:
+            return json.dumps(
+                {
+                    "status": "NEEDS_CLARIFICATION",
+                    "capability": capability.value,
+                    "error_code": "MISSING_CHAT_SESSION",
+                    "error_message": (
+                        "Identificador canónico de conversa em falta: "
+                        "não é permitido executar ferramentas de estudo em contexto global partilhado."
+                    ),
+                    "summary_markdown": (
+                        "Falta o identificador da conversa para executar esta ação de estudo "
+                        "com isolamento de contexto."
+                    ),
+                },
+                ensure_ascii=False,
+            )
         svc = _resolve_shared_study_service(study_service)
         shared_coord = getattr(svc, "_study_coordinator", None)
         active_router = router or (shared_coord.router if shared_coord is not None else StudyCapabilityRouter(svc))
-        capability = _TOOL_TO_CAPABILITY[tool_name]
         req = StudyCapabilityRequest(
             capability=capability,
-            chat_session_id=chat_session_id,
+            chat_session_id=normalized_sid,
             document_id=args.get("document_id"),
             chapter_ref=args.get("chapter_ref"),
             topic=args.get("topic"),

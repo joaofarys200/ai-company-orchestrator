@@ -17,6 +17,25 @@ def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+UNSCOPED_CHAT_SESSION_IDS = frozenset({
+    "global",
+    "default",
+    "default_study_chat",
+    "none",
+    "null",
+})
+
+
+def normalize_chat_session_id(chat_session_id: Any) -> Optional[str]:
+    """Normaliza um ID canónico de conversa sem fabricar identificadores nem mapear para 'global'."""
+    if chat_session_id is None or isinstance(chat_session_id, bool):
+        return None
+    raw = str(chat_session_id).strip()
+    if not raw or raw.lower() in UNSCOPED_CHAT_SESSION_IDS:
+        return None
+    return raw
+
+
 class StudyCapabilityType(str, Enum):
     LIST_DOCUMENTS = "LIST_DOCUMENTS"
     GET_DOCUMENT_STATUS = "GET_DOCUMENT_STATUS"
@@ -132,7 +151,7 @@ class StudyConversationContext:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "StudyConversationContext":
         return cls(
-            chat_session_id=str(data.get("chat_session_id") or "global"),
+            chat_session_id=normalize_chat_session_id(data.get("chat_session_id")) or "",
             active_document_id=data.get("active_document_id"),
             active_document_title=data.get("active_document_title"),
             active_collection_id=data.get("active_collection_id"),
@@ -157,7 +176,7 @@ class StudyCapabilityRequest:
     capability: StudyCapabilityType
     operation_id: str = field(default_factory=lambda: f"op_{uuid.uuid4().hex[:12]}")
     correlation_id: str = ""
-    chat_session_id: str = "global"
+    chat_session_id: Optional[str] = None
     document_id: Optional[str] = None
     document_query: Optional[str] = None
     secondary_document_ids: List[str] = field(default_factory=list)
@@ -332,7 +351,7 @@ class StudyOperationRecord:
         return cls(
             operation_id=str(data.get("operation_id") or ""),
             correlation_id=str(data.get("correlation_id") or ""),
-            chat_session_id=str(data.get("chat_session_id") or "global"),
+            chat_session_id=normalize_chat_session_id(data.get("chat_session_id")) or "",
             capability=str(data.get("capability") or ""),
             document_id=data.get("document_id"),
             status=str(data.get("status") or StudyOperationState.INTERRUPTED.value),

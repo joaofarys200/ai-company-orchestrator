@@ -66,12 +66,18 @@ def artifact_looks_relevant(prompt: str, state: TaskState, filename: str, conten
         return False
     return True
 
+def _is_tool_allowed_in_step(task_plan: TaskPlan, tool_name: str) -> bool:
+    if tool_name in task_plan.allowed_tools():
+        return True
+    return task_plan.current_step.id != "objetivo" and str(tool_name or "").startswith("study_")
+
+
 def allowed_tools_for_current_step(task_plan: TaskPlan, available_tools: list[dict]) -> list[dict]:
-    allowed = task_plan.allowed_tools()
-    return [tool for tool in available_tools if tool.get("name") in allowed]
+    return [tool for tool in available_tools if _is_tool_allowed_in_step(task_plan, str(tool.get("name") or ""))]
+
 
 def validate_tool_for_plan(task_plan: TaskPlan, tool_name: str) -> ToolDecision:
-    if tool_name in task_plan.allowed_tools():
+    if _is_tool_allowed_in_step(task_plan, tool_name):
         return ToolDecision(VALID)
     step = task_plan.current_step
     return ToolDecision(

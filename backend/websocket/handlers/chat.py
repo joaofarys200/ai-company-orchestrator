@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
 import uuid
 from typing import Any
 
@@ -11,6 +12,7 @@ from backend.websocket.contracts import MessageHandler
 from backend.websocket.gateway import ConnectionManager
 from backend.websocket.handlers import bind_handler_methods
 from backend.websocket.handlers.common import WebSocketRuntimeCallbacks
+from services.study_integration.contracts import normalize_chat_session_id
 
 
 CHAT_HANDLERS = {
@@ -37,6 +39,17 @@ class ChatWebSocketHandler:
     def routes(self) -> dict[str, MessageHandler]:
         return bind_handler_methods(self, CHAT_HANDLERS)
 
+    @staticmethod
+    def _supports_kwarg(fn: Any, kwarg: str) -> bool:
+        try:
+            sig = inspect.signature(fn)
+            return kwarg in sig.parameters or any(
+                p.kind == inspect.Parameter.VAR_KEYWORD
+                for p in sig.parameters.values()
+            )
+        except (TypeError, ValueError):
+            return False
+
     async def directive(
         self,
         websocket: Any,
@@ -46,13 +59,35 @@ class ChatWebSocketHandler:
         prompt = str(message.get("text") or "").strip()
         if not prompt:
             return
+        raw_study_ctx = message.get("study_context")
+        study_context = dict(raw_study_ctx) if isinstance(raw_study_ctx, dict) else None
+        explicit_chat_sid = normalize_chat_session_id(
+            (study_context.get("chat_session_id") if study_context else None)
+            or message.get("chat_session_id")
+        )
+        if explicit_chat_sid:
+            study_context = {**(study_context or {}), "chat_session_id": explicit_chat_sid}
+        elif study_context and "chat_session_id" in study_context:
+            study_context.pop("chat_session_id", None)
+
         prompt = normalize_voice_prompt(prompt)
         if prompt.startswith("/"):
-            await self.callbacks.handle_slash_command(
-                prompt,
-                websocket,
-                1,
-            )
+            if explicit_chat_sid and self._supports_kwarg(
+                self.callbacks.handle_slash_command,
+                "chat_session_id",
+            ):
+                await self.callbacks.handle_slash_command(
+                    prompt,
+                    websocket,
+                    1,
+                    chat_session_id=explicit_chat_sid,
+                )
+            else:
+                await self.callbacks.handle_slash_command(
+                    prompt,
+                    websocket,
+                    1,
+                )
             return
 
         prompt_with_context = self.callbacks.parse_file_context(
@@ -126,8 +161,6 @@ class ChatWebSocketHandler:
             or _session.selected_project_id
             or ""
         ).strip() or None
-        raw_study_ctx = message.get("study_context")
-        study_context = dict(raw_study_ctx) if isinstance(raw_study_ctx, dict) else None
         task_kwargs: dict[str, Any] = {
             "project_id": project_id,
             "correlation_id": correlation_id,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
 import os
 import re
 import time
@@ -12,6 +13,7 @@ from backend.errors import safe_user_error
 from backend.logging_config import log_event
 from backend.services.model_service import ModelExecutionService
 from backend.websocket.gateway import ConnectionManager
+from services.study_integration.contracts import normalize_chat_session_id
 
 
 @dataclass(slots=True)
@@ -197,6 +199,8 @@ class ChatCommandService:
         command: str,
         _websocket: Any,
         _session_id: int,
+        *,
+        chat_session_id: str | None = None,
     ) -> None:
         parts = command.split(" ", 1)
         name = parts[0].lower()
@@ -217,7 +221,10 @@ class ChatCommandService:
         elif name == "/theme":
             await self._theme(arguments)
         elif name == "/spawn":
-            await self._spawn(arguments)
+            await self._spawn(
+                arguments,
+                chat_session_id=normalize_chat_session_id(chat_session_id),
+            )
         elif name == "/arena":
             await self._arena(arguments)
         elif name == "/rules":
@@ -239,7 +246,12 @@ class ChatCommandService:
                 ),
             )
 
-    async def _spawn(self, arguments: str) -> None:
+    async def _spawn(
+        self,
+        arguments: str,
+        *,
+        chat_session_id: str | None = None,
+    ) -> None:
         try:
             parts = arguments.split("|")
             if len(parts) < 3:
@@ -258,22 +270,30 @@ class ChatCommandService:
                     ),
                 }
             )
-            result = (
-                await self.services.agents
-                .spawn_specialist_agent(
-                    nome=name,
-                    especialidade=specialty,
-                    backstory=(
-                        f"Es o subagente especialista {name}, "
-                        f"focado em {specialty}."
-                    ),
-                    tarefa=task,
-                    contexto_projeto=(
-                        "Criacao ad-hoc via comando de barra."
-                    ),
-                    on_msg=self.callbacks.on_agent_message,
-                )
-            )
+            spawn_fn = self.services.agents.spawn_specialist_agent
+            spawn_kwargs: dict[str, Any] = {
+                "nome": name,
+                "especialidade": specialty,
+                "backstory": (
+                    f"Es o subagente especialista {name}, "
+                    f"focado em {specialty}."
+                ),
+                "tarefa": task,
+                "contexto_projeto": "Criacao ad-hoc via comando de barra.",
+                "on_msg": self.callbacks.on_agent_message,
+            }
+            try:
+                sig = inspect.signature(spawn_fn)
+                if "chat_session_id" in sig.parameters or any(
+                    p.kind == inspect.Parameter.VAR_KEYWORD
+                    for p in sig.parameters.values()
+                ):
+                    spawn_kwargs["chat_session_id"] = normalize_chat_session_id(
+                        chat_session_id
+                    )
+            except (TypeError, ValueError):
+                pass
+            result = await spawn_fn(**spawn_kwargs)
             await self._chat(
                 name.upper(),
                 specialty,

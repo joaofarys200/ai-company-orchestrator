@@ -15,7 +15,11 @@ import threading
 from typing import Any, Dict, List, Optional, Tuple
 import unicodedata
 
-from services.study_integration.contracts import StudyConversationContext, _utc_now_iso
+from services.study_integration.contracts import (
+    StudyConversationContext,
+    _utc_now_iso,
+    normalize_chat_session_id,
+)
 
 
 _ORDINAL_CHAPTER_WORDS: Dict[str, int] = {
@@ -102,9 +106,10 @@ class StudyContextManager:
                 return {}
             loaded: Dict[str, StudyConversationContext] = {}
             for sid, item in raw.items():
-                if isinstance(item, dict):
-                    loaded[str(sid)] = StudyConversationContext.from_dict(
-                        {**item, "chat_session_id": str(sid)}
+                norm_sid = normalize_chat_session_id(sid)
+                if norm_sid and isinstance(item, dict):
+                    loaded[norm_sid] = StudyConversationContext.from_dict(
+                        {**item, "chat_session_id": norm_sid}
                     )
             return loaded
         except Exception:
@@ -119,8 +124,10 @@ class StudyContextManager:
         )
         os.replace(tmp_path, self.context_path)
 
-    def get_context(self, chat_session_id: str = "global") -> StudyConversationContext:
-        sid = str(chat_session_id or "global").strip() or "global"
+    def get_context(self, chat_session_id: Optional[str] = None) -> StudyConversationContext:
+        sid = normalize_chat_session_id(chat_session_id)
+        if sid is None:
+            return StudyConversationContext(chat_session_id="")
         with self._lock:
             ctx = self._contexts.get(sid)
             if ctx is None:
@@ -130,12 +137,15 @@ class StudyContextManager:
 
     def sync_ui_context(
         self,
-        chat_session_id: str,
+        chat_session_id: Optional[str],
         study_service: Any,
         ui_context: Optional[Dict[str, Any]],
     ) -> StudyConversationContext:
+        sid = normalize_chat_session_id(chat_session_id)
+        if sid is None:
+            return StudyConversationContext(chat_session_id="")
         if not isinstance(ui_context, dict) or not ui_context:
-            return self.get_context(chat_session_id)
+            return self.get_context(sid)
 
         doc_id = str(ui_context.get("document_id") or "").strip() or None
         tab = str(ui_context.get("tab") or "").strip() or None
@@ -173,7 +183,7 @@ class StudyContextManager:
 
     def update_context(
         self,
-        chat_session_id: str,
+        chat_session_id: Optional[str],
         *,
         document_id: Optional[str] = None,
         document_title: Optional[str] = None,
@@ -192,7 +202,9 @@ class StudyContextManager:
         concepts: Optional[List[str]] = None,
         preserve_missing: bool = True,
     ) -> StudyConversationContext:
-        sid = str(chat_session_id or "global").strip() or "global"
+        sid = normalize_chat_session_id(chat_session_id)
+        if sid is None:
+            return StudyConversationContext(chat_session_id="")
         with self._lock:
             ctx = self._contexts.get(sid) or StudyConversationContext(chat_session_id=sid)
 

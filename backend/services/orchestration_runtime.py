@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
 import json
 import os
 import re
@@ -21,6 +22,7 @@ from backend.services.local_app_service import (
 )
 from backend.services.model_service import ModelExecutionService
 from backend.websocket.gateway import ConnectionManager
+from services.study_integration.contracts import normalize_chat_session_id
 
 
 CASUAL_CHAT_SYSTEM_PROMPT = (
@@ -414,8 +416,13 @@ class OrchestrationService:
         project_id: str | None = None,
         correlation_id: str | None = None,
         study_context: dict | None = None,
+        chat_session_id: str | None = None,
     ) -> None:
         try:
+            origin_chat_sid = normalize_chat_session_id(
+                chat_session_id
+                or (study_context.get("chat_session_id") if isinstance(study_context, dict) else None)
+            )
             clean_prompt = prompt.lower().strip(" .?!,")
             if await self._handle_ui_command(clean_prompt):
                 return
@@ -433,14 +440,25 @@ class OrchestrationService:
 
             # ── Canonical Chat -> Mission Integration ────────────────────────
             if self.bridge:
+                effective_study_ctx = (
+                    dict(study_context) if isinstance(study_context, dict) else None
+                )
+                if origin_chat_sid and (
+                    effective_study_ctx is None
+                    or not normalize_chat_session_id(effective_study_ctx.get("chat_session_id"))
+                ):
+                    effective_study_ctx = {
+                        **(effective_study_ctx or {}),
+                        "chat_session_id": origin_chat_sid,
+                    }
                 bridge_kwargs: dict[str, Any] = {
                     "prompt": prompt,
                     "session_id": session_id,
                     "project_id": project_id,
                     "correlation_id": correlation_id,
                 }
-                if study_context is not None:
-                    bridge_kwargs["study_context"] = study_context
+                if effective_study_ctx is not None:
+                    bridge_kwargs["study_context"] = effective_study_ctx
                 bridge_res = await self.bridge.handle_directive(**bridge_kwargs)
                 if bridge_res.get("status") in {"COMPLETED", "FAILED", "REFUSED", "BLOCKED", "NEEDS_CLARIFICATION", "RUNNING"}:
                     return
@@ -478,6 +496,7 @@ class OrchestrationService:
             await self._run_agent_orchestration(
                 prompt,
                 session_id,
+                chat_session_id=origin_chat_sid,
             )
         except Exception as orchestration_error:
             log_event(
@@ -835,6 +854,8 @@ class OrchestrationService:
         self,
         prompt: str,
         session_id: int,
+        *,
+        chat_session_id: str | None = None,
     ) -> None:
         async def on_template_change(name: str) -> None:
             normalized = normalize_template_name(name)
@@ -902,15 +923,31 @@ class OrchestrationService:
             template_name = "research_swarm"
             self.services.agents.active_template_name = template_name
             await on_template_change(template_name)
-        result = await self.services.agents.run_jarvis_orchestration(
+        orch_fn = self.services.agents.run_jarvis_orchestration
+        orch_kwargs: dict[str, Any] = {
+            "history": self.conversation_history,
+            "template_name": template_name,
+            "on_template_change": on_template_change,
+        }
+        try:
+            sig = inspect.signature(orch_fn)
+            if "chat_session_id" in sig.parameters or any(
+                p.kind == inspect.Parameter.VAR_KEYWORD
+                for p in sig.parameters.values()
+            ):
+                orch_kwargs["chat_session_id"] = (
+                    chat_session_id if chat_session_id is not None else ""
+                )
+        except (TypeError, ValueError):
+            pass
+
+        result = await orch_fn(
             prompt,
             session_id,
             self.callbacks.on_agent_message,
             self.callbacks.on_file_update,
             self.callbacks.on_kanban_update,
-            history=self.conversation_history,
-            template_name=template_name,
-            on_template_change=on_template_change,
+            **orch_kwargs,
         )
         self._append_history("assistant", result)
         self._persist_legacy_sandbox_project(

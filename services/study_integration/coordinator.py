@@ -21,6 +21,7 @@ from services.study_integration.contracts import (
     StudyCapabilityRequest,
     StudyCapabilityResult,
     StudyCapabilityType,
+    normalize_chat_session_id,
 )
 from services.study_integration.explainer import (
     OllamaUnavailableError,
@@ -67,7 +68,7 @@ class StudyOrchestrationCoordinator:
         self,
         *,
         prompt: str,
-        chat_session_id: str = "global",
+        chat_session_id: Optional[str] = None,
         correlation_id: str = "",
         ui_study_context: Optional[Dict[str, Any]] = None,
         history: Optional[List[Dict[str, Any]]] = None,
@@ -75,8 +76,9 @@ class StudyOrchestrationCoordinator:
         on_async_complete: Optional[Callable[[StudyCapabilityResult], Any]] = None,
         allow_background: bool = True,
     ) -> StudyCapabilityResult:
+        sid = normalize_chat_session_id(chat_session_id)
         ctx = self.context_manager.sync_ui_context(
-            chat_session_id,
+            sid,
             self.study_service,
             ui_study_context,
         )
@@ -85,7 +87,7 @@ class StudyOrchestrationCoordinator:
         req = self._parse_deterministic_request(
             prompt=prompt,
             ctx=ctx,
-            chat_session_id=chat_session_id,
+            chat_session_id=sid or "",
             correlation_id=correlation_id,
         )
 
@@ -96,7 +98,7 @@ class StudyOrchestrationCoordinator:
                     prompt=prompt,
                     ctx=ctx,
                     history=history or [],
-                    chat_session_id=chat_session_id,
+                    chat_session_id=sid or "",
                     correlation_id=correlation_id,
                 )
             except OllamaUnavailableError as err:

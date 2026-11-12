@@ -9,6 +9,7 @@ import yaml
 import datetime
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from typing import Any, Optional
 try:
     from PIL import ImageGrab  # type: ignore
 except ImportError:
@@ -732,6 +733,22 @@ def list_spawned_agents_summary() -> str:
         return ""
 
 
+def _resolve_orchestration_chat_session_id(
+    session_id: Any,
+    chat_session_id: Optional[str] = None,
+) -> Optional[str]:
+    """Extrai o identificador canónico da conversa sem mapear falhas para 'global'."""
+    from services.study_integration.contracts import normalize_chat_session_id
+
+    if chat_session_id is not None:
+        return normalize_chat_session_id(chat_session_id)
+    if isinstance(session_id, int) and not isinstance(session_id, bool) and session_id > 0:
+        return str(session_id)
+    if isinstance(session_id, str):
+        return normalize_chat_session_id(session_id)
+    return None
+
+
 # --- spawn_specialist_agent ---
 async def spawn_specialist_agent(
     nome: str,
@@ -739,7 +756,8 @@ async def spawn_specialist_agent(
     backstory: str,
     tarefa: str,
     contexto_projeto: str,
-    on_msg
+    on_msg,
+    chat_session_id: Optional[str] = None,
 ) -> str:
     """
     Dynamic Agent Spawning — creates a specialist sub-agent on-the-fly.
@@ -1048,8 +1066,14 @@ Sê honesto. Se não tiveres a certeza de algo, diz-o. Uma resposta honesta com 
                     result_str = f"✅ Regra de Compounding Memory '{chave}' gravada com sucesso no SQLite."
                 elif tool_name.startswith("study_"):
                     from agents.study_tools import execute_study_tool
+                    from services.study_integration.contracts import normalize_chat_session_id
 
-                    result_str = await execute_study_tool(tool_name, tool_input)
+                    result_str = await execute_study_tool(
+                        tool_name,
+                        tool_input,
+                        chat_session_id=normalize_chat_session_id(chat_session_id),
+                        require_chat_session=True,
+                    )
                 else:
                     result_str = f"Erro: Ferramenta desconhecida '{tool_name}'"
                     
@@ -1352,7 +1376,18 @@ def split_response_messages(text: str, agent_info: dict = None) -> list[tuple[st
 
 
 # --- run_jarvis_orchestration ---
-async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on_file, on_kanban, history: list = None, template_name: str = None, on_template_change = None):
+async def run_jarvis_orchestration(
+    prompt_text: str,
+    session_id: int,
+    on_msg,
+    on_file,
+    on_kanban,
+    history: list = None,
+    template_name: str = None,
+    on_template_change = None,
+    chat_session_id: Optional[str] = None,
+):
+    effective_chat_session_id = _resolve_orchestration_chat_session_id(session_id, chat_session_id)
     mode = os.getenv("ORCHESTRATOR_MODE", "local").lower()
     swarm_enabled = env_bool("ORCHESTRATOR_SWARM_ENABLED", False)
     verbose_progress = env_bool("ORCHESTRATOR_VERBOSE_PROGRESS", False)
@@ -2493,7 +2528,8 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                         backstory=backstory,
                         tarefa=tarefa,
                         contexto_projeto=contexto,
-                        on_msg=on_msg
+                        on_msg=on_msg,
+                        chat_session_id=effective_chat_session_id,
                     )
                     
                     if guardar:
@@ -2554,7 +2590,8 @@ async def run_jarvis_orchestration(prompt_text: str, session_id: int, on_msg, on
                     result_str = await execute_study_tool(
                         tool_name,
                         tool_input,
-                        chat_session_id=str(session_id or "global"),
+                        chat_session_id=effective_chat_session_id,
+                        require_chat_session=True,
                     )
                 else:
                     result_str = f"Erro: Ferramenta desconhecida '{tool_name}'"

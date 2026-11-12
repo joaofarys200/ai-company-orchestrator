@@ -21,6 +21,7 @@ from services.study_integration.contracts import (
     StudyCapabilityResult,
     StudyCapabilityType,
     StudyNavigationTarget,
+    normalize_chat_session_id,
 )
 from services.study_integration.explainer import (
     OllamaUnavailableError,
@@ -86,8 +87,9 @@ class StudyCapabilityRouter:
                 error_message=str(val_err),
             )
 
+        req_chat_sid = normalize_chat_session_id(request.chat_session_id)
         ctx = self.context_manager.sync_ui_context(
-            request.chat_session_id,
+            req_chat_sid,
             self.study_service,
             ui_context,
         )
@@ -115,7 +117,7 @@ class StudyCapabilityRouter:
         # Resolver documento alvo com desambiguação e isolamento estrito
         doc_res = self.context_manager.resolve_document(
             self.study_service,
-            chat_session_id=request.chat_session_id,
+            chat_session_id=req_chat_sid or "",
             explicit_document_id=request.document_id,
             document_query=request.document_query,
             prompt=request.raw_prompt,
@@ -170,6 +172,42 @@ class StudyCapabilityRouter:
                 navigation=StudyNavigationTarget(document_id=doc_id, tab="library", label="Ver Estado"),
             )
 
+        if request.study_session_id and hasattr(self.study_service, "list_study_sessions"):
+            explicit_sess = next(
+                (
+                    s
+                    for s in (self.study_service.list_study_sessions() or [])
+                    if s.get("session_id") == request.study_session_id
+                ),
+                None,
+            )
+            if explicit_sess is None and request.capability == StudyCapabilityType.MANAGE_STUDY_SESSION:
+                return StudyCapabilityResult(
+                    operation_id=request.operation_id,
+                    capability=request.capability.value,
+                    status="FAILED",
+                    document_id=doc_id,
+                    document_title=doc_title,
+                    summary_markdown=f"Sessão de estudo '{request.study_session_id}' não encontrada.",
+                    error_code="SESSION_NOT_FOUND",
+                    error_message=f"Sessão '{request.study_session_id}' não encontrada.",
+                )
+            if explicit_sess is not None and explicit_sess.get("document_id") != doc_id:
+                actual_doc_id = str(explicit_sess.get("document_id") or "")
+                return StudyCapabilityResult(
+                    operation_id=request.operation_id,
+                    capability=request.capability.value,
+                    status="FAILED",
+                    document_id=doc_id,
+                    document_title=doc_title,
+                    summary_markdown=(
+                        f"A sessão de estudo '{request.study_session_id}' pertence ao documento "
+                        f"`{actual_doc_id}`, e não a **{doc_title}** (`{doc_id}`)."
+                    ),
+                    error_code="SESSION_DOCUMENT_MISMATCH",
+                    error_message=f"Sessão '{request.study_session_id}' pertence a '{actual_doc_id}', não a '{doc_id}'.",
+                )
+
         # Resolver capítulo / secção estritamente dentro deste documento
         chap_res = self.context_manager.resolve_chapter_or_section(
             self.study_service,
@@ -216,7 +254,7 @@ class StudyCapabilityRouter:
                 doc,
                 chap_res=chap_res,
                 effective_topic=effective_topic,
-                recent_concepts=ctx.recent_concepts,
+                recent_concepts=ctx.recent_concepts if ctx.active_document_id == doc_id else [],
             )
         elif request.capability == StudyCapabilityType.COMPARE_CONCEPTS:
             res = await self._handle_compare(
@@ -259,10 +297,10 @@ class StudyCapabilityRouter:
             )
 
         # Atualizar contexto conversacional apenas em resultados bem-sucedidos / em curso
-        if res.status in {"COMPLETED", "RUNNING"} and res.document_id:
+        if res.status in {"COMPLETED", "RUNNING"} and res.document_id and req_chat_sid:
             concepts = list((res.result_ref or {}).get("concepts_used") or [])
             self.context_manager.update_context(
-                request.chat_session_id,
+                req_chat_sid,
                 document_id=res.document_id,
                 document_title=res.document_title or doc_title,
                 chapter_id=res.chapter_id or effective_chapter_id,
@@ -925,7 +963,7 @@ class StudyCapabilityRouter:
             record, dedup = await self.operation_manager.submit_operation(
                 capability=request.capability.value,
                 document_id=doc_id,
-                chat_session_id=request.chat_session_id,
+                chat_session_id=normalize_chat_session_id(request.chat_session_id) or "",
                 correlation_id=request.correlation_id or request.operation_id,
                 dedup_key=dedup_key,
                 worker_fn=worker,
@@ -1009,7 +1047,7 @@ class StudyCapabilityRouter:
         rec, deduplicated = await self.operation_manager.submit_operation(
             capability=request.capability.value,
             document_id=doc_id,
-            chat_session_id=request.chat_session_id,
+            chat_session_id=normalize_chat_session_id(request.chat_session_id) or "",
             correlation_id=request.correlation_id or request.operation_id,
             dedup_key=dedup_key,
             worker_fn=worker,
@@ -1223,7 +1261,9 @@ class StudyCapabilityRouter:
     ) -> StudyCapabilityResult:
         doc_id = doc.document_id
         doc_title = getattr(doc, "title", doc_id)
-        prompt_id = request.prompt_id or ctx.last_active_recall_prompt_id
+        prompt_id = request.prompt_id or (
+            ctx.last_active_recall_prompt_id if ctx.active_document_id == doc_id else None
+        )
 
         if not prompt_id:
             data = self.study_service.get_active_recall_prompts(doc_id)
@@ -1349,12 +1389,14 @@ class StudyCapabilityRouter:
                 navigation=StudyNavigationTarget(document_id=doc_id, tab="adaptive", label="Abrir Hub Adaptativo"),
             )
 
+        req_sid = normalize_chat_session_id(request.chat_session_id)
         session = self.study_service.start_study_session(
             document_id=doc_id,
             mode="DAILY_REVIEW",
             title=f"Revisão Diária — {doc_title}",
             items=ordered_items,
             item_ids=[it["item_id"] for it in ordered_items],
+            config={"chat_session_id": req_sid} if req_sid else {},
         )
         first_tab = "active_recall" if ordered_items[0]["item_type"] == "active_recall" else "flashcards"
         session_id = str(session.get("session_id") or "")
@@ -1451,11 +1493,41 @@ class StudyCapabilityRouter:
             navigation=StudyNavigationTarget(document_id=doc_id, tab="adaptive", label="Abrir Progresso & Lacunas"),
         )
 
+    @staticmethod
+    def _session_owner(session: Dict[str, Any]) -> Optional[str]:
+        cfg = session.get("config")
+        if isinstance(cfg, dict):
+            return normalize_chat_session_id(cfg.get("chat_session_id"))
+        return None
+
+    @classmethod
+    def _is_session_accessible_implicitly(
+        cls,
+        session: Dict[str, Any],
+        req_sid: Optional[str],
+        ctx: Any,
+        *,
+        require_document_match: bool = True,
+    ) -> bool:
+        """Determina se uma sessão é elegível para retoma implícita nesta conversa."""
+        if not req_sid:
+            return False
+        owner = cls._session_owner(session)
+        active_doc_id = getattr(ctx, "active_document_id", None)
+        if owner == req_sid:
+            if require_document_match and active_doc_id:
+                return session.get("document_id") == active_doc_id
+            return True
+        if owner is None and active_doc_id:
+            return session.get("document_id") == active_doc_id
+        return False
+
     def _try_session_without_explicit_doc(
         self,
         request: StudyCapabilityRequest,
         ctx: Any,
     ) -> Optional[StudyCapabilityResult]:
+        req_sid = normalize_chat_session_id(request.chat_session_id)
         all_sessions = list(self.study_service.list_study_sessions() or [])
         if request.study_session_id:
             target = next((s for s in all_sessions if s.get("session_id") == request.study_session_id), None)
@@ -1472,42 +1544,73 @@ class StudyCapabilityRouter:
 
         action = request.session_action or "resume"
         if action in {"resume", "pause", "complete"}:
-            candidates = [
+            if not req_sid:
+                return StudyCapabilityResult(
+                    operation_id=request.operation_id,
+                    capability=request.capability.value,
+                    status="NEEDS_CLARIFICATION",
+                    summary_markdown=(
+                        "Falta o identificador da conversa para retomar contexto implícito de estudo. "
+                        "Indica explicitamente `study_session_id` ou executa numa conversa identificada."
+                    ),
+                    error_code="MISSING_CHAT_SESSION",
+                    navigation=StudyNavigationTarget(tab="adaptive", label="Abrir Hub Adaptativo"),
+                )
+
+            active_or_paused = [
                 s for s in all_sessions
                 if str(s.get("status", "")).upper() in {"PAUSED", "IN_PROGRESS"}
             ]
-            if ctx.active_document_id:
-                scoped = [s for s in candidates if s.get("document_id") == ctx.active_document_id]
-                if scoped:
-                    candidates = scoped
+            if ctx.active_study_session_id:
+                ctx_target = next(
+                    (s for s in active_or_paused if s.get("session_id") == ctx.active_study_session_id),
+                    None,
+                )
+                if ctx_target and (
+                    not ctx.active_document_id or ctx_target.get("document_id") == ctx.active_document_id
+                ) and self._session_owner(ctx_target) in {None, req_sid}:
+                    doc = self.study_service.get_document(ctx_target.get("document_id"))
+                    return self._apply_session_action(request, ctx_target, doc)
+
+            candidates = [
+                s for s in active_or_paused
+                if self._is_session_accessible_implicitly(s, req_sid, ctx)
+            ]
+            if not candidates:
+                return StudyCapabilityResult(
+                    operation_id=request.operation_id,
+                    capability=request.capability.value,
+                    status="NEEDS_CLARIFICATION",
+                    summary_markdown=(
+                        "Não encontrei nenhuma sessão de estudo ativa ou pausada associada a esta conversa. "
+                        "Indica explicitamente o `study_session_id` ou o documento que pretendes retomar."
+                    ),
+                    error_code="SESSION_CLARIFICATION_REQUIRED",
+                    navigation=StudyNavigationTarget(tab="adaptive", label="Abrir Hub Adaptativo"),
+                )
             if len(candidates) == 1:
                 doc = self.study_service.get_document(candidates[0].get("document_id"))
                 return self._apply_session_action(request, candidates[0], doc)
-            if len(candidates) > 1 and not ctx.active_document_id:
-                # Ordenar pela atividade mais recente e clarificar se houver sessões de documentos diferentes
-                distinct_docs = {s.get("document_id") for s in candidates}
-                if len(distinct_docs) > 1:
-                    opts = [
-                        {
-                            "session_id": s.get("session_id"),
-                            "document_id": s.get("document_id"),
-                            "title": s.get("title") or s.get("mode"),
-                        }
-                        for s in candidates[:5]
-                    ]
-                    return StudyCapabilityResult(
-                        operation_id=request.operation_id,
-                        capability=request.capability.value,
-                        status="NEEDS_CLARIFICATION",
-                        summary_markdown=(
-                            "Tens várias sessões de estudo pausadas/ativas em documentos diferentes. Qual pretendes continuar?\n"
-                            + "\n".join(f"- **{o['title']}** (`{o['session_id']}`)" for o in opts)
-                        ),
-                        clarification_options=opts,
-                        error_code="AMBIGUOUS_SESSION",
-                    )
-                doc = self.study_service.get_document(candidates[0].get("document_id"))
-                return self._apply_session_action(request, candidates[0], doc)
+
+            opts = [
+                {
+                    "session_id": s.get("session_id"),
+                    "document_id": s.get("document_id"),
+                    "title": s.get("title") or s.get("mode"),
+                }
+                for s in candidates[:5]
+            ]
+            return StudyCapabilityResult(
+                operation_id=request.operation_id,
+                capability=request.capability.value,
+                status="NEEDS_CLARIFICATION",
+                summary_markdown=(
+                    "Tens várias sessões de estudo pausadas/ativas nesta conversa. Qual pretendes continuar?\n"
+                    + "\n".join(f"- **{o['title']}** (`{o['session_id']}`)" for o in opts)
+                ),
+                clarification_options=opts,
+                error_code="AMBIGUOUS_SESSION",
+            )
         return None
 
     def _handle_manage_session(
@@ -1519,7 +1622,12 @@ class StudyCapabilityRouter:
         doc_id = doc.document_id
         doc_title = getattr(doc, "title", doc_id)
         action = request.session_action or "resume"
-        sessions = list(self.study_service.list_study_sessions(document_id=doc_id) or [])
+        req_sid = normalize_chat_session_id(request.chat_session_id)
+        all_doc_sessions = list(self.study_service.list_study_sessions(document_id=doc_id) or [])
+        sessions = [
+            s for s in all_doc_sessions
+            if self._session_owner(s) in ({req_sid, None} if req_sid else {None})
+        ]
 
         if action == "list":
             if not sessions:
@@ -1529,7 +1637,7 @@ class StudyCapabilityRouter:
                     status="COMPLETED",
                     document_id=doc_id,
                     document_title=doc_title,
-                    summary_markdown=f"Não existem sessões de estudo registadas para **{doc_title}**.",
+                    summary_markdown=f"Não existem sessões de estudo registadas para **{doc_title}** nesta conversa.",
                     navigation=StudyNavigationTarget(document_id=doc_id, tab="adaptive", label="Abrir Hub Adaptativo"),
                 )
             lines = [f"Sessões de estudo para **{doc_title}**:\n"]
@@ -1549,15 +1657,21 @@ class StudyCapabilityRouter:
         if action == "start":
             return self._handle_start_daily_review(request, doc)
 
-        target_id = request.study_session_id or (ctx.active_study_session_id if ctx.active_document_id == doc_id else None)
-        target_session = (
-            next((s for s in sessions if s.get("session_id") == target_id), None)
-            if target_id
-            else next(
-                (s for s in sessions if str(s.get("status", "")).upper() in {"PAUSED", "IN_PROGRESS"}),
+        if request.study_session_id:
+            target_session = next(
+                (s for s in all_doc_sessions if s.get("session_id") == request.study_session_id),
                 None,
             )
-        )
+        else:
+            target_id = ctx.active_study_session_id if ctx.active_document_id == doc_id else None
+            target_session = (
+                next((s for s in sessions if s.get("session_id") == target_id), None)
+                if target_id
+                else next(
+                    (s for s in sessions if str(s.get("status", "")).upper() in {"PAUSED", "IN_PROGRESS"}),
+                    None,
+                )
+            )
         if not target_session:
             return StudyCapabilityResult(
                 operation_id=request.operation_id,
@@ -1565,7 +1679,7 @@ class StudyCapabilityRouter:
                 status="FAILED",
                 document_id=doc_id,
                 document_title=doc_title,
-                summary_markdown=f"Nenhuma sessão de estudo ativa ou pausada encontrada para **{doc_title}**.",
+                summary_markdown=f"Nenhuma sessão de estudo ativa ou pausada encontrada para **{doc_title}** nesta conversa.",
                 error_code="SESSION_NOT_FOUND",
                 navigation=StudyNavigationTarget(document_id=doc_id, tab="adaptive", label="Iniciar Nova Sessão"),
             )
@@ -1628,14 +1742,16 @@ class StudyCapabilityRouter:
             ),
             auto_navigate=auto_nav,
         )
-        # Sincronizar contexto com documento da sessão
-        self.context_manager.update_context(
-            request.chat_session_id,
-            document_id=doc_id,
-            document_title=doc_title,
-            activity=tab,
-            study_session_id=sid,
-            operation_id=request.operation_id,
-            operation_type=request.capability.value,
-        )
+        # Sincronizar contexto com documento da sessão apenas quando há conversa identificada
+        req_sid = normalize_chat_session_id(request.chat_session_id)
+        if req_sid:
+            self.context_manager.update_context(
+                req_sid,
+                document_id=doc_id,
+                document_title=doc_title,
+                activity=tab,
+                study_session_id=sid,
+                operation_id=request.operation_id,
+                operation_type=request.capability.value,
+            )
         return res
