@@ -69,7 +69,7 @@ import {
   buildSentinelSpatialBoard,
   type SpatialBoardData,
   type SpatialBoardDomain,
-} from '../features/board/SpatialBoard';
+} from '../features/board/boardBuilders';
 import type {
   ChatAttachment,
   ChatSession,
@@ -105,11 +105,34 @@ export interface SafetyRefusalData {
   timestamp: string;
 }
 
+export interface StudyReadingNote {
+  note_id: string;
+  document_id: string;
+  page: number;
+  selection: string;
+  note: string;
+  created_at: string;
+  section_id?: string;
+}
+
+export interface StudyDocumentHighlight {
+  highlight_id: string;
+  document_id: string;
+  page: number;
+  selected_text: string;
+  context?: string;
+  color?: string;
+  created_at?: string;
+}
+
 declare global {
   interface Window {
     jarvisIPC?: {
       send: (message: unknown) => void;
       onMessage: (callback: (data: unknown) => void) => () => void;
+      getPathForFile?: (file: File) => string;
+      selectFolder?: () => Promise<string | null>;
+      openPath?: (targetPath: string) => Promise<{ ok: boolean; error?: string }>;
       isNativeIPC: boolean;
     };
   }
@@ -228,6 +251,8 @@ interface WebSocketContextType {
   createProject: (projectId: string, projectName?: string, template?: string) => void;
   deleteProject: (projectId: string) => void;
   saveProjectFile: (filename: string, content: string) => void;
+  createProjectFile: (filename: string, content?: string) => void;
+  renameProjectFile: (oldFilename: string, newFilename: string) => void;
   deleteProjectFile: (filename: string) => void;
   reindexProject: () => void;
   findReferences: (symbol: string) => void;
@@ -383,9 +408,18 @@ interface WebSocketContextType {
   studyPipelineStage: string;
   studyOperations: Record<string, StudyOperationStatusPayload>;
   studyNavigationTarget: (StudyNavigatePayload & { nonce: number }) | null;
+  studyReadingNotes: Record<string, StudyReadingNote[]>;
+  studyHighlights: Record<string, StudyDocumentHighlight[]>;
+  getStudyDocumentDetails: (documentId: string) => void;
+  addStudyReadingNote: (documentId: string, page: number, note: string, selection?: string, sectionId?: string) => void;
+  addStudyHighlight: (documentId: string, page: number, selectedText: string, context?: string, color?: string) => void;
   updateActiveStudyContext: (ctx: StudyUiContextPayload) => void;
   navigateToStudyTarget: (target: Partial<StudyNavigatePayload>) => void;
   cancelStudyOperation: (operationId: string, documentId?: string) => void;
+  activeDomain: SpatialBoardDomain;
+  setActiveDomain: (domain: SpatialBoardDomain) => void;
+  spatialOverviewOpen: boolean;
+  setSpatialOverviewOpen: (open: boolean) => void;
   activeBoard: SpatialBoardData | null;
   focusedCardId: string | null;
   openSpatialBoard: (domain?: SpatialBoardDomain, query?: string) => void;
@@ -498,7 +532,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [lastStudyDocumentError, setLastStudyDocumentError] = useState<{ filename: string; error: string; ts: number } | null>(null);
   const [studyOperations, setStudyOperations] = useState<Record<string, StudyOperationStatusPayload>>({});
   const [studyNavigationTarget, setStudyNavigationTarget] = useState<(StudyNavigatePayload & { nonce: number }) | null>(null);
+  const [studyReadingNotes, setStudyReadingNotes] = useState<Record<string, StudyReadingNote[]>>({});
+  const [studyHighlights, setStudyHighlights] = useState<Record<string, StudyDocumentHighlight[]>>({});
   const activeStudyContextRef = useRef<StudyUiContextPayload>({});
+  const [activeDomain, setActiveDomainState] = useState<SpatialBoardDomain>('study');
+  const activeDomainRef = useRef<SpatialBoardDomain>('study');
+  const [spatialOverviewOpen, setSpatialOverviewOpen] = useState<boolean>(false);
   const [activeBoard, setActiveBoard] = useState<SpatialBoardData | null>(null);
   const [focusedCardId, setFocusedCardId] = useState<string | null>(null);
 
@@ -826,6 +865,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setDevPanelOpen(true);
     } else if (action === 'close_dev') {
       setDevPanelOpen(false);
+      setActiveBoard(null);
+      setFocusedCardId(null);
     } else if (action === 'toggle_dev') {
       setDevPanelOpen((prev) => !prev);
     } else if (action === 'show_dashboard' || action === 'show_arena_tab') {
@@ -833,6 +874,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } else if (action === 'show_main_screen') {
       setChatPanelOpen(false);
       setDevPanelOpen(false);
+      setActiveBoard(null);
+      setFocusedCardId(null);
     }
   }
 
@@ -978,10 +1021,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'arena_update':
         handleArenaUpdate(msg);
         break;
-      case 'project_output':
+      case 'project_output': {
+        const outProjId = msg.project_id ? String(msg.project_id) : '';
+        const targetProjId = requestedProjectIdRef.current || activeProjectIdRef.current;
+        if (outProjId && targetProjId && outProjId !== targetProjId) break;
         setProjectOutput((prev) => prev + msg.content);
         break;
-      case 'project_status':
+      }
+      case 'project_status': {
+        const statusProjId = msg.project_id ? String(msg.project_id) : '';
+        const targetProjId = requestedProjectIdRef.current || activeProjectIdRef.current;
+        if (statusProjId && targetProjId && statusProjId !== targetProjId) break;
         setIsProjectRunning(Boolean(msg.running));
         if (msg.preview_url) {
           setPreviewUrl(msg.preview_url);
@@ -989,6 +1039,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           setPreviewUrl('about:blank');
         }
         break;
+      }
       case 'ui':
       case 'ui_action':
         handleUiAction(msg.action);
@@ -1078,13 +1129,23 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setMissionSnapshot(msg.data);
         missionRuntimeStore.setMissionSnapshot(msg.data);
         break;
-      case 'mission_event':
+      case 'mission_event': {
         missionRuntimeStore.applyEvent(msg.event, (pId, mId) => {
           sendClientMessage({ type: 'mission_resume_snapshot', project_id: pId, mission_id: mId });
         });
+        const snap = missionRuntimeStore.getSnapshot();
+        if (snap.missions.length > 0) {
+          setMissions(snap.missions);
+        }
+        if (snap.selectedMissionSnapshot) {
+          setMissionSnapshot(snap.selectedMissionSnapshot);
+        }
         break;
+      }
       case 'mission_deleted':
         missionRuntimeStore.removeMission(msg.mission_id);
+        setMissions((prev) => prev.filter((m) => m.mission_id !== msg.mission_id));
+        setMissionSnapshot((prev) => (prev?.mission?.mission_id === msg.mission_id ? null : prev));
         break;
       case 'mission_subdag_history':
         setSubdagHistory(msg.history);
@@ -1110,9 +1171,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setPlanEvaluationResult(msg.result);
         addSystemMessage(`[AVALIAÇÃO DO PLANO: ${msg.result.decision}] ${msg.result.reason}`);
         break;
-      case 'ast_state':
+      case 'ast_state': {
+        const astProjId = msg.project_id ? String(msg.project_id) : '';
+        const targetProjId = requestedProjectIdRef.current || activeProjectIdRef.current;
+        if (astProjId && targetProjId && astProjId !== targetProjId) break;
         setAstState(msg.data);
         break;
+      }
       case 'projects_list':
         setProjects(msg.projects);
         break;
@@ -1125,6 +1190,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           setProjectContext(null);
           setProjectFiles({});
           setProjectFileHashes({});
+          setProjectFileSaveState(null);
+          setAstState(null);
+          setArchitectureSnapshot(null);
+          setProjectReferences(null);
+          setSemanticResults('');
+          setProjectOutput('');
+          setPreviewUrl('about:blank');
+          setIsProjectRunning(false);
+          setCodingSession(null);
+          setMissions([]);
+          setMissionSnapshot(null);
         }
         addSystemMessage(`Projeto '${msg.project_id}' eliminado com sucesso.`);
         break;
@@ -1160,9 +1236,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setIsIndexingProject(false);
         break;
       }
-      case 'architecture_snapshot':
+      case 'architecture_snapshot': {
+        const archProjId = msg.project_id ? String(msg.project_id) : '';
+        const targetProjId = requestedProjectIdRef.current || activeProjectIdRef.current;
+        if (archProjId && targetProjId && archProjId !== targetProjId) break;
         setArchitectureSnapshot(msg.data);
         break;
+      }
       case 'project_file_save_result':
         setProjectFileSaveState({
           ok: msg.ok,
@@ -1172,12 +1252,20 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         });
         setIsSavingProjectFile(false);
         break;
-      case 'project_references':
+      case 'project_references': {
+        const refProjId = msg.project_id ? String(msg.project_id) : '';
+        const targetProjId = requestedProjectIdRef.current || activeProjectIdRef.current;
+        if (refProjId && targetProjId && refProjId !== targetProjId) break;
         setProjectReferences(msg.data);
         break;
-      case 'semantic_results':
+      }
+      case 'semantic_results': {
+        const semProjId = msg.project_id ? String(msg.project_id) : '';
+        const targetProjId = requestedProjectIdRef.current || activeProjectIdRef.current;
+        if (semProjId && targetProjId && semProjId !== targetProjId) break;
         setSemanticResults(msg.content);
         break;
+      }
       case 'coding_session': {
         const sessionProjId = msg.data?.project_id ? String(msg.data.project_id) : '';
         const targetProjId = requestedProjectIdRef.current || activeProjectIdRef.current;
@@ -1842,6 +1930,49 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         break;
       }
+      case 'study_document_details': {
+        const doc = msg.document as StudyDocument | undefined;
+        const docId = doc?.document_id;
+        if (docId) {
+          setStudyDocuments((prev) => {
+            const exists = prev.some((d) => d.document_id === docId);
+            return exists ? prev.map((d) => (d.document_id === docId ? doc : d)) : [doc, ...prev];
+          });
+          if (Array.isArray(msg.notes)) {
+            setStudyReadingNotes((prev) => ({ ...prev, [docId]: msg.notes as StudyReadingNote[] }));
+          }
+          if (Array.isArray(msg.highlights)) {
+            setStudyHighlights((prev) => ({ ...prev, [docId]: msg.highlights as StudyDocumentHighlight[] }));
+          }
+        }
+        break;
+      }
+      case 'study_note_added': {
+        const note = msg.note as StudyReadingNote | undefined;
+        if (note?.document_id) {
+          setStudyReadingNotes((prev) => {
+            const existing = prev[note.document_id] || [];
+            return {
+              ...prev,
+              [note.document_id]: [note, ...existing.filter((n) => n.note_id !== note.note_id)],
+            };
+          });
+        }
+        break;
+      }
+      case 'study_highlight_added': {
+        const hl = msg.highlight as StudyDocumentHighlight | undefined;
+        if (hl?.document_id) {
+          setStudyHighlights((prev) => {
+            const existing = prev[hl.document_id] || [];
+            return {
+              ...prev,
+              [hl.document_id]: [hl, ...existing.filter((h) => h.highlight_id !== hl.highlight_id)],
+            };
+          });
+        }
+        break;
+      }
       case 'permission_pending_list':
         usePermissionStore.getState().setPendingRequests(msg.data);
         break;
@@ -2070,14 +2201,21 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
     if (!isReady()) return;
 
+    const scopedStudyContext =
+      activeDomainRef.current === 'study'
+        ? {
+            ...activeStudyContextRef.current,
+            chat_session_id: activeSessionId,
+          }
+        : {
+            chat_session_id: activeSessionId,
+          };
+
     sendClientMessage({
       type: 'directive',
       text: cleanText,
       attachments: attachments && attachments.length > 0 ? attachments : undefined,
-      study_context: {
-        ...activeStudyContextRef.current,
-        chat_session_id: activeSessionId,
-      },
+      study_context: scopedStudyContext,
     });
     const timestamp = new Date().toLocaleTimeString('pt-PT', { hour12: false });
     const userMsg: ChatMessage = {
@@ -2404,7 +2542,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setProjectFileHashes({});
       setProjectFileSaveState(null);
       setAstState(null);
+      setArchitectureSnapshot(null);
       setProjectReferences(null);
+      setSemanticResults('');
       setProjectOutput('');
       setPreviewUrl('about:blank');
       setIsProjectRunning(false);
@@ -2419,6 +2559,33 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       });
     }
   }, [isReady, sendClientMessage]);
+
+  const createProjectFile = useCallback((filename: string, content = '') => {
+    const trimmed = filename.trim();
+    if (!isReady() || !projectContext?.project_id || !trimmed) {
+      return;
+    }
+    sendClientMessage({
+      type: 'create_project_file',
+      project_id: projectContext.project_id,
+      filename: trimmed,
+      content,
+    });
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
+
+  const renameProjectFile = useCallback((oldFilename: string, newFilename: string) => {
+    const oldTrimmed = oldFilename.trim();
+    const newTrimmed = newFilename.trim();
+    if (!isReady() || !projectContext?.project_id || !oldTrimmed || !newTrimmed || oldTrimmed === newTrimmed) {
+      return;
+    }
+    sendClientMessage({
+      type: 'rename_project_file',
+      project_id: projectContext.project_id,
+      old_filename: oldTrimmed,
+      new_filename: newTrimmed,
+    });
+  }, [isReady, projectContext?.project_id, sendClientMessage]);
 
   const saveProjectFile = useCallback((filename: string, content: string) => {
     const expectedHash = projectFileHashes[filename];
@@ -3494,9 +3661,52 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   }, []);
 
+  const getStudyDocumentDetails = useCallback(
+    (documentId: string) => {
+      if (!isReady() || !documentId) return;
+      sendClientMessage({
+        type: 'study_get_document',
+        document_id: documentId,
+      });
+    },
+    [isReady, sendClientMessage]
+  );
+
+  const addStudyReadingNote = useCallback(
+    (documentId: string, page: number, note: string, selection = '', sectionId = '') => {
+      if (!isReady() || !documentId || !note.trim()) return;
+      sendClientMessage({
+        type: 'study_add_reading_note',
+        document_id: documentId,
+        page,
+        selection,
+        note: note.trim(),
+        section_id: sectionId,
+      });
+    },
+    [isReady, sendClientMessage]
+  );
+
+  const addStudyHighlight = useCallback(
+    (documentId: string, page: number, selectedText: string, context = '', color = 'sky') => {
+      if (!isReady() || !documentId || !selectedText.trim()) return;
+      sendClientMessage({
+        type: 'study_add_highlight',
+        document_id: documentId,
+        page,
+        selected_text: selectedText.trim(),
+        context,
+        color,
+      });
+    },
+    [isReady, sendClientMessage]
+  );
+
   const navigateToStudyTarget = useCallback(
     (target: Partial<StudyNavigatePayload>) => {
       const validTabs = new Set([
+        'overview',
+        'home',
         'library',
         'reader',
         'summary',
@@ -3506,9 +3716,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         'quiz',
         'adaptive',
         'knowledge',
+        'generated_document',
       ]);
       const safeTab = target.tab && validTabs.has(target.tab) ? target.tab : 'library';
       setChatPanelOpen(false);
+      activeDomainRef.current = 'study';
+      setActiveDomainState('study');
       if (target.document_id && !studyDocuments.some((d) => d.document_id === target.document_id)) {
         listStudyDocuments();
       }
@@ -3534,10 +3747,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [isReady, sendClientMessage]
   );
 
+  const setActiveDomain = useCallback((domain: SpatialBoardDomain) => {
+    activeDomainRef.current = domain;
+    setActiveDomainState(domain);
+  }, []);
+
   const openSpatialBoard = useCallback(
     (domain: SpatialBoardDomain = 'study', query = '') => {
       const q = query.trim().toLowerCase();
       setFocusedCardId(null);
+      activeDomainRef.current = domain;
+      setActiveDomainState(domain);
 
       if (domain === 'sentinel') {
         sendClientMessage({ type: 'sentinel_get_status' });
@@ -3552,16 +3772,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
 
       if (domain === 'project') {
-        const targetId =
-          q ||
-          projectContext?.project_id ||
-          projects.find((p) => p.project_id === 'dina')?.project_id ||
-          projects[0]?.project_id ||
-          'dina';
-        if (projectContext?.project_id !== targetId) {
-          openProject(targetId);
+        if (projects.length === 0) listProjects();
+        const targetId = q || projectContext?.project_id || '';
+        if (q && projectContext?.project_id !== q) {
+          openProject(q);
         }
-        setActiveBoard(buildProjectSpatialBoard(targetId, projects, projectContext, projectFiles, previewUrl));
+        setActiveBoard(buildProjectSpatialBoard(targetId || 'projetos', projects, projectContext, projectFiles, previewUrl));
         return;
       }
 
@@ -3573,6 +3789,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         (q
           ? studyDocuments.find(
               (d) =>
+                d.document_id.toLowerCase() === q ||
                 d.title.toLowerCase().includes(q) ||
                 d.subject.toLowerCase().includes(q) ||
                 String((d as unknown as Record<string, unknown>).filename || '')
@@ -3581,14 +3798,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             )
           : undefined) || studyDocuments[0];
 
-      if (matchedDoc) {
-        setActiveBoard(buildStudySpatialBoard(matchedDoc));
-      } else {
-        setActiveBoard(buildObsidianSpatialBoard(notes, studyDocuments));
-      }
+      setActiveBoard(buildStudySpatialBoard(matchedDoc, studyDocuments.length));
     },
     [
       getNotes,
+      listProjects,
       listStudyDocuments,
       notes,
       openProject,
@@ -3967,6 +4181,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         createProject,
         deleteProject,
         saveProjectFile,
+        createProjectFile,
+        renameProjectFile,
         deleteProjectFile,
         reindexProject,
         findReferences,
@@ -4056,9 +4272,18 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         studyPipelineStage,
         studyOperations,
         studyNavigationTarget,
+        studyReadingNotes,
+        studyHighlights,
+        getStudyDocumentDetails,
+        addStudyReadingNote,
+        addStudyHighlight,
         updateActiveStudyContext,
         navigateToStudyTarget,
         cancelStudyOperation,
+        activeDomain,
+        setActiveDomain,
+        spatialOverviewOpen,
+        setSpatialOverviewOpen,
         activeBoard,
         focusedCardId,
         openSpatialBoard,

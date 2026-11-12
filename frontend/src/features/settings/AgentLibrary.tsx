@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Database, Sparkles, ShieldAlert, PenTool, X } from 'lucide-react';
 
 interface AgentLibraryProps {
@@ -54,12 +54,15 @@ export const AgentLibrary: React.FC<AgentLibraryProps> = ({ isOpen, onClose }) =
   };
 
   return (
-    <motion.div
-      initial={{ x: '100%' }}
-      animate={{ x: isOpen ? 0 : '100%' }}
-      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed inset-y-0 right-0 w-full md:w-[420px] bg-[#05070e]/96 border-l border-white/8 shadow-[-18px_0_70px_rgba(0,0,0,0.55)] z-50 flex flex-col backdrop-blur-2xl"
-    >
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          className="fixed inset-y-0 right-0 w-full md:w-[420px] bg-[#0b111a]/98 border-l border-slate-800 shadow-[-18px_0_70px_rgba(0,0,0,0.65)] z-[80] flex flex-col backdrop-blur-2xl"
+        >
       {/* Drawer Header */}
       <div className="flex items-center justify-between p-4 bg-white/[0.025] border-b border-white/8">
         <div className="flex items-center gap-3">
@@ -114,5 +117,7 @@ export const AgentLibrary: React.FC<AgentLibraryProps> = ({ isOpen, onClose }) =
         </div>
       </div>
     </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

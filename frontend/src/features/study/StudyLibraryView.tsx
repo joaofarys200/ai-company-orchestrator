@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   BookOpen,
   FileText,
@@ -28,6 +28,12 @@ import {
   ShieldCheck,
   Loader2,
   FolderX,
+  LayoutList,
+  LayoutGrid,
+  Star,
+  ArrowUpDown,
+  CheckSquare,
+  Square,
 } from 'lucide-react';
 import type { StudyDocument, SourceType, StudyCollection, StudyFolderLink } from './types';
 
@@ -84,9 +90,100 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
   // Course / Collection Selection State
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
 
-  // Filter & Search State
+  // Filter, Sort, Layout & Facet State
   const [filterType, setFilterType] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => {
+    try {
+      const saved = localStorage.getItem('jarvis.study.library.view_mode');
+      return saved === 'grid' ? 'grid' : 'list';
+    } catch {
+      return 'list';
+    }
+  });
+  const [sortBy, setSortBy] = useState<'recent' | 'title' | 'type' | 'progress'>('recent');
+  const [activeFacet, setActiveFacet] = useState<'ALL' | 'RECENT' | 'FAVORITES' | 'FOLDERS' | 'MEDIA'>('ALL');
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem('jarvis.study.library.favorites');
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+  const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
+  const [canvasDragActive, setCanvasDragActive] = useState<boolean>(false);
+
+  const handleSetViewMode = (mode: 'list' | 'grid') => {
+    setViewMode(mode);
+    try {
+      localStorage.setItem('jarvis.study.library.view_mode', mode);
+    } catch {
+      // Ignore storage write errors
+    }
+  };
+
+  const toggleFavorite = (docId: string) => {
+    setFavoriteIds((prev) => {
+      const next = prev.includes(docId) ? prev.filter((id) => id !== docId) : [...prev, docId];
+      try {
+        localStorage.setItem('jarvis.study.library.favorites', JSON.stringify(next));
+      } catch {
+        // Ignore storage write errors
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectDoc = (docId: string) => {
+    setSelectedDocIds((prev) => (prev.includes(docId) ? prev.filter((id) => id !== docId) : [...prev, docId]));
+  };
+
+  const handleCanvasDropUpload = async (files: FileList) => {
+    if (!files?.length) return;
+    for (const file of Array.from(files)) {
+      const nativePath = (window as any)?.jarvisIPC?.getPathForFile?.(file) || '';
+      const ext = file.name.split('.').pop()?.toLowerCase() || '';
+      const inferredType: SourceType =
+        ext === 'mp4' || ext === 'mkv' || ext === 'mov' || ext === 'webm' || ext === 'avi'
+          ? 'VIDEO'
+          : ext === 'pdf'
+          ? 'PDF'
+          : ext === 'pptx' || ext === 'ppt'
+          ? 'PPTX'
+          : 'TXT';
+      const subject = activeCollection?.subject || activeCollection?.name || 'Estudos';
+      const colId = activeCollection?.collection_id;
+      if (nativePath) {
+        onUpload({
+          filename: file.name,
+          file_path: nativePath,
+          subject,
+          source_type: inferredType,
+          collection_id: colId,
+        });
+      } else {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const raw = String(reader.result || '');
+            const idx = raw.indexOf(',');
+            resolve(idx >= 0 ? raw.slice(idx + 1) : raw);
+          };
+          reader.onerror = () => reject(new Error(`Falha ao ler ${file.name}`));
+          reader.readAsDataURL(file);
+        });
+        onUpload({
+          filename: file.name,
+          content_base64: base64,
+          subject,
+          source_type: inferredType,
+          collection_id: colId,
+        });
+      }
+    }
+  };
 
   // Modals
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
@@ -135,39 +232,77 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
   // Active collection object
   const activeCollection = collections.find((c) => c.collection_id === selectedCollectionId) || null;
 
-  // Filtered documents by collection, search query, and type
-  const filteredDocs = documents.filter((doc) => {
-    // 1. Collection filter
-    if (selectedCollectionId && activeCollection) {
-      const inDocIds = activeCollection.document_ids?.includes(doc.document_id);
-      const matchesColId = (doc as any).collection_id === selectedCollectionId;
-      const matchesSubject =
-        doc.subject &&
-        activeCollection.subject &&
-        doc.subject.trim().toLowerCase() === activeCollection.subject.trim().toLowerCase();
-      if (!inDocIds && !matchesColId && !matchesSubject) {
+  // Filtered and sorted documents by collection, facet, search query, and type
+  const filteredDocs = useMemo(() => {
+    const filtered = documents.filter((doc) => {
+      // 1. Collection filter
+      if (selectedCollectionId && activeCollection) {
+        const inDocIds = activeCollection.document_ids?.includes(doc.document_id);
+        const matchesColId = (doc as any).collection_id === selectedCollectionId;
+        const matchesSubject =
+          doc.subject &&
+          activeCollection.subject &&
+          doc.subject.trim().toLowerCase() === activeCollection.subject.trim().toLowerCase();
+        if (!inDocIds && !matchesColId && !matchesSubject) {
+          return false;
+        }
+      }
+
+      // 1b. Facet filter
+      if (activeFacet === 'FAVORITES' && !favoriteIds.includes(doc.document_id)) {
         return false;
       }
-    }
+      if (activeFacet === 'RECENT' && !(doc.reading_progress?.last_read_at || doc.reading_progress?.progress_percent)) {
+        return false;
+      }
+      if (activeFacet === 'FOLDERS') {
+        const origin = (doc as any).source_origin || doc.provenance?.source_origin || 'manual_upload';
+        if (origin !== 'linked_folder') return false;
+      }
+      if (activeFacet === 'MEDIA' && !['VIDEO', 'AUDIO', 'IMAGE', 'LECTURE_AUDIO'].includes(doc.source_type)) {
+        return false;
+      }
 
-    // 2. Search query filter
-    const title = (doc.title || '').toLowerCase();
-    const subject = (doc.subject || '').toLowerCase();
-    const relPath = (doc.provenance?.rel_path || '').toLowerCase();
-    const q = searchQuery.toLowerCase();
-    const matchesSearch = title.includes(q) || subject.includes(q) || relPath.includes(q);
-    if (!matchesSearch) return false;
+      // 2. Search query filter
+      const title = (doc.title || '').toLowerCase();
+      const subject = (doc.subject || '').toLowerCase();
+      const relPath = (doc.provenance?.rel_path || '').toLowerCase();
+      const q = searchQuery.toLowerCase();
+      const matchesSearch = title.includes(q) || subject.includes(q) || relPath.includes(q);
+      if (!matchesSearch) return false;
 
-    // 3. Type filter
-    if (filterType === 'ALL') return true;
-    if (filterType === 'DOCS') return ['PDF', 'DOCX', 'PPTX', 'TXT', 'MARKDOWN'].includes(doc.source_type);
-    if (filterType === 'VIDEO') return doc.source_type === 'VIDEO';
-    if (filterType === 'IMAGES') return doc.source_type === 'IMAGE';
-    if (filterType === 'AUDIO') return doc.source_type === 'AUDIO';
-    if (filterType === 'LECTURES') return doc.source_type === 'LECTURE_AUDIO';
-    if (filterType === 'NOTES') return doc.source_type === 'NOTE';
-    return true;
-  });
+      // 3. Type filter
+      if (filterType === 'ALL') return true;
+      if (filterType === 'DOCS') return ['PDF', 'DOCX', 'PPTX', 'TXT', 'MARKDOWN'].includes(doc.source_type);
+      if (filterType === 'VIDEO') return doc.source_type === 'VIDEO';
+      if (filterType === 'IMAGES') return doc.source_type === 'IMAGE';
+      if (filterType === 'AUDIO') return doc.source_type === 'AUDIO';
+      if (filterType === 'LECTURES') return doc.source_type === 'LECTURE_AUDIO';
+      if (filterType === 'NOTES') return doc.source_type === 'NOTE';
+      return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+      if (sortBy === 'title') return (a.title || '').localeCompare(b.title || '', 'pt');
+      if (sortBy === 'type') return (a.source_type || '').localeCompare(b.source_type || '');
+      if (sortBy === 'progress') {
+        return (b.reading_progress?.progress_percent || 0) - (a.reading_progress?.progress_percent || 0);
+      }
+      const aTime = a.reading_progress?.last_read_at || a.updated_at || a.created_at || '';
+      const bTime = b.reading_progress?.last_read_at || b.updated_at || b.created_at || '';
+      return String(bTime).localeCompare(String(aTime));
+    });
+  }, [activeCollection, activeFacet, documents, favoriteIds, filterType, searchQuery, selectedCollectionId, sortBy]);
+
+  const recentDocsShelf = useMemo(() => {
+    return [...documents]
+      .sort((a, b) => {
+        const aTime = a.reading_progress?.last_read_at || a.updated_at || a.created_at || '';
+        const bTime = b.reading_progress?.last_read_at || b.updated_at || b.created_at || '';
+        return String(bTime).localeCompare(String(aTime));
+      })
+      .slice(0, 3);
+  }, [documents]);
 
   // Calculate count per collection
   const getCollectionDocCount = (col: StudyCollection) => {
@@ -777,11 +912,11 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
           </div>
         )}
 
-        {/* 4. Filters & Search Bar */}
+        {/* 4. Filters, Sort, View Toggle & Search Bar */}
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-2">
           {/* Filter Pills */}
           <div className="flex flex-wrap items-center gap-1.5 text-xs">
-            <span className="mr-1 text-zinc-500 flex items-center gap-1">
+            <span className="mr-1 text-slate-500 flex items-center gap-1">
               <Filter className="h-3 w-3" /> Filtro:
             </span>
             {[
@@ -796,10 +931,10 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
               <button
                 key={f.id}
                 onClick={() => setFilterType(f.id)}
-                className={`rounded-md px-2.5 py-1 transition ${
+                className={`rounded-md px-2.5 py-1 transition cursor-pointer ${
                   filterType === f.id
-                    ? 'bg-cyan-400/15 text-cyan-200 border border-cyan-400/30 font-medium'
-                    : 'text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200'
+                    ? 'bg-sky-500/20 text-sky-200 border border-sky-400/30 font-medium'
+                    : 'text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'
                 }`}
               >
                 {f.label}
@@ -807,16 +942,60 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
             ))}
           </div>
 
-          {/* Search Box */}
-          <div className="relative min-w-[240px] flex-1 sm:flex-none">
-            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" />
-            <input
-              type="text"
-              placeholder="Pesquisar por título, disciplina ou pasta..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 w-full rounded-lg border border-white/[0.08] bg-black/40 pl-8 pr-3 text-xs text-zinc-200 placeholder-zinc-500 outline-none focus:border-cyan-400/40"
-            />
+          <div className="flex flex-wrap items-center gap-2 flex-1 sm:flex-none justify-end">
+            {/* Sort Select */}
+            <label className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#080c12] px-2.5 py-1 text-xs text-slate-300">
+              <ArrowUpDown className="h-3 w-3 text-slate-500" />
+              <select
+                aria-label="Ordenar materiais"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="bg-transparent text-xs text-slate-200 outline-none cursor-pointer"
+              >
+                <option value="recent">Recentes</option>
+                <option value="title">Título (A-Z)</option>
+                <option value="type">Tipo</option>
+                <option value="progress">Progresso</option>
+              </select>
+            </label>
+
+            {/* List / Grid Toggle */}
+            <div className="inline-flex items-center rounded-lg border border-slate-800 bg-[#080c12] p-0.5">
+              <button
+                type="button"
+                data-testid="study-library-view-list"
+                onClick={() => handleSetViewMode('list')}
+                className={`rounded-md p-1.5 transition cursor-pointer ${
+                  viewMode === 'list' ? 'bg-sky-500/20 text-sky-300' : 'text-slate-400 hover:text-white'
+                }`}
+                title="Vista em Lista"
+              >
+                <LayoutList className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                data-testid="study-library-view-grid"
+                onClick={() => handleSetViewMode('grid')}
+                className={`rounded-md p-1.5 transition cursor-pointer ${
+                  viewMode === 'grid' ? 'bg-sky-500/20 text-sky-300' : 'text-slate-400 hover:text-white'
+                }`}
+                title="Vista em Grelha"
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            {/* Search Box */}
+            <div className="relative min-w-[220px] flex-1 sm:flex-none">
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Pesquisar por título, disciplina ou pasta..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-8 w-full rounded-lg border border-slate-800 bg-[#080c12] pl-8 pr-3 text-xs text-slate-200 placeholder-slate-500 outline-none focus:border-sky-400/50"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -835,231 +1014,496 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
         </div>
       )}
 
-      {/* 5. Materials Grid / List */}
-      <div className="flex-1 overflow-y-auto p-6">
-        {filteredDocs.length === 0 ? (
-          <div className="flex h-72 flex-col items-center justify-center rounded-xl border border-dashed border-white/[0.08] bg-white/[0.01] p-8 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.04] text-zinc-500 mb-3">
-              <BookOpen className="h-6 w-6" />
-            </div>
-            <p className="text-sm font-semibold text-zinc-300">
-              {activeCollection
-                ? `Nenhum material associado à disciplina "${activeCollection.name}".`
-                : 'Nenhum material de estudo encontrado.'}
-            </p>
-            <p className="mt-1 text-xs text-zinc-500 max-w-md">
-              {activeCollection
-                ? 'Vincula uma pasta local com apontamentos e diapositivos ou carrega os ficheiros manualmente.'
-                : 'Começa por vincular uma pasta ou carregar um artigo científico, vídeo ou nota de estudo.'}
-            </p>
-            <div className="mt-4 flex items-center gap-3">
-              {activeCollection && (
+      {/* 5. Library Body: Left Facets + Drag-Drop Canvas */}
+      <div
+        className={`relative flex flex-1 overflow-hidden ${canvasDragActive ? 'ring-2 ring-inset ring-sky-400/60 bg-sky-500/[0.04]' : ''}`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setCanvasDragActive(true);
+        }}
+        onDragLeave={() => setCanvasDragActive(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setCanvasDragActive(false);
+          if (e.dataTransfer.files?.length) {
+            handleCanvasDropUpload(e.dataTransfer.files);
+          }
+        }}
+      >
+        {/* Left Discrete Facets Rail */}
+        <aside className="hidden md:flex w-48 shrink-0 flex-col border-r border-slate-800/80 bg-[#090e15] p-3 gap-1">
+          <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            Vistas Rápidas
+          </div>
+          {[
+            { id: 'ALL' as const, label: 'Todos os Materiais', count: documents.length },
+            {
+              id: 'RECENT' as const,
+              label: 'Recentes',
+              count: documents.filter((d) => Boolean(d.reading_progress?.last_read_at || d.reading_progress?.progress_percent)).length,
+            },
+            { id: 'FAVORITES' as const, label: 'Favoritos', count: favoriteIds.length },
+            {
+              id: 'FOLDERS' as const,
+              label: 'Pastas Sincronizadas',
+              count: documents.filter((d) => ((d as any).source_origin || d.provenance?.source_origin) === 'linked_folder').length,
+            },
+            {
+              id: 'MEDIA' as const,
+              label: 'Vídeo & Média',
+              count: documents.filter((d) => ['VIDEO', 'AUDIO', 'IMAGE', 'LECTURE_AUDIO'].includes(d.source_type)).length,
+            },
+          ].map((facet) => (
+            <button
+              key={facet.id}
+              type="button"
+              onClick={() => setActiveFacet(facet.id)}
+              className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition cursor-pointer ${
+                activeFacet === facet.id
+                  ? 'bg-sky-500/15 text-sky-200 font-semibold border border-sky-400/25'
+                  : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200 border border-transparent'
+              }`}
+            >
+              <span className="truncate">{facet.label}</span>
+              <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] text-slate-400">{facet.count}</span>
+            </button>
+          ))}
+
+          <div className="mt-auto rounded-lg border border-dashed border-slate-800 bg-[#070b11] p-2.5 text-[11px] text-slate-400">
+            Arrasta PDFs, slides ou vídeos para qualquer ponto desta biblioteca.
+          </div>
+        </aside>
+
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+          {/* Bulk Selection Toolbar */}
+          {selectedDocIds.length > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-sky-400/30 bg-sky-500/10 px-4 py-2 text-xs">
+              <div className="flex items-center gap-3 text-sky-100 font-medium">
+                <span>{selectedDocIds.length} selecionado(s)</span>
                 <button
-                  onClick={handleTriggerLinkFolder}
-                  className="inline-flex items-center gap-2 rounded-lg border border-cyan-400/40 bg-cyan-500/20 px-4 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/30 transition"
+                  type="button"
+                  onClick={() => setSelectedDocIds(filteredDocs.map((d) => d.document_id))}
+                  className="text-sky-300 hover:underline cursor-pointer"
                 >
-                  <FolderPlus className="h-4 w-4" />
-                  <span>Vincular Pasta Local</span>
+                  Selecionar todos ({filteredDocs.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDocIds([])}
+                  className="text-slate-400 hover:text-white cursor-pointer"
+                >
+                  Limpar
+                </button>
+              </div>
+              {onDeleteDocument && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    for (const docId of selectedDocIds) {
+                      await onDeleteDocument(docId);
+                    }
+                    setSelectedDocIds([]);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/40 bg-rose-500/15 px-3 py-1 text-xs font-semibold text-rose-200 hover:bg-rose-500/25 cursor-pointer"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>Eliminar selecionados</span>
                 </button>
               )}
-              <button
-                onClick={() => setIsUploadModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.05] px-4 py-2 text-xs font-semibold text-zinc-200 hover:bg-white/10 transition"
-              >
-                <FileUp className="h-4 w-4" />
-                <span>Carregar Ficheiro</span>
-              </button>
             </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            {filteredDocs.map((doc) => {
-              const progressPct = Math.round(doc.reading_progress?.progress_percent || 0);
-              const isEn = (doc.language || 'en').toLowerCase().startsWith('en');
-              const isVideo = doc.source_type === 'VIDEO';
-              const videoDuration =
-                (doc.metadata as any)?.video?.duration_seconds || (doc.metadata as any)?.duration_seconds;
-              const videoDurationStr = videoDuration
-                ? `${Math.floor(videoDuration / 60)}:${Math.floor(videoDuration % 60)
-                    .toString()
-                    .padStart(2, '0')}`
-                : null;
-              const lastWatched = (doc.metadata as any)?.video_progress?.last_watched_at;
+          )}
 
-              // Origin detection
-              const sourceOrigin = (doc as any).source_origin || doc.provenance?.source_origin || 'manual_upload';
-              const isLinkedFolder = sourceOrigin === 'linked_folder';
-              const relPath = doc.provenance?.rel_path || '';
+          {/* Recently Opened Shelf */}
+          {recentDocsShelf.length > 0 && activeFacet === 'ALL' && !searchQuery.trim() && (
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Abertos Recentemente
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 gap-2.5 md:grid-cols-3">
+                {recentDocsShelf.map((doc) => {
+                  const pct = Math.round(doc.reading_progress?.progress_percent || 0);
+                  return (
+                    <button
+                      key={`recent-${doc.document_id}`}
+                      type="button"
+                      onClick={() => onOpenDocument(doc.document_id, 'reader')}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-slate-800/80 bg-[#0d141f] p-3 text-left transition hover:border-sky-400/40 hover:bg-[#111b29] cursor-pointer"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate text-xs font-semibold text-white">{doc.title}</div>
+                        <div className="mt-0.5 text-[11px] text-slate-400 truncate">
+                          {doc.subject || 'Geral'} • {doc.source_type}
+                        </div>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-sky-500/15 px-2 py-0.5 font-mono text-[10px] font-semibold text-sky-300">
+                        {pct}%
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
-              // Sync status detection
-              const syncStatus = (doc as any).sync_status || doc.provenance?.sync_status || 'synced';
-              const syncError = (doc as any).sync_error || doc.provenance?.sync_error;
-              const isRetrying = retryingDocs[doc.document_id];
-
-              return (
-                <div
-                  key={doc.document_id}
-                  className="group relative flex flex-col justify-between rounded-xl border border-white/[0.08] bg-[#0e151b]/80 p-5 transition hover:border-white/20 hover:bg-[#121c24]/90 shadow-sm"
+          {filteredDocs.length === 0 ? (
+            <div className="flex h-72 flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 bg-[#0b111a]/60 p-8 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.04] text-slate-500 mb-3">
+                <BookOpen className="h-6 w-6" />
+              </div>
+              <p className="text-sm font-semibold text-slate-300">
+                {activeCollection
+                  ? `Nenhum material associado à disciplina "${activeCollection.name}".`
+                  : 'Nenhum material de estudo encontrado.'}
+              </p>
+              <p className="mt-1 text-xs text-slate-500 max-w-md">
+                {activeCollection
+                  ? 'Vincula uma pasta local com apontamentos e diapositivos ou carrega os ficheiros manualmente.'
+                  : 'Arrasta ficheiros para aqui ou começa por carregar um artigo científico, vídeo ou nota de estudo.'}
+              </p>
+              <div className="mt-4 flex items-center gap-3">
+                {activeCollection && (
+                  <button
+                    onClick={handleTriggerLinkFolder}
+                    className="inline-flex items-center gap-2 rounded-lg border border-sky-400/40 bg-sky-500/20 px-4 py-2 text-xs font-semibold text-sky-200 hover:bg-sky-500/30 transition cursor-pointer"
+                  >
+                    <FolderPlus className="h-4 w-4" />
+                    <span>Vincular Pasta Local</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsUploadModalOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-white/[0.05] px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer"
                 >
-                  <div>
-                    {/* Top Row: Type & Language & Pages / Duration */}
-                    <div className="flex items-center justify-between gap-2 mb-2 text-xs">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span
-                          className={`flex items-center gap-1 rounded px-2 py-0.5 font-medium border ${
-                            isVideo
-                              ? 'bg-purple-500/10 text-purple-300 border-purple-500/20'
-                              : 'bg-white/[0.05] text-cyan-300 border-white/5'
-                          }`}
+                  <FileUp className="h-4 w-4" />
+                  <span>Carregar Ficheiro</span>
+                </button>
+              </div>
+            </div>
+          ) : viewMode === 'list' ? (
+            <div className="overflow-hidden rounded-xl border border-slate-800/80 bg-[#0b111a]">
+              <div className="grid grid-cols-12 items-center gap-2 border-b border-slate-800/80 bg-[#080c12] px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                <div className="col-span-5">Documento / Disciplina</div>
+                <div className="col-span-2 hidden sm:block">Tipo & Origem</div>
+                <div className="col-span-2 hidden md:block">Progresso</div>
+                <div className="col-span-3 text-right">Ações</div>
+              </div>
+              <div className="divide-y divide-slate-800/60">
+                {filteredDocs.map((doc) => {
+                  const progressPct = Math.round(doc.reading_progress?.progress_percent || 0);
+                  const isVideo = doc.source_type === 'VIDEO';
+                  const isFav = favoriteIds.includes(doc.document_id);
+                  const isChecked = selectedDocIds.includes(doc.document_id);
+                  const sourceOrigin = (doc as any).source_origin || doc.provenance?.source_origin || 'manual_upload';
+                  const isLinkedFolder = sourceOrigin === 'linked_folder';
+                  const syncStatus = (doc as any).sync_status || doc.provenance?.sync_status || 'synced';
+                  const isRetrying = retryingDocs[doc.document_id];
+
+                  return (
+                    <div
+                      key={doc.document_id}
+                      className={`grid grid-cols-12 items-center gap-2 px-4 py-3 text-xs transition hover:bg-white/[0.03] ${
+                        isChecked ? 'bg-sky-500/[0.06]' : ''
+                      }`}
+                    >
+                      <div className="col-span-8 sm:col-span-5 flex items-center gap-2.5 min-w-0">
+                        <button
+                          type="button"
+                          onClick={() => toggleSelectDoc(doc.document_id)}
+                          className="text-slate-500 hover:text-sky-300 shrink-0 cursor-pointer"
+                          title="Selecionar documento"
                         >
+                          {isChecked ? <CheckSquare className="h-4 w-4 text-sky-400" /> : <Square className="h-4 w-4" />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleFavorite(doc.document_id)}
+                          className={`shrink-0 cursor-pointer ${isFav ? 'text-amber-400' : 'text-slate-600 hover:text-amber-300'}`}
+                          title={isFav ? 'Remover dos favoritos' : 'Marcar como favorito'}
+                        >
+                          <Star className={`h-3.5 w-3.5 ${isFav ? 'fill-amber-400' : ''}`} />
+                        </button>
+                        <div className="min-w-0">
+                          <button
+                            type="button"
+                            onClick={() => onOpenDocument(doc.document_id, 'reader')}
+                            className="truncate block text-left font-semibold text-white hover:text-sky-300 transition cursor-pointer max-w-full"
+                            title={doc.title}
+                          >
+                            {doc.title}
+                          </button>
+                          <div className="flex items-center gap-2 text-[11px] text-slate-400 truncate">
+                            <span>{doc.subject || 'Geral'}</span>
+                            {syncStatus === 'failed' && (
+                              <span className="text-rose-400 font-medium">• Erro no processamento</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-span-2 hidden sm:flex items-center gap-1.5">
+                        <span className="inline-flex items-center gap-1 rounded border border-slate-700/80 bg-[#080c12] px-1.5 py-0.5 text-[10px] font-medium text-sky-300">
                           {getSourceIcon(doc.source_type)}
                           <span>{doc.source_type}</span>
                         </span>
-
-                        <span className="rounded bg-white/[0.03] px-1.5 py-0.5 font-mono text-[10px] text-zinc-400 border border-white/5">
-                          {isEn ? 'English' : 'Português'}
-                        </span>
-
-                        {/* Origin Badge */}
-                        {isLinkedFolder ? (
-                          <span
-                            className="inline-flex items-center gap-1 rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-300 border border-blue-500/20"
-                            title={`Origem: Pasta local vinculada (${relPath || doc.provenance?.source_file})`}
-                          >
-                            <Folder className="h-3 w-3" />
-                            <span className="truncate max-w-[120px]">{relPath || 'Pasta Local'}</span>
-                          </span>
-                        ) : (
-                          <span
-                            className="inline-flex items-center gap-1 rounded bg-white/[0.03] px-1.5 py-0.5 text-[10px] text-zinc-400 border border-white/5"
-                            title="Carregamento individual"
-                          >
-                            <UploadCloud className="h-3 w-3" />
-                            <span>Upload Manual</span>
+                        {isLinkedFolder && (
+                          <span title="Pasta vinculada" className="inline-flex">
+                            <Folder className="h-3.5 w-3.5 text-sky-400" />
                           </span>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        {isVideo ? (
-                          <span className="text-[11px] text-zinc-400 font-mono">
-                            ⏱️ {videoDurationStr || 'Vídeo'}
-                          </span>
-                        ) : (
-                          <span className="text-[11px] text-zinc-500">
-                            {doc.page_count} {doc.page_count === 1 ? 'página' : 'páginas'}
-                          </span>
+                      <div className="col-span-2 hidden md:flex items-center gap-2">
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+                          <div
+                            className={`h-full rounded-full ${isVideo ? 'bg-purple-400' : 'bg-sky-400'}`}
+                            style={{ width: `${progressPct}%` }}
+                          />
+                        </div>
+                        <span className="w-8 text-right font-mono text-[10px] text-slate-300">{progressPct}%</span>
+                      </div>
+
+                      <div className="col-span-4 sm:col-span-3 flex items-center justify-end gap-1">
+                        {syncStatus === 'failed' && (
+                          <button
+                            type="button"
+                            onClick={() => handleRetryDoc(doc.document_id)}
+                            disabled={isRetrying}
+                            className="rounded px-2 py-1 text-[10px] font-semibold bg-rose-500/15 text-rose-200 hover:bg-rose-500/25 cursor-pointer"
+                          >
+                            {isRetrying ? '...' : 'Retry'}
+                          </button>
                         )}
                         <button
                           type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDocumentToDelete(doc);
-                          }}
-                          className="rounded p-1 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition opacity-60 group-hover:opacity-100"
-                          title="Eliminar material da biblioteca"
+                          onClick={() => onOpenDocument(doc.document_id, 'summary')}
+                          className="rounded px-2 py-1 text-[11px] text-slate-400 hover:bg-white/[0.06] hover:text-white cursor-pointer"
+                        >
+                          Resumo
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onOpenDocument(doc.document_id, 'reader')}
+                          className="inline-flex items-center gap-1 rounded-md border border-sky-400/30 bg-sky-500/15 px-2.5 py-1 text-[11px] font-semibold text-sky-200 hover:bg-sky-500/25 cursor-pointer"
+                        >
+                          <span>Ler</span>
+                          <ArrowRight className="h-3 w-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDocumentToDelete(doc)}
+                          className="rounded p-1 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 cursor-pointer"
+                          title="Eliminar material"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+              {filteredDocs.map((doc) => {
+                const progressPct = Math.round(doc.reading_progress?.progress_percent || 0);
+                const isEn = (doc.language || 'en').toLowerCase().startsWith('en');
+                const isVideo = doc.source_type === 'VIDEO';
+                const isFav = favoriteIds.includes(doc.document_id);
+                const isChecked = selectedDocIds.includes(doc.document_id);
+                const videoDuration =
+                  (doc.metadata as any)?.video?.duration_seconds || (doc.metadata as any)?.duration_seconds;
+                const videoDurationStr = videoDuration
+                  ? `${Math.floor(videoDuration / 60)}:${Math.floor(videoDuration % 60)
+                      .toString()
+                      .padStart(2, '0')}`
+                  : null;
+                const lastWatched = (doc.metadata as any)?.video_progress?.last_watched_at;
 
-                    {/* Sync / Processing Status Banner if not synced */}
-                    {syncStatus === 'failed' && (
-                      <div className="mb-2 flex items-center justify-between rounded bg-red-500/10 px-2 py-1 text-[11px] text-red-300 border border-red-500/20">
-                        <div className="flex items-center gap-1 truncate mr-2">
-                          <AlertCircle className="h-3 w-3 shrink-0" />
-                          <span className="truncate">Falha: {syncError || 'Erro no processamento'}</span>
+                const sourceOrigin = (doc as any).source_origin || doc.provenance?.source_origin || 'manual_upload';
+                const isLinkedFolder = sourceOrigin === 'linked_folder';
+                const relPath = doc.provenance?.rel_path || '';
+
+                const syncStatus = (doc as any).sync_status || doc.provenance?.sync_status || 'synced';
+                const syncError = (doc as any).sync_error || doc.provenance?.sync_error;
+                const isRetrying = retryingDocs[doc.document_id];
+
+                return (
+                  <div
+                    key={doc.document_id}
+                    className={`group relative flex flex-col justify-between rounded-xl border bg-[#0c131d]/90 p-5 transition hover:border-slate-600 hover:bg-[#101927] shadow-sm ${
+                      isChecked ? 'border-sky-400/60' : 'border-slate-800/80'
+                    }`}
+                  >
+                    <div>
+                      {/* Top Row */}
+                      <div className="flex items-center justify-between gap-2 mb-2 text-xs">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => toggleSelectDoc(doc.document_id)}
+                            className="text-slate-500 hover:text-sky-300 cursor-pointer"
+                            title="Selecionar documento"
+                          >
+                            {isChecked ? <CheckSquare className="h-3.5 w-3.5 text-sky-400" /> : <Square className="h-3.5 w-3.5" />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toggleFavorite(doc.document_id)}
+                            className={`cursor-pointer ${isFav ? 'text-amber-400' : 'text-slate-600 hover:text-amber-300'}`}
+                            title={isFav ? 'Remover dos favoritos' : 'Marcar como favorito'}
+                          >
+                            <Star className={`h-3.5 w-3.5 ${isFav ? 'fill-amber-400' : ''}`} />
+                          </button>
+                          <span
+                            className={`flex items-center gap-1 rounded px-2 py-0.5 font-medium border ${
+                              isVideo
+                                ? 'bg-purple-500/10 text-purple-300 border-purple-500/20'
+                                : 'bg-white/[0.05] text-sky-300 border-white/5'
+                            }`}
+                          >
+                            {getSourceIcon(doc.source_type)}
+                            <span>{doc.source_type}</span>
+                          </span>
+
+                          <span className="rounded bg-white/[0.03] px-1.5 py-0.5 font-mono text-[10px] text-slate-400 border border-white/5">
+                            {isEn ? 'English' : 'Português'}
+                          </span>
+
+                          {isLinkedFolder ? (
+                            <span
+                              className="inline-flex items-center gap-1 rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-300 border border-blue-500/20"
+                              title={`Origem: Pasta local vinculada (${relPath || doc.provenance?.source_file})`}
+                            >
+                              <Folder className="h-3 w-3" />
+                              <span className="truncate max-w-[120px]">{relPath || 'Pasta Local'}</span>
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-flex items-center gap-1 rounded bg-white/[0.03] px-1.5 py-0.5 text-[10px] text-slate-400 border border-white/5"
+                              title="Carregamento individual"
+                            >
+                              <UploadCloud className="h-3 w-3" />
+                              <span>Upload Manual</span>
+                            </span>
+                          )}
                         </div>
+
+                        <div className="flex items-center gap-2">
+                          {isVideo ? (
+                            <span className="text-[11px] text-slate-400 font-mono">⏱️ {videoDurationStr || 'Vídeo'}</span>
+                          ) : (
+                            <span className="text-[11px] text-slate-500">
+                              {doc.page_count} {doc.page_count === 1 ? 'página' : 'páginas'}
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDocumentToDelete(doc);
+                            }}
+                            className="rounded p-1 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition opacity-60 group-hover:opacity-100 cursor-pointer"
+                            title="Eliminar material da biblioteca"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {syncStatus === 'failed' && (
+                        <div className="mb-2 flex items-center justify-between rounded bg-red-500/10 px-2 py-1 text-[11px] text-red-300 border border-red-500/20">
+                          <div className="flex items-center gap-1 truncate mr-2">
+                            <AlertCircle className="h-3 w-3 shrink-0" />
+                            <span className="truncate">Falha: {syncError || 'Erro no processamento'}</span>
+                          </div>
+                          <button
+                            onClick={() => handleRetryDoc(doc.document_id)}
+                            disabled={isRetrying}
+                            className="rounded bg-red-500/20 px-2 py-0.5 text-[10px] font-semibold text-red-200 hover:bg-red-500/30 transition shrink-0"
+                          >
+                            {isRetrying ? 'A tentar...' : 'Tentar Novamente'}
+                          </button>
+                        </div>
+                      )}
+
+                      {syncStatus === 'processing' && (
+                        <div className="mb-2 flex items-center gap-1.5 rounded bg-amber-500/10 px-2 py-1 text-[11px] text-amber-300 border border-amber-500/20 animate-pulse">
+                          <Loader2 className="h-3 w-3 animate-spin shrink-0" />
+                          <span>A processar conteúdo em segundo plano...</span>
+                        </div>
+                      )}
+
+                      <h2
+                        onClick={() => onOpenDocument(doc.document_id, 'reader')}
+                        className="text-sm font-semibold text-white group-hover:text-sky-200 transition-colors cursor-pointer line-clamp-2"
+                        title={doc.title}
+                      >
+                        {doc.title}
+                      </h2>
+                      <p className="mt-1 text-xs text-slate-400 flex items-center gap-1">
+                        <span className="text-slate-500">Disciplina:</span> {doc.subject}
+                      </p>
+
+                      <div className="mt-4">
+                        <div className="flex items-center justify-between text-[11px] mb-1">
+                          <span className="text-slate-500">{isVideo ? 'Visualização' : 'Progresso de Leitura'}</span>
+                          <span className="font-mono text-slate-300">
+                            {progressPct}% {isVideo ? 'assistido' : ''}
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                          <div
+                            className={`h-full transition-all duration-300 rounded-full ${isVideo ? 'bg-purple-400' : 'bg-sky-400'}`}
+                            style={{ width: `${progressPct}%` }}
+                          />
+                        </div>
+                        {isVideo && lastWatched && (
+                          <p className="mt-1 text-[10px] text-slate-500 font-mono">
+                            Última visualização: {new Date(lastWatched).toLocaleDateString('pt-PT')}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1 text-[10px] text-slate-500">
+                        <Clock className="h-3 w-3" />
+                        <span>{new Date(doc.updated_at || doc.created_at).toLocaleDateString('pt-PT')}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
                         <button
-                          onClick={() => handleRetryDoc(doc.document_id)}
-                          disabled={isRetrying}
-                          className="rounded bg-red-500/20 px-2 py-0.5 text-[10px] font-semibold text-red-200 hover:bg-red-500/30 transition shrink-0"
+                          onClick={() => onOpenDocument(doc.document_id, 'summary')}
+                          className="rounded-md px-2 py-1 text-xs text-slate-400 hover:text-slate-200 hover:bg-white/[0.05] transition cursor-pointer"
+                          title="Ver Resumo e Argument Map"
                         >
-                          {isRetrying ? 'A tentar...' : 'Tentar Novamente'}
+                          Resumo
+                        </button>
+                        <button
+                          onClick={() => onOpenDocument(doc.document_id, 'quiz')}
+                          className="rounded-md px-2 py-1 text-xs text-slate-400 hover:text-slate-200 hover:bg-white/[0.05] transition cursor-pointer"
+                          title="Fazer Quiz"
+                        >
+                          Quiz
+                        </button>
+                        <button
+                          onClick={() => onOpenDocument(doc.document_id, 'reader')}
+                          className="inline-flex items-center gap-1 rounded-md border border-sky-400/30 bg-sky-400/10 px-2.5 py-1 text-xs font-medium text-sky-300 hover:bg-sky-400/20 transition cursor-pointer"
+                        >
+                          <span>Ler</span>
+                          <ArrowRight className="h-3 w-3" />
                         </button>
                       </div>
-                    )}
-
-                    {syncStatus === 'processing' && (
-                      <div className="mb-2 flex items-center gap-1.5 rounded bg-amber-500/10 px-2 py-1 text-[11px] text-amber-300 border border-amber-500/20 animate-pulse">
-                        <Loader2 className="h-3 w-3 animate-spin shrink-0" />
-                        <span>A processar conteúdo em segundo plano...</span>
-                      </div>
-                    )}
-
-                    {/* Title & Subject */}
-                    <h2
-                      onClick={() => onOpenDocument(doc.document_id, 'reader')}
-                      className="text-sm font-semibold text-white group-hover:text-cyan-200 transition-colors cursor-pointer line-clamp-2"
-                      title={doc.title}
-                    >
-                      {doc.title}
-                    </h2>
-                    <p className="mt-1 text-xs text-zinc-400 flex items-center gap-1">
-                      <span className="text-zinc-500">Disciplina:</span> {doc.subject}
-                    </p>
-
-                    {/* Reading / Watching Progress */}
-                    <div className="mt-4">
-                      <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-zinc-500">{isVideo ? 'Visualização' : 'Progresso de Leitura'}</span>
-                        <span className="font-mono text-zinc-300">
-                          {progressPct}% {isVideo ? 'assistido' : ''}
-                        </span>
-                      </div>
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
-                        <div
-                          className={`h-full transition-all duration-300 rounded-full ${
-                            isVideo ? 'bg-purple-400' : 'bg-cyan-400'
-                          }`}
-                          style={{ width: `${progressPct}%` }}
-                        />
-                      </div>
-                      {isVideo && lastWatched && (
-                        <p className="mt-1 text-[10px] text-zinc-500 font-mono">
-                          Última visualização: {new Date(lastWatched).toLocaleDateString('pt-PT')}
-                        </p>
-                      )}
                     </div>
                   </div>
-
-                  {/* Bottom Controls */}
-                  <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1 text-[10px] text-zinc-500">
-                      <Clock className="h-3 w-3" />
-                      <span>{new Date(doc.updated_at || doc.created_at).toLocaleDateString('pt-PT')}</span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => onOpenDocument(doc.document_id, 'summary')}
-                        className="rounded-md px-2 py-1 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.05] transition"
-                        title="Ver Resumo e Argument Map"
-                      >
-                        Resumo
-                      </button>
-                      <button
-                        onClick={() => onOpenDocument(doc.document_id, 'quiz')}
-                        className="rounded-md px-2 py-1 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.05] transition"
-                        title="Fazer Quiz"
-                      >
-                        Quiz
-                      </button>
-                      <button
-                        onClick={() => onOpenDocument(doc.document_id, 'reader')}
-                        className="inline-flex items-center gap-1 rounded-md border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-xs font-medium text-cyan-300 hover:bg-cyan-400/20 transition cursor-pointer"
-                      >
-                        <span>Ler</span>
-                        <ArrowRight className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ============================================================ */}
@@ -1500,7 +1944,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
                   ref={fileInputRef}
                   type="file"
                   onChange={handleFileChange}
-                  accept=".pdf,.docx,.pptx,.txt,.md,.markdown,.png,.jpg,.jpeg,.webp,.mp3,.wav,.m4a,.ogg,.flac,.aac,.wma"
+                  accept=".pdf,.docx,.pptx,.txt,.md,.markdown,.png,.jpg,.jpeg,.webp,.mp4,.webm,.mkv,.mov,.avi,.wmv,.m4v,.mp3,.wav,.m4a,.ogg,.flac,.aac,.wma"
                   className="hidden"
                 />
               </div>

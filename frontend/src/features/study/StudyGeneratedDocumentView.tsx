@@ -12,6 +12,8 @@ import {
   ChevronDown,
   ChevronRight,
   BookOpen,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import type {
   StudyDocument,
@@ -62,8 +64,25 @@ export const StudyGeneratedDocumentView: React.FC<StudyGeneratedDocumentViewProp
   const [selectedProfile, setSelectedProfile] = useState<string>('ACADEMIC_EDITORIAL_CLASSIC');
   const [exportDocx, setExportDocx] = useState<boolean>(true);
   const [expandedFindings, setExpandedFindings] = useState<boolean>(false);
+  const [previewPdfUrl, setPreviewPdfUrl] = useState<string | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState<boolean>(false);
 
   const docId = document?.document_id;
+
+  useEffect(() => {
+    return () => {
+      if (previewPdfUrl) {
+        URL.revokeObjectURL(previewPdfUrl);
+      }
+    };
+  }, [previewPdfUrl]);
+
+  useEffect(() => {
+    setPreviewPdfUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+  }, [docId]);
 
   const loadStatus = async () => {
     if (!docId || !onGetGeneratedDocumentStatus) return;
@@ -146,6 +165,36 @@ export const StudyGeneratedDocumentView: React.FC<StudyGeneratedDocumentViewProp
       setError(msg || `Erro ao descarregar ${format.toUpperCase()}.`);
     } finally {
       setIsDownloading(null);
+    }
+  };
+
+  const handleTogglePdfPreview = async () => {
+    if (previewPdfUrl) {
+      URL.revokeObjectURL(previewPdfUrl);
+      setPreviewPdfUrl(null);
+      return;
+    }
+    if (!docId || !onGetGeneratedDocumentFile) return;
+    setIsLoadingPreview(true);
+    setError(null);
+    try {
+      const fileData = await onGetGeneratedDocumentFile(docId, 'pdf');
+      if (!fileData || !fileData.base64_data) {
+        throw new Error('Pré-visualização PDF não disponível.');
+      }
+      const byteCharacters = atob(fileData.base64_data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const blob = new Blob([new Uint8Array(byteNumbers)], { type: fileData.mime_type || 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      setPreviewPdfUrl(url);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : '';
+      setError(msg || 'Não foi possível abrir a pré-visualização inline do PDF.');
+    } finally {
+      setIsLoadingPreview(false);
     }
   };
 
@@ -354,12 +403,31 @@ export const StudyGeneratedDocumentView: React.FC<StudyGeneratedDocumentViewProp
               </button>
             )}
 
-            {/* Download Buttons */}
+            {/* Inline PDF Preview + Download Buttons */}
+            {hasPdf && (
+              <button
+                type="button"
+                data-testid="generated-doc-preview-toggle"
+                onClick={handleTogglePdfPreview}
+                disabled={isLoadingPreview}
+                className="flex items-center gap-1.5 rounded-md border border-sky-400/35 bg-sky-500/15 px-3 py-1.5 text-xs font-semibold text-sky-200 hover:bg-sky-500/25 disabled:opacity-50 transition cursor-pointer"
+              >
+                {isLoadingPreview ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : previewPdfUrl ? (
+                  <EyeOff className="h-3.5 w-3.5" />
+                ) : (
+                  <Eye className="h-3.5 w-3.5" />
+                )}
+                <span>{previewPdfUrl ? 'Ocultar PDF' : 'Pré-visualizar PDF'}</span>
+              </button>
+            )}
+
             {hasPdf && (
               <button
                 onClick={() => handleDownload('pdf')}
                 disabled={isDownloading !== null}
-                className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-emerald-500 disabled:opacity-50 transition"
+                className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-emerald-500 disabled:opacity-50 transition cursor-pointer"
               >
                 {isDownloading === 'pdf' ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -387,6 +455,30 @@ export const StudyGeneratedDocumentView: React.FC<StudyGeneratedDocumentViewProp
           </div>
         </div>
       </div>
+
+      {/* Inline PDF Viewer */}
+      {previewPdfUrl && (
+        <section
+          data-testid="generated-doc-inline-preview"
+          className="overflow-hidden rounded-xl border border-slate-800 bg-[#0b111a]"
+        >
+          <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2 text-xs">
+            <span className="font-semibold text-slate-200">Pré-visualização do Documento IA (PDF)</span>
+            <button
+              type="button"
+              onClick={handleTogglePdfPreview}
+              className="text-slate-400 hover:text-white cursor-pointer"
+            >
+              Fechar pré-visualização
+            </button>
+          </div>
+          <iframe
+            src={previewPdfUrl}
+            title="Pré-visualização do Documento IA"
+            className="h-[640px] w-full border-none bg-white"
+          />
+        </section>
+      )}
 
       {/* Metrics & Telemetry Card */}
       {hasPdf && (

@@ -70,7 +70,22 @@ interface StudySummaryViewProps {
     format?: 'pdf' | 'docx',
     version?: number
   ) => Promise<StudyDocumentFilePayload | null>;
+  onOpenGeneratedDocument?: () => void;
   pipelineStage?: string;
+}
+
+const UNAVAILABLE_FEATURE_LABELS: Record<string, string> = {
+  interpretive_synthesis: 'síntese interpretativa com IA',
+  causal_inference: 'relações causais e síntese cruzada',
+  generative_argument_relations: 'estruturação argumentativa aprofundada',
+  deep_conceptual_distinctions: 'distinções conceptuais avançadas',
+  llm_semantic_explanation: 'explicação semântica via qwen3.5:9b',
+};
+
+function formatUnavailableFeatures(features: string[]): string {
+  return features
+    .map((key) => UNAVAILABLE_FEATURE_LABELS[key] || key.replace(/_/g, ' '))
+    .join(', ');
 }
 
 const LEGACY_PREFAB_SNIPPETS = [
@@ -249,6 +264,7 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
   onGetGeneratedDocumentStatus,
   onGenerateStudyDocument,
   onGetGeneratedDocumentFile,
+  onOpenGeneratedDocument,
   pipelineStage,
 }) => {
   const [selectedMode, setSelectedMode] = useState<SummaryMode>('Study');
@@ -672,10 +688,31 @@ export const StudySummaryView: React.FC<StudySummaryViewProps> = ({
                       : ' Clica em "Regenerar Resumo" para executar a síntese generativa com qwen3.5:9b.'}
                   </p>
                   {unavailableFeatures.length > 0 && (
-                    <p className="text-[11px] text-amber-300/80 font-mono">
-                      Operações generativas indisponíveis neste modo: {unavailableFeatures.join(', ')}
+                    <p className="text-[11px] text-amber-300/85">
+                      Funcionalidades indisponíveis sem modelo local: {formatUnavailableFeatures(unavailableFeatures)}.
                     </p>
                   )}
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    {onGenerateSummary && (
+                      <button
+                        type="button"
+                        onClick={handleForceRegenerate}
+                        disabled={isGenerating}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-cyan-400/35 bg-cyan-500/15 px-2.5 py-1 text-[11px] font-semibold text-cyan-200 hover:bg-cyan-500/25 cursor-pointer disabled:opacity-50"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        <span>Gerar Síntese Completa (qwen3.5:9b)</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => (onOpenGeneratedDocument ? onOpenGeneratedDocument() : setActiveTab('study_document'))}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/[0.05] px-2.5 py-1 text-[11px] font-medium text-zinc-200 hover:bg-white/10 cursor-pointer"
+                    >
+                      <BookOpen className="h-3 w-3 text-cyan-300" />
+                      <span>Abrir Documento IA</span>
+                    </button>
+                  </div>
                 </div>
               )}
 

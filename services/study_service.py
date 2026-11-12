@@ -98,11 +98,13 @@ from services.study_ai_engine import (
     ensure_16khz_mono_wav,
     extract_key_terms_from_text,
     extract_keyframes_ocr_windows,
+    extract_keyframes_ocr_windows_with_status,
     generate_complete_study_bundle,
     invoke_study_llm_json,
     is_prefabricated_artifact,
     rank_salient_sentences,
     split_clean_sentences,
+    truncate_at_boundary,
     synthesize_multi_documents_grounded,
     transcribe_audio_real,
 )
@@ -910,6 +912,7 @@ class StudyService:
         media_items: List[Dict[str, Any]] = []
         sections: List[Dict[str, Any]] = []
         ast_data: Optional[AcademicDocumentAST] = None
+        image_ocr_status: Optional[str] = None
         doc_dir = resolve_confined_path(self.storage_dir / "documents", document_id)
         assets_dir = resolve_confined_path(doc_dir, "assets")
 
@@ -952,15 +955,16 @@ class StudyService:
             sections = self._extract_sections_and_paragraphs(pages_text)
         elif source_type == "IMAGE":
             ocr_text = ""
+            image_ocr_status = "OCR_SKIPPED"
             if not os.environ.get("PYTEST_CURRENT_TEST") or os.environ.get("STUDY_FORCE_WINRT_OCR") == "1":
-                ocr_res = extract_keyframes_ocr_windows([file_path])
+                ocr_res, image_ocr_status = extract_keyframes_ocr_windows_with_status([file_path])
                 ocr_text = ocr_res.get(os.path.abspath(file_path), "").strip()
             pages_text = [ocr_text] if ocr_text else [f"[Imagem carregada: {filename}]"]
             media_items.append({
                 "media_id": f"img_{uuid.uuid4().hex[:8]}",
                 "media_type": "image",
                 "title": title,
-                "caption": ocr_text[:240] if ocr_text else f"Ficheiro visual {filename}",
+                "caption": truncate_at_boundary(ocr_text, 240) if ocr_text else f"Ficheiro visual {filename}",
                 "page_number": 1,
                 "data_ref": file_path,
                 "evidence_status": "OBSERVED",
@@ -1032,6 +1036,7 @@ class StudyService:
                 "rel_path": rel_path,
                 "sync_status": sync_status,
                 "sync_error": None,
+                **({"ocr_status": image_ocr_status} if image_ocr_status else {}),
                 "file_mtime": os.path.getmtime(file_path) if os.path.exists(file_path) else time.time(),
                 "generation_mode": bundle["generation_mode"],
                 "artifact_modes": bundle.get("artifact_modes", {}),
@@ -1448,6 +1453,7 @@ class StudyService:
             duration_seconds=video_meta.duration_seconds,
         )
         raw_asr_status = getattr(self.video_service.transcriber, "last_status", "")
+        asr_reason = getattr(self.video_service.transcriber, "asr_unavailable_reason", None)
         asr_status = {
             "TRANSCRIBED_WHISPER": "TRANSCRIPTION_COMPLETED",
             "TRANSCRIBED_MULTIMODAL": "TRANSCRIPTION_COMPLETED",
@@ -1473,8 +1479,11 @@ class StudyService:
                 if ocr_body:
                     raw_ocr_entries.append((k.timestamp, k.frame_id, ocr_body))
         deduped_slides = deduplicate_slide_ocr_entries(raw_ocr_entries)
+        reported_ocr_status = getattr(self.video_service, "last_ocr_status", "")
         if deduped_slides:
             ocr_status = "OCR_COMPLETED"
+        elif reported_ocr_status in ("OCR_UNAVAILABLE", "OCR_SKIPPED_TEST"):
+            ocr_status = reported_ocr_status
         elif keyframes:
             ocr_status = "OCR_PARTIAL"
         else:
@@ -1585,9 +1594,21 @@ class StudyService:
 
         audio_warning = None
         if not full_video_corpus:
-            audio_warning = "Vídeo sem discurso audível nem texto legível detetado nos frames."
+            if asr_reason == "WHISPER_NOT_INSTALLED":
+                audio_warning = (
+                    "Motor local de transcrição (faster-whisper) não instalado e nenhum texto OCR legível "
+                    "foi detetado nos frames deste vídeo."
+                )
+            else:
+                audio_warning = "Vídeo sem discurso audível nem texto legível detetado nos frames."
         elif not has_speech_transcript and deduped_slides:
-            audio_warning = f"Análise do áudio incompleta ({asr_status}); conteúdo extraído exclusivamente via OCR local dos diapositivos ({ocr_status})."
+            if asr_reason == "WHISPER_NOT_INSTALLED":
+                audio_warning = (
+                    f"Transcrição de áudio indisponível (faster-whisper não instalado); "
+                    f"conteúdo extraído via OCR local dos diapositivos ({ocr_status})."
+                )
+            else:
+                audio_warning = f"Análise do áudio incompleta ({asr_status}); conteúdo extraído exclusivamente via OCR local dos diapositivos ({ocr_status})."
 
         now = datetime.now().isoformat()
         study_doc = StudyDocument(
@@ -1612,6 +1633,7 @@ class StudyService:
                 "sync_error": None,
                 "file_mtime": os.path.getmtime(video_path) if os.path.exists(video_path) else time.time(),
                 "transcription_status": asr_status,
+                "asr_unavailable_reason": asr_reason,
                 "ocr_status": ocr_status,
                 "audio_analysis_incomplete": not has_speech_transcript,
                 "transcription_warning": audio_warning,
@@ -4213,11 +4235,11 @@ class StudyService:
                 if isinstance(s_item, dict) and s_item.get("status") in ("OBSERVED", "INFERRED") and s_item.get("text"):
                     _add_card(q_front, str(s_item["text"]), diff, extra_source_ids=s_item.get("source_refs"))
 
-        # Garantir pelo menos 1 cartão fundamentado mesmo em documentos mínimos de teste
-        if not cards:
-            fallback_back = (doc.extracted_text.strip()[:260] if doc and doc.extracted_text.strip() else f"Conteúdo de {doc.title if doc else document_id}")
+        # Garantir 1 cartão fundamentado apenas quando existir texto real extraído (nunca fabricar placeholder vazio)
+        if not cards and doc and doc.extracted_text and doc.extracted_text.strip():
+            fallback_back = truncate_at_boundary(doc.extracted_text.strip(), 260)
             _add_card(
-                f"Qual o conteúdo registado em «{doc.title if doc else document_id}»?",
+                f"Qual o conceito ou síntese principal em «{doc.title}»?",
                 fallback_back,
                 "EASY",
             )
@@ -5134,6 +5156,10 @@ date: "{date_str}"
             raise FileNotFoundError(f"Ficheiro de origem não encontrado no disco: {fpath}")
 
         filename = doc.metadata.get("filename", Path(fpath).name)
+        owning_collection_id = next(
+            (cid for cid, col in self.collections.items() if document_id in (col.document_ids or [])),
+            None,
+        )
         return self.ingest_document(
             fpath,
             filename,
@@ -5142,6 +5168,7 @@ date: "{date_str}"
             linked_folder_path=doc.metadata.get("linked_folder_path"),
             rel_path=doc.metadata.get("rel_path"),
             sync_status="READY",
+            collection_id=owning_collection_id,
             existing_doc_id=document_id,
         )
 

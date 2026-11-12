@@ -58,6 +58,7 @@ class WebSocketResponder:
             websocket,
             {
                 "type": "ast_state",
+                "project_id": project_id,
                 "data": payload.get("symbols") or None,
             },
         )

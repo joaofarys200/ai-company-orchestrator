@@ -99,7 +99,7 @@ export interface StudyHighlight {
   selected_text: string;
   context?: string;
   color?: string;
-  created_at: string;
+  created_at?: string;
 }
 
 export interface StudyDocument {

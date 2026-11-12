@@ -36,6 +36,8 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "delete_project",
         "open_project",
         "save_project_file",
+        "create_project_file",
+        "rename_project_file",
         "delete_project_file",
         "index_project",
         "find_references",

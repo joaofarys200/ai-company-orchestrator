@@ -347,6 +347,8 @@ CLIENT_MESSAGE_TYPES = {
     "delete_project",
     "open_project",
     "save_project_file",
+    "create_project_file",
+    "rename_project_file",
     "delete_project_file",
     "index_project",
     "find_references",
@@ -818,6 +820,16 @@ def validate_client_message(message: Mapping[str, Any]) -> dict[str, Any]:
         expected_sha256 = _as_str(payload.get("expected_sha256")).strip().lower()
         if not re.fullmatch(r"[a-f0-9]{64}", expected_sha256):
             raise WebSocketPayloadError("expected_sha256 deve ser um SHA-256 valido.")
+    if message_type == "create_project_file":
+        if not _as_str(payload.get("project_id")).strip() or not _as_str(payload.get("filename")).strip():
+            raise WebSocketPayloadError("create_project_file exige project_id e filename.")
+    if message_type == "rename_project_file":
+        if (
+            not _as_str(payload.get("project_id")).strip()
+            or not _as_str(payload.get("old_filename")).strip()
+            or not _as_str(payload.get("new_filename")).strip()
+        ):
+            raise WebSocketPayloadError("rename_project_file exige project_id, old_filename e new_filename.")
     if message_type in {
         "mission_apply_execution",
         "mission_cancel_execution",

@@ -14,6 +14,7 @@ import {
   Minimize2,
   Copy,
   Check,
+  Users,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatSidebar } from './ChatSidebar';
@@ -21,6 +22,7 @@ import { SystemConsolePanel } from './SystemConsolePanel';
 import { ChatPromptInput } from './ChatPromptInput';
 import { ChatAttachmentBar } from './ChatAttachmentBar';
 import { ChatStudyResultCard } from './ChatStudyResultCard';
+import { AgentLibrary } from '../settings/AgentLibrary';
 import type { ChatMessage } from '../../protocol/websocket';
 import type { ChatAttachment } from './types';
 
@@ -59,6 +61,7 @@ export const ChatPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'chat' | 'system'>('chat');
   const [showSidebar, setShowSidebar] = useState(false);
   const [isWide, setIsWide] = useState(false);
+  const [agentLibraryOpen, setAgentLibraryOpen] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleCopy = (id: string, text: string) => {
@@ -125,7 +128,7 @@ export const ChatPanel: React.FC = () => {
   };
 
   return (
-    <div className={`flex h-full w-full overflow-hidden bg-[#05070e] transition-all duration-300 ${isWide ? 'lg:min-w-[820px]' : ''}`}>
+    <div className={`flex h-full w-full overflow-hidden bg-[#080c12] transition-all duration-300 ${isWide ? 'lg:min-w-[820px]' : ''}`}>
       {/* ── SIDEBAR DE HISTÓRICO DE CONVERSAS (ESTILO CHATGPT) ── */}
       <AnimatePresence>
         {showSidebar && (
@@ -134,7 +137,7 @@ export const ChatPanel: React.FC = () => {
             animate={{ width: 280, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="h-full shrink-0 overflow-hidden z-20 border-r border-white/8 bg-[#04060d]"
+            className="h-full shrink-0 overflow-hidden z-20 border-r border-slate-800/80 bg-[#0b111a]"
           >
             <div className="w-[280px] h-full">
               <ChatSidebar
@@ -161,15 +164,15 @@ export const ChatPanel: React.FC = () => {
       <div className="flex flex-col flex-1 h-full min-w-0 overflow-hidden bg-transparent">
         
         {/* Top Navigation & Channel Switcher */}
-        <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/8 bg-white/[0.02] backdrop-blur-sm shrink-0">
+        <div className="flex items-center justify-between px-3 py-2.5 border-b border-slate-800/80 bg-[#0b111a]/90 backdrop-blur-sm shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             {/* Sidebar Toggle Button */}
             <button
               onClick={() => setShowSidebar((prev) => !prev)}
               className={`p-1.5 rounded-md border text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
                 showSidebar
-                  ? 'bg-cyan-300/15 border-cyan-300/30 text-cyan-200'
-                  : 'bg-white/[0.035] border-white/8 text-gray-400 hover:text-white hover:bg-white/[0.08]'
+                  ? 'bg-sky-500/15 border-sky-400/35 text-sky-200'
+                  : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-100 hover:bg-slate-800/70'
               }`}
               title={showSidebar ? 'Ocultar histórico de conversas' : 'Ver histórico de conversas (estilo ChatGPT)'}
             >
@@ -180,7 +183,7 @@ export const ChatPanel: React.FC = () => {
             {/* Quick New Chat Button */}
             <button
               onClick={() => createNewChatSession()}
-              className="p-1.5 rounded-md border border-white/8 bg-white/[0.035] text-gray-400 hover:text-cyan-200 hover:bg-white/[0.08] transition-all cursor-pointer flex items-center gap-1 text-[11px]"
+              className="p-1.5 rounded-md border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-sky-200 hover:border-sky-500/30 hover:bg-slate-800/70 transition-all cursor-pointer flex items-center gap-1 text-[11px]"
               title="Nova conversa"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -188,32 +191,32 @@ export const ChatPanel: React.FC = () => {
             </button>
 
             {/* Channel Tabs: Conversa IA vs Consola de Sistema */}
-            <div className="flex items-center rounded-lg bg-black/40 border border-white/8 p-0.5 ml-1">
+            <div className="flex items-center rounded-lg bg-[#070b11] border border-slate-800 p-0.5 ml-1">
               <button
                 onClick={() => setActiveTab('chat')}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'chat'
-                    ? 'bg-cyan-300/15 border border-cyan-300/25 text-cyan-100 shadow-sm'
-                    : 'text-gray-400 hover:text-gray-200 border border-transparent'
+                    ? 'bg-sky-500/15 border border-sky-400/30 text-sky-100 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 border border-transparent'
                 }`}
               >
-                <Sparkles className="w-3 h-3 text-cyan-300" />
+                <Sparkles className="w-3 h-3 text-sky-400" />
                 <span>Conversa IA</span>
-                <span className="text-[10px] text-gray-500 font-mono">({chatMessages.length})</span>
+                <span className="text-[10px] text-slate-500 font-mono">({chatMessages.length})</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('system')}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'system'
-                    ? 'bg-purple-950/40 border border-purple-400/30 text-purple-200 shadow-sm'
-                    : 'text-gray-400 hover:text-gray-200 border border-transparent'
+                    ? 'bg-slate-800/90 border border-slate-600/50 text-slate-100 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 border border-transparent'
                 }`}
               >
-                <Terminal className="w-3 h-3 text-purple-400" />
+                <Terminal className="w-3 h-3 text-amber-400" />
                 <span>Consola Central</span>
                 <span className={`text-[10px] font-mono px-1 py-0.2 rounded ${
-                  systemLogs.length > 0 ? 'bg-purple-900/40 text-purple-300' : 'text-gray-500'
+                  systemLogs.length > 0 ? 'bg-amber-500/15 text-amber-300' : 'text-slate-500'
                 }`}>
                   {systemLogs.length}
                 </span>
@@ -223,6 +226,15 @@ export const ChatPanel: React.FC = () => {
 
           {/* Right Top Actions */}
           <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              onClick={() => setAgentLibraryOpen(true)}
+              className="p-1.5 rounded-md border border-slate-800 bg-white/[0.03] text-slate-300 hover:text-sky-300 hover:border-sky-500/30 transition-all cursor-pointer flex items-center gap-1 text-[11px]"
+              title="Biblioteca de subagentes especializados"
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline">Especialistas</span>
+            </button>
+
             {/* Width Expand Toggle */}
             <button
               onClick={() => setIsWide((prev) => !prev)}
@@ -247,14 +259,14 @@ export const ChatPanel: React.FC = () => {
         {activeTab === 'chat' && (
           <div className="flex flex-col flex-1 h-full min-h-0 overflow-hidden">
             {/* Active Session Title Sub-header */}
-            <div className="px-4 py-1.5 border-b border-white/5 bg-black/20 flex items-center justify-between text-[11px] text-gray-400">
+            <div className="px-4 py-1.5 border-b border-slate-800/70 bg-[#0b111a]/60 flex items-center justify-between text-[11px] text-slate-400">
               <div className="flex items-center gap-2 truncate">
-                <MessageSquare className="w-3 h-3 text-cyan-300 shrink-0" />
-                <span className="font-semibold text-gray-200 truncate">
+                <MessageSquare className="w-3 h-3 text-sky-400 shrink-0" />
+                <span className="font-semibold text-slate-200 truncate">
                   {activeSession?.title || 'Conversa ativa'}
                 </span>
               </div>
-              <span className="text-[10px] text-gray-500 font-mono shrink-0">
+              <span className="text-[10px] text-slate-500 font-mono shrink-0">
                 Jarvis AI Assistant
               </span>
             </div>
@@ -262,13 +274,13 @@ export const ChatPanel: React.FC = () => {
             {/* Dialogue Bubbles Stream */}
             <div
               ref={logRef}
-              className="flex-1 p-4 overflow-y-auto space-y-4 scroll-smooth bg-[#04060d]/60 select-text"
+              className="flex-1 p-4 overflow-y-auto space-y-4 scroll-smooth bg-[#080c12] select-text"
               style={{ scrollbarWidth: 'thin' }}
             >
               {chatMessages.length === 0 ? (
-                <div className="text-gray-500 text-center py-20 text-sm flex flex-col items-center justify-center gap-3 select-none">
-                  <div className="h-14 w-14 rounded-xl border border-cyan-400/20 bg-cyan-400/10 flex items-center justify-center shadow-[0_0_24px_rgba(103,232,249,0.1)]">
-                    <Bot className="w-7 h-7 text-cyan-300" />
+                <div className="text-slate-500 text-center py-20 text-sm flex flex-col items-center justify-center gap-3 select-none">
+                  <div className="h-14 w-14 rounded-xl border border-sky-400/20 bg-sky-500/10 flex items-center justify-center">
+                    <Bot className="w-7 h-7 text-sky-300" />
                   </div>
                   <span className="text-gray-200 font-semibold text-base">Olá, em que posso ajudar hoje?</span>
                   <p className="text-gray-500 text-xs max-w-sm leading-relaxed">
@@ -370,16 +382,16 @@ export const ChatPanel: React.FC = () => {
 
                           {/* Bubble Body */}
                           <div
-                            className={`p-3.5 rounded-lg shadow-lg border text-sm leading-relaxed transition-all font-sans select-text cursor-text ${
+                            className={`p-3.5 rounded-lg shadow-sm border text-sm leading-relaxed transition-all font-sans select-text cursor-text ${
                               isUser
-                                ? 'bg-sky-400/10 border-sky-300/25 text-sky-50'
+                                ? 'bg-sky-500/10 border-sky-400/25 text-sky-50'
                                 : isSafety
                                 ? 'bg-rose-950/25 border-rose-500/35 text-rose-100'
                                 : isError
                                 ? 'bg-red-950/25 border-red-500/35 text-red-100'
                                 : isMission
-                                ? 'bg-cyan-950/25 border-cyan-400/35 text-cyan-50'
-                                : 'bg-white/[0.045] border-white/8 text-gray-100'
+                                ? 'bg-[#0f1722] border-sky-500/30 text-slate-100'
+                                : 'bg-[#0f1722]/90 border-slate-800/90 text-slate-100'
                             }`}
                           >
                             {/* Attached Media/Docs in Message */}
@@ -445,6 +457,8 @@ export const ChatPanel: React.FC = () => {
           </div>
         )}
       </div>
+
+      <AgentLibrary isOpen={agentLibraryOpen} onClose={() => setAgentLibraryOpen(false)} />
     </div>
   );
 };

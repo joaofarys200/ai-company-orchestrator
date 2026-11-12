@@ -574,20 +574,8 @@ def invoke_study_llm_text(
 # OCR Nativo Local de Diapositivos/Keyframes (Windows WinRT Windows.Media.Ocr)
 # ---------------------------------------------------------------------------
 
-def extract_keyframes_ocr_windows_with_status(image_paths: List[str]) -> Tuple[Dict[str, str], str]:
-    """
-    Executa OCR local 100% offline via Windows.Media.Ocr em lote sobre keyframes/imagens.
-    Devolve (ocr_map, ocr_status) onde ocr_status pertence a:
-    {"OCR_COMPLETED", "OCR_PARTIAL", "OCR_UNAVAILABLE"}.
-    """
-    if os.name != "nt":
-        return {}, "OCR_UNAVAILABLE"
-    if not image_paths:
-        return {}, "OCR_UNAVAILABLE"
-    valid_paths = [os.path.abspath(p) for p in image_paths if p and os.path.isfile(p)]
-    if not valid_paths:
-        return {}, "OCR_UNAVAILABLE"
-
+def _run_winrt_ocr_ps_batch(batch_paths: List[str], timeout_sec: int = 28) -> Tuple[Optional[Dict[str, str]], str]:
+    """Executa uma única invocação PowerShell WinRT OCR para um lote pequeno de imagens."""
     ps_script = r"""
 $ErrorActionPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -639,26 +627,73 @@ $results | ConvertTo-Json -Compress -Depth 3
     try:
         proc = subprocess.run(
             ["powershell", "-NoProfile", "-Command", ps_script],
-            input=json.dumps(valid_paths),
+            input=json.dumps(batch_paths),
             capture_output=True,
             text=True,
             encoding="utf-8",
             errors="replace",
-            timeout=35,
+            timeout=timeout_sec,
         )
         if proc.returncode == 0 and proc.stdout.strip():
             parsed = parse_llm_json(proc.stdout.strip())
             if isinstance(parsed, dict):
                 if parsed.get("__ocr_engine_unavailable__"):
-                    return {}, "OCR_UNAVAILABLE"
-                non_empty = {str(k): str(v).strip() for k, v in parsed.items() if str(v).strip()}
-                if non_empty:
-                    status = "OCR_COMPLETED" if len(non_empty) >= max(1, len(valid_paths) // 3) else "OCR_PARTIAL"
-                    return non_empty, status
-                return {}, "OCR_PARTIAL"
+                    return None, "OCR_UNAVAILABLE"
+                return {str(k): str(v).strip() for k, v in parsed.items() if str(v).strip()}, "OK"
+    except subprocess.TimeoutExpired:
+        return None, "TIMEOUT"
     except Exception:
+        return None, "ERROR"
+    return None, "ERROR"
+
+
+def extract_keyframes_ocr_windows_with_status(
+    image_paths: List[str],
+    *,
+    batch_size: int = 6,
+) -> Tuple[Dict[str, str], str]:
+    """
+    Executa OCR local 100% offline via Windows.Media.Ocr em lotes pequenos resilientes
+    com fallback por frame se um lote expirar — nunca descarta texto já extraído.
+    Retorna `(ocr_map, status)` em {"OCR_COMPLETED", "OCR_PARTIAL", "OCR_UNAVAILABLE"}.
+    """
+    if os.name != "nt":
         return {}, "OCR_UNAVAILABLE"
-    return {}, "OCR_UNAVAILABLE"
+    if not image_paths:
+        return {}, "OCR_UNAVAILABLE"
+    valid_paths = [os.path.abspath(p) for p in image_paths if p and os.path.isfile(p)]
+    if not valid_paths:
+        return {}, "OCR_UNAVAILABLE"
+
+    chunk_sz = max(1, int(batch_size))
+    combined: Dict[str, str] = {}
+    had_batch_failure = False
+
+    for start_idx in range(0, len(valid_paths), chunk_sz):
+        batch = valid_paths[start_idx : start_idx + chunk_sz]
+        parsed, batch_state = _run_winrt_ocr_ps_batch(batch, timeout_sec=28)
+        if batch_state == "OCR_UNAVAILABLE":
+            if not combined:
+                return {}, "OCR_UNAVAILABLE"
+            had_batch_failure = True
+            break
+        if parsed is not None:
+            combined.update(parsed)
+        else:
+            had_batch_failure = True
+            # Fallback resiliente em sub-lotes/frame individual para não perder conteúdo de slides
+            for single in batch:
+                sub_parsed, sub_state = _run_winrt_ocr_ps_batch([single], timeout_sec=15)
+                if sub_parsed:
+                    combined.update(sub_parsed)
+                elif sub_state == "OCR_UNAVAILABLE":
+                    break
+
+    if combined:
+        if had_batch_failure or len(combined) < max(1, len(valid_paths) // 3):
+            return combined, "OCR_PARTIAL"
+        return combined, "OCR_COMPLETED"
+    return {}, ("OCR_UNAVAILABLE" if had_batch_failure else "OCR_PARTIAL")
 
 
 def extract_keyframes_ocr_windows(image_paths: List[str]) -> Dict[str, str]:
@@ -862,8 +897,84 @@ def transcribe_audio_real(
 # Motor Extrativo Real (100% fundamentado no texto do documento — Zero Boilerplate)
 # ---------------------------------------------------------------------------
 
+# Abreviações comuns PT/EN/académicas cujo ponto NÃO termina frase
+_PROTECTED_ABBREV_RE = re.compile(
+    r"\b("
+    r"Prof|Profa|Dr|Dra|Sr|Sra|Exmo|Exma|Eng|Arq|MsC|PhD|MSc|"
+    r"vs|etc|cf|al|op|cit|Fig|Figs|Tab|Tabs|Pág|Pag|Págs|Pags|p|pp|"
+    r"Cap|Sec|Art|Arts|Inc|Ltd|Co|Vol|Ed|Univ|Dept|Ref|Obs|Ex|Nr|No|St|"
+    r"e\.g|i\.e|[A-ZÀ-Ý]"
+    r")\.",
+    re.IGNORECASE,
+)
+_SENTENCE_DOT_SENTINEL = "\uE000"
+
+
+def _protect_abbreviations(text: str) -> str:
+    """Substitui pontos de abreviaturas e números decimais/listas antes da segmentação de frases."""
+    if not text:
+        return ""
+    protected = re.sub(r"(\d)\.(\d)", rf"\1{_SENTENCE_DOT_SENTINEL}\2", text)
+    protected = re.sub(r"\bet\s+al\.", f"et al{_SENTENCE_DOT_SENTINEL}", protected, flags=re.IGNORECASE)
+    protected = re.sub(r"\b(e\.g|i\.e)\.", lambda m: m.group(0).replace(".", _SENTENCE_DOT_SENTINEL), protected, flags=re.IGNORECASE)
+    protected = _PROTECTED_ABBREV_RE.sub(lambda m: m.group(1) + _SENTENCE_DOT_SENTINEL, protected)
+    return protected
+
+
+def _restore_abbreviations(text: str) -> str:
+    return text.replace(_SENTENCE_DOT_SENTINEL, ".")
+
+
+def truncate_at_boundary(text: str, max_len: int = 300) -> str:
+    """
+    Encurta texto sem cortar palavras, siglas ou parênteses a meio.
+    Prefere terminar em fim de frase completo; em alternativa, usa fronteira de cláusula
+    ou fronteira de palavra completa (balanceando parênteses abertos).
+    """
+    cleaned = re.sub(r"\s+", " ", (text or "")).strip()
+    if not cleaned or len(cleaned) <= max_len:
+        return cleaned
+
+    window = cleaned[: max_len + 1]
+    protected_win = _protect_abbreviations(window)
+
+    # 1. Procurar o último terminador real de frase depois de 45% do limite
+    min_sentence_idx = max(24, int(max_len * 0.45))
+    best_sent_end = -1
+    for m in re.finditer(r"[.!?]+(?=\s|$)", protected_win):
+        end_pos = m.end()
+        if min_sentence_idx <= end_pos <= max_len:
+            best_sent_end = end_pos
+    if best_sent_end > 0:
+        cand = cleaned[:best_sent_end].strip()
+        if cand.count("(") <= cand.count(")"):
+            return cand
+
+    # 2. Procurar fronteira de cláusula (; — – : ,) depois de 50% do limite
+    min_clause_idx = max(20, int(max_len * 0.5))
+    best_clause_end = -1
+    for m in re.finditer(r"[;:\u2014\u2013](?=\s)", protected_win):
+        pos = m.start()
+        if min_clause_idx <= pos <= max_len - 1:
+            best_clause_end = pos
+    if best_clause_end > 0:
+        cand = cleaned[:best_clause_end].rstrip(" ,;:\u2014\u2013").strip()
+        if cand.count("(") <= cand.count(")"):
+            return f"{cand}…"
+
+    # 3. Recuar para fronteira de palavra e evitar parêntese aberto sem fecho
+    word_cut = window[: max(1, max_len - 1)].rsplit(" ", 1)[0].rstrip(" ,;:-(\"'")
+    if not word_cut:
+        word_cut = cleaned[: max(1, max_len - 1)].strip()
+    if word_cut.count("(") > word_cut.count(")"):
+        last_open = word_cut.rfind("(")
+        if last_open >= int(max_len * 0.35):
+            word_cut = word_cut[:last_open].rstrip(" ,;:-")
+    return f"{word_cut}…"
+
+
 def split_clean_sentences(text: str) -> List[str]:
-    """Divide texto real em frases limpas, preservando números, siglas e citações."""
+    """Divide texto real em frases limpas, preservando números, siglas, abreviaturas académicas e citações."""
     if not text:
         return []
     text = unicodedata.normalize("NFC", text)
@@ -881,13 +992,16 @@ def split_clean_sentences(text: str) -> List[str]:
         lines.append(line)
 
     joined = "\n".join(lines)
-    raw_sents = re.split(r"(?<=[.!?])\s+|\n+", joined)
+    protected = _protect_abbreviations(joined)
+    raw_sents = re.split(r"(?<=[.!?])\s+|\n+", protected)
     sentences: List[str] = []
     seen: set[str] = set()
     for s in raw_sents:
-        s_clean = re.sub(r"\s+", " ", s).strip()
-        if len(s_clean) < 28 or len(s_clean) > 650:
+        s_clean = re.sub(r"\s+", " ", _restore_abbreviations(s)).strip()
+        if len(s_clean) < 28:
             continue
+        if len(s_clean) > 900:
+            s_clean = truncate_at_boundary(s_clean, 650)
         # Ignorar cabeçalhos de página isolados ou linhas só com números
         alpha_chars = sum(1 for c in s_clean if c.isalpha())
         if alpha_chars < 15:
@@ -977,7 +1091,7 @@ def rank_salient_sentences(text: str, top_k: int = 6, preserve_order: bool = Tru
     sentences = split_clean_sentences(text)
     if not sentences:
         raw_trim = re.sub(r"\s+", " ", text).strip()
-        return [raw_trim[:300]] if raw_trim else []
+        return [truncate_at_boundary(raw_trim, 300)] if raw_trim else []
     if len(sentences) <= top_k:
         return sentences
 
@@ -1669,7 +1783,7 @@ def build_extractive_study_bundle(
     key_terms = extract_key_terms_from_text(clean_text, top_k=8)
 
     # 1. Quick Summary (5-6 excertos salientes reais com source_refs)
-    quick_points = top_sentences[:6] if top_sentences else [clean_text[:300]]
+    quick_points = top_sentences[:6] if top_sentences else [truncate_at_boundary(clean_text, 300)]
     quick_items: List[Dict[str, Any]] = []
     for pt in quick_points:
         refs, sc, st = match_claim_to_evidence_units(pt, evidence_units, corpus_tokens=corpus_tokens)
@@ -1700,8 +1814,8 @@ def build_extractive_study_bundle(
             sec_top = rank_salient_sentences(sec_body, top_k=3, preserve_order=True)
             sec_more = rank_salient_sentences(sec_body, top_k=5, preserve_order=True)
             sec_terms = [t for t, _ in extract_key_terms_from_text(sec_body, top_k=4)]
-            sec_summary = " ".join(sec_top) if sec_top else sec_body[:380]
-            sec_detailed = " ".join(sec_more) if sec_more else sec_body[:600]
+            sec_summary = " ".join(sec_top) if sec_top else truncate_at_boundary(sec_body, 380)
+            sec_detailed = " ".join(sec_more) if sec_more else truncate_at_boundary(sec_body, 600)
             page_ref = f"pp. {p_start}-{p_end}" if p_end != p_start else f"p. {p_start}"
             refs, _sc, _st = match_claim_to_evidence_units(sec_summary, evidence_units, corpus_tokens=corpus_tokens)
             study_sections.append({
@@ -1721,7 +1835,7 @@ def build_extractive_study_bundle(
             })
 
     if not detailed_blocks:
-        all_sents = split_clean_sentences(clean_text) or [clean_text[:450]]
+        all_sents = split_clean_sentences(clean_text) or [truncate_at_boundary(clean_text, 450)]
         chunk_sz = max(1, math.ceil(len(all_sents) / min(4, len(all_sents))))
         for b_idx in range(0, len(all_sents), chunk_sz):
             chunk_sents = all_sents[b_idx : b_idx + chunk_sz]
@@ -1783,12 +1897,12 @@ def build_extractive_study_bundle(
         })
 
     # 4. Cornell Notes extrativas com referência explícita à secção/evidência
-    exec_summary = " ".join(top_sentences[:3]) if top_sentences else clean_text[:450]
+    exec_summary = " ".join(top_sentences[:3]) if top_sentences else truncate_at_boundary(clean_text, 450)
     cue_column: List[Dict[str, Any]] = []
     for sec_item in study_sections[:5]:
         cue_column.append({
             "cue": f"Tópico: {sec_item['title']} ({sec_item.get('page_ref', 'p. 1')})",
-            "idea": sec_item["summary"][:260],
+            "idea": truncate_at_boundary(sec_item["summary"], 260),
             "section_id": sec_item["section_id"],
             "source_refs": sec_item.get("source_refs", []),
         })
@@ -1796,7 +1910,7 @@ def build_extractive_study_bundle(
         refs, _sc, _st = match_claim_to_evidence_units(ctx, evidence_units, corpus_tokens=corpus_tokens)
         cue_column.append({
             "cue": f"Conceito observado: {term}",
-            "idea": ctx[:260],
+            "idea": truncate_at_boundary(ctx, 260),
             "section_id": "glossary",
             "source_refs": refs,
         })
@@ -2502,14 +2616,14 @@ def synthesize_multi_documents_grounded(
             else [f"Análise comparativa entre {', '.join(d.get('title', '') for d in docs_info)}."]
         ),
         "differences": [
-            f"«{t}»: {s[:220]}" for t, s in doc_top_sent if s
+            f"«{t}»: {truncate_at_boundary(s, 220)}" for t, s in doc_top_sent if s
         ],
         "shared_concepts": shared_concepts,
         "contradictions": [
             f"Diferença de enfoque entre «{docs_info[0].get('title', 'Doc 1')}» e «{docs_info[1].get('title', 'Doc 2')}» quanto ao nível de detalhe e escopo analisado."
         ] if len(docs_info) >= 2 else [],
         "idea_evolution": [
-            f"Progressão de «{t}» ({s[:140]})" for t, s in doc_top_sent if s
+            f"Progressão de «{t}» ({truncate_at_boundary(s, 140)})" for t, s in doc_top_sent if s
         ],
     }
 

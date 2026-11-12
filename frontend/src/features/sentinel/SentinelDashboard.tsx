@@ -125,22 +125,29 @@ export const SentinelDashboard: React.FC = () => {
     }
   };
 
+  const pendingApprovalCount =
+    sentinelActions?.filter((a) => a.status === 'WAITING_APPROVAL' || a.status === 'PROPOSED').length || 0;
+  const highRiskEventsCount =
+    sentinelEvents?.filter((ev) => ev.severity === 'CONFIRMED_MALICIOUS').length || 0;
+  const suspiciousEventsCount =
+    sentinelEvents?.filter((ev) => ev.severity === 'SUSPICIOUS').length || 0;
+
   return (
-    <div className="flex flex-col h-full bg-[#05070e] text-gray-200 overflow-hidden font-sans">
+    <div className="flex flex-col h-full bg-[#080c12] text-slate-200 overflow-hidden font-sans">
       {/* Header Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 border-b border-white/10 bg-[#080b14]/80 backdrop-blur-md">
+      <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 border-b border-slate-800/80 bg-[#0b111a]/95">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-lg shadow-cyan-500/10">
+          <div className="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
             <Shield className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-white tracking-wide">JARVIS SECURITY SENTINEL</h2>
-              <span className="text-[10px] px-2 py-0.5 rounded-full border border-cyan-400/30 bg-cyan-500/10 text-cyan-300 font-mono">
+              <span className="text-[10px] px-2 py-0.5 rounded-full border border-sky-400/30 bg-sky-500/10 text-sky-300 font-mono">
                 FASE S2: CONTINUOUS WATCHDOG
               </span>
             </div>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-slate-400">
               Monitorização passiva 100% Read-Only e correlação determinística de ameaças no Windows.
             </p>
           </div>
@@ -169,7 +176,7 @@ export const SentinelDashboard: React.FC = () => {
           <button
             onClick={() => runSentinelAudit()}
             disabled={isSentinelAuditing}
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-cyan-400 hover:bg-cyan-300 text-black font-semibold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer active:scale-98"
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer active:scale-98"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isSentinelAuditing ? 'animate-spin' : ''}`} />
             <span>{isSentinelAuditing ? 'A auditar...' : 'Executar Auditoria Agora'}</span>
@@ -177,8 +184,61 @@ export const SentinelDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Severity-Ordered Triage & Action Strip */}
+      <div
+        data-testid="sentinel-severity-strip"
+        className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 bg-[#090f18] px-6 py-2 text-xs"
+      >
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            Triagem Prioritária:
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('actions');
+              setActionFilter('pending');
+            }}
+            className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] font-medium transition cursor-pointer ${
+              pendingApprovalCount > 0
+                ? 'border-amber-500/40 bg-amber-500/15 text-amber-200 hover:bg-amber-500/25'
+                : 'border-slate-800 bg-[#0b111a] text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <ShieldCheck className="h-3.5 w-3.5" />
+            <span>{pendingApprovalCount} aprovações HITL pendentes</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('events')}
+            className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] font-medium transition cursor-pointer ${
+              highRiskEventsCount > 0
+                ? 'border-rose-500/40 bg-rose-500/15 text-rose-200 hover:bg-rose-500/25'
+                : 'border-slate-800 bg-[#0b111a] text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <ShieldAlert className="h-3.5 w-3.5" />
+            <span>{highRiskEventsCount} eventos de risco elevado</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('events')}
+            className="inline-flex items-center gap-1.5 rounded-md border border-slate-800 bg-[#0b111a] px-2.5 py-1 text-[11px] text-slate-300 hover:text-white cursor-pointer"
+          >
+            <AlertTriangle className="h-3.5 w-3.5 text-amber-400" />
+            <span>{suspiciousEventsCount} suspeitos</span>
+          </button>
+        </div>
+
+        <span className="text-[11px] font-mono text-slate-500">
+          {processes.length} proc • {network.length} lig • {persistence.length} persist
+        </span>
+      </div>
+
       {/* Navigation Sub-Tabs */}
-      <div className="flex border-b border-white/8 bg-black/20 px-6 gap-2 select-none overflow-x-auto">
+      <div className="flex border-b border-slate-800/80 bg-[#080c12] px-6 gap-2 select-none overflow-x-auto">
         {[
           { id: 'overview', label: 'Overview', icon: Activity },
           {

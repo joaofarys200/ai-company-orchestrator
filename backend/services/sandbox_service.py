@@ -19,6 +19,7 @@ from services.study_fs import (
     safe_document_id,
     validate_safe_identifier,
 )
+from services.video_intelligence_service import ensure_browser_playable_video
 
 
 logger = get_logger(__name__)
@@ -285,6 +286,30 @@ def start_frontend_http_server(
             raw_fp = doc_entry.get("metadata", {}).get("file_path") if doc_entry else None
             return self._resolve_cataloged_media_path(clean_id, raw_fp, None, (".pdf",))
 
+        def _resolve_video_stream(self, doc_id: str, *, allow_transcode: bool = True) -> Optional[tuple[str, str]]:
+            try:
+                clean_id = safe_document_id(doc_id)
+            except ValueError:
+                return None
+            doc_entry = self._load_study_catalog_entry(clean_id)
+            raw_fp = None
+            if doc_entry:
+                raw_fp = doc_entry.get("metadata", {}).get("file_path") or doc_entry.get("metadata", {}).get("video", {}).get("file_path")
+            file_path = self._resolve_cataloged_media_path(
+                clean_id,
+                raw_fp,
+                "videos",
+                (".mp4", ".webm", ".mkv", ".mov", ".avi", ".wmv", ".m4v", ".flv", ".mpg", ".mpeg"),
+            )
+            if not file_path or not os.path.isfile(file_path):
+                return None
+            if allow_transcode:
+                cache_root = Path(project_root) / "data" / "study" / "videos_cache"
+                return ensure_browser_playable_video(file_path, clean_id, cache_dir=cache_root)
+            ext = os.path.splitext(file_path)[1].lower()
+            mime = self.extensions_map.get(ext, "video/mp4")
+            return file_path, mime
+
         def do_HEAD(self):
             clean_path = self.path.split("?")[0]
             if clean_path.startswith("/api/study/") and not self._is_study_request_authorized():
@@ -305,6 +330,23 @@ def start_frontend_http_server(
                         self.end_headers()
                         return
                 self._send_error_text(404, b"PDF not found")
+                return
+            if clean_path.startswith("/api/study/document/") and clean_path.endswith("/video"):
+                parts = clean_path.strip("/").split("/")
+                if len(parts) == 5:
+                    allow_transcode = "raw=1" not in self.path
+                    resolved = self._resolve_video_stream(parts[3], allow_transcode=allow_transcode)
+                    if resolved and os.path.isfile(resolved[0]):
+                        vpath, vmime = resolved
+                        size = os.path.getsize(vpath)
+                        self.send_response(200)
+                        self.send_header("Content-Type", vmime)
+                        self.send_header("Content-Length", str(size))
+                        self.send_header("Accept-Ranges", "bytes")
+                        self._send_cors_headers()
+                        self.end_headers()
+                        return
+                self._send_error_text(404, b"Video not found")
                 return
             return super().do_HEAD()
 
@@ -412,30 +454,21 @@ def start_frontend_http_server(
                 self._send_error_text(404, b"Media not found")
                 return
 
-            # Streaming de vídeo por document_id
+            # Streaming de vídeo por document_id (com transcode em cache para MP4 quando .wmv/.avi)
             if clean_path.startswith("/api/study/document/") and clean_path.endswith("/video"):
                 parts = clean_path.strip("/").split("/")
                 if len(parts) == 5:
                     try:
-                        doc_id = safe_document_id(parts[3])
+                        safe_document_id(parts[3])
                     except ValueError:
                         self._send_error_text(403, b"Forbidden")
                         return
 
-                    doc_entry = self._load_study_catalog_entry(doc_id)
-                    raw_fp = None
-                    if doc_entry:
-                        raw_fp = doc_entry.get("metadata", {}).get("file_path") or doc_entry.get("metadata", {}).get("video", {}).get("file_path")
-                    file_path = self._resolve_cataloged_media_path(
-                        doc_id,
-                        raw_fp,
-                        "videos",
-                        (".mp4", ".webm", ".mkv", ".mov", ".avi", ".wmv", ".m4v"),
-                    )
-                    if file_path and os.path.isfile(file_path):
-                        ext = os.path.splitext(file_path)[1].lower()
-                        mime = self.extensions_map.get(ext, "video/mp4")
-                        self._serve_file_with_range(file_path, mime)
+                    allow_transcode = "raw=1" not in self.path
+                    resolved = self._resolve_video_stream(parts[3], allow_transcode=allow_transcode)
+                    if resolved and os.path.isfile(resolved[0]):
+                        vpath, vmime = resolved
+                        self._serve_file_with_range(vpath, vmime)
                         return
 
                 self._send_error_text(404, b"Video not found")

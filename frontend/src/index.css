@@ -2,8 +2,8 @@
 
 @layer base {
   body {
-    background-color: #0b0b0a;
-    color: #e8e4dc;
+    background-color: #080c12;
+    color: #e6edf6;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
   }
@@ -24,36 +24,37 @@
   select:focus-visible,
   textarea:focus-visible,
   summary:focus-visible {
-    outline: 2px solid rgba(217, 154, 108, 0.7);
+    outline: 2px solid rgba(56, 189, 248, 0.65);
     outline-offset: 2px;
   }
 }
 
-/* Workspace visual system: clean charcoal surfaces with one warm editorial accent. */
+/* Workspace visual system: deep navy & charcoal surfaces with restrained slate-blue accent. */
 .workspace-shell {
-  --ws-bg: #111110;
-  --ws-surface: rgba(22, 22, 20, 0.94);
-  --ws-surface-raised: rgba(31, 30, 27, 0.96);
-  --ws-border: rgba(224, 216, 201, 0.11);
-  --ws-border-strong: rgba(217, 154, 108, 0.46);
-  --ws-text: #f0ece4;
-  --ws-muted: #9e9a91;
-  --ws-accent: #d99a6c;
-  --ws-secondary: #d8cbbb;
-  --ws-warm: #e8b278;
-  background: #111110;
-  border-color: transparent;
+  --ws-bg: #080c12;
+  --ws-surface: #0b111a;
+  --ws-surface-raised: #0f1722;
+  --ws-surface-hover: #141e2e;
+  --ws-border: rgba(148, 163, 184, 0.14);
+  --ws-border-strong: rgba(56, 189, 248, 0.36);
+  --ws-text: #e6edf6;
+  --ws-muted: #94a3b8;
+  --ws-accent: #38bdf8;
+  --ws-secondary: #60a5fa;
+  --ws-warm: #fbbf24;
+  background: var(--ws-bg);
+  color: var(--ws-text);
 }
 
 .workspace-header {
-  background: #111110;
+  background: var(--ws-surface);
   border-color: var(--ws-border);
 }
 
 .workspace-primary-nav,
 .workspace-secondary-nav {
   scrollbar-width: thin;
-  scrollbar-color: rgba(217, 154, 108, 0.28) transparent;
+  scrollbar-color: rgba(56, 189, 248, 0.25) transparent;
 }
 
 .workspace-primary-tab,
@@ -61,36 +62,34 @@
   position: relative;
   overflow: hidden;
   color: var(--ws-muted);
-  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
 }
 
 .workspace-primary-tab::after,
 .workspace-secondary-tab::after {
   position: absolute;
-  right: 12px;
+  right: 10px;
   bottom: 0;
-  left: 12px;
+  left: 10px;
   height: 2px;
   border-radius: 999px;
   background: var(--ws-accent);
   content: '';
   opacity: 0;
   transform: scaleX(0.35);
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 
 .workspace-primary-tab:hover,
 .workspace-secondary-tab:hover {
   color: var(--ws-text);
-  transform: translateY(-1px);
 }
 
 .workspace-primary-tab[data-active='true'],
 .workspace-secondary-tab[data-active='true'] {
   color: var(--ws-text);
   border-color: var(--ws-border-strong);
-  background: rgba(217, 154, 108, 0.09);
-  box-shadow: none;
+  background: rgba(56, 189, 248, 0.1);
 }
 
 .workspace-primary-tab[data-active='true']::after,
@@ -100,39 +99,12 @@
 }
 
 .workspace-view {
-  will-change: opacity, transform, filter;
+  will-change: opacity, transform;
 }
 
 .workspace-view:focus-visible {
-  outline: 1px solid rgba(217, 154, 108, 0.42);
+  outline: 1px solid rgba(56, 189, 248, 0.45);
   outline-offset: -1px;
-}
-
-/* Normalize legacy utility colors inside the workspace without changing status semantics. */
-.workspace-shell [class*='border-white/'],
-.workspace-shell [class*='border-cyan-'],
-.workspace-shell [class*='border-violet-'],
-.workspace-shell [class*='border-sky-'] {
-  border-color: var(--ws-border) !important;
-}
-
-.workspace-shell [class*='bg-cyan-'],
-.workspace-shell [class*='bg-violet-'],
-.workspace-shell [class*='bg-sky-'] {
-  background-color: rgba(217, 154, 108, 0.08) !important;
-}
-
-.workspace-shell [class*='text-cyan-'],
-.workspace-shell [class*='text-violet-'],
-.workspace-shell [class*='text-sky-'] {
-  color: #d8b08d !important;
-}
-
-.workspace-shell .border-l,
-.workspace-shell .border-r,
-.workspace-shell .border-t,
-.workspace-shell .border-b {
-  border-color: var(--ws-border) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -146,11 +118,11 @@
 
 /* Custom glow effects */
 .text-shadow-glow {
-  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5), 0 0 20px rgba(6, 182, 212, 0.2);
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.45), 0 0 20px rgba(56, 189, 248, 0.18);
 }
 
 .core-glow {
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.15), inset 0 0 20px rgba(168, 85, 247, 0.1);
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.14), inset 0 0 20px rgba(96, 165, 250, 0.08);
 }
 
 /* Scrollbars */
@@ -160,16 +132,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(8, 12, 18, 0.6);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(148, 163, 184, 0.18);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(217, 154, 108, 0.3);
+  background: rgba(56, 189, 248, 0.35);
 }
 
 /* Hologram animations classes */

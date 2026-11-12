@@ -42,6 +42,8 @@ PROJECT_HANDLERS = {
     "list_projects": "list_projects",
     "create_project": "create_project",
     "open_project": "open_project",
+    "create_project_file": "create_project_file",
+    "rename_project_file": "rename_project_file",
     "save_project_file": "save_project_file",
     "delete_project_file": "delete_project_file",
     "delete_project": "delete_project",
@@ -92,6 +94,7 @@ class ProjectWebSocketHandler:
             websocket,
             {
                 "type": "project_output",
+                "project_id": project_id,
                 "content": (
                     f"[Project] A preparar preview de "
                     f"{project_id}...\n"
@@ -104,6 +107,7 @@ class ProjectWebSocketHandler:
                 self.connections.broadcast(
                     {
                         "type": "project_output",
+                        "project_id": project_id,
                         "content": content,
                     }
                 )
@@ -126,6 +130,7 @@ class ProjectWebSocketHandler:
                 websocket,
                 {
                     "type": "project_status",
+                    "project_id": project_id,
                     "running": False,
                     "preview_url": "",
                 },
@@ -146,6 +151,7 @@ class ProjectWebSocketHandler:
                     websocket,
                     {
                         "type": "project_output",
+                        "project_id": project_id,
                         "content": f"[Project] Servidor pronto e a escutar em {preview_url}\n",
                     },
                 )
@@ -154,6 +160,7 @@ class ProjectWebSocketHandler:
             websocket,
             {
                 "type": "project_status",
+                "project_id": project_id,
                 "running": project_running,
                 "preview_url": preview_url,
             },
@@ -321,6 +328,74 @@ class ProjectWebSocketHandler:
                 },
             )
 
+    async def create_project_file(
+        self,
+        websocket: Any,
+        message: dict,
+        session: WebSocketSessionState,
+    ) -> None:
+        project_id = message.get("project_id") or session.selected_project_id
+        filename = str(message.get("filename") or "")
+        content = str(message.get("content") or "")
+        try:
+            result = await asyncio.to_thread(
+                self.project_context.create_project_file,
+                project_id,
+                filename,
+                content,
+            )
+            session.selected_project_id = project_id
+            await self.connections.send(
+                websocket,
+                {"type": "project_file_save_result", "ok": True, **result},
+            )
+            await self.responder.send_project_context(websocket, project_id)
+        except (ProjectContextError, OSError) as create_error:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "project_file_save_result",
+                    "ok": False,
+                    "project_id": project_id,
+                    "filename": filename,
+                    "error": str(create_error),
+                },
+            )
+
+    async def rename_project_file(
+        self,
+        websocket: Any,
+        message: dict,
+        session: WebSocketSessionState,
+    ) -> None:
+        project_id = message.get("project_id") or session.selected_project_id
+        old_filename = str(message.get("old_filename") or "")
+        new_filename = str(message.get("new_filename") or "")
+        try:
+            await asyncio.to_thread(
+                self.project_context.rename_project_file,
+                project_id,
+                old_filename,
+                new_filename,
+            )
+            session.selected_project_id = project_id
+            await self.responder.send_project_context(websocket, project_id)
+            await self.connections.send(
+                websocket,
+                system_message(f"Ficheiro '{old_filename}' movido para '{new_filename}'."),
+            )
+        except (ProjectContextError, OSError) as rename_error:
+            await self.connections.send(
+                websocket,
+                {
+                    "type": "project_file_save_result",
+                    "ok": False,
+                    "project_id": project_id,
+                    "filename": new_filename or old_filename,
+                    "error": str(rename_error),
+                },
+            )
+
     async def delete_project(
         self,
         websocket: Any,
@@ -482,6 +557,7 @@ class ProjectWebSocketHandler:
                 websocket,
                 {
                     "type": "project_references",
+                    "project_id": project_id,
                     "data": reference_data,
                 },
             )
@@ -520,6 +596,7 @@ class ProjectWebSocketHandler:
                 websocket,
                 {
                     "type": "semantic_results",
+                    "project_id": project_id,
                     "query": query,
                     "content": results,
                 },

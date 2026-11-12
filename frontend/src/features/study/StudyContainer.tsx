@@ -1,26 +1,31 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Library,
   BookOpen,
   FileText,
   Bookmark,
   HelpCircle,
-  Database,
-  ArrowLeft,
   Layers,
   Brain,
-  Activity
+  Activity,
+  Sparkles,
+  Home,
+  Mic,
+  ChevronDown,
+  Search,
 } from 'lucide-react';
+import { StudyLandingView } from './StudyLandingView';
 import { StudyLibraryView } from './StudyLibraryView';
 import { StudyReaderView } from './StudyReaderView';
 import { StudyVideoReaderView } from './StudyVideoReaderView';
 import { StudySummaryView } from './StudySummaryView';
 import { StudyNotesView } from './StudyNotesView';
 import { StudyQuizView } from './StudyQuizView';
-import { StudyKnowledgeView } from './StudyKnowledgeView';
 import { StudyFlashcardsView } from './StudyFlashcardsView';
 import { StudyActiveRecallView } from './StudyActiveRecallView';
 import { StudyAdaptiveHubView } from './StudyAdaptiveHubView';
+import { StudyGeneratedDocumentView } from './StudyGeneratedDocumentView';
+import { LecturesPanel } from '../lectures/LecturesPanel';
 import {
   getCurrentSessionItem,
   isSessionAllItemsCompleted,
@@ -51,14 +56,17 @@ import type {
 } from '../../protocol/websocket';
 
 export type StudyTab =
+  | 'overview'
   | 'library'
   | 'reader'
+  | 'generated_doc'
   | 'summary'
   | 'notes'
   | 'flashcards'
   | 'active_recall'
   | 'quiz'
   | 'adaptive'
+  | 'lectures'
   | 'knowledge';
 
 export interface StudyUploadPayload {
@@ -170,12 +178,19 @@ interface StudyContainerProps {
   studyModesApi?: StudyModesBridge;
   externalNavigationTarget?: (StudyNavigatePayload & { nonce?: number }) | null;
   onStudyContextChange?: (ctx: StudyUiContextPayload) => void;
+  onActiveDocumentChange?: (docId: string | null) => void;
+  onActiveTabChange?: (tab: StudyTab) => void;
+  readingNotesByDoc?: Record<string, StudyReadingNote[]>;
+  highlightsByDoc?: Record<string, StudyHighlight[]>;
+  onRequestDocumentDetails?: (docId: string) => void;
+  onAddReadingNote?: (docId: string, page: number, note: string, selection?: string, sectionId?: string) => void;
+  onAddHighlight?: (docId: string, page: number, selectedText: string, context?: string, color?: string) => void;
 }
 
 export const StudyContainer: React.FC<StudyContainerProps> = ({
   documents: initialDocuments = [],
   initialActiveDocumentId,
-  notes = [],
+  notes: _notes = [],
   isRecording = false,
   activeStudyQuiz,
   studyQuizResult,
@@ -199,8 +214,8 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   onPrepareForExam,
   onGenerateCornell,
   onSearchRag,
-  onReadNote,
-  onSaveNoteToObsidian,
+  onReadNote: _onReadNote,
+  onSaveNoteToObsidian: _onSaveNoteToObsidian,
   onRefreshDocuments,
   onGetDocumentFile,
   onDeleteDocument,
@@ -220,15 +235,65 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   studyModesApi,
   externalNavigationTarget,
   onStudyContextChange,
+  onActiveDocumentChange,
+  onActiveTabChange,
+  readingNotesByDoc,
+  highlightsByDoc,
+  onRequestDocumentDetails,
+  onAddReadingNote,
+  onAddHighlight,
 }) => {
-  // Navigation
-  const [activeTab, setActiveTab] = useState<StudyTab>('library');
+  // Navigation — PDF/Video-first when an active or initial document exists, otherwise Landing Overview
+  const [activeTab, setActiveTab] = useState<StudyTab>(
+    initialActiveDocumentId || initialDocuments.length > 0 ? 'reader' : 'overview'
+  );
+  const [practiceMenuOpen, setPracticeMenuOpen] = useState<boolean>(false);
+  const practiceMenuRef = useRef<HTMLDivElement | null>(null);
+  const [ragQuickQuery, setRagQuickQuery] = useState<string>('');
+  const [ragQuickResults, setRagQuickResults] = useState<Array<{ text: string; source: string; score?: number; title?: string }>>([]);
+  const [ragSearching, setRagSearching] = useState<boolean>(false);
   const [topicFilterHint, setTopicFilterHint] = useState<string>('');
   const [activeDailySession, setActiveDailySession] = useState<StudySessionState | null>(null);
   const [documents, setDocuments] = useState<StudyDocument[]>(initialDocuments);
   const [activeDocumentId, setActiveDocumentId] = useState<string | null>(
     initialActiveDocumentId || (initialDocuments[0]?.document_id ?? null)
   );
+  const prevInitialDocIdRef = React.useRef<string | undefined>(initialActiveDocumentId);
+
+  useEffect(() => {
+    if (!practiceMenuOpen) return;
+    const handleOutside = (event: MouseEvent) => {
+      if (practiceMenuRef.current && !practiceMenuRef.current.contains(event.target as Node)) {
+        setPracticeMenuOpen(false);
+      }
+    };
+    window.addEventListener('mousedown', handleOutside);
+    return () => window.removeEventListener('mousedown', handleOutside);
+  }, [practiceMenuOpen]);
+
+  useEffect(() => {
+    if (activeDocumentId && onRequestDocumentDetails) {
+      onRequestDocumentDetails(activeDocumentId);
+    }
+  }, [activeDocumentId, onRequestDocumentDetails]);
+
+  useEffect(() => {
+    if (
+      initialActiveDocumentId &&
+      initialActiveDocumentId !== prevInitialDocIdRef.current
+    ) {
+      prevInitialDocIdRef.current = initialActiveDocumentId;
+      setActiveDocumentId(initialActiveDocumentId);
+    }
+  }, [initialActiveDocumentId]);
+
+  useEffect(() => {
+    onActiveDocumentChange?.(activeDocumentId);
+  }, [activeDocumentId, onActiveDocumentChange]);
+
+  useEffect(() => {
+    onActiveTabChange?.(activeTab);
+  }, [activeTab, onActiveTabChange]);
 
   // Reset active mixed daily session when switching document
   useEffect(() => {
@@ -314,19 +379,23 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
     if (navNonce !== undefined && lastHandledNavNonceRef.current === navNonce) return;
 
     const validTabs = new Set<StudyTab>([
+      'overview',
       'library',
       'reader',
+      'generated_doc',
       'summary',
       'notes',
       'flashcards',
       'active_recall',
       'quiz',
       'adaptive',
+      'lectures',
       'knowledge',
     ]);
-    const requestedTab: StudyTab = validTabs.has(externalNavigationTarget.tab as StudyTab)
-      ? (externalNavigationTarget.tab as StudyTab)
-      : 'library';
+    const rawRequested = externalNavigationTarget.tab === 'home' ? 'overview' : externalNavigationTarget.tab;
+    const requestedTab: StudyTab = validTabs.has(rawRequested as StudyTab)
+      ? (rawRequested as StudyTab)
+      : 'overview';
 
     const targetDocId = externalNavigationTarget.document_id;
     if (targetDocId) {
@@ -404,9 +473,27 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
     );
   }, [lastDocumentError]);
 
-  // Reading Notes & Highlights state
-  const [readingNotes, setReadingNotes] = useState<StudyReadingNote[]>([]);
-  const [highlights, setHighlights] = useState<StudyHighlight[]>([]);
+  // Reading Notes & Highlights state (persisted backend records + optimistic local additions)
+  const [localReadingNotes, setLocalReadingNotes] = useState<StudyReadingNote[]>([]);
+  const [localHighlights, setLocalHighlights] = useState<StudyHighlight[]>([]);
+
+  const readingNotes = useMemo(() => {
+    const persisted = activeDocumentId ? readingNotesByDoc?.[activeDocumentId] ?? [] : [];
+    const seen = new Set(persisted.map((n) => `${n.page}:${n.note}`));
+    const extras = localReadingNotes.filter(
+      (n) => (!activeDocumentId || n.document_id === activeDocumentId) && !seen.has(`${n.page}:${n.note}`)
+    );
+    return [...persisted, ...extras];
+  }, [activeDocumentId, localReadingNotes, readingNotesByDoc]);
+
+  const highlights = useMemo(() => {
+    const persisted = activeDocumentId ? highlightsByDoc?.[activeDocumentId] ?? [] : [];
+    const seen = new Set(persisted.map((h) => `${h.page}:${h.selected_text}`));
+    const extras = localHighlights.filter(
+      (h) => (!activeDocumentId || h.document_id === activeDocumentId) && !seen.has(`${h.page}:${h.selected_text}`)
+    );
+    return [...persisted, ...extras];
+  }, [activeDocumentId, highlightsByDoc, localHighlights]);
 
   // Find active document
   const activeDocument = documents.find((d) => d.document_id === activeDocumentId) || null;
@@ -476,7 +563,8 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
       color: color || '#fef08a',
       created_at: new Date().toISOString().replace('T', ' ').slice(0, 19),
     };
-    setHighlights((prev) => [newHighlight, ...prev]);
+    setLocalHighlights((prev) => [newHighlight, ...prev]);
+    onAddHighlight?.(activeDocumentId, page, text, undefined, color);
   };
 
   // Handler: Save Note
@@ -490,13 +578,61 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
       note,
       created_at: new Date().toISOString().replace('T', ' ').slice(0, 19),
     };
-    setReadingNotes((prev) => [newNote, ...prev]);
+    setLocalReadingNotes((prev) => [newNote, ...prev]);
+    onAddReadingNote?.(activeDocumentId, page, note, text);
   };
 
   // Handler: Delete Note
   const handleDeleteNote = (noteId: string) => {
-    setReadingNotes((prev) => prev.filter((n) => n.note_id !== noteId));
+    setLocalReadingNotes((prev) => prev.filter((n) => n.note_id !== noteId));
   };
+
+  const handleDropUploadFiles = useCallback(
+    async (fileList: FileList) => {
+      if (!onUploadDocument || !fileList?.length) return;
+      for (const file of Array.from(fileList)) {
+        const nativePath = (window as any)?.jarvisIPC?.getPathForFile?.(file) || '';
+        const ext = file.name.split('.').pop()?.toLowerCase() || '';
+        const inferredType =
+          ext === 'mp4' || ext === 'mkv' || ext === 'mov' || ext === 'webm' || ext === 'avi'
+            ? 'VIDEO'
+            : ext === 'pdf'
+            ? 'PDF'
+            : ext === 'pptx' || ext === 'ppt'
+            ? 'SLIDES'
+            : 'TEXT';
+        setIsUploading(true);
+        setUploadStatus(`A processar ${file.name}...`);
+        if (nativePath) {
+          await onUploadDocument({
+            filename: file.name,
+            file_path: nativePath,
+            subject: 'Estudos',
+            source_type: inferredType,
+          });
+        } else {
+          const base64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const raw = String(reader.result || '');
+              const idx = raw.indexOf(',');
+              resolve(idx >= 0 ? raw.slice(idx + 1) : raw);
+            };
+            reader.onerror = () => reject(new Error(`Falha ao ler ${file.name}`));
+            reader.readAsDataURL(file);
+          });
+          await onUploadDocument({
+            filename: file.name,
+            content_base64: base64,
+            subject: 'Estudos',
+            source_type: inferredType,
+          });
+        }
+      }
+      setActiveTab('library');
+    },
+    [onUploadDocument]
+  );
 
   // Handler: Stabilized document file fetcher
   const handleGetDocumentFile = useCallback(() => {
@@ -506,49 +642,93 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
     return Promise.resolve({ error: 'Nenhum documento ativo' });
   }, [onGetDocumentFile, activeDocumentId]);
 
-  return (
-    <div className="flex h-full flex-col overflow-hidden bg-[#0a0f14] text-gray-200">
-      {/* ============================================================ */}
-      {/* TOP NAVIGATION BAR: 6 STUDY AREAS                            */}
-      {/* ============================================================ */}
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#a1bebf]/15 bg-[#0f171d]/95 px-6 py-2.5 backdrop-blur shrink-0">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setActiveTab('library')}
-            className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-cyan-300 transition"
-            title="Voltar à Biblioteca"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Estudo</span>
-          </button>
+  const isPracticeTabActive =
+    activeTab === 'notes' ||
+    activeTab === 'flashcards' ||
+    activeTab === 'active_recall' ||
+    activeTab === 'quiz' ||
+    activeTab === 'adaptive' ||
+    activeTab === 'lectures';
 
-          {activeDocument && (
-            <div className="flex items-center gap-2 border-l border-white/10 pl-3">
-              <span className="text-[11px] text-gray-500 uppercase font-semibold">Artigo:</span>
-              <span className="text-xs font-semibold text-white truncate max-w-[200px] sm:max-w-xs md:max-w-md">
-                {activeDocument.title}
-              </span>
-              {activeDocument.language?.toLowerCase() === 'en' && (
-                <span className="rounded bg-sky-400/10 px-1.5 py-0.2 text-[10px] font-medium text-sky-300 border border-sky-400/20">
-                  EN
-                </span>
-              )}
-            </div>
+  const practiceTabLabel: Record<string, string> = {
+    notes: 'Notas Cornell',
+    flashcards: 'Flashcards',
+    active_recall: 'Recordação',
+    quiz: 'Avaliações',
+    adaptive: 'Progresso',
+    lectures: 'Gravar Aula',
+  };
+
+  return (
+    <div className="flex h-full flex-col overflow-hidden bg-[#080c12] text-slate-200">
+      {/* ============================================================ */}
+      {/* TOP NAVIGATION BAR: STREAMLINED WORKFLOW + PRACTICE GROUP    */}
+      {/* ============================================================ */}
+      <header className="relative z-20 flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-800/80 bg-[#0b111a]/95 px-4 py-2 shrink-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          {documents.length > 0 ? (
+            <select
+              aria-label="Selecionar documento de estudo ativo"
+              data-testid="study-document-switcher"
+              value={activeDocumentId || ''}
+              onChange={(e) => {
+                const nextId = e.target.value;
+                if (nextId) {
+                  setActiveDocumentId(nextId);
+                  if (activeTab === 'library' || activeTab === 'overview') {
+                    setActiveTab('reader');
+                  }
+                }
+              }}
+              className="max-w-[230px] sm:max-w-xs md:max-w-sm rounded-md border border-slate-700/70 bg-[#0f1722] px-2.5 py-1 text-xs font-semibold text-white outline-none hover:border-sky-400/50 focus:border-sky-400/60 cursor-pointer"
+            >
+              {documents.map((doc) => (
+                <option key={doc.document_id} value={doc.document_id}>
+                  [{doc.source_type}] {doc.title}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <span className="text-xs font-medium text-slate-400">Biblioteca vazia</span>
+          )}
+
+          {activeDocument?.language?.toLowerCase() === 'en' && (
+            <span className="rounded bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-medium text-sky-300 border border-sky-400/20">
+              EN
+            </span>
           )}
         </div>
 
-        {/* The 6 Main Study Navigation Tabs */}
-        <nav aria-label="Navegação do módulo de estudo" className="flex items-center rounded-lg border border-white/10 bg-black/40 p-1 text-xs">
+        {/* Streamlined Study Navigation Tabs */}
+        <nav
+          aria-label="Navegação do módulo de estudo"
+          className="flex flex-wrap items-center gap-1 rounded-lg border border-slate-800/90 bg-[#070b11] p-0.5 text-[11px]"
+        >
+          <button
+            id="study-nav-overview-btn"
+            type="button"
+            onClick={() => setActiveTab('overview')}
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition cursor-pointer ${
+              activeTab === 'overview'
+                ? 'bg-sky-500/20 text-sky-200 font-semibold shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Home className="h-3.5 w-3.5" />
+            <span>Início</span>
+          </button>
+
           <button
             id="study-nav-library-btn"
+            type="button"
             onClick={() => {
               setActiveTab('library');
               if (onRefreshDocuments) onRefreshDocuments();
             }}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition cursor-pointer ${
               activeTab === 'library'
-                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-sky-500/20 text-sky-200 font-semibold shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             <Library className="h-3.5 w-3.5" />
@@ -557,11 +737,12 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
 
           <button
             id="study-nav-reader-btn"
+            type="button"
             onClick={() => setActiveTab('reader')}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition cursor-pointer ${
               activeTab === 'reader'
-                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-sky-500/20 text-sky-200 font-semibold shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             <BookOpen className="h-3.5 w-3.5" />
@@ -569,101 +750,162 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
           </button>
 
           <button
+            id="study-nav-generated-doc-btn"
+            type="button"
+            onClick={() => setActiveTab('generated_doc')}
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition cursor-pointer ${
+              activeTab === 'generated_doc'
+                ? 'bg-sky-500/20 text-sky-200 font-semibold shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+            title="Documento de Estudo Estruturado (Qwen 3.5)"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Documento IA</span>
+          </button>
+
+          <button
             id="study-nav-summary-btn"
+            type="button"
             onClick={() => setActiveTab('summary')}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition cursor-pointer ${
               activeTab === 'summary'
-                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-sky-500/20 text-sky-200 font-semibold shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             <FileText className="h-3.5 w-3.5" />
-            <span>Resumo</span>
+            <span>Síntese</span>
           </button>
 
-          <button
-            id="study-nav-notes-btn"
-            onClick={() => setActiveTab('notes')}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
-              activeTab === 'notes'
-                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
-          >
-            <Bookmark className="h-3.5 w-3.5" />
-            <span>Notas</span>
-          </button>
+          <span className="mx-0.5 h-4 w-px bg-slate-800" aria-hidden="true" />
 
-          <button
-            id="study-nav-flashcards-btn"
-            onClick={() => {
-              setTopicFilterHint('');
-              setActiveTab('flashcards');
-            }}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
-              activeTab === 'flashcards'
-                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
-          >
-            <Layers className="h-3.5 w-3.5" />
-            <span>Flashcards</span>
-          </button>
+          {/* Purpose-Grouped Practice Menu */}
+          <div className="relative" ref={practiceMenuRef}>
+            <button
+              id="study-nav-practice-btn"
+              data-testid="study-nav-practice-btn"
+              type="button"
+              onClick={() => setPracticeMenuOpen((v) => !v)}
+              aria-expanded={practiceMenuOpen}
+              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition cursor-pointer ${
+                isPracticeTabActive
+                  ? 'bg-sky-500/20 text-sky-200 font-semibold shadow-sm'
+                  : 'text-slate-300 hover:bg-white/[0.04] hover:text-white'
+              }`}
+            >
+              <Brain className="h-3.5 w-3.5" />
+              <span>{isPracticeTabActive ? practiceTabLabel[activeTab] || 'Praticar' : 'Praticar'}</span>
+              <ChevronDown className="h-3 w-3 opacity-70" />
+            </button>
 
-          <button
-            id="study-nav-recall-btn"
-            onClick={() => setActiveTab('active_recall')}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
-              activeTab === 'active_recall'
-                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
-          >
-            <Brain className="h-3.5 w-3.5" />
-            <span>Recordação Ativa</span>
-          </button>
+            {practiceMenuOpen && (
+              <div
+                data-testid="study-practice-dropdown"
+                className="absolute right-0 top-full mt-1.5 w-60 rounded-xl border border-slate-700/80 bg-[#0d141f] p-2 shadow-2xl z-40"
+              >
+                <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Estudar
+                </div>
+                <button
+                  id="study-nav-notes-btn"
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('notes');
+                    setPracticeMenuOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs transition cursor-pointer ${
+                    activeTab === 'notes' ? 'bg-sky-500/15 text-sky-200 font-semibold' : 'text-slate-300 hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <Bookmark className="h-3.5 w-3.5 text-sky-400" />
+                  <span>Notas Cornell</span>
+                </button>
+                <button
+                  id="study-nav-flashcards-btn"
+                  type="button"
+                  onClick={() => {
+                    setTopicFilterHint('');
+                    setActiveTab('flashcards');
+                    setPracticeMenuOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs transition cursor-pointer ${
+                    activeTab === 'flashcards' ? 'bg-sky-500/15 text-sky-200 font-semibold' : 'text-slate-300 hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <Layers className="h-3.5 w-3.5 text-sky-400" />
+                  <span>Flashcards</span>
+                </button>
+                <button
+                  id="study-nav-recall-btn"
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('active_recall');
+                    setPracticeMenuOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs transition cursor-pointer ${
+                    activeTab === 'active_recall' ? 'bg-sky-500/15 text-sky-200 font-semibold' : 'text-slate-300 hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <Brain className="h-3.5 w-3.5 text-sky-400" />
+                  <span>Recordação Ativa</span>
+                </button>
 
-          <button
-            id="study-nav-quiz-btn"
-            onClick={() => {
-              setTopicFilterHint('');
-              setActiveTab('quiz');
-            }}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
-              activeTab === 'quiz'
-                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
-          >
-            <HelpCircle className="h-3.5 w-3.5" />
-            <span>Avaliações</span>
-          </button>
+                <div className="my-1.5 border-t border-slate-800/80" />
+                <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Avaliar
+                </div>
+                <button
+                  id="study-nav-quiz-btn"
+                  type="button"
+                  onClick={() => {
+                    setTopicFilterHint('');
+                    setActiveTab('quiz');
+                    setPracticeMenuOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs transition cursor-pointer ${
+                    activeTab === 'quiz' ? 'bg-sky-500/15 text-sky-200 font-semibold' : 'text-slate-300 hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <HelpCircle className="h-3.5 w-3.5 text-amber-400" />
+                  <span>Avaliações & Quizzes</span>
+                </button>
+                <button
+                  id="study-nav-adaptive-btn"
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('adaptive');
+                    setPracticeMenuOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs transition cursor-pointer ${
+                    activeTab === 'adaptive' ? 'bg-sky-500/15 text-sky-200 font-semibold' : 'text-slate-300 hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <Activity className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>Progresso & Plano Diário</span>
+                </button>
 
-          <button
-            id="study-nav-adaptive-btn"
-            onClick={() => setActiveTab('adaptive')}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
-              activeTab === 'adaptive'
-                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
-          >
-            <Activity className="h-3.5 w-3.5" />
-            <span>Progresso</span>
-          </button>
-
-          <button
-            id="study-nav-knowledge-btn"
-            onClick={() => setActiveTab('knowledge')}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition ${
-              activeTab === 'knowledge'
-                ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
-          >
-            <Database className="h-3.5 w-3.5" />
-            <span>Conhecimento</span>
-          </button>
+                <div className="my-1.5 border-t border-slate-800/80" />
+                <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Criar & Registar
+                </div>
+                <button
+                  id="study-nav-lectures-btn"
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('lectures');
+                    setPracticeMenuOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs transition cursor-pointer ${
+                    activeTab === 'lectures' ? 'bg-sky-500/15 text-sky-200 font-semibold' : 'text-slate-300 hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <Mic className="h-3.5 w-3.5 text-rose-400" />
+                  <span>Gravar Aula & Lição</span>
+                </button>
+              </div>
+            )}
+          </div>
         </nav>
       </header>
 
@@ -671,6 +913,20 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
       {/* ACTIVE TAB VIEWPORT                                          */}
       {/* ============================================================ */}
       <main className="flex-1 overflow-hidden min-h-0">
+        {activeTab === 'overview' && (
+          <StudyLandingView
+            documents={documents}
+            collections={collections}
+            activeDocument={activeDocument}
+            onSelectDocument={(doc, targetTab) => {
+              setActiveDocumentId(doc.document_id);
+              setActiveTab(targetTab || 'reader');
+            }}
+            onNavigateTab={(tab) => setActiveTab(tab)}
+            onDropFiles={handleDropUploadFiles}
+          />
+        )}
+
         {activeTab === 'library' && (
           <StudyLibraryView
             documents={documents}
@@ -723,7 +979,13 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
           activeDocument ? (
             activeDocument.source_type === 'VIDEO' ? (
               <StudyVideoReaderView
+                key={activeDocument.document_id}
                 document={activeDocument}
+                documents={documents}
+                onSelectDocument={(id) => setActiveDocumentId(id)}
+                onOpenGeneratedDocument={() => setActiveTab('generated_doc')}
+                onOpenSummary={() => setActiveTab('summary')}
+                onRetryDocument={onRetryDocument}
                 onUpdateProgress={handleUpdateProgress}
                 onSaveHighlight={handleSaveHighlight}
                 onSaveNote={handleSaveNote}
@@ -736,6 +998,10 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
               <StudyReaderView
                 key={activeDocument.document_id}
                 document={activeDocument}
+                documents={documents}
+                onSelectDocument={(id) => setActiveDocumentId(id)}
+                onOpenGeneratedDocument={() => setActiveTab('generated_doc')}
+                onOpenSummary={() => setActiveTab('summary')}
                 onUpdateProgress={handleUpdateProgress}
                 onSaveHighlight={handleSaveHighlight}
                 onSaveNote={handleSaveNote}
@@ -768,6 +1034,27 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
           )
         )}
 
+        {activeTab === 'generated_doc' && (
+          <div className="h-full overflow-y-auto bg-[#070b10] p-6">
+            <div className="mx-auto max-w-5xl">
+              {activeDocument ? (
+                <StudyGeneratedDocumentView
+                  document={activeDocument}
+                  onGetGeneratedDocumentStatus={onGetGeneratedDocumentStatus}
+                  onGenerateStudyDocument={onGenerateStudyDocument}
+                  onGetGeneratedDocumentFile={onGetGeneratedDocumentFile}
+                  onCancelGeneration={onCancelGeneration}
+                  pipelineStage={pipelineStage}
+                />
+              ) : (
+                <div className="rounded-xl border border-white/10 bg-[#0b1016] p-8 text-center text-xs text-zinc-400">
+                  Seleciona um documento na Biblioteca ou no seletor superior para gerar e ler o Documento IA (Fase 5).
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {activeTab === 'summary' && (
           <StudySummaryView
             document={activeDocument}
@@ -781,6 +1068,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             onGetGeneratedDocumentStatus={onGetGeneratedDocumentStatus}
             onGenerateStudyDocument={onGenerateStudyDocument}
             onGetGeneratedDocumentFile={onGetGeneratedDocumentFile}
+            onOpenGeneratedDocument={() => setActiveTab('generated_doc')}
           />
         )}
 
@@ -849,14 +1137,68 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
           />
         )}
 
+        {activeTab === 'lectures' && (
+          <div className="h-full overflow-y-auto bg-[#080c12] p-5">
+            <div className="mx-auto max-w-5xl">
+              <LecturesPanel />
+            </div>
+          </div>
+        )}
+
         {activeTab === 'knowledge' && (
-          <StudyKnowledgeView
-            document={activeDocument}
-            notes={notes}
-            onSearchRag={onSearchRag ? (q) => onSearchRag(q, activeDocument?.document_id) : undefined}
-            onReadNote={onReadNote}
-            onSaveNote={onSaveNoteToObsidian}
-          />
+          <div className="h-full overflow-y-auto bg-[#080c12] p-6">
+            <div className="mx-auto max-w-3xl space-y-4">
+              <div className="rounded-xl border border-slate-800 bg-[#0d141f] p-5">
+                <h2 className="text-sm font-semibold text-white">Pesquisa Semântica RAG nos Materiais</h2>
+                <p className="mt-1 text-xs text-slate-400">
+                  O repositório Obsidian e o grafo de conhecimento ficam centralizados no domínio <strong className="text-slate-200">Obsidian</strong> da barra lateral esquerda. Aqui podes pesquisar rapidamente passagens no índice RAG de estudo.
+                </p>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!onSearchRag || !ragQuickQuery.trim()) return;
+                    setRagSearching(true);
+                    try {
+                      const hits = await onSearchRag(ragQuickQuery.trim(), activeDocument?.document_id);
+                      setRagQuickResults(Array.isArray(hits) ? hits : []);
+                    } finally {
+                      setRagSearching(false);
+                    }
+                  }}
+                  className="mt-3 flex gap-2"
+                >
+                  <input
+                    type="text"
+                    value={ragQuickQuery}
+                    onChange={(e) => setRagQuickQuery(e.target.value)}
+                    placeholder="Pesquisar conceitos ou citações nos documentos indexados..."
+                    className="flex-1 rounded-lg border border-slate-700 bg-[#080c12] px-3 py-2 text-xs text-white outline-none focus:border-sky-400/60"
+                  />
+                  <button
+                    type="submit"
+                    disabled={ragSearching || !ragQuickQuery.trim()}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-sky-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-sky-500 disabled:opacity-50 cursor-pointer"
+                  >
+                    <Search className="h-3.5 w-3.5" />
+                    <span>{ragSearching ? 'A pesquisar...' : 'Pesquisar RAG'}</span>
+                  </button>
+                </form>
+              </div>
+              {ragQuickResults.length > 0 && (
+                <div className="space-y-2">
+                  {ragQuickResults.map((hit, idx) => (
+                    <div key={`${hit.source}-${idx}`} className="rounded-xl border border-slate-800 bg-[#0c121b] p-4 text-xs">
+                      <div className="flex items-center justify-between text-[11px] text-sky-300 font-medium mb-1">
+                        <span>{hit.title || hit.source}</span>
+                        {hit.score !== undefined && <span>Relevância: {(hit.score * 100).toFixed(0)}%</span>}
+                      </div>
+                      <p className="text-slate-300 leading-relaxed">{hit.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </main>
     </div>

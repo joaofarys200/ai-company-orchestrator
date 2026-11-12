@@ -456,27 +456,79 @@ class ProjectContextService:
         return content.replace("\r\n", "\n").replace("\r", "\n").replace("\n", newline)
 
     @staticmethod
-    def _resolve_existing_project_file(root: str, relative_path: str) -> str:
+    def _resolve_project_file_path(root: str, relative_path: str, *, must_exist: bool = True) -> tuple[str, str]:
         normalized = str(relative_path or "").replace("\\", "/").strip("/")
-        if not normalized or os.path.isabs(normalized) or normalized.startswith("../") or "/../" in normalized:
+        if not normalized or os.path.isabs(normalized) or normalized.startswith("../") or "/../" in normalized or ".." in normalized.split("/"):
             raise ProjectContextError("Caminho de ficheiro invalido.")
         ignored = {item.lower() for item in IGNORED_DIRECTORIES}
         if any(part.lower() in ignored for part in normalized.split("/")[:-1]):
             raise ProjectContextError("Edicao de diretorios gerados ou dependencias nao permitida.")
         if Path(normalized).suffix.lower() not in TEXT_FILE_SUFFIXES:
             raise ProjectContextError("O editor apenas permite ficheiros de texto suportados.")
-        target = os.path.realpath(os.path.abspath(os.path.join(root, normalized)))
+        root_real = os.path.realpath(os.path.abspath(root))
+        target = os.path.realpath(os.path.abspath(os.path.join(root_real, normalized)))
         try:
-            if os.path.commonpath([root, target]) != root:
+            if os.path.commonpath([root_real, target]) != root_real:
                 raise ProjectContextError("Acesso fora do projeto nao permitido.")
         except ValueError as exc:
             raise ProjectContextError("Acesso fora do projeto nao permitido.") from exc
-        source_path = os.path.abspath(os.path.join(root, normalized))
+        source_path = os.path.abspath(os.path.join(root_real, normalized))
         if os.path.islink(source_path):
             raise ProjectContextError("Edicao de links simbolicos nao permitida.")
-        if not os.path.isfile(target):
+        if must_exist and not os.path.isfile(target):
             raise ProjectContextError("O ficheiro selecionado nao existe.")
+        return target, normalized
+
+    @classmethod
+    def _resolve_existing_project_file(cls, root: str, relative_path: str) -> str:
+        target, _normalized = cls._resolve_project_file_path(root, relative_path, must_exist=True)
         return target
+
+    def create_project_file(
+        self,
+        project_id: str,
+        relative_path: str,
+        content: str = "",
+    ) -> dict[str, Any]:
+        clean_id = self._validate_project_id(project_id)
+        root = self.project_root(clean_id)
+        target, normalized = self._resolve_project_file_path(root, relative_path, must_exist=False)
+        if os.path.exists(target):
+            raise ProjectContextError(f"O ficheiro '{normalized}' ja existe neste projeto.")
+        if not isinstance(content, str) or "\x00" in content:
+            raise ProjectContextError("O editor apenas permite criar ficheiros de texto.")
+        raw_bytes = content.encode("utf-8")
+        if len(raw_bytes) > MAX_VIEW_FILE_BYTES:
+            raise ProjectContextError(f"O ficheiro excede o limite de edicao manual de {MAX_VIEW_FILE_BYTES} bytes.")
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        with open(target, "wb") as handle:
+            handle.write(raw_bytes)
+        return {
+            "project_id": clean_id,
+            "filename": normalized,
+            "sha256": hashlib.sha256(raw_bytes).hexdigest(),
+            "size_bytes": len(raw_bytes),
+        }
+
+    def rename_project_file(
+        self,
+        project_id: str,
+        old_relative_path: str,
+        new_relative_path: str,
+    ) -> dict[str, Any]:
+        clean_id = self._validate_project_id(project_id)
+        root = self.project_root(clean_id)
+        src_target, old_norm = self._resolve_project_file_path(root, old_relative_path, must_exist=True)
+        dst_target, new_norm = self._resolve_project_file_path(root, new_relative_path, must_exist=False)
+        if os.path.exists(dst_target):
+            raise ProjectContextError(f"Ja existe um ficheiro em '{new_norm}'.")
+        os.makedirs(os.path.dirname(dst_target), exist_ok=True)
+        os.replace(src_target, dst_target)
+        return {
+            "project_id": clean_id,
+            "old_filename": old_norm,
+            "new_filename": new_norm,
+        }
 
     def project_file_hashes(self, project_id: str, filenames: set[str]) -> dict[str, str]:
         root = self.project_root(project_id)

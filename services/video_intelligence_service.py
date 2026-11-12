@@ -19,6 +19,8 @@ import re
 import shutil
 import socket
 import subprocess
+import tempfile
+import threading
 import time
 import urllib.parse
 from dataclasses import asdict, dataclass, field
@@ -32,11 +34,12 @@ from services.lecture_synthesizer import LocalTranscriber, VaultLinker
 from services.study_ai_engine import (
     STOPWORDS as STUDY_STOPWORDS,
     extract_key_terms_from_text,
-    extract_keyframes_ocr_windows,
+    extract_keyframes_ocr_windows_with_status,
     generate_complete_study_bundle,
     invoke_study_llm_json,
     rank_salient_sentences,
 )
+from services.study_fs import resolve_confined_path, safe_document_id
 
 
 # ---------------------------------------------------------------------------
@@ -78,6 +81,92 @@ def validate_video_url(url: str) -> bool:
     if hostname in ("127.0.0.1", "localhost", "0.0.0.0", "169.254.169.254") or hostname.startswith("10.") or hostname.startswith("192.168."):
         raise ValueError("SSRF_FORBIDDEN_HOST: Acesso a endereços de rede privada/interna é bloqueado.")
     return True
+
+
+BROWSER_NATIVE_VIDEO_EXTENSIONS = {".mp4", ".webm", ".m4v"}
+TRANSCODE_VIDEO_EXTENSIONS = {".wmv", ".avi", ".flv", ".mkv", ".mov", ".mpg", ".mpeg"}
+_VIDEO_TRANSCODE_LOCKS: Dict[str, threading.Lock] = {}
+_VIDEO_TRANSCODE_LOCKS_GUARD = threading.Lock()
+
+
+def _get_transcode_lock(doc_id: str) -> threading.Lock:
+    with _VIDEO_TRANSCODE_LOCKS_GUARD:
+        lock = _VIDEO_TRANSCODE_LOCKS.get(doc_id)
+        if lock is None:
+            lock = threading.Lock()
+            _VIDEO_TRANSCODE_LOCKS[doc_id] = lock
+        return lock
+
+
+def ensure_browser_playable_video(
+    video_path: str,
+    doc_id: str,
+    cache_dir: Optional[Path | str] = None,
+) -> Tuple[str, str]:
+    """
+    Garante um fluxo reproduzível em browser Chromium/Electron para vídeos com codecs
+    incompatíveis (ex.: `.wmv` / `wmv3`, `.avi`), convertendo uma única vez via FFmpeg
+    para `.mp4` (H.264/AAC) em cache local confinada com escrita atómica.
+    """
+    ext = Path(video_path).suffix.lower()
+    if ext == ".webm":
+        return video_path, "video/webm"
+    if ext in BROWSER_NATIVE_VIDEO_EXTENSIONS:
+        return video_path, "video/mp4"
+    if ext not in TRANSCODE_VIDEO_EXTENSIONS:
+        return video_path, "video/mp4"
+
+    clean_id = safe_document_id(doc_id)
+    cache_root = Path(cache_dir) if cache_dir is not None else (Path("data") / "study" / "videos_cache")
+    cache_root.mkdir(parents=True, exist_ok=True)
+    target_mp4 = resolve_confined_path(cache_root, f"{clean_id}.mp4")
+
+    try:
+        src_mtime = os.path.getmtime(video_path)
+    except OSError:
+        src_mtime = 0.0
+
+    if target_mp4.is_file() and target_mp4.stat().st_size > 0 and target_mp4.stat().st_mtime >= src_mtime:
+        return str(target_mp4), "video/mp4"
+
+    ffmpeg_bin = get_ffmpeg_binary()
+    if not ffmpeg_bin:
+        return video_path, "video/x-ms-wmv" if ext == ".wmv" else "video/mp4"
+
+    with _get_transcode_lock(clean_id):
+        if target_mp4.is_file() and target_mp4.stat().st_size > 0 and target_mp4.stat().st_mtime >= src_mtime:
+            return str(target_mp4), "video/mp4"
+
+        fd, tmp_name = tempfile.mkstemp(dir=str(cache_root), prefix=f".{clean_id}.", suffix=".tmp.mp4")
+        os.close(fd)
+        try:
+            cmd = [
+                ffmpeg_bin,
+                "-y",
+                "-i", video_path,
+                "-c:v", "libx264",
+                "-preset", "veryfast",
+                "-crf", "24",
+                "-pix_fmt", "yuv420p",
+                "-movflags", "+faststart",
+                "-c:a", "aac",
+                "-b:a", "128k",
+                tmp_name,
+            ]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+            if res.returncode == 0 and os.path.isfile(tmp_name) and os.path.getsize(tmp_name) > 0:
+                os.replace(tmp_name, target_mp4)
+                return str(target_mp4), "video/mp4"
+        except Exception:
+            pass
+        finally:
+            if os.path.exists(tmp_name):
+                try:
+                    os.unlink(tmp_name)
+                except OSError:
+                    pass
+
+    return video_path, "video/x-ms-wmv" if ext == ".wmv" else "video/mp4"
 
 
 def sanitize_transcript_for_prompt(text: str) -> str:
@@ -516,6 +605,7 @@ class VideoIntelligenceService:
         self.vault_root = Path(vault_root)
         self.transcriber = LocalTranscriber()
         self.linker = VaultLinker(vault_root=str(self.vault_root))
+        self.last_ocr_status: str = "OCR_UNAVAILABLE"
 
     # -----------------------------------------------------------------------
     # Validação e Segurança
@@ -895,13 +985,14 @@ class VideoIntelligenceService:
             )
             keyframes.append(keyframe)
 
-        # Executar OCR local em lote (Windows WinRT OCR) para extrair texto real de slides/diagramas
+        # Executar OCR local em lotes pequenos resilientes (Windows WinRT OCR) para extrair texto real de slides/diagramas
         run_ocr = bool(keyframes) and (
             not os.environ.get("PYTEST_CURRENT_TEST")
             or os.environ.get("STUDY_FORCE_WINRT_OCR", "").strip().lower() in ("1", "true", "yes")
         )
         if run_ocr:
-            ocr_map = extract_keyframes_ocr_windows([kf.image_path for kf in keyframes])
+            ocr_map, ocr_status = extract_keyframes_ocr_windows_with_status([kf.image_path for kf in keyframes])
+            self.last_ocr_status = ocr_status
             for kf in keyframes:
                 ocr_txt = ocr_map.get(os.path.abspath(kf.image_path), "").strip()
                 if len(ocr_txt) >= 12:
@@ -913,6 +1004,8 @@ class VideoIntelligenceService:
                     kf.confidence = kf.slide_confidence
                     kf.visual_type = "slide"
                     kf.visual_description = f"Texto no ecrã ({kf.timestamp_str}): {ocr_clean[:500]}"
+        else:
+            self.last_ocr_status = "OCR_SKIPPED_TEST" if os.environ.get("PYTEST_CURRENT_TEST") else "OCR_UNAVAILABLE"
 
         return keyframes
 

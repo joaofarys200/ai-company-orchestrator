@@ -87,6 +87,7 @@ class LocalTranscriber:
         self.compute_type = (compute_type or os.getenv("WHISPER_COMPUTE_TYPE") or "int8").strip() or "int8"
         self._model = None
         self.last_status: str = ""
+        self.asr_unavailable_reason: Optional[str] = "WHISPER_NOT_INSTALLED" if WhisperModel is None else None
 
     def _get_model(self):
         if self._model is None and WhisperModel is not None:
@@ -109,6 +110,10 @@ class LocalTranscriber:
             faster_whisper_model=model,
         )
         self.last_status = status
+        if status == "TRANSCRIPTION_FAILED":
+            self.asr_unavailable_reason = "WHISPER_NOT_INSTALLED" if WhisperModel is None else "RUNTIME_ERROR"
+        else:
+            self.asr_unavailable_reason = None
         return full_transcript, structured_segments
 
 

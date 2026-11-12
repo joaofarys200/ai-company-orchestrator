@@ -422,8 +422,10 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1300,
     height: 850,
+    minWidth: 1024,
+    minHeight: 700,
     title: "JARVIS OS // ORCHESTRATOR",
-    backgroundColor: "#08090d",
+    backgroundColor: "#080c12",
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

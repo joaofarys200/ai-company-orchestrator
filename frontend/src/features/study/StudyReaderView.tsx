@@ -107,6 +107,7 @@ if (typeof (Promise as any).withResolvers !== 'function') {
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import 'pdfjs-dist/web/pdf_viewer.css';
+import { ResizableHandle, usePersistedPaneSize } from '../../components/ui';
 import {
   ChevronLeft,
   ChevronRight,
@@ -159,6 +160,10 @@ ensurePdfWorkerConfigured();
 
 export interface StudyReaderViewProps {
   document: StudyDocument;
+  documents?: StudyDocument[];
+  onSelectDocument?: (documentId: string) => void;
+  onOpenGeneratedDocument?: () => void;
+  onOpenSummary?: () => void;
   onUpdateProgress?: (page: number, section: string, percent: number) => void;
   onSaveHighlight?: (page: number, text: string, color?: string) => void;
   onSaveNote?: (page: number, text: string, note: string) => void;
@@ -397,6 +402,10 @@ export type PdfLifecycle = 'IDLE' | 'LOADING' | 'LOADED' | 'PAGE_RENDERING' | 'R
 // ---------------------------------------------------------------------------
 export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
   document,
+  documents = [],
+  onSelectDocument,
+  onOpenGeneratedDocument,
+  onOpenSummary,
   onUpdateProgress,
   onSaveHighlight,
   onSaveNote,
@@ -429,6 +438,18 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
   const [sidebarTab, setSidebarTab] = useState<'thumbnails' | 'sections' | 'media'>('sections');
   const [assistantPanelOpen, setAssistantPanelOpen] = useState<boolean>(true);
   const [assistantTab, setAssistantTab] = useState<'assist' | 'ask' | 'media' | 'notes'>('assist');
+  const [leftSidebarWidth, setLeftSidebarWidth, resetLeftSidebarWidth] = usePersistedPaneSize(
+    'jarvis.study.reader.left_width',
+    224,
+    180,
+    380
+  );
+  const [rightAssistantWidth, setRightAssistantWidth, resetRightAssistantWidth] = usePersistedPaneSize(
+    'jarvis.study.reader.right_width',
+    352,
+    260,
+    540
+  );
 
   // Text Selection & Floating Micro-Toolbar
   const [floatingToolbar, setFloatingToolbar] = useState<{
@@ -1069,9 +1090,25 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
               <List className="h-4 w-4" />
             </button>
 
-            <span className="text-xs font-semibold text-white truncate max-w-[200px] sm:max-w-xs md:max-w-sm" title={document.title}>
-              {document.title}
-            </span>
+            {documents.length > 1 && onSelectDocument ? (
+              <select
+                aria-label="Selecionar material no leitor"
+                data-testid="reader-document-switcher"
+                value={document.document_id}
+                onChange={(e) => onSelectDocument(e.target.value)}
+                className="max-w-[210px] sm:max-w-xs md:max-w-sm rounded-md border border-white/10 bg-[#0b1118] px-2.5 py-1 text-xs font-semibold text-white outline-none hover:border-cyan-400/40 focus:border-cyan-400/50 cursor-pointer"
+              >
+                {documents.map((docItem) => (
+                  <option key={docItem.document_id} value={docItem.document_id}>
+                    [{docItem.source_type}] {docItem.title}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span className="text-xs font-semibold text-white truncate max-w-[200px] sm:max-w-xs md:max-w-sm" title={document.title}>
+                {document.title}
+              </span>
+            )}
 
             {document.language?.toLowerCase() === 'en' && (
               <span className="rounded bg-sky-400/10 px-1.5 py-0.5 text-[10px] font-medium text-sky-300 border border-sky-400/20 flex items-center gap-1 shrink-0">
@@ -1165,6 +1202,28 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
                 <PanelRightOpen className="h-3.5 w-3.5 opacity-70" />
               )}
             </button>
+            {onOpenGeneratedDocument && (
+              <button
+                type="button"
+                onClick={onOpenGeneratedDocument}
+                className="hidden md:inline-flex items-center gap-1 rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-2.5 py-1 text-[11px] font-medium text-cyan-200 hover:bg-cyan-500/20 cursor-pointer"
+                title="Abrir Documento de Estudo IA (Fase 5)"
+              >
+                <BookOpen className="h-3 w-3" />
+                <span>Documento IA</span>
+              </button>
+            )}
+            {onOpenSummary && (
+              <button
+                type="button"
+                onClick={onOpenSummary}
+                className="hidden md:inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-medium text-zinc-300 hover:text-white hover:bg-white/10 cursor-pointer"
+                title="Abrir Síntese e Resumo"
+              >
+                <FileText className="h-3 w-3" />
+                <span>Síntese</span>
+              </button>
+            )}
           </div>
         </header>
 
@@ -1200,7 +1259,11 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
         <div className="flex flex-1 overflow-hidden relative min-h-0">
           {/* Left Collapsible Strip: Sections / Thumbnails / Media */}
           {sidebarOpen && (
-            <aside className="w-56 shrink-0 border-r border-[#a1bebf]/10 bg-[#0b1016] flex flex-col z-10">
+            <>
+              <aside
+                style={{ width: leftSidebarWidth }}
+                className="shrink-0 border-r border-slate-800/80 bg-[#090e15] flex flex-col z-10"
+              >
               <div className="flex items-center border-b border-white/10 p-1 text-xs">
                 <button
                   onClick={() => setSidebarTab('sections')}
@@ -1312,7 +1375,17 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
                   </div>
                 )}
               </div>
-            </aside>
+              </aside>
+              <ResizableHandle
+                direction="horizontal"
+                value={leftSidebarWidth}
+                min={180}
+                max={380}
+                onChange={setLeftSidebarWidth}
+                onReset={resetLeftSidebarWidth}
+                ariaLabel="Redimensionar barra lateral do leitor"
+              />
+            </>
           )}
 
           {/* Central PDF Canvas Viewport */}
@@ -1493,10 +1566,22 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
       {/* RIGHT ASSISTANT PANEL: JARVIS COMPANION (~30% WIDTH)         */}
       {/* ============================================================ */}
       {assistantPanelOpen && (
-        <aside
-          id="study-assistant-panel"
-          className="w-80 md:w-96 shrink-0 flex flex-col bg-[#0e141c] border-l border-[#a1bebf]/15 transition-all z-20"
-        >
+        <>
+          <ResizableHandle
+            direction="horizontal"
+            reverse
+            value={rightAssistantWidth}
+            min={260}
+            max={540}
+            onChange={setRightAssistantWidth}
+            onReset={resetRightAssistantWidth}
+            ariaLabel="Redimensionar painel do assistente de leitura"
+          />
+          <aside
+            id="study-assistant-panel"
+            style={{ width: rightAssistantWidth }}
+            className="shrink-0 flex flex-col bg-[#0c121b] border-l border-slate-800/80 transition-colors z-20"
+          >
           {/* Assistant Header & Mode Tabs */}
           <header className="border-b border-white/10 p-3 bg-[#0b1016]">
             <div className="flex items-center justify-between mb-2">
@@ -1871,7 +1956,8 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
               </div>
             )}
           </div>
-        </aside>
+          </aside>
+        </>
       )}
 
       {/* ============================================================ */}

@@ -15,12 +15,14 @@ import {
   FileSpreadsheet,
   FileText,
   Files,
+  FilePlus2,
   Folder,
   FolderOpen,
   GitPullRequest,
   Layers,
   Network,
   Palette,
+  Pencil,
   Play,
   Save,
   Search,
@@ -30,6 +32,7 @@ import {
 } from 'lucide-react';
 import type { AstState, AstFileSymbols, ArchitectureSnapshot, ProjectContextData } from '../../protocol/websocket';
 import { CodeIntelligenceHud } from './CodeIntelligenceHud';
+import { ResizableHandle, usePersistedPaneSize } from '../../components/ui';
 
 type MonacoGlobal = typeof globalThis & {
   MonacoEnvironment?: {
@@ -79,6 +82,8 @@ interface CodeEditorProps {
   onSelectFile: (filename: string, line?: number) => void;
   onSaveFile: (filename: string, content: string) => void;
   onDeleteFile?: (filename: string) => void;
+  onCreateFile?: (filename: string, content?: string) => void;
+  onRenameFile?: (oldFilename: string, newFilename: string) => void;
   onOpenChanges: () => void;
   onOpenPreview: () => void;
   onOpenArchitecture?: () => void;
@@ -347,6 +352,8 @@ export function CodeEditor({
   onSelectFile,
   onSaveFile,
   onDeleteFile,
+  onCreateFile,
+  onRenameFile,
   onOpenChanges,
   onOpenPreview,
   onOpenArchitecture,
@@ -371,6 +378,47 @@ export function CodeEditor({
 
   const [openFiles, setOpenFiles] = useState<string[]>(selectedFile ? [selectedFile] : []);
   const [drafts, setDrafts] = useState<Record<string, string>>(files);
+  const prevFilesRef = useRef<Record<string, string>>(files);
+  const [explorerWidth, setExplorerWidth, resetExplorerWidth] = usePersistedPaneSize(
+    'jarvis.ide.explorer.width',
+    256,
+    180,
+    420
+  );
+  const [isCreatingFile, setIsCreatingFile] = useState(false);
+  const [newFilenameInput, setNewFilenameInput] = useState('');
+  const [isRenamingFile, setIsRenamingFile] = useState(false);
+  const [renameInput, setRenameInput] = useState('');
+
+  // Sync incoming files from disk/WebSocket into unmodified buffers without overwriting dirty drafts
+  useEffect(() => {
+    const prevFiles = prevFilesRef.current;
+    setDrafts((current) => {
+      let changed = false;
+      const next: Record<string, string> = { ...current };
+      for (const [key, val] of Object.entries(files)) {
+        if (current[key] === undefined || current[key] === prevFiles[key]) {
+          if (next[key] !== val) {
+            next[key] = val;
+            changed = true;
+          }
+        }
+      }
+      for (const existingKey of Object.keys(current)) {
+        if (!(existingKey in files) && current[existingKey] === prevFiles[existingKey]) {
+          delete next[existingKey];
+          changed = true;
+        }
+      }
+      return changed ? next : current;
+    });
+    prevFilesRef.current = files;
+  }, [files]);
+
+  useEffect(() => {
+    setIsRenamingFile(false);
+    setRenameInput(selectedFile || '');
+  }, [selectedFile]);
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     const parentParts = selectedFile.split('/').slice(0, -1);
     return new Set(parentParts.map((_, index) => parentParts.slice(0, index + 1).join('/')));
@@ -623,12 +671,72 @@ export function CodeEditor({
 
       {/* ── 2. Sidebar Explorer ── */}
       {sidebarOpen && (
-        <aside className="absolute inset-y-0 left-12 z-20 flex w-64 flex-col border-r border-white/8 bg-[#0a0d15] md:relative md:left-auto md:z-auto">
-          {/* Header */}
-          <div className="flex h-10 items-center justify-between border-b border-white/8 px-3.5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Explorador</span>
-            <span className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[10px] text-cyan-300">{filenames.length} ficheiros</span>
-          </div>
+        <>
+          <aside
+            style={{ width: explorerWidth }}
+            className="absolute inset-y-0 left-12 z-20 flex shrink-0 flex-col border-r border-slate-800/80 bg-[#090e15] md:relative md:left-auto md:z-auto"
+          >
+            {/* Header */}
+            <div className="flex h-10 items-center justify-between border-b border-slate-800/80 px-3">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Explorador</span>
+              <div className="flex items-center gap-1.5">
+                {dirtyFiles.size > 0 && (
+                  <span
+                    data-testid="ide-dirty-count-badge"
+                    className="rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[10px] text-amber-300 border border-amber-500/25"
+                    title="Ficheiros com alterações não guardadas"
+                  >
+                    {dirtyFiles.size}●
+                  </span>
+                )}
+                {onCreateFile && (
+                  <button
+                    type="button"
+                    data-testid="ide-new-file-btn"
+                    onClick={() => {
+                      setIsCreatingFile((v) => !v);
+                      setNewFilenameInput('');
+                    }}
+                    className="rounded p-1 text-slate-400 hover:bg-white/[0.06] hover:text-sky-300 transition cursor-pointer"
+                    title="Novo Ficheiro"
+                  >
+                    <FilePlus2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+                <span className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[10px] text-sky-300">{filenames.length}f</span>
+              </div>
+            </div>
+
+            {isCreatingFile && onCreateFile && (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const clean = newFilenameInput.trim();
+                  if (!clean) return;
+                  onCreateFile(clean, '');
+                  onSelectFile(clean);
+                  setIsCreatingFile(false);
+                  setNewFilenameInput('');
+                }}
+                className="flex items-center gap-1.5 border-b border-slate-800/80 bg-[#0d141f] px-2.5 py-2"
+              >
+                <input
+                  type="text"
+                  autoFocus
+                  data-testid="ide-new-file-input"
+                  value={newFilenameInput}
+                  onChange={(e) => setNewFilenameInput(e.target.value)}
+                  placeholder="ex: src/utils.ts"
+                  className="min-w-0 flex-1 rounded border border-slate-700 bg-[#080c12] px-2 py-1 text-xs text-white outline-none focus:border-sky-400/60"
+                />
+                <button
+                  type="submit"
+                  className="rounded bg-sky-600 px-2 py-1 text-[11px] font-semibold text-white hover:bg-sky-500 cursor-pointer"
+                >
+                  Criar
+                </button>
+              </form>
+            )}
 
           {/* Project Title Badge */}
           <div className="flex h-8 items-center gap-1.5 border-b border-white/[0.04] bg-white/[0.02] px-3 text-xs font-medium text-gray-300">
@@ -680,7 +788,17 @@ export function CodeEditor({
               ))
             )}
           </div>
-        </aside>
+          </aside>
+          <ResizableHandle
+            direction="horizontal"
+            value={explorerWidth}
+            min={180}
+            max={420}
+            onChange={setExplorerWidth}
+            onReset={resetExplorerWidth}
+            ariaLabel="Redimensionar explorador de ficheiros"
+          />
+        </>
       )}
 
       {/* ── 3. Main Editor Body ── */}
@@ -757,6 +875,59 @@ export function CodeEditor({
                     <CircleAlert className="h-3.5 w-3.5 shrink-0" />
                     {saveState.error}
                   </span>
+                )}
+
+                {onRenameFile && (
+                  isRenamingFile ? (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const nextName = renameInput.trim();
+                        if (nextName && nextName !== selectedFile) {
+                          onRenameFile(selectedFile, nextName);
+                          onSelectFile(nextName);
+                        }
+                        setIsRenamingFile(false);
+                      }}
+                      className="flex items-center gap-1"
+                    >
+                      <input
+                        type="text"
+                        autoFocus
+                        data-testid="ide-rename-file-input"
+                        value={renameInput}
+                        onChange={(e) => setRenameInput(e.target.value)}
+                        className="w-40 rounded border border-sky-400/50 bg-[#080c12] px-2 py-0.5 font-mono text-[11px] text-white outline-none"
+                      />
+                      <button
+                        type="submit"
+                        className="rounded bg-sky-600 px-2 py-0.5 text-[11px] font-semibold text-white hover:bg-sky-500 cursor-pointer"
+                      >
+                        OK
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsRenamingFile(false)}
+                        className="rounded px-1.5 py-0.5 text-[11px] text-slate-400 hover:text-white cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </form>
+                  ) : (
+                    <button
+                      type="button"
+                      data-testid="ide-rename-file-btn"
+                      onClick={() => {
+                        setRenameInput(selectedFile);
+                        setIsRenamingFile(true);
+                      }}
+                      className="flex items-center gap-1 rounded bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-white/[0.08] hover:text-white border border-slate-700/70 transition-colors cursor-pointer"
+                      title="Renomear ficheiro"
+                    >
+                      <Pencil className="h-3 w-3 text-sky-400" />
+                      <span>Renomear</span>
+                    </button>
+                  )
                 )}
 
                 {onDeleteFile && (

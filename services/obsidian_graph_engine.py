@@ -1830,6 +1830,7 @@ Pontos frágeis identificados pelo auditor:
         missing_attachments_list: List[Dict[str, str]] = []
         code_examples_ignored_total = 0
         scores: List[float] = []
+        score_map: Dict[str, float] = {}
 
         # Pass 1 execution
         for note_file in unique_notes:
@@ -1840,6 +1841,7 @@ Pontos frágeis identificados pelo auditor:
             try:
                 audit = self.audit_note_quality(note_file)
                 scores.append(audit["overall_score"])
+                score_map[rel_str] = audit["overall_score"]
             except Exception:
                 pass
 
@@ -1926,6 +1928,39 @@ Pontos frágeis identificados pelo auditor:
         scores_60_69 = sum(1 for s in scores if 60.0 <= s < 70.0)
         scores_lt_60 = sum(1 for s in scores if s < 60.0)
 
+        orphan_set = set(genuine_orphans)
+        hub_set = set(hubs)
+        sorted_rels = sorted(
+            outgoing_map.keys(),
+            key=lambda r: (-(len(outgoing_map[r]) + len(incoming_map[r])), r.lower()),
+        )[:300]
+        included_set = set(sorted_rels)
+        graph_nodes = [
+            {
+                "id": rel,
+                "label": Path(rel).stem,
+                "folder": rel.rsplit("/", 1)[0] if "/" in rel else "",
+                "in_degree": len(incoming_map[rel]),
+                "out_degree": len(outgoing_map[rel]),
+                "degree": len(outgoing_map[rel]) + len(incoming_map[rel]),
+                "score": round(score_map[rel], 1) if rel in score_map else None,
+                "is_orphan": rel in orphan_set,
+                "is_hub": rel in hub_set,
+            }
+            for rel in sorted_rels
+        ]
+        seen_edges: Set[tuple] = set()
+        graph_edges: List[Dict[str, str]] = []
+        for src in sorted_rels:
+            for dst in outgoing_map[src]:
+                if dst in included_set and src != dst and (src, dst) not in seen_edges:
+                    seen_edges.add((src, dst))
+                    graph_edges.append({"source": src, "target": dst})
+                    if len(graph_edges) >= 800:
+                        break
+            if len(graph_edges) >= 800:
+                break
+
         diagnostics: Dict[str, Any] = {
             "audit_id": f"audit_{hashlib.md5(str(time.time_ns()).encode()).hexdigest()[:8]}",
             "timestamp": datetime.now().isoformat(),
@@ -1954,6 +1989,8 @@ Pontos frágeis identificados pelo auditor:
             "accepted_improvements": proposals_applied,
             "rejected_suggestions": proposals_rejected,
             "proposals_awaiting_review": proposals_awaiting_review,
+            "graph_nodes": graph_nodes,
+            "graph_edges": graph_edges,
         }
 
         # Persist diagnostics atomically

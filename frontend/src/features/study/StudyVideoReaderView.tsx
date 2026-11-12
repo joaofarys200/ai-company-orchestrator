@@ -30,9 +30,15 @@ import type {
   VideoSearchResult
 } from './types';
 import { useWebSocket } from '../../context/WebSocketContext';
+import { ResizableHandle, usePersistedPaneSize } from '../../components/ui';
 
 export interface StudyVideoReaderViewProps {
   document: StudyDocument;
+  documents?: StudyDocument[];
+  onSelectDocument?: (documentId: string) => void;
+  onOpenGeneratedDocument?: () => void;
+  onOpenSummary?: () => void;
+  onRetryDocument?: (documentId: string) => void;
   onUpdateProgress?: (page: number, section: string, percent: number) => void;
   onSaveHighlight?: (page: number, text: string, color?: string) => void;
   onSaveNote?: (page: number, text: string, note: string) => void;
@@ -62,6 +68,11 @@ function formatTime(seconds: number): string {
 
 export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
   document,
+  documents = [],
+  onSelectDocument,
+  onOpenGeneratedDocument,
+  onOpenSummary,
+  onRetryDocument,
   onUpdateProgress,
   onSaveHighlight: _onSaveHighlight,
   onSaveNote,
@@ -92,6 +103,11 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [autoScrollTranscript, setAutoScrollTranscript] = useState<boolean>(true);
+  const [videoStreamError, setVideoStreamError] = useState<boolean>(false);
+
+  useEffect(() => {
+    setVideoStreamError(false);
+  }, [document.document_id]);
 
   // Video Data from metadata
   const videoMeta = (document.metadata as any)?.video || {};
@@ -134,6 +150,7 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
 
   // Sidebar / Assistant State
   const [assistantPanelOpen, setAssistantPanelOpen] = useState<boolean>(true);
+  const [rightWidth, setRightWidth, resetRightWidth] = usePersistedPaneSize('jarvis.study.video.right_width', 384, 280, 560);
   const [activeTab, setActiveTab] = useState<'transcript' | 'chapters' | 'visuals' | 'ask' | 'notes'>('transcript');
 
   // Search State
@@ -533,7 +550,17 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
     }
   };
 
-  const videoStreamUrl = `/api/study/document/${document.document_id}/video`;
+  const httpToken = typeof window !== 'undefined' ? (window as any).__JARVIS_HTTP_TOKEN__ || '' : '';
+  const videoStreamUrl = `/api/study/document/${encodeURIComponent(document.document_id)}/video${
+    httpToken ? `?token=${encodeURIComponent(String(httpToken))}` : ''
+  }`;
+  const asrUnavailableReason =
+    videoMeta?.asr_unavailable_reason || (document.metadata as any)?.asr_unavailable_reason || '';
+  const ocrStatus = videoMeta?.ocr_status || (document.metadata as any)?.ocr_status || '';
+  const ocrKeyframes = useMemo(
+    () => keyframes.filter((k) => Boolean((k as any)?.ocr_text && String((k as any).ocr_text).trim())),
+    [keyframes]
+  );
 
   return (
     <div data-testid="study-video-reader-view" className="flex h-full flex-col bg-[#0b1015] text-zinc-200 overflow-hidden">
@@ -543,9 +570,25 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
           <span className="flex items-center gap-1.5 rounded bg-purple-500/10 px-2 py-0.5 text-xs font-semibold text-purple-300 border border-purple-500/20">
             <span>VIDEO</span>
           </span>
-          <h2 className="truncate text-xs font-semibold text-white sm:text-sm" title={document.title}>
-            {document.title}
-          </h2>
+          {documents.length > 1 && onSelectDocument ? (
+            <select
+              aria-label="Selecionar material no leitor de vídeo"
+              data-testid="video-reader-document-switcher"
+              value={document.document_id}
+              onChange={(e) => onSelectDocument(e.target.value)}
+              className="max-w-[220px] sm:max-w-xs md:max-w-sm rounded-md border border-white/10 bg-[#0b1118] px-2.5 py-1 text-xs font-semibold text-white outline-none hover:border-cyan-400/40 focus:border-cyan-400/50 cursor-pointer"
+            >
+              {documents.map((docItem) => (
+                <option key={docItem.document_id} value={docItem.document_id}>
+                  [{docItem.source_type}] {docItem.title}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <h2 className="truncate text-xs font-semibold text-white sm:text-sm" title={document.title}>
+              {document.title}
+            </h2>
+          )}
           {currentChapter && (
             <span className="hidden sm:inline-flex items-center gap-1 rounded bg-white/[0.04] px-2 py-0.5 text-xs text-zinc-400 border border-white/5 truncate max-w-xs">
               <span className="text-zinc-500">Capítulo:</span> {currentChapter.title}
@@ -554,6 +597,34 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {onRetryDocument && (
+            <button
+              type="button"
+              onClick={() => onRetryDocument(document.document_id)}
+              className="hidden md:inline-flex items-center gap-1 rounded-lg border border-amber-400/25 bg-amber-500/10 px-2.5 py-1.5 text-xs font-medium text-amber-200 hover:bg-amber-500/20 cursor-pointer"
+              title="Reprocessar OCR de diapositivos e áudio deste vídeo"
+            >
+              <span>Reprocessar OCR</span>
+            </button>
+          )}
+          {onOpenGeneratedDocument && (
+            <button
+              type="button"
+              onClick={onOpenGeneratedDocument}
+              className="hidden md:inline-flex items-center gap-1 rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-2.5 py-1.5 text-xs font-medium text-cyan-200 hover:bg-cyan-500/20 cursor-pointer"
+            >
+              <span>Documento IA</span>
+            </button>
+          )}
+          {onOpenSummary && (
+            <button
+              type="button"
+              onClick={onOpenSummary}
+              className="hidden md:inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:text-white cursor-pointer"
+            >
+              <span>Síntese</span>
+            </button>
+          )}
           <button
             onClick={() => setAssistantPanelOpen(!assistantPanelOpen)}
             className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition cursor-pointer ${
@@ -572,7 +643,27 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
       {/* 2. Main Content Split View */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Column: Video Player & Subtitles & Timeline (Dominant) */}
-        <div className="flex flex-1 flex-col overflow-y-auto bg-black p-4">
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto bg-[#06090e] p-4">
+          {videoStreamError && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-950/35 px-4 py-2.5 text-xs text-amber-200 flex items-center justify-between gap-3">
+              <span>
+                O fluxo de vídeo (.wmv/.mkv ou stream local) ainda está a ser convertido para MP4 ou encontra-se indisponível nesta sessão.
+              </span>
+              {onRetryDocument && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVideoStreamError(false);
+                    onRetryDocument(document.document_id);
+                  }}
+                  className="shrink-0 rounded bg-amber-500/20 px-2.5 py-1 text-[11px] font-semibold text-amber-100 hover:bg-amber-500/30 cursor-pointer"
+                >
+                  Tentar Novamente
+                </button>
+              )}
+            </div>
+          )}
+
           <div
             ref={videoContainerRef}
             className="group relative flex flex-col justify-center rounded-xl overflow-hidden bg-[#05080b] border border-white/10 shadow-2xl"
@@ -591,7 +682,8 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
               }}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
-              className="max-h-[68vh] w-full object-contain cursor-pointer"
+              onError={() => setVideoStreamError(true)}
+              className="min-h-[260px] max-h-[68vh] w-full object-contain cursor-pointer"
               playsInline
             />
 
@@ -860,7 +952,21 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
 
         {/* Right Column: Jarvis Assistant Panel */}
         {assistantPanelOpen && (
-          <aside className="flex w-96 flex-col border-l border-white/[0.08] bg-[#0c1217] shrink-0">
+          <>
+            <ResizableHandle
+              direction="horizontal"
+              reverse
+              value={rightWidth}
+              min={280}
+              max={560}
+              onChange={setRightWidth}
+              onReset={resetRightWidth}
+              ariaLabel="Redimensionar painel do assistente de vídeo"
+            />
+            <aside
+              style={{ width: rightWidth }}
+              className="flex flex-col border-l border-white/[0.08] bg-[#0c1217] shrink-0"
+            >
             {/* Panel Tabs */}
             <div className="flex border-b border-white/[0.08] bg-[#0e161c] px-2 text-xs">
               <button
@@ -967,8 +1073,68 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
                   className="flex-1 overflow-y-auto p-3 space-y-2"
                 >
                   {transcriptSegments.length === 0 ? (
-                    <div className="p-6 text-center text-xs text-zinc-500">
-                      Nenhuma transcrição disponível para este vídeo.
+                    <div className="space-y-3 p-3 text-xs">
+                      <div className="rounded-lg border border-amber-500/25 bg-amber-950/15 p-3 text-amber-200 space-y-1.5">
+                        <div className="font-semibold">
+                          {asrUnavailableReason === 'WHISPER_NOT_INSTALLED'
+                            ? 'Transcrição de áudio indisponível (Whisper não instalado)'
+                            : 'Nenhuma transcrição falada disponível para este vídeo.'}
+                        </div>
+                        <p className="text-[11px] text-amber-200/80 leading-relaxed">
+                          {asrUnavailableReason === 'WHISPER_NOT_INSTALLED'
+                            ? 'O motor de transcrição de voz (faster-whisper) não está instalado neste ambiente. O conteúdo visual dos diapositivos é extraído por OCR.'
+                            : 'Podes consultar o texto extraído dos diapositivos (OCR) ou reprocessar este vídeo para atualizar os quadros-chave.'}
+                        </p>
+                        {ocrStatus && (
+                          <div className="text-[10px] font-mono text-zinc-400">
+                            Estado OCR Visual: {String(ocrStatus)} • {ocrKeyframes.length} diapositivo(s) com texto
+                          </div>
+                        )}
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          {ocrKeyframes.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => setActiveTab('visuals')}
+                              className="rounded bg-cyan-500/20 px-2.5 py-1 text-[11px] font-semibold text-cyan-200 hover:bg-cyan-500/30 cursor-pointer"
+                            >
+                              Ver Diapositivos OCR ({ocrKeyframes.length})
+                            </button>
+                          )}
+                          {onRetryDocument && (
+                            <button
+                              type="button"
+                              onClick={() => onRetryDocument(document.document_id)}
+                              className="rounded border border-amber-400/30 px-2.5 py-1 text-[11px] font-medium text-amber-200 hover:bg-amber-500/20 cursor-pointer"
+                            >
+                              Reprocessar Vídeo
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {ocrKeyframes.length > 0 && (
+                        <div className="space-y-2">
+                          <div className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
+                            Texto Extraído dos Diapositivos (OCR)
+                          </div>
+                          {ocrKeyframes.map((kf) => (
+                            <button
+                              key={kf.frame_id}
+                              type="button"
+                              onClick={() => handleSeek(kf.timestamp)}
+                              className="w-full rounded-lg border border-white/[0.06] bg-white/[0.02] p-2.5 text-left hover:border-cyan-400/30 hover:bg-white/[0.04] cursor-pointer"
+                            >
+                              <div className="mb-1 flex items-center justify-between font-mono text-[10px] text-cyan-400">
+                                <span>{kf.timestamp_str}</span>
+                                <span>Diapositivo OCR</span>
+                              </div>
+                              <p className="text-[11px] leading-relaxed text-zinc-300 whitespace-pre-line">
+                                {(kf as { ocr_text?: string }).ocr_text}
+                              </p>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ) : (
                     transcriptSegments.map((segment) => {
@@ -1096,7 +1262,9 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
                       <div className="relative aspect-video w-full rounded bg-black/60 overflow-hidden flex items-center justify-center">
                         {kf.image_path ? (
                           <img
-                            src={`/api/study/document/${document.document_id}/media/${kf.frame_id}`}
+                            src={`/api/study/document/${encodeURIComponent(document.document_id)}/media/${encodeURIComponent(kf.frame_id)}${
+                              httpToken ? `?token=${encodeURIComponent(String(httpToken))}` : ''
+                            }`}
                             alt={kf.frame_id}
                             className="h-full w-full object-contain"
                             onError={(e) => {
@@ -1216,7 +1384,8 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
                 )}
               </div>
             )}
-          </aside>
+            </aside>
+          </>
         )}
       </div>
     </div>

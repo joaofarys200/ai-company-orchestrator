@@ -118,7 +118,7 @@ export const PermissionApprovalModal: React.FC = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
         {/* Backdrop escuro com blur */}
         <motion.div
           initial={{ opacity: 0 }}

@@ -252,8 +252,11 @@ def read_json_safe(
 ) -> Tuple[Any, bool]:
     """
     Lê e valida um ficheiro JSON.
-    Retorna `(dados, estava_corrompido)`. Em caso de JSON inválido ou tipo inesperado,
-    preserva o ficheiro original via `.corrupt.*.bak` se `backup_on_corrupt=True`.
+    Retorna `(dados, estava_corrompido)`. Em caso de JSON inválido, codificação corrompida,
+    ficheiro vazio ou tipo inesperado, preserva o ficheiro original via `.corrupt.*.bak`
+    se `backup_on_corrupt=True`.
+    Erros de I/O / permissões (`PermissionError`, `OSError`) não são tratados como corrupção
+    e são propagados sem mover nem substituir o ficheiro original.
     """
     target = Path(path)
     if not target.exists():
@@ -267,9 +270,12 @@ def read_json_safe(
         if expected_type is not None and not isinstance(parsed, expected_type):
             raise TypeError(f"Esperado {expected_type.__name__}, recebido {type(parsed).__name__}")
         return (parsed, False)
-    except Exception as exc:
-        logger.error(f"[StudyFS] Erro ao ler JSON em {target}: {exc}")
+    except (json.JSONDecodeError, UnicodeDecodeError, ValueError, TypeError) as exc:
+        logger.error(f"[StudyFS] Ficheiro JSON corrompido ou inválido em {target}: {exc}")
         if backup_on_corrupt:
             backup_corrupt_file(target)
         return (copy.deepcopy(default), True)
+    except OSError as exc:
+        logger.error(f"[StudyFS] Erro de leitura I/O (ficheiro preservado sem quarentena) em {target}: {exc}")
+        raise
 

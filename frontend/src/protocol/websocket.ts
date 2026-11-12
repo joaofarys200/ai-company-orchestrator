@@ -770,11 +770,13 @@ export interface ArenaUpdateMessage {
 
 export interface ProjectOutputMessage {
   type: 'project_output';
+  project_id?: string;
   content: string;
 }
 
 export interface ProjectStatusMessage {
   type: 'project_status';
+  project_id?: string;
   running: boolean;
   preview_url?: string;
 }
@@ -841,6 +843,18 @@ export interface VaultDiagnosticsData {
     last_batch_result?: any;
     last_run_timestamp?: string | null;
   };
+  graph_nodes?: Array<{
+    id: string;
+    label: string;
+    folder?: string;
+    in_degree: number;
+    out_degree: number;
+    degree: number;
+    score?: number | null;
+    is_orphan?: boolean;
+    is_hub?: boolean;
+  }>;
+  graph_edges?: Array<{ source: string; target: string }>;
 }
 
 export interface QueueWorkerStatusMessage {
@@ -999,6 +1013,7 @@ export interface MissionDeletedMessage {
 
 export interface AstStateMessage {
   type: 'ast_state';
+  project_id?: string;
   data: AstState | null;
 }
 
@@ -1061,11 +1076,13 @@ export interface ProjectFileDeleteErrorMessage {
 
 export interface ProjectReferencesMessage {
   type: 'project_references';
+  project_id?: string;
   data: ProjectReferenceResult;
 }
 
 export interface SemanticResultsMessage {
   type: 'semantic_results';
+  project_id?: string;
   query: string;
   content: string;
 }
@@ -1641,6 +1658,8 @@ export type ServerMessage =
   | { type: 'study_document_deleted'; document_id: string; success?: boolean; event?: string }
   | { type: 'study_document_processing'; filename: string; status: string }
   | { type: 'study_document_details'; document: any; notes?: any[]; highlights?: any[] }
+  | { type: 'study_note_added'; note: any; request_id?: string }
+  | { type: 'study_highlight_added'; highlight: any; request_id?: string }
   | { type: 'study_quiz_ready'; quiz: any; document_id?: string; request_id?: string }
   | { type: 'study_quiz_evaluated'; score: number; quiz_id?: string; request_id?: string; results?: any; evaluation?: any; [key: string]: any }
 
@@ -1726,6 +1745,8 @@ export type ClientMessage =
   | { type: 'create_project'; project_id: string; project_name?: string; template?: string }
   | { type: 'delete_project'; project_id: string }
   | { type: 'open_project'; project_id: string }
+  | { type: 'create_project_file'; project_id: string; filename: string; content?: string }
+  | { type: 'rename_project_file'; project_id: string; old_filename: string; new_filename: string }
   | { type: 'save_project_file'; project_id: string; filename: string; content: string; expected_sha256: string }
   | { type: 'delete_project_file'; project_id: string; filename: string }
   | { type: 'index_project'; project_id: string }
@@ -1769,6 +1790,8 @@ export type ClientMessage =
   | { type: 'study_review_flashcard'; card_id: string; rating: string }
   | { type: 'study_save_note'; document_id: string; page: number; section_id: string; note_text: string }
   | { type: 'study_save_highlight'; document_id: string; page: number; section_id: string; text: string; color?: string }
+  | { type: 'study_add_reading_note'; document_id: string; page: number; selection?: string; note: string; section_id?: string }
+  | { type: 'study_add_highlight'; document_id: string; page: number; selected_text: string; context?: string; color?: string }
   | { type: 'study_get_notes_and_highlights'; document_id: string }
   | { type: 'study_update_reading_progress'; document_id: string; current_page: number; current_section?: string; completion_percentage?: number }
   | { type: 'study_prepare_exam'; document_id: string }
@@ -2298,9 +2321,18 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         tokens: typeof raw.tokens === 'number' || typeof raw.tokens === 'string' ? raw.tokens : '-',
       };
     case 'project_output':
-      return { type, content: asString(raw.content) };
+      return {
+        type,
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        content: asString(raw.content),
+      };
     case 'project_status':
-      return { type, running: asBoolean(raw.running), preview_url: raw.preview_url ? asString(raw.preview_url) : undefined };
+      return {
+        type,
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        running: asBoolean(raw.running),
+        preview_url: raw.preview_url ? asString(raw.preview_url) : undefined,
+      };
     case 'complete':
       return { type, result: raw.result ? asString(raw.result) : undefined };
     case 'notes_list':
@@ -2356,7 +2388,11 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         project_id: asString(raw.project_id),
       };
     case 'ast_state':
-      return { type, data: normalizeAst(raw.data) };
+      return {
+        type,
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        data: normalizeAst(raw.data),
+      };
     case 'architecture_snapshot':
       return {
         type: 'architecture_snapshot',
@@ -2385,9 +2421,18 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         error: asString(raw.error),
       };
     case 'project_references':
-      return { type, data: normalizeReferences(raw.data) };
+      return {
+        type,
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        data: normalizeReferences(raw.data),
+      };
     case 'semantic_results':
-      return { type, query: asString(raw.query), content: asString(raw.content) };
+      return {
+        type,
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        query: asString(raw.query),
+        content: asString(raw.content),
+      };
     case 'coding_session':
       return { type, data: normalizeCodingSession(raw.data) };
     case 'lecture_lesson_generated':
@@ -2929,6 +2974,18 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
         type: 'study_generation_cancelled',
         document_id: raw.document_id ? asString(raw.document_id) : undefined,
         cancelled: asBoolean(raw.cancelled, true),
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_note_added':
+      return {
+        type: 'study_note_added',
+        note: raw.note,
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_highlight_added':
+      return {
+        type: 'study_highlight_added',
+        highlight: raw.highlight,
         request_id: raw.request_id ? asString(raw.request_id) : undefined,
       };
     case 'study_document_ast_result':
