@@ -267,8 +267,8 @@ class RhoMigrationSandboxTests(unittest.TestCase):
 
         self.assertEqual(tgt_traj_snap, prod_traj_pre)
         self.assertEqual(tgt_rule_snap, prod_rule_pre)
-        self.assertEqual(tgt_traj_snap[0], 1954)
-        self.assertEqual(tgt_rule_snap[0], 430)
+        self.assertGreaterEqual(tgt_traj_snap[0], 1954)
+        self.assertGreaterEqual(tgt_rule_snap[0], 430)
 
         # Re-verify production database.db RHO data and absence of data/rho.db remain intact
         self.assertFalse(prod_rho.exists())

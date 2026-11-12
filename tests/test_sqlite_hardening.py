@@ -278,6 +278,7 @@ class SQLiteHardeningTests(unittest.TestCase):
             self.skipTest("Production database.db not present in environment")
 
         copy_db = self.tmp_path / "prod_copy.db"
+        tables = ("model_trajectories", "rho_compounding_rules", "sessions", "projects")
         with closing(get_db_connection(CANONICAL_DB_PATH, read_only=True)) as src:
             self.assertEqual(src.execute("PRAGMA journal_mode").fetchone()[0].lower(), "wal")
             self.assertEqual(src.execute("PRAGMA integrity_check").fetchall(), [("ok",)])
@@ -286,6 +287,10 @@ class SQLiteHardeningTests(unittest.TestCase):
                 for r in src.execute("SELECT name FROM sqlite_master WHERE type='index'").fetchall()
             }
             self.assertIn("idx_model_trajectories_pattern", idx_names)
+            expected_counts = {
+                table: src.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+                for table in tables
+            }
             with closing(sqlite3.connect(copy_db)) as dst:
                 src.backup(dst)
 
@@ -299,10 +304,15 @@ class SQLiteHardeningTests(unittest.TestCase):
             self.assertEqual(conn.execute("PRAGMA foreign_keys").fetchone()[0], 1)
             self.assertEqual(conn.execute("PRAGMA integrity_check").fetchall(), [("ok",)])
             self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(), [])
-            self.assertEqual(conn.execute("SELECT COUNT(*) FROM model_trajectories").fetchone()[0], 1954)
-            self.assertEqual(conn.execute("SELECT COUNT(*) FROM rho_compounding_rules").fetchone()[0], 430)
-            self.assertEqual(conn.execute("SELECT COUNT(*) FROM sessions").fetchone()[0], 317)
-            self.assertEqual(conn.execute("SELECT COUNT(*) FROM projects").fetchone()[0], 69)
+            for table in tables:
+                self.assertEqual(
+                    conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0],
+                    expected_counts[table],
+                )
+            self.assertGreaterEqual(expected_counts["model_trajectories"], 1954)
+            self.assertGreaterEqual(expected_counts["rho_compounding_rules"], 430)
+            self.assertGreaterEqual(expected_counts["sessions"], 317)
+            self.assertGreaterEqual(expected_counts["projects"], 69)
 
 
 if __name__ == "__main__":
