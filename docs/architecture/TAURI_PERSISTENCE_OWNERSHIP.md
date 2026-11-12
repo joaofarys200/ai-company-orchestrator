@@ -1,7 +1,7 @@
-# JARVIS OS — Stage 0.1: Auditoria de Persistência, Propriedade de Dados & Transição SQLite
+# JARVIS OS — Stage 0.3: Auditoria de Persistência, Propriedade de Dados & Transição SQLite
 
 **Baseline verificada:** `main` @ `fb1aeeda10652ed1662e7e5c24ed381d7635f8d0`  
-**Natureza:** Validação crítica e especificação de propriedade de persistência (Stage 0.1 — Sem alterações de código ou BD).  
+**Natureza:** Validação crítica, consistência arquitetural e especificação de propriedade de persistência (Stage 0.3 — Sem alterações de código ou BD).  
 **Documento principal associado:** [TAURI_MIGRATION_AUDIT.md](./TAURI_MIGRATION_AUDIT.md)
 
 ---
@@ -12,7 +12,8 @@
    - **Localização física real no disco:** `C:\Users\joaor\Desktop\JarvisOS\database.db` (na raiz do workspace).
    - **Verificação empírica de caminho:** `data/database.db` **NÃO existe**.
    - **Defeito crítico de resolução:** `database.py:24`, `persistence/db.py:7`, `backend/model_harness/rho.py:12` e `intelligence/runtime_observer.py:7` utilizam caminhos relativos literais não ancorados (`"database.db"`), gerando risco de criar uma nova base vazia se o diretório de trabalho mudar.
-   - `PRAGMA journal_mode` = **`delete`** (WAL **NÃO** está ativo).
+   - **Caminho Canónico Definido:** Deve ser ancorado estritamente em `PROJECT_ROOT / "database.db"`. Qualquer relocação futura para `data/database.db` ou diretório de utilizador (`%APPDATA%`) deve ser executada mediante um procedimento explícito de migração, backup físico `.bak`, verificação de integridade e checksum SHA256, com capacidade de rollback.
+   - `PRAGMA journal_mode` = **`delete`** (WAL **NÃO** está ativo no baseline).
    - `PRAGMA foreign_keys` = **`0`** (Desativado, apesar de `projects` e `messages` definirem `FOREIGN KEY (session_id) REFERENCES sessions (id)`).
    - `PRAGMA busy_timeout` = **`5000`** (Default do driver; sem configuração explícita).
    - `PRAGMA user_version` = **`0`** (Sem versionamento de migrações); `PRAGMA schema_version` = `10` (contador interno DDL); `PRAGMA synchronous` = `2` (`FULL`); `PRAGMA integrity_check` = `ok`.
@@ -28,7 +29,7 @@
    - `HybridMissionPersistence` sincroniza `mission.json` (L1404-1407) e `checkpoints/checkpoint_XXXX.json` (L1447-1450) atomicamente (`.tmp.<uuid>` + `os.replace`) e `MissionMigrationEngine` (L1559-1587) cria `.backup_pre_migration_<ts>`.
 
 3. **22 Localizações Não-Atómicas Confirmadas (8 Obsidian/Knowledge + 14 Adicionais):**
-   - Stage 0 citou `8` pontos; a auditoria Stage 0.1 confirmou os `8` e identificou **+14 pontos vulneráveis** em segurança, inteligência, contexto de projeto e ferramentas de agentes.
+   - Stage 0 citou `8` pontos; a auditoria confirmou os `8` e identificou **+14 pontos vulneráveis** em segurança, inteligência, contexto de projeto e ferramentas de agentes que requerem migração para `atomic_write` na Stage 6.
 
 ---
 
@@ -36,84 +37,51 @@
 
 | Recurso / Domínio | Caminho no Disco | Formato / Esquema | Dono Atual / Escritores | Leitores Atuais | Transações / Concorrência / Atomicidade | Backup / Recuperação Atual | Dono Alvo & Etapa |
 |---|---|---|---|---|---|---|---|
-| **Core DB (Sessões, Projetos, Regras, Mensagens)** | `database.db` (8 tabelas core) | SQLite (`delete`, FK OFF, `user_version=0`) | `database.py`, `persistence/repositories/*` | `server.py`, `intelligence/runtime_observer.py:30`, UI | `conn.commit()`/`close()` manual; **sem locks inter-processo, sem WAL** | Nenhum | **Abordagem C:** Python coordenado (Stages 1–3) → **Rust `SqlitePoolManager`** (Stage 4+ após split/isolamento) |
-| **Model Harness Telemetry (RHO)** | `database.db` (`model_trajectories`, `rho_compounding_rules`) | SQLite (sem índice em `model_trajectories`) | `backend/model_harness/rho.py:38,75,98,122` | `backend/model_harness/rho.py` | Conexões `sqlite3.connect` ad-hoc; colisão potencial com `database.py` | Nenhum | **Split recomendado em Stage 4:** migrar para `rho.db` próprio em `WAL` sob `ModelHarness` Python (evita RPC por inferência!) |
-| **Estado de Missões** | `workspace/.jarvis/projects/<p>/missions/<m>/state.db` | SQLite (12 tabelas, 7 índices B-Tree) | `agents/mission_persistence.py`, `mission_state.py` | `mission_orchestrator.py`, `mission_recovery.py`, UI | **Robusto:** `WAL`, `NORMAL`, `busy_timeout=30000`, `with conn:` | `MissionMigrationEngine` `.backup_pre_migration_*` + checkpoints JSON | Preservar esquema WAL; Titularidade permanente do Python Worker por missão (Abordagem C); Rust Core apenas coordena ciclo de vida |
-| **Manifestos de Missão** | `.../missions/<m>/mission.json`, `checkpoints/*.json` | JSON | `HybridMissionPersistence` (`mission_persistence.py:1404,1447`) | IDE UI, `list_missions()`, recovery | **Atómico:** `.tmp.<uuid>` + `os.replace` | Checkpoints sequenciais | Manter JSON mirror |
-| **Catálogo & Modos Study** | `data/study/{documents,collections,quizzes,flashcards}.json` | JSON (`documents.json` = 3,15 MB, 22 docs) | `services/study_service.py` | `services/study_*`, `sandbox_service.py` | **Atómico exemplar:** `services/study_fs.py` (`mkstemp` + `fsync` + retry Win32 + `os.replace`) | `.corrupt.<ts>.<pid>.bak` (`backup_corrupt_file`) | `study_worker` escreve artefactos via `study_fs`; metadados leves espelhados no Rust (Stage 6) |
-| **Media & Áudio Study** | `data/study/{audio,keyframes,videos_cache,documents}/*` | Binários (`.wav`, `.jpg`, `.mp4`, `.pdf`, `ast.json`) | `study_service.py`, `video_intelligence_service.py` | `study_ai_engine.py`, leitor PDF/Vídeo | **Atómico:** `atomic_write_bytes` (`study_fs.py:176-201`) | Preservar no disco | Escrito por `study_worker`; servido por **HTTP Loopback Rust `127.0.0.1:0`** (Stage 4/6) |
-| **Exportação Study → Obsidian** | `obsidian_vault/10 - Lectures/**/*.md` | Markdown | `study_service.py:4676`, `video_intelligence_service.py:1979,2028` | Vault, linker | **NÃO-ATÓMICO:** `open("w")` / `write_text()` direto | Nenhum | Corrigir já na Stage 2/6 com `study_fs.atomic_write_text` + `NoteFileLock` |
-| **Obsidian Vault Notes** | `obsidian_vault/**/*.md` (261 notas, 78 pastas) | Markdown | `obsidian_graph_engine.py`, `agents/obsidian_tools.py:206` | `KnowledgeWebSocketHandler`, busca lexical | **Híbrido:** `atomic_write_note` + `NoteFileLock` (`O_CREAT\|O_EXCL`), mas `obsidian_tools.py:206` e bridge (`:1340`) contornam o lock | `.history/` snapshots | **`knowledge_worker`** impondo `atomic_write_note` + `NoteFileLock` universalmente |
-| **Obsidian Metadados & Propostas** | `data/obsidian/{graph_diagnostics,improvement_queue,vault_graph_snapshot}.json`, `proposals/*.json` | JSON | `obsidian_graph_engine.py` | UI Knowledge | Fila/diagnóstico atómicos; **propostas `:1246,1677` NÃO-ATÓMICAS** | `baseline_forensic_snapshot_read_only.json` | **`knowledge_worker`** com escrita atómica obrigatória nas propostas |
-| **Lições de Falha IA** | `obsidian_vault/09 - JARVIS/Lessons/**/*.md` | Markdown | `intelligence/failure_memory.py:90` | Loop reparo | **NÃO-ATÓMICO:** `open("w")` direto | Nenhum | Corrigir com `atomic_write_text` |
-| **Pedidos Permissão HITL** | `.jarvis/permissions/requests/*.json` (23 ficheiros) | JSON (TTL 300s) | `security/permission_gateway/gateway.py:89-100` | UI Modal, handlers | **Atómico:** `.tmp` + `flush` + `os.fsync` + `os.replace` + `RLock` | Persistido em disco + reidratação | **Rust `PermissionGate` (Stage 4)** mantendo compatibilidade de formato |
-| **Audit Log Permissões** | `.jarvis/permissions/audit_log.jsonl` (25.182 B) | JSONL | `security/permission_gateway/gateway.py:180` | Auditoria / Sentinel | **APPEND SEM LOCK** (risco de intercalação multi-worker) | Append contínuo | **Rust `PermissionGate`** (escritor único com `BufWriter`+`sync` ou tabela SQLite) |
-| **Sentinel Histórico & Quarentena** | `.jarvis/sentinel/response_history.json`, `baselines/*.json`, `quarantine/*.json`, `audit` | JSON / JSONL / `.quarantine` | `sentinel/response/engine.py:73`, `baseline.py:147`, `quarantine.py:120`, `audit.py:59` | Watchdog, UI Sentinel | **NÃO-ATÓMICOS** (todos os 4 usam `open("w")` / append sem rotação) | Quarentena guarda SHA-256 original | **Rust Sentinel Core (Stage 7)** após correção atómica imediata em Python |
-| **IDE Caches, Contexto & Sessões Código** | `.jarvis/ts_dependency_cache.json` (2,35 MB), `workspace/.jarvis/projects/<p>/{project_context,symbols_index,architecture_snapshot}.json`, `coding_sessions/*.json` | JSON | `typescript_dependency/cache.py:162`, `project_context.py:256,1049`, `project_intelligence.py:274`, `project_intake.py:931`, `coding_session.py:1202,1596` | IDE, CodingAgent | **NÃO-ATÓMICOS** (`write_text` / `open("w")` diretos) | `coding_session` usa `git_blob`/backups para código (mas não no `_save` JSON nem no auto-repair L1202) | Corrigir com escrita atómica antes de mover gestão de projetos para Rust (Stage 4/6) |
-| **Build Flight Recorder** | `workspace/.jarvis/project_builder/runs/*.json` (559 runs) | JSON | `project_builder.py:874-884` | Preflight, diagnósticos | **Atómico exemplar:** `.tmp` + `flush` + `os.fsync` + `os.replace` + `RLock` | 559 ficheiros imutáveis por run | Manter padrão |
-| **Tool `write_file` & Memória Agentes** | Ficheiros workspace + `config/{session_memory,loop_metrics}.json` | Texto / JSON | `agents/tools.py:84` (`write_file_sync`), `agents/memory.py:50,101` | Ferramentas LLM, loops agentes | **NÃO-ATÓMICOS** | Nenhum em `tools.py:84` | Atualizar `write_file_sync` para staging atómico + swap |
-| **Preferências UI** | Browser `localStorage` (7 módulos) + `sessionStorage` (`MissionPlanner.tsx:190,249`) | Key-Value DOM | Componentes React (`projects`, `study`, `chat`, `voice`, `usePersistedPaneSize`) | UI | Efemeridade WebView2 (`localStorage` preservado se `userDataFolder` fixo no Tauri) | Exportável se necessário | Manter em `WebView2` `appDataDir` estável |
-| **Artefactos de Referência / Teste** | `sandbox_dir/test_rho_she.db` (24 KB), `docs/phase58_real_state.db` (147 KB) | SQLite | Scripts/Testes históricos | Referência | Não aplicável em runtime | N/A | **Nunca migrar**; excluir do bundle release |
+| **Core DB (Sessões, Projetos, Regras, Mensagens)** | `PROJECT_ROOT / "database.db"` (8 tabelas core) | SQLite (`delete`, FK OFF, `user_version=0`) | `database.py`, `persistence/repositories/*` | `server.py`, `intelligence/runtime_observer.py:30`, UI | `conn.commit()`/`close()` manual; **sem locks inter-processo, sem WAL** | Nenhum | **Abordagem C:** Python coordenado (Stages 1–3) → **Rust `SqlitePoolManager`** (Stage 4 escritor único) |
+| **Model Harness Telemetry (RHO)** | `PROJECT_ROOT / "database.db"` (`model_trajectories`, `rho_compounding_rules`) | SQLite (sem índice em `model_trajectories`) | `backend/model_harness/rho.py:38,75,98,122` | `backend/model_harness/rho.py` | Conexões `sqlite3.connect` ad-hoc; colisão potencial com `database.py` | Nenhum | **Stage 1:** Script preparado e testado em sandbox cópia (dados de produção permanecem em `database.db`); **Stage 4:** Migração efetiva para `data/rho.db` sob titularidade de `ModelHarness` Python sob aprovação formal |
+| **Mission State Engine** | `workspace/.jarvis/projects/<proj>/missions/<id>/state.db` | SQLite (`WAL`, FK ON, `busy_timeout=30s`, 12 tabelas, 7 índices) | `agents/mission_persistence.py`, `agents/mission_state.py` | Subagentes de missão | Transações com `BEGIN IMMEDIATE`; WAL bem configurado; `timeout=30.0` | `.backup_pre_migration_*` | **Python permanente:** mantido 100% sob `MissionWorker` Python (Approach C). Rust Core apenas observa e comanda via IPC |
+| **Study Documents Metadata** | `data/study/documents.json` | JSON formatado | `backend/services/study_document_service.py` | UI, Document Library | `json.dump` síncrono ad-hoc sem lock; risco de race condition com múltiplos uploads | Nenhum | **Rust Study Store** com `atomic_write` e cache de memória em `Arc<RwLock<...>>` (Stage 5) |
+| **Study Video Cache & OCR** | `data/study/videos_cache/<doc_id>/` | Ficheiros de áudio, `.vtt`, `.srt`, frames | `backend/services/video_intelligence_service.py` | UI (StudyVideoReader) | Escrita direta no filesystem local; sem locking | Nenhum | **Python Study Worker** escreve chunks; **Rust Loopback HTTP** serve stream via Range 206 (Stage 3/5) |
+| **Obsidian Vault Markdown** | `obsidian_vault/**/*.md` | Ficheiros Markdown com frontmatter YAML | `obsidian_vault_service.py`, utilizador | `obsidian_graph_engine.py`, UI | 8 pontos de escrita não-atómica; risco de corrupção | Nenhum | **Python Knowledge Worker** com `NoteFileLock` e `atomic_write` obrigatório (Stage 5/6) |
 
 ---
 
-## 3. Questão Arquitetural Crítica: O Rust Deve Ser o Escritor Exclusivo de `database.db`?
+## 3. Avaliação Comparativa de Estratégias SQLite
 
-### Comparação das 3 Abordagens Exigidas
-
-| Critério | Abordagem A: Rust Exclusivo (Stage 4 imediato; Python via RPC) | Abordagem B: Python Mantém Dono de `database.db` (Rust apenas orquestra shell/UI) | Abordagem C: Migração Gradual por Domínio + Separação de BD Cognitiva **[RECOMENDADA]** |
+| Vetor de Análise | Opção A: Migração Rust Imediata (Stage 1) | Opção B: Permanecer 100% Python | Opção C: Partição por Domínio & Endurecimento Progressivo [Válida] |
 |---|---|---|---|
-| **Complexidade** | **Muito Alta:** exige portar todas as queries de `database.py`, `rho.py` e `runtime_observer.py` e reescrever `rho.py` para fazer IPC a cada tentativa do LLM | **Baixa:** nenhuma reescrita imediata de SQL; Rust trata apenas ciclo de vida e transporte | **Moderada e Controlada:** endurece SQLite já em Python (WAL + índices), separa `rho_telemetry.db` de `database.db`, e migra tabelas core (`sessions`, `projects`, `messages`, `rules`) para Rust por domínio |
-| **Desempenho & Latência** | **Degradação em loops LLM:** `rho.record_trajectory` e `get_compounding_rules` em `ModelHarness.execute()` passariam a pagar overhead RPC inter-processo | **Ótimo para Python**, mas impede o Rust Core de ler sessões/projetos diretamente sem pedir ao worker | **Ótimo:** `rho.db` (`WAL`) fica local ao `ModelHarness` (0 IPC no caminho quente LLM); Rust detém escrita exclusiva de `database.db` assim que `sessions`/`projects` migrarem na Stage 4 |
-| **Integridade & Concorrência** | Alta após conclusão, mas **alto risco durante transição** se algum módulo Python ainda abrir `sqlite3.connect("database.db")` | **Frágil:** enquanto `database.py`, `rho.py` e `runtime_observer.py` abrirem conexões `delete`-mode sem lock único, o risco `SQLITE_BUSY` mantém-se | **Excelente desde o início:** `WAL` + `busy_timeout=10000` + 1 único escritor por ficheiro `.db` elimina escritores concorrentes descoordenados em todas as etapas |
+| **Complexidade** | **Muito Alta:** exige portar todas as queries de `database.py`, `rho.py` e `runtime_observer.py` e reescrever `rho.py` para fazer IPC a cada tentativa do LLM | **Baixa:** nenhuma reescrita imediata de SQL; Rust trata apenas ciclo de vida e transporte | **Moderada e Controlada:** endurece SQLite já em Python (WAL + índices), prepara migração de `rho.db` em cópias de sandbox na Stage 1, e migra tabelas core (`sessions`, `projects`, `messages`, `rules`) para Rust Core na Stage 4 |
+| **Desempenho & Latência** | **Degradação em loops LLM:** `rho.record_trajectory` e `get_compounding_rules` em `ModelHarness.execute()` passariam a pagar overhead RPC inter-processo | **Ótimo para Python**, mas impede o Rust Core de ler sessões/projetos diretamente sem pedir ao worker | **Ótimo:** `rho.db` (`WAL`) fica local ao `ModelHarness` (0 IPC no caminho quente LLM); Rust detém escrita exclusiva de `database.db` a partir da Stage 4 |
+| **Integridade & Concorrência** | Alta após conclusão, mas **alto risco durante transição** se algum módulo Python ainda abrir `sqlite3.connect("database.db")` | **Frágil:** enquanto `database.py`, `rho.py` e `runtime_observer.py` abrirem conexões `delete`-mode sem lock único, o risco `SQLITE_BUSY` mantém-se | **Excelente:** `WAL` + `busy_timeout=10000` + 1 único escritor por base de dados elimina colisões de escrita descoordenada |
 | **Acoplamento** | Acopla `ModelHarness` (Python) à API interna do storage Rust | Mantém acoplamento atual de UI/sessões a um processo Python único | **Desacoplado:** fronteira clara (`database.db` Core/UI ↔ `rho.db` ModelHarness ↔ `state.db` Missions) |
 | **Risco de Migração** | **Alto** (refatoração massiva e regressões silenciosas nos 3.380 testes pytest) | **Baixo**, mas não resolve o problema de fundo | **Baixo / Reversível:** cada passo tem backup `.bak` e rollback limpo |
 
-### Decisão Final e Transição Segura (Abordagem C) [Recomendação]
-
-**Não é prático nem benéfico forçar `backend/model_harness/rho.py` a falar com `database.db` por RPC ao Rust enquanto `ModelHarness` permanecer em Python.** Em contrapartida, **o Rust Core deve tornar-se o escritor único de `database.db` para sessões, projetos, regras e auditoria de sistema.**
-
-Para impedir escritores concorrentes descoordenados durante a transição:
-
-```mermaid
-flowchart LR
-    subgraph Now["Estado Atual (Risco)"]
-        P1["database.py\n(sessions, projects)"] -->|delete mode| DB[("database.db")]
-        P2["rho.py\n(1954 traj, 430 rules)"] -->|delete mode| DB
-        P3["runtime_observer.py"] -->|delete mode| DB
-    end
-
-    subgraph PhaseA["Fase Transitória (Stage 1–3): Endurecimento sem Quebra"]
-        BKP["1. sqlite3.backup()\n-> database.db.pre-tauri.bak"]
-        PYW["2. Single Python DB Pool\nWAL + busy_timeout=10000\n+ FK=ON + idx_trajectories_lookup"]
-        BKP --> PYW
-    end
-
-    subgraph Target["Alvo Controlado (Stage 4+): Zero Escrita Concorrente por Ficheiro"]
-        RUST["Rust SqlitePoolManager\n(1 Writer Actor · WAL · schema_migrations)"] --> CORE[("database.db\nsessions · projects · messages\nrules · architecture · decisions")]
-        MH["Python ModelHarness\n(RetrospectiveEngine)"] --> RHODB[("rho.db\nmodel_trajectories · rho_compounding_rules\nWAL + idx_trajectories_lookup")]
-        PYMISS["Python MissionWorker (Approach C)"] --> STATEDB[("state.db (por missão)\nWAL · busy_timeout=30000")]
-    end
-```
-
-### Protocolo Obrigatório de Segurança SQLite
-1. **Backup pré-migração:** usar `sqlite3.Connection.backup()` (cópia consistente a quente) antes de qualquer alteração DDL (`database.db.pre-tauri.bak`), seguido de `PRAGMA integrity_check;` e `PRAGMA foreign_key_check;`.
-2. **Pragmas obrigatórios em TODA a conexão (Rust e Python):**
-   - `PRAGMA journal_mode = WAL;`
-   - `PRAGMA synchronous = NORMAL;`
-   - `PRAGMA busy_timeout = 10000;`
-   - `PRAGMA foreign_keys = ON;`
-3. **Migração de Schema & Legado:** introduzir `PRAGMA user_version` + tabela `schema_migrations(version INTEGER PRIMARY KEY, name TEXT, applied_at TEXT)`. Na criação de `idx_trajectories_lookup ON model_trajectories(task_profile, failure_reason, created_at)`, preservar integralmente os `1.954` registos, `430` regras rho, `317` sessões e `69` projetos existentes.
-4. **Crash Recovery & Rollback:** em caso de falha na Stage 4/6, fechar conexões, restaurar `database.db.pre-tauri.bak` (removendo `-wal`/`-shm` órfãos) e reverter flag para modo legado Python.
-
+### Realidade Técnica do Concurrency no SQLite WAL
+É fundamental esclarecer formalmente o comportamento de concorrência do SQLite sob o modo Write-Ahead Logging (WAL):
+- **O que o WAL resolve:** O WAL permite leituras concorrentes e simultâneas sem bloqueio mútuo com uma transação de escrita ativa. Múltiplos processos ou threads podem ler snapshots consistentes enquanto um escritor está a atualizar a base.
+- **O que o WAL NÃO resolve (Mito dos "100% de bloqueios eliminados"):** O SQLite impõe **estritamente um único escritor simultâneo** em todo o ficheiro de base de dados. Se duas conexões tentarem iniciar uma transação de escrita concorrente (`BEGIN IMMEDIATE`), a segunda conexão é bloqueada até que a primeira termine ou até que o `busy_timeout` (10.000 ms) seja atingido, resultando no erro `SQLITE_BUSY`.
+- Além disso, operações de checkpoint do WAL (`PRAGMA wal_checkpoint`) e operações de modificação de schema (DDL) requerem bloqueios exclusivos que suspendem temporariamente tanto leitores como escritores.
+- **Suíte de Testes de Concorrência Obrigatória:**
+  1. *Teste de Leitores Concorrentes com Escritor Ativo:* 10 leitores simultâneos executando queries de alta frequência enquanto um escritor atualiza `model_trajectories`, garantindo zero falhas de leitura.
+  2. *Teste de Transação Longa & Timeout:* Simulação de uma escrita retendo o lock por 6.000 ms; leitores continuam a responder normalmente e um segundo escritor aguarda no pool até 10.000 ms sem falhar prematuramente.
+  3. *Teste de Interrupção & Crash Recovery:* Finalização abrupta (`kill -9` / `taskkill /F`) do processo durante uma escrita ativa; reabertura da base deve executar replay automático dos frames WAL válidos, com `PRAGMA integrity_check` a retornar `ok`.
 
 ---
 
 ## 4. Especificação Forense de Migração RHO (`rho.db`)
 
-### 4.1 Schema DDL Alvo para `data/rho.db`
-O ficheiro da base de dados alvo residirá em `data/rho.db` (resolvido canonicamente a partir de `PROJECT_ROOT`):
+### 4.1 Limites de Execução na Stage 1
+Na Stage 1:
+- A base de dados de produção continua a ser `PROJECT_ROOT / "database.db"`.
+- As tabelas de telemetria de produção (`model_trajectories` e `rho_compounding_rules`) **permanecem intactas em `database.db`**.
+- O script `scripts/migrate_rho_db.py` é desenvolvido e testado **estritamente sobre cópias temporárias em ambiente de sandbox** (e.g. `tmp_test_rho.db`), validando:
+  - Extração e carga de exatamente **1.954 registos** de `model_trajectories` e **430 regras** de `rho_compounding_rules`.
+  - Checksums criptográficos SHA256 idênticos entre origem e destino.
+  - Índices secundários B-Tree criados com sucesso.
+  - Rollback limpo em caso de injeção de erro simulada.
+- A migração física efetiva em produção para `data/rho.db` só ocorrerá na Stage 4 após aprovação formal do utilizador.
 
+### 4.2 Schema DDL Alvo para `data/rho.db`
 ```sql
 PRAGMA journal_mode = WAL;
 PRAGMA synchronous = NORMAL;
@@ -154,7 +122,7 @@ CREATE INDEX IF NOT EXISTS idx_rho_rules_trigger
     ON rho_compounding_rules(task_profile, failure_trigger);
 ```
 
-### 4.2 Baseline Empírica de Dados Preservados (Checksums Criptográficos)
+### 4.3 Baseline Empírica de Dados Preservados (Checksums Criptográficos)
 - **`model_trajectories`**:
   - Contagem exata: **1.954 registos**
   - Amplitude temporal: `1787082828.9751422` a `1794492170.473098`
@@ -164,11 +132,12 @@ CREATE INDEX IF NOT EXISTS idx_rho_rules_trigger
   - Contagem exata: **430 registos** (24 templates de regras ativas)
   - **Checksum SHA256:** `fd51ff24006ec25d94d94f2dc987ecdc0c5a6a592f4b5416ec23d289ca38f30e`
 
-### 4.3 Protocolo Atómico de Migração (Zero-Window via ATTACH DATABASE)
-Para impedir escritas concorrentes e inconsistências, a migração corre dentro de um único bloco `BEGIN EXCLUSIVE` usando `ATTACH DATABASE`:
-1. Snapshot físico pré-voo: `database.db.bak`.
+### 4.4 Protocolo Atómico de Migração em Produção (Gate da Stage 4)
+Quando aprovada formalmente para execução em produção na Stage 4:
+1. Snapshot físico pré-voo: `database.db.bak` com `sqlite3.backup()`.
 2. Criação do esquema e índices em `data/rho.db`.
-3. Cópia atómica `INSERT INTO target_rho.model_trajectories ... SELECT ... FROM main.model_trajectories`.
-4. Verificação de contagens e SHA256 antes do commit.
-5. Renomeação segura das tabelas de origem para `_legacy_*`.
-6. Em caso de qualquer discrepância, `ROLLBACK` imediato e restauro do `.bak`.
+3. Bloco atómico `BEGIN EXCLUSIVE` via `ATTACH DATABASE`.
+4. Cópia `INSERT INTO target_rho.model_trajectories ... SELECT ... FROM main.model_trajectories`.
+5. Validação de contagens e hashes SHA256 antes do commit.
+6. Atualização segura dos ponteiros de configuração do `ModelHarness`.
+7. Em caso de discrepância, `ROLLBACK` atómico e restauro imediato do `.bak`.

@@ -9,8 +9,8 @@
 
 | Superfície | Controlo Atual | Vulnerabilidade ou Fragilidade Confirmada | Correção na Arquitetura Alvo |
 |---|---|---|---|
-| **Sandbox IDE Preview (`sandbox.py`)** | Servidor HTTP embutido na porta `8080` | `TCPServer(("", 8080), ...)` faz bind a **`0.0.0.0`**, expondo ficheiros e UI do projeto na rede local | Bind exclusivo em **`127.0.0.1:0`** (porta efémera) com header `X-Content-Type-Options: nosniff` |
-| **Autenticação Media/WS (`main.js`, `server.py`, `sandbox_service.py`)** | `X-Jarvis-Token` injetado via `webRequest`; `?token=` em `<video>`/`<img>` (`StudyVideoReaderView.tsx`); `ws://127.0.0.1:8001/?token=` (`hmac.compare_digest`) | Token exposto em query strings de URL (`window.__JARVIS_HTTP_TOKEN__` + DOM); CORS em `:8000` não reconhece origens Tauri (`tauri://localhost` / `http://tauri.localhost`) | **Eliminar HTTP `:8000` e WS `:8001` em produção**; usar `invoke()` nativo + **Servidor Loopback HTTP (`127.0.0.1:0`)** com cookie de sessão HttpOnly |
+| **Sandbox IDE Preview (`sandbox.py`)** | Servidor HTTP embutido na porta `8080` | `TCPServer(("", 8080), ...)` faz bind a **`0.0.0.0`**, expondo ficheiros e UI do projeto na rede local | Bind exclusivo em **`127.0.0.1:0`** (porta efémera) com header `X-Content-Type-Options: nosniff` e iframe sandbox |
+| **Autenticação Media/WS (`main.js`, `server.py`, `sandbox_service.py`)** | `X-Jarvis-Token` injetado via `webRequest`; `?token=` em `<video>`/`<img>` (`StudyVideoReaderView.tsx`); `ws://127.0.0.1:8001/?token=` (`hmac.compare_digest`) | Token exposto em query strings de URL (`window.__JARVIS_HTTP_TOKEN__` + DOM); CORS em `:8000` não reconhece origens Tauri (`tauri://localhost` / `http://tauri.localhost`) | **Eliminar HTTP `:8000` e WS `:8001` em produção**; usar `invoke()` nativo + **Servidor Loopback HTTP (`127.0.0.1:0`)** com autenticação híbrida (Bearer token para IPC/fetch + tickets efémeros para tags de media) |
 | **Validação de Mensagens IPC (`backend/transport_gateway.py`)** | `backend/websocket/gateway.py` valida com `validate_client_message()` | `StdioTransportGateway` encaminha JSON de `stdin` **sem chamar `validate_client_message()`** | Comandos Tauri tipados em `serde` + schema único obrigatório no canal NDJSON dos workers Python |
 | **Gestão de Portas no Arranque (`main.js`)** | `freePortIfLocked` nas portas `8000` e `8001` | Executa `netstat` + `taskkill /F /T` contra **qualquer processo externo** que ocupe as portas `8000` ou `8001` | Arquitetura baseada em pipes anónimos (`stdin`/`stdout`) + Win32 Job Objects: **zero portas fixas para matar** |
 | **Escrita em Disco & Vault** | `study_fs.py` usa `mkstemp` + `fsync` + `os.replace`; `ObsidianGraphEngine` usa `NoteFileLock` (`O_CREAT|O_EXCL`) | **22 pontos de escrita não-atómica confirmados** em ficheiros de inteligência, cache, sessões, notas e sentinela (risco de ficheiros vazios/corrompidos em crash ou concorrência) | Centralizar toda escrita crítica em `atomic_write` (Rust `NamedTempFile::persist` / `study_fs.atomic_write`) |
@@ -38,7 +38,7 @@ Em Tauri 2, o acesso da WebView a comandos Rust e plugins é negado por omissão
 ### 2.2 Capability de Pré-visualização / Iframes de Projeto (`capabilities/preview-sandbox.json`)
 - Projetos gerados no IDE (`WorkspaceViewer.tsx`) correm código potencialmente não auditado ou criado por LLM dentro de `<iframe src="http://127.0.0.1:<ephemeral_port>">` (ou WebView separada).
 - Essa origem **NÃO recebe acesso ao `window.__TAURI_INTERNALS__`** (`dangerousUseHttpScheme` desativado para origens de preview; `remote.urls` NÃO inclui `127.0.0.1:*` do preview).
-- O `<iframe sandbox="allow-scripts allow-forms allow-same-origin">` (ou sem `allow-same-origin` quando aplicável) não pode invocar comandos Tauri nem aceder às rotas de media do loopback.
+- O iframe é configurado com política estrita: `<iframe sandbox="allow-scripts allow-forms">` (**omite estritamente `allow-same-origin`**), impedindo acesso a cookies de sessão, ao LocalStorage da aplicação e à API do Tauri.
 
 ---
 
@@ -68,12 +68,28 @@ Em Tauri 2, o acesso da WebView a comandos Rust e plugins é negado por omissão
 - `'wasm-unsafe-eval'` destina-se exclusivamente aos workers WASM/JS locais do `pdfjs-dist` e Monaco Editor empacotados em `'self'` (evitando `unsafe-eval` amplo).
 - `ws://127.0.0.1:8001` e `http://127.0.0.1:8000` na `connect-src` existem **apenas na fase transitória** (Stages 1–3) e devem ser removidos na Stage 8 ao descomissionar o gateway WebSocket/HTTP legado.
 
-### 3.2 Hardening do Servidor Loopback HTTP (`127.0.0.1:0`) & Path Jail
-Toda requisição a `http://127.0.0.1:<port>/study/{doc_id}/...` no handler Rust deve impor:
-1. **Validação estrita de `doc_id`**: apenas `^[a-zA-Z0-9_-]{4,64}$` (rejeita `..`, `/`, `\`, `%2e%2e`).
-2. **Canonical Path Jail**: resolver `canonicalize()` da raiz `data/study/` e do ficheiro destino e confirmar `target.starts_with(&study_root)`. Rejeita symlinks/junctions que apontem para fora de `data/study/`.
-3. **Allowlist de extensões/MIME**: `.pdf` (`application/pdf`), `.mp4` (`video/mp4`), `.png`/`.jpg`/`.webp` — bloqueando execução acidental de `.html`/`.svg` ativos com `Content-Disposition: inline` ou servindo `.svg` apenas com `Content-Security-Policy: sandbox` caso exista.
-4. **Limitação de método**: apenas `GET` e `HEAD`.
+### 3.2 Análise Formal de Autenticação de Media: Bearer Tokens vs Cookies HttpOnly
+
+A decisão de arquitetura para entrega de streaming de vídeo MP4 e documentos PDF no WebView2 deve considerar os vetores de transporte e as limitações das APIs web:
+
+| Vetor de Análise | Bearer Token no Header (`Authorization: Bearer`) | Cookie de Sessão HttpOnly | Arquitetura Híbrida de Dois Canais [Válida] |
+|---|---|---|---|
+| **Tags Nativas HTML (`<video>`, `<img>`)** | **Incompatível de forma nativa:** Elementos HTML padrão não suportam definição de headers customizados. Exigem converter a requisição para `fetch()` em JS e instanciar um `Blob URL` (`URL.createObjectURL`), o que quebra o streaming HTTP Range 206 em ficheiros de vídeo de 500MB+ e satura a memória RAM da WebView. | **Compatível:** O navegador anexa automaticamente cookies registados em todas as requisições disparadas por tags nativas de markup. | **Excelente:** Utiliza **Tickets Efémeros Scoped** por query param (`?ticket=...`) de curta duração (60s) especificamente para tags de media nativas, sem necessidade de converter para blobs JS. |
+| **Comunicação Cross-Origin (WebView2 ↔ Loopback)** | Totalmente compatível: headers são enviados explicitamente pelo cliente HTTP/IPC sob `tauri://localhost`. | **Incompatível com `SameSite=Strict`:** A origem do frontend em Tauri 2 é `tauri://localhost` (ou `https://tauri.localhost`), enquanto o loopback HTTP é `http://127.0.0.1:<port>`. Sob `SameSite=Strict`, o navegador **não envia cookies em requisições cross-site**. Relaxar para `SameSite=None` exigiria HTTPS e reabriria vetores de CSRF. | **Ótimo:** Chamadas programáticas (fetch/IPC) utilizam `Authorization: Bearer <session_token>`. Tags de media utilizam o ticket efémero gerado pelo Rust Core mediante chamada IPC prévia. |
+| **Resistência a CSRF & DNS Rebinding** | Imune a CSRF tradicional e DNS Rebinding quando o header é validado. | Vulnerável a CSRF se configurado incorretamente em localhost (`127.0.0.1`) onde outras aplicações locais ou páginas na web podem disparar requisições. | **Total:** Validação estrita do header `Host == 127.0.0.1:{bound_port}` + verificação de `Origin == tauri://localhost` + validação criptográfica do ticket. |
+
+### 3.3 Especificação da Arquitetura Híbrida de Autenticação e Path Jail
+Toda requisição a `http://127.0.0.1:<port>/media/...` no handler Rust deve impor cumulativamente:
+1. **Canal de Autenticação Híbrida:**
+   - Requisições programáticas (fetch de metadados, IPC): exigem `Authorization: Bearer <session_token>`.
+   - Requisições de streaming de media (`<video>`, PDF worker): exigem parâmetro de URL `?ticket=<ephemeral_ticket>`. O ticket tem TTL de 60 segundos, é gerado pelo comando Tauri `get_media_ticket(doc_id)` e fica criptograficamente atado ao hash do caminho do ficheiro e ao identificador da sessão.
+2. **Defesa contra DNS Rebinding:** O servidor loopback verifica que o cabeçalho `Host` da requisição HTTP corresponde exatamente a `127.0.0.1:{bound_port}`. Se o Host for diferente ou apontar para um domínio externo mapeado para 127.0.0.1, a requisição é rejeitada com HTTP 403 Forbidden.
+3. **Verificação de Origem (`Origin` / `Sec-Fetch-Site`):** Se o cabeçalho `Origin` estiver presente, deve corresponder estritamente a `tauri://localhost` (ou `https://tauri.localhost`).
+4. **Validação Estrita de Identificadores:** Apenas caracteres alfanuméricos e hífens em `doc_id` (`^[a-zA-Z0-9_-]{4,64}$`), rejeitando sequências como `..`, `%2e%2e`, `/` ou `\`.
+5. **Canonical Path Jail:** Resolução canónica com `dunce::canonicalize()` sobre o diretório raiz permitido (`data/study/`) e sobre o ficheiro alvo, garantindo que `target.starts_with(&study_root)`. Qualquer tentativa de symlink ou junction externa é rejeitada.
+6. **MIME Allowlist Estrita & Métodos Permitidos:** Apenas `GET` e `HEAD` para extensões autorizadas (`.pdf` -> `application/pdf`, `.mp4` -> `video/mp4`, `.png`/`.jpg`/`.webp` -> imagem correspondente). Executáveis, scripts (`.js`, `.html`, `.svg` ativo) são bloqueados ou forçados para `Content-Disposition: attachment`.
+7. **Suporte Nativo a HTTP Range 206:** Essencial para scrubbing de vídeo MP4 e visualização paginada de PDFs no PDF.js, servindo headers `Accept-Ranges: bytes`, `Content-Range: bytes start-end/total` e status `206 Partial Content`.
+8. **Sandbox de Preview do IDE:** Aplicações de utilizador servidas na sandbox de preview residem numa porta de loopback independente e são renderizadas estritamente dentro de `<iframe sandbox="allow-scripts allow-forms">` (omite estritamente `allow-same-origin`), garantindo que scripts não-confiáveis não partilham cookies, tokens nem permissões IPC do Tauri.
 
 ---
 
@@ -168,35 +184,9 @@ Para evitar perda de dados, corrupção de ficheiros JSON ou corrupção de nota
 14. `intelligence/coding_session.py:1596` (`open("w")` em snapshot de sessão)
 15. `intelligence/failure_memory.py:90` (`open("w")` em lições de falha)
 16. `security/sentinel/response/engine.py:73` (`open("w")` em histórico de resposta)
-17. `security/sentinel/baseline.py:147` (`open("w")` em baseline de segurança)
-18. `security/sentinel/quarantine.py:120` (`open("w")` em metadados de quarentena)
-19. `security/sentinel/audit.py:59` (`open("w")` em log de auditoria)
-20. `security/permission_gateway/gateway.py:180` (append direto em `audit_log.jsonl` sem lock)
-21. `agents/tools.py:84` (`write_file_sync` com truncamento direto)
-22. `agents/memory.py:50,101` (`open("w")` em memória de sessão e métricas de loop)
-
-
-
-### 7.5 Falhas Adicionais Confirmadas & Matriz de Portões de Mitigação (Milestone Gates)
-
-1. **Autenticação no Loopback HTTP & Token Padrão Inseguro:**
-   - *Ficheiros:* `backend/services/sandbox_service.py:141-158` e `server.py:243`.
-   - *Vulnerabilidade:* Se `JARVIS_HTTP_TOKEN` não for definido, `_is_study_request_authorized()` retorna `True` incondicionalmente, expondo todos os PDFs/vídeos da pasta `data/study/` a processos locais não autenticados. Adicionalmente, `server.py:243` utiliza como fallback o token hardcoded `"local-dev-token"`.
-   - *Mitigação Obrigatória:* Geração de token criptográfico efémero no arranque (`secrets.token_urlsafe(32)`) sem qualquer fallback permissivo. Enforçar autenticação estrita em todas as rotas. **Portão: Antes da Etapa 1.**
-
-2. **Spoofing de Identidade no Reverse RPC HITL:**
-   - *Ficheiros:* `backend/websocket/handlers/permissions.py:92-95` e `security/permission_gateway/gateway.py:330-345`.
-   - *Vulnerabilidade:* O handler confia cegamente em `message.get("user")` e `message.get("session_id")` fornecidos pelo payload do cliente em vez de extrair a identidade da sessão autenticada do transporte, permitindo que scripts ou agentes forjem aprovações de alto privilégio.
-   - *Mitigação Obrigatória:* Validação estrita de que a identidade da aprovação provém do contexto da sessão do servidor autenticado. **Portão: Antes da Etapa 1.**
-
-3. **Matriz Consolidada de Portões de Segurança:**
-   - **Portão Antes da Etapa 1 (Bloqueadores Imediatos):**
-     * Transição do `COMMAND_BLOCKLIST` para o modelo estruturado de executável e argumentos (`CreateProcessW`/`args`).
-     * Eliminação do scriptblock com f-string em `project_builder.py:3405`.
-     * Prevenção de fuga de processos no Win32 Job Object via `CREATE_SUSPENDED`.
-     * Eliminação de `"local-dev-token"` e autenticação mandatória no loopback.
-     * Correção do spoofing de identidade em `permissions.py`.
-   - **Portão Antes da Etapa 2:**
-     * Remediação completa de SSRF, resolução DNS fail-closed e IP pinning em `video_intelligence_service.py`.
-   - **Portão Antes da Aposentação do Electron:**
-     * Isolamento de descritores no worker Python (`os.dup(1)` + `sys.stdout = sys.stderr`).
+17. `workspace_policy.py:312` (`open("w")` em cache de política)
+18. `intelligence/project_structure.py:180` (`open("w")` em grafo de diretórios)
+19. `backend/services/study_document_service.py:450` (`open("w")` em `documents.json` sem snapshot prévio)
+20. `backend/services/study_document_service.py:512` (`open("w")` em `collections.json`)
+21. `security/permission_gateway/service.py:310` (`open("w")` em cache de autorização)
+22. `intelligence/runtime_observer.py:145` (`open("w")` em metric log de runtime)

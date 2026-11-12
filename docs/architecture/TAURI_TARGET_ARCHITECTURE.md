@@ -30,12 +30,15 @@ Consolidar o shell Electron, a coordenação de processos, a política de permis
 
 A validação empírica da Etapa 0.1 refinou a estratégia original:
 1. **Ollama & Model Harness (Abordagem Híbrida C):** Em vez de reescrever ingenuamente o cliente Ollama em Rust (o que destruiria 12 subsistemas de auto-cura cognitiva, semáforo GPU e injeção de regras SHE/RHO no `ModelHarness`), o runtime de inferência **permanece em Python no `ModelExecutionService`**. O Rust Core atua como despachante de streams para a UI via Tauri Events.
-2. **Persistência de Dados (Abordagem C - Partição de Domínio):**
-   - Na Etapa 1: Hardening imediato do SQLite em Python (`WAL`, `busy_timeout=10000`, `foreign_keys=ON` e índices em `database.db`).
-   - `state.db` permanece permanentemente sob titularidade do Python. A telemetria de alta frequência do ModelHarness é separada para `rho.db`.
-   - Na Etapa 4: Rust assume a titularidade como escritor único de `database.db` (sessões, projetos, regras e permissões).
-3. **Serviço de Media e Preview via HTTP Loopback (`127.0.0.1:0`):** Devido a limitações comprovadas do WebView2 do Windows com esquemas customizados (`jarvis-media://`) no suporte a HTTP Range 206 (scrubbing de vídeo MP4) e isolamento de Web Workers do `pdfjs-dist` (`pdf.worker.min.mjs`), a entrega de media e o preview do IDE são unificados num **servidor HTTP assíncrono interno em Rust (`warp`/`axum`) vinculado estritamente a `127.0.0.1:0` (porta efémera com bearer token)**.
+2. **Persistência de Dados (Abordagem C - Partição de Domínio & Ancoragem Canónica):**
+   - Caminho Físico Canónico: Ancorado em `PROJECT_ROOT / "database.db"` (a auditoria empírica confirmou que `data/database.db` não existe). Qualquer relocação futura para `data/` exige migração formal com backup `.bak`, integridade e rollback.
+   - Na Etapa 1: Hardening imediato do SQLite em Python (`WAL`, `busy_timeout=10000`, `synchronous=NORMAL`, `foreign_keys=ON` e índice composto em `model_trajectories`).
+   - Realidade do SQLite WAL: Permite leituras concorrentes simultâneas com 1 escritor ativo, mas o SQLite mantém **estritamente um único escritor simultâneo**. `SQLITE_BUSY` pode ocorrer se uma escrita exceder o `busy_timeout` (10.000 ms) ou durante DDL/checkpointing.
+   - Preparação de `rho.db` na Etapa 1: O script de migração é testado exclusivamente em sandbox (cópias temporárias); os dados de produção de RHO permanecem intactos em `database.db`.
+   - Na Etapa 4: Rust Core assume a titularidade de escritor único de `database.db`. `state.db` (missões) e `rho.db` (telemetria do ModelHarness) permanecem permanentemente sob titularidade do Python. Zero escrita concorrente descoordenada entre Rust e Python.
+3. **Serviço de Media e Preview via HTTP Loopback (`127.0.0.1:0`) & Autenticação Híbrida:** Devido a limitações comprovadas do WebView2 do Windows com esquemas customizados (`tauri-media://`) no suporte a HTTP Range 206 (scrubbing de vídeo MP4) e isolamento de Web Workers do `pdfjs-dist` (`pdf.worker.min.mjs`), a entrega de media e o preview do IDE são unificados num **servidor HTTP assíncrono interno em Rust (`warp`/`axum`) vinculado estritamente a `127.0.0.1:0` (porta efémera)**. A autenticação adota um modelo híbrido: Bearer token para chamadas IPC/fetch, tickets efémeros temporários (60s) via query param para tags `<video>` e `<img>`, validação de Host header (`127.0.0.1:{bound_port}`) contra DNS Rebinding, Path Jail canónico, e preview de projetos web em `<iframe sandbox="allow-scripts allow-forms">` (estritamente sem `allow-same-origin`).
 4. **RPC Reverso para Human-In-The-Loop (HITL):** Introdução de framing de RPC reverso (`reverse_request`) permitindo que ferramentas Python executadas por agentes peçam aprovação ao `PermissionGate` do Rust sem bloquear ou entrar em deadlock no fluxo de stdio.
+5. **Preservação Integral de `agents/` e `backend/agents/` na Stage 1:** Ambas as diretorias permanecem 100% intocadas durante a transição de transporte. A auditoria profunda comprovou um acoplamento cruzado massivo (367 imports diretos de `agents.*` dentro de `backend/agents` e 81 imports de `backend.agents.*` em `agents/long_horizon_missions`). A consolidação é formalmente adiada para a Stage 7 / pós-migração, utilizando shims dinâmicos de aliasing (`sys.modules`) e codemods AST.
 
 ```mermaid
 flowchart TB
@@ -85,7 +88,7 @@ flowchart TB
     subgraph L4["Camada 4 — Python Specialized Sidecar Workers (NDJSON sobre stdio)"]
         PW1["Worker AI &amp; Model Harness\nModelExecutionService · ModelHarness (12 Subsistemas)\nSHE/RHO Dynamic Rules · Ollama HTTP Client"]
         PW2["Worker Document &amp; Study\nPyMuPDF · pdfplumber · python-docx\nWinRT OCR · ffmpeg/ffprobe · faster_whisper"]
-        PW3["Worker Knowledge, Agents &amp; Code\nObsidianGraphEngine · Missions Engine\nbackend/agents/ (Poda de duplicados legados)"]
+        PW3["Worker Knowledge, Agents &amp; Code\nObsidianGraphEngine · Missions Engine\nagents/ + backend/agents/ (Preservados integralmente)"]
         WPOOL <== "stdin/stdout NDJSON\n+ Reverse RPC HITL + Cancel" ==> PW1
         WPOOL <== "stdin/stdout NDJSON\n+ Reverse RPC HITL + Cancel" ==> PW2
         WPOOL <== "stdin/stdout NDJSON\n+ Reverse RPC HITL + Cancel" ==> PW3

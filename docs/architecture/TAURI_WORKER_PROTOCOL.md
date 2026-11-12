@@ -272,7 +272,7 @@ sequenceDiagram
 
     Rust->>Py: Spawn Process (stdin/stdout piped)
     Py->>Rust: {"method": "worker.ready", "params": {"worker_type": "ai_engine", "pid": 14208, "version": "1.0.0", "capabilities": ["ollama", "docgen", "video"]}}
-    Rust->>Py: {"id": "handshake-1", "method": "worker.init", "params": {"db_path": "data/database.db", "log_level": "DEBUG", "config": {...}}}
+    Rust->>Py: {"id": "handshake-1", "method": "worker.init", "params": {"db_path": "database.db", "log_level": "DEBUG", "config": {...}}}
     Py->>Rust: {"id": "handshake-1", "result": {"status": "initialized", "active_providers": ["ollama"]}}
     Note over Rust,Py: Worker is now in ACTIVE operational state
 ```

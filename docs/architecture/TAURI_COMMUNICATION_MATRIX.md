@@ -39,8 +39,8 @@ Antes da migração de transporte, foram confirmadas 6 anomalias reais e quantif
 | **Mensagens Servidor Declaradas (`SERVER_MESSAGE_TYPES`)** | 272 | Validado em `websocket_schema.py` | Mapeadas para `tauri::event` / `Channel` |
 | **Mensagens Servidor Emitidas sem Declaração no Schema** | **57** | Disparadas dinamicamente no backend | Formalizadas ou podadas no contrato |
 | **Mensagens Servidor sem Handler no Frontend (`switch`)** | **144** | Ignoradas silenciosamente em `WebSocketContext` | Podadas ou tratadas no `TransportAdapter` |
-| **Handlers Registados sem Ramo de Execução (`missions.py`)** | **33** | Presentes em `MISSION_HANDLERS`, sem `elif` | Auditados e podados na Etapa 1 |
-| **Ramos Mortos Inalcançáveis (`missions.py`)** | **14** | `elif` presente mas rejeitado no gateway | Removidos na consolidação da Etapa 1 |
+| **Handlers Registados sem Ramo de Execução (`missions.py`)** | **33** | Presentes em `MISSION_HANDLERS`, sem `elif` | Auditados nos contratos na Etapa 1 (consolidados na Etapa 5) |
+| **Ramos Mortos Inalcançáveis (`missions.py`)** | **14** | `elif` presente mas rejeitado no gateway | Formalizados nos contratos na Etapa 1 (removidos na Etapa 5) |
 
 ### Detalhe e Classificação Forense das Discrepâncias
 1. **Os 14 Ramos Mortos Inalcançáveis (`missions.py:1456-1716`):**

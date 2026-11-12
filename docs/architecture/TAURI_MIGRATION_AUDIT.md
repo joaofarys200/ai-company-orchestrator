@@ -242,7 +242,7 @@ flowchart LR
 2. **Poluição do `stdout` nos Sidecars Python:** `print()` ou logs C++ de bibliotecas como `PyMuPDF`/`onnxruntime` corrompem o JSON-RPC. *Mitigação:* Duplicar FD 1 no arranque e redirecionar `sys.stdout = sys.stderr`.
 3. **Instabilidade de Custom URI Schemes (`jarvis-media://`) no WebView2:** Limitações conhecidas de seeking MP4 e Web Workers (`pdf.worker.min.mjs`). *Mitigação:* Adotar diretamente servidor **Loopback HTTP Rust `127.0.0.1:0`** com `Range 206` e bearer token de sessão.
 4. **Monolito `WebSocketContext.tsx` (4.302L) & 101/20/144 Dessincronizações:** *Mitigação:* Extrair `JarvisTransport` **na Etapa 1** (antes do bootstrap Tauri) e validar 100% da UI contra Playwright antes de mudar o transporte.
-5. **Duplicação Massiva em `agents/` vs `backend/agents/`:** Existem **98 unidades raiz (815 ficheiros)** em `agents/`, com **30 subpacotes duplicados byte-a-byte** de `backend/agents/`. *Mitigação:* Consolidar/podar duplicados na Etapa 1.
+5. **Duplicação Massiva e Acoplamento Cruzado em `agents/` vs `backend/agents/`:** Existem **98 unidades raiz (815 ficheiros)** em `agents/`, com **30 subpacotes duplicados byte-a-byte** de `backend/agents/`. A auditoria profunda revelou 367 imports de `agents.*` dentro de `backend/agents` e 81 imports inversos em `agents/long_horizon_missions`. *Mitigação:* **Preservar integralmente ambas as diretorias na Stage 1** para garantir risco zero de quebra no runtime e testes; consolidar via shims dinâmicos (`sys.modules`) e codemods AST na Stage 7.
 
 ---
 
@@ -250,7 +250,7 @@ flowchart LR
 
 *(Roadmap detalhado em [TAURI_MIGRATION_ROADMAP.md](./TAURI_MIGRATION_ROADMAP.md) e decisões para as 12 questões em [TAURI_ARCHITECTURAL_DECISIONS.md](./TAURI_ARCHITECTURAL_DECISIONS.md).)*
 
-- **Stage 1 (Pré-Tauri):** `JarvisTransport` adapter no frontend, hardening SQLite Python + split `rho.db`, poda dos 30 duplicados de `agents/`, correção da violação Ollama no `obsidian_graph_engine.py:1495`.
+- **Stage 1 (Pré-Tauri):** `JarvisTransport` adapter no frontend, testes de compatibilidade do transporte, alinhamento de contratos/tipos de protocolo, hardening SQLite Python no caminho canónico `PROJECT_ROOT / "database.db"`, preparação e teste isolado em sandbox da migração RHO (dados de produção de RHO permanecem intactos em `database.db`), e correção da violação Ollama no `obsidian_graph_engine.py:1495`. Preservação integral de `agents/` e `backend/agents/` sem podas prematuras.
 - **Stage 2–3 (Tauri Shell & Loopback Media):** Bootstrap `src-tauri/`, `TauriTransportAdapter`, Loopback HTTP Server (`127.0.0.1:0`) com Range 206 para PDF/Vídeo/Preview.
 - **Stage 4–5 (Workers, Reverse RPC & Domínios):** Protocolo NDJSON (`TAURI_WORKER_PROTOCOL.md`), Job Objects anti-race, Rust escritor único de `database.db`, workers Study/Knowledge e poda de Missões (33 handlers no-op / 14 ramos mortos).
 - **Stage 6 (Hardening Segurança):** Correção do Scriptblock injection, lexer de comandos, 22 escritas atómicas, SSRF DNS rebinding.
