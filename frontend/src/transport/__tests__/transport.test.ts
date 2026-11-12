@@ -751,4 +751,56 @@ describe('JarvisTransport & WebSocketTransportAdapter Compatibility', () => {
 
     adapter.dispose();
   });
+
+  it('normalizes critical server events and preserves request_id uniformly', () => {
+    const criticalEvents: Array<Record<string, unknown>> = [
+      {
+        type: 'safety_refusal',
+        data: {
+          is_allowed: false,
+          status: 'REFUSED',
+          category: 'DESTRUCTIVE_FS',
+          policy_rule: 'NO_RM_RF',
+          reason: 'Blocked unsafe command',
+          sanitized_intent: 'clean temp',
+          request_id: 'safety-req-1',
+          timestamp: '2026-11-12T00:00:00Z',
+        },
+        request_id: 'corr-safety-1',
+      },
+      { type: 'coding_session_error', error: 'Syntax check failed', request_id: 'corr-code-err' },
+      { type: 'lecture_error', message: 'Microphone unavailable', request_id: 'corr-lec-err' },
+      { type: 'project_intake_status', project_id: 'p1', status: 'INDEXING', request_id: 'corr-intake' },
+      { type: 'sentinel_review_result', event_id: 'ev-1', success: true, review: { ok: true }, request_id: 'corr-sent-rev' },
+      { type: 'sentinel_shadow_telemetry', data: { anomalies: 0 }, request_id: 'corr-sent-shad' },
+      { type: 'mission_understanding', project_id: 'p1', understanding: { goal: 'Verify' }, request_id: 'corr-und' },
+      { type: 'architecture_snapshot', project_id: 'p1', data: null, request_id: 'corr-arch' },
+      { type: 'study_document_deleted', document_id: 'doc-1', success: true, request_id: 'corr-del' },
+      { type: 'study_video_note_saved', document_id: 'vid-1', note: { id: 'n1', note_text: 'Key point' }, request_id: 'corr-vnote' },
+      { type: 'study_video_progress_updated', document_id: 'vid-1', progress: { last_position_seconds: 42 }, request_id: 'corr-vprog' },
+      { type: 'note_content', filename: 'note.md', content: '# Hi', request_id: 'corr-note' },
+    ];
+
+    for (const rawEvent of criticalEvents) {
+      const normalized = normalizeServerMessage(rawEvent);
+      assert.ok(normalized !== null);
+      assert.equal(normalized.type, rawEvent.type);
+      assert.notEqual(normalized.type, 'unknown');
+      assert.equal(normalized.request_id, rawEvent.request_id);
+    }
+
+    const withoutRequestId = normalizeServerMessage({ type: 'note_content', filename: 'a.md', content: 'ok' });
+    assert.ok(withoutRequestId !== null);
+    assert.equal(withoutRequestId.type, 'note_content');
+    assert.equal(withoutRequestId.request_id, undefined);
+
+    const typedClientMsgs: ClientMessage[] = [
+      { type: 'study_update_video_progress', document_id: 'vid-1', timestamp: 12.5, progress_percent: 25 },
+      { type: 'study_save_video_note', document_id: 'vid-1', timestamp: 12.5, note_text: 'Important theorem' },
+      { type: 'mission_federation_scale', project_id: 'p1', mission_id: 'm1', action: 'spawn' },
+      { type: 'mission_federation_rebalance', project_id: 'p1', mission_id: 'm1' },
+      { type: 'mission_control_command', command_id: 'c1', mission_id: 'm1', command_type: 'PAUSE_MISSION', reason: null },
+    ];
+    assert.equal(typedClientMsgs.length, 5);
+  });
 });

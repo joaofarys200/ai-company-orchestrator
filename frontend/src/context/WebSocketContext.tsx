@@ -55,6 +55,7 @@ import {
   type StudyUiContextPayload,
   type NoteQualityAuditMessage,
   type NoteEnrichmentResultMessage,
+  type SafetyRefusalData,
 } from '../protocol/websocket';
 import type {
   StudyDocument,
@@ -101,16 +102,7 @@ export interface ProjectFileSaveState {
   error: string;
 }
 
-export interface SafetyRefusalData {
-  is_allowed: boolean;
-  status: string;
-  category: string;
-  policy_rule: string;
-  reason: string;
-  sanitized_intent: string;
-  request_id: string;
-  timestamp: string;
-}
+export type { SafetyRefusalData };
 
 export interface StudyReadingNote {
   note_id: string;
@@ -1704,6 +1696,24 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           addSystemMessage(`[EXECUÇÃO CONCLUÍDA] Ferramenta executada com sucesso.`);
         } else if (msg.status === 'FAILED') {
           addSystemMessage(`[EXECUÇÃO FALHOU] ${msg.error || 'Erro desconhecido'}`);
+        }
+        break;
+      case 'lecture_error':
+        setIsGeneratingLecture(false);
+        setIsSubmittingQuiz(false);
+        setIsRecordingLecture(false);
+        addSystemMessage(`[Erro na Aula] ${msg.message}`);
+        break;
+      case 'error':
+        addSystemMessage(`[Erro] ${msg.message}`);
+        break;
+      case 'project_intake_status':
+      case 'sentinel_shadow_telemetry':
+      case 'mission_understanding':
+        break;
+      case 'sentinel_review_result':
+        if (!msg.success) {
+          addSystemMessage(`[Sentinel] Falha na revisão do evento ${msg.event_id}.`);
         }
         break;
       case 'unknown':
@@ -3771,14 +3781,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     sendClientMessage({
       type: 'mission_control_command',
       ...cmd,
-    } as any);
+    });
   }, [sendClientMessage]);
 
   const getMissionControlState = useCallback((scenario?: string) => {
     sendClientMessage({
       type: 'mission_control_get',
       scenario,
-    } as any);
+    });
   }, [sendClientMessage]);
 
   const clearMissionControlCommandResult = useCallback(() => {
@@ -3791,13 +3801,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         type: 'mission_intent_preview',
         mission_id: missionId,
         text: textOrDelta,
-      } as any);
+      });
     } else {
       sendClientMessage({
         type: 'mission_intent_preview',
         mission_id: missionId,
         delta: textOrDelta,
-      } as any);
+      });
     }
   }, [sendClientMessage]);
 
@@ -3808,14 +3818,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         mission_id: missionId,
         text: textOrDelta,
         pre_approved: preApproved ?? false,
-      } as any);
+      });
     } else {
       sendClientMessage({
         type: 'mission_intent_change',
         mission_id: missionId,
         delta: textOrDelta,
         pre_approved: preApproved ?? false,
-      } as any);
+      });
     }
   }, [sendClientMessage]);
 

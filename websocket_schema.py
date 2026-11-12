@@ -316,6 +316,64 @@ SERVER_MESSAGE_TYPES = {
     "mission_reliability_plan_result",
     "mission_reliability_execute_result",
     "mission_reliability_replay_result",
+    # Critical runtime server events & transport errors (Increment 3 reconciliation)
+    "architecture_snapshot",
+    "coding_session_error",
+    "error",
+    "lecture_error",
+    "mission_understanding",
+    "mission_understanding_review_ack",
+    "mission_timeline",
+    "project_intake_status",
+    "safety_refusal",
+    "sentinel_review_result",
+    "sentinel_shadow_telemetry",
+    "study_document_deleted",
+    # Active Mission Control / Intent / Collaboration / Swarm / Evolution / Multi-Agent responses
+    "mission_control_state",
+    "mission_control_command_result",
+    "mission_control_events",
+    "mission_intent_preview_result",
+    "mission_intent_result",
+    "mission_predict_impact_result",
+    "mission_predictions_result",
+    "mission_collaboration_status_response",
+    "mission_collaboration_arbitrate_response",
+    "mission_swarm_status_response",
+    "mission_swarm_reassign_response",
+    "mission_architecture_evolution_status_result",
+    "mission_architecture_evolution_observe_result",
+    "mission_architecture_evolution_evaluate_result",
+    "mission_self_modification_status_result",
+    "mission_self_modification_execute_result",
+    "mission_self_modification_rollback_result",
+    "mission_multi_agent_coordination_status_result",
+    "mission_multi_agent_intent_submit_result",
+    "mission_multi_agent_arbitrate_result",
+    "mission_multi_agent_schedule_result",
+    # Impact prediction broadcasts
+    "IMPACT_APPLIED",
+    "IMPACT_OUTCOME_RECORDED",
+    "IMPACT_PREDICTION_REJECTED",
+    "IMPACT_PREDICTION_STARTED",
+    "IMPACT_PREDICTION_COMPLETED",
+    "IMPACT_PREDICTION_STALE",
+    "IMPACT_REVIEW_REQUIRED",
+    # Legacy unregistered missions.py branch responses (preserved until Stage 5 cleanup)
+    "mission_continuous_verification_run_result",
+    "mission_continuous_verification_status_result",
+    "mission_cross_project_learning_status_result",
+    "mission_cross_project_learning_transfer_result",
+    "mission_massive_project_state_plan_change_result",
+    "mission_massive_project_state_status_result",
+    "mission_scc_graph_query_impact_result",
+    "mission_scc_graph_status_result",
+    "mission_symbol_graph_query_impact_result",
+    "mission_symbol_graph_status_result",
+    "mission_task_completion_run_result",
+    "mission_task_completion_status_result",
+    "mission_test_synthesis_generate_result",
+    "mission_test_synthesis_status_result",
 }
 
 
@@ -900,6 +958,16 @@ def normalize_canonical_sender(sender: Any) -> str:
 
 
 def normalize_ws_message(message: Mapping[str, Any]) -> dict[str, Any]:
+    normalized = _normalize_ws_payload(message)
+    request_id = message.get("request_id") if isinstance(message, Mapping) else None
+    if isinstance(request_id, str):
+        cleaned_request_id = request_id.strip()
+        if cleaned_request_id and not normalized.get("request_id"):
+            normalized["request_id"] = cleaned_request_id
+    return normalized
+
+
+def _normalize_ws_payload(message: Mapping[str, Any]) -> dict[str, Any]:
     message_type = _as_str(message.get("type"), "unknown")
     if message_type not in SERVER_MESSAGE_TYPES:
         _log_unknown_message_type(message_type)

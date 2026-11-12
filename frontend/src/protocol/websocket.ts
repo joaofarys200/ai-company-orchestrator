@@ -480,7 +480,25 @@ export type MissionClientOperation =
   | { type: 'mission_swarm_status'; project_id: string; mission_id: string }
   | { type: 'mission_swarm_reassign'; project_id: string; mission_id: string; task_id: string; target_agent_id?: string }
   | { type: 'mission_collaboration_status'; project_id: string; mission_id: string }
-  | { type: 'mission_collaboration_arbitrate'; project_id: string; mission_id: string; collaboration_id: string };
+  | { type: 'mission_collaboration_arbitrate'; project_id: string; mission_id: string; collaboration_id: string }
+  | { type: 'mission_federation_status'; project_id?: string; mission_id?: string }
+  | { type: 'mission_federation_scale'; project_id?: string; mission_id?: string; action?: string; subswarm_id?: string; count?: number }
+  | { type: 'mission_federation_rebalance'; project_id?: string; mission_id?: string }
+  | { type: 'mission_federation_switch_mode'; project_id?: string; mission_id?: string; mode?: string; execution_mode?: string }
+  | { type: 'mission_autonomy_run'; project_id: string; mission_id: string; expected_mission_version: number; max_work_packages?: number; confirmed: boolean; test_mode?: boolean }
+  | { type: 'mission_plan_decompose'; project_id: string; title: string; objective: string; mission_id?: string }
+  | { type: 'mission_checkpoint_create'; project_id: string; mission_id: string; label?: string }
+  | { type: 'mission_checkpoint_restore'; project_id: string; mission_id: string; checkpoint_id: string }
+  | { type: 'mission_control_get'; scenario?: string; mission_id?: string; project_id?: string }
+  | { type: 'mission_control_event_stream'; mission_id?: string; project_id?: string; scenario?: string; since_sequence?: number }
+  | { type: 'mission_control_command'; command_type?: CommandType | string; command_id?: string; mission_id?: string; project_id?: string; user_id?: string; target_task_id?: string | null; requested_at?: number; expected_mission_version?: number; expected_task_version?: number | null; payload?: Record<string, unknown>; reason?: string | null; idempotency_key?: string }
+  | { type: 'mission_intent_preview'; mission_id: string; project_id?: string; text?: string; delta?: Record<string, unknown> }
+  | { type: 'mission_intent_change'; mission_id: string; project_id?: string; text?: string; delta?: Record<string, unknown>; pre_approved?: boolean }
+  | { type: 'mission_predict_impact'; project_id?: string; mission_id?: string; text?: string; directive?: string; delta?: Record<string, unknown>; operation?: string; reason?: string; user_id?: string }
+  | { type: 'mission_get_predictions'; project_id?: string; mission_id?: string }
+  | { type: 'mission_understanding_get'; project_id?: string; mission_id?: string; prompt?: string; objective?: string }
+  | { type: 'mission_understanding_review'; project_id?: string; mission_id?: string; action?: string; feedback?: string }
+  | { type: 'mission_timeline_get'; project_id?: string; mission_id?: string };
 
 export interface AstSymbol {
   name: string;
@@ -1575,7 +1593,86 @@ export interface MissionIntentResultMessage {
   details?: Record<string, unknown>;
 }
 
-export type ServerMessage =
+export interface SafetyRefusalData {
+  is_allowed: boolean;
+  status: string;
+  category: string;
+  policy_rule: string;
+  reason: string;
+  sanitized_intent: string;
+  request_id: string;
+  timestamp: string;
+}
+
+export interface CodingSessionErrorMessage {
+  type: 'coding_session_error';
+  error: string;
+}
+
+export interface SafetyRefusalMessage {
+  type: 'safety_refusal';
+  data: SafetyRefusalData;
+}
+
+export interface LectureErrorMessage {
+  type: 'lecture_error';
+  message: string;
+  session?: Record<string, unknown>;
+}
+
+export interface ProjectIntakeStatusMessage {
+  type: 'project_intake_status';
+  project_id?: string;
+  status: string;
+}
+
+export interface SentinelReviewResultMessage {
+  type: 'sentinel_review_result';
+  event_id: string;
+  success: boolean;
+  review?: Record<string, unknown> | null;
+}
+
+export interface SentinelShadowTelemetryMessage {
+  type: 'sentinel_shadow_telemetry';
+  data: Record<string, unknown>;
+}
+
+export interface MissionUnderstandingMessage {
+  type: 'mission_understanding';
+  project_id?: string;
+  understanding: PreExecutionUnderstanding;
+}
+
+export interface MissionUnderstandingReviewAckMessage {
+  type: 'mission_understanding_review_ack';
+  project_id?: string;
+  mission_id?: string | null;
+  action: string;
+  status: string;
+}
+
+export interface MissionTimelineMessage {
+  type: 'mission_timeline';
+  project_id?: string;
+  mission_id: string;
+  timeline: Record<string, unknown>;
+}
+
+export interface MissionControlEventsMessage {
+  type: 'mission_control_events';
+  project_id?: string;
+  scenario?: string;
+  count: number;
+  events: Array<Record<string, unknown>>;
+}
+
+export interface ErrorProtocolMessage {
+  type: 'error';
+  message: string;
+}
+
+export type NormalizedServerMessage =
   | SystemMessage
   | ChatProtocolMessage
   | StateMessage
@@ -1620,15 +1717,20 @@ export type ServerMessage =
   | ProjectReferencesMessage
   | SemanticResultsMessage
   | CodingSessionMessage
+  | CodingSessionErrorMessage
+  | SafetyRefusalMessage
+  | ProjectIntakeStatusMessage
   | UiMessage
   | UiThemeMessage
   | SandboxStatusMessage
+  | LectureErrorMessage
   | LectureLessonGeneratedMessage
   | LectureQuizEvaluatedMessage
   | LectureHistoryResponseMessage
   | LectureStatusResponseMessage
   | LectureRecordingStartedMessage
   | LectureSynthesisCompletedMessage
+  | { type: 'lecture_status' | 'lecture_history' | 'lecture_started' | 'lecture_transcribing_started' | 'lecture_session_update' | 'lecture_audio_level'; [key: string]: unknown }
   | SentinelStatusMessage
   | SentinelAuditCompletedMessage
   | SentinelEventMessage
@@ -1637,6 +1739,8 @@ export type ServerMessage =
   | SentinelActionProposedMessage
   | SentinelActionResultMessage
   | SentinelActionsListMessage
+  | SentinelReviewResultMessage
+  | SentinelShadowTelemetryMessage
   | ActionConfirmRequestMessage
   | PermissionRequestCreatedMessage
   | PermissionRequestApprovedMessage
@@ -1650,8 +1754,12 @@ export type ServerMessage =
   | MissionAdaptationHistoryMessage
   | MissionAdaptationProposalResultMessage
   | MissionPlanEvaluationResultMessage
-  | MissionControlStateMessage
-  | MissionControlCommandResultMessage
+  | MissionControlEventsMessage
+  | MissionUnderstandingMessage
+  | MissionUnderstandingReviewAckMessage
+  | MissionTimelineMessage
+  | { type: 'mission_predict_impact_result' | 'mission_predictions_result' | 'mission_checkpoint_created' | 'mission_checkpoint_restored' | 'mission_plan_status' | 'mission_collaboration_status_response' | 'mission_collaboration_arbitrate_response' | 'mission_swarm_status_response' | 'mission_swarm_reassign_response' | 'mission_federation_status_response' | 'mission_federation_scale_response' | 'mission_federation_rebalance_response' | 'mission_federation_switch_mode_response' | 'mission_architecture_evolution_status_result' | 'mission_architecture_evolution_observe_result' | 'mission_architecture_evolution_evaluate_result' | 'mission_self_modification_status_result' | 'mission_self_modification_execute_result' | 'mission_self_modification_rollback_result' | 'mission_multi_agent_coordination_status_result' | 'mission_multi_agent_intent_submit_result' | 'mission_multi_agent_arbitrate_result' | 'mission_multi_agent_schedule_result'; [key: string]: unknown }
+  | { type: 'IMPACT_APPLIED' | 'IMPACT_OUTCOME_RECORDED' | 'IMPACT_PREDICTION_REJECTED' | 'IMPACT_PREDICTION_STARTED' | 'IMPACT_PREDICTION_COMPLETED' | 'IMPACT_PREDICTION_STALE' | 'IMPACT_REVIEW_REQUIRED'; [key: string]: unknown }
   | { type: 'study_documents_list'; documents: any[]; event?: string }
   | { type: 'study_document_ready'; document: any; event?: string }
   | { type: 'study_document_uploaded'; document: any; event?: string }
@@ -1716,7 +1824,19 @@ export type ServerMessage =
   | { type: 'study_mode_sessions_list'; document_id?: string; sessions: any[]; request_id?: string }
   | { type: 'study_operation_status'; operation: StudyOperationStatusPayload; request_id?: string }
   | { type: 'study_navigate'; navigation: StudyNavigatePayload }
+  | { type: 'study_video_context_result'; document_id: string; timestamp: number; context: Record<string, unknown>; request_id?: string }
+  | { type: 'study_explain_video_moment_result'; document_id: string; timestamp: number; [key: string]: unknown }
+  | { type: 'study_explain_video_visual_result'; document_id: string; timestamp: number; [key: string]: unknown }
+  | { type: 'study_search_video_transcript_result'; document_id: string; query: string; occurrences: number; results: unknown[]; request_id?: string }
+  | { type: 'study_ask_video_result'; document_id: string; question: string; [key: string]: unknown }
+  | { type: 'study_video_note_saved'; document_id: string; note: Record<string, unknown>; request_id?: string }
+  | { type: 'study_video_progress_updated'; document_id: string; progress: Record<string, unknown>; request_id?: string }
+  | { type: 'study_progress_updated'; document_id?: string; [key: string]: unknown }
+  | { type: 'study_document_retried'; document_id?: string; [key: string]: unknown }
+  | ErrorProtocolMessage
   | UnknownServerMessage;
+
+export type ServerMessage = NormalizedServerMessage & { request_id?: string };
 
 export type ClientMessage =
   | { type: 'directive'; text: string; attachments?: ChatAttachment[]; study_context?: StudyUiContextPayload }
@@ -1782,19 +1902,23 @@ export type ClientMessage =
   | { type: 'study_generate_summary'; document_id: string; mode?: string; force_regenerate?: boolean; request_id?: string }
   | { type: 'study_synthesize_documents'; document_ids: string[]; request_id?: string }
   | { type: 'study_generate_cornell'; document_id: string; request_id?: string }
+  | { type: 'study_save_to_knowledge'; title: string; content?: string; markdown_content?: string; subject?: string; source_document_ids?: string[]; document_id?: string; request_id?: string }
   | { type: 'study_save_to_vault'; title: string; content?: string; markdown_content?: string; subject?: string; source_document_ids?: string[]; request_id?: string }
   | { type: 'study_generate_quiz'; document_id: string; question_count?: number; request_id?: string }
   | { type: 'study_submit_quiz'; quiz_id: string; answers: Record<string, number | string>; transfer_answer?: string; request_id?: string }
   | { type: 'study_search_rag'; query: string; document_id?: string; request_id?: string }
   | { type: 'study_list_flashcards'; document_id: string }
   | { type: 'study_review_flashcard'; card_id: string; rating: string }
-  | { type: 'study_save_note'; document_id: string; page: number; section_id: string; note_text: string }
-  | { type: 'study_save_highlight'; document_id: string; page: number; section_id: string; text: string; color?: string }
   | { type: 'study_add_reading_note'; document_id: string; page: number; selection?: string; note: string; section_id?: string }
   | { type: 'study_add_highlight'; document_id: string; page: number; selected_text: string; context?: string; color?: string }
-  | { type: 'study_get_notes_and_highlights'; document_id: string }
-  | { type: 'study_update_reading_progress'; document_id: string; current_page: number; current_section?: string; completion_percentage?: number }
-  | { type: 'study_prepare_exam'; document_id: string }
+  | { type: 'study_update_progress'; document_id: string; current_page?: number; current_section?: string; completion_percentage?: number; progress_percent?: number; request_id?: string }
+  | { type: 'study_get_video_context'; document_id: string; timestamp?: number; request_id?: string }
+  | { type: 'study_explain_video_moment'; document_id: string; timestamp: number; request_id?: string }
+  | { type: 'study_explain_video_visual'; document_id: string; timestamp: number; request_id?: string }
+  | { type: 'study_search_video_transcript'; document_id: string; query: string; request_id?: string }
+  | { type: 'study_ask_video'; document_id: string; question: string; timestamp?: number; request_id?: string }
+  | { type: 'study_save_video_note'; document_id: string; timestamp: number; note_text: string; frame_id?: string; selected_text?: string; request_id?: string }
+  | { type: 'study_update_video_progress'; document_id: string; timestamp: number; progress_percent?: number; request_id?: string }
   | { type: 'study_delete_document'; document_id: string; delete_file?: boolean }
   | { type: 'study_list_collections' }
   | { type: 'study_create_collection'; name: string; subject?: string; document_ids?: string[] }
@@ -1848,6 +1972,7 @@ export type ClientMessage =
   | { type: 'permission_approve'; request_id: string; user?: string; session_id?: string; project_id?: string; mission_id?: string }
   | { type: 'permission_deny'; request_id: string; reason?: string; user?: string; session_id?: string; project_id?: string; mission_id?: string }
   | { type: 'permission_rollback'; request_id: string; user?: string; session_id?: string }
+  | { type: 'permission_resolve_choice'; request_id: string; action: string; user?: string; session_id?: string }
   | MissionClientOperation;
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
@@ -2277,10 +2402,7 @@ export const normalizePermissionRequest = (raw: unknown): PermissionRequestData 
   };
 };
 
-export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
-  if (!isRecord(raw)) return null;
-  const type = asString(raw.type, 'unknown');
-
+const normalizeServerPayload = (type: string, raw: Record<string, unknown>): NormalizedServerMessage => {
   switch (type) {
     case 'system':
       return { type, content: asString(raw.content) };
@@ -3191,9 +3313,235 @@ export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
           ? (raw.navigation as unknown as StudyNavigatePayload)
           : ({ tab: 'library' } as StudyNavigatePayload),
       };
+    case 'coding_session_error':
+      return {
+        type: 'coding_session_error',
+        error: asString(raw.error),
+      };
+    case 'safety_refusal':
+      return {
+        type: 'safety_refusal',
+        data: isRecord(raw.data)
+          ? {
+              is_allowed: asBoolean(raw.data.is_allowed, false),
+              status: asString(raw.data.status, 'REFUSED'),
+              category: asString(raw.data.category),
+              policy_rule: asString(raw.data.policy_rule),
+              reason: asString(raw.data.reason),
+              sanitized_intent: asString(raw.data.sanitized_intent),
+              request_id: asString(raw.data.request_id),
+              timestamp: asString(raw.data.timestamp),
+            }
+          : {
+              is_allowed: false,
+              status: 'REFUSED',
+              category: '',
+              policy_rule: '',
+              reason: asString(raw.reason),
+              sanitized_intent: '',
+              request_id: '',
+              timestamp: '',
+            },
+      };
+    case 'error':
+      return {
+        type: 'error',
+        message: asString(raw.message, asString(raw.error)),
+      };
+    case 'lecture_error':
+      return {
+        type: 'lecture_error',
+        message: asString(raw.message, asString(raw.error)),
+        session: isRecord(raw.session) ? raw.session : undefined,
+      };
+    case 'lecture_status':
+    case 'lecture_history':
+    case 'lecture_started':
+    case 'lecture_transcribing_started':
+    case 'lecture_session_update':
+    case 'lecture_audio_level':
+      return {
+        ...(raw as Record<string, unknown>),
+        type,
+      } as NormalizedServerMessage;
+    case 'project_intake_status':
+      return {
+        type: 'project_intake_status',
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        status: asString(raw.status),
+      };
+    case 'project_deleted':
+      return {
+        type: 'project_deleted',
+        ok: asBoolean(raw.ok),
+        project_id: asString(raw.project_id),
+        was_active: asBoolean(raw.was_active),
+      };
+    case 'project_delete_error':
+      return {
+        type: 'project_delete_error',
+        project_id: asString(raw.project_id),
+        error: asString(raw.error),
+      };
+    case 'project_file_deleted':
+      return {
+        type: 'project_file_deleted',
+        ok: asBoolean(raw.ok),
+        project_id: asString(raw.project_id),
+        filename: asString(raw.filename),
+      };
+    case 'project_file_delete_error':
+      return {
+        type: 'project_file_delete_error',
+        project_id: asString(raw.project_id),
+        filename: asString(raw.filename),
+        error: asString(raw.error),
+      };
+    case 'sentinel_review_result':
+      return {
+        type: 'sentinel_review_result',
+        event_id: asString(raw.event_id),
+        success: asBoolean(raw.success),
+        review: isRecord(raw.review) ? raw.review : null,
+      };
+    case 'sentinel_shadow_telemetry':
+      return {
+        type: 'sentinel_shadow_telemetry',
+        data: isRecord(raw.data) ? raw.data : {},
+      };
+    case 'mission_understanding':
+      return {
+        type: 'mission_understanding',
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        understanding: raw.understanding as PreExecutionUnderstanding,
+      };
+    case 'mission_understanding_review_ack':
+      return {
+        type: 'mission_understanding_review_ack',
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        mission_id: typeof raw.mission_id === 'string' ? raw.mission_id : null,
+        action: asString(raw.action),
+        status: asString(raw.status),
+      };
+    case 'mission_timeline':
+      return {
+        type: 'mission_timeline',
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        mission_id: asString(raw.mission_id),
+        timeline: isRecord(raw.timeline) ? raw.timeline : {},
+      };
+    case 'mission_control_events':
+      return {
+        type: 'mission_control_events',
+        project_id: raw.project_id ? asString(raw.project_id) : undefined,
+        scenario: raw.scenario ? asString(raw.scenario) : undefined,
+        count: asNumber(raw.count),
+        events: asRecordArray(raw.events),
+      };
+    case 'mission_predict_impact_result':
+    case 'mission_predictions_result':
+    case 'mission_checkpoint_created':
+    case 'mission_checkpoint_restored':
+    case 'mission_plan_status':
+    case 'mission_collaboration_status_response':
+    case 'mission_collaboration_arbitrate_response':
+    case 'mission_swarm_status_response':
+    case 'mission_swarm_reassign_response':
+    case 'mission_federation_status_response':
+    case 'mission_federation_scale_response':
+    case 'mission_federation_rebalance_response':
+    case 'mission_federation_switch_mode_response':
+    case 'mission_architecture_evolution_status_result':
+    case 'mission_architecture_evolution_observe_result':
+    case 'mission_architecture_evolution_evaluate_result':
+    case 'mission_self_modification_status_result':
+    case 'mission_self_modification_execute_result':
+    case 'mission_self_modification_rollback_result':
+    case 'mission_multi_agent_coordination_status_result':
+    case 'mission_multi_agent_intent_submit_result':
+    case 'mission_multi_agent_arbitrate_result':
+    case 'mission_multi_agent_schedule_result':
+    case 'IMPACT_APPLIED':
+    case 'IMPACT_OUTCOME_RECORDED':
+    case 'IMPACT_PREDICTION_REJECTED':
+    case 'IMPACT_PREDICTION_STARTED':
+    case 'IMPACT_PREDICTION_COMPLETED':
+    case 'IMPACT_PREDICTION_STALE':
+    case 'IMPACT_REVIEW_REQUIRED':
+      return {
+        ...(raw as Record<string, unknown>),
+        type,
+      } as NormalizedServerMessage;
+    case 'study_video_context_result':
+      return {
+        type: 'study_video_context_result',
+        document_id: asString(raw.document_id),
+        timestamp: asNumber(raw.timestamp),
+        context: isRecord(raw.context) ? raw.context : {},
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_explain_video_moment_result':
+    case 'study_explain_video_visual_result':
+      return {
+        ...(raw as Record<string, unknown>),
+        type,
+        document_id: asString(raw.document_id),
+        timestamp: asNumber(raw.timestamp),
+      };
+    case 'study_search_video_transcript_result':
+      return {
+        type: 'study_search_video_transcript_result',
+        document_id: asString(raw.document_id),
+        query: asString(raw.query),
+        occurrences: asNumber(raw.occurrences),
+        results: Array.isArray(raw.results) ? raw.results : [],
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_ask_video_result':
+      return {
+        ...(raw as Record<string, unknown>),
+        type: 'study_ask_video_result',
+        document_id: asString(raw.document_id),
+        question: asString(raw.question),
+      };
+    case 'study_video_note_saved':
+      return {
+        type: 'study_video_note_saved',
+        document_id: asString(raw.document_id),
+        note: isRecord(raw.note) ? raw.note : {},
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_video_progress_updated':
+      return {
+        type: 'study_video_progress_updated',
+        document_id: asString(raw.document_id),
+        progress: isRecord(raw.progress) ? raw.progress : {},
+        request_id: raw.request_id ? asString(raw.request_id) : undefined,
+      };
+    case 'study_progress_updated':
+    case 'study_document_retried':
+      return {
+        ...(raw as Record<string, unknown>),
+        type,
+        document_id: raw.document_id ? asString(raw.document_id) : undefined,
+      };
     default:
       return { type: 'unknown', originalType: type, payload: raw };
   }
+};
+
+export const normalizeServerMessage = (raw: unknown): ServerMessage | null => {
+  if (!isRecord(raw)) return null;
+  const type = asString(raw.type, 'unknown');
+  const normalized = normalizeServerPayload(type, raw) as ServerMessage;
+  const requestId =
+    typeof raw.request_id === 'string' && raw.request_id.trim()
+      ? raw.request_id.trim()
+      : undefined;
+  if (requestId && !normalized.request_id) {
+    normalized.request_id = requestId;
+  }
+  return normalized;
 };
 
 export const normalizeSentinelAction = (raw: Record<string, unknown>): SentinelActionData => ({

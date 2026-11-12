@@ -678,7 +678,7 @@ export function MissionPlanner() {
                     type: 'mission_federation_rebalance',
                     project_id: projectId,
                     mission_id: activeMissionId,
-                  } as unknown as MissionClientOperation)}
+                  })}
                   className={BUTTON}
                   title="Rebalancear Hotspots"
                 >
@@ -690,7 +690,7 @@ export function MissionPlanner() {
                     project_id: projectId,
                     mission_id: activeMissionId,
                     action: 'spawn',
-                  } as unknown as MissionClientOperation)}
+                  })}
                   className={BUTTON}
                   title="Spawn Sub-Swarm"
                 >

@@ -29,7 +29,6 @@ import type {
   VideoKeyframe,
   VideoSearchResult
 } from './types';
-import type { ClientMessage } from '../../protocol/websocket';
 import { useTransport } from '../../transport';
 import { ResizableHandle, usePersistedPaneSize } from '../../components/ui';
 
@@ -291,13 +290,12 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
       if (onUpdateProgress) {
         onUpdateProgress(1, currentChapter?.title || 'Geral', progressPercent);
       }
-      // Increment 3 will add study_update_video_progress to ClientMessage union
       transport.send({
         type: 'study_update_video_progress',
         document_id: document.document_id,
         timestamp: now,
         progress_percent: progressPercent,
-      } as unknown as ClientMessage);
+      });
     }
   };
 
@@ -470,14 +468,13 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
     if (onSaveNote) {
       onSaveNote(1, currentSegment?.text || `Momento @ ${formatTime(currentTime)}`, txt);
     }
-    // Increment 3 will add study_save_video_note to ClientMessage union
     transport.send({
       type: 'study_save_video_note',
       document_id: document.document_id,
       timestamp: currentTime,
       note_text: txt,
       selected_text: currentSegment?.text,
-    } as unknown as ClientMessage);
+    });
     setNewNoteText('');
     setIsAddingNote(false);
     setActiveTab('notes');

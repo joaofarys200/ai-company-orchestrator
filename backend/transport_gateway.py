@@ -12,8 +12,20 @@ import asyncio
 from typing import Any, Callable, Optional, Dict, Awaitable
 from dataclasses import dataclass, field
 
-from backend.websocket.context import WebSocketSessionState
+from backend.errors import safe_user_error
 from backend.logging_config import log_event
+from backend.message_protocol import (
+    normalize_ws_message,
+    system_message,
+    validate_client_message,
+)
+from backend.websocket.context import (
+    WebSocketSessionState,
+    bind_response_request_id,
+    current_response_request_id,
+    reset_response_request_id,
+    resolve_request_id,
+)
 
 
 class VirtualIPCClient:
@@ -29,7 +41,13 @@ class VirtualIPCClient:
             except Exception:
                 msg_dict = {"raw": msg_str}
         else:
-            msg_dict = msg_str
+            msg_dict = dict(msg_str)
+        if isinstance(msg_dict, dict):
+            if isinstance(msg_dict.get("type"), str):
+                msg_dict = normalize_ws_message(msg_dict)
+            active_req_id = current_response_request_id()
+            if active_req_id and not msg_dict.get("request_id"):
+                msg_dict["request_id"] = active_req_id
         await self.gateway.send_message(msg_dict)
 
 
@@ -42,11 +60,17 @@ class StdioTransportGateway:
         logger: Any = None,
         on_connect: Optional[Callable[[Any, WebSocketSessionState], Awaitable[None]]] = None,
         on_broadcast: Optional[Callable[[Dict[str, Any]], None]] = None,
+        validate_messages: Optional[bool] = None,
     ) -> None:
         self.dispatcher = dispatcher
         self.logger = logger
         self.on_connect = on_connect
         self.on_broadcast = on_broadcast
+        self.validate_messages = (
+            validate_messages
+            if validate_messages is not None
+            else hasattr(dispatcher, "message_types")
+        )
         self.session_state = WebSocketSessionState()
         self.virtual_client = VirtualIPCClient(self)
         self._running = False
@@ -178,28 +202,31 @@ class StdioTransportGateway:
             await self.send_message(err_payload)
             return
         msg_type = msg_type.strip()
-
+        request_token = None
         try:
+            _, supplied_request_id = resolve_request_id(data)
+            request_token = bind_response_request_id(supplied_request_id)
+            payload = validate_client_message(data) if self.validate_messages else data
             # Despachar para o WebSocketDispatcher unificado
             if hasattr(self.dispatcher, "dispatch"):
                 await self.dispatcher.dispatch(
                     websocket=self.virtual_client,
-                    message=data,
+                    message=payload,
                     session=self.session_state,
                 )
             elif hasattr(self.dispatcher, "handle"):
-                await self.dispatcher.handle(self.virtual_client, data)
+                await self.dispatcher.handle(self.virtual_client, payload)
         except Exception as e:
             if msg_type.startswith("study_"):
                 err_msg: Dict[str, Any] = {
                     "type": "study_error",
-                    "message": f"Erro no processamento IPC de estudo: {e}",
+                    "message": safe_user_error("Erro no processamento IPC de estudo", e),
                 }
             else:
-                err_msg = {
-                    "type": "error",
-                    "message": f"Erro no processamento IPC: {e}",
-                }
+                err_msg = system_message(safe_user_error("Mensagem IPC invalida", e))
             if req_id is not None:
                 err_msg["request_id"] = req_id
             await self.send_message(err_msg)
+        finally:
+            if request_token is not None:
+                reset_response_request_id(request_token)

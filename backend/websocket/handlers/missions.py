@@ -9,7 +9,10 @@ import uuid
 
 from backend.message_protocol import system_message
 from backend.websocket.context import WebSocketSessionState
-from backend.websocket.contracts import MessageHandler
+from backend.websocket.contracts import (
+    MISSION_UNIMPLEMENTED_STUB_OPERATIONS,
+    MessageHandler,
+)
 from backend.websocket.handlers import bind_handler_methods
 from backend.websocket.handlers.common import WebSocketResponder
 
@@ -1115,7 +1118,6 @@ class MissionWebSocketHandler:
                     MissionControlCommand,
                     CommandType,
                 )
-                import time
                 cmd_id = str(message.get("command_id") or uuid.uuid4().hex)
                 m_id = str(message.get("mission_id") or "m_p36_interactive")
                 cmd_type_str = str(message.get("command_type") or "PAUSE").upper()
@@ -2590,6 +2592,15 @@ class MissionWebSocketHandler:
                         "type": "mission_reliability_replay_result",
                         **replay_res,
                     },
+                )
+                return
+
+            if operation in MISSION_UNIMPLEMENTED_STUB_OPERATIONS:
+                await self.connections.send(
+                    websocket,
+                    system_message(
+                        f"Operação '{operation}' declarada apenas no contrato sem handler ativo nesta etapa."
+                    ),
                 )
                 return
 
