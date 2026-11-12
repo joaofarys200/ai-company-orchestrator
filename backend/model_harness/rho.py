@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+from contextlib import closing
 import json
-import sqlite3
 import time
 from dataclasses import dataclass
 from pathlib import Path
 
 from backend.model_harness.contracts import ModelRequest, ModelResponse, ModelResponseStatus
+from persistence.db import (
+    CANONICAL_DB_PATH,
+    ensure_rho_schema,
+    get_db_connection,
+    write_transaction,
+)
 
 
-DB_PATH = Path("database.db")
+DB_PATH = CANONICAL_DB_PATH
 
 
 @dataclass(frozen=True)
@@ -35,34 +41,8 @@ class RetrospectiveEngine:
         self._init_db()
 
     def _init_db(self) -> None:
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute(
-                """
-                CREATE TABLE IF NOT EXISTS model_trajectories (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    request_id TEXT NOT NULL,
-                    task_profile TEXT NOT NULL,
-                    fingerprint TEXT NOT NULL,
-                    status TEXT NOT NULL,
-                    attempts_count INTEGER NOT NULL,
-                    failure_reason TEXT,
-                    created_at REAL NOT NULL
-                )
-                """
-            )
-            conn.execute(
-                """
-                CREATE TABLE IF NOT EXISTS rho_compounding_rules (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    task_profile TEXT NOT NULL,
-                    rule_text TEXT NOT NULL,
-                    failure_trigger TEXT NOT NULL,
-                    occurrences INTEGER DEFAULT 1,
-                    created_at REAL NOT NULL
-                )
-                """
-            )
-            conn.commit()
+        with write_transaction(self.db_path) as conn:
+            ensure_rho_schema(conn)
 
     def record_trajectory(self, request: ModelRequest, response: ModelResponse) -> None:
         """Stores trajectory record and triggers RHO rule synthesis if failures repeat."""
@@ -72,7 +52,7 @@ class RetrospectiveEngine:
         elif response.errors:
             failure_reason = str(response.errors[0].get("message", "unknown_error"))
 
-        with sqlite3.connect(self.db_path) as conn:
+        with write_transaction(self.db_path) as conn:
             conn.execute(
                 """
                 INSERT INTO model_trajectories (request_id, task_profile, fingerprint, status, attempts_count, failure_reason, created_at)
@@ -88,14 +68,13 @@ class RetrospectiveEngine:
                     time.time(),
                 ),
             )
-            conn.commit()
 
         if response.status != ModelResponseStatus.SUCCEEDED and failure_reason:
             self._evaluate_failure_pattern(request.task_profile, failure_reason)
 
     def _evaluate_failure_pattern(self, task_profile: str, failure_reason: str) -> None:
         """If 2 or more failures of the same pattern occur, synthesize a compounding rule."""
-        with sqlite3.connect(self.db_path) as conn:
+        with write_transaction(self.db_path) as conn:
             cur = conn.cursor()
             cur.execute(
                 """
@@ -115,11 +94,10 @@ class RetrospectiveEngine:
                     """,
                     (task_profile, rule_text, failure_reason, time.time()),
                 )
-                conn.commit()
 
     def get_compounding_rules(self, task_profile: str) -> list[str]:
         """Fetches active RHO compounding rules for a task profile."""
-        with sqlite3.connect(self.db_path) as conn:
+        with closing(get_db_connection(self.db_path)) as conn:
             cur = conn.cursor()
             cur.execute(
                 """

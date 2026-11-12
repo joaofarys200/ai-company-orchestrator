@@ -1,11 +1,15 @@
+from contextlib import closing
 import os
-import sqlite3
+from pathlib import Path
 import psutil
 from datetime import datetime
 
+from persistence.db import CANONICAL_DB_PATH, get_db_connection
+
+
 class RuntimeObserver:
-    def __init__(self, db_path="database.db"):
-        self.db_path = db_path
+    def __init__(self, db_path: Path | str | None = None):
+        self.db_path = db_path if db_path is not None else CANONICAL_DB_PATH
 
     def get_system_telemetry(self):
         try:
@@ -27,22 +31,21 @@ class RuntimeObserver:
         
     def get_db_metrics(self):
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            
-            # Conta sessões totais
-            cursor.execute("SELECT COUNT(*) FROM sessions")
-            total_sessions = cursor.fetchone()[0]
-            
-            # Conta eventos no historico
-            cursor.execute("SELECT COUNT(*) FROM event_sourcing_log")
-            total_events = cursor.fetchone()[0]
-            
-            conn.close()
+            with closing(get_db_connection(self.db_path)) as conn:
+                cursor = conn.cursor()
+
+                # Conta sessões totais
+                cursor.execute("SELECT COUNT(*) FROM sessions")
+                total_sessions = cursor.fetchone()[0]
+
+                # Conta eventos no historico
+                cursor.execute("SELECT COUNT(*) FROM event_sourcing_log")
+                total_events = cursor.fetchone()[0]
+
             return {
                 "sqlite_online": True,
                 "total_sessions": total_sessions,
-                "total_events_in_log": total_events
+                "total_events_in_log": total_events,
             }
         except Exception as e:
             return {"sqlite_online": False, "error": str(e)}
