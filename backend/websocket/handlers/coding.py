@@ -4,6 +4,7 @@ import asyncio
 from typing import Any
 
 from backend.message_protocol import system_message
+from backend.services.model_service import ModelExecutionService
 from backend.websocket.context import WebSocketSessionState
 from backend.websocket.contracts import MessageHandler
 from backend.websocket.handlers import bind_handler_methods
@@ -26,10 +27,14 @@ class CodingSessionWebSocketHandler:
         self,
         coding_sessions: Any,
         responder: WebSocketResponder,
+        *,
+        model_harness: Any = None,
+        model_service: ModelExecutionService | None = None,
     ) -> None:
         self.coding_sessions = coding_sessions
         self.responder = responder
         self.connections = responder.connections
+        self.model_service = model_service or ModelExecutionService(model_harness)
 
     def routes(self) -> dict[str, MessageHandler]:
         return bind_handler_methods(self, CODING_HANDLERS)
@@ -97,19 +102,11 @@ class CodingSessionWebSocketHandler:
                 system_message(str(coding_error)),
             )
         except Exception as generic_error:
-            error_name = type(generic_error).__name__
-            detail = str(generic_error).strip() or error_name
-            if "timeout" in error_name.lower():
-                detail = (
-                    "O modelo local demorou demasiado a gerar o plano "
-                    f"({error_name}). Tente um objetivo mais restrito ou "
-                    "aumente JARVIS_CODING_PLAN_TIMEOUT_SECONDS."
-                )
-            elif "connect" in error_name.lower():
-                detail = (
-                    "Nao foi possivel contactar o Ollama em "
-                    "127.0.0.1:11434. Confirme que o Ollama esta a correr."
-                )
+            detail = self.model_service.describe_provider_error(
+                generic_error,
+                provider="ollama",
+                timeout_env_var="JARVIS_CODING_PLAN_TIMEOUT_SECONDS",
+            )
             await self.connections.send(
                 websocket,
                 {

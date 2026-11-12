@@ -76,6 +76,7 @@ def create_websocket_handlers(
         "coding": CodingSessionWebSocketHandler(
             services.coding_sessions,
             responder,
+            model_harness=services.model_harness,
         ).routes(),
         "knowledge": KnowledgeWebSocketHandler(
             services.agents,

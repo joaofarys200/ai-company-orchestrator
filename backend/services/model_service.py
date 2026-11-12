@@ -21,6 +21,89 @@ class ModelExecutionService:
     def __init__(self, harness: Any = None) -> None:
         self.harness = harness
 
+    def _resolve_harness(self) -> Any:
+        if self.harness is not None:
+            return self.harness
+        from backend.model_harness.runtime import get_model_harness
+
+        return get_model_harness()
+
+    def get_provider_endpoint(self, provider: str = "ollama") -> str | None:
+        """Return the configured base URL for a registered provider, if exposed."""
+        try:
+            harness = self._resolve_harness()
+            provider_impl = harness.providers.get(provider)
+        except Exception:
+            return None
+        base_url = getattr(provider_impl, "base_url", None)
+        return str(base_url).rstrip("/") if base_url else None
+
+    def describe_provider_error(
+        self,
+        error: BaseException,
+        *,
+        provider: str = "ollama",
+        timeout_env_var: str = "JARVIS_CODING_PLAN_TIMEOUT_SECONDS",
+    ) -> str:
+        """Format an actionable timeout/connection diagnostic via registered provider metadata."""
+        error_name = type(error).__name__
+        detail = str(error).strip() or error_name
+        if "timeout" in error_name.lower():
+            return (
+                "O modelo local demorou demasiado a gerar o plano "
+                f"({error_name}). Tente um objetivo mais restrito ou "
+                f"aumente {timeout_env_var}."
+            )
+        if "connect" in error_name.lower():
+            endpoint = self.get_provider_endpoint(provider)
+            if endpoint:
+                return (
+                    f"Nao foi possivel contactar o fornecedor local ({provider}) em "
+                    f"{endpoint}. Confirme que o servico esta a correr."
+                )
+            return (
+                f"Nao foi possivel contactar o fornecedor local ({provider}). "
+                "Confirme que o servico esta a correr."
+            )
+        return detail
+
+    async def check_model_available(
+        self,
+        *,
+        provider: str = "ollama",
+        model: str = "qwen3.5:9b",
+        match_family_prefix: str | None = None,
+        timeout_seconds: float = 1.5,
+    ) -> bool:
+        """Probe model availability through the ModelHarness provider registry."""
+        try:
+            harness = self._resolve_harness()
+            provider_impl = harness.providers.get(provider)
+        except Exception:
+            return False
+
+        target = str(model or "").strip()
+        prefix = str(match_family_prefix or "").strip().lower()
+        try:
+            if hasattr(provider_impl, "list_models"):
+                models = await provider_impl.list_models(timeout_seconds=timeout_seconds)
+                for item in models:
+                    name = str(item.get("name") or item.get("model") or "").strip()
+                    if not name:
+                        continue
+                    if (target and target in name) or (prefix and prefix in name.lower()):
+                        return True
+                return False
+            if hasattr(provider_impl, "inspect_model"):
+                await provider_impl.inspect_model(
+                    target,
+                    OllamaExecutionOptions(readiness_timeout=timeout_seconds),
+                )
+                return True
+        except Exception:
+            return False
+        return False
+
     async def execute(
         self,
         *,
@@ -92,7 +175,7 @@ class ModelExecutionService:
                 provider_payload=provider_payload,
             ),
         )
-        response = await self.harness.execute(request)
+        response = await self._resolve_harness().execute(request)
         if response.status == ModelResponseStatus.SUCCEEDED:
             return response
         if response.provider_exception is not None:

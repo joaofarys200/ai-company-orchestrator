@@ -1488,18 +1488,33 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
             self.save_queue(queue)
         return reconciled
 
+    def _get_model_execution_service(self) -> Any:
+        from backend.model_harness import get_model_harness
+        from backend.services.model_service import ModelExecutionService
+
+        return ModelExecutionService(get_model_harness())
+
+    async def check_ollama_qwen_available_async(self) -> bool:
+        """Verify local Ollama qwen availability via ModelExecutionService / ModelHarness."""
+        model_service = self._get_model_execution_service()
+        return await model_service.check_model_available(
+            provider="ollama",
+            model="qwen3.5:9b",
+            match_family_prefix="qwen",
+            timeout_seconds=1.5,
+        )
+
     def check_ollama_qwen_available(self) -> bool:
-        """Quick non-blocking check to verify local Ollama has qwen3.5:9b available."""
-        import urllib.request
+        """Synchronous compatibility wrapper around ModelExecutionService readiness check."""
         try:
-            with urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=1.5) as resp:
-                if resp.status == 200:
-                    data = json.loads(resp.read().decode("utf-8"))
-                    models = [m.get("name") for m in data.get("models", [])]
-                    return any("qwen3.5:9b" in m or "qwen" in m.lower() for m in models)
-        except Exception:
-            return False
-        return False
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(self.check_ollama_qwen_available_async())
+
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            return pool.submit(asyncio.run, self.check_ollama_qwen_available_async()).result(timeout=5.0)
 
     async def _execute_qwen_knowledge_improvement(
         self,
@@ -1509,8 +1524,7 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
         """
         Invokes local Ollama qwen3.5:9b via ModelExecutionService to produce substantive knowledge improvements.
         """
-        from backend.model_harness import OutputFormat, get_model_harness
-        from backend.services.model_service import ModelExecutionService
+        from backend.model_harness import OutputFormat
 
         full_path = self._resolve_contained_note_path(rel_path)
         rel_str = str(full_path.relative_to(self.vault_root)).replace("\\", "/")
@@ -1563,8 +1577,7 @@ Pontos frágeis identificados pelo auditor:
 {json.dumps(audit.get('findings', [])[:3], ensure_ascii=False)}
 """
 
-        harness = get_model_harness()
-        exec_service = ModelExecutionService(harness)
+        exec_service = self._get_model_execution_service()
 
         resp = await exec_service.execute(
             provider="ollama",
@@ -1731,8 +1744,8 @@ Pontos frágeis identificados pelo auditor:
                     await asyncio.to_thread(self.save_queue, queue)
                     await asyncio.to_thread(self.save_worker_state, state)
 
-                    # Check if Ollama qwen3.5:9b is accessible
-                    ollama_ok = await asyncio.to_thread(self.check_ollama_qwen_available)
+                    # Check if Ollama qwen3.5:9b is accessible via ModelExecutionService
+                    ollama_ok = await self.check_ollama_qwen_available_async()
 
                     if ollama_ok:
                         try:

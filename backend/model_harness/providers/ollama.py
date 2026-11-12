@@ -329,6 +329,24 @@ class OllamaChatProvider:
             )
         return result
 
+    async def list_models(
+        self,
+        *,
+        timeout_seconds: float = 1.5,
+    ) -> list[dict[str, Any]]:
+        """List locally installed Ollama models via the official provider transport."""
+        timeout = httpx.Timeout(
+            connect=min(timeout_seconds, 1.5),
+            read=timeout_seconds,
+            write=min(timeout_seconds, 5.0),
+            pool=min(timeout_seconds, 1.5),
+        )
+        async with self._client(timeout) as client:
+            response = await client.get("/api/tags")
+            response.raise_for_status()
+            models = (response.json() or {}).get("models") or []
+            return [m for m in models if isinstance(m, dict)]
+
     async def inspect_model(
         self,
         model: str,
