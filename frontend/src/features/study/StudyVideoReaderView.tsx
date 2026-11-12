@@ -29,7 +29,8 @@ import type {
   VideoKeyframe,
   VideoSearchResult
 } from './types';
-import { useWebSocket } from '../../context/WebSocketContext';
+import type { ClientMessage } from '../../protocol/websocket';
+import { useTransport } from '../../transport';
 import { ResizableHandle, usePersistedPaneSize } from '../../components/ui';
 
 export interface StudyVideoReaderViewProps {
@@ -84,7 +85,7 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
   onExplainMoment,
   onExplainVisual,
 }) => {
-  const { sendClientMessage } = useWebSocket();
+  const transport = useTransport();
 
   // Video Element Ref
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -290,14 +291,13 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
       if (onUpdateProgress) {
         onUpdateProgress(1, currentChapter?.title || 'Geral', progressPercent);
       }
-      if (sendClientMessage) {
-        sendClientMessage({
-          type: 'study_update_video_progress',
-          document_id: document.document_id,
-          timestamp: now,
-          progress_percent: progressPercent,
-        });
-      }
+      // Increment 3 will add study_update_video_progress to ClientMessage union
+      transport.send({
+        type: 'study_update_video_progress',
+        document_id: document.document_id,
+        timestamp: now,
+        progress_percent: progressPercent,
+      } as unknown as ClientMessage);
     }
   };
 
@@ -470,15 +470,14 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
     if (onSaveNote) {
       onSaveNote(1, currentSegment?.text || `Momento @ ${formatTime(currentTime)}`, txt);
     }
-    if (sendClientMessage) {
-      sendClientMessage({
-        type: 'study_save_video_note',
-        document_id: document.document_id,
-        timestamp: currentTime,
-        note_text: txt,
-        selected_text: currentSegment?.text,
-      });
-    }
+    // Increment 3 will add study_save_video_note to ClientMessage union
+    transport.send({
+      type: 'study_save_video_note',
+      document_id: document.document_id,
+      timestamp: currentTime,
+      note_text: txt,
+      selected_text: currentSegment?.text,
+    } as unknown as ClientMessage);
     setNewNoteText('');
     setIsAddingNote(false);
     setActiveTab('notes');
@@ -550,10 +549,10 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
     }
   };
 
-  const httpToken = typeof window !== 'undefined' ? (window as any).__JARVIS_HTTP_TOKEN__ || '' : '';
-  const videoStreamUrl = `/api/study/document/${encodeURIComponent(document.document_id)}/video${
-    httpToken ? `?token=${encodeURIComponent(String(httpToken))}` : ''
-  }`;
+  const videoStreamUrl = transport.system.resolveMediaUrl(
+    `/api/study/document/${encodeURIComponent(document.document_id)}/video`,
+    { appendToken: true }
+  );
   const asrUnavailableReason =
     videoMeta?.asr_unavailable_reason || (document.metadata as any)?.asr_unavailable_reason || '';
   const ocrStatus = videoMeta?.ocr_status || (document.metadata as any)?.ocr_status || '';
@@ -1262,9 +1261,10 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
                       <div className="relative aspect-video w-full rounded bg-black/60 overflow-hidden flex items-center justify-center">
                         {kf.image_path ? (
                           <img
-                            src={`/api/study/document/${encodeURIComponent(document.document_id)}/media/${encodeURIComponent(kf.frame_id)}${
-                              httpToken ? `?token=${encodeURIComponent(String(httpToken))}` : ''
-                            }`}
+                            src={transport.system.resolveMediaUrl(
+                              `/api/study/document/${encodeURIComponent(document.document_id)}/media/${encodeURIComponent(kf.frame_id)}`,
+                              { appendToken: true }
+                            )}
                             alt={kf.frame_id}
                             className="h-full w-full object-contain"
                             onError={(e) => {

@@ -36,6 +36,7 @@ import {
   Square,
 } from 'lucide-react';
 import type { StudyDocument, SourceType, StudyCollection, StudyFolderLink } from './types';
+import { useTransportSystem } from '../../transport';
 
 interface StudyLibraryViewProps {
   documents: StudyDocument[];
@@ -87,6 +88,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
   onAskCourse,
   onRetryDocument,
 }) => {
+  const transportSystem = useTransportSystem();
   // Course / Collection Selection State
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
 
@@ -143,7 +145,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
   const handleCanvasDropUpload = async (files: FileList) => {
     if (!files?.length) return;
     for (const file of Array.from(files)) {
-      const nativePath = (window as any)?.jarvisIPC?.getPathForFile?.(file) || '';
+      const nativePath = transportSystem.getPathForFile(file);
       const ext = file.name.split('.').pop()?.toLowerCase() || '';
       const inferredType: SourceType =
         ext === 'mp4' || ext === 'mkv' || ext === 'mov' || ext === 'webm' || ext === 'avi'
@@ -381,10 +383,10 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
   const handleTriggerLinkFolder = async () => {
     if (!activeCollection) return;
 
-    // Check if Electron native dialog is available
-    if ((window as any).jarvisIPC?.selectFolder) {
+    // Check if native desktop folder dialog is available
+    if (transportSystem.isNativeDesktop()) {
       try {
-        const folderPath = await (window as any).jarvisIPC.selectFolder();
+        const folderPath = await transportSystem.selectFolder();
         if (folderPath && typeof folderPath === 'string') {
           setIsLinkingFolder(true);
           if (onLinkFolder) {
@@ -465,8 +467,8 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
   };
 
   const handleOpenFolderOnDisk = (folderPath: string) => {
-    if ((window as any).jarvisIPC?.openPath) {
-      (window as any).jarvisIPC.openPath(folderPath);
+    if (transportSystem.isNativeDesktop()) {
+      void transportSystem.openPath(folderPath);
     } else {
       alert(`Caminho local da pasta: ${folderPath}`);
     }
@@ -561,11 +563,8 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
     const isAudio = ['mp3', 'wav', 'm4a', 'ogg', 'flac', 'aac', 'wma'].includes(ext);
     const detectedSourceType: SourceType | undefined = isVideo ? 'VIDEO' : isAudio ? 'AUDIO' : undefined;
 
-    // Em ambiente Electron desktop, utilizar o caminho nativo diretamente
-    const localFilePath =
-      (window as any).jarvisIPC?.getPathForFile?.(selectedFile) ||
-      (selectedFile as any).path ||
-      '';
+    // Em ambiente desktop nativo, utilizar o caminho nativo diretamente
+    const localFilePath = transportSystem.getPathForFile(selectedFile);
 
     if (localFilePath) {
       onUpload({

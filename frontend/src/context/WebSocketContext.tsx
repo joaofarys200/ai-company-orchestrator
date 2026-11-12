@@ -2,7 +2,14 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { missionRuntimeStore } from '../features/missions/stores/missionRuntimeStore';
 import { usePermissionStore } from '../features/permissions/PermissionStore';
 import {
+  useOptionalTransport,
+  WebSocketTransportAdapter,
+  type JarvisTransport,
+  type ResponseDecision,
+} from '../transport';
+import {
   normalizeServerMessage,
+  type ServerMessage,
   type ActiveTemplate,
   type ArenaState,
   type ArenaUpdateMessage,
@@ -123,19 +130,6 @@ export interface StudyDocumentHighlight {
   context?: string;
   color?: string;
   created_at?: string;
-}
-
-declare global {
-  interface Window {
-    jarvisIPC?: {
-      send: (message: unknown) => void;
-      onMessage: (callback: (data: unknown) => void) => () => void;
-      getPathForFile?: (file: File) => string;
-      selectFolder?: () => Promise<string | null>;
-      openPath?: (targetPath: string) => Promise<{ ok: boolean; error?: string }>;
-      isNativeIPC: boolean;
-    };
-  }
 }
 
 export type {
@@ -555,30 +549,19 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     claude: { status: 'IDLE', content: 'Aguardando prompt de Arena...', time: '-', tokens: '-' },
   });
 
-  const socketRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<number | null>(null);
-  const shouldReconnectRef = useRef(true);
+  const contextTransport = useOptionalTransport();
+  const [ownsFallbackTransport] = useState(() => !contextTransport);
+  const [transport] = useState<JarvisTransport>(
+    () => contextTransport ?? new WebSocketTransportAdapter({ normalizeMessage: normalizeServerMessage })
+  );
+
   const recentMessageHashesRef = useRef<Map<string, number>>(new Map());
   const activeProjectIdRef = useRef<string | null>(null);
   const requestedProjectIdRef = useRef<string | null>(null);
-  const pendingStudyRequestsRef = useRef<Map<string, {
-    resolve: (value: any) => void;
-    reject: (reason?: any) => void;
-    timer: any;
-  }>>(new Map());
-  const pendingNoteRequestsRef = useRef<Map<string, {
-    resolve: (value: string) => void;
-    reject: (reason?: any) => void;
-    timer: any;
-  }>>(new Map());
 
   const sendClientMessage = useCallback((message: ClientMessage) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify(message));
-    } else if (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC) {
-      window.jarvisIPC.send(message);
-    }
-  }, []);
+    transport.send(message);
+  }, [transport]);
 
   // Keep active chat session synced in localStorage
   useEffect(() => {
@@ -1055,12 +1038,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         break;
       case 'note_content': {
         setCurrentNote({ filename: msg.filename, content: msg.content });
-        const pending = pendingNoteRequestsRef.current.get(msg.filename);
-        if (pending) {
-          clearTimeout(pending.timer);
-          pendingNoteRequestsRef.current.delete(msg.filename);
-          pending.resolve(msg.content);
-        }
         break;
       }
       case 'vault_diagnostics':
@@ -1330,64 +1307,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'study_quiz_ready': {
         setActiveStudyQuiz(msg.quiz);
         addSystemMessage(`Quiz pedagógico gerado para: ${msg.quiz.topic}`);
-        const reqId = msg.request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg.quiz);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`quiz:${msg.document_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(msg.quiz);
-              break;
-            }
-          }
-        }
         break;
       }
       case 'study_quiz_evaluated': {
         setStudyQuizResult(msg);
         addSystemMessage(`Quiz de estudo avaliado: ${msg.score}% de aproveitamento.`);
-        const reqId = msg.request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`eval:${msg.quiz_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(msg);
-              break;
-            }
-          }
-        }
         break;
       }
-      case 'study_search_rag_result': {
-        const reqId = msg.request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg.results || []);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith('rag:')) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(msg.results || []);
-              break;
-            }
-          }
-        }
+      case 'study_search_rag_result':
         break;
-      }
       case 'study_flashcards_list':
         setStudyFlashcards(msg.flashcards || []);
         break;
@@ -1422,13 +1350,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'study_mode_session_updated':
       case 'study_mode_sessions_list': {
         setStudyPipelineStage('');
-        const reqId = (msg as any).request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg);
-        }
         break;
       }
       case 'study_collections_list':
@@ -1442,47 +1363,16 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         addSystemMessage(`Nova disciplina/coleção criada: ${(msg as any).collection?.name}`);
         break;
       case 'study_folder_linked': {
-        const reqId = (msg as any).request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg);
-        }
         addSystemMessage(`Pasta vinculada com sucesso: ${(msg as any).folder_path}`);
         break;
       }
       case 'study_folder_unlinked': {
-        const reqId = (msg as any).request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg);
-        }
         addSystemMessage('Pasta desvinculada. Ficheiros originais preservados no disco.');
         break;
       }
-      case 'study_folder_synced': {
-        const reqId = (msg as any).request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve((msg as any).report);
-        }
+      case 'study_folder_synced':
+      case 'study_ask_course_result':
         break;
-      }
-      case 'study_ask_course_result': {
-        const reqId = (msg as any).request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg);
-        }
-        break;
-      }
       case 'study_operation_status': {
         const op = (msg as any).operation as StudyOperationStatusPayload | undefined;
         if (op?.operation_id) {
@@ -1601,24 +1491,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             ...prev.filter((d) => d.document_id !== msg.document.document_id),
           ]);
         }
-        const reqId = msg.request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg);
-        }
         break;
       }
       case 'study_document_failed': {
         setStudyPipelineStage('');
-        const reqId = msg.request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.reject(new Error(msg.error || 'Falha ao processar documento'));
-        }
         setLastStudyDocumentError({
           filename: msg.filename || '',
           error: msg.error || 'Falha ao processar documento',
@@ -1630,56 +1506,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       case 'study_generation_cancelled': {
         setStudyPipelineStage('');
         const docId = msg.document_id || '';
-        for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-          if (!docId || k.includes(docId)) {
-            clearTimeout(item.timer);
-            pendingStudyRequestsRef.current.delete(k);
-            item.reject(new Error('Geração cancelada pelo utilizador'));
-          }
-        }
+        transport.cancelPendingRequests(
+          (meta) => !docId || Boolean(meta.tag?.includes(docId)) || meta.requestId.includes(docId),
+          'Geração cancelada pelo utilizador'
+        );
         addSystemMessage(`[Estudo] Geração cancelada pelo utilizador${docId ? ` (${docId})` : ''}.`);
         break;
       }
-      case 'study_contextual_assist_result': {
-        const reqId = msg.request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`assist:${msg.document_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(msg);
-              break;
-            }
-          }
-        }
+      case 'study_contextual_assist_result':
+      case 'study_ask_paper_result':
         break;
-      }
-      case 'study_ask_paper_result': {
-        const reqId = msg.request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve({ answer: msg.answer, sources: msg.sources || [] });
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`ask:${msg.document_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve({ answer: msg.answer, sources: msg.sources || [] });
-              break;
-            }
-          }
-        }
-        break;
-      }
       case 'study_summary_ready': {
-        const reqId = msg.request_id;
         const resolvedSummaries = msg.summaries || msg.summary?.summaries;
         if (resolvedSummaries && msg.document_id) {
           setStudyDocuments((prev) =>
@@ -1696,78 +1533,16 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             )
           );
         }
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg.summary || resolvedSummaries || '');
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`summary:${msg.document_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(msg.summary || resolvedSummaries || '');
-              break;
-            }
-          }
-        }
         break;
       }
-      case 'study_synthesis_ready': {
-        const reqId = msg.request_id;
-        const payload = {
-          common_points: Array.isArray(msg.common_points) ? msg.common_points : [],
-          differences: Array.isArray(msg.differences) ? msg.differences : [],
-          shared_concepts: Array.isArray(msg.shared_concepts) ? msg.shared_concepts : [],
-          contradictions: Array.isArray(msg.contradictions) ? msg.contradictions : [],
-          idea_evolution: Array.isArray(msg.idea_evolution) ? msg.idea_evolution : [],
-        };
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(payload);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith('synth:')) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(payload);
-              break;
-            }
-          }
-        }
+      case 'study_synthesis_ready':
         break;
-      }
       case 'study_knowledge_saved': {
-        const reqId = msg.request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(true);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith('vault:')) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(true);
-              break;
-            }
-          }
-        }
         addSystemMessage(`Nota de estudo guardada no Knowledge Vault: ${msg.title}`);
         break;
       }
       case 'study_error': {
-        const reqId = msg.request_id;
         setStudyPipelineStage('');
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.reject(new Error(msg.message || 'Erro no módulo de estudo'));
-        }
         addSystemMessage(`[Estudo] ${msg.message || 'Erro ao processar operação de estudo'}`);
         break;
       }
@@ -1778,26 +1553,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
       case 'study_editorial_plan_result': {
         setStudyPipelineStage('');
-        const reqId = msg.request_id;
-        const payload = {
-          plan: (msg.plan as EditorialStudyPlan | null) ?? null,
-          plan_status: (msg.plan_status as EditorialPlanStatus | null) ?? null,
-        };
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(payload);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`editorial_plan:${msg.document_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(payload);
-              break;
-            }
-          }
-        }
         break;
       }
       case 'study_generated_document_progress': {
@@ -1805,87 +1560,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setStudyPipelineStage(`${msg.message || msg.stage || 'Geração documental em curso'}${pctLabel}`);
         break;
       }
-      case 'study_generated_document_status_result': {
-        const reqId = msg.request_id;
-        const payload = (msg.status as StudyDocumentGenerationStatus | null) ?? null;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(payload);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`doc_gen_status:${msg.document_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(payload);
-              break;
-            }
-          }
-        }
+      case 'study_generated_document_status_result':
         break;
-      }
       case 'study_generated_document_result': {
         setStudyPipelineStage('');
-        const reqId = msg.request_id;
-        const payload = {
-          result: (msg.result as StudyDocumentGenerationResult | null) ?? null,
-          status: (msg.status as StudyDocumentGenerationStatus | null) ?? null,
-        };
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(payload);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`doc_gen:${msg.document_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(payload);
-              break;
-            }
-          }
-        }
         break;
       }
-      case 'study_generated_document_file_result': {
-        const reqId = msg.request_id;
-        const payload = msg as StudyDocumentFilePayload;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(payload);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`doc_gen_file:${msg.document_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(payload);
-              break;
-            }
-          }
-        }
+      case 'study_generated_document_file_result':
         break;
-      }
       case 'study_notes_ready': {
-        const reqId = msg.request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve(msg.cornell);
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`cornell:${msg.document_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve(msg.cornell);
-              break;
-            }
-          }
-        }
         if (msg.cornell && msg.document_id) {
           setStudyDocuments((prev) =>
             prev.map((d) =>
@@ -1903,33 +1586,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         break;
       }
-      case 'study_document_file_result': {
-        const reqId = msg.request_id;
-        if (reqId && pendingStudyRequestsRef.current.has(reqId)) {
-          const item = pendingStudyRequestsRef.current.get(reqId)!;
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(reqId);
-          item.resolve({
-            contentBase64: msg.content_base64,
-            filename: msg.filename,
-            error: msg.error,
-          });
-        } else {
-          for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-            if (k.startsWith(`file:${msg.document_id}`)) {
-              clearTimeout(item.timer);
-              pendingStudyRequestsRef.current.delete(k);
-              item.resolve({
-                contentBase64: msg.content_base64,
-                filename: msg.filename,
-                error: msg.error,
-              });
-              break;
-            }
-          }
-        }
+      case 'study_document_file_result':
         break;
-      }
       case 'study_document_details': {
         const doc = msg.document as StudyDocument | undefined;
         const docId = doc?.document_id;
@@ -2055,7 +1713,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         break;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addChatMessage, addSystemMessage, handleArenaUpdate, handleKanbanUpdate, handleTemplateChanged, handleUiAction]);
+  }, [addChatMessage, addSystemMessage, handleArenaUpdate, handleKanbanUpdate, handleTemplateChanged, handleUiAction, transport]);
 
   const handleServerMessageRef = useRef(handleServerMessage);
   useEffect(() => {
@@ -2063,132 +1721,86 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [handleServerMessage]);
 
   const isReady = useCallback(() => {
-    return Boolean(socketRef.current?.readyState === WebSocket.OPEN || (typeof window !== 'undefined' && window.jarvisIPC?.isNativeIPC));
-  }, []);
+    return transport.system.isReady();
+  }, [transport]);
 
-  // Register Native Electron IPC listener once so WebSocket reconnects do not leak duplicate listeners
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.jarvisIPC?.isNativeIPC) {
-      return;
-    }
-    console.log('[Transport] Initializing Native Electron IPC Listener');
-    const ipcUnsubscribe = window.jarvisIPC.onMessage((rawData) => {
-      try {
-        const msg = normalizeServerMessage(rawData);
-        if (msg) {
-          handleServerMessageRef.current(msg);
+    const startupTimers: Array<ReturnType<typeof setTimeout>> = [];
+    const clearStartupTimers = () => {
+      while (startupTimers.length > 0) {
+        const timer = startupTimers.pop();
+        if (timer !== undefined) {
+          clearTimeout(timer);
         }
-      } catch (e) {
-        console.error('[Native IPC] Error processing message:', e);
+      }
+    };
+
+    const scheduleInitialSync = () => {
+      clearStartupTimers();
+      startupTimers.push(
+        window.setTimeout(() => {
+          if (transport.system.isReady()) {
+            transport.send({ type: 'list_projects' });
+            transport.send({ type: 'get_notes' });
+            transport.send({ type: 'get_rules' });
+            transport.send({ type: 'get_planner_state' });
+            transport.send({ type: 'mission_list', project_id: 'ALL' });
+            transport.send({ type: 'study_list_documents' });
+            transport.send({ type: 'study_list_collections' });
+            transport.send({ type: 'permission_get_pending' });
+          }
+        }, 50)
+      );
+
+      startupTimers.push(
+        window.setTimeout(() => {
+          const autoConnect = localStorage.getItem('jarvis_voice_auto_connect') === 'true';
+          if (autoConnect && transport.system.isReady()) {
+            transport.send({ type: 'toggle_voice', active: true });
+            console.log('[WebSocket] Auto-enabled voice on startup based on user preference');
+          }
+        }, 1500)
+      );
+    };
+
+    const unsubStatus = transport.subscribeConnectionState((snapshot) => {
+      const connected = snapshot.status === 'CONNECTED';
+      setIsConnected(connected);
+      setSystemStatus(connected ? 'ONLINE' : 'OFFLINE');
+      missionRuntimeStore.setConnectionState(
+        connected
+          ? 'CONNECTED'
+          : snapshot.status === 'RECONNECTING'
+          ? 'RECONNECTING'
+          : 'OFFLINE'
+      );
+      if (!connected) {
+        setVoiceStatus('offline');
+        setIsProjectRunning(false);
       }
     });
-    return () => {
-      if (ipcUnsubscribe) ipcUnsubscribe();
-    };
-  }, []);
 
-  const connect = useCallback(function connectSocket() {
-    // Primary Realtime WebSocket on ws://127.0.0.1:8001
-    if (socketRef.current && (socketRef.current.readyState === WebSocket.OPEN || socketRef.current.readyState === WebSocket.CONNECTING)) {
-      return;
+    const unsubConnected = transport.onConnected(scheduleInitialSync);
+    const unsubMessages = transport.subscribeAny((msg) => {
+      handleServerMessageRef.current(msg);
+    });
+
+    if (ownsFallbackTransport) {
+      transport.system.connect();
+    } else if (transport.system.getStatus().status === 'CONNECTED') {
+      scheduleInitialSync();
     }
 
-    const wsToken = import.meta.env.VITE_JARVIS_WS_TOKEN || 'local-dev-token';
-    const wsUrl = `ws://127.0.0.1:8001/?token=${encodeURIComponent(wsToken)}`;
-    console.log('[WebSocket] Connecting to ws://127.0.0.1:8001');
-    const ws = new WebSocket(wsUrl);
-    socketRef.current = ws;
-
-    ws.onopen = () => {
-      console.log('[WebSocket] Connected');
-      setIsConnected(true);
-      setSystemStatus('ONLINE');
-      missionRuntimeStore.setConnectionState('CONNECTED');
-      if (reconnectTimeoutRef.current) {
-        window.clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = null;
-      }
-
-      // Initial state synchronization on connect
-      window.setTimeout(() => {
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: 'list_projects' } satisfies ClientMessage));
-          ws.send(JSON.stringify({ type: 'get_notes' } satisfies ClientMessage));
-          ws.send(JSON.stringify({ type: 'get_rules' } satisfies ClientMessage));
-          ws.send(JSON.stringify({ type: 'get_planner_state' } satisfies ClientMessage));
-          ws.send(JSON.stringify({ type: 'mission_list', project_id: 'ALL' } satisfies ClientMessage));
-          ws.send(JSON.stringify({ type: 'study_list_documents' } satisfies ClientMessage));
-          ws.send(JSON.stringify({ type: 'study_list_collections' } satisfies ClientMessage));
-          ws.send(JSON.stringify({ type: 'permission_get_pending' } satisfies ClientMessage));
-        }
-      }, 50);
-
-      // Auto-enable voice on startup only if user explicitly opted in via localStorage
-      window.setTimeout(() => {
-        const autoConnect = localStorage.getItem('jarvis_voice_auto_connect') === 'true';
-        if (autoConnect && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: 'toggle_voice', active: true } satisfies ClientMessage));
-          console.log('[WebSocket] Auto-enabled voice on startup based on user preference');
-        }
-      }, 1500);
-    };
-
-    ws.onclose = () => {
-      console.log('[WebSocket] Disconnected');
-      if (socketRef.current === ws) {
-        socketRef.current = null;
-      }
-      setIsConnected(false);
-      setSystemStatus('OFFLINE');
-      missionRuntimeStore.setConnectionState(shouldReconnectRef.current ? 'RECONNECTING' : 'OFFLINE');
-      setVoiceStatus('offline');
-      setIsProjectRunning(false);
-
-      if (shouldReconnectRef.current) {
-        if (reconnectTimeoutRef.current) {
-          window.clearTimeout(reconnectTimeoutRef.current);
-        }
-        reconnectTimeoutRef.current = window.setTimeout(() => {
-          connectSocket();
-        }, 3000);
-      }
-    };
-
-    ws.onerror = (error) => {
-      console.error('[WebSocket] Error:', error);
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const msg = normalizeServerMessage(JSON.parse(event.data));
-        if (!msg) {
-          console.warn('[WebSocket] Ignored malformed message');
-          return;
-        }
-        console.log('[WebSocket] Message received:', msg.type);
-        handleServerMessageRef.current(msg);
-      } catch (err) {
-        console.error('[WebSocket] Error parsing message data:', err);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    shouldReconnectRef.current = true;
-    connect();
-
     return () => {
-      shouldReconnectRef.current = false;
-      if (socketRef.current) {
-        socketRef.current.close();
-        socketRef.current = null;
-      }
-      if (reconnectTimeoutRef.current) {
-        window.clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = null;
+      clearStartupTimers();
+      unsubStatus();
+      unsubConnected();
+      unsubMessages();
+      if (ownsFallbackTransport) {
+        transport.system.disconnect();
       }
     };
-  }, [connect]);
+  }, [transport, ownsFallbackTransport]);
 
   const handleSpatialBoardIntentRef = useRef<(rawText: string) => void>(() => {});
 
@@ -2289,20 +1901,29 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [isReady, sendClientMessage]);
 
   const readNote = useCallback((filename: string): Promise<string> => {
-    return new Promise((resolve) => {
-      const timer = setTimeout(() => {
-        pendingNoteRequestsRef.current.delete(filename);
-        resolve('');
-      }, 6000);
-      pendingNoteRequestsRef.current.set(filename, { resolve, reject: () => resolve(''), timer });
-      if (isReady()) {
-        sendClientMessage({ type: 'read_note', filename });
-      } else {
-        clearTimeout(timer);
-        resolve('');
-      }
-    });
-  }, [isReady, sendClientMessage]);
+    return transport
+      .invoke<string>(
+        { type: 'read_note', filename },
+        {
+          timeoutMs: 6000,
+          requireReady: true,
+          tag: `note:${filename}`,
+          matchResponse: (msg): ResponseDecision<string> => {
+            if (msg.type === 'note_content' && msg.filename === filename) {
+              return { kind: 'resolve', value: msg.content };
+            }
+            return { kind: 'ignore' };
+          },
+          legacyMatchResponse: (msg): ResponseDecision<string> => {
+            if (msg.type === 'note_content' && msg.filename === filename) {
+              return { kind: 'resolve', value: msg.content };
+            }
+            return { kind: 'ignore' };
+          },
+        }
+      )
+      .catch(() => '');
+  }, [transport]);
 
   const getVaultDiagnostics = useCallback(() => {
     if (isReady()) {
@@ -2817,29 +2438,91 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [sendClientMessage]
   );
 
+  const invokeStudyRpc = useCallback(
+    <TResult,>(
+      config: {
+        prefix: string;
+        timeoutMs: number;
+        timeoutMessage: string;
+        tag?: string;
+        successTypes: ServerMessage['type'][];
+        extractResult: (msg: Record<string, unknown>) => TResult;
+        legacyMatch?: (msg: Record<string, unknown>) => boolean;
+      },
+      buildMessage: (requestId: string) => ClientMessage
+    ): Promise<TResult> => {
+      const requestId = `${config.prefix}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
+      const evaluateDecision = (msg: ServerMessage): ResponseDecision<TResult> => {
+        const record = msg as unknown as Record<string, unknown>;
+        if (config.successTypes.includes(msg.type)) {
+          return { kind: 'resolve', value: config.extractResult(record) };
+        }
+        if (msg.type === 'study_error') {
+          return {
+            kind: 'reject',
+            error: new Error((msg as { message?: string }).message || 'Erro no módulo de estudo'),
+          };
+        }
+        if (msg.type === 'study_document_failed') {
+          return {
+            kind: 'reject',
+            error: new Error((msg as { error?: string }).error || 'Falha ao processar documento'),
+          };
+        }
+        if (msg.type === 'study_generation_cancelled') {
+          return {
+            kind: 'reject',
+            error: new Error('Geração cancelada pelo utilizador'),
+          };
+        }
+        return { kind: 'ignore' };
+      };
+
+      return transport.invoke<TResult>(buildMessage(requestId), {
+        requestId,
+        timeoutMs: config.timeoutMs,
+        timeoutMessage: config.timeoutMessage,
+        tag: config.tag,
+        requireReady: true,
+        matchResponse: (msg) => evaluateDecision(msg),
+        legacyMatchResponse: config.legacyMatch
+          ? (msg) => {
+              if (!config.successTypes.includes(msg.type)) {
+                return { kind: 'ignore' };
+              }
+              const record = msg as unknown as Record<string, unknown>;
+              return config.legacyMatch!(record)
+                ? { kind: 'resolve', value: config.extractResult(record) }
+                : { kind: 'ignore' };
+            }
+          : undefined,
+      });
+    },
+    [transport]
+  );
+
   const ingestStudyVideoUrl = useCallback(
     (url: string, title?: string, subject?: string, collectionId?: string): Promise<any> => {
       setLastStudyDocumentError(null);
-      const requestId = `video:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Tempo limite ao ingerir URL de vídeo.'));
-        }, 300000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc(
+        {
+          prefix: 'video',
+          timeoutMs: 300000,
+          timeoutMessage: 'Tempo limite ao ingerir URL de vídeo.',
+          successTypes: ['study_video_url_ingested'],
+          extractResult: (msg) => msg,
+        },
+        (requestId) => ({
           type: 'study_ingest_video_url',
           url,
           title,
           subject,
           collection_id: collectionId,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const deleteStudyDocument = useCallback(
@@ -2856,69 +2539,73 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const generateStudyQuiz = useCallback(
     (documentId: string, count?: number): Promise<StudyQuiz> => {
-      const requestId = `quiz:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Generate quiz timed out'));
-        }, 20000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc<StudyQuiz>(
+        {
+          prefix: `quiz:${documentId}`,
+          tag: documentId,
+          timeoutMs: 20000,
+          timeoutMessage: 'Generate quiz timed out',
+          successTypes: ['study_quiz_ready'],
+          extractResult: (msg) => msg.quiz as StudyQuiz,
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_generate_quiz',
           document_id: documentId,
           question_count: count || 5,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const submitStudyQuiz = useCallback(
     (quizId: string, answers: Record<string, number | string>, transferAnswer?: string): Promise<QuizEvaluationResult> => {
-      const requestId = `eval:${quizId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Submit quiz timed out'));
-        }, 15000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc<QuizEvaluationResult>(
+        {
+          prefix: `eval:${quizId}`,
+          tag: quizId,
+          timeoutMs: 15000,
+          timeoutMessage: 'Submit quiz timed out',
+          successTypes: ['study_quiz_evaluated'],
+          extractResult: (msg) => msg as unknown as QuizEvaluationResult,
+          legacyMatch: (msg) => msg.quiz_id === quizId,
+        },
+        (requestId) => ({
           type: 'study_submit_quiz',
           quiz_id: quizId,
           answers,
           transfer_answer: transferAnswer || '',
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const searchStudyRag = useCallback(
     (query: string, documentId?: string): Promise<Array<{ text: string; source: string; score?: number; title?: string }>> => {
-      const requestId = `rag:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Search RAG timed out'));
-        }, 15000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc<Array<{ text: string; source: string; score?: number; title?: string }>>(
+        {
+          prefix: 'rag',
+          tag: documentId,
+          timeoutMs: 15000,
+          timeoutMessage: 'Search RAG timed out',
+          successTypes: ['study_search_rag_result'],
+          extractResult: (msg) =>
+            (msg.results as Array<{ text: string; source: string; score?: number; title?: string }> | undefined) || [],
+          legacyMatch: () => true,
+        },
+        (requestId) => ({
           type: 'study_search_rag',
           query,
           document_id: documentId || '',
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const listStudyFlashcards = useCallback(
@@ -2955,16 +2642,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         mediaId?: string;
       }
     ): Promise<any> => {
-      const requestId = `assist:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Assist request timed out'));
-        }, 15000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc(
+        {
+          prefix: `assist:${documentId}`,
+          tag: documentId,
+          timeoutMs: 15000,
+          timeoutMessage: 'Assist request timed out',
+          successTypes: ['study_contextual_assist_result'],
+          extractResult: (msg) => msg,
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_contextual_assist',
           document_id: documentId,
           action,
@@ -2975,10 +2663,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           target_language: options?.targetLanguage || 'pt-PT',
           media_id: options?.mediaId,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const askStudyPaper = useCallback(
@@ -2987,69 +2675,79 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       question: string,
       sectionId?: string
     ): Promise<{ answer: string; sources: string[] }> => {
-      const requestId = `ask:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Ask paper request timed out'));
-        }, 20000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc<{ answer: string; sources: string[] }>(
+        {
+          prefix: `ask:${documentId}`,
+          tag: documentId,
+          timeoutMs: 20000,
+          timeoutMessage: 'Ask paper request timed out',
+          successTypes: ['study_ask_paper_result'],
+          extractResult: (msg) => ({
+            answer: typeof msg.answer === 'string' ? msg.answer : '',
+            sources: Array.isArray(msg.sources) ? (msg.sources as string[]) : [],
+          }),
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_ask_paper',
           document_id: documentId,
           question,
           section_id: sectionId,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const getStudyDocumentFile = useCallback(
     (
       documentId: string
     ): Promise<{ contentBase64?: string; filename?: string; error?: string }> => {
-      const requestId = `file:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Get document file timed out'));
-        }, 4000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc<{ contentBase64?: string; filename?: string; error?: string }>(
+        {
+          prefix: `file:${documentId}`,
+          tag: documentId,
+          timeoutMs: 5000,
+          timeoutMessage: 'Get document file timed out',
+          successTypes: ['study_document_file_result'],
+          extractResult: (msg) => ({
+            contentBase64: msg.content_base64 as string | undefined,
+            filename: msg.filename as string | undefined,
+            error: msg.error as string | undefined,
+          }),
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_get_document_file',
           document_id: documentId,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const generateStudyCornell = useCallback(
     (documentId: string): Promise<any> => {
-      const requestId = `cornell:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Generate Cornell notes timed out'));
-        }, 30000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc(
+        {
+          prefix: `cornell:${documentId}`,
+          tag: documentId,
+          timeoutMs: 30000,
+          timeoutMessage: 'Generate Cornell notes timed out',
+          successTypes: ['study_notes_ready'],
+          extractResult: (msg) => msg.cornell,
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_generate_cornell',
           document_id: documentId,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const generateStudySummary = useCallback(
@@ -3058,25 +2756,29 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       mode: 'Quick' | 'Study' | 'Detailed' | 'Exam' = 'Study',
       forceRegenerate = false
     ): Promise<any> => {
-      const requestId = `summary:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Generate summary timed out'));
-        }, 90000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc(
+        {
+          prefix: `summary:${documentId}`,
+          tag: documentId,
+          timeoutMs: 90000,
+          timeoutMessage: 'Generate summary timed out',
+          successTypes: ['study_summary_ready'],
+          extractResult: (msg) => {
+            const nested = msg.summary as { summaries?: unknown } | undefined;
+            return msg.summary || msg.summaries || nested?.summaries || '';
+          },
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_generate_summary',
           document_id: documentId,
           mode,
           force_regenerate: forceRegenerate,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const synthesizeStudyDocuments = useCallback(
@@ -3089,23 +2791,35 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       contradictions: string[];
       idea_evolution: string[];
     }> => {
-      const requestId = `synth:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Synthesize documents timed out'));
-        }, 90000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc<{
+        common_points: string[];
+        differences: string[];
+        shared_concepts: string[];
+        contradictions: string[];
+        idea_evolution: string[];
+      }>(
+        {
+          prefix: 'synth',
+          timeoutMs: 90000,
+          timeoutMessage: 'Synthesize documents timed out',
+          successTypes: ['study_synthesis_ready'],
+          extractResult: (msg) => ({
+            common_points: Array.isArray(msg.common_points) ? (msg.common_points as string[]) : [],
+            differences: Array.isArray(msg.differences) ? (msg.differences as string[]) : [],
+            shared_concepts: Array.isArray(msg.shared_concepts) ? (msg.shared_concepts as string[]) : [],
+            contradictions: Array.isArray(msg.contradictions) ? (msg.contradictions as string[]) : [],
+            idea_evolution: Array.isArray(msg.idea_evolution) ? (msg.idea_evolution as string[]) : [],
+          }),
+          legacyMatch: () => true,
+        },
+        (requestId) => ({
           type: 'study_synthesize_documents',
           document_ids: documentIds,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const saveToStudyVault = useCallback(
@@ -3115,16 +2829,16 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       subject?: string;
       source_document_ids?: string[];
     }): Promise<boolean> => {
-      const requestId = `vault:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Save to vault timed out'));
-        }, 20000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc<boolean>(
+        {
+          prefix: 'vault',
+          timeoutMs: 20000,
+          timeoutMessage: 'Save to vault timed out',
+          successTypes: ['study_knowledge_saved'],
+          extractResult: () => true,
+          legacyMatch: () => true,
+        },
+        (requestId) => ({
           type: 'study_save_to_vault',
           title: data.title,
           content: data.markdown_content,
@@ -3132,10 +2846,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           subject: data.subject || 'Geral',
           source_document_ids: data.source_document_ids || [],
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const listStudyCollections = useCallback(() => {
@@ -3163,26 +2877,26 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       syncEnabled = true,
       recursive = true
     ): Promise<any> => {
-      const requestId = `link:${collectionId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Link folder request timed out'));
-        }, 30000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc(
+        {
+          prefix: `link:${collectionId}`,
+          tag: collectionId,
+          timeoutMs: 30000,
+          timeoutMessage: 'Link folder request timed out',
+          successTypes: ['study_folder_linked'],
+          extractResult: (msg) => msg,
+        },
+        (requestId) => ({
           type: 'study_link_folder',
           collection_id: collectionId,
           folder_path: folderPath,
           sync_enabled: syncEnabled,
           recursive,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const unlinkStudyFolder = useCallback(
@@ -3191,90 +2905,94 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       folderPath: string,
       removeMaterials = false
     ): Promise<any> => {
-      const requestId = `unlink:${collectionId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Unlink folder request timed out'));
-        }, 15000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc(
+        {
+          prefix: `unlink:${collectionId}`,
+          tag: collectionId,
+          timeoutMs: 15000,
+          timeoutMessage: 'Unlink folder request timed out',
+          successTypes: ['study_folder_unlinked'],
+          extractResult: (msg) => msg,
+        },
+        (requestId) => ({
           type: 'study_unlink_folder',
           collection_id: collectionId,
           folder_path: folderPath,
           remove_materials: removeMaterials,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const syncStudyFolder = useCallback(
     (collectionId: string, folderPath?: string): Promise<any> => {
-      const requestId = `sync:${collectionId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Sync folder request timed out'));
-        }, 60000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc(
+        {
+          prefix: `sync:${collectionId}`,
+          tag: collectionId,
+          timeoutMs: 60000,
+          timeoutMessage: 'Sync folder request timed out',
+          successTypes: ['study_folder_synced'],
+          extractResult: (msg) => msg.report,
+        },
+        (requestId) => ({
           type: 'study_sync_folder',
           collection_id: collectionId,
           folder_path: folderPath,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const askStudyCourse = useCallback(
     (collectionId: string, question: string): Promise<any> => {
-      const requestId = `course_ask:${collectionId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Ask course request timed out'));
-        }, 25000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc(
+        {
+          prefix: `course_ask:${collectionId}`,
+          tag: collectionId,
+          timeoutMs: 25000,
+          timeoutMessage: 'Ask course request timed out',
+          successTypes: ['study_ask_course_result'],
+          extractResult: (msg) => msg,
+        },
+        (requestId) => ({
           type: 'study_ask_course',
           collection_id: collectionId,
           question,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const retryStudyDocument = useCallback(
     (documentId: string): Promise<any> => {
-      const requestId = `retry:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Retry document request timed out'));
-        }, 45000);
-
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-
-        sendClientMessage({
+      return invokeStudyRpc(
+        {
+          prefix: `retry:${documentId}`,
+          tag: documentId,
+          timeoutMs: 45000,
+          timeoutMessage: 'Retry document request timed out',
+          successTypes: ['study_document_ready'],
+          extractResult: (msg) => msg,
+          legacyMatch: (msg) =>
+            typeof msg.document === 'object' &&
+            msg.document !== null &&
+            (msg.document as { document_id?: string }).document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_retry_document',
           document_id: documentId,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const cancelStudyGeneration = useCallback(
@@ -3285,15 +3003,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         document_id: documentId,
         request_id: `cancel:${documentId}:${Date.now()}`,
       });
-      for (const [k, item] of pendingStudyRequestsRef.current.entries()) {
-        if (k.includes(documentId)) {
-          clearTimeout(item.timer);
-          pendingStudyRequestsRef.current.delete(k);
-          item.reject(new Error('Cancelado pelo utilizador'));
-        }
-      }
+      transport.cancelPendingRequests(
+        (meta) => Boolean(meta.tag?.includes(documentId)) || meta.requestId.includes(documentId),
+        'Cancelado pelo utilizador'
+      );
     },
-    [sendClientMessage]
+    [sendClientMessage, transport]
   );
 
   const getStudyEditorialPlan = useCallback(
@@ -3303,21 +3018,30 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       plan: EditorialStudyPlan | null;
       plan_status: EditorialPlanStatus | null;
     }> => {
-      const requestId = `editorial_plan:${documentId}:get:${Date.now()}:${Math.random().toString(36).slice(2, 6)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Tempo limite excedido ao consultar o plano editorial.'));
-        }, 30000);
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-        sendClientMessage({
+      return invokeStudyRpc<{
+        plan: EditorialStudyPlan | null;
+        plan_status: EditorialPlanStatus | null;
+      }>(
+        {
+          prefix: `editorial_plan:${documentId}:get`,
+          tag: documentId,
+          timeoutMs: 30000,
+          timeoutMessage: 'Tempo limite excedido ao consultar o plano editorial.',
+          successTypes: ['study_editorial_plan_result'],
+          extractResult: (msg) => ({
+            plan: (msg.plan as EditorialStudyPlan | null) ?? null,
+            plan_status: (msg.plan_status as EditorialPlanStatus | null) ?? null,
+          }),
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_get_editorial_plan',
           document_id: documentId,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const generateStudyEditorialPlan = useCallback(
@@ -3329,42 +3053,54 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       plan: EditorialStudyPlan | null;
       plan_status: EditorialPlanStatus | null;
     }> => {
-      const requestId = `editorial_plan:${documentId}:gen:${Date.now()}:${Math.random().toString(36).slice(2, 6)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Tempo limite excedido no planeamento editorial local.'));
-        }, 600000);
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-        sendClientMessage({
+      return invokeStudyRpc<{
+        plan: EditorialStudyPlan | null;
+        plan_status: EditorialPlanStatus | null;
+      }>(
+        {
+          prefix: `editorial_plan:${documentId}:gen`,
+          tag: documentId,
+          timeoutMs: 600000,
+          timeoutMessage: 'Tempo limite excedido no planeamento editorial local.',
+          successTypes: ['study_editorial_plan_result'],
+          extractResult: (msg) => ({
+            plan: (msg.plan as EditorialStudyPlan | null) ?? null,
+            plan_status: (msg.plan_status as EditorialPlanStatus | null) ?? null,
+          }),
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_generate_editorial_plan',
           document_id: documentId,
           force_recompute: forceRecompute,
           auto_generate_dossier: autoGenerateDossier,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const getGeneratedStudyDocumentStatus = useCallback(
     (documentId: string): Promise<StudyDocumentGenerationStatus | null> => {
-      const requestId = `doc_gen_status:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 6)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Tempo limite excedido ao consultar o estado documental.'));
-        }, 30000);
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-        sendClientMessage({
+      return invokeStudyRpc<StudyDocumentGenerationStatus | null>(
+        {
+          prefix: `doc_gen_status:${documentId}`,
+          tag: documentId,
+          timeoutMs: 30000,
+          timeoutMessage: 'Tempo limite excedido ao consultar o estado documental.',
+          successTypes: ['study_generated_document_status_result'],
+          extractResult: (msg) => (msg.status as StudyDocumentGenerationStatus | null) ?? null,
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_get_generated_document_status',
           document_id: documentId,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const generateStudyDocument = useCallback(
@@ -3380,14 +3116,23 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       result: StudyDocumentGenerationResult | null;
       status: StudyDocumentGenerationStatus | null;
     }> => {
-      const requestId = `doc_gen:${documentId}:${Date.now()}:${Math.random().toString(36).slice(2, 6)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error('Tempo limite excedido na composição e geração documental local.'));
-        }, 900000);
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-        sendClientMessage({
+      return invokeStudyRpc<{
+        result: StudyDocumentGenerationResult | null;
+        status: StudyDocumentGenerationStatus | null;
+      }>(
+        {
+          prefix: `doc_gen:${documentId}`,
+          tag: documentId,
+          timeoutMs: 900000,
+          timeoutMessage: 'Tempo limite excedido na composição e geração documental local.',
+          successTypes: ['study_generated_document_result'],
+          extractResult: (msg) => ({
+            result: (msg.result as StudyDocumentGenerationResult | null) ?? null,
+            status: (msg.status as StudyDocumentGenerationStatus | null) ?? null,
+          }),
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_generate_study_document',
           document_id: documentId,
           force_recompute: options?.forceRecompute ?? false,
@@ -3395,10 +3140,10 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           design_profile_id: options?.designProfileId ?? 'ACADEMIC_EDITORIAL_CLASSIC',
           export_docx: options?.exportDocx ?? true,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const getGeneratedStudyDocumentFile = useCallback(
@@ -3407,23 +3152,26 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       format: 'pdf' | 'docx' = 'pdf',
       version?: number
     ): Promise<StudyDocumentFilePayload | null> => {
-      const requestId = `doc_gen_file:${documentId}:${format}:${Date.now()}:${Math.random().toString(36).slice(2, 6)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error(`Tempo limite excedido ao descarregar o ficheiro ${format}.`));
-        }, 60000);
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-        sendClientMessage({
+      return invokeStudyRpc<StudyDocumentFilePayload | null>(
+        {
+          prefix: `doc_gen_file:${documentId}:${format}`,
+          tag: documentId,
+          timeoutMs: 60000,
+          timeoutMessage: `Tempo limite excedido ao descarregar o ficheiro ${format}.`,
+          successTypes: ['study_generated_document_file_result'],
+          extractResult: (msg) => msg as unknown as StudyDocumentFilePayload,
+          legacyMatch: (msg) => msg.document_id === documentId,
+        },
+        (requestId) => ({
           type: 'study_get_generated_document_file',
           document_id: documentId,
           format,
           version,
           request_id: requestId,
-        });
-      });
+        })
+      );
     },
-    [sendClientMessage]
+    [invokeStudyRpc]
   );
 
   const sendStudyModeRpc = useCallback(
@@ -3433,16 +3181,38 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       timeoutMs = 120000
     ): Promise<T> => {
       const requestId = `sm_${prefix}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          pendingStudyRequestsRef.current.delete(requestId);
-          reject(new Error(`Tempo limite excedido (${prefix}).`));
-        }, timeoutMs);
-        pendingStudyRequestsRef.current.set(requestId, { resolve, reject, timer });
-        sendClientMessage(payloadBuilder(requestId));
+      return transport.invoke<T>(payloadBuilder(requestId), {
+        requestId,
+        timeoutMs,
+        timeoutMessage: `Tempo limite excedido (${prefix}).`,
+        requireReady: true,
+        matchResponse: (msg): ResponseDecision<T> => {
+          if (msg.type === 'study_error') {
+            return {
+              kind: 'reject',
+              error: new Error((msg as { message?: string }).message || 'Erro no módulo de estudo'),
+            };
+          }
+          if (msg.type === 'study_document_failed') {
+            return {
+              kind: 'reject',
+              error: new Error((msg as { error?: string }).error || 'Falha ao processar documento'),
+            };
+          }
+          if (msg.type === 'study_generation_cancelled') {
+            return {
+              kind: 'reject',
+              error: new Error('Geração cancelada pelo utilizador'),
+            };
+          }
+          if (msg.type.startsWith('study_mode_') && msg.type !== 'study_mode_progress_event') {
+            return { kind: 'resolve', value: msg as unknown as T };
+          }
+          return { kind: 'ignore' };
+        },
       });
     },
-    [sendClientMessage]
+    [transport]
   );
 
   const studyModesApi: StudyModesBridge = useMemo(

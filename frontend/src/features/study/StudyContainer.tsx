@@ -54,6 +54,7 @@ import type {
   StudyNavigatePayload,
   StudyUiContextPayload,
 } from '../../protocol/websocket';
+import { useTransportSystem } from '../../transport';
 
 export type StudyTab =
   | 'overview'
@@ -243,6 +244,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
   onAddReadingNote,
   onAddHighlight,
 }) => {
+  const transportSystem = useTransportSystem();
   // Navigation — PDF/Video-first when an active or initial document exists, otherwise Landing Overview
   const [activeTab, setActiveTab] = useState<StudyTab>(
     initialActiveDocumentId || initialDocuments.length > 0 ? 'reader' : 'overview'
@@ -591,7 +593,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
     async (fileList: FileList) => {
       if (!onUploadDocument || !fileList?.length) return;
       for (const file of Array.from(fileList)) {
-        const nativePath = (window as any)?.jarvisIPC?.getPathForFile?.(file) || '';
+        const nativePath = transportSystem.getPathForFile(file);
         const ext = file.name.split('.').pop()?.toLowerCase() || '';
         const inferredType =
           ext === 'mp4' || ext === 'mkv' || ext === 'mov' || ext === 'webm' || ext === 'avi'
@@ -631,7 +633,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
       }
       setActiveTab('library');
     },
-    [onUploadDocument]
+    [onUploadDocument, transportSystem]
   );
 
   // Handler: Stabilized document file fetcher

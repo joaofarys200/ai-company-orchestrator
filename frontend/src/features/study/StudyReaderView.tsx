@@ -139,6 +139,7 @@ import type {
   StudyHighlight,
   ExplanationLevel
 } from './types';
+import { resolveTransportMediaUrl, useTransportSystem } from '../../transport';
 
 // Configure pdf.js worker using stable public asset URL with origin resolution
 export const ensurePdfWorkerConfigured = () => {
@@ -149,9 +150,10 @@ export const ensurePdfWorkerConfigured = () => {
         ? window.location.origin
         : window.location && window.location.href && !window.location.href.startsWith('data:')
         ? new URL(window.location.href).origin
-        : 'http://localhost:8000';
-    const workerOriginUrl = new URL('/pdf.worker.min.mjs', origin).href;
-    pdfjsLib.GlobalWorkerOptions.workerSrc = workerOriginUrl;
+        : undefined;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = resolveTransportMediaUrl('/pdf.worker.min.mjs', {
+      baseUrl: origin,
+    });
   } catch {
     pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
   }
@@ -418,6 +420,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
   onExplainMedia,
   onGetDocumentFile,
 }) => {
+  const transportSystem = useTransportSystem();
   // PDF State & Lifecycle
   const [lifecycle, setLifecycle] = useState<PdfLifecycle>('IDLE');
   const readerInstanceId = useRef(`reader_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`).current;
@@ -562,27 +565,22 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
       try {
         let pdfData: Uint8Array | null = null;
 
-        // Strategy 1: Direct HTTP streaming from local backend sandbox_service
+        // Strategy 1: Direct HTTP streaming via transport media URL resolver
         const docIdEncoded = encodeURIComponent(document.document_id);
-        const candidateUrls: string[] = [
-          `/api/study/document/${docIdEncoded}/file`,
-          `http://127.0.0.1:8000/api/study/document/${docIdEncoded}/file`,
-          `http://localhost:8000/api/study/document/${docIdEncoded}/file`,
-        ];
+        const relativePaths: string[] = [`/api/study/document/${docIdEncoded}/file`];
         const metaFilePath = (document.metadata as any)?.file_path;
         if (metaFilePath && typeof metaFilePath === 'string') {
           const rawFp = metaFilePath.replace(/\\/g, '/');
           const dataStudyMatch = rawFp.match(/(?:^|\/)(data\/study\/.+)$/i);
           if (dataStudyMatch && dataStudyMatch[1]) {
-            const relUrl = encodeURI(`/${dataStudyMatch[1].replace(/^\/+/, '')}`);
-            candidateUrls.push(relUrl);
-            candidateUrls.push(`http://127.0.0.1:8000${relUrl}`);
+            relativePaths.push(encodeURI(`/${dataStudyMatch[1].replace(/^\/+/, '')}`));
           } else if (rawFp.startsWith('/api/') || rawFp.startsWith('api/')) {
-            const relApi = encodeURI(rawFp.startsWith('/') ? rawFp : `/${rawFp}`);
-            candidateUrls.push(relApi);
-            candidateUrls.push(`http://127.0.0.1:8000${relApi}`);
+            relativePaths.push(encodeURI(rawFp.startsWith('/') ? rawFp : `/${rawFp}`));
           }
         }
+        const candidateUrls = transportSystem.getMediaCandidateUrls(relativePaths, {
+          appendToken: true,
+        });
         for (const url of candidateUrls) {
           try {
             const controller = new AbortController();
@@ -747,7 +745,7 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
       }
       setPdfDoc(null);
     };
-  }, [document.document_id, reloadKey, disposePdfDoc]);
+  }, [document.document_id, reloadKey, disposePdfDoc, transportSystem]);
 
   // Handle page visibility change and update progress (throttled to maintain 60fps scrolling)
   const lastProgressRef = useRef<{ page: number; time: number }>({ page: 1, time: 0 });
