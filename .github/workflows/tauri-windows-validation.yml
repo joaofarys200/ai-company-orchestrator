@@ -1,0 +1,191 @@
+name: Tauri Windows Validation (Stage 2.1)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - "stage2.1/**"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tauri-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tauri-windows-build:
+    name: Windows Tauri 2 + Rust + Frontend Build
+    runs-on: windows-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Enable Git longpaths on Windows runner
+        run: git config --global core.longpaths true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify Electron shell preservation and repo hygiene
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path ci-logs | Out-Null
+
+          foreach ($required in @("main.js", "preload.js", "package.json", "src-tauri/Cargo.toml", "src-tauri/tauri.conf.json", "src-tauri/capabilities/main-window.json")) {
+            if (-not (Test-Path $required)) {
+              throw "Missing required file: $required"
+            }
+          }
+
+          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+          if ($pkg.scripts.start -ne "electron .") {
+            throw "Unexpected root start script: $($pkg.scripts.start)"
+          }
+          if (-not ($pkg.scripts.dev -match "electron \. --dev")) {
+            throw "Unexpected root dev script: $($pkg.scripts.dev)"
+          }
+
+          $forbidden = Get-ChildItem -Force -Recurse -ErrorAction SilentlyContinue | Where-Object {
+            $_.FullName -match '\\database\.db' -or
+            $_.FullName -match '\\data\\study\\documents\\' -or
+            $_.FullName -match '\\data\\study\\videos_cache\\'
+          }
+          if ($forbidden) {
+            throw "Forbidden runtime/database artifacts found in checkout: $($forbidden.FullName -join ', ')"
+          }
+
+          "Electron scripts and clean repository state verified." | Tee-Object -FilePath ci-logs/hygiene.log
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Setup Rust MSVC toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.100.0"
+          targets: x86_64-pc-windows-msvc
+
+      - name: Inspect toolchain versions
+        run: |
+          $ErrorActionPreference = 'Continue'
+          @(
+            "node: $(node --version)"
+            "npm: $(npm --version)"
+            "rustc: $(rustc --version)"
+            "cargo: $(cargo --version)"
+            "os: $([System.Environment]::OSVersion.VersionString)"
+          ) | Tee-Object -FilePath ci-logs/toolchain.log
+
+      - name: Install root dependencies from lockfile
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm ci --ignore-scripts 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/npm-ci-root.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/npm-ci-root.log
+          exit $code
+
+      - name: Install frontend dependencies from lockfile
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm --prefix frontend ci 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/npm-ci-frontend.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/npm-ci-frontend.log
+          exit $code
+
+      - name: Collect Tauri environment info
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm exec -- tauri info 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-info.log
+          exit 0
+
+      - name: Build React + TypeScript frontend
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm --prefix frontend run build 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/frontend-build.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/frontend-build.log
+          exit $code
+
+      - name: Run cargo check (--locked --all-targets)
+        run: |
+          $ErrorActionPreference = 'Continue'
+          cargo check --manifest-path src-tauri/Cargo.toml --locked --all-targets 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/cargo-check.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/cargo-check.log
+          exit $code
+
+      - name: Run cargo test (--locked)
+        run: |
+          $ErrorActionPreference = 'Continue'
+          cargo test --manifest-path src-tauri/Cargo.toml --locked -- --nocapture 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/cargo-test.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/cargo-test.log
+          exit $code
+
+      - name: Build Tauri release binary (--no-bundle)
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm run tauri:build -- --no-bundle 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-build-no-bundle.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/tauri-build-no-bundle.log
+          if ($code -eq 0 -and (Test-Path "src-tauri/target/release/jarvis-os.exe")) {
+            Get-Item "src-tauri/target/release/jarvis-os.exe" | Select-Object Name, Length | Out-String | Add-Content ci-logs/tauri-build-no-bundle.log
+          }
+          exit $code
+
+      - name: Build Tauri Windows installers (unsigned bundle validation)
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm run tauri:build 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-build-bundle.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/tauri-build-bundle.log
+          if (Test-Path "src-tauri/target/release/bundle") {
+            Get-ChildItem -Recurse "src-tauri/target/release/bundle" -File | Select-Object FullName, Length | Out-String | Add-Content ci-logs/tauri-build-bundle.log
+          }
+          exit $code
+
+      - name: Write workflow summary
+        if: always()
+        run: |
+          $ErrorActionPreference = 'Continue'
+          Add-Content $env:GITHUB_STEP_SUMMARY "## JARVIS OS — Tauri Windows Validation (Stage 2.1)"
+          Add-Content $env:GITHUB_STEP_SUMMARY ""
+          if (Test-Path ci-logs/toolchain.log) {
+            Add-Content $env:GITHUB_STEP_SUMMARY "### Toolchain"
+            Add-Content $env:GITHUB_STEP_SUMMARY '```'
+            Get-Content ci-logs/toolchain.log | Add-Content $env:GITHUB_STEP_SUMMARY
+            Add-Content $env:GITHUB_STEP_SUMMARY '```'
+          }
+          if (Test-Path ci-logs/tauri-info.log) {
+            Add-Content $env:GITHUB_STEP_SUMMARY "### Tauri Info"
+            Add-Content $env:GITHUB_STEP_SUMMARY '```'
+            Get-Content ci-logs/tauri-info.log | Add-Content $env:GITHUB_STEP_SUMMARY
+            Add-Content $env:GITHUB_STEP_SUMMARY '```'
+          }
+          foreach ($log in @("frontend-build.log", "cargo-check.log", "cargo-test.log", "tauri-build-no-bundle.log", "tauri-build-bundle.log")) {
+            $path = Join-Path "ci-logs" $log
+            if (Test-Path $path) {
+              $tail = Get-Content $path -Tail 15
+              Add-Content $env:GITHUB_STEP_SUMMARY "### $log (tail)"
+              Add-Content $env:GITHUB_STEP_SUMMARY '```'
+              $tail | Add-Content $env:GITHUB_STEP_SUMMARY
+              Add-Content $env:GITHUB_STEP_SUMMARY '```'
+            }
+          }
+
+      - name: Upload CI validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-windows-ci-logs-${{ github.run_number }}
+          path: ci-logs/**
+          retention-days: 14
