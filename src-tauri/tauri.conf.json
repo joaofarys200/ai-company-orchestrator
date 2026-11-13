@@ -1,0 +1,54 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "JARVIS OS",
+  "version": "0.1.0",
+  "identifier": "com.jarvisos.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev --prefix frontend",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build --prefix frontend",
+    "frontendDist": "../frontend/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "JARVIS OS",
+        "width": 1300,
+        "height": 850,
+        "minWidth": 1024,
+        "minHeight": 700,
+        "backgroundColor": "#080c12",
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self' 'wasm-unsafe-eval'",
+        "style-src": "'self' 'unsafe-inline'",
+        "font-src": "'self' data:",
+        "img-src": "'self' data: blob: http://127.0.0.1:* http://localhost:*",
+        "media-src": "'self' blob: http://127.0.0.1:* http://localhost:*",
+        "connect-src": "'self' ipc: http://ipc.localhost ws://127.0.0.1:8001 ws://localhost:8001 http://127.0.0.1:8000 http://localhost:8000",
+        "worker-src": "'self' blob:",
+        "frame-src": "'self' http://127.0.0.1:* http://localhost:*",
+        "object-src": "'none'",
+        "base-uri": "'self'"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}
+

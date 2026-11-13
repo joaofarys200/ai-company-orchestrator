@@ -29,6 +29,8 @@ yarn-error.log*
 frontend/dist/
 dist/
 build/
+src-tauri/target/
+src-tauri/gen/schemas/
 
 # Local data, memory and generated state
 database.db
