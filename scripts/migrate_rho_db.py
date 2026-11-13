@@ -158,18 +158,41 @@ def assert_sandbox_target_path(
 ) -> Path:
     """
     Enforce Stage 1 sandbox-only allowlist:
-    - Target must resolve canonically inside the approved temporary sandbox root.
+    - Any caller-supplied sandbox_root may only narrow (never widen) the canonical
+      default temporary root returned by get_default_sandbox_root().
+    - Target must resolve canonically as a strict descendant of the effective sandbox root
+      and default temporary root.
     - Target cannot equal the source path or protected production paths/directories.
     - Symlinks and hard-linked file aliases (`st_nlink > 1` or matching inode) are rejected.
     """
+    if isinstance(sandbox_root, str) and not sandbox_root.strip():
+        raise RhoMigrationSafetyError("Stage 1 safety guard blocked empty sandbox_root.")
+
+    default_root = get_default_sandbox_root()
+    canonical_project_root = Path(os.path.realpath(str(PROJECT_ROOT)))
+
+    if sandbox_root is None:
+        resolved_root = default_root
+    else:
+        raw_root = Path(sandbox_root).expanduser()
+        if raw_root.is_symlink():
+            raise RhoMigrationSafetyError(
+                f"Stage 1 safety guard blocked symlink sandbox_root: {raw_root}"
+            )
+        resolved_root = Path(os.path.realpath(str(raw_root)))
+        if (
+            resolved_root == canonical_project_root
+            or resolved_root.is_relative_to(canonical_project_root)
+            or not resolved_root.is_relative_to(default_root)
+        ):
+            raise RhoMigrationSafetyError(
+                f"Stage 1 safety guard blocked non-sandbox or widened sandbox_root ({resolved_root}); "
+                f"must reside within canonical temporary directory ({default_root})."
+            )
+
     raw_target = Path(target_path).expanduser()
     raw_source = Path(source_path).expanduser()
 
-    resolved_root = Path(
-        os.path.realpath(
-            str(Path(sandbox_root).expanduser() if sandbox_root is not None else tempfile.gettempdir())
-        )
-    )
     resolved_target = Path(os.path.realpath(str(raw_target)))
     resolved_source = Path(os.path.realpath(str(raw_source)))
 
@@ -184,12 +207,22 @@ def assert_sandbox_target_path(
         raise RhoMigrationSafetyError(
             f"Target path cannot equal source path: {resolved_target}"
         )
-    if resolved_target in forbidden_paths or resolved_target.is_relative_to(data_dir):
+    if (
+        resolved_target in forbidden_paths
+        or resolved_target.is_relative_to(data_dir)
+        or resolved_target == canonical_project_root
+        or resolved_target.is_relative_to(canonical_project_root)
+    ):
         raise RhoMigrationSafetyError(
-            f"Stage 1 safety guard blocked non-sandbox target path: {resolved_target}. "
+            f"Stage 1 safety guard blocked non-sandbox or repository target path: {resolved_target}. "
             "Production RHO migration is forbidden in Stage 1."
         )
-    if resolved_target == resolved_root or not resolved_target.is_relative_to(resolved_root):
+    if (
+        resolved_target == resolved_root
+        or not resolved_target.is_relative_to(resolved_root)
+        or resolved_target == default_root
+        or not resolved_target.is_relative_to(default_root)
+    ):
         raise RhoMigrationSafetyError(
             f"Stage 1 safety guard blocked target outside approved sandbox root ({resolved_root}): "
             f"{resolved_target}. Stage 1 RHO migration requires a temporary sandbox destination."
@@ -199,22 +232,30 @@ def assert_sandbox_target_path(
     for suffix in ("", "-wal", "-shm"):
         candidate_raw = Path(f"{raw_target}{suffix}")
         candidate_resolved = Path(f"{resolved_target}{suffix}")
-        if candidate_raw.is_symlink() or candidate_resolved.is_symlink():
+        candidate_realpath = Path(os.path.realpath(str(candidate_raw)))
+        if (
+            candidate_raw.is_symlink()
+            or candidate_resolved.is_symlink()
+            or candidate_realpath == resolved_root
+            or not candidate_realpath.is_relative_to(resolved_root)
+            or candidate_realpath == default_root
+            or not candidate_realpath.is_relative_to(default_root)
+        ):
             raise RhoMigrationSafetyError(
-                f"Stage 1 safety guard blocked symlink target or WAL sidecar: {candidate_raw}"
+                f"Stage 1 safety guard blocked symlink or out-of-sandbox target/sidecar: {candidate_raw}"
             )
         try:
-            st = os.stat(candidate_resolved)
+            st = os.stat(candidate_realpath)
         except FileNotFoundError:
             continue
         except OSError as exc:
             raise RhoMigrationSafetyError(
-                f"Stage 1 safety guard could not inspect target path {candidate_resolved}: {exc}"
+                f"Stage 1 safety guard could not inspect target path {candidate_realpath}: {exc}"
             ) from exc
         if st.st_nlink > 1 or (st.st_ino and (st.st_dev, st.st_ino) in protected_ids):
             raise RhoMigrationSafetyError(
                 f"Stage 1 safety guard blocked hard-linked or protected inode alias: "
-                f"{candidate_resolved} (st_nlink={st.st_nlink})."
+                f"{candidate_realpath} (st_nlink={st.st_nlink})."
             )
 
     return resolved_target

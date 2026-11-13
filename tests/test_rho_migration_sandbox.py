@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -23,6 +24,7 @@ from scripts.migrate_rho_db import (
     RhoMigrationSafetyError,
     assert_sandbox_target_path,
     compute_table_snapshot,
+    get_default_sandbox_root,
     migrate_rho_db,
 )
 
@@ -236,6 +238,113 @@ class RhoMigrationSandboxTests(unittest.TestCase):
                 conn.execute("SELECT id, marker FROM protected_guard").fetchall(),
                 [(1, "untouched-sentinel")],
             )
+
+    def test_rejects_widened_sandbox_root_project_root_and_state_db(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        state_db = PROJECT_ROOT / "state.db"
+        state_existed = state_db.exists()
+        state_pre_sha = hashlib.sha256(state_db.read_bytes()).hexdigest() if state_existed else None
+        escaped_in_repo = PROJECT_ROOT / "_stage12_should_not_exist.db"
+        self.assertFalse(escaped_in_repo.exists())
+
+        for target in (state_db, escaped_in_repo):
+            self._assert_rejected_cli_and_python(target, sandbox_root=PROJECT_ROOT)
+
+        if CANONICAL_DB_PATH.exists():
+            pre_stat = CANONICAL_DB_PATH.stat()
+            self._assert_rejected_cli_and_python(CANONICAL_DB_PATH, sandbox_root=PROJECT_ROOT)
+            post_stat = CANONICAL_DB_PATH.stat()
+            self.assertEqual((post_stat.st_size, post_stat.st_mtime_ns), (pre_stat.st_size, pre_stat.st_mtime_ns))
+
+        self.assertEqual(state_db.exists(), state_existed)
+        if state_pre_sha is not None:
+            self.assertEqual(hashlib.sha256(state_db.read_bytes()).hexdigest(), state_pre_sha)
+        self.assertFalse(escaped_in_repo.exists())
+
+    def test_rejects_widened_sandbox_root_project_parent(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        parent_escape = PROJECT_ROOT.parent / "_stage12_parent_escape.db"
+        state_db = PROJECT_ROOT / "state.db"
+        self.assertFalse(parent_escape.exists())
+        state_existed = state_db.exists()
+
+        for target in (parent_escape, state_db):
+            self._assert_rejected_cli_and_python(target, sandbox_root=PROJECT_ROOT.parent)
+
+        self.assertFalse(parent_escape.exists())
+        self.assertEqual(state_db.exists(), state_existed)
+
+    def test_rejects_widened_sandbox_root_outside_default_temp_even_when_target_inside(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        default_root = get_default_sandbox_root()
+
+        # Ancestors of default temp root (parent and filesystem anchor) and empty root must fail
+        if default_root.parent != default_root:
+            self._assert_rejected_cli_and_python(
+                self.tmp_path / "attempt_via_temp_parent.db",
+                sandbox_root=default_root.parent,
+            )
+            self.assertFalse((self.tmp_path / "attempt_via_temp_parent.db").exists())
+        self._assert_rejected_cli_and_python(
+            self.tmp_path / "attempt_via_fs_root.db",
+            sandbox_root=Path(default_root.anchor),
+        )
+        self.assertFalse((self.tmp_path / "attempt_via_fs_root.db").exists())
+        self._assert_rejected_cli_and_python(self.target_db, sandbox_root="")
+        self.assertFalse(self.target_db.exists())
+
+        # Arbitrary directory outside default temp root must fail even when nonexistent
+        external_root = Path.home() / "_stage12_non_temp_root"
+        external_target = external_root / "inside_external.db"
+        self.assertFalse(external_root.exists())
+        self._assert_rejected_cli_and_python(external_target, sandbox_root=external_root)
+        self.assertFalse(external_target.exists())
+        self.assertFalse(external_root.exists())
+
+        # Existing SQLite database inside a caller-supplied root outside default temp must stay untouched
+        simulated_default_temp = self.tmp_path / "canonical_default_temp"
+        simulated_default_temp.mkdir()
+        external_dir_with_db = self.tmp_path / "outside_custom_root"
+        existing_db = external_dir_with_db / "existing_outside.db"
+        pre_sha = self._create_protected_sqlite_db(existing_db)
+
+        with patch("scripts.migrate_rho_db.tempfile.gettempdir", return_value=str(simulated_default_temp)):
+            self._assert_rejected_cli_and_python(existing_db, sandbox_root=external_dir_with_db)
+
+        self.assertEqual(hashlib.sha256(existing_db.read_bytes()).hexdigest(), pre_sha)
+        self.assertFalse(Path(f"{existing_db}-wal").exists())
+        self.assertFalse(Path(f"{existing_db}-shm").exists())
+        with closing(sqlite3.connect(existing_db)) as conn:
+            self.assertEqual(
+                conn.execute("SELECT id, marker FROM protected_guard").fetchall(),
+                [(1, "untouched-sentinel")],
+            )
+
+    def test_accepts_default_temp_root_and_narrower_descendant_sandbox_root(self) -> None:
+        self._create_synthetic_source_db(self.source_db)
+        default_root = get_default_sandbox_root()
+
+        explicit_default_target = self.tmp_path / "explicit_default_sandbox.db"
+        report_default = migrate_rho_db(
+            self.source_db,
+            explicit_default_target,
+            sandbox_root=default_root,
+        )
+        self.assertTrue(report_default.integrity_ok)
+        self.assertEqual(report_default.target_trajectories, 3)
+
+        narrow_root = self.tmp_path / "narrow_sandbox_dir"
+        narrow_root.mkdir()
+        narrow_target = narrow_root / "nested" / "narrow_rho.db"
+        report_narrow = migrate_rho_db(
+            self.source_db,
+            narrow_target,
+            sandbox_root=narrow_root,
+        )
+        self.assertTrue(report_narrow.integrity_ok)
+        self.assertEqual(report_narrow.target_trajectories, 3)
+        self.assertEqual(report_narrow.source_trajectories_sha256, report_narrow.target_trajectories_sha256)
+        self.assertEqual(report_narrow.source_rules_sha256, report_narrow.target_rules_sha256)
 
     def test_synthetic_sandbox_migration_full_parity_indexes_and_rollback(self) -> None:
         self._create_synthetic_source_db(self.source_db)
