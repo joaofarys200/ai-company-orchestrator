@@ -230,3 +230,43 @@ pub async fn stream_file_with_range(
         .body(body)
         .unwrap_or_else(|_| Response::new(Body::empty()))
 }
+
+#[cfg(test)]
+pub(crate) async fn test_send_raw_http(port: u16, req: &str) -> (u16, String, Vec<u8>) {
+    use std::time::Duration;
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+    use tokio::net::TcpStream;
+
+    tokio::task::yield_now().await;
+    let mut stream = TcpStream::connect(("127.0.0.1", port))
+        .await
+        .expect("connect to local axum test server");
+    stream.write_all(req.as_bytes()).await.unwrap();
+    stream.flush().await.unwrap();
+
+    // Wait for server response EOF (server closes via `Connection: close`) without half-closing early.
+    let mut buf = Vec::new();
+    tokio::time::timeout(Duration::from_secs(5), stream.read_to_end(&mut buf))
+        .await
+        .expect("timed out reading HTTP response")
+        .expect("read HTTP response bytes");
+
+    let sep = buf.windows(4).position(|w| w == b"\r\n\r\n").unwrap_or_else(|| {
+        panic!(
+            "valid HTTP response headers (got {} bytes: {:?})",
+            buf.len(),
+            String::from_utf8_lossy(&buf)
+        )
+    });
+    let head = String::from_utf8_lossy(&buf[..sep]).to_string();
+    let body = buf[(sep + 4)..].to_vec();
+
+    let status: u16 = head
+        .lines()
+        .next()
+        .and_then(|l| l.split_whitespace().nth(1))
+        .and_then(|s| s.parse().ok())
+        .expect("HTTP status code");
+    (status, head, body)
+}
+

@@ -247,33 +247,9 @@ async fn serve_preview_relative(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::protocol::http_common::test_send_raw_http as send_raw_http;
     use std::fs;
     use tempfile::tempdir;
-    use tokio::io::{AsyncReadExt, AsyncWriteExt};
-    use tokio::net::TcpStream;
-
-    async fn send_raw_http(port: u16, req: &str) -> (u16, String, Vec<u8>) {
-        let mut stream = TcpStream::connect(("127.0.0.1", port)).await.unwrap();
-        stream.write_all(req.as_bytes()).await.unwrap();
-        stream.shutdown().await.unwrap();
-
-        let mut buf = Vec::new();
-        stream.read_to_end(&mut buf).await.unwrap();
-
-        let sep = buf
-            .windows(4)
-            .position(|w| w == b"\r\n\r\n")
-            .expect("valid HTTP response headers");
-        let head = String::from_utf8_lossy(&buf[..sep]).to_string();
-        let body = buf[(sep + 4)..].to_vec();
-        let status: u16 = head
-            .lines()
-            .next()
-            .and_then(|l| l.split_whitespace().nth(1))
-            .and_then(|s| s.parse().ok())
-            .expect("HTTP status");
-        (status, head, body)
-    }
 
     #[tokio::test]
     async fn preview_server_isolates_workspace_and_blocks_traversal_and_host_spoof() {
@@ -326,3 +302,4 @@ mod tests {
         preview.shutdown();
     }
 }
+
