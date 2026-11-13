@@ -4,7 +4,9 @@ pub mod permissions;
 pub mod process;
 pub mod protocol;
 pub mod storage;
+pub mod workers;
 
+use std::sync::Arc;
 use tauri::Manager;
 
 pub const SHELL_NAME: &str = "tauri";
@@ -12,7 +14,7 @@ pub const APP_DISPLAY_NAME: &str = "JARVIS OS";
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
@@ -23,6 +25,10 @@ pub fn run() {
             } else {
                 None
             };
+
+            let worker_config =
+                workers::supervisor::WorkerSupervisorConfig::for_workspace(project_root.clone());
+            let worker_supervisor = Arc::new(workers::supervisor::WorkerSupervisor::new(worker_config));
 
             let (loopback, preview) = tauri::async_runtime::block_on(async move {
                 let loopback = protocol::loopback::LoopbackHandle::start(project_root)
@@ -36,7 +42,11 @@ pub fn run() {
                 Ok::<_, Box<dyn std::error::Error>>((loopback, preview))
             })?;
 
-            app.manage(commands::media::RuntimeServices { loopback, preview });
+            app.manage(commands::media::RuntimeServices {
+                loopback,
+                preview,
+                workers: worker_supervisor,
+            });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -45,9 +55,20 @@ pub fn run() {
             commands::system::system_open_path,
             commands::media::get_loopback_config,
             commands::media::get_media_ticket,
+            commands::workers::get_worker_health,
+            commands::workers::restart_worker_role,
+            commands::workers::worker_system_health,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running JARVIS OS Tauri shell");
+        .build(tauri::generate_context!())
+        .expect("error while building JARVIS OS Tauri shell");
+
+    app.run(|app_handle, event| {
+        if let tauri::RunEvent::Exit = event {
+            if let Some(services) = app_handle.try_state::<commands::media::RuntimeServices>() {
+                tauri::async_runtime::block_on(services.workers.shutdown_all());
+            }
+        }
+    });
 }
 
 #[cfg(test)]

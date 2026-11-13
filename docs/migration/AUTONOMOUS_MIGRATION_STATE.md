@@ -1,10 +1,10 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-13T01:33:00Z`
-- **Current Phase:** `Phase 2 — Rust Core and Tauri IPC foundation (Increments 2.1, 2.2 COMPLETE; 2.3 Implemented — Validating on Windows CI)`
-- **Current Increment:** `Increment 2.3 Implemented -> Pushing migration/tauri-rust-complete for Windows CI Validation before Phase 3`
+- **Last Updated (UTC):** `2026-11-13T01:54:00Z`
+- **Current Phase:** `Phase 3 — Functional Migration from Python to Rust (Phase 2 COMPLETE; Increment 3.1 Implemented)`
+- **Current Increment:** `Increment 3.1 Implemented -> Pushing to migration/tauri-rust-complete for Windows CI Validation`
 - **Current Branch:** `migration/tauri-rust-complete`
-- **Current Commit:** `148bef0` + Increment 2.3 changes (base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
+- **Current Commit:** `c195ce4` + Increment 3.1 changes (base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
 
 ---
 
@@ -37,7 +37,7 @@
   - Updated `StudyContainer.tsx`, `StudyLibraryView.tsx`, `StudyReaderView.tsx`, and `StudyVideoReaderView.tsx` (extracted shared `uploadHelpers.ts`) for native Tauri dialogs, native file drop paths, and ticketed media URLs.
   - Decoupled `main.tsx` and all 12 UI components from `useWebSocket` onto `AppSessionContext` (`useAppSession` / `AppSessionProvider`).
   - Added `frontend/src/transport/__tests__/tauriTransport.test.ts` (`14/14` passing).
-- **2.3 Rust Loopback HTTP (`127.0.0.1:0`), Isolated IDE Preview & Atomic FS (IMPLEMENTED LOCALLY — Validating on Windows CI):**
+- **2.3 Rust Loopback HTTP (`127.0.0.1:0`), Isolated IDE Preview & Atomic FS (COMPLETE — `2e478a2`, CI fix `c195ce4`, verified CI Run `#43346899364`):**
   - Added `tokio`, `tokio-util`, `axum`, `http`, `bytes`, `http-range-header`, `hmac`, `sha2`, `hex`, `rand`, `tempfile`, `url` to `src-tauri/Cargo.toml` and locked via `cargo fetch`.
   - Added `ensure_confined_existing_file`, `is_blocked_system_path`, and `is_safe_identifier` helpers to `src-tauri/src/permissions/path_jail.rs`.
   - Implemented `src-tauri/src/storage/atomic_fs.rs` (`atomic_write_bytes`, `atomic_write_string`, `read_bounded_bytes` + unit tests).
@@ -45,17 +45,19 @@
   - Implemented `src-tauri/src/process/preview_server.rs` (isolated ephemeral `127.0.0.1:0` preview server with `Host` guard + symlink/traversal confinement + `X-Content-Type-Options: nosniff` + `Cache-Control: no-store` + TCP integration tests).
   - Exposed Tauri commands `get_loopback_config` and `get_media_ticket` via managed `RuntimeServices` in `src-tauri/src/commands/media.rs` + `src-tauri/src/lib.rs`, added `http://127.0.0.1:*` to `connect-src`/`worker-src` in `tauri.conf.json`, and added `sandbox="allow-scripts allow-forms"` to `WorkspaceViewer.tsx` preview `<iframe>` elements.
 
+### Phase 3 — Functional Migration from Python to Rust (IN PROGRESS)
+- **3.1 Rust Worker Supervisor + Win32 Job Objects + NDJSON JSON-RPC 2.0 + `workers/worker_boot.py` (IMPLEMENTED LOCALLY — Pushing for Windows CI Validation):**
+  - Implemented Python worker runtime `workers/{__init__,worker_boot}.py` and `workers/common/{__init__,stdio_rpc}.py` isolating `os.dup(1)` + redirecting `sys.stdout = sys.stderr` prior to imports, with 16 MiB frame limit, `StreamChunkBatcher` (16 ms / 3 chunks), `system.ping`/`system.pong`, `task.cancel`, and non-blocking `reverse_request`/`reverse_response` HITL approval + `tests/test_worker_stdio_rpc.py` (`2 passed in 0.41s`).
+  - Added `windows-sys` (`Win32_Foundation`, `Win32_Security`, `Win32_System_JobObjects`, `Win32_System_Threading`), `uuid`, `chrono`, and `tokio` `"process"` feature to `src-tauri/Cargo.toml` and locked `Cargo.lock`.
+  - Implemented `src-tauri/src/process/job_object.rs` (RAII `JobObject` with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE | JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION` + `CREATE_NO_WINDOW` + child termination test).
+  - Implemented `src-tauri/src/workers/{mod,rpc_client,supervisor}.rs` (`WorkerRpcClient` with bounded `mpsc(1024)` queue, 5s/15s heartbeat, async `ReverseRpcHandler`, and `WorkerSupervisor` managing `Echo`/`Ai`/`Study`/`Knowledge`/`Mission`/`Voice` roles with backoff auto-restart + 3 live Rust-to-Python integration tests).
+  - Exposed `get_worker_health`, `restart_worker_role`, `worker_system_health` in `src-tauri/src/commands/workers.rs` and wired `RuntimeServices.workers` shutdown on `RunEvent::Exit` in `src-tauri/src/lib.rs`.
+
 ---
 
-## 2. Remaining Work (Phases 2.3–5)
+## 2. Remaining Work (Phases 3.2–5)
 
-### Phase 2 — Rust Core and Tauri IPC Foundation (Remaining)
-- **2.3 Rust Internal Loopback HTTP (`127.0.0.1:0`) & Isolated IDE Preview Server:**
-  - Implement `storage/atomic_fs.rs`, `protocol/loopback.rs` (`axum` + `http-range-header`, Bearer + 60s `?ticket=`, `Host` DNS-rebinding guard, `Origin` check, Range `206`, strict MIME), `process/preview_server.rs` (`X-Content-Type-Options: nosniff`, sandboxed iframe), and `get_media_ticket` / `get_loopback_config` commands + full integration tests; push branch and validate cleanly on GitHub Actions `windows-latest`.
-
-### Phase 3 — Functional Migration from Python to Rust
-- **3.1 Rust Worker Supervisor + NDJSON JSON-RPC 2.0 + Win32 Job Objects + `workers/worker_boot.py`:**
-  - `process/job_object.rs` (`CREATE_SUSPENDED` + `AssignProcessToJobObject(KILL_ON_JOB_CLOSE)`), `workers/{supervisor,rpc_client,pools}.rs`, 5s/15s heartbeat, bounded `mpsc(1024)` backpressure, 16ms `stream.chunk` micro-batching, `task.cancel`, Reverse RPC HITL (`reverse_request`/`reverse_response`), and Python `workers/common/{stdio_rpc,health}.py` with `os.dup(1)` + `sys.stdout = sys.stderr`.
+### Phase 3 — Functional Migration from Python to Rust (Remaining)
 - **3.2 Rust SQLite Core (`database.db` Single Writer) + Study Catalog Store:**
   - `storage/{sqlite,migrations,study_store}.rs` (`rusqlite` bundled WAL actor, `user_version` migrations preserving existing rows, `documents.json`/`collections.json` atomic store), cross-checking RHO cutover safety (`data/rho.db` tested on disposable/CI copies; `state.db` retained permanently in Python).
 - **3.3 Security Hardening in Rust Core:**
@@ -79,14 +81,14 @@
 
 - **Python Stage 1 / Contract Baseline (`venv\Scripts\python.exe -m pytest -q tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_protocol_contracts.py tests/test_model_service_compliance.py tests/test_model_transport_architecture.py tests/test_websocket_dispatcher_contract.py tests/test_server_websocket_characterization.py tests/test_transport_gateway.py tests/test_documentation_integrity.py`):**
   - **Result:** `58 passed, 1 skipped, 2 warnings, 281 subtests passed in 32.89s` (`exit_code=0`).
-- **Python Post-2.3 Check (`venv\Scripts\python.exe -m pytest -q tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py tests/test_transport_gateway.py tests/test_websocket_dispatcher_contract.py`):** `37 passed, 1 skipped, 276 subtests passed in 9.84s` (bare Python lightweight subset: `28 passed, 1 skipped in 9.33s`).
-- **Frontend Transport (`npm --prefix frontend test`):** `14/14 passed (4 suites, 0 fail)` (`240ms`).
-- **Frontend Build (`npm --prefix frontend run build`):** `3545 modules transformed, ✓ built in 3.70s` (`exit_code=0`).
-- **CI Rust Baseline (Run `#43338081076` on `stage2.1/tauri-windows-ci` @ `732383e`):**
-  - `cargo check --locked --all-targets`: passed (`1m 58s`).
-  - `cargo test --locked`: passed (`1 passed; 0 failed` — `shell_constants_match_stage2_identity`).
-  - `tauri build --no-bundle`: passed (`jarvis-os.exe`, `12,956,160` B).
-  - `tauri build`: passed (`MSI` `6.84 MiB`, `NSIS` `5.89 MiB`).
+- **Python Post-3.1 Check (`venv\Scripts\python.exe -m pytest -q tests/test_worker_stdio_rpc.py tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py`):** `26 passed, 1 skipped, 2 subtests passed in 9.33s` (`tests/test_worker_stdio_rpc.py`: `2 passed in 0.41s`; bare system Python CI suite including `tests/test_transport_gateway.py`: `30 passed, 1 skipped, 2 subtests passed in 9.52s`).
+- **Frontend Transport (`npm --prefix frontend test`):** `14/14 passed (4 suites, 0 fail)` (`243.85ms`).
+- **Frontend Build (`npm --prefix frontend run build`):** `3545 modules transformed, ✓ built in 3.72s` (`exit_code=0`).
+- **CI Rust Phase 2 Complete (Run `#43346899364` on `migration/tauri-rust-complete` @ `c195ce4`, `conclusion=success`):**
+  - `cargo check --locked --all-targets`: `exit_code=0`, 0 errors, 0 warnings (`2m 03s`).
+  - `cargo test --locked`: `9 passed; 0 failed` (`atomic_fs` 3, `path_jail`/`system` 4, `loopback` 1, `preview_server` 1; `0.07s`).
+  - `tauri build --no-bundle`: `exit_code=0`, `jarvis-os.exe` (`15,231,488` B, `3m 39s`).
+  - CI Python contract tests: `27 passed, 2 skipped, 2 subtests passed in 10.23s`; Frontend test: `14 pass`; Frontend build: `5.80s`.
 
 ---
 
@@ -107,7 +109,7 @@
 
 ## 5. Next Executable Task
 
-- **Validate Phase 2 Increment 2.3 on Windows CI (`migration/tauri-rust-complete`), verify full `cargo check`/`cargo test`/`tauri build --no-bundle` logs, fix any warnings/errors, mark Phase 2 Complete, and start Phase 3 — Increment 3.1 (Rust Worker Supervisor + NDJSON JSON-RPC 2.0 + Win32 Job Objects + `workers/worker_boot.py`).**
+- **Validate Phase 3 Increment 3.1 (Win32 Job Objects + Rust Worker Supervisor <-> Python `worker_boot.py` live stdio JSON-RPC integration tests) on Windows CI, and immediately implement Phase 3 Increment 3.2 (Rust SQLite Core `database.db` Single Writer + `user_version` migrations + Study Atomic Catalog Store).**
 
 ---
 
