@@ -1,6 +1,11 @@
 pub mod commands;
 pub mod error;
 pub mod permissions;
+pub mod process;
+pub mod protocol;
+pub mod storage;
+
+use tauri::Manager;
 
 pub const SHELL_NAME: &str = "tauri";
 pub const APP_DISPLAY_NAME: &str = "JARVIS OS";
@@ -10,10 +15,36 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        .setup(|app| {
+            let project_root = permissions::path_jail::resolve_project_root();
+            let workspace_dir = project_root.join("workspace");
+            let initial_preview_root = if workspace_dir.is_dir() {
+                Some(workspace_dir)
+            } else {
+                None
+            };
+
+            let (loopback, preview) = tauri::async_runtime::block_on(async move {
+                let loopback = protocol::loopback::LoopbackHandle::start(project_root)
+                    .await
+                    .map_err(|err| Box::new(err) as Box<dyn std::error::Error>)?;
+                let preview = process::preview_server::PreviewServerHandle::start(
+                    initial_preview_root,
+                )
+                .await
+                .map_err(|err| Box::new(err) as Box<dyn std::error::Error>)?;
+                Ok::<_, Box<dyn std::error::Error>>((loopback, preview))
+            })?;
+
+            app.manage(commands::media::RuntimeServices { loopback, preview });
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             commands::system::system_ping,
             commands::system::system_info,
             commands::system::system_open_path,
+            commands::media::get_loopback_config,
+            commands::media::get_media_ticket,
         ])
         .run(tauri::generate_context!())
         .expect("error while running JARVIS OS Tauri shell");

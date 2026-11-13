@@ -1431,7 +1431,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                         {ideDockTab === 'preview' && (
                           <div className="relative min-h-0 flex-1 bg-white">
                             {previewUrl && previewUrl !== 'about:blank' ? (
-                              <iframe key={previewKey} src={previewUrl} className="h-full w-full border-none" title="IDE Dock Preview" />
+                              <iframe key={previewKey} src={previewUrl} sandbox="allow-scripts allow-forms" className="h-full w-full border-none" title="IDE Dock Preview" />
                             ) : (
                               <div className="flex h-full flex-col items-center justify-center gap-2 bg-[#080c12] p-4 text-center text-slate-400">
                                 <Rocket className="h-7 w-7 text-sky-400/70" />
@@ -1523,7 +1523,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
                     <p className="max-w-sm text-xs text-gray-400">A compilar projeto e a aguardar escuta ativa na porta de rede...</p>
                   </div>
                 ) : previewUrl && previewUrl !== 'about:blank' ? (
-                  <iframe key={previewKey} src={previewUrl} className="h-full w-full border-none" title="Project Preview" />
+                  <iframe key={previewKey} src={previewUrl} sandbox="allow-scripts allow-forms" className="h-full w-full border-none" title="Project Preview" />
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center gap-3 bg-[#070a10] p-6 text-center text-gray-400">
                     <Rocket className="h-10 w-10 text-cyan-300/60" />

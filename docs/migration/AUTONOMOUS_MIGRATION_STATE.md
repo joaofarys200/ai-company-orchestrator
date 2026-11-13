@@ -1,10 +1,10 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-13T01:24:00Z`
-- **Current Phase:** `Phase 2 — Rust Core and Tauri IPC foundation (Increments 2.1 & 2.2 COMPLETE -> Advancing to 2.3 Loopback HTTP & Isolated Preview)`
-- **Current Increment:** `Increment 2.2 Complete -> Starting 2.3 (Rust Loopback HTTP 127.0.0.1:0, 60s ?ticket= media streaming, Host/Origin guards, Isolated IDE Preview Server, Atomic FS)`
+- **Last Updated (UTC):** `2026-11-13T01:33:00Z`
+- **Current Phase:** `Phase 2 — Rust Core and Tauri IPC foundation (Increments 2.1, 2.2 COMPLETE; 2.3 Implemented — Validating on Windows CI)`
+- **Current Increment:** `Increment 2.3 Implemented -> Pushing migration/tauri-rust-complete for Windows CI Validation before Phase 3`
 - **Current Branch:** `migration/tauri-rust-complete`
-- **Current Commit:** `(updating with Increment 2.2 commit; previous: 868f9fc)` (base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
+- **Current Commit:** `148bef0` + Increment 2.3 changes (base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
 
 ---
 
@@ -30,13 +30,20 @@
   - Converted `ChatPanel.tsx` TTS audio playback to `blob:` URLs (`URL.createObjectURL` + cleanup) and deferred `URL.revokeObjectURL` in `StudyGeneratedDocumentView.tsx`.
   - Installed `@tauri-apps/plugin-dialog` & `@tauri-apps/plugin-opener`; locked Rust dependencies (`tauri-plugin-dialog`, `tauri-plugin-opener`, `dunce`) in `src-tauri/Cargo.lock`.
   - Implemented `src-tauri/src/{error,lib}.rs`, `permissions/path_jail.rs`, `commands/system.rs` (`system_ping`, `system_info`, `system_open_path`), WebView2 `--autoplay-policy=no-user-gesture-required`, strict CSP, and least-privilege `main-window.json` / `preview-sandbox.json` capabilities.
-- **2.2 Frontend `TauriTransportAdapter` + Platform Detection + Transport Unification (COMPLETE — verified `14/14` unit specs + `tsc -b && vite build`):**
+- **2.2 Frontend `TauriTransportAdapter` + Platform Detection + Transport Unification (COMPLETE — `148bef0`):**
   - Added `isTauriRuntime()`, `isVirtualDesktopOrigin()`, and hardened `resolveDefaultHttpBaseUrl()` in `JarvisTransport.ts` so `http://tauri.localhost` / `tauri://` never resolve as API hosts.
   - Extracted shared `TransportCorrelationRegistry` (`TransportCorrelation.ts`) used by both `WebSocketTransportAdapter` and `TauriTransportAdapter`.
   - Implemented `TauriTransportAdapter.ts` supporting pure `tauri-ipc` and Phase 2 `tauri-hybrid` coexistence, native `selectFolder` / `selectFile`, `openPath`, WebView2 `onDragDropEvent` path mapping, `get_loopback_config` & `get_media_ticket` caching (`resolveMediaUrlAsync` / `getMediaCandidateUrlsAsync`), and `createDefaultTransport()`.
   - Updated `StudyContainer.tsx`, `StudyLibraryView.tsx`, `StudyReaderView.tsx`, and `StudyVideoReaderView.tsx` (extracted shared `uploadHelpers.ts`) for native Tauri dialogs, native file drop paths, and ticketed media URLs.
   - Decoupled `main.tsx` and all 12 UI components from `useWebSocket` onto `AppSessionContext` (`useAppSession` / `AppSessionProvider`).
   - Added `frontend/src/transport/__tests__/tauriTransport.test.ts` (`14/14` passing).
+- **2.3 Rust Loopback HTTP (`127.0.0.1:0`), Isolated IDE Preview & Atomic FS (IMPLEMENTED LOCALLY — Validating on Windows CI):**
+  - Added `tokio`, `tokio-util`, `axum`, `http`, `bytes`, `http-range-header`, `hmac`, `sha2`, `hex`, `rand`, `tempfile`, `url` to `src-tauri/Cargo.toml` and locked via `cargo fetch`.
+  - Added `ensure_confined_existing_file`, `is_blocked_system_path`, and `is_safe_identifier` helpers to `src-tauri/src/permissions/path_jail.rs`.
+  - Implemented `src-tauri/src/storage/atomic_fs.rs` (`atomic_write_bytes`, `atomic_write_string`, `read_bounded_bytes` + unit tests).
+  - Implemented `src-tauri/src/protocol/{http_common,loopback}.rs` (ephemeral `127.0.0.1:0` Axum server, `OsRng` 64-hex Bearer token, constant-time HMAC comparison, 60s `doc_id`-scoped `?ticket=`, `Host`/`Origin`/`Sec-Fetch-Site` DNS-rebinding guards, `ReaderStream` HTTP `206 Partial Content`/`416`/`HEAD`, strict MIME + `X-Content-Type-Options: nosniff` + TCP wire integration tests).
+  - Implemented `src-tauri/src/process/preview_server.rs` (isolated ephemeral `127.0.0.1:0` preview server with `Host` guard + symlink/traversal confinement + `X-Content-Type-Options: nosniff` + `Cache-Control: no-store` + TCP integration tests).
+  - Exposed Tauri commands `get_loopback_config` and `get_media_ticket` via managed `RuntimeServices` in `src-tauri/src/commands/media.rs` + `src-tauri/src/lib.rs`, added `http://127.0.0.1:*` to `connect-src`/`worker-src` in `tauri.conf.json`, and added `sandbox="allow-scripts allow-forms"` to `WorkspaceViewer.tsx` preview `<iframe>` elements.
 
 ---
 
@@ -72,8 +79,9 @@
 
 - **Python Stage 1 / Contract Baseline (`venv\Scripts\python.exe -m pytest -q tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_protocol_contracts.py tests/test_model_service_compliance.py tests/test_model_transport_architecture.py tests/test_websocket_dispatcher_contract.py tests/test_server_websocket_characterization.py tests/test_transport_gateway.py tests/test_documentation_integrity.py`):**
   - **Result:** `58 passed, 1 skipped, 2 warnings, 281 subtests passed in 32.89s` (`exit_code=0`).
-- **Frontend Transport (`npm --prefix frontend test`):** `14/14 passed (4 suites, 0 fail)` covering `WebSocketTransportAdapter`, `TauriTransportAdapter`, native dialogs/drag-drop, `tauri.localhost` origin safety, and media tickets.
-- **Frontend Build (`npm --prefix frontend run build`):** `3545 modules transformed, ✓ built in 3.76s` (`exit_code=0`).
+- **Python Post-2.3 Check (`venv\Scripts\python.exe -m pytest -q tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py tests/test_transport_gateway.py tests/test_websocket_dispatcher_contract.py`):** `37 passed, 1 skipped, 276 subtests passed in 9.84s` (bare Python lightweight subset: `28 passed, 1 skipped in 9.33s`).
+- **Frontend Transport (`npm --prefix frontend test`):** `14/14 passed (4 suites, 0 fail)` (`240ms`).
+- **Frontend Build (`npm --prefix frontend run build`):** `3545 modules transformed, ✓ built in 3.70s` (`exit_code=0`).
 - **CI Rust Baseline (Run `#43338081076` on `stage2.1/tauri-windows-ci` @ `732383e`):**
   - `cargo check --locked --all-targets`: passed (`1m 58s`).
   - `cargo test --locked`: passed (`1 passed; 0 failed` — `shell_constants_match_stage2_identity`).
@@ -99,10 +107,7 @@
 
 ## 5. Next Executable Task
 
-- **Execute Phase 2 — Increment 2.3:**
-  1. Add `tokio`, `axum`, `http-range-header`, `sha2`, `hmac`, `hex`, `rand`, `url`, `tempfile`, `mime_guess` to `src-tauri/Cargo.toml` and lock via `cargo fetch`.
-  2. Implement `src-tauri/src/storage/atomic_fs.rs`, `src-tauri/src/protocol/loopback.rs` (`127.0.0.1:0`, Bearer + 60s `?ticket=`, `Host`/`Origin` DNS-rebinding guards, Range `206`, strict MIME), `src-tauri/src/process/preview_server.rs` (`X-Content-Type-Options: nosniff`), and Tauri commands `get_loopback_config` + `get_media_ticket`.
-  3. Add Rust integration tests + tighten preview CSP/iframe sandboxing, push `migration/tauri-rust-complete` to `origin`, verify full Windows CI green logs, and mark Phase 2 complete.
+- **Validate Phase 2 Increment 2.3 on Windows CI (`migration/tauri-rust-complete`), verify full `cargo check`/`cargo test`/`tauri build --no-bundle` logs, fix any warnings/errors, mark Phase 2 Complete, and start Phase 3 — Increment 3.1 (Rust Worker Supervisor + NDJSON JSON-RPC 2.0 + Win32 Job Objects + `workers/worker_boot.py`).**
 
 ---
 

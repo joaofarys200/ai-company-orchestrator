@@ -269,3 +269,114 @@ pub fn validate_open_target(
     ))
 }
 
+/// Validates a path identifier (`doc_id`, `frame_id`, etc.) against traversal, separators, and reserved names.
+pub fn is_safe_identifier(value: &str) -> bool {
+    if value.is_empty() || value.len() > 128 || value == "." || value == ".." || value.contains("..") {
+        return false;
+    }
+    if !value
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.'))
+    {
+        return false;
+    }
+    !has_win32_reserved_name(Path::new(value))
+}
+
+/// Returns true if a canonical path points inside OS-protected system directories.
+pub fn is_blocked_system_path(canon: &Path) -> bool {
+    let lower = canon.to_string_lossy().replace('\\', "/").to_ascii_lowercase();
+    #[cfg(windows)]
+    {
+        for prefix in [
+            "c:/windows",
+            "c:/program files",
+            "c:/program files (x86)",
+            "c:/programdata",
+        ] {
+            if lower == prefix || lower.starts_with(&format!("{prefix}/")) {
+                return true;
+            }
+        }
+    }
+    #[cfg(not(windows))]
+    {
+        for prefix in ["/etc", "/bin", "/sbin", "/usr", "/proc", "/sys", "/dev"] {
+            if lower == prefix || lower.starts_with(&format!("{prefix}/")) {
+                return true;
+            }
+        }
+    }
+    let _ = lower;
+    false
+}
+
+/// Resolves an existing regular file strictly confined inside `root`, rejecting any symlink along the relative path.
+pub fn ensure_confined_existing_file(root: &Path, target: &Path) -> Result<PathBuf, AppError> {
+    let canon_root = dunce::canonicalize(root).map_err(|err| {
+        AppError::new(
+            "ROOT_UNAVAILABLE",
+            format!("Allowed root could not be canonicalized: {err}"),
+        )
+    })?;
+    let canon_target = resolve_confined_path(&canon_root, target)?;
+
+    // Reject symlinks on the target or any intermediate directory below canon_root.
+    let rel = canon_target.strip_prefix(&canon_root).map_err(|_| {
+        AppError::new(
+            "PATH_JAIL_VIOLATION",
+            "Target path resolves outside allowed root.",
+        )
+    })?;
+
+    let raw_rel_opt = if target.is_absolute() {
+        target
+            .strip_prefix(&canon_root)
+            .ok()
+            .or_else(|| target.strip_prefix(root).ok())
+    } else {
+        Some(target)
+    };
+
+    if let Some(raw_rel) = raw_rel_opt {
+        let mut raw_cursor = canon_root.clone();
+        for comp in raw_rel.components() {
+            if let Component::Normal(seg) = comp {
+                raw_cursor.push(seg);
+                let meta = fs::symlink_metadata(&raw_cursor)
+                    .map_err(|_| AppError::new("NOT_FOUND", "Target path does not exist."))?;
+                if meta.file_type().is_symlink() {
+                    return Err(AppError::new(
+                        "SYMLINK_BLOCKED",
+                        "Symbolic links are not permitted.",
+                    ));
+                }
+            }
+        }
+    }
+
+    let mut cursor = canon_root;
+    for comp in rel.components() {
+        cursor.push(comp);
+        let meta = fs::symlink_metadata(&cursor)
+            .map_err(|_| AppError::new("NOT_FOUND", "Target path does not exist."))?;
+        if meta.file_type().is_symlink() {
+            return Err(AppError::new(
+                "SYMLINK_BLOCKED",
+                "Symbolic links are not permitted.",
+            ));
+        }
+    }
+
+    let meta = fs::symlink_metadata(&canon_target)
+        .map_err(|_| AppError::new("NOT_FOUND", "Target file does not exist."))?;
+    if meta.file_type().is_symlink() || !meta.is_file() {
+        return Err(AppError::new(
+            "NOT_A_REGULAR_FILE",
+            "Target must be a regular non-symlink file.",
+        ));
+    }
+
+    Ok(canon_target)
+}
+
