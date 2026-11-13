@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useWebSocket } from '../../context/WebSocketContext';
+import { useAppSession } from '../../context/AppSessionContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Globe, MessageSquare, Mic, MicOff, BookOpen, Code2, Database, Shield } from 'lucide-react';
 
@@ -22,7 +22,7 @@ export const HologramCore: React.FC<HologramCoreProps> = ({
     activeBoard,
     openSpatialBoard,
     closeSpatialBoard,
-  } = useWebSocket();
+  } = useAppSession();
 
   const [timeStr, setTimeStr] = useState('00:00:00');
   const [dateStr, setDateStr] = useState('STANDBY // READY');

@@ -55,6 +55,11 @@ import type {
   StudyUiContextPayload,
 } from '../../protocol/websocket';
 import { useTransportSystem } from '../../transport';
+import {
+  basenameFromPath,
+  inferContainerSourceType,
+  readBrowserFileAsBase64,
+} from './uploadHelpers';
 
 export type StudyTab =
   | 'overview'
@@ -594,15 +599,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
       if (!onUploadDocument || !fileList?.length) return;
       for (const file of Array.from(fileList)) {
         const nativePath = transportSystem.getPathForFile(file);
-        const ext = file.name.split('.').pop()?.toLowerCase() || '';
-        const inferredType =
-          ext === 'mp4' || ext === 'mkv' || ext === 'mov' || ext === 'webm' || ext === 'avi'
-            ? 'VIDEO'
-            : ext === 'pdf'
-            ? 'PDF'
-            : ext === 'pptx' || ext === 'ppt'
-            ? 'SLIDES'
-            : 'TEXT';
+        const inferredType = inferContainerSourceType(file.name);
         setIsUploading(true);
         setUploadStatus(`A processar ${file.name}...`);
         if (nativePath) {
@@ -613,16 +610,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
             source_type: inferredType,
           });
         } else {
-          const base64 = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-              const raw = String(reader.result || '');
-              const idx = raw.indexOf(',');
-              resolve(idx >= 0 ? raw.slice(idx + 1) : raw);
-            };
-            reader.onerror = () => reject(new Error(`Falha ao ler ${file.name}`));
-            reader.readAsDataURL(file);
-          });
+          const base64 = await readBrowserFileAsBase64(file);
           await onUploadDocument({
             filename: file.name,
             content_base64: base64,
@@ -635,6 +623,29 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
     },
     [onUploadDocument, transportSystem]
   );
+
+  // Tauri native OS file-drop handler when viewing the Study Overview dropzone
+  useEffect(() => {
+    if (activeTab !== 'overview' || !onUploadDocument || !transportSystem.onFileDrop) {
+      return;
+    }
+    return transportSystem.onFileDrop((paths) => {
+      void (async () => {
+        for (const filePath of paths) {
+          const filename = basenameFromPath(filePath);
+          setIsUploading(true);
+          setUploadStatus(`A processar ${filename}...`);
+          await onUploadDocument({
+            filename,
+            file_path: filePath,
+            subject: 'Estudos',
+            source_type: inferContainerSourceType(filename),
+          });
+        }
+        setActiveTab('library');
+      })();
+    });
+  }, [activeTab, onUploadDocument, transportSystem]);
 
   // Handler: Stabilized document file fetcher
   const handleGetDocumentFile = useCallback(() => {

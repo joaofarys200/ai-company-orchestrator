@@ -1,10 +1,10 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-13T01:07:00Z`
-- **Current Phase:** `Phase 1 — Architecture audit and migration planning (COMPLETE) -> Advancing immediately to Phase 2 — Rust Core and Tauri IPC foundation`
-- **Current Increment:** `Phase 1 Checkpoint -> Starting Phase 2.1 (CSP fixes, Tauri capabilities/plugins, WebView2 shell hardening, system IPC commands)`
+- **Last Updated (UTC):** `2026-11-13T01:24:00Z`
+- **Current Phase:** `Phase 2 — Rust Core and Tauri IPC foundation (Increments 2.1 & 2.2 COMPLETE -> Advancing to 2.3 Loopback HTTP & Isolated Preview)`
+- **Current Increment:** `Increment 2.2 Complete -> Starting 2.3 (Rust Loopback HTTP 127.0.0.1:0, 60s ?ticket= media streaming, Host/Origin guards, Isolated IDE Preview Server, Atomic FS)`
 - **Current Branch:** `migration/tauri-rust-complete`
-- **Current Commit:** `e6ad1922e1926eeb0b77d98367d19fe4fb1112b2` (parent: `d5a43e2`; base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
+- **Current Commit:** `(updating with Increment 2.2 commit; previous: 868f9fc)` (base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
 
 ---
 
@@ -23,24 +23,28 @@
   - Remote Windows CI proof (`stage2.1/tauri-windows-ci` run `#43338081076`): `frontend build`, `cargo check`, `cargo test` (`1 passed`), `tauri build --no-bundle` (`jarvis-os.exe`), and unsigned MSI/NSIS bundles all succeeded on `windows-latest` (WebView2 `156.0.4314.58`, `rustc 1.100.0`).
 - **4-Domain Deep Audit Executed:** Mapped every Electron IPC call (`main.js`, `preload.js`), frontend `fetch`/media/iframe/worker surface, Python WS/HTTP/SQLite/dependency inventory (confirming no FastAPI/Uvicorn at runtime; `websockets==16.0` on `:8001` + stdlib HTTP `:8000` + `sandbox.py`), and static WebView2/CSP incompatibilities.
 
+### Phase 2 — Rust Core and Tauri IPC Foundation (IN PROGRESS)
+- **2.1 CSP, Polyfills, Plugins, Capabilities & Shell Commands (COMPLETE — `868f9fc`):**
+  - Created `frontend/src/polyfills.ts`; removed inline `<script>` from `frontend/index.html`, removed duplicate hoisted polyfills from `main.tsx` and `StudyReaderView.tsx`; externalized `frontend/public/direct_pdf_test.{css,js}`.
+  - Configured `frontend/vite.config.ts` (`127.0.0.1:5173`, `strictPort: true`, `clearScreen: false`).
+  - Converted `ChatPanel.tsx` TTS audio playback to `blob:` URLs (`URL.createObjectURL` + cleanup) and deferred `URL.revokeObjectURL` in `StudyGeneratedDocumentView.tsx`.
+  - Installed `@tauri-apps/plugin-dialog` & `@tauri-apps/plugin-opener`; locked Rust dependencies (`tauri-plugin-dialog`, `tauri-plugin-opener`, `dunce`) in `src-tauri/Cargo.lock`.
+  - Implemented `src-tauri/src/{error,lib}.rs`, `permissions/path_jail.rs`, `commands/system.rs` (`system_ping`, `system_info`, `system_open_path`), WebView2 `--autoplay-policy=no-user-gesture-required`, strict CSP, and least-privilege `main-window.json` / `preview-sandbox.json` capabilities.
+- **2.2 Frontend `TauriTransportAdapter` + Platform Detection + Transport Unification (COMPLETE — verified `14/14` unit specs + `tsc -b && vite build`):**
+  - Added `isTauriRuntime()`, `isVirtualDesktopOrigin()`, and hardened `resolveDefaultHttpBaseUrl()` in `JarvisTransport.ts` so `http://tauri.localhost` / `tauri://` never resolve as API hosts.
+  - Extracted shared `TransportCorrelationRegistry` (`TransportCorrelation.ts`) used by both `WebSocketTransportAdapter` and `TauriTransportAdapter`.
+  - Implemented `TauriTransportAdapter.ts` supporting pure `tauri-ipc` and Phase 2 `tauri-hybrid` coexistence, native `selectFolder` / `selectFile`, `openPath`, WebView2 `onDragDropEvent` path mapping, `get_loopback_config` & `get_media_ticket` caching (`resolveMediaUrlAsync` / `getMediaCandidateUrlsAsync`), and `createDefaultTransport()`.
+  - Updated `StudyContainer.tsx`, `StudyLibraryView.tsx`, `StudyReaderView.tsx`, and `StudyVideoReaderView.tsx` (extracted shared `uploadHelpers.ts`) for native Tauri dialogs, native file drop paths, and ticketed media URLs.
+  - Decoupled `main.tsx` and all 12 UI components from `useWebSocket` onto `AppSessionContext` (`useAppSession` / `AppSessionProvider`).
+  - Added `frontend/src/transport/__tests__/tauriTransport.test.ts` (`14/14` passing).
+
 ---
 
-## 2. Remaining Work (Phases 2–5)
+## 2. Remaining Work (Phases 2.3–5)
 
-### Phase 2 — Rust Core and Tauri IPC Foundation
-- **2.1 CSP, Polyfills, Plugins, Capabilities & Shell Commands:**
-  - Externalize inline `<script>` polyfill in `frontend/index.html` and fix ESM import hoisting in `main.tsx` / `StudyReaderView.tsx`; clean inline `<script>`/`<style>` in `frontend/public/direct_pdf_test.html`.
-  - Configure `frontend/vite.config.ts` (`port: 5173`, `strictPort: true`, `clearScreen: false`).
-  - Add `tauri-plugin-dialog` + `tauri-plugin-opener` + `capabilities/preview-sandbox.json` + scoped `main-window.json` (`core:default`, `dialog:allow-open`, `opener:deny-default`, custom command permissions).
-  - Add WebView2 autoplay policy switch & Rust commands `system_ping`, `system_info`, `system_open_path` (with `path_jail` & scheme allowlist) + unit tests.
-  - Tighten `tauri.conf.json` (`127.0.0.1:5173`, CSP `blob:` in `frame-src` only where needed, fix `ChatPanel.tsx` audio `data:` -> `blob:` URL).
-- **2.2 Frontend `TauriTransportAdapter` + Component Unification:**
-  - Implement `frontend/src/transport/TauriTransportAdapter.ts` (`invoke`, `listen`, `Channel<T>`, native dialog, drag-drop paths, `openPath`, loopback URL + `?ticket=`).
-  - Update `TransportProvider.tsx` & `JarvisTransport.ts` (`resolveDefaultHttpBaseUrl()` safe under `http://tauri.localhost`).
-  - Migrate the remaining 12 components + `main.tsx` off direct `useWebSocket` coupling to unified `useTransport()`.
-  - Add `npm test` script in `frontend/package.json` and expand `transport.test.ts` to cover `TauriTransportAdapter`.
+### Phase 2 — Rust Core and Tauri IPC Foundation (Remaining)
 - **2.3 Rust Internal Loopback HTTP (`127.0.0.1:0`) & Isolated IDE Preview Server:**
-  - Implement `permissions/path_jail.rs`, `storage/atomic_fs.rs`, `protocol/loopback.rs` (`axum` + `http-range-header`, Bearer + 60s `?ticket=`, `Host` DNS-rebinding guard, `Origin` check, Range `206`, strict MIME), `process/preview_server.rs` (`X-Content-Type-Options: nosniff`, sandboxed iframe), and `get_media_ticket` / `get_loopback_config` commands + full integration tests.
+  - Implement `storage/atomic_fs.rs`, `protocol/loopback.rs` (`axum` + `http-range-header`, Bearer + 60s `?ticket=`, `Host` DNS-rebinding guard, `Origin` check, Range `206`, strict MIME), `process/preview_server.rs` (`X-Content-Type-Options: nosniff`, sandboxed iframe), and `get_media_ticket` / `get_loopback_config` commands + full integration tests; push branch and validate cleanly on GitHub Actions `windows-latest`.
 
 ### Phase 3 — Functional Migration from Python to Rust
 - **3.1 Rust Worker Supervisor + NDJSON JSON-RPC 2.0 + Win32 Job Objects + `workers/worker_boot.py`:**
@@ -68,10 +72,8 @@
 
 - **Python Stage 1 / Contract Baseline (`venv\Scripts\python.exe -m pytest -q tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_protocol_contracts.py tests/test_model_service_compliance.py tests/test_model_transport_architecture.py tests/test_websocket_dispatcher_contract.py tests/test_server_websocket_characterization.py tests/test_transport_gateway.py tests/test_documentation_integrity.py`):**
   - **Result:** `58 passed, 1 skipped, 2 warnings, 281 subtests passed in 32.89s` (`exit_code=0`).
-- **Frontend Transport (`npx tsc -p frontend/tsconfig.test.json --noEmit` + `node --experimental-strip-types --test src/transport/__tests__/transport.test.ts`):**
-  - **Result:** `9/9 passed (1 suite, 0 fail, 164.1ms)` (`exit_code=0`).
-- **Frontend Build (`npm --prefix frontend run build`):**
-  - **Result:** `3531 modules transformed, ✓ built in 3.63s` (local) / `7.01s` (CI) (`exit_code=0`).
+- **Frontend Transport (`npm --prefix frontend test`):** `14/14 passed (4 suites, 0 fail)` covering `WebSocketTransportAdapter`, `TauriTransportAdapter`, native dialogs/drag-drop, `tauri.localhost` origin safety, and media tickets.
+- **Frontend Build (`npm --prefix frontend run build`):** `3545 modules transformed, ✓ built in 3.76s` (`exit_code=0`).
 - **CI Rust Baseline (Run `#43338081076` on `stage2.1/tauri-windows-ci` @ `732383e`):**
   - `cargo check --locked --all-targets`: passed (`1m 58s`).
   - `cargo test --locked`: passed (`1 passed; 0 failed` — `shell_constants_match_stage2_identity`).
@@ -85,11 +87,11 @@
 - **Local OS Code Integrity Blocker:** Windows **Smart App Control** (`SmartAppControlState: On`, `os error 4551`) blocks local execution of unsigned Rust build scripts/binaries (`cargo check`, `cargo test`, `tauri:dev`). Mitigation: never weaken/bypass local OS security; execute Rust compilation, `cargo test`, `tauri build`, and headless WebView2 CDP E2E tests in GitHub Actions `windows-latest`. Any final **manual interactive visual desktop test** on the user's PC requires an environment without Smart App Control blocking unsigned local binaries or signed artifacts (kept non-blocking for `main` because `main` stays untouched at `af11ae9`).
 - **Static Frontend/CSP Gaps Found in Phase 1 Audit:**
   1. `frontend/index.html` L7–111 inline `<script>` & `direct_pdf_test.html` inline `<script>`/`<style>` blocked by `script-src 'self' 'wasm-unsafe-eval'`; `main.tsx` / `StudyReaderView.tsx` polyfills evaluated after static ESM imports due to JS module hoisting.
-  2. `StudyGeneratedDocumentView.tsx` uses `<iframe src="blob:...">` (blocked unless `blob:` is in `frame-src` or served cleanly) and synchronous `URL.revokeObjectURL` right after `.click()`.
-  3. `ChatPanel.tsx` plays `new Audio('data:audio/mp3;base64,...')` (`media-src` lacks `data:` -> convert cleanly to `blob:` URL, already permitted by `media-src 'self' blob:`) and needs WebView2 autoplay policy switch.
-  4. `resolveDefaultHttpBaseUrl()` in `JarvisTransport.ts` returns `http://tauri.localhost` in Tauri builds, breaking `/api/study/...` requests until wired to Rust Loopback HTTP (`127.0.0.1:0`) + `?ticket=`.
-  5. Remaining 12 UI files still import `useWebSocket` rather than `useTransport`.
-  6. `backend/websocket/handlers/missions.py` retains 33 unimplemented stub keys and 14 unregistered legacy branches.
+  2. Fixed in 2.1: `StudyGeneratedDocumentView.tsx` uses `<iframe src="blob:...">` (allowed in `frame-src` + deferred `URL.revokeObjectURL`).
+  3. Fixed in 2.1: `ChatPanel.tsx` plays TTS audio via `blob:` URLs + `--autoplay-policy=no-user-gesture-required`.
+  4. Fixed in 2.2: `resolveDefaultHttpBaseUrl()` blocks `tauri.localhost`/`tauri://`; `TauriTransportAdapter` resolves `get_loopback_config` & `get_media_ticket` once 2.3 backend activates.
+  5. Fixed in 2.2: All 12 UI components + `main.tsx` migrated onto transport-agnostic `AppSessionContext`.
+  6. Remaining for Phase 3.4: `backend/websocket/handlers/missions.py` retains 33 unimplemented stub keys and 14 unregistered legacy branches.
 - **Architectural Decisions Locked:** Preserve Q1–Q12 (`database.db` Rust single-writer in Phase 3, `state.db` permanent Python, `data/rho.db` permanent Python `ModelHarness` after safe migration tooling, `ModelExecutionService` & Python workers for PyMuPDF/OCR/FFmpeg/Whisper/ChromaDB/CrewAI/GeminiLive/Ollama, NDJSON JSON-RPC 2.0 + `os.dup(1)` + Win32 Job Objects, Rust Loopback HTTP `127.0.0.1:0` with Bearer + 60s `?ticket=`).
 - **Git & Data Safety Rule:** User's local `data/` and `database.db*` remain untracked/unstaged and are NEVER committed, reset, or modified by migration tooling during automated runs (DB tests operate strictly on disposable copies / temp roots).
 
@@ -97,10 +99,10 @@
 
 ## 5. Next Executable Task
 
-- **Begin Phase 2 — Increment 2.1:**
-  1. Update `.github/workflows/tauri-windows-validation.yml` to run on `migration/**`, add `Swatinem/rust-cache@v2`, add frontend `node --test` and Python contract `pytest` jobs so CI validates Rust + Python + Frontend on every push cleanly.
-  2. Fix `frontend/index.html`, `frontend/src/polyfills.ts`, `frontend/src/main.tsx`, `frontend/src/features/study/StudyReaderView.tsx`, `frontend/public/direct_pdf_test.html`, `frontend/vite.config.ts`, `frontend/src/features/chat/ChatPanel.tsx` (`blob:` TTS URL), and `frontend/src/features/study/StudyGeneratedDocumentView.tsx` (deferred `revokeObjectURL`) for strict Tauri CSP compliance.
-  3. Configure `src-tauri/` Phase 2.1 foundation (`Cargo.toml` plugins `dialog`/`opener`, `capabilities/main-window.json`, `capabilities/preview-sandbox.json`, `tauri.conf.json` tightened CSP + `127.0.0.1:5173`, `src-tauri/src/lib.rs` WebView2 autoplay arg + `system_ping`, `system_info`, `system_open_path` with `path_jail` + unit tests).
+- **Execute Phase 2 — Increment 2.3:**
+  1. Add `tokio`, `axum`, `http-range-header`, `sha2`, `hmac`, `hex`, `rand`, `url`, `tempfile`, `mime_guess` to `src-tauri/Cargo.toml` and lock via `cargo fetch`.
+  2. Implement `src-tauri/src/storage/atomic_fs.rs`, `src-tauri/src/protocol/loopback.rs` (`127.0.0.1:0`, Bearer + 60s `?ticket=`, `Host`/`Origin` DNS-rebinding guards, Range `206`, strict MIME), `src-tauri/src/process/preview_server.rs` (`X-Content-Type-Options: nosniff`), and Tauri commands `get_loopback_config` + `get_media_ticket`.
+  3. Add Rust integration tests + tighten preview CSP/iframe sandboxing, push `migration/tauri-rust-complete` to `origin`, verify full Windows CI green logs, and mark Phase 2 complete.
 
 ---
 
@@ -108,3 +110,4 @@
 
 - Local machine cannot execute unsigned compiled Rust binaries due to Windows Smart App Control (`os error 4551`); remote GitHub Actions (`windows-latest`) serves as the active Windows Rust/Tauri/WebView2 CI runner.
 - User approval will be requested only after Phase 5 completes cleanly before any merge into `main` (or if an interactive human Windows UI sign-off is required).
+

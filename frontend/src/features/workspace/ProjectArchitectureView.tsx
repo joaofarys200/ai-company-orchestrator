@@ -21,7 +21,7 @@ import {
   X,
   Zap,
 } from 'lucide-react';
-import { useWebSocket } from '../../context/WebSocketContext';
+import { useAppSession } from '../../context/AppSessionContext';
 import { CodeIntelligenceHud } from './CodeIntelligenceHud';
 import type { ArchitectureKeySymbol, ArchitectureEntrypoint } from '../../protocol/websocket';
 
@@ -43,7 +43,7 @@ export const ProjectArchitectureView: React.FC<ProjectArchitectureViewProps> = (
     architectureSnapshot,
     reindexProject,
     isIndexingProject,
-  } = useWebSocket();
+  } = useAppSession();
 
   const [symbolFilter, setSymbolFilter] = useState<'all' | 'functions' | 'classes'>('all');
   const [searchQuery, setSearchQuery] = useState('');

@@ -13,12 +13,12 @@ import {
   Info,
 } from 'lucide-react';
 import { usePermissionStore } from './PermissionStore';
-import { useWebSocket } from '../../context/WebSocketContext';
+import { useAppSession } from '../../context/AppSessionContext';
 import type { PermissionRiskLevel } from '../../protocol/websocket';
 
 export const PermissionApprovalModal: React.FC = () => {
   const { currentRequest, modalOpen, setModalOpen, markApproved, markDenied } = usePermissionStore();
-  const { approvePermissionRequest, denyPermissionRequest } = useWebSocket();
+  const { approvePermissionRequest, denyPermissionRequest } = useAppSession();
   const [submitting, setSubmitting] = useState(false);
   const [criteriaWarning, setCriteriaWarning] = useState<string | null>(null);
 

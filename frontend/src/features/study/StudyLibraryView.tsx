@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import {
   BookOpen,
   FileText,
@@ -37,6 +37,13 @@ import {
 } from 'lucide-react';
 import type { StudyDocument, SourceType, StudyCollection, StudyFolderLink } from './types';
 import { useTransportSystem } from '../../transport';
+import {
+  basenameFromPath,
+  getStudyDialogFilters,
+  inferLibrarySourceType,
+  readBrowserFileAsBase64,
+  titleFromFilename,
+} from './uploadHelpers';
 
 interface StudyLibraryViewProps {
   documents: StudyDocument[];
@@ -146,15 +153,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
     if (!files?.length) return;
     for (const file of Array.from(files)) {
       const nativePath = transportSystem.getPathForFile(file);
-      const ext = file.name.split('.').pop()?.toLowerCase() || '';
-      const inferredType: SourceType =
-        ext === 'mp4' || ext === 'mkv' || ext === 'mov' || ext === 'webm' || ext === 'avi'
-          ? 'VIDEO'
-          : ext === 'pdf'
-          ? 'PDF'
-          : ext === 'pptx' || ext === 'ppt'
-          ? 'PPTX'
-          : 'TXT';
+      const inferredType = inferLibrarySourceType(file.name);
       const subject = activeCollection?.subject || activeCollection?.name || 'Estudos';
       const colId = activeCollection?.collection_id;
       if (nativePath) {
@@ -166,16 +165,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
           collection_id: colId,
         });
       } else {
-        const base64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const raw = String(reader.result || '');
-            const idx = raw.indexOf(',');
-            resolve(idx >= 0 ? raw.slice(idx + 1) : raw);
-          };
-          reader.onerror = () => reject(new Error(`Falha ao ler ${file.name}`));
-          reader.readAsDataURL(file);
-        });
+        const base64 = await readBrowserFileAsBase64(file);
         onUpload({
           filename: file.name,
           content_base64: base64,
@@ -229,10 +219,42 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
   const [videoUrlInput, setVideoUrlInput] = useState<string>('');
   const [rawTextContent, setRawTextContent] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedNativePath, setSelectedNativePath] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Active collection object
   const activeCollection = collections.find((c) => c.collection_id === selectedCollectionId) || null;
+
+  useEffect(() => {
+    if (!transportSystem.onFileDrop) {
+      return;
+    }
+    return transportSystem.onFileDrop((paths) => {
+      if (paths.length === 0) return;
+      if (isUploadModalOpen) {
+        const firstPath = paths[0];
+        const filename = basenameFromPath(firstPath);
+        setSelectedFile(null);
+        setSelectedNativePath(firstPath);
+        if (!uploadTitle) {
+          setUploadTitle(titleFromFilename(filename));
+        }
+        return;
+      }
+      const subject = activeCollection?.subject || activeCollection?.name || 'Estudos';
+      const colId = activeCollection?.collection_id;
+      for (const filePath of paths) {
+        const filename = basenameFromPath(filePath);
+        onUpload({
+          filename,
+          file_path: filePath,
+          subject,
+          source_type: inferLibrarySourceType(filename),
+          collection_id: colId,
+        });
+      }
+    });
+  }, [activeCollection, isUploadModalOpen, onUpload, transportSystem, uploadTitle]);
 
   // Filtered and sorted documents by collection, facet, search query, and type
   const filteredDocs = useMemo(() => {
@@ -320,9 +342,10 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      setSelectedNativePath(null);
       setSelectedFile(file);
       if (!uploadTitle) {
-        setUploadTitle(file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '));
+        setUploadTitle(titleFromFilename(file.name));
       }
     }
   };
@@ -331,11 +354,36 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
+      setSelectedNativePath(null);
       setSelectedFile(file);
       if (!uploadTitle) {
-        setUploadTitle(file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '));
+        setUploadTitle(titleFromFilename(file.name));
       }
     }
+  };
+
+  const handleOpenUploadPicker = async () => {
+    if (transportSystem.isNativeDesktop() && transportSystem.selectFile) {
+      try {
+        const picked = await transportSystem.selectFile({
+          title: uploadMode === 'video' ? 'Selecionar vídeo ou áudio' : 'Selecionar material de estudo',
+          multiple: false,
+          filters: getStudyDialogFilters(uploadMode === 'video' ? 'video' : 'file'),
+        });
+        const chosen = Array.isArray(picked) ? picked[0] : picked;
+        if (typeof chosen === 'string' && chosen.length > 0) {
+          setSelectedFile(null);
+          setSelectedNativePath(chosen);
+          if (!uploadTitle) {
+            setUploadTitle(titleFromFilename(basenameFromPath(chosen)));
+          }
+          return;
+        }
+      } catch {
+        // Fallback cleanly to HTML file input if native dialog cancels/fails
+      }
+    }
+    fileInputRef.current?.click();
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -556,12 +604,26 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
       return;
     }
 
+    if (selectedNativePath) {
+      const filename = basenameFromPath(selectedNativePath);
+      onUpload({
+        filename,
+        file_path: selectedNativePath,
+        subject: finalSubject,
+        source_type: inferLibrarySourceType(filename, { undefinedForCommonDocs: true }),
+        title: uploadTitle || filename,
+        collection_id: finalCollectionId,
+      });
+      setIsUploadModalOpen(false);
+      setSelectedFile(null);
+      setSelectedNativePath(null);
+      setUploadTitle('');
+      return;
+    }
+
     if (!selectedFile) return;
 
-    const ext = selectedFile.name.split('.').pop()?.toLowerCase() || '';
-    const isVideo = ['mp4', 'webm', 'mkv', 'mov', 'avi', 'wmv', 'm4v'].includes(ext);
-    const isAudio = ['mp3', 'wav', 'm4a', 'ogg', 'flac', 'aac', 'wma'].includes(ext);
-    const detectedSourceType: SourceType | undefined = isVideo ? 'VIDEO' : isAudio ? 'AUDIO' : undefined;
+    const detectedSourceType = inferLibrarySourceType(selectedFile.name, { undefinedForCommonDocs: true });
 
     // Em ambiente desktop nativo, utilizar o caminho nativo diretamente
     const localFilePath = transportSystem.getPathForFile(selectedFile);
@@ -577,6 +639,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
       });
       setIsUploadModalOpen(false);
       setSelectedFile(null);
+      setSelectedNativePath(null);
       setUploadTitle('');
       return;
     }
@@ -1929,12 +1992,16 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
               <div
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => void handleOpenUploadPicker()}
                 className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/20 bg-white/[0.02] p-6 text-center hover:border-cyan-400/50 hover:bg-cyan-500/[0.02] transition cursor-pointer"
               >
                 <UploadCloud className="h-8 w-8 text-zinc-400 mb-2" />
                 <p className="text-xs font-medium text-zinc-200">
-                  {selectedFile ? selectedFile.name : 'Arrasta o documento ou áudio para aqui ou clica para procurar'}
+                  {selectedFile
+                    ? selectedFile.name
+                    : selectedNativePath
+                    ? basenameFromPath(selectedNativePath)
+                    : 'Arrasta o documento ou áudio para aqui ou clica para procurar'}
                 </p>
                 <p className="mt-1 text-[11px] text-zinc-500">
                   PDF, DOCX, PPTX, TXT, Markdown, PNG, JPG, MP3, WAV, M4A (máx. 100 MB)
@@ -1953,12 +2020,16 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
               <div
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => void handleOpenUploadPicker()}
                 className="flex flex-col items-center justify-center rounded-xl border border-dashed border-purple-400/30 bg-purple-500/[0.02] p-6 text-center hover:border-purple-400/60 transition cursor-pointer"
               >
                 <Video className="h-8 w-8 text-purple-400 mb-2" />
                 <p className="text-xs font-medium text-zinc-200">
-                  {selectedFile ? selectedFile.name : 'Arrasta o ficheiro de vídeo ou áudio para aqui ou clica para procurar'}
+                  {selectedFile
+                    ? selectedFile.name
+                    : selectedNativePath
+                    ? basenameFromPath(selectedNativePath)
+                    : 'Arrasta o ficheiro de vídeo ou áudio para aqui ou clica para procurar'}
                 </p>
                 <p className="mt-1 text-[11px] text-zinc-400">
                   Formatos suportados: .mp4, .webm, .mkv, .mov, .avi, .wmv, .mp3, .wav, .m4a
@@ -2023,7 +2094,7 @@ export const StudyLibraryView: React.FC<StudyLibraryViewProps> = ({
               <button
                 onClick={handleSubmitUpload}
                 data-testid="study-upload-submit-btn"
-                disabled={uploadMode === 'file' && !selectedFile && !uploadTitle}
+                disabled={(uploadMode === 'file' || uploadMode === 'video') && !selectedFile && !selectedNativePath && !uploadTitle}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/40 bg-cyan-500/20 px-4 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 <span>{uploadMode === 'lecture' ? 'Iniciar Gravação' : 'Processar Material'}</span>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useWebSocket } from './context/WebSocketContext';
+import { useAppSession } from './context/AppSessionContext';
 import { ChatPanel } from './features/chat';
 import { HologramCore, WorkspaceViewer } from './features/workspace';
 import { PermissionApprovalModal } from './features/permissions';
@@ -19,7 +19,7 @@ function App() {
     focusSpatialCard,
     studyNavigationTarget,
     setActiveDomain,
-  } = useWebSocket();
+  } = useAppSession();
 
   const [dismissedNavNonce, setDismissedNavNonce] = useState<number | null>(null);
   const fullWorkspaceNavActive = Boolean(

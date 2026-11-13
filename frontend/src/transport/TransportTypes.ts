@@ -32,7 +32,43 @@ export type TransportConnectionStatus =
   | 'DISCONNECTED'
   | 'OFFLINE';
 
-export type TransportBackendKind = 'websocket' | 'electron-ipc' | 'custom';
+export type TransportBackendKind =
+  | 'websocket'
+  | 'electron-ipc'
+  | 'tauri-ipc'
+  | 'tauri-hybrid'
+  | 'custom';
+
+export interface TauriSelectFileFilter {
+  name: string;
+  extensions: string[];
+}
+
+export interface TauriSelectFileOptions {
+  title?: string;
+  multiple?: boolean;
+  directory?: boolean;
+  defaultPath?: string;
+  filters?: TauriSelectFileFilter[];
+}
+
+export interface TauriPingResult {
+  ok: boolean;
+  runtime: string;
+  timestamp_ms?: number;
+}
+
+export interface TauriLoopbackConfig {
+  base_url: string;
+  token: string;
+  preview_base_url?: string;
+}
+
+export interface TauriMediaTicket {
+  ticket: string;
+  base_url?: string;
+  expires_at_ms?: number;
+}
 
 export interface TransportStatusSnapshot {
   status: TransportConnectionStatus;
@@ -141,11 +177,25 @@ export interface TransportSystemCapabilities {
   reconnect: () => void;
   disconnect: () => void;
   selectFolder: () => Promise<string | null>;
+  selectFile?: (options?: TauriSelectFileOptions) => Promise<string | string[] | null>;
   openPath: (targetPath: string) => Promise<{ ok: boolean; error?: string } | null>;
   getPathForFile: (file: File) => string;
   getHttpBaseUrl: () => string;
-  resolveMediaUrl: (pathOrUrl: string, options?: { appendToken?: boolean }) => string;
-  getMediaCandidateUrls: (relativePaths: string[], options?: { appendToken?: boolean }) => string[];
+  resolveMediaUrl: (pathOrUrl: string, options?: { appendToken?: boolean; ticket?: string }) => string;
+  getMediaCandidateUrls: (relativePaths: string[], options?: { appendToken?: boolean; ticket?: string }) => string[];
+  getMediaTicket?: (docId: string) => Promise<string | null>;
+  resolveMediaUrlAsync?: (
+    pathOrUrl: string,
+    options?: { appendToken?: boolean; docId?: string }
+  ) => Promise<string>;
+  getMediaCandidateUrlsAsync?: (
+    relativePaths: string[],
+    options?: { appendToken?: boolean; docId?: string }
+  ) => Promise<string[]>;
+  onFileDrop?: (handler: (paths: string[]) => void) => () => void;
+  getLastDroppedPaths?: () => string[];
+  pingNative?: () => Promise<TauriPingResult | null>;
+  getPreviewBaseUrl?: () => string | null;
 }
 
 export interface WebSocketCloseEventLike {

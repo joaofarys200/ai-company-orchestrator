@@ -43,7 +43,7 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { useWebSocket } from '../../context/WebSocketContext';
+import { useAppSession } from '../../context/AppSessionContext';
 import { MissionPlanner } from '../planner';
 import { MissionControlCenter, MissionListView } from '../missions';
 import { StudyContainer, type StudyTab } from '../study';
@@ -254,7 +254,7 @@ export const WorkspaceViewer: React.FC<WorkspaceViewerProps> = ({ onClose }) => 
     sentinelActions,
     isSentinelAuditing,
     runSentinelAudit,
-  } = useWebSocket();
+  } = useAppSession();
 
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     if (activeBoard?.domain === 'study') return 'study';

@@ -104,10 +104,25 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [autoScrollTranscript, setAutoScrollTranscript] = useState<boolean>(true);
   const [videoStreamError, setVideoStreamError] = useState<boolean>(false);
+  const [mediaTicket, setMediaTicket] = useState<string | null>(null);
 
   useEffect(() => {
     setVideoStreamError(false);
-  }, [document.document_id]);
+    setMediaTicket(null);
+    const getTicket = transport.system.getMediaTicket;
+    if (!getTicket) {
+      return;
+    }
+    let cancelled = false;
+    void getTicket(document.document_id).then((ticket) => {
+      if (!cancelled && ticket) {
+        setMediaTicket(ticket);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [document.document_id, transport.system]);
 
   // Video Data from metadata
   const videoMeta = (document.metadata as any)?.video || {};
@@ -548,7 +563,7 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
 
   const videoStreamUrl = transport.system.resolveMediaUrl(
     `/api/study/document/${encodeURIComponent(document.document_id)}/video`,
-    { appendToken: true }
+    { appendToken: !mediaTicket, ticket: mediaTicket ?? undefined }
   );
   const asrUnavailableReason =
     videoMeta?.asr_unavailable_reason || (document.metadata as any)?.asr_unavailable_reason || '';
@@ -1260,7 +1275,7 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
                           <img
                             src={transport.system.resolveMediaUrl(
                               `/api/study/document/${encodeURIComponent(document.document_id)}/media/${encodeURIComponent(kf.frame_id)}`,
-                              { appendToken: true }
+                              { appendToken: !mediaTicket, ticket: mediaTicket ?? undefined }
                             )}
                             alt={kf.frame_id}
                             className="h-full w-full object-contain"

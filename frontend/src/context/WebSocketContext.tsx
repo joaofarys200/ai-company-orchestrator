@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { missionRuntimeStore } from '../features/missions/stores/missionRuntimeStore';
 import { usePermissionStore } from '../features/permissions/PermissionStore';
 import {
+  createDefaultTransport,
   useOptionalTransport,
-  WebSocketTransportAdapter,
   type JarvisTransport,
   type ResponseDecision,
 } from '../transport';
@@ -544,7 +544,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const contextTransport = useOptionalTransport();
   const [ownsFallbackTransport] = useState(() => !contextTransport);
   const [transport] = useState<JarvisTransport>(
-    () => contextTransport ?? new WebSocketTransportAdapter({ normalizeMessage: normalizeServerMessage })
+    () => contextTransport ?? createDefaultTransport({ normalizeMessage: normalizeServerMessage })
   );
 
   const recentMessageHashesRef = useRef<Map<string, number>>(new Map());

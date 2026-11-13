@@ -1,15 +1,14 @@
 import type { ClientMessage, ServerMessage } from '../protocol/websocket';
 import {
-  createTransportRequestId,
+  buildMediaCandidateUrls,
   getWindowHttpToken,
   getWindowNativeBridge,
-  resolveTransportMediaUrl,
-  buildMediaCandidateUrls,
   resolveDefaultHttpBaseUrl,
+  resolveTransportMediaUrl,
   type JarvisTransport,
 } from './JarvisTransport.ts';
+import { TransportCorrelationRegistry } from './TransportCorrelation.ts';
 import {
-  normalizeTransportTimeout,
   TransportError,
   WS_READY_STATE_CLOSED,
   WS_READY_STATE_CLOSING,
@@ -20,8 +19,6 @@ import {
   type OpenStreamOptions,
   type PendingRequestMeta,
   type ReconnectPolicy,
-  type ResponseDecision,
-  type StreamDecision,
   type TransportConnectionStatus,
   type TransportStatusSnapshot,
   type TransportStreamHandle,
@@ -42,33 +39,6 @@ export interface WebSocketTransportAdapterConfig {
   randomFn?: () => number;
   nowFn?: () => number;
   maxSettledHistory?: number;
-}
-
-interface PendingInvokeEntry<TResult> {
-  meta: PendingRequestMeta;
-  resolve: (value: TResult) => void;
-  reject: (error: Error) => void;
-  timer: ReturnType<typeof setTimeout>;
-  abortCleanup?: () => void;
-  rejectOnDisconnect: boolean;
-  matchResponse: (message: ServerMessage, requestId: string) => ResponseDecision<TResult>;
-  legacyMatchResponse?: (message: ServerMessage) => ResponseDecision<TResult>;
-  cancelMessage?: ClientMessage | ((requestId: string) => ClientMessage);
-}
-
-interface ActiveStreamEntry<TChunk> {
-  meta: PendingRequestMeta;
-  onChunk: (chunk: TChunk) => void;
-  resolveDone: () => void;
-  rejectDone: (error: Error) => void;
-  timer: ReturnType<typeof setTimeout>;
-  timeoutMs: number;
-  timeoutMessage: string;
-  abortCleanup?: () => void;
-  matchChunk: (message: ServerMessage, correlationId: string) => StreamDecision<TChunk>;
-  legacyMatchChunk?: (message: ServerMessage) => StreamDecision<TChunk>;
-  cancelMessage?: ClientMessage | ((correlationId: string) => ClientMessage);
-  settled: boolean;
 }
 
 const DEFAULT_RECONNECT_POLICY: ReconnectPolicy = {
@@ -101,13 +71,12 @@ export class WebSocketTransportAdapter implements JarvisTransport {
   private readonly httpBaseUrl?: string;
   private readonly getHttpToken: () => string;
   private readonly reconnectPolicy: ReconnectPolicy;
-  private readonly timeoutBounds?: { min?: number; max?: number };
   private readonly createWebSocket: (url: string) => WebSocketLike;
   private readonly nativeBridge: NativeDesktopBridge | null;
   private readonly normalizeMessage: (raw: unknown) => ServerMessage | null;
   private readonly randomFn: () => number;
   private readonly nowFn: () => number;
-  private readonly maxSettledHistory: number;
+  private readonly correlation: TransportCorrelationRegistry;
 
   private socket: WebSocketLike | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -120,10 +89,6 @@ export class WebSocketTransportAdapter implements JarvisTransport {
   private lastConnectedAt: number | null = null;
   private lastDisconnectedAt: number | null = null;
   private lastError: string | null = null;
-
-  private readonly pendingInvokes = new Map<string, PendingInvokeEntry<unknown>>();
-  private readonly activeStreams = new Map<string, ActiveStreamEntry<unknown>>();
-  private readonly settledRequestIds = new Map<string, number>();
 
   private readonly typeListeners = new Map<string, Set<(msg: ServerMessage, raw?: unknown) => void>>();
   private readonly anyListeners = new Set<(msg: ServerMessage, raw?: unknown) => void>();
@@ -147,13 +112,18 @@ export class WebSocketTransportAdapter implements JarvisTransport {
       ...DEFAULT_RECONNECT_POLICY,
       ...(config.reconnectPolicy ?? {}),
     };
-    this.timeoutBounds = config.timeoutBounds;
     this.createWebSocket = config.createWebSocket ?? defaultWebSocketFactory;
     this.nativeBridge = config.nativeBridge !== undefined ? config.nativeBridge : getWindowNativeBridge();
     this.normalizeMessage = config.normalizeMessage ?? defaultNormalizeMessage;
     this.randomFn = config.randomFn ?? Math.random;
     this.nowFn = config.nowFn ?? Date.now;
-    this.maxSettledHistory = config.maxSettledHistory ?? 1000;
+    this.correlation = new TransportCorrelationRegistry({
+      nowFn: this.nowFn,
+      maxSettledHistory: config.maxSettledHistory ?? 1000,
+      timeoutBounds: config.timeoutBounds,
+      sendCancel: (cancelMsg) => this.send(cancelMsg),
+      onPendingChanged: () => this.notifyStatusListeners(),
+    });
 
     this.system = {
       getStatus: () => this.getStatusSnapshot(),
@@ -217,8 +187,8 @@ export class WebSocketTransportAdapter implements JarvisTransport {
       lastConnectedAt: this.lastConnectedAt,
       lastDisconnectedAt: this.lastDisconnectedAt,
       lastError: this.lastError,
-      pendingRequests: this.pendingInvokes.size,
-      activeStreams: this.activeStreams.size,
+      pendingRequests: this.correlation.pendingCount,
+      activeStreams: this.correlation.activeStreamCount,
     };
   }
 
@@ -325,7 +295,7 @@ export class WebSocketTransportAdapter implements JarvisTransport {
       }
 
       if (!this.nativeBridge?.isNativeIPC) {
-        this.rejectDisconnectedRequests(
+        this.correlation.rejectDisconnected(
           new TransportError(
             'DISCONNECTED',
             `Ligação de transporte interrompida${closeReason || '.'}`
@@ -401,7 +371,7 @@ export class WebSocketTransportAdapter implements JarvisTransport {
         // Ignore close errors
       }
     }
-    this.rejectAllPending(new TransportError('DISCONNECTED', 'Transporte desligado pelo cliente.'));
+    this.correlation.rejectAll(new TransportError('DISCONNECTED', 'Transporte desligado pelo cliente.'));
     this.connectionStatus = 'OFFLINE';
     this.lastDisconnectedAt = this.nowFn();
     this.notifyStatusListeners();
@@ -442,7 +412,7 @@ export class WebSocketTransportAdapter implements JarvisTransport {
       this.nativeUnsubscribe = null;
     }
 
-    this.rejectAllPending(new TransportError('TRANSPORT_CLOSED', 'Transporte encerrado.'));
+    this.correlation.rejectAll(new TransportError('TRANSPORT_CLOSED', 'Transporte encerrado.'));
     this.typeListeners.clear();
     this.anyListeners.clear();
     this.connectedListeners.clear();
@@ -480,140 +450,26 @@ export class WebSocketTransportAdapter implements JarvisTransport {
     message: ClientMessage,
     options: InvokeOptions<TResult> = {}
   ): Promise<TResult> {
-    if (this.disposed) {
-      return Promise.reject(
-        new TransportError('TRANSPORT_CLOSED', 'Não é possível invocar após dispose do transporte.')
-      );
-    }
-
-    const requestId =
-      options.requestId ??
-      (typeof (message as { request_id?: unknown }).request_id === 'string' &&
-      (message as { request_id: string }).request_id.length > 0
-        ? (message as { request_id: string }).request_id
-        : createTransportRequestId(message.type));
-
-    if (this.pendingInvokes.has(requestId) || this.activeStreams.has(requestId)) {
-      return Promise.reject(
-        new TransportError(
-          'DUPLICATE_REQUEST_ID',
-          `Request ID duplicado ainda em curso: ${requestId}`,
-          { requestId }
-        )
-      );
-    }
-
-    if (options.signal?.aborted) {
-      return Promise.reject(
-        new TransportError('ABORTED', `Pedido ${requestId} cancelado antes do envio.`, {
-          requestId,
-          cause: options.signal.reason,
-        })
-      );
-    }
-
     const requireReady = options.requireReady ?? true;
-    if (requireReady && !this.isReady()) {
-      return Promise.reject(
-        new TransportError('DISCONNECTED', 'Transporte não está ligado para executar pedido.', {
-          requestId,
-        })
-      );
-    }
-
-    const timeoutMs = normalizeTransportTimeout(options.timeoutMs, this.timeoutBounds);
-    const attachRequestId = options.attachRequestId ?? true;
-    const outboundMessage = (
-      attachRequestId ? { ...message, request_id: requestId } : message
-    ) as ClientMessage;
-
-    const matchResponse =
-      options.matchResponse ??
-      ((msg: ServerMessage): ResponseDecision<TResult> => ({
-        kind: 'resolve',
-        value: msg as unknown as TResult,
-      }));
-
-    return new Promise<TResult>((resolve, reject) => {
-      const cleanupEntry = (): PendingInvokeEntry<unknown> | null => {
-        const entry = this.pendingInvokes.get(requestId);
-        if (!entry) {
-          return null;
-        }
-        this.pendingInvokes.delete(requestId);
-        clearTimeout(entry.timer);
-        if (entry.abortCleanup) {
-          entry.abortCleanup();
-        }
-        this.markSettled(requestId);
-        this.notifyStatusListeners();
-        return entry;
-      };
-
-      const timer = setTimeout(() => {
-        const entry = cleanupEntry();
-        if (!entry) return;
-        const msg =
-          options.timeoutMessage ??
-          `Tempo limite excedido (${timeoutMs}ms) para ${outboundMessage.type}.`;
-        reject(new TransportError('TIMEOUT', msg, { requestId }));
-      }, timeoutMs);
-
-      let abortCleanup: (() => void) | undefined;
-      if (options.signal) {
-        const onAbort = () => {
-          const entry = cleanupEntry();
-          if (!entry) return;
-          if (entry.cancelMessage) {
-            const cancelPayload =
-              typeof entry.cancelMessage === 'function'
-                ? entry.cancelMessage(requestId)
-                : entry.cancelMessage;
-            this.send(cancelPayload);
-          }
-          reject(
-            new TransportError('ABORTED', `Pedido ${requestId} cancelado.`, {
+    return this.correlation.runInvoke(
+      message,
+      options,
+      {
+        isDisposed: this.disposed,
+        isReady: this.isReady(),
+        disconnectedMessage: 'Transporte não está ligado para executar pedido.',
+      },
+      (outboundMessage, requestId, rejectEarly) => {
+        const sent = this.send(outboundMessage);
+        if (!sent && requireReady) {
+          rejectEarly(
+            new TransportError('DISCONNECTED', `Falha ao enviar pedido ${outboundMessage.type}.`, {
               requestId,
-              cause: options.signal?.reason,
             })
           );
-        };
-        options.signal.addEventListener('abort', onAbort, { once: true });
-        abortCleanup = () => options.signal?.removeEventListener('abort', onAbort);
+        }
       }
-
-      const entry: PendingInvokeEntry<unknown> = {
-        meta: {
-          requestId,
-          messageType: outboundMessage.type,
-          tag: options.tag,
-          startedAt: this.nowFn(),
-        },
-        resolve: (value: unknown) => resolve(value as TResult),
-        reject,
-        timer,
-        abortCleanup,
-        rejectOnDisconnect: options.rejectOnDisconnect ?? true,
-        matchResponse: (msg, reqId) => matchResponse(msg, reqId) as ResponseDecision<unknown>,
-        legacyMatchResponse: options.legacyMatchResponse
-          ? (msg) => options.legacyMatchResponse!(msg) as ResponseDecision<unknown>
-          : undefined,
-        cancelMessage: options.cancelMessage,
-      };
-
-      this.pendingInvokes.set(requestId, entry);
-      this.notifyStatusListeners();
-
-      const sent = this.send(outboundMessage);
-      if (!sent && requireReady) {
-        cleanupEntry();
-        reject(
-          new TransportError('DISCONNECTED', `Falha ao enviar pedido ${outboundMessage.type}.`, {
-            requestId,
-          })
-        );
-      }
-    });
+    );
   }
 
   openStream<TChunk = ServerMessage>(
@@ -621,179 +477,27 @@ export class WebSocketTransportAdapter implements JarvisTransport {
     options: OpenStreamOptions<TChunk>,
     onChunk: (chunk: TChunk) => void
   ): TransportStreamHandle {
-    const requestId =
-      options.correlationId ??
-      (typeof (message as { request_id?: unknown }).request_id === 'string' &&
-      (message as { request_id: string }).request_id.length > 0
-        ? (message as { request_id: string }).request_id
-        : createTransportRequestId(`stream_${message.type}`));
-
-    if (this.disposed) {
-      return {
-        requestId,
-        done: Promise.reject(
-          new TransportError('TRANSPORT_CLOSED', 'Não é possível abrir stream após dispose.')
-        ),
-        cancel: () => {},
-      };
-    }
-
-    if (this.pendingInvokes.has(requestId) || this.activeStreams.has(requestId)) {
-      return {
-        requestId,
-        done: Promise.reject(
-          new TransportError('DUPLICATE_REQUEST_ID', `Correlation ID duplicado em curso: ${requestId}`, {
-            requestId,
-          })
-        ),
-        cancel: () => {},
-      };
-    }
-
-    if (options.signal?.aborted) {
-      return {
-        requestId,
-        done: Promise.reject(
-          new TransportError('ABORTED', `Stream ${requestId} cancelado antes de iniciar.`, {
-            requestId,
-            cause: options.signal.reason,
-          })
-        ),
-        cancel: () => {},
-      };
-    }
-
     const requireReady = options.requireReady ?? true;
-    if (requireReady && !this.isReady()) {
-      return {
-        requestId,
-        done: Promise.reject(
-          new TransportError('DISCONNECTED', 'Transporte não está ligado para abrir stream.', {
-            requestId,
-          })
-        ),
-        cancel: () => {},
-      };
-    }
-
-    const timeoutMs = normalizeTransportTimeout(options.timeoutMs, this.timeoutBounds);
-    const timeoutMessage =
-      options.timeoutMessage ?? `Tempo limite de stream excedido (${timeoutMs}ms) para ${message.type}.`;
-    const attachRequestId = options.attachRequestId ?? true;
-    const outboundMessage = (
-      attachRequestId ? { ...message, request_id: requestId } : message
-    ) as ClientMessage;
-
-    let cancelStream: (reason?: string) => void = () => {};
-
-    const done = new Promise<void>((resolveDone, rejectDone) => {
-      const cleanupStream = (): ActiveStreamEntry<unknown> | null => {
-        const entry = this.activeStreams.get(requestId);
-        if (!entry || entry.settled) {
-          return null;
-        }
-        entry.settled = true;
-        this.activeStreams.delete(requestId);
-        clearTimeout(entry.timer);
-        if (entry.abortCleanup) {
-          entry.abortCleanup();
-        }
-        this.markSettled(requestId);
-        this.notifyStatusListeners();
-        return entry;
-      };
-
-      const startTimer = () =>
-        setTimeout(() => {
-          const entry = cleanupStream();
-          if (!entry) return;
-          if (entry.cancelMessage) {
-            const cancelPayload =
-              typeof entry.cancelMessage === 'function'
-                ? entry.cancelMessage(requestId)
-                : entry.cancelMessage;
-            this.send(cancelPayload);
-          }
-          rejectDone(new TransportError('TIMEOUT', timeoutMessage, { requestId }));
-        }, timeoutMs);
-
-      const handleCancel = (reason?: string, cause?: unknown) => {
-        const entry = cleanupStream();
-        if (!entry) return;
-        if (entry.cancelMessage) {
-          const cancelPayload =
-            typeof entry.cancelMessage === 'function'
-              ? entry.cancelMessage(requestId)
-              : entry.cancelMessage;
-          this.send(cancelPayload);
-        }
-        rejectDone(
-          new TransportError('ABORTED', reason || `Stream ${requestId} cancelado.`, {
-            requestId,
-            cause,
-          })
-        );
-      };
-
-      cancelStream = (reason?: string) => handleCancel(reason);
-
-      let abortCleanup: (() => void) | undefined;
-      if (options.signal) {
-        const onAbort = () => handleCancel(`Stream ${requestId} cancelado via AbortSignal.`, options.signal?.reason);
-        options.signal.addEventListener('abort', onAbort, { once: true });
-        abortCleanup = () => options.signal?.removeEventListener('abort', onAbort);
-      }
-
-      const entry: ActiveStreamEntry<unknown> = {
-        meta: {
-          requestId,
-          messageType: outboundMessage.type,
-          tag: options.tag,
-          startedAt: this.nowFn(),
-        },
-        onChunk: (chunk: unknown) => onChunk(chunk as TChunk),
-        resolveDone: () => {
-          if (cleanupStream()) {
-            resolveDone();
-          }
-        },
-        rejectDone: (err: Error) => {
-          if (cleanupStream()) {
-            rejectDone(err);
-          }
-        },
-        timer: startTimer(),
-        timeoutMs,
-        timeoutMessage,
-        abortCleanup,
-        matchChunk: (msg, corrId) => options.matchChunk(msg, corrId) as StreamDecision<unknown>,
-        legacyMatchChunk: options.legacyMatchChunk
-          ? (msg) => options.legacyMatchChunk!(msg) as StreamDecision<unknown>
-          : undefined,
-        cancelMessage: options.cancelMessage,
-        settled: false,
-      };
-
-      this.activeStreams.set(requestId, entry);
-      this.notifyStatusListeners();
-
-      const sent = this.send(outboundMessage);
-      if (!sent && requireReady) {
-        if (cleanupStream()) {
-          rejectDone(
+    return this.correlation.openStream(
+      message,
+      options,
+      onChunk,
+      {
+        isDisposed: this.disposed,
+        isReady: this.isReady(),
+        disconnectedMessage: 'Transporte não está ligado para abrir stream.',
+      },
+      (outboundMessage, requestId, rejectEarly) => {
+        const sent = this.send(outboundMessage);
+        if (!sent && requireReady) {
+          rejectEarly(
             new TransportError('DISCONNECTED', `Falha ao iniciar stream ${outboundMessage.type}.`, {
               requestId,
             })
           );
         }
       }
-    });
-
-    return {
-      requestId,
-      done,
-      cancel: cancelStream,
-    };
+    );
   }
 
   subscribe<TType extends ServerMessage['type']>(
@@ -856,32 +560,7 @@ export class WebSocketTransportAdapter implements JarvisTransport {
   }
 
   cancelPendingRequests(predicate: (meta: PendingRequestMeta) => boolean, reason = 'Cancelado pelo utilizador'): number {
-    let cancelledCount = 0;
-
-    for (const [reqId, entry] of Array.from(this.pendingInvokes.entries())) {
-      if (predicate(entry.meta)) {
-        this.pendingInvokes.delete(reqId);
-        clearTimeout(entry.timer);
-        if (entry.abortCleanup) {
-          entry.abortCleanup();
-        }
-        this.markSettled(reqId);
-        entry.reject(new TransportError('ABORTED', reason, { requestId: reqId }));
-        cancelledCount += 1;
-      }
-    }
-
-    for (const [corrId, stream] of Array.from(this.activeStreams.entries())) {
-      if (predicate(stream.meta)) {
-        stream.rejectDone(new TransportError('ABORTED', reason, { requestId: corrId }));
-        cancelledCount += 1;
-      }
-    }
-
-    if (cancelledCount > 0) {
-      this.notifyStatusListeners();
-    }
-    return cancelledCount;
+    return this.correlation.cancelWhere(predicate, reason);
   }
 
   computeNextReconnectDelayMs(attempt = this.reconnectAttempt): number {
@@ -909,136 +588,6 @@ export class WebSocketTransportAdapter implements JarvisTransport {
         this.connect();
       }
     }, delayMs);
-  }
-
-  private markSettled(requestId: string): void {
-    this.settledRequestIds.set(requestId, this.nowFn());
-    while (this.settledRequestIds.size > this.maxSettledHistory) {
-      const oldestKey = this.settledRequestIds.keys().next().value;
-      if (oldestKey === undefined) break;
-      this.settledRequestIds.delete(oldestKey);
-    }
-  }
-
-  private rejectDisconnectedRequests(error: TransportError): void {
-    let changed = false;
-    for (const [reqId, entry] of Array.from(this.pendingInvokes.entries())) {
-      if (entry.rejectOnDisconnect) {
-        this.pendingInvokes.delete(reqId);
-        clearTimeout(entry.timer);
-        if (entry.abortCleanup) {
-          entry.abortCleanup();
-        }
-        this.markSettled(reqId);
-        entry.reject(error);
-        changed = true;
-      }
-    }
-    for (const stream of Array.from(this.activeStreams.values())) {
-      stream.rejectDone(error);
-      changed = true;
-    }
-    if (changed) {
-      this.notifyStatusListeners();
-    }
-  }
-
-  private rejectAllPending(error: TransportError): void {
-    const hadPending = this.pendingInvokes.size > 0 || this.activeStreams.size > 0;
-    for (const [reqId, entry] of Array.from(this.pendingInvokes.entries())) {
-      this.pendingInvokes.delete(reqId);
-      clearTimeout(entry.timer);
-      if (entry.abortCleanup) {
-        entry.abortCleanup();
-      }
-      this.markSettled(reqId);
-      entry.reject(error);
-    }
-    for (const stream of Array.from(this.activeStreams.values())) {
-      stream.rejectDone(error);
-    }
-    if (hadPending) {
-      this.notifyStatusListeners();
-    }
-  }
-
-  private settlePendingInvoke<TResult>(
-    requestId: string,
-    entry: PendingInvokeEntry<TResult>,
-    decision: ResponseDecision<TResult>
-  ): boolean {
-    if (decision.kind === 'ignore') {
-      return false;
-    }
-    this.pendingInvokes.delete(requestId);
-    clearTimeout(entry.timer);
-    if (entry.abortCleanup) {
-      entry.abortCleanup();
-    }
-    this.markSettled(requestId);
-    this.notifyStatusListeners();
-
-    if (decision.kind === 'resolve') {
-      entry.resolve(decision.value);
-    } else {
-      entry.reject(decision.error);
-    }
-    return true;
-  }
-
-  private applyStreamDecision<TChunk>(
-    stream: ActiveStreamEntry<TChunk>,
-    decision: StreamDecision<TChunk>
-  ): boolean {
-    if (decision.kind === 'ignore' || stream.settled) {
-      return false;
-    }
-
-    if (decision.kind === 'chunk') {
-      clearTimeout(stream.timer);
-      stream.timer = setTimeout(() => {
-        if (!stream.settled) {
-          if (stream.cancelMessage) {
-            const payload =
-              typeof stream.cancelMessage === 'function'
-                ? stream.cancelMessage(stream.meta.requestId)
-                : stream.cancelMessage;
-            this.send(payload);
-          }
-          stream.rejectDone(
-            new TransportError('TIMEOUT', stream.timeoutMessage, { requestId: stream.meta.requestId })
-          );
-        }
-      }, stream.timeoutMs);
-
-      try {
-        stream.onChunk(decision.chunk);
-      } catch (err) {
-        stream.rejectDone(err instanceof Error ? err : new Error(String(err)));
-        return true;
-      }
-
-      if (decision.done) {
-        stream.resolveDone();
-      }
-      return true;
-    }
-
-    if (decision.kind === 'complete') {
-      if (decision.chunk !== undefined) {
-        try {
-          stream.onChunk(decision.chunk);
-        } catch (err) {
-          stream.rejectDone(err instanceof Error ? err : new Error(String(err)));
-          return true;
-        }
-      }
-      stream.resolveDone();
-      return true;
-    }
-
-    stream.rejectDone(decision.error);
-    return true;
   }
 
   private handleIncomingRawMessage(rawData: unknown): void {
@@ -1075,37 +624,7 @@ export class WebSocketTransportAdapter implements JarvisTransport {
     const effectiveRequestId =
       rawRequestId ?? (typeof msgReqId === 'string' && msgReqId.length > 0 ? msgReqId : undefined);
 
-    if (effectiveRequestId) {
-      if (!this.settledRequestIds.has(effectiveRequestId)) {
-        const invokeEntry = this.pendingInvokes.get(effectiveRequestId);
-        if (invokeEntry) {
-          const decision = invokeEntry.matchResponse(msg, effectiveRequestId);
-          this.settlePendingInvoke(effectiveRequestId, invokeEntry, decision);
-        } else {
-          const streamEntry = this.activeStreams.get(effectiveRequestId);
-          if (streamEntry) {
-            const decision = streamEntry.matchChunk(msg, effectiveRequestId);
-            this.applyStreamDecision(streamEntry, decision);
-          }
-        }
-      }
-      // Guard: tagged request_id messages must NEVER fall through to legacy untagged matching
-    } else {
-      for (const [reqId, entry] of Array.from(this.pendingInvokes.entries())) {
-        if (!entry.legacyMatchResponse) continue;
-        const decision = entry.legacyMatchResponse(msg);
-        if (this.settlePendingInvoke(reqId, entry, decision)) {
-          break;
-        }
-      }
-      for (const stream of Array.from(this.activeStreams.values())) {
-        if (!stream.legacyMatchChunk || stream.settled) continue;
-        const decision = stream.legacyMatchChunk(msg);
-        if (this.applyStreamDecision(stream, decision)) {
-          break;
-        }
-      }
-    }
+    this.correlation.handleMessage(msg, effectiveRequestId);
 
     const typedHandlers = this.typeListeners.get(msg.type);
     if (typedHandlers) {

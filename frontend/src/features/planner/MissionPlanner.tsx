@@ -21,7 +21,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { useWebSocket } from '../../context/WebSocketContext';
+import { useAppSession } from '../../context/AppSessionContext';
 import { Modal } from '../../components/Modal';
 import type { MissionClientOperation, MissionCriterion, MissionDeliverable, MissionExecution, MissionWorkPackage } from '../../protocol/websocket';
 
@@ -183,7 +183,7 @@ export function MissionPlanner() {
     adaptationHistory,
     planEvaluationResult,
     evaluateMissionPlan,
-  } = useWebSocket();
+  } = useAppSession();
 
   // Persist selected mission in sessionStorage
   const [selectedMissionId, setSelectedMissionId] = useState(() => (

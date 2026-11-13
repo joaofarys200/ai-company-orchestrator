@@ -22,7 +22,7 @@ import {
   Eye,
   UserCheck,
 } from 'lucide-react';
-import { useWebSocket } from '../../context/WebSocketContext';
+import { useAppSession } from '../../context/AppSessionContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const SentinelDashboard: React.FC = () => {
@@ -41,7 +41,7 @@ export const SentinelDashboard: React.FC = () => {
     rejectSentinelAction,
     rollbackSentinelAction,
     submitSentinelReview,
-  } = useWebSocket();
+  } = useAppSession();
 
   const [activeTab, setActiveTab] = useState<
     'overview' | 'actions' | 'processes' | 'network' | 'persistence' | 'browser' | 'events' | 'evidence'

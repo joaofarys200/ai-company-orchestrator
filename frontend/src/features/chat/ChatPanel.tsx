@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useWebSocket } from '../../context/WebSocketContext';
+import { useAppSession } from '../../context/AppSessionContext';
 import {
   Bot,
   User,
@@ -56,7 +56,7 @@ export const ChatPanel: React.FC = () => {
     studyOperations,
     navigateToStudyTarget,
     cancelStudyOperation,
-  } = useWebSocket();
+  } = useAppSession();
 
   const [activeTab, setActiveTab] = useState<'chat' | 'system'>('chat');
   const [showSidebar, setShowSidebar] = useState(false);

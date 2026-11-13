@@ -473,9 +473,14 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             relativePaths.push(encodeURI(rawFp.startsWith('/') ? rawFp : `/${rawFp}`));
           }
         }
-        const candidateUrls = transportSystem.getMediaCandidateUrls(relativePaths, {
-          appendToken: true,
-        });
+        const candidateUrls = transportSystem.getMediaCandidateUrlsAsync
+          ? await transportSystem.getMediaCandidateUrlsAsync(relativePaths, {
+              appendToken: true,
+              docId: document.document_id,
+            })
+          : transportSystem.getMediaCandidateUrls(relativePaths, {
+              appendToken: true,
+            });
         for (const url of candidateUrls) {
           try {
             const controller = new AbortController();
