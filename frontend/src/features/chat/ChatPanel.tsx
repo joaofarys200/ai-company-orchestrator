@@ -76,7 +76,20 @@ export const ChatPanel: React.FC = () => {
 
   const logRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioObjectUrlRef = useRef<string | null>(null);
   const playedAudioIds = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      if (audioObjectUrlRef.current) {
+        URL.revokeObjectURL(audioObjectUrlRef.current);
+        audioObjectUrlRef.current = null;
+      }
+    };
+  }, []);
 
   // Auto-scroll to bottom of chat on new messages
   useEffect(() => {
@@ -85,7 +98,7 @@ export const ChatPanel: React.FC = () => {
     }
   }, [chatMessages, activeTab]);
 
-  // Autoplay TTS audio when a message arrives with base64 audio
+  // Autoplay TTS audio when a message arrives with base64 audio (Blob URL compatible with media-src 'self' blob:)
   useEffect(() => {
     const lastMsg = chatMessages[chatMessages.length - 1];
     if (lastMsg && lastMsg.audio && !playedAudioIds.current.has(lastMsg.id)) {
@@ -94,7 +107,18 @@ export const ChatPanel: React.FC = () => {
         if (audioRef.current) {
           audioRef.current.pause();
         }
-        const audioUrl = `data:audio/mp3;base64,${lastMsg.audio}`;
+        if (audioObjectUrlRef.current) {
+          URL.revokeObjectURL(audioObjectUrlRef.current);
+          audioObjectUrlRef.current = null;
+        }
+        const binary = atob(lastMsg.audio);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: 'audio/mp3' });
+        const audioUrl = URL.createObjectURL(blob);
+        audioObjectUrlRef.current = audioUrl;
         audioRef.current = new Audio(audioUrl);
         audioRef.current.play().catch((err) => {
           console.warn('[TTS] Autoplay blocked or failed:', err);

@@ -159,7 +159,8 @@ export const StudyGeneratedDocumentView: React.FC<StudyGeneratedDocumentViewProp
       window.document.body.appendChild(link);
       link.click();
       window.document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // Defer revocation so WebView2 initiates the blob download before release
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : '';
       setError(msg || `Erro ao descarregar ${format.toUpperCase()}.`);

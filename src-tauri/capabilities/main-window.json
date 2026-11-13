@@ -1,11 +1,17 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "main-capability",
-  "description": "Least-privilege capability for the primary JARVIS OS Stage 2 window. Grants only event listener permissions alongside Stage 2 app commands; excludes generic filesystem, shell, dialog, and opener plugins.",
+  "description": "Least-privilege capability for the primary JARVIS OS window. Explicitly allows event channels and native folder dialog while denying raw opener plugin access and generic shell/fs.",
   "windows": ["main"],
+  "local": true,
   "permissions": [
+    "core:default",
     "core:event:allow-listen",
-    "core:event:allow-unlisten"
+    "core:event:allow-unlisten",
+    "core:event:allow-emit",
+    "dialog:allow-open",
+    "opener:deny-open-url",
+    "opener:deny-open-path",
+    "opener:deny-reveal-item-in-dir"
   ]
 }
-

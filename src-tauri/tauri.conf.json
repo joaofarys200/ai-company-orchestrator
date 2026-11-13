@@ -5,7 +5,7 @@
   "identifier": "com.jarvisos.desktop",
   "build": {
     "beforeDevCommand": "npm run dev --prefix frontend",
-    "devUrl": "http://localhost:5173",
+    "devUrl": "http://127.0.0.1:5173",
     "beforeBuildCommand": "npm run build --prefix frontend",
     "frontendDist": "../frontend/dist"
   },
@@ -20,7 +20,8 @@
         "minHeight": 700,
         "backgroundColor": "#080c12",
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "additionalBrowserArgs": "--autoplay-policy=no-user-gesture-required"
       }
     ],
     "security": {
@@ -29,11 +30,11 @@
         "script-src": "'self' 'wasm-unsafe-eval'",
         "style-src": "'self' 'unsafe-inline'",
         "font-src": "'self' data:",
-        "img-src": "'self' data: blob: http://127.0.0.1:* http://localhost:*",
-        "media-src": "'self' blob: http://127.0.0.1:* http://localhost:*",
-        "connect-src": "'self' ipc: http://ipc.localhost ws://127.0.0.1:8001 ws://localhost:8001 http://127.0.0.1:8000 http://localhost:8000",
+        "img-src": "'self' data: blob: http://127.0.0.1:*",
+        "media-src": "'self' blob: http://127.0.0.1:*",
+        "connect-src": "'self' ipc: http://ipc.localhost ws://127.0.0.1:8001 http://127.0.0.1:8000 ws://127.0.0.1:5173 http://127.0.0.1:5173",
         "worker-src": "'self' blob:",
-        "frame-src": "'self' http://127.0.0.1:* http://localhost:*",
+        "frame-src": "'self' blob: http://127.0.0.1:*",
         "object-src": "'none'",
         "base-uri": "'self'"
       }
@@ -51,4 +52,3 @@
     ]
   }
 }
-

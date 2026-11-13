@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - "stage2.1/**"
+      - "migration/**"
   pull_request:
     branches:
       - main
@@ -33,23 +34,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Verify Electron shell preservation and repo hygiene
+      - name: Verify repo hygiene (no local DBs/user caches committed)
         run: |
           $ErrorActionPreference = 'Stop'
           New-Item -ItemType Directory -Force -Path ci-logs | Out-Null
 
-          foreach ($required in @("main.js", "preload.js", "package.json", "src-tauri/Cargo.toml", "src-tauri/tauri.conf.json", "src-tauri/capabilities/main-window.json")) {
+          foreach ($required in @("src-tauri/Cargo.toml", "src-tauri/tauri.conf.json", "src-tauri/capabilities/main-window.json", "package.json", "frontend/package.json")) {
             if (-not (Test-Path $required)) {
               throw "Missing required file: $required"
             }
-          }
-
-          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
-          if ($pkg.scripts.start -ne "electron .") {
-            throw "Unexpected root start script: $($pkg.scripts.start)"
-          }
-          if (-not ($pkg.scripts.dev -match "electron \. --dev")) {
-            throw "Unexpected root dev script: $($pkg.scripts.dev)"
           }
 
           $forbidden = Get-ChildItem -Force -Recurse -ErrorAction SilentlyContinue | Where-Object {
@@ -61,12 +54,17 @@ jobs:
             throw "Forbidden runtime/database artifacts found in checkout: $($forbidden.FullName -join ', ')"
           }
 
-          "Electron scripts and clean repository state verified." | Tee-Object -FilePath ci-logs/hygiene.log
+          "Repository hygiene verified." | Tee-Object -FilePath ci-logs/hygiene.log
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
       - name: Setup Rust MSVC toolchain
         uses: dtolnay/rust-toolchain@master
@@ -74,12 +72,18 @@ jobs:
           toolchain: "1.100.0"
           targets: x86_64-pc-windows-msvc
 
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
       - name: Inspect toolchain versions
         run: |
           $ErrorActionPreference = 'Continue'
           @(
             "node: $(node --version)"
             "npm: $(npm --version)"
+            "python: $(python --version)"
             "rustc: $(rustc --version)"
             "cargo: $(cargo --version)"
             "os: $([System.Environment]::OSVersion.VersionString)"
@@ -107,12 +111,29 @@ jobs:
           npm exec -- tauri info 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-info.log
           exit 0
 
+      - name: Run frontend transport & type tests
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm --prefix frontend test 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/frontend-test.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/frontend-test.log
+          exit $code
+
       - name: Build React + TypeScript frontend
         run: |
           $ErrorActionPreference = 'Continue'
           npm --prefix frontend run build 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/frontend-build.log
           $code = $LASTEXITCODE
           "exit_code=$code" | Add-Content ci-logs/frontend-build.log
+          exit $code
+
+      - name: Run Python core contract & hardening tests
+        run: |
+          $ErrorActionPreference = 'Continue'
+          python -m pip install --quiet pytest pyyaml jsonschema websockets httpx python-dotenv
+          python -m pytest -q tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py tests/test_transport_gateway.py tests/test_websocket_dispatcher_contract.py 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/python-contract-tests.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/python-contract-tests.log
           exit $code
 
       - name: Run cargo check (--locked --all-targets)
@@ -142,39 +163,16 @@ jobs:
           }
           exit $code
 
-      - name: Build Tauri Windows installers (unsigned bundle validation)
-        run: |
-          $ErrorActionPreference = 'Continue'
-          npm run tauri:build 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-build-bundle.log
-          $code = $LASTEXITCODE
-          "exit_code=$code" | Add-Content ci-logs/tauri-build-bundle.log
-          if (Test-Path "src-tauri/target/release/bundle") {
-            Get-ChildItem -Recurse "src-tauri/target/release/bundle" -File | Select-Object FullName, Length | Out-String | Add-Content ci-logs/tauri-build-bundle.log
-          }
-          exit $code
-
       - name: Write workflow summary
         if: always()
         run: |
           $ErrorActionPreference = 'Continue'
-          Add-Content $env:GITHUB_STEP_SUMMARY "## JARVIS OS — Tauri Windows Validation (Stage 2.1)"
+          Add-Content $env:GITHUB_STEP_SUMMARY "## JARVIS OS — Tauri Windows Validation"
           Add-Content $env:GITHUB_STEP_SUMMARY ""
-          if (Test-Path ci-logs/toolchain.log) {
-            Add-Content $env:GITHUB_STEP_SUMMARY "### Toolchain"
-            Add-Content $env:GITHUB_STEP_SUMMARY '```'
-            Get-Content ci-logs/toolchain.log | Add-Content $env:GITHUB_STEP_SUMMARY
-            Add-Content $env:GITHUB_STEP_SUMMARY '```'
-          }
-          if (Test-Path ci-logs/tauri-info.log) {
-            Add-Content $env:GITHUB_STEP_SUMMARY "### Tauri Info"
-            Add-Content $env:GITHUB_STEP_SUMMARY '```'
-            Get-Content ci-logs/tauri-info.log | Add-Content $env:GITHUB_STEP_SUMMARY
-            Add-Content $env:GITHUB_STEP_SUMMARY '```'
-          }
-          foreach ($log in @("frontend-build.log", "cargo-check.log", "cargo-test.log", "tauri-build-no-bundle.log", "tauri-build-bundle.log")) {
+          foreach ($log in @("toolchain.log", "tauri-info.log", "frontend-test.log", "frontend-build.log", "python-contract-tests.log", "cargo-check.log", "cargo-test.log", "tauri-build-no-bundle.log")) {
             $path = Join-Path "ci-logs" $log
             if (Test-Path $path) {
-              $tail = Get-Content $path -Tail 15
+              $tail = Get-Content $path -Tail 20
               Add-Content $env:GITHUB_STEP_SUMMARY "### $log (tail)"
               Add-Content $env:GITHUB_STEP_SUMMARY '```'
               $tail | Add-Content $env:GITHUB_STEP_SUMMARY
