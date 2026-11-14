@@ -204,7 +204,15 @@ jobs:
           if code != 0:
               lines = pathlib.Path("ci-logs/cargo-test.log").read_text(encoding="utf-8", errors="replace").splitlines()
               emitted = 0
+              in_failures = False
               for i, line in enumerate(lines):
+                  if line.strip() == "failures:":
+                      in_failures = True
+                  if in_failures and emitted < 10 and line.strip():
+                      if any(tok in line for tok in ("---- ", "panicked at", "left:", "right:", "assertion")):
+                          print(f"::error::{line[:400]}")
+                          emitted += 1
+                          continue
                   if ("error[" in line or line.startswith("error:") or "FAILED" in line) and emitted < 10:
                       snippet = line
                       if i + 1 < len(lines) and "-->" in lines[i + 1]:

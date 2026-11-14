@@ -2695,7 +2695,7 @@ mod tests {
         let diag = engine.compute_graph_diagnostics().unwrap();
         assert_eq!(diag["total_notes"], 3);
         assert_eq!(diag["genuine_orphans"], 1);
-        assert_eq!(diag["broken_links"], 6); // Topic Two..Five + Missing Note
+        assert_eq!(diag["broken_links"], 5); // Topic Two..Five (4) + Missing Note (1)
 
         let audit = engine.audit_note_quality("Topic One.md").unwrap();
         assert_eq!(audit["score_type"], "HEURISTIC");
