@@ -2197,11 +2197,11 @@ impl ObsidianGraphEngine {
         let mut count = 0usize;
         let mut model_used = "deterministic";
 
-        for item in &mut queue {
+        for idx in 0..queue.len() {
             if count >= clamped {
                 break;
             }
-            if item.get("status").and_then(Value::as_str) != Some("PENDING") {
+            if queue[idx].get("status").and_then(Value::as_str) != Some("PENDING") {
                 continue;
             }
             if self
@@ -2212,12 +2212,12 @@ impl ObsidianGraphEngine {
             {
                 break;
             }
-            let item_path = item
+            let item_path = queue[idx]
                 .get("note_path")
                 .and_then(Value::as_str)
                 .unwrap_or("")
                 .to_string();
-            let item_id = item
+            let item_id = queue[idx]
                 .get("item_id")
                 .and_then(Value::as_str)
                 .unwrap_or("")
@@ -2226,7 +2226,7 @@ impl ObsidianGraphEngine {
                 continue;
             }
 
-            if let Some(obj) = item.as_object_mut() {
+            if let Some(obj) = queue[idx].as_object_mut() {
                 obj.insert("status".to_string(), json!("IN_PROGRESS"));
                 obj.insert("updated_at".to_string(), json!(now_iso_local()));
             }
@@ -2245,7 +2245,7 @@ impl ObsidianGraphEngine {
                             .unwrap_or("AWAITING_REVIEW")
                             .to_string();
                         let pid = proposal["proposal_id"].clone();
-                        if let Some(obj) = item.as_object_mut() {
+                        if let Some(obj) = queue[idx].as_object_mut() {
                             obj.insert("status".to_string(), json!(status));
                             obj.insert("proposal_id".to_string(), pid);
                             obj.insert("updated_at".to_string(), json!(now_iso_local()));
@@ -2254,7 +2254,7 @@ impl ObsidianGraphEngine {
                         model_used = "qwen3.5:9b";
                     }
                     Err(err) => {
-                        if let Some(obj) = item.as_object_mut() {
+                        if let Some(obj) = queue[idx].as_object_mut() {
                             obj.insert("status".to_string(), json!("FAILED_VALIDATION"));
                             obj.insert("error".to_string(), json!(err.to_string()));
                             obj.insert("updated_at".to_string(), json!(now_iso_local()));
@@ -2272,7 +2272,7 @@ impl ObsidianGraphEngine {
             } else {
                 let proposal = self.enrich_note_safely(&item_path, true)?;
                 let pid = proposal["proposal_id"].clone();
-                if let Some(obj) = item.as_object_mut() {
+                if let Some(obj) = queue[idx].as_object_mut() {
                     obj.insert("status".to_string(), json!("APPLIED"));
                     obj.insert("proposal_id".to_string(), pid);
                     obj.insert("updated_at".to_string(), json!(now_iso_local()));
