@@ -88,6 +88,10 @@ pub fn run() {
                 Ok::<_, Box<dyn std::error::Error>>((loopback, preview))
             })?;
 
+            let sentinel_watchdog = sentinel::watchdog_store::SentinelWatchdog::open(
+                &project_root,
+                Arc::clone(&sentinel_scheduler),
+            );
             app.manage(commands::media::RuntimeServices {
                 project_root,
                 db,
@@ -97,6 +101,7 @@ pub fn run() {
                 workers: worker_supervisor,
                 permissions: permission_gateway,
                 sentinel: sentinel_scheduler,
+                sentinel_watchdog,
                 active_dispatches: Arc::new(Mutex::new(HashMap::new())),
             });
             Ok(())

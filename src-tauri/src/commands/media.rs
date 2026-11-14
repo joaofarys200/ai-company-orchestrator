@@ -9,6 +9,7 @@ use crate::permissions::gateway::PermissionGateway;
 use crate::process::preview_server::PreviewServerHandle;
 use crate::protocol::loopback::{LoopbackConfig, LoopbackHandle, MediaTicketResponse};
 use crate::sentinel::scheduler::SentinelScheduler;
+use crate::sentinel::watchdog_store::SentinelWatchdog;
 use crate::storage::sqlite::SqliteDatabase;
 use crate::storage::study_store::StudyStore;
 use crate::workers::supervisor::{WorkerPoolRole, WorkerSupervisor};
@@ -29,6 +30,7 @@ pub struct RuntimeServices {
     pub workers: Arc<WorkerSupervisor>,
     pub permissions: Arc<PermissionGateway>,
     pub sentinel: Arc<SentinelScheduler>,
+    pub sentinel_watchdog: Arc<SentinelWatchdog>,
     pub active_dispatches: Arc<Mutex<HashMap<String, ActiveDispatch>>>,
 }
 
@@ -46,4 +48,3 @@ pub fn get_media_ticket(
 ) -> Result<MediaTicketResponse, AppError> {
     services.loopback.issue_media_ticket(&doc_id, None)
 }
-

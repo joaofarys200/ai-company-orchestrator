@@ -41,7 +41,6 @@ pub fn route_message_to_worker_role(msg_type: &str) -> Option<WorkerPoolRole> {
         || msg_type.starts_with("deliverable_")
         || msg_type.starts_with("criterion_")
         || msg_type.starts_with("evidence_")
-        || msg_type.starts_with("sentinel_")
         || msg_type.starts_with("permission_")
         || msg_type == "action_confirm_response"
     {
@@ -94,7 +93,11 @@ fn timeout_for_message(msg_type: &str) -> Duration {
     }
 }
 
-fn attach_request_id(mut event: Value, client_request_id: Option<&str>, worker_req_id: &str) -> Value {
+fn attach_request_id(
+    mut event: Value,
+    client_request_id: Option<&str>,
+    worker_req_id: &str,
+) -> Value {
     if let (Some(obj), Some(cid)) = (event.as_object_mut(), client_request_id) {
         let should_replace = match obj.get("request_id").and_then(Value::as_str) {
             None => true,
@@ -153,14 +156,19 @@ fn emit_fast_path_events(app: &AppHandle, events: Vec<Value>, client_request_id:
 }
 
 /// Executes minimal Rust-native fast-path control operations (`ping`).
-async fn try_execute_native_fast_path_events(msg_type: &str) -> Result<Option<Vec<Value>>, AppError> {
+async fn try_execute_native_fast_path_events(
+    msg_type: &str,
+) -> Result<Option<Vec<Value>>, AppError> {
     match msg_type {
         "ping" => Ok(Some(vec![json!({ "type": "pong" })])),
         _ => Ok(None),
     }
 }
 
-async fn merge_native_pending_permissions(mut event: Value, permissions: &PermissionGateway) -> Value {
+async fn merge_native_pending_permissions(
+    mut event: Value,
+    permissions: &PermissionGateway,
+) -> Value {
     if event.get("type").and_then(Value::as_str) != Some("permission_pending_list") {
         return event;
     }
@@ -171,7 +179,11 @@ async fn merge_native_pending_permissions(mut event: Value, permissions: &Permis
     if let Some(arr) = event.get_mut("data").and_then(Value::as_array_mut) {
         let mut seen: HashSet<String> = arr
             .iter()
-            .filter_map(|item| item.get("request_id").and_then(Value::as_str).map(String::from))
+            .filter_map(|item| {
+                item.get("request_id")
+                    .and_then(Value::as_str)
+                    .map(String::from)
+            })
             .collect();
         for rec in native_pending {
             if seen.insert(rec.request_id.clone()) {
@@ -192,7 +204,11 @@ fn spawn_worker_stream_forwarder(
     msg_type: String,
     mut stream_rx: tokio::sync::mpsc::Receiver<WorkerStreamEvent>,
     response_fut: std::pin::Pin<
-        Box<dyn std::future::Future<Output = Result<Value, crate::workers::rpc_client::RpcCallError>> + Send>,
+        Box<
+            dyn std::future::Future<
+                    Output = Result<Value, crate::workers::rpc_client::RpcCallError>,
+                > + Send,
+        >,
     >,
 ) {
     tauri::async_runtime::spawn(async move {
@@ -210,7 +226,8 @@ fn spawn_worker_stream_forwarder(
                             req_id_for_stream.as_deref(),
                             &worker_id_for_stream,
                         ) {
-                            let enriched = merge_native_pending_permissions(ev, &perms_for_stream).await;
+                            let enriched =
+                                merge_native_pending_permissions(ev, &perms_for_stream).await;
                             let _ = app_for_stream.emit(JARVIS_EVENT_NAME, &enriched);
                         }
                     }
@@ -241,7 +258,8 @@ fn spawn_worker_stream_forwarder(
         active_dispatches.lock().await.remove(&correlation_key);
 
         if let Err(err) = rpc_res {
-            let err_event = build_error_event(&msg_type, &err.to_string(), client_request_id.as_deref());
+            let err_event =
+                build_error_event(&msg_type, &err.to_string(), client_request_id.as_deref());
             let _ = app.emit(JARVIS_EVENT_NAME, &err_event);
         }
     });
@@ -258,7 +276,12 @@ pub async fn dispatch_client_message(
         .and_then(Value::as_str)
         .map(str::trim)
         .filter(|s| !s.is_empty())
-        .ok_or_else(|| AppError::new("INVALID_MESSAGE", "ClientMessage must include a non-empty `type` field"))?
+        .ok_or_else(|| {
+            AppError::new(
+                "INVALID_MESSAGE",
+                "ClientMessage must include a non-empty `type` field",
+            )
+        })?
         .to_string();
 
     let client_request_id = message
@@ -332,9 +355,39 @@ pub async fn dispatch_client_message(
         return Ok(Value::Null);
     }
 
+    if let Some(events) = crate::storage::study_modes_ops::try_execute_study_modes_fast_path(
+        &services.project_root,
+        &msg_type,
+        &message,
+    )
+    .await?
+    {
+        emit_fast_path_events(&app, events, client_request_id.as_deref());
+        return Ok(Value::Null);
+    }
+
     if let Some(events) = crate::commands::project_dispatch::try_execute_project_fast_path(
-        &app,
-        &*services,
+        &app, &*services, &msg_type, &message,
+    )
+    .await?
+    {
+        emit_fast_path_events(&app, events, client_request_id.as_deref());
+        return Ok(Value::Null);
+    }
+
+    if let Some(events) = crate::commands::mission_dispatch::try_execute_mission_fast_path(
+        &services.project_root,
+        &msg_type,
+        &message,
+    )
+    .await?
+    {
+        emit_fast_path_events(&app, events, client_request_id.as_deref());
+        return Ok(Value::Null);
+    }
+
+    if let Some(events) = crate::sentinel::dispatch::try_execute_sentinel_fast_path(
+        &services.sentinel_watchdog,
         &msg_type,
         &message,
     )
@@ -400,7 +453,12 @@ pub async fn cancel_client_request(
     if cleaned.is_empty() {
         return Ok(false);
     }
-    let active = services.active_dispatches.lock().await.get(cleaned).cloned();
+    let active = services
+        .active_dispatches
+        .lock()
+        .await
+        .get(cleaned)
+        .cloned();
     let Some(entry) = active else {
         return Ok(false);
     };
@@ -496,17 +554,47 @@ mod tests {
 
     #[test]
     fn route_message_covers_all_production_domains() {
-        assert_eq!(route_message_to_worker_role("directive"), Some(WorkerPoolRole::Ai));
-        assert_eq!(route_message_to_worker_role("select_template"), Some(WorkerPoolRole::Ai));
-        assert_eq!(route_message_to_worker_role("get_planner_state"), Some(WorkerPoolRole::Ai));
-        assert_eq!(route_message_to_worker_role("list_projects"), Some(WorkerPoolRole::Ai));
-        assert_eq!(route_message_to_worker_role("save_project_file"), Some(WorkerPoolRole::Ai));
-        assert_eq!(route_message_to_worker_role("create_coding_session"), Some(WorkerPoolRole::Ai));
+        assert_eq!(
+            route_message_to_worker_role("directive"),
+            Some(WorkerPoolRole::Ai)
+        );
+        assert_eq!(
+            route_message_to_worker_role("select_template"),
+            Some(WorkerPoolRole::Ai)
+        );
+        assert_eq!(
+            route_message_to_worker_role("get_planner_state"),
+            Some(WorkerPoolRole::Ai)
+        );
+        assert_eq!(
+            route_message_to_worker_role("list_projects"),
+            Some(WorkerPoolRole::Ai)
+        );
+        assert_eq!(
+            route_message_to_worker_role("save_project_file"),
+            Some(WorkerPoolRole::Ai)
+        );
+        assert_eq!(
+            route_message_to_worker_role("create_coding_session"),
+            Some(WorkerPoolRole::Ai)
+        );
 
-        assert_eq!(route_message_to_worker_role("study_list_documents"), Some(WorkerPoolRole::Study));
-        assert_eq!(route_message_to_worker_role("study_mode_get_flashcards"), Some(WorkerPoolRole::Study));
-        assert_eq!(route_message_to_worker_role("start_lecture_recording"), Some(WorkerPoolRole::Study));
-        assert_eq!(route_message_to_worker_role("submit_lecture_quiz"), Some(WorkerPoolRole::Study));
+        assert_eq!(
+            route_message_to_worker_role("study_list_documents"),
+            Some(WorkerPoolRole::Study)
+        );
+        assert_eq!(
+            route_message_to_worker_role("study_mode_get_flashcards"),
+            Some(WorkerPoolRole::Study)
+        );
+        assert_eq!(
+            route_message_to_worker_role("start_lecture_recording"),
+            Some(WorkerPoolRole::Study)
+        );
+        assert_eq!(
+            route_message_to_worker_role("submit_lecture_quiz"),
+            Some(WorkerPoolRole::Study)
+        );
 
         for retired_knowledge_msg in [
             "get_notes",
@@ -536,13 +624,29 @@ mod tests {
             "WorkerPoolRole::Knowledge must remain retired from production_roles()"
         );
 
-        assert_eq!(route_message_to_worker_role("mission_list"), Some(WorkerPoolRole::Mission));
-        assert_eq!(route_message_to_worker_role("work_package_create"), Some(WorkerPoolRole::Mission));
-        assert_eq!(route_message_to_worker_role("sentinel_get_status"), Some(WorkerPoolRole::Mission));
-        assert_eq!(route_message_to_worker_role("permission_approve"), Some(WorkerPoolRole::Mission));
-        assert_eq!(route_message_to_worker_role("action_confirm_response"), Some(WorkerPoolRole::Mission));
+        assert_eq!(
+            route_message_to_worker_role("mission_list"),
+            Some(WorkerPoolRole::Mission)
+        );
+        assert_eq!(
+            route_message_to_worker_role("work_package_create"),
+            Some(WorkerPoolRole::Mission)
+        );
+        // B3: sentinel_* is natively consolidated in Rust and retired from Python MissionWorker routing.
+        assert_eq!(route_message_to_worker_role("sentinel_get_status"), None);
+        assert_eq!(
+            route_message_to_worker_role("permission_approve"),
+            Some(WorkerPoolRole::Mission)
+        );
+        assert_eq!(
+            route_message_to_worker_role("action_confirm_response"),
+            Some(WorkerPoolRole::Mission)
+        );
 
-        assert_eq!(route_message_to_worker_role("toggle_voice"), Some(WorkerPoolRole::Voice));
+        assert_eq!(
+            route_message_to_worker_role("toggle_voice"),
+            Some(WorkerPoolRole::Voice)
+        );
         assert_eq!(route_message_to_worker_role("nonexistent_command"), None);
     }
 
