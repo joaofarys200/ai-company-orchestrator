@@ -283,7 +283,11 @@ class GeminiLiveService:
                     result_str = await self.execute_voice_control_tool(name, args)
                 else:
                     import agents
-                    import server
+                    from backend.runtime_bridge import (
+                        emit_broadcast,
+                        emit_broadcast_state,
+                        emit_file_update,
+                    )
 
                     if name == "execute_command":
                         cmd = args.get("command")
@@ -291,7 +295,7 @@ class GeminiLiveService:
                     elif name == "write_file":
                         fn = args.get("filename")
                         content = args.get("content")
-                        result_str = await agents.run_write_file(fn, content, server.on_file_update)
+                        result_str = await agents.run_write_file(fn, content, emit_file_update)
                     elif name == "read_file":
                         fn = args.get("filename")
                         result_str = await agents.run_read_file(fn)
@@ -338,7 +342,7 @@ class GeminiLiveService:
                     elif name == "frontend_ui_command":
                         action_name = args.get("action")
                         async def send_ui():
-                            await server.broadcast({
+                            await emit_broadcast({
                                 "type": "ui_action",
                                 "action": action_name
                             })
@@ -351,7 +355,7 @@ class GeminiLiveService:
                             current_task = asyncio.current_task()
                             self.active_tasks.add(current_task)
                             try:
-                                await server.broadcast_state("processing")
+                                await emit_broadcast_state("processing")
                                 def on_msg_dummy(sender, role, content):
                                     print(f"[Swarm {dominio} log] {sender} ({role}): {content}")
                                 def on_file_dummy(name, content):
@@ -365,7 +369,7 @@ class GeminiLiveService:
                             finally:
                                 self.active_tasks.discard(current_task)
                                 if not self.active_tasks:
-                                    await server.broadcast_state("idle")
+                                    await emit_broadcast_state("idle")
                         asyncio.create_task(run_swarm_bg())
                         result_str = f"Swarm de domínio '{dominio}' iniciado com sucesso em segundo plano com o prompt: '{prompt_p}'."
                     elif name == "criar_agente_especialista":
@@ -378,7 +382,7 @@ class GeminiLiveService:
                             current_task = asyncio.current_task()
                             self.active_tasks.add(current_task)
                             try:
-                                await server.broadcast_state("processing")
+                                await emit_broadcast_state("processing")
                                 def on_msg_dummy(sender, role, content):
                                     print(f"[Specialist {nome} log] {sender} ({role}): {content}")
                                 res = await agents.spawn_specialist_agent(nome, especialidade, backstory, tarefa, contexto, on_msg_dummy)
@@ -388,7 +392,7 @@ class GeminiLiveService:
                             finally:
                                 self.active_tasks.discard(current_task)
                                 if not self.active_tasks:
-                                    await server.broadcast_state("idle")
+                                    await emit_broadcast_state("idle")
                         asyncio.create_task(run_specialist_bg())
                         result_str = f"Agente especialista '{nome}' ({especialidade}) criado e iniciado em segundo plano para executar a tarefa."
                     elif name == "declarar_objetivo":

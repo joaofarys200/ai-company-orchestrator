@@ -18,9 +18,10 @@ class ReliabilityPersistence:
         os.makedirs(self.storage_dir, exist_ok=True)
 
     def save_decisions(self, filename: str, decisions: List[Dict[str, Any]]) -> str:
+        from backend.atomic_io import atomic_write_json
+
         path = os.path.join(self.storage_dir, filename)
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(decisions, f, indent=2)
+        atomic_write_json(path, decisions, indent=2)
         return path
 
     def load_decisions(self, filename: str) -> List[Dict[str, Any]]:

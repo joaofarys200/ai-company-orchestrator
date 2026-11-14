@@ -2,17 +2,14 @@
   "name": "ai-company-orchestrator",
   "version": "1.0.0",
   "description": "JARVIS OS AI Company Orchestrator",
-  "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "dev": "concurrently -k -n \"vite,electron\" -c \"cyan,green\" \"npm run dev --prefix frontend\" \"electron . --dev\"",
+    "dev": "tauri dev",
+    "build": "tauri build",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.12.4",
-    "concurrently": "^10.0.3",
-    "electron": "^31.7.7"
+    "@tauri-apps/cli": "^2.12.4"
   }
 }

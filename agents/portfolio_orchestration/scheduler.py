@@ -11,8 +11,8 @@ import uuid
 from typing import Dict, List, Optional, Set, Tuple
 
 try:
-    from backend.agents.multi_agent_coordination.claims import ClaimManager
-    from backend.agents.multi_agent_coordination.models import (
+    from agents.multi_agent_coordination.claims import ClaimManager
+    from agents.multi_agent_coordination.models import (
         ClaimType,
         ResourceClaim,
         ResourceGranularity,

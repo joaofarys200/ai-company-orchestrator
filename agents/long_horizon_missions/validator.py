@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple
 
-from backend.agents.long_horizon_missions.models import (
+from agents.long_horizon_missions.models import (
     LongHorizonMission,
     Milestone,
     MissionObjective,

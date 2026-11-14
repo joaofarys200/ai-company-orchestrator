@@ -20,13 +20,13 @@ def _control_engine() -> Any:
 
 
 def _long_horizon_bridge() -> Any:
-    from backend.agents.long_horizon_missions.bridge import LongHorizonMissionBridge
+    from agents.long_horizon_missions.bridge import LongHorizonMissionBridge
 
     return LongHorizonMissionBridge.get_instance()
 
 
 def _quality_bridge() -> Any:
-    from backend.agents.engineering_quality_governance.bridge import (
+    from agents.engineering_quality_governance.bridge import (
         EngineeringQualityGovernanceBridge,
     )
 
@@ -426,7 +426,7 @@ def _handle_behavioral_proof_trigger(message: dict[str, Any]) -> dict[str, Any]:
 
 
 def _handle_long_horizon_checkpoint_create(message: dict[str, Any]) -> dict[str, Any]:
-    from backend.agents.long_horizon_missions.models import CheckpointType
+    from agents.long_horizon_missions.models import CheckpointType
 
     bridge = _long_horizon_bridge()
     mid = _mission_id(message)
@@ -481,7 +481,7 @@ def _handle_long_horizon_checkpoint_create(message: dict[str, Any]) -> dict[str,
 
 
 def _handle_long_horizon_recover(message: dict[str, Any]) -> dict[str, Any]:
-    from backend.agents.long_horizon_missions.models import MissionState
+    from agents.long_horizon_missions.models import MissionState
 
     bridge = _long_horizon_bridge()
     mid = _mission_id(message)

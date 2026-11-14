@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Optional, Set
 from .models import ChangeItem, ChangeSet, ChangeType, VerificationSurface
 
 try:
-    from backend.agents.symbol_fine_grained_graph.bridge import SymbolFineGrainedGraphBridge
+    from agents.symbol_fine_grained_graph.bridge import SymbolFineGrainedGraphBridge
 except ImportError:
     try:
         from agents.symbol_fine_grained_graph.bridge import SymbolFineGrainedGraphBridge

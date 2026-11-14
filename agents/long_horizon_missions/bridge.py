@@ -9,22 +9,22 @@ import time
 from typing import Any, Dict, List, Optional, Set, Tuple
 import uuid
 
-from backend.agents.long_horizon_missions.adaptation import AdaptiveReplanner
-from backend.agents.long_horizon_missions.architecture import ArchitectureConsistencyGovernor
-from backend.agents.long_horizon_missions.behavior import BehaviorConsistencyGovernor
-from backend.agents.long_horizon_missions.budget import BudgetTracker
-from backend.agents.long_horizon_missions.cache import MissionStateCache
-from backend.agents.long_horizon_missions.checkpoint import CheckpointManager
-from backend.agents.long_horizon_missions.completion import CompletionEvaluator
-from backend.agents.long_horizon_missions.constraints import ConstraintValidator
-from backend.agents.long_horizon_missions.contracts import ContractConsistencyGovernor
-from backend.agents.long_horizon_missions.coordination import MissionCoordinationManager
-from backend.agents.long_horizon_missions.evidence import EvidenceLedger
-from backend.agents.long_horizon_missions.execution import MissionExecutionEngine
-from backend.agents.long_horizon_missions.metrics import MissionMetricsTracker
-from backend.agents.long_horizon_missions.milestones import MilestoneManager
-from backend.agents.long_horizon_missions.mission_state import MissionStateMachine
-from backend.agents.long_horizon_missions.models import (
+from agents.long_horizon_missions.adaptation import AdaptiveReplanner
+from agents.long_horizon_missions.architecture import ArchitectureConsistencyGovernor
+from agents.long_horizon_missions.behavior import BehaviorConsistencyGovernor
+from agents.long_horizon_missions.budget import BudgetTracker
+from agents.long_horizon_missions.cache import MissionStateCache
+from agents.long_horizon_missions.checkpoint import CheckpointManager
+from agents.long_horizon_missions.completion import CompletionEvaluator
+from agents.long_horizon_missions.constraints import ConstraintValidator
+from agents.long_horizon_missions.contracts import ContractConsistencyGovernor
+from agents.long_horizon_missions.coordination import MissionCoordinationManager
+from agents.long_horizon_missions.evidence import EvidenceLedger
+from agents.long_horizon_missions.execution import MissionExecutionEngine
+from agents.long_horizon_missions.metrics import MissionMetricsTracker
+from agents.long_horizon_missions.milestones import MilestoneManager
+from agents.long_horizon_missions.mission_state import MissionStateMachine
+from agents.long_horizon_missions.models import (
     CheckpointType,
     LongHorizonMission,
     Milestone,
@@ -35,16 +35,16 @@ from backend.agents.long_horizon_missions.models import (
     ObjectiveCategory,
     ObjectiveState,
 )
-from backend.agents.long_horizon_missions.objectives import ObjectiveTracker
-from backend.agents.long_horizon_missions.persistence import MissionPersistenceStore
-from backend.agents.long_horizon_missions.planning import MissionPlanner
-from backend.agents.long_horizon_missions.policy import get_policy
-from backend.agents.long_horizon_missions.provenance import ProvenanceTracker
-from backend.agents.long_horizon_missions.recovery import CrashRecoveryEngine
-from backend.agents.long_horizon_missions.risk import RiskGovernor, RiskSeverity
-from backend.agents.long_horizon_missions.security import MissionSecuritySentinel
-from backend.agents.long_horizon_missions.validator import MissionValidator
-from backend.agents.long_horizon_missions.verification import MissionVerifier
+from agents.long_horizon_missions.objectives import ObjectiveTracker
+from agents.long_horizon_missions.persistence import MissionPersistenceStore
+from agents.long_horizon_missions.planning import MissionPlanner
+from agents.long_horizon_missions.policy import get_policy
+from agents.long_horizon_missions.provenance import ProvenanceTracker
+from agents.long_horizon_missions.recovery import CrashRecoveryEngine
+from agents.long_horizon_missions.risk import RiskGovernor, RiskSeverity
+from agents.long_horizon_missions.security import MissionSecuritySentinel
+from agents.long_horizon_missions.validator import MissionValidator
+from agents.long_horizon_missions.verification import MissionVerifier
 
 
 class LongHorizonMissionBridge:

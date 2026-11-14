@@ -44,9 +44,10 @@ class OptimizationStore:
         self.decs_dir.mkdir(parents=True, exist_ok=True)
 
     def save_opportunity(self, opportunity: OptimizationOpportunity) -> str:
+        from backend.atomic_io import atomic_write_json
+
         file_path = self.opps_dir / f"{opportunity.opportunity_id}.json"
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(opportunity.to_dict(), f, indent=2)
+        atomic_write_json(file_path, opportunity.to_dict(), indent=2)
         return str(file_path)
 
     def load_opportunity(self, opportunity_id: str) -> Optional[OptimizationOpportunity]:
@@ -81,19 +82,22 @@ class OptimizationStore:
         )
 
     def save_hypothesis(self, hypothesis: OptimizationHypothesis) -> str:
+        from backend.atomic_io import atomic_write_json
+
         file_path = self.hyps_dir / f"{hypothesis.hypothesis_id}.json"
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(hypothesis.to_dict(), f, indent=2)
+        atomic_write_json(file_path, hypothesis.to_dict(), indent=2)
         return str(file_path)
 
     def save_experiment(self, experiment: ExperimentRecord) -> str:
+        from backend.atomic_io import atomic_write_json
+
         file_path = self.exps_dir / f"{experiment.experiment_id}.json"
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(experiment.to_dict(), f, indent=2)
+        atomic_write_json(file_path, experiment.to_dict(), indent=2)
         return str(file_path)
 
     def save_decision(self, decision: OptimizationDecision) -> str:
+        from backend.atomic_io import atomic_write_json
+
         file_path = self.decs_dir / f"{decision.decision_id}.json"
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(decision.to_dict(), f, indent=2)
+        atomic_write_json(file_path, decision.to_dict(), indent=2)
         return str(file_path)

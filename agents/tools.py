@@ -28,7 +28,6 @@ import agents.memory as memory
 import agents.tools as ag_tools
 import agents.obsidian_tools as obs_tools
 import agents.swarm as swarm
-import server
 from workspace_policy import (
     BASE_DIR,
     COMMAND_BLOCKLIST,
@@ -469,8 +468,8 @@ async def run_causal_diagnosis(symptom: str, subsystem: str = "workspace", error
         try:
             import uuid
             try:
-                from backend.agents.causal_diagnosis.bridge import CausalDiagnosisBridge
-                from backend.agents.causal_diagnosis.models import CausalNodeType
+                from agents.causal_diagnosis.bridge import CausalDiagnosisBridge
+                from agents.causal_diagnosis.models import CausalNodeType
             except ImportError:
                 from agents.causal_diagnosis.bridge import CausalDiagnosisBridge
                 from agents.causal_diagnosis.models import CausalNodeType
@@ -532,7 +531,7 @@ async def run_verify_evidence(claim_description: str, evidence_path: str = "") -
         try:
             import uuid
             try:
-                from backend.agents.evidence_governance.bridge import EvidenceGovernanceBridge
+                from agents.evidence_governance.bridge import EvidenceGovernanceBridge
             except ImportError:
                 from agents.evidence_governance.bridge import EvidenceGovernanceBridge
 

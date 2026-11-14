@@ -9,7 +9,7 @@ from __future__ import annotations
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
-from backend.agents.long_horizon_missions.models import (
+from agents.long_horizon_missions.models import (
     CompletionResult,
     LongHorizonMission,
     MilestoneState,

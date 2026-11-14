@@ -1,6 +1,6 @@
 """
 JARVIS OS — Phase 64: Autonomous Architecture Evolution & Design Governance
-Package: backend.agents.architecture_evolution
+Package: agents.architecture_evolution
 """
 
 from .alternatives import ArchitectureAlternativeGenerator

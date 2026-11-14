@@ -76,7 +76,7 @@ def start_local_fallback_server():
         handler = lambda *args, **kwargs: NoCacheHTTPRequestHandler(*args, directory=SANDBOX_DIR, **kwargs)
         socketserver.TCPServer.allow_reuse_address = True
         try:
-            with socketserver.TCPServer(("", PORT), handler) as httpd:
+            with socketserver.TCPServer(("127.0.0.1", PORT), handler) as httpd:
                 log_event(logger, "sandbox.local_fallback.started", port=PORT, health_path="/healthz")
                 httpd.serve_forever()
         except Exception as server_err:

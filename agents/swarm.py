@@ -28,7 +28,6 @@ import agents.memory as memory
 import agents.tools as ag_tools
 import agents.obsidian_tools as obs_tools
 import agents.swarm as swarm
-import server
 from agents.providers.factory import build_crewai_llm
 
 

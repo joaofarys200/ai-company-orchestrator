@@ -10,7 +10,7 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 import uuid
 
-from backend.agents.long_horizon_missions.models import Milestone
+from agents.long_horizon_missions.models import Milestone
 
 
 class MultiAgentBypassError(Exception):

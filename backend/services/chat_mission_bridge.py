@@ -2522,8 +2522,8 @@ class ChatMissionBridge:
     async def _run_causal_diagnosis(self, project_id: str, prompt: str) -> str:
         """Runs autonomous causal root-cause diagnosis (Phase 78)."""
         try:
-            from backend.agents.causal_diagnosis.bridge import CausalDiagnosisBridge
-            from backend.agents.causal_diagnosis.models import FailureEvent, FailureSeverity
+            from agents.causal_diagnosis.bridge import CausalDiagnosisBridge
+            from agents.causal_diagnosis.models import FailureEvent, FailureSeverity
             
             bridge = CausalDiagnosisBridge()
             failure = FailureEvent(

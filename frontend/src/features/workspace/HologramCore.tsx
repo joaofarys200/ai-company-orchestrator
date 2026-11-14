@@ -300,7 +300,7 @@ export const HologramCore: React.FC<HologramCoreProps> = ({
             setTimeout(() => setShowStatusAlert(false), 3000);
           }}
           className="relative p-2 rounded-full hover:bg-white/5 transition-all text-gray-500 hover:text-white cursor-pointer"
-          title={isConnected ? 'WebSocket Conectado (Porta 8001)' : 'WebSocket Desconectado'}
+          title={isConnected ? 'Tauri IPC Conectado' : 'Runtime Desconectado'}
         >
           <Globe className={`w-4 h-4 transition-colors ${isConnected ? 'text-emerald-400' : 'text-rose-500'}`} />
           {isConnected && (
@@ -401,7 +401,7 @@ export const HologramCore: React.FC<HologramCoreProps> = ({
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               className="absolute bottom-14 left-1/2 -translate-x-1/2 px-3.5 py-1.5 rounded-lg bg-[#05070e] border border-white/10 text-gray-300 text-[10px] font-mono whitespace-nowrap shadow-xl"
             >
-              {isConnected ? 'LIGAÇÃO ESTÁVEL: WS 8001' : 'SEM SINAL DE BACKEND'}
+              {isConnected ? 'LIGAÇÃO ESTÁVEL: TAURI IPC' : 'SEM SINAL DE BACKEND'}
             </motion.div>
           )}
         </AnimatePresence>

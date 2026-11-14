@@ -240,7 +240,7 @@ export const SystemConsolePanel: React.FC<SystemConsolePanelProps> = ({
           <span
             className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400' : 'bg-rose-400'}`}
           />
-          <span>{isConnected ? 'Daemon Online (Porta 8001)' : 'Desconectado'}</span>
+          <span>{isConnected ? 'Runtime IPC Nativo (Tauri)' : 'Desconectado'}</span>
           <span>•</span>
           <span>{logs.length} eventos registados</span>
         </div>
