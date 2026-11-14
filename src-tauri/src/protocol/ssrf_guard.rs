@@ -63,8 +63,7 @@ fn is_forbidden_ipv6(v6: Ipv6Addr) -> bool {
 /// Validates scheme, absence of embedded credentials, host safety, and rejects numeric/obfuscated
 /// hosts prior to DNS resolution.
 pub fn validate_url_syntax(raw_url: &str) -> Result<(Url, String, u16), String> {
-    let parsed = Url::parse(raw_url.trim())
-        .map_err(|e| format!("Invalid URL syntax: {e}"))?;
+    let parsed = Url::parse(raw_url.trim()).map_err(|e| format!("Invalid URL syntax: {e}"))?;
 
     let scheme = parsed.scheme();
     if scheme != "http" && scheme != "https" {
@@ -126,7 +125,9 @@ pub async fn validate_and_resolve_remote_url(raw_url: &str) -> Result<ValidatedR
     let addrs: Vec<SocketAddr> = tokio::net::lookup_host((host.as_str(), port))
         .await
         .map_err(|e| {
-            format!("SECURITY_VIOLATION: SSRF DNS resolution failed (fail-closed) for `{host}`: {e}")
+            format!(
+                "SECURITY_VIOLATION: SSRF DNS resolution failed (fail-closed) for `{host}`: {e}"
+            )
         })?
         .collect();
 
@@ -203,11 +204,10 @@ mod tests {
 
     #[tokio::test]
     async fn ssrf_resolver_fails_closed_when_dns_cannot_resolve() {
-        let err = validate_and_resolve_remote_url(
-            "https://nonexistent.invalid.jarvis.test/video.mp4",
-        )
-        .await
-        .expect_err("unresolved DNS must fail closed");
+        let err =
+            validate_and_resolve_remote_url("https://nonexistent.invalid.jarvis.test/video.mp4")
+                .await
+                .expect_err("unresolved DNS must fail closed");
         assert!(err.contains("SECURITY_VIOLATION"));
     }
 }

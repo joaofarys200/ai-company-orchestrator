@@ -48,7 +48,8 @@
     ],
     "resources": {
       "../workers/*.py": "workers/",
-      "../workers/common/*.py": "workers/common/"
+      "../workers/common/*.py": "workers/common/",
+      "py-runtime/*": "py-runtime/"
     },
     "icon": [
       "icons/32x32.png",

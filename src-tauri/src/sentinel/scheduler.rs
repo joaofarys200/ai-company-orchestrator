@@ -167,7 +167,10 @@ impl SentinelScheduler {
         let snapshot: SystemTelemetrySnapshot = collect_system_telemetry().await?;
         let (shadow_mode, threshold) = {
             let guard = self.inner.read().await;
-            (guard.config.shadow_mode, guard.config.critical_memory_load_pct)
+            (
+                guard.config.shadow_mode,
+                guard.config.critical_memory_load_pct,
+            )
         };
         let protected_pids = self.current_protected_pids();
         let high_memory_pressure = snapshot.memory.memory_load_pct >= threshold;
@@ -217,7 +220,8 @@ mod tests {
     #[tokio::test]
     async fn sentinel_defaults_to_shadow_mode_and_protects_host_and_worker_pids() {
         let worker_pid = 42420u32;
-        let scheduler = SentinelScheduler::with_default_read_only(Arc::new(move || vec![worker_pid]));
+        let scheduler =
+            SentinelScheduler::with_default_read_only(Arc::new(move || vec![worker_pid]));
 
         assert!(scheduler.is_shadow_mode().await);
 
@@ -238,10 +242,7 @@ mod tests {
             .evaluate_remediation(worker_pid, "python.exe")
             .await
             .is_err());
-        assert!(scheduler
-            .evaluate_remediation(4, "System")
-            .await
-            .is_err());
+        assert!(scheduler.evaluate_remediation(4, "System").await.is_err());
         assert!(scheduler
             .evaluate_remediation(55555, "ollama.exe")
             .await

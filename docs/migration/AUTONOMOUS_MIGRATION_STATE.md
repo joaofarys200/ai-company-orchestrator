@@ -1,8 +1,8 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-14T17:10:00Z`
-- **Current Phase:** `Post-Audit Architectural Closure — Complete (Increments A, B1, B2, B3, C, D)`
-- **Current Increment:** `Increment D Complete: Windows MSI/NSIS Packaging, %LOCALAPPDATA%\JarvisOS vs resource_dir Separation & Full Documentation Sync`
+- **Last Updated (UTC):** `2026-11-14T21:50:00Z`
+- **Current Phase:** `Pre-Merge Corrective Increment Complete — Ready for Merge Validation`
+- **Current Increment:** `Incremento Corretivo Pré-Merge: UI/Iframe/Keyboard/Video State Fixes + Standalone Bundled Python Runtime in MSI/NSIS + Working Tree Hygiene`
 - **Current Branch:** `migration/tauri-rust-complete`
 - **Main Baseline:** Untouched at `af11ae9095f4cfd8c8e01334704ffde282da9554` (awaiting user approval before merge)
 
@@ -137,6 +137,18 @@
   - Implemented `AppPaths`, `resolve_app_paths`, `resolve_app_paths_with_overrides`, and `ensure_writable_data_subdirs` in `src-tauri/src/permissions/path_jail.rs`, separating mutable runtime state (`data_root` -> `%LOCALAPPDATA%\JarvisOS` in installed builds) from read-only application resources (`resource_root` -> Tauri `resource_dir()`) while preserving developer checkouts and `JARVIS_PROJECT_ROOT` CI overrides.
   - Threaded `resource_root` and `data_root` across `src-tauri/src/lib.rs`, `src-tauri/src/commands/{media,system}.rs`, `src-tauri/src/protocol/loopback.rs` (`LoopbackHandle::start_with_roots`), `src-tauri/src/workers/supervisor.rs` (`with_resource_root`, `JARVIS_RESOURCE_ROOT`), and `workers/common/domain_bridge.py` (`JARVIS_PROJECT_ROOT` fallback).
   - Configured `src-tauri/tauri.conf.json` (`"targets": ["msi", "nsis"]` and bundled `workers/*.py` + `workers/common/*.py` resources) and expanded `.github/workflows/tauri-windows-validation.yml` to verify MSI + NSIS installer generation, packaged clean-install launch in `%LOCALAPPDATA%\JarvisOS` with zero writes to `installDir`, and in-place upgrade state persistence.
+- **Pre-Merge Corrective Increment Complete (UI Regressions + Standalone Python Worker Packaging + Working Tree Hygiene):**
+  - **UI & Security Fixes (`frontend/src/features/uiGuards.ts`, `WorkspaceViewer.tsx`, `CodeEditor.tsx`, `StudyVideoReaderView.tsx`, `uiRegressions.test.ts`):**
+    1. Added `resolvePreviewIframeSandbox` so preview iframes on isolated ephemeral HTTP preview servers (`http://127.0.0.1:<port>`, distinct from `window.location.origin`) receive `allow-scripts allow-forms allow-same-origin allow-modals` (enabling `localStorage`/`sessionStorage`/`indexedDB`), while same-origin or `about:blank` URLs omit `allow-same-origin` to prevent sandbox escape.
+    2. Added `shouldTriggerTreeRowKeyboardSelect` and `handleTreeRowDeleteKeyDown` in `CodeEditor.tsx` so `Enter` and `Space` on the `Eliminar` (`Trash2`) button delete the item and stop propagation without triggering parent row selection.
+    3. Implemented deterministic `loading`, `ready`, `error`, and `missing_media` UI states (with retry button) in `StudyVideoReaderView.tsx`.
+    4. Added `frontend/src/transport/__tests__/uiRegressions.test.ts` (`19/19` frontend tests passing).
+  - **Standalone Bundled Python Runtime (`scripts/prepare_python_runtime.py`, `src-tauri/py-runtime/manifest.json`, `src-tauri/src/workers/supervisor.rs`, `src-tauri/src/lib.rs`, `src-tauri/tauri.conf.json`):**
+    1. Anchored `PROJECT_ROOT`/`BASE_DIR`/`WORKSPACE_ROOT` to `JARVIS_PROJECT_ROOT` across `database.py`, `persistence/db.py`, `workers/common/db_guard.py`, `sandbox.py`, `workspace_policy.py`, `agents/globals.py`, `agents/mission_control_engine.py`, `agents/obsidian_tools.py`, and `agents/real_user_mission_engine.py` so extracted runtime code never writes into read-only bundle directories.
+    2. Created `scripts/prepare_python_runtime.py` assembling `src-tauri/py-runtime/runtime-bundle.zip` (`python/` standalone CPython + `67` allowlisted runtime `site-packages` entries + `app/` with `1,125` repository files across `workers`, `backend`, `agents`, `intelligence`, `persistence`, `security`, `services`, `schemas`, `config`, benchmark/AST scripts, and root modules).
+    3. Updated `WorkerSupervisor` (`ensure_bundled_python_runtime` + `verify_and_boot_production_workers`) to extract `runtime-bundle.zip` on first launch into `%LOCALAPPDATA%\JarvisOS\runtime\python-bundle` (verified by `.extracted_sha256`), set `PYTHONHOME`, `PYTHONPATH`, `PYTHONNOUSERSITE=1`, `JARVIS_RESOURCE_ROOT`, and `JARVIS_PROJECT_ROOT`, supervise all 4 production workers (`ai`, `study`, `mission`, `voice`) under Win32 `JobObject`s, and terminate all worker processes on shutdown (`0` orphan PIDs).
+    4. Updated `.github/workflows/tauri-windows-validation.yml` to build `runtime-bundle.zip`, package MSI + NSIS installers, and verify both NSIS and MSI installations on a clean `PATH="C:\Windows\System32;C:\Windows;C:\Windows\System32\Wbem"` (no Python/Node on `PATH`), asserting all 4 workers boot, upgrade data persists, and `0` worker PIDs remain alive after shutdown.
+  - **Working Tree Hygiene:** Formatted all 24 modified `.rs` files (`rustfmt`) and `SystemConsolePanel.tsx`, archived and removed the 27 obsolete duplicate subdirectories in `backend/agents/*/` (`258/258` Phase 71–79 tests passing), and preserved all local user data/databases untouched.
 
 ---
 

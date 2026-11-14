@@ -448,7 +448,10 @@ impl PreviewServerHandle {
         let mut child = cmd.spawn().map_err(|err| {
             AppError::new(
                 "PREVIEW_SPAWN_FAILED",
-                format!("Failed to start preview process `{}`: {err}", validated.program),
+                format!(
+                    "Failed to start preview process `{}`: {err}",
+                    validated.program
+                ),
             )
         })?;
 
@@ -538,12 +541,11 @@ fn build_router(state: PreviewState) -> Router {
         .with_state(state)
 }
 
-async fn preview_guard(
-    State(state): State<PreviewState>,
-    req: Request,
-    next: Next,
-) -> Response {
-    let host = req.headers().get(header::HOST).and_then(|v| v.to_str().ok());
+async fn preview_guard(State(state): State<PreviewState>, req: Request, next: Next) -> Response {
+    let host = req
+        .headers()
+        .get(header::HOST)
+        .and_then(|v| v.to_str().ok());
     if !is_valid_loopback_host(host, state.port) {
         return plain_error(StatusCode::FORBIDDEN, "Forbidden host");
     }
@@ -570,10 +572,9 @@ async fn preview_guard(
         header::X_CONTENT_TYPE_OPTIONS,
         HeaderValue::from_static("nosniff"),
     );
-    response.headers_mut().insert(
-        header::CACHE_CONTROL,
-        HeaderValue::from_static("no-store"),
-    );
+    response
+        .headers_mut()
+        .insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
     response
 }
 
@@ -658,7 +659,9 @@ mod tests {
         fs::write(proj.join("index.html"), "<h1>Preview OK</h1>").unwrap();
         fs::write(base.join("outside_secret.txt"), "top-secret").unwrap();
 
-        let preview = PreviewServerHandle::start(Some(proj.clone())).await.unwrap();
+        let preview = PreviewServerHandle::start(Some(proj.clone()))
+            .await
+            .unwrap();
         let port = preview.port();
 
         // 1. Index serves cleanly with nosniff + no-store
@@ -668,8 +671,12 @@ mod tests {
         )
         .await;
         assert_eq!(st, 200);
-        assert!(head.to_ascii_lowercase().contains("x-content-type-options: nosniff"));
-        assert!(head.to_ascii_lowercase().contains("cache-control: no-store"));
+        assert!(head
+            .to_ascii_lowercase()
+            .contains("x-content-type-options: nosniff"));
+        assert!(head
+            .to_ascii_lowercase()
+            .contains("cache-control: no-store"));
         assert_eq!(body, b"<h1>Preview OK</h1>");
 
         // 2. Host spoof blocked -> 403
@@ -692,7 +699,9 @@ mod tests {
         preview.set_workspace_root(None).unwrap();
         let (st, _, _) = send_raw_http(
             port,
-            &format!("GET /index.html HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: close\r\n\r\n"),
+            &format!(
+                "GET /index.html HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: close\r\n\r\n"
+            ),
         )
         .await;
         assert_eq!(st, 404);
@@ -705,7 +714,11 @@ mod tests {
         let dir = tempdir().unwrap();
         let proj = dunce::canonicalize(dir.path()).unwrap().join("demo-web");
         fs::create_dir_all(&proj).unwrap();
-        fs::write(proj.join("index.html"), "<html><body>Demo Web</body></html>").unwrap();
+        fs::write(
+            proj.join("index.html"),
+            "<html><body>Demo Web</body></html>",
+        )
+        .unwrap();
         fs::write(proj.join("styles.css"), "body { color: #fff; }").unwrap();
         fs::write(proj.join("app.js"), "console.log('demo');").unwrap();
         fs::write(
@@ -768,12 +781,7 @@ fn is_ignored_layout_dir(name: &str) -> bool {
     )
 }
 
-fn collect_layout_files(
-    dir: &Path,
-    depth: usize,
-    max_depth: usize,
-    out: &mut Vec<PathBuf>,
-) {
+fn collect_layout_files(dir: &Path, depth: usize, max_depth: usize, out: &mut Vec<PathBuf>) {
     if depth > max_depth {
         return;
     }
@@ -875,4 +883,3 @@ async fn wait_for_port_ready(host: &str, port: u16, timeout: Duration) -> bool {
     }
     false
 }
-

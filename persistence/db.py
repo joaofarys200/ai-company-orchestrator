@@ -12,7 +12,9 @@ from workers.common.db_guard import (
     get_active_canonical_db_path,
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(
+    os.environ.get("JARVIS_PROJECT_ROOT") or Path(__file__).resolve().parent.parent
+).resolve()
 CANONICAL_DB_PATH = get_active_canonical_db_path()
 DEFAULT_BUSY_TIMEOUT_MS = 10_000
 DEFAULT_CONNECT_TIMEOUT_SECONDS = 10.0

@@ -5,7 +5,9 @@ import re
 import shlex
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.abspath(
+    os.environ.get("JARVIS_PROJECT_ROOT") or os.path.dirname(os.path.abspath(__file__))
+)
 WORKSPACE_ROOT = os.path.realpath(os.path.abspath(BASE_DIR))
 
 COMMAND_BLOCKLIST = [

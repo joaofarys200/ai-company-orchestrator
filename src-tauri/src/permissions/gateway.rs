@@ -10,9 +10,7 @@ use serde_json::{json, Value};
 use tokio::sync::{oneshot, Mutex};
 use uuid::Uuid;
 
-use crate::permissions::policy::{
-    evaluate_permission_policy, PermissionRequestStatus,
-};
+use crate::permissions::policy::{evaluate_permission_policy, PermissionRequestStatus};
 use crate::workers::rpc_client::{ReverseRequest, ReverseRpcHandler, RpcRemoteError};
 
 pub const DEFAULT_PERMISSION_TTL: Duration = Duration::from_secs(300);
@@ -103,7 +101,13 @@ impl PermissionGateway {
         project_id: Option<String>,
         agent_id: Option<String>,
         ttl_override: Option<Duration>,
-    ) -> Result<(PermissionRequestRecord, Option<oneshot::Receiver<PermissionDecision>>), String> {
+    ) -> Result<
+        (
+            PermissionRequestRecord,
+            Option<oneshot::Receiver<PermissionDecision>>,
+        ),
+        String,
+    > {
         let tool_name = tool_name.into();
         let requested_operation = requested_operation.into();
         let reason = reason.into();
@@ -344,7 +348,8 @@ impl PermissionGateway {
         let mut expired_ids = Vec::new();
         let mut guard = self.state.lock().await;
         for (req_id, entry) in guard.requests.iter_mut() {
-            if entry.record.status == PermissionRequestStatus::WaitingForUser && now > entry.deadline
+            if entry.record.status == PermissionRequestStatus::WaitingForUser
+                && now > entry.deadline
             {
                 entry.record.status = PermissionRequestStatus::Expired;
                 if let Some(tx) = entry.waiter.take() {

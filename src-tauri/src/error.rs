@@ -23,4 +23,3 @@ impl std::fmt::Display for AppError {
 }
 
 impl std::error::Error for AppError {}
-

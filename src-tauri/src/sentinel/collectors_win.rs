@@ -33,9 +33,7 @@ pub fn read_memory_telemetry() -> Result<MemoryTelemetry, String> {
     #[cfg(windows)]
     {
         use std::mem::size_of;
-        use windows_sys::Win32::System::SystemInformation::{
-            GlobalMemoryStatusEx, MEMORYSTATUSEX,
-        };
+        use windows_sys::Win32::System::SystemInformation::{GlobalMemoryStatusEx, MEMORYSTATUSEX};
 
         let mut mem: MEMORYSTATUSEX = unsafe { std::mem::zeroed() };
         mem.dwLength = size_of::<MEMORYSTATUSEX>() as u32;

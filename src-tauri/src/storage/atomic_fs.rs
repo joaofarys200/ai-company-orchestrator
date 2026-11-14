@@ -76,11 +76,7 @@ pub fn atomic_write_bytes(root: &Path, target: &Path, data: &[u8]) -> Result<Pat
 }
 
 /// Atomically writes UTF-8 text to a target file strictly confined under `root`.
-pub fn atomic_write_string(
-    root: &Path,
-    target: &Path,
-    content: &str,
-) -> Result<PathBuf, AppError> {
+pub fn atomic_write_string(root: &Path, target: &Path, content: &str) -> Result<PathBuf, AppError> {
     atomic_write_bytes(root, target, content.as_bytes())
 }
 

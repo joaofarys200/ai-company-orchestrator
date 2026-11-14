@@ -57,7 +57,10 @@ fn ensure_not_protected_target(path: &Path) -> Result<(), AppError> {
     Ok(())
 }
 
-fn resolve_target_root(project_root: &Path, root_subpath: Option<&str>) -> Result<PathBuf, AppError> {
+fn resolve_target_root(
+    project_root: &Path,
+    root_subpath: Option<&str>,
+) -> Result<PathBuf, AppError> {
     match root_subpath.map(str::trim).filter(|s| !s.is_empty()) {
         Some(sub) => {
             let candidate = resolve_confined_path(project_root, Path::new(sub))?;

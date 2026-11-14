@@ -157,8 +157,8 @@ pub async fn stream_file_with_range(
     let file_size = meta.len();
 
     if let Some(raw_range) = range_header {
-        let parsed = http_range_header::parse_range_header(raw_range)
-            .and_then(|r| r.validate(file_size));
+        let parsed =
+            http_range_header::parse_range_header(raw_range).and_then(|r| r.validate(file_size));
         let ranges = match parsed {
             Ok(list) if list.len() == 1 => list,
             _ => {
@@ -251,13 +251,16 @@ pub(crate) async fn test_send_raw_http(port: u16, req: &str) -> (u16, String, Ve
         .expect("timed out reading HTTP response")
         .expect("read HTTP response bytes");
 
-    let sep = buf.windows(4).position(|w| w == b"\r\n\r\n").unwrap_or_else(|| {
-        panic!(
-            "valid HTTP response headers (got {} bytes: {:?})",
-            buf.len(),
-            String::from_utf8_lossy(&buf)
-        )
-    });
+    let sep = buf
+        .windows(4)
+        .position(|w| w == b"\r\n\r\n")
+        .unwrap_or_else(|| {
+            panic!(
+                "valid HTTP response headers (got {} bytes: {:?})",
+                buf.len(),
+                String::from_utf8_lossy(&buf)
+            )
+        });
     let head = String::from_utf8_lossy(&buf[..sep]).to_string();
     let body = buf[(sep + 4)..].to_vec();
 
@@ -269,4 +272,3 @@ pub(crate) async fn test_send_raw_http(port: u16, req: &str) -> (u16, String, Ve
         .expect("HTTP status code");
     (status, head, body)
 }
-

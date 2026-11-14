@@ -130,7 +130,7 @@ jobs:
       - name: Run Python core contract, worker E2E & hardening tests
         run: |
           $ErrorActionPreference = 'Continue'
-          python -m pip install --quiet pytest pyyaml jsonschema websockets httpx python-dotenv psutil pillow numpy python-docx pymupdf pdfplumber cryptography
+          python -m pip install --quiet pytest pyyaml jsonschema websockets httpx python-dotenv psutil pillow numpy python-docx pymupdf pdfplumber cryptography pydantic python-pptx
           python -m pytest -q tests/test_sqlite_hardening.py tests/test_sqlite_write_exclusivity.py tests/test_model_harness_rho_she.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py tests/test_transport_gateway.py tests/test_worker_stdio_rpc.py tests/test_security_hardening_phase3.py tests/test_domain_workers_phase3.py tests/test_e2e_workers_all_roles.py tests/test_protocol_contracts.py 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/python-contract-tests.log
           $code1 = $LASTEXITCODE
           python -m pytest -q tests/test_smoke.py tests/test_application_lifecycle.py tests/test_stage1_backend_integrity.py tests/test_mission_websocket_schema.py tests/test_server_websocket_characterization.py tests/test_study_agent_session_isolation.py tests/test_voice_readonly_access.py tests/test_runtime_security.py tests/test_websocket_dispatcher_contract.py 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/python-contract-tests.log -Append
@@ -226,7 +226,11 @@ jobs:
       - name: Build Tauri release binary & Windows installers (MSI + NSIS)
         run: |
           $ErrorActionPreference = 'Continue'
-          npm run tauri:build -- --bundles msi,nsis 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-build-no-bundle.log
+          python scripts/prepare_python_runtime.py 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-build-no-bundle.log
+          if ($LASTEXITCODE -ne 0) {
+            throw "Failed to prepare standalone Python runtime bundle"
+          }
+          npm run tauri:build -- --bundles msi,nsis 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-build-no-bundle.log -Append
           $code = $LASTEXITCODE
           "exit_code=$code" | Add-Content ci-logs/tauri-build-no-bundle.log
           if ($code -ne 0) {
@@ -251,6 +255,9 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $exe = Resolve-Path "src-tauri/target/release/jarvis-os.exe"
+          $msiFile = @(Get-ChildItem -Path "src-tauri/target/release/bundle/msi" -Filter "*.msi")[0]
+          $nsisFile = @(Get-ChildItem -Path "src-tauri/target/release/bundle/nsis" -Filter "*-setup.exe")[0]
+          $pythonHostBin = (Get-Command python).Source
           $tmpRoot = Join-Path $env:RUNNER_TEMP ("jarvis_smoke_" + [System.Guid]::NewGuid().ToString("N"))
           New-Item -ItemType Directory -Force -Path $tmpRoot | Out-Null
           $stdoutLog = Join-Path $env:RUNNER_TEMP ("jarvis_smoke_out_" + [System.Guid]::NewGuid().ToString("N") + ".log")
@@ -308,91 +315,154 @@ jobs:
               }
               Start-Sleep -Milliseconds 300
             }
-            $schemaInfo = python -c "import sqlite3, sys; c = sqlite3.connect(sys.argv[1]); objs = {r[0] for r in c.execute('SELECT name FROM sqlite_master').fetchall()}; uv = c.execute('PRAGMA user_version').fetchone()[0]; jm = c.execute('PRAGMA journal_mode').fetchone()[0]; c.close(); assert 'sessions' in objs and uv >= 1 and jm.lower() == 'wal', f'Unexpected schema: objs={sorted(objs)} uv={uv} jm={jm}'; print(f'user_version={uv} journal_mode={jm} objects={len(objs)}')" $dbPath
+            $schemaInfo = & $pythonHostBin -c "import sqlite3, sys; c = sqlite3.connect(sys.argv[1]); objs = {r[0] for r in c.execute('SELECT name FROM sqlite_master').fetchall()}; uv = c.execute('PRAGMA user_version').fetchone()[0]; jm = c.execute('PRAGMA journal_mode').fetchone()[0]; c.close(); assert 'sessions' in objs and uv >= 1 and jm.lower() == 'wal', f'Unexpected schema: objs={sorted(objs)} uv={uv} jm={jm}'; print(f'user_version={uv} journal_mode={jm} objects={len(objs)}')" $dbPath
             if ($LASTEXITCODE -ne 0) {
               throw "Rust Core SQLite schema verification failed with exit code $LASTEXITCODE"
             }
             "alive=True pid=$pidVal rss_mb=$rssMb db_bytes=$dbLen study_dir_exists=True $schemaInfo" | Add-Content ci-logs/tauri-binary-smoke.log
 
-            # Phase 2: Packaged install simulation (%LOCALAPPDATA%\JarvisOS separation + in-place upgrade persistence)
-            $installDir = Join-Path $env:RUNNER_TEMP ("jarvis_installed_" + [System.Guid]::NewGuid().ToString("N"))
+            # Phase 2 & 3: Real NSIS & MSI Clean-Machine Installers (No Python/Node on PATH) + Bundled Worker Boot + Upgrade Persistence + Complete Process Termination
+            $nsisInstallDir = Join-Path $env:RUNNER_TEMP ("jarvis_nsis_" + [System.Guid]::NewGuid().ToString("N"))
+            $msiExtractDir = Join-Path $env:RUNNER_TEMP ("jarvis_msi_" + [System.Guid]::NewGuid().ToString("N"))
             $localAppDataSim = Join-Path $env:RUNNER_TEMP ("jarvis_localappdata_" + [System.Guid]::NewGuid().ToString("N"))
-            New-Item -ItemType Directory -Force -Path (Join-Path $installDir "workers\common"), $localAppDataSim | Out-Null
-            Copy-Item -Path $exe.Path -Destination (Join-Path $installDir "jarvis-os.exe") -Force
-            Copy-Item -Path "workers\*.py" -Destination (Join-Path $installDir "workers") -Force
-            Copy-Item -Path "workers\common\*.py" -Destination (Join-Path $installDir "workers\common") -Force
-            $installedExe = Join-Path $installDir "jarvis-os.exe"
+            New-Item -ItemType Directory -Force -Path $nsisInstallDir, $msiExtractDir, $localAppDataSim | Out-Null
+
+            # 2a. Silent install via NSIS setup.exe
+            $nsisProc = Start-Process -FilePath $nsisFile.FullName -ArgumentList @("/S", "/D=$nsisInstallDir") -Wait -PassThru
+            if ($nsisProc.ExitCode -ne 0) {
+              throw "NSIS installer failed with exit code $($nsisProc.ExitCode)"
+            }
+            $nsisExeObj = Get-ChildItem -Path $nsisInstallDir -Filter "jarvis-os.exe" -Recurse | Select-Object -First 1
+            if ($null -eq $nsisExeObj) {
+              throw "NSIS installer did not produce jarvis-os.exe under $nsisInstallDir"
+            }
+            $nsisExe = $nsisExeObj.FullName
+            $nsisBaseDir = $nsisExeObj.DirectoryName
+            $nsisBundleZip = Get-ChildItem -Path $nsisBaseDir -Filter "runtime-bundle.zip" -Recurse | Select-Object -First 1
+            if ($null -eq $nsisBundleZip) {
+              throw "NSIS package did not bundle py-runtime/runtime-bundle.zip under $nsisBaseDir"
+            }
+            "nsis_installed=True exe=$nsisExe bundle_zip=$($nsisBundleZip.FullName) bundle_bytes=$($nsisBundleZip.Length)" | Add-Content ci-logs/tauri-binary-smoke.log
+
             $expectedDataRoot = Join-Path $localAppDataSim "JarvisOS"
             $installedDb = Join-Path $expectedDataRoot "database.db"
             $installedStudy = Join-Path $expectedDataRoot "data\study"
+            $nsisReportPath = Join-Path $env:RUNNER_TEMP ("jarvis_nsis_workers_" + [System.Guid]::NewGuid().ToString("N") + ".json")
+            $msiReportPath = Join-Path $env:RUNNER_TEMP ("jarvis_msi_workers_" + [System.Guid]::NewGuid().ToString("N") + ".json")
 
             $prevLocalAppData = $env:LOCALAPPDATA
             $prevDataDir = $env:JARVIS_DATA_DIR
+            $prevPath = $env:PATH
             try {
               Remove-Item Env:\JARVIS_PROJECT_ROOT -ErrorAction SilentlyContinue
               Remove-Item Env:\JARVIS_DATA_DIR -ErrorAction SilentlyContinue
+              Remove-Item Env:\JARVIS_PYTHON_BIN -ErrorAction SilentlyContinue
               $env:LOCALAPPDATA = $localAppDataSim
-
-              # Boot #1: Clean install launch without JARVIS_PROJECT_ROOT
-              $p1 = Start-Process -FilePath $installedExe -WorkingDirectory $installDir -PassThru -WindowStyle Hidden
-              try {
-                $boot1Ready = $false
-                for ($i = 0; $i -lt 60; $i++) {
-                  Start-Sleep -Milliseconds 500
-                  $p1.Refresh()
-                  if ($p1.HasExited) { break }
-                  if ((Test-Path $installedDb -PathType Leaf) -and (Test-Path $installedStudy -PathType Container) -and ((Get-Item $installedDb).Length -gt 0)) {
-                    Start-Sleep -Seconds 1
-                    $p1.Refresh()
-                    $boot1Ready = -not $p1.HasExited
-                    break
-                  }
-                }
-                if (-not $boot1Ready) {
-                  throw "Packaged clean-install boot failed to initialize $installedDb and $installedStudy"
-                }
-                if ((Test-Path (Join-Path $installDir "database.db")) -or (Test-Path (Join-Path $installDir "data"))) {
-                  throw "Packaged binary wrote state into read-only install directory $installDir"
-                }
-              } finally {
-                if ($null -ne $p1 -and -not $p1.HasExited) {
-                  & taskkill.exe /PID $p1.Id /T /F 2>$null | Out-Null
-                  Stop-Process -Id $p1.Id -Force -ErrorAction SilentlyContinue
-                  $p1.WaitForExit(5000) | Out-Null
-                }
-                Start-Sleep -Milliseconds 300
+              # Strip PATH to Windows System32 only — ZERO Python and ZERO Node on PATH!
+              $env:PATH = "C:\Windows\System32;C:\Windows;C:\Windows\System32\Wbem"
+              if ($null -ne (Get-Command python -ErrorAction SilentlyContinue)) {
+                throw "Expected no python on clean-machine PATH"
+              }
+              if ($null -ne (Get-Command node -ErrorAction SilentlyContinue)) {
+                throw "Expected no node on clean-machine PATH"
               }
 
-              # Seed user session + study catalog before simulated upgrade
-              python -c "import json, pathlib, sqlite3, sys; db = pathlib.Path(sys.argv[1]); c = sqlite3.connect(str(db)); c.execute('INSERT INTO sessions (name, created_at) VALUES (?, ?)', ('Persisted Across Upgrade', '2026-11-14T00:00:00Z')); c.commit(); c.close(); docs = pathlib.Path(sys.argv[2]) / 'documents.json'; docs.write_text(json.dumps({'doc_upgrade': {'id': 'doc_upgrade', 'title': 'Upgrade Doc'}}), encoding='utf-8')" $installedDb $installedStudy
+              # Boot #1: NSIS-installed jarvis-os.exe boots all 4 bundled workers (ai, study, mission, voice) and shuts down cleanly
+              $env:JARVIS_VERIFY_BUNDLED_WORKERS_REPORT = $nsisReportPath
+              $env:JARVIS_EXIT_AFTER_WORKER_VERIFY = "1"
+              $p1 = Start-Process -FilePath $nsisExe -WorkingDirectory $nsisBaseDir -PassThru -WindowStyle Hidden
+              if (-not $p1.WaitForExit(120000)) {
+                & C:\Windows\System32\taskkill.exe /PID $p1.Id /T /F 2>$null | Out-Null
+                throw "NSIS jarvis-os.exe timed out (120s) while extracting bundled runtime and booting all 4 workers"
+              }
+              if (-not (Test-Path $nsisReportPath -PathType Leaf)) {
+                throw "NSIS jarvis-os.exe did not write worker verification report at $nsisReportPath (exit_code=$($p1.ExitCode))"
+              }
+              $nsisReport = Get-Content $nsisReportPath -Raw | ConvertFrom-Json
+              if ($nsisReport.status -ne "verified") {
+                throw "NSIS bundled worker verification failed: $($nsisReport | ConvertTo-Json -Compress)"
+              }
+              foreach ($roleName in @("ai", "study", "mission", "voice")) {
+                $roleObj = $nsisReport.roles.$roleName
+                if ($null -eq $roleObj -or $roleObj.pid -le 0 -or $roleObj.capabilities_count -le 0) {
+                  throw "NSIS worker role '$roleName' failed to boot: $($nsisReport | ConvertTo-Json -Compress)"
+                }
+              }
+              if ($nsisReport.post_shutdown_live_pids.Count -ne 0) {
+                throw "NSIS supervisor reported live worker PIDs after shutdown_all: $($nsisReport.post_shutdown_live_pids -join ',')"
+              }
+              Start-Sleep -Milliseconds 500
+              foreach ($wPid in $nsisReport.spawned_pids) {
+                if ($null -ne (Get-Process -Id ([int]$wPid) -ErrorAction SilentlyContinue)) {
+                  throw "NSIS worker PID $wPid remained alive after jarvis-os.exe shutdown"
+                }
+              }
+              $extractedPyExe = Join-Path $expectedDataRoot "runtime\python-bundle\python\python.exe"
+              if (-not (Test-Path $extractedPyExe -PathType Leaf)) {
+                throw "Expected extracted standalone Python at $extractedPyExe"
+              }
+              if ((Test-Path (Join-Path $nsisBaseDir "database.db")) -or (Test-Path (Join-Path $nsisBaseDir "data"))) {
+                throw "NSIS binary wrote state into read-only install directory $nsisBaseDir"
+              }
+              "nsis_clean_machine_workers=True roles=ai,study,mission,voice spawned_pids=$($nsisReport.spawned_pids -join ',') orphan_pids=0" | Add-Content ci-logs/tauri-binary-smoke.log
+
+              # Seed user session + study catalog before MSI install/upgrade test
+              & $pythonHostBin -c "import json, pathlib, sqlite3, sys; db = pathlib.Path(sys.argv[1]); c = sqlite3.connect(str(db)); c.execute('INSERT INTO sessions (name, created_at) VALUES (?, ?)', ('Persisted Across Upgrade', '2026-11-14T00:00:00Z')); c.commit(); c.close(); docs = pathlib.Path(sys.argv[2]) / 'documents.json'; docs.write_text(json.dumps({'doc_upgrade': {'id': 'doc_upgrade', 'title': 'Upgrade Doc'}}), encoding='utf-8')" $installedDb $installedStudy
               if ($LASTEXITCODE -ne 0) { throw "Failed to seed pre-upgrade state in $expectedDataRoot" }
 
-              # Simulate in-place MSI/NSIS upgrade by overwriting jarvis-os.exe and re-launching
-              Copy-Item -Path $exe.Path -Destination $installedExe -Force
-              $p2 = Start-Process -FilePath $installedExe -WorkingDirectory $installDir -PassThru -WindowStyle Hidden
-              try {
-                Start-Sleep -Seconds 3
-                $p2.Refresh()
-                if ($p2.HasExited) {
-                  throw "Upgraded jarvis-os.exe exited prematurely with code $($p2.ExitCode)"
+              # 3a. Extract real MSI package via msiexec /a
+              $msiProc = Start-Process -FilePath "C:\Windows\System32\msiexec.exe" -ArgumentList @("/a", "`"$($msiFile.FullName)`"", "/qn", "TARGETDIR=`"$msiExtractDir`"") -Wait -PassThru
+              if ($msiProc.ExitCode -ne 0) {
+                throw "MSI administrative install failed with exit code $($msiProc.ExitCode)"
+              }
+              $msiExeObj = @(Get-ChildItem -Path $msiExtractDir -Filter "jarvis-os.exe" -Recurse | Where-Object { $_.FullName -ne $msiFile.FullName })[0]
+              if ($null -eq $msiExeObj) {
+                throw "MSI installer did not unpack jarvis-os.exe under $msiExtractDir"
+              }
+              $msiExe = $msiExeObj.FullName
+              $msiBaseDir = $msiExeObj.DirectoryName
+              $msiBundleZip = Get-ChildItem -Path $msiBaseDir -Filter "runtime-bundle.zip" -Recurse | Select-Object -First 1
+              if ($null -eq $msiBundleZip) {
+                throw "MSI package did not bundle py-runtime/runtime-bundle.zip under $msiBaseDir"
+              }
+              "msi_installed=True exe=$msiExe bundle_zip=$($msiBundleZip.FullName)" | Add-Content ci-logs/tauri-binary-smoke.log
+
+              # Boot #2: MSI-installed jarvis-os.exe boots on clean PATH over pre-existing %LOCALAPPDATA%\JarvisOS state
+              $env:JARVIS_VERIFY_BUNDLED_WORKERS_REPORT = $msiReportPath
+              $env:JARVIS_EXIT_AFTER_WORKER_VERIFY = "1"
+              $p2 = Start-Process -FilePath $msiExe -WorkingDirectory $msiBaseDir -PassThru -WindowStyle Hidden
+              if (-not $p2.WaitForExit(120000)) {
+                & C:\Windows\System32\taskkill.exe /PID $p2.Id /T /F 2>$null | Out-Null
+                throw "MSI jarvis-os.exe timed out (120s) while booting workers on upgraded state"
+              }
+              if (-not (Test-Path $msiReportPath -PathType Leaf)) {
+                throw "MSI jarvis-os.exe did not write worker verification report at $msiReportPath (exit_code=$($p2.ExitCode))"
+              }
+              $msiReport = Get-Content $msiReportPath -Raw | ConvertFrom-Json
+              if ($msiReport.status -ne "verified") {
+                throw "MSI bundled worker verification failed: $($msiReport | ConvertTo-Json -Compress)"
+              }
+              if ($msiReport.sessions_count -lt 1 -or $msiReport.documents_count -lt 1) {
+                throw "MSI binary did not see pre-existing sessions/documents across upgrade: $($msiReport | ConvertTo-Json -Compress)"
+              }
+              Start-Sleep -Milliseconds 500
+              foreach ($wPid in $msiReport.spawned_pids) {
+                if ($null -ne (Get-Process -Id ([int]$wPid) -ErrorAction SilentlyContinue)) {
+                  throw "MSI worker PID $wPid remained alive after jarvis-os.exe shutdown"
                 }
-              } finally {
-                if ($null -ne $p2 -and -not $p2.HasExited) {
-                  & taskkill.exe /PID $p2.Id /T /F 2>$null | Out-Null
-                  Stop-Process -Id $p2.Id -Force -ErrorAction SilentlyContinue
-                  $p2.WaitForExit(5000) | Out-Null
-                }
-                Start-Sleep -Milliseconds 300
               }
 
-              $upgradeVerify = python -c "import json, pathlib, sqlite3, sys; c = sqlite3.connect(sys.argv[1]); row = c.execute('SELECT name FROM sessions WHERE name = ?', ('Persisted Across Upgrade',)).fetchone(); c.close(); docs = json.loads((pathlib.Path(sys.argv[2]) / 'documents.json').read_text(encoding='utf-8')); assert row and row[0] == 'Persisted Across Upgrade', f'Missing session after upgrade: {row}'; assert 'doc_upgrade' in docs, f'Missing study doc after upgrade: {docs}'; print('packaged_localappdata=True upgrade_persisted=True')" $installedDb $installedStudy
+              $upgradeVerify = & $pythonHostBin -c "import json, pathlib, sqlite3, sys; c = sqlite3.connect(sys.argv[1]); row = c.execute('SELECT name FROM sessions WHERE name = ?', ('Persisted Across Upgrade',)).fetchone(); c.close(); docs = json.loads((pathlib.Path(sys.argv[2]) / 'documents.json').read_text(encoding='utf-8')); assert row and row[0] == 'Persisted Across Upgrade', f'Missing session after upgrade: {row}'; assert 'doc_upgrade' in docs, f'Missing study doc after upgrade: {docs}'; print('packaged_localappdata=True msi_nsis_clean_machine=True upgrade_persisted=True orphan_workers=0')" $installedDb $installedStudy
               if ($LASTEXITCODE -ne 0) { throw "Post-upgrade persistence verification failed" }
               $upgradeVerify | Add-Content ci-logs/tauri-binary-smoke.log
             } finally {
+              $env:PATH = $prevPath
               $env:LOCALAPPDATA = $prevLocalAppData
               $env:JARVIS_PROJECT_ROOT = $prevRoot
               $env:JARVIS_DATA_DIR = $prevDataDir
-              Remove-Item -Recurse -Force $installDir, $localAppDataSim -ErrorAction SilentlyContinue
+              Remove-Item Env:\JARVIS_VERIFY_BUNDLED_WORKERS_REPORT -ErrorAction SilentlyContinue
+              Remove-Item Env:\JARVIS_EXIT_AFTER_WORKER_VERIFY -ErrorAction SilentlyContinue
+              Remove-Item -Recurse -Force $nsisInstallDir, $msiExtractDir, $localAppDataSim, $nsisReportPath, $msiReportPath -ErrorAction SilentlyContinue
             }
             "exit_code=0" | Add-Content ci-logs/tauri-binary-smoke.log
           } finally {

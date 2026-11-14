@@ -56,7 +56,10 @@ pub fn obsidian_path_looks_like_code_artifact(filename: &str) -> bool {
 /// Normalizes a relative Markdown note filename and rejects traversal or invalid segments.
 pub fn normalize_note_rel_path(filename: &str, ensure_md: bool) -> Result<String, AppError> {
     if filename.contains('\0') {
-        return Err(AppError::new("INVALID_NOTE_PATH", "Caminho de nota inválido."));
+        return Err(AppError::new(
+            "INVALID_NOTE_PATH",
+            "Caminho de nota inválido.",
+        ));
     }
     let replaced = filename.trim().replace('\\', "/");
     let trimmed = replaced.trim_start_matches('/');
@@ -71,7 +74,10 @@ pub fn normalize_note_rel_path(filename: &str, ensure_md: bool) -> Result<String
     }
     let rel_path = Path::new(trimmed);
     for comp in rel_path.components() {
-        if matches!(comp, Component::ParentDir | Component::RootDir | Component::Prefix(_)) {
+        if matches!(
+            comp,
+            Component::ParentDir | Component::RootDir | Component::Prefix(_)
+        ) {
             return Err(AppError::new(
                 "VAULT_SECURITY_VIOLATION",
                 "Acesso fora da pasta do Obsidian não permitido.",
@@ -185,7 +191,8 @@ pub fn save_note_events(
                     .to_string(),
             );
         }
-        let rel = normalize_note_rel_path(fname, true).map_err(|e| format!("Erro ao escrever nota: {}", e.message))?;
+        let rel = normalize_note_rel_path(fname, true)
+            .map_err(|e| format!("Erro ao escrever nota: {}", e.message))?;
         let target = resolve_confined_path(vault_root, Path::new(&rel))
             .map_err(|e| format!("Erro ao escrever nota: {}", e.message))?;
         atomic_write_string(vault_root, &target, content)
@@ -221,8 +228,12 @@ mod tests {
 
         // Artifact rejection
         assert!(obsidian_path_looks_like_code_artifact("backend/server.py"));
-        assert!(obsidian_path_looks_like_code_artifact("sandbox/index.html.md"));
-        assert!(!obsidian_path_looks_like_code_artifact("00 - Architecture/Rust Core.md"));
+        assert!(obsidian_path_looks_like_code_artifact(
+            "sandbox/index.html.md"
+        ));
+        assert!(!obsidian_path_looks_like_code_artifact(
+            "00 - Architecture/Rust Core.md"
+        ));
 
         let blocked_save = save_note_events(&vault, Some("../escape.md"), Some("secret"));
         assert!(blocked_save[1]["result"]
@@ -238,7 +249,11 @@ mod tests {
             .contains("artefacto de codigo"));
 
         // Valid write + read + list
-        let ok_save = save_note_events(&vault, Some("Concepts/Rust Core"), Some("# Rust Core\nContent"));
+        let ok_save = save_note_events(
+            &vault,
+            Some("Concepts/Rust Core"),
+            Some("# Rust Core\nContent"),
+        );
         assert!(ok_save[1]["result"]
             .as_str()
             .unwrap()

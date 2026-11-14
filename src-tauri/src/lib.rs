@@ -120,6 +120,68 @@ pub fn run() {
                 sentinel_watchdog,
                 active_dispatches: Arc::new(Mutex::new(HashMap::new())),
             });
+            if let Some(report_path) = std::env::var_os("JARVIS_VERIFY_BUNDLED_WORKERS_REPORT") {
+                let report_path = std::path::PathBuf::from(report_path);
+                let exit_after = std::env::var_os("JARVIS_EXIT_AFTER_WORKER_VERIFY").is_some();
+                let app_handle = app.handle().clone();
+                tauri::async_runtime::spawn(async move {
+                    let services = app_handle.state::<commands::media::RuntimeServices>();
+                    let sessions_count = services
+                        .db
+                        .list_sessions(50)
+                        .map(|s| s.len())
+                        .unwrap_or(0);
+                    let _ = services.study_store.refresh().await;
+                    let documents_count = services.study_store.list_documents().await.len();
+                    let worker_result =
+                        services.workers.verify_and_boot_production_workers().await;
+                    let mut final_payload = match worker_result {
+                        Ok(val) => val,
+                        Err(err) => serde_json::json!({
+                            "status": "error",
+                            "error": err.to_string(),
+                        }),
+                    };
+                    if exit_after {
+                        services.workers.shutdown_all().await;
+                    }
+                    let post_shutdown_pids = services.workers.live_pids();
+                    if let Some(obj) = final_payload.as_object_mut() {
+                        obj.insert(
+                            "sessions_count".to_string(),
+                            serde_json::json!(sessions_count),
+                        );
+                        obj.insert(
+                            "documents_count".to_string(),
+                            serde_json::json!(documents_count),
+                        );
+                        obj.insert(
+                            "shutdown_requested".to_string(),
+                            serde_json::json!(exit_after),
+                        );
+                        obj.insert(
+                            "post_shutdown_live_pids".to_string(),
+                            serde_json::json!(post_shutdown_pids),
+                        );
+                    }
+                    if let Some(parent) = report_path.parent() {
+                        let _ = std::fs::create_dir_all(parent);
+                    }
+                    if let Ok(serialized) = serde_json::to_string_pretty(&final_payload) {
+                        let _ = std::fs::write(&report_path, serialized);
+                    }
+                    if exit_after {
+                        let code = if final_payload.get("status").and_then(|v| v.as_str())
+                            == Some("verified")
+                        {
+                            0
+                        } else {
+                            2
+                        };
+                        std::process::exit(code);
+                    }
+                });
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

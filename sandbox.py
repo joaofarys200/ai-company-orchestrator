@@ -16,7 +16,9 @@ from backend.logging_config import get_logger, log_event
 logger = get_logger(__name__)
 
 PORT = int(os.getenv("DOCKER_PORT", 8080))
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.abspath(
+    os.environ.get("JARVIS_PROJECT_ROOT") or os.path.dirname(os.path.abspath(__file__))
+)
 SANDBOX_DIR = os.path.join(BASE_DIR, "sandbox_dir")
 
 def init_sandbox_dir():

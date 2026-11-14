@@ -16,7 +16,9 @@ use crate::commands::storage::{
 };
 use crate::error::AppError;
 use crate::knowledge::graph_engine::{KnowledgeError, ObsidianGraphEngine};
-use crate::knowledge::vault::{list_notes, read_note_payload, resolve_vault_root, save_note_events};
+use crate::knowledge::vault::{
+    list_notes, read_note_payload, resolve_vault_root, save_note_events,
+};
 use crate::storage::sqlite::SqliteDatabase;
 
 fn map_knowledge_error(err: KnowledgeError) -> AppError {
@@ -48,7 +50,12 @@ where
         Ok::<T, AppError>(f(&vault_root))
     })
     .await
-    .map_err(|err| AppError::new("KNOWLEDGE_TASK_PANIC", format!("Knowledge vault task failed: {err}")))?
+    .map_err(|err| {
+        AppError::new(
+            "KNOWLEDGE_TASK_PANIC",
+            format!("Knowledge vault task failed: {err}"),
+        )
+    })?
 }
 
 /// Executes a deterministic or bounded-LLM Knowledge route natively in Rust.
@@ -326,7 +333,10 @@ pub async fn try_execute_knowledge_fast_path(
             })
             .await
             .map_err(|err| {
-                AppError::new("KNOWLEDGE_TASK_PANIC", format!("Knowledge batch init failed: {err}"))
+                AppError::new(
+                    "KNOWLEDGE_TASK_PANIC",
+                    format!("Knowledge batch init failed: {err}"),
+                )
             })?
             .map_err(map_knowledge_error)?;
 
@@ -334,15 +344,16 @@ pub async fn try_execute_knowledge_fast_path(
                 .run_bounded_improvement_batch(batch_size)
                 .await
                 .map_err(map_knowledge_error)?;
-            let diagnostics = tokio::task::spawn_blocking(move || engine.compute_graph_diagnostics())
-                .await
-                .map_err(|err| {
-                    AppError::new(
-                        "KNOWLEDGE_TASK_PANIC",
-                        format!("Knowledge diagnostics task failed: {err}"),
-                    )
-                })?
-                .map_err(map_knowledge_error)?;
+            let diagnostics =
+                tokio::task::spawn_blocking(move || engine.compute_graph_diagnostics())
+                    .await
+                    .map_err(|err| {
+                        AppError::new(
+                            "KNOWLEDGE_TASK_PANIC",
+                            format!("Knowledge diagnostics task failed: {err}"),
+                        )
+                    })?
+                    .map_err(map_knowledge_error)?;
 
             let count_processed = proposals.len();
             Ok(Some(vec![json!({
@@ -445,9 +456,13 @@ mod tests {
         db.add_architecture_memory("knowledge", "Native Rust engine", "[]", "hash1")
             .await
             .unwrap();
-        db.add_engineering_decision("Use Rust single-writer SQLite", "Eliminate lock contention", "ADRs")
-            .await
-            .unwrap();
+        db.add_engineering_decision(
+            "Use Rust single-writer SQLite",
+            "Eliminate lock contention",
+            "ADRs",
+        )
+        .await
+        .unwrap();
 
         let rules_ev = try_execute_knowledge_fast_path(root, &db, "get_rules", &json!({}))
             .await
@@ -456,15 +471,11 @@ mod tests {
         assert_eq!(rules_ev[0]["type"], "rules_list");
         assert_eq!(rules_ev[0]["rules"].as_array().unwrap().len(), 1);
 
-        let del_rule = try_execute_knowledge_fast_path(
-            root,
-            &db,
-            "delete_rule",
-            &json!({ "key": "k1" }),
-        )
-        .await
-        .unwrap()
-        .unwrap();
+        let del_rule =
+            try_execute_knowledge_fast_path(root, &db, "delete_rule", &json!({ "key": "k1" }))
+                .await
+                .unwrap()
+                .unwrap();
         assert_eq!(del_rule.len(), 2);
         assert_eq!(del_rule[0]["type"], "rules_list");
         assert_eq!(del_rule[1]["type"], "rules_updated");
@@ -495,15 +506,11 @@ mod tests {
         assert_eq!(del_dec[0]["decisions"].as_array().unwrap().len(), 0);
 
         // 8. get_vault_diagnostics
-        let diag_ev = try_execute_knowledge_fast_path(
-            root,
-            &db,
-            "get_vault_diagnostics",
-            &json!({}),
-        )
-        .await
-        .unwrap()
-        .unwrap();
+        let diag_ev =
+            try_execute_knowledge_fast_path(root, &db, "get_vault_diagnostics", &json!({}))
+                .await
+                .unwrap()
+                .unwrap();
         assert_eq!(diag_ev[0]["type"], "vault_diagnostics");
         assert_eq!(diag_ev[0]["diagnostics"]["total_notes"], 2);
 
@@ -518,7 +525,10 @@ mod tests {
         .unwrap()
         .unwrap();
         assert_eq!(audit_ev[0]["type"], "note_quality_audit");
-        assert_eq!(audit_ev[0]["audit"]["rel_path"], "Architecture/RAG Pipeline.md");
+        assert_eq!(
+            audit_ev[0]["audit"]["rel_path"],
+            "Architecture/RAG Pipeline.md"
+        );
 
         // 10. enrich_note + 11. rollback_note
         let enrich_ev = try_execute_knowledge_fast_path(
@@ -553,7 +563,8 @@ mod tests {
         assert_eq!(rollback_ev[0]["success"], true);
 
         // Verify note content was restored cleanly
-        let restored = fs::read_to_string(root.join("obsidian_vault/Architecture/RAG Pipeline.md")).unwrap();
+        let restored =
+            fs::read_to_string(root.join("obsidian_vault/Architecture/RAG Pipeline.md")).unwrap();
         assert!(restored.starts_with("# Agentic RAG"));
 
         // Invalid rollback path returns structured error event instead of unwinding
@@ -582,10 +593,11 @@ mod tests {
         assert_eq!(pause_ev[0]["action"], "paused");
         assert_eq!(pause_ev[0]["worker_state"]["is_paused"], true);
 
-        let resume_ev = try_execute_knowledge_fast_path(root, &db, "resume_queue_worker", &json!({}))
-            .await
-            .unwrap()
-            .unwrap();
+        let resume_ev =
+            try_execute_knowledge_fast_path(root, &db, "resume_queue_worker", &json!({}))
+                .await
+                .unwrap()
+                .unwrap();
         assert_eq!(resume_ev[0]["type"], "queue_worker_status");
         assert_eq!(resume_ev[0]["action"], "resumed");
         assert_eq!(resume_ev[0]["worker_state"]["is_paused"], false);
@@ -612,9 +624,11 @@ mod tests {
         assert!(batch_ev[0]["diagnostics"]["total_notes"].as_u64().is_some());
 
         // Unrelated message returns None
-        assert!(try_execute_knowledge_fast_path(root, &db, "mission_list", &json!({}))
-            .await
-            .unwrap()
-            .is_none());
+        assert!(
+            try_execute_knowledge_fast_path(root, &db, "mission_list", &json!({}))
+                .await
+                .unwrap()
+                .is_none()
+        );
     }
 }

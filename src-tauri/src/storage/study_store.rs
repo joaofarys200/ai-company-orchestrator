@@ -277,7 +277,8 @@ mod tests {
     use tempfile::tempdir;
 
     #[tokio::test]
-    async fn study_store_roundtrips_documents_collections_flashcards_and_quarantines_corrupt_json() {
+    async fn study_store_roundtrips_documents_collections_flashcards_and_quarantines_corrupt_json()
+    {
         let dir = tempdir().expect("create tempdir");
         std::fs::write(dir.path().join("documents.json"), "{not-valid-json")
             .expect("seed corrupt json");
@@ -335,7 +336,11 @@ mod tests {
         assert_eq!(doc["custom_nested"]["pages"], 42);
         assert_eq!(reloaded.list_collections().await.len(), 1);
         assert_eq!(
-            reloaded.list_flashcards(Some("doc_01")).await.unwrap().len(),
+            reloaded
+                .list_flashcards(Some("doc_01"))
+                .await
+                .unwrap()
+                .len(),
             1
         );
 

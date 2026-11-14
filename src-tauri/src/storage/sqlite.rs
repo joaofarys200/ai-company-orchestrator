@@ -743,7 +743,10 @@ impl SqliteDatabase {
         .await
     }
 
-    pub async fn delete_compounding_rule(&self, rule_key: impl Into<String>) -> Result<bool, String> {
+    pub async fn delete_compounding_rule(
+        &self,
+        rule_key: impl Into<String>,
+    ) -> Result<bool, String> {
         let rule_key = rule_key.into();
         self.write_with(move |conn| {
             let deleted = conn
@@ -857,7 +860,10 @@ impl SqliteDatabase {
         .await
     }
 
-    pub async fn delete_architecture_memory(&self, module: impl Into<String>) -> Result<bool, String> {
+    pub async fn delete_architecture_memory(
+        &self,
+        module: impl Into<String>,
+    ) -> Result<bool, String> {
         let module = module.into();
         self.write_with(move |conn| {
             let deleted = conn
@@ -958,7 +964,9 @@ impl SqliteDatabase {
         .await
     }
 
-    pub async fn get_engineering_decisions(&self) -> Result<Vec<EngineeringDecisionRecord>, String> {
+    pub async fn get_engineering_decisions(
+        &self,
+    ) -> Result<Vec<EngineeringDecisionRecord>, String> {
         self.read_with(|conn| {
             let mut stmt = conn
                 .prepare(
@@ -1104,7 +1112,8 @@ impl SqliteDatabase {
     }
 
     pub async fn rho_ensure_schema(&self) -> Result<(), String> {
-        self.write_with(|conn| ensure_rho_schema_on_conn(conn)).await
+        self.write_with(|conn| ensure_rho_schema_on_conn(conn))
+            .await
     }
 
     pub async fn rho_record_trajectory(
@@ -1227,7 +1236,9 @@ impl SqliteDatabase {
                 .query_row("SELECT COUNT(*) FROM sessions", [], |row| row.get(0))
                 .map_err(|e| format!("runtime_db_metrics sessions count failed: {e}"))?;
             let total_events_in_log: i64 = conn
-                .query_row("SELECT COUNT(*) FROM event_sourcing_log", [], |row| row.get(0))
+                .query_row("SELECT COUNT(*) FROM event_sourcing_log", [], |row| {
+                    row.get(0)
+                })
                 .map_err(|e| format!("runtime_db_metrics events count failed: {e}"))?;
             Ok(RuntimeDbMetrics {
                 sqlite_online: true,
@@ -1307,7 +1318,10 @@ mod tests {
         let dir = tempdir().expect("create tempdir");
         let db = SqliteDatabase::open(dir.path().join("concurrent.db")).expect("open sqlite");
 
-        let session = db.create_session("Concurrency").await.expect("create session");
+        let session = db
+            .create_session("Concurrency")
+            .await
+            .expect("create session");
         let mut handles = Vec::new();
 
         for writer_idx in 0..16 {
@@ -1340,7 +1354,9 @@ mod tests {
 
         let all_msgs = db.list_messages(session.id, 500).await.unwrap();
         assert_eq!(all_msgs.len(), 80);
-        assert!(all_msgs.iter().all(|m| m.sender == "CLIENTE" || m.sender == "JARVIS"));
+        assert!(all_msgs
+            .iter()
+            .all(|m| m.sender == "CLIENTE" || m.sender == "JARVIS"));
     }
 
     #[tokio::test]
@@ -1350,7 +1366,10 @@ mod tests {
 
         let s = db.create_session("RepoParity").await.unwrap();
         assert!(db.update_session_status(s.id, "running").await.unwrap());
-        assert_eq!(db.get_session(s.id).await.unwrap().unwrap().status, "running");
+        assert_eq!(
+            db.get_session(s.id).await.unwrap().unwrap().status,
+            "running"
+        );
 
         // Project upsert on session_id
         let p1 = db
@@ -1396,7 +1415,9 @@ mod tests {
         assert_eq!(goal.status, "active");
         assert_eq!(db.list_strategic_goals().await.unwrap().len(), 1);
 
-        db.append_event_log("PHASE_3", Some("ok".into())).await.unwrap();
+        db.append_event_log("PHASE_3", Some("ok".into()))
+            .await
+            .unwrap();
         assert_eq!(db.list_event_logs(10).await.unwrap().len(), 1);
     }
 

@@ -354,9 +354,12 @@ mod tests {
         assert_eq!(perm["decision"], "approved");
 
         // 4. Full SQLite + RHO flow executes exclusively inside Rust SqliteDatabase.
-        let session = handler(make_req("sqlite.create_session", json!({ "name": "RPC Session" })))
-            .await
-            .expect("create session");
+        let session = handler(make_req(
+            "sqlite.create_session",
+            json!({ "name": "RPC Session" }),
+        ))
+        .await
+        .expect("create session");
         let sid = session["id"].as_i64().unwrap();
 
         let msg = handler(make_req(

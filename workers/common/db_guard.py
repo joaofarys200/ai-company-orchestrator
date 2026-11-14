@@ -20,7 +20,9 @@ from typing import Any
 from urllib.parse import parse_qs, unquote, urlsplit
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = Path(
+    os.environ.get("JARVIS_PROJECT_ROOT") or Path(__file__).resolve().parent.parent.parent
+).resolve()
 DEFAULT_CANONICAL_DB_PATH = PROJECT_ROOT / "database.db"
 
 _GUARD_LOCK = threading.Lock()

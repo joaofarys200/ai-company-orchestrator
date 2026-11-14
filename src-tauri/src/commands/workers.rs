@@ -49,4 +49,3 @@ pub async fn worker_system_health(
         .await
         .map_err(|err| AppError::new("WORKER_RPC_FAILED", err.to_string()))
 }
-

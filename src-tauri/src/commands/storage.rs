@@ -139,7 +139,14 @@ pub async fn sqlite_save_project(
 ) -> Result<ProjectRecord, AppError> {
     services
         .db
-        .save_project(session_id, name, description, html_content, css_content, js_content)
+        .save_project(
+            session_id,
+            name,
+            description,
+            html_content,
+            css_content,
+            js_content,
+        )
         .await
         .map_err(|err| AppError::new("SQLITE_WRITE_FAILED", err))
 }

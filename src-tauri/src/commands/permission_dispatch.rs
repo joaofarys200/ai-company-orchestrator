@@ -84,7 +84,11 @@ fn load_disk_request(project_root: &Path, request_id: &str) -> Result<Option<Val
     Ok(Some(parsed))
 }
 
-fn persist_disk_request(project_root: &Path, request_id: &str, value: &Value) -> Result<(), AppError> {
+fn persist_disk_request(
+    project_root: &Path,
+    request_id: &str,
+    value: &Value,
+) -> Result<(), AppError> {
     let dir = requests_dir(project_root);
     fs::create_dir_all(&dir).map_err(|err| {
         AppError::new(
@@ -103,7 +107,11 @@ fn persist_disk_request(project_root: &Path, request_id: &str, value: &Value) ->
     Ok(())
 }
 
-fn persist_disk_rollback(project_root: &Path, request_id: &str, rollback: &Value) -> Result<(), AppError> {
+fn persist_disk_rollback(
+    project_root: &Path,
+    request_id: &str,
+    rollback: &Value,
+) -> Result<(), AppError> {
     let dir = rollbacks_dir(project_root);
     fs::create_dir_all(&dir).map_err(|err| {
         AppError::new(
@@ -362,7 +370,9 @@ fn validate_installer_source(source: &str) -> Result<(), String> {
         return Ok(());
     }
     if cleaned.contains("..") || cleaned.contains('\\') || cleaned.starts_with('/') {
-        return Err("Supply Chain rejected installer source containing path traversal.".to_string());
+        return Err(
+            "Supply Chain rejected installer source containing path traversal.".to_string(),
+        );
     }
     let lower = cleaned.to_ascii_lowercase();
     if TRUSTED_INSTALLER_PREFIXES
@@ -404,7 +414,11 @@ async fn handle_get_pending(
 
     let mut seen: HashSet<String> = pending
         .iter()
-        .filter_map(|item| item.get("request_id").and_then(Value::as_str).map(String::from))
+        .filter_map(|item| {
+            item.get("request_id")
+                .and_then(Value::as_str)
+                .map(String::from)
+        })
         .collect();
 
     let dir = requests_dir(project_root);
@@ -478,7 +492,8 @@ async fn handle_approve(
         }
     };
     let user = opt_json_str(message, "user").unwrap_or_else(|| "human_operator".to_string());
-    let session_id = opt_json_str(message, "session_id").unwrap_or_else(|| "web_session".to_string());
+    let session_id =
+        opt_json_str(message, "session_id").unwrap_or_else(|| "web_session".to_string());
     let project_id = opt_json_str(message, "project_id");
     let mission_id = opt_json_str(message, "mission_id");
 
@@ -662,7 +677,8 @@ async fn handle_deny(
     let user = opt_json_str(message, "user").unwrap_or_else(|| "human_operator".to_string());
     let reason =
         opt_json_str(message, "reason").unwrap_or_else(|| "Denied by operator".to_string());
-    let session_id = opt_json_str(message, "session_id").unwrap_or_else(|| "web_session".to_string());
+    let session_id =
+        opt_json_str(message, "session_id").unwrap_or_else(|| "web_session".to_string());
     let project_id = opt_json_str(message, "project_id");
     let mission_id = opt_json_str(message, "mission_id");
 
@@ -832,7 +848,8 @@ async fn handle_resolve_choice(
     let request_id = validate_request_id(raw_id)?;
     let action = json_str(message, "action").to_ascii_uppercase();
     let user = opt_json_str(message, "user").unwrap_or_else(|| "human_operator".to_string());
-    let session_id = opt_json_str(message, "session_id").unwrap_or_else(|| "web_session".to_string());
+    let session_id =
+        opt_json_str(message, "session_id").unwrap_or_else(|| "web_session".to_string());
 
     if action == "CANCEL" {
         let mut events = handle_deny(project_root, permissions, message).await?;
@@ -945,14 +962,20 @@ async fn handle_resolve_choice(
                         map.insert("policy_reason".to_string(), json!(supply_err));
                     }
                     persist_disk_request(project_root, &request_id, &req)?;
-                    return Err(AppError::new("PERMISSION_SUPPLY_CHAIN_REJECTED", supply_err));
+                    return Err(AppError::new(
+                        "PERMISSION_SUPPLY_CHAIN_REJECTED",
+                        supply_err,
+                    ));
                 }
             }
 
             let now = now_unix_secs();
             if let Some(map) = req.as_object_mut() {
                 map.insert("user_decision".to_string(), json!("USER_APPROVED"));
-                map.insert("approval_semantic".to_string(), json!("AUTHORIZE_INSTALLATION"));
+                map.insert(
+                    "approval_semantic".to_string(),
+                    json!("AUTHORIZE_INSTALLATION"),
+                );
                 map.insert("decided_by".to_string(), json!(user));
                 map.insert("session_id".to_string(), json!(session_id));
                 map.insert("decided_at".to_string(), json!(now));
@@ -994,10 +1017,9 @@ async fn handle_resolve_choice(
 
         _ => {
             let mut events = handle_approve(project_root, permissions, message).await?;
-            if let Some(cap_ev) = events
-                .iter_mut()
-                .find(|ev| ev.get("type").and_then(Value::as_str) == Some("permission_capability_result"))
-            {
+            if let Some(cap_ev) = events.iter_mut().find(|ev| {
+                ev.get("type").and_then(Value::as_str) == Some("permission_capability_result")
+            }) {
                 if cap_ev.get("status").and_then(Value::as_str) == Some("INSTALLATION_REQUIRED") {
                     let inst_id = format!("perm-{}", &Uuid::new_v4().simple().to_string()[..12]);
                     let now = now_unix_secs();
@@ -1022,7 +1044,9 @@ async fn handle_resolve_choice(
                         "decision_evidence": { "parent_request_id": request_id },
                     });
                     persist_disk_request(project_root, &inst_id, &child_req)?;
-                    if let Some(cap_obj) = cap_ev.get_mut("capability").and_then(Value::as_object_mut) {
+                    if let Some(cap_obj) =
+                        cap_ev.get_mut("capability").and_then(Value::as_object_mut)
+                    {
                         cap_obj.insert("installation_request_id".to_string(), json!(inst_id));
                     }
                     events.push(json!({

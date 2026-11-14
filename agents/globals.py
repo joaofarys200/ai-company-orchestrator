@@ -91,5 +91,8 @@ _SPAWNED_AGENTS_PATH = Path(_ECC_BASE_DIR) / "config" / "spawned_agents.json"
 
 
 # --- BASE_DIR ---
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.abspath(
+    os.environ.get("JARVIS_PROJECT_ROOT")
+    or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 

@@ -12,25 +12,13 @@ use serde::Serialize;
 use tokio::io::AsyncReadExt;
 use tokio::process::Command;
 
-use crate::permissions::path_jail::{
-    is_blocked_system_path, resolve_confined_path,
-};
+use crate::permissions::path_jail::{is_blocked_system_path, resolve_confined_path};
 use crate::process::job_object::WORKER_CREATION_FLAGS;
 
 pub const MAX_COMMAND_OUTPUT_BYTES: usize = 512 * 1024; // 512 KiB per stream
 
 const ALLOWED_EXECUTABLES: &[&str] = &[
-    "python",
-    "python3",
-    "pytest",
-    "npm",
-    "npx",
-    "node",
-    "tsc",
-    "vite",
-    "cargo",
-    "rustc",
-    "git",
+    "python", "python3", "pytest", "npm", "npx", "node", "tsc", "vite", "cargo", "rustc", "git",
 ];
 
 const SAFE_GIT_SUBCOMMANDS: &[&str] = &["status", "diff", "log", "show", "branch", "rev-parse"];
@@ -79,7 +67,9 @@ pub fn tokenize_command_line(raw: &str) -> Result<Vec<String>, String> {
         return Err("Command cannot be empty".to_string());
     }
     if trimmed.contains('\0') || trimmed.contains('\r') || trimmed.contains('\n') {
-        return Err("SECURITY_VIOLATION: control characters or multi-line scripts blocked".to_string());
+        return Err(
+            "SECURITY_VIOLATION: control characters or multi-line scripts blocked".to_string(),
+        );
     }
 
     let mut tokens = Vec::new();
@@ -109,7 +99,10 @@ pub fn tokenize_command_line(raw: &str) -> Result<Vec<String>, String> {
                     if !current.is_empty() {
                         tokens.push(std::mem::take(&mut current));
                     }
-                } else if matches!(ch, '|' | '&' | ';' | '>' | '<' | '`' | '(' | ')' | '{' | '}' | '$') {
+                } else if matches!(
+                    ch,
+                    '|' | '&' | ';' | '>' | '<' | '`' | '(' | ')' | '{' | '}' | '$'
+                ) {
                     return Err(format!(
                         "SECURITY_VIOLATION: shell metacharacter `{ch}` rejected"
                     ));
@@ -199,15 +192,12 @@ pub fn validate_command_argv(
         }
     }
 
-    let canonical_root = dunce::canonicalize(workspace_root).map_err(|e| {
-        format!(
-            "Invalid workspace root {}: {e}",
-            workspace_root.display()
-        )
-    })?;
+    let canonical_root = dunce::canonicalize(workspace_root)
+        .map_err(|e| format!("Invalid workspace root {}: {e}", workspace_root.display()))?;
     let working_dir = match requested_cwd {
-        Some(rel_or_abs) => resolve_confined_path(&canonical_root, rel_or_abs)
-            .map_err(|e| e.to_string())?,
+        Some(rel_or_abs) => {
+            resolve_confined_path(&canonical_root, rel_or_abs).map_err(|e| e.to_string())?
+        }
         None => canonical_root.clone(),
     };
 
@@ -220,7 +210,8 @@ pub fn validate_command_argv(
                 "SECURITY_VIOLATION: path traversal sequence `..` blocked in `{arg}`"
             ));
         }
-        if looks_like_path_token(arg) && !arg.starts_with("http://") && !arg.starts_with("https://") {
+        if looks_like_path_token(arg) && !arg.starts_with("http://") && !arg.starts_with("https://")
+        {
             let candidate = Path::new(arg);
             if is_blocked_system_path(candidate) {
                 return Err(format!(
@@ -322,12 +313,9 @@ pub async fn execute_guarded_command(
         cmd.creation_flags(WORKER_CREATION_FLAGS);
     }
 
-    let mut child = cmd.spawn().map_err(|e| {
-        format!(
-            "Failed to spawn `{}` cleanly: {e}",
-            validated.program
-        )
-    })?;
+    let mut child = cmd
+        .spawn()
+        .map_err(|e| format!("Failed to spawn `{}` cleanly: {e}", validated.program))?;
 
     let stdout_pipe = child.stdout.take().expect("stdout piped");
     let stderr_pipe = child.stderr.take().expect("stderr piped");

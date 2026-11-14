@@ -92,7 +92,7 @@ impl WorkerSupervisorConfig {
             python_executable: None,
             heartbeat_interval: Duration::from_secs(5),
             heartbeat_timeout: Duration::from_secs(15),
-            ready_timeout: Duration::from_secs(15),
+            ready_timeout: Duration::from_secs(45),
             shutdown_timeout: Duration::from_secs(2),
             max_memory_bytes: Some(JobObject::DEFAULT_WORKER_MEMORY_LIMIT_BYTES),
             max_restart_attempts: 5,
@@ -354,19 +354,134 @@ pub struct ManagedWorker {
     stderr_task: Mutex<Option<JoinHandle<()>>>,
 }
 
+/// Ensures that if a packaged `py-runtime/runtime-bundle.zip` (or pre-extracted
+/// `py-runtime/python/python.exe`) exists under `resource_root`, it is extracted once
+/// (verified by SHA-256 stamp) into `workspace_root/runtime/python-bundle` and returns
+/// `(python_exe_path, app_code_root)`.
+pub fn ensure_bundled_python_runtime(
+    resource_root: &Path,
+    workspace_root: &Path,
+) -> Option<(PathBuf, PathBuf)> {
+    let direct_candidates = [
+        resource_root.join("py-runtime"),
+        resource_root.join("_up_").join("py-runtime"),
+        resource_root.to_path_buf(),
+    ];
+
+    for dir in &direct_candidates {
+        let direct_py = dir.join("python").join("python.exe");
+        let direct_app = dir.join("app");
+        if direct_py.is_file() && direct_app.join("workers").join("worker_boot.py").is_file() {
+            return Some((direct_py, direct_app));
+        }
+    }
+
+    let bundle_zip = direct_candidates
+        .iter()
+        .map(|d| d.join("runtime-bundle.zip"))
+        .find(|p| p.is_file())?;
+
+    static EXTRACT_LOCK: std::sync::OnceLock<std::sync::Mutex<()>> = std::sync::OnceLock::new();
+    let _extract_guard = EXTRACT_LOCK
+        .get_or_init(|| std::sync::Mutex::new(()))
+        .lock()
+        .ok()?;
+
+    let manifest_path = bundle_zip.parent()?.join("manifest.json");
+    let expected_stamp = std::fs::read_to_string(&manifest_path)
+        .ok()
+        .and_then(|s| serde_json::from_str::<serde_json::Value>(&s).ok())
+        .and_then(|v| {
+            v.get("bundle_sha256")
+                .and_then(|x| x.as_str())
+                .map(|x| x.to_string())
+        })
+        .unwrap_or_else(|| {
+            let len = std::fs::metadata(&bundle_zip).map(|m| m.len()).unwrap_or(0);
+            format!("size:{len}")
+        });
+
+    let target_dir = workspace_root.join("runtime").join("python-bundle");
+    let stamp_file = target_dir.join(".extracted_sha256");
+    let extracted_py = target_dir.join("python").join("python.exe");
+    let extracted_app = target_dir.join("app");
+    let extracted_boot = extracted_app.join("workers").join("worker_boot.py");
+
+    let already_valid = extracted_py.is_file()
+        && extracted_boot.is_file()
+        && std::fs::read_to_string(&stamp_file)
+            .map(|s| s.trim() == expected_stamp)
+            .unwrap_or(false);
+
+    if !already_valid {
+        let _ = std::fs::create_dir_all(&target_dir);
+        let tar_bin = if cfg!(windows) {
+            PathBuf::from(r"C:\Windows\System32\tar.exe")
+        } else {
+            PathBuf::from("tar")
+        };
+        let tar_cmd = if tar_bin.is_file() {
+            tar_bin
+        } else {
+            PathBuf::from("tar")
+        };
+        let mut extract_cmd = std::process::Command::new(tar_cmd);
+        extract_cmd
+            .arg("-xf")
+            .arg(&bundle_zip)
+            .arg("-C")
+            .arg(&target_dir);
+        #[cfg(windows)]
+        {
+            use std::os::windows::process::CommandExt;
+            extract_cmd.creation_flags(WORKER_CREATION_FLAGS);
+        }
+        let status = extract_cmd.status().ok()?;
+        if !status.success() {
+            return None;
+        }
+        let _ = std::fs::write(&stamp_file, &expected_stamp);
+    }
+
+    if extracted_py.is_file() && extracted_boot.is_file() {
+        Some((extracted_py, extracted_app))
+    } else {
+        None
+    }
+}
+
 impl ManagedWorker {
     async fn spawn(
         role: WorkerPoolRole,
         config: &WorkerSupervisorConfig,
         reverse_handler: Arc<RwLock<Option<ReverseRpcHandler>>>,
     ) -> Result<Arc<Self>, RpcCallError> {
-        let code_root = config
+        let base_code_root = config
             .resource_root
             .as_deref()
             .unwrap_or(&config.workspace_root);
+
+        let bundled_runtime = if config.python_executable.is_none()
+            && std::env::var_os("JARVIS_PYTHON_BIN").is_none()
+        {
+            ensure_bundled_python_runtime(base_code_root, &config.workspace_root)
+        } else {
+            None
+        };
+
+        let code_root: PathBuf = bundled_runtime
+            .as_ref()
+            .map(|(_, app_dir)| app_dir.clone())
+            .unwrap_or_else(|| base_code_root.to_path_buf());
+
         let script_candidates = [
             code_root.join("workers").join("worker_boot.py"),
             code_root
+                .join("_up_")
+                .join("workers")
+                .join("worker_boot.py"),
+            base_code_root.join("workers").join("worker_boot.py"),
+            base_code_root
                 .join("_up_")
                 .join("workers")
                 .join("worker_boot.py"),
@@ -384,9 +499,11 @@ impl ManagedWorker {
             )));
         }
 
-        let python_bin = {
+        let python_bin = if let Some((bundled_py, _)) = &bundled_runtime {
+            bundled_py.clone()
+        } else {
             let from_code =
-                resolve_python_executable(code_root, config.python_executable.as_deref());
+                resolve_python_executable(&code_root, config.python_executable.as_deref());
             if from_code != Path::new("python") {
                 from_code
             } else {
@@ -418,6 +535,31 @@ impl ManagedWorker {
             "JARVIS_RESOURCE_ROOT".to_string(),
             code_root.to_string_lossy().into_owned(),
         );
+
+        let path_sep = if cfg!(windows) { ";" } else { ":" };
+        let mut python_path_entries = vec![code_root.to_string_lossy().into_owned()];
+        if let Some(py_dir) = python_bin.parent() {
+            let stdlib_dir = py_dir.join("Lib");
+            let site_packages_dir = stdlib_dir.join("site-packages");
+            let dlls_dir = py_dir.join("DLLs");
+            if stdlib_dir.is_dir() {
+                python_path_entries.push(stdlib_dir.to_string_lossy().into_owned());
+            }
+            if site_packages_dir.is_dir() {
+                python_path_entries.push(site_packages_dir.to_string_lossy().into_owned());
+            }
+            if dlls_dir.is_dir() {
+                python_path_entries.push(dlls_dir.to_string_lossy().into_owned());
+            }
+            if stdlib_dir.join("os.py").is_file() && !py_dir.join("pyvenv.cfg").is_file() {
+                worker_env.insert(
+                    "PYTHONHOME".to_string(),
+                    py_dir.to_string_lossy().into_owned(),
+                );
+                worker_env.insert("PYTHONNOUSERSITE".to_string(), "1".to_string());
+            }
+        }
+        worker_env.insert("PYTHONPATH".to_string(), python_path_entries.join(path_sep));
 
         let mut cmd = Command::new(&python_bin);
         cmd.env_clear()
@@ -803,6 +945,40 @@ impl WorkerSupervisor {
         for &role in WorkerPoolRole::all_roles() {
             self.shutdown_role(role).await;
         }
+    }
+
+    /// Boots all four production worker roles (`ai`, `study`, `mission`, `voice`),
+    /// verifies each role is responsive over JSON-RPC, and returns a JSON report
+    /// with each role's PID and capabilities.
+    pub async fn verify_and_boot_production_workers(&self) -> Result<Value, RpcCallError> {
+        let mut roles_report = serde_json::Map::new();
+        let mut spawned_pids = Vec::new();
+        for &role in WorkerPoolRole::production_roles() {
+            let worker = self.ensure_worker(role).await?;
+            let hb = worker.rpc().heartbeat_snapshot().await;
+            spawned_pids.push(worker.pid);
+            roles_report.insert(
+                role.as_str().to_string(),
+                json!({
+                    "pid": worker.pid,
+                    "running": worker.is_alive().await,
+                    "capabilities": worker.capabilities,
+                    "capabilities_count": worker.capabilities.len(),
+                    "rss_memory_mb": hb.rss_memory_mb,
+                }),
+            );
+        }
+        Ok(json!({
+            "status": "verified",
+            "workspace_root": self.config.workspace_root.to_string_lossy(),
+            "resource_root": self
+                .config
+                .resource_root
+                .as_ref()
+                .map(|p| p.to_string_lossy().into_owned()),
+            "spawned_pids": spawned_pids,
+            "roles": roles_report,
+        }))
     }
 }
 

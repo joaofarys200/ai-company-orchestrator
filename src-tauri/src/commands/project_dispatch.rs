@@ -53,7 +53,10 @@ fn projects_root_dir(workspace_root: &Path) -> PathBuf {
 }
 
 fn project_metadata_root_dir(workspace_root: &Path) -> PathBuf {
-    workspace_root.join("workspace").join(".jarvis").join("projects")
+    workspace_root
+        .join("workspace")
+        .join(".jarvis")
+        .join("projects")
 }
 
 fn matches_project_id_pattern(value: &str) -> bool {
@@ -69,7 +72,10 @@ fn matches_project_id_pattern(value: &str) -> bool {
 fn validate_project_id(raw: &str) -> Result<String, AppError> {
     let trimmed = raw.trim();
     if trimmed.is_empty() {
-        return Err(AppError::new("PROJECT_INVALID_ID", "project_id obrigatorio."));
+        return Err(AppError::new(
+            "PROJECT_INVALID_ID",
+            "project_id obrigatorio.",
+        ));
     }
 
     let mut clean_id = if matches_project_id_pattern(trimmed) {
@@ -120,7 +126,10 @@ fn validate_project_id(raw: &str) -> Result<String, AppError> {
     Ok(clean_id)
 }
 
-fn resolve_existing_project_dir(workspace_root: &Path, clean_id: &str) -> Result<PathBuf, AppError> {
+fn resolve_existing_project_dir(
+    workspace_root: &Path,
+    clean_id: &str,
+) -> Result<PathBuf, AppError> {
     let base = projects_root_dir(workspace_root);
     if !base.is_dir() {
         return Err(AppError::new(
@@ -160,7 +169,9 @@ fn is_ignored_dir_name(name: &str) -> bool {
 
 fn is_allowed_text_suffix(path: &str) -> bool {
     let lower = path.to_ascii_lowercase();
-    TEXT_FILE_SUFFIXES.iter().any(|suffix| lower.ends_with(suffix))
+    TEXT_FILE_SUFFIXES
+        .iter()
+        .any(|suffix| lower.ends_with(suffix))
 }
 
 fn normalize_rel_file_path(raw: &str) -> Result<String, AppError> {
@@ -170,11 +181,20 @@ fn normalize_rel_file_path(raw: &str) -> Result<String, AppError> {
         || normalized.contains(':')
         || normalized.starts_with('/')
     {
-        return Err(AppError::new("INVALID_PATH", "Caminho de ficheiro invalido."));
+        return Err(AppError::new(
+            "INVALID_PATH",
+            "Caminho de ficheiro invalido.",
+        ));
     }
     let segments: Vec<&str> = normalized.split('/').collect();
-    if segments.iter().any(|seg| seg.is_empty() || *seg == "." || *seg == "..") {
-        return Err(AppError::new("INVALID_PATH", "Caminho de ficheiro invalido."));
+    if segments
+        .iter()
+        .any(|seg| seg.is_empty() || *seg == "." || *seg == "..")
+    {
+        return Err(AppError::new(
+            "INVALID_PATH",
+            "Caminho de ficheiro invalido.",
+        ));
     }
     if segments.len() > 1
         && segments[..segments.len() - 1]
@@ -387,8 +407,16 @@ fn collect_project_files(
 
 fn preserve_line_endings(original_body: &[u8], content: &str) -> String {
     let crlf = original_body.windows(2).filter(|w| *w == b"\r\n").count();
-    let lf = original_body.iter().filter(|b| **b == b'\n').count().saturating_sub(crlf);
-    let cr = original_body.iter().filter(|b| **b == b'\r').count().saturating_sub(crlf);
+    let lf = original_body
+        .iter()
+        .filter(|b| **b == b'\n')
+        .count()
+        .saturating_sub(crlf);
+    let cr = original_body
+        .iter()
+        .filter(|b| **b == b'\r')
+        .count()
+        .saturating_sub(crlf);
 
     let newline = if crlf > 0 && lf == 0 && cr == 0 {
         "\r\n"
@@ -409,7 +437,14 @@ fn preserve_line_endings(original_body: &[u8], content: &str) -> String {
 fn detect_project_stack_and_scripts(
     project_dir: &Path,
     files: &BTreeMap<String, String>,
-) -> (Value, Vec<String>, Vec<String>, Vec<String>, BTreeMap<String, String>, Vec<String>) {
+) -> (
+    Value,
+    Vec<String>,
+    Vec<String>,
+    Vec<String>,
+    BTreeMap<String, String>,
+    Vec<String>,
+) {
     let pkg_json = read_json_value_safe(&project_dir.join("package.json")).unwrap_or(Value::Null);
 
     let mut stack: BTreeSet<String> = BTreeSet::new();
@@ -425,10 +460,16 @@ fn detect_project_stack_and_scripts(
         stack.insert("Node".to_string());
         managers.insert("npm".to_string());
     }
-    if files.keys().any(|k| k.ends_with(".html") || k.ends_with(".htm")) {
+    if files
+        .keys()
+        .any(|k| k.ends_with(".html") || k.ends_with(".htm"))
+    {
         stack.insert("HTML/JavaScript".to_string());
     }
-    if files.keys().any(|k| k.ends_with(".ts") || k.ends_with(".tsx")) {
+    if files
+        .keys()
+        .any(|k| k.ends_with(".ts") || k.ends_with(".tsx"))
+    {
         stack.insert("TypeScript".to_string());
     }
     if files.keys().any(|k| k.ends_with(".rs")) || project_dir.join("Cargo.toml").is_file() {
@@ -926,7 +967,10 @@ pub async fn execute_project_message(
 
             let meta_dir = project_metadata_dir(workspace_root, &clean_id);
             fs::create_dir_all(&meta_dir).map_err(|err| {
-                AppError::new("PROJECT_META_FAILED", format!("Failed creating meta dir: {err}"))
+                AppError::new(
+                    "PROJECT_META_FAILED",
+                    format!("Failed creating meta dir: {err}"),
+                )
             })?;
             let ctx_json = serde_json::to_string_pretty(&json!({
                 "project_id": clean_id,
@@ -1104,15 +1148,21 @@ pub async fn execute_project_message(
                 Err(err) => return err_event(err.message),
             };
             if expected_hash.len() != 64
-                || !expected_hash.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
+                || !expected_hash
+                    .bytes()
+                    .all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
             {
                 return err_event("Hash original do ficheiro em falta ou invalido.".to_string());
             }
             let Some(text_content) = content else {
-                return err_event("O editor apenas permite guardar ficheiros de texto.".to_string());
+                return err_event(
+                    "O editor apenas permite guardar ficheiros de texto.".to_string(),
+                );
             };
             if text_content.contains('\0') {
-                return err_event("O editor apenas permite guardar ficheiros de texto.".to_string());
+                return err_event(
+                    "O editor apenas permite guardar ficheiros de texto.".to_string(),
+                );
             }
             let current_bytes = match fs::read(&target) {
                 Ok(b) => b,
@@ -1173,10 +1223,7 @@ pub async fn execute_project_message(
                 .get("filename")
                 .and_then(Value::as_str)
                 .unwrap_or("");
-            let content = message
-                .get("content")
-                .and_then(Value::as_str)
-                .unwrap_or("");
+            let content = message.get("content").and_then(Value::as_str).unwrap_or("");
 
             let err_event = |err_msg: String| {
                 Ok(Some(vec![json!({
@@ -1530,9 +1577,13 @@ mod tests {
         .unwrap();
         assert!(evs.iter().any(|e| e["type"] == "project_context"
             && e["context"]["project_id"] == "demo-app"
-            && e["files"]["index.html"].as_str().unwrap().contains("Demo App")));
-        assert!(evs.iter().any(|e| e["type"] == "projects_list"
-            && e["projects"][0]["project_id"] == "demo-app"));
+            && e["files"]["index.html"]
+                .as_str()
+                .unwrap()
+                .contains("Demo App")));
+        assert!(evs
+            .iter()
+            .any(|e| e["type"] == "projects_list" && e["projects"][0]["project_id"] == "demo-app"));
 
         // Seed coding_session + mission state.db & symbols_index.json and verify open_project + get_ast_state
         let meta = project_metadata_dir(&root, "demo-app");
@@ -1583,8 +1634,10 @@ mod tests {
         assert!(opened
             .iter()
             .any(|e| e["type"] == "mission_list" && e["missions"][0]["mission_id"] == "m_1"));
-        assert!(opened.iter().any(|e| e["type"] == "ast_state"
-            && e["data"]["app.js"]["functions"][0]["name"] == "boot"));
+        assert!(opened
+            .iter()
+            .any(|e| e["type"] == "ast_state"
+                && e["data"]["app.js"]["functions"][0]["name"] == "boot"));
 
         let ast_evs = execute_project_message(&root, &preview, "get_ast_state", &json!({}), None)
             .await
@@ -1658,7 +1711,9 @@ mod tests {
         .await
         .unwrap()
         .unwrap();
-        assert!(ren.iter().any(|e| e["type"] == "project_context" && e["files"]["src/util.js"].is_string()));
+        assert!(ren
+            .iter()
+            .any(|e| e["type"] == "project_context" && e["files"]["src/util.js"].is_string()));
 
         let del_f = execute_project_message(
             &root,

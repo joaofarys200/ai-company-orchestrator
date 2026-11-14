@@ -104,8 +104,7 @@ pub struct ReverseRequest {
     pub params: Value,
 }
 
-pub type ReverseRpcFuture =
-    Pin<Box<dyn Future<Output = Result<Value, RpcRemoteError>> + Send>>;
+pub type ReverseRpcFuture = Pin<Box<dyn Future<Output = Result<Value, RpcRemoteError>> + Send>>;
 pub type ReverseRpcHandler = Arc<dyn Fn(ReverseRequest) -> ReverseRpcFuture + Send + Sync>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -449,10 +448,7 @@ impl WorkerRpcClient {
 
         {
             let mut guard = self.pending.lock().await;
-            guard.insert(
-                request_id.clone(),
-                PendingCall { resp_tx, stream_tx },
-            );
+            guard.insert(request_id.clone(), PendingCall { resp_tx, stream_tx });
         }
 
         let payload = build_envelope(json!({
@@ -497,9 +493,10 @@ impl WorkerRpcClient {
             }
         }));
         let line = encode_ndjson_line(&frame)?;
-        self.writer_tx.send(line).await.map_err(|_| {
-            RpcCallError::TransportClosed("worker outbound writer closed".into())
-        })
+        self.writer_tx
+            .send(line)
+            .await
+            .map_err(|_| RpcCallError::TransportClosed("worker outbound writer closed".into()))
     }
 
     /// Attempts a graceful `worker.shutdown` RPC before process termination.
@@ -567,7 +564,10 @@ impl Drop for WorkerRpcClient {
 fn build_envelope(mut payload: Value) -> Value {
     if let Some(obj) = payload.as_object_mut() {
         obj.insert("jsonrpc".into(), Value::String("2.0".into()));
-        obj.insert("protocol_version".into(), Value::String(PROTOCOL_VERSION.into()));
+        obj.insert(
+            "protocol_version".into(),
+            Value::String(PROTOCOL_VERSION.into()),
+        );
         obj.insert(
             "timestamp".into(),
             Value::Number(serde_json::Number::from(
@@ -644,7 +644,11 @@ async fn dispatch_inbound_frame(
     // 1. Reverse RPC requests MUST be spawned asynchronously so the reader keeps draining
     // heartbeats and other responses while waiting on HITL approval or other slow operations.
     if frame.get("type").and_then(Value::as_str) == Some("reverse_request") {
-        let Some(rev_id) = frame.get("id").and_then(Value::as_str).map(ToOwned::to_owned) else {
+        let Some(rev_id) = frame
+            .get("id")
+            .and_then(Value::as_str)
+            .map(ToOwned::to_owned)
+        else {
             return;
         };
         let Some(method) = frame
@@ -660,12 +664,14 @@ async fn dispatch_inbound_frame(
 
         tokio::spawn(async move {
             let outcome = match handler_opt {
-                Some(handler) => handler(ReverseRequest {
-                    id: rev_id.clone(),
-                    method,
-                    params,
-                })
-                .await,
+                Some(handler) => {
+                    handler(ReverseRequest {
+                        id: rev_id.clone(),
+                        method,
+                        params,
+                    })
+                    .await
+                }
                 None => Err(RpcRemoteError {
                     code: -32003,
                     message: "Reverse RPC denied: no approval handler registered (fail-closed)"
@@ -802,4 +808,3 @@ async fn dispatch_inbound_frame(
         _ => {}
     }
 }
-

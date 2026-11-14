@@ -161,9 +161,7 @@ pub fn evaluate_permission_policy(
                     is_eligible_for_human_approval: false,
                     is_auto_permitted: false,
                     is_blocked_by_policy: true,
-                    reason: format!(
-                        "High-risk tool `{tool_name}` is not cataloged for elevation."
-                    ),
+                    reason: format!("High-risk tool `{tool_name}` is not cataloged for elevation."),
                     initial_status: PermissionRequestStatus::BlockedByPolicy,
                 }
             }

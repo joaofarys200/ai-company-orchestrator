@@ -90,7 +90,8 @@ const CONCEPT_SYNONYM_REGISTRY: &[ConceptRegistryEntry] = &[
     },
     ConceptRegistryEntry {
         key: "pqc",
-        canonical_note: "Post-Quantum Cryptography Migration - Hybrid ML-KEM (FIPS 203) and ML-DSA (FIPS 204)",
+        canonical_note:
+            "Post-Quantum Cryptography Migration - Hybrid ML-KEM (FIPS 203) and ML-DSA (FIPS 204)",
         synonyms: &[
             "post-quantum cryptography",
             "ml-kem",
@@ -645,8 +646,8 @@ pub struct ObsidianGraphEngine {
 impl ObsidianGraphEngine {
     /// Opens an engine using workspace-relative `obsidian_vault` (or `OBSIDIAN_VAULT_PATH`) and `data/obsidian`.
     pub fn open_default(project_root: &Path) -> Result<Self, KnowledgeError> {
-        let vault = resolve_vault_root(project_root)
-            .map_err(|e| KnowledgeError::Internal(e.message))?;
+        let vault =
+            resolve_vault_root(project_root).map_err(|e| KnowledgeError::Internal(e.message))?;
         let data = project_root.join("data").join("obsidian");
         Self::with_paths(vault, data)
     }
@@ -659,8 +660,9 @@ impl ObsidianGraphEngine {
         }
         let canon_vault = dunce::canonicalize(&vault_root)
             .map_err(|e| KnowledgeError::Internal(format!("Failed canonicalizing vault: {e}")))?;
-        let canon_data = dunce::canonicalize(&data_dir)
-            .map_err(|e| KnowledgeError::Internal(format!("Failed canonicalizing data dir: {e}")))?;
+        let canon_data = dunce::canonicalize(&data_dir).map_err(|e| {
+            KnowledgeError::Internal(format!("Failed canonicalizing data dir: {e}"))
+        })?;
 
         let history_dir = canon_vault.join(".history");
         let proposals_dir = canon_data.join("proposals");
@@ -730,7 +732,8 @@ impl ObsidianGraphEngine {
                     };
                     let rel_str = rel.to_string_lossy().replace('\\', "/");
                     let stem = path_stem_str(&canon);
-                    self.canonical_notes.insert(stem.to_lowercase(), canon.clone());
+                    self.canonical_notes
+                        .insert(stem.to_lowercase(), canon.clone());
                     self.canonical_rel_paths
                         .insert(rel_str.to_lowercase(), canon.clone());
 
@@ -742,14 +745,12 @@ impl ObsidianGraphEngine {
                                     for a in arr {
                                         let s = a.as_str().unwrap_or("").trim();
                                         if !s.is_empty() {
-                                            self.alias_map
-                                                .insert(s.to_lowercase(), stem.clone());
+                                            self.alias_map.insert(s.to_lowercase(), stem.clone());
                                         }
                                     }
                                 }
                                 Value::String(s) if !s.trim().is_empty() => {
-                                    self.alias_map
-                                        .insert(s.trim().to_lowercase(), stem.clone());
+                                    self.alias_map.insert(s.trim().to_lowercase(), stem.clone());
                                 }
                                 _ => {}
                             }
@@ -759,7 +760,8 @@ impl ObsidianGraphEngine {
                             match tags_val {
                                 Value::Array(arr) => {
                                     for t in arr {
-                                        let s = t.as_str().unwrap_or("").trim().trim_start_matches('#');
+                                        let s =
+                                            t.as_str().unwrap_or("").trim().trim_start_matches('#');
                                         if !s.is_empty() {
                                             tags.push(s.to_lowercase());
                                         }
@@ -823,7 +825,11 @@ impl ObsidianGraphEngine {
         self.verify_contained_file(&joined, &cleaned)
     }
 
-    fn verify_contained_file(&self, candidate: &Path, display: &str) -> Result<PathBuf, KnowledgeError> {
+    fn verify_contained_file(
+        &self,
+        candidate: &Path,
+        display: &str,
+    ) -> Result<PathBuf, KnowledgeError> {
         if !candidate.exists() {
             // Check parent containment even when missing so traversal/outside paths fail with SecurityViolation.
             if candidate.is_absolute() {
@@ -873,7 +879,10 @@ impl ObsidianGraphEngine {
         Ok(canon)
     }
 
-    fn resolve_contained_snapshot_path(&self, backup_target: &str) -> Result<PathBuf, KnowledgeError> {
+    fn resolve_contained_snapshot_path(
+        &self,
+        backup_target: &str,
+    ) -> Result<PathBuf, KnowledgeError> {
         let cleaned = Self::validate_raw_target(backup_target)?;
         let candidate = Path::new(&cleaned);
         let joined = if candidate.is_absolute() {
@@ -955,7 +964,8 @@ impl ObsidianGraphEngine {
         let verified_bytes = fs::read(&written_snap).map_err(|e| {
             KnowledgeError::Internal(format!("Falha ao verificar snapshot gravado: {e}"))
         })?;
-        if sha256_hex(&verified_bytes) != content_sha256 || verified_bytes.len() != content_bytes.len()
+        if sha256_hex(&verified_bytes) != content_sha256
+            || verified_bytes.len() != content_bytes.len()
         {
             let _ = fs::remove_file(&written_snap);
             return Err(KnowledgeError::Internal(
@@ -984,8 +994,9 @@ impl ObsidianGraphEngine {
                 .unwrap_or(&snapshot_filename)
         );
         let meta_path = self.history_dir.join(&meta_filename);
-        let serialized_meta = serde_json::to_string_pretty(&metadata)
-            .map_err(|e| KnowledgeError::Internal(format!("Serialize snapshot metadata failed: {e}")))?;
+        let serialized_meta = serde_json::to_string_pretty(&metadata).map_err(|e| {
+            KnowledgeError::Internal(format!("Serialize snapshot metadata failed: {e}"))
+        })?;
         atomic_write_string(&self.history_dir, &meta_path, &serialized_meta).map_err(|e| {
             let _ = fs::remove_file(&written_snap);
             KnowledgeError::Internal(e.message)
@@ -1017,7 +1028,10 @@ impl ObsidianGraphEngine {
         }
 
         let backup_meta = if create_backup {
-            Some(self.create_note_backup_snapshot(target, "pre_enrichment")?.1)
+            Some(
+                self.create_note_backup_snapshot(target, "pre_enrichment")?
+                    .1,
+            )
         } else {
             None
         };
@@ -1089,7 +1103,10 @@ impl ObsidianGraphEngine {
             ));
         }
 
-        let expected_rel = meta.get("note_rel_path").and_then(Value::as_str).unwrap_or("");
+        let expected_rel = meta
+            .get("note_rel_path")
+            .and_then(Value::as_str)
+            .unwrap_or("");
         if expected_rel.is_empty() || expected_rel != rel_str {
             return Err(KnowledgeError::SecurityViolation(format!(
                 "Snapshot pertence a '{expected_rel}', não a '{rel_str}'. Rollback cross-note rejeitado."
@@ -1120,7 +1137,10 @@ impl ObsidianGraphEngine {
             }
         }
 
-        let expected_sha = meta.get("content_sha256").and_then(Value::as_str).unwrap_or("");
+        let expected_sha = meta
+            .get("content_sha256")
+            .and_then(Value::as_str)
+            .unwrap_or("");
         let actual_snap_sha = sha256_hex(&snapshot_bytes);
         if expected_sha.is_empty() || actual_snap_sha != expected_sha {
             return Err(KnowledgeError::SecurityViolation(format!(
@@ -1243,9 +1263,17 @@ impl ObsidianGraphEngine {
         } else {
             let has_summary = sections.iter().any(|s| {
                 let l = s.to_lowercase();
-                ["sumário", "sumario", "resumo", "overview", "executive", "visão geral", "visao geral"]
-                    .iter()
-                    .any(|kw| l.contains(kw))
+                [
+                    "sumário",
+                    "sumario",
+                    "resumo",
+                    "overview",
+                    "executive",
+                    "visão geral",
+                    "visao geral",
+                ]
+                .iter()
+                .any(|kw| l.contains(kw))
             });
             let has_technical_core = sections.len() >= 3 || words_count >= 250;
             let has_takeaways = sections.iter().any(|s| {
@@ -1315,28 +1343,48 @@ impl ObsidianGraphEngine {
         let has_source_doc = meta_has_truthy(&meta, &["source_document_ids", "source_notes"]);
         let gen_mode = meta.get("generation_mode").and_then(Value::as_str);
 
-        let (ev_score, epistemic_class, verif_basis) =
-            if matches!(raw_source_type.as_str(), "RFC" | "NIST" | "FIPS" | "PAPER" | "PRIMARY_SOURCE") {
-                if citations_present {
-                    (95.0, "VERIFIED_PRIMARY_SOURCE", "PRIMARY_STANDARD_WITH_FORMAL_CITATIONS")
-                } else {
-                    (80.0, "VERIFIED_PRIMARY_SOURCE", "PRIMARY_STANDARD_DECLARATION")
-                }
-            } else if gen_mode == Some("LLM_GROUNDED") && citations_present {
-                (85.0, "GROUNDED_STUDY_SYNTHESIS", "GROUNDED_MODEL_SYNTHESIS_WITH_EVIDENCE_ANCHORS")
-            } else if matches!(raw_source_type.as_str(), "JARVIS_INTERNAL" | "LESSON" | "ADR")
-                || has_source_doc
-            {
+        let (ev_score, epistemic_class, verif_basis) = if matches!(
+            raw_source_type.as_str(),
+            "RFC" | "NIST" | "FIPS" | "PAPER" | "PRIMARY_SOURCE"
+        ) {
+            if citations_present {
                 (
-                    if citations_present { 75.0 } else { 65.0 },
-                    "INTERNAL_ENGINEERING_SPEC",
-                    "INTERNAL_ENGINEERING_SPECIFICATION",
+                    95.0,
+                    "VERIFIED_PRIMARY_SOURCE",
+                    "PRIMARY_STANDARD_WITH_FORMAL_CITATIONS",
                 )
-            } else if gen_mode == Some("EXTRACTIVE_GROUNDED") {
-                (60.0, "EXTRACTIVE_TRANSCRIPTION", "RAW_LECTURE_OR_OCR_TRANSCRIPTION")
             } else {
-                if raw_source_type.is_empty() {
-                    findings.push(json!({
+                (
+                    80.0,
+                    "VERIFIED_PRIMARY_SOURCE",
+                    "PRIMARY_STANDARD_DECLARATION",
+                )
+            }
+        } else if gen_mode == Some("LLM_GROUNDED") && citations_present {
+            (
+                85.0,
+                "GROUNDED_STUDY_SYNTHESIS",
+                "GROUNDED_MODEL_SYNTHESIS_WITH_EVIDENCE_ANCHORS",
+            )
+        } else if matches!(
+            raw_source_type.as_str(),
+            "JARVIS_INTERNAL" | "LESSON" | "ADR"
+        ) || has_source_doc
+        {
+            (
+                if citations_present { 75.0 } else { 65.0 },
+                "INTERNAL_ENGINEERING_SPEC",
+                "INTERNAL_ENGINEERING_SPECIFICATION",
+            )
+        } else if gen_mode == Some("EXTRACTIVE_GROUNDED") {
+            (
+                60.0,
+                "EXTRACTIVE_TRANSCRIPTION",
+                "RAW_LECTURE_OR_OCR_TRANSCRIPTION",
+            )
+        } else {
+            if raw_source_type.is_empty() {
+                findings.push(json!({
                         "category": "Evidence Quality",
                         "dimension": "Provenance",
                         "what_is_missing": "Proveniência de fonte não identificada nos metadados",
@@ -1344,8 +1392,8 @@ impl ObsidianGraphEngine {
                         "evidence_supporting_finding": "Frontmatter não declara 'source_type' nem 'provenance'",
                         "recommended_improvement": "Adicionar proveniência ou ligar a documento fonte",
                     }));
-                }
-                findings.push(json!({
+            }
+            findings.push(json!({
                     "category": "Evidence Quality",
                     "dimension": "Factual Grounding",
                     "what_is_missing": "Citações formais de evidência [E#], RFC, DOI ou normas",
@@ -1353,12 +1401,12 @@ impl ObsidianGraphEngine {
                     "evidence_supporting_finding": "Ausência de marcadores de citação ou proveniência documental",
                     "recommended_improvement": "Ancorar as afirmações centrais em especificações ou fontes primárias",
                 }));
-                (
-                    if footnotes_present { 40.0 } else { 25.0 },
-                    "UNVERIFIED_HEURISTIC",
-                    "UNVERIFIED_HEURISTIC_CONTENT",
-                )
-            };
+            (
+                if footnotes_present { 40.0 } else { 25.0 },
+                "UNVERIFIED_HEURISTIC",
+                "UNVERIFIED_HEURISTIC_CONTENT",
+            )
+        };
         let evidence_quality = round1(ev_score);
 
         // D. GRAPH QUALITY
@@ -1391,7 +1439,11 @@ impl ObsidianGraphEngine {
         }
 
         let graph_score = if is_moc {
-            if outgoing_valid >= 5 { 100.0 } else { 70.0 }
+            if outgoing_valid >= 5 {
+                100.0
+            } else {
+                70.0
+            }
         } else if outgoing_valid == 0 {
             findings.push(json!({
                 "category": "Graph Quality",
@@ -1402,8 +1454,7 @@ impl ObsidianGraphEngine {
                 "recommended_improvement": "Estabelecer 2 a 4 ligações com conceitos ou MOCs relevantes",
             }));
             25.0
-        } else if outgoing_valid == 1
-            && link_analysis.wikilinks.iter().any(|l| l.contains("Index"))
+        } else if outgoing_valid == 1 && link_analysis.wikilinks.iter().any(|l| l.contains("Index"))
         {
             findings.push(json!({
                 "category": "Graph Quality",
@@ -1434,7 +1485,11 @@ impl ObsidianGraphEngine {
                 }
             }
         }
-        let uniqueness_score = if duplicate_candidates.is_empty() { 100.0 } else { 55.0 };
+        let uniqueness_score = if duplicate_candidates.is_empty() {
+            100.0
+        } else {
+            55.0
+        };
         if !duplicate_candidates.is_empty() {
             let preview: Vec<String> = duplicate_candidates.iter().take(2).cloned().collect();
             findings.push(json!({
@@ -1520,9 +1575,15 @@ impl ObsidianGraphEngine {
     ) -> &'static str {
         let combined =
             format!("{source_or_type} {target_or_context} {context_window}").to_lowercase();
-        if ["prerequisito", "pré-requisito", "prerequisite", "depende de", "baseia-se em"]
-            .iter()
-            .any(|w| combined.contains(w))
+        if [
+            "prerequisito",
+            "pré-requisito",
+            "prerequisite",
+            "depende de",
+            "baseia-se em",
+        ]
+        .iter()
+        .any(|w| combined.contains(w))
         {
             return "PREREQUISITE_OF";
         }
@@ -1538,9 +1599,15 @@ impl ObsidianGraphEngine {
         {
             return "SUPPORTS";
         }
-        if ["versus", "em contraste", "contrasta com", "contrasts", "trade-off"]
-            .iter()
-            .any(|w| combined.contains(w))
+        if [
+            "versus",
+            "em contraste",
+            "contrasta com",
+            "contrasts",
+            "trade-off",
+        ]
+        .iter()
+        .any(|w| combined.contains(w))
         {
             return "CONTRASTS_WITH";
         }
@@ -1630,8 +1697,7 @@ impl ObsidianGraphEngine {
             if alias_stem != source_stem {
                 let rel_type =
                     self.infer_relationship_type(source_stem, alias_stem, context_window);
-                let justification =
-                    Self::generate_justification(source_stem, alias_stem, rel_type);
+                let justification = Self::generate_justification(source_stem, alias_stem, rel_type);
                 return Some(json!({
                     "source_note": source_stem,
                     "target_note": alias_stem,
@@ -1674,8 +1740,12 @@ impl ObsidianGraphEngine {
         let filename = format!("{proposal_id}.json");
         let serialized = serde_json::to_string_pretty(payload)
             .map_err(|e| KnowledgeError::Internal(format!("Serialize proposal failed: {e}")))?;
-        atomic_write_string(&self.proposals_dir, &self.proposals_dir.join(&filename), &serialized)
-            .map_err(|e| KnowledgeError::Internal(e.message))?;
+        atomic_write_string(
+            &self.proposals_dir,
+            &self.proposals_dir.join(&filename),
+            &serialized,
+        )
+        .map_err(|e| KnowledgeError::Internal(e.message))?;
         Ok(())
     }
 
@@ -1724,9 +1794,7 @@ impl ObsidianGraphEngine {
             }
             for &syn in std::iter::once(&entry.key).chain(entry.synonyms.iter()) {
                 if contains_word_ci(&body, syn) {
-                    if let Some(resolved) =
-                        self.resolve_concept_link(syn, &stem, &ctx_preview)
-                    {
+                    if let Some(resolved) = self.resolve_concept_link(syn, &stem, &ctx_preview) {
                         let target_name = resolved
                             .get("target_note")
                             .and_then(Value::as_str)
@@ -1753,9 +1821,15 @@ impl ObsidianGraphEngine {
                 "## 🔗 Grafo de Conhecimento & Relações Tipadas".to_string(),
             ];
             for rel in proposed_relationships.iter().take(4) {
-                let r_type = rel.get("relationship_type").and_then(Value::as_str).unwrap_or("RELATED_TO");
+                let r_type = rel
+                    .get("relationship_type")
+                    .and_then(Value::as_str)
+                    .unwrap_or("RELATED_TO");
                 let r_target = rel.get("target_note").and_then(Value::as_str).unwrap_or("");
-                let r_just = rel.get("justification").and_then(Value::as_str).unwrap_or("");
+                let r_just = rel
+                    .get("justification")
+                    .and_then(Value::as_str)
+                    .unwrap_or("");
                 links_block.push(format!("- **{r_type}** ➔ [[{r_target}]] — *{r_just}*"));
             }
             format!("{}\n{}\n", body.trim_end(), links_block.join("\n"))
@@ -1953,7 +2027,9 @@ impl ObsidianGraphEngine {
                     obj.insert("status".to_string(), json!("RECONCILIATION_REQUIRED"));
                     obj.insert(
                         "reconciliation_reason".to_string(),
-                        json!("Processo interrompido durante execução anterior detetado no arranque."),
+                        json!(
+                            "Processo interrompido durante execução anterior detetado no arranque."
+                        ),
                     );
                     obj.insert("updated_at".to_string(), json!(now_iso_local()));
                 }
@@ -2011,7 +2087,10 @@ impl ObsidianGraphEngine {
             .unwrap_or(false)
     }
 
-    async fn execute_qwen_knowledge_improvement(&self, rel_path: &str) -> Result<Value, KnowledgeError> {
+    async fn execute_qwen_knowledge_improvement(
+        &self,
+        rel_path: &str,
+    ) -> Result<Value, KnowledgeError> {
         let full_path = self.resolve_contained_note_path(rel_path)?;
         let rel_str = self.rel_str_for(&full_path)?;
         let stem = path_stem_str(&full_path);
@@ -2023,7 +2102,8 @@ impl ObsidianGraphEngine {
 
         let body_snippet: String = content_text.chars().take(3000).collect();
         let sys_prompt = "És o motor de melhoria conceptual de notas do JARVIS OS. Responde EXCLUSIVAMENTE em JSON com 'substantive_addition', 'mechanisms_and_tradeoffs', 'evidence_anchors', 'jarvis_linkage' e 'suggested_typed_relationships'.";
-        let user_prompt = format!("Nota: '{stem}' ({rel_str})\n<note_content>\n{body_snippet}\n</note_content>");
+        let user_prompt =
+            format!("Nota: '{stem}' ({rel_str})\n<note_content>\n{body_snippet}\n</note_content>");
 
         let chat_body = json!({
             "model": "qwen3.5:9b",
@@ -2042,10 +2122,13 @@ impl ObsidianGraphEngine {
             chat_body
         );
 
-        let mut stream = timeout(Duration::from_secs(2), TcpStream::connect("127.0.0.1:11434"))
-            .await
-            .map_err(|_| KnowledgeError::Internal("Timeout connecting to Ollama".to_string()))?
-            .map_err(|e| KnowledgeError::Internal(format!("Ollama connect failed: {e}")))?;
+        let mut stream = timeout(
+            Duration::from_secs(2),
+            TcpStream::connect("127.0.0.1:11434"),
+        )
+        .await
+        .map_err(|_| KnowledgeError::Internal("Timeout connecting to Ollama".to_string()))?
+        .map_err(|e| KnowledgeError::Internal(format!("Ollama connect failed: {e}")))?;
 
         stream
             .write_all(http_req.as_bytes())
@@ -2059,9 +2142,9 @@ impl ObsidianGraphEngine {
             .map_err(|e| KnowledgeError::Internal(format!("Ollama read failed: {e}")))?;
 
         let raw = String::from_utf8_lossy(&resp_buf);
-        let (_, http_body) = raw
-            .split_once("\r\n\r\n")
-            .ok_or_else(|| KnowledgeError::Internal("Invalid HTTP response from Ollama".to_string()))?;
+        let (_, http_body) = raw.split_once("\r\n\r\n").ok_or_else(|| {
+            KnowledgeError::Internal("Invalid HTTP response from Ollama".to_string())
+        })?;
         let resp_json: Value = serde_json::from_str(http_body)
             .map_err(|e| KnowledgeError::Internal(format!("Ollama JSON parse failed: {e}")))?;
         let msg_content = resp_json["message"]["content"]
@@ -2071,12 +2154,23 @@ impl ObsidianGraphEngine {
             .to_string();
         let parsed: Value = serde_json::from_str(&msg_content).unwrap_or_else(|_| json!({}));
 
-        let addition = parsed["substantive_addition"].as_str().unwrap_or("").trim().to_string();
+        let addition = parsed["substantive_addition"]
+            .as_str()
+            .unwrap_or("")
+            .trim()
+            .to_string();
         let mechanisms: Vec<String> = parsed["mechanisms_and_tradeoffs"]
             .as_array()
-            .map(|a| a.iter().filter_map(|v| v.as_str().map(String::from)).collect())
+            .map(|a| {
+                a.iter()
+                    .filter_map(|v| v.as_str().map(String::from))
+                    .collect()
+            })
             .unwrap_or_default();
-        let anchors = parsed["evidence_anchors"].as_array().cloned().unwrap_or_default();
+        let anchors = parsed["evidence_anchors"]
+            .as_array()
+            .cloned()
+            .unwrap_or_default();
         let linkage = parsed["jarvis_linkage"].as_str().unwrap_or("").to_string();
         let suggested_rels = parsed["suggested_typed_relationships"]
             .as_array()
@@ -2096,7 +2190,10 @@ impl ObsidianGraphEngine {
             fm.insert("domain".to_string(), json!(domain));
             fm.insert("provenance".to_string(), json!("UNDECLARED"));
             fm.insert("status".to_string(), json!("needs_review"));
-            fm.insert("tags".to_string(), json!([domain.to_lowercase().replace(' ', "-")]));
+            fm.insert(
+                "tags".to_string(),
+                json!([domain.to_lowercase().replace(' ', "-")]),
+            );
             fm.insert("type".to_string(), json!("atomic_note"));
             fm
         } else {
@@ -2401,7 +2498,8 @@ impl ObsidianGraphEngine {
                     .unwrap_or("")
                     .trim()
                     .to_lowercase();
-                if !asset_files.contains(&emb_clean) && !self.canonical_notes.contains_key(&emb_clean)
+                if !asset_files.contains(&emb_clean)
+                    && !self.canonical_notes.contains_key(&emb_clean)
                 {
                     missing_attachments_list.push(json!({ "source": rel_str, "target": emb }));
                 }
@@ -2467,15 +2565,10 @@ impl ObsidianGraphEngine {
                 if out_edges.is_empty() && in_edges.is_empty() {
                     genuine_orphans.push(rel_str.clone());
                 } else {
-                    let all_connected_moc = out_edges
-                        .iter()
-                        .chain(in_edges.iter())
-                        .all(|c| {
-                            c.to_lowercase().contains("00 - moc")
-                                || path_stem_str(Path::new(c))
-                                    .to_lowercase()
-                                    .contains("index")
-                        });
+                    let all_connected_moc = out_edges.iter().chain(in_edges.iter()).all(|c| {
+                        c.to_lowercase().contains("00 - moc")
+                            || path_stem_str(Path::new(c)).to_lowercase().contains("index")
+                    });
                     if all_connected_moc {
                         moc_only_notes.push(rel_str.clone());
                     }
@@ -2513,8 +2606,14 @@ impl ObsidianGraphEngine {
             round1(scores.iter().sum::<f64>() / scores.len() as f64)
         };
         let scores_ge_80 = scores.iter().filter(|&&s| s >= 80.0).count();
-        let scores_70_79 = scores.iter().filter(|&&s| (70.0..80.0).contains(&s)).count();
-        let scores_60_69 = scores.iter().filter(|&&s| (60.0..70.0).contains(&s)).count();
+        let scores_70_79 = scores
+            .iter()
+            .filter(|&&s| (70.0..80.0).contains(&s))
+            .count();
+        let scores_60_69 = scores
+            .iter()
+            .filter(|&&s| (60.0..70.0).contains(&s))
+            .count();
         let scores_lt_60 = scores.iter().filter(|&&s| s < 60.0).count();
 
         let orphan_set: HashSet<String> = genuine_orphans.iter().cloned().collect();
@@ -2535,10 +2634,7 @@ impl ObsidianGraphEngine {
             .map(|rel| {
                 let in_deg = incoming_map[rel].len();
                 let out_deg = outgoing_map[rel].len();
-                let folder = rel
-                    .rsplit_once('/')
-                    .map(|(f, _)| f)
-                    .unwrap_or("");
+                let folder = rel.rsplit_once('/').map(|(f, _)| f).unwrap_or("");
                 json!({
                     "id": rel,
                     "label": path_stem_str(Path::new(rel)),
@@ -2655,7 +2751,12 @@ mod tests {
         ));
 
         let res = engine
-            .atomic_write_note("Alpha Note.md", "Alpha updated content", Some(&orig_sha), true)
+            .atomic_write_note(
+                "Alpha Note.md",
+                "Alpha updated content",
+                Some(&orig_sha),
+                true,
+            )
             .unwrap();
         let snap_path = res["backup_snapshot"]["snapshot_path"].as_str().unwrap();
 
@@ -2666,7 +2767,9 @@ mod tests {
         ));
 
         // 4. Same-note rollback restores original bytes cleanly
-        assert!(engine.rollback_note("Alpha Note.md", snap_path, None).unwrap());
+        assert!(engine
+            .rollback_note("Alpha Note.md", snap_path, None)
+            .unwrap());
         assert_eq!(
             fs::read_to_string(vault.join("Alpha Note.md")).unwrap(),
             "Alpha original content"

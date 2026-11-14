@@ -39,7 +39,9 @@ def get_similarity(s1: str, s2: str) -> float:
     return difflib.SequenceMatcher(None, c1, c2).ratio()
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(
+    os.environ.get("JARVIS_PROJECT_ROOT") or Path(__file__).resolve().parent
+).resolve()
 DB_FILE = str(CANONICAL_DB_PATH)
 
 
