@@ -795,7 +795,7 @@ mod tests {
         let ids = cols_after[0]["collections"][0]["document_ids"]
             .as_array()
             .unwrap();
-        assert_eq!(ids, &[json!("doc_linked")]);
+        assert_eq!(ids.as_slice(), &[json!("doc_linked")]);
 
         // Deleting linked document never removes external source file!
         let _ = try_execute_study_fast_path(
