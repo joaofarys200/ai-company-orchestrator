@@ -16,6 +16,7 @@ from backend.transport_gateway import (
     StdioTransportGateway,
     VirtualIPCClient,
     bind_response_request_id,
+    reset_response_request_id,
 )
 from backend.websocket.contracts import (
     CRITICAL_SERVER_EVENT_TYPES,
@@ -349,8 +350,11 @@ class ProtocolContractTests(unittest.TestCase):
 
             gateway = VirtualCaptureGateway(dispatcher=SimpleNamespace())
             client = VirtualIPCClient(gateway)
-            with bind_response_request_id("virt-req-9"):
+            token = bind_response_request_id("virt-req-9")
+            try:
                 await client.send({"type": "coding_session_error", "error": "boom"})
+            finally:
+                reset_response_request_id(token)
 
         asyncio.run(_send_with_virtual_client())
         self.assertEqual(len(emitted_virtual), 1)
