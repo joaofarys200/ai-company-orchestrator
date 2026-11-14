@@ -252,6 +252,7 @@ impl SentinelWatchdog {
                 guard.baseline_duration_seconds = elapsed;
                 guard.baseline = Some(new_baseline.clone());
             } else if let Some(prev) = guard.baseline.clone() {
+                let state = &mut *guard;
                 // 1. Check Hosts file hash drift
                 let prev_hosts = prev
                     .get("hosts")
@@ -264,9 +265,9 @@ impl SentinelWatchdog {
                 {
                     let fp = compute_fingerprint("HOSTS", "file:hosts", "HOSTS_MODIFIED");
                     if let Some((ev, act)) = record_or_dedup_event(
-                        &mut guard.events,
-                        &mut guard.actions,
-                        &guard.known_goods,
+                        &mut state.events,
+                        &mut state.actions,
+                        &state.known_goods,
                         &fp,
                         "HOSTS",
                         "SUSPICIOUS",
@@ -327,9 +328,9 @@ impl SentinelWatchdog {
                         let fp =
                             compute_fingerprint("PERSISTENCE", &asset, "NEW_PERSISTENCE_ENTRY");
                         if let Some((ev, act)) = record_or_dedup_event(
-                            &mut guard.events,
-                            &mut guard.actions,
-                            &guard.known_goods,
+                            &mut state.events,
+                            &mut state.actions,
+                            &state.known_goods,
                             &fp,
                             "PERSISTENCE",
                             "SUSPICIOUS",
@@ -349,7 +350,7 @@ impl SentinelWatchdog {
                 }
 
                 // Refresh current baseline snapshot after diffing so subsequent scans compare cleanly
-                guard.baseline = Some(new_baseline);
+                state.baseline = Some(new_baseline);
             }
 
             self.persist_locked(&guard)?;

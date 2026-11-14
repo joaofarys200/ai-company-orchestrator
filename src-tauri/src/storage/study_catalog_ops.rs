@@ -637,7 +637,7 @@ pub async fn try_execute_study_fast_path(
                 .trim()
                 .to_string();
             let _clean_id = validate_study_id(&doc_id, "document_id")?;
-            let Some(doc) = store
+            let Some(doc) = study_store
                 .get_document(&doc_id)
                 .await
                 .map_err(|err| AppError::new("STUDY_STORE_READ_FAILED", err))?
@@ -867,7 +867,7 @@ pub async fn try_execute_study_fast_path(
                     "message": "card_id é obrigatório para rever flashcard.",
                 })]));
             }
-            let cards = store
+            let cards = study_store
                 .list_flashcards(None)
                 .await
                 .map_err(|err| AppError::new("STUDY_STORE_READ_FAILED", err))?;
@@ -882,7 +882,7 @@ pub async fn try_execute_study_fast_path(
             };
 
             apply_legacy_flashcard_review(&mut card, &rating);
-            store
+            study_store
                 .upsert_flashcard(&card_id, card.clone())
                 .await
                 .map_err(|err| AppError::new("STUDY_STORE_WRITE_FAILED", err))?;
@@ -901,7 +901,7 @@ pub async fn try_execute_study_fast_path(
                 .trim()
                 .to_string();
             let _clean_cid = validate_study_id(&cid, "collection_id")?;
-            let collections = store.list_collections().await;
+            let collections = study_store.list_collections().await;
             let Some(col) = collections
                 .into_iter()
                 .find(|c| c.get("collection_id").and_then(Value::as_str) == Some(cid.as_str()))
@@ -923,7 +923,7 @@ pub async fn try_execute_study_fast_path(
                 })
                 .unwrap_or_default();
 
-            let all_docs = store.list_documents().await;
+            let all_docs = study_store.list_documents().await;
             let mut materials = Vec::new();
             for doc in all_docs {
                 let did = doc
@@ -964,7 +964,7 @@ pub async fn try_execute_study_fast_path(
                 .max(0.0);
             let progress_percent = message.get("progress_percent").and_then(Value::as_f64);
 
-            let Some(mut doc) = store
+            let Some(mut doc) = study_store
                 .get_document(&doc_id)
                 .await
                 .map_err(|err| AppError::new("STUDY_STORE_READ_FAILED", err))?
@@ -1005,7 +1005,7 @@ pub async fn try_execute_study_fast_path(
                     }
                 }
             }
-            store
+            study_store
                 .upsert_document(&doc_id, doc)
                 .await
                 .map_err(|err| AppError::new("STUDY_STORE_WRITE_FAILED", err))?;
@@ -1032,7 +1032,7 @@ pub async fn try_execute_study_fast_path(
                 .trim()
                 .to_string();
 
-            let Some(doc) = store
+            let Some(doc) = study_store
                 .get_document(&doc_id)
                 .await
                 .map_err(|err| AppError::new("STUDY_STORE_READ_FAILED", err))?
@@ -1068,7 +1068,7 @@ pub async fn try_execute_study_fast_path(
                 .unwrap_or(0.0)
                 .max(0.0);
 
-            let Some(doc) = store
+            let Some(doc) = study_store
                 .get_document(&doc_id)
                 .await
                 .map_err(|err| AppError::new("STUDY_STORE_READ_FAILED", err))?
