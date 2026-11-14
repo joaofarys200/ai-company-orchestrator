@@ -173,7 +173,7 @@ export const HologramCore: React.FC<HologramCoreProps> = ({
         >
           <div className={`absolute w-44 h-44 rounded-full transition-all duration-700 bg-transparent ${theme.glow} -z-10`} />
 
-          <motion.g
+          <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
             className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
@@ -183,7 +183,7 @@ export const HologramCore: React.FC<HologramCoreProps> = ({
               {ticks}
               {compassDots}
             </svg>
-          </motion.g>
+          </motion.div>
 
           <svg width="360" height="360" viewBox="0 0 360 360" className="absolute pointer-events-none">
             <line x1="180" y1="12" x2="180" y2="22" stroke={theme.hex} strokeWidth="1.5" opacity="0.7" />

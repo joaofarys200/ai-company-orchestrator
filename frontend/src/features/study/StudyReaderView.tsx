@@ -34,7 +34,7 @@ import type {
   StudyHighlight,
   ExplanationLevel
 } from './types';
-import { resolveTransportMediaUrl, useTransportSystem } from '../../transport';
+import { useTransportSystem } from '../../transport';
 
 // Configure pdf.js worker using stable public asset URL with origin resolution
 export const ensurePdfWorkerConfigured = () => {
@@ -46,9 +46,9 @@ export const ensurePdfWorkerConfigured = () => {
         : window.location && window.location.href && !window.location.href.startsWith('data:')
         ? new URL(window.location.href).origin
         : undefined;
-    pdfjsLib.GlobalWorkerOptions.workerSrc = resolveTransportMediaUrl('/pdf.worker.min.mjs', {
-      baseUrl: origin,
-    });
+    pdfjsLib.GlobalWorkerOptions.workerSrc = origin
+      ? `${origin.replace(/\/+$/, '')}/pdf.worker.min.mjs`
+      : '/pdf.worker.min.mjs';
   } catch {
     pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
   }
@@ -473,13 +473,14 @@ export const StudyReaderView: React.FC<StudyReaderViewProps> = ({
             relativePaths.push(encodeURI(rawFp.startsWith('/') ? rawFp : `/${rawFp}`));
           }
         }
+        const allowQueryToken = !transportSystem.isNativeDesktop();
         const candidateUrls = transportSystem.getMediaCandidateUrlsAsync
           ? await transportSystem.getMediaCandidateUrlsAsync(relativePaths, {
-              appendToken: true,
+              appendToken: allowQueryToken,
               docId: document.document_id,
             })
           : transportSystem.getMediaCandidateUrls(relativePaths, {
-              appendToken: true,
+              appendToken: allowQueryToken,
             });
         for (const url of candidateUrls) {
           try {

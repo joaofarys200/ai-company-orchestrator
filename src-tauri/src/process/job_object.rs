@@ -113,6 +113,18 @@ impl JobObject {
         }
     }
 
+    /// Default per-worker private commit ceiling (4 GiB) preventing runaway Python/ML allocations.
+    pub const DEFAULT_WORKER_MEMORY_LIMIT_BYTES: usize = 4usize.saturating_mul(1024 * 1024 * 1024);
+
+    /// Creates a Job Object enforcing `max_memory_bytes` or falling back to
+    /// `DEFAULT_WORKER_MEMORY_LIMIT_BYTES` when omitted or zero.
+    pub fn with_default_memory_limit(max_memory_bytes: Option<usize>) -> Result<Self, String> {
+        let effective = max_memory_bytes
+            .filter(|&bytes| bytes > 0)
+            .unwrap_or(Self::DEFAULT_WORKER_MEMORY_LIMIT_BYTES);
+        Self::new(Some(effective))
+    }
+
     #[cfg(windows)]
     fn as_handle(&self) -> HANDLE {
         self.handle as HANDLE
@@ -138,8 +150,7 @@ impl JobObject {
     pub fn assign_pid(&self, pid: u32) -> Result<(), String> {
         #[cfg(windows)]
         {
-            let proc_handle =
-                unsafe { OpenProcess(PROCESS_SET_QUOTA | PROCESS_TERMINATE, 0, pid) };
+            let proc_handle = unsafe { OpenProcess(PROCESS_SET_QUOTA | PROCESS_TERMINATE, 0, pid) };
             if proc_handle.is_null() {
                 return Err(format!(
                     "OpenProcess(pid={pid}) failed: {}",
@@ -221,7 +232,8 @@ mod tests {
             .spawn()
             .expect("spawn child powershell process");
 
-        job.assign_pid(child.id()).expect("assign child pid to JobObject");
+        job.assign_pid(child.id())
+            .expect("assign child pid to JobObject");
         drop(job);
 
         let deadline = Instant::now() + Duration::from_secs(5);
@@ -237,5 +249,53 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn default_worker_job_enforces_job_memory_limit_in_windows_kernel() {
+        let job = JobObject::with_default_memory_limit(None).expect("create default JobObject");
+        let mut info: JOBOBJECT_EXTENDED_LIMIT_INFORMATION = Default::default();
+        let mut ret_len: u32 = 0;
+        let ok = unsafe {
+            windows_sys::Win32::System::JobObjects::QueryInformationJobObject(
+                job.as_handle(),
+                JobObjectExtendedLimitInformation,
+                (&mut info as *mut JOBOBJECT_EXTENDED_LIMIT_INFORMATION).cast::<std::ffi::c_void>(),
+                std::mem::size_of::<JOBOBJECT_EXTENDED_LIMIT_INFORMATION>() as u32,
+                &mut ret_len,
+            )
+        };
+        assert_ne!(ok, 0, "QueryInformationJobObject failed");
+        assert_ne!(
+            info.BasicLimitInformation.LimitFlags & JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+            0
+        );
+        assert_ne!(
+            info.BasicLimitInformation.LimitFlags & JOB_OBJECT_LIMIT_JOB_MEMORY,
+            0
+        );
+        assert_eq!(
+            info.JobMemoryLimit,
+            JobObject::DEFAULT_WORKER_MEMORY_LIMIT_BYTES
+        );
+
+        let zero_fallback =
+            JobObject::with_default_memory_limit(Some(0)).expect("zero limit falls back");
+        let mut fallback_info: JOBOBJECT_EXTENDED_LIMIT_INFORMATION = Default::default();
+        let ok2 = unsafe {
+            windows_sys::Win32::System::JobObjects::QueryInformationJobObject(
+                zero_fallback.as_handle(),
+                JobObjectExtendedLimitInformation,
+                (&mut fallback_info as *mut JOBOBJECT_EXTENDED_LIMIT_INFORMATION)
+                    .cast::<std::ffi::c_void>(),
+                std::mem::size_of::<JOBOBJECT_EXTENDED_LIMIT_INFORMATION>() as u32,
+                &mut ret_len,
+            )
+        };
+        assert_ne!(ok2, 0);
+        assert_eq!(
+            fallback_info.JobMemoryLimit,
+            JobObject::DEFAULT_WORKER_MEMORY_LIMIT_BYTES
+        );
     }
 }

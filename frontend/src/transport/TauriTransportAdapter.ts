@@ -160,6 +160,7 @@ export class TauriTransportAdapter implements JarvisTransport {
   private lastDisconnectedAt: number | null = null;
   private lastError: string | null = null;
   private loopbackConfig: TauriLoopbackConfig | null = null;
+  private fallbackMediaBaseUrl: string | null = null;
 
   private ipcEventUnlisten: (() => void) | null = null;
   private dragDropUnlisten: (() => void) | null = null;
@@ -293,10 +294,12 @@ export class TauriTransportAdapter implements JarvisTransport {
         pathOrUrl: string,
         mediaOpts?: { appendToken?: boolean; ticket?: string }
       ) => {
+        const allowQueryToken =
+          !this.system.isNativeDesktop() && Boolean(mediaOpts?.appendToken);
         const resolved = resolveTransportMediaUrl(pathOrUrl, {
           baseUrl: this.getEffectiveHttpBaseUrl(),
           token: this.getEffectiveHttpToken(),
-          appendToken: mediaOpts?.appendToken,
+          appendToken: allowQueryToken,
         });
         return mediaOpts?.ticket ? attachQueryParam(resolved, 'ticket', mediaOpts.ticket) : resolved;
       },
@@ -304,10 +307,12 @@ export class TauriTransportAdapter implements JarvisTransport {
         relativePaths: string[],
         mediaOpts?: { appendToken?: boolean; ticket?: string }
       ) => {
+        const allowQueryToken =
+          !this.system.isNativeDesktop() && Boolean(mediaOpts?.appendToken);
         const urls = buildMediaCandidateUrls(relativePaths, {
           baseUrl: this.getEffectiveHttpBaseUrl(),
           token: this.getEffectiveHttpToken(),
-          appendToken: mediaOpts?.appendToken,
+          appendToken: allowQueryToken,
         });
         return mediaOpts?.ticket
           ? urls.map((u) => attachQueryParam(u, 'ticket', mediaOpts.ticket!))
@@ -320,7 +325,7 @@ export class TauriTransportAdapter implements JarvisTransport {
       ) => {
         const ticket = mediaOpts?.docId ? await this.fetchMediaTicket(mediaOpts.docId) : null;
         return this.system.resolveMediaUrl(pathOrUrl, {
-          appendToken: ticket ? false : mediaOpts?.appendToken,
+          appendToken: ticket || this.system.isNativeDesktop() ? false : mediaOpts?.appendToken,
           ticket: ticket ?? undefined,
         });
       },
@@ -330,7 +335,7 @@ export class TauriTransportAdapter implements JarvisTransport {
       ) => {
         const ticket = mediaOpts?.docId ? await this.fetchMediaTicket(mediaOpts.docId) : null;
         return this.system.getMediaCandidateUrls(relativePaths, {
-          appendToken: ticket ? false : mediaOpts?.appendToken,
+          appendToken: ticket || this.system.isNativeDesktop() ? false : mediaOpts?.appendToken,
           ticket: ticket ?? undefined,
         });
       },
@@ -359,6 +364,9 @@ export class TauriTransportAdapter implements JarvisTransport {
     if (this.loopbackConfig?.base_url) {
       return this.loopbackConfig.base_url.replace(/\/+$/, '');
     }
+    if (this.fallbackMediaBaseUrl) {
+      return this.fallbackMediaBaseUrl.replace(/\/+$/, '');
+    }
     return resolveDefaultHttpBaseUrl(this.httpBaseUrlOverride);
   }
 
@@ -384,11 +392,7 @@ export class TauriTransportAdapter implements JarvisTransport {
       });
       if (res && typeof res.ticket === 'string' && res.ticket.length > 0) {
         if (res.base_url) {
-          this.loopbackConfig = {
-            base_url: res.base_url,
-            token: this.loopbackConfig?.token ?? '',
-            preview_base_url: this.loopbackConfig?.preview_base_url,
-          };
+          this.fallbackMediaBaseUrl = res.base_url;
         }
         const expiresAt = typeof res.expires_at_ms === 'number' ? res.expires_at_ms : now + 30000;
         this.ticketCache.set(docId, { ticket: res.ticket, expiresAtMs: expiresAt });

@@ -542,4 +542,83 @@ describe('TauriTransportAdapter hybrid coexistence mode', () => {
 
     adapter.dispose();
   });
+
+  it('preserves loopback bearer token across fetchMediaTicket base_url updates and never emits ?token= in native mode', async () => {
+    const harness = createMockTauriHarness({
+      loopbackConfig: {
+        base_url: 'http://127.0.0.1:56100',
+        token: 'super-secret-loopback-token',
+        preview_base_url: 'http://127.0.0.1:56101',
+      },
+      ticketFactory: (docId) => ({
+        ticket: `scoped-tkt-${docId}`,
+        base_url: 'http://127.0.0.1:56100',
+        expires_at_ms: Date.now() + 60000,
+      }),
+    });
+
+    const adapter = new TauriTransportAdapter({
+      preferHybridFallback: false,
+      tauriApis: harness.apis,
+    });
+
+    adapter.connect();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    // Fetch ticket returning base_url must not clobber existing loopbackConfig.token or preview_base_url
+    const ticketUrl = await adapter.system.resolveMediaUrlAsync?.('/api/study/document/doc-7/file', {
+      docId: 'doc-7',
+      appendToken: true,
+    });
+    assert.equal(
+      ticketUrl,
+      'http://127.0.0.1:56100/api/study/document/doc-7/file?ticket=scoped-tkt-doc-7'
+    );
+    assert.equal(adapter.system.getPreviewBaseUrl?.(), 'http://127.0.0.1:56101');
+    assert.equal(
+      (adapter as unknown as { getEffectiveHttpToken(): string }).getEffectiveHttpToken(),
+      'super-secret-loopback-token'
+    );
+
+    // Sync/async media URLs in native Tauri mode must never leak ?token= even if appendToken is requested
+    const directUrl = adapter.system.resolveMediaUrl('/api/study/document/doc-7/video', {
+      appendToken: true,
+    });
+    assert.equal(directUrl, 'http://127.0.0.1:56100/api/study/document/doc-7/video');
+    assert.equal(directUrl.includes('token='), false);
+
+    const candidates = adapter.system.getMediaCandidateUrls(['/api/study/document/doc-7/file'], {
+      appendToken: true,
+    });
+    assert.equal(candidates.some((u) => u.includes('token=')), false);
+
+    // Ticket fetched BEFORE get_loopback_config resolves still provides base_url without overwriting token later
+    const slowHarness = createMockTauriHarness({
+      ticketFactory: (docId) => ({
+        ticket: `early-tkt-${docId}`,
+        base_url: 'http://127.0.0.1:57200',
+        expires_at_ms: Date.now() + 60000,
+      }),
+    });
+    const earlyAdapter = new TauriTransportAdapter({
+      preferHybridFallback: false,
+      tauriApis: slowHarness.apis,
+      getHttpToken: () => 'window-fallback-token',
+    });
+    const earlyUrl = await earlyAdapter.system.resolveMediaUrlAsync?.(
+      '/api/study/document/doc-8/file',
+      { docId: 'doc-8', appendToken: true }
+    );
+    assert.equal(
+      earlyUrl,
+      'http://127.0.0.1:57200/api/study/document/doc-8/file?ticket=early-tkt-doc-8'
+    );
+    assert.equal(
+      (earlyAdapter as unknown as { getEffectiveHttpToken(): string }).getEffectiveHttpToken(),
+      'window-fallback-token'
+    );
+
+    earlyAdapter.dispose();
+    adapter.dispose();
+  });
 });

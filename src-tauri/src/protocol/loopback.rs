@@ -153,7 +153,9 @@ impl LoopbackHandle {
         ttl_secs: Option<u64>,
     ) -> Result<MediaTicketResponse, AppError> {
         let now = now_ms()?;
-        let ttl_ms = ttl_secs.unwrap_or(DEFAULT_TICKET_TTL_SECS).saturating_mul(1000);
+        let ttl_ms = ttl_secs
+            .unwrap_or(DEFAULT_TICKET_TTL_SECS)
+            .saturating_mul(1000);
         self.issue_media_ticket_with_expiry(doc_id, now.saturating_add(ttl_ms))
     }
 
@@ -203,15 +205,14 @@ fn build_router(state: LoopbackState) -> Router {
             get(handle_doc_media),
         )
         .route("/data/study/{*subpath}", get(handle_data_study))
-        .layer(middleware::from_fn_with_state(state.clone(), security_guard))
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            security_guard,
+        ))
         .with_state(state)
 }
 
-async fn security_guard(
-    State(state): State<LoopbackState>,
-    req: Request,
-    next: Next,
-) -> Response {
+async fn security_guard(State(state): State<LoopbackState>, req: Request, next: Next) -> Response {
     let headers = req.headers();
     let host = headers.get(header::HOST).and_then(|v| v.to_str().ok());
     if !is_valid_loopback_host(host, state.port) {
@@ -223,10 +224,7 @@ async fn security_guard(
         return plain_error(StatusCode::FORBIDDEN, "Forbidden path");
     }
 
-    if let Some(sec_fetch) = headers
-        .get("sec-fetch-site")
-        .and_then(|v| v.to_str().ok())
-    {
+    if let Some(sec_fetch) = headers.get("sec-fetch-site").and_then(|v| v.to_str().ok()) {
         if sec_fetch.trim().eq_ignore_ascii_case("cross-site") {
             return plain_error(StatusCode::FORBIDDEN, "Cross-site request blocked");
         }
@@ -283,8 +281,16 @@ async fn handle_pdf_worker(
         return err_resp;
     }
 
-    let dist_candidate = state.project_root.join("frontend").join("dist").join("pdf.worker.min.mjs");
-    let pub_candidate = state.project_root.join("frontend").join("public").join("pdf.worker.min.mjs");
+    let dist_candidate = state
+        .project_root
+        .join("frontend")
+        .join("dist")
+        .join("pdf.worker.min.mjs");
+    let pub_candidate = state
+        .project_root
+        .join("frontend")
+        .join("public")
+        .join("pdf.worker.min.mjs");
 
     let resolved = ensure_confined_existing_file(
         &state.project_root.join("frontend").join("dist"),
@@ -299,13 +305,15 @@ async fn handle_pdf_worker(
 
     let _ = (dist_candidate, pub_candidate);
     match resolved {
-        Ok(canon) => stream_file_with_range(
-            &canon,
-            "application/javascript; charset=utf-8",
-            &method,
-            headers.get(header::RANGE).and_then(|v| v.to_str().ok()),
-        )
-        .await,
+        Ok(canon) => {
+            stream_file_with_range(
+                &canon,
+                "application/javascript; charset=utf-8",
+                &method,
+                headers.get(header::RANGE).and_then(|v| v.to_str().ok()),
+            )
+            .await
+        }
         Err(_) => plain_error(StatusCode::NOT_FOUND, "pdf.worker.min.mjs not found"),
     }
 }
@@ -360,13 +368,9 @@ async fn handle_doc_file(
         return err_resp;
     }
 
-    let Some(canon) = resolve_cataloged_media(
-        &state.project_root,
-        &doc_id,
-        None,
-        PDF_EXTENSIONS,
-        false,
-    ) else {
+    let Some(canon) =
+        resolve_cataloged_media(&state.project_root, &doc_id, None, PDF_EXTENSIONS, false)
+    else {
         return plain_error(StatusCode::NOT_FOUND, "PDF not found");
     };
 
@@ -562,7 +566,10 @@ fn infer_doc_id_from_study_subpath(subpath: &str) -> Option<String> {
 }
 
 fn extract_bearer_or_header_token(headers: &HeaderMap) -> Option<String> {
-    if let Some(auth) = headers.get(header::AUTHORIZATION).and_then(|v| v.to_str().ok()) {
+    if let Some(auth) = headers
+        .get(header::AUTHORIZATION)
+        .and_then(|v| v.to_str().ok())
+    {
         let trimmed = auth.trim();
         if trimmed.len() > 7 && trimmed[..7].eq_ignore_ascii_case("bearer ") {
             return Some(trimmed[7..].trim().to_string());
@@ -602,17 +609,16 @@ fn authorize_doc_request(
         if verify_media_ticket(&state.hmac_key, &ticket, doc_id).is_ok() {
             return None;
         }
-        return Some(plain_error(StatusCode::FORBIDDEN, "Invalid or expired media ticket"));
+        return Some(plain_error(
+            StatusCode::FORBIDDEN,
+            "Invalid or expired media ticket",
+        ));
     }
 
-    if let Some(qtok) = extract_query_param(query, "token") {
-        if constant_time_str_eq(&state.hmac_key, &qtok, &state.token) {
-            return None;
-        }
-        return Some(plain_error(StatusCode::UNAUTHORIZED, "Unauthorized"));
-    }
-
-    Some(plain_error(StatusCode::UNAUTHORIZED, "Authentication required"))
+    Some(plain_error(
+        StatusCode::UNAUTHORIZED,
+        "Authentication required",
+    ))
 }
 
 fn authorize_general_request(
@@ -628,23 +634,22 @@ fn authorize_general_request(
         return Some(plain_error(StatusCode::UNAUTHORIZED, "Unauthorized"));
     }
 
-    if let Some(qtok) = extract_query_param(query, "token") {
-        if constant_time_str_eq(&state.hmac_key, &qtok, &state.token) {
-            return None;
-        }
-        return Some(plain_error(StatusCode::UNAUTHORIZED, "Unauthorized"));
-    }
-
     if let Some(ticket) = extract_query_param(query, "ticket") {
         if let Some(doc_id) = scoped_doc_id {
             if verify_media_ticket(&state.hmac_key, &ticket, doc_id).is_ok() {
                 return None;
             }
         }
-        return Some(plain_error(StatusCode::FORBIDDEN, "Invalid or expired media ticket"));
+        return Some(plain_error(
+            StatusCode::FORBIDDEN,
+            "Invalid or expired media ticket",
+        ));
     }
 
-    Some(plain_error(StatusCode::UNAUTHORIZED, "Authentication required"))
+    Some(plain_error(
+        StatusCode::UNAUTHORIZED,
+        "Authentication required",
+    ))
 }
 
 fn sign_hmac_hex(hmac_key: &[u8; 32], payload: &str) -> String {
@@ -730,39 +735,41 @@ fn resolve_cataloged_media(
     let catalog = load_documents_catalog(&study_dir)?;
     let entry = catalog.get(doc_id)?;
 
-    let raw_fp = entry
-        .get("metadata")
-        .and_then(|m| {
-            m.get("file_path").and_then(|v| v.as_str()).or_else(|| {
-                if check_video_nested {
-                    m.get("video")
-                        .and_then(|v| v.get("file_path"))
-                        .and_then(|v| v.as_str())
-                } else {
-                    None
-                }
-            })
-        });
+    let raw_fp = entry.get("metadata").and_then(|m| {
+        m.get("file_path").and_then(|v| v.as_str()).or_else(|| {
+            if check_video_nested {
+                m.get("video")
+                    .and_then(|v| v.get("file_path"))
+                    .and_then(|v| v.as_str())
+            } else {
+                None
+            }
+        })
+    });
 
     if let Some(fp_str) = raw_fp {
-        let p = Path::new(fp_str);
-        let candidate = if p.is_absolute() {
-            p.to_path_buf()
-        } else {
-            project_root.join(p)
-        };
-        if let Ok(meta) = fs::symlink_metadata(&candidate) {
-            if !meta.file_type().is_symlink() && meta.is_file() {
-                if let Ok(canon) = dunce::canonicalize(&candidate) {
-                    if !is_blocked_system_path(&canon)
-                        && has_allowed_extension(&canon, allowed_exts)
-                    {
-                        if let Ok(canon_meta) = fs::symlink_metadata(&canon) {
-                            if !canon_meta.file_type().is_symlink() && canon_meta.is_file() {
-                                return Some(canon);
+        if !has_suspicious_path_traversal(fp_str) {
+            let p = Path::new(fp_str);
+            if p.is_absolute() {
+                if let Ok(meta) = fs::symlink_metadata(p) {
+                    if !meta.file_type().is_symlink() && meta.is_file() {
+                        if let Ok(canon) = dunce::canonicalize(p) {
+                            if !is_blocked_system_path(&canon)
+                                && has_allowed_extension(&canon, allowed_exts)
+                            {
+                                if let Ok(canon_meta) = fs::symlink_metadata(&canon) {
+                                    if !canon_meta.file_type().is_symlink() && canon_meta.is_file()
+                                    {
+                                        return Some(canon);
+                                    }
+                                }
                             }
                         }
                     }
+                }
+            } else if let Ok(canon) = ensure_confined_existing_file(project_root, p) {
+                if !is_blocked_system_path(&canon) && has_allowed_extension(&canon, allowed_exts) {
+                    return Some(canon);
                 }
             }
         }
@@ -782,7 +789,8 @@ fn resolve_cataloged_media(
                 for item in entries.flatten() {
                     let name = item.file_name();
                     if name.to_string_lossy().starts_with(hash_prefix) {
-                        if let Ok(canon) = ensure_confined_existing_file(&search_dir, &item.path()) {
+                        if let Ok(canon) = ensure_confined_existing_file(&search_dir, &item.path())
+                        {
                             if has_allowed_extension(&canon, allowed_exts) {
                                 return Some(canon);
                             }
@@ -815,7 +823,10 @@ mod tests {
         fs::write(study_dir.join("secret.json"), br#"{"secret":true}"#).unwrap();
         fs::write(root.join("outside.pdf"), b"outside").unwrap();
         fs::write(
-            study_dir.join("keyframes").join("doc_alpha").join("kf1.jpg"),
+            study_dir
+                .join("keyframes")
+                .join("doc_alpha")
+                .join("kf1.jpg"),
             b"JPGDATA",
         )
         .unwrap();
@@ -852,11 +863,15 @@ mod tests {
         // 1. /healthz works with valid Host
         let (st, head, body) = send_raw_http(
             port,
-            &format!("GET /healthz HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: close\r\n\r\n"),
+            &format!(
+                "GET /healthz HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: close\r\n\r\n"
+            ),
         )
         .await;
         assert_eq!(st, 200);
-        assert!(head.to_ascii_lowercase().contains("x-content-type-options: nosniff"));
+        assert!(head
+            .to_ascii_lowercase()
+            .contains("x-content-type-options: nosniff"));
         assert!(String::from_utf8_lossy(&body).contains("tauri-loopback"));
 
         // 2. DNS-rebinding Host spoof -> 403
@@ -944,7 +959,9 @@ mod tests {
         assert_eq!(st, 403);
 
         // 9. Expired ticket -> 403
-        let expired = handle.issue_media_ticket_with_expiry("doc_alpha", 1).unwrap();
+        let expired = handle
+            .issue_media_ticket_with_expiry("doc_alpha", 1)
+            .unwrap();
         let (st, _, _) = send_raw_http(
             port,
             &format!("GET /api/study/document/doc_alpha/file?ticket={} HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: close\r\n\r\n", expired.ticket),
@@ -976,7 +993,37 @@ mod tests {
         .await;
         assert_eq!(st, 403);
 
+        // 11. Legacy ?token= query authentication is rejected across all endpoints
+        let (st, _, _) = send_raw_http(
+            port,
+            &format!("GET /api/study/document/doc_alpha/file?token={tok} HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: close\r\n\r\n"),
+        )
+        .await;
+        assert_eq!(st, 401);
+
+        let (st, _, _) = send_raw_http(
+            port,
+            &format!("GET /api/study/documents?token={tok} HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: close\r\n\r\n"),
+        )
+        .await;
+        assert_eq!(st, 401);
+
+        let (st, _, _) = send_raw_http(
+            port,
+            &format!("GET /pdf.worker.min.mjs?token={tok} HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: close\r\n\r\n"),
+        )
+        .await;
+        assert_eq!(st, 401);
+
+        // Bearer header grants access to /api/study/documents while confining documents.json
+        let (st, _, docs_body) = send_raw_http(
+            port,
+            &format!("GET /api/study/documents HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nAuthorization: Bearer {tok}\r\nConnection: close\r\n\r\n"),
+        )
+        .await;
+        assert_eq!(st, 200);
+        assert!(String::from_utf8_lossy(&docs_body).contains("doc_alpha"));
+
         handle.shutdown();
     }
 }
-

@@ -200,10 +200,21 @@ function TreeRow({
 
   return (
     <>
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => (node.type === 'directory' ? onToggle(node.path) : onSelect(node.path))}
-        className={`group flex h-7 w-full items-center gap-1.5 pr-2 text-left text-xs transition-colors ${
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            if (node.type === 'directory') {
+              onToggle(node.path);
+            } else {
+              onSelect(node.path);
+            }
+          }
+        }}
+        className={`group flex h-7 w-full cursor-pointer items-center gap-1.5 pr-2 text-left text-xs transition-colors ${
           selected
             ? 'bg-cyan-500/15 text-cyan-200 font-medium border-l-2 border-cyan-400'
             : 'text-gray-300 hover:bg-white/[0.04] hover:text-white'
@@ -286,7 +297,7 @@ function TreeRow({
             <Trash2 className="h-3 w-3" />
           </button>
         )}
-      </button>
+      </div>
 
       {/* Directory children */}
       {node.type === 'directory' && isExpanded && node.children.map((child) => (

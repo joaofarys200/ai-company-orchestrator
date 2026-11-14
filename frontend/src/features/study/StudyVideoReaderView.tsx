@@ -561,10 +561,17 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
     }
   };
 
-  const videoStreamUrl = transport.system.resolveMediaUrl(
-    `/api/study/document/${encodeURIComponent(document.document_id)}/video`,
-    { appendToken: !mediaTicket, ticket: mediaTicket ?? undefined }
-  );
+  const isNativeDesktop = transport.system.isNativeDesktop();
+  const videoStreamUrl =
+    isNativeDesktop && !mediaTicket
+      ? undefined
+      : transport.system.resolveMediaUrl(
+          `/api/study/document/${encodeURIComponent(document.document_id)}/video`,
+          {
+            appendToken: !isNativeDesktop && !mediaTicket,
+            ticket: mediaTicket ?? undefined,
+          }
+        );
   const asrUnavailableReason =
     videoMeta?.asr_unavailable_reason || (document.metadata as any)?.asr_unavailable_reason || '';
   const ocrStatus = videoMeta?.ocr_status || (document.metadata as any)?.ocr_status || '';
@@ -1271,11 +1278,14 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
                       </div>
                       {/* Image snapshot */}
                       <div className="relative aspect-video w-full rounded bg-black/60 overflow-hidden flex items-center justify-center">
-                        {kf.image_path ? (
+                        {kf.image_path && (!isNativeDesktop || Boolean(mediaTicket)) ? (
                           <img
                             src={transport.system.resolveMediaUrl(
                               `/api/study/document/${encodeURIComponent(document.document_id)}/media/${encodeURIComponent(kf.frame_id)}`,
-                              { appendToken: !mediaTicket, ticket: mediaTicket ?? undefined }
+                              {
+                                appendToken: !isNativeDesktop && !mediaTicket,
+                                ticket: mediaTicket ?? undefined,
+                              }
                             )}
                             alt={kf.frame_id}
                             className="h-full w-full object-contain"

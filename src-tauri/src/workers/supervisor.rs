@@ -5,7 +5,7 @@
 //! `worker.init` handshake, maintains 5s/15s heartbeats, and auto-restarts with bounded
 //! exponential backoff when crashed or unresponsive.
 
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
@@ -52,12 +52,7 @@ impl WorkerPoolRole {
     }
 
     pub fn production_roles() -> &'static [WorkerPoolRole] {
-        &[
-            Self::Ai,
-            Self::Study,
-            Self::Mission,
-            Self::Voice,
-        ]
+        &[Self::Ai, Self::Study, Self::Mission, Self::Voice]
     }
 
     pub fn all_roles() -> &'static [WorkerPoolRole] {
@@ -97,7 +92,7 @@ impl WorkerSupervisorConfig {
             heartbeat_timeout: Duration::from_secs(15),
             ready_timeout: Duration::from_secs(15),
             shutdown_timeout: Duration::from_secs(2),
-            max_memory_bytes: None,
+            max_memory_bytes: Some(JobObject::DEFAULT_WORKER_MEMORY_LIMIT_BYTES),
             max_restart_attempts: 5,
             base_backoff: Duration::from_secs(1),
             init_params: json!({}),
@@ -108,6 +103,151 @@ impl WorkerSupervisorConfig {
         self.canonical_db_path = Some(db_path);
         self
     }
+}
+
+const CORE_WORKER_SAFE_ENV_KEYS: &[&str] = &[
+    "PATH",
+    "PATHEXT",
+    "SYSTEMROOT",
+    "WINDIR",
+    "SYSTEMDRIVE",
+    "COMSPEC",
+    "OS",
+    "NUMBER_OF_PROCESSORS",
+    "PROCESSOR_ARCHITECTURE",
+    "TEMP",
+    "TMP",
+    "HOME",
+    "USERPROFILE",
+    "HOMEDRIVE",
+    "HOMEPATH",
+    "LOCALAPPDATA",
+    "APPDATA",
+    "PROGRAMDATA",
+    "PROGRAMFILES",
+    "PROGRAMFILES(X86)",
+    "COMMONPROGRAMFILES",
+    "COMMONPROGRAMFILES(X86)",
+    "LANG",
+    "LC_ALL",
+    "LC_CTYPE",
+    "TERM",
+    "SSL_CERT_FILE",
+    "REQUESTS_CA_BUNDLE",
+    "CURL_CA_BUNDLE",
+    "VIRTUAL_ENV",
+    "CONDA_PREFIX",
+    "CUDA_VISIBLE_DEVICES",
+    "NVIDIA_VISIBLE_DEVICES",
+    "PYTEST_CURRENT_TEST",
+];
+
+const RUNTIME_WORKER_SAFE_ENV_KEYS: &[&str] = &[
+    "ALLOW_EXTERNAL_FALLBACK",
+    "CHAT_MAX_TOKENS",
+    "CHAT_TIMEOUT_SECONDS",
+    "CLOUD_FOR_COMPLEX",
+    "CREWAI_TEMPERATURE",
+    "FFMPEG_PATH",
+    "FFPROBE_PATH",
+    "GEMINI_CREW_MODEL",
+    "GEMINI_FOR_COMPLEX",
+    "GEMINI_LIVE_VOICE",
+    "GEMINI_MODEL",
+    "GEMINI_OPENAI_BASE_URL",
+    "HF_HOME",
+    "HUGGINGFACE_HUB_CACHE",
+    "JARVIS_MISSION_STALE_LOCK_SECONDS",
+    "JARVIS_STATE_DIR",
+    "JARVIS_STORAGE_BACKEND",
+    "MAX_BUDGET_USD",
+    "MAX_DAILY_SPEND",
+    "MAX_SINGLE_TRANSACTION",
+    "OBSIDIAN_VAULT_PATH",
+    "ORCHESTRATOR_MODE",
+];
+
+const AI_WORKER_API_ENV_KEYS: &[&str] = &[
+    "ANTHROPIC_API_KEY",
+    "APIFY_API_TOKEN",
+    "BROWSERBASE_API_KEY",
+    "COMPOSIO_API_KEY",
+    "FIRECRAWL_API_KEY",
+    "GEMINI_API_KEY",
+];
+
+fn is_allowed_worker_env_key(role: WorkerPoolRole, upper_key: &str) -> bool {
+    if CORE_WORKER_SAFE_ENV_KEYS.contains(&upper_key) {
+        return true;
+    }
+    if role == WorkerPoolRole::Echo {
+        return false;
+    }
+    if RUNTIME_WORKER_SAFE_ENV_KEYS.contains(&upper_key)
+        || upper_key.starts_with("OLLAMA_")
+        || upper_key.starts_with("VOICE_")
+        || upper_key.starts_with("WHISPER_")
+        || upper_key.starts_with("STUDY_")
+        || upper_key.starts_with("AIRLLM_")
+    {
+        return true;
+    }
+    if matches!(
+        role,
+        WorkerPoolRole::Ai
+            | WorkerPoolRole::Study
+            | WorkerPoolRole::Voice
+            | WorkerPoolRole::Mission
+    ) && (AI_WORKER_API_ENV_KEYS.contains(&upper_key)
+        || upper_key.starts_with("GEMINI_API_KEY_"))
+    {
+        return true;
+    }
+    false
+}
+
+/// Builds an explicitly allowlisted, role-scoped child environment (used with `cmd.env_clear()`).
+pub fn build_worker_environment_from_iter<I, K, V>(
+    role: WorkerPoolRole,
+    workspace_root: &Path,
+    canonical_db: &Path,
+    parent_env: I,
+) -> BTreeMap<String, String>
+where
+    I: IntoIterator<Item = (K, V)>,
+    K: AsRef<str>,
+    V: AsRef<str>,
+{
+    let mut env = BTreeMap::new();
+    for (k, v) in parent_env {
+        let key_str = k.as_ref();
+        let upper = key_str.to_ascii_uppercase();
+        if is_allowed_worker_env_key(role, &upper) {
+            env.insert(key_str.to_string(), v.as_ref().to_string());
+        }
+    }
+
+    env.insert("PYTHONUNBUFFERED".to_string(), "1".to_string());
+    env.insert("PYTHONIOENCODING".to_string(), "utf-8".to_string());
+    env.insert("PYTHONDONTWRITEBYTECODE".to_string(), "1".to_string());
+    env.insert("JARVIS_DB_WRITE_OWNER".to_string(), "rust".to_string());
+    env.insert(
+        "JARVIS_CANONICAL_DB_PATH".to_string(),
+        canonical_db.to_string_lossy().into_owned(),
+    );
+    env.insert(
+        "JARVIS_PROJECT_ROOT".to_string(),
+        workspace_root.to_string_lossy().into_owned(),
+    );
+    env
+}
+
+pub fn build_worker_environment(
+    role: WorkerPoolRole,
+    workspace_root: &Path,
+    canonical_db: &Path,
+) -> BTreeMap<String, String> {
+    build_worker_environment_from_iter(role, workspace_root, canonical_db, std::env::vars())
 }
 
 /// Resolves the JARVIS OS workspace root containing `workers/worker_boot.py`.
@@ -158,8 +298,14 @@ pub fn resolve_python_executable(workspace_root: &Path, override_path: Option<&P
 
     let venv_candidates = if cfg!(windows) {
         vec![
-            workspace_root.join("venv").join("Scripts").join("python.exe"),
-            workspace_root.join(".venv").join("Scripts").join("python.exe"),
+            workspace_root
+                .join("venv")
+                .join("Scripts")
+                .join("python.exe"),
+            workspace_root
+                .join(".venv")
+                .join("Scripts")
+                .join("python.exe"),
         ]
     } else {
         vec![
@@ -226,26 +372,24 @@ impl ManagedWorker {
         } else if let (Some(parent), Some(name)) =
             (raw_canonical_db.parent(), raw_canonical_db.file_name())
         {
-            let canon_parent =
-                dunce::canonicalize(parent).unwrap_or_else(|_| parent.to_path_buf());
+            let canon_parent = dunce::canonicalize(parent).unwrap_or_else(|_| parent.to_path_buf());
             canon_parent.join(name)
         } else {
             raw_canonical_db
         };
-        let job = JobObject::new(config.max_memory_bytes).map_err(RpcCallError::TransportClosed)?;
+        let job = JobObject::with_default_memory_limit(config.max_memory_bytes)
+            .map_err(RpcCallError::TransportClosed)?;
+        let worker_env =
+            build_worker_environment(role, &config.workspace_root, resolved_canonical_db.as_ref());
 
         let mut cmd = Command::new(&python_bin);
-        cmd.arg("-u")
+        cmd.env_clear()
+            .arg("-u")
             .arg(&script_path)
             .arg("--worker")
             .arg(role.as_str())
             .current_dir(&config.workspace_root)
-            .env("PYTHONUNBUFFERED", "1")
-            .env("PYTHONIOENCODING", "utf-8")
-            .env("PYTHONDONTWRITEBYTECODE", "1")
-            .env("JARVIS_DB_WRITE_OWNER", "rust")
-            .env("JARVIS_CANONICAL_DB_PATH", &resolved_canonical_db)
-            .env("JARVIS_PROJECT_ROOT", &config.workspace_root)
+            .envs(&worker_env)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -329,7 +473,11 @@ impl ManagedWorker {
         );
 
         if let Err(err) = rpc
-            .call("worker.init", Value::Object(init_payload), config.ready_timeout)
+            .call(
+                "worker.init",
+                Value::Object(init_payload),
+                config.ready_timeout,
+            )
             .await
         {
             stderr_task.abort();
@@ -482,12 +630,8 @@ impl WorkerSupervisor {
             }
         }
 
-        let worker = ManagedWorker::spawn(
-            role,
-            &self.config,
-            Arc::clone(&self.reverse_handler),
-        )
-        .await?;
+        let worker =
+            ManagedWorker::spawn(role, &self.config, Arc::clone(&self.reverse_handler)).await?;
         if worker.pid > 0 {
             if let Ok(mut pids) = self.active_pids.write() {
                 pids.insert(worker.pid);
@@ -824,10 +968,12 @@ mod tests {
         cfg.ready_timeout = Duration::from_secs(30);
         let supervisor = WorkerSupervisor::new(cfg);
         supervisor
-            .set_reverse_handler(crate::workers::reverse_rpc::build_composite_reverse_rpc_handler(
-                Arc::clone(&db),
-                permissions,
-            ))
+            .set_reverse_handler(
+                crate::workers::reverse_rpc::build_composite_reverse_rpc_handler(
+                    Arc::clone(&db),
+                    permissions,
+                ),
+            )
             .await;
 
         // Real production Knowledge worker triggers synchronous `database.get_compounding_rules()`
@@ -862,5 +1008,87 @@ mod tests {
 
         supervisor.shutdown_all().await;
     }
-}
 
+    #[test]
+    fn worker_environment_scrubs_unallowlisted_secrets_and_defaults_memory_cap() {
+        let workspace = PathBuf::from(r"C:\JarvisWorkspace");
+        let db = PathBuf::from(r"C:\Users\demo\AppData\Local\JarvisOS\data\database.db");
+        let cfg = WorkerSupervisorConfig::for_workspace(workspace.clone());
+        assert_eq!(
+            cfg.max_memory_bytes,
+            Some(JobObject::DEFAULT_WORKER_MEMORY_LIMIT_BYTES)
+        );
+
+        let fake_parent = vec![
+            ("PATH", r"C:\Windows\System32"),
+            ("SYSTEMROOT", r"C:\Windows"),
+            ("TEMP", r"C:\Temp"),
+            ("VIRTUAL_ENV", r"C:\JarvisWorkspace\venv"),
+            ("OLLAMA_MODEL", "qwen3.5:9b"),
+            ("GEMINI_API_KEY", "gem-secret-123"),
+            ("ANTHROPIC_API_KEY", "ant-secret-456"),
+            ("GITHUB_TOKEN", "ghp_should_be_scrubbed"),
+            ("AWS_SECRET_ACCESS_KEY", "aws_should_be_scrubbed"),
+            ("JARVIS_HTTP_TOKEN", "loopback_master_token_never_inherited"),
+            ("JARVIS_DB_WRITE_OWNER", "python"),
+        ];
+
+        // Echo receives only core OS/Python keys and forced Rust write-ownership vars
+        let echo_env = build_worker_environment_from_iter(
+            WorkerPoolRole::Echo,
+            &workspace,
+            &db,
+            fake_parent.clone(),
+        );
+        assert_eq!(
+            echo_env.get("SYSTEMROOT").map(String::as_str),
+            Some(r"C:\Windows")
+        );
+        assert_eq!(
+            echo_env.get("VIRTUAL_ENV").map(String::as_str),
+            Some(r"C:\JarvisWorkspace\venv")
+        );
+        assert_eq!(
+            echo_env.get("JARVIS_DB_WRITE_OWNER").map(String::as_str),
+            Some("rust")
+        );
+        assert!(!echo_env.contains_key("GITHUB_TOKEN"));
+        assert!(!echo_env.contains_key("AWS_SECRET_ACCESS_KEY"));
+        assert!(!echo_env.contains_key("JARVIS_HTTP_TOKEN"));
+        assert!(!echo_env.contains_key("GEMINI_API_KEY"));
+        assert!(!echo_env.contains_key("OLLAMA_MODEL"));
+
+        // Knowledge receives OLLAMA runtime vars without external LLM/cloud keys
+        let know_env = build_worker_environment_from_iter(
+            WorkerPoolRole::Knowledge,
+            &workspace,
+            &db,
+            fake_parent.clone(),
+        );
+        assert_eq!(
+            know_env.get("OLLAMA_MODEL").map(String::as_str),
+            Some("qwen3.5:9b")
+        );
+        assert!(!know_env.contains_key("GEMINI_API_KEY"));
+        assert!(!know_env.contains_key("GITHUB_TOKEN"));
+
+        // AI receives allowlisted LLM keys while scrubbing GitHub/AWS/loopback secrets
+        let ai_env =
+            build_worker_environment_from_iter(WorkerPoolRole::Ai, &workspace, &db, fake_parent);
+        assert_eq!(
+            ai_env.get("GEMINI_API_KEY").map(String::as_str),
+            Some("gem-secret-123")
+        );
+        assert_eq!(
+            ai_env.get("ANTHROPIC_API_KEY").map(String::as_str),
+            Some("ant-secret-456")
+        );
+        assert_eq!(
+            ai_env.get("JARVIS_DB_WRITE_OWNER").map(String::as_str),
+            Some("rust")
+        );
+        assert!(!ai_env.contains_key("GITHUB_TOKEN"));
+        assert!(!ai_env.contains_key("AWS_SECRET_ACCESS_KEY"));
+        assert!(!ai_env.contains_key("JARVIS_HTTP_TOKEN"));
+    }
+}
