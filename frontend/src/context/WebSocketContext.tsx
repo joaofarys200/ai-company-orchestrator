@@ -3569,9 +3569,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         (q
           ? studyDocuments.find(
               (d) =>
-                d.document_id.toLowerCase() === q ||
-                d.title.toLowerCase().includes(q) ||
-                d.subject.toLowerCase().includes(q) ||
+                String(d.document_id || '').toLowerCase() === q ||
+                String(d.title || '').toLowerCase().includes(q) ||
+                String(d.subject || '').toLowerCase().includes(q) ||
                 String((d as unknown as Record<string, unknown>).filename || '')
                   .toLowerCase()
                   .includes(q)

@@ -990,7 +990,7 @@ export const StudyContainer: React.FC<StudyContainerProps> = ({
 
         {activeTab === 'reader' && (
           activeDocument ? (
-            activeDocument.source_type === 'VIDEO' ? (
+            String(activeDocument.source_type || (activeDocument as any).doc_type || '').toUpperCase() === 'VIDEO' ? (
               <StudyVideoReaderView
                 key={activeDocument.document_id}
                 document={activeDocument}
