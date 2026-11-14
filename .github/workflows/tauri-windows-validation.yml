@@ -176,37 +176,47 @@ jobs:
           $prevRoot = $env:JARVIS_PROJECT_ROOT
           $env:JARVIS_PROJECT_ROOT = $tmpRoot
           $proc = Start-Process -FilePath $exe.Path -WorkingDirectory (Get-Location).Path -PassThru -WindowStyle Hidden
+          $dbPath = Join-Path $tmpRoot "database.db"
+          $studyDir = Join-Path $tmpRoot "data\study"
           try {
-            Start-Sleep -Seconds 6
-            $proc.Refresh()
-            if ($proc.HasExited) {
-              throw "jarvis-os.exe exited prematurely with exit code $($proc.ExitCode)"
+            try {
+              Start-Sleep -Seconds 6
+              $proc.Refresh()
+              if ($proc.HasExited) {
+                throw "jarvis-os.exe exited prematurely with exit code $($proc.ExitCode)"
+              }
+              if (-not (Test-Path $dbPath -PathType Leaf)) {
+                throw "Expected Rust Core SQLite database to initialize at $dbPath"
+              }
+              if (-not (Test-Path $studyDir -PathType Container)) {
+                throw "Expected Rust Core StudyStore catalog directory to initialize at $studyDir"
+              }
+              $dbLen = (Get-Item $dbPath).Length
+              if ($dbLen -le 0) {
+                throw "Expected non-empty Rust Core SQLite database at $dbPath (got $dbLen bytes)"
+              }
+              $rssMb = [math]::Round($proc.WorkingSet64 / 1MB, 2)
+              $pidVal = $proc.Id
+            } finally {
+              $env:JARVIS_PROJECT_ROOT = $prevRoot
+              if ($null -ne $proc -and -not $proc.HasExited) {
+                Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+                $proc.WaitForExit(5000) | Out-Null
+              }
+              if ($null -ne $proc) {
+                Get-CimInstance Win32_Process -Filter "ParentProcessId = $($proc.Id)" -ErrorAction SilentlyContinue | ForEach-Object {
+                  Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+                }
+              }
+              Start-Sleep -Milliseconds 300
             }
-            $dbPath = Join-Path $tmpRoot "database.db"
-            $studyDbPath = Join-Path $tmpRoot "data\study\study.db"
-            if (-not (Test-Path $dbPath)) {
-              throw "Expected Rust Core SQLite database to initialize at $dbPath"
+            $schemaInfo = python -c "import sqlite3, sys; c = sqlite3.connect(sys.argv[1]); objs = {r[0] for r in c.execute('SELECT name FROM sqlite_master').fetchall()}; uv = c.execute('PRAGMA user_version').fetchone()[0]; jm = c.execute('PRAGMA journal_mode').fetchone()[0]; c.close(); assert 'sessions' in objs and uv >= 1 and jm.lower() == 'wal', f'Unexpected schema: objs={sorted(objs)} uv={uv} jm={jm}'; print(f'user_version={uv} journal_mode={jm} objects={len(objs)}')" $dbPath
+            if ($LASTEXITCODE -ne 0) {
+              throw "Rust Core SQLite schema verification failed with exit code $LASTEXITCODE"
             }
-            if (-not (Test-Path $studyDbPath)) {
-              throw "Expected Rust Core StudyStore database to initialize at $studyDbPath"
-            }
-            $dbLen = (Get-Item $dbPath).Length
-            $studyDbLen = (Get-Item $studyDbPath).Length
-            $rssMb = [math]::Round($proc.WorkingSet64 / 1MB, 2)
-            "alive=True pid=$($proc.Id) rss_mb=$rssMb db_bytes=$dbLen study_db_bytes=$studyDbLen" | Add-Content ci-logs/tauri-binary-smoke.log
+            "alive=True pid=$pidVal rss_mb=$rssMb db_bytes=$dbLen study_dir_exists=True $schemaInfo" | Add-Content ci-logs/tauri-binary-smoke.log
             "exit_code=0" | Add-Content ci-logs/tauri-binary-smoke.log
           } finally {
-            $env:JARVIS_PROJECT_ROOT = $prevRoot
-            if ($null -ne $proc -and -not $proc.HasExited) {
-              Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
-              $proc.WaitForExit(5000) | Out-Null
-            }
-            if ($null -ne $proc) {
-              Get-CimInstance Win32_Process -Filter "ParentProcessId = $($proc.Id)" -ErrorAction SilentlyContinue | ForEach-Object {
-                Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
-              }
-            }
-            Start-Sleep -Milliseconds 300
             Remove-Item -Recurse -Force $tmpRoot -ErrorAction SilentlyContinue
           }
 

@@ -1,10 +1,10 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-14T01:35:00Z`
-- **Current Phase:** `Phase 5 — Stabilization, Regression Validation & Documentation (COMPLETE pending final Windows CI run)`
-- **Current Increment:** `Phase 5 (Win32 Pipe Deadlock Fix, 5-Role Live Worker E2E, Binary Smoke CI & Core Docs Sync)`
+- **Last Updated (UTC):** `2026-11-14T01:52:00Z`
+- **Current Phase:** `Phase 5 — Stabilization, Regression Validation & Documentation`
+- **Current Increment:** `Phase 5 (Two-Pass Python Regression Gate, StudyStore Directory Boot Smoke Assertion & State Sync)`
 - **Current Branch:** `migration/tauri-rust-complete`
-- **Current Commit:** `9b97ff2` -> committing Phase 5 workflow & state sync (`main` untouched at `af11ae9095f4cfd8c8e01334704ffde282da9554`)
+- **Main Baseline:** Untouched at `af11ae9095f4cfd8c8e01334704ffde282da9554` (awaiting user approval before merge)
 
 ---
 
@@ -73,15 +73,15 @@
 ### Phase 5 — Stabilization, Regression Validation & Documentation (`9b97ff2` -> HEAD)
 - **Win32 Pipe Deadlock Root-Cause Fix (`workers/common/stdio_rpc.py`):** Replaced blocking `sys.stdin.readline()` on Windows anonymous pipes (`GetFileType == FILE_TYPE_PIPE`) with non-blocking `PeekNamedPipe` + chunked `os.read`, eliminating the kernel `FILE_OBJECT->Lock` deadlock when `study` / `voice` workers lazily import `numpy` / C extension DLLs.
 - **5-Role Live Worker E2E (`tests/test_e2e_workers_all_roles.py`):** Added end-to-end subprocess JSON-RPC verification across `ai`, `study`, `knowledge`, `mission`, and `voice` (`worker.ready`, `worker.init`, `system.ping`/`system.pong`, correlated `domain.dispatch` streaming + `result.events`, post-import `ping2`, and clean `worker.shutdown` exit `0`).
-- **Windows CI Binary Smoke & Core Docs Sync:** Added `jarvis-os.exe` boot + SQLite/StudyStore creation smoke check and expanded CI pytest suite to 18 suites in `.github/workflows/tauri-windows-validation.yml`; synchronized `README.md`, `ARCHITECTURE.md`, `SECURITY.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, and `docs/PROJECT_MAP.md`.
+- **Windows CI Binary Smoke, Two-Pass Isolation & Core Docs Sync:** Added two-pass clean-DB vs server-import Python gate (18 suites), `jarvis-os.exe` release binary boot + Rust SQLite (`database.db` WAL/schema) + `StudyStore` (`data/study`) initialization smoke verification in `.github/workflows/tauri-windows-validation.yml`, and synchronized `README.md`, `ARCHITECTURE.md`, `SECURITY.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, and `docs/PROJECT_MAP.md`.
 
 ---
 
 ## 2. Observed Phase 5 Verification Summary
 
 - **Frontend Transport & Build (`npm --prefix frontend test` + `npm --prefix frontend run build`):** `15 passed, 0 failed (4 suites, 322.15ms)`; Vite production build `3545 modules transformed, ✓ built in 5.50s`.
-- **CI 18-Suite Python Matrix (includes `test_e2e_workers_all_roles.py`, `test_protocol_contracts.py`, `test_worker_stdio_rpc.py`, `test_domain_workers_phase3.py`, `test_smoke.py`, `test_runtime_security.py`, `test_documentation_integrity.py`):** `145 passed, 1 skipped, 2 warnings, 333 subtests passed in 28.57s`.
-- **Documentation & Architecture Map (`tests/test_documentation_integrity.py` + `tests/test_architecture_map.py`):** `8 passed, 3 warnings in 130.41s`.
+- **Local Two-Pass 18-Suite Python Gate (`b437336`):** Pass 1 (clean-DB hardening, worker E2E, docs, protocol contracts: 9 suites) `46 passed, 1 skipped, 12 subtests passed in 18.31s`; Pass 2 (server-import runtime/smoke/security/study/voice: 9 suites) `99 passed, 2 warnings, 321 subtests passed in 11.37s`.
+- **Windows CI (`windows-latest`, Run `#43542230990` @ `b437336`):** Frontend tests/build (`success`), Two-Pass Python gate (`45 passed, 2 skipped, 12 subtests` + `99 passed, 321 subtests`), `cargo check --locked --all-targets` (`success`), `cargo test --locked` (`29 passed; 0 failed`), and `tauri build --no-bundle` (`jarvis-os.exe`, `success`); Step 19 smoke assertion corrected from `data\study\study.db` to `data\study` JSON catalog directory + SQLite WAL/schema check.
 
 ---
 
