@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass, field
+import io
 import json
 import os
 import sys
@@ -385,8 +386,76 @@ class WorkerRpcServer:
         line_queue: asyncio.Queue[str | None] = asyncio.Queue()
         loop = self._loop
 
+        def _push_pipe_lines_win32(fd: int, handle: int) -> None:
+            """Non-blocking PeekNamedPipe reader preventing Win32 synchronous pipe deadlocks on DLL load."""
+            import ctypes
+            from ctypes import wintypes
+
+            kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            kernel32.PeekNamedPipe.argtypes = [
+                wintypes.HANDLE,
+                wintypes.LPVOID,
+                wintypes.DWORD,
+                ctypes.POINTER(wintypes.DWORD),
+                ctypes.POINTER(wintypes.DWORD),
+                ctypes.POINTER(wintypes.DWORD),
+            ]
+            kernel32.PeekNamedPipe.restype = wintypes.BOOL
+
+            buf = bytearray()
+            avail = wintypes.DWORD(0)
+            poll_s = 0.001
+            h_void = wintypes.HANDLE(handle)
+            while True:
+                ok = kernel32.PeekNamedPipe(h_void, None, 0, None, ctypes.byref(avail), None)
+                if not ok:
+                    if buf:
+                        tail = bytes(buf).decode("utf-8", errors="replace").replace("\r\n", "\n")
+                        loop.call_soon_threadsafe(line_queue.put_nowait, tail)
+                        buf.clear()
+                    loop.call_soon_threadsafe(line_queue.put_nowait, None)
+                    break
+                if avail.value > 0:
+                    chunk = os.read(fd, min(65536, int(avail.value)))
+                    if not chunk:
+                        if buf:
+                            tail = bytes(buf).decode("utf-8", errors="replace").replace("\r\n", "\n")
+                            loop.call_soon_threadsafe(line_queue.put_nowait, tail)
+                            buf.clear()
+                        loop.call_soon_threadsafe(line_queue.put_nowait, None)
+                        break
+                    buf.extend(chunk)
+                    while b"\n" in buf:
+                        nl_idx = buf.index(b"\n")
+                        raw_line = bytes(buf[: nl_idx + 1])
+                        del buf[: nl_idx + 1]
+                        decoded = raw_line.decode("utf-8", errors="replace").replace("\r\n", "\n")
+                        loop.call_soon_threadsafe(line_queue.put_nowait, decoded)
+                    poll_s = 0.001
+                else:
+                    time.sleep(poll_s)
+                    if poll_s < 0.008:
+                        poll_s = min(0.008, poll_s * 2.0)
+
         def _stdin_reader_thread() -> None:
             try:
+                if sys.platform == "win32":
+                    try:
+                        import ctypes
+                        from ctypes import wintypes
+                        import msvcrt
+
+                        fd = self._stdin.fileno()
+                        handle = msvcrt.get_osfhandle(fd)
+                        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+                        kernel32.GetFileType.argtypes = [wintypes.HANDLE]
+                        kernel32.GetFileType.restype = wintypes.DWORD
+                        if kernel32.GetFileType(wintypes.HANDLE(handle)) == 3:
+                            _push_pipe_lines_win32(fd, handle)
+                            return
+                    except (OSError, ValueError, io.UnsupportedOperation, AttributeError):
+                        pass
+
                 while True:
                     line = self._stdin.readline()
                     if not line:

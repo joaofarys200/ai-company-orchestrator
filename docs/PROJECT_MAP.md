@@ -9,22 +9,24 @@ An exhaustive architectural and structural guide to all physical directories, ke
 ```
 JARVIS OS (ai-company-orchestrator)
 ├── agents/                  # Multi-agent swarm (Clara, Alex, Devon, Quinn), mission executors, tools
-├── backend/                 # Core server runtime, Model Harness, WebSocket gateway, lifecycle
+├── backend/                 # Domain dispatcher, contracts, Model Harness, runtime_bridge, agents/ alias
 ├── config/                  # Global system configuration and runtime parameters
 ├── diagnostics/             # Environment diagnostic tools and system telemetry scripts
 ├── docs/                    # Architectural specifications, benchmark reports, diagrams, and ADRs
 │   ├── decisions/           # Architecture Decision Records (ADR-001 to ADR-006)
 │   └── diagrams/            # Standalone vector SVG architecture diagrams (01 to 10)
 ├── evidence/                # Verified test run evidence (screenshots, DOM dumps, event logs)
-├── frontend/                # React 18 + Tailwind + Monaco Editor desktop workspace HUD
+├── frontend/                # React 19 + Vite + Tailwind + Monaco Editor + JarvisTransport desktop HUD
 ├── intelligence/            # Coding Agent 2.0 (AST repair, repo graph, semantic resolver, build loop)
 ├── obsidian_vault/          # Plain-text Markdown Knowledge Vault and Cornell study guides
 ├── persistence/             # SQLite repositories for rules, decisions, projects and messages
 ├── schemas/                 # Canonical JSON Schemas (Draft-07) for core data contracts
 ├── security/                # Security Sentinel watchdog, EDR host monitors, safety classifier
 ├── sentinel/                # Sentinel quarantine store and response history audit log
-├── services/                # Specialized background services (Lecture recorder, synthesizer, AirLLM)
-├── tests/                   # 38+ automated pytest test suites covering all subsystems
+├── services/                # Specialized background services (StudyService, Lecture recorder/synthesizer)
+├── src-tauri/               # Tauri 2 + Rust Core native shell, SQLite writer, loopback HTTP, Win32 Job supervisor
+├── tests/                   # Automated pytest test suites covering all subsystems & 5-worker E2E IPC
+├── workers/                 # Role-isolated Python domain sidecar workers (`ai`, `study`, `knowledge`, `mission`, `voice`)
 └── workspace/               # Isolated project code sandboxes and AST metadata (.jarvis/)
 ```
 
@@ -46,18 +48,18 @@ JARVIS OS (ai-company-orchestrator)
 
 ---
 
-### 2. `backend/` — Application Runtime &amp; Model Harness
-- **Purpose**: Central FastAPI server, WebSocket dispatcher, service lifecycle, and multi-provider Model Harness.
+### 2. `backend/` & `workers/` — Domain Runtime, Dispatcher & Sidecar Workers
+- **Purpose**: Domain dispatcher contracts, multi-provider Model Harness, `runtime_bridge`, canonical `agents/` alias loader, and stdio NDJSON JSON-RPC domain workers (`src-tauri/` hosts the Tauri 2 + Rust Core supervisor & native SQLite/loopback services).
 - **Key Modules**:
-  - `application_services.py`: Dependency injection container providing singleton services.
-  - `application_lifecycle.py`: Application startup and graceful shutdown lifecycle coordinator.
-  - `websocket/gateway.py`: Duplex WebSocket gateway managing active connections.
-  - `websocket/dispatcher.py`: Type-safe WebSocket message router verifying protocol conformity.
-  - `model_harness/harness.py`: Model invocation core with profile routing and telemetry.
-  - `model_harness/router.py`: Profile router (Local Ollama, OpenRouter Free Tier, Cloud APIs).
-  - `model_harness/validation.py`: 7-stage output validator (syntax, schema, enums, references).
-  - `model_harness/recovery.py`: Deterministic parse repair and semantic retry engine.
-- **Test Suites**: `tests/test_model_harness.py`, `tests/test_server_websocket_characterization.py`.
+  - `src-tauri/src/lib.rs` & `commands/dispatch.rs`: Tauri 2 native entry point, `RuntimeServices`, and IPC router.
+  - `src-tauri/src/workers/{supervisor,rpc_client}.rs`: Win32 Job Object worker supervisor and JSON-RPC 2.0 pipe client.
+  - `src-tauri/src/storage/{sqlite,study_store,atomic_fs}.rs`: Single-writer SQLite engine, `StudyStore`, and atomic file storage.
+  - `workers/worker_boot.py` & `workers/common/{stdio_rpc,domain_bridge}.py`: Stdio FD-isolated JSON-RPC 2.0 runtime for `ai`, `study`, `knowledge`, `mission`, and `voice` roles.
+  - `backend/runtime_bridge.py`: Decoupled bridge connecting `agents/` and legacy callers without circular `import server` cycles.
+  - `backend/agents/__init__.py`: Dynamic alias finder/loader forwarding imports cleanly to canonical `agents/`.
+  - `backend/websocket/{dispatcher,contracts}.py`: Message router and protocol contracts shared across Python workers and Rust IPC.
+  - `backend/model_harness/{harness,router,validation,recovery}.py`: Multi-provider execution engine with profile routing and 7-stage validation.
+- **Test Suites**: `tests/test_model_harness.py`, `tests/test_server_websocket_characterization.py`, `tests/test_worker_stdio_rpc.py`, `tests/test_domain_workers_phase3.py`, `tests/test_e2e_workers_all_roles.py`.
 
 ---
 
@@ -90,10 +92,11 @@ JARVIS OS (ai-company-orchestrator)
 
 ---
 
-### 5. `frontend/` — React 18 + Vite + Tailwind Desktop HUD
-- **Purpose**: User interface, Monaco code editor, Mission planner, Sentinel watchdog monitor, and Cornell lecture player.
+### 5. `frontend/` — React 19 + Vite + Tailwind + Tauri IPC Desktop HUD
+- **Purpose**: User interface, Monaco code editor, Mission planner, Sentinel watchdog monitor, Study HUD, and Cornell lecture player.
 - **Key Components**:
-  - `src/context/WebSocketContext.tsx`: React context managing duplex WebSocket connection state.
+  - `src/transport/{JarvisTransport,TauriTransportAdapter}.ts`: Transport abstraction and pure Tauri IPC adapter (`jarvis:event` + native dialogs/drag-drop/media tickets).
+  - `src/context/AppSessionContext.tsx`: React session context decoupling UI panels from transport implementation.
   - `src/features/workspace/WorkspaceViewer.tsx`: Main workspace HUD (Kanban, Code, Preview, Missions, Sentinel).
   - `src/features/workspace/CodeEditor.tsx`: Monaco Editor integration with file tree, diff, formatting, and delete modal.
   - `src/features/planner/MissionPlanner.tsx`: Interactive Kanban mission viewer and step runner.
