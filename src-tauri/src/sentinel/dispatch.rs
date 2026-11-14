@@ -224,13 +224,18 @@ mod tests {
 
         // Ensure protected PID termination is always blocked even when ShadowMode is turned off
         scheduler.set_shadow_mode(false).await;
-        let outcome = scheduler
+        let err = scheduler
             .evaluate_remediation(protected_pid, "jarvis-os.exe")
+            .await
+            .expect_err("protected pid must remain immune even when shadow mode is disabled");
+        assert!(err.contains("SENTINEL_PROTECTED_TARGET"));
+        let allowed = scheduler
+            .evaluate_remediation(99991, "rogue_dummy.exe")
             .await
             .unwrap();
         assert_eq!(
-            outcome,
-            crate::sentinel::scheduler::RemediationOutcome::BlockedProtectedPid
+            allowed,
+            crate::sentinel::scheduler::RemediationOutcome::AllowedNonProtected
         );
     }
 }

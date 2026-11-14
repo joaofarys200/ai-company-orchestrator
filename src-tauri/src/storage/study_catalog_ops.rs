@@ -10,7 +10,6 @@ use std::path::{Path, PathBuf};
 
 use chrono::{Duration, Local};
 use serde_json::{json, Value};
-use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
 use crate::error::AppError;
@@ -1171,74 +1170,6 @@ pub(crate) fn read_json_object_file_safe(
         }
     };
     Ok(serde_json::from_str(&raw).unwrap_or(Value::Null))
-}
-
-fn sort_json_keys(val: &Value) -> Value {
-    match val {
-        Value::Array(items) => Value::Array(items.iter().map(sort_json_keys).collect()),
-        Value::Object(map) => {
-            let mut sorted = serde_json::Map::new();
-            let mut keys: Vec<&String> = map.keys().collect();
-            keys.sort();
-            for k in keys {
-                if let Some(v) = map.get(k) {
-                    sorted.insert(k.clone(), sort_json_keys(v));
-                }
-            }
-            Value::Object(sorted)
-        }
-        other => other.clone(),
-    }
-}
-
-/// Computes SHA-256 hex digest using Python-compatible sorted keys and `, ` / `: ` separators.
-pub(crate) fn python_sorted_json_sha256_prefix24(value: &Value) -> String {
-    let sorted = sort_json_keys(value);
-    let mut out = String::new();
-    format_python_json(&sorted, &mut out);
-    let digest = Sha256::digest(out.as_bytes());
-    hex::encode(digest).chars().take(24).collect()
-}
-
-fn format_python_json(value: &Value, out: &mut String) {
-    match value {
-        Value::Null => out.push_str("null"),
-        Value::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
-        Value::Number(n) => out.push_str(&n.to_string()),
-        Value::String(s) => {
-            if let Ok(encoded) = serde_json::to_string(s) {
-                out.push_str(&encoded);
-            } else {
-                out.push_str("\"\"");
-            }
-        }
-        Value::Array(items) => {
-            out.push('[');
-            for (idx, item) in items.iter().enumerate() {
-                if idx > 0 {
-                    out.push_str(", ");
-                }
-                format_python_json(item, out);
-            }
-            out.push(']');
-        }
-        Value::Object(map) => {
-            out.push('{');
-            for (idx, (k, v)) in map.iter().enumerate() {
-                if idx > 0 {
-                    out.push_str(", ");
-                }
-                if let Ok(k_enc) = serde_json::to_string(k) {
-                    out.push_str(&k_enc);
-                } else {
-                    out.push_str("\"\"");
-                }
-                out.push_str(": ");
-                format_python_json(v, out);
-            }
-            out.push('}');
-        }
-    }
 }
 
 fn compute_editorial_plan_status(doc_id: &str, plan: &Value, dossier: &Value) -> Value {
