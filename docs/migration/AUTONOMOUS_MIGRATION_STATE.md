@@ -1,10 +1,10 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-14T00:50:45Z`
-- **Current Phase:** `Phase 3 — Functional Migration from Python to Rust (Increment 3.4 Implemented -> Validating on Windows CI)`
-- **Current Increment:** `Increment 3.4 (33 Mission Governance Dispatchers, 5 Domain Workers, Rust IPC Router & DB/FS Commands, Pure Tauri Default Transport)`
+- **Last Updated (UTC):** `2026-11-14T01:35:00Z`
+- **Current Phase:** `Phase 5 — Stabilization, Regression Validation & Documentation (COMPLETE pending final Windows CI run)`
+- **Current Increment:** `Phase 5 (Win32 Pipe Deadlock Fix, 5-Role Live Worker E2E, Binary Smoke CI & Core Docs Sync)`
 - **Current Branch:** `migration/tauri-rust-complete`
-- **Current Commit:** Pending Increment 3.4 commit & CI validation (prior CI green: `bfb585f`, base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
+- **Current Commit:** `9b97ff2` -> committing Phase 5 workflow & state sync (`main` untouched at `af11ae9095f4cfd8c8e01334704ffde282da9554`)
 
 ---
 
@@ -57,41 +57,35 @@
   - Implemented `src-tauri/src/storage/migrations.rs`, `src-tauri/src/storage/sqlite.rs`, and `src-tauri/src/storage/study_store.rs`.
   - Implemented `src-tauri/src/process/command_guard.rs`, `src-tauri/src/protocol/ssrf_guard.rs`, `src-tauri/src/permissions/{policy,gateway}.rs`, `src-tauri/src/sentinel/{mod,collectors_win,scheduler}.rs`, `src-tauri/src/commands/security.rs`, `backend/atomic_io.py`, `services/url_ssrf_guard.py`, and `tests/test_security_hardening_phase3.py`.
   - CI Run `#43534493463` passed all 20 steps cleanly (`frontend test`, `frontend build`, `python-contract-tests`, `cargo check --locked --all-targets`, `cargo test --locked`, `tauri build --no-bundle`).
-- **3.4 Governance Resolution, Python Domain Workers & Unified Rust IPC Router (IMPLEMENTED — Validating on Windows CI):**
+- **3.4 Governance Resolution, Python Domain Workers & Unified Rust IPC Router (COMPLETE — `d183b44`, verified CI Run `#43537630997`):**
   - Resolved all 33 previously stubbed mission governance operations via lazy dispatch table `backend/mission_governance_dispatch.py` + fixed `agents/mission_control_engine.py:2754` `LoopDecisionType` import; registered all 14 legacy mission branches in `backend/websocket/handlers/missions.py` (`143` handlers, `0` stubs, `0` unregistered legacy branches); synchronized `backend/websocket/contracts.py`, `websocket_schema.py`, and `tests/test_protocol_contracts.py`.
   - Created `workers/common/domain_bridge.py` (`DomainWorkerRuntime` + `_WorkerEventStreamClient`) and the 5 specialized role workers `workers/{ai,study,knowledge,mission,voice}_worker.py` registered in `workers/worker_boot.py` + `tests/test_domain_workers_phase3.py`.
   - Wired `SqliteDatabase` & `StudyStore` into `RuntimeServices` (`src-tauri/src/commands/media.rs`, `src-tauri/src/lib.rs`), added `permission_record_to_frontend_json` + `"jarvis:event"` Reverse-RPC bridge, fixed `PingResponse` (`ok: true`, `runtime: "tauri-rust"`), and implemented `src-tauri/src/commands/{storage,study,projects,dispatch}.rs` (`dispatch_client_message`, `cancel_client_request`, `trigger_initial_sync`, native fast-paths, confined file IO, and async streaming worker forwarder).
   - Updated `frontend/src/transport/createDefaultTransport.ts` (default `preferHybridFallback: false` in Tauri runtime) and added `cancelNativeRequest` + unit tests in `frontend/src/transport/TauriTransportAdapter.ts` & `frontend/src/transport/__tests__/tauriTransport.test.ts`.
-  - Extended `.github/workflows/tauri-windows-validation.yml` to run `tests/test_domain_workers_phase3.py` and `tests/test_protocol_contracts.py`.
+  - Windows CI Run `#43537630997` (`conclusion=success`): frontend tests + Vite build, `44 passed, 2 skipped, 7 subtests passed` Python contract suite, `cargo check --locked --all-targets`, `cargo test --locked` (`29 passed; 0 failed`), and `tauri build --no-bundle` (`jarvis-os.exe`).
+
+### Phase 4 — Legacy Infrastructure Removal (COMPLETE — `2ce890a`)
+- **Electron & Legacy WS UI/CSP Removed:** Deleted `main.js` and `preload.js`; updated root `package.json` & `package-lock.json` removing `electron` & `concurrently` while retaining `@tauri-apps/cli` (`^2.12.4`); removed `ws://127.0.0.1:8001` from `src-tauri/tauri.conf.json`; updated status text in `SystemConsolePanel.tsx`, `HologramCore.tsx`, and `backend/websocket/handlers/common.py`.
+- **Sandbox & Legacy Entrypoint Retired:** Restricted `sandbox.py` `TCPServer` exclusively to `127.0.0.1`; updated `server.py` removing `websockets`/`subprocess` server startup on `:8001`/`:8000` while running headless stdio IPC + lifecycle cleanly.
+- **Circular `agents -> server` Coupling Broken:** Created `backend/runtime_bridge.py` and eliminated dead/circular `import server` edges across `agents/`, `agents/orchestrator/`, `agents/study_tools.py`, and `gemini_live.py`.
+- **Canonical `agents/` Consolidation:** Synced the 10 Stage 1 `atomic_write_json` updates from `backend/agents/` into `agents/`, normalized 29 callers, deleted 596 duplicate files under `backend/agents/`, and installed dynamic alias loader `backend/agents/__init__.py`.
+
+### Phase 5 — Stabilization, Regression Validation & Documentation (`9b97ff2` -> HEAD)
+- **Win32 Pipe Deadlock Root-Cause Fix (`workers/common/stdio_rpc.py`):** Replaced blocking `sys.stdin.readline()` on Windows anonymous pipes (`GetFileType == FILE_TYPE_PIPE`) with non-blocking `PeekNamedPipe` + chunked `os.read`, eliminating the kernel `FILE_OBJECT->Lock` deadlock when `study` / `voice` workers lazily import `numpy` / C extension DLLs.
+- **5-Role Live Worker E2E (`tests/test_e2e_workers_all_roles.py`):** Added end-to-end subprocess JSON-RPC verification across `ai`, `study`, `knowledge`, `mission`, and `voice` (`worker.ready`, `worker.init`, `system.ping`/`system.pong`, correlated `domain.dispatch` streaming + `result.events`, post-import `ping2`, and clean `worker.shutdown` exit `0`).
+- **Windows CI Binary Smoke & Core Docs Sync:** Added `jarvis-os.exe` boot + SQLite/StudyStore creation smoke check and expanded CI pytest suite to 18 suites in `.github/workflows/tauri-windows-validation.yml`; synchronized `README.md`, `ARCHITECTURE.md`, `SECURITY.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, and `docs/PROJECT_MAP.md`.
 
 ---
 
-## 2. Remaining Work (Phases 4–5)
+## 2. Observed Phase 5 Verification Summary
 
-### Phase 4 — Legacy Infrastructure Removal (on `migration/tauri-rust-complete`)
-- Consolidate `agents/` vs `backend/agents/` via `sys.modules` shim + AST codemods verified by `pytest`, prune dead `agents/` / telemetry.
-- Remove legacy WS server (`:8001`), stdlib HTTP server (`:8000`), `0.0.0.0:8080` server, `backend/transport_gateway.py`, and `_free_port_if_locked`.
-- Remove transitional `:8000`/`:8001`/`localhost` entries from `tauri.conf.json` CSP & retire Electron shell (`main.js`, `preload.js`, `electron` deps/scripts) cleanly on migration branch.
-
-### Phase 5 — Stabilization, Regression Validation & Documentation
-- Run full Rust `cargo test`, Python `pytest`, frontend `vite build` + `node --test`, and headless WebView2 CDP E2E + startup/RSS/orphan verification on `windows-latest`.
-- Update core documentation (`ARCHITECTURE.md`, `SECURITY.md`, `README.md`, `CHANGELOG.md`, `docs/PROJECT_MAP.md`, `docs/decisions/`) and pass `tests/test_documentation_integrity.py`.
-- Deliver consolidated final migration report.
+- **Frontend Transport & Build (`npm --prefix frontend test` + `npm --prefix frontend run build`):** `15 passed, 0 failed (4 suites, 322.15ms)`; Vite production build `3545 modules transformed, ✓ built in 5.50s`.
+- **CI 18-Suite Python Matrix (includes `test_e2e_workers_all_roles.py`, `test_protocol_contracts.py`, `test_worker_stdio_rpc.py`, `test_domain_workers_phase3.py`, `test_smoke.py`, `test_runtime_security.py`, `test_documentation_integrity.py`):** `145 passed, 1 skipped, 2 warnings, 333 subtests passed in 28.57s`.
+- **Documentation & Architecture Map (`tests/test_documentation_integrity.py` + `tests/test_architecture_map.py`):** `8 passed, 3 warnings in 130.41s`.
 
 ---
 
-## 3. Baseline Test Results (Observed)
-
-- **Python Stage 1 / Contract Baseline (`venv\Scripts\python.exe -m pytest -q tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_protocol_contracts.py tests/test_model_service_compliance.py tests/test_model_transport_architecture.py tests/test_websocket_dispatcher_contract.py tests/test_server_websocket_characterization.py tests/test_transport_gateway.py tests/test_documentation_integrity.py`):**
-  - **Result:** `58 passed, 1 skipped, 2 warnings, 281 subtests passed in 32.89s` (`exit_code=0`).
-- **Python Post-3.3 Local Suite (`venv\Scripts\python.exe -m pytest -q tests/test_security_hardening_phase3.py tests/test_smoke.py tests/test_video_intelligence.py tests/test_study_phase8_qa_e2e.py tests/test_worker_stdio_rpc.py tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py tests/test_transport_gateway.py`):** `147 passed, 3 skipped, 2 warnings, 12 subtests passed in 13.58s` (`exit_code=0`).
-- **Frontend Transport (`npm --prefix frontend test`):** `14/14 passed (4 suites, 0 fail)` (`243.85ms`).
-- **Frontend Build (`npm --prefix frontend run build`):** `3545 modules transformed, ✓ built in 3.72s` (`exit_code=0`).
-- **3.2 & 3.3 Post-CI Verification (Run `#43534493463` on `migration/tauri-rust-complete` @ `bfb585f`, `conclusion=success`):** All 20 build and test steps (`frontend-test`, `frontend-build`, `python-contract-tests`, `cargo check --locked --all-targets`, `cargo test --locked`, `tauri build --no-bundle`) passed.
-
----
-
-## 4. Known Issues & Architectural Decisions
+## 3. Known Issues & Architectural Decisions
 
 - **Local OS Code Integrity Blocker:** Windows **Smart App Control** (`SmartAppControlState: On`, `os error 4551`) blocks local execution of unsigned Rust build scripts/binaries (`cargo check`, `cargo test`, `tauri:dev`). Mitigation: never weaken/bypass local OS security; execute Rust compilation, `cargo test`, `tauri build`, and headless WebView2 CDP E2E tests in GitHub Actions `windows-latest`. Any final **manual interactive visual desktop test** on the user's PC requires an environment without Smart App Control blocking unsigned local binaries or signed artifacts (kept non-blocking for `main` because `main` stays untouched at `af11ae9`).
 - **Static Frontend/CSP Gaps Found in Phase 1 Audit:**
@@ -106,13 +100,13 @@
 
 ---
 
-## 5. Next Executable Task
+## 4. Next Executable Task
 
-- **Verify Windows CI green for Increment 3.4 (`bfb585f -> HEAD`), then execute Phase 4 (Legacy Infrastructure Removal: consolidate `agents/` vs `backend/agents/`, remove legacy `:8001` WS / `:8000` stdlib HTTP / `:8080` server / `transport_gateway.py`, tighten CSP, and retire Electron files/dependencies on `migration/tauri-rust-complete`).**
+- **Await final Phase 5 Windows CI workflow run (`tauri-windows-validation.yml`) and request explicit user approval before merging `migration/tauri-rust-complete` into `main`.**
 
 ---
 
-## 6. Outstanding External Dependencies
+## 5. Outstanding External Dependencies
 
 - Local machine cannot execute unsigned compiled Rust binaries due to Windows Smart App Control (`os error 4551`); remote GitHub Actions (`windows-latest`) serves as the active Windows Rust/Tauri/WebView2 CI runner.
 - User approval will be requested only after Phase 5 completes cleanly before any merge into `main` (or if an interactive human Windows UI sign-off is required).
