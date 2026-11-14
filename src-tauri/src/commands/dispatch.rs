@@ -6,7 +6,6 @@ use serde_json::{json, Value};
 use tauri::{AppHandle, Emitter, State};
 
 use crate::commands::media::{ActiveDispatch, RuntimeServices};
-use crate::commands::security::permission_record_to_frontend_json;
 use crate::commands::storage::{
     architecture_memory_to_json, compounding_rules_to_json, engineering_decisions_to_json,
 };

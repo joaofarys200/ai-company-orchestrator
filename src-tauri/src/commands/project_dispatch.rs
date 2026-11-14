@@ -374,7 +374,7 @@ fn collect_project_files(
         let rel_str = rel.to_string_lossy().replace('\\', "/");
         hashes.insert(rel_str.clone(), sha256_hex(&raw_bytes));
         let body = raw_bytes
-            .strip_prefix(&[0xEF, 0xBB, 0xBF])
+            .strip_prefix(&[0xEFu8, 0xBB, 0xBF][..])
             .unwrap_or(&raw_bytes);
         let decoded = String::from_utf8_lossy(body).into_owned();
         files.insert(rel_str, decoded);

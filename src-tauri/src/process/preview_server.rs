@@ -383,7 +383,7 @@ impl PreviewServerHandle {
                 &canon_root,
                 &script_dir,
                 &argv,
-                sink,
+                sink.clone(),
             )
             .await?;
 
@@ -720,10 +720,8 @@ mod tests {
             .await
             .unwrap();
         assert!(outcome.running);
-        assert_eq!(
-            outcome.preview_url.as_deref(),
-            Some(format!("{}/index.html", preview.base_url()).as_str())
-        );
+        let expected_url = format!("{}/index.html", preview.base_url());
+        assert_eq!(outcome.preview_url.as_deref(), Some(expected_url.as_str()));
         assert_eq!(preview.selected_project_id().as_deref(), Some("demo-web"));
 
         let (st, _, body) = send_raw_http(

@@ -1124,11 +1124,11 @@ mod tests {
         let dir = TempDir::new().unwrap();
         let gw = PermissionGateway::new(Duration::from_secs(60));
         let (native_req, _) = gw
-            .create_pending_request(
+            .create_request(
                 "fs.write",
                 "write config",
-                "LOW_RISK_MUTATION",
                 "create file",
+                "LOW_RISK_MUTATION",
                 vec!["a.txt".into()],
                 Some("m-1".into()),
                 Some("p-1".into()),
@@ -1174,11 +1174,11 @@ mod tests {
 
         // 1. Rust-native via action_confirm_response APPROVE
         let (native_req, rx_opt) = gw
-            .create_pending_request(
+            .create_request(
                 "fs.write",
                 "write main.py",
-                "LOW_RISK_MUTATION",
                 "edit code",
+                "LOW_RISK_MUTATION",
                 vec!["main.py".into()],
                 None,
                 Some("proj-nat".into()),
