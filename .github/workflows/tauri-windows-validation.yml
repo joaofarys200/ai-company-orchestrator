@@ -172,41 +172,58 @@ jobs:
           $exe = Resolve-Path "src-tauri/target/release/jarvis-os.exe"
           $tmpRoot = Join-Path $env:RUNNER_TEMP ("jarvis_smoke_" + [System.Guid]::NewGuid().ToString("N"))
           New-Item -ItemType Directory -Force -Path $tmpRoot | Out-Null
+          $stdoutLog = Join-Path $env:RUNNER_TEMP ("jarvis_smoke_out_" + [System.Guid]::NewGuid().ToString("N") + ".log")
+          $stderrLog = Join-Path $env:RUNNER_TEMP ("jarvis_smoke_err_" + [System.Guid]::NewGuid().ToString("N") + ".log")
           "smoke_root=$tmpRoot" | Tee-Object -FilePath ci-logs/tauri-binary-smoke.log
           $prevRoot = $env:JARVIS_PROJECT_ROOT
           $env:JARVIS_PROJECT_ROOT = $tmpRoot
-          $proc = Start-Process -FilePath $exe.Path -WorkingDirectory (Get-Location).Path -PassThru -WindowStyle Hidden
+          $proc = Start-Process -FilePath $exe.Path -WorkingDirectory (Get-Location).Path -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog -PassThru -WindowStyle Hidden
           $dbPath = Join-Path $tmpRoot "database.db"
           $studyDir = Join-Path $tmpRoot "data\study"
           try {
             try {
-              Start-Sleep -Seconds 6
-              $proc.Refresh()
+              $ready = $false
+              for ($i = 0; $i -lt 60; $i++) {
+                Start-Sleep -Milliseconds 500
+                $proc.Refresh()
+                if ($proc.HasExited) {
+                  break
+                }
+                if ((Test-Path $dbPath -PathType Leaf) -and (Test-Path $studyDir -PathType Container) -and ((Get-Item $dbPath).Length -gt 0)) {
+                  Start-Sleep -Seconds 2
+                  $proc.Refresh()
+                  $ready = -not $proc.HasExited
+                  break
+                }
+              }
               if ($proc.HasExited) {
-                throw "jarvis-os.exe exited prematurely with exit code $($proc.ExitCode)"
+                $outText = if (Test-Path $stdoutLog) { (Get-Content $stdoutLog -Raw -ErrorAction SilentlyContinue) } else { "" }
+                $errText = if (Test-Path $stderrLog) { (Get-Content $stderrLog -Raw -ErrorAction SilentlyContinue) } else { "" }
+                "exited_early code=$($proc.ExitCode)`nstdout=$outText`nstderr=$errText" | Add-Content ci-logs/tauri-binary-smoke.log
+                throw "jarvis-os.exe exited prematurely with exit code $($proc.ExitCode); stderr=$errText"
               }
-              if (-not (Test-Path $dbPath -PathType Leaf)) {
-                throw "Expected Rust Core SQLite database to initialize at $dbPath"
-              }
-              if (-not (Test-Path $studyDir -PathType Container)) {
-                throw "Expected Rust Core StudyStore catalog directory to initialize at $studyDir"
+              if (-not $ready) {
+                $tree = (Get-ChildItem $tmpRoot -Force -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName) -join "; "
+                $outText = if (Test-Path $stdoutLog) { (Get-Content $stdoutLog -Raw -ErrorAction SilentlyContinue) } else { "" }
+                $errText = if (Test-Path $stderrLog) { (Get-Content $stderrLog -Raw -ErrorAction SilentlyContinue) } else { "" }
+                "timeout_tree=$tree`nstdout=$outText`nstderr=$errText" | Add-Content ci-logs/tauri-binary-smoke.log
+                if (-not (Test-Path $dbPath -PathType Leaf)) {
+                  throw "Expected Rust Core SQLite database to initialize at $dbPath within 30s (tmpRoot contents: $tree; stderr: $errText)"
+                }
+                if (-not (Test-Path $studyDir -PathType Container)) {
+                  throw "Expected Rust Core StudyStore catalog directory to initialize at $studyDir within 30s (tmpRoot contents: $tree; stderr: $errText)"
+                }
+                throw "Expected non-empty Rust Core SQLite database at $dbPath within 30s"
               }
               $dbLen = (Get-Item $dbPath).Length
-              if ($dbLen -le 0) {
-                throw "Expected non-empty Rust Core SQLite database at $dbPath (got $dbLen bytes)"
-              }
               $rssMb = [math]::Round($proc.WorkingSet64 / 1MB, 2)
               $pidVal = $proc.Id
             } finally {
               $env:JARVIS_PROJECT_ROOT = $prevRoot
               if ($null -ne $proc -and -not $proc.HasExited) {
+                & taskkill.exe /PID $proc.Id /T /F 2>$null | Out-Null
                 Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
                 $proc.WaitForExit(5000) | Out-Null
-              }
-              if ($null -ne $proc) {
-                Get-CimInstance Win32_Process -Filter "ParentProcessId = $($proc.Id)" -ErrorAction SilentlyContinue | ForEach-Object {
-                  Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
-                }
               }
               Start-Sleep -Milliseconds 300
             }
@@ -217,7 +234,7 @@ jobs:
             "alive=True pid=$pidVal rss_mb=$rssMb db_bytes=$dbLen study_dir_exists=True $schemaInfo" | Add-Content ci-logs/tauri-binary-smoke.log
             "exit_code=0" | Add-Content ci-logs/tauri-binary-smoke.log
           } finally {
-            Remove-Item -Recurse -Force $tmpRoot -ErrorAction SilentlyContinue
+            Remove-Item -Recurse -Force $tmpRoot, $stdoutLog, $stderrLog -ErrorAction SilentlyContinue
           }
 
       - name: Write workflow summary
