@@ -20,7 +20,7 @@ use tokio::sync::oneshot;
 use crate::error::AppError;
 use crate::permissions::path_jail::{
     ensure_confined_existing_file, is_blocked_system_path, is_safe_identifier,
-    resolve_confined_path,
+    resolve_confined_path, validate_syntactic_path_safety,
 };
 use crate::protocol::http_common::{
     attach_cors_and_security_headers, content_type_for_ext, has_suspicious_path_traversal,
@@ -748,8 +748,8 @@ fn resolve_cataloged_media(
     });
 
     if let Some(fp_str) = raw_fp {
-        if !has_suspicious_path_traversal(fp_str) {
-            let p = Path::new(fp_str);
+        let p = Path::new(fp_str);
+        if validate_syntactic_path_safety(fp_str, p).is_ok() {
             if p.is_absolute() {
                 if let Ok(meta) = fs::symlink_metadata(p) {
                     if !meta.file_type().is_symlink() && meta.is_file() {
