@@ -107,7 +107,12 @@
 
 ## 4. Next Executable Task
 
-- **Validate Increment A on Windows CI (`cargo check`, `cargo test`, `tauri build`), then execute Increment B (progressive migration of `StudyStore`, `ProjectContext`, `PermissionGateway`, `PreviewServerHandle`, and native Rust `Knowledge` engine).**
+- **Increment B1 Complete (Pending CI Validation on Push):**
+  - Migrated deterministic Study catalog operations (`study_catalog_ops.rs` — 8 catalog routes).
+  - Migrated all 12 deterministic Project/Planner/AST/Preview routes (`project_dispatch.rs` + `PreviewServerHandle` static preview & guarded child process supervision) and removed `sandbox.py` runtime import from `workers/common/domain_bridge.py`.
+  - Migrated all 6 `PERMISSION_HANDLERS` (`permission_dispatch.rs` bridging Rust `PermissionGateway` + `.jarvis/permissions/requests/` disk requests, capability checks, rollback, and dependency governance choices) and wired them in `dispatch.rs`.
+  - Fixed asyncio orchestration background task timing flake in `tests/test_study_agent_session_isolation.py`.
+- **Next:** Validate Increment B1 on Windows CI (`cargo check`, `cargo test`, `tauri:build`, two-pass pytest, `jarvis-os.exe` smoke), then execute **Increment B2** (porting all 15 `Knowledge` routes from `obsidian_graph_engine.py` / `knowledge.py` to Rust `src-tauri/src/knowledge/` & retiring `WorkerPoolRole::Knowledge`).
 
 ---
 

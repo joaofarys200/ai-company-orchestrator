@@ -1,5 +1,7 @@
 pub mod dispatch;
 pub mod media;
+pub mod permission_dispatch;
+pub mod project_dispatch;
 pub mod projects;
 pub mod security;
 pub mod storage;

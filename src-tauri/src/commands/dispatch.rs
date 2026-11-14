@@ -171,10 +171,16 @@ fn build_error_event(msg_type: &str, err_text: &str, client_request_id: Option<&
     ev
 }
 
-/// Executes Rust-native fast-path operations (`database.db` single writer & HITL Reverse RPC).
+fn emit_fast_path_events(app: &AppHandle, events: Vec<Value>, client_request_id: Option<&str>) {
+    for ev in events {
+        emit_jarvis_event(app, ev, client_request_id);
+    }
+}
+
+/// Executes Rust-native fast-path operations (`database.db` single writer).
 async fn try_execute_native_fast_path_events(
     db: &SqliteDatabase,
-    permissions: &PermissionGateway,
+    _permissions: &PermissionGateway,
     message: &Value,
     msg_type: &str,
 ) -> Result<Option<Vec<Value>>, AppError> {
@@ -253,81 +259,6 @@ async fn try_execute_native_fast_path_events(
             Ok(Some(vec![json!({
                 "type": "decisions_updated",
                 "decisions": engineering_decisions_to_json(&decisions),
-            })]))
-        }
-
-        "permission_approve" => {
-            let perm_id = message
-                .get("request_id")
-                .and_then(Value::as_str)
-                .unwrap_or("")
-                .trim();
-            if perm_id.is_empty() {
-                return Ok(None);
-            }
-            let is_rust_native = permissions
-                .pending_requests()
-                .await
-                .iter()
-                .any(|r| r.request_id == perm_id);
-            if !is_rust_native {
-                return Ok(None);
-            }
-            let user = message
-                .get("user")
-                .and_then(Value::as_str)
-                .unwrap_or("operator");
-            let project_id = message.get("project_id").and_then(Value::as_str);
-            let mission_id = message.get("mission_id").and_then(Value::as_str);
-            let rec = permissions
-                .approve_request(perm_id, user, "allow_once", project_id, mission_id)
-                .await
-                .map_err(|err| AppError::new("PERMISSION_APPROVE_FAILED", err))?;
-            Ok(Some(vec![json!({
-                "type": "permission_request_approved",
-                "request_id": rec.request_id,
-                "request": permission_record_to_frontend_json(&rec),
-                "success": true,
-            })]))
-        }
-
-        "permission_deny" => {
-            let perm_id = message
-                .get("request_id")
-                .and_then(Value::as_str)
-                .unwrap_or("")
-                .trim();
-            if perm_id.is_empty() {
-                return Ok(None);
-            }
-            let is_rust_native = permissions
-                .pending_requests()
-                .await
-                .iter()
-                .any(|r| r.request_id == perm_id);
-            if !is_rust_native {
-                return Ok(None);
-            }
-            let user = message
-                .get("user")
-                .and_then(Value::as_str)
-                .unwrap_or("operator");
-            let reason = message
-                .get("reason")
-                .and_then(Value::as_str)
-                .unwrap_or("Denied by operator");
-            let project_id = message.get("project_id").and_then(Value::as_str);
-            let mission_id = message.get("mission_id").and_then(Value::as_str);
-            let rec = permissions
-                .deny_request(perm_id, user, reason, project_id, mission_id)
-                .await
-                .map_err(|err| AppError::new("PERMISSION_DENY_FAILED", err))?;
-            Ok(Some(vec![json!({
-                "type": "permission_request_denied",
-                "request_id": rec.request_id,
-                "request": permission_record_to_frontend_json(&rec),
-                "reason": rec.policy_reason,
-                "success": true,
             })]))
         }
 
@@ -474,9 +405,43 @@ pub async fn dispatch_client_message(
     )
     .await?
     {
-        for ev in events {
-            emit_jarvis_event(&app, ev, client_request_id.as_deref());
-        }
+        emit_fast_path_events(&app, events, client_request_id.as_deref());
+        return Ok(Value::Null);
+    }
+
+    if let Some(events) = crate::commands::permission_dispatch::try_execute_permission_fast_path(
+        &services.project_root,
+        &services.permissions,
+        &msg_type,
+        &message,
+    )
+    .await?
+    {
+        emit_fast_path_events(&app, events, client_request_id.as_deref());
+        return Ok(Value::Null);
+    }
+
+    if let Some(events) = crate::storage::study_catalog_ops::try_execute_study_fast_path(
+        &services.project_root,
+        &services.study_store,
+        &msg_type,
+        &message,
+    )
+    .await?
+    {
+        emit_fast_path_events(&app, events, client_request_id.as_deref());
+        return Ok(Value::Null);
+    }
+
+    if let Some(events) = crate::commands::project_dispatch::try_execute_project_fast_path(
+        &app,
+        &*services,
+        &msg_type,
+        &message,
+    )
+    .await?
+    {
+        emit_fast_path_events(&app, events, client_request_id.as_deref());
         return Ok(Value::Null);
     }
 

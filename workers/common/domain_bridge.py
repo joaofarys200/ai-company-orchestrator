@@ -320,7 +320,10 @@ class DomainWorkerRuntime:
 
         database_mod = self._safe_import("database")
         agents_mod = self._safe_import("agents")
-        sandbox_mod = self._safe_import("sandbox")
+        sandbox_mod = SimpleNamespace(
+            SANDBOX_DIR=os.path.join(self.project_root, "sandbox_dir"),
+            stop_custom_project=lambda: None,
+        )
         project_ctx = ProjectContextService()
         coding_sessions = CodingSessionService(project_ctx)
 

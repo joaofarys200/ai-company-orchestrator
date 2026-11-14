@@ -782,6 +782,26 @@ def test_normal_orchestration_and_websocket_pipeline_propagate_chat_session_to_s
         orch_svc.classify_intent = AsyncMock(return_value="TASK")  # type: ignore[method-assign]
         orch_svc.bridge = SimpleNamespace(handle_directive=AsyncMock(return_value={"status": "IGNORED"}))  # type: ignore[assignment]
 
+        task_done = asyncio.Event()
+
+        async def _tracked_run_task(
+            prompt,
+            sid,
+            project_id=None,
+            correlation_id=None,
+            study_context=None,
+        ):
+            try:
+                return await orch_svc.run_task(
+                    prompt,
+                    sid,
+                    project_id=project_id,
+                    correlation_id=correlation_id,
+                    study_context=study_context,
+                )
+            finally:
+                task_done.set()
+
         chat_handler = ChatWebSocketHandler(
             agents=fake_agents,
             database=fake_services.database,
@@ -791,13 +811,12 @@ def test_normal_orchestration_and_websocket_pipeline_propagate_chat_session_to_s
                 handle_slash_command=lambda *a, **k: None,
                 parse_file_context=lambda p: p,
                 broadcast_state=lambda v: conns.broadcast({"type": "state", "value": v}),
-                run_orchestration_task=lambda prompt, sid, project_id=None, correlation_id=None, study_context=None: orch_svc.run_task(
-                    prompt, sid, project_id=project_id, correlation_id=correlation_id, study_context=study_context
-                ),
+                run_orchestration_task=_tracked_run_task,
             ),
             logger=__import__("logging").getLogger("test_isolation_ws"),
         )
 
+        task_done.clear()
         await chat_handler.directive(
             object(),
             {
@@ -809,7 +828,7 @@ def test_normal_orchestration_and_websocket_pipeline_propagate_chat_session_to_s
             },
             WebSocketSessionState(),
         )
-        await asyncio.sleep(0.2)
+        await asyncio.wait_for(task_done.wait(), timeout=5.0)
         assert len(recorded) == 2
         assert all(r.chat_session_id == "ws_thread_beta" for r in recorded)
 
@@ -854,6 +873,7 @@ def test_normal_orchestration_and_websocket_pipeline_propagate_chat_session_to_s
         # 4. Directive sem study_context.chat_session_id não fabrica ID a partir de project_id/correlation_id/session_id=505
         recorded.clear()
         call_phase.clear()
+        task_done.clear()
         await chat_handler.directive(
             object(),
             {
@@ -864,7 +884,7 @@ def test_normal_orchestration_and_websocket_pipeline_propagate_chat_session_to_s
             },
             WebSocketSessionState(),
         )
-        await asyncio.sleep(0.2)
+        await asyncio.wait_for(task_done.wait(), timeout=5.0)
         assert "orch_study_tool" in call_phase
         assert recorded == []
         assert "global" not in coord.context_manager._contexts
