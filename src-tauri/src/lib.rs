@@ -129,6 +129,7 @@ pub fn run() {
                     let sessions_count = services
                         .db
                         .list_sessions(50)
+                        .await
                         .map(|s| s.len())
                         .unwrap_or(0);
                     let _ = services.study_store.refresh().await;
