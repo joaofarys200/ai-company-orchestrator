@@ -364,7 +364,7 @@ jobs:
               }
 
               # Seed user session + study catalog before simulated upgrade
-              python -c "import json, pathlib, sqlite3, sys; db = pathlib.Path(sys.argv[1]); c = sqlite3.connect(str(db)); c.execute('INSERT INTO sessions (id, name, created_at) VALUES (?, ?, ?)', ('upgrade_session_1', 'Persisted Across Upgrade', '2026-11-14T00:00:00Z')); c.commit(); c.close(); docs = pathlib.Path(sys.argv[2]) / 'documents.json'; docs.write_text(json.dumps({'doc_upgrade': {'id': 'doc_upgrade', 'title': 'Upgrade Doc'}}), encoding='utf-8')" $installedDb $installedStudy
+              python -c "import json, pathlib, sqlite3, sys; db = pathlib.Path(sys.argv[1]); c = sqlite3.connect(str(db)); c.execute('INSERT INTO sessions (name, created_at) VALUES (?, ?)', ('Persisted Across Upgrade', '2026-11-14T00:00:00Z')); c.commit(); c.close(); docs = pathlib.Path(sys.argv[2]) / 'documents.json'; docs.write_text(json.dumps({'doc_upgrade': {'id': 'doc_upgrade', 'title': 'Upgrade Doc'}}), encoding='utf-8')" $installedDb $installedStudy
               if ($LASTEXITCODE -ne 0) { throw "Failed to seed pre-upgrade state in $expectedDataRoot" }
 
               # Simulate in-place MSI/NSIS upgrade by overwriting jarvis-os.exe and re-launching
@@ -385,7 +385,7 @@ jobs:
                 Start-Sleep -Milliseconds 300
               }
 
-              $upgradeVerify = python -c "import json, pathlib, sqlite3, sys; c = sqlite3.connect(sys.argv[1]); row = c.execute('SELECT name FROM sessions WHERE id = ?', ('upgrade_session_1',)).fetchone(); c.close(); docs = json.loads((pathlib.Path(sys.argv[2]) / 'documents.json').read_text(encoding='utf-8')); assert row and row[0] == 'Persisted Across Upgrade', f'Missing session after upgrade: {row}'; assert 'doc_upgrade' in docs, f'Missing study doc after upgrade: {docs}'; print('packaged_localappdata=True upgrade_persisted=True')" $installedDb $installedStudy
+              $upgradeVerify = python -c "import json, pathlib, sqlite3, sys; c = sqlite3.connect(sys.argv[1]); row = c.execute('SELECT name FROM sessions WHERE name = ?', ('Persisted Across Upgrade',)).fetchone(); c.close(); docs = json.loads((pathlib.Path(sys.argv[2]) / 'documents.json').read_text(encoding='utf-8')); assert row and row[0] == 'Persisted Across Upgrade', f'Missing session after upgrade: {row}'; assert 'doc_upgrade' in docs, f'Missing study doc after upgrade: {docs}'; print('packaged_localappdata=True upgrade_persisted=True')" $installedDb $installedStudy
               if ($LASTEXITCODE -ne 0) { throw "Post-upgrade persistence verification failed" }
               $upgradeVerify | Add-Content ci-logs/tauri-binary-smoke.log
             } finally {
