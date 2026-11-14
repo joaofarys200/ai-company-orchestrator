@@ -340,13 +340,13 @@ mod tests {
         let bad_params = handler(make_req("sqlite.create_session", json!({}))).await;
         assert_eq!(bad_params.unwrap_err().code, -32602);
 
-        // 3. Permission READ level auto-approves through PermissionGateway.
+        // 3. Permission READ_ONLY level auto-approves through PermissionGateway.
         let perm = handler(make_req(
             "permission.request_approval",
             json!({
                 "action": "fs.read",
                 "resource": "README.md",
-                "security_level": "READ",
+                "security_level": "READ_ONLY",
             }),
         ))
         .await
