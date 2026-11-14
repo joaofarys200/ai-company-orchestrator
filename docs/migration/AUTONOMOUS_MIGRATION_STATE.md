@@ -1,10 +1,10 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-13T01:54:00Z`
-- **Current Phase:** `Phase 3 — Functional Migration from Python to Rust (Phase 2 COMPLETE; Increment 3.1 Implemented)`
-- **Current Increment:** `Increment 3.1 Implemented -> Pushing to migration/tauri-rust-complete for Windows CI Validation`
+- **Last Updated (UTC):** `2026-11-14T00:17:00Z`
+- **Current Phase:** `Phase 3 — Functional Migration from Python to Rust (3.1 COMPLETE; 3.2 Implemented)`
+- **Current Increment:** `Increment 3.2 Implemented -> Pushing Rust SQLite Single Writer & Study Catalog Store for Windows CI Validation`
 - **Current Branch:** `migration/tauri-rust-complete`
-- **Current Commit:** `c195ce4` + Increment 3.1 changes (base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
+- **Current Commit:** `d5e46cd` + Increment 3.2 changes (base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
 
 ---
 
@@ -46,20 +46,23 @@
   - Exposed Tauri commands `get_loopback_config` and `get_media_ticket` via managed `RuntimeServices` in `src-tauri/src/commands/media.rs` + `src-tauri/src/lib.rs`, added `http://127.0.0.1:*` to `connect-src`/`worker-src` in `tauri.conf.json`, and added `sandbox="allow-scripts allow-forms"` to `WorkspaceViewer.tsx` preview `<iframe>` elements.
 
 ### Phase 3 — Functional Migration from Python to Rust (IN PROGRESS)
-- **3.1 Rust Worker Supervisor + Win32 Job Objects + NDJSON JSON-RPC 2.0 + `workers/worker_boot.py` (IMPLEMENTED LOCALLY — Pushing for Windows CI Validation):**
-  - Implemented Python worker runtime `workers/{__init__,worker_boot}.py` and `workers/common/{__init__,stdio_rpc}.py` isolating `os.dup(1)` + redirecting `sys.stdout = sys.stderr` prior to imports, with 16 MiB frame limit, `StreamChunkBatcher` (16 ms / 3 chunks), `system.ping`/`system.pong`, `task.cancel`, and non-blocking `reverse_request`/`reverse_response` HITL approval + `tests/test_worker_stdio_rpc.py` (`2 passed in 0.41s`).
+- **3.1 Rust Worker Supervisor + Win32 Job Objects + NDJSON JSON-RPC 2.0 + `workers/worker_boot.py` (COMPLETE — `d5e46cd`, verified CI Run `#43348340070`):**
+  - Implemented Python worker runtime `workers/{__init__,worker_boot}.py` and `workers/common/{__init__,stdio_rpc}.py` isolating `os.dup(1)` + redirecting `sys.stdout = sys.stderr` prior to imports, with 16 MiB frame limit, `StreamChunkBatcher` (16 ms / 3 chunks), `system.ping`/`system.pong`, `task.cancel`, and non-blocking `reverse_request`/`reverse_response` HITL approval + `tests/test_worker_stdio_rpc.py`.
   - Added `windows-sys` (`Win32_Foundation`, `Win32_Security`, `Win32_System_JobObjects`, `Win32_System_Threading`), `uuid`, `chrono`, and `tokio` `"process"` feature to `src-tauri/Cargo.toml` and locked `Cargo.lock`.
   - Implemented `src-tauri/src/process/job_object.rs` (RAII `JobObject` with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE | JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION` + `CREATE_NO_WINDOW` + child termination test).
   - Implemented `src-tauri/src/workers/{mod,rpc_client,supervisor}.rs` (`WorkerRpcClient` with bounded `mpsc(1024)` queue, 5s/15s heartbeat, async `ReverseRpcHandler`, and `WorkerSupervisor` managing `Echo`/`Ai`/`Study`/`Knowledge`/`Mission`/`Voice` roles with backoff auto-restart + 3 live Rust-to-Python integration tests).
   - Exposed `get_worker_health`, `restart_worker_role`, `worker_system_health` in `src-tauri/src/commands/workers.rs` and wired `RuntimeServices.workers` shutdown on `RunEvent::Exit` in `src-tauri/src/lib.rs`.
+- **3.2 Rust SQLite Core (`database.db` Single Writer) + Study Catalog Store (IMPLEMENTED LOCALLY — Pushing for Windows CI Validation):**
+  - Added `rusqlite` (`0.38`, `features = ["bundled"]`) to `src-tauri/Cargo.toml` and locked via `cargo fetch`.
+  - Implemented `src-tauri/src/storage/migrations.rs` (WAL pragmas + transactional `PRAGMA user_version = 1` schema covering `sessions`, `messages`, `projects`, `compounding_memory`, `architecture_memory`, `engineering_decisions`, `strategic_goals`, `event_sourcing_log`, normalizing `OPENCLAW` -> `JARVIS`, and preserving existing rows & non-core legacy tables).
+  - Implemented `src-tauri/src/storage/sqlite.rs` (`SqliteDatabase` dedicated single-writer OS thread + bounded `mpsc(512)` queue + concurrent `query_only=ON` WAL readers via `spawn_blocking` + full repository parity + 3 concurrency/migration tests on disposable temp DBs).
+  - Implemented `src-tauri/src/storage/study_store.rs` (atomic `documents.json`/`collections.json`/`flashcards.json` store with `atomic_write_string`, forensic `.corrupt.<ts>.<pid>.bak` backup, `is_safe_identifier` checks, and roundtrip integration tests).
 
 ---
 
-## 2. Remaining Work (Phases 3.2–5)
+## 2. Remaining Work (Phases 3.3–5)
 
 ### Phase 3 — Functional Migration from Python to Rust (Remaining)
-- **3.2 Rust SQLite Core (`database.db` Single Writer) + Study Catalog Store:**
-  - `storage/{sqlite,migrations,study_store}.rs` (`rusqlite` bundled WAL actor, `user_version` migrations preserving existing rows, `documents.json`/`collections.json` atomic store), cross-checking RHO cutover safety (`data/rho.db` tested on disposable/CI copies; `state.db` retained permanently in Python).
 - **3.3 Security Hardening in Rust Core:**
   - `process/command_guard.rs` (lexer + closed allowlist replacing `workspace_policy.py` & PowerShell `& { ... }`), `permissions/{gateway,policy}.rs` (fail-closed 300s TTL HITL via Reverse RPC), SSRF DNS+IP pinning guard (`video_intelligence_service.py` + Rust), `atomic_write` across all 22 non-atomic write sites, `sentinel/{scheduler,collectors_win}.rs` (`shadow_mode=True` default, dynamic PID tree allowlist), secret isolation in Rust Core.
 - **3.4 Domain IPC Commands & Specialized Python Workers:**
@@ -84,11 +87,11 @@
 - **Python Post-3.1 Check (`venv\Scripts\python.exe -m pytest -q tests/test_worker_stdio_rpc.py tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py`):** `26 passed, 1 skipped, 2 subtests passed in 9.33s` (`tests/test_worker_stdio_rpc.py`: `2 passed in 0.41s`; bare system Python CI suite including `tests/test_transport_gateway.py`: `30 passed, 1 skipped, 2 subtests passed in 9.52s`).
 - **Frontend Transport (`npm --prefix frontend test`):** `14/14 passed (4 suites, 0 fail)` (`243.85ms`).
 - **Frontend Build (`npm --prefix frontend run build`):** `3545 modules transformed, ✓ built in 3.72s` (`exit_code=0`).
-- **CI Rust Phase 2 Complete (Run `#43346899364` on `migration/tauri-rust-complete` @ `c195ce4`, `conclusion=success`):**
-  - `cargo check --locked --all-targets`: `exit_code=0`, 0 errors, 0 warnings (`2m 03s`).
-  - `cargo test --locked`: `9 passed; 0 failed` (`atomic_fs` 3, `path_jail`/`system` 4, `loopback` 1, `preview_server` 1; `0.07s`).
-  - `tauri build --no-bundle`: `exit_code=0`, `jarvis-os.exe` (`15,231,488` B, `3m 39s`).
-  - CI Python contract tests: `27 passed, 2 skipped, 2 subtests passed in 10.23s`; Frontend test: `14 pass`; Frontend build: `5.80s`.
+- **CI Rust Phase 3 Increment 3.1 (Run `#43348340070` on `migration/tauri-rust-complete` @ `d5e46cd`, `conclusion=success`):**
+  - `cargo check --locked --all-targets`: `exit_code=0`, 0 errors, 0 warnings (`33.68s`).
+  - `cargo test --locked`: `13 passed; 0 failed` (`2.61s` — includes Win32 `JobObject` child termination + all 3 live Rust `WorkerSupervisor` <-> Python `worker_boot.py` unary/streaming/heartbeat/Reverse-RPC/cancel/crash-recovery tests).
+  - `tauri build --no-bundle`: `exit_code=0`, `jarvis-os.exe` (`15,932,928` B, `1m 41s`).
+  - CI Python contract tests (incl. `test_worker_stdio_rpc.py`): `29 passed, 2 skipped, 2 subtests passed in 11.20s`; Frontend test: `14 pass`; Frontend build: passed.
 
 ---
 
@@ -109,7 +112,7 @@
 
 ## 5. Next Executable Task
 
-- **Validate Phase 3 Increment 3.1 (Win32 Job Objects + Rust Worker Supervisor <-> Python `worker_boot.py` live stdio JSON-RPC integration tests) on Windows CI, and immediately implement Phase 3 Increment 3.2 (Rust SQLite Core `database.db` Single Writer + `user_version` migrations + Study Atomic Catalog Store).**
+- **Validate Phase 3 Increment 3.2 (`rusqlite` bundled WAL single-writer `SqliteDatabase`, `user_version=1` migrations, and `StudyStore` atomic catalog) on Windows CI, while completing Phase 3 Increment 3.3 (Rust `command_guard`, fail-closed `permissions/{policy,gateway}`, SSRF DNS+IP pinning in Rust & `video_intelligence_service.py`, `atomic_write` hardening across Python persistence sites, and `sentinel` shadow-mode/allowlist).**
 
 ---
 
