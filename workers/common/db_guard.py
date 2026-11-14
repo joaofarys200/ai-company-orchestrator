@@ -151,8 +151,16 @@ def parse_sqlite_target(
         mode_vals = query_params.get("mode") or []
         mode = mode_vals[0].strip().lower() if mode_vals else None
         unquoted_path = unquote(parsed.path or "")
-        if not unquoted_path and parsed.netloc:
-            unquoted_path = unquote(parsed.netloc)
+        netloc_unquoted = unquote(parsed.netloc or "")
+        if not unquoted_path and netloc_unquoted:
+            unquoted_path = netloc_unquoted
+        elif os.name == "nt" and netloc_unquoted:
+            # Handle `file://C:/path/database.db` where urlsplit treats `C:` as netloc,
+            # `file://localhost/C:/...`, and UNC paths `file://server/share/...`.
+            if re.match(r"^[A-Za-z]:$", netloc_unquoted):
+                unquoted_path = f"{netloc_unquoted}{unquoted_path}"
+            elif netloc_unquoted.lower() != "localhost" and unquoted_path.startswith("/"):
+                unquoted_path = f"//{netloc_unquoted}{unquoted_path}"
         if unquoted_path.startswith(":memory:") or mode == "memory":
             return None, mode, True
         if os.name == "nt" and re.match(r"^/[A-Za-z]:", unquoted_path):
@@ -238,7 +246,7 @@ def _attach_jail_authorizer(
 
 
 def _readonly_uri_for_normalized(normalized_path: str) -> str:
-    return f"file:{Path(normalized_path).as_posix()}?mode=ro"
+    return f"{Path(normalized_path).as_uri()}?mode=ro"
 
 
 class _GuardedConnection(_ORIG_CONNECTION):

@@ -136,6 +136,21 @@ class SqliteWriteExclusivityTests(unittest.TestCase):
                 is_canonical_db_target(f"file:{canon.as_posix()}?mode=rwc", uri=True)
             )
             self.assertTrue(
+                is_canonical_db_target(f"{canon.as_uri()}?mode=ro", uri=True)
+            )
+            self.assertTrue(
+                is_canonical_db_target(
+                    f"file:///{canon.as_posix().lstrip('/').replace(' ', '%20')}?mode=rw",
+                    uri=True,
+                )
+            )
+            self.assertTrue(
+                is_canonical_db_target(
+                    f"file://localhost/{canon.as_posix().lstrip('/').replace(' ', '%20')}?mode=ro",
+                    uri=True,
+                )
+            )
+            self.assertTrue(
                 is_canonical_db_target(f"file://{canon.as_posix().replace(' ', '%20')}?mode=ro", uri=True)
             )
 
