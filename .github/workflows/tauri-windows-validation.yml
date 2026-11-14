@@ -142,8 +142,54 @@ jobs:
       - name: Run cargo check (--locked --all-targets)
         run: |
           $ErrorActionPreference = 'Continue'
-          cargo check --manifest-path src-tauri/Cargo.toml --locked --all-targets 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/cargo-check.log
+          cmd /c "cargo check --manifest-path src-tauri/Cargo.toml --locked --all-targets --message-format=json > ci-logs\cargo-check.jsonl 2> ci-logs\cargo-check-stderr.log"
           $code = $LASTEXITCODE
+          @'
+          import json, pathlib
+          out_lines = []
+          emitted = 0
+          jsonl = pathlib.Path("ci-logs/cargo-check.jsonl")
+          if jsonl.exists():
+              for raw in jsonl.read_text(encoding="utf-8", errors="replace").splitlines():
+                  try:
+                      obj = json.loads(raw)
+                  except Exception:
+                      out_lines.append(raw)
+                      continue
+                  if obj.get("reason") == "compiler-message":
+                      msg = obj.get("message", {})
+                      lvl = msg.get("level", "")
+                      rendered = msg.get("rendered") or msg.get("message") or ""
+                      if rendered:
+                          out_lines.append(rendered)
+                          if lvl == "error":
+                              print(rendered)
+                      if lvl == "error" and emitted < 10:
+                          spans = msg.get("spans") or []
+                          primary = next((s for s in spans if s.get("is_primary")), spans[0] if spans else None)
+                          text = (msg.get("message") or rendered).replace("\r", " ").replace("\n", " ")[:400]
+                          if primary and primary.get("file_name"):
+                              f = primary["file_name"].replace("\\", "/")
+                              if not f.startswith("src-tauri/"):
+                                  f = "src-tauri/" + f
+                              line = primary.get("line_start") or 1
+                              print(f"::error file={f},line={line}::[{f}:{line}] {text}")
+                          else:
+                              print(f"::error::{text}")
+                          emitted += 1
+          stderr_path = pathlib.Path("ci-logs/cargo-check-stderr.log")
+          if stderr_path.exists():
+              err_txt = stderr_path.read_text(encoding="utf-8", errors="replace")
+              if err_txt.strip():
+                  out_lines.append(err_txt)
+                  print(err_txt)
+                  if emitted == 0:
+                      for line in err_txt.splitlines():
+                          if ("error" in line.lower() or "-->" in line) and emitted < 10:
+                              print(f"::error::{line[:400]}")
+                              emitted += 1
+          pathlib.Path("ci-logs/cargo-check.log").write_text("\n".join(out_lines) + "\n", encoding="utf-8")
+          '@ | python -
           "exit_code=$code" | Add-Content ci-logs/cargo-check.log
           exit $code
 
@@ -152,6 +198,20 @@ jobs:
           $ErrorActionPreference = 'Continue'
           cargo test --manifest-path src-tauri/Cargo.toml --locked -- --nocapture 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/cargo-test.log
           $code = $LASTEXITCODE
+          @'
+          import pathlib, sys
+          code = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+          if code != 0:
+              lines = pathlib.Path("ci-logs/cargo-test.log").read_text(encoding="utf-8", errors="replace").splitlines()
+              emitted = 0
+              for i, line in enumerate(lines):
+                  if ("error[" in line or line.startswith("error:") or "FAILED" in line) and emitted < 10:
+                      snippet = line
+                      if i + 1 < len(lines) and "-->" in lines[i + 1]:
+                          snippet += " | " + lines[i + 1].strip()
+                      print(f"::error::{snippet[:400]}")
+                      emitted += 1
+          '@ | python - $code
           "exit_code=$code" | Add-Content ci-logs/cargo-test.log
           exit $code
 
