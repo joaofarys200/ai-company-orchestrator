@@ -1,8 +1,8 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-14T13:14:00Z`
-- **Current Phase:** `Post-Audit Architectural Closure — Increment A (SQLite Write Exclusivity)`
-- **Current Increment:** `Increment A (Rust Single-Writer Parity + Composite Reverse-RPC + Unbypassable Python Worker db_guard)`
+- **Last Updated (UTC):** `2026-11-14T15:30:00Z`
+- **Current Phase:** `Post-Audit Architectural Closure — Increment B2 (Native Rust Knowledge & Obsidian Vault)`
+- **Current Increment:** `Increment B2 Complete (Pending CI Validation): Native 15-Route Rust Knowledge Engine & WorkerPoolRole::Knowledge Retirement`
 - **Current Branch:** `migration/tauri-rust-complete`
 - **Main Baseline:** Untouched at `af11ae9095f4cfd8c8e01334704ffde282da9554` (awaiting user approval before merge)
 
@@ -107,12 +107,17 @@
 
 ## 4. Next Executable Task
 
-- **Increment B1 Complete (Pending CI Validation on Push):**
-  - Migrated deterministic Study catalog operations (`study_catalog_ops.rs` — 8 catalog routes).
-  - Migrated all 12 deterministic Project/Planner/AST/Preview routes (`project_dispatch.rs` + `PreviewServerHandle` static preview & guarded child process supervision) and removed `sandbox.py` runtime import from `workers/common/domain_bridge.py`.
-  - Migrated all 6 `PERMISSION_HANDLERS` (`permission_dispatch.rs` bridging Rust `PermissionGateway` + `.jarvis/permissions/requests/` disk requests, capability checks, rollback, and dependency governance choices) and wired them in `dispatch.rs`.
+- **Increment B1 Complete & Verified (`07a479c`, Windows CI Run `#43608606851`):**
+  - Migrated deterministic Study catalog operations (`src-tauri/src/storage/study_catalog_ops.rs` — 8 catalog routes).
+  - Migrated all 12 deterministic Project/Planner/AST/Preview routes (`src-tauri/src/commands/project_dispatch.rs` + `PreviewServerHandle` static preview & guarded child process supervision) and removed `sandbox.py` runtime import from `workers/common/domain_bridge.py`.
+  - Migrated all 6 `PERMISSION_HANDLERS` (`src-tauri/src/commands/permission_dispatch.rs` bridging Rust `PermissionGateway` + `.jarvis/permissions/requests/` disk requests, capability checks, rollback, and dependency governance choices) and wired them in `src-tauri/src/commands/dispatch.rs`.
   - Fixed asyncio orchestration background task timing flake in `tests/test_study_agent_session_isolation.py`.
-- **Next:** Validate Increment B1 on Windows CI (`cargo check`, `cargo test`, `tauri:build`, two-pass pytest, `jarvis-os.exe` smoke), then execute **Increment B2** (porting all 15 `Knowledge` routes from `obsidian_graph_engine.py` / `knowledge.py` to Rust `src-tauri/src/knowledge/` & retiring `WorkerPoolRole::Knowledge`).
+  - Verified on Windows CI Run `#43608606851` across all steps (`frontend test`/`build`, Two-Pass Python gate, `cargo check --locked --all-targets`, `cargo test --locked`, `tauri build --no-bundle`, and `jarvis-os.exe` smoke boot).
+- **Increment B2 Complete (Pending Windows CI Validation):**
+  - Implemented native Rust Obsidian Vault & Knowledge Graph Engine in `src-tauri/src/knowledge/{mod,vault,graph_engine,dispatch}.rs` covering all 15 `KNOWLEDGE_HANDLERS` (`get_notes`, `read_note`, `save_note`, `get_rules`, `delete_rule`, `delete_architecture`, `delete_decision`, `get_vault_diagnostics`, `audit_note_quality`, `enrich_note`, `rollback_note`, `get_queue_status`, `pause_queue_worker`, `resume_queue_worker`, `start_improvement_batch`).
+  - Wired `crate::knowledge::dispatch::try_execute_knowledge_fast_path` and native `get_rules`/`get_notes` `trigger_initial_sync` in `src-tauri/src/commands/dispatch.rs`; exposed `pub mod knowledge;` in `src-tauri/src/lib.rs`.
+  - Retired `WorkerPoolRole::Knowledge` from `WorkerPoolRole::production_roles()` (`src-tauri/src/workers/supervisor.rs`), `route_message_to_worker_role()`, and `trigger_initial_sync()` (`src-tauri/src/commands/dispatch.rs`) while retaining `workers/knowledge_worker.py` temporarily only for legacy Python contract/exclusivity tests.
+- **Next:** Validate Increment B2 on Windows CI (`cargo check --locked --all-targets`, `cargo test --locked`, `tauri build --no-bundle`), then execute **Increment B3** (deterministic Study SRS/Cornell/folder-sync, Mission CRUD, Sentinel Windows collectors) followed by **Increment C** (frontend/transport/loopback hardening) and **Increment D** (Windows MSI/NSIS packaging + `%LOCALAPPDATA%` separation).
 
 ---
 

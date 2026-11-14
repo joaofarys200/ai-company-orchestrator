@@ -1,5 +1,6 @@
 pub mod commands;
 pub mod error;
+pub mod knowledge;
 pub mod permissions;
 pub mod process;
 pub mod protocol;

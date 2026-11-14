@@ -7,12 +7,8 @@ use tauri::{AppHandle, Emitter, State};
 
 use crate::commands::media::{ActiveDispatch, RuntimeServices};
 use crate::commands::security::permission_record_to_frontend_json;
-use crate::commands::storage::{
-    architecture_memory_to_json, compounding_rules_to_json, engineering_decisions_to_json,
-};
 use crate::error::AppError;
 use crate::permissions::gateway::PermissionGateway;
-use crate::storage::sqlite::SqliteDatabase;
 use crate::workers::rpc_client::WorkerStreamEvent;
 use crate::workers::supervisor::WorkerPoolRole;
 
@@ -38,27 +34,6 @@ pub fn route_message_to_worker_role(msg_type: &str) -> Option<WorkerPoolRole> {
 
     if msg_type == "toggle_voice" || msg_type.starts_with("voice_") {
         return Some(WorkerPoolRole::Voice);
-    }
-
-    if matches!(
-        msg_type,
-        "get_notes"
-            | "read_note"
-            | "save_note"
-            | "get_rules"
-            | "delete_rule"
-            | "delete_architecture"
-            | "delete_decision"
-            | "get_vault_diagnostics"
-            | "audit_note_quality"
-            | "enrich_note"
-            | "rollback_note"
-            | "get_queue_status"
-            | "pause_queue_worker"
-            | "resume_queue_worker"
-            | "start_improvement_batch"
-    ) {
-        return Some(WorkerPoolRole::Knowledge);
     }
 
     if msg_type.starts_with("mission_")
@@ -177,91 +152,10 @@ fn emit_fast_path_events(app: &AppHandle, events: Vec<Value>, client_request_id:
     }
 }
 
-/// Executes Rust-native fast-path operations (`database.db` single writer).
-async fn try_execute_native_fast_path_events(
-    db: &SqliteDatabase,
-    _permissions: &PermissionGateway,
-    message: &Value,
-    msg_type: &str,
-) -> Result<Option<Vec<Value>>, AppError> {
+/// Executes minimal Rust-native fast-path control operations (`ping`).
+async fn try_execute_native_fast_path_events(msg_type: &str) -> Result<Option<Vec<Value>>, AppError> {
     match msg_type {
         "ping" => Ok(Some(vec![json!({ "type": "pong" })])),
-
-        "get_rules" => {
-            let rules = db
-                .get_compounding_rules()
-                .await
-                .map_err(|err| AppError::new("SQLITE_READ_FAILED", err))?;
-            Ok(Some(vec![json!({
-                "type": "rules_list",
-                "rules": compounding_rules_to_json(&rules),
-            })]))
-        }
-
-        "delete_rule" => {
-            let key = message
-                .get("key")
-                .and_then(Value::as_str)
-                .unwrap_or("")
-                .trim();
-            if !key.is_empty() {
-                db.delete_compounding_rule(key)
-                    .await
-                    .map_err(|err| AppError::new("SQLITE_WRITE_FAILED", err))?;
-            }
-            let rules = db
-                .get_compounding_rules()
-                .await
-                .map_err(|err| AppError::new("SQLITE_READ_FAILED", err))?;
-            let serialized = compounding_rules_to_json(&rules);
-            Ok(Some(vec![
-                json!({ "type": "rules_list", "rules": serialized }),
-                json!({ "type": "rules_updated", "rules": serialized }),
-            ]))
-        }
-
-        "delete_architecture" => {
-            let module = message
-                .get("module")
-                .and_then(Value::as_str)
-                .unwrap_or("")
-                .trim();
-            if !module.is_empty() {
-                db.delete_architecture_memory(module)
-                    .await
-                    .map_err(|err| AppError::new("SQLITE_WRITE_FAILED", err))?;
-            }
-            let arch = db
-                .get_architecture_memory()
-                .await
-                .map_err(|err| AppError::new("SQLITE_READ_FAILED", err))?;
-            Ok(Some(vec![json!({
-                "type": "architecture_updated",
-                "architecture": architecture_memory_to_json(&arch),
-            })]))
-        }
-
-        "delete_decision" => {
-            let decision = message
-                .get("decision")
-                .and_then(Value::as_str)
-                .unwrap_or("")
-                .trim();
-            if !decision.is_empty() {
-                db.delete_engineering_decision(decision)
-                    .await
-                    .map_err(|err| AppError::new("SQLITE_WRITE_FAILED", err))?;
-            }
-            let decisions = db
-                .get_engineering_decisions()
-                .await
-                .map_err(|err| AppError::new("SQLITE_READ_FAILED", err))?;
-            Ok(Some(vec![json!({
-                "type": "decisions_updated",
-                "decisions": engineering_decisions_to_json(&decisions),
-            })]))
-        }
-
         _ => Ok(None),
     }
 }
@@ -397,11 +291,16 @@ pub async fn dispatch_client_message(
         return Ok(Value::Null);
     }
 
-    if let Some(events) = try_execute_native_fast_path_events(
+    if let Some(events) = try_execute_native_fast_path_events(&msg_type).await? {
+        emit_fast_path_events(&app, events, client_request_id.as_deref());
+        return Ok(Value::Null);
+    }
+
+    if let Some(events) = crate::knowledge::dispatch::try_execute_knowledge_fast_path(
+        &services.project_root,
         &services.db,
-        &services.permissions,
-        &message,
         &msg_type,
+        &message,
     )
     .await?
     {
@@ -523,20 +422,19 @@ pub async fn trigger_initial_sync(
     services: State<'_, RuntimeServices>,
     project_id: Option<String>,
 ) -> Result<Value, AppError> {
-    // Emit Rust-owned compounding rules immediately from SqliteDatabase.
-    let rules = services
-        .db
-        .get_compounding_rules()
-        .await
-        .map_err(|err| AppError::new("SQLITE_READ_FAILED", err))?;
-    emit_jarvis_event(
-        &app,
-        json!({
-            "type": "rules_list",
-            "rules": compounding_rules_to_json(&rules),
-        }),
-        None,
-    );
+    // Emit Rust-owned Knowledge snapshots (`rules_list` + `notes_list`) immediately without a worker.
+    for init_msg in ["get_rules", "get_notes"] {
+        if let Some(events) = crate::knowledge::dispatch::try_execute_knowledge_fast_path(
+            &services.project_root,
+            &services.db,
+            init_msg,
+            &json!({}),
+        )
+        .await?
+        {
+            emit_fast_path_events(&app, events, None);
+        }
+    }
 
     // Emit any already-pending Rust HITL permission requests immediately.
     let native_pending: Vec<Value> = services
@@ -561,7 +459,6 @@ pub async fn trigger_initial_sync(
     for role in [
         WorkerPoolRole::Ai,
         WorkerPoolRole::Study,
-        WorkerPoolRole::Knowledge,
         WorkerPoolRole::Mission,
     ] {
         let params = if role == WorkerPoolRole::Mission {
@@ -594,7 +491,7 @@ pub async fn trigger_initial_sync(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::Duration;
+    use crate::storage::sqlite::SqliteDatabase;
     use tempfile::TempDir;
 
     #[test]
@@ -611,9 +508,33 @@ mod tests {
         assert_eq!(route_message_to_worker_role("start_lecture_recording"), Some(WorkerPoolRole::Study));
         assert_eq!(route_message_to_worker_role("submit_lecture_quiz"), Some(WorkerPoolRole::Study));
 
-        assert_eq!(route_message_to_worker_role("get_notes"), Some(WorkerPoolRole::Knowledge));
-        assert_eq!(route_message_to_worker_role("get_rules"), Some(WorkerPoolRole::Knowledge));
-        assert_eq!(route_message_to_worker_role("get_vault_diagnostics"), Some(WorkerPoolRole::Knowledge));
+        for retired_knowledge_msg in [
+            "get_notes",
+            "read_note",
+            "save_note",
+            "get_rules",
+            "delete_rule",
+            "delete_architecture",
+            "delete_decision",
+            "get_vault_diagnostics",
+            "audit_note_quality",
+            "enrich_note",
+            "rollback_note",
+            "get_queue_status",
+            "pause_queue_worker",
+            "resume_queue_worker",
+            "start_improvement_batch",
+        ] {
+            assert_eq!(
+                route_message_to_worker_role(retired_knowledge_msg),
+                None,
+                "Knowledge route {retired_knowledge_msg} must stay native in Rust and never route to a Python worker"
+            );
+        }
+        assert!(
+            !WorkerPoolRole::production_roles().contains(&WorkerPoolRole::Knowledge),
+            "WorkerPoolRole::Knowledge must remain retired from production_roles()"
+        );
 
         assert_eq!(route_message_to_worker_role("mission_list"), Some(WorkerPoolRole::Mission));
         assert_eq!(route_message_to_worker_role("work_package_create"), Some(WorkerPoolRole::Mission));
@@ -643,7 +564,12 @@ mod tests {
     async fn native_fast_path_executes_sqlite_rule_architecture_and_decision_flows() {
         let dir = TempDir::new().unwrap();
         let db = SqliteDatabase::open(dir.path().join("database.db")).unwrap();
-        let permissions = PermissionGateway::new(Duration::from_secs(60));
+
+        let ping_ev = try_execute_native_fast_path_events("ping")
+            .await
+            .unwrap()
+            .expect("ping handled natively");
+        assert_eq!(ping_ev, vec![json!({ "type": "pong" })]);
 
         db.add_compounding_rule("k1", "desc", "corr").await.unwrap();
         db.add_architecture_memory("mod_a", "purpose", "dep", "cons")
@@ -653,19 +579,24 @@ mod tests {
             .await
             .unwrap();
 
-        let rules_ev = try_execute_native_fast_path_events(&db, &permissions, &json!({ "type": "get_rules" }), "get_rules")
-            .await
-            .unwrap()
-            .expect("get_rules handled natively");
+        let rules_ev = crate::knowledge::dispatch::try_execute_knowledge_fast_path(
+            dir.path(),
+            &db,
+            "get_rules",
+            &json!({ "type": "get_rules" }),
+        )
+        .await
+        .unwrap()
+        .expect("get_rules handled natively");
         assert_eq!(rules_ev.len(), 1);
         assert_eq!(rules_ev[0]["type"], "rules_list");
         assert_eq!(rules_ev[0]["rules"][0]["rule_key"], "k1");
 
-        let del_rule = try_execute_native_fast_path_events(
+        let del_rule = crate::knowledge::dispatch::try_execute_knowledge_fast_path(
+            dir.path(),
             &db,
-            &permissions,
-            &json!({ "type": "delete_rule", "key": "k1" }),
             "delete_rule",
+            &json!({ "type": "delete_rule", "key": "k1" }),
         )
         .await
         .unwrap()
@@ -675,11 +606,11 @@ mod tests {
         assert_eq!(del_rule[1]["type"], "rules_updated");
         assert!(del_rule[1]["rules"].as_array().unwrap().is_empty());
 
-        let del_arch = try_execute_native_fast_path_events(
+        let del_arch = crate::knowledge::dispatch::try_execute_knowledge_fast_path(
+            dir.path(),
             &db,
-            &permissions,
-            &json!({ "type": "delete_architecture", "module": "mod_a" }),
             "delete_architecture",
+            &json!({ "type": "delete_architecture", "module": "mod_a" }),
         )
         .await
         .unwrap()
@@ -687,11 +618,11 @@ mod tests {
         assert_eq!(del_arch[0]["type"], "architecture_updated");
         assert!(del_arch[0]["architecture"].as_array().unwrap().is_empty());
 
-        let del_dec = try_execute_native_fast_path_events(
+        let del_dec = crate::knowledge::dispatch::try_execute_knowledge_fast_path(
+            dir.path(),
             &db,
-            &permissions,
-            &json!({ "type": "delete_decision", "decision": "dec_1" }),
             "delete_decision",
+            &json!({ "type": "delete_decision", "decision": "dec_1" }),
         )
         .await
         .unwrap()

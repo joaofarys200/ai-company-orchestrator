@@ -55,7 +55,6 @@ impl WorkerPoolRole {
         &[
             Self::Ai,
             Self::Study,
-            Self::Knowledge,
             Self::Mission,
             Self::Voice,
         ]
