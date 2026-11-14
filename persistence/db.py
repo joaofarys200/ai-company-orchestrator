@@ -88,6 +88,8 @@ def get_db_connection(
         return conn
 
     assert_direct_write_allowed(target, operation="get_db_connection(read_only=False)")
+    if target != ":memory:" and not str(target).startswith("file:"):
+        Path(target).parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(
         target,
         timeout=timeout_seconds,
