@@ -13,7 +13,7 @@ use uuid::Uuid;
 use crate::permissions::policy::{
     evaluate_permission_policy, PermissionRequestStatus,
 };
-use crate::workers::rpc_client::{ReverseRpcHandler, RpcRemoteError};
+use crate::workers::rpc_client::{ReverseRequest, ReverseRpcHandler, RpcRemoteError};
 
 pub const DEFAULT_PERMISSION_TTL: Duration = Duration::from_secs(300);
 
@@ -496,7 +496,6 @@ fn push_audit(log: &mut VecDeque<AuditLogEntry>, entry: AuditLogEntry) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::workers::rpc_client::ReverseRequest;
 
     #[tokio::test]
     async fn permission_gateway_enforces_fail_closed_policy_scoping_and_ttl() {
