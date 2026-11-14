@@ -14,45 +14,231 @@ pub enum ValidatedOpenTarget {
     LocalPath(PathBuf),
 }
 
+/// Separation between mutable user/runtime state (`data_root`, e.g. `%LOCALAPPDATA%\JarvisOS`)
+/// and immutable application resources (`resource_root`, e.g. `%ProgramFiles%\JARVIS OS`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AppPaths {
+    pub data_root: PathBuf,
+    pub resource_root: PathBuf,
+    pub is_packaged: bool,
+}
+
 fn looks_like_project_root(dir: &Path) -> bool {
     dir.join("package.json").is_file()
         && (dir.join("src-tauri").is_dir() || dir.join("server.py").is_file())
 }
 
-/// Resolves the canonical workspace root without relying on arbitrary CWD state.
-pub fn resolve_project_root() -> PathBuf {
-    if let Some(explicit) = std::env::var_os("JARVIS_PROJECT_ROOT") {
-        let candidate = PathBuf::from(explicit);
-        if candidate.is_dir() {
-            if let Ok(canon) = dunce::canonicalize(&candidate) {
-                return canon;
-            }
-        }
-    }
+fn looks_like_resource_root(dir: &Path) -> bool {
+    dir.join("workers").join("worker_boot.py").is_file()
+        || dir
+            .join("_up_")
+            .join("workers")
+            .join("worker_boot.py")
+            .is_file()
+}
 
+fn normalize_or_create_dir(path: &Path, create: bool) -> PathBuf {
+    if create {
+        let _ = fs::create_dir_all(path);
+    }
+    dunce::canonicalize(path).unwrap_or_else(|_| path.to_path_buf())
+}
+
+/// Ensures standard writable subdirectories exist under `data_root`.
+pub fn ensure_writable_data_subdirs(data_root: &Path) {
+    let _ = fs::create_dir_all(data_root.join("data").join("study"));
+    let _ = fs::create_dir_all(data_root.join("data").join("sentinel"));
+    let _ = fs::create_dir_all(data_root.join("obsidian_vault"));
+    let _ = fs::create_dir_all(data_root.join("workspace"));
+    let _ = fs::create_dir_all(data_root.join(".jarvis"));
+}
+
+/// Detects whether the current executable is running directly inside a developer repository checkout.
+/// Release builds intentionally ignore compile-time `CARGO_MANIFEST_DIR` so installed MSI/NSIS
+/// binaries never resolve back to the build machine's checkout directory.
+pub fn detect_dev_checkout_root() -> Option<PathBuf> {
     if let Ok(exe) = std::env::current_exe() {
         for ancestor in exe.ancestors() {
             if looks_like_project_root(ancestor) {
                 if let Ok(canon) = dunce::canonicalize(ancestor) {
-                    return canon;
+                    return Some(canon);
                 }
             }
         }
     }
 
+    #[cfg(debug_assertions)]
     if let Some(manifest_dir) = option_env!("CARGO_MANIFEST_DIR") {
         if let Some(parent) = Path::new(manifest_dir).parent() {
             if looks_like_project_root(parent) {
                 if let Ok(canon) = dunce::canonicalize(parent) {
-                    return canon;
+                    return Some(canon);
                 }
             }
         }
     }
 
-    std::env::current_dir()
-        .and_then(dunce::canonicalize)
-        .unwrap_or_else(|_| PathBuf::from("."))
+    None
+}
+
+/// Pure, deterministic resolver for `data_root` vs `resource_root` across dev, CI override,
+/// and installed Windows MSI/NSIS desktop environments.
+pub fn resolve_app_paths_with_overrides(
+    explicit_project_root: Option<&Path>,
+    explicit_data_dir: Option<&Path>,
+    explicit_resource_dir: Option<&Path>,
+    dev_checkout_root: Option<&Path>,
+    resource_dir_hint: Option<&Path>,
+    local_app_data_base: Option<&Path>,
+) -> AppPaths {
+    let resolve_resource = |fallback: &Path| -> PathBuf {
+        if let Some(exp_res) = explicit_resource_dir {
+            if exp_res.is_dir() {
+                return normalize_or_create_dir(exp_res, false);
+            }
+        }
+        if let Some(hint) = resource_dir_hint {
+            if hint.is_dir() && (looks_like_resource_root(hint) || dev_checkout_root.is_none()) {
+                let candidate = if hint
+                    .join("_up_")
+                    .join("workers")
+                    .join("worker_boot.py")
+                    .is_file()
+                {
+                    hint.join("_up_")
+                } else {
+                    hint.to_path_buf()
+                };
+                return normalize_or_create_dir(&candidate, false);
+            }
+        }
+        if looks_like_resource_root(fallback) {
+            return normalize_or_create_dir(fallback, false);
+        }
+        if let Some(dev) = dev_checkout_root {
+            if dev.is_dir() {
+                return normalize_or_create_dir(dev, false);
+            }
+        }
+        normalize_or_create_dir(fallback, false)
+    };
+
+    // 1. Explicit `JARVIS_PROJECT_ROOT` override (used by dev scripts and CI smoke tests).
+    if let Some(proj) = explicit_project_root {
+        let proj_norm = normalize_or_create_dir(proj, true);
+        let data_root = match explicit_data_dir {
+            Some(d) => normalize_or_create_dir(d, true),
+            None => proj_norm.clone(),
+        };
+        let resource_root = resolve_resource(&proj_norm);
+        return AppPaths {
+            data_root,
+            resource_root,
+            is_packaged: false,
+        };
+    }
+
+    // 2. Explicit `JARVIS_DATA_DIR` override without `JARVIS_PROJECT_ROOT` (packaged data override).
+    if let Some(data_dir) = explicit_data_dir {
+        let data_root = normalize_or_create_dir(data_dir, true);
+        ensure_writable_data_subdirs(&data_root);
+        let fallback_res = resource_dir_hint
+            .or(dev_checkout_root)
+            .unwrap_or(data_root.as_path());
+        let resource_root = resolve_resource(fallback_res);
+        return AppPaths {
+            data_root,
+            resource_root,
+            is_packaged: true,
+        };
+    }
+
+    // 3. Running inside a developer checkout (`package.json` + `src-tauri/` in exe ancestors).
+    if let Some(dev_root) = dev_checkout_root {
+        let canon_dev = normalize_or_create_dir(dev_root, false);
+        let resource_root = match explicit_resource_dir {
+            Some(r) if r.is_dir() => normalize_or_create_dir(r, false),
+            _ => canon_dev.clone(),
+        };
+        return AppPaths {
+            data_root: canon_dev,
+            resource_root,
+            is_packaged: false,
+        };
+    }
+
+    // 4. Packaged installed desktop mode (MSI / NSIS): writable state lives in `%LOCALAPPDATA%\JarvisOS`.
+    let raw_data_root = if let Some(local_base) = local_app_data_base {
+        local_base.join("JarvisOS")
+    } else if let Some(hint) = resource_dir_hint {
+        hint.to_path_buf()
+    } else {
+        std::env::temp_dir().join("JarvisOS")
+    };
+    let data_root = normalize_or_create_dir(&raw_data_root, true);
+    ensure_writable_data_subdirs(&data_root);
+
+    let exe_dir_buf = std::env::current_exe()
+        .ok()
+        .and_then(|e| e.parent().map(|p| p.to_path_buf()));
+    let fallback_res = resource_dir_hint
+        .or(exe_dir_buf.as_deref())
+        .unwrap_or(data_root.as_path());
+    let resource_root = resolve_resource(fallback_res);
+
+    AppPaths {
+        data_root,
+        resource_root,
+        is_packaged: true,
+    }
+}
+
+fn non_empty_env_path(var_name: &str) -> Option<PathBuf> {
+    std::env::var_os(var_name)
+        .filter(|v| !v.is_empty())
+        .map(PathBuf::from)
+}
+
+/// Resolves application `data_root` and `resource_root` using environment overrides,
+/// Tauri path hints (`resource_dir`, `app_local_data_dir`), and `%LOCALAPPDATA%\JarvisOS`.
+pub fn resolve_app_paths(
+    resource_dir_hint: Option<&Path>,
+    app_local_data_hint: Option<&Path>,
+) -> AppPaths {
+    let explicit_project_root = non_empty_env_path("JARVIS_PROJECT_ROOT");
+    let explicit_data_dir = non_empty_env_path("JARVIS_DATA_DIR");
+    let explicit_resource_dir = non_empty_env_path("JARVIS_RESOURCE_ROOT");
+    let dev_checkout = detect_dev_checkout_root();
+
+    let env_local_appdata = non_empty_env_path("LOCALAPPDATA").or_else(|| {
+        app_local_data_hint
+            .and_then(|p| p.parent().map(|parent| parent.to_path_buf()))
+            .or_else(|| app_local_data_hint.map(|p| p.to_path_buf()))
+    });
+
+    let exe_dir = std::env::current_exe()
+        .ok()
+        .and_then(|e| e.parent().map(|p| p.to_path_buf()));
+    let effective_resource_hint = resource_dir_hint.or(exe_dir.as_deref());
+
+    resolve_app_paths_with_overrides(
+        explicit_project_root.as_deref(),
+        explicit_data_dir.as_deref(),
+        explicit_resource_dir.as_deref(),
+        dev_checkout.as_deref(),
+        effective_resource_hint,
+        env_local_appdata.as_deref(),
+    )
+}
+
+/// Resolves the canonical writable workspace/data root without relying on arbitrary CWD state.
+pub fn resolve_project_root() -> PathBuf {
+    resolve_app_paths(None, None).data_root
+}
+
+/// Resolves the canonical read-only resource/code root (`workers/`, bundled assets).
+pub fn resolve_resource_root() -> PathBuf {
+    resolve_app_paths(None, None).resource_root
 }
 
 /// Default local roots allowed for OS file/folder opening and confined shell operations.
@@ -225,9 +411,8 @@ pub fn validate_open_target(
 
     // Detect Windows drive letter path (e.g. C:\foo or C:/foo) before URL scheme check
     let bytes = trimmed.as_bytes();
-    let is_windows_drive_path = bytes.len() >= 2
-        && bytes[0].is_ascii_alphabetic()
-        && bytes[1] == b':';
+    let is_windows_drive_path =
+        bytes.len() >= 2 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':';
 
     if !is_windows_drive_path {
         if let Some(colon_idx) = trimmed.find(':') {
@@ -239,7 +424,9 @@ pub fn validate_open_target(
             if valid_scheme_chars {
                 if (scheme == "http" || scheme == "https") && !trimmed.contains('\\') {
                     let prefix = format!("{scheme}://");
-                    if trimmed.to_ascii_lowercase().starts_with(&prefix) && trimmed.len() > prefix.len() {
+                    if trimmed.to_ascii_lowercase().starts_with(&prefix)
+                        && trimmed.len() > prefix.len()
+                    {
                         return Ok(ValidatedOpenTarget::Url(trimmed.to_string()));
                     }
                 }
@@ -271,7 +458,12 @@ pub fn validate_open_target(
 
 /// Validates a path identifier (`doc_id`, `frame_id`, etc.) against traversal, separators, and reserved names.
 pub fn is_safe_identifier(value: &str) -> bool {
-    if value.is_empty() || value.len() > 128 || value == "." || value == ".." || value.contains("..") {
+    if value.is_empty()
+        || value.len() > 128
+        || value == "."
+        || value == ".."
+        || value.contains("..")
+    {
         return false;
     }
     if !value
@@ -285,7 +477,10 @@ pub fn is_safe_identifier(value: &str) -> bool {
 
 /// Returns true if a canonical path points inside OS-protected system directories.
 pub fn is_blocked_system_path(canon: &Path) -> bool {
-    let lower = canon.to_string_lossy().replace('\\', "/").to_ascii_lowercase();
+    let lower = canon
+        .to_string_lossy()
+        .replace('\\', "/")
+        .to_ascii_lowercase();
     #[cfg(windows)]
     {
         for prefix in [
@@ -380,3 +575,79 @@ pub fn ensure_confined_existing_file(root: &Path, target: &Path) -> Result<PathB
     Ok(canon_target)
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn packaged_mode_separates_localappdata_from_readonly_resource_dir() {
+        let dir = tempdir().unwrap();
+        let resource_dir = dir.path().join("ProgramFiles").join("JARVIS OS");
+        fs::create_dir_all(resource_dir.join("workers")).unwrap();
+        fs::write(
+            resource_dir.join("workers").join("worker_boot.py"),
+            b"# boot",
+        )
+        .unwrap();
+
+        let local_app_data = dir.path().join("AppData").join("Local");
+        fs::create_dir_all(&local_app_data).unwrap();
+
+        let paths = resolve_app_paths_with_overrides(
+            None,
+            None,
+            None,
+            None,
+            Some(&resource_dir),
+            Some(&local_app_data),
+        );
+
+        assert!(paths.is_packaged);
+        assert_eq!(
+            paths.resource_root,
+            dunce::canonicalize(&resource_dir).unwrap()
+        );
+        let expected_data = dunce::canonicalize(local_app_data.join("JarvisOS")).unwrap();
+        assert_eq!(paths.data_root, expected_data);
+        assert!(paths.data_root.join("data").join("study").is_dir());
+        assert!(paths.data_root.join("data").join("sentinel").is_dir());
+        assert!(paths.data_root.join("obsidian_vault").is_dir());
+        assert!(paths.data_root.join("workspace").is_dir());
+        assert!(!resource_dir.join("data").exists());
+        assert!(!resource_dir.join("database.db").exists());
+    }
+
+    #[test]
+    fn dev_checkout_and_explicit_override_resolve_deterministically() {
+        let dir = tempdir().unwrap();
+        let dev_root = dir.path().join("repo");
+        fs::create_dir_all(dev_root.join("src-tauri")).unwrap();
+        fs::create_dir_all(dev_root.join("workers")).unwrap();
+        fs::write(dev_root.join("package.json"), b"{}").unwrap();
+        fs::write(dev_root.join("workers").join("worker_boot.py"), b"# boot").unwrap();
+
+        let dev_paths =
+            resolve_app_paths_with_overrides(None, None, None, Some(&dev_root), None, None);
+        let canon_dev = dunce::canonicalize(&dev_root).unwrap();
+        assert!(!dev_paths.is_packaged);
+        assert_eq!(dev_paths.data_root, canon_dev);
+        assert_eq!(dev_paths.resource_root, canon_dev);
+
+        let smoke_root = dir.path().join("smoke_state");
+        let override_paths = resolve_app_paths_with_overrides(
+            Some(&smoke_root),
+            None,
+            None,
+            Some(&dev_root),
+            Some(&dev_root),
+            None,
+        );
+        assert!(!override_paths.is_packaged);
+        assert_eq!(
+            override_paths.data_root,
+            dunce::canonicalize(&smoke_root).unwrap()
+        );
+        assert_eq!(override_paths.resource_root, canon_dev);
+    }
+}

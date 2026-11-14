@@ -190,3 +190,8 @@ Para evitar perda de dados, corrupção de ficheiros JSON ou corrupção de nota
 20. `backend/services/study_document_service.py:512` (`open("w")` em `collections.json`)
 21. `security/permission_gateway/service.py:310` (`open("w")` em cache de autorização)
 22. `intelligence/runtime_observer.py:145` (`open("w")` em metric log de runtime)
+
+### 7.5 Controles de Segurança Concluídos nos Incrementos A–D
+- **Loopback HTTP Endurecido (`src-tauri/src/protocol/loopback.rs`):** Removida a autenticação legada por query string `?token=`; apenas `Authorization: Bearer <token>`, `X-Jarvis-Token` (comparação HMAC em tempo constante) e tickets efémeros `?ticket=<hmac>` vinculados a `doc_id` (TTL 60s) são aceites. Caminhos relativos em `documents.json` são confinados via `ensure_confined_existing_file` + `validate_syntactic_path_safety`.
+- **Isolamento de Ambiente e Memória nos Workers (`src-tauri/src/workers/supervisor.rs`, `src-tauri/src/process/job_object.rs`):** Todos os processos Python são iniciados com `cmd.env_clear()` e allowlist explícita por role (`build_worker_environment`), filtrando credenciais sensíveis (`GITHUB_TOKEN`, `AWS_*`, `JARVIS_HTTP_TOKEN`) e aplicando limite de memória de `4 GiB` (`JobObject::DEFAULT_WORKER_MEMORY_LIMIT_BYTES`) no kernel Win32 (`JOB_OBJECT_LIMIT_JOB_MEMORY | JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`).
+- **Sentinel Nativo em Rust (`src-tauri/src/sentinel/`):** As 10 rotas `sentinel_*` operam nativamente em Rust com `ShadowMode` por omissão e imunidade estrita para o PID do host Tauri e PIDs ativos dos workers supervisionados.

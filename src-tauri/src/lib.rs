@@ -22,7 +22,14 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
-            let project_root = permissions::path_jail::resolve_project_root();
+            let tauri_resource_dir = app.path().resource_dir().ok();
+            let tauri_local_data_dir = app.path().app_local_data_dir().ok();
+            let app_paths = permissions::path_jail::resolve_app_paths(
+                tauri_resource_dir.as_deref(),
+                tauri_local_data_dir.as_deref(),
+            );
+            let project_root = app_paths.data_root;
+            let resource_root = app_paths.resource_root;
             let workspace_dir = project_root.join("workspace");
             let initial_preview_root = if workspace_dir.is_dir() {
                 Some(workspace_dir)
@@ -31,16 +38,20 @@ pub fn run() {
             };
 
             let db = Arc::new(
-                storage::sqlite::SqliteDatabase::open(project_root.join("database.db"))
-                    .map_err(|err| Box::new(std::io::Error::other(err)) as Box<dyn std::error::Error>)?,
+                storage::sqlite::SqliteDatabase::open(project_root.join("database.db")).map_err(
+                    |err| Box::new(std::io::Error::other(err)) as Box<dyn std::error::Error>,
+                )?,
             );
             let study_store = Arc::new(
                 storage::study_store::StudyStore::open(project_root.join("data").join("study"))
-                    .map_err(|err| Box::new(std::io::Error::other(err)) as Box<dyn std::error::Error>)?,
+                    .map_err(|err| {
+                        Box::new(std::io::Error::other(err)) as Box<dyn std::error::Error>
+                    })?,
             );
 
             let worker_config =
                 workers::supervisor::WorkerSupervisorConfig::for_workspace(project_root.clone())
+                    .with_resource_root(resource_root.clone())
                     .with_canonical_db_path(db.database_path().to_path_buf());
             let worker_supervisor = Arc::new(workers::supervisor::WorkerSupervisor::new(worker_config));
             let permission_gateway = Arc::new(permissions::gateway::PermissionGateway::new(
@@ -58,6 +69,7 @@ pub fn run() {
             let gateway_for_setup = Arc::clone(&permission_gateway);
             let workers_for_setup = Arc::clone(&worker_supervisor);
             let root_for_loopback = project_root.clone();
+            let resource_for_loopback = resource_root.clone();
             let (loopback, preview) = tauri::async_runtime::block_on(async move {
                 gateway_for_setup
                     .set_notifier(Arc::new(move |record| {
@@ -77,9 +89,12 @@ pub fn run() {
                         gateway_for_setup,
                     ))
                     .await;
-                let loopback = protocol::loopback::LoopbackHandle::start(root_for_loopback)
-                    .await
-                    .map_err(|err| Box::new(err) as Box<dyn std::error::Error>)?;
+                let loopback = protocol::loopback::LoopbackHandle::start_with_roots(
+                    root_for_loopback,
+                    resource_for_loopback,
+                )
+                .await
+                .map_err(|err| Box::new(err) as Box<dyn std::error::Error>)?;
                 let preview = process::preview_server::PreviewServerHandle::start(
                     initial_preview_root,
                 )
@@ -94,6 +109,7 @@ pub fn run() {
             );
             app.manage(commands::media::RuntimeServices {
                 project_root,
+                resource_root,
                 db,
                 study_store,
                 loopback,

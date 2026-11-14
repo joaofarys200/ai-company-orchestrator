@@ -58,6 +58,7 @@ pub struct MediaTicketResponse {
 #[derive(Clone)]
 struct LoopbackState {
     project_root: PathBuf,
+    resource_root: PathBuf,
     port: u16,
     token: String,
     hmac_key: [u8; 32],
@@ -73,7 +74,17 @@ pub struct LoopbackHandle {
 impl LoopbackHandle {
     /// Binds to an ephemeral `127.0.0.1:0` port and spawns the authenticated Axum server.
     pub async fn start(project_root: PathBuf) -> Result<Self, AppError> {
+        let res = project_root.clone();
+        Self::start_with_roots(project_root, res).await
+    }
+
+    /// Binds to an ephemeral `127.0.0.1:0` port using separate writable `project_root` and read-only `resource_root`.
+    pub async fn start_with_roots(
+        project_root: PathBuf,
+        resource_root: PathBuf,
+    ) -> Result<Self, AppError> {
         let canon_root = dunce::canonicalize(&project_root).unwrap_or(project_root);
+        let canon_resource = dunce::canonicalize(&resource_root).unwrap_or(resource_root);
 
         let mut token_bytes = [0u8; 32];
         let mut hmac_key = [0u8; 32];
@@ -103,6 +114,7 @@ impl LoopbackHandle {
         let base_url = format!("http://127.0.0.1:{port}");
         let state = LoopbackState {
             project_root: canon_root,
+            resource_root: canon_resource,
             port,
             token,
             hmac_key,
@@ -301,6 +313,15 @@ async fn handle_pdf_worker(
             &state.project_root.join("frontend").join("public"),
             Path::new("pdf.worker.min.mjs"),
         )
+    })
+    .or_else(|_| {
+        ensure_confined_existing_file(
+            &state.resource_root.join("frontend").join("dist"),
+            Path::new("pdf.worker.min.mjs"),
+        )
+    })
+    .or_else(|_| {
+        ensure_confined_existing_file(&state.resource_root, Path::new("pdf.worker.min.mjs"))
     });
 
     let _ = (dist_candidate, pub_candidate);

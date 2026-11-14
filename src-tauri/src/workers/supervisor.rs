@@ -70,6 +70,7 @@ impl WorkerPoolRole {
 #[derive(Debug, Clone)]
 pub struct WorkerSupervisorConfig {
     pub workspace_root: PathBuf,
+    pub resource_root: Option<PathBuf>,
     pub canonical_db_path: Option<PathBuf>,
     pub python_executable: Option<PathBuf>,
     pub heartbeat_interval: Duration,
@@ -86,6 +87,7 @@ impl WorkerSupervisorConfig {
     pub fn for_workspace(workspace_root: PathBuf) -> Self {
         Self {
             workspace_root,
+            resource_root: None,
             canonical_db_path: None,
             python_executable: None,
             heartbeat_interval: Duration::from_secs(5),
@@ -97,6 +99,11 @@ impl WorkerSupervisorConfig {
             base_backoff: Duration::from_secs(1),
             init_params: json!({}),
         }
+    }
+
+    pub fn with_resource_root(mut self, resource_root: PathBuf) -> Self {
+        self.resource_root = Some(resource_root);
+        self
     }
 
     pub fn with_canonical_db_path(mut self, db_path: PathBuf) -> Self {
@@ -353,7 +360,23 @@ impl ManagedWorker {
         config: &WorkerSupervisorConfig,
         reverse_handler: Arc<RwLock<Option<ReverseRpcHandler>>>,
     ) -> Result<Arc<Self>, RpcCallError> {
-        let script_path = config.workspace_root.join("workers").join("worker_boot.py");
+        let code_root = config
+            .resource_root
+            .as_deref()
+            .unwrap_or(&config.workspace_root);
+        let script_candidates = [
+            code_root.join("workers").join("worker_boot.py"),
+            code_root
+                .join("_up_")
+                .join("workers")
+                .join("worker_boot.py"),
+            config.workspace_root.join("workers").join("worker_boot.py"),
+        ];
+        let script_path = script_candidates
+            .iter()
+            .find(|p| p.is_file())
+            .cloned()
+            .unwrap_or_else(|| script_candidates[0].clone());
         if !script_path.is_file() {
             return Err(RpcCallError::Protocol(format!(
                 "Worker bootstrapper not found: {}",
@@ -361,8 +384,18 @@ impl ManagedWorker {
             )));
         }
 
-        let python_bin =
-            resolve_python_executable(&config.workspace_root, config.python_executable.as_deref());
+        let python_bin = {
+            let from_code =
+                resolve_python_executable(code_root, config.python_executable.as_deref());
+            if from_code != Path::new("python") {
+                from_code
+            } else {
+                resolve_python_executable(
+                    &config.workspace_root,
+                    config.python_executable.as_deref(),
+                )
+            }
+        };
         let raw_canonical_db = config
             .canonical_db_path
             .clone()
@@ -379,8 +412,12 @@ impl ManagedWorker {
         };
         let job = JobObject::with_default_memory_limit(config.max_memory_bytes)
             .map_err(RpcCallError::TransportClosed)?;
-        let worker_env =
+        let mut worker_env =
             build_worker_environment(role, &config.workspace_root, resolved_canonical_db.as_ref());
+        worker_env.insert(
+            "JARVIS_RESOURCE_ROOT".to_string(),
+            code_root.to_string_lossy().into_owned(),
+        );
 
         let mut cmd = Command::new(&python_bin);
         cmd.env_clear()

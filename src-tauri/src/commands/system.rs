@@ -5,7 +5,8 @@ use tauri_plugin_opener::OpenerExt;
 
 use crate::error::AppError;
 use crate::permissions::path_jail::{
-    default_open_roots, resolve_project_root, validate_open_target, ValidatedOpenTarget,
+    default_open_roots, resolve_app_paths, resolve_project_root, validate_open_target,
+    ValidatedOpenTarget,
 };
 use crate::{APP_DISPLAY_NAME, SHELL_NAME};
 
@@ -27,6 +28,8 @@ pub struct SystemInfo {
     pub os: String,
     pub arch: String,
     pub project_root: String,
+    pub resource_root: String,
+    pub is_packaged: bool,
     pub dialog_supported: bool,
     pub native_open_supported: bool,
 }
@@ -47,14 +50,16 @@ pub fn build_ping_response(app_version: &str) -> PingResponse {
 }
 
 pub fn build_system_info(app_version: &str) -> SystemInfo {
-    let root = resolve_project_root();
+    let paths = resolve_app_paths(None, None);
     SystemInfo {
         shell: SHELL_NAME.to_string(),
         app_name: APP_DISPLAY_NAME.to_string(),
         app_version: app_version.to_string(),
         os: std::env::consts::OS.to_string(),
         arch: std::env::consts::ARCH.to_string(),
-        project_root: root.to_string_lossy().to_string(),
+        project_root: paths.data_root.to_string_lossy().to_string(),
+        resource_root: paths.resource_root.to_string_lossy().to_string(),
+        is_packaged: paths.is_packaged,
         dialog_supported: true,
         native_open_supported: true,
     }
@@ -87,4 +92,3 @@ pub fn system_open_path(app: tauri::AppHandle, target: String) -> Result<(), App
             .map_err(|err| AppError::new("OPENER_PATH_FAILED", err.to_string())),
     }
 }
-

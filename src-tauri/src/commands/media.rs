@@ -23,6 +23,7 @@ pub struct ActiveDispatch {
 /// Managed runtime services started during Tauri shell setup.
 pub struct RuntimeServices {
     pub project_root: PathBuf,
+    pub resource_root: PathBuf,
     pub db: Arc<SqliteDatabase>,
     pub study_store: Arc<StudyStore>,
     pub loopback: LoopbackHandle,

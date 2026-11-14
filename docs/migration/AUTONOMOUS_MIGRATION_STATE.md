@@ -1,8 +1,8 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-14T15:30:00Z`
-- **Current Phase:** `Post-Audit Architectural Closure — Increment B2 (Native Rust Knowledge & Obsidian Vault)`
-- **Current Increment:** `Increment B2 Complete (Pending CI Validation): Native 15-Route Rust Knowledge Engine & WorkerPoolRole::Knowledge Retirement`
+- **Last Updated (UTC):** `2026-11-14T17:10:00Z`
+- **Current Phase:** `Post-Audit Architectural Closure — Complete (Increments A, B1, B2, B3, C, D)`
+- **Current Increment:** `Increment D Complete: Windows MSI/NSIS Packaging, %LOCALAPPDATA%\JarvisOS vs resource_dir Separation & Full Documentation Sync`
 - **Current Branch:** `migration/tauri-rust-complete`
 - **Main Baseline:** Untouched at `af11ae9095f4cfd8c8e01334704ffde282da9554` (awaiting user approval before merge)
 
@@ -118,13 +118,25 @@
   - Wired `crate::knowledge::dispatch::try_execute_knowledge_fast_path` and native `get_rules`/`get_notes` `trigger_initial_sync` in `src-tauri/src/commands/dispatch.rs`; exposed `pub mod knowledge;` in `src-tauri/src/lib.rs`.
   - Retired `WorkerPoolRole::Knowledge` from `WorkerPoolRole::production_roles()` (`src-tauri/src/workers/supervisor.rs`), `route_message_to_worker_role()`, and `trigger_initial_sync()` (`src-tauri/src/commands/dispatch.rs`) while retaining `workers/knowledge_worker.py` temporarily only for legacy Python contract/exclusivity tests.
   - Verified on Windows CI Run `#43611638532` (26/26 steps `success`).
-- **Increment B3 Complete (Pending Windows CI Validation):**
+- **Increment B3 Complete & Verified (`8e86865`, Windows CI Run `#43615209555`):**
   - Expanded `src-tauri/src/storage/study_catalog_ops.rs` with 11 remaining deterministic Study catalog/document/course/video routes (`study_get_document_file` with bounded reads & RFC 4648 base64, `study_get_document_ast` cached hit with cold PyMuPDF fallback to `StudyWorker`, `study_get_academic_reasoning`, `study_get_editorial_plan`, `study_get_generated_document_status`, `study_get_generated_document_file`, `study_review_flashcard`, `study_get_course_details`, `study_update_video_progress`, `study_search_video_transcript`, `study_get_video_context`).
   - Added `src-tauri/src/storage/study_modes_ops.rs` implementing all 20 deterministic Phase 6 `study_mode_*` routes (readiness checks, custom flashcard CRUD, SM-2 v6.0 spaced-repetition scheduling & history, Cornell Notes edit/annotation/Obsidian Vault export via `knowledge::vault::resolve_vault_root`, assessment & active-recall read getters, prioritized daily queues, learning progress & gap recomputation, and session lifecycle management), while preserving LLM synthesis routes on `StudyWorker`.
   - Added `src-tauri/src/commands/mission_dispatch.rs` for read-only `mission_list` observation (`state.db` via `SQLITE_OPEN_READ_ONLY` + `mission.json` fallback), strictly preserving ADR `state.db` write exclusivity on Python `MissionWorker`.
   - Added `src-tauri/src/sentinel/{watchdog_store,dispatch}.rs` and wired `Arc<SentinelWatchdog>` into `RuntimeServices` (`src-tauri/src/commands/media.rs`, `src-tauri/src/lib.rs`), handling all 10 `sentinel_*` routes natively in Rust via `Arc<SentinelScheduler>` (ShadowMode read-only default, Protected PID immunity, Windows host/startup/process/memory collectors, diff correlation, known-goods, human review, and action lifecycle) and retiring `sentinel_*` from Python `MissionWorker` routing (`src-tauri/src/commands/dispatch.rs`).
   - Retained Python workers strictly for non-deterministic ML/PDF/audio/mission-write responsibilities (`Ai`, `Study`, `Mission`, `Voice`).
-- **Next:** Validate Increment B3 on Windows CI (`cargo check --locked --all-targets`, `cargo test --locked`, `tauri build --no-bundle`, binary smoke boot), then execute **Increment C** (frontend/transport/loopback & worker supervisor hardening) and **Increment D** (Windows MSI/NSIS packaging + `%LOCALAPPDATA%` separation).
+  - Verified on Windows CI Run `#43615209555` (`cargo test --locked`: `50 passed; 0 failed` with 0 warnings; `jarvis-os.exe` release binary boot & SQLite WAL initialization).
+- **Increment C Complete & Verified (`8bbaf96`, Windows CI Run `#43617155326`):**
+  - Removed redundant uncompressed `frontend/public/pdf.worker.mjs` (retaining `pdf.worker.min.mjs`).
+  - Fixed invalid outer `<motion.g>` wrapping `<svg>` in `frontend/src/features/workspace/HologramCore.tsx` and nested `<button>` inside `<button>` in `frontend/src/features/workspace/CodeEditor.tsx`.
+  - Updated `frontend/src/features/study/StudyReaderView.tsx`, `frontend/src/features/study/StudyVideoReaderView.tsx`, and `frontend/src/transport/TauriTransportAdapter.ts` (`fallbackMediaBaseUrl`, ticket-only native URLs, no `?token=` query leakage) + added regression tests in `frontend/src/transport/__tests__/tauriTransport.test.ts` (`16 passed; 0 failed`).
+  - Hardened `src-tauri/src/protocol/loopback.rs`: removed legacy `?token=` query auth from `authorize_doc_request` and `authorize_general_request`, confined relative `file_path` entries via `ensure_confined_existing_file(project_root, p)` + `validate_syntactic_path_safety`, and added TCP wire tests for `?token=` rejection (`401 Unauthorized`) and `/api/study/documents` Bearer auth (`200 OK`).
+  - Added `JobObject::DEFAULT_WORKER_MEMORY_LIMIT_BYTES` (`4 GiB`) and `JobObject::with_default_memory_limit` in `src-tauri/src/process/job_object.rs` + Win32 kernel `QueryInformationJobObject` verification test.
+  - Hardened `src-tauri/src/workers/supervisor.rs` with `cmd.env_clear()` and role-scoped `build_worker_environment` (allowlisting OS/Python/runtime variables and role-specific AI/Study/Voice/Mission keys while scrubbing `GITHUB_TOKEN`, `AWS_*`, `JARVIS_HTTP_TOKEN` and enforcing `JARVIS_DB_WRITE_OWNER=rust`).
+  - Verified on Windows CI Run `#43617155326` (`cargo test --locked`: `52 passed; 0 failed`; all 21 workflow steps `success`).
+- **Increment D Complete (`%LOCALAPPDATA%\JarvisOS` vs `resource_dir` Separation & Windows MSI/NSIS Packaging):**
+  - Implemented `AppPaths`, `resolve_app_paths`, `resolve_app_paths_with_overrides`, and `ensure_writable_data_subdirs` in `src-tauri/src/permissions/path_jail.rs`, separating mutable runtime state (`data_root` -> `%LOCALAPPDATA%\JarvisOS` in installed builds) from read-only application resources (`resource_root` -> Tauri `resource_dir()`) while preserving developer checkouts and `JARVIS_PROJECT_ROOT` CI overrides.
+  - Threaded `resource_root` and `data_root` across `src-tauri/src/lib.rs`, `src-tauri/src/commands/{media,system}.rs`, `src-tauri/src/protocol/loopback.rs` (`LoopbackHandle::start_with_roots`), `src-tauri/src/workers/supervisor.rs` (`with_resource_root`, `JARVIS_RESOURCE_ROOT`), and `workers/common/domain_bridge.py` (`JARVIS_PROJECT_ROOT` fallback).
+  - Configured `src-tauri/tauri.conf.json` (`"targets": ["msi", "nsis"]` and bundled `workers/*.py` + `workers/common/*.py` resources) and expanded `.github/workflows/tauri-windows-validation.yml` to verify MSI + NSIS installer generation, packaged clean-install launch in `%LOCALAPPDATA%\JarvisOS` with zero writes to `installDir`, and in-place upgrade state persistence.
 
 ---
 

@@ -116,10 +116,15 @@ class DomainWorkerRuntime:
         if worker_type not in WORKER_ROLE_DOMAINS:
             raise ValueError(f"Unsupported domain worker role: {worker_type}")
         self.worker_type = worker_type
+        env_project_root = os.environ.get("JARVIS_PROJECT_ROOT", "").strip()
         self.project_root = str(
             Path(project_root).resolve()
             if project_root is not None
-            else Path(__file__).resolve().parents[2]
+            else (
+                Path(env_project_root).resolve()
+                if env_project_root
+                else Path(__file__).resolve().parents[2]
+            )
         )
         self.logger = get_logger(f"worker.{worker_type}")
         self.session_state = WebSocketSessionState()

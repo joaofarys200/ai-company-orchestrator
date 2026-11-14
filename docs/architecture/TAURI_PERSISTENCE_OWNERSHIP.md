@@ -141,3 +141,8 @@ Quando aprovada formalmente para execução em produção na Stage 4:
 5. Validação de contagens e hashes SHA256 antes do commit.
 6. Atualização segura dos ponteiros de configuração do `ModelHarness`.
 7. Em caso de discrepância, `ROLLBACK` atómico e restauro imediato do `.bak`.
+
+### 4.5 Verificação de Exclusividade de Escrita em Produção (Incrementos A–D)
+- **Propriedade exclusiva de `database.db` em Rust (`src-tauri/src/storage/sqlite.rs`):** Todas as mutações de `sessions`, `projects`, `messages`, `compounding_rules`, `architecture_memory`, `engineering_decisions` e `model_trajectories` em `database.db` são executadas exclusivamente pelo escritor único Rust (`Mutex<Connection>` em `WAL` + `busy_timeout=10000`).
+- **Guarda em Workers Python (`workers/common/db_guard.py` + `src-tauri/src/workers/reverse_rpc.rs`):** Todos os workers recebem `JARVIS_DB_WRITE_OWNER=rust` e `JARVIS_CANONICAL_DB_PATH`; chamadas em `database.py` e `backend/model_harness/rho.py` sobre `database.db` são encaminhadas via Reverse-RPC síncrono para `sqlite.*` no supervisor Rust, bloqueando qualquer escrita direta SQLite a partir do Python enquanto preservam `state.db` (`MissionWorker`) e `data/rho.db` (`ModelHarness`).
+- **Separação `%LOCALAPPDATA%\JarvisOS` vs `resource_dir` (`src-tauri/src/permissions/path_jail.rs`):** Em builds instaladas (MSI/NSIS), `database.db`, `data/study/`, `data/sentinel/`, `obsidian_vault/` e `workspace/` residem em `%LOCALAPPDATA%\JarvisOS` (`data_root`), mantendo `resource_dir` estritamente read-only e preservando dados entre upgrades.
