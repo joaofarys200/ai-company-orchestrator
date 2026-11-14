@@ -5,6 +5,7 @@ import psutil
 from datetime import datetime
 
 from persistence.db import CANONICAL_DB_PATH, get_db_connection
+from workers.common.db_guard import should_route_canonical_db_via_rpc
 
 
 class RuntimeObserver:
@@ -31,7 +32,11 @@ class RuntimeObserver:
         
     def get_db_metrics(self):
         try:
-            with closing(get_db_connection(self.db_path)) as conn:
+            use_rpc, rpc = should_route_canonical_db_via_rpc(self.db_path)
+            if use_rpc and rpc is not None:
+                return rpc.send_reverse_request_sync("sqlite.runtime_db_metrics", {})
+
+            with closing(get_db_connection(self.db_path, read_only=True)) as conn:
                 cursor = conn.cursor()
 
                 # Conta sessões totais

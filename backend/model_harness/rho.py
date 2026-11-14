@@ -13,6 +13,12 @@ from persistence.db import (
     get_db_connection,
     write_transaction,
 )
+from workers.common.db_guard import (
+    is_canonical_db_target,
+    is_rust_write_owner,
+    is_worker_guard_installed,
+    should_route_canonical_db_via_rpc,
+)
 
 
 DB_PATH = CANONICAL_DB_PATH
@@ -36,11 +42,23 @@ class RetrospectiveEngine:
     compounding self-healing rules when validation failures repeat 2+ times.
     """
 
-    def __init__(self, db_path: Path | str = DB_PATH):
-        self.db_path = Path(db_path)
+    def __init__(self, db_path: Path | str | None = None):
+        self.db_path = Path(db_path) if db_path is not None else CANONICAL_DB_PATH
         self._init_db()
 
     def _init_db(self) -> None:
+        use_rpc, rpc = should_route_canonical_db_via_rpc(self.db_path)
+        if use_rpc and rpc is not None:
+            rpc.send_reverse_request_sync("sqlite.rho_ensure_schema", {})
+            return
+        # Unbridged standalone worker boot (without Rust supervisor) defers schema DDL safely
+        # while direct writes/trajectories still fail closed.
+        if (
+            is_worker_guard_installed()
+            and not is_rust_write_owner()
+            and is_canonical_db_target(self.db_path)
+        ):
+            return
         with write_transaction(self.db_path) as conn:
             ensure_rho_schema(conn)
 
@@ -51,6 +69,21 @@ class RetrospectiveEngine:
             failure_reason = f"{response.validation.issues[0].stage.value}:{response.validation.issues[0].code}"
         elif response.errors:
             failure_reason = str(response.errors[0].get("message", "unknown_error"))
+
+        use_rpc, rpc = should_route_canonical_db_via_rpc(self.db_path)
+        if use_rpc and rpc is not None:
+            rpc.send_reverse_request_sync(
+                "sqlite.rho_record_trajectory",
+                {
+                    "request_id": request.request_id,
+                    "task_profile": request.task_profile,
+                    "fingerprint": request.fingerprint(),
+                    "status": response.status.value,
+                    "attempts_count": len(response.recovery) + 1,
+                    "failure_reason": failure_reason,
+                },
+            )
+            return
 
         with write_transaction(self.db_path) as conn:
             conn.execute(
@@ -97,8 +130,23 @@ class RetrospectiveEngine:
 
     def get_compounding_rules(self, task_profile: str) -> list[str]:
         """Fetches active RHO compounding rules for a task profile."""
-        with closing(get_db_connection(self.db_path)) as conn:
+        use_rpc, rpc = should_route_canonical_db_via_rpc(self.db_path)
+        if use_rpc and rpc is not None:
+            return list(
+                rpc.send_reverse_request_sync(
+                    "sqlite.rho_get_compounding_rules",
+                    {"task_profile": task_profile, "limit": 5},
+                )
+                or []
+            )
+
+        with closing(get_db_connection(self.db_path, read_only=True)) as conn:
             cur = conn.cursor()
+            has_table = cur.execute(
+                "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'rho_compounding_rules'"
+            ).fetchone()[0]
+            if not has_table:
+                return []
             cur.execute(
                 """
                 SELECT rule_text FROM rho_compounding_rules

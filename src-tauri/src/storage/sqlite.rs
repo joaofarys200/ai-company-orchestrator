@@ -117,6 +117,130 @@ fn utc_now_iso() -> String {
     Utc::now().to_rfc3339_opts(SecondsFormat::Micros, true)
 }
 
+fn unix_now_seconds_f64() -> f64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs_f64())
+        .unwrap_or(0.0)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct RhoTrajectoryOutcome {
+    pub trajectory_id: i64,
+    pub failure_count: i64,
+    pub synthesized_rule: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct RuntimeDbMetrics {
+    pub sqlite_online: bool,
+    pub total_sessions: i64,
+    pub total_events_in_log: i64,
+}
+
+fn find_longest_match(
+    a: &[char],
+    b: &[char],
+    alo: usize,
+    ahi: usize,
+    blo: usize,
+    bhi: usize,
+) -> (usize, usize, usize) {
+    let mut besti = alo;
+    let mut bestj = blo;
+    let mut bestsize = 0usize;
+    let mut j2len: std::collections::HashMap<usize, usize> = std::collections::HashMap::new();
+    for (i_off, &ch_a) in a[alo..ahi].iter().enumerate() {
+        let i = alo + i_off;
+        let mut newj2len: std::collections::HashMap<usize, usize> =
+            std::collections::HashMap::new();
+        for (j_off, &ch_b) in b[blo..bhi].iter().enumerate() {
+            if ch_a != ch_b {
+                continue;
+            }
+            let j = blo + j_off;
+            let prev = j
+                .checked_sub(1)
+                .and_then(|p| j2len.get(&p).copied())
+                .unwrap_or(0);
+            let k = prev + 1;
+            newj2len.insert(j, k);
+            if k > bestsize {
+                besti = i + 1 - k;
+                bestj = j + 1 - k;
+                bestsize = k;
+            }
+        }
+        j2len = newj2len;
+    }
+    (besti, bestj, bestsize)
+}
+
+fn matching_character_count(a: &[char], b: &[char]) -> usize {
+    let mut queue = vec![(0usize, a.len(), 0usize, b.len())];
+    let mut total = 0usize;
+    while let Some((alo, ahi, blo, bhi)) = queue.pop() {
+        let (i, j, k) = find_longest_match(a, b, alo, ahi, blo, bhi);
+        if k > 0 {
+            total += k;
+            if alo < i && blo < j {
+                queue.push((alo, i, blo, j));
+            }
+            if i + k < ahi && j + k < bhi {
+                queue.push((i + k, ahi, j + k, bhi));
+            }
+        }
+    }
+    total
+}
+
+/// Computes normalized alphanumeric + Latin-1 similarity identical to Python `database.get_similarity`.
+pub fn normalized_similarity(s1: &str, s2: &str) -> f64 {
+    fn clean(s: &str) -> Vec<char> {
+        s.to_lowercase()
+            .chars()
+            .filter(|ch| matches!(ch, 'a'..='z' | '0'..='9' | '\u{00C0}'..='\u{00FF}'))
+            .collect()
+    }
+    let c1 = clean(s1);
+    let c2 = clean(s2);
+    if c1.is_empty() || c2.is_empty() {
+        return 0.0;
+    }
+    let matches = matching_character_count(&c1, &c2);
+    (2.0 * matches as f64) / ((c1.len() + c2.len()) as f64)
+}
+
+fn ensure_rho_schema_on_conn(conn: &Connection) -> Result<(), String> {
+    conn.execute_batch(
+        "
+        CREATE TABLE IF NOT EXISTS model_trajectories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            request_id TEXT NOT NULL,
+            task_profile TEXT NOT NULL,
+            fingerprint TEXT NOT NULL,
+            status TEXT NOT NULL,
+            attempts_count INTEGER NOT NULL,
+            failure_reason TEXT,
+            created_at REAL NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS rho_compounding_rules (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            task_profile TEXT NOT NULL,
+            rule_text TEXT NOT NULL,
+            failure_trigger TEXT NOT NULL,
+            occurrences INTEGER DEFAULT 1,
+            created_at REAL NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_model_trajectories_pattern
+        ON model_trajectories (task_profile, failure_reason, created_at);
+        CREATE INDEX IF NOT EXISTS idx_rho_rules_task_profile_id
+        ON rho_compounding_rules (task_profile, id DESC);
+        ",
+    )
+    .map_err(|e| format!("ensure_rho_schema failed: {e}"))
+}
+
 #[derive(Clone)]
 pub struct SqliteDatabase {
     db_path: Arc<PathBuf>,
@@ -435,8 +559,8 @@ impl SqliteDatabase {
                 conn.execute(
                     "UPDATE projects
                      SET name = ?1, description = ?2, html_content = ?3, css_content = ?4, js_content = ?5
-                     WHERE id = ?6",
-                    params![name, description, html, css, js, id],
+                     WHERE session_id = ?6",
+                    params![name, description, html, css, js, session_id],
                 )
                 .map_err(|e| format!("save_project update failed: {e}"))?;
 
@@ -551,12 +675,41 @@ impl SqliteDatabase {
         let correction = correction.into();
         let created_at = utc_now_iso();
         self.write_with(move |conn| {
+            let existing: Vec<(Option<String>, Option<String>)> = {
+                let mut stmt = conn
+                    .prepare("SELECT rule_key, correction FROM compounding_memory ORDER BY id ASC")
+                    .map_err(|e| format!("add_compounding_rule scan failed: {e}"))?;
+                let rows = stmt
+                    .query_map([], |row| Ok((row.get(0)?, row.get(1)?)))
+                    .map_err(|e| format!("add_compounding_rule query failed: {e}"))?;
+                rows.collect::<Result<Vec<_>, _>>()
+                    .map_err(|e| format!("add_compounding_rule collect failed: {e}"))?
+            };
+
+            let target_key_lower = rule_key.to_lowercase();
+            for (ext_key_opt, ext_corr_opt) in existing {
+                let Some(ext_key) = ext_key_opt else {
+                    continue;
+                };
+                let ext_corr = ext_corr_opt.unwrap_or_default();
+                if target_key_lower == ext_key.to_lowercase()
+                    || normalized_similarity(&correction, &ext_corr) > 0.75
+                    || normalized_similarity(&rule_key, &ext_key) > 0.85
+                {
+                    conn.execute(
+                        "UPDATE compounding_memory
+                         SET description = ?1, correction = ?2, created_at = ?3
+                         WHERE rule_key = ?4",
+                        params![description, correction, created_at, ext_key],
+                    )
+                    .map_err(|e| format!("add_compounding_rule update failed: {e}"))?;
+                    return Ok(());
+                }
+            }
+
             conn.execute(
                 "INSERT INTO compounding_memory (rule_key, description, correction, created_at)
-                 VALUES (?1, ?2, ?3, ?4)
-                 ON CONFLICT(rule_key) DO UPDATE SET
-                   description = excluded.description,
-                   correction = excluded.correction",
+                 VALUES (?1, ?2, ?3, ?4)",
                 params![rule_key, description, correction, created_at],
             )
             .map_err(|e| format!("add_compounding_rule failed: {e}"))?;
@@ -727,14 +880,66 @@ impl SqliteDatabase {
         let decision = decision.into();
         let reason = reason.into();
         let impact_str = impact.into();
-        let impact_opt = if impact_str.is_empty() {
-            None
-        } else {
-            Some(impact_str)
-        };
         let created_at = utc_now_iso();
 
         self.write_with(move |conn| {
+            let existing: Vec<(i64, String, String, Option<String>)> = {
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT id, decision, reason, impact
+                         FROM engineering_decisions ORDER BY id ASC",
+                    )
+                    .map_err(|e| format!("add_engineering_decision scan failed: {e}"))?;
+                let rows = stmt
+                    .query_map([], |row| {
+                        Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?))
+                    })
+                    .map_err(|e| format!("add_engineering_decision query failed: {e}"))?;
+                rows.collect::<Result<Vec<_>, _>>()
+                    .map_err(|e| format!("add_engineering_decision collect failed: {e}"))?
+            };
+
+            for (existing_id, ext_dec, ext_reason, ext_impact) in existing {
+                if normalized_similarity(&decision, &ext_dec) > 0.8 {
+                    let mut merged_reason = ext_reason.clone();
+                    if !reason.is_empty() && !ext_reason.contains(&reason) {
+                        merged_reason.push_str(" | ");
+                        merged_reason.push_str(&reason);
+                    }
+                    let mut merged_impact = ext_impact.unwrap_or_default();
+                    if !impact_str.is_empty() && !merged_impact.contains(&impact_str) {
+                        if !merged_impact.is_empty() {
+                            merged_impact.push_str(" | ");
+                        }
+                        merged_impact.push_str(&impact_str);
+                    }
+                    let impact_for_db = if merged_impact.is_empty() {
+                        None
+                    } else {
+                        Some(merged_impact)
+                    };
+                    conn.execute(
+                        "UPDATE engineering_decisions
+                         SET reason = ?1, impact = ?2, created_at = ?3
+                         WHERE decision = ?4",
+                        params![merged_reason, impact_for_db, created_at, ext_dec],
+                    )
+                    .map_err(|e| format!("add_engineering_decision update failed: {e}"))?;
+                    return Ok(EngineeringDecisionRecord {
+                        id: existing_id,
+                        decision: ext_dec,
+                        reason: merged_reason,
+                        impact: impact_for_db,
+                        created_at,
+                    });
+                }
+            }
+
+            let impact_opt = if impact_str.is_empty() {
+                None
+            } else {
+                Some(impact_str)
+            };
             conn.execute(
                 "INSERT INTO engineering_decisions (decision, reason, impact, created_at)
                  VALUES (?1, ?2, ?3, ?4)",
@@ -894,6 +1099,141 @@ impl SqliteDatabase {
                 .map_err(|e| format!("list_event_logs query failed: {e}"))?;
             rows.collect::<Result<Vec<_>, _>>()
                 .map_err(|e| format!("list_event_logs collect failed: {e}"))
+        })
+        .await
+    }
+
+    pub async fn rho_ensure_schema(&self) -> Result<(), String> {
+        self.write_with(|conn| ensure_rho_schema_on_conn(conn)).await
+    }
+
+    pub async fn rho_record_trajectory(
+        &self,
+        request_id: impl Into<String>,
+        task_profile: impl Into<String>,
+        fingerprint: impl Into<String>,
+        status: impl Into<String>,
+        attempts_count: i64,
+        failure_reason: impl Into<String>,
+        created_at: Option<f64>,
+    ) -> Result<RhoTrajectoryOutcome, String> {
+        let request_id = request_id.into();
+        let task_profile = task_profile.into();
+        let fingerprint = fingerprint.into();
+        let status = status.into();
+        let failure_reason = failure_reason.into();
+        let now_ts = created_at.unwrap_or_else(unix_now_seconds_f64);
+
+        self.write_with(move |conn| {
+            let tx = conn
+                .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
+                .map_err(|e| format!("rho_record_trajectory begin immediate failed: {e}"))?;
+            ensure_rho_schema_on_conn(&tx)?;
+
+            tx.execute(
+                "INSERT INTO model_trajectories
+                 (request_id, task_profile, fingerprint, status, attempts_count, failure_reason, created_at)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                params![
+                    request_id,
+                    task_profile,
+                    fingerprint,
+                    status,
+                    attempts_count,
+                    failure_reason,
+                    now_ts
+                ],
+            )
+            .map_err(|e| format!("rho_record_trajectory insert failed: {e}"))?;
+            let trajectory_id = tx.last_insert_rowid();
+
+            let mut failure_count = 0_i64;
+            let mut synthesized_rule = None;
+            if !status.eq_ignore_ascii_case("succeeded") && !failure_reason.trim().is_empty() {
+                let cutoff = now_ts - 3600.0;
+                failure_count = tx
+                    .query_row(
+                        "SELECT COUNT(*) FROM model_trajectories
+                         WHERE task_profile = ?1 AND failure_reason = ?2 AND created_at > ?3",
+                        params![task_profile, failure_reason, cutoff],
+                        |row| row.get(0),
+                    )
+                    .map_err(|e| format!("rho_record_trajectory failure count failed: {e}"))?;
+
+                if failure_count >= 2 {
+                    let rule_text = format!(
+                        "AUTO-RULE [RHO-{task_profile}]: Evita falha {failure_reason}. Garanta estrita conformidade com argumentos de ferramentas e formatos JSON."
+                    );
+                    tx.execute(
+                        "INSERT INTO rho_compounding_rules (task_profile, rule_text, failure_trigger, created_at)
+                         VALUES (?1, ?2, ?3, ?4)",
+                        params![task_profile, rule_text, failure_reason, now_ts],
+                    )
+                    .map_err(|e| format!("rho_record_trajectory rule insert failed: {e}"))?;
+                    synthesized_rule = Some(rule_text);
+                }
+            }
+
+            tx.commit()
+                .map_err(|e| format!("rho_record_trajectory commit failed: {e}"))?;
+
+            Ok(RhoTrajectoryOutcome {
+                trajectory_id,
+                failure_count,
+                synthesized_rule,
+            })
+        })
+        .await
+    }
+
+    pub async fn rho_get_compounding_rules(
+        &self,
+        task_profile: impl Into<String>,
+        limit: i64,
+    ) -> Result<Vec<String>, String> {
+        let task_profile = task_profile.into();
+        let clamped = limit.clamp(1, 100);
+        self.read_with(move |conn| {
+            let table_exists: i64 = conn
+                .query_row(
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'rho_compounding_rules'",
+                    [],
+                    |row| row.get(0),
+                )
+                .map_err(|e| format!("rho_get_compounding_rules table check failed: {e}"))?;
+            if table_exists == 0 {
+                return Ok(Vec::new());
+            }
+
+            let mut stmt = conn
+                .prepare(
+                    "SELECT rule_text FROM rho_compounding_rules
+                     WHERE task_profile = ?1
+                     ORDER BY id DESC LIMIT ?2",
+                )
+                .map_err(|e| format!("rho_get_compounding_rules prepare failed: {e}"))?;
+            let rows = stmt
+                .query_map(params![task_profile, clamped], |row| row.get(0))
+                .map_err(|e| format!("rho_get_compounding_rules query failed: {e}"))?;
+            rows.collect::<Result<Vec<String>, _>>()
+                .map_err(|e| format!("rho_get_compounding_rules collect failed: {e}"))
+        })
+        .await
+    }
+
+    pub async fn runtime_db_metrics(&self) -> Result<RuntimeDbMetrics, String> {
+        self.read_with(|conn| {
+            let total_sessions: i64 = conn
+                .query_row("SELECT COUNT(*) FROM sessions", [], |row| row.get(0))
+                .map_err(|e| format!("runtime_db_metrics sessions count failed: {e}"))?;
+            let total_events_in_log: i64 = conn
+                .query_row("SELECT COUNT(*) FROM event_sourcing_log", [], |row| row.get(0))
+                .map_err(|e| format!("runtime_db_metrics events count failed: {e}"))?;
+            Ok(RuntimeDbMetrics {
+                sqlite_online: true,
+                total_sessions,
+                total_events_in_log,
+            })
         })
         .await
     }
@@ -1058,5 +1398,149 @@ mod tests {
 
         db.append_event_log("PHASE_3", Some("ok".into())).await.unwrap();
         assert_eq!(db.list_event_logs(10).await.unwrap().len(), 1);
+    }
+
+    #[tokio::test]
+    async fn fuzzy_dedup_matches_python_similarity_semantics() {
+        let dir = tempdir().expect("create tempdir");
+        let db = SqliteDatabase::open(dir.path().join("similarity.db")).expect("open sqlite");
+
+        // Case-insensitive rule_key and >0.75 correction similarity deduplicate in place.
+        db.add_compounding_rule("StrictJSON", "v1", "Always emit valid JSON output strictly")
+            .await
+            .unwrap();
+        db.add_compounding_rule("strictjson", "v2", "Replaced via case-insensitive match")
+            .await
+            .unwrap();
+        db.add_compounding_rule(
+            "DifferentKeyName",
+            "v3",
+            "Replaced via case-insensitive match!",
+        )
+        .await
+        .unwrap();
+        let rules = db.get_compounding_rules().await.unwrap();
+        assert_eq!(rules.len(), 1);
+        assert_eq!(rules[0].rule_key, "StrictJSON");
+        assert_eq!(rules[0].description.as_deref(), Some("v3"));
+
+        // >0.80 engineering decision similarity merges reason & impact with " | ".
+        db.add_engineering_decision(
+            "Adopt Tauri IPC transport layer",
+            "Lower latency",
+            "Safer boundary",
+        )
+        .await
+        .unwrap();
+        db.add_engineering_decision(
+            "Adopt Tauri IPC transport layers",
+            "Single writer owner",
+            "Cleaner packaging",
+        )
+        .await
+        .unwrap();
+        let decisions = db.get_engineering_decisions().await.unwrap();
+        assert_eq!(decisions.len(), 1);
+        assert_eq!(decisions[0].reason, "Lower latency | Single writer owner");
+        assert_eq!(
+            decisions[0].impact.as_deref(),
+            Some("Safer boundary | Cleaner packaging")
+        );
+
+        let metrics = db.runtime_db_metrics().await.unwrap();
+        assert!(metrics.sqlite_online);
+        assert_eq!(metrics.total_sessions, 0);
+        assert_eq!(metrics.total_events_in_log, 0);
+    }
+
+    #[tokio::test]
+    async fn rho_records_trajectories_and_synthesizes_compounding_rules_transactionally() {
+        let dir = tempdir().expect("create tempdir");
+        let db = SqliteDatabase::open(dir.path().join("rho.db")).expect("open sqlite");
+        db.rho_ensure_schema().await.unwrap();
+
+        let base_ts = 10_000.0;
+        // Stale failure older than 3600s does not count toward repeating pattern.
+        let old = db
+            .rho_record_trajectory(
+                "req-0",
+                "coder",
+                "fp0",
+                "VALIDATION_FAILED",
+                1,
+                "SCHEMA:missing_path",
+                Some(base_ts - 4000.0),
+            )
+            .await
+            .unwrap();
+        assert_eq!(old.failure_count, 1);
+        assert!(old.synthesized_rule.is_none());
+
+        // First recent failure still < 2 within 3600s window.
+        let first_recent = db
+            .rho_record_trajectory(
+                "req-1",
+                "coder",
+                "fp1",
+                "VALIDATION_FAILED",
+                2,
+                "SCHEMA:missing_path",
+                Some(base_ts),
+            )
+            .await
+            .unwrap();
+        assert_eq!(first_recent.failure_count, 1);
+        assert!(first_recent.synthesized_rule.is_none());
+
+        // Second recent failure within 3600s synthesizes an AUTO-RULE atomically.
+        let second_recent = db
+            .rho_record_trajectory(
+                "req-2",
+                "coder",
+                "fp2",
+                "PROVIDER_FAILED",
+                1,
+                "SCHEMA:missing_path",
+                Some(base_ts + 30.0),
+            )
+            .await
+            .unwrap();
+        assert_eq!(second_recent.failure_count, 2);
+        let rule = second_recent
+            .synthesized_rule
+            .expect("rule synthesized at 2+ recent failures");
+        assert!(rule.contains("AUTO-RULE [RHO-coder]: Evita falha SCHEMA:missing_path."));
+
+        // Concurrent RHO trajectory writes complete cleanly on single-writer actor.
+        let mut tasks = Vec::new();
+        for idx in 0..8 {
+            let db_clone = db.clone();
+            tasks.push(tokio::spawn(async move {
+                db_clone
+                    .rho_record_trajectory(
+                        format!("req-conc-{idx}"),
+                        "planner",
+                        format!("fp-{idx}"),
+                        "SUCCEEDED",
+                        1,
+                        "",
+                        Some(10_500.0 + idx as f64),
+                    )
+                    .await
+                    .unwrap()
+            }));
+        }
+        for t in tasks {
+            t.await.unwrap();
+        }
+
+        let coder_rules = db.rho_get_compounding_rules("coder", 5).await.unwrap();
+        assert_eq!(coder_rules.len(), 1);
+        assert_eq!(coder_rules[0], rule);
+        assert!(db
+            .rho_get_compounding_rules("planner", 5)
+            .await
+            .unwrap()
+            .is_empty());
     }
 }

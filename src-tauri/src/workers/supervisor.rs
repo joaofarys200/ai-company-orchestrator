@@ -76,6 +76,7 @@ impl WorkerPoolRole {
 #[derive(Debug, Clone)]
 pub struct WorkerSupervisorConfig {
     pub workspace_root: PathBuf,
+    pub canonical_db_path: Option<PathBuf>,
     pub python_executable: Option<PathBuf>,
     pub heartbeat_interval: Duration,
     pub heartbeat_timeout: Duration,
@@ -91,6 +92,7 @@ impl WorkerSupervisorConfig {
     pub fn for_workspace(workspace_root: PathBuf) -> Self {
         Self {
             workspace_root,
+            canonical_db_path: None,
             python_executable: None,
             heartbeat_interval: Duration::from_secs(5),
             heartbeat_timeout: Duration::from_secs(15),
@@ -101,6 +103,11 @@ impl WorkerSupervisorConfig {
             base_backoff: Duration::from_secs(1),
             init_params: json!({}),
         }
+    }
+
+    pub fn with_canonical_db_path(mut self, db_path: PathBuf) -> Self {
+        self.canonical_db_path = Some(db_path);
+        self
     }
 }
 
@@ -211,6 +218,21 @@ impl ManagedWorker {
 
         let python_bin =
             resolve_python_executable(&config.workspace_root, config.python_executable.as_deref());
+        let raw_canonical_db = config
+            .canonical_db_path
+            .clone()
+            .unwrap_or_else(|| config.workspace_root.join("database.db"));
+        let resolved_canonical_db = if raw_canonical_db.exists() {
+            dunce::canonicalize(&raw_canonical_db).unwrap_or(raw_canonical_db)
+        } else if let (Some(parent), Some(name)) =
+            (raw_canonical_db.parent(), raw_canonical_db.file_name())
+        {
+            let canon_parent =
+                dunce::canonicalize(parent).unwrap_or_else(|_| parent.to_path_buf());
+            canon_parent.join(name)
+        } else {
+            raw_canonical_db
+        };
         let job = JobObject::new(config.max_memory_bytes).map_err(RpcCallError::TransportClosed)?;
 
         let mut cmd = Command::new(&python_bin);
@@ -222,6 +244,9 @@ impl ManagedWorker {
             .env("PYTHONUNBUFFERED", "1")
             .env("PYTHONIOENCODING", "utf-8")
             .env("PYTHONDONTWRITEBYTECODE", "1")
+            .env("JARVIS_DB_WRITE_OWNER", "rust")
+            .env("JARVIS_CANONICAL_DB_PATH", &resolved_canonical_db)
+            .env("JARVIS_PROJECT_ROOT", &config.workspace_root)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -777,6 +802,64 @@ mod tests {
         let new_pid = health_after["pid"].as_u64().expect("pid present") as u32;
         assert_eq!(health_after["status"], "healthy");
         assert_ne!(new_pid, old_pid);
+
+        supervisor.shutdown_all().await;
+    }
+
+    #[tokio::test]
+    async fn supervisor_routes_real_worker_sqlite_via_reverse_rpc_exclusively() {
+        let temp_dir = tempfile::tempdir().expect("tempdir");
+        let canon_db = temp_dir.path().join("database.db");
+        let db = Arc::new(
+            crate::storage::sqlite::SqliteDatabase::open(&canon_db).expect("open sqlite db"),
+        );
+        db.add_compounding_rule("RUST_OWNED_RULE", "desc", "Always route via Rust")
+            .await
+            .expect("seed rule");
+        let permissions = Arc::new(crate::permissions::gateway::PermissionGateway::new(
+            Duration::from_secs(30),
+        ));
+
+        let mut cfg = WorkerSupervisorConfig::for_workspace(test_workspace_root())
+            .with_canonical_db_path(canon_db.clone());
+        cfg.ready_timeout = Duration::from_secs(30);
+        let supervisor = WorkerSupervisor::new(cfg);
+        supervisor
+            .set_reverse_handler(crate::workers::reverse_rpc::build_composite_reverse_rpc_handler(
+                Arc::clone(&db),
+                permissions,
+            ))
+            .await;
+
+        // Real production Knowledge worker triggers synchronous `database.get_compounding_rules()`
+        // and `database.delete_compounding_rule()` inside its event loop thread, transparently
+        // bridged over stdio Reverse-RPC to Rust's single-writer SqliteDatabase.
+        let get_res = supervisor
+            .call(
+                WorkerPoolRole::Knowledge,
+                "domain.dispatch",
+                json!({ "message": { "type": "get_rules" } }),
+                Duration::from_secs(30),
+            )
+            .await
+            .expect("knowledge worker get_rules via reverse RPC");
+        assert_eq!(get_res["status"], "ok");
+        let events = get_res["events"].as_array().expect("events array");
+        assert_eq!(events[0]["type"], "rules_list");
+        assert_eq!(events[0]["rules"].as_array().unwrap().len(), 1);
+        assert_eq!(events[0]["rules"][0]["rule_key"], "RUST_OWNED_RULE");
+
+        let del_res = supervisor
+            .call(
+                WorkerPoolRole::Knowledge,
+                "domain.dispatch",
+                json!({ "message": { "type": "delete_rule", "key": "RUST_OWNED_RULE" } }),
+                Duration::from_secs(15),
+            )
+            .await
+            .expect("knowledge worker delete_rule via reverse RPC");
+        assert_eq!(del_res["status"], "ok");
+        assert!(db.get_compounding_rules().await.unwrap().is_empty());
 
         supervisor.shutdown_all().await;
     }

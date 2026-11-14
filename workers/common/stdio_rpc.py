@@ -25,6 +25,14 @@ ERROR_MODEL_UNAVAILABLE = -32001
 
 RpcHandler = Callable[["WorkerContext", dict[str, Any]], Awaitable[Any]]
 
+_ACTIVE_RPC_LOCK = threading.Lock()
+_ACTIVE_RPC_SERVER: "WorkerRpcServer | None" = None
+
+
+def get_active_rpc_server() -> "WorkerRpcServer | None":
+    with _ACTIVE_RPC_LOCK:
+        return _ACTIVE_RPC_SERVER
+
 
 class TaskCancelledError(asyncio.CancelledError):
     """Raised when a worker task observes cooperative cancellation from Rust Core."""
@@ -342,12 +350,81 @@ class WorkerRpcServer:
         self._stdin = stdin_stream if stdin_stream is not None else sys.stdin
         self._handlers: dict[str, RpcHandler] = {}
         self._active_tasks: dict[str, _ActiveTask] = {}
-        self._reverse_futures: dict[str, asyncio.Future[dict[str, Any]]] = {}
+        self._reverse_futures: dict[str, asyncio.Future[Any]] = {}
+        self._sync_waiter_lock = threading.Lock()
+        self._sync_reverse_waiters: dict[str, tuple[threading.Event, dict[str, Any]]] = {}
+        self._reader_stopped = False
         self._config: dict[str, Any] = {}
         self._initialized = False
         self._loop: asyncio.AbstractEventLoop | None = None
 
         self.register("worker.init", self._handle_worker_init)
+
+    def _try_resolve_sync_reverse_response(self, raw_line: str) -> bool:
+        stripped = raw_line.strip()
+        if '"reverse_response"' not in stripped:
+            return False
+        try:
+            frame = json.loads(stripped)
+        except json.JSONDecodeError:
+            return False
+        if not isinstance(frame, dict) or frame.get("type") != "reverse_response":
+            return False
+        rev_id = str(frame.get("id") or "")
+        if not rev_id:
+            return False
+        with self._sync_waiter_lock:
+            waiter = self._sync_reverse_waiters.get(rev_id)
+        if waiter is None:
+            return False
+        event, box = waiter
+        box["frame"] = frame
+        event.set()
+        return True
+
+    def _abort_sync_reverse_waiters(self, reason: str) -> None:
+        with self._sync_waiter_lock:
+            self._reader_stopped = True
+            waiters = list(self._sync_reverse_waiters.values())
+        for event, box in waiters:
+            box["transport_error"] = reason
+            event.set()
+
+    def send_reverse_request_sync(
+        self,
+        method: str,
+        params: dict[str, Any],
+        *,
+        timeout_ms: int = 30_000,
+    ) -> Any:
+        """Executes a blocking Reverse-RPC call safely even from the event loop thread."""
+        with self._sync_waiter_lock:
+            if self._reader_stopped:
+                raise ConnectionError("Worker stdin reader stopped before reverse request")
+            reverse_id = f"rev-{uuid.uuid4().hex[:12]}"
+            event = threading.Event()
+            box: dict[str, Any] = {}
+            self._sync_reverse_waiters[reverse_id] = (event, box)
+
+        try:
+            self.writer.send_reverse_request(reverse_id, method, params)
+            timeout_s = max(0.05, float(timeout_ms) / 1000.0)
+            if not event.wait(timeout=timeout_s):
+                raise TimeoutError(f"Reverse RPC {method} timed out after {timeout_ms}ms")
+            if "transport_error" in box:
+                raise ConnectionError(str(box["transport_error"]))
+            frame = box.get("frame") or {}
+            if "error" in frame and isinstance(frame["error"], dict):
+                err = frame["error"]
+                code = int(err.get("code") or -32000)
+                message = str(err.get("message") or "Reverse RPC failed")
+                if code == -32003 or method.startswith("permission."):
+                    raise PermissionError(message)
+                raise RuntimeError(f"Reverse RPC error {code}: {message}")
+            return frame.get("result")
+        finally:
+            with self._sync_waiter_lock:
+                self._sync_reverse_waiters.pop(reverse_id, None)
 
     def register(self, method: str, handler: RpcHandler) -> None:
         self._handlers[method] = handler
@@ -382,9 +459,21 @@ class WorkerRpcServer:
             self._reverse_futures.pop(reverse_id, None)
 
     async def serve(self) -> None:
+        global _ACTIVE_RPC_SERVER
         self._loop = asyncio.get_running_loop()
         line_queue: asyncio.Queue[str | None] = asyncio.Queue()
         loop = self._loop
+
+        def _safe_enqueue_raw(item: str | None) -> None:
+            try:
+                if not loop.is_closed():
+                    loop.call_soon_threadsafe(line_queue.put_nowait, item)
+            except RuntimeError:
+                pass
+
+        def _enqueue_or_resolve(raw_line: str) -> None:
+            if not self._try_resolve_sync_reverse_response(raw_line):
+                _safe_enqueue_raw(raw_line)
 
         def _push_pipe_lines_win32(fd: int, handle: int) -> None:
             """Non-blocking PeekNamedPipe reader preventing Win32 synchronous pipe deadlocks on DLL load."""
@@ -411,18 +500,20 @@ class WorkerRpcServer:
                 if not ok:
                     if buf:
                         tail = bytes(buf).decode("utf-8", errors="replace").replace("\r\n", "\n")
-                        loop.call_soon_threadsafe(line_queue.put_nowait, tail)
+                        _enqueue_or_resolve(tail)
                         buf.clear()
-                    loop.call_soon_threadsafe(line_queue.put_nowait, None)
+                    self._abort_sync_reverse_waiters("Worker stdin pipe closed")
+                    _safe_enqueue_raw(None)
                     break
                 if avail.value > 0:
                     chunk = os.read(fd, min(65536, int(avail.value)))
                     if not chunk:
                         if buf:
                             tail = bytes(buf).decode("utf-8", errors="replace").replace("\r\n", "\n")
-                            loop.call_soon_threadsafe(line_queue.put_nowait, tail)
+                            _enqueue_or_resolve(tail)
                             buf.clear()
-                        loop.call_soon_threadsafe(line_queue.put_nowait, None)
+                        self._abort_sync_reverse_waiters("Worker stdin EOF")
+                        _safe_enqueue_raw(None)
                         break
                     buf.extend(chunk)
                     while b"\n" in buf:
@@ -430,7 +521,7 @@ class WorkerRpcServer:
                         raw_line = bytes(buf[: nl_idx + 1])
                         del buf[: nl_idx + 1]
                         decoded = raw_line.decode("utf-8", errors="replace").replace("\r\n", "\n")
-                        loop.call_soon_threadsafe(line_queue.put_nowait, decoded)
+                        _enqueue_or_resolve(decoded)
                     poll_s = 0.001
                 else:
                     time.sleep(poll_s)
@@ -459,13 +550,20 @@ class WorkerRpcServer:
                 while True:
                     line = self._stdin.readline()
                     if not line:
-                        loop.call_soon_threadsafe(line_queue.put_nowait, None)
+                        self._abort_sync_reverse_waiters("Worker stdin EOF")
+                        _safe_enqueue_raw(None)
                         break
-                    loop.call_soon_threadsafe(line_queue.put_nowait, line)
+                    _enqueue_or_resolve(line)
             except Exception as exc:
                 sys.stderr.write(f"[worker:{self.worker_type}] stdin reader stopped: {exc}\n")
                 sys.stderr.flush()
-                loop.call_soon_threadsafe(line_queue.put_nowait, None)
+                self._abort_sync_reverse_waiters(f"Worker stdin error: {exc}")
+                _safe_enqueue_raw(None)
+
+        with _ACTIVE_RPC_LOCK:
+            _ACTIVE_RPC_SERVER = self
+        with self._sync_waiter_lock:
+            self._reader_stopped = False
 
         reader_thread = threading.Thread(
             target=_stdin_reader_thread,
@@ -477,99 +575,105 @@ class WorkerRpcServer:
         self.writer.send_ready(self.worker_type, self.capabilities)
 
         pending_jobs: set[asyncio.Task[None]] = set()
-        while True:
-            raw_line = await line_queue.get()
-            if raw_line is None:
-                break
-            stripped = raw_line.strip()
-            if not stripped:
-                continue
+        try:
+            while True:
+                raw_line = await line_queue.get()
+                if raw_line is None:
+                    break
+                stripped = raw_line.strip()
+                if not stripped:
+                    continue
 
-            if len(raw_line.encode("utf-8")) > MAX_FRAME_BYTES:
-                self.writer.send_error(None, ERROR_INVALID_REQUEST, "Frame exceeds 16 MiB limit")
-                continue
+                if len(raw_line.encode("utf-8")) > MAX_FRAME_BYTES:
+                    self.writer.send_error(None, ERROR_INVALID_REQUEST, "Frame exceeds 16 MiB limit")
+                    continue
 
-            try:
-                frame = json.loads(stripped)
-            except json.JSONDecodeError as exc:
-                self.writer.send_error(None, ERROR_PARSE, f"Invalid JSON frame: {exc}")
-                continue
+                try:
+                    frame = json.loads(stripped)
+                except json.JSONDecodeError as exc:
+                    self.writer.send_error(None, ERROR_PARSE, f"Invalid JSON frame: {exc}")
+                    continue
 
-            if not isinstance(frame, dict):
-                self.writer.send_error(None, ERROR_INVALID_REQUEST, "Frame must be a JSON object")
-                continue
+                if not isinstance(frame, dict):
+                    self.writer.send_error(None, ERROR_INVALID_REQUEST, "Frame must be a JSON object")
+                    continue
 
-            # Reverse response resolution (non-blocking)
-            if frame.get("type") == "reverse_response":
-                rev_id = frame.get("id")
-                fut = self._reverse_futures.get(str(rev_id)) if rev_id is not None else None
-                if fut is not None and not fut.done():
-                    if "error" in frame and isinstance(frame["error"], dict):
-                        fut.set_exception(
-                            PermissionError(frame["error"].get("message", "Reverse RPC denied"))
+                # Reverse response resolution (non-blocking)
+                if frame.get("type") == "reverse_response":
+                    rev_id = frame.get("id")
+                    fut = self._reverse_futures.get(str(rev_id)) if rev_id is not None else None
+                    if fut is not None and not fut.done():
+                        if "error" in frame and isinstance(frame["error"], dict):
+                            fut.set_exception(
+                                PermissionError(frame["error"].get("message", "Reverse RPC denied"))
+                            )
+                        else:
+                            res = frame.get("result")
+                            fut.set_result({} if res is None else res)
+                    continue
+
+                method = frame.get("method")
+                request_id = frame.get("id")
+                params = frame.get("params")
+                if not isinstance(params, dict):
+                    params = {}
+
+                # Notification handling (heartbeat & cooperative cancellation)
+                if method == "system.ping":
+                    seq = int(params.get("sequence") or 0)
+                    self.writer.send_pong(seq, len(self._active_tasks))
+                    continue
+
+                if method == "task.cancel":
+                    target_id = str(params.get("request_id") or "")
+                    reason = str(params.get("reason") or "user_cancelled")
+                    active = self._active_tasks.get(target_id)
+                    if active is not None:
+                        active.cancel_reason = reason
+                        active.cancel_event.set()
+                    if request_id is not None:
+                        self.writer.send_response(
+                            str(request_id),
+                            {"cancelled": active is not None, "request_id": target_id},
                         )
-                    else:
-                        fut.set_result(dict(frame.get("result") or {}))
-                continue
+                    continue
 
-            method = frame.get("method")
-            request_id = frame.get("id")
-            params = frame.get("params")
-            if not isinstance(params, dict):
-                params = {}
+                if method == "worker.shutdown":
+                    if request_id is not None:
+                        self.writer.send_response(str(request_id), {"status": "shutting_down"})
+                    break
 
-            # Notification handling (heartbeat & cooperative cancellation)
-            if method == "system.ping":
-                seq = int(params.get("sequence") or 0)
-                self.writer.send_pong(seq, len(self._active_tasks))
-                continue
-
-            if method == "task.cancel":
-                target_id = str(params.get("request_id") or "")
-                reason = str(params.get("reason") or "user_cancelled")
-                active = self._active_tasks.get(target_id)
-                if active is not None:
-                    active.cancel_reason = reason
-                    active.cancel_event.set()
-                if request_id is not None:
-                    self.writer.send_response(
-                        str(request_id),
-                        {"cancelled": active is not None, "request_id": target_id},
+                if not isinstance(method, str) or request_id is None:
+                    self.writer.send_error(
+                        str(request_id) if request_id is not None else None,
+                        ERROR_INVALID_REQUEST,
+                        "Missing required method or request id",
                     )
-                continue
+                    continue
 
-            if method == "worker.shutdown":
-                if request_id is not None:
-                    self.writer.send_response(str(request_id), {"status": "shutting_down"})
-                break
+                handler = self._handlers.get(method)
+                if handler is None:
+                    self.writer.send_error(
+                        str(request_id),
+                        ERROR_METHOD_NOT_FOUND,
+                        f"Unknown worker method: {method}",
+                    )
+                    continue
 
-            if not isinstance(method, str) or request_id is None:
-                self.writer.send_error(
-                    str(request_id) if request_id is not None else None,
-                    ERROR_INVALID_REQUEST,
-                    "Missing required method or request id",
+                job = asyncio.create_task(
+                    self._run_request(str(request_id), method, handler, params)
                 )
-                continue
-
-            handler = self._handlers.get(method)
-            if handler is None:
-                self.writer.send_error(
-                    str(request_id),
-                    ERROR_METHOD_NOT_FOUND,
-                    f"Unknown worker method: {method}",
-                )
-                continue
-
-            job = asyncio.create_task(
-                self._run_request(str(request_id), method, handler, params)
-            )
-            pending_jobs.add(job)
-            job.add_done_callback(pending_jobs.discard)
-
-        for job in list(pending_jobs):
-            job.cancel()
-        if pending_jobs:
-            await asyncio.gather(*pending_jobs, return_exceptions=True)
+                pending_jobs.add(job)
+                job.add_done_callback(pending_jobs.discard)
+        finally:
+            self._abort_sync_reverse_waiters("Worker RPC loop exited")
+            with _ACTIVE_RPC_LOCK:
+                if _ACTIVE_RPC_SERVER is self:
+                    _ACTIVE_RPC_SERVER = None
+            for job in list(pending_jobs):
+                job.cancel()
+            if pending_jobs:
+                await asyncio.gather(*pending_jobs, return_exceptions=True)
 
     async def _run_request(
         self,

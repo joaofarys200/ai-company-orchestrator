@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+import os
 from pathlib import Path
 import sqlite3
 from typing import Iterator
 
+from workers.common.db_guard import (
+    DatabaseWritePermissionError,
+    assert_direct_write_allowed,
+    get_active_canonical_db_path,
+)
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-CANONICAL_DB_PATH = PROJECT_ROOT / "database.db"
+CANONICAL_DB_PATH = get_active_canonical_db_path()
 DEFAULT_BUSY_TIMEOUT_MS = 10_000
 DEFAULT_CONNECT_TIMEOUT_SECONDS = 10.0
 
@@ -19,14 +26,14 @@ def resolve_db_path(db_path: Path | str | None = None) -> str:
         candidate = getattr(database, "DB_FILE", "")
         text = str(candidate).strip() if candidate is not None else ""
         if not text or text == "database.db":
-            return str(CANONICAL_DB_PATH)
+            return str(get_active_canonical_db_path())
         return text
 
     text = str(db_path).strip()
     if text == ":memory:":
         return ":memory:"
     if not text or text == "database.db":
-        return str(CANONICAL_DB_PATH)
+        return str(get_active_canonical_db_path())
     return text
 
 
@@ -71,6 +78,7 @@ def get_db_connection(
             timeout=timeout_seconds,
             check_same_thread=check_same_thread,
         )
+        conn.execute("PRAGMA query_only = ON")
         apply_sqlite_pragmas(
             conn,
             busy_timeout_ms=busy_timeout_ms,
@@ -79,6 +87,7 @@ def get_db_connection(
         )
         return conn
 
+    assert_direct_write_allowed(target, operation="get_db_connection(read_only=False)")
     conn = sqlite3.connect(
         target,
         timeout=timeout_seconds,
@@ -122,6 +131,12 @@ def write_transaction(
 ) -> Iterator[sqlite3.Connection]:
     """Execute a SQLite write transaction using explicit `BEGIN IMMEDIATE`."""
     owned = conn is None
+    if owned:
+        assert_direct_write_allowed(db_path, operation="write_transaction")
+    elif getattr(conn, "_jarvis_readonly_locked", False):
+        raise DatabaseWritePermissionError(
+            "Direct Python write_transaction on read-only canonical database.db connection is forbidden."
+        )
     active_conn = (
         get_db_connection(
             db_path=db_path,

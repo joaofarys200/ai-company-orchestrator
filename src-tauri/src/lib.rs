@@ -39,7 +39,8 @@ pub fn run() {
             );
 
             let worker_config =
-                workers::supervisor::WorkerSupervisorConfig::for_workspace(project_root.clone());
+                workers::supervisor::WorkerSupervisorConfig::for_workspace(project_root.clone())
+                    .with_canonical_db_path(db.database_path().to_path_buf());
             let worker_supervisor = Arc::new(workers::supervisor::WorkerSupervisor::new(worker_config));
             let permission_gateway = Arc::new(permissions::gateway::PermissionGateway::new(
                 permissions::gateway::DEFAULT_PERMISSION_TTL,
@@ -52,6 +53,7 @@ pub fn run() {
             );
 
             let app_handle_for_perm = app.handle().clone();
+            let db_for_setup = Arc::clone(&db);
             let gateway_for_setup = Arc::clone(&permission_gateway);
             let workers_for_setup = Arc::clone(&worker_supervisor);
             let root_for_loopback = project_root.clone();
@@ -69,7 +71,10 @@ pub fn run() {
                     }))
                     .await;
                 workers_for_setup
-                    .set_reverse_handler(gateway_for_setup.as_reverse_rpc_handler())
+                    .set_reverse_handler(workers::reverse_rpc::build_composite_reverse_rpc_handler(
+                        db_for_setup,
+                        gateway_for_setup,
+                    ))
                     .await;
                 let loopback = protocol::loopback::LoopbackHandle::start(root_for_loopback)
                     .await
@@ -110,16 +115,26 @@ pub fn run() {
             commands::security::sentinel_status,
             commands::security::sentinel_tick_shadow,
             commands::storage::sqlite_list_sessions,
+            commands::storage::sqlite_get_session,
             commands::storage::sqlite_create_session,
+            commands::storage::sqlite_update_session_status,
             commands::storage::sqlite_list_messages,
             commands::storage::sqlite_add_message,
+            commands::storage::sqlite_save_project,
             commands::storage::sqlite_list_projects,
+            commands::storage::sqlite_add_compounding_rule,
             commands::storage::sqlite_get_compounding_rules,
             commands::storage::sqlite_delete_compounding_rule,
+            commands::storage::sqlite_add_architecture_memory,
             commands::storage::sqlite_get_architecture_memory,
             commands::storage::sqlite_delete_architecture_memory,
+            commands::storage::sqlite_add_engineering_decision,
             commands::storage::sqlite_get_engineering_decisions,
             commands::storage::sqlite_delete_engineering_decision,
+            commands::storage::sqlite_list_strategic_goals,
+            commands::storage::sqlite_add_strategic_goal,
+            commands::storage::sqlite_list_event_logs,
+            commands::storage::sqlite_append_event_log,
             commands::study::study_store_refresh,
             commands::study::study_store_list_documents,
             commands::study::study_store_get_document,

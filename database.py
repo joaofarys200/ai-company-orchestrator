@@ -10,11 +10,21 @@ from persistence.db import (
     CANONICAL_DB_PATH,
     ensure_rho_schema,
     get_db_connection as open_db_connection,
+    resolve_db_path,
     write_transaction,
+)
+from workers.common.db_guard import (
+    DatabaseWritePermissionError,
+    should_route_canonical_db_via_rpc,
 )
 
 
 logger = get_logger(__name__)
+
+
+def _rpc_for_db():
+    use_rpc, server = should_route_canonical_db_via_rpc(resolve_db_path(None))
+    return server if use_rpc else None
 
 
 def utc_now_iso() -> str:
@@ -56,6 +66,11 @@ def get_connection():
 
 
 def init_db():
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        rpc.send_reverse_request_sync("sqlite.init_db", {})
+        return
+
     with closing(get_connection()) as conn, write_transaction(conn=conn):
         cursor = conn.cursor()
         # Create sessions table
@@ -157,6 +172,18 @@ def init_db():
         """)
 
 def add_compounding_rule(rule_key: str, description: str, correction: str):
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        rpc.send_reverse_request_sync(
+            "sqlite.add_compounding_rule",
+            {
+                "rule_key": rule_key,
+                "description": description,
+                "correction": correction,
+            },
+        )
+        return
+
     created_at = utc_now_iso()
     try:
         with closing(get_connection()) as conn, write_transaction(conn=conn):
@@ -182,12 +209,18 @@ def add_compounding_rule(rule_key: str, description: str, correction: str):
                 INSERT INTO compounding_memory (rule_key, description, correction, created_at)
                 VALUES (?, ?, ?, ?)
             """, (rule_key, description, correction, created_at))
+    except DatabaseWritePermissionError:
+        raise
     except Exception as e:
         log_event(logger, "database.rule.save_error", level="error", error=str(e))
 
 def get_compounding_rules():
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        return list(rpc.send_reverse_request_sync("sqlite.get_compounding_rules", {}) or [])
+
     try:
-        with closing(get_connection()) as conn:
+        with closing(get_db_connection(read_only=True)) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT rule_key, description, correction FROM compounding_memory ORDER BY id DESC")
             rows = cursor.fetchall()
@@ -197,17 +230,36 @@ def get_compounding_rules():
         return []
 
 def delete_compounding_rule(rule_key: str) -> bool:
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        res = rpc.send_reverse_request_sync(
+            "sqlite.delete_compounding_rule",
+            {"rule_key": rule_key},
+        )
+        return bool((res or {}).get("deleted", False))
+
     try:
         with closing(get_connection()) as conn, write_transaction(conn=conn):
             cursor = conn.cursor()
             cursor.execute("DELETE FROM compounding_memory WHERE rule_key = ?", (rule_key,))
             return cursor.rowcount > 0
+    except DatabaseWritePermissionError:
+        raise
     except Exception as e:
         log_event(logger, "database.rule.delete_error", level="error", rule_key=rule_key, error=str(e))
         return False
 
 
 def create_session(name: str):
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        res = rpc.send_reverse_request_sync("sqlite.create_session", {"name": name}) or {}
+
+        class SessionObj:
+            id = res.get("id")
+
+        return SessionObj()
+
     created_at = utc_now_iso()
     with closing(get_connection()) as conn, write_transaction(conn=conn):
         cursor = conn.cursor()
@@ -222,6 +274,19 @@ def create_session(name: str):
     return SessionObj()
 
 def add_message(session_id: int, sender: str, role: str, content: str):
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        rpc.send_reverse_request_sync(
+            "sqlite.add_message",
+            {
+                "session_id": int(session_id),
+                "sender": sender,
+                "role": role,
+                "content": content,
+            },
+        )
+        return
+
     from backend.message_protocol import normalize_canonical_sender
     canonical_sender = normalize_canonical_sender(sender)
     timestamp = utc_now_iso()
@@ -233,6 +298,21 @@ def add_message(session_id: int, sender: str, role: str, content: str):
         """, (session_id, canonical_sender, role, content, timestamp))
 
 def save_project(session_id: int, name: str, description: str, html: str, css: str, js: str):
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        rpc.send_reverse_request_sync(
+            "sqlite.save_project",
+            {
+                "session_id": int(session_id),
+                "name": name,
+                "description": description,
+                "html_content": html,
+                "css_content": css,
+                "js_content": js,
+            },
+        )
+        return
+
     with closing(get_connection()) as conn, write_transaction(conn=conn):
         cursor = conn.cursor()
 
@@ -254,8 +334,12 @@ def save_project(session_id: int, name: str, description: str, html: str, css: s
             """, (session_id, name, description, html, css, js, created_at))
 
 def get_architecture_memory():
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        return list(rpc.send_reverse_request_sync("sqlite.get_architecture_memory", {}) or [])
+
     try:
-        with closing(get_connection()) as conn:
+        with closing(get_db_connection(read_only=True)) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT module, purpose, dependencies, constraints, updated_at FROM architecture_memory ORDER BY module ASC")
             rows = cursor.fetchall()
@@ -274,6 +358,19 @@ def get_architecture_memory():
         return []
 
 def add_architecture_memory(module: str, purpose: str, dependencies: str, constraints: str):
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        rpc.send_reverse_request_sync(
+            "sqlite.add_architecture_memory",
+            {
+                "module": module,
+                "purpose": purpose,
+                "dependencies": dependencies,
+                "constraints": constraints,
+            },
+        )
+        return
+
     updated_at = utc_now_iso()
     try:
         with closing(get_connection()) as conn, write_transaction(conn=conn):
@@ -309,12 +406,18 @@ def add_architecture_memory(module: str, purpose: str, dependencies: str, constr
                     INSERT OR REPLACE INTO architecture_memory (module, purpose, dependencies, constraints, updated_at)
                     VALUES (?, ?, ?, ?, ?)
                 """, (module, purpose, dependencies, constraints, updated_at))
+    except DatabaseWritePermissionError:
+        raise
     except Exception as e:
         log_event(logger, "database.architecture.save_error", level="error", error=str(e))
 
 def get_engineering_decisions():
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        return list(rpc.send_reverse_request_sync("sqlite.get_engineering_decisions", {}) or [])
+
     try:
-        with closing(get_connection()) as conn:
+        with closing(get_db_connection(read_only=True)) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT decision, reason, impact, created_at FROM engineering_decisions ORDER BY id DESC")
             rows = cursor.fetchall()
@@ -332,6 +435,18 @@ def get_engineering_decisions():
         return []
 
 def add_engineering_decision(decision: str, reason: str, impact: str):
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        rpc.send_reverse_request_sync(
+            "sqlite.add_engineering_decision",
+            {
+                "decision": decision,
+                "reason": reason,
+                "impact": impact,
+            },
+        )
+        return
+
     created_at = utc_now_iso()
     try:
         with closing(get_connection()) as conn, write_transaction(conn=conn):
@@ -364,25 +479,47 @@ def add_engineering_decision(decision: str, reason: str, impact: str):
                 INSERT INTO engineering_decisions (decision, reason, impact, created_at)
                 VALUES (?, ?, ?, ?)
             """, (decision, reason, impact, created_at))
+    except DatabaseWritePermissionError:
+        raise
     except Exception as e:
         log_event(logger, "database.decision.save_error", level="error", error=str(e))
 
 def delete_architecture_memory(module: str) -> bool:
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        res = rpc.send_reverse_request_sync(
+            "sqlite.delete_architecture_memory",
+            {"module": module},
+        )
+        return bool((res or {}).get("deleted", False))
+
     try:
         with closing(get_connection()) as conn, write_transaction(conn=conn):
             cursor = conn.cursor()
             cursor.execute("DELETE FROM architecture_memory WHERE module = ?", (module,))
             return cursor.rowcount > 0
+    except DatabaseWritePermissionError:
+        raise
     except Exception as e:
         log_event(logger, "database.architecture.delete_error", level="error", module=module, error=str(e))
         return False
 
 def delete_engineering_decision(decision: str) -> bool:
+    rpc = _rpc_for_db()
+    if rpc is not None:
+        res = rpc.send_reverse_request_sync(
+            "sqlite.delete_engineering_decision",
+            {"decision": decision},
+        )
+        return bool((res or {}).get("deleted", False))
+
     try:
         with closing(get_connection()) as conn, write_transaction(conn=conn):
             cursor = conn.cursor()
             cursor.execute("DELETE FROM engineering_decisions WHERE decision = ?", (decision,))
             return cursor.rowcount > 0
+    except DatabaseWritePermissionError:
+        raise
     except Exception as e:
         log_event(logger, "database.decision.delete_error", level="error", decision=decision, error=str(e))
         return False

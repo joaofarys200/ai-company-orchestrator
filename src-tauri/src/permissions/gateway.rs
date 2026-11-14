@@ -381,102 +381,108 @@ impl PermissionGateway {
         let gw = self.clone();
         Arc::new(move |req| {
             let gw = gw.clone();
-            Box::pin(async move {
-                if req.method != "permission.request_approval" {
-                    return Err(RpcRemoteError {
-                        code: -32601,
-                        message: format!("Unsupported reverse RPC method: {}", req.method),
-                        data: None,
-                    });
-                }
-
-                let action = req
-                    .params
-                    .get("action")
-                    .and_then(Value::as_str)
-                    .unwrap_or("unknown");
-                let resource = req
-                    .params
-                    .get("resource")
-                    .and_then(Value::as_str)
-                    .unwrap_or("");
-                let agent_name = req
-                    .params
-                    .get("agent_name")
-                    .and_then(Value::as_str)
-                    .map(ToOwned::to_owned);
-                let security_level = req
-                    .params
-                    .get("security_level")
-                    .and_then(Value::as_str)
-                    .unwrap_or("LOW_RISK_MUTATION");
-                let project_id = req
-                    .params
-                    .get("project_id")
-                    .and_then(Value::as_str)
-                    .map(ToOwned::to_owned);
-                let mission_id = req
-                    .params
-                    .get("mission_id")
-                    .and_then(Value::as_str)
-                    .map(ToOwned::to_owned);
-                let timeout_ms = req
-                    .params
-                    .get("timeout_ms")
-                    .and_then(Value::as_u64)
-                    .unwrap_or(DEFAULT_PERMISSION_TTL.as_millis() as u64)
-                    .min(DEFAULT_PERMISSION_TTL.as_millis() as u64);
-
-                let (record, rx_opt) = gw
-                    .create_request(
-                        action,
-                        format!("{action} {resource}"),
-                        "Worker Reverse RPC authorization request",
-                        security_level,
-                        if resource.is_empty() {
-                            vec![]
-                        } else {
-                            vec![resource.to_string()]
-                        },
-                        mission_id,
-                        project_id,
-                        agent_name,
-                        Some(Duration::from_millis(timeout_ms)),
-                    )
-                    .await
-                    .map_err(|msg| RpcRemoteError {
-                        code: -32003,
-                        message: msg,
-                        data: None,
-                    })?;
-
-                let Some(rx) = rx_opt else {
-                    return Ok(json!({
-                        "decision": "approved",
-                        "grant_type": "read_only_auto",
-                        "request_id": record.request_id,
-                    }));
-                };
-
-                let wait_dur = Duration::from_millis(timeout_ms);
-                match tokio::time::timeout(wait_dur, rx).await {
-                    Ok(Ok(decision)) => serde_json::to_value(decision).map_err(|e| RpcRemoteError {
-                        code: -32603,
-                        message: e.to_string(),
-                        data: None,
-                    }),
-                    _ => {
-                        let _ = gw.sweep_expired().await;
-                        Ok(json!({
-                            "decision": "denied",
-                            "grant_type": "timeout_fail_closed",
-                            "request_id": record.request_id,
-                            "reason": "HITL approval timed out (fail-closed)",
-                        }))
-                    }
-                }
-            })
+            Box::pin(async move { gw.handle_reverse_request(req).await })
         })
+    }
+
+    /// Handles a single Reverse-RPC `permission.*` request directly.
+    pub async fn handle_reverse_request(
+        &self,
+        req: ReverseRequest,
+    ) -> Result<Value, RpcRemoteError> {
+        if req.method != "permission.request_approval" {
+            return Err(RpcRemoteError {
+                code: -32601,
+                message: format!("Unsupported reverse RPC method: {}", req.method),
+                data: None,
+            });
+        }
+
+        let action = req
+            .params
+            .get("action")
+            .and_then(Value::as_str)
+            .unwrap_or("unknown");
+        let resource = req
+            .params
+            .get("resource")
+            .and_then(Value::as_str)
+            .unwrap_or("");
+        let agent_name = req
+            .params
+            .get("agent_name")
+            .and_then(Value::as_str)
+            .map(ToOwned::to_owned);
+        let security_level = req
+            .params
+            .get("security_level")
+            .and_then(Value::as_str)
+            .unwrap_or("LOW_RISK_MUTATION");
+        let project_id = req
+            .params
+            .get("project_id")
+            .and_then(Value::as_str)
+            .map(ToOwned::to_owned);
+        let mission_id = req
+            .params
+            .get("mission_id")
+            .and_then(Value::as_str)
+            .map(ToOwned::to_owned);
+        let timeout_ms = req
+            .params
+            .get("timeout_ms")
+            .and_then(Value::as_u64)
+            .unwrap_or(DEFAULT_PERMISSION_TTL.as_millis() as u64)
+            .min(DEFAULT_PERMISSION_TTL.as_millis() as u64);
+
+        let (record, rx_opt) = self
+            .create_request(
+                action,
+                format!("{action} {resource}"),
+                "Worker Reverse RPC authorization request",
+                security_level,
+                if resource.is_empty() {
+                    vec![]
+                } else {
+                    vec![resource.to_string()]
+                },
+                mission_id,
+                project_id,
+                agent_name,
+                Some(Duration::from_millis(timeout_ms)),
+            )
+            .await
+            .map_err(|msg| RpcRemoteError {
+                code: -32003,
+                message: msg,
+                data: None,
+            })?;
+
+        let Some(rx) = rx_opt else {
+            return Ok(json!({
+                "decision": "approved",
+                "grant_type": "read_only_auto",
+                "request_id": record.request_id,
+            }));
+        };
+
+        let wait_dur = Duration::from_millis(timeout_ms);
+        match tokio::time::timeout(wait_dur, rx).await {
+            Ok(Ok(decision)) => serde_json::to_value(decision).map_err(|e| RpcRemoteError {
+                code: -32603,
+                message: e.to_string(),
+                data: None,
+            }),
+            _ => {
+                let _ = self.sweep_expired().await;
+                Ok(json!({
+                    "decision": "denied",
+                    "grant_type": "timeout_fail_closed",
+                    "request_id": record.request_id,
+                    "reason": "HITL approval timed out (fail-closed)",
+                }))
+            }
+        }
     }
 }
 

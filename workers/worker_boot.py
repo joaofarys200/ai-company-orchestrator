@@ -24,6 +24,11 @@ from workers.common.stdio_rpc import (  # noqa: E402
 # Capture real NDJSON protocol stream and hijack sys.stdout -> sys.stderr immediately.
 _PROTOCOL_STDOUT = isolate_protocol_stdout()
 
+# Enforce single-writer exclusivity on canonical database.db before importing domain code.
+from workers.common.db_guard import install_canonical_db_write_guard  # noqa: E402
+
+install_canonical_db_write_guard()
+
 import argparse  # noqa: E402
 import asyncio  # noqa: E402
 import importlib  # noqa: E402

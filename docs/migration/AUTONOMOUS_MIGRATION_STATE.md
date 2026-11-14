@@ -1,8 +1,8 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-14T01:52:00Z`
-- **Current Phase:** `Phase 5 — Stabilization, Regression Validation & Documentation`
-- **Current Increment:** `Phase 5 (Two-Pass Python Regression Gate, StudyStore Directory Boot Smoke Assertion & State Sync)`
+- **Last Updated (UTC):** `2026-11-14T13:14:00Z`
+- **Current Phase:** `Post-Audit Architectural Closure — Increment A (SQLite Write Exclusivity)`
+- **Current Increment:** `Increment A (Rust Single-Writer Parity + Composite Reverse-RPC + Unbypassable Python Worker db_guard)`
 - **Current Branch:** `migration/tauri-rust-complete`
 - **Main Baseline:** Untouched at `af11ae9095f4cfd8c8e01334704ffde282da9554` (awaiting user approval before merge)
 
@@ -83,6 +83,11 @@
 - **Local Two-Pass 18-Suite Python Gate (`b437336`):** Pass 1 (clean-DB hardening, worker E2E, docs, protocol contracts: 9 suites) `46 passed, 1 skipped, 12 subtests passed in 18.31s`; Pass 2 (server-import runtime/smoke/security/study/voice: 9 suites) `99 passed, 2 warnings, 321 subtests passed in 11.37s`.
 - **Windows CI (`windows-latest`, Run `#43542230990` @ `b437336`):** Frontend tests/build (`success`), Two-Pass Python gate (`45 passed, 2 skipped, 12 subtests` + `99 passed, 321 subtests`), `cargo check --locked --all-targets` (`success`), `cargo test --locked` (`29 passed; 0 failed`), and `tauri build --no-bundle` (`jarvis-os.exe`, `success`); Step 19 smoke assertion corrected from `data\study\study.db` to `data\study` JSON catalog directory + SQLite WAL/schema check.
 
+### Increment A — SQLite Write Exclusivity (`database.db` Rust-Only Writer)
+- **Rust `SqliteDatabase` Parity (`src-tauri/src/storage/sqlite.rs` & `src-tauri/src/commands/storage.rs` & `src-tauri/src/lib.rs`):** Added `normalized_similarity` (`difflib.SequenceMatcher` parity), semantic parity in `save_project` (`WHERE session_id = ?`), `add_compounding_rule` (`>0.75`/`>0.85`), `add_engineering_decision` (`>0.80` + `" | "` merge), transactional `rho_record_trajectory` (3600s auto-rule synthesis), `rho_ensure_schema`, `rho_get_compounding_rules`, `runtime_db_metrics`, plus 10 registered `sqlite_*` commands.
+- **Composite Reverse-RPC & Worker Guard (`src-tauri/src/workers/reverse_rpc.rs`, `supervisor.rs`, `gateway.rs`, `workers/common/stdio_rpc.py`, `workers/common/db_guard.py`, `workers/worker_boot.py`):** Workers receive `JARVIS_DB_WRITE_OWNER=rust` + `JARVIS_CANONICAL_DB_PATH` + `JARVIS_PROJECT_ROOT`; `db_guard` intercepts `sqlite3.connect` / `sqlite3.Connection` / `?mode=rw/rwc` / `ATTACH DATABASE` / `persistence.db`; `database.py` and `backend/model_harness/rho.py` route canonical `database.db` operations over non-deadlocking `send_reverse_request_sync` to Rust `SqliteDatabase` while keeping `MissionWorker` `state.db`, `:memory:`, and temp test DBs writable.
+- **Exclusivity Verification (`tests/test_sqlite_write_exclusivity.py`):** Proven locally across all 5 live worker roles (`ai`, `study`, `knowledge`, `mission`, `voice`) + sync Reverse-RPC roundtrips; Rust live `WorkerPoolRole::Knowledge` integration test added in `src-tauri/src/workers/supervisor.rs` for Windows CI verification.
+
 ---
 
 ## 3. Known Issues & Architectural Decisions
@@ -102,7 +107,7 @@
 
 ## 4. Next Executable Task
 
-- **Await final Phase 5 Windows CI workflow run (`tauri-windows-validation.yml`) and request explicit user approval before merging `migration/tauri-rust-complete` into `main`.**
+- **Validate Increment A on Windows CI (`cargo check`, `cargo test`, `tauri build`), then execute Increment B (progressive migration of `StudyStore`, `ProjectContext`, `PermissionGateway`, `PreviewServerHandle`, and native Rust `Knowledge` engine).**
 
 ---
 
