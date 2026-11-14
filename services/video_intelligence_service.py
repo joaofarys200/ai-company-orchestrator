@@ -40,6 +40,11 @@ from services.study_ai_engine import (
     rank_salient_sentences,
 )
 from services.study_fs import resolve_confined_path, safe_document_id
+from services.url_ssrf_guard import (
+    is_forbidden_ip as _guard_is_forbidden_ip,
+    validate_remote_url as _guard_validate_remote_url,
+    validate_remote_url_syntax as _guard_validate_remote_url_syntax,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -69,17 +74,10 @@ def validate_video_path(path: str) -> bool:
 
 def validate_video_url(url: str) -> bool:
     """Valida URL de vídeo e protege contra SSRF."""
-    from urllib.parse import urlparse
-    parsed = urlparse(url)
-    if parsed.scheme not in ("http", "https"):
-        raise ValueError("SSRF_FORBIDDEN_HOST: Apenas esquemas HTTP/HTTPS são permitidos.")
-    
-    hostname = (parsed.hostname or "").lower()
-    if not hostname:
-        raise ValueError("SSRF_FORBIDDEN_HOST: URL sem host válido.")
-    
-    if hostname in ("127.0.0.1", "localhost", "0.0.0.0", "169.254.169.254") or hostname.startswith("10.") or hostname.startswith("192.168."):
-        raise ValueError("SSRF_FORBIDDEN_HOST: Acesso a endereços de rede privada/interna é bloqueado.")
+    try:
+        _guard_validate_remote_url_syntax(url)
+    except ValueError as exc:
+        raise ValueError(f"SSRF_FORBIDDEN_HOST: {exc}") from exc
     return True
 
 
@@ -635,18 +633,7 @@ class VideoIntelligenceService:
 
     @staticmethod
     def _is_forbidden_ip(addr_str: str) -> bool:
-        try:
-            ip = ipaddress.ip_address(addr_str.split("%")[0])
-            return bool(
-                ip.is_private
-                or ip.is_loopback
-                or ip.is_link_local
-                or ip.is_multicast
-                or ip.is_reserved
-                or ip.is_unspecified
-            )
-        except ValueError:
-            return False
+        return _guard_is_forbidden_ip(addr_str)
 
     @staticmethod
     def _host_matches_domain(hostname: str, allowed_domains: Tuple[str, ...]) -> bool:
@@ -655,44 +642,18 @@ class VideoIntelligenceService:
 
     def validate_online_url(self, url: str) -> Dict[str, Any]:
         """
-        Valida URL de vídeo online com proteção estrita contra SSRF.
+        Valida URL de vídeo online com proteção estrita fail-closed contra SSRF.
         Suporta apenas HTTP/HTTPS em provedores verificados ou streams diretos.
         """
-        parsed = urllib.parse.urlparse(url.strip())
-        if parsed.scheme not in ("http", "https"):
-            raise ValueError("VIDEO_URL_NOT_SUPPORTED: Apenas URLs HTTP e HTTPS são suportadas.")
-
-        hostname = (parsed.hostname or "").strip().lower().rstrip(".")
-        if not hostname:
-            raise ValueError("SECURITY_VIOLATION: Hostname ausente no URL.")
-
-        if hostname in ("localhost", "localhost.localdomain") or hostname.endswith(".localhost"):
-            raise ValueError("SECURITY_VIOLATION: Acesso a endereços locais bloqueado por SSRF guard.")
-
-        # Bloquear literais IPv4/IPv6 privados ou formas numéricas obfuscadas (decimal/hex/octal)
-        if self._is_forbidden_ip(hostname):
-            raise ValueError("SECURITY_VIOLATION: Acesso a IP privado ou loopback bloqueado por SSRF guard.")
         try:
-            packed = socket.inet_aton(hostname)
-            normalized_ip = socket.inet_ntoa(packed)
-            if self._is_forbidden_ip(normalized_ip):
-                raise ValueError("SECURITY_VIOLATION: Endereço IP numérico privado bloqueado por SSRF guard.")
-        except OSError:
-            pass
+            parsed, hostname = _guard_validate_remote_url_syntax(url)
+        except ValueError as exc:
+            msg = str(exc)
+            if "HTTP e HTTPS" in msg:
+                raise ValueError("VIDEO_URL_NOT_SUPPORTED: Apenas URLs HTTP e HTTPS são suportadas.") from exc
+            raise
 
-        # Resolução DNS para bloquear rebinding/internos se DNS estiver disponível
-        try:
-            infos = socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM)
-            for info in infos:
-                resolved_ip = info[4][0]
-                if self._is_forbidden_ip(resolved_ip):
-                    raise ValueError(
-                        f"SECURITY_VIOLATION: Host '{hostname}' resolve para IP interno/reservado ({resolved_ip})."
-                    )
-        except socket.gaierror:
-            pass
-
-        # Identificar provedor suportado com verificação estrita de sufixo de domínio
+        # Identificar provedor suportado com verificação estrita antes da resolução DNS (evita DNS exfiltration)
         if self._host_matches_domain(hostname, ("youtube.com", "youtu.be", "youtube-nocookie.com")):
             provider = "YOUTUBE"
         elif self._host_matches_domain(hostname, ("vimeo.com",)):
@@ -703,11 +664,15 @@ class VideoIntelligenceService:
             # Rejeitar domínios arbitrários não verificados (inclui spoofed como youtube.com.evil.com)
             raise ValueError("VIDEO_URL_NOT_SUPPORTED: Provedor ou formato de stream online não suportado.")
 
+        res = _guard_validate_remote_url(url, resolve_dns=True)
+        resolved_ips = res["resolved_ips"]
+
         return {
             "valid": True,
             "provider": provider,
             "url": url,
             "hostname": hostname,
+            "resolved_ips": resolved_ips,
         }
 
     # -----------------------------------------------------------------------
@@ -1975,8 +1940,10 @@ tags:
 - [ ] Praticar os cartões de memorização espaçada associados.
 """
         # Injetar wikilinks do vault
+        from backend.atomic_io import atomic_write_text
+
         linked_content = self.linker.link_text(content)
-        out_file.write_text(linked_content, encoding="utf-8")
+        atomic_write_text(out_file, linked_content, encoding="utf-8")
 
         return {
             "saved": True,
@@ -1994,7 +1961,7 @@ tags:
         vault_path = Path(vault_root)
         vault_path.mkdir(parents=True, exist_ok=True)
         title = getattr(cornell_notes, "topic", getattr(cornell_notes, "title", "Video Notes")) or "Video Notes"
-        clean_title = "".join(c for c in title if c.isalnum() or c in (" ", "-", "_")).strip()
+        clean_title = "".join(c for c in title if c.isalnum() or c in (" ", "-", "_")).strip() or "Video Notes"
         filename = f"{clean_title}.md"
         out_file = vault_path / filename
 
@@ -2024,8 +1991,10 @@ tags:
 ## Notas
 {getattr(cornell_notes, "detailed_notes", "")}
 """
+        from backend.atomic_io import atomic_write_text
+
         linked = self.linker.link_text(content)
-        out_file.write_text(linked, encoding="utf-8")
+        atomic_write_text(out_file, linked, encoding="utf-8")
         return str(out_file)
 
     def save_note(

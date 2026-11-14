@@ -131,7 +131,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Continue'
           python -m pip install --quiet pytest pyyaml jsonschema websockets httpx python-dotenv
-          python -m pytest -q tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py tests/test_transport_gateway.py tests/test_worker_stdio_rpc.py 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/python-contract-tests.log
+          python -m pytest -q tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py tests/test_transport_gateway.py tests/test_worker_stdio_rpc.py tests/test_security_hardening_phase3.py 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/python-contract-tests.log
           $code = $LASTEXITCODE
           "exit_code=$code" | Add-Content ci-logs/python-contract-tests.log
           exit $code

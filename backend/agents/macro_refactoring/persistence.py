@@ -40,9 +40,10 @@ class MacroRefactoringStore:
 
     def save_migration(self, migration: MacroMigration) -> str:
         """Saves a MacroMigration instance to disk as JSON."""
+        from backend.atomic_io import atomic_write_json
+
         file_path = self.migrations_dir / f"{migration.migration_id}.json"
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(migration.to_dict(), f, indent=2)
+        atomic_write_json(file_path, migration.to_dict(), indent=2)
         return str(file_path)
 
     def load_migration(self, migration_id: str) -> Optional[MacroMigration]:
@@ -58,9 +59,10 @@ class MacroRefactoringStore:
 
     def save_checkpoint(self, checkpoint: MigrationCheckpoint) -> str:
         """Saves a checkpoint to disk."""
+        from backend.atomic_io import atomic_write_json
+
         file_path = self.checkpoints_dir / f"{checkpoint.checkpoint_id}.json"
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(checkpoint.to_dict(), f, indent=2)
+        atomic_write_json(file_path, checkpoint.to_dict(), indent=2)
         return str(file_path)
 
     def load_checkpoint(self, checkpoint_id: str) -> Optional[MigrationCheckpoint]:

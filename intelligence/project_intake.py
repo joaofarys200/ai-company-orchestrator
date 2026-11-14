@@ -927,8 +927,10 @@ class ProjectIntakeService:
         return meta_dir / "architecture_snapshot.json"
 
     def save_snapshot(self, project_id: str, snapshot: ArchitectureSnapshot) -> str:
+        from backend.atomic_io import atomic_write_json
+
         path = self.snapshot_path(project_id)
-        path.write_text(json.dumps(snapshot.to_dict(), indent=2), encoding="utf-8")
+        atomic_write_json(path, snapshot.to_dict(), indent=2)
         return str(path)
 
     def load_snapshot(self, project_id: str) -> ArchitectureSnapshot | None:

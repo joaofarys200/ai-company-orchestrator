@@ -258,7 +258,8 @@ class PredictiveImpactEngine:
                 "outcomes": [o.to_dict() for o in cls._outcomes.values()],
                 "timestamp": time.time(),
             }
-            with open(cls._persistence_file, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+            from backend.atomic_io import atomic_write_json
+
+            atomic_write_json(cls._persistence_file, data, indent=2)
         except Exception:
             pass  # Non-blocking telemetry persistence

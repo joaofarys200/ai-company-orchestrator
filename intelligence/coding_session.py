@@ -1199,7 +1199,9 @@ class CodingSessionService:
                     )
 
                 if res and res.success and res.repaired_content != content:
-                    Path(abs_path).write_text(res.repaired_content, encoding="utf-8")
+                    from backend.atomic_io import atomic_write_text
+
+                    atomic_write_text(abs_path, res.repaired_content, encoding="utf-8")
                     step_repaired = True
                     if not hasattr(session, "auto_repair_logs") or session.auto_repair_logs is None:
                         session.auto_repair_logs = []
@@ -1308,7 +1310,9 @@ class CodingSessionService:
                 if result.returncode != 0:
                     raise CodingSessionError(f"Nao foi possivel restaurar {relative_path} pelo Git.")
                 Path(absolute_path).parent.mkdir(parents=True, exist_ok=True)
-                Path(absolute_path).write_bytes(result.stdout)
+                from backend.atomic_io import atomic_write_bytes
+
+                atomic_write_bytes(absolute_path, result.stdout)
             else:
                 backup_path = record.get("backup_path") or record.get("backup")
                 if not backup_path or not os.path.isfile(backup_path):
@@ -1590,10 +1594,11 @@ class CodingSessionService:
         return os.path.join(self._session_dir(project_id, session_id), "session.json")
 
     def _save(self, session: CodingSession) -> None:
+        from backend.atomic_io import atomic_write_json
+
         session.updated_at = datetime.now(timezone.utc).isoformat()
         path = Path(self._session_path(session.project_id, session.session_id))
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(session.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
+        atomic_write_json(path, session.to_dict(), indent=2)
 
 
 CODE_EDIT_PLAN_SCHEMA: dict[str, Any] = {

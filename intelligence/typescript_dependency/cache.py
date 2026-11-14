@@ -159,8 +159,9 @@ class TypeScriptDependencyCache:
                 "config_hashes": self._config_hashes,
                 "entries": {k: v.to_dict() for k, v in self._cache.items()},
             }
-            with open(self.cache_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+            from backend.atomic_io import atomic_write_json
+
+            atomic_write_json(self.cache_path, data, indent=2)
         except OSError:
             pass
 

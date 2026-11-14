@@ -590,12 +590,10 @@ def main():
         print(f" {i}. {c['path']} (Score: {c['score']} | {c['severity']} | LOC: {c['loc']} | Resp: {len(c['responsibilities'])})")
 
     # Salva relatórios solicitados na especificação
-    os.makedirs("docs", exist_ok=True)
-    with open("docs/phase38_super_file_audit.json", "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
+    from backend.atomic_io import atomic_write_json
 
-    with open("docs/super_file_audit.json", "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
+    atomic_write_json("docs/phase38_super_file_audit.json", results, indent=2)
+    atomic_write_json("docs/super_file_audit.json", results, indent=2)
 
     print("\nSaved docs/phase38_super_file_audit.json and docs/super_file_audit.json successfully.")
 

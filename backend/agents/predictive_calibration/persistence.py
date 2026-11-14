@@ -40,14 +40,10 @@ class CalibrationStore:
 
     def save_calibration_version(self, version: CalibrationVersion) -> Path:
         """Atomically persist a versioned calibration model."""
+        from backend.atomic_io import atomic_write_json
+
         target_path = self.versions_dir / f"{version.version_id}.json"
-        temp_path = self.versions_dir / f"{version.version_id}.tmp"
-
-        with open(temp_path, "w", encoding="utf-8") as f:
-            json.dump(version.to_dict(), f, indent=2)
-
-        # Atomic replacement
-        os.replace(temp_path, target_path)
+        atomic_write_json(target_path, version.to_dict(), indent=2)
         return target_path
 
     def load_calibration_version(self, version_id: str) -> Optional[CalibrationVersion]:

@@ -269,9 +269,9 @@ class ProjectIntelligenceEngine:
         return lines
 
     def save_index(self, output_path: str) -> None:
-        path = Path(output_path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(self.symbol_graph, indent=2, ensure_ascii=False), encoding="utf-8")
+        from backend.atomic_io import atomic_write_json
+
+        atomic_write_json(output_path, self.symbol_graph, indent=2)
 
 
 if __name__ == "__main__":

@@ -2,8 +2,10 @@ use std::sync::Arc;
 use tauri::State;
 
 use crate::error::AppError;
+use crate::permissions::gateway::PermissionGateway;
 use crate::process::preview_server::PreviewServerHandle;
 use crate::protocol::loopback::{LoopbackConfig, LoopbackHandle, MediaTicketResponse};
+use crate::sentinel::scheduler::SentinelScheduler;
 use crate::workers::supervisor::WorkerSupervisor;
 
 /// Managed runtime services started during Tauri shell setup.
@@ -11,6 +13,8 @@ pub struct RuntimeServices {
     pub loopback: LoopbackHandle,
     pub preview: PreviewServerHandle,
     pub workers: Arc<WorkerSupervisor>,
+    pub permissions: Arc<PermissionGateway>,
+    pub sentinel: Arc<SentinelScheduler>,
 }
 
 #[tauri::command]

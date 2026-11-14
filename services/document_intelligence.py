@@ -1687,7 +1687,9 @@ class DocumentIntelligenceExtractor:
                 path = self.assets_dir / name
                 png_bytes = pix.tobytes("png")
                 sha = hashlib.sha256(png_bytes).hexdigest()
-                path.write_bytes(png_bytes)
+                from backend.atomic_io import atomic_write_bytes
+
+                atomic_write_bytes(path, png_bytes)
                 f["asset_ref"], f["asset_sha"], f["asset_status"] = f"assets/{name}", sha, "EXTRACTED"
                 f["w"], f["h"] = pix.width, pix.height
                 cache[f["xref"]] = (f["asset_ref"], sha)
@@ -1704,7 +1706,9 @@ class DocumentIntelligenceExtractor:
             path = self.assets_dir / name
             png_bytes = pix.tobytes("png")
             sha = hashlib.sha256(png_bytes).hexdigest()
-            path.write_bytes(png_bytes)
+            from backend.atomic_io import atomic_write_bytes
+
+            atomic_write_bytes(path, png_bytes)
             f["asset_ref"] = f"assets/{name}"
             f["asset_sha"] = sha
             f["asset_status"] = "RENDERED_FROM_PAGE"
@@ -1731,7 +1735,9 @@ class DocumentIntelligenceExtractor:
             path = self.assets_dir / name
             png_bytes = pix.tobytes("png")
             sha = hashlib.sha256(png_bytes).hexdigest()
-            path.write_bytes(png_bytes)
+            from backend.atomic_io import atomic_write_bytes
+
+            atomic_write_bytes(path, png_bytes)
             fm["asset_ref"] = f"assets/{name}"
             fm["asset_sha"] = sha
         except Exception:

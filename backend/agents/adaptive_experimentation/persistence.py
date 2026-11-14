@@ -28,13 +28,11 @@ class AdaptiveExperimentStore:
 
     def save_session(self, session: InvestigationSession) -> None:
         """Atomically persist an investigation session."""
+        from backend.atomic_io import atomic_write_json
+
         records = self.load_all_sessions()
         records[session.session_id] = session.to_dict()
-
-        temp_path = self.base_dir / "sessions.tmp"
-        with open(temp_path, "w", encoding="utf-8") as f:
-            json.dump(records, f, indent=2)
-        os.replace(temp_path, self.sessions_file)
+        atomic_write_json(self.sessions_file, records, indent=2)
 
     def load_all_sessions(self) -> Dict[str, Dict]:
         """Load all persisted sessions from disk."""
@@ -60,8 +58,4 @@ class AdaptiveExperimentStore:
             except Exception:
                 ledger = []
         ledger.append(entry)
-
-        temp_path = self.base_dir / "audit_ledger.tmp"
-        with open(temp_path, "w", encoding="utf-8") as f:
-            json.dump(ledger, f, indent=2)
-        os.replace(temp_path, self.audit_ledger_file)
+        atomic_write_json(self.audit_ledger_file, ledger, indent=2)

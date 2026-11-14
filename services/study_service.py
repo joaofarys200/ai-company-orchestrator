@@ -4638,8 +4638,10 @@ class StudyService:
             ts_suffix = now_dt.strftime("%Y%m%d_%H%M%S_%f")
             archive_path = archive_dir / f"{dest_file.stem}_{ts_suffix}.md"
             try:
+                from backend.atomic_io import atomic_write_bytes
+
                 existing_bytes = dest_file.read_bytes()
-                archive_path.write_bytes(existing_bytes)
+                atomic_write_bytes(archive_path, existing_bytes)
             except Exception:
                 pass
 

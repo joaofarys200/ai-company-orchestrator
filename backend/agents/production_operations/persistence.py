@@ -32,10 +32,11 @@ class OperationsPersistence:
         os.makedirs(self.storage_dir, exist_ok=True)
 
     def save_json(self, filename: str, data: Any) -> str:
+        from backend.atomic_io import atomic_write_json
+
         filepath = os.path.join(self.storage_dir, filename)
         sanitized = _sanitize(data)
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(sanitized, f, indent=2)
+        atomic_write_json(filepath, sanitized, indent=2)
         return filepath
 
     def load_json(self, filename: str) -> Any:

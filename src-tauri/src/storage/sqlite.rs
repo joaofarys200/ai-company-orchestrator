@@ -166,7 +166,7 @@ impl SqliteDatabase {
                     )
                 });
 
-                let conn = match open_res {
+                let mut conn = match open_res {
                     Ok(mut c) => {
                         if let Err(err) = configure_writer_connection(&c)
                             .and_then(|_| apply_migrations(&mut c).map(|_| ()))

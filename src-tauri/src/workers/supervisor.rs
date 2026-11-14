@@ -5,7 +5,7 @@
 //! `worker.init` handshake, maintains 5s/15s heartbeats, and auto-restarts with bounded
 //! exponential backoff when crashed or unresponsive.
 
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
@@ -373,6 +373,7 @@ pub struct WorkerSupervisor {
     config: WorkerSupervisorConfig,
     slots: HashMap<WorkerPoolRole, Arc<RoleSlot>>,
     reverse_handler: Arc<RwLock<Option<ReverseRpcHandler>>>,
+    active_pids: Arc<std::sync::RwLock<HashSet<u32>>>,
 }
 
 impl WorkerSupervisor {
@@ -385,7 +386,16 @@ impl WorkerSupervisor {
             config,
             slots,
             reverse_handler: Arc::new(RwLock::new(None)),
+            active_pids: Arc::new(std::sync::RwLock::new(HashSet::new())),
         }
+    }
+
+    /// Returns currently tracked live Python worker PIDs without waiting on async slot locks.
+    pub fn live_pids(&self) -> Vec<u32> {
+        self.active_pids
+            .read()
+            .map(|guard| guard.iter().copied().collect())
+            .unwrap_or_default()
     }
 
     pub fn config(&self) -> &WorkerSupervisorConfig {
@@ -421,6 +431,9 @@ impl WorkerSupervisor {
                 return Ok(Arc::clone(existing));
             }
             existing.shutdown(self.config.shutdown_timeout).await;
+            if let Ok(mut pids) = self.active_pids.write() {
+                pids.remove(&existing.pid);
+            }
             *guard = None;
             let failures = slot.restarts.fetch_add(1, Ordering::SeqCst) + 1;
             *slot.last_failure_at.lock().await = Some(Instant::now());
@@ -451,6 +464,11 @@ impl WorkerSupervisor {
             Arc::clone(&self.reverse_handler),
         )
         .await?;
+        if worker.pid > 0 {
+            if let Ok(mut pids) = self.active_pids.write() {
+                pids.insert(worker.pid);
+            }
+        }
         *guard = Some(Arc::clone(&worker));
         Ok(worker)
     }
@@ -568,6 +586,9 @@ impl WorkerSupervisor {
         };
         let worker_opt = slot.worker.lock().await.take();
         if let Some(worker) = worker_opt {
+            if let Ok(mut pids) = self.active_pids.write() {
+                pids.remove(&worker.pid);
+            }
             worker.shutdown(self.config.shutdown_timeout).await;
         }
     }

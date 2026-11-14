@@ -3,11 +3,12 @@ pub mod error;
 pub mod permissions;
 pub mod process;
 pub mod protocol;
+pub mod sentinel;
 pub mod storage;
 pub mod workers;
 
 use std::sync::Arc;
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 
 pub const SHELL_NAME: &str = "tauri";
 pub const APP_DISPLAY_NAME: &str = "JARVIS OS";
@@ -29,8 +30,28 @@ pub fn run() {
             let worker_config =
                 workers::supervisor::WorkerSupervisorConfig::for_workspace(project_root.clone());
             let worker_supervisor = Arc::new(workers::supervisor::WorkerSupervisor::new(worker_config));
+            let permission_gateway = Arc::new(permissions::gateway::PermissionGateway::new(
+                permissions::gateway::DEFAULT_PERMISSION_TTL,
+            ));
+            let worker_supervisor_for_pid = Arc::clone(&worker_supervisor);
+            let sentinel_scheduler = Arc::new(
+                sentinel::scheduler::SentinelScheduler::with_default_read_only(Arc::new(move || {
+                    worker_supervisor_for_pid.live_pids()
+                })),
+            );
 
+            let app_handle_for_perm = app.handle().clone();
+            let gateway_for_setup = Arc::clone(&permission_gateway);
+            let workers_for_setup = Arc::clone(&worker_supervisor);
             let (loopback, preview) = tauri::async_runtime::block_on(async move {
+                gateway_for_setup
+                    .set_notifier(Arc::new(move |record| {
+                        let _ = app_handle_for_perm.emit("permission.requested", record);
+                    }))
+                    .await;
+                workers_for_setup
+                    .set_reverse_handler(gateway_for_setup.as_reverse_rpc_handler())
+                    .await;
                 let loopback = protocol::loopback::LoopbackHandle::start(project_root)
                     .await
                     .map_err(|err| Box::new(err) as Box<dyn std::error::Error>)?;
@@ -46,6 +67,8 @@ pub fn run() {
                 loopback,
                 preview,
                 workers: worker_supervisor,
+                permissions: permission_gateway,
+                sentinel: sentinel_scheduler,
             });
             Ok(())
         })
@@ -58,6 +81,11 @@ pub fn run() {
             commands::workers::get_worker_health,
             commands::workers::restart_worker_role,
             commands::workers::worker_system_health,
+            commands::security::list_pending_permissions,
+            commands::security::approve_permission_request,
+            commands::security::deny_permission_request,
+            commands::security::sentinel_status,
+            commands::security::sentinel_tick_shadow,
         ])
         .build(tauri::generate_context!())
         .expect("error while building JARVIS OS Tauri shell");

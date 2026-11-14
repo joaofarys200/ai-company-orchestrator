@@ -194,7 +194,9 @@ fn persist_map_atomic(
 ) -> Result<(), String> {
     let serialized = serde_json::to_string_pretty(map)
         .map_err(|e| format!("Failed to serialize {filename}: {e}"))?;
-    atomic_write_string(root_dir, filename, &serialized).map_err(|err| err.to_string())
+    atomic_write_string(root_dir, Path::new(filename), &serialized)
+        .map(|_| ())
+        .map_err(|err| err.to_string())
 }
 
 fn read_json_map_safe(path: &Path) -> Result<BTreeMap<String, Value>, String> {

@@ -530,9 +530,10 @@ class ProjectDependencyManager:
                             pkg_data = json.load(rf)
                     deps = pkg_data.setdefault("dependencies", {})
                     if package_name not in deps:
+                        from backend.atomic_io import atomic_write_json
+
                         deps[package_name] = "^1.0.0"
-                        with open(manifest_path, "w", encoding="utf-8") as wf:
-                            json.dump(pkg_data, wf, indent=2)
+                        atomic_write_json(manifest_path, pkg_data, indent=2)
                         manifest_updated = True
             except Exception as e:
                 logger.warning(f"Erro ao atualizar manifest '{manifest_name}': {e}")
