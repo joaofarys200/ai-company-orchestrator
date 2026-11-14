@@ -26,6 +26,16 @@ _PROTOCOL_STDOUT = isolate_protocol_stdout()
 
 import argparse  # noqa: E402
 import asyncio  # noqa: E402
+import importlib  # noqa: E402
+
+
+_ROLE_WORKER_MODULES = {
+    "ai": "workers.ai_worker",
+    "study": "workers.study_worker",
+    "knowledge": "workers.knowledge_worker",
+    "mission": "workers.mission_worker",
+    "voice": "workers.voice_worker",
+}
 
 
 async def _handle_echo(ctx: WorkerContext, params: dict) -> dict:
@@ -83,6 +93,10 @@ def build_worker_server(worker_type: str, writer: ProtocolFrameWriter) -> Worker
     server = WorkerRpcServer(worker_type=worker_type, capabilities=caps, writer=writer)
     server.register("system.health", _handle_health)
     server.register("worker.echo", _handle_echo)
+    module_path = _ROLE_WORKER_MODULES.get(worker_type)
+    if module_path is not None:
+        mod = importlib.import_module(module_path)
+        mod.register_worker_handlers(server)
     return server
 
 

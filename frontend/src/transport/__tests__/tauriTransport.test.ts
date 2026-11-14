@@ -129,6 +129,9 @@ function createMockTauriHarness(options?: {
         }
         return undefined as T;
       }
+      if (command === 'cancel_client_request') {
+        return true as T;
+      }
       if (command === 'dispatch_client_message') {
         if (options?.onInvokeDispatch) {
           return options.onInvokeDispatch(args, (payload) => emitEvent('jarvis:event', payload)) as T;
@@ -221,9 +224,9 @@ describe('Platform detection & virtual origin safety', () => {
       const harness = createMockTauriHarness();
       const tauriTransport = createDefaultTransport({
         tauriApis: harness.apis,
-        preferHybridFallback: false,
       });
       assert.ok(tauriTransport instanceof TauriTransportAdapter);
+      assert.equal(tauriTransport.system.getStatus().backend, 'tauri-ipc');
       tauriTransport.dispose();
     } finally {
       if (hadInternals) {
@@ -489,6 +492,53 @@ describe('TauriTransportAdapter hybrid coexistence mode', () => {
     lastSocket!.simulateServerJson({ type: 'system_status', cpu: 10, memory: 20 });
     assert.ok(receivedTypes.includes('study_document_details'));
     assert.ok(receivedTypes.includes('system_status'));
+
+    adapter.dispose();
+  });
+
+  it('routes domain commands and native cancellation cleanly in pure Tauri IPC mode', async () => {
+    const dispatchedTypes: string[] = [];
+    const harness = createMockTauriHarness({
+      onInvokeDispatch: (args, emit) => {
+        const msg = args?.message as { type: string; request_id?: string };
+        dispatchedTypes.push(msg.type);
+        const eventTypeMap: Record<string, string> = {
+          get_rules: 'rules_list',
+          study_list_documents: 'study_documents_list',
+          mission_list: 'mission_list_result',
+          directive: 'state',
+        };
+        const replyType = eventTypeMap[msg.type] ?? 'system';
+        emit({ type: replyType, request_id: msg.request_id });
+        return null;
+      },
+    });
+
+    const adapter = new TauriTransportAdapter({
+      preferHybridFallback: false,
+      tauriApis: harness.apis,
+    });
+    adapter.connect();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    const r1 = await adapter.invoke<{ type: string }>({ type: 'get_rules' });
+    const r2 = await adapter.invoke<{ type: string }>({ type: 'study_list_documents' });
+    const r3 = await adapter.invoke<{ type: string }>({ type: 'mission_list', project_id: 'ALL' } as never);
+    const r4 = await adapter.invoke<{ type: string }>({ type: 'directive', prompt: 'status' } as never);
+
+    assert.equal(r1.type, 'rules_list');
+    assert.equal(r2.type, 'study_documents_list');
+    assert.equal(r3.type, 'mission_list_result');
+    assert.equal(r4.type, 'state');
+    assert.deepEqual(dispatchedTypes, ['get_rules', 'study_list_documents', 'mission_list', 'directive']);
+
+    const cancelled = await adapter.cancelNativeRequest('req-cancel-123', 'user_cancelled');
+    assert.equal(cancelled, true);
+    assert.ok(
+      harness.invokedCommands.some(
+        (c) => c.command === 'cancel_client_request' && c.args?.requestId === 'req-cancel-123'
+      )
+    );
 
     adapter.dispose();
   });

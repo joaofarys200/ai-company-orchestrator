@@ -171,6 +171,8 @@ class ProtocolContractTests(unittest.TestCase):
             self.assertIn(event_type, ts_switch_cases)
 
     def test_mission_handler_audit_counts_and_non_silent_stub_handling(self) -> None:
+        from backend.mission_governance_dispatch import MISSION_GOVERNANCE_OPERATIONS
+
         missions_path = PROJECT_ROOT / "backend" / "websocket" / "handlers" / "missions.py"
         tree = ast.parse(missions_path.read_text(encoding="utf-8"))
 
@@ -197,17 +199,20 @@ class ProtocolContractTests(unittest.TestCase):
                                 if isinstance(elt, ast.Constant) and isinstance(elt.value, str):
                                     handle_branches.add(elt.value)
 
-        actual_stubs = set(MISSION_HANDLERS.keys()) - handle_branches
-        actual_legacy = handle_branches - set(MISSION_HANDLERS.keys())
+        handled_operations = handle_branches | set(MISSION_GOVERNANCE_OPERATIONS)
+        actual_stubs = set(MISSION_HANDLERS.keys()) - handled_operations
+        actual_legacy = handled_operations - set(MISSION_HANDLERS.keys())
 
-        self.assertEqual(len(MISSION_HANDLERS), 129)
-        self.assertEqual(actual_stubs, set(MISSION_UNIMPLEMENTED_STUB_OPERATIONS))
-        self.assertEqual(len(MISSION_UNIMPLEMENTED_STUB_OPERATIONS), 33)
-        self.assertEqual(actual_legacy, set(MISSION_UNREGISTERED_LEGACY_BRANCHES))
-        self.assertEqual(len(MISSION_UNREGISTERED_LEGACY_BRANCHES), 14)
+        self.assertEqual(len(MISSION_HANDLERS), 143)
+        self.assertEqual(len(MISSION_GOVERNANCE_OPERATIONS), 33)
+        self.assertEqual(actual_stubs, set())
+        self.assertEqual(set(MISSION_UNIMPLEMENTED_STUB_OPERATIONS), set())
+        self.assertEqual(actual_legacy, set())
+        self.assertEqual(set(MISSION_UNREGISTERED_LEGACY_BRANCHES), set())
 
-    def test_mission_stub_operation_emits_diagnostic_instead_of_silent_drop(self) -> None:
+    def test_all_mission_governance_operations_dispatch_real_payloads(self) -> None:
         import asyncio
+        from backend.mission_governance_dispatch import MISSION_GOVERNANCE_OPERATIONS
 
         sent_events: list[dict] = []
 
@@ -223,25 +228,39 @@ class ProtocolContractTests(unittest.TestCase):
                 send_json=_send_ws,
             ),
         )
-        stub_op = sorted(MISSION_UNIMPLEMENTED_STUB_OPERATIONS)[0]
         dummy_session = SimpleNamespace(selected_project_id="proj-1")
-        asyncio.run(
-            handler.handle(
-                object(),
-                {
-                    "type": stub_op,
+        sample_payloads = {
+            "mission_policy_proposal_review": {"proposal_id": "prop_p40_osc_01", "action": "APPROVE"},
+            "mission_experience_curate": {"experience_id": "exp_1", "action": "APPROVE"},
+            "mission_contract_proposal_review": {"proposal_id": "prop_1", "action": "ACCEPT"},
+            "mission_contract_drift_review": {"drift_id": "drift_1", "action": "APPROVE"},
+            "mission_contract_rollback": {"contract_id": "c_1", "target_version": "1.0.0"},
+            "mission_polymorphic_variant_review": {"schema_id": "s_1", "variant_id": "v_1", "action": "APPROVE"},
+            "mission_polymorphic_compatibility_check": {"schema_id": "s_1"},
+            "mission_contract_migration_plan": {"migration_id": "mig_1"},
+            "mission_contract_change_gate_action": {"migration_id": "mig_1", "action": "APPROVE"},
+            "mission_loop_respond_human": {"action": "APPROVE"},
+        }
+
+        async def _exercise_all() -> None:
+            for op in sorted(MISSION_GOVERNANCE_OPERATIONS):
+                sent_events.clear()
+                payload = {
+                    "type": op,
                     "project_id": "proj-1",
-                    "mission_id": "m-1",
-                    "request_id": "req-stub-1",
-                },
-                dummy_session,
-            )
-        )
-        self.assertEqual(len(sent_events), 1)
-        self.assertEqual(sent_events[0]["type"], "system")
-        self.assertIn(stub_op, sent_events[0]["content"])
-        normalized = normalize_ws_message(sent_events[0])
-        self.assertIsNotNone(normalized)
+                    "mission_id": "m-gov-1",
+                    "request_id": f"req-{op}",
+                    **sample_payloads.get(op, {}),
+                }
+                await handler.handle(object(), payload, dummy_session)
+                self.assertEqual(len(sent_events), 1, f"{op} should emit exactly one response event")
+                event_type = sent_events[0].get("type")
+                self.assertEqual(event_type, f"{op}_result", f"{op} emitted unexpected type {event_type}")
+                self.assertIn(event_type, SERVER_MESSAGE_TYPES, f"{event_type} missing from SERVER_MESSAGE_TYPES")
+                normalized = normalize_ws_message(sent_events[0])
+                self.assertIsNotNone(normalized)
+
+        asyncio.run(_exercise_all())
 
     def test_normalize_ws_message_preserves_request_id(self) -> None:
         msg_with_id = normalize_ws_message(

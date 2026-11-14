@@ -2751,13 +2751,13 @@ class MissionControlEngine:
         controller = cls.get_autonomous_loop_controller(mission_id, scenario_key)
         registry = cls.get_policy_registry()
         from agents.decision_calibration.evaluator import DecisionOutcomeEvaluator
+        from agents.autonomous_loop.models import LoopDecisionType
         from agents.decision_calibration.models import (
             CounterfactualDecision,
             DecisionCorrectness,
             DecisionErrorTaxonomy,
             DecisionOutcome,
             DecisionSeverity,
-            LoopDecisionType,
             MissedObservationType,
             PredictionContributionType,
         )

@@ -8,11 +8,12 @@ from typing import Any, Mapping
 import uuid
 
 from backend.message_protocol import system_message
-from backend.websocket.context import WebSocketSessionState
-from backend.websocket.contracts import (
-    MISSION_UNIMPLEMENTED_STUB_OPERATIONS,
-    MessageHandler,
+from backend.mission_governance_dispatch import (
+    MISSION_GOVERNANCE_OPERATIONS,
+    dispatch_mission_governance_operation,
 )
+from backend.websocket.context import WebSocketSessionState
+from backend.websocket.contracts import MessageHandler
 from backend.websocket.handlers import bind_handler_methods
 from backend.websocket.handlers.common import WebSocketResponder
 
@@ -153,6 +154,21 @@ MISSION_HANDLERS = {
     "mission_reliability_plan": "handle",
     "mission_reliability_execute": "handle",
     "mission_reliability_replay": "handle",
+    # Registered mission engineering engines (completion, state, graphs, verification, synthesis)
+    "mission_continuous_verification_run": "handle",
+    "mission_continuous_verification_status": "handle",
+    "mission_cross_project_learning_status": "handle",
+    "mission_cross_project_learning_transfer": "handle",
+    "mission_massive_project_state_plan_change": "handle",
+    "mission_massive_project_state_status": "handle",
+    "mission_scc_graph_query_impact": "handle",
+    "mission_scc_graph_status": "handle",
+    "mission_symbol_graph_query_impact": "handle",
+    "mission_symbol_graph_status": "handle",
+    "mission_task_completion_run": "handle",
+    "mission_task_completion_status": "handle",
+    "mission_test_synthesis_generate": "handle",
+    "mission_test_synthesis_status": "handle",
 }
 
 
@@ -2595,13 +2611,13 @@ class MissionWebSocketHandler:
                 )
                 return
 
-            if operation in MISSION_UNIMPLEMENTED_STUB_OPERATIONS:
-                await self.connections.send(
-                    websocket,
-                    system_message(
-                        f"Operação '{operation}' declarada apenas no contrato sem handler ativo nesta etapa."
-                    ),
+            if operation in MISSION_GOVERNANCE_OPERATIONS:
+                governance_payload = await asyncio.to_thread(
+                    dispatch_mission_governance_operation,
+                    operation,
+                    message,
                 )
+                await self.connections.send(websocket, governance_payload)
                 return
 
             if snapshot is None:

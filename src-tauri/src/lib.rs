@@ -7,8 +7,10 @@ pub mod sentinel;
 pub mod storage;
 pub mod workers;
 
+use std::collections::HashMap;
 use std::sync::Arc;
 use tauri::{Emitter, Manager};
+use tokio::sync::Mutex;
 
 pub const SHELL_NAME: &str = "tauri";
 pub const APP_DISPLAY_NAME: &str = "JARVIS OS";
@@ -27,6 +29,15 @@ pub fn run() {
                 None
             };
 
+            let db = Arc::new(
+                storage::sqlite::SqliteDatabase::open(project_root.join("database.db"))
+                    .map_err(|err| Box::new(std::io::Error::other(err)) as Box<dyn std::error::Error>)?,
+            );
+            let study_store = Arc::new(
+                storage::study_store::StudyStore::open(project_root.join("data").join("study"))
+                    .map_err(|err| Box::new(std::io::Error::other(err)) as Box<dyn std::error::Error>)?,
+            );
+
             let worker_config =
                 workers::supervisor::WorkerSupervisorConfig::for_workspace(project_root.clone());
             let worker_supervisor = Arc::new(workers::supervisor::WorkerSupervisor::new(worker_config));
@@ -43,16 +54,24 @@ pub fn run() {
             let app_handle_for_perm = app.handle().clone();
             let gateway_for_setup = Arc::clone(&permission_gateway);
             let workers_for_setup = Arc::clone(&worker_supervisor);
+            let root_for_loopback = project_root.clone();
             let (loopback, preview) = tauri::async_runtime::block_on(async move {
                 gateway_for_setup
                     .set_notifier(Arc::new(move |record| {
                         let _ = app_handle_for_perm.emit("permission.requested", record);
+                        let _ = app_handle_for_perm.emit(
+                            commands::dispatch::JARVIS_EVENT_NAME,
+                            serde_json::json!({
+                                "type": "permission_request_created",
+                                "request": commands::security::permission_record_to_frontend_json(record),
+                            }),
+                        );
                     }))
                     .await;
                 workers_for_setup
                     .set_reverse_handler(gateway_for_setup.as_reverse_rpc_handler())
                     .await;
-                let loopback = protocol::loopback::LoopbackHandle::start(project_root)
+                let loopback = protocol::loopback::LoopbackHandle::start(root_for_loopback)
                     .await
                     .map_err(|err| Box::new(err) as Box<dyn std::error::Error>)?;
                 let preview = process::preview_server::PreviewServerHandle::start(
@@ -64,11 +83,15 @@ pub fn run() {
             })?;
 
             app.manage(commands::media::RuntimeServices {
+                project_root,
+                db,
+                study_store,
                 loopback,
                 preview,
                 workers: worker_supervisor,
                 permissions: permission_gateway,
                 sentinel: sentinel_scheduler,
+                active_dispatches: Arc::new(Mutex::new(HashMap::new())),
             });
             Ok(())
         })
@@ -86,6 +109,27 @@ pub fn run() {
             commands::security::deny_permission_request,
             commands::security::sentinel_status,
             commands::security::sentinel_tick_shadow,
+            commands::storage::sqlite_list_sessions,
+            commands::storage::sqlite_create_session,
+            commands::storage::sqlite_list_messages,
+            commands::storage::sqlite_add_message,
+            commands::storage::sqlite_list_projects,
+            commands::storage::sqlite_get_compounding_rules,
+            commands::storage::sqlite_delete_compounding_rule,
+            commands::storage::sqlite_get_architecture_memory,
+            commands::storage::sqlite_delete_architecture_memory,
+            commands::storage::sqlite_get_engineering_decisions,
+            commands::storage::sqlite_delete_engineering_decision,
+            commands::study::study_store_refresh,
+            commands::study::study_store_list_documents,
+            commands::study::study_store_get_document,
+            commands::study::study_store_list_collections,
+            commands::study::study_store_list_flashcards,
+            commands::projects::confined_read_file,
+            commands::projects::confined_write_file,
+            commands::dispatch::dispatch_client_message,
+            commands::dispatch::cancel_client_request,
+            commands::dispatch::trigger_initial_sync,
         ])
         .build(tauri::generate_context!())
         .expect("error while building JARVIS OS Tauri shell");

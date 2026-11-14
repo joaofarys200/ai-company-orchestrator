@@ -795,6 +795,20 @@ export class TauriTransportAdapter implements JarvisTransport {
     return cancelledCount;
   }
 
+  async cancelNativeRequest(requestId: string, reason = 'user_cancelled'): Promise<boolean> {
+    if (this.disposed || !requestId) {
+      return false;
+    }
+    try {
+      return await this.apis.invoke<boolean>('cancel_client_request', {
+        requestId,
+        reason,
+      });
+    } catch {
+      return false;
+    }
+  }
+
   private dispatchMessageToSubscribers(msg: ServerMessage, parsed: unknown): void {
     const typedHandlers = this.typeListeners.get(msg.type);
     if (typedHandlers) {

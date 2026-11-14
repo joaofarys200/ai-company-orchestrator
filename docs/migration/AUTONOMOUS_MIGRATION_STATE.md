@@ -1,10 +1,10 @@
 # JARVIS OS — Autonomous Migration State
 
-- **Last Updated (UTC):** `2026-11-14T00:28:30Z`
-- **Current Phase:** `Phase 3 — Functional Migration from Python to Rust (3.1 COMPLETE; 3.2 Fixed & 3.3 Hardening Implemented -> Validating on Windows CI)`
-- **Current Increment:** `Increment 3.2 Fix + Increment 3.3 Security Hardening (Command Guard, HITL Gateway, SSRF Fail-Closed, Atomic IO, Win32 Sentinel ShadowMode)`
+- **Last Updated (UTC):** `2026-11-14T00:50:45Z`
+- **Current Phase:** `Phase 3 — Functional Migration from Python to Rust (Increment 3.4 Implemented -> Validating on Windows CI)`
+- **Current Increment:** `Increment 3.4 (33 Mission Governance Dispatchers, 5 Domain Workers, Rust IPC Router & DB/FS Commands, Pure Tauri Default Transport)`
 - **Current Branch:** `migration/tauri-rust-complete`
-- **Current Commit:** `5ef29ac` + 3.2 fix & 3.3 commit pending push (base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
+- **Current Commit:** Pending Increment 3.4 commit & CI validation (prior CI green: `bfb585f`, base `main`: `af11ae9095f4cfd8c8e01334704ffde282da9554`, untouched)
 
 ---
 
@@ -45,32 +45,28 @@
   - Implemented `src-tauri/src/process/preview_server.rs` (isolated ephemeral `127.0.0.1:0` preview server with `Host` guard + symlink/traversal confinement + `X-Content-Type-Options: nosniff` + `Cache-Control: no-store` + TCP integration tests).
   - Exposed Tauri commands `get_loopback_config` and `get_media_ticket` via managed `RuntimeServices` in `src-tauri/src/commands/media.rs` + `src-tauri/src/lib.rs`, added `http://127.0.0.1:*` to `connect-src`/`worker-src` in `tauri.conf.json`, and added `sandbox="allow-scripts allow-forms"` to `WorkspaceViewer.tsx` preview `<iframe>` elements.
 
-### Phase 3 — Functional Migration from Python to Rust (IN PROGRESS)
+### Phase 3 — Functional Migration from Python to Rust (COMPLETE pending CI)
 - **3.1 Rust Worker Supervisor + Win32 Job Objects + NDJSON JSON-RPC 2.0 + `workers/worker_boot.py` (COMPLETE — `d5e46cd`, verified CI Run `#43348340070`):**
   - Implemented Python worker runtime `workers/{__init__,worker_boot}.py` and `workers/common/{__init__,stdio_rpc}.py` isolating `os.dup(1)` + redirecting `sys.stdout = sys.stderr` prior to imports, with 16 MiB frame limit, `StreamChunkBatcher` (16 ms / 3 chunks), `system.ping`/`system.pong`, `task.cancel`, and non-blocking `reverse_request`/`reverse_response` HITL approval + `tests/test_worker_stdio_rpc.py`.
   - Added `windows-sys` (`Win32_Foundation`, `Win32_Security`, `Win32_System_JobObjects`, `Win32_System_Threading`), `uuid`, `chrono`, and `tokio` `"process"` feature to `src-tauri/Cargo.toml` and locked `Cargo.lock`.
   - Implemented `src-tauri/src/process/job_object.rs` (RAII `JobObject` with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE | JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION` + `CREATE_NO_WINDOW` + child termination test).
   - Implemented `src-tauri/src/workers/{mod,rpc_client,supervisor}.rs` (`WorkerRpcClient` with bounded `mpsc(1024)` queue, 5s/15s heartbeat, async `ReverseRpcHandler`, and `WorkerSupervisor` managing `Echo`/`Ai`/`Study`/`Knowledge`/`Mission`/`Voice` roles with backoff auto-restart + 3 live Rust-to-Python integration tests).
   - Exposed `get_worker_health`, `restart_worker_role`, `worker_system_health` in `src-tauri/src/commands/workers.rs` and wired `RuntimeServices.workers` shutdown on `RunEvent::Exit` in `src-tauri/src/lib.rs`.
-- **3.2 Rust SQLite Core (`database.db` Single Writer) + Study Catalog Store (IMPLEMENTED & FIXED FOR CI):**
-  - Added `rusqlite` (`0.38`, `features = ["bundled"]`) to `src-tauri/Cargo.toml` and locked via `cargo fetch` (`5ef29ac`).
-  - Implemented `src-tauri/src/storage/migrations.rs`, `src-tauri/src/storage/sqlite.rs` (`SqliteDatabase` dedicated single-writer OS thread + `query_only=ON` WAL readers + 3 temp-DB tests), and `src-tauri/src/storage/study_store.rs` (atomic Study catalog store + forensic `.corrupt.<ts>.<pid>.bak` backup).
-  - Resolved `5ef29ac` CI #43533262704 `cargo check` errors (`study_store.rs:197` `Path::new(filename)` + `.map(|_| ())`; `sqlite.rs:169` `let mut conn`).
-- **3.3 Security Hardening in Rust Core & Python Services (IMPLEMENTED — Pushing with 3.2 Fix for Windows CI):**
-  - Implemented `src-tauri/src/process/command_guard.rs` (shell-free argv tokenizer, closed executable allowlist, safe `git` subcommand gate, `python -c` / `node -e` inline eval block, `env_clear` + scrubbed `SAFE_ENV_KEYS`, `CREATE_NO_WINDOW`, 512 KiB output cap, and timeout enforcement).
-  - Implemented `src-tauri/src/protocol/ssrf_guard.rs` (blocks IPv4/IPv6 private/loopback/link-local/CGNAT `100.64.0.0/10`/benchmark `198.18.0.0/15`/`0.0.0.0/8`, IPv4-mapped IPv6, embedded credentials, `.local`/`.internal`, hex/decimal obfuscation, and fail-closed async DNS resolution).
-  - Implemented `src-tauri/src/permissions/{policy,gateway}.rs` (fail-closed risk classification, project/mission scope isolation, 300s TTL HITL approval wait via `oneshot`, and `PermissionGateway::as_reverse_rpc_handler()` wired onto `WorkerSupervisor` + `permission.requested` Tauri event emission).
-  - Implemented `src-tauri/src/sentinel/{mod,collectors_win,scheduler}.rs` (`Win32_System_Diagnostics_ToolHelp` + `Win32_System_SystemInformation` non-blocking collectors via `spawn_blocking`, `ShadowMode=true` read-only default, and dynamic protected-PID immunity including Tauri PID + `WorkerSupervisor::live_pids()`).
-  - Exposed HITL/Sentinel Tauri commands in `src-tauri/src/commands/security.rs` and wired `RuntimeServices` in `src-tauri/src/lib.rs`.
-  - Extracted shared zero-dependency Python modules `backend/atomic_io.py` and `services/url_ssrf_guard.py`; migrated `services/`, `security/`, `intelligence/`, and `backend/agents/` non-atomic writes onto `atomic_write_*`; hardened `workspace_policy.py` and `services/video_intelligence_service.py` (preserving legacy `SSRF_FORBIDDEN_HOST` / `VIDEO_URL_NOT_SUPPORTED` contracts); added `tests/test_security_hardening_phase3.py`.
+- **3.2 & 3.3 Rust SQLite Single Writer, StudyStore & Security Hardening (COMPLETE — `bfb585f`, verified CI Run `#43534493463`):**
+  - Added `rusqlite` (`0.38`, `features = ["bundled"]`) and `windows-sys` (`ToolHelp` + `SystemInformation`) locked in `src-tauri/Cargo.lock`.
+  - Implemented `src-tauri/src/storage/migrations.rs`, `src-tauri/src/storage/sqlite.rs`, and `src-tauri/src/storage/study_store.rs`.
+  - Implemented `src-tauri/src/process/command_guard.rs`, `src-tauri/src/protocol/ssrf_guard.rs`, `src-tauri/src/permissions/{policy,gateway}.rs`, `src-tauri/src/sentinel/{mod,collectors_win,scheduler}.rs`, `src-tauri/src/commands/security.rs`, `backend/atomic_io.py`, `services/url_ssrf_guard.py`, and `tests/test_security_hardening_phase3.py`.
+  - CI Run `#43534493463` passed all 20 steps cleanly (`frontend test`, `frontend build`, `python-contract-tests`, `cargo check --locked --all-targets`, `cargo test --locked`, `tauri build --no-bundle`).
+- **3.4 Governance Resolution, Python Domain Workers & Unified Rust IPC Router (IMPLEMENTED — Validating on Windows CI):**
+  - Resolved all 33 previously stubbed mission governance operations via lazy dispatch table `backend/mission_governance_dispatch.py` + fixed `agents/mission_control_engine.py:2754` `LoopDecisionType` import; registered all 14 legacy mission branches in `backend/websocket/handlers/missions.py` (`143` handlers, `0` stubs, `0` unregistered legacy branches); synchronized `backend/websocket/contracts.py`, `websocket_schema.py`, and `tests/test_protocol_contracts.py`.
+  - Created `workers/common/domain_bridge.py` (`DomainWorkerRuntime` + `_WorkerEventStreamClient`) and the 5 specialized role workers `workers/{ai,study,knowledge,mission,voice}_worker.py` registered in `workers/worker_boot.py` + `tests/test_domain_workers_phase3.py`.
+  - Wired `SqliteDatabase` & `StudyStore` into `RuntimeServices` (`src-tauri/src/commands/media.rs`, `src-tauri/src/lib.rs`), added `permission_record_to_frontend_json` + `"jarvis:event"` Reverse-RPC bridge, fixed `PingResponse` (`ok: true`, `runtime: "tauri-rust"`), and implemented `src-tauri/src/commands/{storage,study,projects,dispatch}.rs` (`dispatch_client_message`, `cancel_client_request`, `trigger_initial_sync`, native fast-paths, confined file IO, and async streaming worker forwarder).
+  - Updated `frontend/src/transport/createDefaultTransport.ts` (default `preferHybridFallback: false` in Tauri runtime) and added `cancelNativeRequest` + unit tests in `frontend/src/transport/TauriTransportAdapter.ts` & `frontend/src/transport/__tests__/tauriTransport.test.ts`.
+  - Extended `.github/workflows/tauri-windows-validation.yml` to run `tests/test_domain_workers_phase3.py` and `tests/test_protocol_contracts.py`.
 
 ---
 
-## 2. Remaining Work (Phases 3.3–5)
-
-### Phase 3 — Functional Migration from Python to Rust (Remaining)
-- **3.4 Domain IPC Commands & Specialized Python Workers:**
-  - `commands/{chat,projects,permissions,study,knowledge,sentinel,missions,voice,system}.rs`, Rust FS/runner in `projects.rs`, Python workers (`workers/{ai_worker,study_worker,knowledge_worker,mission_worker,voice_swarm_worker}.py`), resolve 33 `missions.py` stubs & 14 dead branches (`mission_governance_dispatch`).
+## 2. Remaining Work (Phases 4–5)
 
 ### Phase 4 — Legacy Infrastructure Removal (on `migration/tauri-rust-complete`)
 - Consolidate `agents/` vs `backend/agents/` via `sys.modules` shim + AST codemods verified by `pytest`, prune dead `agents/` / telemetry.
@@ -91,11 +87,7 @@
 - **Python Post-3.3 Local Suite (`venv\Scripts\python.exe -m pytest -q tests/test_security_hardening_phase3.py tests/test_smoke.py tests/test_video_intelligence.py tests/test_study_phase8_qa_e2e.py tests/test_worker_stdio_rpc.py tests/test_sqlite_hardening.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py tests/test_transport_gateway.py`):** `147 passed, 3 skipped, 2 warnings, 12 subtests passed in 13.58s` (`exit_code=0`).
 - **Frontend Transport (`npm --prefix frontend test`):** `14/14 passed (4 suites, 0 fail)` (`243.85ms`).
 - **Frontend Build (`npm --prefix frontend run build`):** `3545 modules transformed, ✓ built in 3.72s` (`exit_code=0`).
-- **CI Rust Phase 3 Increment 3.1 (Run `#43348340070` on `migration/tauri-rust-complete` @ `d5e46cd`, `conclusion=success`):**
-  - `cargo check --locked --all-targets`: `exit_code=0`, 0 errors, 0 warnings (`33.68s`).
-  - `cargo test --locked`: `13 passed; 0 failed` (`2.61s` — includes Win32 `JobObject` child termination + all 3 live Rust `WorkerSupervisor` <-> Python `worker_boot.py` unary/streaming/heartbeat/Reverse-RPC/cancel/crash-recovery tests).
-  - `tauri build --no-bundle`: `exit_code=0`, `jarvis-os.exe` (`15,932,928` B, `1m 41s`).
-  - CI Python contract tests (incl. `test_worker_stdio_rpc.py`): `29 passed, 2 skipped, 2 subtests passed in 11.20s`; Frontend test: `14 pass`; Frontend build: passed.
+- **3.2 & 3.3 Post-CI Verification (Run `#43534493463` on `migration/tauri-rust-complete` @ `bfb585f`, `conclusion=success`):** All 20 build and test steps (`frontend-test`, `frontend-build`, `python-contract-tests`, `cargo check --locked --all-targets`, `cargo test --locked`, `tauri build --no-bundle`) passed.
 
 ---
 
@@ -106,17 +98,17 @@
   1. `frontend/index.html` L7–111 inline `<script>` & `direct_pdf_test.html` inline `<script>`/`<style>` blocked by `script-src 'self' 'wasm-unsafe-eval'`; `main.tsx` / `StudyReaderView.tsx` polyfills evaluated after static ESM imports due to JS module hoisting.
   2. Fixed in 2.1: `StudyGeneratedDocumentView.tsx` uses `<iframe src="blob:...">` (allowed in `frame-src` + deferred `URL.revokeObjectURL`).
   3. Fixed in 2.1: `ChatPanel.tsx` plays TTS audio via `blob:` URLs + `--autoplay-policy=no-user-gesture-required`.
-  4. Fixed in 2.2: `resolveDefaultHttpBaseUrl()` blocks `tauri.localhost`/`tauri://`; `TauriTransportAdapter` resolves `get_loopback_config` & `get_media_ticket` once 2.3 backend activates.
+  4. Fixed in 2.2: `resolveDefaultHttpBaseUrl()` blocks `tauri.localhost`/`tauri://`; `TauriTransportAdapter` resolves `get_loopback_config` & `get_media_ticket`.
   5. Fixed in 2.2: All 12 UI components + `main.tsx` migrated onto transport-agnostic `AppSessionContext`.
-  6. Remaining for Phase 3.4: `backend/websocket/handlers/missions.py` retains 33 unimplemented stub keys and 14 unregistered legacy branches.
-- **Architectural Decisions Locked:** Preserve Q1–Q12 (`database.db` Rust single-writer in Phase 3, `state.db` permanent Python, `data/rho.db` permanent Python `ModelHarness` after safe migration tooling, `ModelExecutionService` & Python workers for PyMuPDF/OCR/FFmpeg/Whisper/ChromaDB/CrewAI/GeminiLive/Ollama, NDJSON JSON-RPC 2.0 + `os.dup(1)` + Win32 Job Objects, Rust Loopback HTTP `127.0.0.1:0` with Bearer + 60s `?ticket=`).
+  6. Fixed in 3.4: Resolved all 33 stubbed mission governance operations and 14 unregistered legacy mission branches via `backend/mission_governance_dispatch.py`.
+- **Architectural Decisions Locked:** Preserve Q1–Q12 (`database.db` Rust single-writer, `state.db` permanent Python, `data/rho.db` permanent Python `ModelHarness`, `ModelExecutionService` & Python workers for PyMuPDF/OCR/FFmpeg/Whisper/ChromaDB/CrewAI/GeminiLive/Ollama, NDJSON JSON-RPC 2.0 + `os.dup(1)` + Win32 Job Objects, Rust Loopback HTTP `127.0.0.1:0` with Bearer + 60s `?ticket=`).
 - **Git & Data Safety Rule:** User's local `data/` and `database.db*` remain untracked/unstaged and are NEVER committed, reset, or modified by migration tooling during automated runs (DB tests operate strictly on disposable copies / temp roots).
 
 ---
 
 ## 5. Next Executable Task
 
-- **Verify Windows CI green for Increment 3.2 + 3.3 (`sqlite`, `study_store`, `command_guard`, `ssrf_guard`, `permissions`, `sentinel`), then begin Phase 3 Increment 3.4: Domain Tauri Commands, Python Domain Workers (`workers/{ai,study,knowledge,mission,voice}_worker.py`), resolving the 33 stubs & 14 dead branches in `missions.py`, and wiring full `TauriTransportAdapter` domain dispatch.**
+- **Verify Windows CI green for Increment 3.4 (`bfb585f -> HEAD`), then execute Phase 4 (Legacy Infrastructure Removal: consolidate `agents/` vs `backend/agents/`, remove legacy `:8001` WS / `:8000` stdlib HTTP / `:8080` server / `transport_gateway.py`, tighten CSP, and retire Electron files/dependencies on `migration/tauri-rust-complete`).**
 
 ---
 

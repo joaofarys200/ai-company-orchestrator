@@ -11,8 +11,10 @@ use crate::{APP_DISPLAY_NAME, SHELL_NAME};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct PingResponse {
+    pub ok: bool,
     pub status: String,
     pub shell: String,
+    pub runtime: String,
     pub app_version: String,
     pub timestamp_ms: u128,
 }
@@ -35,8 +37,10 @@ pub fn build_ping_response(app_version: &str) -> PingResponse {
         .map(|d| d.as_millis())
         .unwrap_or(0);
     PingResponse {
+        ok: true,
         status: "ok".to_string(),
         shell: SHELL_NAME.to_string(),
+        runtime: "tauri-rust".to_string(),
         app_version: app_version.to_string(),
         timestamp_ms,
     }
