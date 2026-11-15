@@ -15,7 +15,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 # Subsystem integrations
 try:
-    from backend.agents.macro_refactoring import MacroRefactoringBridge
+    from agents.macro_refactoring import MacroRefactoringBridge
     _HAS_PHASE_73 = True
 except ImportError:
     try:
@@ -26,7 +26,7 @@ except ImportError:
         MacroRefactoringBridge = None  # type: ignore
 
 try:
-    from backend.agents.architectural_optimization import ArchitecturalOptimizationBridge
+    from agents.architectural_optimization import ArchitecturalOptimizationBridge
     _HAS_PHASE_74 = True
 except ImportError:
     try:

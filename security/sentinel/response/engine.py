@@ -70,8 +70,13 @@ class ResponseEngine:
 
     def _save_history(self) -> None:
         try:
-            with open(self.history_file, "w", encoding="utf-8") as f:
-                json.dump([a.to_dict() for a in self._actions.values()], f, indent=2)
+            from backend.atomic_io import atomic_write_json
+
+            atomic_write_json(
+                self.history_file,
+                [a.to_dict() for a in self._actions.values()],
+                indent=2,
+            )
         except Exception:
             pass
 

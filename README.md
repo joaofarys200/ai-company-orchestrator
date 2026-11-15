@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Status-Independent_Engineering_Project-3b82f6?style=for-the-badge&logo=rocket&logoColor=white" alt="Independent Project" />
   <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.11+" />
   <img src="https://img.shields.io/badge/React_19-TypeScript_6-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="React 19 and TypeScript 6" />
-  <img src="https://img.shields.io/badge/Electron_31-Spatial_Desktop_HUD-47848F?style=for-the-badge&logo=electron&logoColor=white" alt="Electron 31 Desktop HUD" />
+  <img src="https://img.shields.io/badge/Tauri_2-Rust_Desktop_HUD-FFC131?style=for-the-badge&logo=tauri&logoColor=black" alt="Tauri 2 Rust Desktop HUD" />
   <img src="https://img.shields.io/badge/Local_AI-Ollama_qwen3.5%3A9b-a855f7?style=for-the-badge" alt="Local Ollama qwen3.5:9b" />
   <img src="https://img.shields.io/badge/Test_Suite-356_Modules_%2F_3341_Tests-22c55e?style=for-the-badge&logo=pytest&logoColor=white" alt="356 Test Modules / 3341 Collected Tests" />
   <img src="https://img.shields.io/badge/Study_Engine-Phases_2--7-f59e0b?style=for-the-badge" alt="Study Engine Phases 2-7" />
@@ -90,7 +90,7 @@ To maintain factual transparency, all platform subsystems are categorized by cur
 
 | Subsystem | State | Current Implementation & Verification Scope |
 |---|---|---|
-| **Spatial Board HUD & Workspace UI** | `IMPLEMENTED & VERIFIED` | Electron 31 + React 19 + TypeScript 6 + Vite 8 HUD, `ChatStudyResultCard` deep links & Playwright E2E verified (`tsc -b`, `vite build`, headless Chromium). |
+| **Spatial Board HUD & Workspace UI** | `IMPLEMENTED & VERIFIED` | Tauri 2 + Rust Core + React 19 + TypeScript + Vite 8 HUD, `JarvisTransport` (`TauriTransportAdapter`), `ChatStudyResultCard` deep links & automated transport/Rust/Python verification. |
 | **Academic Study Engine (Phases 2–7)** | `IMPLEMENTED & VERIFIED` | Document AST extraction, hierarchical reasoning, editorial planner, PDF/DOCX composer, SM-2/Active Recall modes & JARVIS chat/agent orchestration on local `qwen3.5:9b`. |
 | **Multi-Agent Swarm & Chat Bridge** | `IMPLEMENTED & VERIFIED` | `Clara`, `Alex`, `Devon`, `Quinn` personas, WorkPackage DAG scheduling, intent resolver (`STUDY_OPERATION` vs coding/missions) & WS schema parity. |
 | **Coding Agent 2.0 Engine** | `VALIDATED IN TRIALS` | `tree-sitter` AST symbol replacement, TypeScript `@/*` alias resolution, failure memory & checkpoint rollback across 4 empirical suites. |
@@ -247,7 +247,7 @@ Active planned milestones for upcoming releases across Study OS, Multi-Agent Eng
 - 🔬 **Containerized Per-Mission Quotas**: Enforced CPU, memory, and network egress caps for sandboxed project runs with cryptographic audit digests.
 
 ### 4. Desktop Packaging & Telemetry HUD
-- 🛠️ **Standalone Installers & First-Run Wizard**: Electron Builder packages (`.exe`, `.AppImage`, `.dmg`) with automatic Ollama model detection (`qwen3.5:9b`) and environment health diagnostics.
+- 🛠️ **Standalone Native Installers & Sidecar Diagnostics**: Tauri 2 native packages (`.msi`, `.exe`, `.AppImage`, `.dmg`) with Rust worker supervision, automatic Ollama model detection (`qwen3.5:9b`), and environment health diagnostics.
 - 🔬 **Spatial Board Flight Recorder**: Visual timeline inspector inside the Spatial Board to replay agent tool calls, checkpoint diffs, and epistemic verification traces.
 
 ---
@@ -274,7 +274,9 @@ Active planned milestones for upcoming releases across Study OS, Multi-Agent Eng
 ```
 ai-company-orchestrator/
 ├── agents/                        # Swarm personas (Clara, Alex, Devon, Quinn), orchestrator & study tools
-├── backend/                       # FastAPI/WS runtime, Model Harness, ChatMissionBridge, permission gateway
+├── backend/                       # Dispatcher, contracts, Model Harness, runtime_bridge, canonical agents/ alias
+├── src-tauri/                     # Tauri 2 + Rust Core shell, SQLite writer, loopback media server, Job supervision
+├── workers/                       # Specialized stdio JSON-RPC Python workers (ai, study, knowledge, mission, voice)
 ├── config/                        # Runtime settings & model configuration
 ├── diagnostics/                   # Environment health and telemetry scripts
 ├── docs/                          # Architectural specs, ADRs (decisions/), 10 SVG diagrams & forensic reports
@@ -326,7 +328,7 @@ python -m venv venv
 Copy-Item .env.example .env
 ```
 
-### 3. Frontend & Electron Desktop HUD Setup
+### 3. Frontend & Tauri 2 Desktop HUD Setup
 ```powershell
 npm install
 npm install --prefix frontend
@@ -334,13 +336,13 @@ npm install --prefix frontend
 
 ### 4. Running JARVIS OS
 ```powershell
-# Launch full Desktop Application (Electron 31 HUD + Vite Dev + Python Backend)
-npm start
-
-# Or launch Vite Dev + Electron in concurrent dev mode
+# Launch full Desktop Application (Tauri 2 + Rust Core + Vite Dev + Python Workers)
 npm run dev
 
-# Or run the standalone Python WebSocket/API backend server
+# Or build native Tauri 2 Desktop installers / binary
+npm run tauri:build
+
+# Or run the headless Python IPC lifecycle entry point directly
 .\venv\Scripts\python.exe server.py
 ```
 
@@ -348,7 +350,7 @@ npm run dev
 
 ## 🧪 Testing & Verification
 
-Run targeted domain suites or documentation checks anytime:
+Run targeted domain suites, worker E2E checks, frontend tests, or documentation integrity checks anytime:
 
 ```powershell
 # Study Engine Phases 2–7 full verification suite
@@ -363,8 +365,10 @@ Run targeted domain suites or documentation checks anytime:
 # Documentation, SVG blueprints, ADRs & relative link integrity
 .\venv\Scripts\python.exe -m pytest tests/test_documentation_integrity.py -v
 
-# Core WebSocket contracts, chat routing & safety classifiers
+# Core IPC protocol contracts, 5-role stdio worker E2E, chat routing & security
 .\venv\Scripts\python.exe -m pytest `
+  tests/test_e2e_workers_all_roles.py `
+  tests/test_protocol_contracts.py `
   tests/test_chat_mission_bridge.py `
   tests/test_websocket_dispatcher_contract.py `
   tests/test_safety_classifier_regression.py `
@@ -373,10 +377,15 @@ Run targeted domain suites or documentation checks anytime:
 # Security Sentinel EDR & Coding Agent 2.0
 .\venv\Scripts\python.exe -m pytest tests/test_sentinel.py tests/test_coding_agent_2_benchmark.py -q
 
-# Frontend TypeScript check & production bundle (Vite 8)
+# Frontend transport unit tests, TypeScript check & production bundle (Vite 8)
+npm test --prefix frontend
 npm run build --prefix frontend
 
-# Complete pytest suite discovery / execution (356 modules / 3,341 collected tests)
+# Rust Core compilation & unit/integration tests
+cargo check --manifest-path src-tauri/Cargo.toml --locked --all-targets
+cargo test --manifest-path src-tauri/Cargo.toml --locked
+
+# Complete pytest test discovery / execution
 .\venv\Scripts\python.exe -m pytest tests/ -q
 ```
 

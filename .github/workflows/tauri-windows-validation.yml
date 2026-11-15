@@ -1,0 +1,495 @@
+name: Tauri Windows Validation (Stage 2.1)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - "stage2.1/**"
+      - "migration/**"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tauri-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tauri-windows-build:
+    name: Windows Tauri 2 + Rust + Frontend Build
+    runs-on: windows-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Enable Git longpaths on Windows runner
+        run: git config --global core.longpaths true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify repo hygiene (no local DBs/user caches committed)
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path ci-logs | Out-Null
+
+          foreach ($required in @("src-tauri/Cargo.toml", "src-tauri/tauri.conf.json", "src-tauri/capabilities/main-window.json", "package.json", "frontend/package.json")) {
+            if (-not (Test-Path $required)) {
+              throw "Missing required file: $required"
+            }
+          }
+
+          $forbidden = Get-ChildItem -Force -Recurse -ErrorAction SilentlyContinue | Where-Object {
+            $_.FullName -match '\\database\.db' -or
+            $_.FullName -match '\\data\\study\\documents\\' -or
+            $_.FullName -match '\\data\\study\\videos_cache\\'
+          }
+          if ($forbidden) {
+            throw "Forbidden runtime/database artifacts found in checkout: $($forbidden.FullName -join ', ')"
+          }
+
+          "Repository hygiene verified." | Tee-Object -FilePath ci-logs/hygiene.log
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Setup Rust MSVC toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.100.0"
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Inspect toolchain versions
+        run: |
+          $ErrorActionPreference = 'Continue'
+          @(
+            "node: $(node --version)"
+            "npm: $(npm --version)"
+            "python: $(python --version)"
+            "rustc: $(rustc --version)"
+            "cargo: $(cargo --version)"
+            "os: $([System.Environment]::OSVersion.VersionString)"
+          ) | Tee-Object -FilePath ci-logs/toolchain.log
+
+      - name: Install root dependencies from lockfile
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm ci --ignore-scripts 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/npm-ci-root.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/npm-ci-root.log
+          exit $code
+
+      - name: Install frontend dependencies from lockfile
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm --prefix frontend ci 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/npm-ci-frontend.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/npm-ci-frontend.log
+          exit $code
+
+      - name: Collect Tauri environment info
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm exec -- tauri info 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-info.log
+          exit 0
+
+      - name: Run frontend transport & type tests
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm --prefix frontend test 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/frontend-test.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/frontend-test.log
+          exit $code
+
+      - name: Build React + TypeScript frontend
+        run: |
+          $ErrorActionPreference = 'Continue'
+          npm --prefix frontend run build 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/frontend-build.log
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/frontend-build.log
+          exit $code
+
+      - name: Run Python core contract, worker E2E & hardening tests
+        run: |
+          $ErrorActionPreference = 'Continue'
+          python -m pip install --quiet pytest pyyaml jsonschema websockets httpx python-dotenv psutil pillow numpy python-docx pymupdf pdfplumber cryptography pydantic python-pptx
+          python -m pytest -q tests/test_sqlite_hardening.py tests/test_sqlite_write_exclusivity.py tests/test_model_harness_rho_she.py tests/test_rho_migration_sandbox.py tests/test_documentation_integrity.py tests/test_transport_gateway.py tests/test_worker_stdio_rpc.py tests/test_security_hardening_phase3.py tests/test_domain_workers_phase3.py tests/test_e2e_workers_all_roles.py tests/test_protocol_contracts.py 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/python-contract-tests.log
+          $code1 = $LASTEXITCODE
+          python -m pytest -q tests/test_smoke.py tests/test_application_lifecycle.py tests/test_stage1_backend_integrity.py tests/test_mission_websocket_schema.py tests/test_server_websocket_characterization.py tests/test_study_agent_session_isolation.py tests/test_voice_readonly_access.py tests/test_runtime_security.py tests/test_websocket_dispatcher_contract.py 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/python-contract-tests.log -Append
+          $code2 = $LASTEXITCODE
+          $code = if ($code1 -ne 0) { $code1 } else { $code2 }
+          "exit_code_pass1=$code1 exit_code_pass2=$code2 exit_code=$code" | Add-Content ci-logs/python-contract-tests.log
+          exit $code
+
+      - name: Run cargo check (--locked --all-targets)
+        run: |
+          $ErrorActionPreference = 'Continue'
+          cmd /c "cargo check --manifest-path src-tauri/Cargo.toml --locked --all-targets --message-format=json > ci-logs\cargo-check.jsonl 2> ci-logs\cargo-check-stderr.log"
+          $code = $LASTEXITCODE
+          @'
+          import json, pathlib
+          out_lines = []
+          emitted = 0
+          jsonl = pathlib.Path("ci-logs/cargo-check.jsonl")
+          if jsonl.exists():
+              for raw in jsonl.read_text(encoding="utf-8", errors="replace").splitlines():
+                  try:
+                      obj = json.loads(raw)
+                  except Exception:
+                      out_lines.append(raw)
+                      continue
+                  if obj.get("reason") == "compiler-message":
+                      msg = obj.get("message", {})
+                      lvl = msg.get("level", "")
+                      rendered = msg.get("rendered") or msg.get("message") or ""
+                      if rendered:
+                          out_lines.append(rendered)
+                          if lvl == "error":
+                              print(rendered)
+                      if lvl == "error" and emitted < 10:
+                          spans = msg.get("spans") or []
+                          primary = next((s for s in spans if s.get("is_primary")), spans[0] if spans else None)
+                          text = (msg.get("message") or rendered).replace("\r", " ").replace("\n", " ")[:400]
+                          if primary and primary.get("file_name"):
+                              f = primary["file_name"].replace("\\", "/")
+                              if not f.startswith("src-tauri/"):
+                                  f = "src-tauri/" + f
+                              line = primary.get("line_start") or 1
+                              print(f"::error file={f},line={line}::[{f}:{line}] {text}")
+                          else:
+                              print(f"::error::{text}")
+                          emitted += 1
+          stderr_path = pathlib.Path("ci-logs/cargo-check-stderr.log")
+          if stderr_path.exists():
+              err_txt = stderr_path.read_text(encoding="utf-8", errors="replace")
+              if err_txt.strip():
+                  out_lines.append(err_txt)
+                  print(err_txt)
+                  if emitted == 0:
+                      for line in err_txt.splitlines():
+                          if ("error" in line.lower() or "-->" in line) and emitted < 10:
+                              print(f"::error::{line[:400]}")
+                              emitted += 1
+          pathlib.Path("ci-logs/cargo-check.log").write_text("\n".join(out_lines) + "\n", encoding="utf-8")
+          '@ | python -
+          "exit_code=$code" | Add-Content ci-logs/cargo-check.log
+          exit $code
+
+      - name: Run cargo test (--locked)
+        run: |
+          $ErrorActionPreference = 'Continue'
+          cargo test --manifest-path src-tauri/Cargo.toml --locked -- --nocapture 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/cargo-test.log
+          $code = $LASTEXITCODE
+          @'
+          import pathlib, sys
+          code = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+          if code != 0:
+              lines = pathlib.Path("ci-logs/cargo-test.log").read_text(encoding="utf-8", errors="replace").splitlines()
+              emitted = 0
+              in_failures = False
+              for i, line in enumerate(lines):
+                  if line.strip() == "failures:":
+                      in_failures = True
+                  if in_failures and emitted < 10 and line.strip():
+                      if any(tok in line for tok in ("---- ", "panicked at", "left:", "right:", "assertion")):
+                          print(f"::error::{line[:400]}")
+                          emitted += 1
+                          continue
+                  if ("error[" in line or line.startswith("error:") or "FAILED" in line) and emitted < 10:
+                      snippet = line
+                      if i + 1 < len(lines) and "-->" in lines[i + 1]:
+                          snippet += " | " + lines[i + 1].strip()
+                      print(f"::error::{snippet[:400]}")
+                      emitted += 1
+          '@ | python - $code
+          "exit_code=$code" | Add-Content ci-logs/cargo-test.log
+          exit $code
+
+      - name: Build Tauri release binary & Windows installers (MSI + NSIS)
+        run: |
+          $ErrorActionPreference = 'Continue'
+          python scripts/prepare_python_runtime.py 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-build-no-bundle.log
+          if ($LASTEXITCODE -ne 0) {
+            throw "Failed to prepare standalone Python runtime bundle"
+          }
+          npm run tauri:build -- --bundles msi,nsis 2>&1 | ForEach-Object { if ($null -ne $_) { $_.ToString() } else { "" } } | Tee-Object -FilePath ci-logs/tauri-build-no-bundle.log -Append
+          $code = $LASTEXITCODE
+          "exit_code=$code" | Add-Content ci-logs/tauri-build-no-bundle.log
+          if ($code -ne 0) {
+            exit $code
+          }
+          if (-not (Test-Path "src-tauri/target/release/jarvis-os.exe")) {
+            throw "Expected release binary src-tauri/target/release/jarvis-os.exe was not generated"
+          }
+          $msiFiles = @(Get-ChildItem -Path "src-tauri/target/release/bundle/msi" -Filter "*.msi" -ErrorAction SilentlyContinue)
+          $nsisFiles = @(Get-ChildItem -Path "src-tauri/target/release/bundle/nsis" -Filter "*-setup.exe" -ErrorAction SilentlyContinue)
+          if ($msiFiles.Count -eq 0) {
+            throw "Expected Windows MSI installer under src-tauri/target/release/bundle/msi/*.msi"
+          }
+          if ($nsisFiles.Count -eq 0) {
+            throw "Expected Windows NSIS installer under src-tauri/target/release/bundle/nsis/*-setup.exe"
+          }
+          Get-Item "src-tauri/target/release/jarvis-os.exe" | Select-Object Name, Length | Out-String | Add-Content ci-logs/tauri-build-no-bundle.log
+          $msiFiles | Select-Object Name, Length | Out-String | Add-Content ci-logs/tauri-build-no-bundle.log
+          $nsisFiles | Select-Object Name, Length | Out-String | Add-Content ci-logs/tauri-build-no-bundle.log
+
+      - name: Verify built jarvis-os.exe binary boot, %LOCALAPPDATA% separation & upgrade persistence
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $exe = Resolve-Path "src-tauri/target/release/jarvis-os.exe"
+          $msiFile = @(Get-ChildItem -Path "src-tauri/target/release/bundle/msi" -Filter "*.msi")[0]
+          $nsisFile = @(Get-ChildItem -Path "src-tauri/target/release/bundle/nsis" -Filter "*-setup.exe")[0]
+          $pythonHostBin = (Get-Command python).Source
+          $tmpRoot = Join-Path $env:RUNNER_TEMP ("jarvis_smoke_" + [System.Guid]::NewGuid().ToString("N"))
+          New-Item -ItemType Directory -Force -Path $tmpRoot | Out-Null
+          $stdoutLog = Join-Path $env:RUNNER_TEMP ("jarvis_smoke_out_" + [System.Guid]::NewGuid().ToString("N") + ".log")
+          $stderrLog = Join-Path $env:RUNNER_TEMP ("jarvis_smoke_err_" + [System.Guid]::NewGuid().ToString("N") + ".log")
+          "smoke_root=$tmpRoot" | Tee-Object -FilePath ci-logs/tauri-binary-smoke.log
+          $prevRoot = $env:JARVIS_PROJECT_ROOT
+          $env:JARVIS_PROJECT_ROOT = $tmpRoot
+          $proc = Start-Process -FilePath $exe.Path -WorkingDirectory (Get-Location).Path -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog -PassThru -WindowStyle Hidden
+          $dbPath = Join-Path $tmpRoot "database.db"
+          $studyDir = Join-Path $tmpRoot "data\study"
+          try {
+            try {
+              $ready = $false
+              for ($i = 0; $i -lt 60; $i++) {
+                Start-Sleep -Milliseconds 500
+                $proc.Refresh()
+                if ($proc.HasExited) {
+                  break
+                }
+                if ((Test-Path $dbPath -PathType Leaf) -and (Test-Path $studyDir -PathType Container) -and ((Get-Item $dbPath).Length -gt 0)) {
+                  Start-Sleep -Seconds 2
+                  $proc.Refresh()
+                  $ready = -not $proc.HasExited
+                  break
+                }
+              }
+              if ($proc.HasExited) {
+                $outText = if (Test-Path $stdoutLog) { (Get-Content $stdoutLog -Raw -ErrorAction SilentlyContinue) } else { "" }
+                $errText = if (Test-Path $stderrLog) { (Get-Content $stderrLog -Raw -ErrorAction SilentlyContinue) } else { "" }
+                "exited_early code=$($proc.ExitCode)`nstdout=$outText`nstderr=$errText" | Add-Content ci-logs/tauri-binary-smoke.log
+                throw "jarvis-os.exe exited prematurely with exit code $($proc.ExitCode); stderr=$errText"
+              }
+              if (-not $ready) {
+                $tree = (Get-ChildItem $tmpRoot -Force -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName) -join "; "
+                $outText = if (Test-Path $stdoutLog) { (Get-Content $stdoutLog -Raw -ErrorAction SilentlyContinue) } else { "" }
+                $errText = if (Test-Path $stderrLog) { (Get-Content $stderrLog -Raw -ErrorAction SilentlyContinue) } else { "" }
+                "timeout_tree=$tree`nstdout=$outText`nstderr=$errText" | Add-Content ci-logs/tauri-binary-smoke.log
+                if (-not (Test-Path $dbPath -PathType Leaf)) {
+                  throw "Expected Rust Core SQLite database to initialize at $dbPath within 30s (tmpRoot contents: $tree; stderr: $errText)"
+                }
+                if (-not (Test-Path $studyDir -PathType Container)) {
+                  throw "Expected Rust Core StudyStore catalog directory to initialize at $studyDir within 30s (tmpRoot contents: $tree; stderr: $errText)"
+                }
+                throw "Expected non-empty Rust Core SQLite database at $dbPath within 30s"
+              }
+              $dbLen = (Get-Item $dbPath).Length
+              $rssMb = [math]::Round($proc.WorkingSet64 / 1MB, 2)
+              $pidVal = $proc.Id
+            } finally {
+              $env:JARVIS_PROJECT_ROOT = $prevRoot
+              if ($null -ne $proc -and -not $proc.HasExited) {
+                & taskkill.exe /PID $proc.Id /T /F 2>$null | Out-Null
+                Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+                $proc.WaitForExit(5000) | Out-Null
+              }
+              Start-Sleep -Milliseconds 300
+            }
+            $schemaInfo = & $pythonHostBin -c "import sqlite3, sys; c = sqlite3.connect(sys.argv[1]); objs = {r[0] for r in c.execute('SELECT name FROM sqlite_master').fetchall()}; uv = c.execute('PRAGMA user_version').fetchone()[0]; jm = c.execute('PRAGMA journal_mode').fetchone()[0]; c.close(); assert 'sessions' in objs and uv >= 1 and jm.lower() == 'wal', f'Unexpected schema: objs={sorted(objs)} uv={uv} jm={jm}'; print(f'user_version={uv} journal_mode={jm} objects={len(objs)}')" $dbPath
+            if ($LASTEXITCODE -ne 0) {
+              throw "Rust Core SQLite schema verification failed with exit code $LASTEXITCODE"
+            }
+            "alive=True pid=$pidVal rss_mb=$rssMb db_bytes=$dbLen study_dir_exists=True $schemaInfo" | Add-Content ci-logs/tauri-binary-smoke.log
+
+            # Phase 2 & 3: Real NSIS & MSI Clean-Machine Installers (No Python/Node on PATH) + Bundled Worker Boot + Upgrade Persistence + Complete Process Termination
+            $nsisInstallDir = Join-Path $env:RUNNER_TEMP ("jarvis_nsis_" + [System.Guid]::NewGuid().ToString("N"))
+            $msiExtractDir = Join-Path $env:RUNNER_TEMP ("jarvis_msi_" + [System.Guid]::NewGuid().ToString("N"))
+            $localAppDataSim = Join-Path $env:RUNNER_TEMP ("jarvis_localappdata_" + [System.Guid]::NewGuid().ToString("N"))
+            New-Item -ItemType Directory -Force -Path $nsisInstallDir, $msiExtractDir, $localAppDataSim | Out-Null
+
+            # 2a. Silent install via NSIS setup.exe
+            $nsisProc = Start-Process -FilePath $nsisFile.FullName -ArgumentList @("/S", "/D=$nsisInstallDir") -Wait -PassThru
+            if ($nsisProc.ExitCode -ne 0) {
+              throw "NSIS installer failed with exit code $($nsisProc.ExitCode)"
+            }
+            $nsisExeObj = Get-ChildItem -Path $nsisInstallDir -Filter "jarvis-os.exe" -Recurse | Select-Object -First 1
+            if ($null -eq $nsisExeObj) {
+              throw "NSIS installer did not produce jarvis-os.exe under $nsisInstallDir"
+            }
+            $nsisExe = $nsisExeObj.FullName
+            $nsisBaseDir = $nsisExeObj.DirectoryName
+            $nsisBundleZip = Get-ChildItem -Path $nsisBaseDir -Filter "runtime-bundle.zip" -Recurse | Select-Object -First 1
+            if ($null -eq $nsisBundleZip) {
+              throw "NSIS package did not bundle py-runtime/runtime-bundle.zip under $nsisBaseDir"
+            }
+            "nsis_installed=True exe=$nsisExe bundle_zip=$($nsisBundleZip.FullName) bundle_bytes=$($nsisBundleZip.Length)" | Add-Content ci-logs/tauri-binary-smoke.log
+
+            $expectedDataRoot = Join-Path $localAppDataSim "JarvisOS"
+            $installedDb = Join-Path $expectedDataRoot "database.db"
+            $installedStudy = Join-Path $expectedDataRoot "data\study"
+            $nsisReportPath = Join-Path $env:RUNNER_TEMP ("jarvis_nsis_workers_" + [System.Guid]::NewGuid().ToString("N") + ".json")
+            $msiReportPath = Join-Path $env:RUNNER_TEMP ("jarvis_msi_workers_" + [System.Guid]::NewGuid().ToString("N") + ".json")
+
+            $prevLocalAppData = $env:LOCALAPPDATA
+            $prevDataDir = $env:JARVIS_DATA_DIR
+            $prevPath = $env:PATH
+            try {
+              Remove-Item Env:\JARVIS_PROJECT_ROOT -ErrorAction SilentlyContinue
+              Remove-Item Env:\JARVIS_DATA_DIR -ErrorAction SilentlyContinue
+              Remove-Item Env:\JARVIS_PYTHON_BIN -ErrorAction SilentlyContinue
+              $env:LOCALAPPDATA = $localAppDataSim
+              # Strip PATH to Windows System32 only — ZERO Python and ZERO Node on PATH!
+              $env:PATH = "C:\Windows\System32;C:\Windows;C:\Windows\System32\Wbem"
+              if ($null -ne (Get-Command python -ErrorAction SilentlyContinue)) {
+                throw "Expected no python on clean-machine PATH"
+              }
+              if ($null -ne (Get-Command node -ErrorAction SilentlyContinue)) {
+                throw "Expected no node on clean-machine PATH"
+              }
+
+              # Boot #1: NSIS-installed jarvis-os.exe boots all 4 bundled workers (ai, study, mission, voice) and shuts down cleanly
+              $env:JARVIS_VERIFY_BUNDLED_WORKERS_REPORT = $nsisReportPath
+              $env:JARVIS_EXIT_AFTER_WORKER_VERIFY = "1"
+              $p1 = Start-Process -FilePath $nsisExe -WorkingDirectory $nsisBaseDir -PassThru -WindowStyle Hidden
+              if (-not $p1.WaitForExit(120000)) {
+                & C:\Windows\System32\taskkill.exe /PID $p1.Id /T /F 2>$null | Out-Null
+                throw "NSIS jarvis-os.exe timed out (120s) while extracting bundled runtime and booting all 4 workers"
+              }
+              if (-not (Test-Path $nsisReportPath -PathType Leaf)) {
+                throw "NSIS jarvis-os.exe did not write worker verification report at $nsisReportPath (exit_code=$($p1.ExitCode))"
+              }
+              $nsisReport = Get-Content $nsisReportPath -Raw | ConvertFrom-Json
+              if ($nsisReport.status -ne "verified") {
+                throw "NSIS bundled worker verification failed: $($nsisReport | ConvertTo-Json -Compress)"
+              }
+              foreach ($roleName in @("ai", "study", "mission", "voice")) {
+                $roleObj = $nsisReport.roles.$roleName
+                if ($null -eq $roleObj -or $roleObj.pid -le 0 -or $roleObj.capabilities_count -le 0) {
+                  throw "NSIS worker role '$roleName' failed to boot: $($nsisReport | ConvertTo-Json -Compress)"
+                }
+              }
+              if ($nsisReport.post_shutdown_live_pids.Count -ne 0) {
+                throw "NSIS supervisor reported live worker PIDs after shutdown_all: $($nsisReport.post_shutdown_live_pids -join ',')"
+              }
+              Start-Sleep -Milliseconds 500
+              foreach ($wPid in $nsisReport.spawned_pids) {
+                if ($null -ne (Get-Process -Id ([int]$wPid) -ErrorAction SilentlyContinue)) {
+                  throw "NSIS worker PID $wPid remained alive after jarvis-os.exe shutdown"
+                }
+              }
+              $extractedPyExe = Join-Path $expectedDataRoot "runtime\python-bundle\python\python.exe"
+              if (-not (Test-Path $extractedPyExe -PathType Leaf)) {
+                throw "Expected extracted standalone Python at $extractedPyExe"
+              }
+              if ((Test-Path (Join-Path $nsisBaseDir "database.db")) -or (Test-Path (Join-Path $nsisBaseDir "data"))) {
+                throw "NSIS binary wrote state into read-only install directory $nsisBaseDir"
+              }
+              "nsis_clean_machine_workers=True roles=ai,study,mission,voice spawned_pids=$($nsisReport.spawned_pids -join ',') orphan_pids=0" | Add-Content ci-logs/tauri-binary-smoke.log
+
+              # Seed user session + study catalog before MSI install/upgrade test
+              & $pythonHostBin -c "import json, pathlib, sqlite3, sys; db = pathlib.Path(sys.argv[1]); c = sqlite3.connect(str(db)); c.execute('INSERT INTO sessions (name, created_at) VALUES (?, ?)', ('Persisted Across Upgrade', '2026-11-14T00:00:00Z')); c.commit(); c.close(); docs = pathlib.Path(sys.argv[2]) / 'documents.json'; docs.write_text(json.dumps({'doc_upgrade': {'id': 'doc_upgrade', 'title': 'Upgrade Doc'}}), encoding='utf-8')" $installedDb $installedStudy
+              if ($LASTEXITCODE -ne 0) { throw "Failed to seed pre-upgrade state in $expectedDataRoot" }
+
+              # 3a. Extract real MSI package via msiexec /a
+              $msiProc = Start-Process -FilePath "C:\Windows\System32\msiexec.exe" -ArgumentList @("/a", "`"$($msiFile.FullName)`"", "/qn", "TARGETDIR=`"$msiExtractDir`"") -Wait -PassThru
+              if ($msiProc.ExitCode -ne 0) {
+                throw "MSI administrative install failed with exit code $($msiProc.ExitCode)"
+              }
+              $msiExeObj = @(Get-ChildItem -Path $msiExtractDir -Filter "jarvis-os.exe" -Recurse | Where-Object { $_.FullName -ne $msiFile.FullName })[0]
+              if ($null -eq $msiExeObj) {
+                throw "MSI installer did not unpack jarvis-os.exe under $msiExtractDir"
+              }
+              $msiExe = $msiExeObj.FullName
+              $msiBaseDir = $msiExeObj.DirectoryName
+              $msiBundleZip = Get-ChildItem -Path $msiBaseDir -Filter "runtime-bundle.zip" -Recurse | Select-Object -First 1
+              if ($null -eq $msiBundleZip) {
+                throw "MSI package did not bundle py-runtime/runtime-bundle.zip under $msiBaseDir"
+              }
+              "msi_installed=True exe=$msiExe bundle_zip=$($msiBundleZip.FullName)" | Add-Content ci-logs/tauri-binary-smoke.log
+
+              # Boot #2: MSI-installed jarvis-os.exe boots on clean PATH over pre-existing %LOCALAPPDATA%\JarvisOS state
+              $env:JARVIS_VERIFY_BUNDLED_WORKERS_REPORT = $msiReportPath
+              $env:JARVIS_EXIT_AFTER_WORKER_VERIFY = "1"
+              $p2 = Start-Process -FilePath $msiExe -WorkingDirectory $msiBaseDir -PassThru -WindowStyle Hidden
+              if (-not $p2.WaitForExit(120000)) {
+                & C:\Windows\System32\taskkill.exe /PID $p2.Id /T /F 2>$null | Out-Null
+                throw "MSI jarvis-os.exe timed out (120s) while booting workers on upgraded state"
+              }
+              if (-not (Test-Path $msiReportPath -PathType Leaf)) {
+                throw "MSI jarvis-os.exe did not write worker verification report at $msiReportPath (exit_code=$($p2.ExitCode))"
+              }
+              $msiReport = Get-Content $msiReportPath -Raw | ConvertFrom-Json
+              if ($msiReport.status -ne "verified") {
+                throw "MSI bundled worker verification failed: $($msiReport | ConvertTo-Json -Compress)"
+              }
+              if ($msiReport.sessions_count -lt 1 -or $msiReport.documents_count -lt 1) {
+                throw "MSI binary did not see pre-existing sessions/documents across upgrade: $($msiReport | ConvertTo-Json -Compress)"
+              }
+              Start-Sleep -Milliseconds 500
+              foreach ($wPid in $msiReport.spawned_pids) {
+                if ($null -ne (Get-Process -Id ([int]$wPid) -ErrorAction SilentlyContinue)) {
+                  throw "MSI worker PID $wPid remained alive after jarvis-os.exe shutdown"
+                }
+              }
+
+              $upgradeVerify = & $pythonHostBin -c "import json, pathlib, sqlite3, sys; c = sqlite3.connect(sys.argv[1]); row = c.execute('SELECT name FROM sessions WHERE name = ?', ('Persisted Across Upgrade',)).fetchone(); c.close(); docs = json.loads((pathlib.Path(sys.argv[2]) / 'documents.json').read_text(encoding='utf-8')); assert row and row[0] == 'Persisted Across Upgrade', f'Missing session after upgrade: {row}'; assert 'doc_upgrade' in docs, f'Missing study doc after upgrade: {docs}'; print('packaged_localappdata=True msi_nsis_clean_machine=True upgrade_persisted=True orphan_workers=0')" $installedDb $installedStudy
+              if ($LASTEXITCODE -ne 0) { throw "Post-upgrade persistence verification failed" }
+              $upgradeVerify | Add-Content ci-logs/tauri-binary-smoke.log
+            } finally {
+              $env:PATH = $prevPath
+              $env:LOCALAPPDATA = $prevLocalAppData
+              $env:JARVIS_PROJECT_ROOT = $prevRoot
+              $env:JARVIS_DATA_DIR = $prevDataDir
+              Remove-Item Env:\JARVIS_VERIFY_BUNDLED_WORKERS_REPORT -ErrorAction SilentlyContinue
+              Remove-Item Env:\JARVIS_EXIT_AFTER_WORKER_VERIFY -ErrorAction SilentlyContinue
+              Remove-Item -Recurse -Force $nsisInstallDir, $msiExtractDir, $localAppDataSim, $nsisReportPath, $msiReportPath -ErrorAction SilentlyContinue
+            }
+            "exit_code=0" | Add-Content ci-logs/tauri-binary-smoke.log
+          } finally {
+            Remove-Item -Recurse -Force $tmpRoot, $stdoutLog, $stderrLog -ErrorAction SilentlyContinue
+          }
+
+      - name: Write workflow summary
+        if: always()
+        run: |
+          $ErrorActionPreference = 'Continue'
+          Add-Content $env:GITHUB_STEP_SUMMARY "## JARVIS OS — Tauri Windows Validation"
+          Add-Content $env:GITHUB_STEP_SUMMARY ""
+          foreach ($log in @("toolchain.log", "tauri-info.log", "frontend-test.log", "frontend-build.log", "python-contract-tests.log", "cargo-check.log", "cargo-test.log", "tauri-build-no-bundle.log", "tauri-binary-smoke.log")) {
+            $path = Join-Path "ci-logs" $log
+            if (Test-Path $path) {
+              $tail = Get-Content $path -Tail 20
+              Add-Content $env:GITHUB_STEP_SUMMARY "### $log (tail)"
+              Add-Content $env:GITHUB_STEP_SUMMARY '```'
+              $tail | Add-Content $env:GITHUB_STEP_SUMMARY
+              Add-Content $env:GITHUB_STEP_SUMMARY '```'
+            }
+          }
+
+      - name: Upload CI validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-windows-ci-logs-${{ github.run_number }}
+          path: ci-logs/**
+          retention-days: 14

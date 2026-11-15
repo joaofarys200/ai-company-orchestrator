@@ -43,7 +43,7 @@ import agents.memory as memory
 import agents.tools as ag_tools
 import agents.obsidian_tools as obs_tools
 import agents.swarm as swarm
-import server
+from backend.runtime_bridge import emit_broadcast
 
 VALID = "VALID"
 INVALID_WITH_CORRECTION = "INVALID_WITH_CORRECTION"
@@ -966,9 +966,8 @@ Sê honesto. Se não tiveres a certeza de algo, diz-o. Uma resposta honesta com 
                     path = tool_input.get("path", ".")
                     result_str = await ag_tools.run_list_directory(path)
                 elif tool_name == "frontend_ui_command":
-                    import server
                     action_ui = tool_input.get("action")
-                    await server.broadcast({"type": "ui_action", "action": action_ui})
+                    await emit_broadcast({"type": "ui_action", "action": action_ui})
                     result_str = f"Comando de UI '{action_ui}' emitido para o frontend."
                 elif tool_name == "semantic_code_search":
                     from intelligence.semantic_index import SemanticCodeIndex
@@ -994,24 +993,22 @@ Sê honesto. Se não tiveres a certeza de algo, diz-o. Uma resposta honesta com 
                     result_str = await run_start_autonomous_plan_safely(tool_input)
                 elif tool_name == "registar_decisao_engenharia":
                     import database
-                    import server
                     decision = tool_input.get("decision")
                     reason = tool_input.get("reason")
                     impact = tool_input.get("impact", "")
                     database.add_engineering_decision(decision, reason, impact)
                     decisions = database.get_engineering_decisions()
-                    await server.broadcast({"type": "decisions_updated", "decisions": decisions})
+                    await emit_broadcast({"type": "decisions_updated", "decisions": decisions})
                     result_str = f"Decisão de engenharia registada com sucesso no SQLite: '{decision}'"
                 elif tool_name == "atualizar_memoria_arquitetura":
                     import database
-                    import server
                     module = tool_input.get("module")
                     purpose = tool_input.get("purpose")
                     dependencies = tool_input.get("dependencies", "")
                     constraints = tool_input.get("constraints", "")
                     database.add_architecture_memory(module, purpose, dependencies, constraints)
                     arch = database.get_architecture_memory()
-                    await server.broadcast({"type": "architecture_updated", "architecture": arch})
+                    await emit_broadcast({"type": "architecture_updated", "architecture": arch})
                     result_str = f"Memória de arquitetura atualizada com sucesso no SQLite para o módulo: '{module}'"
                 elif tool_name == "apply_code_patch":
                     from agents.patch_engine import PatchEngine
@@ -2393,9 +2390,8 @@ async def run_jarvis_orchestration(
                     path = tool_input.get("path", ".")
                     result_str = await ag_tools.run_list_directory(path)
                 elif tool_name == "frontend_ui_command":
-                    import server
                     action_ui = tool_input.get("action")
-                    await server.broadcast({"type": "ui_action", "action": action_ui})
+                    await emit_broadcast({"type": "ui_action", "action": action_ui})
                     result_str = f"Comando de UI '{action_ui}' emitido para o frontend com sucesso."
                 elif tool_name == "semantic_code_search":
                     from intelligence.semantic_index import SemanticCodeIndex
@@ -2421,24 +2417,22 @@ async def run_jarvis_orchestration(
                     result_str = await run_start_autonomous_plan_safely(tool_input)
                 elif tool_name == "registar_decisao_engenharia":
                     import database
-                    import server
                     decision = tool_input.get("decision")
                     reason = tool_input.get("reason")
                     impact = tool_input.get("impact", "")
                     database.add_engineering_decision(decision, reason, impact)
                     decisions = database.get_engineering_decisions()
-                    await server.broadcast({"type": "decisions_updated", "decisions": decisions})
+                    await emit_broadcast({"type": "decisions_updated", "decisions": decisions})
                     result_str = f"Decisão de engenharia registada com sucesso no SQLite: '{decision}'"
                 elif tool_name == "atualizar_memoria_arquitetura":
                     import database
-                    import server
                     module = tool_input.get("module")
                     purpose = tool_input.get("purpose")
                     dependencies = tool_input.get("dependencies", "")
                     constraints = tool_input.get("constraints", "")
                     database.add_architecture_memory(module, purpose, dependencies, constraints)
                     arch = database.get_architecture_memory()
-                    await server.broadcast({"type": "architecture_updated", "architecture": arch})
+                    await emit_broadcast({"type": "architecture_updated", "architecture": arch})
                     result_str = f"Memória de arquitetura atualizada com sucesso no SQLite para o módulo: '{module}'"
                 elif tool_name == "apply_code_patch":
                     from agents.patch_engine import PatchEngine

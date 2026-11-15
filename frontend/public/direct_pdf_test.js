@@ -1,0 +1,137 @@
+const logEl = document.getElementById('log');
+const statusEl = document.getElementById('status');
+const canvas = document.getElementById('pdf-canvas');
+
+window.__DIAGNOSTIC__ = {
+  pdfjs_available: false,
+  pdfjs_worker_loaded: false,
+  pdfjs_load_started: false,
+  pdfjs_load_completed: false,
+  pdfjs_page_load: false,
+  canvas_created: false,
+  canvas_size: '0x0',
+  render_started: false,
+  render_completed: false,
+  render_error: null,
+  pixel_check_non_white_count: 0,
+  total_pages: 0,
+  verdict: 'PENDING',
+};
+
+function log(msg) {
+  if (logEl) {
+    logEl.textContent += msg + '\n';
+  }
+  console.log('[DIRECT_TEST] ' + msg);
+}
+
+async function run() {
+  try {
+    log('1. Importing pdfjs-dist from /pdf.min.mjs ...');
+    const pdfjsLib = await import('/pdf.min.mjs');
+    window.__DIAGNOSTIC__.pdfjs_available = true;
+    log('PDF.js imported successfully. Version: ' + (pdfjsLib.version || 'v6'));
+
+    log('2. Configuring workerSrc ...');
+    const workerOriginUrl = new URL('/pdf.worker.min.mjs', window.location.origin).href;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = workerOriginUrl;
+    log('Worker URL configured: ' + workerOriginUrl);
+    window.__DIAGNOSTIC__.pdfjs_worker_loaded = true;
+
+    log('3. Fetching PDF bytes from /api/study/document/doc_a3b336f4295d/file ...');
+    const res = await fetch('/api/study/document/doc_a3b336f4295d/file');
+    log('Fetch HTTP Status: ' + res.status + ' ' + res.statusText);
+    if (!res.ok) throw new Error('Fetch failed with status ' + res.status);
+    const arrayBuf = await res.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuf);
+    log('Bytes received: ' + bytes.length + ' bytes');
+    log('Header check: ' + String.fromCharCode(...bytes.slice(0, 5)));
+
+    log('4. Calling pdfjsLib.getDocument({ data: bytes.slice(0) }) ...');
+    window.__DIAGNOSTIC__.pdfjs_load_started = true;
+    const loadingTask = pdfjsLib.getDocument({
+      data: bytes.slice(0),
+      disableRange: true,
+      disableStream: true,
+      disableAutoFetch: true,
+    });
+
+    const doc = await loadingTask.promise;
+    window.__DIAGNOSTIC__.pdfjs_load_completed = true;
+    window.__DIAGNOSTIC__.total_pages = doc.numPages;
+    log('PDF Document loaded! Total pages: ' + doc.numPages);
+
+    log('5. Loading Page 1 ...');
+    const page = await doc.getPage(1);
+    window.__DIAGNOSTIC__.pdfjs_page_load = true;
+    const scale = 1.0;
+    const viewport = page.getViewport({ scale });
+    log('Viewport dimensions: ' + viewport.width + 'x' + viewport.height);
+
+    log('6. Preparing Canvas ...');
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      throw new Error('Missing #pdf-canvas element');
+    }
+    const ctx = canvas.getContext('2d', { alpha: false });
+    if (!ctx) {
+      throw new Error('Could not initialize 2D context');
+    }
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+    canvas.style.width = Math.floor(viewport.width) + 'px';
+    canvas.style.height = Math.floor(viewport.height) + 'px';
+    window.__DIAGNOSTIC__.canvas_created = true;
+    window.__DIAGNOSTIC__.canvas_size = canvas.width + 'x' + canvas.height;
+
+    log('7. Calling page.render(...) ...');
+    window.__DIAGNOSTIC__.render_started = true;
+    const renderTask = page.render({
+      canvasContext: ctx,
+      viewport: viewport,
+      canvas: canvas,
+    });
+
+    await renderTask.promise;
+    window.__DIAGNOSTIC__.render_completed = true;
+    log('Render completed successfully!');
+
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let nonWhiteOrBlack = 0;
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      const r = imgData.data[i];
+      const g = imgData.data[i + 1];
+      const b = imgData.data[i + 2];
+      if (r < 240 || g < 240 || b < 240) {
+        nonWhiteOrBlack++;
+      }
+    }
+    window.__DIAGNOSTIC__.pixel_check_non_white_count = nonWhiteOrBlack;
+    log('Pixel check: ' + nonWhiteOrBlack + ' non-white pixels detected.');
+
+    if (nonWhiteOrBlack > 100) {
+      window.__DIAGNOSTIC__.verdict = 'PASS';
+      if (statusEl) {
+        statusEl.textContent = 'PASS: DIRECT PDF RENDER SUCCESSFUL';
+        statusEl.className = 'status-pass';
+      }
+      log('*** VERDICT: PDF_RENDER_DIRECT = PASS ***');
+    } else {
+      window.__DIAGNOSTIC__.verdict = 'BLANK_CANVAS';
+      if (statusEl) {
+        statusEl.textContent = 'FAIL: CANVAS IS BLANK';
+        statusEl.className = 'status-fail';
+      }
+    }
+  } catch (err) {
+    window.__DIAGNOSTIC__.render_error = String(err);
+    window.__DIAGNOSTIC__.verdict = 'FAIL';
+    if (statusEl) {
+      statusEl.textContent = 'FAIL: ' + (err && err.message ? err.message : String(err));
+      statusEl.className = 'status-fail';
+    }
+    log('ERROR: ' + String(err) + '\n' + (err && err.stack ? err.stack : ''));
+  }
+}
+
+void run();
+

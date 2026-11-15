@@ -48,3 +48,16 @@ We take the security and integrity of JARVIS OS seriously. If you discover a sec
 |---|---|---|
 | 1.0.x (Current `main`) | :white_check_mark: | Active Security Updates &amp; Sentinel Fixes |
 | &lt; 1.0.0 | :x: | Deprecated |
+
+---
+
+## Tauri 2 Native Shell & Rust Core Security Boundaries
+
+Starting in the **Tauri 2 + Rust IPC** runtime (`src-tauri/`):
+
+- **Least-Privilege Capabilities & Strict CSP**: `src-tauri/tauri.conf.json` enforces a strict Content Security Policy without `unsafe-inline` scripts and restricts loopback connections exclusively to `127.0.0.1` ephemeral ports; permissions are scoped via `src-tauri/capabilities/main-window.json` and `preview-sandbox.json`.
+- **Path Confinement (`PathJail`)**: `src-tauri/src/permissions/path_jail.rs` canonicalizes paths and blocks directory traversal, symlink escapes, and sensitive system paths before native read/write/media operations execute.
+- **Command & SSRF Guards**: `src-tauri/src/process/command_guard.rs` enforces command allowlists without shell interpolation, and `src-tauri/src/protocol/ssrf_guard.rs` + `services/url_ssrf_guard.py` block private/loopback/metadata SSRF targets.
+- **Authenticated Ephemeral Loopback Media (`127.0.0.1:0`)**: `src-tauri/src/protocol/loopback.rs` binds only to `127.0.0.1`, validates `Host`/`Origin`/`Sec-Fetch-Site` headers against DNS rebinding, and enforces `OsRng` bearer tokens and short-lived HMAC tickets scoped by `doc_id`.
+- **Process Lifecycle Containment**: On Windows, `src-tauri/src/process/job_object.rs` attaches Python domain workers to RAII Win32 Job Objects with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE` so no orphan workers survive shell exit.
+- **HITL Reverse-RPC Permission Gateway**: Sensitive actions triggered inside Python workers invoke `permission.request_approval` back to Rust `PermissionGateway` (`src-tauri/src/permissions/gateway.rs`) and require explicit operator sign-off.

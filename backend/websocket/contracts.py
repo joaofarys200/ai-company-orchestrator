@@ -284,6 +284,21 @@ EXPECTED_MESSAGE_TYPES = frozenset(
         "permission_deny",
         "permission_rollback",
         "permission_resolve_choice",
+        # Continuous Verification, Graph Impact, Cross-Project Learning, and Test Synthesis
+        "mission_continuous_verification_run",
+        "mission_continuous_verification_status",
+        "mission_cross_project_learning_status",
+        "mission_cross_project_learning_transfer",
+        "mission_massive_project_state_plan_change",
+        "mission_massive_project_state_status",
+        "mission_scc_graph_query_impact",
+        "mission_scc_graph_status",
+        "mission_symbol_graph_query_impact",
+        "mission_symbol_graph_status",
+        "mission_task_completion_run",
+        "mission_task_completion_status",
+        "mission_test_synthesis_generate",
+        "mission_test_synthesis_status",
     }
 )
 
@@ -302,65 +317,11 @@ CRITICAL_SERVER_EVENT_TYPES = frozenset(
     }
 )
 
-# 33 keys registered in MISSION_HANDLERS / CLIENT_MESSAGE_TYPES without an execution branch
-# in MissionWebSocketHandler.handle(); explicitly audited for Stage 1 without inventing fake logic.
-MISSION_UNIMPLEMENTED_STUB_OPERATIONS = frozenset(
-    {
-        "mission_behavioral_baseline_status",
-        "mission_behavioral_proof_status",
-        "mission_behavioral_proof_trigger",
-        "mission_build_contract_extraction_status",
-        "mission_build_contract_trigger_extract",
-        "mission_contract_change_gate_action",
-        "mission_contract_change_prediction",
-        "mission_contract_discovery_status",
-        "mission_contract_drift_review",
-        "mission_contract_health_status",
-        "mission_contract_migration_plan",
-        "mission_contract_proposal_review",
-        "mission_contract_rollback",
-        "mission_decision_quality_status",
-        "mission_dynamic_consumer_resolution",
-        "mission_experience_curate",
-        "mission_experience_memory_status",
-        "mission_long_horizon_adapt",
-        "mission_long_horizon_checkpoint_create",
-        "mission_long_horizon_completion_evaluate",
-        "mission_long_horizon_recover",
-        "mission_loop_respond_human",
-        "mission_loop_run",
-        "mission_loop_status",
-        "mission_loop_step",
-        "mission_policy_proposal_review",
-        "mission_policy_rollback",
-        "mission_polymorphic_compatibility_check",
-        "mission_polymorphic_schema_status",
-        "mission_polymorphic_variant_review",
-        "mission_quality_governance_baseline",
-        "mission_quality_governance_trend",
-        "mission_semantic_graph_status",
-    }
-)
+# All 33 formerly stubbed governance operations now dispatch to real engines via
+# `backend/mission_governance_dispatch.py`, and all 14 legacy mission branches are registered.
+MISSION_UNIMPLEMENTED_STUB_OPERATIONS: frozenset[str] = frozenset()
 
-# 14 branches present in MissionWebSocketHandler.handle() not registered in MISSION_HANDLERS or CLIENT_MESSAGE_TYPES.
-MISSION_UNREGISTERED_LEGACY_BRANCHES = frozenset(
-    {
-        "mission_continuous_verification_run",
-        "mission_continuous_verification_status",
-        "mission_cross_project_learning_status",
-        "mission_cross_project_learning_transfer",
-        "mission_massive_project_state_plan_change",
-        "mission_massive_project_state_status",
-        "mission_scc_graph_query_impact",
-        "mission_scc_graph_status",
-        "mission_symbol_graph_query_impact",
-        "mission_symbol_graph_status",
-        "mission_task_completion_run",
-        "mission_task_completion_status",
-        "mission_test_synthesis_generate",
-        "mission_test_synthesis_status",
-    }
-)
+MISSION_UNREGISTERED_LEGACY_BRANCHES: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True, slots=True)

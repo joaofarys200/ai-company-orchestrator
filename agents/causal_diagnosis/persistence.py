@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from backend.atomic_io import atomic_write_json
 from .models import DiagnosisReport
 
 
@@ -31,11 +32,7 @@ class CausalDiagnosisStore:
         """Atomically persist a diagnosis report."""
         records = self.load_all_diagnoses()
         records[report.diagnosis_id] = report.to_dict()
-
-        temp_path = self.base_dir / "diagnoses.tmp"
-        with open(temp_path, "w", encoding="utf-8") as f:
-            json.dump(records, f, indent=2)
-        os.replace(temp_path, self.diagnoses_file)
+        atomic_write_json(self.diagnoses_file, records, indent=2)
 
     def load_all_diagnoses(self) -> Dict[str, Dict]:
         """Load all persisted diagnoses from disk."""
@@ -61,8 +58,4 @@ class CausalDiagnosisStore:
             except Exception:
                 ledger = []
         ledger.append(entry)
-
-        temp_path = self.base_dir / "audit_ledger.tmp"
-        with open(temp_path, "w", encoding="utf-8") as f:
-            json.dump(ledger, f, indent=2)
-        os.replace(temp_path, self.audit_ledger_file)
+        atomic_write_json(self.audit_ledger_file, ledger, indent=2)

@@ -1243,8 +1243,9 @@ class ObsidianGraphEngine:
             "status": "APPLIED" if auto_apply else "PROPOSED",
             "created_at": datetime.now().isoformat(),
         }
-        with open(proposal_file, "w", encoding="utf-8") as f:
-            json.dump(proposal_payload, f, indent=2, ensure_ascii=False)
+        from backend.atomic_io import atomic_write_json
+
+        atomic_write_json(proposal_file, proposal_payload)
 
         return proposal_payload
 
@@ -1334,10 +1335,12 @@ Esta nota de síntese transversal estabelece a ponte conceptual e arquitetural e
 - **Arquitetura & Código:** [[{path_b.stem}]]
 - **MOCs Relacionados:** [[00 - Knowledge Index]], [[JARVIS Index]]
 """
+        from backend.atomic_io import atomic_write_text
+
         if out_path.exists():
             self.atomic_write_note(out_path, content, create_backup=True)
         else:
-            out_path.write_text(content, encoding="utf-8")
+            atomic_write_text(out_path, content, encoding="utf-8")
 
         self.refresh_vault_catalogs()
         return out_path
@@ -1687,8 +1690,9 @@ Pontos frágeis identificados pelo auditor:
             "status": "AWAITING_REVIEW",
             "created_at": datetime.now().isoformat(),
         }
-        with open(proposal_file, "w", encoding="utf-8") as f:
-            json.dump(proposal_payload, f, indent=2, ensure_ascii=False)
+        from backend.atomic_io import atomic_write_json
+
+        atomic_write_json(proposal_file, proposal_payload)
 
         return proposal_payload
 

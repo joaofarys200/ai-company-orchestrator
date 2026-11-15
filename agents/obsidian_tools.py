@@ -28,9 +28,11 @@ import agents.memory as memory
 import agents.tools as ag_tools
 import agents.obsidian_tools as obs_tools
 import agents.swarm as swarm
-import server
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.abspath(
+    os.environ.get("JARVIS_PROJECT_ROOT")
+    or os.path.dirname(os.path.dirname(__file__))
+)
 
 CODE_ARTIFACT_NOTE_RE = re.compile(
     r"\.(?:py|js|jsx|ts|tsx|css|html?|json|ya?ml|toml|sql|sh|bat|ps1|env)(?:\.md)?$",

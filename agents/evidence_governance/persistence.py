@@ -36,22 +36,18 @@ class EvidenceGovernanceStore:
 
     def save_claim(self, claim: EngineeringClaim) -> None:
         """Atomically persist a single claim."""
+        from backend.atomic_io import atomic_write_json
+
         claims = self.load_all_claims()
         claims[claim.claim_id] = claim.to_dict()
-
-        temp_path = self.base_dir / "claims.tmp"
-        with open(temp_path, "w", encoding="utf-8") as f:
-            json.dump(claims, f, indent=2)
-        os.replace(temp_path, self.claims_file)
+        atomic_write_json(self.claims_file, claims, indent=2)
 
     def save_artifact(self, artifact: EvidenceArtifact) -> Path:
         """Atomically persist an evidence artifact."""
-        target_path = self.artifacts_dir / f"{artifact.artifact_id}.json"
-        temp_path = self.artifacts_dir / f"{artifact.artifact_id}.tmp"
+        from backend.atomic_io import atomic_write_json
 
-        with open(temp_path, "w", encoding="utf-8") as f:
-            json.dump(artifact.to_dict(), f, indent=2)
-        os.replace(temp_path, target_path)
+        target_path = self.artifacts_dir / f"{artifact.artifact_id}.json"
+        atomic_write_json(target_path, artifact.to_dict(), indent=2)
         return target_path
 
     def load_all_claims(self) -> Dict[str, Dict]:
@@ -73,12 +69,10 @@ class EvidenceGovernanceStore:
                     ledger = json.load(f)
             except Exception:
                 ledger = []
-        ledger.append(entry)
+        from backend.atomic_io import atomic_write_json
 
-        temp_path = self.base_dir / "audit_ledger.tmp"
-        with open(temp_path, "w", encoding="utf-8") as f:
-            json.dump(ledger, f, indent=2)
-        os.replace(temp_path, self.audit_ledger_file)
+        ledger.append(entry)
+        atomic_write_json(self.audit_ledger_file, ledger, indent=2)
 
     def reconcile_and_recover(self, registry: EvidenceClaimsRegistry) -> int:
         """

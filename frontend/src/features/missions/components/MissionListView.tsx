@@ -18,7 +18,7 @@ import {
   useMissionRuntimeStore,
   missionRuntimeStore,
 } from '../stores/missionRuntimeStore';
-import { useWebSocket } from '../../../context/WebSocketContext';
+import { useAppSession } from '../../../context/AppSessionContext';
 import type { MissionData } from '../../../protocol/websocket';
 
 interface MissionListViewProps {
@@ -51,7 +51,7 @@ export const MissionListView: React.FC<MissionListViewProps> = ({
   onSelectProject,
 }) => {
   const store = useMissionRuntimeStore();
-  const { projects, deleteMission, cancelMissionExecution, getMissions } = useWebSocket();
+  const { projects, deleteMission, cancelMissionExecution, getMissions } = useAppSession();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTabFilter, setActiveTabFilter] = useState<'ALL' | 'ACTIVE' | 'TERMINAL'>('ALL');

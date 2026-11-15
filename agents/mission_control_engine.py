@@ -30,7 +30,10 @@ import uuid
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 # Workspace root
-WORKSPACE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+WORKSPACE_ROOT = os.path.abspath(
+    os.environ.get("JARVIS_PROJECT_ROOT")
+    or os.path.join(os.path.dirname(__file__), "..")
+)
 if WORKSPACE_ROOT not in sys.path:
     sys.path.insert(0, WORKSPACE_ROOT)
 
@@ -2751,13 +2754,13 @@ class MissionControlEngine:
         controller = cls.get_autonomous_loop_controller(mission_id, scenario_key)
         registry = cls.get_policy_registry()
         from agents.decision_calibration.evaluator import DecisionOutcomeEvaluator
+        from agents.autonomous_loop.models import LoopDecisionType
         from agents.decision_calibration.models import (
             CounterfactualDecision,
             DecisionCorrectness,
             DecisionErrorTaxonomy,
             DecisionOutcome,
             DecisionSeverity,
-            LoopDecisionType,
             MissedObservationType,
             PredictionContributionType,
         )

@@ -121,11 +121,10 @@ export const SystemConsolePanel: React.FC<SystemConsolePanelProps> = ({
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setAutoScroll((prev) => !prev)}
-            className={`h-7 px-2.5 rounded text-[11px] font-medium border flex items-center gap-1.5 transition-all cursor-pointer ${
-              autoScroll
+            className={`h-7 px-2.5 rounded text-[11px] font-medium border flex items-center gap-1.5 transition-all cursor-pointer ${autoScroll
                 ? 'bg-cyan-950/40 border-cyan-500/30 text-cyan-200'
                 : 'bg-white/[0.04] border-white/8 text-gray-400 hover:text-white'
-            }`}
+              }`}
             title={autoScroll ? 'Pausar auto-scroll' : 'Ativar auto-scroll'}
           >
             {autoScroll ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
@@ -173,11 +172,10 @@ export const SystemConsolePanel: React.FC<SystemConsolePanelProps> = ({
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`h-6 px-2 rounded text-[11px] font-mono border transition-all cursor-pointer flex items-center gap-1.5 ${
-                  active
+                className={`h-6 px-2 rounded text-[11px] font-mono border transition-all cursor-pointer flex items-center gap-1.5 ${active
                     ? 'bg-purple-950/50 border-purple-400/40 text-purple-200 font-semibold'
                     : 'bg-white/[0.02] border-white/5 text-gray-400 hover:text-white hover:bg-white/[0.05]'
-                }`}
+                  }`}
               >
                 <span>{cat.label}</span>
                 <span className={`text-[10px] ${active ? 'text-purple-300' : 'text-gray-600'}`}>({count})</span>
@@ -240,7 +238,7 @@ export const SystemConsolePanel: React.FC<SystemConsolePanelProps> = ({
           <span
             className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400' : 'bg-rose-400'}`}
           />
-          <span>{isConnected ? 'Daemon Online (Porta 8001)' : 'Desconectado'}</span>
+          <span>{isConnected ? 'Runtime IPC Nativo (Tauri)' : 'Desconectado'}</span>
           <span>•</span>
           <span>{logs.length} eventos registados</span>
         </div>

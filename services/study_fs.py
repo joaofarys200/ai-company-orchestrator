@@ -20,6 +20,12 @@ import urllib.parse
 from pathlib import Path
 from typing import Any, Optional, Tuple, Type
 
+from backend.atomic_io import (
+    atomic_write_bytes,
+    atomic_write_json,
+    atomic_write_text,
+    run_with_sharing_retry,
+)
 from backend.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -162,53 +168,7 @@ def is_path_within_roots(candidate: Path | str, roots: Tuple[Path | str, ...] | 
     return False
 
 
-def _run_with_sharing_retry(fn: Any, *, attempts: int = 10, base_delay: float = 0.004) -> Any:
-    """Repete brevemente operações sujeitas a lock transitório WinError 5/32 no Windows."""
-    for attempt in range(attempts):
-        try:
-            return fn()
-        except PermissionError:
-            if os.name != "nt" or attempt + 1 >= attempts:
-                raise
-            time.sleep(base_delay * (attempt + 1))
-
-
-def atomic_write_bytes(path: Path | str, data: bytes) -> None:
-    """Escreve bytes atomicamente com ficheiro temporário único, `flush`, `fsync` e `os.replace`."""
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp_name = tempfile.mkstemp(
-        dir=str(target.parent),
-        prefix=f".{target.name}.",
-        suffix=".tmp",
-    )
-    try:
-        with os.fdopen(fd, "wb") as handle:
-            handle.write(data)
-            handle.flush()
-            try:
-                os.fsync(handle.fileno())
-            except OSError:
-                pass
-        _run_with_sharing_retry(lambda: os.replace(tmp_name, target))
-    except Exception:
-        try:
-            if os.path.exists(tmp_name):
-                os.unlink(tmp_name)
-        except OSError:
-            pass
-        raise
-
-
-def atomic_write_text(path: Path | str, content: str, *, encoding: str = "utf-8") -> None:
-    """Escreve texto atomicamente."""
-    atomic_write_bytes(path, content.encode(encoding))
-
-
-def atomic_write_json(path: Path | str, payload: Any, *, indent: int = 2) -> None:
-    """Serializa e persiste JSON atomicamente com `fsync` e `os.replace`."""
-    serialized = json.dumps(payload, indent=indent, ensure_ascii=False)
-    atomic_write_text(path, serialized, encoding="utf-8")
+_run_with_sharing_retry = run_with_sharing_retry
 
 
 def backup_corrupt_file(path: Path | str) -> Optional[Path]:

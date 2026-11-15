@@ -14,7 +14,7 @@ import uuid
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from backend.agents.macro_refactoring import MacroRefactoringBridge, MigrationState
+from agents.macro_refactoring import MacroRefactoringBridge, MigrationState
 
 from .alternative_generator import AlternativeGenerator
 from .evaluator import MultiObjectiveEvaluator

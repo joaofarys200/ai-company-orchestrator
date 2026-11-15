@@ -166,6 +166,9 @@ function FileIcon({ filename }: { filename: string }) {
   return <FileCode2 className="h-3.5 w-3.5 shrink-0 text-cyan-300/80" />;
 }
 
+export { shouldTriggerTreeRowKeyboardSelect, handleTreeRowDeleteKeyDown } from '../uiGuards.ts';
+import { shouldTriggerTreeRowKeyboardSelect, handleTreeRowDeleteKeyDown } from '../uiGuards.ts';
+
 function TreeRow({
   node,
   depth,
@@ -200,10 +203,21 @@ function TreeRow({
 
   return (
     <>
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => (node.type === 'directory' ? onToggle(node.path) : onSelect(node.path))}
-        className={`group flex h-7 w-full items-center gap-1.5 pr-2 text-left text-xs transition-colors ${
+        onKeyDown={(event) => {
+          if (shouldTriggerTreeRowKeyboardSelect(event)) {
+            event.preventDefault();
+            if (node.type === 'directory') {
+              onToggle(node.path);
+            } else {
+              onSelect(node.path);
+            }
+          }
+        }}
+        className={`group flex h-7 w-full cursor-pointer items-center gap-1.5 pr-2 text-left text-xs transition-colors ${
           selected
             ? 'bg-cyan-500/15 text-cyan-200 font-medium border-l-2 border-cyan-400'
             : 'text-gray-300 hover:bg-white/[0.04] hover:text-white'
@@ -280,13 +294,16 @@ function TreeRow({
               event.stopPropagation();
               onDelete(node.path);
             }}
-            className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-500 hover:text-rose-400 rounded transition-all shrink-0"
+            onKeyDown={(event) => {
+              handleTreeRowDeleteKeyDown(event, node.path, onDelete);
+            }}
+            className="opacity-0 group-hover:opacity-100 focus:opacity-100 focus-visible:opacity-100 p-0.5 text-gray-500 hover:text-rose-400 rounded transition-all shrink-0"
             title={`Eliminar ${node.name}`}
           >
             <Trash2 className="h-3 w-3" />
           </button>
         )}
-      </button>
+      </div>
 
       {/* Directory children */}
       {node.type === 'directory' && isExpanded && node.children.map((child) => (

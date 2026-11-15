@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { normalizeServerMessage } from '../protocol/websocket';
+import {
+  createDefaultTransport,
+  type DefaultTransportConfig,
+} from './createDefaultTransport.ts';
 import type { JarvisTransport } from './JarvisTransport.ts';
 import { TransportReactContext } from './TransportContext.ts';
-import {
-  WebSocketTransportAdapter,
-  type WebSocketTransportAdapterConfig,
-} from './WebSocketTransportAdapter.ts';
 
 export interface TransportProviderProps {
   children: React.ReactNode;
   transport?: JarvisTransport;
-  config?: WebSocketTransportAdapterConfig;
+  config?: DefaultTransportConfig;
   autoConnect?: boolean;
 }
 
@@ -23,7 +23,7 @@ export const TransportProvider: React.FC<TransportProviderProps> = ({
   const [ownedTransport] = useState<JarvisTransport | null>(() =>
     injectedTransport
       ? null
-      : new WebSocketTransportAdapter({
+      : createDefaultTransport({
           normalizeMessage: normalizeServerMessage,
           ...config,
         })

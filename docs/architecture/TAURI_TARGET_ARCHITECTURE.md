@@ -440,5 +440,8 @@ sequenceDiagram
 - **Etapa 4 (Partição Definitiva):** Rust Core assume papel de **escritor único de `database.db`** (sessões, projetos, mensagens, permissões). O Python mantém permanentemente a titularidade exclusiva de **`state.db`** e **`rho.db`**, evitando saturação do canal IPC.
 - **Migrações & Backups:** Preservar 100% dos dados reais com `PRAGMA user_version` e snapshot pré-migração (`database.db.pre-tauri.bak`).
 - **Centralização Atómica:** Padronizar todas as 22 escritas em disco através do helper `atomic_write` (`mkstemp` + `fsync` + `os.replace` em Python; `tempfile::NamedTempFile::persist` em Rust).
+- **Estado Implementado (Incrementos A–D):**
+  - `WorkerPoolRole::production_roles()` reduzido a 4 roles Python (`Ai`, `Study`, `Mission`, `Voice`), com `Knowledge` (15 rotas), `Sentinel` (10 rotas), `Permissions` (6 rotas), `Project/Planner/AST/Preview` (12 rotas), `Study Catalog & Study Modes` (39 rotas determinísticas) e `mission_list` (leitura read-only de `state.db`) executados nativamente em Rust.
+  - Separação em runtime entre `resource_root` (read-only `app.path().resource_dir()`) e `data_root` (`%LOCALAPPDATA%\JarvisOS`) em `src-tauri/src/permissions/path_jail.rs`, com empacotamento Windows `.msi` e `-setup.exe` (NSIS) configurado em `src-tauri/tauri.conf.json`.
 
 

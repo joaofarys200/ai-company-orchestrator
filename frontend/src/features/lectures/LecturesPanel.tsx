@@ -14,7 +14,7 @@ import {
   User,
   Zap,
 } from 'lucide-react';
-import { useWebSocket } from '../../context/WebSocketContext';
+import { useAppSession } from '../../context/AppSessionContext';
 
 export const LecturesPanel: React.FC = () => {
   const {
@@ -29,7 +29,7 @@ export const LecturesPanel: React.FC = () => {
     listLectureHistory,
     startLectureRecording,
     stopLectureRecording,
-  } = useWebSocket();
+  } = useAppSession();
 
   const [topic, setTopic] = useState('Sistemas Multiagente e Arquiteturas RAG');
   const [subject, setSubject] = useState('Inteligência Artificial');

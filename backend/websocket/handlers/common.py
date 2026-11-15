@@ -155,7 +155,7 @@ class InitialSyncHandler:
         await send(
             websocket,
             system_message(
-                "Conectado ao servidor Jarvis WebSocket na porta 8001!"
+                "Conectado ao runtime JARVIS OS!"
             ),
         )
         await send(

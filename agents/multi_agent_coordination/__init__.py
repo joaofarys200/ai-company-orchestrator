@@ -1,6 +1,6 @@
 """
 JARVIS OS — Phase 66: Multi-Agent Engineering Coordination & Conflict Arbitration
-Package: backend.agents.multi_agent_coordination
+Package: agents.multi_agent_coordination
 Exports core bridges, managers, engines, and domain models.
 """
 

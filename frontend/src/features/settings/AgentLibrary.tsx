@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWebSocket } from '../../context/WebSocketContext';
+import { useAppSession } from '../../context/AppSessionContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Database, Sparkles, ShieldAlert, PenTool, X } from 'lucide-react';
 
@@ -44,7 +44,7 @@ const PRESET_AGENTS = [
 ];
 
 export const AgentLibrary: React.FC<AgentLibraryProps> = ({ isOpen, onClose }) => {
-  const { sendDirective, setChatPanelOpen } = useWebSocket();
+  const { sendDirective, setChatPanelOpen } = useAppSession();
 
   const handleSpawn = (agent: typeof PRESET_AGENTS[0]) => {
     const directive = `/spawn ${agent.name} | ${agent.specialty} | ${agent.task}`;

@@ -158,17 +158,21 @@ class CornellNoteSynthesizer:
         filename = f"{date_str} - {clean_title}.md"
         output_file = subject_dir / filename
 
+        from backend.atomic_io import atomic_write_bytes, atomic_write_text
+
         if output_file.exists():
             archive_dir = subject_dir / ".archive"
             archive_dir.mkdir(parents=True, exist_ok=True)
             ts_suffix = now_dt.strftime("%Y%m%d_%H%M%S_%f")
             try:
-                (archive_dir / f"{output_file.stem}_{ts_suffix}.md").write_bytes(output_file.read_bytes())
+                atomic_write_bytes(
+                    archive_dir / f"{output_file.stem}_{ts_suffix}.md",
+                    output_file.read_bytes(),
+                )
             except Exception:
                 pass
 
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(linked_markdown)
+        atomic_write_text(output_file, linked_markdown, encoding="utf-8")
 
         session.markdown_path = str(output_file)
         session.status = "COMPLETED"

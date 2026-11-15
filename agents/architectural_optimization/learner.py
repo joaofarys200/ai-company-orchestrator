@@ -86,9 +86,10 @@ class OptimizationLearner:
         return False
 
     def _persist_record(self, record: CalibrationRecord) -> None:
+        from backend.atomic_io import atomic_write_json
+
         file_path = self.storage_dir / f"{record.calibration_id}.json"
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(record.to_dict(), f, indent=2)
+        atomic_write_json(file_path, record.to_dict(), indent=2)
 
     def _load_records(self) -> None:
         for f in self.storage_dir.glob("cal_*.json"):

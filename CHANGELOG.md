@@ -4,6 +4,25 @@ All notable changes to **JARVIS OS** are documented in this file in adherence to
 
 ---
 
+## [2.0.0-tauri] - Tauri 2 + Rust Core Migration
+
+### Added
+- **Tauri 2 Native Shell & Rust Core (`src-tauri/`)**: Added Rust Core runtime with Win32 Job Object worker supervision, single-writer SQLite engine (`rusqlite`), `StudyStore`, `PathJail`, `PermissionGateway`, `CommandGuard`, and `UrlSsrfGuard`.
+- **Authenticated Loopback Media & Preview Servers (`127.0.0.1:0`)**: Added Axum range-request media server (`Host`/`Origin`/`Sec-Fetch-Site` guards, `OsRng` bearer token, `doc_id`-scoped HMAC tickets) and sandboxed IDE preview server.
+- **Frontend Transport Abstraction (`frontend/src/transport/`)**: Added `JarvisTransport`, `TauriTransportAdapter`, shared correlation registry, native dialog/drag-drop integration, and pure Tauri IPC default routing.
+- **Specialized Python Domain Workers (`workers/`)**: Added `ai`, `study`, `knowledge`, `mission`, and `voice` workers over stdio NDJSON JSON-RPC 2.0 with stdout fd isolation, cooperative `task.cancel`, Reverse-RPC HITL approvals, and Windows `PeekNamedPipe` reader safety.
+- **Mission Governance Resolution & Runtime Bridge**: Resolved all 33 mission governance dispatch paths via `backend/mission_governance_dispatch.py` and broke circular `agents -> server` coupling with `backend/runtime_bridge.py`.
+
+### Changed
+- **Canonical Agent Package Consolidation**: Consolidated 596 duplicate files from `backend/agents/` into `agents/` with a dynamic `backend/agents/__init__.py` alias loader for backwards import compatibility.
+- **Loopback Sandbox Binding**: Restricted `sandbox.py` server binding exclusively to `127.0.0.1`.
+- **CI Validation Pipeline**: Upgraded `.github/workflows/tauri-windows-validation.yml` for Windows build, Rust `cargo test --locked`, Python contract + E2E worker tests, and `jarvis-os.exe` smoke boot validation.
+
+### Removed
+- **Electron Shell & Legacy WebSocket/HTTP Daemons**: Removed `main.js`, `preload.js`, `electron`/`concurrently` npm dependencies, `:8001`/`:8000` startup in `server.py`, and transitional localhost WebSocket CSP exemptions in `tauri.conf.json`.
+
+---
+
 ## [1.0.0] - 2026-08-31
 
 ### Added

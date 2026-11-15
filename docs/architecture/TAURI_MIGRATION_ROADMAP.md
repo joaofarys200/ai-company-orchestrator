@@ -150,6 +150,11 @@ flowchart LR
   - Assinatura digital de executáveis e bibliotecas DLL.
   - Verificação de telemetria Sentinel em ambiente de produção limpo.
 - **Portão de Aceitação:** Instalação bem-sucedida em máquina limpa Windows sem Python pré-instalado.
+- **Estado de Execução (Branch `migration/tauri-rust-complete`):**
+  - **Incremento A (`SqliteDatabase` Rust-Only Writer):** Escrita exclusiva de `database.db` em Rust (`src-tauri/src/storage/sqlite.rs`, `workers/common/db_guard.py`, `src-tauri/src/workers/reverse_rpc.rs`) mantendo `state.db` em `MissionWorker` e `data/rho.db` em `ModelHarness`.
+  - **Incrementos B1, B2 e B3 (Migração Funcional para Rust):** Catálogo Study (`study_catalog_ops.rs` — 19 rotas), Modos de Estudo SM-2 v6.0 / Cornell (`study_modes_ops.rs` — 20 rotas), Projetos/AST/Planner/Preview (`project_dispatch.rs` — 12 rotas), Permissões HITL (`permission_dispatch.rs` — 6 rotas), Knowledge & Obsidian Graph Engine (`src-tauri/src/knowledge/` — 15 rotas; reforma de `WorkerPoolRole::Knowledge`), observação read-only `mission_list` (`mission_dispatch.rs`), e Sentinel Watchdog nativo (`src-tauri/src/sentinel/` — 10 rotas).
+  - **Incremento C (Hardening Frontend, Loopback & Supervisor):** Eliminação de `?token=` em rotas loopback (`src-tauri/src/protocol/loopback.rs`), `cmd.env_clear()` + allowlist por role (`supervisor.rs`), limite de memória de 4 GiB em Win32 Job Objects (`job_object.rs`), e correções DOM/worker no frontend (`Run #43617155326`).
+  - **Incremento D (Empacotamento MSI/NSIS & `%LOCALAPPDATA%\JarvisOS`):** Separação entre `data_root` (`%LOCALAPPDATA%\JarvisOS`) e `resource_root` (`app.path().resource_dir()`) em `src-tauri/src/permissions/path_jail.rs`, geração de instaladores Windows `.msi` e `-setup.exe` (`src-tauri/tauri.conf.json`), e validação automatizada de clean-launch e upgrade em `.github/workflows/tauri-windows-validation.yml`.
 
 ---
 

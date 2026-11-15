@@ -115,10 +115,11 @@ class FileQuarantineExecutor(BaseActionExecutor):
         }
 
         # Move o ficheiro para quarentena
+        from backend.atomic_io import atomic_write_json
+
         shutil.move(path, quarantine_path)
 
-        with open(metadata_path, "w", encoding="utf-8") as f:
-            json.dump(metadata, f, indent=2)
+        atomic_write_json(metadata_path, metadata, indent=2)
 
         return {
             "original_path": path,

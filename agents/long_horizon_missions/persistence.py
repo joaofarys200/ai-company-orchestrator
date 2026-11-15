@@ -11,7 +11,7 @@ import sqlite3
 import time
 from typing import Any, Dict, List, Optional
 
-from backend.agents.long_horizon_missions.models import (
+from agents.long_horizon_missions.models import (
     LongHorizonMission,
     Milestone,
     MissionCheckpoint,

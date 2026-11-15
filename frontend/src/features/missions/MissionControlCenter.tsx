@@ -13,7 +13,7 @@ import type {
   MissionControlEventData,
   CommandType,
 } from '../../protocol/websocket';
-import { useWebSocket } from '../../context/WebSocketContext';
+import { useAppSession } from '../../context/AppSessionContext';
 import {
   MissionHeader,
   MissionControlActions,
@@ -266,7 +266,7 @@ export const MissionControlCenter: React.FC<MissionControlCenterProps> = ({
     sendMissionControlCommand,
     sendMissionIntentPreview,
     sendMissionIntentChange,
-  } = useWebSocket();
+  } = useAppSession();
 
   const [selectedScenario, setSelectedScenario] = useState<ScenarioKey>('INTERACTIVE');
   const [missionState, setMissionState] = useState<MissionControlStateData>(FALLBACK_INTERACTIVE_STATE);

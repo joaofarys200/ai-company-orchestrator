@@ -1,12 +1,9 @@
 import os
 import json
 import asyncio
-import subprocess
 from typing import Optional
-import websockets
 from backend.health import build_local_health_report
 from backend.logging_config import get_logger, log_event
-from backend.services.sandbox_service import start_frontend_http_server as start_frontend_http_server_service
 from backend.services.local_app_service import (
     extract_local_app_query,
     find_local_app_request,
@@ -586,55 +583,13 @@ voice_runtime = _create_voice_runtime()
 websocket_gateway = _create_websocket_gateway()
 
 
-def start_frontend_http_server():
-    return start_frontend_http_server_service(
-        os.path.dirname(__file__),
-        port=8000,
-    )
-
-def _free_port_if_locked(port: int = 8001) -> None:
-    """Closes any orphaned background processes holding the port before binding."""
-    current_pid = os.getpid()
-    try:
-        import psutil
-        for conn in psutil.net_connections(kind="inet"):
-            if conn.laddr and conn.laddr.port == port and conn.status == psutil.CONN_LISTEN:
-                if conn.pid and conn.pid != current_pid:
-                    try:
-                        proc = psutil.Process(conn.pid)
-                        proc.kill()
-                        proc.wait(timeout=1.0)
-                    except (psutil.NoSuchProcess, psutil.AccessDenied):
-                        pass
-    except Exception:
-        pass
-    try:
-        if os.name == "nt":
-            ps_script = (
-                f"Get-NetTCPConnection -LocalPort {int(port)} -State Listen -ErrorAction SilentlyContinue | "
-                f"Where-Object {{ $_.OwningProcess -ne {int(current_pid)} }} | "
-                "ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"
-            )
-            subprocess.run(
-                ["powershell.exe", "-NoProfile", "-Command", ps_script],
-                shell=False,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                timeout=2.0,
-            )
-    except Exception:
-        pass
-
-
 async def main():
     runtime_state.main_loop = asyncio.get_running_loop()
-    _free_port_if_locked(8000)
-    _free_port_if_locked(8001)
     lifecycle = ApplicationLifecycle(
         services=_current_application_services(),
         initialize_voice=init_voice_service,
         get_voice_service=lambda: voice_runtime.voice_service,
-        start_frontend=start_frontend_http_server,
+        start_frontend=lambda: None,
     )
     lifecycle.startup()
 
@@ -652,7 +607,7 @@ async def main():
 
     asyncio.create_task(_async_warmup())
 
-    # Start Native Stdio Transport Gateway for Electron desktop IPC
+    # Legacy standalone entrypoint runs solely over stdio JSON-line IPC (no :8000 HTTP or :8001 WS server).
     stdio_task = None
     if stdio_transport_gateway is not None:
         stdio_task = stdio_transport_gateway.start(runtime_state.main_loop)
@@ -666,20 +621,12 @@ async def main():
         log_event(logger, "sentinel.watchdog.start_failed", error=str(e))
 
     log_event(logger, "runtime.health", health=build_runtime_health())
-    log_event(logger, "websocket.server.starting", host=WS_HOST, port=8001)
 
     try:
-        for attempt in range(3):
-            try:
-                async with websockets.serve(handle_client, WS_HOST, 8001, max_size=33554432):
-                    await asyncio.Future()
-            except OSError as exc:
-                if exc.errno in (10048, 98) and attempt < 2:
-                    log_event(logger, "websocket.server.port_conflict_resolving", port=8001, attempt=attempt + 1)
-                    _free_port_if_locked(8001)
-                    await asyncio.sleep(0.5 * (attempt + 1))
-                else:
-                    raise
+        if stdio_task is not None:
+            await stdio_task
+        else:
+            await asyncio.Event().wait()
     finally:
         try:
             await sentinel_watchdog.stop()

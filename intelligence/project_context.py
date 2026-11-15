@@ -253,8 +253,9 @@ class ProjectContextService:
             "project_name": display_name,
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
-        with open(self.context_path(clean_id), "w", encoding="utf-8") as f:
-            json.dump(ctx_data, f, indent=2, ensure_ascii=False)
+        from backend.atomic_io import atomic_write_json
+
+        atomic_write_json(self.context_path(clean_id), ctx_data, indent=2)
 
         return self.open_project(clean_id)
 
@@ -1044,9 +1045,10 @@ class ProjectContextService:
             return None
 
     def _persist_context(self, context: ProjectContext) -> None:
+        from backend.atomic_io import atomic_write_json
+
         path = Path(self.context_path(context.project_id))
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(context.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
+        atomic_write_json(path, context.to_dict(), indent=2)
 
 
 def index_project(project_id: str) -> ProjectContext:

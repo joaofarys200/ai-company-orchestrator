@@ -15,7 +15,8 @@ Thank you for your interest in contributing to **JARVIS OS**! We welcome contrib
 ## 2. Setting Up the Development Environment
 
 ### Prerequisites
-- Windows 10/11, macOS, or Linux
+- Windows 10/11 (primary target with WebView2 Runtime)
+- Rust toolchain (`rustup`, stable MSVC target on Windows) for building `src-tauri/`
 - Python 3.11+
 - Node.js v20+ and `npm`
 

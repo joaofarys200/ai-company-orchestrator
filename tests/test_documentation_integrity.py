@@ -143,3 +143,42 @@ def test_markdown_relative_links_integrity():
                 f"Broken link in {md_file.relative_to(REPO_ROOT)}: '{target}' "
                 f"resolves to non-existent path: {resolved_path}"
             )
+
+
+def test_tauri_bundle_includes_python_runtime_manifest_and_workers():
+    """Validates that Tauri bundle resources include py-runtime/* and manifest.json covers all worker modules."""
+    tauri_conf_path = REPO_ROOT / "src-tauri" / "tauri.conf.json"
+    assert tauri_conf_path.exists(), "src-tauri/tauri.conf.json must exist"
+    conf = json.loads(tauri_conf_path.read_text(encoding="utf-8"))
+    resources = conf.get("bundle", {}).get("resources", {})
+    assert "py-runtime/*" in resources, "tauri.conf.json bundle.resources must include py-runtime/*"
+    assert resources["py-runtime/*"] == "py-runtime/"
+
+    manifest_path = REPO_ROOT / "src-tauri" / "py-runtime" / "manifest.json"
+    assert manifest_path.exists(), "src-tauri/py-runtime/manifest.json must exist"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest.get("bundle_filename") == "runtime-bundle.zip"
+    assert manifest.get("app_files_count", 0) >= 1000
+    assert manifest.get("python_files_count", 0) >= 1000
+    required_dirs = {
+        "workers",
+        "backend",
+        "agents",
+        "intelligence",
+        "persistence",
+        "security",
+        "services",
+        "schemas",
+        "config",
+    }
+    assert required_dirs.issubset(set(manifest.get("app_packages", [])))
+    required_root_files = {
+        "database.py",
+        "gemini_live.py",
+        "sandbox.py",
+        "voice_service.py",
+        "websocket_schema.py",
+        "workspace_policy.py",
+    }
+    assert required_root_files.issubset(set(manifest.get("app_root_modules", [])))
+

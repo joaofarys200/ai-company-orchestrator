@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "JARVIS OS",
+  "version": "0.1.0",
+  "identifier": "com.jarvisos.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev --prefix frontend",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeBuildCommand": "npm run build --prefix frontend",
+    "frontendDist": "../frontend/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "JARVIS OS",
+        "width": 1300,
+        "height": 850,
+        "minWidth": 1024,
+        "minHeight": 700,
+        "backgroundColor": "#080c12",
+        "resizable": true,
+        "fullscreen": false,
+        "additionalBrowserArgs": "--autoplay-policy=no-user-gesture-required"
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self' 'wasm-unsafe-eval'",
+        "style-src": "'self' 'unsafe-inline'",
+        "font-src": "'self' data:",
+        "img-src": "'self' data: blob: http://127.0.0.1:*",
+        "media-src": "'self' blob: http://127.0.0.1:*",
+        "connect-src": "'self' ipc: http://ipc.localhost http://127.0.0.1:* ws://127.0.0.1:5173",
+        "worker-src": "'self' blob: http://127.0.0.1:*",
+        "frame-src": "'self' blob: http://127.0.0.1:*",
+        "object-src": "'none'",
+        "base-uri": "'self'"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "msi",
+      "nsis"
+    ],
+    "resources": {
+      "../workers/*.py": "workers/",
+      "../workers/common/*.py": "workers/common/",
+      "py-runtime/*": "py-runtime/"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

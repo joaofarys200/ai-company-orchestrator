@@ -17,7 +17,7 @@ from .models import SelectedTestItem, TestSelectionPriority, VerificationSurface
 from .security import VerificationSecuritySentinel
 
 try:
-    from backend.agents.autonomous_test_synthesis.bridge import AutonomousTestSynthesisBridge
+    from agents.autonomous_test_synthesis.bridge import AutonomousTestSynthesisBridge
 except ImportError:
     try:
         from agents.autonomous_test_synthesis.bridge import AutonomousTestSynthesisBridge

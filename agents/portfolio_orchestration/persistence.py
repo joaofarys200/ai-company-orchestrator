@@ -40,9 +40,10 @@ class PortfolioStore:
 
     def save_roadmap(self, roadmap: PortfolioRoadmap) -> Path:
         """Persist a versioned roadmap."""
+        from backend.atomic_io import atomic_write_json
+
         filepath = self.roadmaps_dir / f"{roadmap.roadmap_id}_{roadmap.version}.json"
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(roadmap.to_dict(), f, indent=2)
+        atomic_write_json(filepath, roadmap.to_dict(), indent=2)
         return filepath
 
     def load_roadmap(self, roadmap_id: str, version: Optional[str] = None) -> Optional[PortfolioRoadmap]:
@@ -84,9 +85,10 @@ class PortfolioStore:
 
     def save_initiatives(self, initiatives: Dict[str, EngineeringInitiative]) -> Path:
         """Persist normalized initiatives."""
+        from backend.atomic_io import atomic_write_json
+
         payload = {init_id: init.to_dict() for init_id, init in initiatives.items()}
-        with open(self.initiatives_file, "w", encoding="utf-8") as f:
-            json.dump(payload, f, indent=2)
+        atomic_write_json(self.initiatives_file, payload, indent=2)
         return self.initiatives_file
 
     def load_initiatives(self) -> Dict[str, EngineeringInitiative]:
@@ -106,9 +108,10 @@ class PortfolioStore:
                     events = json.load(f)
             except Exception:
                 events = []
+        from backend.atomic_io import atomic_write_json
+
         events.append(event.to_dict())
-        with open(self.replanning_file, "w", encoding="utf-8") as f:
-            json.dump(events, f, indent=2)
+        atomic_write_json(self.replanning_file, events, indent=2)
 
     def reconcile_and_recover(
         self,

@@ -28,7 +28,6 @@ import agents.memory as memory
 import agents.tools as ag_tools
 import agents.obsidian_tools as obs_tools
 import agents.swarm as swarm
-import server
 
 
 # --- message_callback ---
@@ -92,5 +91,8 @@ _SPAWNED_AGENTS_PATH = Path(_ECC_BASE_DIR) / "config" / "spawned_agents.json"
 
 
 # --- BASE_DIR ---
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.abspath(
+    os.environ.get("JARVIS_PROJECT_ROOT")
+    or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 

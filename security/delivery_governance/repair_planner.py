@@ -92,7 +92,9 @@ class RepairPlanner:
                 full_p = os.path.join(project_root, act.file_path)
                 os.makedirs(os.path.dirname(full_p), exist_ok=True)
                 if not os.path.exists(full_p) or os.path.getsize(full_p) == 0:
-                    Path(full_p).write_text(act.content, encoding="utf-8")
+                    from backend.atomic_io import atomic_write_text
+
+                    atomic_write_text(full_p, act.content, encoding="utf-8")
                     applied.append(act.file_path)
             elif act.action_type == "MAP_EXISTING_EQUIVALENT":
                 applied.append(f"Mapped: {act.file_path}")

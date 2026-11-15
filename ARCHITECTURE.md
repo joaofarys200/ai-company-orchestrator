@@ -47,13 +47,13 @@ JARVIS OS bridges human natural language direction and deterministic desktop sof
 
 ---
 
-## 2. Runtime Architecture &amp; Event Loop
+## 2. Runtime Architecture & Event Loop
 
-The JARVIS OS backend is powered by Python 3.11+ using an asynchronous event-driven architecture (`backend/application_lifecycle.py` and `server.py`):
-- **FastAPI / Uvicorn Core**: Hosts HTTP health endpoints and single-port WebSocket endpoints.
-- **WebSocket Gateway (`backend/websocket/gateway.py`)**: Manages client connection lifecycles, connection tracking, and broadcast channels.
-- **WebSocket Dispatcher (`backend/websocket/dispatcher.py`)**: Central router mapping inbound message opcodes to async domain handlers with zero protocol drift assertion.
-- **Electron Shell (`main.js`)**: Desktop window manager communicating over loopback with automatic process management and graceful shutdown (`taskkill /F /T` on Windows).
+The JARVIS OS desktop runtime uses a native **Tauri 2 + Rust Core** shell orchestrating specialized **Python Domain Workers** over authenticated stdio NDJSON JSON-RPC 2.0 pipes (replacing the legacy Electron shell and `:8001`/`:8000` TCP servers):
+- **Rust Core & Tauri IPC Router (`src-tauri/src/`)**: Manages application lifecycle, Win32 Job Object worker supervision (`workers/supervisor.rs`), single-writer SQLite persistence (`storage/sqlite.rs`), `StudyStore` (`storage/study_store.rs`), and synchronous/streaming command dispatch (`commands/dispatch.rs`).
+- **Ephemeral Loopback Media & Preview Servers (`127.0.0.1:0`)**: Serves range-request PDF/media streams (`protocol/loopback.rs`) gated by `OsRng` bearer tokens and scoped HMAC tickets, plus isolated project previews (`process/preview_server.rs`) and restricted local sandbox previews (`sandbox.py` bound exclusively to `127.0.0.1`).
+- **Domain Worker Pool (`workers/`)**: Launches role-isolated Python workers (`ai`, `study`, `knowledge`, `mission`, `voice`) using Windows `PeekNamedPipe`-safe NDJSON stdio RPC (`workers/common/stdio_rpc.py`) and `DomainWorkerRuntime` (`workers/common/domain_bridge.py`).
+- **Frontend Transport Abstraction (`frontend/src/transport/`)**: Routes React HUD operations through `JarvisTransport` and `TauriTransportAdapter` onto native Tauri IPC commands and `jarvis:event` streams without requiring localhost WebSocket daemons.
 
 ![Runtime WebSocket Flow](./docs/diagrams/09-runtime-websocket-flow.svg)
 
@@ -147,12 +147,11 @@ JARVIS OS uses a multi-tier persistence model combining relational speed, filesy
 
 ---
 
-## 8. Duplex WebSocket Message Protocol
+## 8. Duplex IPC & Domain Message Protocol
 
-All client-server interaction runs over a single, multiplexed WebSocket channel:
-- **Client Messages**: 58 canonical opcodes defined in [`websocket_schema.py`](./websocket_schema.py) and typed in [`frontend/src/protocol/websocket.ts`](./frontend/src/protocol/websocket.ts).
-- **Server Messages**: 40+ typed responses covering streaming tokens, audio levels, AST updates, and Sentinel alerts.
-- **Static Schema Alignment**: [`tests/test_websocket_dispatcher_contract.py`](./tests/test_websocket_dispatcher_contract.py) asserts that the dispatcher never diverges from canonical protocol schemas.
+All frontend-to-core interaction runs over **`JarvisTransport` / Tauri IPC** backed by JSON-RPC 2.0 NDJSON worker streams and shared message contracts:
+- **Client & Server Message Types**: 263 client opcodes and 326 server message types synchronized across [`websocket_schema.py`](./websocket_schema.py), `backend/websocket/contracts.py`, and [`frontend/src/protocol/websocket.ts`](./frontend/src/protocol/websocket.ts).
+- **Zero Protocol Drift Validation**: [`tests/test_websocket_dispatcher_contract.py`](./tests/test_websocket_dispatcher_contract.py) and `tests/test_protocol_contracts.py` assert complete registration and zero-stub dispatch across all handlers.
 
 ---
 
@@ -247,7 +246,7 @@ JARVIS OS strictly classifies economic tasks into 4 verifiable tiers to prevent 
 
 ## 17. Core Architectural Invariants
 
-1. **No Untyped WebSocket Messages**: Every frame must match a registered opcode.
+1. **No Untyped IPC Messages**: Every inbound and outbound message must match a registered opcode in the protocol contracts.
 2. **No Unchecked File Overwrites**: All code patches must be preceded by an automated checkpoint.
 3. **No Unapproved Sentinel Mutations**: Containment actions require human operator sign-off.
 4. **Strict Economic Transparency**: Synthetic benchmarks are never labeled as financial revenue.

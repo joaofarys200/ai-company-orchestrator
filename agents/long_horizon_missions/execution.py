@@ -10,15 +10,15 @@ from __future__ import annotations
 import time
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from backend.agents.long_horizon_missions.adaptation import AdaptiveReplanner
-from backend.agents.long_horizon_missions.budget import BudgetTracker
-from backend.agents.long_horizon_missions.checkpoint import CheckpointManager
-from backend.agents.long_horizon_missions.completion import CompletionEvaluator
-from backend.agents.long_horizon_missions.coordination import MissionCoordinationManager
-from backend.agents.long_horizon_missions.evidence import EvidenceLedger
-from backend.agents.long_horizon_missions.milestones import MilestoneManager
-from backend.agents.long_horizon_missions.mission_state import MissionStateMachine
-from backend.agents.long_horizon_missions.models import (
+from agents.long_horizon_missions.adaptation import AdaptiveReplanner
+from agents.long_horizon_missions.budget import BudgetTracker
+from agents.long_horizon_missions.checkpoint import CheckpointManager
+from agents.long_horizon_missions.completion import CompletionEvaluator
+from agents.long_horizon_missions.coordination import MissionCoordinationManager
+from agents.long_horizon_missions.evidence import EvidenceLedger
+from agents.long_horizon_missions.milestones import MilestoneManager
+from agents.long_horizon_missions.mission_state import MissionStateMachine
+from agents.long_horizon_missions.models import (
     CheckpointType,
     CompletionResult,
     LongHorizonMission,
@@ -29,11 +29,11 @@ from backend.agents.long_horizon_missions.models import (
     ObjectiveCategory,
     ObjectiveState,
 )
-from backend.agents.long_horizon_missions.objectives import ObjectiveTracker
-from backend.agents.long_horizon_missions.planning import MissionPlanner
-from backend.agents.long_horizon_missions.risk import RiskGovernor, RiskSeverity
-from backend.agents.long_horizon_missions.security import MissionSecuritySentinel
-from backend.agents.long_horizon_missions.verification import MissionVerifier
+from agents.long_horizon_missions.objectives import ObjectiveTracker
+from agents.long_horizon_missions.planning import MissionPlanner
+from agents.long_horizon_missions.risk import RiskGovernor, RiskSeverity
+from agents.long_horizon_missions.security import MissionSecuritySentinel
+from agents.long_horizon_missions.verification import MissionVerifier
 
 
 class MissionExecutionEngine:

@@ -256,9 +256,9 @@ def _resolve_shared_study_service(study_service: Any = None) -> Any:
     if study_service is not None:
         return study_service
     try:
-        import server
+        from backend.runtime_bridge import get_application_services
 
-        app_services = server._current_application_services()
+        app_services = get_application_services()
         if app_services and getattr(app_services, "study_service", None) is not None:
             return app_services.study_service
     except Exception:

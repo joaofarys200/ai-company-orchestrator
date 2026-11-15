@@ -59,13 +59,71 @@ export function getWindowHttpToken(): string {
   return typeof token === 'string' ? token : '';
 }
 
+export function isTauriRuntime(): boolean {
+  if (typeof globalThis === 'undefined') {
+    return false;
+  }
+  const g = globalThis as {
+    __TAURI_INTERNALS__?: unknown;
+    __TAURI__?: unknown;
+    location?: { origin?: string; protocol?: string; hostname?: string };
+    window?: {
+      __TAURI_INTERNALS__?: unknown;
+      __TAURI__?: unknown;
+      location?: { origin?: string; protocol?: string; hostname?: string };
+    };
+  };
+  if (
+    Boolean(g.__TAURI_INTERNALS__) ||
+    Boolean(g.__TAURI__) ||
+    Boolean(g.window?.__TAURI_INTERNALS__) ||
+    Boolean(g.window?.__TAURI__)
+  ) {
+    return true;
+  }
+  const loc = g.window?.location ?? g.location;
+  const protocol = loc?.protocol?.toLowerCase() ?? '';
+  const hostname = loc?.hostname?.toLowerCase() ?? '';
+  if (protocol === 'tauri:' || protocol === 'ipc:') {
+    return true;
+  }
+  return hostname === 'tauri.localhost' || hostname === 'ipc.localhost' || hostname.endsWith('.tauri.localhost');
+}
+
+export function isVirtualDesktopOrigin(origin: string | undefined): boolean {
+  if (!origin || origin === 'null' || origin.startsWith('file://')) {
+    return true;
+  }
+  const lower = origin.trim().toLowerCase();
+  if (lower.startsWith('tauri://') || lower.startsWith('ipc://')) {
+    return true;
+  }
+  try {
+    const parsed = new URL(lower);
+    const host = parsed.hostname;
+    if (
+      host === 'tauri.localhost' ||
+      host === 'ipc.localhost' ||
+      host.endsWith('.tauri.localhost')
+    ) {
+      return true;
+    }
+    if ((host === '127.0.0.1' || host === 'localhost') && (parsed.port === '5173' || parsed.port === '1420')) {
+      return true;
+    }
+  } catch {
+    return true;
+  }
+  return false;
+}
+
 export function resolveDefaultHttpBaseUrl(overrideBaseUrl?: string): string {
   if (overrideBaseUrl && overrideBaseUrl.trim().length > 0) {
     return overrideBaseUrl.trim().replace(/\/+$/, '');
   }
   if (typeof window !== 'undefined') {
     const origin = window.location?.origin;
-    if (origin && origin !== 'null' && !origin.includes(':5173')) {
+    if (origin && !isVirtualDesktopOrigin(origin)) {
       return origin.replace(/\/+$/, '');
     }
     if (window.location?.href && !window.location.href.startsWith('data:')) {

@@ -26,8 +26,8 @@ from .models import (
 
 # Optional import of Phase 66 claim manager
 try:
-    from backend.agents.multi_agent_coordination.claims import ClaimManager
-    from backend.agents.multi_agent_coordination.models import ClaimType, ResourceGranularity
+    from agents.multi_agent_coordination.claims import ClaimManager
+    from agents.multi_agent_coordination.models import ClaimType, ResourceGranularity
 except ImportError:
     ClaimManager = None
     ClaimType = None

@@ -54,6 +54,9 @@ export interface StudyVideoReaderViewProps {
   onExplainVisual?: (timestamp: number) => Promise<{ visual_type: string; explanation: string; frame_id?: string; timestamp_str: string }>;
 }
 
+export { deriveVideoStreamUiState, type VideoStreamUiState } from '../uiGuards.ts';
+import { deriveVideoStreamUiState } from '../uiGuards.ts';
+
 function formatTime(seconds: number): string {
   if (isNaN(seconds) || seconds < 0) return '00:00:00';
   const total = Math.floor(seconds);
@@ -104,10 +107,47 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [autoScrollTranscript, setAutoScrollTranscript] = useState<boolean>(true);
   const [videoStreamError, setVideoStreamError] = useState<boolean>(false);
+  const [mediaTicket, setMediaTicket] = useState<string | null>(null);
+  const [isTicketLoading, setIsTicketLoading] = useState<boolean>(() =>
+    Boolean(transport.system.isNativeDesktop() && transport.system.getMediaTicket)
+  );
+  const [mediaTicketError, setMediaTicketError] = useState<boolean>(false);
+  const [ticketRetryNonce, setTicketRetryNonce] = useState<number>(0);
 
   useEffect(() => {
     setVideoStreamError(false);
-  }, [document.document_id]);
+    setMediaTicket(null);
+    setMediaTicketError(false);
+    const getTicket = transport.system.getMediaTicket;
+    if (!getTicket) {
+      setIsTicketLoading(false);
+      return;
+    }
+    setIsTicketLoading(true);
+    let cancelled = false;
+    void Promise.resolve()
+      .then(() => getTicket(document.document_id))
+      .then((ticket) => {
+        if (cancelled) return;
+        if (ticket && String(ticket).trim()) {
+          setMediaTicket(ticket);
+          setMediaTicketError(false);
+        } else {
+          setMediaTicket(null);
+          setMediaTicketError(true);
+        }
+        setIsTicketLoading(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setMediaTicket(null);
+        setMediaTicketError(true);
+        setIsTicketLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [document.document_id, transport.system, ticketRetryNonce]);
 
   // Video Data from metadata
   const videoMeta = (document.metadata as any)?.video || {};
@@ -546,10 +586,31 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
     }
   };
 
-  const videoStreamUrl = transport.system.resolveMediaUrl(
-    `/api/study/document/${encodeURIComponent(document.document_id)}/video`,
-    { appendToken: true }
-  );
+  const isNativeDesktop = transport.system.isNativeDesktop();
+  const videoStreamUrl =
+    isNativeDesktop && !mediaTicket
+      ? undefined
+      : transport.system.resolveMediaUrl(
+          `/api/study/document/${encodeURIComponent(document.document_id)}/video`,
+          {
+            appendToken: !isNativeDesktop && !mediaTicket,
+            ticket: mediaTicket ?? undefined,
+          }
+        );
+  const videoStreamUiState = deriveVideoStreamUiState({
+    isNativeDesktop,
+    isTicketLoading,
+    mediaTicket,
+    mediaTicketError,
+    videoStreamError,
+    videoStreamUrl,
+  });
+  const handleRetryVideoStream = useCallback(() => {
+    setVideoStreamError(false);
+    setMediaTicketError(false);
+    setTicketRetryNonce((prev) => prev + 1);
+    onRetryDocument?.(document.document_id);
+  }, [document.document_id, onRetryDocument]);
   const asrUnavailableReason =
     videoMeta?.asr_unavailable_reason || (document.metadata as any)?.asr_unavailable_reason || '';
   const ocrStatus = videoMeta?.ocr_status || (document.metadata as any)?.ocr_status || '';
@@ -640,23 +701,20 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
       <div className="flex flex-1 overflow-hidden">
         {/* Left Column: Video Player & Subtitles & Timeline (Dominant) */}
         <div className="flex flex-1 flex-col gap-3 overflow-y-auto bg-[#06090e] p-4">
-          {videoStreamError && (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-950/35 px-4 py-2.5 text-xs text-amber-200 flex items-center justify-between gap-3">
-              <span>
-                O fluxo de vídeo (.wmv/.mkv ou stream local) ainda está a ser convertido para MP4 ou encontra-se indisponível nesta sessão.
-              </span>
-              {onRetryDocument && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setVideoStreamError(false);
-                    onRetryDocument(document.document_id);
-                  }}
-                  className="shrink-0 rounded bg-amber-500/20 px-2.5 py-1 text-[11px] font-semibold text-amber-100 hover:bg-amber-500/30 cursor-pointer"
-                >
-                  Tentar Novamente
-                </button>
-              )}
+          {videoStreamUiState.showErrorBanner && (
+            <div
+              data-testid="study-video-error-banner"
+              className="rounded-xl border border-amber-500/30 bg-amber-950/35 px-4 py-2.5 text-xs text-amber-200 flex items-center justify-between gap-3"
+            >
+              <span>{videoStreamUiState.message}</span>
+              <button
+                type="button"
+                data-testid="study-video-retry-button"
+                onClick={handleRetryVideoStream}
+                className="shrink-0 rounded bg-amber-500/20 px-2.5 py-1 text-[11px] font-semibold text-amber-100 hover:bg-amber-500/30 cursor-pointer"
+              >
+                Tentar Novamente
+              </button>
             </div>
           )}
 
@@ -682,6 +740,32 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
               className="min-h-[260px] max-h-[68vh] w-full object-contain cursor-pointer"
               playsInline
             />
+
+            {videoStreamUiState.status === 'loading' && (
+              <div
+                data-testid="study-video-loading-state"
+                className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#05080b]/90 px-6 text-center z-20"
+              >
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-cyan-400/30 border-t-cyan-400" />
+                <p className="text-xs font-medium text-cyan-200">{videoStreamUiState.message}</p>
+              </div>
+            )}
+
+            {(videoStreamUiState.status === 'error' || videoStreamUiState.status === 'missing_media') && (
+              <div
+                data-testid={`study-video-${videoStreamUiState.status}-state`}
+                className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-[#05080b]/90 px-6 text-center z-20"
+              >
+                <p className="max-w-md text-xs text-amber-200">{videoStreamUiState.message}</p>
+                <button
+                  type="button"
+                  onClick={handleRetryVideoStream}
+                  className="rounded-lg border border-amber-400/30 bg-amber-500/15 px-3 py-1.5 text-xs font-semibold text-amber-100 hover:bg-amber-500/25 cursor-pointer"
+                >
+                  Tentar Novamente
+                </button>
+              </div>
+            )}
 
             {/* In-Video Active Subtitle Overlay (Optional CC toggle) */}
             {showSubtitles && currentSegment && (
@@ -1256,11 +1340,14 @@ export const StudyVideoReaderView: React.FC<StudyVideoReaderViewProps> = ({
                       </div>
                       {/* Image snapshot */}
                       <div className="relative aspect-video w-full rounded bg-black/60 overflow-hidden flex items-center justify-center">
-                        {kf.image_path ? (
+                        {kf.image_path && (!isNativeDesktop || Boolean(mediaTicket)) ? (
                           <img
                             src={transport.system.resolveMediaUrl(
                               `/api/study/document/${encodeURIComponent(document.document_id)}/media/${encodeURIComponent(kf.frame_id)}`,
-                              { appendToken: true }
+                              {
+                                appendToken: !isNativeDesktop && !mediaTicket,
+                                ticket: mediaTicket ?? undefined,
+                              }
                             )}
                             alt={kf.frame_id}
                             className="h-full w-full object-contain"

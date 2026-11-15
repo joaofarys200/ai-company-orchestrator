@@ -8,11 +8,12 @@ from typing import Any, Mapping
 import uuid
 
 from backend.message_protocol import system_message
-from backend.websocket.context import WebSocketSessionState
-from backend.websocket.contracts import (
-    MISSION_UNIMPLEMENTED_STUB_OPERATIONS,
-    MessageHandler,
+from backend.mission_governance_dispatch import (
+    MISSION_GOVERNANCE_OPERATIONS,
+    dispatch_mission_governance_operation,
 )
+from backend.websocket.context import WebSocketSessionState
+from backend.websocket.contracts import MessageHandler
 from backend.websocket.handlers import bind_handler_methods
 from backend.websocket.handlers.common import WebSocketResponder
 
@@ -153,6 +154,21 @@ MISSION_HANDLERS = {
     "mission_reliability_plan": "handle",
     "mission_reliability_execute": "handle",
     "mission_reliability_replay": "handle",
+    # Registered mission engineering engines (completion, state, graphs, verification, synthesis)
+    "mission_continuous_verification_run": "handle",
+    "mission_continuous_verification_status": "handle",
+    "mission_cross_project_learning_status": "handle",
+    "mission_cross_project_learning_transfer": "handle",
+    "mission_massive_project_state_plan_change": "handle",
+    "mission_massive_project_state_status": "handle",
+    "mission_scc_graph_query_impact": "handle",
+    "mission_scc_graph_status": "handle",
+    "mission_symbol_graph_query_impact": "handle",
+    "mission_symbol_graph_status": "handle",
+    "mission_task_completion_run": "handle",
+    "mission_task_completion_status": "handle",
+    "mission_test_synthesis_generate": "handle",
+    "mission_test_synthesis_status": "handle",
 }
 
 
@@ -1456,7 +1472,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_task_completion_run":
-                from backend.agents.autonomous_task_completion.bridge import AutonomousTaskCompletionBridge
+                from agents.autonomous_task_completion.bridge import AutonomousTaskCompletionBridge
                 raw_intent = str(message.get("intent") or "Implementar tarefa autónoma de engenharia com verificação completa")
                 m_id = str(message.get("mission_id") or "m_p57_task_01")
                 mission = await asyncio.to_thread(
@@ -1476,7 +1492,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_task_completion_status":
-                from backend.agents.autonomous_task_completion.bridge import AutonomousTaskCompletionBridge
+                from agents.autonomous_task_completion.bridge import AutonomousTaskCompletionBridge
                 m_id = str(message.get("mission_id") or "m_p57_task_01")
                 mission = AutonomousTaskCompletionBridge.get_mission(m_id)
                 await self.connections.send(
@@ -1491,7 +1507,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_massive_project_state_status":
-                from backend.agents.massive_project_state.bridge import MassiveProjectStateBridge
+                from agents.massive_project_state.bridge import MassiveProjectStateBridge
                 p_id = str(message.get("project_id") or project_id or "default")
                 status = MassiveProjectStateBridge.get_state_status(p_id)
                 await self.connections.send(
@@ -1505,7 +1521,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_massive_project_state_plan_change":
-                from backend.agents.massive_project_state.bridge import MassiveProjectStateBridge
+                from agents.massive_project_state.bridge import MassiveProjectStateBridge
                 p_id = str(message.get("project_id") or project_id or "default")
                 objective = str(message.get("objective") or "Repository change")
                 changed_files = list(message.get("changed_files") or [])
@@ -1525,7 +1541,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_scc_graph_status":
-                from backend.agents.scc_aware_graph.bridge import SCCAwareGraphBridge
+                from agents.scc_aware_graph.bridge import SCCAwareGraphBridge
                 p_id = str(message.get("project_id") or project_id or "default")
                 status = SCCAwareGraphBridge.get_graph_status(p_id)
                 await self.connections.send(
@@ -1539,7 +1555,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_scc_graph_query_impact":
-                from backend.agents.scc_aware_graph.bridge import SCCAwareGraphBridge
+                from agents.scc_aware_graph.bridge import SCCAwareGraphBridge
                 p_id = str(message.get("project_id") or project_id or "default")
                 symbols = list(message.get("symbols") or ["fe_scc_panel"])
                 max_sccs = int(message.get("max_sccs") or 15)
@@ -1561,7 +1577,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_symbol_graph_status":
-                from backend.agents.symbol_fine_grained_graph.bridge import SymbolFineGrainedGraphBridge
+                from agents.symbol_fine_grained_graph.bridge import SymbolFineGrainedGraphBridge
                 bridge = SymbolFineGrainedGraphBridge.get_instance()
                 status = bridge.get_status()
                 largest_scc = bridge.get_largest_scc()
@@ -1576,7 +1592,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_symbol_graph_query_impact":
-                from backend.agents.symbol_fine_grained_graph.bridge import SymbolFineGrainedGraphBridge
+                from agents.symbol_fine_grained_graph.bridge import SymbolFineGrainedGraphBridge
                 bridge = SymbolFineGrainedGraphBridge.get_instance()
                 symbol_id = str(message.get("symbol_id") or "agents/__init__.py::TaskRunner")
                 result = bridge.query_symbol_impact(symbol_id=symbol_id)
@@ -1590,7 +1606,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_test_synthesis_status":
-                from backend.agents.autonomous_test_synthesis.bridge import AutonomousTestSynthesisBridge
+                from agents.autonomous_test_synthesis.bridge import AutonomousTestSynthesisBridge
                 bridge = AutonomousTestSynthesisBridge.get_instance()
                 status = bridge.get_status()
                 await self.connections.send(
@@ -1603,7 +1619,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_test_synthesis_generate":
-                from backend.agents.autonomous_test_synthesis.bridge import AutonomousTestSynthesisBridge
+                from agents.autonomous_test_synthesis.bridge import AutonomousTestSynthesisBridge
                 bridge = AutonomousTestSynthesisBridge.get_instance()
                 sym = str(message.get("symbol_id") or "agents/payment.py::process_transaction")
                 fpath = str(message.get("file_id") or "agents/payment.py")
@@ -1618,7 +1634,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_continuous_verification_status":
-                from backend.agents.continuous_verification.bridge import ContinuousVerificationBridge
+                from agents.continuous_verification.bridge import ContinuousVerificationBridge
                 bridge = ContinuousVerificationBridge.get_instance()
                 latest_baseline = bridge.baseline_store.get_latest_snapshot()
                 metrics = bridge.metrics.to_dict()
@@ -1635,8 +1651,8 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_continuous_verification_run":
-                from backend.agents.continuous_verification.bridge import ContinuousVerificationBridge
-                from backend.agents.continuous_verification.models import ChangeItem, ChangeSet, ChangeType, ChangeSource
+                from agents.continuous_verification.bridge import ContinuousVerificationBridge
+                from agents.continuous_verification.models import ChangeItem, ChangeSet, ChangeType, ChangeSource
                 bridge = ContinuousVerificationBridge.get_instance()
                 file_path = str(message.get("file_path") or "agents/payment.py")
                 symbol_id = str(message.get("symbol_id") or "process_transaction")
@@ -1664,7 +1680,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_cross_project_learning_status":
-                from backend.agents.cross_project_learning.bridge import CrossProjectLearningBridge
+                from agents.cross_project_learning.bridge import CrossProjectLearningBridge
                 bridge = CrossProjectLearningBridge.get_instance()
                 metrics = bridge.metrics.to_dict()
                 await self.connections.send(
@@ -1680,8 +1696,8 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_cross_project_learning_transfer":
-                from backend.agents.cross_project_learning.bridge import CrossProjectLearningBridge
-                from backend.agents.cross_project_learning.project_fingerprint import ProjectFingerprintExtractor
+                from agents.cross_project_learning.bridge import CrossProjectLearningBridge
+                from agents.cross_project_learning.project_fingerprint import ProjectFingerprintExtractor
                 bridge = CrossProjectLearningBridge.get_instance()
                 target_project = str(message.get("target_project") or project_id or "target_project_alpha")
                 query_intent = str(message.get("query_intent") or "resilience and retry patterns")
@@ -1717,7 +1733,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_architecture_evolution_status":
-                from backend.agents.architecture_evolution.bridge import ArchitectureEvolutionBridge
+                from agents.architecture_evolution.bridge import ArchitectureEvolutionBridge
                 bridge = ArchitectureEvolutionBridge.get_instance()
                 status_dict = bridge.get_status()
                 await self.connections.send(
@@ -1730,8 +1746,8 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_architecture_evolution_observe":
-                from backend.agents.architecture_evolution.bridge import ArchitectureEvolutionBridge
-                from backend.agents.architecture_evolution.models import ArchitectureSnapshot
+                from agents.architecture_evolution.bridge import ArchitectureEvolutionBridge
+                from agents.architecture_evolution.models import ArchitectureSnapshot
                 bridge = ArchitectureEvolutionBridge.get_instance()
                 snap_id = str(message.get("snapshot_id") or "snap_jarvis_core")
 
@@ -1749,7 +1765,7 @@ class MissionWebSocketHandler:
                         symbols=[
                             "backend.websocket.handlers.missions::handle_mission_control",
                             "agents.autonomous_loop.controller::AutonomousLoopController",
-                            "backend.agents.continuous_verification.bridge::ContinuousVerificationBridge",
+                            "agents.continuous_verification.bridge::ContinuousVerificationBridge",
                             "database.sqlite_store::execute_query",
                         ],
                         dependencies=[
@@ -1789,7 +1805,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_architecture_evolution_evaluate":
-                from backend.agents.architecture_evolution.bridge import ArchitectureEvolutionBridge
+                from agents.architecture_evolution.bridge import ArchitectureEvolutionBridge
                 bridge = ArchitectureEvolutionBridge.get_instance()
                 prob_id = str(message.get("problem_id") or "")
                 snap_id = str(message.get("snapshot_id") or "snap_jarvis_core")
@@ -1823,7 +1839,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_self_modification_status":
-                from backend.agents.safe_self_modification.bridge import SafeSelfModificationBridge
+                from agents.safe_self_modification.bridge import SafeSelfModificationBridge
                 bridge = SafeSelfModificationBridge.get_instance()
                 await self.connections.send(
                     websocket,
@@ -1836,7 +1852,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_self_modification_execute":
-                from backend.agents.safe_self_modification.bridge import SafeSelfModificationBridge
+                from agents.safe_self_modification.bridge import SafeSelfModificationBridge
                 bridge = SafeSelfModificationBridge.get_instance()
                 decision = message.get("governance_decision") or {
                     "decision_id": "dec_demo_p65",
@@ -1874,7 +1890,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_self_modification_rollback":
-                from backend.agents.safe_self_modification.bridge import SafeSelfModificationBridge
+                from agents.safe_self_modification.bridge import SafeSelfModificationBridge
                 bridge = SafeSelfModificationBridge.get_instance()
                 tx_id = message.get("transaction_id")
                 tx = bridge.tx_engine.transactions.get(tx_id) if tx_id else None
@@ -1903,7 +1919,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_multi_agent_coordination_status":
-                from backend.agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
+                from agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
                 bridge = MultiAgentCoordinationBridge.get_instance()
                 status = bridge.get_coordination_status()
                 await self.connections.send(
@@ -1916,8 +1932,8 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_multi_agent_intent_submit":
-                from backend.agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
-                from backend.agents.multi_agent_coordination.models import AgentEngineeringIntent
+                from agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
+                from agents.multi_agent_coordination.models import AgentEngineeringIntent
                 bridge = MultiAgentCoordinationBridge.get_instance()
                 intent_data = message.get("intent", {})
                 if isinstance(intent_data, dict) and "agent_id" in intent_data:
@@ -1949,7 +1965,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_multi_agent_arbitrate":
-                from backend.agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
+                from agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
                 bridge = MultiAgentCoordinationBridge.get_instance()
                 intents = list(bridge.intent_mgr.intents.values())
                 coord_res = bridge.coordinate_intents(intents)
@@ -1963,7 +1979,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_multi_agent_schedule":
-                from backend.agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
+                from agents.multi_agent_coordination.bridge import MultiAgentCoordinationBridge
                 bridge = MultiAgentCoordinationBridge.get_instance()
                 intents = list(bridge.intent_mgr.intents.values())
                 sched = bridge.scheduler.schedule_intents(intents)
@@ -1977,7 +1993,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_long_horizon_status":
-                from backend.agents.long_horizon_missions.bridge import LongHorizonMissionBridge
+                from agents.long_horizon_missions.bridge import LongHorizonMissionBridge
                 bridge = LongHorizonMissionBridge.get_instance()
                 mid = message.get("mission_id", "default_mission")
                 m = bridge.get_mission(mid)
@@ -1991,7 +2007,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_long_horizon_create":
-                from backend.agents.long_horizon_missions.bridge import LongHorizonMissionBridge
+                from agents.long_horizon_missions.bridge import LongHorizonMissionBridge
                 bridge = LongHorizonMissionBridge.get_instance()
                 obj = message.get("objective", "Autonomous Long-Horizon Mission")
                 m = bridge.create_mission(
@@ -2011,7 +2027,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_long_horizon_step":
-                from backend.agents.long_horizon_missions.bridge import LongHorizonMissionBridge
+                from agents.long_horizon_missions.bridge import LongHorizonMissionBridge
                 bridge = LongHorizonMissionBridge.get_instance()
                 mid = message.get("mission_id")
                 res = bridge.execute_step(mid, context=message.get("context"))
@@ -2025,7 +2041,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_long_horizon_run":
-                from backend.agents.long_horizon_missions.bridge import LongHorizonMissionBridge
+                from agents.long_horizon_missions.bridge import LongHorizonMissionBridge
                 bridge = LongHorizonMissionBridge.get_instance()
                 mid = message.get("mission_id")
                 max_s = int(message.get("max_steps", 100))
@@ -2040,7 +2056,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_quality_governance_status":
-                from backend.agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
+                from agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
                 bridge = EngineeringQualityGovernanceBridge.get_instance()
                 mid = message.get("mission_id", "default_mission")
                 base = bridge.baseline_manager.get_baseline(mid)
@@ -2058,7 +2074,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_quality_governance_snapshot":
-                from backend.agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
+                from agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
                 bridge = EngineeringQualityGovernanceBridge.get_instance()
                 mid = message.get("mission_id", "default_mission")
                 snap = bridge.capture_after(mid, context=message.get("context"))
@@ -2072,7 +2088,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_quality_governance_gate":
-                from backend.agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
+                from agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
                 bridge = EngineeringQualityGovernanceBridge.get_instance()
                 mid = message.get("mission_id", "default_mission")
                 pol = message.get("policy_name", "GOVERNED")
@@ -2087,7 +2103,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_quality_governance_debt_list":
-                from backend.agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
+                from agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
                 bridge = EngineeringQualityGovernanceBridge.get_instance()
                 debts = bridge.debt_manager.list_items()
                 vectors = bridge.prioritize_debt()
@@ -2102,7 +2118,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_quality_governance_hotspots":
-                from backend.agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
+                from agents.engineering_quality_governance.bridge import EngineeringQualityGovernanceBridge
                 bridge = EngineeringQualityGovernanceBridge.get_instance()
                 hotspots = bridge.get_hotspots()
                 await self.connections.send(
@@ -2116,7 +2132,7 @@ class MissionWebSocketHandler:
 
             # Phase 69 Autonomous Quality Debt Remediation Handlers
             elif operation == "mission_debt_remediation_status":
-                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                from agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
                 bridge = QualityDebtRemediationBridge.get_instance()
                 validations = bridge.store.get_all("debt_validations")
                 plans = bridge.store.get_all("remediation_plans")
@@ -2136,13 +2152,13 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_debt_remediation_validate":
-                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                from agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
                 bridge = QualityDebtRemediationBridge.get_instance()
                 raw_debt = message.get("debt_item") or {
                     "debt_id": "debt_demo_01",
                     "category": "ARCHITECTURAL",
                     "severity": "HIGH",
-                    "affected_surface": "backend.agents.massive_project_state",
+                    "affected_surface": "agents.massive_project_state",
                     "evidence": {"scc_cycle": True},
                     "confidence": 0.90,
                 }
@@ -2158,13 +2174,13 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_debt_remediation_root_cause":
-                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                from agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
                 bridge = QualityDebtRemediationBridge.get_instance()
                 raw_debt = message.get("debt_item") or {
                     "debt_id": "debt_demo_01",
                     "category": "ARCHITECTURAL",
                     "severity": "HIGH",
-                    "affected_surface": "backend.agents.massive_project_state",
+                    "affected_surface": "agents.massive_project_state",
                     "evidence": {"scc_cycle": True},
                     "confidence": 0.90,
                 }
@@ -2180,13 +2196,13 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_debt_remediation_options":
-                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                from agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
                 bridge = QualityDebtRemediationBridge.get_instance()
                 raw_debt = message.get("debt_item") or {
                     "debt_id": "debt_demo_01",
                     "category": "ARCHITECTURAL",
                     "severity": "HIGH",
-                    "affected_surface": "backend.agents.massive_project_state",
+                    "affected_surface": "agents.massive_project_state",
                     "evidence": {"scc_cycle": True},
                     "confidence": 0.90,
                 }
@@ -2203,13 +2219,13 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_debt_remediation_plan":
-                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                from agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
                 bridge = QualityDebtRemediationBridge.get_instance()
                 raw_debt = message.get("debt_item") or {
                     "debt_id": "debt_demo_01",
                     "category": "ARCHITECTURAL",
                     "severity": "HIGH",
-                    "affected_surface": "backend.agents.massive_project_state",
+                    "affected_surface": "agents.massive_project_state",
                     "evidence": {"scc_cycle": True},
                     "confidence": 0.90,
                 }
@@ -2229,7 +2245,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_debt_remediation_execute":
-                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                from agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
                 bridge = QualityDebtRemediationBridge.get_instance()
                 raw_debt = message.get("debt_item") or {
                     "debt_id": "debt_demo_01",
@@ -2250,7 +2266,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_debt_remediation_resolve":
-                from backend.agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
+                from agents.quality_debt_remediation.bridge import QualityDebtRemediationBridge
                 bridge = QualityDebtRemediationBridge.get_instance()
                 resolutions = bridge.store.get_all("resolution_results")
                 await self.connections.send(
@@ -2263,7 +2279,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_release_readiness_status":
-                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                from agents.release_readiness.bridge import ReleaseReadinessBridge
                 bridge = ReleaseReadinessBridge()
                 release_id = message.get("release_id", "rc-default")
                 candidate = bridge.store.get_candidate(release_id)
@@ -2280,7 +2296,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_release_readiness_baseline":
-                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                from agents.release_readiness.bridge import ReleaseReadinessBridge
                 bridge = ReleaseReadinessBridge()
                 baseline_data = message.get("baseline_data", {})
                 baseline = bridge.capture_baseline(baseline_data)
@@ -2294,7 +2310,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_release_readiness_evaluate":
-                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                from agents.release_readiness.bridge import ReleaseReadinessBridge
                 bridge = ReleaseReadinessBridge()
                 release_id = message.get("release_id", "rc-eval-01")
                 evaluation_inputs = message.get("evaluation_inputs", {})
@@ -2314,7 +2330,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_release_readiness_plan":
-                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                from agents.release_readiness.bridge import ReleaseReadinessBridge
                 bridge = ReleaseReadinessBridge()
                 release_id = message.get("release_id", "rc-plan-01")
                 deployment_available = message.get("deployment_available", False)
@@ -2332,7 +2348,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_release_readiness_gate":
-                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                from agents.release_readiness.bridge import ReleaseReadinessBridge
                 bridge = ReleaseReadinessBridge()
                 decision_id = message.get("decision_id")
                 if decision_id:
@@ -2350,7 +2366,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_release_readiness_rollback":
-                from backend.agents.release_readiness.bridge import ReleaseReadinessBridge
+                from agents.release_readiness.bridge import ReleaseReadinessBridge
                 bridge = ReleaseReadinessBridge()
                 release_id = message.get("release_id", "rc-rollback-01")
                 await self.connections.send(
@@ -2366,7 +2382,7 @@ class MissionWebSocketHandler:
 
             # Phase 71 Autonomous Production Operations & Incident Governance
             elif operation == "mission_production_operations_status":
-                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                from agents.production_operations.bridge import ProductionOperationsBridge
                 bridge = ProductionOperationsBridge()
                 bridge.check_infrastructure_grounding()
                 status_dict = bridge.get_status()
@@ -2380,7 +2396,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_production_operations_observe":
-                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                from agents.production_operations.bridge import ProductionOperationsBridge
                 bridge = ProductionOperationsBridge()
                 obs_data = message.get("observation", {})
                 obs = bridge.ingest_runtime_observation(obs_data)
@@ -2394,7 +2410,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_production_operations_health":
-                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                from agents.production_operations.bridge import ProductionOperationsBridge
                 bridge = ProductionOperationsBridge()
                 results = bridge.execute_healthchecks()
                 await self.connections.send(
@@ -2407,7 +2423,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_production_operations_slo":
-                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                from agents.production_operations.bridge import ProductionOperationsBridge
                 bridge = ProductionOperationsBridge()
                 metrics_data = message.get("metrics", {})
                 evals = bridge.evaluate_slos(metrics_data)
@@ -2421,8 +2437,8 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_production_operations_remediate":
-                from backend.agents.production_operations.bridge import ProductionOperationsBridge
-                from backend.agents.production_operations.models import RecoveryPlan, RecoveryStrategy, RemediationSafety
+                from agents.production_operations.bridge import ProductionOperationsBridge
+                from agents.production_operations.models import RecoveryPlan, RecoveryStrategy, RemediationSafety
                 bridge = ProductionOperationsBridge()
                 strategy_str = message.get("strategy", "RESTART_PROCESS")
                 strategy = RecoveryStrategy(strategy_str)
@@ -2450,7 +2466,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_production_operations_rollback":
-                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                from agents.production_operations.bridge import ProductionOperationsBridge
                 bridge = ProductionOperationsBridge()
                 target = message.get("target_release", "v69.0.0")
                 bridge.rollback.register_checkpoint("v69.0.0", "6900000000000000000000000000000000000000000000000000000000000000")
@@ -2465,7 +2481,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_production_operations_replay":
-                from backend.agents.production_operations.bridge import ProductionOperationsBridge
+                from agents.production_operations.bridge import ProductionOperationsBridge
                 bridge = ProductionOperationsBridge()
                 status_res, steps, explanation = bridge.replayer.replay(bridge.ledger.get_entries())
                 await self.connections.send(
@@ -2481,7 +2497,7 @@ class MissionWebSocketHandler:
 
             # Phase 72 Autonomous Reliability Intelligence & Preventive Operations
             elif operation == "mission_reliability_status":
-                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                from agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
                 service_id = message.get("service_id", "default-service")
                 bridge = ReliabilityIntelligenceBridge(service_id=service_id)
                 summary = bridge.get_status_summary()
@@ -2495,7 +2511,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_reliability_observe":
-                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                from agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
                 service_id = message.get("service_id", "default-service")
                 bridge = ReliabilityIntelligenceBridge(service_id=service_id)
                 obs_data = message.get("observation", {})
@@ -2510,7 +2526,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_reliability_anomalies":
-                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                from agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
                 service_id = message.get("service_id", "default-service")
                 metric = message.get("metric", "latency")
                 bridge = ReliabilityIntelligenceBridge(service_id=service_id)
@@ -2531,7 +2547,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_reliability_predict":
-                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                from agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
                 service_id = message.get("service_id", "default-service")
                 metric = message.get("metric", "latency")
                 bridge = ReliabilityIntelligenceBridge(service_id=service_id)
@@ -2546,7 +2562,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_reliability_plan":
-                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                from agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
                 service_id = message.get("service_id", "default-service")
                 metric = message.get("metric", "latency")
                 bridge = ReliabilityIntelligenceBridge(service_id=service_id)
@@ -2562,7 +2578,7 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_reliability_execute":
-                from backend.agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
+                from agents.reliability_intelligence.bridge import ReliabilityIntelligenceBridge
                 service_id = message.get("service_id", "default-service")
                 metric = message.get("metric", "latency")
                 bridge = ReliabilityIntelligenceBridge(service_id=service_id)
@@ -2580,10 +2596,10 @@ class MissionWebSocketHandler:
                 return
 
             elif operation == "mission_reliability_replay":
-                from backend.agents.reliability_intelligence.replay import PredictionReplayer
+                from agents.reliability_intelligence.replay import PredictionReplayer
                 replayer = PredictionReplayer()
                 raw_obs = message.get("observations", [])
-                from backend.agents.reliability_intelligence.timeseries import TimeSeriesNormalizer
+                from agents.reliability_intelligence.timeseries import TimeSeriesNormalizer
                 norm_obs = [TimeSeriesNormalizer.normalize(o) for o in raw_obs]
                 replay_res = replayer.replay_stream(norm_obs)
                 await self.connections.send(
@@ -2595,13 +2611,13 @@ class MissionWebSocketHandler:
                 )
                 return
 
-            if operation in MISSION_UNIMPLEMENTED_STUB_OPERATIONS:
-                await self.connections.send(
-                    websocket,
-                    system_message(
-                        f"Operação '{operation}' declarada apenas no contrato sem handler ativo nesta etapa."
-                    ),
+            if operation in MISSION_GOVERNANCE_OPERATIONS:
+                governance_payload = await asyncio.to_thread(
+                    dispatch_mission_governance_operation,
+                    operation,
+                    message,
                 )
+                await self.connections.send(websocket, governance_payload)
                 return
 
             if snapshot is None:

@@ -143,9 +143,10 @@ class BaselineEngine:
 
     def save_baseline(self, baseline: SystemBaseline) -> str:
         """Guarda o snapshot em ficheiro JSON no disco."""
+        from backend.atomic_io import atomic_write_json
+
         file_path = os.path.join(self.storage_dir, f"{baseline.baseline_id}.json")
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(baseline.to_dict(), f, indent=2, ensure_ascii=False)
+        atomic_write_json(file_path, baseline.to_dict(), indent=2)
         return file_path
 
     def load_baseline(self, baseline_id_or_path: str) -> Optional[SystemBaseline]:
