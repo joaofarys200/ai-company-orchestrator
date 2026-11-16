@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import sys
 import zipfile
 
@@ -33,6 +34,7 @@ APP_PACKAGES: tuple[str, ...] = (
 )
 
 APP_ROOT_MODULES: tuple[str, ...] = (
+    "THIRD_PARTY_LICENSES.md",
     "database.py",
     "gemini_live.py",
     "sandbox.py",
@@ -308,6 +310,9 @@ def build_runtime_bundle() -> dict[str, object]:
                                 python_files_count += 1
 
     os.replace(tmp_zip_path, BUNDLE_ZIP_PATH)
+    licenses_src = REPO_ROOT / "THIRD_PARTY_LICENSES.md"
+    if licenses_src.is_file():
+        shutil.copy2(licenses_src, OUTPUT_DIR / "THIRD_PARTY_LICENSES.md")
 
     sha256_hash = hashlib.sha256(BUNDLE_ZIP_PATH.read_bytes()).hexdigest()
     bundle_size_bytes = BUNDLE_ZIP_PATH.stat().st_size

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "bundle_filename": "runtime-bundle.zip",
-  "bundle_sha256": "506b4bdf991913ea1a335e5fc0c38aa1e8c2e98139a05e9f7143e32703634105",
-  "bundle_size_bytes": 110147311,
+  "bundle_sha256": "2476e3bb978c48da7cd6b3a60d75183341602a250ea602353dbbf7c1c9735a93",
+  "bundle_size_bytes": 110142147,
   "python_version": "3.14.7",
   "python_rel_path": "python/python.exe",
   "app_rel_path": "app",
@@ -19,6 +19,7 @@
     "config"
   ],
   "app_root_modules": [
+    "THIRD_PARTY_LICENSES.md",
     "database.py",
     "gemini_live.py",
     "sandbox.py",
