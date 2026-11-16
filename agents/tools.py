@@ -10,6 +10,7 @@ import yaml
 import datetime
 from pathlib import Path
 from PIL import ImageGrab
+from backend.process_utils import hidden_subprocess_kwargs
 from sandbox import SANDBOX_DIR
 
 try:
@@ -46,16 +47,16 @@ async def run_local_command(command: str) -> str:
     loop = asyncio.get_running_loop()
     def run_cmd():
         try:
-            run_kwargs = {
-                "text": True,
-                "encoding": "utf-8",
-                "errors": "replace",
-                "capture_output": True,
-                "timeout": 60,
-                "cwd": BASE_DIR,
-            }
-            if os.name == "nt" and hasattr(subprocess, "CREATE_NO_WINDOW"):
-                run_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+            run_kwargs = hidden_subprocess_kwargs(
+                {
+                    "text": True,
+                    "encoding": "utf-8",
+                    "errors": "replace",
+                    "capture_output": True,
+                    "timeout": 60,
+                    "cwd": BASE_DIR,
+                }
+            )
             process = subprocess.run(
                 ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", command],
                 **run_kwargs,
@@ -250,13 +251,13 @@ async def run_playwright_scrape_impl(url: str) -> str:
 async def run_httpx_scrape_impl(url: str) -> str:
     """Basic fallback using HTTPX and BeautifulSoup/markdownify."""
     import httpx
-    from bs4 import BeautifulSoup
-    from markdownify import markdownify
     
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     try:
+        from bs4 import BeautifulSoup
+        from markdownify import markdownify
         async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
             response = await client.get(url, headers=headers)
         if response.status_code != 200:

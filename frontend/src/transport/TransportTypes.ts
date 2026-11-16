@@ -9,18 +9,8 @@ export const WS_READY_STATE_OPEN = 1;
 export const WS_READY_STATE_CLOSING = 2;
 export const WS_READY_STATE_CLOSED = 3;
 
-export interface NativeDesktopBridge {
-  send: (message: unknown) => void;
-  onMessage: (callback: (data: unknown) => void) => () => void;
-  getPathForFile?: (file: File) => string;
-  selectFolder?: () => Promise<string | null>;
-  openPath?: (targetPath: string) => Promise<{ ok: boolean; error?: string } | null>;
-  isNativeIPC: boolean;
-}
-
 declare global {
   interface Window {
-    jarvisIPC?: NativeDesktopBridge;
     __JARVIS_HTTP_TOKEN__?: string;
   }
 }
@@ -34,9 +24,7 @@ export type TransportConnectionStatus =
 
 export type TransportBackendKind =
   | 'websocket'
-  | 'electron-ipc'
   | 'tauri-ipc'
-  | 'tauri-hybrid'
   | 'custom';
 
 export interface TauriSelectFileFilter {

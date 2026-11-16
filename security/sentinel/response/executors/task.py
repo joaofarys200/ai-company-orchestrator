@@ -10,6 +10,7 @@ import subprocess
 import time
 from typing import Any, Dict, Tuple
 
+from backend.process_utils import hidden_subprocess_kwargs
 from security.sentinel.contracts import ResponseActionType, SecurityResponseAction
 from security.sentinel.response.executors.base import BaseActionExecutor
 
@@ -34,7 +35,10 @@ class ScheduledTaskDisableExecutor(BaseActionExecutor):
         """Consulta o estado atual da tarefa via schtasks."""
         cmd = ["schtasks.exe", "/Query", "/TN", task_name, "/FO", "LIST", "/V"]
         try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=5, shell=False)
+            res = subprocess.run(
+                cmd,
+                **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5, shell=False),
+            )
             if res.returncode != 0:
                 return {"exists": False, "raw_output": res.stderr}
 
@@ -94,7 +98,10 @@ class ScheduledTaskDisableExecutor(BaseActionExecutor):
     def execute(self, action: SecurityResponseAction) -> Dict[str, Any]:
         task_name = self._sanitize_task_name(action.target)
         cmd = ["schtasks.exe", "/Change", "/TN", task_name, "/DISABLE"]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=5, shell=False)
+        res = subprocess.run(
+            cmd,
+            **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5, shell=False),
+        )
 
         if res.returncode != 0:
             raise RuntimeError(f"Falha ao desativar tarefa '{task_name}': {res.stderr.strip() or res.stdout.strip()}")
@@ -136,7 +143,10 @@ class ScheduledTaskDisableExecutor(BaseActionExecutor):
     def rollback(self, action: SecurityResponseAction) -> Tuple[bool, Dict[str, Any]]:
         task_name = self._sanitize_task_name(action.target)
         cmd = ["schtasks.exe", "/Change", "/TN", task_name, "/ENABLE"]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=5, shell=False)
+        res = subprocess.run(
+            cmd,
+            **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5, shell=False),
+        )
 
         if res.returncode != 0:
             return False, {

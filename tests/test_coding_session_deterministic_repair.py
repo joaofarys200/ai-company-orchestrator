@@ -119,3 +119,83 @@ async def test_coding_session_no_unnecessary_repairs_when_complete(workspace_wit
 
     assert len(session.proposed_changes) == 1
     assert session.proposed_changes[0]["file"] == "app.js"
+
+
+@pytest.mark.anyio
+async def test_model_harness_plan_requester_raises_provider_exception_when_stopped():
+    import httpx
+    from backend.model_harness import (
+        CallableModelProvider,
+        ModelHarness,
+        ProviderRegistry,
+    )
+    from backend.services.model_service import ModelExecutionService
+    from intelligence.coding_session import ModelHarnessPlanRequester
+
+    req = httpx.Request("POST", "http://127.0.0.1:11434/api/chat")
+    resp = httpx.Response(500, request=req, json={"error": "llama-server out of memory"})
+
+    def failing_provider(*_args):
+        raise httpx.HTTPStatusError(
+            "Server error '500 Internal Server Error' (llama-server out of memory)",
+            request=req,
+            response=resp,
+        )
+
+    harness = ModelHarness(
+        ProviderRegistry([CallableModelProvider("ollama", "qwen3.5:9b", failing_provider)])
+    )
+    requester = ModelHarnessPlanRequester(harness)
+    payload = {"project_id": "dina", "objective": "scan ips"}
+
+    # First execute -> PROVIDER_FAILED; second execute triggers NO_PROGRESS -> STOPPED
+    with pytest.raises(httpx.HTTPStatusError, match="500 Internal Server Error"):
+        await requester(payload)
+    with pytest.raises(httpx.HTTPStatusError, match="llama-server out of memory") as exc_info:
+        await requester(payload)
+
+    described = ModelExecutionService(harness).describe_provider_error(
+        exc_info.value,
+        provider="ollama",
+    )
+    assert "erro interno" in described.lower()
+    assert "llama-server out of memory" in described
+
+
+@pytest.mark.anyio
+async def test_coding_session_allows_readme_md_and_requirements_in_blank_project(tmp_path):
+    projects = ProjectContextService(workspace_root=str(tmp_path))
+    projects.create_project("blank-net", "Blank Net", template="blank")
+    projects.index_project("blank-net")
+    sessions = CodingSessionService(projects)
+
+    plan_json = json.dumps({
+        "changes": [
+            {
+                "file": "scanner.py",
+                "operation": "create_file",
+                "new_code": "import socket\n\ndef scan(ip: str) -> bool:\n    return bool(ip)\n",
+                "reason": "Implementar scanner inicial.",
+            },
+            {
+                "file": "README.md",
+                "operation": "replace_text",
+                "old_text": "Projeto criado via JARVIS OS.",
+                "new_code": "Projeto criado via JARVIS OS.\n\nExecutar `python scanner.py`.",
+                "reason": "Documentar execucao no README.",
+            },
+        ],
+        "risks": [],
+    })
+
+    async def fake_requester(_payload, _correction=None):
+        return plan_json
+
+    session = await sessions.create_assisted_session(
+        project_id="blank-net",
+        objective="Cria scanner simples de rede",
+        requester=fake_requester,
+    )
+    assert session.status == "PROPOSED"
+    proposed_files = {c["file"] for c in session.proposed_changes}
+    assert {"scanner.py", "README.md"}.issubset(proposed_files)

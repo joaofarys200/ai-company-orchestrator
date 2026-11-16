@@ -22,9 +22,7 @@ import {
   type TransportStatusSnapshot,
   type TransportStreamHandle,
   type TransportSystemCapabilities,
-  type WebSocketLike,
 } from './TransportTypes.ts';
-import { WebSocketTransportAdapter } from './WebSocketTransportAdapter.ts';
 
 export type TauriDragDropEventPayload =
   | { type: 'enter'; paths: string[] }
@@ -46,18 +44,13 @@ export interface TauriRuntimeApis {
 }
 
 export interface TauriTransportAdapterConfig {
-  preferHybridFallback?: boolean;
-  nativeRpcCommands?: Iterable<string>;
   ipcDispatchCommand?: string;
   ipcEventName?: string;
   tauriApis?: TauriRuntimeApis;
-  wsUrl?: string;
-  wsToken?: string;
   httpBaseUrl?: string;
   getHttpToken?: () => string;
   reconnectPolicy?: Partial<ReconnectPolicy>;
   timeoutBounds?: { min?: number; max?: number };
-  createWebSocket?: (url: string) => WebSocketLike;
   normalizeMessage?: (raw: unknown) => ServerMessage | null;
   randomFn?: () => number;
   nowFn?: () => number;
@@ -141,15 +134,12 @@ function attachQueryParam(url: string, key: string, value: string): string {
 
 export class TauriTransportAdapter implements JarvisTransport {
   private readonly apis: TauriRuntimeApis;
-  private readonly preferHybridFallback: boolean;
-  private readonly nativeRpcCommands: Set<string>;
   private readonly ipcDispatchCommand: string;
   private readonly ipcEventName: string;
   private readonly httpBaseUrlOverride?: string;
   private readonly getHttpToken: () => string;
   private readonly normalizeMessage: (raw: unknown) => ServerMessage | null;
   private readonly nowFn: () => number;
-  private readonly fallbackWs: WebSocketTransportAdapter | null;
   private readonly correlation: TransportCorrelationRegistry;
 
   private disposed = false;
@@ -164,9 +154,6 @@ export class TauriTransportAdapter implements JarvisTransport {
 
   private ipcEventUnlisten: (() => void) | null = null;
   private dragDropUnlisten: (() => void) | null = null;
-  private fallbackStatusUnsub: (() => void) | null = null;
-  private fallbackConnectedUnsub: (() => void) | null = null;
-  private fallbackAnyUnsub: (() => void) | null = null;
 
   private readonly droppedPathsByName = new Map<string, string>();
   private lastDroppedPaths: string[] = [];
@@ -182,8 +169,6 @@ export class TauriTransportAdapter implements JarvisTransport {
 
   constructor(config: TauriTransportAdapterConfig = {}) {
     this.apis = config.tauriApis ?? createDefaultTauriApis();
-    this.preferHybridFallback = config.preferHybridFallback ?? true;
-    this.nativeRpcCommands = new Set(config.nativeRpcCommands ?? []);
     this.ipcDispatchCommand = config.ipcDispatchCommand ?? 'dispatch_client_message';
     this.ipcEventName = config.ipcEventName ?? 'jarvis:event';
     this.httpBaseUrlOverride = config.httpBaseUrl;
@@ -198,35 +183,6 @@ export class TauriTransportAdapter implements JarvisTransport {
       sendCancel: (cancelMsg) => this.send(cancelMsg),
       onPendingChanged: () => this.notifyStatusListeners(),
     });
-
-    if (this.preferHybridFallback) {
-      this.fallbackWs = new WebSocketTransportAdapter({
-        wsUrl: config.wsUrl,
-        wsToken: config.wsToken,
-        httpBaseUrl: config.httpBaseUrl,
-        getHttpToken: config.getHttpToken,
-        reconnectPolicy: config.reconnectPolicy,
-        timeoutBounds: config.timeoutBounds,
-        createWebSocket: config.createWebSocket,
-        nativeBridge: null,
-        normalizeMessage: config.normalizeMessage,
-        randomFn: config.randomFn,
-        nowFn: config.nowFn,
-        maxSettledHistory: config.maxSettledHistory,
-      });
-      this.fallbackStatusUnsub = this.fallbackWs.subscribeConnectionState(() => {
-        this.notifyStatusListeners();
-      });
-      this.fallbackConnectedUnsub = this.fallbackWs.onConnected(() => {
-        this.lastConnectedAt = this.nowFn();
-        this.fireConnectedListeners();
-      });
-      this.fallbackAnyUnsub = this.fallbackWs.subscribeAny((msg, raw) => {
-        this.dispatchMessageToSubscribers(msg, raw);
-      });
-    } else {
-      this.fallbackWs = null;
-    }
 
     this.system = {
       getStatus: () => this.getStatusSnapshot(),
@@ -416,17 +372,6 @@ export class TauriTransportAdapter implements JarvisTransport {
   }
 
   private getStatusSnapshot(): TransportStatusSnapshot {
-    if (this.fallbackWs) {
-      const wsSnap = this.fallbackWs.system.getStatus();
-      return {
-        ...wsSnap,
-        backend: 'tauri-hybrid',
-        pendingRequests: wsSnap.pendingRequests + this.correlation.pendingCount,
-        activeStreams: wsSnap.activeStreams + this.correlation.activeStreamCount,
-        lastError: this.lastError ?? wsSnap.lastError,
-      };
-    }
-
     return {
       status: this.connectionStatus,
       backend: 'tauri-ipc',
@@ -440,13 +385,7 @@ export class TauriTransportAdapter implements JarvisTransport {
   }
 
   private isReady(): boolean {
-    if (this.disposed) {
-      return false;
-    }
-    if (this.fallbackWs) {
-      return this.fallbackWs.system.isReady() || this.nativeReady;
-    }
-    return this.nativeReady;
+    return !this.disposed && this.nativeReady;
   }
 
   private notifyStatusListeners(): void {
@@ -478,9 +417,7 @@ export class TauriTransportAdapter implements JarvisTransport {
       this.connectInFlight = true;
       void this.bootstrapNativeConnection();
     }
-    if (this.fallbackWs) {
-      this.fallbackWs.connect();
-    } else if (!this.nativeReady) {
+    if (!this.nativeReady) {
       this.connectionStatus = 'CONNECTING';
       this.notifyStatusListeners();
     }
@@ -509,13 +446,11 @@ export class TauriTransportAdapter implements JarvisTransport {
       const wasReady = this.nativeReady;
       this.nativeReady = true;
       this.lastError = null;
-      if (!this.fallbackWs) {
-        this.connectionStatus = 'CONNECTED';
-        this.lastConnectedAt = this.nowFn();
-      }
+      this.connectionStatus = 'CONNECTED';
+      this.lastConnectedAt = this.nowFn();
       this.notifyStatusListeners();
 
-      if (!this.fallbackWs && !wasReady) {
+      if (!wasReady) {
         this.fireConnectedListeners();
       }
     } catch (err) {
@@ -524,10 +459,8 @@ export class TauriTransportAdapter implements JarvisTransport {
       }
       this.nativeReady = false;
       this.lastError = err instanceof Error ? err.message : String(err);
-      if (!this.fallbackWs) {
-        this.lastDisconnectedAt = this.nowFn();
-        this.connectionStatus = 'OFFLINE';
-      }
+      this.lastDisconnectedAt = this.nowFn();
+      this.connectionStatus = 'OFFLINE';
       this.notifyStatusListeners();
     } finally {
       this.connectInFlight = false;
@@ -564,18 +497,12 @@ export class TauriTransportAdapter implements JarvisTransport {
     }
     this.nativeReady = false;
     this.connectInFlight = false;
-    if (this.fallbackWs) {
-      this.fallbackWs.reconnect();
-    }
     this.connect();
   }
 
   disconnect(): void {
     this.nativeReady = false;
     this.connectInFlight = false;
-    if (this.fallbackWs) {
-      this.fallbackWs.disconnect();
-    }
     this.correlation.rejectAll(new TransportError('DISCONNECTED', 'Transporte Tauri desligado.'));
     this.connectionStatus = 'OFFLINE';
     this.lastDisconnectedAt = this.nowFn();
@@ -605,21 +532,6 @@ export class TauriTransportAdapter implements JarvisTransport {
       }
       this.dragDropUnlisten = null;
     }
-    if (this.fallbackStatusUnsub) {
-      this.fallbackStatusUnsub();
-      this.fallbackStatusUnsub = null;
-    }
-    if (this.fallbackConnectedUnsub) {
-      this.fallbackConnectedUnsub();
-      this.fallbackConnectedUnsub = null;
-    }
-    if (this.fallbackAnyUnsub) {
-      this.fallbackAnyUnsub();
-      this.fallbackAnyUnsub = null;
-    }
-    if (this.fallbackWs) {
-      this.fallbackWs.dispose();
-    }
 
     this.correlation.rejectAll(new TransportError('TRANSPORT_CLOSED', 'Transporte Tauri encerrado.'));
     this.fileDropListeners.clear();
@@ -633,38 +545,21 @@ export class TauriTransportAdapter implements JarvisTransport {
     this.statusListeners.clear();
   }
 
-  private shouldRouteToNativeIpc(message: ClientMessage): boolean {
-    if (!this.fallbackWs) {
-      return true;
-    }
-    return this.nativeRpcCommands.has(message.type);
-  }
-
   send(message: ClientMessage): boolean {
-    if (this.disposed) {
+    if (this.disposed || !this.nativeReady) {
       return false;
     }
-    if (this.shouldRouteToNativeIpc(message)) {
-      if (!this.nativeReady) {
-        return false;
-      }
-      void this.apis.invoke(this.ipcDispatchCommand, { message }).catch((err) => {
-        this.lastError = err instanceof Error ? err.message : String(err);
-        this.notifyStatusListeners();
-      });
-      return true;
-    }
-    return this.fallbackWs ? this.fallbackWs.send(message) : false;
+    void this.apis.invoke(this.ipcDispatchCommand, { message }).catch((err) => {
+      this.lastError = err instanceof Error ? err.message : String(err);
+      this.notifyStatusListeners();
+    });
+    return true;
   }
 
   invoke<TResult = ServerMessage>(
     message: ClientMessage,
     options: InvokeOptions<TResult> = {}
   ): Promise<TResult> {
-    if (!this.shouldRouteToNativeIpc(message) && this.fallbackWs) {
-      return this.fallbackWs.invoke(message, options);
-    }
-
     return this.correlation.runInvoke(
       message,
       options,
@@ -700,10 +595,6 @@ export class TauriTransportAdapter implements JarvisTransport {
     options: OpenStreamOptions<TChunk>,
     onChunk: (chunk: TChunk) => void
   ): TransportStreamHandle {
-    if (!this.shouldRouteToNativeIpc(message) && this.fallbackWs) {
-      return this.fallbackWs.openStream(message, options, onChunk);
-    }
-
     return this.correlation.openStream(
       message,
       options,
@@ -792,11 +683,7 @@ export class TauriTransportAdapter implements JarvisTransport {
     predicate: (meta: PendingRequestMeta) => boolean,
     reason = 'Cancelado pelo utilizador'
   ): number {
-    let cancelledCount = this.correlation.cancelWhere(predicate, reason);
-    if (this.fallbackWs) {
-      cancelledCount += this.fallbackWs.cancelPendingRequests(predicate, reason);
-    }
-    return cancelledCount;
+    return this.correlation.cancelWhere(predicate, reason);
   }
 
   async cancelNativeRequest(requestId: string, reason = 'user_cancelled'): Promise<boolean> {

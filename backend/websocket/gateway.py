@@ -9,8 +9,6 @@ from dataclasses import dataclass, field
 from typing import Any, Awaitable, Callable
 from urllib.parse import parse_qs, urlparse
 
-import websockets
-
 from backend.errors import safe_user_error
 from backend.logging_config import log_event
 from backend.message_protocol import (
@@ -187,6 +185,8 @@ class WebSocketGateway:
         self.logger = logger
 
     async def handle_client(self, websocket: Any, *args: Any) -> None:
+        import websockets
+
         if not is_ws_authorized(
             websocket,
             args,

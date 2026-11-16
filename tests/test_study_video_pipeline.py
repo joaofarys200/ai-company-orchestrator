@@ -57,8 +57,8 @@ def test_ensure_browser_playable_video_transcodes_wmv_and_caches(tmp_path):
 
     calls = []
 
-    def fake_run(cmd, capture_output=True, text=True, timeout=300):
-        calls.append(cmd)
+    def fake_run(cmd, capture_output=True, text=True, timeout=300, **kwargs):
+        calls.append((cmd, kwargs))
         out_path = Path(cmd[-1])
         out_path.write_bytes(b"\x00\x00\x00\x18ftypmp42")
 

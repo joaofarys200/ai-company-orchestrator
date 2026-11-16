@@ -1,9 +1,14 @@
 import os
-import chromadb
+try:
+    import chromadb
+except ImportError:
+    chromadb = None
 from intelligence.project_intelligence import ProjectIntelligenceEngine
 
 class SemanticCodeIndex:
     def __init__(self, workspace_root: str = ".", db_path: str | None = None, collection_name: str = "codebase_index"):
+        if chromadb is None:
+            raise RuntimeError("O módulo opcional 'chromadb' não está instalado neste runtime.")
         self.workspace_root = os.path.realpath(os.path.abspath(workspace_root))
         self.db_path = db_path or os.path.join(self.workspace_root, "chroma_db")
         os.makedirs(self.db_path, exist_ok=True)

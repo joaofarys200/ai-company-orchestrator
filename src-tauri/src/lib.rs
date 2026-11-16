@@ -1,6 +1,7 @@
 pub mod commands;
 pub mod error;
 pub mod knowledge;
+pub mod logging;
 pub mod permissions;
 pub mod process;
 pub mod protocol;
@@ -237,6 +238,7 @@ pub fn run() {
     app.run(|app_handle, event| {
         if let tauri::RunEvent::Exit = event {
             if let Some(services) = app_handle.try_state::<commands::media::RuntimeServices>() {
+                services.preview.shutdown();
                 tauri::async_runtime::block_on(services.workers.shutdown_all());
             }
         }

@@ -22,6 +22,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from backend.process_utils import hidden_subprocess_kwargs
+
 logger = logging.getLogger("Jarvis.RuntimeIdentity")
 
 
@@ -180,8 +182,7 @@ class RuntimeTracker:
         try:
             netstat_out = subprocess.check_output(
                 ["netstat", "-ano", "-p", "tcp"],
-                text=True,
-                stderr=subprocess.DEVNULL,
+                **hidden_subprocess_kwargs(text=True, stderr=subprocess.DEVNULL),
             )
             target_pid = None
             for line in netstat_out.splitlines():
@@ -207,8 +208,7 @@ class RuntimeTracker:
             )
             ps_out = subprocess.check_output(
                 ["powershell", "-NoProfile", "-Command", ps_cmd],
-                text=True,
-                stderr=subprocess.DEVNULL,
+                **hidden_subprocess_kwargs(text=True, stderr=subprocess.DEVNULL),
             ).strip()
 
             if not ps_out:
@@ -239,8 +239,7 @@ class RuntimeTracker:
                 try:
                     ts_check = subprocess.check_output(
                         ["powershell", "-NoProfile", "-Command", f"[double]((Get-Date '{cdate_raw}') - (Get-Date '1970-01-01')).TotalSeconds"],
-                        text=True,
-                        stderr=subprocess.DEVNULL,
+                        **hidden_subprocess_kwargs(text=True, stderr=subprocess.DEVNULL),
                     ).strip()
                     start_time = float(ts_check)
                 except Exception:
@@ -262,8 +261,7 @@ class RuntimeTracker:
         try:
             lsof_out = subprocess.check_output(
                 ["lsof", "-i", f":{port}", "-sTCP:LISTEN", "-t"],
-                text=True,
-                stderr=subprocess.DEVNULL,
+                **hidden_subprocess_kwargs(text=True, stderr=subprocess.DEVNULL),
             ).strip()
             if lsof_out:
                 pid = int(lsof_out.splitlines()[0])

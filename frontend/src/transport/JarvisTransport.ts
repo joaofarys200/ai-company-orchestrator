@@ -1,7 +1,6 @@
 import type { ClientMessage, ServerMessage } from '../protocol/websocket';
 import type {
   InvokeOptions,
-  NativeDesktopBridge,
   OpenStreamOptions,
   PendingRequestMeta,
   TransportStatusSnapshot,
@@ -38,17 +37,6 @@ export function createTransportRequestId(prefix = 'req'): string {
   requestSequence = (requestSequence + 1) % Number.MAX_SAFE_INTEGER;
   const randomPart = Math.random().toString(36).slice(2, 7);
   return `${prefix}:${Date.now()}:${requestSequence}:${randomPart}`;
-}
-
-export function getWindowNativeBridge(): NativeDesktopBridge | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-  const bridge = window.jarvisIPC;
-  if (!bridge || !bridge.isNativeIPC) {
-    return null;
-  }
-  return bridge;
 }
 
 export function getWindowHttpToken(): string {
@@ -204,16 +192,14 @@ export function buildMediaCandidateUrls(
 }
 
 export function createStandaloneSystemCapabilities(options?: {
-  nativeBridge?: NativeDesktopBridge | null;
   httpBaseUrl?: string;
   getHttpToken?: () => string;
 }): TransportSystemCapabilities {
-  const getBridge = () => options?.nativeBridge ?? getWindowNativeBridge();
   const getToken = () => (options?.getHttpToken ? options.getHttpToken() : getWindowHttpToken());
 
   const snapshot: TransportStatusSnapshot = {
-    status: getBridge()?.isNativeIPC ? 'CONNECTED' : 'DISCONNECTED',
-    backend: getBridge()?.isNativeIPC ? 'electron-ipc' : 'websocket',
+    status: 'DISCONNECTED',
+    backend: 'websocket',
     reconnectAttempt: 0,
     lastConnectedAt: null,
     lastDisconnectedAt: null,
@@ -224,30 +210,14 @@ export function createStandaloneSystemCapabilities(options?: {
 
   return {
     getStatus: () => ({ ...snapshot }),
-    isReady: () => Boolean(getBridge()?.isNativeIPC),
-    isNativeDesktop: () => Boolean(getBridge()?.isNativeIPC),
+    isReady: () => false,
+    isNativeDesktop: () => false,
     connect: () => {},
     reconnect: () => {},
     disconnect: () => {},
-    selectFolder: async () => {
-      const bridge = getBridge();
-      if (bridge?.selectFolder) {
-        return bridge.selectFolder();
-      }
-      return null;
-    },
-    openPath: async (targetPath: string) => {
-      const bridge = getBridge();
-      if (bridge?.openPath) {
-        return bridge.openPath(targetPath);
-      }
-      return null;
-    },
+    selectFolder: async () => null,
+    openPath: async () => null,
     getPathForFile: (file: File) => {
-      const bridge = getBridge();
-      if (bridge?.getPathForFile) {
-        return bridge.getPathForFile(file);
-      }
       const fallbackFile = file as File & { path?: string };
       return typeof fallbackFile.path === 'string' ? fallbackFile.path : '';
     },

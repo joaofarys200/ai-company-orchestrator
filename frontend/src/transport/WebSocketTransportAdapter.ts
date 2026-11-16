@@ -2,7 +2,6 @@ import type { ClientMessage, ServerMessage } from '../protocol/websocket';
 import {
   buildMediaCandidateUrls,
   getWindowHttpToken,
-  getWindowNativeBridge,
   resolveDefaultHttpBaseUrl,
   resolveTransportMediaUrl,
   type JarvisTransport,
@@ -15,7 +14,6 @@ import {
   WS_READY_STATE_CONNECTING,
   WS_READY_STATE_OPEN,
   type InvokeOptions,
-  type NativeDesktopBridge,
   type OpenStreamOptions,
   type PendingRequestMeta,
   type ReconnectPolicy,
@@ -34,7 +32,6 @@ export interface WebSocketTransportAdapterConfig {
   reconnectPolicy?: Partial<ReconnectPolicy>;
   timeoutBounds?: { min?: number; max?: number };
   createWebSocket?: (url: string) => WebSocketLike;
-  nativeBridge?: NativeDesktopBridge | null;
   normalizeMessage?: (raw: unknown) => ServerMessage | null;
   randomFn?: () => number;
   nowFn?: () => number;
@@ -72,7 +69,6 @@ export class WebSocketTransportAdapter implements JarvisTransport {
   private readonly getHttpToken: () => string;
   private readonly reconnectPolicy: ReconnectPolicy;
   private readonly createWebSocket: (url: string) => WebSocketLike;
-  private readonly nativeBridge: NativeDesktopBridge | null;
   private readonly normalizeMessage: (raw: unknown) => ServerMessage | null;
   private readonly randomFn: () => number;
   private readonly nowFn: () => number;
@@ -82,7 +78,6 @@ export class WebSocketTransportAdapter implements JarvisTransport {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private shouldReconnect = true;
   private disposed = false;
-  private nativeUnsubscribe: (() => void) | null = null;
 
   private connectionStatus: TransportConnectionStatus = 'DISCONNECTED';
   private reconnectAttempt = 0;
@@ -113,7 +108,6 @@ export class WebSocketTransportAdapter implements JarvisTransport {
       ...(config.reconnectPolicy ?? {}),
     };
     this.createWebSocket = config.createWebSocket ?? defaultWebSocketFactory;
-    this.nativeBridge = config.nativeBridge !== undefined ? config.nativeBridge : getWindowNativeBridge();
     this.normalizeMessage = config.normalizeMessage ?? defaultNormalizeMessage;
     this.randomFn = config.randomFn ?? Math.random;
     this.nowFn = config.nowFn ?? Date.now;
@@ -128,26 +122,13 @@ export class WebSocketTransportAdapter implements JarvisTransport {
     this.system = {
       getStatus: () => this.getStatusSnapshot(),
       isReady: () => this.isReady(),
-      isNativeDesktop: () => Boolean(this.nativeBridge?.isNativeIPC),
+      isNativeDesktop: () => false,
       connect: () => this.connect(),
       reconnect: () => this.reconnect(),
       disconnect: () => this.disconnect(),
-      selectFolder: async () => {
-        if (this.nativeBridge?.selectFolder) {
-          return this.nativeBridge.selectFolder();
-        }
-        return null;
-      },
-      openPath: async (targetPath: string) => {
-        if (this.nativeBridge?.openPath) {
-          return this.nativeBridge.openPath(targetPath);
-        }
-        return null;
-      },
+      selectFolder: async () => null,
+      openPath: async () => null,
       getPathForFile: (file: File) => {
-        if (this.nativeBridge?.getPathForFile) {
-          return this.nativeBridge.getPathForFile(file);
-        }
         const fallbackFile = file as File & { path?: string };
         return typeof fallbackFile.path === 'string' ? fallbackFile.path : '';
       },
@@ -165,24 +146,12 @@ export class WebSocketTransportAdapter implements JarvisTransport {
           appendToken: mediaOpts?.appendToken,
         }),
     };
-
-    this.attachNativeIpcListener();
-  }
-
-  private attachNativeIpcListener(): void {
-    if (!this.nativeBridge?.isNativeIPC || this.nativeUnsubscribe) {
-      return;
-    }
-    this.nativeUnsubscribe = this.nativeBridge.onMessage((rawData) => {
-      this.handleIncomingRawMessage(rawData);
-    });
   }
 
   private getStatusSnapshot(): TransportStatusSnapshot {
-    const wsOpen = this.socket?.readyState === WS_READY_STATE_OPEN;
     return {
       status: this.connectionStatus,
-      backend: !wsOpen && this.nativeBridge?.isNativeIPC ? 'electron-ipc' : 'websocket',
+      backend: 'websocket',
       reconnectAttempt: this.reconnectAttempt,
       lastConnectedAt: this.lastConnectedAt,
       lastDisconnectedAt: this.lastDisconnectedAt,
@@ -204,17 +173,13 @@ export class WebSocketTransportAdapter implements JarvisTransport {
   }
 
   private isReady(): boolean {
-    return Boolean(
-      !this.disposed &&
-        (this.socket?.readyState === WS_READY_STATE_OPEN || this.nativeBridge?.isNativeIPC)
-    );
+    return Boolean(!this.disposed && this.socket?.readyState === WS_READY_STATE_OPEN);
   }
 
   connect(): void {
     if (this.disposed) {
       return;
     }
-    this.attachNativeIpcListener();
     this.shouldReconnect = true;
 
     if (
@@ -294,14 +259,12 @@ export class WebSocketTransportAdapter implements JarvisTransport {
         this.lastError = `Socket closed with code ${event.code}${closeReason}`;
       }
 
-      if (!this.nativeBridge?.isNativeIPC) {
-        this.correlation.rejectDisconnected(
-          new TransportError(
-            'DISCONNECTED',
-            `Ligação de transporte interrompida${closeReason || '.'}`
-          )
-        );
-      }
+      this.correlation.rejectDisconnected(
+        new TransportError(
+          'DISCONNECTED',
+          `Ligação de transporte interrompida${closeReason || '.'}`
+        )
+      );
 
       this.connectionStatus = this.shouldReconnect ? 'RECONNECTING' : 'OFFLINE';
       this.notifyStatusListeners();
@@ -403,15 +366,6 @@ export class WebSocketTransportAdapter implements JarvisTransport {
       }
     }
 
-    if (this.nativeUnsubscribe) {
-      try {
-        this.nativeUnsubscribe();
-      } catch {
-        // Ignore unsubscribe error
-      }
-      this.nativeUnsubscribe = null;
-    }
-
     this.correlation.rejectAll(new TransportError('TRANSPORT_CLOSED', 'Transporte encerrado.'));
     this.typeListeners.clear();
     this.anyListeners.clear();
@@ -431,15 +385,6 @@ export class WebSocketTransportAdapter implements JarvisTransport {
         return true;
       } catch (err) {
         this.lastError = err instanceof Error ? err.message : 'Serialization failure';
-        return false;
-      }
-    }
-    if (this.nativeBridge?.isNativeIPC) {
-      try {
-        this.nativeBridge.send(message);
-        return true;
-      } catch (err) {
-        this.lastError = err instanceof Error ? err.message : 'Native IPC send failure';
         return false;
       }
     }

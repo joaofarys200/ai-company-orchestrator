@@ -33,8 +33,8 @@ class MissionModelHarnessEndToEndTest(
     async def test_reference_coding_mission_succeeds_twice(self):
         source = (
             Path(__file__).parents[1]
-            / "workspace"
-            / "projects"
+            / "tests"
+            / "fixtures"
             / "task-app"
         )
         provider_requests = []

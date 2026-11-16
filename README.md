@@ -54,24 +54,24 @@ JARVIS OS centers around an interactive **Hologram Core Orb** that docks into a 
     <td width="50%">
       <strong>Study Spatial Board (<code>Estudos</code>)</strong><br />
       Structured paper reader, grounded <code>qwen3.5:9b</code> synthesis, section citations, Cornell notes &amp; interactive quiz/flashcards.<br /><br />
-      <img src="./evidence/spatial_board/02_study_spatial_board.png" alt="JARVIS OS Study Spatial Board" />
+      <img src="./docs/assets/spatial_board/02_study_spatial_board.png" alt="JARVIS OS Study Spatial Board" />
     </td>
     <td width="50%">
       <strong>Projects &amp; Coding Agent 2.0 (<code>Projetos &amp; Código</code>)</strong><br />
       Embedded Monaco code editor, live sandbox preview, and assisted AST diff planning/apply/rollback.<br /><br />
-      <img src="./evidence/spatial_board/04_project_spatial_board.png" alt="JARVIS OS Project Spatial Board" />
+      <img src="./docs/assets/spatial_board/04_project_spatial_board.png" alt="JARVIS OS Project Spatial Board" />
     </td>
   </tr>
   <tr>
     <td width="50%">
       <strong>Obsidian Knowledge Vault (<code>Obsidian Vault</code>)</strong><br />
       261 indexed Markdown notes with YAML provenance, Maps of Content (MOCs), wikilinks &amp; quality audit queue.<br /><br />
-      <img src="./evidence/spatial_board/05_obsidian_spatial_board.png" alt="JARVIS OS Obsidian Vault Spatial Board" />
+      <img src="./docs/assets/spatial_board/05_obsidian_spatial_board.png" alt="JARVIS OS Obsidian Vault Spatial Board" />
     </td>
     <td width="50%">
       <strong>Security Sentinel (<code>Sentinel</code>)</strong><br />
       Host EDR watchdog telemetry, baseline drift event stream, mandatory human approval queue &amp; rollback controls.<br /><br />
-      <img src="./evidence/spatial_board/06_sentinel_spatial_board.png" alt="JARVIS OS Sentinel Spatial Board" />
+      <img src="./docs/assets/spatial_board/06_sentinel_spatial_board.png" alt="JARVIS OS Sentinel Spatial Board" />
     </td>
   </tr>
 </table>
@@ -79,7 +79,7 @@ JARVIS OS centers around an interactive **Hologram Core Orb** that docks into a 
 <details>
 <summary><strong>Preview: Native HiDPI PDF Reader &amp; Contextual Academic Assistant</strong></summary>
 <br />
-<img src="./evidence/study/01_pdf_native_reader_initial.png" alt="Native PDF Reader in JARVIS Study Workspace" />
+<img src="./docs/assets/study/01_pdf_native_reader_initial.png" alt="Native PDF Reader in JARVIS Study Workspace" />
 </details>
 
 ---
@@ -374,8 +374,8 @@ Run targeted domain suites, worker E2E checks, frontend tests, or documentation 
   tests/test_safety_classifier_regression.py `
   tests/test_runtime_security.py -q
 
-# Security Sentinel EDR & Coding Agent 2.0
-.\venv\Scripts\python.exe -m pytest tests/test_sentinel.py tests/test_coding_agent_2_benchmark.py -q
+# Security Sentinel EDR & Coding Session
+.\venv\Scripts\python.exe -m pytest tests/test_sentinel_lifecycle.py tests/test_coding_session.py tests/test_project_context.py -q
 
 # Frontend transport unit tests, TypeScript check & production bundle (Vite 8)
 npm test --prefix frontend

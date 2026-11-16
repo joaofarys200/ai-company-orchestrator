@@ -17,10 +17,7 @@ export function createDefaultTransport(config: DefaultTransportConfig = {}): Jar
   const mode = config.forceBackend ?? 'auto';
   const useTauri = mode === 'tauri' || (mode === 'auto' && isTauriRuntime());
   if (useTauri) {
-    return new TauriTransportAdapter({
-      preferHybridFallback: config.preferHybridFallback ?? false,
-      ...config,
-    });
+    return new TauriTransportAdapter(config);
   }
   return new WebSocketTransportAdapter(config);
 }

@@ -15,8 +15,8 @@ use windows_sys::Win32::Foundation::{CloseHandle, HANDLE};
 use windows_sys::Win32::System::JobObjects::{
     AssignProcessToJobObject, CreateJobObjectW, JobObjectExtendedLimitInformation,
     SetInformationJobObject, TerminateJobObject, JOBOBJECT_EXTENDED_LIMIT_INFORMATION,
-    JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION, JOB_OBJECT_LIMIT_JOB_MEMORY,
-    JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+    JOB_OBJECT_LIMIT_BREAKAWAY_OK, JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION,
+    JOB_OBJECT_LIMIT_JOB_MEMORY, JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
 };
 #[cfg(windows)]
 use windows_sys::Win32::System::Threading::{
@@ -32,8 +32,11 @@ pub const WORKER_CREATION_FLAGS: u32 = 0;
 
 /// RAII wrapper around an OS Job Object (`HANDLE` on Windows).
 ///
-/// Configured with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE` and
-/// `JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION` plus an optional job memory cap.
+/// Configured with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`,
+/// `JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION`, and
+/// `JOB_OBJECT_LIMIT_BREAKAWAY_OK` (allowing persistent external system daemons
+/// such as `ollama serve` to break away via `CREATE_BREAKAWAY_FROM_JOB`) plus an
+/// optional job memory cap.
 pub struct JobObject {
     #[cfg(windows)]
     handle: isize,
@@ -74,8 +77,9 @@ impl JobObject {
             }
 
             let mut info: JOBOBJECT_EXTENDED_LIMIT_INFORMATION = Default::default();
-            let mut flags =
-                JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE | JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION;
+            let mut flags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+                | JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION
+                | JOB_OBJECT_LIMIT_BREAKAWAY_OK;
 
             if let Some(limit) = max_memory_bytes {
                 if limit > 0 {
@@ -272,6 +276,10 @@ mod tests {
         );
         assert_ne!(
             info.BasicLimitInformation.LimitFlags & JOB_OBJECT_LIMIT_JOB_MEMORY,
+            0
+        );
+        assert_ne!(
+            info.BasicLimitInformation.LimitFlags & JOB_OBJECT_LIMIT_BREAKAWAY_OK,
             0
         );
         assert_eq!(

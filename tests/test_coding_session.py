@@ -72,7 +72,7 @@ def assert_python_module_validation(
 
 @pytest.fixture
 def task_app_service(tmp_path):
-    source = Path(__file__).parents[1] / "workspace" / "projects" / "task-app"
+    source = Path(__file__).parents[1] / "tests" / "fixtures" / "task-app"
     target = tmp_path / "workspace" / "projects" / "task-app"
     target.parent.mkdir(parents=True)
     shutil.copytree(source, target)

@@ -45,9 +45,10 @@ class ModelExecutionService:
         provider: str = "ollama",
         timeout_env_var: str = "JARVIS_CODING_PLAN_TIMEOUT_SECONDS",
     ) -> str:
-        """Format an actionable timeout/connection diagnostic via registered provider metadata."""
+        """Format an actionable timeout/connection/status diagnostic via provider metadata."""
         error_name = type(error).__name__
         detail = str(error).strip() or error_name
+        lowered = detail.casefold()
         if "timeout" in error_name.lower():
             return (
                 "O modelo local demorou demasiado a gerar o plano "
@@ -64,6 +65,29 @@ class ModelExecutionService:
             return (
                 f"Nao foi possivel contactar o fornecedor local ({provider}). "
                 "Confirme que o servico esta a correr."
+            )
+        response = getattr(error, "response", None)
+        status_code = getattr(response, "status_code", None)
+        if (isinstance(status_code, int) and status_code >= 500) or (
+            "500 internal server error" in lowered
+            or "out-of-memory" in lowered
+            or "allocate" in lowered
+        ):
+            endpoint = self.get_provider_endpoint(provider)
+            target = f"{provider} ({endpoint})" if endpoint else provider
+            return (
+                f"O servidor do modelo {target} devolveu erro interno ao carregar "
+                f"ou executar o modelo: {detail}"
+            )
+        if status_code in (401, 403):
+            return (
+                f"Falha de autenticacao no fornecedor {provider} "
+                f"(HTTP {status_code}): {detail}"
+            )
+        if status_code == 429:
+            return (
+                f"Limite de pedidos atingido no fornecedor {provider} "
+                f"(HTTP 429): {detail}"
             )
         return detail
 

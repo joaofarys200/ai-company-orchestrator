@@ -15,7 +15,6 @@ import {
   WS_READY_STATE_CLOSED,
   WS_READY_STATE_CONNECTING,
   WS_READY_STATE_OPEN,
-  type NativeDesktopBridge,
   type TransportStatusSnapshot,
   type WebSocketCloseEventLike,
   type WebSocketLike,
@@ -89,53 +88,7 @@ class MockWebSocket implements WebSocketLike {
   }
 }
 
-interface MockNativeHarness {
-  bridge: NativeDesktopBridge;
-  sent: unknown[];
-  openedPaths: string[];
-  emit: (payload: unknown) => void;
-  getListenerCount: () => number;
-}
-
-function createMockNativeBridge(options?: { selectedFolder?: string | null }): MockNativeHarness {
-  const listeners = new Set<(data: unknown) => void>();
-  const sent: unknown[] = [];
-  const openedPaths: string[] = [];
-
-  const bridge: NativeDesktopBridge = {
-    isNativeIPC: true,
-    send: (msg: unknown) => {
-      sent.push(msg);
-    },
-    onMessage: (cb: (data: unknown) => void) => {
-      listeners.add(cb);
-      return () => {
-        listeners.delete(cb);
-      };
-    },
-    getPathForFile: (file: File) => `/native/path/${file.name}`,
-    selectFolder: async () => options?.selectedFolder ?? '/courses/math',
-    openPath: async (targetPath: string) => {
-      openedPaths.push(targetPath);
-      return { ok: true };
-    },
-  };
-
-  return {
-    bridge,
-    sent,
-    openedPaths,
-    emit: (payload: unknown) => {
-      for (const cb of Array.from(listeners)) {
-        cb(payload);
-      }
-    },
-    getListenerCount: () => listeners.size,
-  };
-}
-
 function createAdapterHarness(options?: {
-  nativeBridge?: NativeDesktopBridge | null;
   wsUrl?: string;
   httpBaseUrl?: string;
   httpToken?: string;
@@ -146,7 +99,6 @@ function createAdapterHarness(options?: {
     wsUrl: options?.wsUrl ?? 'ws://127.0.0.1:8001/?token=test-token',
     httpBaseUrl: options?.httpBaseUrl,
     getHttpToken: () => options?.httpToken ?? '',
-    nativeBridge: options?.nativeBridge ?? null,
     normalizeMessage: normalizeServerMessage,
     randomFn: options?.randomFn ?? (() => 0.5),
     createWebSocket: (url) => {
@@ -594,12 +546,8 @@ describe('JarvisTransport & WebSocketTransportAdapter Compatibility', () => {
     adapter.dispose();
   });
 
-  it('cleans up all subscribers, native IPC hooks, and pending requests on unsubscribe and dispose', async () => {
-    const nativeHarness = createMockNativeBridge();
-    const { adapter, sockets } = createAdapterHarness({
-      nativeBridge: nativeHarness.bridge,
-    });
-    assert.equal(nativeHarness.getListenerCount(), 1);
+  it('cleans up all subscribers and pending requests on unsubscribe and dispose', async () => {
+    const { adapter, sockets } = createAdapterHarness();
 
     let systemCount = 0;
     let anyCount = 0;
@@ -630,7 +578,6 @@ describe('JarvisTransport & WebSocketTransportAdapter Compatibility', () => {
     );
 
     adapter.dispose();
-    assert.equal(nativeHarness.getListenerCount(), 0);
     assert.equal(ws.readyState, WS_READY_STATE_CLOSED);
     await assert.rejects(
       pendingBeforeDispose,
@@ -645,42 +592,14 @@ describe('JarvisTransport & WebSocketTransportAdapter Compatibility', () => {
     );
   });
 
-  it('preserves compatibility across Study, IDE, Obsidian, Agents, Sentinel, Native IPC, and Media URLs', async () => {
-    const nativeHarness = createMockNativeBridge({ selectedFolder: 'D:/University/Courses' });
+  it('preserves compatibility across Study, IDE, Obsidian, Agents, Sentinel, and Media URLs', async () => {
     const { adapter, sockets } = createAdapterHarness({
-      nativeBridge: nativeHarness.bridge,
       httpBaseUrl: 'http://127.0.0.1:8000',
       httpToken: 'secret-http-token',
     });
 
-    // Native IPC fallback works even before WebSocket opens
-    assert.equal(adapter.system.isNativeDesktop(), true);
-    assert.equal(adapter.system.isReady(), true);
-    assert.equal(await adapter.system.selectFolder(), 'D:/University/Courses');
-    const openRes = await adapter.system.openPath('D:/University/Courses');
-    assert.deepEqual(openRes, { ok: true });
-    assert.deepEqual(nativeHarness.openedPaths, ['D:/University/Courses']);
-
-    const ipcRequest = adapter.invoke<ServerMessage>(
-      { type: 'study_get_document_file', document_id: 'doc_pdf_1' },
-      {
-        requestId: 'req-ipc-study',
-        matchResponse: (m) =>
-          m.type === 'study_document_file_result'
-            ? { kind: 'resolve', value: m }
-            : { kind: 'ignore' },
-      }
-    );
-    assert.equal(nativeHarness.sent.length, 1);
-    nativeHarness.emit({
-      type: 'study_document_file_result',
-      document_id: 'doc_pdf_1',
-      filename: 'lecture1.pdf',
-      content_base64: 'JVBERi0xLjQK',
-      request_id: 'req-ipc-study',
-    });
-    const studyFileMsg = await ipcRequest;
-    assert.equal(studyFileMsg.type, 'study_document_file_result');
+    assert.equal(adapter.system.isNativeDesktop(), false);
+    assert.equal(adapter.system.isReady(), false);
 
     // Media URL helpers preserve token query & candidate paths
     assert.equal(
@@ -703,6 +622,7 @@ describe('JarvisTransport & WebSocketTransportAdapter Compatibility', () => {
     adapter.system.connect();
     const ws = sockets[0];
     ws.simulateOpen();
+    assert.equal(adapter.system.isReady(), true);
 
     const receivedTypes: string[] = [];
     adapter.subscribe('project_context', (m) => receivedTypes.push(m.type));

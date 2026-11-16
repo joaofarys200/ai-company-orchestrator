@@ -18,12 +18,13 @@ import tempfile
 import threading
 import unicodedata
 import wave
+from array import array
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-import numpy as np
+from backend.process_utils import hidden_subprocess_kwargs
 
 EXTRACTION_VERSION = "3.0-grounded"
 
@@ -627,12 +628,14 @@ $results | ConvertTo-Json -Compress -Depth 3
     try:
         proc = subprocess.run(
             ["powershell", "-NoProfile", "-Command", ps_script],
-            input=json.dumps(batch_paths),
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            timeout=timeout_sec,
+            **hidden_subprocess_kwargs(
+                input=json.dumps(batch_paths),
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=timeout_sec,
+            ),
         )
         if proc.returncode == 0 and proc.stdout.strip():
             parsed = parse_llm_json(proc.stdout.strip())
@@ -753,11 +756,23 @@ def compute_wav_duration_and_rms(wav_path: str) -> Tuple[float, float]:
                 return duration, 0.0
             sample_frames = min(nframes, rate * 45)
             raw = wf.readframes(sample_frames)
-            arr = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
-            if channels > 1 and len(arr) >= channels:
-                arr = arr[::channels]
-            rms = float(np.sqrt(np.mean(arr ** 2))) if len(arr) > 0 else 0.0
-            return duration, rms
+            try:
+                import numpy as np  # optional fast path
+
+                arr = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+                if channels > 1 and len(arr) >= channels:
+                    arr = arr[::channels]
+                rms = float(np.sqrt(np.mean(arr ** 2))) if len(arr) > 0 else 0.0
+                return duration, rms
+            except ImportError:
+                pcm = array("h")
+                pcm.frombytes(raw[: len(raw) - (len(raw) % 2)])
+                samples = pcm[::channels] if channels > 1 else pcm
+                if not samples:
+                    return duration, 0.0
+                inv = 1.0 / 32768.0
+                mean_sq = sum((s * inv) ** 2 for s in samples) / len(samples)
+                return duration, math.sqrt(mean_sq)
     except Exception:
         return 0.0, 0.0
 
@@ -789,7 +804,10 @@ def ensure_16khz_mono_wav(input_audio_path: str, output_wav_path: Optional[str] 
         "-vn", "-acodec", "pcm_s16le", "-ar", "16000", "-ac", "1",
         output_wav_path,
     ]
-    res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    res = subprocess.run(
+        cmd,
+        **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=120),
+    )
     if res.returncode != 0 or not os.path.isfile(output_wav_path) or os.path.getsize(output_wav_path) == 0:
         if is_temp and os.path.exists(output_wav_path):
             try:

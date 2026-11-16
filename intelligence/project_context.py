@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 import sandbox
+from backend.process_utils import hidden_subprocess_kwargs
 from intelligence.project_intelligence import GENERATED_SUFFIXES, IGNORED_DIRECTORIES, ProjectIntelligenceEngine
 from workspace_policy import WORKSPACE_ROOT, resolve_workspace_path
 
@@ -32,10 +33,7 @@ MAX_VIEW_FILE_BYTES = 500_000
 # transactional source files up to 50 MiB without loading them fully into memory.
 DEFAULT_MAX_TRANSACTION_FILE_BYTES = 50 * 1024 * 1024
 HASH_CHUNK_BYTES = 1024 * 1024
-TRANSACTIONAL_FILE_SUFFIXES = {
-    ".css", ".html", ".htm", ".js", ".jsx", ".json", ".mjs", ".cjs",
-    ".py", ".toml", ".ts", ".tsx", ".yaml", ".yml",
-}
+TRANSACTIONAL_FILE_SUFFIXES = set(TEXT_FILE_SUFFIXES)
 
 
 class ProjectContextError(Exception):
@@ -791,9 +789,7 @@ class ProjectContextService:
         try:
             result = subprocess.run(
                 [executable, "--version"],
-                capture_output=True,
-                text=True,
-                timeout=5,
+                **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5),
             )
         except (OSError, subprocess.TimeoutExpired):
             return None
@@ -810,8 +806,7 @@ class ProjectContextService:
                     "-c",
                     f"import importlib.util; raise SystemExit(0 if importlib.util.find_spec({module!r}) else 1)",
                 ],
-                capture_output=True,
-                timeout=10,
+                **hidden_subprocess_kwargs(capture_output=True, timeout=10),
             )
             return result.returncode == 0
         except (OSError, subprocess.TimeoutExpired):
@@ -990,11 +985,17 @@ class ProjectContextService:
         if not shutil.which("git"):
             return {"available": False, "error": "git nao esta disponivel no ambiente"}
         try:
-            probe = subprocess.run(["git", "-C", root, "rev-parse", "--show-toplevel"], capture_output=True, text=True, timeout=5)
+            probe = subprocess.run(
+                ["git", "-C", root, "rev-parse", "--show-toplevel"],
+                **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5),
+            )
             if probe.returncode != 0:
                 return {"available": False, "error": (probe.stderr or "nao e um repositorio Git").strip()}
             repository_root = os.path.realpath(probe.stdout.strip())
-            status = subprocess.run(["git", "-C", root, "status", "--porcelain", "--branch"], capture_output=True, text=True, timeout=5)
+            status = subprocess.run(
+                ["git", "-C", root, "status", "--porcelain", "--branch"],
+                **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5),
+            )
             lines = status.stdout.splitlines()
             return {
                 "available": status.returncode == 0,

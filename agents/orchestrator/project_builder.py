@@ -2982,9 +2982,9 @@ def _stream_text(value: str | bytes | None) -> str:
 
 def _process_creation_options() -> dict[str, Any]:
     if os.name == "nt":
-        flags = int(getattr(subprocess, "CREATE_NO_WINDOW", 0))
-        flags |= int(getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0))
-        return {"creationflags": flags} if flags else {}
+        from backend.process_utils import hidden_subprocess_kwargs
+
+        return hidden_subprocess_kwargs(new_process_group=True)
     return {"start_new_session": True}
 
 
@@ -3793,11 +3793,9 @@ def start_static_preview(project_dir: str, serve_directory: str | None = None) -
         "stdin": subprocess.DEVNULL,
     }
     if os.name == "nt":
-        flags = 0
-        for flag_name in ("CREATE_NO_WINDOW", "DETACHED_PROCESS", "CREATE_NEW_PROCESS_GROUP"):
-            flags |= int(getattr(subprocess, flag_name, 0))
-        if flags:
-            kwargs["creationflags"] = flags
+        from backend.process_utils import hidden_subprocess_kwargs
+
+        kwargs = hidden_subprocess_kwargs(kwargs, new_process_group=True)
     else:
         kwargs["start_new_session"] = True
     process = subprocess.Popen(command, **kwargs)

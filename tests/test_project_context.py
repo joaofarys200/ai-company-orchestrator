@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import shutil
 from pathlib import Path
 
 import pytest
@@ -179,8 +180,12 @@ def test_manual_project_file_save_rejects_stale_hash_and_paths_outside_project(t
     assert source.read_text(encoding="utf-8") == "const value = 2;\n"
 
 
-def test_task_app_smoke_uses_real_project_and_finds_add_task():
-    service = ProjectContextService()
+def test_task_app_smoke_uses_real_project_and_finds_add_task(tmp_path):
+    source = Path(__file__).parents[1] / "tests" / "fixtures" / "task-app"
+    target = tmp_path / "workspace" / "projects" / "task-app"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(source, target)
+    service = ProjectContextService(workspace_root=str(tmp_path))
     context = service.index_project("task-app")
     result = service.find_references("task-app", "addTask")
 

@@ -35,9 +35,14 @@ src-tauri/gen/schemas/
 # Local data, memory and generated state
 database.db
 *.db
+*.db-wal
+*.db-shm
+*.bak
 *.sqlite
 *.sqlite3
 chroma_db/
+data/study/documents/
+data/study/videos_cache/
 obsidian_vault/.obsidian/
 obsidian_vault/.history/
 sandbox_dir/

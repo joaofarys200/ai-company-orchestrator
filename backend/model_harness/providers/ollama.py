@@ -181,6 +181,12 @@ class OllamaChatProvider:
             return False
         import shutil
         import subprocess
+        from backend.process_utils import (
+            hidden_startupinfo,
+            log_process_event,
+            no_window_creationflags,
+            rotate_and_open_process_log_handle,
+        )
 
         ollama_bin = shutil.which("ollama")
         if not ollama_bin:
@@ -193,22 +199,116 @@ class OllamaChatProvider:
         env = os.environ.copy()
         env.setdefault("OLLAMA_FLASH_ATTENTION", "1")
         env.setdefault("OLLAMA_KV_CACHE_TYPE", "q8_0")
-        creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0) | getattr(
-            subprocess, "DETACHED_PROCESS", 0
-        )
+        creationflags = no_window_creationflags(allow_breakaway=True)
+        fallback_flags = no_window_creationflags(allow_breakaway=False)
+
+        log_fh = None
         try:
-            subprocess.Popen(
-                [ollama_bin, "serve"],
-                env=env,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                stdin=subprocess.DEVNULL,
-                close_fds=True,
+            log_fh = rotate_and_open_process_log_handle("ollama.log")
+            stdout_target: Any = log_fh
+            stderr_target: Any = subprocess.STDOUT
+        except Exception:
+            stdout_target = subprocess.DEVNULL
+            stderr_target = subprocess.DEVNULL
+
+        cmd = [ollama_bin, "serve"]
+        popen_kwargs: dict[str, Any] = {
+            "env": env,
+            "stdout": stdout_target,
+            "stderr": stderr_target,
+            "stdin": subprocess.DEVNULL,
+            "close_fds": True,
+            "creationflags": creationflags,
+        }
+        if os.name == "nt":
+            popen_kwargs["startupinfo"] = hidden_startupinfo()
+
+        try:
+            proc = subprocess.Popen(cmd, **popen_kwargs)
+            log_process_event(
+                "ollama_start",
+                target=ollama_bin,
+                args=cmd,
+                pid=getattr(proc, "pid", None),
                 creationflags=creationflags,
+                extra={"log_file": "ollama.log", "breakaway": True},
             )
             return True
-        except Exception:
+        except OSError as exc:
+            if fallback_flags != creationflags:
+                try:
+                    popen_kwargs["creationflags"] = fallback_flags
+                    proc = subprocess.Popen(cmd, **popen_kwargs)
+                    log_process_event(
+                        "ollama_start",
+                        target=ollama_bin,
+                        args=cmd,
+                        pid=getattr(proc, "pid", None),
+                        creationflags=fallback_flags,
+                        extra={"log_file": "ollama.log", "breakaway": False},
+                    )
+                    return True
+                except Exception as fallback_exc:
+                    log_process_event(
+                        "ollama_start_failed",
+                        target=ollama_bin,
+                        args=cmd,
+                        creationflags=fallback_flags,
+                        extra={"error": f"{type(fallback_exc).__name__}: {fallback_exc}"},
+                    )
+                    return False
+            log_process_event(
+                "ollama_start_failed",
+                target=ollama_bin,
+                args=cmd,
+                creationflags=creationflags,
+                extra={"error": f"{type(exc).__name__}: {exc}"},
+            )
             return False
+        except Exception as exc:
+            log_process_event(
+                "ollama_start_failed",
+                target=ollama_bin,
+                args=cmd,
+                creationflags=creationflags,
+                extra={"error": f"{type(exc).__name__}: {exc}"},
+            )
+            return False
+        finally:
+            if log_fh is not None:
+                try:
+                    log_fh.close()
+                except OSError:
+                    pass
+
+    async def _wait_for_daemon_ready(self, timeout_seconds: float = 15.0) -> bool:
+        """Polls `/api/tags` until the newly spawned Ollama daemon finishes GPU discovery."""
+        from backend.process_utils import log_process_event
+
+        deadline = time.monotonic() + max(timeout_seconds, 1.0)
+        probe_timeout = httpx.Timeout(connect=1.5, read=2.0, write=1.5, pool=1.5)
+        while time.monotonic() < deadline:
+            try:
+                async with self._client(probe_timeout) as client:
+                    resp = await client.get("/api/tags")
+                    if resp.status_code == 200:
+                        log_process_event(
+                            "ollama_ready",
+                            target="ollama",
+                            args=["/api/tags"],
+                            extra={"base_url": self.base_url},
+                        )
+                        return True
+            except Exception:
+                pass
+            await asyncio.sleep(0.4)
+        log_process_event(
+            "ollama_wait_timeout",
+            target="ollama",
+            args=["/api/tags"],
+            extra={"base_url": self.base_url, "timeout_seconds": timeout_seconds},
+        )
+        return False
 
     async def warmup(self, model: str | None = None) -> bool:
         if not _OLLAMA_GPU_SEM.acquire(blocking=False):
@@ -238,7 +338,7 @@ class OllamaChatProvider:
                     return resp.status_code < 400
             except Exception:
                 if attempt == 0 and self._ensure_local_daemon_running():
-                    await asyncio.sleep(2.5)
+                    await self._wait_for_daemon_ready()
                     continue
                 return False
         return False
@@ -278,7 +378,9 @@ class OllamaChatProvider:
 
         payload = self._payload(request, route, options)
         timeout = self._timeout(request, options)
-        for attempt in range(2):
+        started_daemon = False
+        reduced_ctx_retried = False
+        while True:
             try:
                 async with self._client(timeout) as client:
                     if route.streaming:
@@ -295,16 +397,18 @@ class OllamaChatProvider:
                         )
                 break
             except httpx.ConnectError:
-                if attempt == 0 and self._ensure_local_daemon_running():
-                    await asyncio.sleep(2.5)
+                if not started_daemon and self._ensure_local_daemon_running():
+                    started_daemon = True
+                    await self._wait_for_daemon_ready()
                     continue
                 raise
             except httpx.HTTPStatusError as exc:
                 if (
-                    attempt == 0
+                    not reduced_ctx_retried
                     and exc.response.status_code >= 500
                     and (payload.get("options") or {}).get("num_ctx", 0) > 4096
                 ):
+                    reduced_ctx_retried = True
                     options.emit(
                         "ollama_500_retry_with_reduced_context",
                         {
@@ -376,7 +480,14 @@ class OllamaChatProvider:
         status = "FAILED"
         try:
             async with self._client(timeout) as client:
-                response = await client.get("/api/tags")
+                try:
+                    response = await client.get("/api/tags")
+                except httpx.ConnectError:
+                    if self._ensure_local_daemon_running():
+                        await self._wait_for_daemon_ready()
+                        response = await client.get("/api/tags")
+                    else:
+                        raise
                 response.raise_for_status()
                 result["service_available"] = True
                 models = (response.json() or {}).get("models") or []
@@ -647,6 +758,22 @@ class OllamaChatProvider:
         return self._provider_result(envelope)
 
     @staticmethod
+    def _extract_error_detail(body: str) -> str:
+        text = str(body or "").strip()
+        if not text:
+            return ""
+        try:
+            parsed = json.loads(text)
+            if isinstance(parsed, Mapping) and parsed.get("error"):
+                text = str(parsed["error"]).strip()
+        except Exception:
+            pass
+        compact = " ".join(text.split())
+        if len(compact) > 360:
+            compact = compact[:357] + "..."
+        return compact
+
+    @staticmethod
     def _raise_for_status(
         response: httpx.Response,
         payload: Mapping[str, Any],
@@ -667,7 +794,17 @@ class OllamaChatProvider:
             raise OllamaStructuredOutputUnsupportedError(
                 "O provider rejeitou structured output com JSON Schema."
             )
-        response.raise_for_status()
+        detail = OllamaChatProvider._extract_error_detail(body)
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            if detail:
+                raise httpx.HTTPStatusError(
+                    f"{exc} ({detail})",
+                    request=exc.request,
+                    response=exc.response,
+                ) from None
+            raise
 
     def _provider_result(
         self,

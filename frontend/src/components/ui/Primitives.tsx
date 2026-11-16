@@ -23,28 +23,6 @@ export const StatusPill: React.FC<{
   </span>
 );
 
-export const InlineBanner: React.FC<{
-  tone?: StatusTone;
-  icon?: LucideIcon;
-  title: string;
-  description?: string;
-  actions?: React.ReactNode;
-  className?: string;
-}> = ({ tone = 'accent', icon: Icon, title, description, actions, className = '' }) => (
-  <div
-    className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 text-xs ${TONE_CLASSES[tone]} ${className}`}
-  >
-    <div className="flex min-w-0 items-start gap-2.5">
-      {Icon && <Icon className="mt-0.5 h-4 w-4 shrink-0" />}
-      <div className="min-w-0">
-        <div className="font-semibold">{title}</div>
-        {description && <p className="mt-0.5 opacity-85 leading-relaxed">{description}</p>}
-      </div>
-    </div>
-    {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
-  </div>
-);
-
 export const PanelEmptyState: React.FC<{
   icon: LucideIcon;
   title: string;

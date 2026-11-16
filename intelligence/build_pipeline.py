@@ -14,6 +14,7 @@ import sys
 import time
 from typing import Any, Dict, List, Optional
 
+from backend.process_utils import hidden_subprocess_kwargs
 from intelligence.cross_file_validator import CrossFileValidator, ValidationReport
 from intelligence.repository_graph import RepositoryGraph
 
@@ -210,11 +211,13 @@ class DeterministicBuildPipeline:
         try:
             res = subprocess.run(
                 cmd,
-                cwd=self.workspace_root,
-                shell=True,
-                capture_output=True,
-                text=True,
-                timeout=30,
+                **hidden_subprocess_kwargs(
+                    cwd=self.workspace_root,
+                    shell=True,
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                ),
             )
             passed = res.returncode == 0
             return StageResult(
@@ -258,11 +261,13 @@ class DeterministicBuildPipeline:
         try:
             res = subprocess.run(
                 cmd,
-                cwd=self.workspace_root,
-                shell=True,
-                capture_output=True,
-                text=True,
-                timeout=60,
+                **hidden_subprocess_kwargs(
+                    cwd=self.workspace_root,
+                    shell=True,
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                ),
             )
             passed = res.returncode == 0
             return StageResult(

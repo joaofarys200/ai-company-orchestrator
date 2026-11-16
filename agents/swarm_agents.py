@@ -308,10 +308,14 @@ class TestingAgent(SwarmAgent):
 
         if cmd:
             try:
+                from backend.process_utils import hidden_subprocess_kwargs
+
                 proc = await asyncio.create_subprocess_shell(
                     cmd,
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
+                    **hidden_subprocess_kwargs(
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE,
+                    ),
                 )
                 stdout_b, stderr_b = await proc.communicate()
                 stdout_str = stdout_b.decode(errors="replace")

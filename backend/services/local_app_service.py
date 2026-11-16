@@ -588,6 +588,18 @@ async def open_local_application(
 
     def run_command() -> tuple[bool, str]:
         try:
+            from backend.process_utils import hidden_subprocess_kwargs
+
+            run_kwargs = hidden_subprocess_kwargs(
+                {
+                    "text": True,
+                    "encoding": "utf-8",
+                    "errors": "replace",
+                    "capture_output": True,
+                    "timeout": 10,
+                    "cwd": working_directory,
+                }
+            )
             process = subprocess.run(
                 [
                     "powershell.exe",
@@ -596,12 +608,7 @@ async def open_local_application(
                     "-Command",
                     command,
                 ],
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                capture_output=True,
-                timeout=10,
-                cwd=working_directory,
+                **run_kwargs,
             )
             output = "\n".join(
                 part
