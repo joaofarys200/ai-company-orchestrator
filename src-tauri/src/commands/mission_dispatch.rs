@@ -1,6 +1,6 @@
 //! Read-only mission observer fast path.
 //!
-//! Per ADR (`docs/architecture/TAURI_PERSISTENCE_OWNERSHIP.md:42`), Python
+//! Per Stage-2 persistence ownership (`docs/decisions/ADR-005-sqlite-and-json-state-persistence.md`), Python
 //! `MissionWorker` remains the exclusive writer of per-mission `state.db` files.
 //! This module only serves read-only `mission_list` observations by inspecting
 //! `workspace/.jarvis/projects/<project_id>/missions/*/mission.json` and falling

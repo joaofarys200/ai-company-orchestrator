@@ -374,8 +374,8 @@ Run targeted domain suites, worker E2E checks, frontend tests, or documentation 
   tests/test_safety_classifier_regression.py `
   tests/test_runtime_security.py -q
 
-# Security Sentinel EDR & Coding Agent 2.0
-.\venv\Scripts\python.exe -m pytest tests/test_sentinel.py tests/test_coding_agent_2_benchmark.py -q
+# Security Sentinel EDR & Coding Session
+.\venv\Scripts\python.exe -m pytest tests/test_sentinel_lifecycle.py tests/test_coding_session.py tests/test_project_context.py -q
 
 # Frontend transport unit tests, TypeScript check & production bundle (Vite 8)
 npm test --prefix frontend

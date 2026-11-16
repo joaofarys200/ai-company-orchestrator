@@ -35,20 +35,26 @@ def test_zero_circular_dependencies_in_repository():
 
 def test_docs_ledger_and_diffs_exist():
     required_docs = [
-        "docs/phase38_super_file_audit.json",
-        "docs/super_file_audit.json",
-        "docs/phase38_decomposition_plan.json",
-        "docs/phase38_architecture_before.json",
-        "docs/phase38_architecture_after.json",
-        "docs/phase38_api_diff.json",
-        "docs/phase38_dependency_diff.json",
+        "ARCHITECTURE.md",
+        "docs/PROJECT_MAP.md",
+        "docs/decisions/ADR-001-hybrid-dual-model-harness.md",
+        "docs/decisions/ADR-002-websocket-protocol-multiplexing.md",
+        "docs/decisions/ADR-003-host-security-sentinel-watchdog.md",
+        "docs/decisions/ADR-004-deterministic-ast-patch-engine.md",
+        "docs/decisions/ADR-005-sqlite-and-json-state-persistence.md",
+        "docs/decisions/ADR-006-four-tier-economic-evidence-taxonomy.md",
     ]
-
     for d in required_docs:
         assert os.path.isfile(d), f"Document {d} must exist"
         with open(d, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            assert data is not None, f"Document {d} must contain valid JSON"
+            content = f.read()
+            assert content.strip(), f"Document {d} must not be empty"
+
+    manifest_path = "src-tauri/py-runtime/manifest.json"
+    assert os.path.isfile(manifest_path), f"Document {manifest_path} must exist"
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        assert data is not None and data.get("bundle_sha256"), "Runtime manifest must be valid JSON"
 
 
 def test_frontend_typecheck_and_build():

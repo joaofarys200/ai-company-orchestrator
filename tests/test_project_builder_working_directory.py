@@ -52,6 +52,8 @@ class ProjectBuilderWorkingDirectoryTest(unittest.IsolatedAsyncioTestCase):
 
         workspace_root = Path(ag_tools.resolve_workspace_path("."))
         root_test = workspace_root / "src" / "test.js"
+        src_dir_existed = root_test.parent.exists()
+        root_test.parent.mkdir(parents=True, exist_ok=True)
         root_existed = root_test.exists()
         root_bytes = root_test.read_bytes() if root_existed else None
         root_test.write_text("console.log('WRONG_ROOT_FILE');\n", encoding="utf-8")
@@ -64,6 +66,11 @@ class ProjectBuilderWorkingDirectoryTest(unittest.IsolatedAsyncioTestCase):
                 root_test.write_bytes(root_bytes or b"")
             else:
                 root_test.unlink(missing_ok=True)
+                if not src_dir_existed:
+                    try:
+                        root_test.parent.rmdir()
+                    except OSError:
+                        pass
 
         self.assertTrue(result.ok)
         self.assertEqual(result.exit_code, 0)
