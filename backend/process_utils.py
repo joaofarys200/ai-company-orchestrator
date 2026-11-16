@@ -92,6 +92,7 @@ _LOG_LOCK = threading.Lock()
 _GUARD_LOCK = threading.Lock()
 _GUARD_INSTALLED = False
 _ASYNCIO_GUARD_INSTALLED = False
+_MP_GUARD_INSTALLED = False
 _LOG_GUARD = threading.local()
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -639,8 +640,7 @@ def install_windows_no_window_subprocess_guard() -> bool:
                 existing_flags = int(kwargs.get("creationflags", 0) or 0)
                 if not (existing_flags & WIN_CREATE_NEW_CONSOLE):
                     kwargs["creationflags"] = no_window_creationflags(existing_flags)
-                if kwargs.get("startupinfo") is None:
-                    kwargs["startupinfo"] = hidden_startupinfo()
+                    kwargs["startupinfo"] = hidden_startupinfo(kwargs.get("startupinfo"))
 
             caller = _caller_summary()
             target = _extract_target(args, kwargs.get("executable"))
@@ -700,5 +700,87 @@ def install_windows_no_window_subprocess_guard() -> bool:
         subprocess.Popen.communicate = _guarded_popen_comm  # type: ignore[method-assign]
 
         _install_asyncio_subprocess_guard()
+        _install_windows_multiprocessing_no_window_guard()
         _GUARD_INSTALLED = True
         return True
+
+
+class _NoWindowMpWinApiProxy:
+    """Proxies `multiprocessing.popen_spawn_win32._winapi` to enforce `CREATE_NO_WINDOW`."""
+
+    def __init__(self, wrapped: Any) -> None:
+        self._wrapped = wrapped
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._wrapped, name)
+
+    def CreateProcess(
+        self,
+        application_name: Any,
+        command_line: Any,
+        proc_attrs: Any,
+        thread_attrs: Any,
+        inherit_handles: Any,
+        creation_flags: int,
+        env_mapping: Any,
+        current_directory: Any,
+        startup_info: Any,
+    ) -> Any:
+        flags = int(creation_flags or 0)
+        if not (flags & WIN_CREATE_NEW_CONSOLE):
+            flags = no_window_creationflags(flags)
+            startup_info = hidden_startupinfo(startup_info)
+
+        caller = _caller_summary()
+        target = _extract_target(command_line, application_name)
+        try:
+            res = self._wrapped.CreateProcess(
+                application_name,
+                command_line,
+                proc_attrs,
+                thread_attrs,
+                inherit_handles,
+                flags,
+                env_mapping,
+                current_directory,
+                startup_info,
+            )
+        except Exception as exc:
+            log_process_event(
+                "mp_process_error",
+                target=target,
+                args=command_line,
+                creationflags=flags,
+                caller=caller,
+                extra={"error": f"{type(exc).__name__}: {exc}"},
+            )
+            raise
+
+        pid = res[2] if isinstance(res, tuple) and len(res) >= 3 else None
+        log_process_event(
+            "mp_process_start",
+            target=target,
+            args=command_line,
+            pid=pid,
+            creationflags=flags,
+            caller=caller,
+        )
+        return res
+
+
+def _install_windows_multiprocessing_no_window_guard() -> None:
+    """Wraps `multiprocessing.popen_spawn_win32._winapi.CreateProcess` on Windows."""
+    global _MP_GUARD_INSTALLED
+    if os.name != "nt" or _MP_GUARD_INSTALLED:
+        return
+    try:
+        import multiprocessing.popen_spawn_win32 as popen_spawn_win32
+    except Exception:
+        return
+
+    current = getattr(popen_spawn_win32, "_winapi", None)
+    if current is None or isinstance(current, _NoWindowMpWinApiProxy):
+        _MP_GUARD_INSTALLED = True
+        return
+    popen_spawn_win32._winapi = _NoWindowMpWinApiProxy(current)  # type: ignore[assignment]
+    _MP_GUARD_INSTALLED = True

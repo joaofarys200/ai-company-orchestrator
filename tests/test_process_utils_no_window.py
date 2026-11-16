@@ -317,3 +317,58 @@ def test_no_unwrapped_subprocess_calls_in_runtime_modules() -> None:
                 missing.append(f"{rel.as_posix()}:{node.lineno} ({call_name})")
 
     assert not missing, f"Bare subprocess calls missing hidden kwargs/flags: {missing}"
+
+
+def test_multiprocessing_spawn_and_swarm_federation_suppress_console_windows(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    if os.name != "nt":
+        pytest.skip("Windows-specific multiprocessing spawn check")
+
+    import concurrent.futures
+    import multiprocessing as mp
+    import multiprocessing.popen_spawn_win32 as popen_spawn_win32
+
+    from agents.swarm_federation import SwarmIsolationMode, _create_spawn_process_pool
+
+    logs_dir = tmp_path / "mp_logs"
+    monkeypatch.setenv("JARVIS_LOG_DIR", str(logs_dir))
+    process_utils.install_windows_no_window_subprocess_guard()
+
+    wrapped_winapi = popen_spawn_win32._winapi
+    assert isinstance(wrapped_winapi, process_utils._NoWindowMpWinApiProxy)
+
+    captured: list[tuple[int, object]] = []
+    orig_inner = wrapped_winapi._wrapped
+
+    class _SpyWinApi:
+        def __getattr__(self, name: str):
+            return getattr(orig_inner, name)
+
+        def CreateProcess(self, app, cmd, pa, ta, inh, flags, env, cwd, si):
+            captured.append((flags, si))
+            return orig_inner.CreateProcess(app, cmd, pa, ta, inh, flags, env, cwd, si)
+
+    monkeypatch.setattr(wrapped_winapi, "_wrapped", _SpyWinApi())
+
+    # Spawn a real ProcessPoolExecutor worker via SwarmFederation helper
+    assert SwarmIsolationMode.PROCESS.value == "PROCESS"
+    with _create_spawn_process_pool(1) as pool:
+        fut = pool.submit(os.getpid)
+        worker_pid = fut.result(timeout=20)
+        assert isinstance(worker_pid, int) and worker_pid != os.getpid()
+
+    assert len(captured) >= 1
+    flags, si = captured[0]
+    assert flags & process_utils.WIN_CREATE_NO_WINDOW
+    assert (flags & process_utils.WIN_DETACHED_PROCESS) == 0
+    assert int(getattr(si, "dwFlags", 0)) & process_utils.WIN_STARTF_USESHOWWINDOW
+    assert int(getattr(si, "wShowWindow", -1)) == process_utils.WIN_SW_HIDE
+
+    entries = [
+        json.loads(line.strip())
+        for line in (logs_dir / "processes.log").read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert any(e.get("event") == "mp_process_start" and e.get("pid") == worker_pid for e in entries)

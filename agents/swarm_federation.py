@@ -70,8 +70,25 @@ from agents.swarm_coordinator import (
 )
 from agents.task_graph import FailureCategory, FailureInfo, TaskGraph, TaskNode, TaskStatus
 from backend.logging_config import get_logger, log_event
+from backend.process_utils import install_windows_no_window_subprocess_guard
 
 logger = get_logger(__name__)
+
+
+def _swarm_worker_bootstrap() -> None:
+    """Installs windowless subprocess defaults inside spawned SwarmFederation workers."""
+    install_windows_no_window_subprocess_guard()
+
+
+def _create_spawn_process_pool(max_workers: int) -> concurrent.futures.ProcessPoolExecutor:
+    """Creates a Windows-safe `ProcessPoolExecutor` with `CREATE_NO_WINDOW` guard active."""
+    install_windows_no_window_subprocess_guard()
+    ctx = mp.get_context("spawn")
+    return concurrent.futures.ProcessPoolExecutor(
+        max_workers=max_workers,
+        mp_context=ctx,
+        initializer=_swarm_worker_bootstrap,
+    )
 
 
 # ── ENUMS & VALUE OBJECTS ──────────────────────────────────────────────────────
@@ -717,11 +734,7 @@ class SubSwarmWorkerPool:
         with self._lock:
             if self._executor is None:
                 t0 = time.perf_counter()
-                ctx = mp.get_context("spawn")
-                self._executor = concurrent.futures.ProcessPoolExecutor(
-                    max_workers=self.max_workers,
-                    mp_context=ctx,
-                )
+                self._executor = _create_spawn_process_pool(self.max_workers)
                 self.worker_startup_count += self.max_workers
                 self._spawn_latency_ms = (time.perf_counter() - t0) * 1000.0
                 self._is_warm = True
@@ -741,11 +754,7 @@ class SubSwarmWorkerPool:
                 self._executor = None
             self.crash_count += 1
             self.replacement_count += 1
-            ctx = mp.get_context("spawn")
-            self._executor = concurrent.futures.ProcessPoolExecutor(
-                max_workers=self.max_workers,
-                mp_context=ctx,
-            )
+            self._executor = _create_spawn_process_pool(self.max_workers)
             self.worker_startup_count += self.max_workers
             self._safe_emit(
                 FederatedEventType.WORKER_REPLACED.value,
@@ -764,11 +773,7 @@ class SubSwarmWorkerPool:
                     except Exception:
                         pass
                     self._executor = None
-                ctx = mp.get_context("spawn")
-                self._executor = concurrent.futures.ProcessPoolExecutor(
-                    max_workers=self.max_workers,
-                    mp_context=ctx,
-                )
+                self._executor = _create_spawn_process_pool(self.max_workers)
                 self.worker_startup_count += self.max_workers
                 self._safe_emit(
                     FederatedEventType.WORKER_POOL_SCALED.value,
@@ -2329,11 +2334,7 @@ class SwarmFederation:
             return proc_b.pool.get_executor()
         else:
             if self._executor is None:
-                ctx = mp.get_context("spawn")
-                self._executor = concurrent.futures.ProcessPoolExecutor(
-                    max_workers=self.max_workers,
-                    mp_context=ctx,
-                )
+                self._executor = _create_spawn_process_pool(self.max_workers)
             return self._executor
 
     def shutdown_worker_pool(self) -> None:
