@@ -270,7 +270,6 @@ describe('TauriTransportAdapter native IPC mode', () => {
     });
 
     const adapter = new TauriTransportAdapter({
-      preferHybridFallback: false,
       tauriApis: harness.apis,
       nowFn: () => fakeNow,
     });
@@ -394,7 +393,6 @@ describe('TauriTransportAdapter native IPC mode', () => {
       openPathError: new Error('Path outside allowed study roots'),
     });
     const adapter = new TauriTransportAdapter({
-      preferHybridFallback: false,
       tauriApis: harness.apis,
     });
     adapter.connect();
@@ -413,7 +411,6 @@ describe('TauriTransportAdapter native IPC mode', () => {
       },
     });
     const adapter2 = new TauriTransportAdapter({
-      preferHybridFallback: false,
       tauriApis: harnessWithCancel.apis,
     });
     adapter2.connect();
@@ -436,66 +433,7 @@ describe('TauriTransportAdapter native IPC mode', () => {
   });
 });
 
-describe('TauriTransportAdapter hybrid coexistence mode', () => {
-  it('routes legacy WS commands to fallback WS while handling native commands and system APIs over Tauri', async () => {
-    let lastSocket: MockWebSocket | null = null;
-    const harness = createMockTauriHarness({
-      onInvokeDispatch: (args, emit) => {
-        const msg = args?.message as { type: string; request_id?: string };
-        if (msg?.type === 'study_get_document') {
-          emit({
-            type: 'study_document_details',
-            request_id: msg.request_id,
-            document: { document_id: 'doc-native', title: 'Native' },
-          });
-        }
-        return null;
-      },
-    });
-
-    const adapter = new TauriTransportAdapter({
-      preferHybridFallback: true,
-      nativeRpcCommands: ['study_get_document'],
-      tauriApis: harness.apis,
-      createWebSocket: (url) => {
-        lastSocket = new MockWebSocket(url);
-        return lastSocket;
-      },
-    });
-
-    const receivedTypes: string[] = [];
-    adapter.subscribeAny((msg) => {
-      receivedTypes.push(msg.type);
-    });
-
-    adapter.connect();
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    lastSocket!.simulateOpen();
-
-    assert.equal(adapter.system.getStatus().backend, 'tauri-hybrid');
-    assert.equal(adapter.system.getHttpBaseUrl(), 'http://127.0.0.1:8000');
-
-    // Domain message goes to fallback WS
-    assert.equal(adapter.send({ type: 'study_list_documents' }), true);
-    assert.equal(lastSocket!.sentPayloads.length, 1);
-    assert.equal(JSON.parse(lastSocket!.sentPayloads[0]).type, 'study_list_documents');
-
-    // Native command goes to Tauri invoke
-    const doc = await adapter.invoke<{ type: string }>({
-      type: 'study_get_document',
-      document_id: 'doc-native',
-    });
-    assert.equal(doc.type, 'study_document_details');
-    assert.equal(lastSocket!.sentPayloads.length, 1);
-
-    // Events from WS flow to unified subscribers
-    lastSocket!.simulateServerJson({ type: 'system_status', cpu: 10, memory: 20 });
-    assert.ok(receivedTypes.includes('study_document_details'));
-    assert.ok(receivedTypes.includes('system_status'));
-
-    adapter.dispose();
-  });
-
+describe('TauriTransportAdapter domain dispatch & loopback tokens', () => {
   it('routes domain commands and native cancellation cleanly in pure Tauri IPC mode', async () => {
     const dispatchedTypes: string[] = [];
     const harness = createMockTauriHarness({
@@ -515,7 +453,6 @@ describe('TauriTransportAdapter hybrid coexistence mode', () => {
     });
 
     const adapter = new TauriTransportAdapter({
-      preferHybridFallback: false,
       tauriApis: harness.apis,
     });
     adapter.connect();
@@ -558,7 +495,6 @@ describe('TauriTransportAdapter hybrid coexistence mode', () => {
     });
 
     const adapter = new TauriTransportAdapter({
-      preferHybridFallback: false,
       tauriApis: harness.apis,
     });
 
@@ -601,7 +537,6 @@ describe('TauriTransportAdapter hybrid coexistence mode', () => {
       }),
     });
     const earlyAdapter = new TauriTransportAdapter({
-      preferHybridFallback: false,
       tauriApis: slowHarness.apis,
       getHttpToken: () => 'window-fallback-token',
     });

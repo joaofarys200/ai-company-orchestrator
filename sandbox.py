@@ -11,6 +11,7 @@ from urllib.parse import quote
 from backend.errors import safe_user_error
 from backend.health import check_sandbox_runtime
 from backend.logging_config import get_logger, log_event
+from backend.process_utils import hidden_subprocess_kwargs
 
 
 logger = get_logger(__name__)
@@ -334,10 +335,12 @@ def _preflight_check_node_project(package_dir: str, on_output_callback) -> bool:
         # 1. Node syntax check
         check_proc = subprocess.run(
             ["node", "--check", entrypoint],
-            cwd=package_dir,
-            text=True,
-            capture_output=True,
-            timeout=10,
+            **hidden_subprocess_kwargs(
+                cwd=package_dir,
+                text=True,
+                capture_output=True,
+                timeout=10,
+            ),
         )
         if check_proc.returncode != 0:
             on_output_callback(f"[JARVIS Preflight Error] Erro de sintaxe detetado em {entrypoint}:\n{check_proc.stderr}\n")
@@ -423,11 +426,13 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
                 if should_install:
                     install_proc = subprocess.run(
                         "npm install",
-                        cwd=package_dir,
-                        shell=True,
-                        text=True,
-                        capture_output=True,
-                        timeout=180
+                        **hidden_subprocess_kwargs(
+                            cwd=package_dir,
+                            shell=True,
+                            text=True,
+                            capture_output=True,
+                            timeout=180,
+                        ),
                     )
                     if install_proc.returncode != 0:
                         on_output_callback(f"[Sandbox Error] npm install failed:\n{install_proc.stderr}\n")
@@ -435,11 +440,13 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
 
                 project_process = subprocess.Popen(
                     f"npm run {script_name}",
-                    cwd=package_dir,
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True
+                    **hidden_subprocess_kwargs(
+                        cwd=package_dir,
+                        shell=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                    ),
                 )
 
                 if project_process.stdout:
@@ -474,10 +481,12 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
                     on_output_callback("[Sandbox] requirements.txt detected. Installing backend dependencies...\n")
                     install_proc = subprocess.run(
                         [python_cmd, "-m", "pip", "install", "-r", requirements_path],
-                        cwd=script_dir,
-                        text=True,
-                        capture_output=True,
-                        timeout=180,
+                        **hidden_subprocess_kwargs(
+                            cwd=script_dir,
+                            text=True,
+                            capture_output=True,
+                            timeout=180,
+                        ),
                     )
                     if install_proc.returncode != 0:
                         on_output_callback(f"[Sandbox Error] pip install failed:\n{install_proc.stderr}\n")
@@ -485,10 +494,12 @@ def run_custom_project(on_output_callback, root_dir: str | None = None, allow_de
 
                 project_process = subprocess.Popen(
                     [python_cmd, "-u", script_name],
-                    cwd=script_dir,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True
+                    **hidden_subprocess_kwargs(
+                        cwd=script_dir,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                    ),
                 )
                 if project_process.stdout:
                     for line in project_process.stdout:
@@ -532,8 +543,7 @@ def stop_custom_project():
             if sys.platform == "win32":
                 subprocess.run(
                     ["taskkill", "/F", "/T", "/PID", str(process.pid)],
-                    shell=False,
-                    capture_output=True,
+                    **hidden_subprocess_kwargs(shell=False, capture_output=True),
                 )
             else:
                 process.terminate()

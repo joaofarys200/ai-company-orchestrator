@@ -9,6 +9,7 @@ import json
 import subprocess
 from typing import Dict, List
 
+from backend.process_utils import hidden_subprocess_kwargs
 from security.sentinel.collectors.base import BaseCollector
 from security.sentinel.contracts import EventCategory, SecurityEvidence, WindowsSecurityStatus
 
@@ -26,10 +27,12 @@ class WindowsSecurityEventsCollector(BaseCollector):
         try:
             res = subprocess.run(
                 ["powershell", "-NoProfile", "-Command", cmd],
-                capture_output=True,
-                text=True,
-                timeout=8,
-                check=False,
+                **hidden_subprocess_kwargs(
+                    capture_output=True,
+                    text=True,
+                    timeout=8,
+                    check=False,
+                ),
             )
             if res.returncode == 0 and res.stdout.strip():
                 data = json.loads(res.stdout)
@@ -46,10 +49,12 @@ class WindowsSecurityEventsCollector(BaseCollector):
         try:
             res = subprocess.run(
                 ["powershell", "-NoProfile", "-Command", cmd],
-                capture_output=True,
-                text=True,
-                timeout=8,
-                check=False,
+                **hidden_subprocess_kwargs(
+                    capture_output=True,
+                    text=True,
+                    timeout=8,
+                    check=False,
+                ),
             )
             if res.returncode == 0 and res.stdout.strip():
                 data = json.loads(res.stdout)

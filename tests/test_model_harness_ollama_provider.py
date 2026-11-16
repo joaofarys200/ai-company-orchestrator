@@ -202,6 +202,75 @@ class OllamaChatProviderTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.usage.total_tokens, 11)
         self.assertIn(("stream_completed", "COMPLETED"), events)
 
+    async def test_raise_for_status_preserves_ollama_server_error_detail(self):
+        async def handler(_request):
+            return httpx.Response(
+                500,
+                json={"error": "llama-server reported out-of-memory during startup"},
+            )
+
+        provider = OllamaChatProvider(
+            base_url="http://ollama.invalid",
+            default_model="local-model",
+            transport=httpx.MockTransport(handler),
+        )
+        request = ModelRequest(
+            task_profile="CODE_REASONING",
+            system_prompt="system",
+            user_prompt="hello",
+            expected_output=ExpectedOutput(format=OutputFormat.TEXT),
+            execution_constraints=ExecutionConstraints(timeout_seconds=5, streaming=False, thinking=False),
+        )
+        with self.assertRaises(httpx.HTTPStatusError) as ctx:
+            await provider.generate(
+                request,
+                ModelRoute(
+                    provider="ollama",
+                    model="local-model",
+                    mode="chat",
+                    streaming=False,
+                    thinking=False,
+                ),
+                None,
+            )
+        self.assertEqual(ctx.exception.response.status_code, 500)
+        self.assertIn("llama-server reported out-of-memory", str(ctx.exception))
+
+    def test_ensure_local_daemon_running_uses_breakaway_without_detached_process(self):
+        import os
+        import shutil
+        import subprocess
+        from unittest.mock import patch
+
+        provider = OllamaChatProvider(
+            base_url="http://127.0.0.1:11434",
+            default_model="local-model",
+            transport=None,
+        )
+        calls = []
+
+        def fake_popen(cmd, **kwargs):
+            calls.append((cmd, kwargs.get("creationflags", 0)))
+            if len(calls) == 1 and os.name == "nt":
+                # Simulate restricted parent job rejecting breakaway on first try
+                raise OSError(5, "Access is denied")
+            return object()
+
+        with patch.object(shutil, "which", return_value="ollama.exe"), patch.object(
+            subprocess, "Popen", side_effect=fake_popen
+        ):
+            started = provider._ensure_local_daemon_running()
+
+        self.assertTrue(started)
+        if os.name == "nt":
+            no_window = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
+            detached = getattr(subprocess, "DETACHED_PROCESS", 0x00000008)
+            breakaway = getattr(subprocess, "CREATE_BREAKAWAY_FROM_JOB", 0x01000000)
+            self.assertEqual(len(calls), 2)
+            self.assertEqual(calls[0][1], no_window | breakaway)
+            self.assertEqual(calls[0][1] & detached, 0)
+            self.assertEqual(calls[1][1], no_window)
+
 
 if __name__ == "__main__":
     unittest.main()

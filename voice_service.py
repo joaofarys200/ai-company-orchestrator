@@ -1,9 +1,18 @@
 import os
 import time
 import threading
-import numpy as np
-import webrtcvad
-import sounddevice as sd
+try:
+    import numpy as np
+except ImportError:
+    np = None
+try:
+    import webrtcvad
+except ImportError:
+    webrtcvad = None
+try:
+    import sounddevice as sd
+except ImportError:
+    sd = None
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -86,7 +95,7 @@ class VoiceService:
 
     def configure_detection(self):
         self.vad_sensitivity = self._env_int("VOICE_VAD_SENSITIVITY", self.default_sensitivity, 0, 3)
-        self.vad = webrtcvad.Vad(self.vad_sensitivity)
+        self.vad = webrtcvad.Vad(self.vad_sensitivity) if webrtcvad is not None else None
         default_rms = self._env_float("VOICE_INTERRUPT_RMS_THRESHOLD", 900.0, 0.0, 32768.0)
         self.rms_threshold = self._env_float("VOICE_RMS_THRESHOLD", default_rms, 0.0, 32768.0)
         self.min_speech_ms = self._env_int("VOICE_MIN_SPEECH_MS", 240, 0, 3000)
@@ -114,8 +123,11 @@ class VoiceService:
         raw_bytes = audio_frame.tobytes()
         
         try:
-            rms = float(np.sqrt(np.mean(audio_frame.astype(np.float32) ** 2))) if audio_frame.size else 0.0
-            is_speech = self.vad.is_speech(raw_bytes, self.sample_rate) and rms >= self.rms_threshold
+            rms = float(np.sqrt(np.mean(audio_frame.astype(np.float32) ** 2))) if (np is not None and audio_frame.size) else 0.0
+            if self.vad is not None:
+                is_speech = self.vad.is_speech(raw_bytes, self.sample_rate) and rms >= self.rms_threshold
+            else:
+                is_speech = rms >= self.rms_threshold
         except Exception as e:
             is_speech = False
             rms = 0.0
@@ -195,6 +207,8 @@ class VoiceService:
     def start(self):
         if self.is_listening:
             return
+        if sd is None or np is None:
+            raise RuntimeError("Dependências de áudio (sounddevice/numpy) indisponíveis neste runtime.")
             
         # Re-read environment variables on start to catch runtime changes in .env
         load_dotenv()

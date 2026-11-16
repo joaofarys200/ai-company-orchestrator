@@ -14,6 +14,7 @@ import subprocess
 import time
 from typing import Any, Dict, List, Optional, Set, Tuple
 
+from backend.process_utils import hidden_subprocess_kwargs
 from intelligence.typescript_dependency.models import (
     BoundaryType,
     ConfidenceClass,
@@ -484,10 +485,12 @@ class TypeScriptSyntaxParser:
         """Bridge invocation to Node.js TypeScript compiler API."""
         proc = subprocess.run(
             ["node", cls.NODE_AST_PARSER_SCRIPT, "--single", abs_path],
-            input=content,
-            capture_output=True,
-            text=True,
-            timeout=5.0,
+            **hidden_subprocess_kwargs(
+                input=content,
+                capture_output=True,
+                text=True,
+                timeout=5.0,
+            ),
         )
         if proc.returncode != 0:
             return None

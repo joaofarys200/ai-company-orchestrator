@@ -17,6 +17,7 @@ try:
 except ImportError:
     winreg = None
 
+from backend.process_utils import hidden_subprocess_kwargs
 from security.sentinel.collectors.base import BaseCollector
 from security.sentinel.contracts import EventCategory, PersistenceItem, SecurityEvidence
 
@@ -106,10 +107,12 @@ class PersistenceCollector(BaseCollector):
         try:
             res = subprocess.run(
                 ["schtasks", "/query", "/fo", "CSV", "/nh"],
-                capture_output=True,
-                text=True,
-                timeout=10,
-                check=False,
+                **hidden_subprocess_kwargs(
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                    check=False,
+                ),
             )
             if res.returncode == 0 and res.stdout:
                 reader = csv.reader(io.StringIO(res.stdout))

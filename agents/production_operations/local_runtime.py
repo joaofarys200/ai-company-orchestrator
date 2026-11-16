@@ -13,6 +13,7 @@ import subprocess
 import sys
 import time
 from typing import Any, Dict, List, Optional, Tuple
+from backend.process_utils import hidden_subprocess_kwargs
 from .models import OperationalState, RuntimeTarget
 
 
@@ -82,10 +83,12 @@ class LocalRuntimeController:
         try:
             proc = subprocess.Popen(
                 cmd,
-                cwd=cwd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
+                **hidden_subprocess_kwargs(
+                    cwd=cwd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                ),
             )
             self._managed_processes[name] = proc
             self._process_logs[name] = [f"Started with PID {proc.pid} at {time.time()}"]

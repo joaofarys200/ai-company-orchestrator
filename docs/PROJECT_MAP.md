@@ -12,10 +12,10 @@ JARVIS OS (ai-company-orchestrator)
 ├── backend/                 # Domain dispatcher, contracts, Model Harness, runtime_bridge, agents/ alias
 ├── config/                  # Global system configuration and runtime parameters
 ├── diagnostics/             # Environment diagnostic tools and system telemetry scripts
-├── docs/                    # Architectural specifications, benchmark reports, diagrams, and ADRs
+├── docs/                    # Architectural specifications, benchmark reports, assets, diagrams, and ADRs
+│   ├── assets/              # Visual product screenshots linked in documentation
 │   ├── decisions/           # Architecture Decision Records (ADR-001 to ADR-006)
 │   └── diagrams/            # Standalone vector SVG architecture diagrams (01 to 10)
-├── evidence/                # Verified test run evidence (screenshots, DOM dumps, event logs)
 ├── frontend/                # React 19 + Vite + Tailwind + Monaco Editor + JarvisTransport desktop HUD
 ├── intelligence/            # Coding Agent 2.0 (AST repair, repo graph, semantic resolver, build loop)
 ├── obsidian_vault/          # Plain-text Markdown Knowledge Vault and Cornell study guides
@@ -73,8 +73,6 @@ JARVIS OS (ai-company-orchestrator)
   - `tsconfig_resolver.py`: TSConfig path mapping and alias resolution (`@/*`).
   - `cross_file_validator.py`: Multi-file contract alignment and signature verification.
   - `build_pipeline.py`: Compilation and linter verification (`py_compile`, `tsc`, `eslint`).
-  - `autonomous_repair_loop.py`: Automatic feedback and AST repair loop on build/test failures.
-  - `failure_memory.py`: Bank of broken patch patterns to prevent repeating buggy attempts.
 - **Test Suites**: `tests/test_project_context.py`, `tests/test_coding_session.py`, `tests/test_repository_graph.py`.
 
 ---

@@ -21,6 +21,7 @@ use tokio::process::{Child, Command};
 use tokio::sync::{mpsc, Mutex, RwLock};
 use tokio::task::JoinHandle;
 
+use crate::logging::{redact_args, resolve_logs_dir, RotatingFileLogger};
 use crate::process::job_object::{JobObject, WORKER_CREATION_FLAGS};
 use crate::workers::rpc_client::{
     ReverseRpcHandler, RpcCallError, WorkerHealth, WorkerRpcClient, WorkerStreamEvent,
@@ -164,6 +165,7 @@ const RUNTIME_WORKER_SAFE_ENV_KEYS: &[&str] = &[
     "GEMINI_OPENAI_BASE_URL",
     "HF_HOME",
     "HUGGINGFACE_HUB_CACHE",
+    "JARVIS_LOG_DIR",
     "JARVIS_MISSION_STALE_LOCK_SECONDS",
     "JARVIS_STATE_DIR",
     "JARVIS_STORAGE_BACKEND",
@@ -246,7 +248,81 @@ where
         "JARVIS_PROJECT_ROOT".to_string(),
         workspace_root.to_string_lossy().into_owned(),
     );
+    env.entry("JARVIS_LOG_DIR".to_string())
+        .or_insert_with(|| workspace_root.join("logs").to_string_lossy().into_owned());
+    env.insert(
+        "JARVIS_SUPERVISOR_PID".to_string(),
+        std::process::id().to_string(),
+    );
     env
+}
+
+/// Parses `.env` key-value pairs cleanly without mutating the parent process environment.
+fn parse_dotenv_entries(content: &str) -> Vec<(String, String)> {
+    let mut entries = Vec::new();
+    for raw_line in content.lines() {
+        let mut line = raw_line.trim_start_matches('\u{feff}').trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        if let Some(rest) = line.strip_prefix("export ") {
+            line = rest.trim_start();
+        }
+        let Some((raw_key, raw_val)) = line.split_once('=') else {
+            continue;
+        };
+        let key = raw_key.trim();
+        if key.is_empty() || !key.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+            continue;
+        }
+        let val_trimmed = raw_val.trim();
+        let value = if val_trimmed.starts_with('"') || val_trimmed.starts_with('\'') {
+            let quote = val_trimmed.chars().next().unwrap_or('"');
+            let mut extracted = String::new();
+            let mut escaped = false;
+            let mut closed = false;
+            for ch in val_trimmed[1..].chars() {
+                if quote == '"' && escaped {
+                    match ch {
+                        'n' => extracted.push('\n'),
+                        'r' => extracted.push('\r'),
+                        't' => extracted.push('\t'),
+                        _ => extracted.push(ch),
+                    }
+                    escaped = false;
+                } else if quote == '"' && ch == '\\' {
+                    escaped = true;
+                } else if ch == quote {
+                    closed = true;
+                    break;
+                } else {
+                    extracted.push(ch);
+                }
+            }
+            if closed {
+                extracted
+            } else {
+                val_trimmed.to_string()
+            }
+        } else {
+            let without_comment = val_trimmed
+                .split(" #")
+                .next()
+                .unwrap_or(val_trimmed)
+                .trim();
+            without_comment.to_string()
+        };
+        entries.push((key.to_string(), value));
+    }
+    entries
+}
+
+fn load_workspace_dotenv(workspace_root: &Path) -> Vec<(String, String)> {
+    let dotenv_path = workspace_root.join(".env");
+    let Ok(content) = std::fs::read_to_string(dotenv_path) else {
+        return Vec::new();
+    };
+    parse_dotenv_entries(&content)
 }
 
 pub fn build_worker_environment(
@@ -254,7 +330,20 @@ pub fn build_worker_environment(
     workspace_root: &Path,
     canonical_db: &Path,
 ) -> BTreeMap<String, String> {
-    build_worker_environment_from_iter(role, workspace_root, canonical_db, std::env::vars())
+    let os_vars: Vec<(String, String)> = std::env::vars().collect();
+    let os_upper: HashSet<String> = os_vars
+        .iter()
+        .map(|(k, _)| k.to_ascii_uppercase())
+        .collect();
+    let dotenv_vars = load_workspace_dotenv(workspace_root)
+        .into_iter()
+        .filter(|(k, _)| !os_upper.contains(&k.to_ascii_uppercase()));
+    build_worker_environment_from_iter(
+        role,
+        workspace_root,
+        canonical_db,
+        dotenv_vars.chain(os_vars),
+    )
 }
 
 /// Resolves the JARVIS OS workspace root containing `workers/worker_boot.py`.
@@ -352,6 +441,10 @@ pub struct ManagedWorker {
     child: Mutex<Child>,
     stderr_lines: Arc<Mutex<VecDeque<String>>>,
     stderr_task: Mutex<Option<JoinHandle<()>>>,
+    workers_log: RotatingFileLogger,
+    role_log: RotatingFileLogger,
+    target_bin: String,
+    redacted_args: Vec<String>,
 }
 
 /// Ensures that if a packaged `py-runtime/runtime-bundle.zip` (or pre-extracted
@@ -425,21 +518,71 @@ pub fn ensure_bundled_python_runtime(
         } else {
             PathBuf::from("tar")
         };
-        let mut extract_cmd = std::process::Command::new(tar_cmd);
+        let logs_dir = resolve_logs_dir(workspace_root);
+        let runtime_log = RotatingFileLogger::for_stream(&logs_dir, "runtime.log");
+        let raw_args = vec![
+            "-xf".to_string(),
+            bundle_zip.to_string_lossy().into_owned(),
+            "-C".to_string(),
+            target_dir.to_string_lossy().into_owned(),
+        ];
+        let safe_args = redact_args(&raw_args);
+        let target_str = tar_cmd.to_string_lossy().into_owned();
+        runtime_log.log_event(
+            "extract_start",
+            json!({
+                "target": target_str,
+                "args": safe_args,
+            }),
+        );
+
+        let mut extract_cmd = std::process::Command::new(&tar_cmd);
         extract_cmd
-            .arg("-xf")
-            .arg(&bundle_zip)
-            .arg("-C")
-            .arg(&target_dir);
+            .args(&raw_args)
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
         #[cfg(windows)]
         {
             use std::os::windows::process::CommandExt;
             extract_cmd.creation_flags(WORKER_CREATION_FLAGS);
         }
-        let status = extract_cmd.status().ok()?;
-        if !status.success() {
+        let output = match extract_cmd.output() {
+            Ok(out) => out,
+            Err(err) => {
+                runtime_log.log_event(
+                    "extract_failed",
+                    json!({
+                        "target": target_str,
+                        "args": safe_args,
+                        "error": err.to_string(),
+                    }),
+                );
+                return None;
+            }
+        };
+        let exit_code = output.status.code();
+        if !output.status.success() {
+            let stderr_text = String::from_utf8_lossy(&output.stderr).into_owned();
+            runtime_log.log_event(
+                "extract_failed",
+                json!({
+                    "target": target_str,
+                    "args": safe_args,
+                    "exit_code": exit_code,
+                    "stderr": stderr_text,
+                }),
+            );
             return None;
         }
+        runtime_log.log_event(
+            "extract_ok",
+            json!({
+                "target": target_str,
+                "args": safe_args,
+                "exit_code": exit_code,
+            }),
+        );
         let _ = std::fs::write(&stamp_file, &expected_stamp);
     }
 
@@ -561,12 +704,23 @@ impl ManagedWorker {
         }
         worker_env.insert("PYTHONPATH".to_string(), python_path_entries.join(path_sep));
 
+        let logs_dir = resolve_logs_dir(&config.workspace_root);
+        let workers_log = RotatingFileLogger::for_stream(&logs_dir, "workers.log");
+        let role_log =
+            RotatingFileLogger::for_stream(&logs_dir, &format!("worker-{}.log", role.as_str()));
+
+        let spawn_args = vec![
+            "-u".to_string(),
+            script_path.to_string_lossy().into_owned(),
+            "--worker".to_string(),
+            role.as_str().to_string(),
+        ];
+        let safe_args = redact_args(&spawn_args);
+        let target_bin = python_bin.to_string_lossy().into_owned();
+
         let mut cmd = Command::new(&python_bin);
         cmd.env_clear()
-            .arg("-u")
-            .arg(&script_path)
-            .arg("--worker")
-            .arg(role.as_str())
+            .args(&spawn_args)
             .current_dir(&config.workspace_root)
             .envs(&worker_env)
             .stdin(Stdio::piped())
@@ -579,15 +733,55 @@ impl ManagedWorker {
             cmd.creation_flags(WORKER_CREATION_FLAGS);
         }
 
-        let mut child = cmd.spawn().map_err(|err| {
-            RpcCallError::TransportClosed(format!(
-                "Failed to spawn {} worker via {}: {err}",
-                role.as_str(),
-                python_bin.display()
-            ))
-        })?;
+        let mut child = match cmd.spawn() {
+            Ok(child) => child,
+            Err(err) => {
+                let msg = format!(
+                    "Failed to spawn {} worker via {}: {err}",
+                    role.as_str(),
+                    python_bin.display()
+                );
+                workers_log.log_event(
+                    "worker_spawn_failed",
+                    json!({
+                        "role": role.as_str(),
+                        "target": target_bin,
+                        "args": safe_args,
+                        "error": msg,
+                    }),
+                );
+                role_log.log_event(
+                    "worker_spawn_failed",
+                    json!({
+                        "role": role.as_str(),
+                        "target": target_bin,
+                        "args": safe_args,
+                        "error": err.to_string(),
+                    }),
+                );
+                return Err(RpcCallError::TransportClosed(msg));
+            }
+        };
 
         let pid = child.id().unwrap_or(0);
+        workers_log.log_event(
+            "worker_spawn",
+            json!({
+                "role": role.as_str(),
+                "target": target_bin,
+                "args": safe_args,
+                "pid": pid,
+            }),
+        );
+        role_log.log_event(
+            "worker_spawn",
+            json!({
+                "role": role.as_str(),
+                "target": target_bin,
+                "args": safe_args,
+                "pid": pid,
+            }),
+        );
 
         #[cfg(windows)]
         {
@@ -611,11 +805,13 @@ impl ManagedWorker {
 
         let stderr_lines = Arc::new(Mutex::new(VecDeque::with_capacity(MAX_STDERR_LINES)));
         let stderr_buf = Arc::clone(&stderr_lines);
+        let role_log_for_task = role_log.clone();
         let role_name = role.as_str();
         let stderr_task = tokio::spawn(async move {
             let mut reader = BufReader::new(stderr).lines();
             while let Ok(Some(line)) = reader.next_line().await {
                 eprintln!("[worker:{role_name}] {line}");
+                role_log_for_task.log_stream_line("stderr", Some(pid), &line);
                 let mut ring = stderr_buf.lock().await;
                 if ring.len() >= MAX_STDERR_LINES {
                     ring.pop_front();
@@ -635,8 +831,40 @@ impl ManagedWorker {
         let ready = match rpc.wait_ready(config.ready_timeout).await {
             Ok(info) => info,
             Err(err) => {
-                stderr_task.abort();
                 let _ = child.start_kill();
+                let exit_code = tokio::time::timeout(Duration::from_millis(250), child.wait())
+                    .await
+                    .ok()
+                    .and_then(|res| res.ok())
+                    .and_then(|st| st.code());
+                tokio::time::sleep(Duration::from_millis(20)).await;
+                stderr_task.abort();
+                let recent: Vec<String> = stderr_lines.lock().await.iter().cloned().collect();
+                workers_log.log_event(
+                    "worker_spawn_failed",
+                    json!({
+                        "role": role.as_str(),
+                        "target": target_bin,
+                        "args": safe_args,
+                        "pid": pid,
+                        "phase": "wait_ready",
+                        "exit_code": exit_code,
+                        "error": err.to_string(),
+                        "recent_stderr": recent,
+                    }),
+                );
+                role_log.log_event(
+                    "worker_spawn_failed",
+                    json!({
+                        "role": role.as_str(),
+                        "target": target_bin,
+                        "args": safe_args,
+                        "pid": pid,
+                        "phase": "wait_ready",
+                        "exit_code": exit_code,
+                        "error": err.to_string(),
+                    }),
+                );
                 return Err(err);
             }
         };
@@ -659,20 +887,74 @@ impl ManagedWorker {
             )
             .await
         {
-            stderr_task.abort();
             let _ = child.start_kill();
+            let exit_code = tokio::time::timeout(Duration::from_millis(250), child.wait())
+                .await
+                .ok()
+                .and_then(|res| res.ok())
+                .and_then(|st| st.code());
+            tokio::time::sleep(Duration::from_millis(20)).await;
+            stderr_task.abort();
+            let recent: Vec<String> = stderr_lines.lock().await.iter().cloned().collect();
+            workers_log.log_event(
+                "worker_spawn_failed",
+                json!({
+                    "role": role.as_str(),
+                    "target": target_bin,
+                    "args": safe_args,
+                    "pid": pid,
+                    "phase": "worker_init",
+                    "exit_code": exit_code,
+                    "error": err.to_string(),
+                    "recent_stderr": recent,
+                }),
+            );
+            role_log.log_event(
+                "worker_spawn_failed",
+                json!({
+                    "role": role.as_str(),
+                    "target": target_bin,
+                    "args": safe_args,
+                    "pid": pid,
+                    "phase": "worker_init",
+                    "exit_code": exit_code,
+                    "error": err.to_string(),
+                }),
+            );
             return Err(err);
         }
 
+        let resolved_pid = if ready.pid > 0 { ready.pid } else { pid };
+        workers_log.log_event(
+            "worker_ready",
+            json!({
+                "role": role.as_str(),
+                "pid": resolved_pid,
+                "capabilities_count": ready.capabilities.len(),
+            }),
+        );
+        role_log.log_event(
+            "worker_ready",
+            json!({
+                "role": role.as_str(),
+                "pid": resolved_pid,
+                "capabilities_count": ready.capabilities.len(),
+            }),
+        );
+
         Ok(Arc::new(Self {
             role,
-            pid: if ready.pid > 0 { ready.pid } else { pid },
+            pid: resolved_pid,
             capabilities: ready.capabilities,
             _job: job,
             rpc,
             child: Mutex::new(child),
             stderr_lines,
             stderr_task: Mutex::new(Some(stderr_task)),
+            workers_log,
+            role_log,
+            target_bin,
+            redacted_args: safe_args,
         }))
     }
 
@@ -692,14 +974,41 @@ impl ManagedWorker {
         self.stderr_lines.lock().await.iter().cloned().collect()
     }
 
+    pub async fn try_exit_code(&self) -> Option<i32> {
+        let mut child = self.child.lock().await;
+        match child.try_wait() {
+            Ok(Some(status)) => status.code(),
+            _ => None,
+        }
+    }
+
     pub async fn shutdown(&self, timeout: Duration) {
         let _ = self.rpc.graceful_shutdown(timeout).await;
+        let mut child = self.child.lock().await;
+        let exit_code = match child.try_wait() {
+            Ok(Some(status)) => status.code(),
+            _ => {
+                let _ = child.start_kill();
+                tokio::time::timeout(Duration::from_millis(500), child.wait())
+                    .await
+                    .ok()
+                    .and_then(|res| res.ok())
+                    .and_then(|st| st.code())
+            }
+        };
+        drop(child);
         if let Some(handle) = self.stderr_task.lock().await.take() {
             handle.abort();
         }
-        let mut child = self.child.lock().await;
-        let _ = child.start_kill();
-        let _ = tokio::time::timeout(Duration::from_millis(500), child.wait()).await;
+        let payload = json!({
+            "role": self.role.as_str(),
+            "target": self.target_bin,
+            "args": self.redacted_args,
+            "pid": self.pid,
+            "exit_code": exit_code,
+        });
+        self.workers_log.log_event("worker_shutdown", payload.clone());
+        self.role_log.log_event("worker_shutdown", payload);
     }
 }
 
@@ -725,6 +1034,7 @@ pub struct WorkerSupervisor {
     slots: HashMap<WorkerPoolRole, Arc<RoleSlot>>,
     reverse_handler: Arc<RwLock<Option<ReverseRpcHandler>>>,
     active_pids: Arc<std::sync::RwLock<HashSet<u32>>>,
+    process_log: RotatingFileLogger,
 }
 
 impl WorkerSupervisor {
@@ -733,11 +1043,14 @@ impl WorkerSupervisor {
         for &role in WorkerPoolRole::all_roles() {
             slots.insert(role, Arc::new(RoleSlot::new()));
         }
+        let logs_dir = resolve_logs_dir(&config.workspace_root);
+        let process_log = RotatingFileLogger::for_stream(&logs_dir, "workers.log");
         Self {
             config,
             slots,
             reverse_handler: Arc::new(RwLock::new(None)),
             active_pids: Arc::new(std::sync::RwLock::new(HashSet::new())),
+            process_log,
         }
     }
 
@@ -776,11 +1089,26 @@ impl WorkerSupervisor {
             .get(&role)
             .ok_or_else(|| RpcCallError::Protocol(format!("Unknown role {:?}", role)))?;
 
+        let mut previous_exit_code: Option<i32> = None;
         let mut guard = slot.worker.lock().await;
         if let Some(existing) = guard.as_ref() {
             if existing.is_alive().await {
                 return Ok(Arc::clone(existing));
             }
+            previous_exit_code = existing.try_exit_code().await;
+            let health_reason = match existing.rpc().health() {
+                WorkerHealth::Healthy => "process_exited".to_string(),
+                WorkerHealth::Unhealthy(reason) => reason,
+            };
+            self.process_log.log_event(
+                "worker_unhealthy",
+                json!({
+                    "role": role.as_str(),
+                    "pid": existing.pid,
+                    "exit_code": previous_exit_code,
+                    "reason": health_reason,
+                }),
+            );
             existing.shutdown(self.config.shutdown_timeout).await;
             if let Ok(mut pids) = self.active_pids.write() {
                 pids.remove(&existing.pid);
@@ -789,6 +1117,15 @@ impl WorkerSupervisor {
             let failures = slot.restarts.fetch_add(1, Ordering::SeqCst) + 1;
             *slot.last_failure_at.lock().await = Some(Instant::now());
             if failures > self.config.max_restart_attempts {
+                self.process_log.log_event(
+                    "worker_restart_limit",
+                    json!({
+                        "role": role.as_str(),
+                        "failures": failures,
+                        "max_restart_attempts": self.config.max_restart_attempts,
+                        "previous_exit_code": previous_exit_code,
+                    }),
+                );
                 return Err(RpcCallError::TransportClosed(format!(
                     "worker `{}` exceeded max restart limit ({})",
                     role.as_str(),
@@ -799,14 +1136,26 @@ impl WorkerSupervisor {
 
         let failures = slot.restarts.load(Ordering::SeqCst);
         if failures > 0 {
+            let mut wait_ms: u64 = 0;
             if let Some(last_fail) = *slot.last_failure_at.lock().await {
                 let exponent = (failures - 1).min(4);
                 let backoff = self.config.base_backoff.saturating_mul(1u32 << exponent);
                 let elapsed = last_fail.elapsed();
                 if elapsed < backoff {
-                    tokio::time::sleep(backoff - elapsed).await;
+                    let remaining = backoff - elapsed;
+                    wait_ms = remaining.as_millis() as u64;
+                    tokio::time::sleep(remaining).await;
                 }
             }
+            self.process_log.log_event(
+                "worker_restart",
+                json!({
+                    "role": role.as_str(),
+                    "attempt": failures,
+                    "backoff_ms": wait_ms,
+                    "previous_exit_code": previous_exit_code,
+                }),
+            );
         }
 
         let worker =
@@ -1303,5 +1652,145 @@ mod tests {
         assert!(!ai_env.contains_key("GITHUB_TOKEN"));
         assert!(!ai_env.contains_key("AWS_SECRET_ACCESS_KEY"));
         assert!(!ai_env.contains_key("JARVIS_HTTP_TOKEN"));
+    }
+
+    #[test]
+    fn build_worker_environment_loads_allowlisted_workspace_dotenv_safely() {
+        let uniq = format!(
+            "jarvis_dotenv_test_{}_{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_nanos()
+        );
+        let workspace = std::env::temp_dir().join(uniq);
+        std::fs::create_dir_all(&workspace).expect("create temp workspace");
+        let dotenv_path = workspace.join(".env");
+        std::fs::write(
+            &dotenv_path,
+            concat!(
+                "\u{feff}# Runtime overrides\n",
+                "OLLAMA_MODEL=\"qwen3.5:9b\" # comment\n",
+                "GEMINI_API_KEY=\"gem-from-dotenv\"\n",
+                "GITHUB_TOKEN=\"should-stay-scrubbed\"\n",
+                "ORCHESTRATOR_MODE='local'\n",
+            ),
+        )
+        .expect("write temp .env");
+
+        let db = workspace.join("database.db");
+        let ai_env = build_worker_environment(WorkerPoolRole::Ai, &workspace, &db);
+        let echo_env = build_worker_environment(WorkerPoolRole::Echo, &workspace, &db);
+
+        if std::env::var_os("OLLAMA_MODEL").is_none() {
+            assert_eq!(ai_env.get("OLLAMA_MODEL").map(String::as_str), Some("qwen3.5:9b"));
+        }
+        if std::env::var_os("ORCHESTRATOR_MODE").is_none() {
+            assert_eq!(ai_env.get("ORCHESTRATOR_MODE").map(String::as_str), Some("local"));
+        }
+        if std::env::var_os("GEMINI_API_KEY").is_none() {
+            assert_eq!(
+                ai_env.get("GEMINI_API_KEY").map(String::as_str),
+                Some("gem-from-dotenv")
+            );
+        }
+        assert!(!ai_env.contains_key("GITHUB_TOKEN"));
+        assert!(!echo_env.contains_key("GEMINI_API_KEY"));
+        assert!(!echo_env.contains_key("OLLAMA_MODEL"));
+
+        let _ = std::fs::remove_dir_all(&workspace);
+    }
+
+    #[tokio::test]
+    async fn supervisor_writes_worker_and_restart_logs_without_secrets() {
+        let repo_root = test_workspace_root();
+        let uniq = format!(
+            "jarvis_supervisor_logs_test_{}_{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_nanos()
+        );
+        let temp_ws = std::env::temp_dir().join(uniq);
+        std::fs::create_dir_all(&temp_ws).expect("create temp workspace");
+        let py_bin = resolve_python_executable(&repo_root, None);
+
+        let mut cfg = WorkerSupervisorConfig::for_workspace(temp_ws.clone())
+            .with_resource_root(repo_root.clone());
+        cfg.python_executable = Some(py_bin);
+        cfg.base_backoff = Duration::from_millis(20);
+        let supervisor = WorkerSupervisor::new(cfg);
+
+        // Emit a fake secret onto stderr via echo call and verify log + redaction + restart + shutdown.
+        let res = supervisor
+            .call(
+                WorkerPoolRole::Echo,
+                "worker.echo",
+                json!({
+                    "message": "ok",
+                    "stderr_line": "GEMINI_API_KEY=AIzaSyTestSecretKey987654321"
+                }),
+                Duration::from_secs(5),
+            )
+            .await
+            .expect("echo call");
+        assert_eq!(res["status"], "ok");
+        tokio::time::sleep(Duration::from_millis(50)).await;
+
+        let worker_before = supervisor
+            .ensure_worker(WorkerPoolRole::Echo)
+            .await
+            .expect("active worker before simulated crash");
+        let crashed_pid = worker_before.pid;
+        {
+            let mut child = worker_before.child.lock().await;
+            let _ = child.kill().await;
+        }
+        tokio::time::sleep(Duration::from_millis(120)).await;
+
+        let health_after = supervisor
+            .call(
+                WorkerPoolRole::Echo,
+                "system.health",
+                json!({}),
+                Duration::from_secs(5),
+            )
+            .await
+            .expect("respawn echo worker after crash");
+        assert_eq!(health_after["status"], "healthy");
+        assert_ne!(health_after["pid"].as_u64().unwrap_or(0) as u32, crashed_pid);
+
+        supervisor.shutdown_all().await;
+
+        let logs_dir = temp_ws.join("logs");
+        let workers_log = std::fs::read_to_string(logs_dir.join("workers.log"))
+            .expect("workers.log must exist");
+        let role_log = std::fs::read_to_string(logs_dir.join("worker-echo.log"))
+            .expect("worker-echo.log must exist");
+
+        assert!(workers_log.contains("[worker_spawn]"));
+        assert!(workers_log.contains("[worker_ready]"));
+        assert!(workers_log.contains("[worker_unhealthy]"));
+        assert!(workers_log.contains("[worker_restart]"));
+        assert!(workers_log.contains("[worker_shutdown]"));
+        assert!(workers_log.contains("\"starter_pid\""));
+        assert!(workers_log.contains("\"target\""));
+        assert!(workers_log.contains("\"args\""));
+
+        assert!(role_log.contains("[worker_spawn]"));
+        assert!(role_log.contains("[worker_shutdown]"));
+        assert!(
+            role_log.contains("GEMINI_API_KEY=[REDACTED]"),
+            "redacted marker expected in role_log={role_log}"
+        );
+        assert!(
+            !workers_log.contains("AIzaSyTestSecretKey987654321")
+                && !role_log.contains("AIzaSyTestSecretKey987654321"),
+            "API key secret must never leak into worker logs"
+        );
+
+        let _ = std::fs::remove_dir_all(&temp_ws);
     }
 }

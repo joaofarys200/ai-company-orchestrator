@@ -158,6 +158,8 @@ class BrowserIntegrityValidator:
                 "elements_found": [],
             }
 
+        from backend.process_utils import hidden_subprocess_kwargs
+
         cmd = [
             edge_path,
             "--headless=new",
@@ -173,10 +175,12 @@ class BrowserIntegrityValidator:
                 None,
                 lambda: subprocess.run(
                     cmd,
-                    capture_output=True,
-                    encoding="utf-8",
-                    errors="ignore",
-                    timeout=timeout_sec,
+                    **hidden_subprocess_kwargs(
+                        capture_output=True,
+                        encoding="utf-8",
+                        errors="ignore",
+                        timeout=timeout_sec,
+                    ),
                 ),
             )
         except subprocess.TimeoutExpired:

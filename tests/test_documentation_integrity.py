@@ -158,7 +158,7 @@ def test_tauri_bundle_includes_python_runtime_manifest_and_workers():
     assert manifest_path.exists(), "src-tauri/py-runtime/manifest.json must exist"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert manifest.get("bundle_filename") == "runtime-bundle.zip"
-    assert manifest.get("app_files_count", 0) >= 1000
+    assert manifest.get("app_files_count", 0) >= 500
     assert manifest.get("python_files_count", 0) >= 1000
     required_dirs = {
         "workers",

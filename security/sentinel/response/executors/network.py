@@ -11,6 +11,7 @@ import subprocess
 import time
 from typing import Any, Dict, Optional, Tuple
 
+from backend.process_utils import hidden_subprocess_kwargs
 from security.sentinel.contracts import ResponseActionType, SecurityResponseAction
 from security.sentinel.response.executors.base import BaseActionExecutor
 
@@ -51,7 +52,10 @@ class FirewallBlockExecutor(BaseActionExecutor):
 
     def _rule_exists(self, rule_name: str) -> bool:
         cmd = ["netsh.exe", "advfirewall", "firewall", "show", "rule", f"name={rule_name}"]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=5, shell=False)
+        res = subprocess.run(
+            cmd,
+            **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5, shell=False),
+        )
         return res.returncode == 0 and "No rules match" not in res.stdout and "Nenhuma regra correspondente" not in res.stdout
 
     def capture_pre_state(self, action: SecurityResponseAction) -> Dict[str, Any]:
@@ -100,7 +104,10 @@ class FirewallBlockExecutor(BaseActionExecutor):
         if port is not None:
             cmd.extend(["protocol=TCP", f"remoteport={port}"])
 
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=5, shell=False)
+        res = subprocess.run(
+            cmd,
+            **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5, shell=False),
+        )
         if res.returncode != 0:
             raise RuntimeError(f"Falha ao criar regra de firewall: {res.stderr.strip() or res.stdout.strip()}")
 
@@ -140,7 +147,10 @@ class FirewallBlockExecutor(BaseActionExecutor):
             }
 
         cmd = ["netsh.exe", "advfirewall", "firewall", "delete", "rule", f"name={rule_name}"]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=5, shell=False)
+        res = subprocess.run(
+            cmd,
+            **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5, shell=False),
+        )
 
         if res.returncode != 0:
             return False, {

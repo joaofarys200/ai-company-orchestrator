@@ -29,6 +29,12 @@ from workers.common.db_guard import install_canonical_db_write_guard  # noqa: E4
 
 install_canonical_db_write_guard()
 
+# Ensure all child processes and bundled third-party tools run without flashing
+# console windows on Windows while logging lifecycle safely to %LOCALAPPDATA%\JarvisOS\logs\.
+from backend.process_utils import install_windows_no_window_subprocess_guard  # noqa: E402
+
+install_windows_no_window_subprocess_guard()
+
 import argparse  # noqa: E402
 import asyncio  # noqa: E402
 import importlib  # noqa: E402
@@ -46,6 +52,9 @@ _ROLE_WORKER_MODULES = {
 async def _handle_echo(ctx: WorkerContext, params: dict) -> dict:
     # Deliberately emit a print() to verify stdout hijacking routes it to stderr safely.
     print(f"[worker-echo-noise] handling request={ctx.request_id}")
+    if params.get("stderr_line"):
+        sys.stderr.write(f"{params['stderr_line']}\n")
+        sys.stderr.flush()
     if params.get("stream"):
         batcher = ctx.create_chunk_batcher(max_chunks=2, max_delay_ms=10)
         for token in params.get("tokens", ["hello ", "tauri ", "worker"]):
@@ -114,6 +123,7 @@ def main(argv: list[str] | None = None) -> int:
         help="Worker pool role identifier",
     )
     args = parser.parse_args(argv)
+    os.environ["JARVIS_WORKER_ROLE"] = args.worker
 
     writer = ProtocolFrameWriter(_PROTOCOL_STDOUT)
     server = build_worker_server(args.worker, writer)

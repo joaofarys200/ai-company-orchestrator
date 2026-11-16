@@ -16,6 +16,7 @@ import subprocess
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
+from backend.process_utils import hidden_subprocess_kwargs
 from .models import PreflightStatus
 
 
@@ -33,10 +34,12 @@ class PreflightChecker:
         try:
             res = subprocess.run(
                 ["git", "status", "--porcelain"],
-                cwd=self.workspace_root,
-                capture_output=True,
-                text=True,
-                timeout=10,
+                **hidden_subprocess_kwargs(
+                    cwd=self.workspace_root,
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                ),
             )
             if res.returncode != 0:
                 # Not a git repo or git error

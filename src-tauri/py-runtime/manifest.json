@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "bundle_filename": "runtime-bundle.zip",
-  "bundle_sha256": "72547b1201c3cb505d83215926ffbbd4ddff6851d39ea675375a0ea59fb00bb7",
-  "bundle_size_bytes": 107686181,
+  "bundle_sha256": "506b4bdf991913ea1a335e5fc0c38aa1e8c2e98139a05e9f7143e32703634105",
+  "bundle_size_bytes": 110147311,
   "python_version": "3.14.7",
   "python_rel_path": "python/python.exe",
   "app_rel_path": "app",
@@ -26,7 +26,7 @@
     "websocket_schema.py",
     "workspace_policy.py"
   ],
-  "app_files_count": 1125,
-  "python_files_count": 2736,
-  "site_packages_count": 67
+  "app_files_count": 800,
+  "python_files_count": 2751,
+  "site_packages_count": 94
 }

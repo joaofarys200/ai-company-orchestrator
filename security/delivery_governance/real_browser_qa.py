@@ -14,6 +14,8 @@ import subprocess
 import sys
 from typing import Any, Dict, List, Optional
 
+from backend.process_utils import hidden_subprocess_kwargs
+
 logger = logging.getLogger("Jarvis.RealBrowserQA")
 
 
@@ -74,9 +76,11 @@ class RealBrowserQAValidator:
         try:
             res = subprocess.run(
                 cmd,
-                capture_output=True,
-                text=True,
-                timeout=timeout_seconds,
+                **hidden_subprocess_kwargs(
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout_seconds,
+                ),
             )
             raw_stdout = res.stdout.strip()
             # Encontrar JSON no stdout

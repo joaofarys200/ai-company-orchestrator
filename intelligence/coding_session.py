@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any, Awaitable, Callable
 
 import sandbox
+from backend.process_utils import hidden_subprocess_kwargs
 from backend.model_harness import (
     ExecutionConstraints,
     ExpectedOutput,
@@ -29,7 +30,11 @@ from backend.model_harness import (
     OutputFormat,
     get_runtime_model_harness,
 )
-from intelligence.project_context import ProjectContextError, ProjectContextService
+from intelligence.project_context import (
+    ProjectContextError,
+    ProjectContextService,
+    TEXT_FILE_SUFFIXES,
+)
 from security.delivery_governance import (
     AcceptanceLevel,
     AssetIntegrityValidator,
@@ -51,7 +56,7 @@ from security.safety_classifier import SafetyClassifier, SafetyRefusalError, Saf
 from workspace_policy import validate_local_command
 
 
-EDITABLE_SUFFIXES = {".css", ".html", ".htm", ".js", ".jsx", ".json", ".mjs", ".cjs", ".py", ".ts", ".tsx"}
+EDITABLE_SUFFIXES = set(TEXT_FILE_SUFFIXES)
 MAX_CHANGE_BYTES = 500_000
 PlanRequester = Callable[[dict[str, Any], str | None], Awaitable[str | dict[str, Any]] | str | dict[str, Any]]
 
@@ -74,9 +79,7 @@ def resolve_project_git_context(project_root: str) -> dict[str, Any]:
     try:
         result = subprocess.run(
             ["git", "-C", canonical_root, "rev-parse", "--show-toplevel"],
-            capture_output=True,
-            text=True,
-            timeout=5,
+            **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5),
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         context["reason"] = f"git_probe_failed:{type(exc).__name__}"
@@ -833,9 +836,11 @@ class CodingSessionService:
                         original_bytes = handle.read()
                     result = subprocess.run(
                         ["git", "-C", root, "hash-object", "-w", "--stdin"],
-                        input=original_bytes,
-                        capture_output=True,
-                        timeout=10,
+                        **hidden_subprocess_kwargs(
+                            input=original_bytes,
+                            capture_output=True,
+                            timeout=10,
+                        ),
                     )
                     if result.returncode != 0:
                         raise CodingSessionError(f"Falha ao criar blob Git para {relative_path}.")
@@ -1283,7 +1288,15 @@ class CodingSessionService:
                 args = ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", command]
             else:
                 args = ["sh", "-c", command]
-            result = subprocess.run(args, cwd=root, text=True, capture_output=True, timeout=180)
+            result = subprocess.run(
+                args,
+                **hidden_subprocess_kwargs(
+                    cwd=root,
+                    text=True,
+                    capture_output=True,
+                    timeout=180,
+                ),
+            )
             return result.returncode, result.stdout or "", result.stderr or ""
         except subprocess.TimeoutExpired as exc:
             stdout_str = exc.stdout.decode("utf-8", errors="replace") if isinstance(exc.stdout, bytes) else str(exc.stdout or "")
@@ -1304,8 +1317,7 @@ class CodingSessionService:
                 blob_oid = record.get("git_blob_oid") or record.get("blob")
                 result = subprocess.run(
                     ["git", "-C", root, "cat-file", "blob", blob_oid],
-                    capture_output=True,
-                    timeout=10,
+                    **hidden_subprocess_kwargs(capture_output=True, timeout=10),
                 )
                 if result.returncode != 0:
                     raise CodingSessionError(f"Nao foi possivel restaurar {relative_path} pelo Git.")
@@ -1701,13 +1713,13 @@ class ModelHarnessPlanRequester:
             "validation_result": response.validation.status.value,
             "step": step,
         })
-        if response.status == ModelResponseStatus.PROVIDER_FAILED:
+        if response.status != ModelResponseStatus.SUCCEEDED:
             if response.provider_exception is not None:
                 raise response.provider_exception
-            raise CodingSessionError(
-                "O ModelHarness nao conseguiu obter resposta do provider."
-            )
-        if response.status != ModelResponseStatus.SUCCEEDED:
+            if response.status == ModelResponseStatus.PROVIDER_FAILED:
+                raise CodingSessionError(
+                    "O ModelHarness nao conseguiu obter resposta do provider."
+                )
             issue_codes = [
                 issue.code for issue in response.validation.issues
             ]

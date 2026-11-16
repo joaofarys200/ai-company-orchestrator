@@ -17,6 +17,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from backend.process_utils import hidden_subprocess_kwargs
 from security.permission_gateway.gateway import (
     CrossProjectApprovalError,
     PermissionBlockedByPolicyError,
@@ -265,9 +266,11 @@ class ProjectDependencyManager:
                 try:
                     res = subprocess.run(
                         [env_info.python_executable, "-c", f"import {norm_pkg}"],
-                        capture_output=True,
-                        text=True,
-                        timeout=5,
+                        **hidden_subprocess_kwargs(
+                            capture_output=True,
+                            text=True,
+                            timeout=5,
+                        ),
                     )
                     if res.returncode == 0:
                         return True
@@ -477,10 +480,12 @@ class ProjectDependencyManager:
             try:
                 proc = subprocess.run(
                     cmd,
-                    cwd=env.project_root,
-                    capture_output=True,
-                    text=True,
-                    timeout=120,
+                    **hidden_subprocess_kwargs(
+                        cwd=env.project_root,
+                        capture_output=True,
+                        text=True,
+                        timeout=120,
+                    ),
                 )
                 exit_code = proc.returncode
                 stdout_txt = proc.stdout

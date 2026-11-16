@@ -16,6 +16,7 @@ import sys
 import time
 from typing import Any, Dict, Optional, Tuple
 
+from backend.process_utils import hidden_subprocess_kwargs
 from security.delivery_governance.runtime_identity import RuntimeIdentity, RuntimeTracker
 
 logger = logging.getLogger("Jarvis.PreviewLifecycle")
@@ -169,9 +170,11 @@ class PreviewLifecycleManager:
             if sys.platform == "win32":
                 subprocess.run(
                     ["taskkill", "/PID", str(pid), "/T", "/F"],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    timeout=timeout,
+                    **hidden_subprocess_kwargs(
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        timeout=timeout,
+                    ),
                 )
             else:
                 import signal
@@ -223,20 +226,24 @@ class PreviewLifecycleManager:
             if sys.platform == "win32":
                 return subprocess.Popen(
                     command,
-                    cwd=cwd,
-                    shell=True,
-                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
+                    **hidden_subprocess_kwargs(
+                        new_process_group=True,
+                        cwd=cwd,
+                        shell=True,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                    ),
                 )
             else:
                 return subprocess.Popen(
                     command,
-                    cwd=cwd,
-                    shell=True,
-                    preexec_fn=os.setsid,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
+                    **hidden_subprocess_kwargs(
+                        cwd=cwd,
+                        shell=True,
+                        preexec_fn=os.setsid,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                    ),
                 )
         except Exception as e:
             logger.error(f"[Lifecycle] Falha ao arrancar servidor '{command}': {e}")

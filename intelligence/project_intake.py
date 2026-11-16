@@ -23,6 +23,8 @@ import re
 import shutil
 import subprocess
 import sys
+
+from backend.process_utils import hidden_subprocess_kwargs
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
@@ -858,10 +860,12 @@ class ProjectIntakeService:
             try:
                 res = subprocess.run(
                     ["git", "rev-parse", "HEAD"],
-                    cwd=str(root),
-                    capture_output=True,
-                    text=True,
-                    timeout=3,
+                    **hidden_subprocess_kwargs(
+                        cwd=str(root),
+                        capture_output=True,
+                        text=True,
+                        timeout=3,
+                    ),
                 )
                 if res.returncode == 0:
                     source_commit = res.stdout.strip()

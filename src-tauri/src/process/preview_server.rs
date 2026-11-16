@@ -17,6 +17,7 @@ use tokio::process::{Child, Command};
 use tokio::sync::{oneshot, Mutex as AsyncMutex};
 
 use crate::error::AppError;
+use crate::logging::{redact_args, resolve_logs_dir, RotatingFileLogger};
 use crate::permissions::path_jail::ensure_confined_existing_file;
 use crate::process::command_guard::{build_sanitized_env, validate_command_argv};
 use crate::process::job_object::{JobObject, WORKER_CREATION_FLAGS};
@@ -445,15 +446,41 @@ impl PreviewServerHandle {
         #[cfg(windows)]
         cmd.creation_flags(WORKER_CREATION_FLAGS);
 
-        let mut child = cmd.spawn().map_err(|err| {
-            AppError::new(
-                "PREVIEW_SPAWN_FAILED",
-                format!(
-                    "Failed to start preview process `{}`: {err}",
-                    validated.program
-                ),
-            )
-        })?;
+        let preview_log =
+            RotatingFileLogger::for_stream(&resolve_logs_dir(workspace_root), "preview.log");
+        let safe_args = redact_args(&validated.args);
+
+        let mut child = match cmd.spawn() {
+            Ok(child) => child,
+            Err(err) => {
+                preview_log.log_event(
+                    "preview_spawn_failed",
+                    json!({
+                        "project_id": project_id,
+                        "target": validated.program,
+                        "args": safe_args,
+                        "error": err.to_string(),
+                    }),
+                );
+                return Err(AppError::new(
+                    "PREVIEW_SPAWN_FAILED",
+                    format!(
+                        "Failed to start preview process `{}`: {err}",
+                        validated.program
+                    ),
+                ));
+            }
+        };
+        let child_pid = child.id();
+        preview_log.log_event(
+            "preview_spawn",
+            json!({
+                "project_id": project_id,
+                "target": validated.program,
+                "args": safe_args,
+                "pid": child_pid,
+            }),
+        );
 
         let job = if let Some(pid) = child.id() {
             match JobObject::new(Some(1024 * 1024 * 1024)) {
@@ -473,9 +500,11 @@ impl PreviewServerHandle {
         if let Some(stdout) = child.stdout.take() {
             let pid_str = project_id.to_string();
             let sink_out = sink.clone();
+            let log_out = preview_log.clone();
             tokio::spawn(async move {
                 let mut reader = BufReader::new(stdout).lines();
                 while let Ok(Some(line)) = reader.next_line().await {
+                    log_out.log_stream_line("stdout", child_pid, &line);
                     if let Some(cb) = &sink_out {
                         cb(json!({
                             "type": "project_output",
@@ -489,9 +518,11 @@ impl PreviewServerHandle {
         if let Some(stderr) = child.stderr.take() {
             let pid_str = project_id.to_string();
             let sink_err = sink;
+            let log_err = preview_log;
             tokio::spawn(async move {
                 let mut reader = BufReader::new(stderr).lines();
                 while let Ok(Some(line)) = reader.next_line().await {
+                    log_err.log_stream_line("stderr", child_pid, &line);
                     if let Some(cb) = &sink_err {
                         cb(json!({
                             "type": "project_output",

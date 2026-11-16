@@ -14,6 +14,7 @@ import sys
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
+from backend.process_utils import hidden_subprocess_kwargs
 from .models import TestValidationResult
 
 
@@ -71,10 +72,12 @@ class TestValidator:
             try:
                 res = subprocess.run(
                     cmd,
-                    cwd=self.workspace_root,
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout_sec,
+                    **hidden_subprocess_kwargs(
+                        cwd=self.workspace_root,
+                        capture_output=True,
+                        text=True,
+                        timeout=timeout_sec,
+                    ),
                 )
                 output = res.stdout + res.stderr
                 passed_in_file = 0

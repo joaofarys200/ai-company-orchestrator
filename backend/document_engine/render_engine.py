@@ -13,6 +13,7 @@ from typing import Any, List, Optional, Sequence, Tuple
 import pymupdf  # PyMuPDF
 
 from backend.document_engine.word_ast import extract_ast_from_docx
+from backend.process_utils import hidden_subprocess_kwargs
 
 
 class RenderEngineType(str, Enum):
@@ -95,9 +96,7 @@ class RenderEngineManager:
 
             res = subprocess.run(
                 ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", tf_path],
-                capture_output=True,
-                text=True,
-                timeout=15,
+                **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=15),
             )
             try:
                 os.remove(tf_path)
@@ -277,9 +276,7 @@ try {{
         try:
             res = subprocess.run(
                 ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script_path],
-                capture_output=True,
-                text=True,
-                timeout=45,
+                **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=45),
             )
         finally:
             try:
@@ -300,9 +297,7 @@ try {{
             return 1, ""
         res = subprocess.run(
             [soffice, "--headless", "--convert-to", "pdf", str(docx_path), "--outdir", str(out_dir)],
-            capture_output=True,
-            text=True,
-            timeout=40,
+            **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=40),
         )
         pdf_path = out_dir / f"{docx_path.stem}.pdf"
         if res.returncode == 0 and pdf_path.exists() and pdf_path.stat().st_size > 0:

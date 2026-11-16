@@ -28,6 +28,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
+from backend.process_utils import hidden_subprocess_kwargs
+
 from PIL import Image, ImageStat
 
 from services.lecture_synthesizer import LocalTranscriber, VaultLinker
@@ -151,7 +153,10 @@ def ensure_browser_playable_video(
                 "-b:a", "128k",
                 tmp_name,
             ]
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+            res = subprocess.run(
+                cmd,
+                **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=300),
+            )
             if res.returncode == 0 and os.path.isfile(tmp_name) and os.path.getsize(tmp_name) > 0:
                 os.replace(tmp_name, target_mp4)
                 return str(target_mp4), "video/mp4"
@@ -232,7 +237,10 @@ def check_video_capabilities() -> Dict[str, Any]:
     version_str = "Unavailable"
     if ffmpeg_ok:
         try:
-            res = subprocess.run([ffmpeg_path, "-version"], capture_output=True, text=True, timeout=5)
+            res = subprocess.run(
+                [ffmpeg_path, "-version"],
+                **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=5),
+            )
             if res.returncode == 0:
                 version_str = res.stdout.splitlines()[0]
             else:
@@ -691,7 +699,15 @@ class VideoIntelligenceService:
         # Executar probe via ffmpeg -i
         cmd = [ffmpeg_bin, "-hide_banner", "-i", video_path]
         try:
-            res = subprocess.run(cmd, capture_output=True, text=True, errors="replace", timeout=15)
+            res = subprocess.run(
+                cmd,
+                **hidden_subprocess_kwargs(
+                    capture_output=True,
+                    text=True,
+                    errors="replace",
+                    timeout=15,
+                ),
+            )
             stderr = res.stderr or ""
         except Exception as e:
             raise RuntimeError(f"Falha ao executar probe do vídeo: {e}")
@@ -774,7 +790,10 @@ class VideoIntelligenceService:
         ]
 
         try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            res = subprocess.run(
+                cmd,
+                **hidden_subprocess_kwargs(capture_output=True, text=True, timeout=120),
+            )
             if res.returncode != 0 or not os.path.exists(output_wav_path) or os.path.getsize(output_wav_path) == 0:
                 # Caso o vídeo não possua stream de áudio
                 if "does not contain any stream" in (res.stderr or "") or "Output file is empty" in (res.stderr or ""):
@@ -923,7 +942,10 @@ class VideoIntelligenceService:
                 str(frame_path),
             ]
             try:
-                subprocess.run(cmd, capture_output=True, timeout=15)
+                subprocess.run(
+                    cmd,
+                    **hidden_subprocess_kwargs(capture_output=True, timeout=15),
+                )
             except Exception:
                 continue
 

@@ -70,46 +70,75 @@ EXCLUDED_DLL_PREFIXES: tuple[str, ...] = (
 )
 
 ALLOWED_SITE_PACKAGE_PREFIXES: tuple[str, ...] = (
+    # HTTP / TLS / Async transport
     "anyio",
-    "attr",
-    "attrs",
     "certifi",
-    "cffi",
-    "_cffi_backend",
     "charset_normalizer",
-    "colorama",
-    "cryptography",
-    "docx",
-    "python_docx",
-    "dotenv",
-    "python_dotenv",
-    "fitz",
-    "pymupdf",
     "h11",
     "httpcore",
     "httpx",
     "idna",
+    "requests",
+    "sniffio",
+    "urllib3",
+    "websockets",
+    # Schema / Config / Data
+    "attr",
+    "attrs",
+    "defusedxml",
+    "dotenv",
+    "python_dotenv",
     "jsonschema",
     "jsonschema_specifications",
+    "psutil",
+    "referencing",
+    "rpds",
+    "typing_extensions",
+    "yaml",
+    "_yaml",
+    "pyyaml",
+    # Document / PDF / Study / Web extraction
+    "bs4",
+    "beautifulsoup4",
+    "docx",
+    "python_docx",
+    "fitz",
+    "pymupdf",
     "lxml",
-    "networkx",
-    "packaging",
+    "markdownify",
     "pdfminer",
     "pdfplumber",
     "pil",
     "pillow",
-    "psutil",
+    "pypdfium2",
+    "pypdfium2_cfg",
+    "pypdfium2_cli",
+    "pypdfium2_raw",
+    "six",
+    "soupsieve",
+    "youtube_transcript_api",
+    # Security / Crypto / TLS / Audio CFFI
+    "cffi",
+    "_cffi_backend",
+    "cryptography",
+    "imageio_ffmpeg",
+    "numpy",
+    "numpy.libs",
     "pycparser",
-    "pygments",
-    "referencing",
-    "rpds",
-    "sniffio",
-    "tabulate",
-    "typing_extensions",
-    "websockets",
-    "yaml",
-    "_yaml",
-    "pyyaml",
+    "sounddevice",
+    "_sounddevice",
+    "_sounddevice_data",
+    # Coding Agent 2.0 AST parsing
+    "tree_sitter",
+    "tree_sitter_javascript",
+    "tree_sitter_python",
+)
+
+MSVC_REDIST_DLLS: tuple[str, ...] = (
+    "msvcp140.dll",
+    "msvcp140_1.dll",
+    "vcruntime140.dll",
+    "vcruntime140_1.dll",
 )
 
 
@@ -193,6 +222,7 @@ def build_runtime_bundle() -> dict[str, object]:
                 app_files_count += 1
 
         # 2. Bundle portable CPython interpreter & base DLLs under `python/`
+        seen_python_arcs: set[str] = set()
         for root_file in base_prefix.iterdir():
             if not root_file.is_file():
                 continue
@@ -203,8 +233,23 @@ def build_runtime_bundle() -> dict[str, object]:
                 or (lower.startswith("vcruntime") and lower.endswith(".dll"))
                 or (lower.startswith("msvcp") and lower.endswith(".dll"))
             ):
-                zf.write(root_file, f"python/{root_file.name}")
+                arc = f"python/{root_file.name}"
+                seen_python_arcs.add(lower)
+                zf.write(root_file, arc)
                 python_files_count += 1
+
+        # Bundle MSVC C++ runtime DLLs required by native wheels (e.g., PyMuPDF)
+        # even when clean Windows machines lack VC++ Redistributable.
+        if os.name == "nt":
+            sys32_dir = Path(os.environ.get("SystemRoot", r"C:\Windows")) / "System32"
+            for dll_name in MSVC_REDIST_DLLS:
+                if dll_name.lower() in seen_python_arcs:
+                    continue
+                dll_src = sys32_dir / dll_name
+                if dll_src.is_file():
+                    seen_python_arcs.add(dll_name.lower())
+                    zf.write(dll_src, f"python/{dll_name}")
+                    python_files_count += 1
 
         dlls_dir = base_prefix / "DLLs"
         if dlls_dir.is_dir():

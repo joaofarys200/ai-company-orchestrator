@@ -275,11 +275,42 @@ class DomainWorkerRuntime:
 
         def _get_voice_service() -> Any:
             if getattr(self, "_voice_runtime", None) is None:
+                mode = os.getenv("VOICE_MODE", "none").strip().lower()
+                if mode == "none":
+                    return None
                 try:
-                    import voice
+                    if mode == "gemini_live":
+                        from gemini_live import GeminiLiveService
 
-                    self._voice_runtime = voice.VoiceService()
-                except Exception:
+                        self._voice_runtime = GeminiLiveService(
+                            api_key=os.getenv("GEMINI_API_KEY", ""),
+                            voice_name=os.getenv("GEMINI_LIVE_VOICE", "Puck"),
+                            on_state_change=lambda st: _run_in_main_loop(
+                                self.connections.broadcast({"type": "voice_status", "status": st})
+                            ),
+                            on_message=lambda txt: _run_in_main_loop(
+                                self.connections.broadcast(
+                                    {"type": "chat", "sender": "JARVIS", "role": "Orquestrador", "content": txt}
+                                )
+                            ),
+                        )
+                    else:
+                        from voice_service import VoiceService
+
+                        self._voice_runtime = VoiceService(
+                            on_speech_start=lambda: _run_in_main_loop(
+                                self.connections.broadcast({"type": "voice_status", "status": "listening"})
+                            ),
+                            on_speech_end=lambda: _run_in_main_loop(
+                                self.connections.broadcast({"type": "voice_status", "status": "idle"})
+                            ),
+                            on_transcribing=lambda: _run_in_main_loop(
+                                self.connections.broadcast({"type": "voice_status", "status": "transcribing"})
+                            ),
+                            model_name=os.getenv("VOICE_MODEL", "tiny"),
+                        )
+                except Exception as exc:
+                    self.logger.warning("voice_service_init_failed mode=%s err=%s", mode, exc)
                     self._voice_runtime = None
             return self._voice_runtime
 
@@ -815,8 +846,13 @@ class DomainWorkerRuntime:
         _params: dict[str, Any],
     ) -> dict[str, Any]:
         ctx.raise_if_cancelled()
+        voice_rt = getattr(self, "_voice_runtime", None)
+        active = bool(
+            getattr(voice_rt, "is_listening", getattr(voice_rt, "is_running", False))
+        )
         return {
             "status": "ok",
             "worker_type": "voice",
-            "active": getattr(getattr(self, "_voice_runtime", None), "is_running", False),
+            "mode": os.getenv("VOICE_MODE", "none").strip().lower(),
+            "active": active,
         }
